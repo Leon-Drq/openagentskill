@@ -22,17 +22,17 @@ export default function Page() {
               <span className="font-display text-xl font-semibold">Open Agent Skill</span>
             </div>
             <nav className="flex gap-1">
-              <a href="#about" className="px-4 py-1.5 text-sm hover:opacity-60 transition-opacity">
-                {'About'}
+              <a href="/" className="px-4 py-1.5 text-sm hover:opacity-60 transition-opacity">
+                {'Home'}
               </a>
-              <a href="#marketplace" className="px-4 py-1.5 text-sm hover:opacity-60 transition-opacity">
-                {'Marketplace'}
+              <a href="/skills" className="px-4 py-1.5 text-sm hover:opacity-60 transition-opacity">
+                {'Browse Skills'}
               </a>
-              <a href="#contribute" className="px-4 py-1.5 text-sm hover:opacity-60 transition-opacity">
-                {'Contribute'}
-              </a>
-              <a href="#docs" className="px-4 py-1.5 text-sm hover:opacity-60 transition-opacity">
+              <a href="/docs" className="px-4 py-1.5 text-sm hover:opacity-60 transition-opacity">
                 {'Documentation'}
+              </a>
+              <a href="/api" className="px-4 py-1.5 text-sm hover:opacity-60 transition-opacity">
+                {'API'}
               </a>
             </nav>
           </div>
@@ -191,16 +191,16 @@ export default function Page() {
 
             <div className="mt-12 pt-8 border-t border-border">
               <div className="flex gap-6 text-sm">
-                <a href="#" className="underline hover:opacity-60 transition-opacity">
+                <a href="/skills" className="underline hover:opacity-60 transition-opacity">
                   {'Explore the Marketplace'}
                 </a>
-                <a href="#" className="underline hover:opacity-60 transition-opacity">
+                <a href="/docs" className="underline hover:opacity-60 transition-opacity">
                   {'Read the Documentation'}
                 </a>
-                <a href="#" className="underline hover:opacity-60 transition-opacity">
+                <a href="https://discord.gg/openagentskill" className="underline hover:opacity-60 transition-opacity">
                   {'Join the Community'}
                 </a>
-                <a href="#" className="underline hover:opacity-60 transition-opacity">
+                <a href="https://github.com/openagentskill" className="underline hover:opacity-60 transition-opacity">
                   {'View on GitHub'}
                 </a>
               </div>
@@ -215,37 +215,37 @@ export default function Page() {
               <div>
                 <h3 className="font-semibold mb-4">{'Platform'}</h3>
                 <ul className="space-y-2 text-secondary">
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'Marketplace'}</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'Skill Composer'}</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'Benchmarks'}</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'Standards'}</a></li>
+                  <li><a href="/skills" className="hover:text-foreground transition-colors">{'Marketplace'}</a></li>
+                  <li><a href="/composer" className="hover:text-foreground transition-colors">{'Skill Composer'}</a></li>
+                  <li><a href="/benchmarks" className="hover:text-foreground transition-colors">{'Benchmarks'}</a></li>
+                  <li><a href="/standards" className="hover:text-foreground transition-colors">{'Standards'}</a></li>
                 </ul>
               </div>
               <div>
                 <h3 className="font-semibold mb-4">{'Developers'}</h3>
                 <ul className="space-y-2 text-secondary">
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'Documentation'}</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'API Reference'}</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'Examples'}</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'GitHub'}</a></li>
+                  <li><a href="/docs" className="hover:text-foreground transition-colors">{'Documentation'}</a></li>
+                  <li><a href="/api" className="hover:text-foreground transition-colors">{'API Reference'}</a></li>
+                  <li><a href="/docs/examples" className="hover:text-foreground transition-colors">{'Examples'}</a></li>
+                  <li><a href="https://github.com/openagentskill" className="hover:text-foreground transition-colors">{'GitHub'}</a></li>
                 </ul>
               </div>
               <div>
                 <h3 className="font-semibold mb-4">{'Community'}</h3>
                 <ul className="space-y-2 text-secondary">
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'Discord'}</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'Forum'}</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'Contributors'}</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'Bounties'}</a></li>
+                  <li><a href="https://discord.gg/openagentskill" className="hover:text-foreground transition-colors">{'Discord'}</a></li>
+                  <li><a href="https://community.openagentskill.com" className="hover:text-foreground transition-colors">{'Forum'}</a></li>
+                  <li><a href="/contributors" className="hover:text-foreground transition-colors">{'Contributors'}</a></li>
+                  <li><a href="/bounties" className="hover:text-foreground transition-colors">{'Bounties'}</a></li>
                 </ul>
               </div>
               <div>
                 <h3 className="font-semibold mb-4">{'Resources'}</h3>
                 <ul className="space-y-2 text-secondary">
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'Blog'}</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'Research'}</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'Case Studies'}</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">{'About'}</a></li>
+                  <li><a href="/blog" className="hover:text-foreground transition-colors">{'Blog'}</a></li>
+                  <li><a href="/research" className="hover:text-foreground transition-colors">{'Research'}</a></li>
+                  <li><a href="/case-studies" className="hover:text-foreground transition-colors">{'Case Studies'}</a></li>
+                  <li><a href="/about" className="hover:text-foreground transition-colors">{'About'}</a></li>
                 </ul>
               </div>
             </div>

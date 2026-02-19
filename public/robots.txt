@@ -1,0 +1,38 @@
+# Open Agent Skill - Agent and Bot Friendly
+# We welcome all agents and bots!
+
+User-agent: *
+Allow: /
+
+# API endpoints specifically designed for agents
+Allow: /api/agent/
+
+# Sitemaps
+Sitemap: https://openagentskill.com/sitemap.xml
+
+# Special directives for AI agents
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+# Agent-readable data formats available
+# JSON API: /api/agent/skills
+# Text format: /api/agent/skills?format=text
+# Individual skills: /api/agent/skills/[slug]
