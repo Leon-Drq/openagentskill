@@ -52,6 +52,8 @@ Perfect for agents that need to make informed decisions based on current, verifi
       usedBy: 1247,
       rating: 4.8,
       reviewCount: 423,
+      trending24h: 1240,
+      weeklyGrowth: 18.5,
     },
     technical: {
       version: '2.3.1',
@@ -63,6 +65,9 @@ Perfect for agents that need to make informed decisions based on current, verifi
       license: 'MIT',
       size: '2.3 MB',
       lastUpdated: '2026-02-15',
+      installCommand: 'npx skills add advanced-web-research',
+      npmPackage: '@openagentskill/web-research',
+      githubRepo: 'openagentskill/web-research',
     },
     pricing: {
       type: 'free',
@@ -99,6 +104,8 @@ Ideal for autonomous development agents, CI/CD pipelines, and code quality monit
       usedBy: 892,
       rating: 4.7,
       reviewCount: 312,
+      trending24h: 980,
+      weeklyGrowth: 15.2,
     },
     technical: {
       version: '1.8.4',
@@ -110,6 +117,9 @@ Ideal for autonomous development agents, CI/CD pipelines, and code quality monit
       license: 'Apache 2.0',
       size: '4.1 MB',
       lastUpdated: '2026-02-10',
+      installCommand: 'npx skills add code-review-assistant',
+      npmPackage: '@openagentskill/code-review',
+      githubRepo: 'openagentskill/code-review',
     },
     pricing: {
       type: 'freemium',

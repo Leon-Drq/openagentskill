@@ -38,6 +38,8 @@ export interface SkillStats {
   usedBy: number
   rating: number
   reviewCount: number
+  trending24h?: number // Trending score in last 24h
+  weeklyGrowth?: number // Weekly growth percentage
 }
 
 export interface TechnicalDetails {
@@ -51,6 +53,9 @@ export interface TechnicalDetails {
   license: string
   size: string
   lastUpdated: string
+  installCommand?: string // Modern CLI install command
+  npmPackage?: string // NPM package name if applicable
+  githubRepo?: string // org/repo format
 }
 
 export interface PricingInfo {

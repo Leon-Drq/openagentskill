@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getSkillBySlug } from '@/lib/mock-data'
 import { AgentSkillManifest } from '@/lib/types'
+import { InstallCommand } from '@/components/install-command'
 
 export async function generateMetadata({
   params,
@@ -74,75 +75,75 @@ export default function SkillDetailPage({ params }: { params: { slug: string } }
 
       {/* Header */}
       <header className="border-b border-border bg-background">
-        <div className="container mx-auto px-6 py-6">
+        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex items-baseline justify-between">
-            <Link href="/" className="text-2xl font-display font-bold text-foreground">
+            <Link href="/" className="text-xl sm:text-2xl font-display font-bold text-foreground">
               {'Open Agent Skill'}
             </Link>
-            <nav className="flex gap-6 text-sm">
+            <nav className="flex gap-3 sm:gap-6 text-xs sm:text-sm">
               <Link href="/skills" className="text-secondary hover:text-foreground">
                 {'Browse'}
               </Link>
               <Link href="/docs" className="text-secondary hover:text-foreground">
-                {'Documentation'}
+                {'Docs'}
               </Link>
             </nav>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-12">
+      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-12">
         {/* Breadcrumb */}
-        <nav className="mb-8 text-sm text-secondary">
+        <nav className="mb-6 sm:mb-8 text-xs sm:text-sm text-secondary">
           <Link href="/skills" className="hover:text-foreground">
             {'Skills'}
           </Link>
           {' / '}
-          <span className="text-foreground">{skill.name}</span>
+          <span className="text-foreground break-words">{skill.name}</span>
         </nav>
 
         {/* Hero Section */}
-        <div className="mb-12">
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h1 className="font-display text-5xl font-bold text-foreground mb-4 leading-tight">
+        <div className="mb-8 sm:mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 gap-4">
+            <div className="flex-1 min-w-0">
+              <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-3 sm:mb-4 leading-tight break-words">
                 {skill.name}
               </h1>
-              <p className="text-xl italic text-secondary leading-relaxed">
+              <p className="text-base sm:text-lg lg:text-xl italic text-secondary leading-relaxed">
                 {skill.tagline}
               </p>
             </div>
             {skill.verified && (
-              <span className="border border-foreground px-4 py-2 text-sm font-mono shrink-0">
+              <span className="border border-foreground px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-mono shrink-0 w-fit">
                 {'✓ VERIFIED'}
               </span>
             )}
           </div>
 
           {/* Stats Bar */}
-          <div className="flex flex-wrap gap-6 border-y border-border py-6 text-sm">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3 sm:gap-6 border-y border-border py-4 sm:py-6 text-xs sm:text-sm">
             <div>
-              <span className="text-secondary">{'Downloads'}</span>
-              <span className="ml-2 font-mono font-semibold">
-                {skill.stats.downloads.toLocaleString()}
+              <span className="text-secondary block sm:inline">{'Downloads'}</span>
+              <span className="ml-0 sm:ml-2 font-mono font-semibold block sm:inline">
+                {(skill.stats.downloads / 1000).toFixed(1)}K
               </span>
             </div>
             <div>
-              <span className="text-secondary">{'Stars'}</span>
-              <span className="ml-2 font-mono font-semibold">
-                {'★ '}{skill.stats.stars.toLocaleString()}
+              <span className="text-secondary block sm:inline">{'Stars'}</span>
+              <span className="ml-0 sm:ml-2 font-mono font-semibold block sm:inline">
+                {'★ '}{(skill.stats.stars / 1000).toFixed(1)}K
               </span>
             </div>
             <div>
-              <span className="text-secondary">{'Rating'}</span>
-              <span className="ml-2 font-mono font-semibold">
-                {skill.stats.rating}/5 ({skill.stats.reviewCount} reviews)
+              <span className="text-secondary block sm:inline">{'Rating'}</span>
+              <span className="ml-0 sm:ml-2 font-mono font-semibold block sm:inline">
+                {skill.stats.rating}/5
               </span>
             </div>
             <div>
-              <span className="text-secondary">{'Used by'}</span>
-              <span className="ml-2 font-mono font-semibold">
-                {skill.stats.usedBy.toLocaleString()} agents
+              <span className="text-secondary block sm:inline">{'Used by'}</span>
+              <span className="ml-0 sm:ml-2 font-mono font-semibold block sm:inline">
+                {(skill.stats.usedBy / 1000).toFixed(1)}K agents
               </span>
             </div>
           </div>
@@ -151,10 +152,16 @@ export default function SkillDetailPage({ params }: { params: { slug: string } }
         <div className="grid gap-12 lg:grid-cols-3">
           {/* Main Content */}
           <div className="lg:col-span-2">
+            {/* Modern Install Command */}
+            <InstallCommand 
+              command={skill.technical.installCommand || `npx skills add ${skill.slug}`}
+              skillSlug={skill.slug}
+            />
+
             {/* Description */}
-            <section className="mb-12">
-              <h2 className="font-display text-3xl font-semibold mb-6">{'Overview'}</h2>
-              <div className="prose-custom space-y-4 text-lg leading-relaxed">
+            <section className="mb-8 sm:mb-12">
+              <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">{'Overview'}</h2>
+              <div className="prose-custom space-y-4 text-base sm:text-lg leading-relaxed">
                 {skill.longDescription.split('\n\n').map((paragraph, index) => (
                   <p key={index} className="text-foreground">
                     {paragraph}

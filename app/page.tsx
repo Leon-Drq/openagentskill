@@ -16,22 +16,22 @@ export default function Page() {
       <div className="relative">
         {/* Header/Navigation */}
         <header className="border-b border-border">
-          <div className="max-w-5xl mx-auto px-8 py-8 flex items-center justify-between">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 border-2 border-foreground" />
-              <span className="font-display text-xl font-semibold">Open Agent Skill</span>
+              <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-foreground" />
+              <span className="font-display text-base sm:text-lg lg:text-xl font-semibold">Open Agent Skill</span>
             </div>
             <nav className="flex gap-1">
-              <a href="/" className="px-4 py-1.5 text-sm hover:opacity-60 transition-opacity">
+              <a href="/" className="px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity">
                 {'Home'}
               </a>
-              <a href="/skills" className="px-4 py-1.5 text-sm hover:opacity-60 transition-opacity">
-                {'Browse Skills'}
+              <a href="/skills" className="px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity">
+                {'Skills'}
               </a>
-              <a href="/docs" className="px-4 py-1.5 text-sm hover:opacity-60 transition-opacity">
-                {'Documentation'}
+              <a href="/docs" className="hidden sm:inline-block px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity">
+                {'Docs'}
               </a>
-              <a href="/api" className="px-4 py-1.5 text-sm hover:opacity-60 transition-opacity">
+              <a href="/api" className="hidden md:inline-block px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity">
                 {'API'}
               </a>
             </nav>
@@ -39,49 +39,62 @@ export default function Page() {
         </header>
 
         {/* Hero Section */}
-        <section className="max-w-4xl mx-auto px-8 py-24 text-center">
-          <h1 className="font-display text-6xl md:text-7xl font-bold mb-6 text-balance leading-tight">
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 lg:py-24 text-center">
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-balance leading-tight">
             {'OPEN AGENT SKILL'}
           </h1>
-          <p className="font-display text-xl md:text-2xl text-secondary mb-16 italic text-balance">
+          <p className="font-display text-base sm:text-lg md:text-xl lg:text-2xl text-secondary mb-8 sm:mb-12 lg:mb-16 italic text-balance">
             {'As agents emerge to reshape how we interact with intelligence, a new marketplace is born.'}
           </p>
 
+          {/* Try it Now Section */}
+          <div className="mb-12 sm:mb-16 lg:mb-20">
+            <h2 className="text-sm sm:text-base font-semibold mb-4 tracking-wide">{'TRY IT NOW'}</h2>
+            <div className="max-w-2xl mx-auto border border-border bg-card p-4 sm:p-6">
+              <pre className="text-left font-mono text-xs sm:text-sm md:text-base overflow-x-auto">
+                <code>{'$ npx skills add <skill-name>'}</code>
+              </pre>
+            </div>
+            <p className="text-xs sm:text-sm text-secondary mt-4">
+              {'Install any skill with a single command. No configuration needed.'}
+            </p>
+          </div>
+
           {/* Tag Navigation */}
-          <div className="flex flex-wrap justify-center gap-3 mb-20 text-sm">
-            <span className="px-4 py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-12 sm:mb-16 lg:mb-20 text-xs sm:text-sm">
+            <span className="px-3 sm:px-4 py-1.5 sm:py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
               {'The Open Ecosystem'}
             </span>
-            <span className="px-4 py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
+            <span className="px-3 sm:px-4 py-1.5 sm:py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
               {'Skill Marketplace'}
             </span>
-            <span className="px-4 py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
+            <span className="px-3 sm:px-4 py-1.5 sm:py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
               {'Composable Architecture'}
             </span>
-            <span className="px-4 py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
+            <span className="px-3 sm:px-4 py-1.5 sm:py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
               {'Cross-Platform Standards'}
             </span>
-            <span className="px-4 py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
+            <span className="px-3 sm:px-4 py-1.5 sm:py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
               {'Developer Community'}
             </span>
-            <span className="px-4 py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
+            <span className="px-3 sm:px-4 py-1.5 sm:py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
               {'Agent Interoperability'}
             </span>
           </div>
         </section>
 
         {/* Main Article Content */}
-        <article className="max-w-3xl mx-auto px-8 pb-32">
-          <header className="mb-12">
-            <h2 className="font-display text-5xl font-bold mb-4">
+        <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24 lg:pb-32">
+          <header className="mb-8 sm:mb-10 lg:mb-12">
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
               {'The Future of Agent Skills'}
             </h2>
-            <p className="text-secondary text-sm">
+            <p className="text-secondary text-xs sm:text-sm">
               {'OpenAgentSkill Team, February 2026'}
             </p>
           </header>
 
-          <div className="space-y-8 text-lg leading-relaxed">
+          <div className="space-y-6 sm:space-y-8 text-base sm:text-lg leading-relaxed">
             <p className="text-pretty">
               {'Today\'s most powerful AI agents can think, reason, and execute complex workflows — but they can\'t easily share capabilities. Each agent exists in isolation, unable to leverage the collective intelligence of the broader ecosystem.'}
             </p>
