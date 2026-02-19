@@ -13,16 +13,19 @@ export const metadata: Metadata = {
   },
 }
 
-export default function SkillsPage({
+export default async function SkillsPage({
   searchParams,
 }: {
-  searchParams: { q?: string }
+  searchParams: Promise<{ q?: string }>
 }) {
+  // Await searchParams in Next.js 16
+  const params = await searchParams
+  
   // Filter skills based on search
   let filteredSkills = mockSkills
 
-  if (searchParams.q) {
-    const query = searchParams.q.toLowerCase()
+  if (params.q) {
+    const query = params.q.toLowerCase()
     filteredSkills = filteredSkills.filter(
       (skill) =>
         skill.name.toLowerCase().includes(query) ||
@@ -59,7 +62,7 @@ export default function SkillsPage({
             <input
               type="text"
               name="q"
-              defaultValue={searchParams.q}
+              defaultValue={params.q}
               placeholder="Search skills..."
               className="w-full border border-border bg-background px-4 py-3 text-base font-serif focus:border-foreground focus:outline-none"
             />
@@ -74,9 +77,9 @@ export default function SkillsPage({
           <p className="text-sm text-secondary mb-2">
             {sortedSkills.length} {sortedSkills.length === 1 ? 'skill' : 'skills'}
           </p>
-          {searchParams.q && (
+          {params.q && (
             <p className="text-xs text-secondary">
-              {'Showing results for "'}{searchParams.q}{'"'} · <Link href="/skills" className="underline">Clear</Link>
+              {'Showing results for "'}{params.q}{'"'} · <Link href="/skills" className="underline">Clear</Link>
             </p>
           )}
         </div>
