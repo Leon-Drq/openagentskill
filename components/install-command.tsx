@@ -5,9 +5,10 @@ import { useState } from 'react'
 interface InstallCommandProps {
   command: string
   skillSlug: string
+  compact?: boolean
 }
 
-export function InstallCommand({ command, skillSlug }: InstallCommandProps) {
+export function InstallCommand({ command, skillSlug, compact = false }: InstallCommandProps) {
   const [copied, setCopied] = useState(false)
 
   const fullCommand = command || `npx skills add ${skillSlug}`
@@ -20,6 +21,25 @@ export function InstallCommand({ command, skillSlug }: InstallCommandProps) {
     } catch (err) {
       console.error('[v0] Failed to copy:', err)
     }
+  }
+
+  if (compact) {
+    return (
+      <div className="border border-border bg-card inline-block max-w-full">
+        <div className="px-3 py-2 flex items-center gap-3">
+          <code className="font-mono text-xs sm:text-sm break-all text-foreground">
+            $ {fullCommand}
+          </code>
+          <button
+            onClick={copyToClipboard}
+            className="text-xs text-secondary hover:text-foreground transition-colors shrink-0"
+            aria-label="Copy command"
+          >
+            {copied ? '✓' : 'copy'}
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (

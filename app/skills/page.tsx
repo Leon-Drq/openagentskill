@@ -1,10 +1,7 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { mockSkills } from '@/lib/mock-data'
-import { SkillCard } from '@/components/skill-card'
-import { SearchBar } from '@/components/search-bar'
-import { SkillFilters } from '@/components/skill-filters'
-import { LeaderboardTabs } from '@/components/leaderboard-tabs'
+import { InstallCommand } from '@/components/install-command'
 
 export const metadata: Metadata = {
   title: 'Browse Agent Skills - Open Agent Skill',
@@ -19,9 +16,9 @@ export const metadata: Metadata = {
 export default function SkillsPage({
   searchParams,
 }: {
-  searchParams: { q?: string; category?: string; platform?: string; pricing?: string }
+  searchParams: { q?: string }
 }) {
-  // Filter skills based on search params
+  // Filter skills based on search
   let filteredSkills = mockSkills
 
   if (searchParams.q) {
@@ -30,119 +27,166 @@ export default function SkillsPage({
       (skill) =>
         skill.name.toLowerCase().includes(query) ||
         skill.description.toLowerCase().includes(query) ||
-        skill.tags.some((tag) => tag.toLowerCase().includes(query))
+        skill.tags.some((tag) => tag.toLowerCase().includes(query)) ||
+        skill.technical.githubRepo?.toLowerCase().includes(query)
     )
   }
 
-  if (searchParams.category && searchParams.category !== 'all') {
-    filteredSkills = filteredSkills.filter(
-      (skill) => skill.category === searchParams.category
-    )
-  }
-
-  if (searchParams.platform && searchParams.platform !== 'all') {
-    filteredSkills = filteredSkills.filter((skill) =>
-      skill.compatibility.some((c) => c.platform === searchParams.platform)
-    )
-  }
-
-  if (searchParams.pricing && searchParams.pricing !== 'all') {
-    filteredSkills = filteredSkills.filter(
-      (skill) => skill.pricing.type === searchParams.pricing
-    )
-  }
+  // Sort by downloads by default
+  const sortedSkills = [...filteredSkills].sort((a, b) => b.stats.downloads - a.stats.downloads)
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-background">
-        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8">
-          <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between mb-6 sm:mb-8 gap-4">
-            <Link href="/" className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-foreground">
+      {/* Minimal Header */}
+      <header className="border-b border-border">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="flex items-center justify-between mb-8">
+            <Link href="/" className="text-xl sm:text-2xl font-display font-bold hover:opacity-60 transition-opacity">
               {'Open Agent Skill'}
             </Link>
-            <nav className="flex gap-4 sm:gap-6 text-xs sm:text-sm">
-              <Link href="/skills" className="text-foreground underline">
-                {'Browse'}
+            <div className="flex gap-4 sm:gap-6 text-xs sm:text-sm">
+              <Link href="/docs" className="text-secondary hover:text-foreground transition-colors">
+                {'docs'}
               </Link>
-              <Link href="/docs" className="text-secondary hover:text-foreground">
-                {'Docs'}
+              <Link href="/api-docs" className="text-secondary hover:text-foreground transition-colors">
+                {'api'}
               </Link>
-              <Link href="/submit" className="text-secondary hover:text-foreground">
-                {'Submit'}
-              </Link>
-            </nav>
+            </div>
           </div>
-          <SearchBar />
+
+          {/* Simple Search */}
+          <form action="/skills" method="get" className="relative">
+            <input
+              type="text"
+              name="q"
+              defaultValue={searchParams.q}
+              placeholder="Search skills..."
+              className="w-full border border-border bg-background px-4 py-3 text-base font-serif focus:border-foreground focus:outline-none"
+            />
+          </form>
         </div>
       </header>
 
-      {/* Filters */}
-      <SkillFilters />
-
-      {/* Results */}
-      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-12">
-        {/* Leaderboard - only show when not searching */}
-        {!searchParams.q && !searchParams.category && !searchParams.platform && (
-          <LeaderboardTabs skills={mockSkills} />
-        )}
-
-        <div className="mb-6 sm:mb-8">
-          <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
-            {searchParams.q ? `Search Results for "${searchParams.q}"` : 'Browse Agent Skills'}
-          </h1>
-          <p className="text-secondary text-sm sm:text-base lg:text-lg">
-            {filteredSkills.length} {filteredSkills.length === 1 ? 'skill' : 'skills'} found
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        {/* Stats */}
+        <div className="mb-8 sm:mb-12 text-center">
+          <p className="text-sm text-secondary mb-2">
+            {sortedSkills.length} {sortedSkills.length === 1 ? 'skill' : 'skills'}
           </p>
+          {searchParams.q && (
+            <p className="text-xs text-secondary">
+              {'Showing results for "'}{searchParams.q}{'"'} · <Link href="/skills" className="underline">Clear</Link>
+            </p>
+          )}
         </div>
 
-        {filteredSkills.length === 0 ? (
-          <div className="border border-border bg-card p-8 sm:p-12 text-center">
-            <p className="text-lg sm:text-xl text-secondary mb-4">{'No skills found matching your criteria.'}</p>
-            <Link href="/skills" className="text-foreground underline text-sm sm:text-base">
-              {'Clear filters'}
+        {/* Skills List */}
+        {sortedSkills.length === 0 ? (
+          <div className="border border-border p-12 text-center">
+            <p className="text-secondary mb-4">{'No skills found.'}</p>
+            <Link href="/skills" className="text-foreground underline text-sm">
+              {'View all skills'}
             </Link>
           </div>
         ) : (
-          <div className="grid gap-4 sm:gap-6">
-            {filteredSkills.map((skill, index) => (
-              <div key={skill.id} className="flex gap-3 sm:gap-4 items-start">
-                <div className="font-mono text-lg sm:text-xl text-secondary shrink-0 w-8 sm:w-10 text-right">
-                  {index + 1}
+          <div className="space-y-8 sm:space-y-12">
+            {sortedSkills.map((skill, index) => (
+              <article key={skill.id} className="border-b border-border pb-8 sm:pb-12 last:border-0">
+                {/* Rank */}
+                <div className="flex gap-4 sm:gap-6 items-start">
+                  <div className="font-mono text-lg sm:text-xl text-secondary shrink-0 w-8 sm:w-10 text-right pt-1">
+                    {index + 1}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    {/* Skill Name & Tags */}
+                    <div className="mb-4">
+                      <Link 
+                        href={`/skills/${skill.slug}`}
+                        className="inline-block"
+                      >
+                        <h2 className="font-display text-2xl sm:text-3xl font-semibold hover:opacity-60 transition-opacity mb-2">
+                          {skill.name}
+                        </h2>
+                      </Link>
+                      <p className="text-base sm:text-lg text-secondary italic leading-relaxed">
+                        {skill.tagline}
+                      </p>
+                    </div>
+
+                    {/* Install Command */}
+                    {skill.technical.installCommand && (
+                      <div className="mb-4">
+                        <InstallCommand 
+                          command={skill.technical.installCommand}
+                          skillSlug={skill.slug}
+                          compact
+                        />
+                      </div>
+                    )}
+
+                    {/* Stats */}
+                    <div className="flex flex-wrap gap-4 text-xs sm:text-sm text-secondary font-mono mb-4">
+                      <span>{(skill.stats.downloads / 1000).toFixed(1)}k installs</span>
+                      <span>★ {(skill.stats.stars / 1000).toFixed(1)}k</span>
+                      <span>{skill.stats.rating}/5</span>
+                      {skill.stats.weeklyGrowth && skill.stats.weeklyGrowth > 0 && (
+                        <span className="text-foreground">↑ {skill.stats.weeklyGrowth}%</span>
+                      )}
+                    </div>
+
+                    {/* Platforms */}
+                    <div className="flex flex-wrap gap-2">
+                      {skill.compatibility.slice(0, 6).map((compat) => (
+                        <span
+                          key={compat.platform}
+                          className="text-xs border border-border px-2 py-1 text-secondary"
+                        >
+                          {compat.platform}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Author */}
+                    <div className="mt-4 text-xs text-secondary">
+                      {'by '}{skill.author.name}
+                      {skill.verified && <span className="ml-2 font-mono">✓ VERIFIED</span>}
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <SkillCard skill={skill} />
-                </div>
-              </div>
+              </article>
             ))}
           </div>
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-background mt-12 sm:mt-20">
-        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="grid gap-6 sm:gap-8 sm:grid-cols-2 md:grid-cols-3">
+      {/* Minimal Footer */}
+      <footer className="border-t border-border mt-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+          <div className="grid sm:grid-cols-3 gap-8 text-sm">
             <div>
-              <h3 className="font-display text-lg sm:text-xl font-semibold mb-3 sm:mb-4">{'Open Agent Skill'}</h3>
-              <p className="text-secondary text-sm sm:text-base leading-relaxed">
-                {'The open marketplace for AI agent skills. Built by the community, for the community.'}
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">{'Resources'}</h4>
-              <ul className="space-y-2 text-secondary text-sm sm:text-base">
-                <li><Link href="/docs" className="hover:text-foreground">{'Documentation'}</Link></li>
-                <li><Link href="/api" className="hover:text-foreground">{'API Reference'}</Link></li>
-                <li><Link href="/standards" className="hover:text-foreground">{'Standards'}</Link></li>
+              <p className="font-semibold mb-3">{'Platform'}</p>
+              <ul className="space-y-2 text-secondary">
+                <li><Link href="/docs" className="hover:text-foreground">Documentation</Link></li>
+                <li><Link href="/api-docs" className="hover:text-foreground">API</Link></li>
+                <li><Link href="/submit" className="hover:text-foreground">Submit Skill</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">{'Community'}</h4>
-              <ul className="space-y-2 text-secondary text-sm sm:text-base">
-                <li><Link href="/github" className="hover:text-foreground">{'GitHub'}</Link></li>
-                <li><Link href="/discord" className="hover:text-foreground">{'Discord'}</Link></li>
-                <li><Link href="/twitter" className="hover:text-foreground">{'Twitter'}</Link></li>
+              <p className="font-semibold mb-3">{'Community'}</p>
+              <ul className="space-y-2 text-secondary">
+                <li><a href="https://github.com/openagentskill" className="hover:text-foreground">GitHub</a></li>
+                <li><a href="https://discord.gg/openagentskill" className="hover:text-foreground">Discord</a></li>
+                <li><a href="https://twitter.com/openagentskill" className="hover:text-foreground">Twitter</a></li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold mb-3">{'Resources'}</p>
+              <ul className="space-y-2 text-secondary">
+                <li><Link href="/about" className="hover:text-foreground">About</Link></li>
+                <li><Link href="/blog" className="hover:text-foreground">Blog</Link></li>
+                <li><Link href="/standards" className="hover:text-foreground">Standards</Link></li>
               </ul>
             </div>
           </div>
