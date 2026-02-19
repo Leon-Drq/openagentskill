@@ -1,0 +1,49 @@
+{
+  "version": "1.0",
+  "name": "Open Agent Skill",
+  "description": "The open marketplace for AI agent skills",
+  "api_base_url": "https://openagentskill.com/api/agent",
+  "endpoints": {
+    "search_skills": {
+      "path": "/skills",
+      "method": "GET",
+      "description": "Search and filter agent skills",
+      "parameters": {
+        "q": "Search query",
+        "category": "Filter by category",
+        "platform": "Filter by platform",
+        "sort": "Sort by: downloads, stars, rating, trending",
+        "format": "Response format: json or text (default: json)"
+      }
+    },
+    "get_skill": {
+      "path": "/skills/{slug}",
+      "method": "GET",
+      "description": "Get detailed information about a specific skill",
+      "parameters": {
+        "format": "Response format: json or text (default: json)"
+      }
+    },
+    "install_skill": {
+      "command": "npx skills add {owner}/{repo}",
+      "description": "Install a skill using the CLI"
+    }
+  },
+  "text_formats": {
+    "skills_list": "Plain text format optimized for LLM consumption, includes: name, description, install command, stats",
+    "skill_detail": "Comprehensive plain text with installation instructions, usage examples, and technical details"
+  },
+  "supported_agents": [
+    "Claude",
+    "GPT-4",
+    "Gemini",
+    "Cursor",
+    "Windsurf",
+    "Cline",
+    "Goose",
+    "LangChain",
+    "AutoGPT",
+    "CrewAI",
+    "Semantic Kernel"
+  ]
+}

@@ -52,12 +52,24 @@ export default function Page() {
             <h2 className="text-sm sm:text-base font-semibold mb-4 tracking-wide">{'TRY IT NOW'}</h2>
             <div className="max-w-2xl mx-auto border border-border bg-card p-4 sm:p-6">
               <pre className="text-left font-mono text-xs sm:text-sm md:text-base overflow-x-auto">
-                <code>{'$ npx skills add <skill-name>'}</code>
+                <code>{'$ npx skills add <owner/repo>'}</code>
               </pre>
             </div>
             <p className="text-xs sm:text-sm text-secondary mt-4">
               {'Install any skill with a single command. No configuration needed.'}
             </p>
+          </div>
+
+          {/* Supported Agents */}
+          <div className="mb-12 sm:mb-16 lg:mb-20">
+            <h2 className="text-sm sm:text-base font-semibold mb-6 tracking-wide">{'AVAILABLE FOR THESE AGENTS'}</h2>
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 max-w-3xl mx-auto">
+              {['Claude', 'GPT-4', 'Gemini', 'Cursor', 'Windsurf', 'Cline', 'Goose', 'LangChain', 'AutoGPT', 'CrewAI', 'Copilot', 'Roo', 'Cody', 'Kilo', 'AMP'].map((agent) => (
+                <span key={agent} className="px-3 sm:px-4 py-2 border border-border text-xs sm:text-sm font-mono hover:bg-muted transition-colors">
+                  {agent}
+                </span>
+              ))}
+            </div>
           </div>
 
           {/* Tag Navigation */}
