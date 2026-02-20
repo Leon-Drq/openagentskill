@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Crimson_Text, EB_Garamond, IBM_Plex_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { StructuredData } from '@/components/structured-data'
 import './globals.css'
 
 const crimsonText = Crimson_Text({ 
@@ -25,8 +26,27 @@ const ibmPlexMono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Open Agent Skill - The Open Marketplace for AI Agent Skills',
-  description: 'Discover, share, and compose Agent Skills. An open ecosystem for building the future of autonomous AI agents.',
+  metadataBase: new URL('https://openagentskill.com'),
+  title: {
+    default: 'Open Agent Skill - The Open Marketplace for AI Agent Skills',
+    template: '%s | Open Agent Skill',
+  },
+  description: 'Discover, share, and compose Agent Skills. An open ecosystem for building the future of autonomous AI agents. Install skills with npx skills add <owner/repo>.',
+  keywords: ['AI agents', 'agent skills', 'AI marketplace', 'autonomous agents', 'LangChain', 'AutoGPT', 'Claude', 'GPT-4', 'agent capabilities', 'skill marketplace', 'openagentskill'],
+  authors: [{ name: 'Open Agent Skill Team' }],
+  creator: 'Open Agent Skill',
+  publisher: 'Open Agent Skill',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   generator: 'v0.app',
   icons: {
     icon: [
@@ -42,9 +62,24 @@ export const metadata: Metadata = {
     apple: '/apple-icon.png',
   },
   openGraph: {
+    title: 'Open Agent Skill - The Open Marketplace for AI Agent Skills',
+    description: 'Discover, share, and compose Agent Skills. An open ecosystem for building the future of autonomous AI agents.',
+    url: 'https://openagentskill.com',
+    siteName: 'Open Agent Skill',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
     title: 'Open Agent Skill',
     description: 'The Open Marketplace for AI Agent Skills',
-    type: 'website',
+    creator: '@openagentskill',
+  },
+  alternates: {
+    canonical: 'https://openagentskill.com',
+  },
+  verification: {
+    google: 'your-google-verification-code',
   },
 }
 
@@ -55,6 +90,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${crimsonText.variable} ${ebGaramond.variable} ${ibmPlexMono.variable}`}>
+      <head>
+        <StructuredData />
+      </head>
       <body className="font-serif antialiased">
         {children}
         <Analytics />

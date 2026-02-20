@@ -1,3 +1,6 @@
+import { HeroTerminal } from '@/components/hero-terminal'
+import { PixelAgentsParade } from '@/components/pixel-agents-parade'
+
 export default function Page() {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -44,7 +47,7 @@ export default function Page() {
             {'OPEN AGENT SKILL'}
           </h1>
           <p className="font-display text-base sm:text-lg md:text-xl lg:text-2xl text-secondary mb-8 sm:mb-12 lg:mb-16 italic text-balance">
-            {'As agents emerge to reshape how we interact with intelligence, a new marketplace is born.'}
+            {'The premier skill marketplace for OpenClaw and autonomous AI agents.'}
           </p>
 
           {/* Try it Now Section */}
@@ -56,16 +59,22 @@ export default function Page() {
               </pre>
             </div>
             <p className="text-xs sm:text-sm text-secondary mt-4">
-              {'Install any skill with a single command. No configuration needed.'}
+              {'Install any skill with a single command. Works with OpenClaw, Claude, GPT-4, and 15+ other agents.'}
             </p>
           </div>
+
+          {/* Pixel Agents Parade */}
+          <PixelAgentsParade />
 
           {/* Supported Agents */}
           <div className="mb-12 sm:mb-16 lg:mb-20">
             <h2 className="text-sm sm:text-base font-semibold mb-6 tracking-wide">{'AVAILABLE FOR THESE AGENTS'}</h2>
             <div className="flex flex-wrap justify-center gap-3 sm:gap-4 max-w-3xl mx-auto">
-              {['Claude', 'GPT-4', 'Gemini', 'Cursor', 'Windsurf', 'Cline', 'Goose', 'LangChain', 'AutoGPT', 'CrewAI', 'Copilot', 'Roo', 'Cody', 'Kilo', 'AMP'].map((agent) => (
-                <span key={agent} className="px-3 sm:px-4 py-2 border border-border text-xs sm:text-sm font-mono hover:bg-muted transition-colors">
+              {['Claude', 'GPT-4', 'OpenClaw', 'Gemini', 'Cursor', 'Windsurf', 'Cline', 'Goose', 'LangChain', 'AutoGPT', 'CrewAI', 'Copilot', 'Roo', 'Cody', 'Kilo', 'AMP'].map((agent) => (
+                <span 
+                  key={agent} 
+                  className={`px-3 sm:px-4 py-2 border border-border text-xs sm:text-sm font-mono hover:bg-muted transition-colors ${agent === 'OpenClaw' ? 'bg-muted/50' : ''}`}
+                >
                   {agent}
                 </span>
               ))}
