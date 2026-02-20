@@ -127,10 +127,12 @@ export function convertSkillRecordToManifest(record: SkillRecord): AgentSkillMan
     },
     verified: record.verified,
     featured: false,
-    compatibility: {
-      platforms: record.frameworks,
+    compatibility: record.frameworks.map(platform => ({
+      platform,
       minVersion: '1.0.0',
-    },
+      maxVersion: undefined,
+      tested: true,
+    })),
     stats: {
       downloads: record.downloads,
       stars: record.github_stars,
