@@ -44,8 +44,9 @@ export default async function SkillsPage({
       <header className="border-b border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="flex items-center justify-between mb-8">
-            <Link href="/" className="text-xl sm:text-2xl font-display font-bold hover:opacity-60 transition-opacity">
-              {'Open Agent Skill'}
+            <Link href="/" className="flex items-center gap-2 hover:opacity-60 transition-opacity">
+              <span className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-foreground rounded-full flex items-center justify-center font-display font-bold text-xs sm:text-sm">O</span>
+              <span className="text-xl sm:text-2xl font-display font-bold">{'Open Agent Skill'}</span>
             </Link>
             <div className="flex gap-4 sm:gap-6 text-xs sm:text-sm">
               <Link href="/docs" className="text-secondary hover:text-foreground transition-colors">
