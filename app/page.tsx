@@ -18,7 +18,7 @@ export default function Page() {
         <header className="border-b border-border">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-foreground" />
+              <span className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-foreground rounded-full flex items-center justify-center font-display font-bold text-xs sm:text-sm">O</span>
               <span className="font-display text-base sm:text-lg lg:text-xl font-semibold">Open Agent Skill</span>
             </div>
             <nav className="flex gap-1">

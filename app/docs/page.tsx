@@ -12,8 +12,9 @@ export default function DocsPage() {
       <header className="border-b border-border bg-background">
         <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex items-baseline justify-between">
-            <Link href="/" className="text-xl sm:text-2xl font-display font-bold text-foreground">
-              {'Open Agent Skill'}
+            <Link href="/" className="flex items-center gap-2 hover:opacity-60 transition-opacity">
+              <span className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-foreground rounded-full flex items-center justify-center font-display font-bold text-xs sm:text-sm">O</span>
+              <span className="text-xl sm:text-2xl font-display font-bold text-foreground">{'Open Agent Skill'}</span>
             </Link>
             <nav className="flex gap-3 sm:gap-6 text-xs sm:text-sm">
               <Link href="/skills" className="text-secondary hover:text-foreground">

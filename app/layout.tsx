@@ -31,12 +31,8 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
+        url: '/favicon.ico',
+        sizes: '32x32',
       },
       {
         url: '/icon.svg',
@@ -44,6 +40,11 @@ export const metadata: Metadata = {
       },
     ],
     apple: '/apple-icon.png',
+  },
+  openGraph: {
+    title: 'Open Agent Skill',
+    description: 'The Open Marketplace for AI Agent Skills',
+    type: 'website',
   },
 }
 
