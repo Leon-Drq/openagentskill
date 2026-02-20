@@ -2,15 +2,30 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getSkillBySlug } from '@/lib/mock-data'
+import { getSkillBySlug as getDbSkillBySlug, convertSkillRecordToManifest } from '@/lib/db/skills'
 import { AgentSkillManifest } from '@/lib/types'
 import { InstallCommand } from '@/components/install-command'
 
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }): Promise<Metadata> {
-  const skill = getSkillBySlug(params.slug)
+  const { slug } = await params
+  
+  // Try database first, fallback to mock data
+  let skill
+  try {
+    const dbSkill = await getDbSkillBySlug(slug)
+    skill = dbSkill ? convertSkillRecordToManifest(dbSkill) : null
+  } catch (error) {
+    console.error('[v0] Failed to fetch skill from database:', error)
+    skill = null
+  }
+  
+  if (!skill) {
+    skill = getSkillBySlug(slug)
+  }
 
   if (!skill) {
     return {
@@ -29,10 +44,27 @@ export async function generateMetadata({
   }
 }
 
-export default function SkillDetailPage({ params }: { params: { slug: string } }) {
-  const skill = getSkillBySlug(params.slug)
+export default async function SkillDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  
+  // Try database first, fallback to mock data
+  let skill
+  try {
+    const dbSkill = await getDbSkillBySlug(slug)
+    skill = dbSkill ? convertSkillRecordToManifest(dbSkill) : null
+    console.log('[v0] Fetched skill from database:', slug, !!skill)
+  } catch (error) {
+    console.error('[v0] Failed to fetch skill from database:', error)
+    skill = null
+  }
+  
+  if (!skill) {
+    skill = getSkillBySlug(slug)
+    console.log('[v0] Using mock data for skill:', slug, !!skill)
+  }
 
   if (!skill) {
+    console.log('[v0] Skill not found:', slug)
     notFound()
   }
 
