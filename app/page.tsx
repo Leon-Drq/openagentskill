@@ -1,3 +1,6 @@
+import { HeroTerminal } from '@/components/hero-terminal'
+import { PixelAgentsParade } from '@/components/pixel-agents-parade'
+
 export default function Page() {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -60,6 +63,9 @@ export default function Page() {
             </p>
           </div>
 
+          {/* Pixel Agents Parade */}
+          <PixelAgentsParade />
+
           {/* Supported Agents */}
           <div className="mb-12 sm:mb-16 lg:mb-20">
             <h2 className="text-sm sm:text-base font-semibold mb-6 tracking-wide">{'AVAILABLE FOR THESE AGENTS'}</h2>
@@ -67,7 +73,7 @@ export default function Page() {
               {['Claude', 'GPT-4', 'OpenClaw', 'Gemini', 'Cursor', 'Windsurf', 'Cline', 'Goose', 'LangChain', 'AutoGPT', 'CrewAI', 'Copilot', 'Roo', 'Cody', 'Kilo', 'AMP'].map((agent) => (
                 <span 
                   key={agent} 
-                  className="px-3 sm:px-4 py-2 border border-border text-xs sm:text-sm font-mono hover:bg-muted transition-colors"
+                  className={`px-3 sm:px-4 py-2 border border-border text-xs sm:text-sm font-mono hover:bg-muted transition-colors ${agent === 'OpenClaw' ? 'bg-muted/50' : ''}`}
                 >
                   {agent}
                 </span>
