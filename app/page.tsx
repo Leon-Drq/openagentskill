@@ -1,3 +1,5 @@
+import { HeroTerminal } from '@/components/hero-terminal'
+
 export default function Page() {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -47,16 +49,12 @@ export default function Page() {
             {'As agents emerge to reshape how we interact with intelligence, a new marketplace is born.'}
           </p>
 
-          {/* Try it Now Section */}
+          {/* Live Terminal Demo */}
           <div className="mb-12 sm:mb-16 lg:mb-20">
-            <h2 className="text-sm sm:text-base font-semibold mb-4 tracking-wide">{'TRY IT NOW'}</h2>
-            <div className="max-w-2xl mx-auto border border-border bg-card p-4 sm:p-6">
-              <pre className="text-left font-mono text-xs sm:text-sm md:text-base overflow-x-auto">
-                <code>{'$ npx skills add <owner/repo>'}</code>
-              </pre>
-            </div>
-            <p className="text-xs sm:text-sm text-secondary mt-4">
-              {'Install any skill with a single command. No configuration needed.'}
+            <h2 className="text-sm sm:text-base font-semibold mb-6 tracking-wide">{'SEE IT IN ACTION'}</h2>
+            <HeroTerminal />
+            <p className="text-xs sm:text-sm text-secondary mt-6 text-center">
+              {'Install any skill with a single command. Watch agents learn in real-time.'}
             </p>
           </div>
 
