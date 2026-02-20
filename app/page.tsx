@@ -1,6 +1,3 @@
-import { HeroTerminal } from '@/components/hero-terminal'
-import { TypewriterTitle } from '@/components/typewriter-title'
-
 export default function Page() {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -43,12 +40,8 @@ export default function Page() {
 
         {/* Hero Section */}
         <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 lg:py-24 text-center">
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-balance leading-tight min-h-[1.2em]">
-            <TypewriterTitle 
-              text="OPEN AGENT SKILL" 
-              delay={300}
-              speed={100}
-            />
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-balance leading-tight">
+            {'OPEN AGENT SKILL'}
           </h1>
           <p className="font-display text-base sm:text-lg md:text-xl lg:text-2xl text-secondary mb-8 sm:mb-12 lg:mb-16 italic text-balance">
             {'As agents emerge to reshape how we interact with intelligence, a new marketplace is born.'}
