@@ -1,7 +1,3 @@
-import { HeroTerminal } from '@/components/hero-terminal'
-import { TypewriterTitle } from '@/components/typewriter-title'
-import Link from 'next/link'
-
 export default function Page() {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -44,22 +40,23 @@ export default function Page() {
 
         {/* Hero Section */}
         <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 lg:py-24 text-center">
-          <TypewriterTitle 
-            text="OPEN AGENT SKILL"
-            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-balance leading-tight"
-            speed={100}
-            showCursor={true}
-          />
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-balance leading-tight">
+            {'OPEN AGENT SKILL'}
+          </h1>
           <p className="font-display text-base sm:text-lg md:text-xl lg:text-2xl text-secondary mb-8 sm:mb-12 lg:mb-16 italic text-balance">
             {'As agents emerge to reshape how we interact with intelligence, a new marketplace is born.'}
           </p>
 
-          {/* Live Terminal Demo */}
+          {/* Try it Now Section */}
           <div className="mb-12 sm:mb-16 lg:mb-20">
-            <h2 className="text-sm sm:text-base font-semibold mb-6 tracking-wide">{'SEE IT IN ACTION'}</h2>
-            <HeroTerminal />
-            <p className="text-xs sm:text-sm text-secondary mt-6 text-center">
-              {'Install any skill with a single command. Watch agents learn in real-time.'}
+            <h2 className="text-sm sm:text-base font-semibold mb-4 tracking-wide">{'TRY IT NOW'}</h2>
+            <div className="max-w-2xl mx-auto border border-border bg-card p-4 sm:p-6">
+              <pre className="text-left font-mono text-xs sm:text-sm md:text-base overflow-x-auto">
+                <code>{'$ npx skills add <owner/repo>'}</code>
+              </pre>
+            </div>
+            <p className="text-xs sm:text-sm text-secondary mt-4">
+              {'Install any skill with a single command. No configuration needed.'}
             </p>
           </div>
 
