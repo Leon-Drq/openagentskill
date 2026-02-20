@@ -117,16 +117,69 @@ export async function POST(request: NextRequest) {
       verified: review.approved && review.totalScore >= 35,
     }
 
-    // In a real implementation, this would save to database
-    // For now, we'll just log it
-    console.log('[v0] Created skill:', newSkill.slug)
+    // Save to database
+    const { createSkill, createSubmissionRecord } = await import('@/lib/db/skills')
+    
+    try {
+      const skillRecord = await createSkill({
+        slug,
+        name: skillName,
+        description: manifestData?.description || repoData.description || '',
+        long_description: readmeContent.slice(0, 1000),
+        tagline: manifestData?.tagline || repoData.description || '',
+        author_name: owner,
+        author_url: `https://github.com/${owner}`,
+        repository: `https://github.com/${owner}/${repo}`,
+        github_repo: `${owner}/${repo}`,
+        github_stars: repoData.stars,
+        github_forks: repoData.forks,
+        category,
+        tags,
+        frameworks: manifestData?.frameworks || [],
+        version: manifestData?.version || '1.0.0',
+        license: repoData.license || 'Unknown',
+        install_command: `npx skills add ${owner}/${repo}`,
+        verified: review.approved && review.totalScore >= 35,
+        submission_source: submissionSource,
+        submitted_by_agent: body.submittedByAgent,
+        ai_review_score: review.scores,
+        ai_review_approved: review.approved,
+        ai_review_issues: review.issues,
+        ai_review_suggestions: review.suggestions,
+      })
 
-    return NextResponse.json({
-      success: true,
-      approved: review.approved,
-      review,
-      skill: newSkill,
-    })
+      // Create submission record
+      await createSubmissionRecord({
+        skill_id: skillRecord.id,
+        github_repo: `${owner}/${repo}`,
+        submission_source: submissionSource,
+        submitted_by_agent: body.submittedByAgent,
+        ai_review_result: review,
+        status: review.approved ? 'approved' : 'rejected',
+      })
+
+      console.log('[v0] Skill saved to database:', skillRecord.id)
+
+      return NextResponse.json({
+        success: true,
+        approved: review.approved,
+        review,
+        skill: {
+          ...newSkill,
+          id: skillRecord.id,
+        },
+      })
+    } catch (dbError: any) {
+      console.error('[v0] Database save error:', dbError)
+      // Still return success with review, but note the DB error
+      return NextResponse.json({
+        success: true,
+        approved: review.approved,
+        review,
+        skill: newSkill,
+        warning: 'Skill created but database save failed',
+      })
+    }
   } catch (error: any) {
     console.error('[v0] Submission error:', error)
 

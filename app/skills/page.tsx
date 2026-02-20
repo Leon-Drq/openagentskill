@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { mockSkills } from '@/lib/mock-data'
 import { InstallCommand } from '@/components/install-command'
+import { getAllSkills, convertSkillRecordToManifest } from '@/lib/db/skills'
 
 export const metadata: Metadata = {
   title: 'Browse Agent Skills - Open Agent Skill',
@@ -21,8 +22,21 @@ export default async function SkillsPage({
   // Await searchParams in Next.js 16
   const params = await searchParams
   
+  // Get skills from database, fallback to mock data
+  let dbSkills
+  try {
+    const records = await getAllSkills()
+    dbSkills = records.map(convertSkillRecordToManifest)
+  } catch (error) {
+    console.error('[v0] Failed to fetch skills from database:', error)
+    dbSkills = []
+  }
+  
+  // Use database skills if available, otherwise use mock data
+  const allSkills = dbSkills.length > 0 ? dbSkills : mockSkills
+  
   // Filter skills based on search
-  let filteredSkills = mockSkills
+  let filteredSkills = allSkills
 
   if (params.q) {
     const query = params.q.toLowerCase()
