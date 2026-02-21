@@ -110,6 +110,27 @@ export async function searchSkills(query: string): Promise<SkillRecord[]> {
   return data || []
 }
 
+export async function getRelatedSkills(
+  skillId: string,
+  category: string,
+  limit = 4
+): Promise<SkillRecord[]> {
+  const supabase = await createClient()
+
+  // Get skills in the same category, excluding current skill
+  const { data, error } = await supabase
+    .from('skills')
+    .select('*')
+    .eq('ai_review_approved', true)
+    .eq('category', category)
+    .neq('id', skillId)
+    .order('downloads', { ascending: false })
+    .limit(limit)
+
+  if (error) return []
+  return data || []
+}
+
 export function convertSkillRecordToManifest(record: SkillRecord): Skill {
   return {
     id: record.id,

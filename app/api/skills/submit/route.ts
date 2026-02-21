@@ -7,7 +7,8 @@ import {
   parseGitHubUrl,
 } from '@/lib/github/api'
 import { reviewSkill } from '@/lib/ai-review/reviewer'
-import { mockSkills } from '@/lib/mock-data'
+import { analyzeCode } from '@/lib/security/static-analysis'
+import { createActivity } from '@/lib/db/activity'
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,7 +47,27 @@ export async function POST(request: NextRequest) {
       fetchCodeFiles(owner, repo).catch(() => []),
     ])
 
-    // Step 3: AI Review
+    // Step 3: Static security analysis
+    console.log('[v0] Running static analysis...')
+    const staticResult = analyzeCode(
+      codeFiles.map((f: { path: string; content: string }) => ({
+        path: f.path,
+        content: f.content,
+      }))
+    )
+
+    if (!staticResult.passed) {
+      return NextResponse.json(
+        {
+          error: 'Skill rejected: critical security issues detected',
+          issues: staticResult.issues,
+          riskLevel: staticResult.riskLevel,
+        },
+        { status: 400 }
+      )
+    }
+
+    // Step 4: AI Review
     console.log('[v0] Starting AI review...')
     const review = await reviewSkill({
       repository: repoData.fullName,
@@ -159,6 +180,24 @@ export async function POST(request: NextRequest) {
       })
 
       console.log('[v0] Skill saved to database:', skillRecord.id)
+
+      // Record activity
+      try {
+        await createActivity({
+          event_type: submissionSource === 'agent' ? 'agent_submitted' : 'skill_published',
+          skill_id: skillRecord.id,
+          actor_name: submissionSource === 'agent' ? (body.submittedByAgent || 'Unknown Agent') : owner,
+          actor_type: submissionSource === 'agent' ? 'agent' : 'human',
+          description: `${submissionSource === 'agent' ? 'Discovered and submitted' : 'Published'} ${skillName} — ${repoData.description || ''}`,
+          metadata: {
+            stars: repoData.stars,
+            source: submissionSource,
+            static_analysis: staticResult,
+          },
+        })
+      } catch (activityError) {
+        console.error('[v0] Failed to record activity:', activityError)
+      }
 
       return NextResponse.json({
         success: true,
