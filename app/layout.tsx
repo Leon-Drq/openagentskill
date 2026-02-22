@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Crimson_Text, EB_Garamond, IBM_Plex_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { StructuredData } from '@/components/structured-data'
+import { I18nProvider } from '@/lib/i18n/context'
 import './globals.css'
 
 const crimsonText = Crimson_Text({ 
@@ -94,7 +95,9 @@ export default function RootLayout({
         <StructuredData />
       </head>
       <body className="font-serif antialiased">
-        {children}
+        <I18nProvider>
+          {children}
+        </I18nProvider>
         <Analytics />
       </body>
     </html>
