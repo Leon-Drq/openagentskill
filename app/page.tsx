@@ -1,4 +1,4 @@
-import { HomePageClient } from '@/components/home-page-client'
+import { HomePageEnhanced } from '@/components/home-page-enhanced'
 import { getRecentActivity, getPlatformStats } from '@/lib/db/activity'
 import { createClient } from '@/lib/supabase/server'
 
@@ -40,5 +40,5 @@ export default async function Page() {
     console.error('[v0] Failed to fetch homepage data:', error)
   }
 
-  return <HomePageClient stats={stats} activities={activities} featuredSkills={featuredSkills} />
+  return <HomePageEnhanced stats={stats} activities={activities} featuredSkills={featuredSkills} />
 }
