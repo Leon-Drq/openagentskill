@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import type { AgentSkillManifest } from '@/lib/types'
+import type { Skill } from '@/lib/types'
 
 export interface SkillRecord {
   id: string
@@ -110,7 +110,28 @@ export async function searchSkills(query: string): Promise<SkillRecord[]> {
   return data || []
 }
 
-export function convertSkillRecordToManifest(record: SkillRecord): AgentSkillManifest {
+export async function getRelatedSkills(
+  skillId: string,
+  category: string,
+  limit = 4
+): Promise<SkillRecord[]> {
+  const supabase = await createClient()
+
+  // Get skills in the same category, excluding current skill
+  const { data, error } = await supabase
+    .from('skills')
+    .select('*')
+    .eq('ai_review_approved', true)
+    .eq('category', category)
+    .neq('id', skillId)
+    .order('downloads', { ascending: false })
+    .limit(limit)
+
+  if (error) return []
+  return data || []
+}
+
+export function convertSkillRecordToManifest(record: SkillRecord): Skill {
   return {
     id: record.id,
     slug: record.slug,
@@ -119,43 +140,51 @@ export function convertSkillRecordToManifest(record: SkillRecord): AgentSkillMan
     longDescription: record.long_description || record.description,
     tagline: record.tagline || record.description,
     category: record.category as any,
-    tags: record.tags,
+    tags: record.tags || [],
     author: {
+      id: record.id,
       name: record.author_name,
-      email: record.author_email || undefined,
-      url: record.author_url || undefined,
+      username: record.author_name.toLowerCase().replace(/\s+/g, '-'),
+      bio: undefined,
+      reputation: 0,
+      skillCount: 1,
+      verified: record.verified,
     },
     verified: record.verified,
     featured: false,
-    compatibility: record.frameworks.map(platform => ({
-      platform,
-      minVersion: '1.0.0',
-      maxVersion: undefined,
-      tested: true,
+    compatibility: (record.frameworks || []).map(platform => ({
+      platform: platform.toLowerCase().replace(/\s+/g, '-') as any,
+      version: '>=1.0.0',
+      status: 'full' as const,
     })),
     stats: {
-      downloads: record.downloads,
-      stars: record.github_stars,
-      forks: record.github_forks,
-      usedBy: record.used_by,
-      rating: record.rating,
-      reviewCount: record.review_count,
+      downloads: record.downloads || 0,
+      stars: record.github_stars || 0,
+      forks: record.github_forks || 0,
+      usedBy: record.used_by || 0,
+      rating: record.rating || 0,
+      reviewCount: record.review_count || 0,
       trending24h: 0,
       weeklyGrowth: 0,
     },
     technical: {
-      version: record.version,
+      version: record.version || '1.0.0',
       language: ['TypeScript'],
-      frameworks: record.frameworks,
+      frameworks: record.frameworks || [],
       dependencies: [],
       documentation: record.repository,
       repository: record.repository,
-      license: record.license,
+      license: record.license || 'MIT',
       size: '1 MB',
       lastUpdated: record.updated_at,
       installCommand: record.install_command || `npx skills add ${record.github_repo}`,
       npmPackage: record.npm_package || undefined,
       githubRepo: record.github_repo,
     },
+    pricing: {
+      type: 'free' as const,
+    },
+    createdAt: record.created_at,
+    updatedAt: record.updated_at,
   }
 }

@@ -28,11 +28,11 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://openagentskill.com'),
   title: {
-    default: 'Open Agent Skill - The Open Marketplace for AI Agent Skills',
+    default: 'Open Agent Skill — The Open Infrastructure for Agent Intelligence',
     template: '%s | Open Agent Skill',
   },
-  description: 'Discover, share, and compose Agent Skills. An open ecosystem for building the future of autonomous AI agents. Install skills with npx skills add <owner/repo>.',
-  keywords: ['AI agents', 'agent skills', 'AI marketplace', 'autonomous agents', 'LangChain', 'AutoGPT', 'Claude', 'GPT-4', 'agent capabilities', 'skill marketplace', 'openagentskill'],
+  description: 'The open infrastructure for agent intelligence. Humans and agents discover, publish, compose, and share skills together. Install any skill with npx skills add <owner/repo>.',
+  keywords: ['AI agents', 'agent skills', 'agent infrastructure', 'skill protocol', 'MCP', 'autonomous agents', 'LangChain', 'Claude', 'GPT-4', 'Cursor', 'agent interoperability', 'openagentskill'],
   authors: [{ name: 'Open Agent Skill Team' }],
   creator: 'Open Agent Skill',
   publisher: 'Open Agent Skill',
@@ -62,8 +62,8 @@ export const metadata: Metadata = {
     apple: '/apple-icon.png',
   },
   openGraph: {
-    title: 'Open Agent Skill - The Open Marketplace for AI Agent Skills',
-    description: 'Discover, share, and compose Agent Skills. An open ecosystem for building the future of autonomous AI agents.',
+    title: 'Open Agent Skill — The Open Infrastructure for Agent Intelligence',
+    description: 'Humans and agents discover, publish, compose, and share skills together. The open infrastructure for agent intelligence.',
     url: 'https://openagentskill.com',
     siteName: 'Open Agent Skill',
     locale: 'en_US',

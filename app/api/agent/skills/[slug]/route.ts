@@ -1,144 +1,104 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSkillBySlug } from '@/lib/mock-data'
+import { getSkillBySlug } from '@/lib/db/skills'
 
 /**
- * Agent-friendly API endpoint for getting a specific skill
+ * GET /api/agent/skills/{slug}
+ * Full skill details by slug. Database-backed. Agent-friendly.
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
-  const skill = getSkillBySlug(params.slug)
+  const { slug } = await params
   const format = request.nextUrl.searchParams.get('format') || 'json'
 
-  if (!skill) {
-    return NextResponse.json(
-      { error: 'Skill not found' },
-      { status: 404 }
-    )
-  }
+  try {
+    const skill = await getSkillBySlug(slug)
 
-  if (format === 'text') {
-    // Plain text format optimized for LLM consumption
-    const textResponse = `
-${skill.name}
+    if (!skill) {
+      return NextResponse.json(
+        { error: `Skill not found: ${slug}` },
+        { status: 404 }
+      )
+    }
+
+    if (format === 'text') {
+      const text = `${skill.name}
 ${'='.repeat(skill.name.length)}
 
-Tagline: ${skill.tagline}
+${skill.tagline || skill.description}
 
 Description:
-${skill.description}
-
-Detailed Information:
-${skill.longDescription}
+${skill.long_description || skill.description}
 
 Technical Details:
-- Version: ${skill.technical.version}
-- Languages: ${skill.technical.language.join(', ')}
-- Frameworks: ${skill.technical.frameworks.join(', ')}
-- License: ${skill.technical.license}
-- Size: ${skill.technical.size}
-- Last Updated: ${skill.technical.lastUpdated}
-
-Compatibility:
-${skill.compatibility
-  .map((c) => `- ${c.platform} (${c.version}): ${c.status}`)
-  .join('\n')}
+- Version: ${skill.version}
+- License: ${skill.license}
+- Platforms: ${(skill.frameworks || []).join(', ')}
+- Tags: ${(skill.tags || []).join(', ')}
 
 Statistics:
-- Downloads: ${skill.stats.downloads.toLocaleString()}
-- Stars: ${skill.stats.stars.toLocaleString()}
-- Rating: ${skill.stats.rating}/5 (${skill.stats.reviewCount} reviews)
-- Used by: ${skill.stats.usedBy.toLocaleString()} agents
+- GitHub Stars: ${skill.github_stars}
+- Downloads: ${skill.downloads}
+- Rating: ${skill.rating}/5 (${skill.review_count} reviews)
 
-Pricing:
-- Type: ${skill.pricing.type}
-${skill.pricing.price ? `- Price: $${skill.pricing.price} ${skill.pricing.pricingModel}` : ''}
+Author: ${skill.author_name}${skill.verified ? ' (Verified)' : ''}
 
-Installation:
-pip install oas-${skill.slug}
+Install:
+${skill.install_command || `npx skills add ${skill.github_repo}`}
 
-or
-
-npm install @openagentskill/${skill.slug}
-
-Author:
-${skill.author.name} (@${skill.author.username})${skill.author.verified ? ' ✓ Verified' : ''}
-${skill.author.bio || ''}
-
-Tags: ${skill.tags.join(', ')}
-
-Documentation: ${skill.technical.documentation}
-${skill.technical.repository ? `Repository: ${skill.technical.repository}` : ''}
+Repository: ${skill.repository}
 
 ---
-This skill is ${skill.verified ? 'verified' : 'not verified'} by Open Agent Skill.
-${skill.featured ? 'Featured skill.' : ''}
-`
+Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
 
-    return new NextResponse(textResponse, {
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'X-Agent-Friendly': 'true',
-      },
-    })
-  }
+      return new NextResponse(text, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'X-Agent-Friendly': 'true',
+        },
+      })
+    }
 
-  // JSON format with complete structured data
-  return NextResponse.json({
-    id: skill.id,
-    slug: skill.slug,
-    name: skill.name,
-    tagline: skill.tagline,
-    description: skill.description,
-    longDescription: skill.longDescription,
-    category: skill.category,
-    tags: skill.tags,
-    verified: skill.verified,
-    featured: skill.featured,
-    stats: skill.stats,
-    pricing: skill.pricing,
-    technical: skill.technical,
-    compatibility: skill.compatibility,
-    author: skill.author,
-    install: {
-      pip: `pip install oas-${skill.slug}`,
-      npm: `npm install @openagentskill/${skill.slug}`,
-      instructions: `# Install ${skill.name}\n\nFor Python:\npip install oas-${skill.slug}\n\nFor JavaScript/Node:\nnpm install @openagentskill/${skill.slug}\n\nSee documentation for detailed setup: ${skill.technical.documentation}`,
-    },
-    urls: {
-      detail: `https://openagentskill.com/skills/${skill.slug}`,
-      documentation: skill.technical.documentation,
-      repository: skill.technical.repository,
-    },
-    metadata: {
-      createdAt: skill.createdAt,
-      updatedAt: skill.updatedAt,
-    },
-    schema: {
-      '@context': 'https://schema.org',
-      '@type': 'SoftwareApplication',
+    return NextResponse.json({
+      slug: skill.slug,
       name: skill.name,
       description: skill.description,
-      applicationCategory: skill.category,
-      offers: {
-        '@type': 'Offer',
-        price: skill.pricing.price?.toString() || '0',
-        priceCurrency: skill.pricing.currency || 'USD',
+      long_description: skill.long_description,
+      tagline: skill.tagline,
+      category: skill.category,
+      tags: skill.tags,
+      author: skill.author_name,
+      verified: skill.verified,
+      stats: {
+        stars: skill.github_stars,
+        forks: skill.github_forks,
+        downloads: skill.downloads,
+        rating: skill.rating,
+        review_count: skill.review_count,
       },
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: skill.stats.rating,
-        reviewCount: skill.stats.reviewCount,
+      platforms: skill.frameworks,
+      install: skill.install_command || `npx skills add ${skill.github_repo}`,
+      repository: skill.repository,
+      github_repo: skill.github_repo,
+      version: skill.version,
+      license: skill.license,
+      urls: {
+        web: `https://openagentskill.com/skills/${skill.slug}`,
+        repository: skill.repository,
+        api: `/api/agent/skills/${skill.slug}`,
       },
-      operatingSystem: skill.compatibility.map((c) => c.platform),
-      softwareVersion: skill.technical.version,
-      datePublished: skill.createdAt,
-      dateModified: skill.updatedAt,
-      author: {
-        '@type': skill.author.verified ? 'Organization' : 'Person',
-        name: skill.author.name,
+      meta: {
+        created_at: skill.created_at,
+        updated_at: skill.updated_at,
+        agent_friendly: true,
       },
-    },
-  })
+    })
+  } catch (error) {
+    console.error('Agent skill detail API error:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch skill details' },
+      { status: 500 }
+    )
+  }
 }

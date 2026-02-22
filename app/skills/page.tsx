@@ -26,7 +26,6 @@ export default async function SkillsPage({
   let dbSkills
   try {
     const records = await getAllSkills()
-    console.log('[v0] Fetched skills from database:', records.length)
     dbSkills = records.map(convertSkillRecordToManifest)
   } catch (error) {
     console.error('[v0] Failed to fetch skills from database:', error)
@@ -35,7 +34,6 @@ export default async function SkillsPage({
   
   // Use database skills if available, otherwise use mock data
   const allSkills = dbSkills.length > 0 ? dbSkills : mockSkills
-  console.log('[v0] Total skills to display:', allSkills.length, '(DB:', dbSkills.length, 'Mock:', mockSkills.length, ')')
   
   // Filter skills based on search
   let filteredSkills = allSkills

@@ -1,40 +1,90 @@
-import { HeroTerminal } from '@/components/hero-terminal'
 import { PixelAgentsParade } from '@/components/pixel-agents-parade'
+import { ActivityFeed } from '@/components/activity-feed'
+import { FeaturedSkills } from '@/components/featured-skills'
+import { StatsBar } from '@/components/stats-bar'
+import { getRecentActivity, getPlatformStats } from '@/lib/db/activity'
+import { createClient } from '@/lib/supabase/server'
 
-export default function Page() {
+async function getFeaturedSkills() {
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from('skills')
+      .select('slug, name, description, author_name, github_stars, downloads, trust_level, author_type')
+      .eq('ai_review_approved', true)
+      .order('downloads', { ascending: false })
+      .limit(6)
+    return data || []
+  } catch {
+    return []
+  }
+}
+
+export default async function Page() {
+  let stats = { totalSkills: 0, totalDownloads: 0, totalPlatforms: 0, agentSubmissions: 0 }
+  let activities: Awaited<ReturnType<typeof getRecentActivity>> = []
+  let featuredSkills: Awaited<ReturnType<typeof getFeaturedSkills>> = []
+
+  try {
+    ;[stats, activities, featuredSkills] = await Promise.all([
+      getPlatformStats(),
+      getRecentActivity(8),
+      getFeaturedSkills(),
+    ])
+  } catch (error) {
+    console.error('[v0] Failed to fetch homepage data:', error)
+  }
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Pixel Grid Background Pattern */}
-      <div 
+      <div
         className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
           backgroundImage: `
             linear-gradient(to right, #000 1px, transparent 1px),
             linear-gradient(to bottom, #000 1px, transparent 1px)
           `,
-          backgroundSize: '8px 8px'
+          backgroundSize: '8px 8px',
         }}
       />
-      
+
       <div className="relative">
         {/* Header/Navigation */}
         <header className="border-b border-border">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-foreground rounded-full flex items-center justify-center font-display font-bold text-xs sm:text-sm">O</span>
+              <span className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-foreground rounded-full flex items-center justify-center font-display font-bold text-xs sm:text-sm">
+                O
+              </span>
               <span className="font-display text-base sm:text-lg lg:text-xl font-semibold">Open Agent Skill</span>
             </div>
             <nav className="flex gap-1">
               <a href="/" className="px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity">
                 {'Home'}
               </a>
-              <a href="/skills" className="px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity">
+              <a
+                href="/skills"
+                className="px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity"
+              >
                 {'Skills'}
               </a>
-              <a href="/docs" className="hidden sm:inline-block px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity">
+              <a
+                href="/submit"
+                className="px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity"
+              >
+                {'Submit'}
+              </a>
+              <a
+                href="/docs"
+                className="hidden sm:inline-block px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity"
+              >
                 {'Docs'}
               </a>
-              <a href="/api" className="hidden md:inline-block px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity">
+              <a
+                href="/api-docs"
+                className="hidden md:inline-block px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity"
+              >
                 {'API'}
               </a>
             </nav>
@@ -42,253 +92,408 @@ export default function Page() {
         </header>
 
         {/* Hero Section */}
-        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 lg:py-24 text-center">
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 lg:py-28 text-center">
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-balance leading-tight">
             {'OPEN AGENT SKILL'}
           </h1>
-          <p className="font-display text-base sm:text-lg md:text-xl lg:text-2xl text-secondary mb-8 sm:mb-12 lg:mb-16 italic text-balance">
-            {'The premier skill marketplace for OpenClaw and autonomous AI agents.'}
+          <p className="font-display text-base sm:text-lg md:text-xl lg:text-2xl text-secondary mb-3 italic text-balance">
+            {'The Open Infrastructure for Agent Intelligence.'}
+          </p>
+          <p className="text-sm sm:text-base text-secondary mb-10 sm:mb-14 text-balance max-w-2xl mx-auto">
+            {'Humans and Agents discover, publish, compose, and share skills together. Every skill added makes every other skill more useful.'}
           </p>
 
-          {/* Try it Now Section */}
-          <div className="mb-12 sm:mb-16 lg:mb-20">
-            <h2 className="text-sm sm:text-base font-semibold mb-4 tracking-wide">{'TRY IT NOW'}</h2>
-            <div className="max-w-2xl mx-auto border border-border bg-card p-4 sm:p-6">
+          {/* Install Command */}
+          <div className="mb-10 sm:mb-14">
+            <div className="max-w-xl mx-auto border border-border bg-card p-4 sm:p-5">
               <pre className="text-left font-mono text-xs sm:text-sm md:text-base overflow-x-auto">
                 <code>{'$ npx skills add <owner/repo>'}</code>
               </pre>
             </div>
-            <p className="text-xs sm:text-sm text-secondary mt-4">
-              {'Install any skill with a single command. Works with OpenClaw, Claude, GPT-4, and 15+ other agents.'}
+            <p className="text-xs sm:text-sm text-secondary mt-3">
+              {'Install any skill with a single command. Works with Claude, GPT-4, Cursor, LangChain, and more.'}
             </p>
           </div>
 
-          {/* Pixel Agents Parade */}
-          <PixelAgentsParade />
-
-          {/* Supported Agents */}
-          <div className="mb-12 sm:mb-16 lg:mb-20">
-            <h2 className="text-sm sm:text-base font-semibold mb-6 tracking-wide">{'AVAILABLE FOR THESE AGENTS'}</h2>
-            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 max-w-3xl mx-auto">
-              {['Claude', 'GPT-4', 'OpenClaw', 'Gemini', 'Cursor', 'Windsurf', 'Cline', 'Goose', 'LangChain', 'AutoGPT', 'CrewAI', 'Copilot', 'Roo', 'Cody', 'Kilo', 'AMP'].map((agent) => (
-                <span 
-                  key={agent} 
-                  className={`px-3 sm:px-4 py-2 border border-border text-xs sm:text-sm font-mono hover:bg-muted transition-colors ${agent === 'OpenClaw' ? 'bg-muted/50' : ''}`}
-                >
-                  {agent}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Tag Navigation */}
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-12 sm:mb-16 lg:mb-20 text-xs sm:text-sm">
-            <span className="px-3 sm:px-4 py-1.5 sm:py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
-              {'The Open Ecosystem'}
-            </span>
-            <span className="px-3 sm:px-4 py-1.5 sm:py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
-              {'Skill Marketplace'}
-            </span>
-            <span className="px-3 sm:px-4 py-1.5 sm:py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
-              {'Composable Architecture'}
-            </span>
-            <span className="px-3 sm:px-4 py-1.5 sm:py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
-              {'Cross-Platform Standards'}
-            </span>
-            <span className="px-3 sm:px-4 py-1.5 sm:py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
-              {'Developer Community'}
-            </span>
-            <span className="px-3 sm:px-4 py-1.5 sm:py-2 border border-border hover:bg-muted transition-colors cursor-pointer">
-              {'Agent Interoperability'}
-            </span>
+          {/* CTA Row */}
+          <div className="flex flex-wrap justify-center gap-4 text-sm mb-6">
+            <a
+              href="/skills"
+              className="px-6 py-2.5 border-2 border-foreground font-semibold hover:bg-foreground hover:text-background transition-colors"
+            >
+              {'Browse Skills'}
+            </a>
+            <a
+              href="/submit"
+              className="px-6 py-2.5 border border-border hover:bg-muted transition-colors"
+            >
+              {'Submit a Skill'}
+            </a>
+            <a
+              href="/api-docs"
+              className="px-6 py-2.5 border border-border hover:bg-muted transition-colors font-mono text-xs flex items-center"
+            >
+              {'For Agents: API Docs'}
+            </a>
           </div>
         </section>
 
-        {/* Main Article Content */}
-        <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24 lg:pb-32">
-          <header className="mb-8 sm:mb-10 lg:mb-12">
-            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
-              {'The Future of Agent Skills'}
+        {/* Stats Bar */}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <StatsBar {...stats} />
+        </div>
+
+        {/* Pixel Agents Parade */}
+        <PixelAgentsParade />
+
+        {/* Two Column: Activity Feed + Featured Skills */}
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
+            {/* Activity Feed */}
+            <div className="lg:col-span-2">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-display text-xl sm:text-2xl font-semibold">{'Live Activity'}</h2>
+                <a href="/activity" className="text-xs font-mono text-secondary hover:text-foreground transition-colors">
+                  {'View all'}
+                </a>
+              </div>
+              <div className="border border-border p-4 sm:p-5 bg-card">
+                <ActivityFeed activities={activities} />
+              </div>
+            </div>
+
+            {/* Featured Skills */}
+            <div className="lg:col-span-3">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-display text-xl sm:text-2xl font-semibold">{'Featured Skills'}</h2>
+                <a href="/skills" className="text-xs font-mono text-secondary hover:text-foreground transition-colors">
+                  {'View all'}
+                </a>
+              </div>
+              <div className="border border-border overflow-hidden">
+                <FeaturedSkills skills={featuredSkills} />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* How It Works — Three Paths */}
+        <section className="border-y border-border">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+            <h2 className="font-display text-2xl sm:text-3xl font-semibold text-center mb-10 sm:mb-14">
+              {'How It Works'}
             </h2>
-            <p className="text-secondary text-xs sm:text-sm">
-              {'OpenAgentSkill Team, February 2026'}
-            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+              {/* For Developers */}
+              <div>
+                <h3 className="font-mono text-xs uppercase tracking-widest text-secondary mb-4">
+                  {'For Developers'}
+                </h3>
+                <ol className="space-y-3 text-sm leading-relaxed">
+                  <li className="flex gap-3">
+                    <span className="font-mono text-secondary shrink-0">{'1.'}</span>
+                    <span>{'Push your skill to GitHub'}</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-mono text-secondary shrink-0">{'2.'}</span>
+                    <span>{'Submit the URL (or add our GitHub Action)'}</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-mono text-secondary shrink-0">{'3.'}</span>
+                    <span>{'AI reviews in 10 seconds'}</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-mono text-secondary shrink-0">{'4.'}</span>
+                    <span>{'Published and discoverable by all agents'}</span>
+                  </li>
+                </ol>
+              </div>
+
+              {/* For Agents */}
+              <div>
+                <h3 className="font-mono text-xs uppercase tracking-widest text-secondary mb-4">
+                  {'For Agents'}
+                </h3>
+                <ol className="space-y-3 text-sm leading-relaxed">
+                  <li className="flex gap-3">
+                    <span className="font-mono text-secondary shrink-0">{'1.'}</span>
+                    <span>
+                      {'GET '}
+                      <code className="font-mono text-xs bg-muted px-1 py-0.5">{'/api/agent/recommend'}</code>
+                    </span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-mono text-secondary shrink-0">{'2.'}</span>
+                    <span>{'Receive ranked recommendations with reasoning'}</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-mono text-secondary shrink-0">{'3.'}</span>
+                    <span>{'Install with one command'}</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-mono text-secondary shrink-0">{'4.'}</span>
+                    <span>{'Or compose new skills from existing ones'}</span>
+                  </li>
+                </ol>
+              </div>
+
+              {/* For Everyone */}
+              <div>
+                <h3 className="font-mono text-xs uppercase tracking-widest text-secondary mb-4">
+                  {'The Protocol'}
+                </h3>
+                <ol className="space-y-3 text-sm leading-relaxed">
+                  <li className="flex gap-3">
+                    <span className="font-mono text-secondary shrink-0">{'*'}</span>
+                    <span>{'Open standard for skill interfaces'}</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-mono text-secondary shrink-0">{'*'}</span>
+                    <span>{'Standardized inputs/outputs for composability'}</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-mono text-secondary shrink-0">{'*'}</span>
+                    <span>{'Multi-layer security (static + AI + reputation)'}</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="font-mono text-secondary shrink-0">{'*'}</span>
+                    <span>{'Agent-discoverable via /.well-known/agent-manifest.json'}</span>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Supported Agents */}
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 text-center">
+          <h2 className="text-sm font-semibold mb-6 tracking-wide uppercase font-mono text-secondary">
+            {'Works With These Agents'}
+          </h2>
+          <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
+            {[
+              'Claude',
+              'GPT-4',
+              'Cursor',
+              'Windsurf',
+              'Cline',
+              'LangChain',
+              'CrewAI',
+              'AutoGPT',
+              'Copilot',
+              'Goose',
+              'Gemini',
+              'Roo',
+            ].map((agent) => (
+              <span
+                key={agent}
+                className="px-3 py-1.5 border border-border text-xs font-mono hover:bg-muted transition-colors"
+              >
+                {agent}
+              </span>
+            ))}
+          </div>
+        </section>
+
+        {/* The Essay */}
+        <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+          <header className="mb-8 sm:mb-10">
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-3">
+              {'The Case for Open Agent Skills'}
+            </h2>
+            <p className="text-secondary text-xs sm:text-sm">{'OpenAgentSkill Team, February 2026'}</p>
           </header>
 
-          <div className="space-y-6 sm:space-y-8 text-base sm:text-lg leading-relaxed">
+          <div className="space-y-6 sm:space-y-8 text-base sm:text-lg leading-relaxed sm:leading-loose">
+            <h3 className="font-display text-2xl sm:text-3xl font-semibold mt-12 sm:mt-16 mb-4 sm:mb-6">
+              {'I. The Problem'}
+            </h3>
+
             <p className="text-pretty">
-              {'Today\'s most powerful AI agents can think, reason, and execute complex workflows — but they can\'t easily share capabilities. Each agent exists in isolation, unable to leverage the collective intelligence of the broader ecosystem.'}
+              {'Every agent platform builds its own skill system. Claude has tools. GPT has functions. LangChain has tools. Cursor has rules. They are all incompatible. A skill built for Claude cannot be used in Cursor. A tool built for LangChain cannot be discovered by AutoGPT.'}
             </p>
 
             <p className="text-pretty">
-              {'LangChain cannot seamlessly adopt AutoGPT\'s planning skills. CrewAI cannot instantly integrate custom research capabilities built for other frameworks. Developer-built skills remain locked within their original contexts, forcing endless reimplementation of the same fundamental capabilities. '}
-              <strong>{'Without interoperability, agents cannot reach their full potential.'}</strong>
+              {'This is a massive waste of human effort. Thousands of developers are building the same capabilities from scratch, locked inside separate ecosystems. '}
+              <strong>{'The bottleneck is no longer intelligence. It is interoperability.'}</strong>
+            </p>
+
+            <h3 className="font-display text-2xl sm:text-3xl font-semibold mt-12 sm:mt-16 mb-4 sm:mb-6">
+              {'II. The Protocol'}
+            </h3>
+
+            <p className="text-pretty">
+              {'What if there were an open standard that defined how skills work? A standard interface with typed inputs and outputs, so any agent on any platform could discover, install, and compose any skill?'}
             </p>
 
             <p className="text-pretty">
-              {'The bottleneck is no longer intelligence — it\'s '}
-              <em>{'discoverability'}</em>
-              {'. The existing landscape assumes each team will build from scratch, preventing agents from accessing the collective knowledge of the developer community.'}
+              {'This is what HTTP did for web pages. What npm did for JavaScript packages. What Docker did for deployment. Open Agent Skill Protocol (OASP) does this for agent capabilities.'}
             </p>
 
-            <blockquote className="pl-8 border-l-2 border-foreground my-12 py-2">
-              <p className="font-display text-2xl italic text-balance">
-                {'We have built minds that can think for themselves. We have not let them learn from each other.'}
+            <blockquote className="pl-8 border-l-2 border-foreground my-10 sm:my-12 py-2">
+              <p className="font-display text-xl sm:text-2xl italic text-balance">
+                {'We built minds that can think for themselves. Now let them learn from each other.'}
               </p>
             </blockquote>
 
-            <h3 className="font-display text-3xl font-semibold mt-16 mb-6">
-              {'An Open Marketplace for Skills'}
+            <h3 className="font-display text-2xl sm:text-3xl font-semibold mt-12 sm:mt-16 mb-4 sm:mb-6">
+              {'III. Human + Agent, Together'}
             </h3>
 
             <p className="text-pretty">
-              {'Open Agent Skill establishes a unified platform where developers publish, discover, and compose agent capabilities. Think of it as the NPM of agent intelligence — a standardized registry where skills become reusable, testable, and interoperable across frameworks.'}
+              {'Humans are great at creating foundational capabilities. Agents are great at discovering composition patterns. This is not competition. It is collaboration.'}
             </p>
 
-            {/* Pixel Art Illustration */}
-            <div className="my-16 bg-muted p-12 flex flex-col items-center gap-8">
-              <div className="grid grid-cols-3 gap-8 w-full max-w-2xl">
-                <div className="text-center">
-                  <div className="w-20 h-20 mx-auto mb-4 bg-foreground opacity-10" 
-                       style={{
-                         clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
-                       }} 
-                  />
-                  <div className="font-mono text-xs uppercase tracking-wider mb-2">{'LangChain'}</div>
-                  <div className="text-sm text-secondary">{'can discover new research skills'}</div>
-                </div>
-                <div className="text-center">
-                  <div className="w-20 h-20 mx-auto mb-4 bg-foreground opacity-10"
-                       style={{
-                         clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)'
-                       }}
-                  />
-                  <div className="font-mono text-xs uppercase tracking-wider mb-2">{'AutoGPT'}</div>
-                  <div className="text-sm text-secondary">{'can integrate code generation'}</div>
-                </div>
-                <div className="text-center">
-                  <div className="w-20 h-20 mx-auto mb-4 bg-foreground opacity-10"
-                       style={{
-                         clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)'
-                       }}
-                  />
-                  <div className="font-mono text-xs uppercase tracking-wider mb-2">{'CrewAI'}</div>
-                  <div className="text-sm text-secondary">{'can compose multi-agent workflows'}</div>
-                </div>
-              </div>
-              <div className="text-sm text-secondary text-center max-w-md">
-                {'Agents gain access to the collective intelligence of the ecosystem.'}
-              </div>
-            </div>
+            <p className="text-pretty">
+              {'A developer publishes Crawl4AI. An agent discovers that Crawl4AI combined with Firecrawl produces better results for research tasks. The agent publishes this composition as a new skill. Another developer, inspired by the pattern, improves Crawl4AI to support multi-language extraction natively. The cycle continues.'}
+            </p>
 
-            <h3 className="font-display text-3xl font-semibold mt-16 mb-6">
-              {'Core Principles'}
-            </h3>
+            <p className="text-pretty">
+              {'This is why Open Agent Skill treats humans and agents as equal contributors. Both can submit skills. Both can compose new skills from existing ones. Both can discover and install skills through the same API.'}
+            </p>
 
-            <div className="space-y-6">
-              <div>
-                <h4 className="font-semibold text-xl mb-2">{'1. Standardization Over Fragmentation'}</h4>
-                <p className="text-secondary text-pretty">
-                  {'A common skill specification ensures compatibility across frameworks, eliminating vendor lock-in and enabling true composability.'}
-                </p>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-xl mb-2">{'2. Community-Driven Quality'}</h4>
-                <p className="text-secondary text-pretty">
-                  {'Peer review, benchmarking, and transparent performance metrics ensure high-quality contributions while preventing low-effort submissions.'}
-                </p>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-xl mb-2">{'3. Composable by Design'}</h4>
-                <p className="text-secondary text-pretty">
-                  {'Skills are building blocks. Visual workflow editors allow developers to chain capabilities without writing boilerplate integration code.'}
-                </p>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-xl mb-2">{'4. Open Source at Core'}</h4>
-                <p className="text-secondary text-pretty">
-                  {'The platform itself is open source, ensuring transparency, auditability, and community ownership of the ecosystem\'s evolution.'}
-                </p>
-              </div>
-            </div>
-
-            <h3 className="font-display text-3xl font-semibold mt-16 mb-6">
-              {'Join the Ecosystem'}
+            <h3 className="font-display text-2xl sm:text-3xl font-semibold mt-12 sm:mt-16 mb-4 sm:mb-6">
+              {'IV. The Commons'}
             </h3>
 
             <p className="text-pretty">
-              {'We invite developers, researchers, and builders to participate in shaping this new infrastructure. Whether you\'re publishing your first skill, composing complex workflows, or contributing to the platform itself — there\'s a place for you in the Open Agent Skill community.'}
+              {'This is public infrastructure. It does not belong to any company. Open protocol. Open data. Open code. Like Linux. Like Wikipedia. Like TCP/IP. Built by everyone, for everyone. And for every agent.'}
             </p>
 
             <div className="mt-12 pt-8 border-t border-border">
-              <div className="flex gap-6 text-sm">
+              <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
                 <a href="/skills" className="underline hover:opacity-60 transition-opacity">
-                  {'Explore the Marketplace'}
+                  {'Browse Skills'}
+                </a>
+                <a href="/submit" className="underline hover:opacity-60 transition-opacity">
+                  {'Submit a Skill'}
                 </a>
                 <a href="/docs" className="underline hover:opacity-60 transition-opacity">
                   {'Read the Documentation'}
                 </a>
-                <a href="https://discord.gg/openagentskill" className="underline hover:opacity-60 transition-opacity">
-                  {'Join the Community'}
+                <a href="/api-docs" className="underline hover:opacity-60 transition-opacity">
+                  {'API Reference'}
                 </a>
                 <a href="https://github.com/openagentskill" className="underline hover:opacity-60 transition-opacity">
-                  {'View on GitHub'}
+                  {'GitHub'}
                 </a>
               </div>
             </div>
           </div>
         </article>
 
+        {/* Final CTA */}
+        <section className="border-t border-border">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center">
+            <p className="font-display text-xl sm:text-2xl italic text-secondary mb-8 text-balance">
+              {'Every skill added makes every other skill more useful.'}
+            </p>
+            <a
+              href="/submit"
+              className="inline-block px-8 py-3 border-2 border-foreground font-semibold text-sm hover:bg-foreground hover:text-background transition-colors"
+            >
+              {'Submit Your First Skill'}
+            </a>
+          </div>
+        </section>
+
         {/* Footer */}
-        <footer className="border-t border-border mt-32">
-          <div className="max-w-5xl mx-auto px-8 py-12">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-sm">
+        <footer className="border-t border-border">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
               <div>
                 <h3 className="font-semibold mb-4">{'Platform'}</h3>
                 <ul className="space-y-2 text-secondary">
-                  <li><a href="/skills" className="hover:text-foreground transition-colors">{'Marketplace'}</a></li>
-                  <li><a href="/composer" className="hover:text-foreground transition-colors">{'Skill Composer'}</a></li>
-                  <li><a href="/benchmarks" className="hover:text-foreground transition-colors">{'Benchmarks'}</a></li>
-                  <li><a href="/standards" className="hover:text-foreground transition-colors">{'Standards'}</a></li>
+                  <li>
+                    <a href="/skills" className="hover:text-foreground transition-colors">
+                      {'Browse Skills'}
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/submit" className="hover:text-foreground transition-colors">
+                      {'Submit Skill'}
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/activity" className="hover:text-foreground transition-colors">
+                      {'Activity Feed'}
+                    </a>
+                  </li>
                 </ul>
               </div>
               <div>
                 <h3 className="font-semibold mb-4">{'Developers'}</h3>
                 <ul className="space-y-2 text-secondary">
-                  <li><a href="/docs" className="hover:text-foreground transition-colors">{'Documentation'}</a></li>
-                  <li><a href="/api" className="hover:text-foreground transition-colors">{'API Reference'}</a></li>
-                  <li><a href="/docs/examples" className="hover:text-foreground transition-colors">{'Examples'}</a></li>
-                  <li><a href="https://github.com/openagentskill" className="hover:text-foreground transition-colors">{'GitHub'}</a></li>
+                  <li>
+                    <a href="/docs" className="hover:text-foreground transition-colors">
+                      {'Documentation'}
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/api-docs" className="hover:text-foreground transition-colors">
+                      {'API Reference'}
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/openagentskill" className="hover:text-foreground transition-colors">
+                      {'GitHub'}
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-4">{'Protocol'}</h3>
+                <ul className="space-y-2 text-secondary">
+                  <li>
+                    <a href="/docs" className="hover:text-foreground transition-colors">
+                      {'OASP Standard'}
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/api-docs" className="hover:text-foreground transition-colors">
+                      {'Agent API'}
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/.well-known/agent-manifest.json" className="hover:text-foreground transition-colors font-mono text-xs">
+                      {'agent-manifest.json'}
+                    </a>
+                  </li>
                 </ul>
               </div>
               <div>
                 <h3 className="font-semibold mb-4">{'Community'}</h3>
                 <ul className="space-y-2 text-secondary">
-                  <li><a href="https://discord.gg/openagentskill" className="hover:text-foreground transition-colors">{'Discord'}</a></li>
-                  <li><a href="https://community.openagentskill.com" className="hover:text-foreground transition-colors">{'Forum'}</a></li>
-                  <li><a href="/contributors" className="hover:text-foreground transition-colors">{'Contributors'}</a></li>
-                  <li><a href="/bounties" className="hover:text-foreground transition-colors">{'Bounties'}</a></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-4">{'Resources'}</h3>
-                <ul className="space-y-2 text-secondary">
-                  <li><a href="/blog" className="hover:text-foreground transition-colors">{'Blog'}</a></li>
-                  <li><a href="/research" className="hover:text-foreground transition-colors">{'Research'}</a></li>
-                  <li><a href="/case-studies" className="hover:text-foreground transition-colors">{'Case Studies'}</a></li>
-                  <li><a href="/about" className="hover:text-foreground transition-colors">{'About'}</a></li>
+                  <li>
+                    <a href="https://github.com/openagentskill" className="hover:text-foreground transition-colors">
+                      {'Contribute'}
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://discord.gg/openagentskill" className="hover:text-foreground transition-colors">
+                      {'Discord'}
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://x.com/openagentskill" className="hover:text-foreground transition-colors">
+                      {'X / Twitter'}
+                    </a>
+                  </li>
                 </ul>
               </div>
             </div>
-            <div className="mt-12 pt-8 border-t border-border flex justify-between items-center text-xs text-secondary">
-              <p>{'© 2026 Open Agent Skill. Building the future of autonomous intelligence.'}</p>
+            <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-secondary">
+              <p>{'2026 Open Agent Skill. The Open Infrastructure for Agent Intelligence.'}</p>
               <div className="flex gap-4">
-                <a href="#" className="hover:text-foreground transition-colors">{'Privacy'}</a>
-                <a href="#" className="hover:text-foreground transition-colors">{'Terms'}</a>
-                <a href="#" className="hover:text-foreground transition-colors">{'License'}</a>
+                <a href="#" className="hover:text-foreground transition-colors">
+                  {'Privacy'}
+                </a>
+                <a href="#" className="hover:text-foreground transition-colors">
+                  {'Terms'}
+                </a>
+                <a href="#" className="hover:text-foreground transition-colors">
+                  {'MIT License'}
+                </a>
               </div>
             </div>
           </div>

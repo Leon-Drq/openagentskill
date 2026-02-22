@@ -2,8 +2,8 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getSkillBySlug } from '@/lib/mock-data'
-import { getSkillBySlug as getDbSkillBySlug, convertSkillRecordToManifest } from '@/lib/db/skills'
-import { AgentSkillManifest } from '@/lib/types'
+import { getSkillBySlug as getDbSkillBySlug, convertSkillRecordToManifest, getRelatedSkills } from '@/lib/db/skills'
+import { Skill } from '@/lib/types'
 import { InstallCommand } from '@/components/install-command'
 
 export async function generateMetadata({
@@ -52,7 +52,6 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   try {
     const dbSkill = await getDbSkillBySlug(slug)
     skill = dbSkill ? convertSkillRecordToManifest(dbSkill) : null
-    console.log('[v0] Fetched skill from database:', slug, !!skill)
   } catch (error) {
     console.error('[v0] Failed to fetch skill from database:', error)
     skill = null
@@ -60,16 +59,22 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   
   if (!skill) {
     skill = getSkillBySlug(slug)
-    console.log('[v0] Using mock data for skill:', slug, !!skill)
   }
 
   if (!skill) {
-    console.log('[v0] Skill not found:', slug)
     notFound()
   }
 
+  // Fetch related skills
+  let relatedSkills: Awaited<ReturnType<typeof getRelatedSkills>> = []
+  try {
+    relatedSkills = await getRelatedSkills(skill.id, skill.category, 3)
+  } catch {
+    // Silently fail — related skills are optional
+  }
+
   // Generate JSON-LD structured data for agents
-  const structuredData: AgentSkillManifest = {
+  const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: skill.name,
@@ -77,8 +82,8 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
     applicationCategory: skill.category,
     offers: {
       '@type': 'Offer',
-      price: skill.pricing.price?.toString() || '0',
-      priceCurrency: skill.pricing.currency || 'USD',
+      price: skill.pricing?.price?.toString() || '0',
+      priceCurrency: skill.pricing?.currency || 'USD',
     },
     aggregateRating: {
       '@type': 'AggregateRating',
@@ -204,6 +209,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
             </section>
 
             {/* Compatibility */}
+            {skill.compatibility && skill.compatibility.length > 0 && (
             <section className="mb-12">
               <h2 className="font-display text-3xl font-semibold mb-6">{'Compatibility'}</h2>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -220,14 +226,15 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                             : 'text-muted-foreground'
                         }`}
                       >
-                        {compat.status.toUpperCase()}
+                        {compat.status?.toUpperCase() || 'SUPPORTED'}
                       </span>
                     </div>
-                    <p className="text-sm text-secondary">{compat.version}</p>
+                    <p className="text-sm text-secondary">{compat.version || '>=1.0.0'}</p>
                   </div>
                 ))}
               </div>
             </section>
+            )}
 
             {/* Technical Details */}
             <section className="mb-12">
@@ -282,7 +289,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
               <div className="border border-border bg-card p-6">
                 <h3 className="font-display text-xl font-semibold mb-4">{'Install'}</h3>
                 
-                {skill.pricing.type === 'free' ? (
+                {(!skill.pricing || skill.pricing.type === 'free') ? (
                   <p className="text-sm text-secondary mb-4">{'Free and open source'}</p>
                 ) : skill.pricing.type === 'freemium' ? (
                   <p className="text-sm text-secondary mb-4">
@@ -342,10 +349,16 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                         <span className="ml-2 text-xs font-mono">{'✓'}</span>
                       )}
                     </h4>
-                    <p className="text-sm text-secondary">@{skill.author.username}</p>
-                    <p className="mt-2 text-sm text-secondary">
-                      {skill.author.skillCount} skills • {skill.author.reputation.toLocaleString()} reputation
-                    </p>
+                    {skill.author.username && (
+                      <p className="text-sm text-secondary">@{skill.author.username}</p>
+                    )}
+                    {(skill.author.skillCount > 0 || skill.author.reputation > 0) && (
+                      <p className="mt-2 text-sm text-secondary">
+                        {skill.author.skillCount > 0 && `${skill.author.skillCount} skills`}
+                        {skill.author.skillCount > 0 && skill.author.reputation > 0 && ' • '}
+                        {skill.author.reputation > 0 && `${skill.author.reputation.toLocaleString()} reputation`}
+                      </p>
+                    )}
                   </div>
                 </div>
                 {skill.author.bio && (
@@ -354,6 +367,30 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                   </p>
                 )}
               </div>
+
+              {/* Related Skills */}
+              {relatedSkills.length > 0 && (
+                <div className="border border-border bg-card p-6">
+                  <h3 className="font-display text-xl font-semibold mb-4">{'Related Skills'}</h3>
+                  <div className="space-y-3">
+                    {relatedSkills.map((rs) => (
+                      <Link
+                        key={rs.slug}
+                        href={`/skills/${rs.slug}`}
+                        className="block border-b border-border pb-3 last:border-b-0 last:pb-0 hover:opacity-70 transition-opacity"
+                      >
+                        <h4 className="font-semibold text-sm">{rs.name}</h4>
+                        <p className="text-xs text-secondary mt-1 line-clamp-2">
+                          {rs.description}
+                        </p>
+                        <span className="text-xs font-mono text-secondary mt-1 block">
+                          {(rs.github_stars / 1000).toFixed(1)}K stars
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Tags */}
               <div className="border border-border bg-card p-6">
