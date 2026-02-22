@@ -51,24 +51,24 @@ export function HomePageClient({ stats, activities, featuredSkills }: HomePageCl
     <div className="min-h-screen bg-background text-foreground">
       {/* Navigation */}
       <nav className="border-b border-border">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-display text-xl font-semibold hover:opacity-70 transition-opacity">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="font-display text-lg sm:text-xl font-semibold hover:opacity-70 transition-opacity">
             {t.hero.title}
           </Link>
-          <div className="flex items-center gap-6">
-            <Link href="/skills" className="text-sm hover:opacity-70 transition-opacity">
+          <div className="flex items-center gap-3 sm:gap-6">
+            <Link href="/skills" className="text-xs sm:text-sm hover:opacity-70 transition-opacity">
               {t.nav.skills}
             </Link>
-            <Link href="/submit" className="text-sm hover:opacity-70 transition-opacity">
+            <Link href="/submit" className="text-xs sm:text-sm hover:opacity-70 transition-opacity hidden sm:inline">
               {t.nav.submit}
             </Link>
-            <Link href="/docs" className="text-sm hover:opacity-70 transition-opacity">
+            <Link href="/docs" className="text-xs sm:text-sm hover:opacity-70 transition-opacity hidden md:inline">
               {t.nav.docs}
             </Link>
-            <Link href="/api-docs" className="text-sm hover:opacity-70 transition-opacity">
+            <Link href="/api-docs" className="text-xs sm:text-sm hover:opacity-70 transition-opacity hidden lg:inline">
               {t.nav.apiDocs}
             </Link>
-            <Link href="/activity" className="text-sm hover:opacity-70 transition-opacity">
+            <Link href="/activity" className="text-xs sm:text-sm hover:opacity-70 transition-opacity hidden md:inline">
               {t.nav.activity}
             </Link>
             <LanguageSwitcher />
@@ -77,17 +77,17 @@ export function HomePageClient({ stats, activities, featuredSkills }: HomePageCl
       </nav>
 
       {/* Hero */}
-      <section className="max-w-5xl mx-auto px-6 py-24 text-center">
-        <div className="mb-12">
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-24 text-center">
+        <div className="mb-8 sm:mb-12">
           <PixelAgentsParade />
         </div>
-        <h1 className="font-display text-6xl font-bold mb-6 leading-tight">
+        <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
           {t.hero.title}
         </h1>
-        <p className="text-xl text-secondary mb-12 leading-relaxed">
+        <p className="text-base sm:text-xl text-secondary mb-8 sm:mb-12 leading-relaxed">
           {t.hero.subtitle}
         </p>
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
           <Link
             href="/skills"
             className="px-6 py-3 bg-foreground text-background font-semibold hover:opacity-90 transition-opacity"

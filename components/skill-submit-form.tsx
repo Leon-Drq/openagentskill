@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { parseGitHubUrl } from '@/lib/github/api'
+import { useI18n } from '@/lib/i18n/context'
 
 interface SubmitFormProps {
   onSubmit: (data: SubmitFormData) => Promise<void>
@@ -14,20 +15,8 @@ export interface SubmitFormData {
   submissionSource: 'web' | 'api' | 'agent'
 }
 
-const categories = [
-  { value: 'data-analysis', label: '数据分析' },
-  { value: 'code-generation', label: '代码生成' },
-  { value: 'research', label: '研究助手' },
-  { value: 'automation', label: '自动化' },
-  { value: 'communication', label: '沟通协作' },
-  { value: 'creative', label: '创意工具' },
-  { value: 'business', label: '商业工具' },
-  { value: 'developer-tools', label: '开发工具' },
-  { value: 'security', label: '安全' },
-  { value: 'integration', label: '集成' },
-]
-
 export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
+  const { t } = useI18n()
   const [repository, setRepository] = useState('')
   const [category, setCategory] = useState('')
   const [tagInput, setTagInput] = useState('')
@@ -36,6 +25,19 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
   const [repoValid, setRepoValid] = useState<boolean | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+
+  const categories = [
+    { value: 'data-analysis', label: t.submitPage.form.categories.dataAnalysis },
+    { value: 'code-generation', label: t.submitPage.form.categories.codeGeneration },
+    { value: 'research', label: t.submitPage.form.categories.research },
+    { value: 'automation', label: t.submitPage.form.categories.automation },
+    { value: 'communication', label: t.submitPage.form.categories.communication },
+    { value: 'creative', label: t.submitPage.form.categories.creative },
+    { value: 'business', label: t.submitPage.form.categories.business },
+    { value: 'developer-tools', label: t.submitPage.form.categories.developerTools },
+    { value: 'security', label: t.submitPage.form.categories.security },
+    { value: 'integration', label: t.submitPage.form.categories.integration },
+  ]
 
   const validateRepo = async (repoUrl: string) => {
     if (!repoUrl) {
@@ -46,7 +48,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
     const parsed = parseGitHubUrl(repoUrl)
     if (!parsed) {
       setRepoValid(false)
-      setError('请输入有效的 GitHub 仓库 URL 或 owner/repo 格式')
+      setError(t.submitPage.form.repoValidError)
       return
     }
 
@@ -67,11 +69,11 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
         setError('')
       } else {
         setRepoValid(false)
-        setError(data.error || '仓库验证失败')
+        setError(data.error || t.submitPage.form.validationFailed)
       }
     } catch (err) {
       setRepoValid(false)
-      setError('验证失败，请稍后重试')
+      setError(t.submitPage.form.retryLater)
     } finally {
       setValidating(false)
     }
@@ -103,17 +105,17 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
     e.preventDefault()
 
     if (!repoValid) {
-      setError('请先验证 GitHub 仓库')
+      setError(t.submitPage.form.pleaseValidate)
       return
     }
 
     if (!category) {
-      setError('请选择分类')
+      setError(t.submitPage.form.pleaseSelectCategory)
       return
     }
 
     if (tags.length === 0) {
-      setError('请至少添加一个标签')
+      setError(t.submitPage.form.pleaseAddTags)
       return
     }
 
@@ -128,18 +130,18 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
         submissionSource: 'web',
       })
     } catch (err: any) {
-      setError(err.message || '提交失败，请稍后重试')
+      setError(err.message || t.submitPage.form.retryLater)
     } finally {
       setSubmitting(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-8">
+    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6 sm:space-y-8">
       {/* GitHub Repository */}
       <div>
         <label htmlFor="repository" className="block text-sm font-semibold mb-2">
-          GitHub 仓库
+          {t.submitPage.form.repository}
         </label>
         <input
           id="repository"
@@ -147,15 +149,15 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
           value={repository}
           onChange={(e) => handleRepoChange(e.target.value)}
           onBlur={handleRepoBlur}
-          placeholder="https://github.com/owner/repo 或 owner/repo"
-          className="w-full border border-border bg-background px-4 py-3 text-base font-serif focus:border-foreground focus:outline-none"
+          placeholder={t.submitPage.form.repositoryPlaceholder}
+          className="w-full border border-border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-serif focus:border-foreground focus:outline-none"
           required
         />
         {validating && (
-          <p className="mt-2 text-sm text-secondary">验证中...</p>
+          <p className="mt-2 text-sm text-secondary">{t.submitPage.form.validating}</p>
         )}
         {repoValid === true && (
-          <p className="mt-2 text-sm text-foreground">✓ 仓库验证成功</p>
+          <p className="mt-2 text-sm text-foreground">{t.submitPage.form.repoValidSuccess}</p>
         )}
         {repoValid === false && error && (
           <p className="mt-2 text-sm text-destructive">{error}</p>
@@ -165,16 +167,16 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
       {/* Category */}
       <div>
         <label htmlFor="category" className="block text-sm font-semibold mb-2">
-          分类
+          {t.submitPage.form.category}
         </label>
         <select
           id="category"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="w-full border border-border bg-background px-4 py-3 text-base font-serif focus:border-foreground focus:outline-none"
+          className="w-full border border-border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-serif focus:border-foreground focus:outline-none"
           required
         >
-          <option value="">选择分类</option>
+          <option value="">{t.submitPage.form.categoryPlaceholder}</option>
           {categories.map((cat) => (
             <option key={cat.value} value={cat.value}>
               {cat.label}
@@ -186,7 +188,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
       {/* Tags */}
       <div>
         <label htmlFor="tags" className="block text-sm font-semibold mb-2">
-          标签（最多 10 个）
+          {t.submitPage.form.tags}
         </label>
         <div className="flex gap-2 mb-2">
           <input
@@ -200,15 +202,15 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
                 addTag()
               }
             }}
-            placeholder="输入标签后按回车"
-            className="flex-1 border border-border bg-background px-4 py-2 text-sm font-serif focus:border-foreground focus:outline-none"
+            placeholder={t.submitPage.form.tagsPlaceholder}
+            className="flex-1 border border-border bg-background px-3 sm:px-4 py-2 text-xs sm:text-sm font-serif focus:border-foreground focus:outline-none"
           />
           <button
             type="button"
             onClick={addTag}
-            className="px-4 py-2 border border-foreground text-sm hover:bg-muted transition-colors"
+            className="px-3 sm:px-4 py-2 border border-foreground text-xs sm:text-sm hover:bg-muted transition-colors whitespace-nowrap"
           >
-            添加
+            {t.submitPage.form.addTag}
           </button>
         </div>
         {tags.length > 0 && (
@@ -216,7 +218,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
             {tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center gap-2 px-3 py-1 border border-border text-sm"
+                className="inline-flex items-center gap-2 px-2 sm:px-3 py-1 border border-border text-xs sm:text-sm"
               >
                 {tag}
                 <button
@@ -237,9 +239,9 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
         <button
           type="submit"
           disabled={!repoValid || submitting}
-          className="w-full px-6 py-3 border-2 border-foreground bg-foreground text-background font-semibold hover:bg-background hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full px-4 sm:px-6 py-2 sm:py-3 border-2 border-foreground bg-foreground text-background font-semibold hover:bg-background hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
         >
-          {submitting ? '提交中...' : '提交技能'}
+          {submitting ? t.submitPage.form.submitting : t.submitPage.form.submit}
         </button>
       </div>
 
