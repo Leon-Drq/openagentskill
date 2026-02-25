@@ -5,7 +5,7 @@ export function StructuredData() {
     name: 'Open Agent Skill',
     alternateName: 'OpenAgentSkill',
     url: 'https://openagentskill.com',
-    description: 'The Open Marketplace for AI Agent Skills',
+    description: 'The open infrastructure for agent intelligence. Humans and agents discover, publish, compose, and share skills together.',
     potentialAction: {
       '@type': 'SearchAction',
       target: 'https://openagentskill.com/skills?q={search_term_string}',
@@ -28,7 +28,8 @@ export function StructuredData() {
     name: 'Open Agent Skill',
     url: 'https://openagentskill.com',
     logo: 'https://openagentskill.com/icon.svg',
-    description: 'An open ecosystem for AI agent skills and capabilities',
+    description: 'The open infrastructure for agent intelligence. Humans and agents discover, publish, compose, and share skills together.',
+    image: 'https://openagentskill.com/og-image.jpg',
     foundingDate: '2026',
     sameAs: [
       'https://github.com/openagentskill',

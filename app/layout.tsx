@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Crimson_Text, EB_Garamond, IBM_Plex_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { StructuredData } from '@/components/structured-data'
+import { I18nProvider } from '@/lib/i18n/context'
 import './globals.css'
 
 const crimsonText = Crimson_Text({ 
@@ -68,12 +69,23 @@ export const metadata: Metadata = {
     siteName: 'Open Agent Skill',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Open Agent Skill — The Open Infrastructure for Agent Intelligence',
+        type: 'image/jpeg',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Open Agent Skill',
-    description: 'The Open Marketplace for AI Agent Skills',
+    title: 'Open Agent Skill — The Open Infrastructure for Agent Intelligence',
+    description: 'Humans and agents discover, publish, compose, and share skills together. The open infrastructure for agent intelligence.',
     creator: '@openagentskill',
+    site: '@openagentskill',
+    images: ['/og-image.jpg'],
   },
   alternates: {
     canonical: 'https://openagentskill.com',
@@ -94,7 +106,9 @@ export default function RootLayout({
         <StructuredData />
       </head>
       <body className="font-serif antialiased">
-        {children}
+        <I18nProvider>
+          {children}
+        </I18nProvider>
         <Analytics />
       </body>
     </html>

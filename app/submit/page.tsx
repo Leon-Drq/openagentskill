@@ -3,8 +3,11 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { SkillSubmitForm, SubmitFormData } from '@/components/skill-submit-form'
+import { useI18n } from '@/lib/i18n/context'
+import { LanguageSwitcher } from '@/components/language-switcher'
 
 export default function SubmitPage() {
+  const { t } = useI18n()
   const [submitted, setSubmitted] = useState(false)
   const [reviewResult, setReviewResult] = useState<any>(null)
 
@@ -19,7 +22,7 @@ export default function SubmitPage() {
 
     if (!response.ok) {
       const error = await response.json()
-      throw new Error(error.error || '提交失败')
+      throw new Error(error.error || t.common.error)
     }
 
     const result = await response.json()
@@ -44,48 +47,61 @@ export default function SubmitPage() {
                   Open Agent Skill
                 </span>
               </Link>
+              <div className="flex items-center gap-4 sm:gap-6">
+                <nav className="flex gap-3 sm:gap-6 text-xs sm:text-sm">
+                  <Link href="/skills" className="text-secondary hover:text-foreground">
+                    {t.nav.skills}
+                  </Link>
+                  <Link href="/docs" className="text-secondary hover:text-foreground">
+                    {t.nav.docs}
+                  </Link>
+                </nav>
+                <LanguageSwitcher />
+              </div>
             </div>
           </div>
         </header>
 
         {/* Result */}
-        <main className="container mx-auto px-4 sm:px-6 py-12">
+        <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="max-w-2xl mx-auto text-center">
             {reviewResult.approved ? (
               <>
-                <h1 className="font-display text-4xl font-bold mb-4">
-                  技能审核通过！
+                <h1 className="font-display text-3xl sm:text-4xl font-bold mb-4">
+                  {t.submitPage.result.approved.title}
                 </h1>
-                <p className="text-lg text-secondary mb-8">
-                  您的技能已成功发布到 Open Agent Skill 平台
+                <p className="text-base sm:text-lg text-secondary mb-8">
+                  {t.submitPage.result.approved.subtitle}
                 </p>
-                <div className="border border-border p-6 mb-8 text-left">
-                  <h2 className="font-semibold text-xl mb-4">审核详情</h2>
+                <div className="border border-border p-4 sm:p-6 mb-8 text-left">
+                  <h2 className="font-semibold text-lg sm:text-xl mb-4">
+                    {t.submitPage.result.approved.reviewDetails}
+                  </h2>
                   <div className="space-y-2 text-sm">
                     <p>
-                      <span className="text-secondary">安全性:</span>{' '}
+                      <span className="text-secondary">{t.submitPage.result.approved.security}</span>{' '}
                       <span className="font-mono">{reviewResult.review.scores.security}/10</span>
                     </p>
                     <p>
-                      <span className="text-secondary">质量:</span>{' '}
+                      <span className="text-secondary">{t.submitPage.result.approved.quality}</span>{' '}
                       <span className="font-mono">{reviewResult.review.scores.quality}/10</span>
                     </p>
                     <p>
-                      <span className="text-secondary">实用性:</span>{' '}
+                      <span className="text-secondary">{t.submitPage.result.approved.usefulness}</span>{' '}
                       <span className="font-mono">{reviewResult.review.scores.usefulness}/10</span>
                     </p>
                     <p>
-                      <span className="text-secondary">合规性:</span>{' '}
+                      <span className="text-secondary">{t.submitPage.result.approved.compliance}</span>{' '}
                       <span className="font-mono">{reviewResult.review.scores.compliance}/10</span>
                     </p>
                     <p className="pt-2 border-t border-border mt-2">
-                      <span className="text-secondary">总分:</span>{' '}
+                      <span className="text-secondary">{t.submitPage.result.approved.totalScore}</span>{' '}
                       <span className="font-mono font-semibold">{reviewResult.review.totalScore}/40</span>
                     </p>
                   </div>
                   {reviewResult.review.suggestions.length > 0 && (
                     <div className="mt-4 pt-4 border-t border-border">
-                      <h3 className="font-semibold mb-2">改进建议</h3>
+                      <h3 className="font-semibold mb-2">{t.submitPage.result.approved.suggestions}</h3>
                       <ul className="list-disc list-inside text-sm text-secondary space-y-1">
                         {reviewResult.review.suggestions.map((suggestion: string, i: number) => (
                           <li key={i}>{suggestion}</li>
@@ -96,21 +112,23 @@ export default function SubmitPage() {
                 </div>
                 <Link
                   href={`/skills/${reviewResult.skill.slug}`}
-                  className="inline-block px-6 py-3 border-2 border-foreground font-semibold hover:bg-foreground hover:text-background transition-colors"
+                  className="inline-block px-4 sm:px-6 py-2 sm:py-3 border-2 border-foreground font-semibold hover:bg-foreground hover:text-background transition-colors text-sm sm:text-base"
                 >
-                  查看技能详情
+                  {t.submitPage.result.approved.viewSkill}
                 </Link>
               </>
             ) : (
               <>
-                <h1 className="font-display text-4xl font-bold mb-4">
-                  技能未通过审核
+                <h1 className="font-display text-3xl sm:text-4xl font-bold mb-4">
+                  {t.submitPage.result.rejected.title}
                 </h1>
-                <p className="text-lg text-secondary mb-8">
-                  您的技能需要改进后重新提交
+                <p className="text-base sm:text-lg text-secondary mb-8">
+                  {t.submitPage.result.rejected.subtitle}
                 </p>
-                <div className="border border-destructive p-6 mb-8 text-left">
-                  <h2 className="font-semibold text-xl mb-4">审核问题</h2>
+                <div className="border border-destructive p-4 sm:p-6 mb-8 text-left">
+                  <h2 className="font-semibold text-lg sm:text-xl mb-4">
+                    {t.submitPage.result.rejected.reviewIssues}
+                  </h2>
                   <ul className="list-disc list-inside text-sm space-y-2">
                     {reviewResult.review.issues.map((issue: string, i: number) => (
                       <li key={i} className="text-destructive">{issue}</li>
@@ -118,7 +136,7 @@ export default function SubmitPage() {
                   </ul>
                   {reviewResult.review.suggestions.length > 0 && (
                     <div className="mt-4 pt-4 border-t border-border">
-                      <h3 className="font-semibold mb-2">改进建议</h3>
+                      <h3 className="font-semibold mb-2">{t.submitPage.result.rejected.suggestions}</h3>
                       <ul className="list-disc list-inside text-sm text-secondary space-y-1">
                         {reviewResult.review.suggestions.map((suggestion: string, i: number) => (
                           <li key={i}>{suggestion}</li>
@@ -132,9 +150,9 @@ export default function SubmitPage() {
                 </div>
                 <button
                   onClick={() => setSubmitted(false)}
-                  className="inline-block px-6 py-3 border-2 border-foreground font-semibold hover:bg-foreground hover:text-background transition-colors"
+                  className="inline-block px-4 sm:px-6 py-2 sm:py-3 border-2 border-foreground font-semibold hover:bg-foreground hover:text-background transition-colors text-sm sm:text-base"
                 >
-                  重新提交
+                  {t.submitPage.result.rejected.resubmit}
                 </button>
               </>
             )}
@@ -158,41 +176,41 @@ export default function SubmitPage() {
                 Open Agent Skill
               </span>
             </Link>
-            <nav className="flex gap-3 sm:gap-6 text-xs sm:text-sm">
-              <Link href="/skills" className="text-secondary hover:text-foreground">
-                浏览技能
-              </Link>
-              <Link href="/docs" className="text-secondary hover:text-foreground">
-                文档
-              </Link>
-            </nav>
+            <div className="flex items-center gap-3 sm:gap-6">
+              <nav className="hidden sm:flex gap-6 text-sm">
+                <Link href="/skills" className="text-secondary hover:text-foreground">
+                  {t.nav.skills}
+                </Link>
+                <Link href="/docs" className="text-secondary hover:text-foreground">
+                  {t.nav.docs}
+                </Link>
+              </nav>
+              <LanguageSwitcher />
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 sm:px-6 py-12">
-        <div className="text-center mb-12">
-          <h1 className="font-display text-4xl sm:text-5xl font-bold mb-4">
-            提交 Agent Skill
+      <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
+            {t.submitPage.title}
           </h1>
-          <p className="text-lg text-secondary max-w-2xl mx-auto">
-            分享您的 Agent Skill 到开放平台。我们使用 AI 自动审核，确保质量和安全性。
+          <p className="text-base sm:text-lg text-secondary max-w-2xl mx-auto px-4">
+            {t.submitPage.subtitle}
           </p>
         </div>
 
         <SkillSubmitForm onSubmit={handleSubmit} />
 
         {/* Info */}
-        <div className="max-w-2xl mx-auto mt-12 pt-8 border-t border-border">
-          <h2 className="font-semibold text-xl mb-4">提交须知</h2>
+        <div className="max-w-2xl mx-auto mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-border">
+          <h2 className="font-semibold text-lg sm:text-xl mb-4">{t.submitPage.guidelines.title}</h2>
           <ul className="space-y-2 text-sm text-secondary">
-            <li>• 技能必须托管在 GitHub 公开仓库</li>
-            <li>• 建议在仓库中包含 skill.json 清单文件</li>
-            <li>• README 应包含清晰的安装说明和使用示例</li>
-            <li>• 代码必须遵循开源协议（MIT、Apache 2.0 等）</li>
-            <li>• AI 会自动审核代码安全性、质量和实用性</li>
-            <li>• 审核通过后技能将立即发布到平台</li>
+            {t.submitPage.guidelines.items.map((item, i) => (
+              <li key={i}>• {item}</li>
+            ))}
           </ul>
         </div>
       </main>
