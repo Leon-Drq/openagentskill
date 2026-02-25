@@ -54,7 +54,7 @@ export async function getPlatformStats(): Promise<{
 
   const { data: skills, error: skillsError } = await supabase
     .from('skills')
-    .select('downloads, platforms')
+    .select('downloads, frameworks')
     .eq('ai_review_approved', true)
 
   if (skillsError) throw skillsError
@@ -65,7 +65,7 @@ export async function getPlatformStats(): Promise<{
   // Count unique platforms across all skills
   const allPlatforms = new Set<string>()
   skills?.forEach(s => {
-    ;(s.platforms || []).forEach((f: string) => allPlatforms.add(f))
+    ;(s.frameworks || []).forEach((f: string) => allPlatforms.add(f))
   })
   // Ensure a minimum count based on known supported platforms
   const platformCount = Math.max(allPlatforms.size, 8)
