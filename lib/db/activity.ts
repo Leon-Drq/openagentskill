@@ -1,3 +1,4 @@
+import { createPublicClient } from '@/lib/supabase/public'
 import { createClient } from '@/lib/supabase/server'
 
 export interface ActivityRecord {
@@ -12,7 +13,7 @@ export interface ActivityRecord {
 }
 
 export async function getRecentActivity(limit = 10): Promise<ActivityRecord[]> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   const { data, error } = await supabase
     .from('activity_feed')
@@ -50,7 +51,7 @@ export async function getPlatformStats(): Promise<{
   activePlatforms: number
   agentSubmissions: number
 }> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   const { data: skills, error: skillsError } = await supabase
     .from('skills')

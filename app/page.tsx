@@ -1,10 +1,12 @@
 import { HomePageEnhanced } from '@/components/home-page-enhanced'
 import { getRecentActivity, getPlatformStats } from '@/lib/db/activity'
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
+
+export const dynamic = 'force-dynamic'
 
 async function getFeaturedSkills() {
   try {
-    const supabase = await createClient()
+    const supabase = createPublicClient()
     const { data, error } = await supabase
       .from('skills')
       .select('slug, name, description, github_stars, downloads')
@@ -12,13 +14,12 @@ async function getFeaturedSkills() {
       .order('downloads', { ascending: false })
       .limit(6)
     if (error) {
-      console.error('[v0] getFeaturedSkills error:', error)
+      console.error('getFeaturedSkills error:', error)
       return []
     }
-    console.log('[v0] getFeaturedSkills result:', data?.length, 'skills')
     return data || []
   } catch (e) {
-    console.error('[v0] getFeaturedSkills exception:', e)
+    console.error('getFeaturedSkills exception:', e)
     return []
   }
 }
@@ -35,20 +36,13 @@ export default async function Page() {
 
   // Fetch independently so one failure doesn't block others
   const [fetchedStats, fetchedActivities, fetchedSkills] = await Promise.all([
-    getPlatformStats().catch((e) => {
-      console.error('[v0] getPlatformStats failed:', e)
-      return stats
-    }),
-    getRecentActivity(8).catch((e) => {
-      console.error('[v0] getRecentActivity failed:', e)
-      return [] as Awaited<ReturnType<typeof getRecentActivity>>
-    }),
+    getPlatformStats().catch(() => stats),
+    getRecentActivity(8).catch(() => [] as Awaited<ReturnType<typeof getRecentActivity>>),
     getFeaturedSkills(),
   ])
   stats = fetchedStats
   activities = fetchedActivities
   featuredSkills = fetchedSkills
-  console.log('[v0] Homepage data loaded:', { totalSkills: stats.totalSkills, activities: activities.length, skills: featuredSkills.length })
 
   return <HomePageEnhanced stats={stats} activities={activities} featuredSkills={featuredSkills} />
 }

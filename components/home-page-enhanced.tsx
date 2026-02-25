@@ -92,7 +92,6 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
   const [scrollY, setScrollY] = useState(0)
   const [mounted, setMounted] = useState(false)
 
-  console.log("[v0] HomePageEnhanced props:", { stats, activitiesCount: activities.length, featuredSkillsCount: featuredSkills.length, featuredSkills })
   const [taskQuery, setTaskQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const [recommendations, setRecommendations] = useState<Recommendation[]>([])
