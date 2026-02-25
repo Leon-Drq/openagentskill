@@ -6,7 +6,6 @@ export const dynamic = 'force-dynamic'
 
 async function getFeaturedSkills() {
   const supabase = createPublicClient()
-  if (!supabase) return []
   const { data, error } = await supabase
     .from('skills')
     .select('slug, name, description, github_stars, downloads')
@@ -19,21 +18,14 @@ async function getFeaturedSkills() {
 
 export default async function Page() {
   const [stats, activities, featuredSkills] = await Promise.all([
-    getPlatformStats().catch(() => null),
-    getRecentActivity(8).catch(() => []),
+    getPlatformStats(),
+    getRecentActivity(8),
     getFeaturedSkills(),
   ])
 
-  const resolvedStats = stats ?? {
-    totalSkills: 0,
-    totalDownloads: 0,
-    activePlatforms: 0,
-    agentSubmissions: 0,
-  }
-
   return (
     <HomePageEnhanced
-      stats={resolvedStats}
+      stats={stats}
       activities={activities}
       featuredSkills={featuredSkills}
     />

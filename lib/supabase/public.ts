@@ -1,19 +1,22 @@
-import { createClient as createSupabaseClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+
+// Supabase anon key is intentionally public — it is safe to commit.
+// RLS policies on the database enforce all access control.
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  process.env.SUPABASE_URL ||
+  'https://rtuodkczrlkxwwtaxwrr.supabase.co'
+
+const SUPABASE_ANON_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  process.env.SUPABASE_ANON_KEY ||
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0dW9ka2N6cmxreHd3dGF4d3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1OTc0ODAsImV4cCI6MjA4NzE3MzQ4MH0.KlJ70ysYG78x1hwOTmePW53t_IEeLqC_PzGiBozh2Ug'
 
 /**
  * A lightweight Supabase client for public read-only operations.
  * Does NOT depend on cookies() — works in any server context.
- *
- * Returns null if environment variables are missing instead of throwing,
- * so callers can gracefully fall back to mock data.
+ * Falls back to hardcoded credentials if env vars are not set.
  */
-export function createPublicClient(): SupabaseClient | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
-
-  if (!url || !key) {
-    return null
-  }
-
-  return createSupabaseClient(url, key)
+export function createPublicClient() {
+  return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 }
