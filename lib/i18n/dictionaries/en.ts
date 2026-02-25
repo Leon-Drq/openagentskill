@@ -13,10 +13,21 @@ export default {
   hero: {
     title: 'OPEN AGENT SKILL',
     subtitle: 'The Open Infrastructure for Agent Intelligence.',
+    tryItNow: 'Try it now',
+    installPrefix: '$ npx skills add',
+    installPlaceholder: 'owner/repo',
+    orDescribeTask: 'or describe what your agent needs',
+    taskPlaceholder: 'I need my agent to scrape websites and extract structured data...',
+    findSkills: 'Find Skills',
+    searching: 'Searching...',
+    recommendedSkills: 'Recommended Skills',
+    noResults: 'No matching skills found. Try a different description.',
+    confidence: 'match',
+    installCommand: 'Install',
     cta: {
-      browse: 'Browse Skills',
+      browse: 'Browse All Skills',
       submit: 'Submit a Skill',
-      forAgents: 'For Agents: API Docs',
+      forAgents: 'Agent API',
     },
   },
   

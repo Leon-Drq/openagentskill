@@ -13,10 +13,21 @@ export default {
   hero: {
     title: 'OPEN AGENT SKILL',
     subtitle: 'Agent 智能的开放基础设施',
+    tryItNow: '立即体验',
+    installPrefix: '$ npx skills add',
+    installPlaceholder: 'owner/repo',
+    orDescribeTask: '或描述你的 Agent 需要什么能力',
+    taskPlaceholder: '我需要 Agent 能够爬取网页并提取结构化数据...',
+    findSkills: '查找技能',
+    searching: '搜索中...',
+    recommendedSkills: '推荐技能',
+    noResults: '未找到匹配的技能，请尝试其他描述。',
+    confidence: '匹配度',
+    installCommand: '安装',
     cta: {
-      browse: '浏览技能',
+      browse: '浏览全部技能',
       submit: '提交技能',
-      forAgents: 'Agent API 文档',
+      forAgents: 'Agent API',
     },
   },
   
