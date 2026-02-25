@@ -3,6 +3,8 @@ import { mockSkills } from '@/lib/mock-data'
 import { getAllSkills, convertSkillRecordToManifest } from '@/lib/db/skills'
 import { SkillsPageClient } from '@/components/skills-page-client'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Browse Agent Skills — Open Agent Skill',
   description:
@@ -27,7 +29,7 @@ export default async function SkillsPage({
     const records = await getAllSkills()
     dbSkills = records.map(convertSkillRecordToManifest)
   } catch (error) {
-    console.error('[v0] Failed to fetch skills from database:', error)
+    // Silently fail — will fall back to mock data
     dbSkills = []
   }
 
