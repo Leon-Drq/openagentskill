@@ -5,12 +5,18 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js'
  * Does NOT depend on cookies() — works in any server context
  * (static generation, ISR, edge, server components, API routes).
  * 
- * Use this for: homepage stats, skill listings, activity feeds, etc.
- * Use the server.ts client for: authenticated operations (user sessions, writes).
+ * Uses SUPABASE_URL (server-side) with fallback to NEXT_PUBLIC_SUPABASE_URL.
+ * Uses SUPABASE_ANON_KEY (server-side) with fallback to NEXT_PUBLIC_SUPABASE_ANON_KEY.
  */
 export function createPublicClient() {
-  return createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  )
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!url || !key) {
+    throw new Error(
+      `Supabase env vars missing: URL=${!!url}, KEY=${!!key}`
+    )
+  }
+
+  return createSupabaseClient(url, key)
 }
