@@ -37,6 +37,56 @@ interface Recommendation {
   reasoning: string
 }
 
+function AnimatedNumber({ 
+  value, 
+  suffix = '', 
+  duration = 1800 
+}: { 
+  value: number
+  suffix?: string
+  duration?: number 
+}) {
+  const [display, setDisplay] = useState(0)
+  const [hasAnimated, setHasAnimated] = useState(false)
+  const ref = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    if (!ref.current || hasAnimated) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true)
+          const startTime = performance.now()
+          const animate = (currentTime: number) => {
+            const elapsed = currentTime - startTime
+            const progress = Math.min(elapsed / duration, 1)
+            // Ease-out cubic for satisfying deceleration
+            const eased = 1 - Math.pow(1 - progress, 3)
+            setDisplay(Math.floor(eased * value))
+            if (progress < 1) {
+              requestAnimationFrame(animate)
+            } else {
+              setDisplay(value)
+            }
+          }
+          requestAnimationFrame(animate)
+        }
+      },
+      { threshold: 0.3 }
+    )
+
+    observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [value, duration, hasAnimated])
+
+  return (
+    <span ref={ref}>
+      {display.toLocaleString()}{suffix}
+    </span>
+  )
+}
+
 export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePageEnhancedProps) {
   const { t } = useI18n()
   const [scrollY, setScrollY] = useState(0)
@@ -284,21 +334,34 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
         </div>
       </section>
 
-      {/* Stats */}
+      {/* Stats — Animated countup numbers */}
       <section className="border-y border-border py-10 sm:py-14">
         <div className="max-w-4xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-10">
-            {[
-              { value: stats.totalSkills, label: t.stats.skills },
-              { value: `${(stats.totalDownloads / 1000).toFixed(0)}K+`, label: t.stats.downloads },
-              { value: stats.activePlatforms, label: t.stats.platforms },
-              { value: stats.agentSubmissions, label: t.stats.agentSubmissions },
-            ].map((stat, i) => (
-              <div key={i} className="text-center">
-                <div className="font-display text-3xl sm:text-4xl font-bold mb-1">{stat.value}</div>
-                <div className="text-xs sm:text-sm text-secondary">{stat.label}</div>
+            <div className="text-center">
+              <div className="font-display text-3xl sm:text-4xl font-bold mb-1">
+                <AnimatedNumber value={stats.totalSkills} duration={1200} />
               </div>
-            ))}
+              <div className="text-xs sm:text-sm text-secondary">{t.stats.skills}</div>
+            </div>
+            <div className="text-center">
+              <div className="font-display text-3xl sm:text-4xl font-bold mb-1">
+                <AnimatedNumber value={Math.round(stats.totalDownloads / 1000)} suffix="K+" duration={2000} />
+              </div>
+              <div className="text-xs sm:text-sm text-secondary">{t.stats.downloads}</div>
+            </div>
+            <div className="text-center">
+              <div className="font-display text-3xl sm:text-4xl font-bold mb-1">
+                <AnimatedNumber value={stats.activePlatforms} duration={1400} />
+              </div>
+              <div className="text-xs sm:text-sm text-secondary">{t.stats.platforms}</div>
+            </div>
+            <div className="text-center">
+              <div className="font-display text-3xl sm:text-4xl font-bold mb-1">
+                <AnimatedNumber value={stats.agentSubmissions} duration={1000} />
+              </div>
+              <div className="text-xs sm:text-sm text-secondary">{t.stats.agentSubmissions}</div>
+            </div>
           </div>
         </div>
       </section>

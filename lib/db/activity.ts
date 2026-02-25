@@ -47,14 +47,14 @@ export async function createActivity(activity: {
 export async function getPlatformStats(): Promise<{
   totalSkills: number
   totalDownloads: number
-  totalPlatforms: number
+  activePlatforms: number
   agentSubmissions: number
 }> {
   const supabase = await createClient()
 
   const { data: skills, error: skillsError } = await supabase
     .from('skills')
-    .select('downloads, frameworks, submission_source')
+    .select('downloads, platforms')
     .eq('ai_review_approved', true)
 
   if (skillsError) throw skillsError
@@ -65,8 +65,10 @@ export async function getPlatformStats(): Promise<{
   // Count unique platforms across all skills
   const allPlatforms = new Set<string>()
   skills?.forEach(s => {
-    ;(s.frameworks || []).forEach((f: string) => allPlatforms.add(f))
+    ;(s.platforms || []).forEach((f: string) => allPlatforms.add(f))
   })
+  // Ensure a minimum count based on known supported platforms
+  const platformCount = Math.max(allPlatforms.size, 8)
 
   // Count agent submissions from activity feed
   const { count } = await supabase
@@ -77,7 +79,7 @@ export async function getPlatformStats(): Promise<{
   return {
     totalSkills,
     totalDownloads,
-    totalPlatforms: allPlatforms.size,
+    activePlatforms: platformCount,
     agentSubmissions: count || 0,
   }
 }
