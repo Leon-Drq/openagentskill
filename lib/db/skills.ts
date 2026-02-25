@@ -40,7 +40,8 @@ export interface SkillRecord {
 
 export async function getAllSkills(): Promise<SkillRecord[]> {
   const supabase = createPublicClient()
-  
+  if (!supabase) return []
+
   const { data, error } = await supabase
     .from('skills')
     .select('*')
@@ -53,7 +54,8 @@ export async function getAllSkills(): Promise<SkillRecord[]> {
 
 export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> {
   const supabase = createPublicClient()
-  
+  if (!supabase) return null
+
   const { data, error } = await supabase
     .from('skills')
     .select('*')
@@ -99,7 +101,8 @@ export async function createSubmissionRecord(submission: {
 
 export async function searchSkills(query: string): Promise<SkillRecord[]> {
   const supabase = createPublicClient()
-  
+  if (!supabase) return []
+
   const { data, error } = await supabase
     .from('skills')
     .select('*')
@@ -117,6 +120,7 @@ export async function getRelatedSkills(
   limit = 4
 ): Promise<SkillRecord[]> {
   const supabase = createPublicClient()
+  if (!supabase) return []
 
   // Get skills in the same category, excluding current skill
   const { data, error } = await supabase
