@@ -1,3 +1,4 @@
+import { createPublicClient } from '@/lib/supabase/public'
 import { createClient } from '@/lib/supabase/server'
 import type { Skill } from '@/lib/types'
 
@@ -38,7 +39,7 @@ export interface SkillRecord {
 }
 
 export async function getAllSkills(): Promise<SkillRecord[]> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   
   const { data, error } = await supabase
     .from('skills')
@@ -51,7 +52,7 @@ export async function getAllSkills(): Promise<SkillRecord[]> {
 }
 
 export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   
   const { data, error } = await supabase
     .from('skills')
@@ -97,7 +98,7 @@ export async function createSubmissionRecord(submission: {
 }
 
 export async function searchSkills(query: string): Promise<SkillRecord[]> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   
   const { data, error } = await supabase
     .from('skills')
@@ -115,7 +116,7 @@ export async function getRelatedSkills(
   category: string,
   limit = 4
 ): Promise<SkillRecord[]> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   // Get skills in the same category, excluding current skill
   const { data, error } = await supabase
