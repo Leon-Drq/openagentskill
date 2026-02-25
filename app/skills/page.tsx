@@ -1,5 +1,4 @@
 import { Metadata } from 'next'
-import { mockSkills } from '@/lib/mock-data'
 import { getAllSkills, convertSkillRecordToManifest } from '@/lib/db/skills'
 import { SkillsPageClient } from '@/components/skills-page-client'
 
@@ -8,10 +7,10 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: 'Browse Agent Skills — Open Agent Skill',
   description:
-    'Explore thousands of AI agent skills across all platforms. Find the perfect skills for your autonomous agents.',
+    'Explore AI agent skills across all platforms. Find the perfect skills for your autonomous agents.',
   openGraph: {
     title: 'Browse Agent Skills — Open Agent Skill',
-    description: 'Explore thousands of AI agent skills across all platforms.',
+    description: 'Explore AI agent skills across all platforms.',
     type: 'website',
   },
 }
@@ -23,19 +22,9 @@ export default async function SkillsPage({
 }) {
   const params = await searchParams
 
-  // Get skills from database
-  let dbSkills
-  try {
-    const records = await getAllSkills()
-    dbSkills = records.map(convertSkillRecordToManifest)
-  } catch (error) {
-    // Silently fail — will fall back to mock data
-    dbSkills = []
-  }
+  const records = await getAllSkills()
+  const allSkills = records.map(convertSkillRecordToManifest)
 
-  const allSkills = dbSkills.length > 0 ? dbSkills : mockSkills
-
-  // Filter skills based on search
   let filteredSkills = allSkills
   if (params.q) {
     const query = params.q.toLowerCase()
@@ -48,7 +37,6 @@ export default async function SkillsPage({
     )
   }
 
-  // Sort by downloads
   const sortedSkills = [...filteredSkills].sort((a, b) => b.stats.downloads - a.stats.downloads)
 
   return <SkillsPageClient skills={sortedSkills} query={params.q} />
