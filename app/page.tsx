@@ -29,10 +29,10 @@ function getMockFeaturedSkills() {
     .sort((a, b) => b.stats.downloads - a.stats.downloads)
     .slice(0, 6)
     .map(s => ({
-      slug: s.id,
+      slug: s.slug,
       name: s.name,
       description: s.description,
-      github_stars: s.stats.githubStars,
+      github_stars: s.stats.stars,
       downloads: s.stats.downloads,
     }))
 }
@@ -40,7 +40,9 @@ function getMockFeaturedSkills() {
 function getMockStats() {
   const totalDownloads = mockSkills.reduce((sum, s) => sum + s.stats.downloads, 0)
   const allPlatforms = new Set<string>()
-  mockSkills.forEach(s => s.platforms.forEach(p => allPlatforms.add(p)))
+  mockSkills.forEach(s =>
+    (s.compatibility || []).forEach(c => allPlatforms.add(c.platform))
+  )
   return {
     totalSkills: mockSkills.length,
     totalDownloads,
