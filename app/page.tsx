@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic'
 async function getFeaturedSkills() {
   try {
     const supabase = createPublicClient()
+    if (!supabase) return null
     const { data, error } = await supabase
       .from('skills')
       .select('slug, name, description, github_stars, downloads')

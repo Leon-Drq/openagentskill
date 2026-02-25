@@ -14,6 +14,7 @@ export interface ActivityRecord {
 
 export async function getRecentActivity(limit = 10): Promise<ActivityRecord[]> {
   const supabase = createPublicClient()
+  if (!supabase) return []
 
   const { data, error } = await supabase
     .from('activity_feed')
@@ -52,6 +53,9 @@ export async function getPlatformStats(): Promise<{
   agentSubmissions: number
 }> {
   const supabase = createPublicClient()
+  if (!supabase) {
+    return { totalSkills: 0, totalDownloads: 0, activePlatforms: 8, agentSubmissions: 0 }
+  }
 
   const { data: skills, error: skillsError } = await supabase
     .from('skills')
