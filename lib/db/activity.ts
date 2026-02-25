@@ -51,11 +51,9 @@ export async function getPlatformStats(): Promise<{
   totalDownloads: number
   activePlatforms: number
   agentSubmissions: number
-}> {
+} | null> {
   const supabase = createPublicClient()
-  if (!supabase) {
-    return { totalSkills: 0, totalDownloads: 0, activePlatforms: 8, agentSubmissions: 0 }
-  }
+  if (!supabase) return null
 
   const { data: skills, error: skillsError } = await supabase
     .from('skills')
