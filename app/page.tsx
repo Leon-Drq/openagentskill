@@ -15,12 +15,10 @@ async function getFeaturedSkills() {
       .order('downloads', { ascending: false })
       .limit(6)
     if (error) {
-      console.error('getFeaturedSkills supabase error:', error.message)
-      return null // signal failure
+      return null
     }
     return data && data.length > 0 ? data : null
-  } catch (e) {
-    console.error('getFeaturedSkills exception:', e instanceof Error ? e.message : e)
+  } catch {
     return null
   }
 }

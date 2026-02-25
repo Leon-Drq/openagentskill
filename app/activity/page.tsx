@@ -2,6 +2,8 @@ import { Metadata } from 'next'
 import { getRecentActivity } from '@/lib/db/activity'
 import { ActivityPageClient } from '@/components/activity-page-client'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Activity Feed — Open Agent Skill',
   description:
@@ -14,7 +16,7 @@ export default async function ActivityPage() {
   try {
     activities = await getRecentActivity(50)
   } catch (error) {
-    console.error('[v0] Failed to fetch activity:', error)
+    // Silently fail — will show empty state
   }
 
   return <ActivityPageClient activities={activities} />
