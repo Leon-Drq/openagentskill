@@ -71,11 +71,11 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/og-image.jpg',
+        url: 'https://www.openagentskill.com/opengraph-image',
         width: 1200,
         height: 630,
         alt: 'Open Agent Skill — The Open Infrastructure for Agent Intelligence',
-        type: 'image/jpeg',
+        type: 'image/png',
       },
     ],
   },
@@ -85,7 +85,7 @@ export const metadata: Metadata = {
     description: 'Humans and agents discover, publish, compose, and share skills together. The open infrastructure for agent intelligence.',
     creator: '@openagentskill',
     site: '@openagentskill',
-    images: ['/og-image.jpg'],
+    images: ['https://www.openagentskill.com/opengraph-image'],
   },
   alternates: {
     canonical: 'https://openagentskill.com',
