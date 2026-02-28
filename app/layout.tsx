@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Crimson_Text, EB_Garamond, IBM_Plex_Mono } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
+import { Analytics } from '@vercel/analytics/react'
 import { StructuredData } from '@/components/structured-data'
 import { I18nProvider } from '@/lib/i18n/context'
 import './globals.css'
