@@ -38,17 +38,52 @@ export interface SkillRecord {
   updated_at: string
 }
 
-export async function getAllSkills(): Promise<SkillRecord[]> {
+export type SkillSortMode = 'downloads' | 'stars' | 'new' | 'trending'
+
+export async function getAllSkills(
+  sort: SkillSortMode = 'downloads',
+  category?: string
+): Promise<SkillRecord[]> {
   const supabase = createPublicClient()
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('skills')
     .select('*')
     .eq('ai_review_approved', true)
-    .order('created_at', { ascending: false })
-  
+
+  if (category && category !== 'all') {
+    query = query.eq('category', category)
+  }
+
+  switch (sort) {
+    case 'stars':
+      query = query.order('github_stars', { ascending: false })
+      break
+    case 'new':
+      query = query.order('created_at', { ascending: false })
+      break
+    case 'trending':
+      // Trending: high downloads relative to age (recent + popular)
+      query = query.order('downloads', { ascending: false }).order('created_at', { ascending: false })
+      break
+    default:
+      query = query.order('downloads', { ascending: false })
+  }
+
+  const { data, error } = await query
   if (error) throw error
   return data || []
+}
+
+export async function getCategories(): Promise<string[]> {
+  const supabase = createPublicClient()
+  const { data, error } = await supabase
+    .from('skills')
+    .select('category')
+    .eq('ai_review_approved', true)
+  if (error) return []
+  const unique = [...new Set((data || []).map((r) => r.category).filter(Boolean))]
+  return unique.sort()
 }
 
 export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> {

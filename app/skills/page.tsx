@@ -1,13 +1,12 @@
 import { Metadata } from 'next'
-import { getAllSkills, convertSkillRecordToManifest } from '@/lib/db/skills'
+import { getAllSkills, getCategories, convertSkillRecordToManifest, type SkillSortMode } from '@/lib/db/skills'
 import { SkillsPageClient } from '@/components/skills-page-client'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Browse Agent Skills — Open Agent Skill',
-  description:
-    'Explore AI agent skills across all platforms. Find the perfect skills for your autonomous agents.',
+  description: 'Explore AI agent skills across all platforms. Find the perfect skills for your autonomous agents.',
   openGraph: {
     title: 'Browse Agent Skills — Open Agent Skill',
     description: 'Explore AI agent skills across all platforms.',
@@ -18,17 +17,22 @@ export const metadata: Metadata = {
 export default async function SkillsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>
+  searchParams: Promise<{ q?: string; sort?: string; category?: string }>
 }) {
   const params = await searchParams
+  const sort = (params.sort as SkillSortMode) || 'downloads'
+  const category = params.category || 'all'
 
-  const records = await getAllSkills()
-  const allSkills = records.map(convertSkillRecordToManifest)
+  const [records, categories] = await Promise.all([
+    getAllSkills(sort, category),
+    getCategories(),
+  ])
 
-  let filteredSkills = allSkills
+  let skills = records.map(convertSkillRecordToManifest)
+
   if (params.q) {
     const query = params.q.toLowerCase()
-    filteredSkills = filteredSkills.filter(
+    skills = skills.filter(
       (skill) =>
         skill.name.toLowerCase().includes(query) ||
         skill.description.toLowerCase().includes(query) ||
@@ -37,7 +41,13 @@ export default async function SkillsPage({
     )
   }
 
-  const sortedSkills = [...filteredSkills].sort((a, b) => b.stats.downloads - a.stats.downloads)
-
-  return <SkillsPageClient skills={sortedSkills} query={params.q} />
+  return (
+    <SkillsPageClient
+      skills={skills}
+      query={params.q}
+      sort={sort}
+      category={category}
+      categories={categories}
+    />
+  )
 }
