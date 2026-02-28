@@ -17,15 +17,24 @@ export const maxDuration = 300
  * Headers:
  *   Authorization: Bearer <INDEXER_SECRET>
  */
-export async function POST(request: NextRequest) {
-  // Auth check
+function isAuthorized(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization')
-  const secret = process.env.INDEXER_SECRET
+  const indexerSecret = process.env.INDEXER_SECRET
+  const cronSecret = process.env.CRON_SECRET // Vercel injects this automatically
 
-  if (secret) {
-    if (!authHeader || authHeader !== `Bearer ${secret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  // No secret configured — allow all (dev mode)
+  if (!indexerSecret && !cronSecret) return true
+
+  if (!authHeader) return false
+  const token = authHeader.replace('Bearer ', '')
+
+  return (!!indexerSecret && token === indexerSecret) ||
+         (!!cronSecret && token === cronSecret)
+}
+
+export async function POST(request: NextRequest) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
@@ -91,11 +100,7 @@ export async function POST(request: NextRequest) {
  * Health check — also called by Vercel Cron (GET).
  */
 export async function GET(request: NextRequest) {
-  // Cron calls via GET with the same auth header
-  const authHeader = request.headers.get('authorization')
-  const secret = process.env.INDEXER_SECRET
-
-  if (secret && authHeader !== `Bearer ${secret}`) {
+  if (!isAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
