@@ -1,156 +1,197 @@
 /**
  * Skill Processor for Auto-Indexer
  *
- * For each candidate repository, runs the full pipeline:
- *   1. Validate GitHub repo
- *   2. Fetch README + manifest + code files
- *   3. Static security analysis
- *   4. AI review
- *   5. Write to database
+ * For each candidate repository, runs the pipeline:
+ *   1. Fetch repo metadata + README from GitHub
+ *   2. AI quality review (gpt-4o-mini via AI Gateway)
+ *   3. Write to Supabase via service-role client (bypasses RLS)
  */
 
-import {
-  validateGitHubRepo,
-  fetchReadme,
-  fetchSkillManifest,
-  fetchCodeFiles,
-} from '@/lib/github/api'
-import { reviewSkill } from '@/lib/ai-review/reviewer'
-import { analyzeCode } from '@/lib/security/static-analysis'
-import { createSkill, createSubmissionRecord } from '@/lib/db/skills'
-import { createActivity } from '@/lib/db/activity'
+import { createServiceClient } from '@/lib/supabase/public'
+import { generateText } from 'ai'
 import type { CandidateRepo } from './github-search'
+
+const GITHUB_HEADERS = () => ({
+  Accept: 'application/vnd.github.v3+json',
+  ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
+})
 
 export interface ProcessResult {
   repo: string
   status: 'indexed' | 'rejected' | 'error' | 'skipped'
   reason?: string
-  skillId?: string
+  slug?: string
 }
 
-/**
- * Process a single candidate repository through the full pipeline.
- */
+// ─── GitHub helpers ───────────────────────────────────────────────────────────
+
+async function fetchDefaultBranch(owner: string, repo: string): Promise<string> {
+  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+    headers: GITHUB_HEADERS(),
+  })
+  if (!res.ok) throw new Error(`GitHub repo fetch failed: ${res.status}`)
+  const data = await res.json()
+  return data.default_branch || 'main'
+}
+
+async function fetchReadme(owner: string, repo: string): Promise<string> {
+  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/readme`, {
+    headers: { ...GITHUB_HEADERS(), Accept: 'application/vnd.github.v3.raw' },
+  })
+  if (!res.ok) return ''
+  return res.text()
+}
+
+// ─── AI Review ────────────────────────────────────────────────────────────────
+
+interface ReviewResult {
+  approved: boolean
+  score: number        // 0-100
+  category: string
+  tags: string[]
+  summary: string
+  reason?: string
+}
+
+async function aiReview(candidate: CandidateRepo, readme: string): Promise<ReviewResult> {
+  const prompt = `You are an AI curator for Open Agent Skill, a registry of MCP servers and AI agent tools.
+
+Evaluate this GitHub repository and decide if it should be listed:
+
+Repo: ${candidate.fullName}
+Description: ${candidate.description}
+Stars: ${candidate.stars}
+Language: ${candidate.language || 'unknown'}
+
+README (first 1500 chars):
+${readme.slice(0, 1500)}
+
+Rules:
+- APPROVE if: it is an MCP server, AI agent tool, LLM utility, or automation skill with clear documentation
+- REJECT if: it is a demo/tutorial/example repo, has no clear use case, is a fork with no changes, or has under 5 stars unless very unique
+- Score 0-100 based on quality, documentation, and usefulness
+- Pick ONE category from: data, development, productivity, media, security, utility
+- Pick 1-5 relevant tags
+
+Respond with JSON only, no markdown:
+{"approved":boolean,"score":number,"category":"string","tags":["string"],"summary":"one sentence description","reason":"brief reason if rejected"}`
+
+  try {
+    const { text } = await generateText({
+      model: 'openai/gpt-4o-mini',
+      prompt,
+      temperature: 0.2,
+    })
+    const match = text.match(/\{[\s\S]*\}/)
+    if (!match) throw new Error('No JSON in response')
+    return JSON.parse(match[0]) as ReviewResult
+  } catch (err) {
+    // If AI fails, do a basic heuristic approval for high-star repos
+    const approved = candidate.stars >= 50
+    return {
+      approved,
+      score: approved ? 60 : 30,
+      category: 'utility',
+      tags: [candidate.language?.toLowerCase() || 'tool'],
+      summary: candidate.description || candidate.repo,
+      reason: approved ? undefined : 'AI review unavailable, low star count',
+    }
+  }
+}
+
+// ─── Main processor ───────────────────────────────────────────────────────────
+
 export async function processRepo(candidate: CandidateRepo): Promise<ProcessResult> {
   const { owner, repo } = candidate
   const repoRef = `${owner}/${repo}`
+  const slug = `${owner}-${repo}`.toLowerCase().replace(/[^a-z0-9-]/g, '-')
 
   try {
-    // Step 1: Validate
-    const repoData = await validateGitHubRepo(repoRef)
+    const supabase = createServiceClient()
 
-    if (!repoData.hasReadme) {
-      return { repo: repoRef, status: 'skipped', reason: 'No README found' }
+    // 1. Check if already indexed
+    const { data: existing } = await supabase
+      .from('skills')
+      .select('id')
+      .eq('slug', slug)
+      .maybeSingle()
+
+    if (existing) {
+      return { repo: repoRef, status: 'skipped', reason: 'Already indexed' }
     }
 
-    // Step 2: Fetch content
-    const [readmeContent, manifestData, codeFiles] = await Promise.all([
-      fetchReadme(owner, repo),
-      fetchSkillManifest(owner, repo).catch(() => null),
-      fetchCodeFiles(owner, repo, 5).catch(() => []),
-    ])
-
-    // Step 3: Static security analysis
-    const staticResult = analyzeCode(
-      codeFiles.map((f: { path: string; content: string }) => ({
-        path: f.path,
-        content: f.content,
-      }))
-    )
-
-    if (!staticResult.passed) {
-      return {
-        repo: repoRef,
-        status: 'rejected',
-        reason: `Static analysis failed: ${staticResult.issues.join(', ')}`,
-      }
+    // 2. Fetch README
+    const readme = await fetchReadme(owner, repo)
+    if (!readme) {
+      return { repo: repoRef, status: 'skipped', reason: 'No README' }
     }
 
-    // Step 4: AI Review
-    const review = await reviewSkill({
-      repository: repoData.fullName,
-      readmeContent,
-      codeFiles,
-      manifestData,
-      githubStats: {
-        stars: repoData.stars,
-        forks: repoData.forks,
-        lastUpdated: repoData.updatedAt,
-      },
-    })
+    // 3. AI Review
+    const review = await aiReview(candidate, readme)
 
     if (!review.approved) {
-      return {
-        repo: repoRef,
-        status: 'rejected',
-        reason: `AI review rejected (score: ${review.totalScore}/40): ${review.issues.join(', ')}`,
-      }
+      return { repo: repoRef, status: 'rejected', reason: review.reason || 'Did not pass review' }
     }
 
-    // Step 5: Write to database
-    const skillName = manifestData?.name || repo.replace(/-/g, ' ')
-    const slug = `${owner}-${repo}`.toLowerCase()
-    const category = manifestData?.category || inferCategory(repoData.description, readmeContent)
-
-    const skillRecord = await createSkill({
+    // 4. Write to skills table
+    const skillData = {
       slug,
-      name: skillName,
-      description: manifestData?.description || repoData.description || '',
-      long_description: readmeContent.slice(0, 1000),
-      tagline: manifestData?.tagline || repoData.description || '',
+      name: repo.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+      description: review.summary,
+      long_description: readme.slice(0, 2000),
+      tagline: candidate.description || review.summary,
       author_name: owner,
       author_url: `https://github.com/${owner}`,
       repository: `https://github.com/${owner}/${repo}`,
       github_repo: repoRef,
-      github_stars: repoData.stars,
-      github_forks: repoData.forks,
-      category,
-      tags: manifestData?.tags || inferTags(repoData.language, repoData.description),
-      frameworks: manifestData?.frameworks || [],
-      version: manifestData?.version || '1.0.0',
-      license: repoData.license || 'Unknown',
+      github_stars: candidate.stars,
+      github_forks: 0,
+      category: review.category,
+      tags: review.tags,
+      frameworks: [],
+      version: '1.0.0',
+      license: 'Unknown',
       install_command: `npx skills add ${repoRef}`,
-      verified: review.totalScore >= 35,
+      verified: candidate.stars >= 100,
       submission_source: 'auto-indexer',
       submitted_by_agent: 'open-agent-skill-indexer',
-      ai_review_score: review.scores,
-      ai_review_approved: review.approved,
-      ai_review_issues: review.issues,
-      ai_review_suggestions: review.suggestions,
-    })
+      ai_review_score: { total: review.score },
+      ai_review_approved: true,
+      ai_review_issues: [],
+      ai_review_suggestions: [],
+      downloads: 0,
+      used_by: 0,
+      rating: 0,
+      review_count: 0,
+    }
 
-    // Submission record
-    await createSubmissionRecord({
-      skill_id: skillRecord.id,
-      github_repo: repoRef,
-      submission_source: 'auto-indexer',
-      submitted_by_agent: 'open-agent-skill-indexer',
-      ai_review_result: review,
-      status: 'approved',
-    })
+    const { data: skillRecord, error: skillError } = await supabase
+      .from('skills')
+      .insert(skillData)
+      .select('id')
+      .single()
 
-    // Activity feed entry
-    await createActivity({
+    if (skillError) throw new Error(`DB insert failed: ${skillError.message}`)
+
+    // 5. Log to activity feed
+    await supabase.from('activity_feed').insert({
       event_type: 'skill_published',
       skill_id: skillRecord.id,
       actor_name: 'Open Agent Skill Indexer',
       actor_type: 'agent',
-      description: `Auto-indexed ${skillName} from GitHub — ${repoData.description || ''}`,
-      metadata: { stars: repoData.stars, source: 'auto-indexer' },
+      description: `Auto-indexed ${skillData.name} from GitHub (${candidate.stars} stars)`,
+      metadata: { stars: candidate.stars, source: 'auto-indexer', score: review.score },
     })
 
-    return { repo: repoRef, status: 'indexed', skillId: skillRecord.id }
+    return { repo: repoRef, status: 'indexed', slug }
   } catch (error: any) {
     return { repo: repoRef, status: 'error', reason: error.message }
   }
 }
 
-/**
- * Process a batch of candidates with a concurrency limit.
- */
 export async function processBatch(
   candidates: CandidateRepo[],
-  concurrency = 3
+  concurrency = 2
 ): Promise<ProcessResult[]> {
   const results: ProcessResult[] = []
 
@@ -159,33 +200,11 @@ export async function processBatch(
     const chunkResults = await Promise.all(chunk.map(processRepo))
     results.push(...chunkResults)
 
-    // Brief pause between chunks to respect GitHub rate limits
+    // Respect GitHub rate limits
     if (i + concurrency < candidates.length) {
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      await new Promise((r) => setTimeout(r, 2000))
     }
   }
 
   return results
-}
-
-// --- Helpers ---
-
-function inferCategory(description: string, readme: string): string {
-  const text = `${description} ${readme}`.toLowerCase()
-  if (text.includes('web scraping') || text.includes('crawl') || text.includes('browser')) return 'data'
-  if (text.includes('search') || text.includes('retrieval') || text.includes('rag')) return 'data'
-  if (text.includes('code') || text.includes('programming') || text.includes('developer')) return 'development'
-  if (text.includes('image') || text.includes('vision') || text.includes('screenshot')) return 'media'
-  if (text.includes('email') || text.includes('calendar') || text.includes('slack')) return 'productivity'
-  if (text.includes('security') || text.includes('auth') || text.includes('encrypt')) return 'security'
-  return 'utility'
-}
-
-function inferTags(language: string | null, description: string): string[] {
-  const tags: string[] = []
-  if (language) tags.push(language.toLowerCase())
-  const keywords = ['mcp', 'llm', 'agent', 'automation', 'api', 'scraping', 'search', 'rag']
-  const text = description.toLowerCase()
-  keywords.forEach((kw) => { if (text.includes(kw)) tags.push(kw) })
-  return [...new Set(tags)].slice(0, 5)
 }
