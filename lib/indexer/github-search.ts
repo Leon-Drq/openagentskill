@@ -27,56 +27,81 @@ export interface CandidateRepo {
   htmlUrl: string
 }
 
-// Search queries rotated across indexer runs to discover diverse repos
-const SEARCH_QUERIES = [
-  'topic:mcp-server',
-  'topic:model-context-protocol',
-  'topic:ai-agent stars:>5',
-  'topic:llm-tools stars:>10',
-  '"mcp server" language:python stars:>5',
-  '"mcp server" language:typescript stars:>5',
-  'filename:SKILL.md',
-  '"agent skill" stars:>3',
-  'topic:openai-tools stars:>10',
-  'topic:claude-mcp stars:>3',
+/**
+ * Search strategy matrix — each entry targets a distinct category of agent skills.
+ *
+ * Two axes:
+ *  - "skill collections" (awesome-lists / curated skill packs): high value, many skills per repo
+ *  - "single skill repos" (focused MCP tool / agent plugin): broad long-tail discovery
+ *
+ * Ordered by expected signal quality. Rotated round-robin across cron runs so
+ * every query gets fresh results over time without hitting rate limits.
+ */
+const SEARCH_QUERIES: Array<{ q: string; sort: 'stars' | 'updated' }> = [
+  // ── Skill collections ──────────────────────────────────────────────────────
+  { q: 'topic:agent-skills',               sort: 'stars'   },
+  { q: 'topic:openclaw-skills',            sort: 'stars'   },
+  { q: 'topic:clawdbot-skill',             sort: 'stars'   },
+  { q: 'topic:mcp-skills',                 sort: 'stars'   },
+  { q: '"awesome" "agent skills"',         sort: 'stars'   },
+  { q: '"awesome" "mcp servers"',          sort: 'stars'   },
+  { q: 'filename:SKILL.md',                sort: 'stars'   },
+
+  // ── Single MCP tool / plugin repos ────────────────────────────────────────
+  { q: 'topic:mcp-tool stars:>10',         sort: 'stars'   },
+  { q: 'topic:mcp-plugin stars:>5',        sort: 'stars'   },
+  { q: 'topic:claude-tool stars:>5',       sort: 'stars'   },
+  { q: 'topic:openai-plugin stars:>10',    sort: 'stars'   },
+  { q: 'topic:langchain-tool stars:>10',   sort: 'stars'   },
+  { q: 'topic:crewai stars:>10',           sort: 'stars'   },
+  { q: 'topic:autogen stars:>10',          sort: 'stars'   },
+  { q: '"mcp server" stars:>20 -topic:n8n',sort: 'stars'   },
+  { q: 'topic:voltagent-skill',            sort: 'stars'   },
+  { q: 'topic:ai-skill',                   sort: 'stars'   },
+  { q: '"agent tool" stars:>10',           sort: 'updated' },
+  { q: '"agent plugin" stars:>10',         sort: 'updated' },
+  { q: 'topic:browser-use',               sort: 'stars'   },
 ]
 
 /**
- * Search GitHub for agent skill / MCP server repositories.
- * Rotates across multiple search queries for broad discovery.
+ * Search GitHub for agent skill repositories.
+ * Rotates across the query matrix so each cron run covers a different slice.
  */
 export async function searchSkillRepos(
   page = 1,
   perPage = 20
 ): Promise<CandidateRepo[]> {
-  // Pick query based on page number to rotate across all queries over time
-  const query = SEARCH_QUERIES[(page - 1) % SEARCH_QUERIES.length]
-  const sort = 'stars'
-  const url = `${GITHUB_API_BASE}/search/repositories?q=${encodeURIComponent(query)}&sort=${sort}&order=desc&per_page=${perPage}&page=${Math.ceil(page / SEARCH_QUERIES.length)}`
+  const idx = (page - 1) % SEARCH_QUERIES.length
+  const { q, sort } = SEARCH_QUERIES[idx]
+  const ghPage = Math.ceil(page / SEARCH_QUERIES.length)
 
-  const response = await fetch(url, {
-    headers: githubHeaders(),
-    next: { revalidate: 3600 },
-  } as RequestInit)
+  const url =
+    `${GITHUB_API_BASE}/search/repositories` +
+    `?q=${encodeURIComponent(q)}&sort=${sort}&order=desc&per_page=${perPage}&page=${ghPage}`
+
+  const response = await fetch(url, { headers: githubHeaders() } as RequestInit)
 
   if (!response.ok) {
     const body = await response.text()
-    throw new Error(`GitHub Repo Search failed [${query}]: ${response.status} ${body}`)
+    throw new Error(`GitHub search failed [${q}]: ${response.status} ${body}`)
   }
 
   const data = await response.json()
-  if (!data.items || data.items.length === 0) return []
+  if (!data.items?.length) return []
 
-  return data.items.map((r: any) => ({
-    owner: r.owner.login,
-    repo: r.name,
-    fullName: r.full_name,
-    description: r.description || '',
-    stars: r.stargazers_count ?? 0,
-    language: r.language ?? null,
-    updatedAt: r.updated_at,
-    htmlUrl: r.html_url,
-  }))
+  return (data.items as any[])
+    .filter((r) => !r.archived && !r.fork)          // skip archived and forks
+    .filter((r) => r.stargazers_count >= 3)          // minimum quality bar
+    .map((r) => ({
+      owner:       r.owner.login,
+      repo:        r.name,
+      fullName:    r.full_name,
+      description: r.description || '',
+      stars:       r.stargazers_count ?? 0,
+      language:    r.language ?? null,
+      updatedAt:   r.updated_at,
+      htmlUrl:     r.html_url,
+    }))
 }
 
 /**

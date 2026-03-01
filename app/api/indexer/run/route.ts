@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { searchSkillRepos } from '@/lib/indexer/github-search'
-import { processBatch } from '@/lib/indexer/processor'
+import { searchSkillRepos, type CandidateRepo } from '@/lib/indexer/github-search'
+import { processBatch, processRepo } from '@/lib/indexer/processor'
 
 // Allow up to 5 minutes (Vercel Pro max)
 export const maxDuration = 300
@@ -28,6 +28,22 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}))
     const page = Math.max(1, Number(body.page) || 1)
     const limit = Math.min(Number(body.limit) || 20, 30)
+
+    // Support direct URL injection: POST { "repoUrl": "https://github.com/owner/repo" }
+    if (body.repoUrl) {
+      const match = String(body.repoUrl).match(/github\.com\/([^/]+)\/([^/]+)/)
+      if (!match) {
+        return NextResponse.json({ error: 'Invalid GitHub URL' }, { status: 400 })
+      }
+      const candidate: CandidateRepo = {
+        owner: match[1], repo: match[2].replace(/\.git$/, ''),
+        fullName: `${match[1]}/${match[2]}`,
+        description: '', stars: 0, language: null,
+        updatedAt: new Date().toISOString(), htmlUrl: body.repoUrl,
+      }
+      const result = await processRepo(candidate)
+      return NextResponse.json({ success: true, summary: { found: 1, indexed: result.status === 'indexed' ? 1 : 0, rejected: result.status === 'rejected' ? 1 : 0, skipped: result.status === 'skipped' ? 1 : 0, errors: result.status === 'error' ? 1 : 0 }, results: [result] })
+    }
 
     console.log(`[indexer] Starting — page=${page}, limit=${limit}`)
 
