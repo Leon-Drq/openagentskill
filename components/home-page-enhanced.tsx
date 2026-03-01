@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { useI18n } from '@/lib/i18n/context'
 import { LanguageSwitcher } from './language-switcher'
+import { NavUserMenu } from './nav-user-menu'
 
 interface HomePageEnhancedProps {
   stats: {
@@ -165,6 +166,7 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
             <Link href="/activity" className="text-xs sm:text-sm text-secondary hover:text-foreground transition-colors hidden md:inline">
               {t.nav.activity}
             </Link>
+            <NavUserMenu />
             <LanguageSwitcher />
           </div>
         </div>
