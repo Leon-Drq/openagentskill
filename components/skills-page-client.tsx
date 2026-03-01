@@ -6,6 +6,7 @@ import { useCallback } from 'react'
 import { useI18n } from '@/lib/i18n/context'
 import { InstallCommand } from './install-command'
 import { LanguageSwitcher } from './language-switcher'
+import { NavUserMenu } from './nav-user-menu'
 
 interface Skill {
   id: string
@@ -82,6 +83,7 @@ export function SkillsPageClient({ skills, query, sort, category, categories }: 
                 <Link href="/submit" className="text-secondary hover:text-foreground transition-colors">Submit</Link>
                 <Link href="/docs" className="text-secondary hover:text-foreground transition-colors">{t.nav.docs}</Link>
               </div>
+              <NavUserMenu />
               <LanguageSwitcher />
             </div>
           </div>
