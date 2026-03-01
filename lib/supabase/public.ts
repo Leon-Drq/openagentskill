@@ -15,8 +15,24 @@ const SUPABASE_ANON_KEY =
 /**
  * A lightweight Supabase client for public read-only operations.
  * Does NOT depend on cookies() — works in any server context.
- * Falls back to hardcoded credentials if env vars are not set.
  */
 export function createPublicClient() {
   return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+}
+
+/**
+ * Service-role Supabase client for server-side write operations
+ * (indexer, cron jobs, etc.) that bypass RLS.
+ * NEVER expose this to the client side.
+ */
+export function createServiceClient() {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!serviceKey) {
+    // Fall back to anon key — writes will be subject to RLS
+    console.warn('[supabase] SUPABASE_SERVICE_ROLE_KEY not set, falling back to anon key')
+    return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  }
+  return createSupabaseClient(SUPABASE_URL, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
 }
