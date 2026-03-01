@@ -27,51 +27,56 @@ export interface CandidateRepo {
   htmlUrl: string
 }
 
+// Search queries rotated across indexer runs to discover diverse repos
+const SEARCH_QUERIES = [
+  'topic:mcp-server',
+  'topic:model-context-protocol',
+  'topic:ai-agent stars:>5',
+  'topic:llm-tools stars:>10',
+  '"mcp server" language:python stars:>5',
+  '"mcp server" language:typescript stars:>5',
+  'filename:SKILL.md',
+  '"agent skill" stars:>3',
+  'topic:openai-tools stars:>10',
+  'topic:claude-mcp stars:>3',
+]
+
 /**
- * Search GitHub for repositories containing SKILL.md.
- * Returns up to `perPage` results sorted by stars descending.
+ * Search GitHub for agent skill / MCP server repositories.
+ * Rotates across multiple search queries for broad discovery.
  */
 export async function searchSkillRepos(
   page = 1,
   perPage = 20
 ): Promise<CandidateRepo[]> {
-  // Search for repos that have a SKILL.md file in the root
-  const query = 'filename:SKILL.md path:/'
-  const url = `${GITHUB_API_BASE}/search/code?q=${encodeURIComponent(query)}&per_page=${perPage}&page=${page}`
+  // Pick query based on page number to rotate across all queries over time
+  const query = SEARCH_QUERIES[(page - 1) % SEARCH_QUERIES.length]
+  const sort = 'stars'
+  const url = `${GITHUB_API_BASE}/search/repositories?q=${encodeURIComponent(query)}&sort=${sort}&order=desc&per_page=${perPage}&page=${Math.ceil(page / SEARCH_QUERIES.length)}`
 
-  const response = await fetch(url, { headers: githubHeaders() })
+  const response = await fetch(url, {
+    headers: githubHeaders(),
+    next: { revalidate: 3600 },
+  } as RequestInit)
 
   if (!response.ok) {
     const body = await response.text()
-    throw new Error(`GitHub Code Search failed: ${response.status} ${body}`)
+    throw new Error(`GitHub Repo Search failed [${query}]: ${response.status} ${body}`)
   }
 
   const data = await response.json()
-
   if (!data.items || data.items.length === 0) return []
 
-  // De-duplicate by repository (multiple files may match per repo)
-  const seen = new Set<string>()
-  const repos: CandidateRepo[] = []
-
-  for (const item of data.items) {
-    const r = item.repository
-    if (seen.has(r.full_name)) continue
-    seen.add(r.full_name)
-
-    repos.push({
-      owner: r.owner.login,
-      repo: r.name,
-      fullName: r.full_name,
-      description: r.description || '',
-      stars: r.stargazers_count ?? 0,
-      language: r.language ?? null,
-      updatedAt: r.updated_at,
-      htmlUrl: r.html_url,
-    })
-  }
-
-  return repos
+  return data.items.map((r: any) => ({
+    owner: r.owner.login,
+    repo: r.name,
+    fullName: r.full_name,
+    description: r.description || '',
+    stars: r.stargazers_count ?? 0,
+    language: r.language ?? null,
+    updatedAt: r.updated_at,
+    htmlUrl: r.html_url,
+  }))
 }
 
 /**
