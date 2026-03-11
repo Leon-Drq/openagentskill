@@ -37,10 +37,10 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServiceClient()
 
-    // 1. 验证 skill 存在
+    // 1. 验证 skill 存在，并获取作者 user_id
     const { data: skill, error: skillError } = await supabase
       .from('skills')
-      .select('slug, author_name')
+      .select('slug, author_name, author_user_id')
       .eq('slug', skill_slug)
       .single()
 
@@ -65,21 +65,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to record feedback' }, { status: 500 })
     }
 
-    // 3. 如果成功调用，给作者加积分（未来可以通过 author_user_id 关联真实用户）
-    // 目前先记录到 activity_feed 作为记录
+    // 3. 如果成功调用，给作者发放积分
+    let pointsAwarded = 0
+    if (success && skill.author_user_id) {
+      // 每次成功调用奖励 1 积分
+      const { error: pointsError } = await supabase
+        .from('point_events')
+        .insert({
+          user_id: skill.author_user_id,
+          amount: 1,
+          event_type: 'skill_called',
+          description: `Skill "${skill_slug}" called by ${agent_id}`,
+          ref_id: skill_slug,
+        })
+      
+      if (!pointsError) {
+        pointsAwarded = 1
+      }
+    }
+
+    // 4. 记录到 activity_feed
     if (success) {
       await supabase.from('activity_feed').insert({
         type: 'skill_called',
         skill_slug,
         actor_name: agent_id,
-        metadata: { latency_ms, success: true },
+        metadata: { latency_ms, success: true, points_awarded: pointsAwarded },
       }).catch(() => {}) // 忽略 activity 写入失败
     }
 
     return NextResponse.json({ 
       success: true, 
       message: 'Feedback recorded',
-      data: { skill_slug, agent_id, success }
+      data: { skill_slug, agent_id, success, points_awarded: pointsAwarded }
     })
 
   } catch (error) {
