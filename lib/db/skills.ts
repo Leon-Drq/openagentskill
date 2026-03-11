@@ -75,6 +75,38 @@ export async function getAllSkills(
   return data || []
 }
 
+export interface SkillAgentStats {
+  total_calls: number
+  success_calls: number
+  success_rate: number | null
+  avg_latency_ms: number | null
+  unique_agents: number
+  last_called_at: string | null
+}
+
+/**
+ * 获取所有 skill 的 Agent 调用统计
+ * 返回以 slug 为 key 的 map
+ */
+export async function getSkillStats(): Promise<Record<string, SkillAgentStats>> {
+  const supabase = createPublicClient()
+  const { data, error } = await supabase.from('skill_stats').select('*')
+  if (error || !data) return {}
+  
+  const map: Record<string, SkillAgentStats> = {}
+  for (const row of data) {
+    map[row.skill_slug] = {
+      total_calls: row.total_calls,
+      success_calls: row.success_calls,
+      success_rate: row.success_rate,
+      avg_latency_ms: row.avg_latency_ms,
+      unique_agents: row.unique_agents,
+      last_called_at: row.last_called_at,
+    }
+  }
+  return map
+}
+
 export async function getCategories(): Promise<string[]> {
   const supabase = createPublicClient()
   const { data, error } = await supabase
