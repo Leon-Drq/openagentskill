@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { getAllSkills, getCategories, convertSkillRecordToManifest, type SkillSortMode } from '@/lib/db/skills'
+import { getAllSkills, getCategories, convertSkillRecordToManifest, type SkillSortMode, getSkillStats } from '@/lib/db/skills'
 import { SkillsPageClient } from '@/components/skills-page-client'
 
 export const dynamic = 'force-dynamic'
@@ -23,12 +23,16 @@ export default async function SkillsPage({
   const sort = (params.sort as SkillSortMode) || 'downloads'
   const category = params.category || 'all'
 
-  const [records, categories] = await Promise.all([
+  const [records, categories, statsMap] = await Promise.all([
     getAllSkills(sort, category),
     getCategories(),
+    getSkillStats(),
   ])
 
-  let skills = records.map(convertSkillRecordToManifest)
+  let skills = records.map((r) => ({
+    ...convertSkillRecordToManifest(r),
+    agentStats: statsMap[r.slug] || null,
+  }))
 
   if (params.q) {
     const query = params.q.toLowerCase()

@@ -8,6 +8,14 @@ import { InstallCommand } from './install-command'
 import { LanguageSwitcher } from './language-switcher'
 import { NavUserMenu } from './nav-user-menu'
 
+interface AgentStats {
+  total_calls: number
+  success_calls: number
+  success_rate: number | null
+  avg_latency_ms: number | null
+  unique_agents: number
+}
+
 interface Skill {
   id: string
   slug: string
@@ -27,6 +35,7 @@ interface Skill {
   author: { name: string }
   verified: boolean
   createdAt: string
+  agentStats?: AgentStats | null
 }
 
 const SORT_TABS = [
@@ -244,22 +253,37 @@ export function SkillsPageClient({ skills, query, sort, category, categories }: 
 
                     {/* Stats */}
                     <div className="flex flex-wrap gap-4 text-sm text-secondary font-mono mb-4">
-                      <span title="Downloads">
-                        {skill.stats.downloads >= 1000
-                          ? `${(skill.stats.downloads / 1000).toFixed(1)}K`
-                          : skill.stats.downloads}{' '}
-                        installs
-                      </span>
+                      {/* Agent Calls - 核心指标 */}
+                      {skill.agentStats && skill.agentStats.total_calls > 0 && (
+                        <>
+                          <span title="Agent Calls" className="text-foreground font-semibold">
+                            {skill.agentStats.total_calls >= 1000
+                              ? `${(skill.agentStats.total_calls / 1000).toFixed(1)}K`
+                              : skill.agentStats.total_calls}{' '}
+                            agent calls
+                          </span>
+                          {skill.agentStats.success_rate !== null && (
+                            <span 
+                              title="Success Rate"
+                              className={skill.agentStats.success_rate >= 90 ? 'text-foreground' : skill.agentStats.success_rate >= 70 ? 'text-secondary' : 'text-red-600'}
+                            >
+                              {skill.agentStats.success_rate}% success
+                            </span>
+                          )}
+                        </>
+                      )}
                       <span title="GitHub Stars">
                         {skill.stats.stars >= 1000
                           ? `${(skill.stats.stars / 1000).toFixed(1)}K`
                           : skill.stats.stars} stars
                       </span>
-                      {skill.stats.rating > 0 && (
-                        <span>{skill.stats.rating.toFixed(1)}/5</span>
-                      )}
-                      {skill.stats.weeklyGrowth && skill.stats.weeklyGrowth > 0 && (
-                        <span className="text-foreground">+{skill.stats.weeklyGrowth}% this week</span>
+                      {skill.stats.downloads > 0 && (
+                        <span title="Downloads">
+                          {skill.stats.downloads >= 1000
+                            ? `${(skill.stats.downloads / 1000).toFixed(1)}K`
+                            : skill.stats.downloads}{' '}
+                          installs
+                        </span>
                       )}
                     </div>
 
