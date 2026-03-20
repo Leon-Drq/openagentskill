@@ -5,12 +5,17 @@ import { SkillsPageClient } from '@/components/skills-page-client'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Browse Agent Skills — Open Agent Skill',
-  description: 'Explore AI agent skills across all platforms. Find the perfect skills for your autonomous agents.',
+  title: 'Browse 35+ AI Agent Skills',
+  description: 'Discover AI agent skills for data processing, automation, finance, and more. Real usage stats from agents. Filter by category, sort by popularity or recent.',
+  keywords: ['AI agent skills', 'MCP servers', 'Claude tools', 'GPT plugins', 'LangChain tools', 'agent marketplace'],
   openGraph: {
-    title: 'Browse Agent Skills — Open Agent Skill',
-    description: 'Explore AI agent skills across all platforms.',
+    title: 'Browse 35+ AI Agent Skills — Open Agent Skill',
+    description: 'Discover AI agent skills ranked by real agent usage. Data processing, automation, finance, and more.',
     type: 'website',
+    url: 'https://www.openagentskill.com/skills',
+  },
+  alternates: {
+    canonical: 'https://www.openagentskill.com/skills',
   },
 }
 

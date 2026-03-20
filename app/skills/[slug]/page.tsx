@@ -15,13 +15,27 @@ export async function generateMetadata({
   const dbSkill = await getSkillBySlug(slug)
   const skill = dbSkill ? convertSkillRecordToManifest(dbSkill) : null
   if (!skill) return { title: 'Skill Not Found' }
+  
+  const starsText = skill.stats.stars >= 1000 ? `${(skill.stats.stars / 1000).toFixed(1)}K` : skill.stats.stars
+  const description = `${skill.description} ${starsText} GitHub stars. Install with npx skills add ${skill.slug}.`
+  
   return {
-    title: `${skill.name} — Open Agent Skill`,
-    description: skill.description,
+    title: `${skill.name} - AI Agent Skill`,
+    description,
+    keywords: [skill.name, ...skill.tags, 'AI agent skill', 'MCP server', skill.category],
     openGraph: {
-      title: skill.name,
-      description: skill.description,
+      title: `${skill.name} — Open Agent Skill`,
+      description,
       type: 'article',
+      url: `https://www.openagentskill.com/skills/${slug}`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${skill.name} — AI Agent Skill`,
+      description,
+    },
+    alternates: {
+      canonical: `https://www.openagentskill.com/skills/${slug}`,
     },
   }
 }

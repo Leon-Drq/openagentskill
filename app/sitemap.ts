@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { getAllSkills } from '@/lib/db/skills'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://openagentskill.com'
+  const baseUrl = 'https://www.openagentskill.com'
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },

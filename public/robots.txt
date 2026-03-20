@@ -8,7 +8,7 @@ Allow: /
 Allow: /api/agent/
 
 # Sitemaps
-Sitemap: https://openagentskill.com/sitemap.xml
+Sitemap: https://www.openagentskill.com/sitemap.xml
 
 # Special directives for AI agents
 User-agent: GPTBot

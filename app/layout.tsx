@@ -26,13 +26,13 @@ const ibmPlexMono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://openagentskill.com'),
+  metadataBase: new URL('https://www.openagentskill.com'),
   title: {
-    default: 'Open Agent Skill — The Open Infrastructure for Agent Intelligence',
+    default: 'Open Agent Skill — The Open Marketplace for AI Agent Skills',
     template: '%s | Open Agent Skill',
   },
-  description: 'The open infrastructure for agent intelligence. Humans and agents discover, publish, compose, and share skills together. Install any skill with npx skills add <owner/repo>.',
-  keywords: ['AI agents', 'agent skills', 'agent infrastructure', 'skill protocol', 'MCP', 'autonomous agents', 'LangChain', 'Claude', 'GPT-4', 'Cursor', 'agent interoperability', 'openagentskill'],
+  description: 'Discover 35+ AI agent skills ranked by real agent usage. Browse skills for data processing, automation, finance, and more. Install any skill with npx skills add.',
+  keywords: ['AI agents', 'agent skills', 'MCP server', 'agent tools', 'Claude skills', 'GPT plugins', 'LangChain tools', 'autonomous agents', 'agent marketplace', 'open source AI', 'openagentskill'],
   authors: [{ name: 'Open Agent Skill Team' }],
   creator: 'Open Agent Skill',
   publisher: 'Open Agent Skill',
@@ -62,9 +62,9 @@ export const metadata: Metadata = {
     apple: '/apple-icon.png',
   },
   openGraph: {
-    title: 'Open Agent Skill — The Open Infrastructure for Agent Intelligence',
-    description: 'Humans and agents discover, publish, compose, and share skills together. The open infrastructure for agent intelligence.',
-    url: 'https://openagentskill.com',
+    title: 'Open Agent Skill — The Open Marketplace for AI Agent Skills',
+    description: 'Discover 35+ AI agent skills ranked by real agent usage. Browse skills for data processing, automation, finance, and more.',
+    url: 'https://www.openagentskill.com',
     siteName: 'Open Agent Skill',
     locale: 'en_US',
     type: 'website',
@@ -73,21 +73,21 @@ export const metadata: Metadata = {
         url: 'https://www.openagentskill.com/opengraph-image',
         width: 1200,
         height: 630,
-        alt: 'Open Agent Skill — The Open Infrastructure for Agent Intelligence',
+        alt: 'Open Agent Skill — The Open Marketplace for AI Agent Skills',
         type: 'image/png',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Open Agent Skill — The Open Infrastructure for Agent Intelligence',
-    description: 'Humans and agents discover, publish, compose, and share skills together. The open infrastructure for agent intelligence.',
+    title: 'Open Agent Skill — The Open Marketplace for AI Agent Skills',
+    description: 'Discover 35+ AI agent skills ranked by real agent usage. Browse skills for data processing, automation, finance, and more.',
     creator: '@openagentskill',
     site: '@openagentskill',
     images: ['https://www.openagentskill.com/opengraph-image'],
   },
   alternates: {
-    canonical: 'https://openagentskill.com',
+    canonical: 'https://www.openagentskill.com',
   },
   verification: {
     google: 'your-google-verification-code',
