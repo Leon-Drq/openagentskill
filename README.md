@@ -1,18 +1,32 @@
+<div align="center">
+
 # Open Agent Skill
 
-**The open marketplace for AI agent skills.** Discover, publish, and compose skills for Claude, GPT, Copilot, and other AI agents.
+### The Open Marketplace for AI Agent Skills
 
-Website: **[openagentskill.com](https://www.openagentskill.com)**
+[![Website](https://img.shields.io/badge/Website-openagentskill.com-blue?style=for-the-badge)](https://www.openagentskill.com)
+[![GitHub Stars](https://img.shields.io/github/stars/Leon-Drq/openagentskill?style=for-the-badge&logo=github)](https://github.com/Leon-Drq/openagentskill)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](./LICENSE)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com)
+
+**Discover, publish, and share skills for Claude, GPT, Copilot, and other AI agents.**
+
+[Browse Skills](https://www.openagentskill.com/skills) | [Submit Skill](https://www.openagentskill.com/submit) | [API Docs](https://www.openagentskill.com/docs)
+
+</div>
 
 ---
 
 ## Why Open Agent Skill?
 
+> **"The only skill ranking based on real agent usage, not vanity metrics."**
+
 | Problem | Solution |
 |---------|----------|
-| Finding quality skills is hard | Curated directory with 35+ verified skills |
+| Finding quality skills is hard | Curated directory with **35+ verified skills**, auto-indexed daily |
 | GitHub stars don't reflect real usage | **Agent Feedback Loop** — real usage data from AI agents |
-| No incentive for skill authors | Points system rewards authors for every successful call |
+| No incentive for skill authors | **Points system** rewards authors for every successful call |
+| Skills scattered across GitHub | **One-stop marketplace** with search, filters, and categories |
 
 ---
 
@@ -59,10 +73,15 @@ Website: **[openagentskill.com](https://www.openagentskill.com)**
 
 | Skill | Stars | Description | Use Case |
 |-------|-------|-------------|----------|
+| [ClawFeed](https://github.com/kevinho/clawfeed) | 1.6K | AI-powered news digest from multiple sources | Curate Twitter, RSS, HackerNews, Reddit into summaries |
 | [Planning With Files](https://github.com/OthmanAdi/planning-with-files) | 14K | Persistent markdown planning workflows | Project management with AI agents |
 | [Eigent](https://github.com/eigent-ai/eigent) | 12K | Build custom AI workforce | Multi-agent team collaboration |
 
-[View all 35+ skills →](https://www.openagentskill.com/skills)
+<div align="center">
+
+**[View all 35+ skills →](https://www.openagentskill.com/skills)**
+
+</div>
 
 ---
 
@@ -239,6 +258,13 @@ MIT License — see [LICENSE](./LICENSE)
 
 ---
 
-**Built with care for the AI agent ecosystem.**
+<div align="center">
 
-[Website](https://www.openagentskill.com) · [Browse Skills](https://www.openagentskill.com/skills) · [Submit Skill](https://www.openagentskill.com/submit) · [API Docs](https://www.openagentskill.com/docs)
+**Built with love for the AI agent ecosystem.**
+
+[![Website](https://img.shields.io/badge/Visit-openagentskill.com-blue?style=flat-square)](https://www.openagentskill.com)
+[![Twitter](https://img.shields.io/badge/Follow-@drq__ai-1DA1F2?style=flat-square&logo=twitter)](https://twitter.com/drq_ai)
+
+[Browse Skills](https://www.openagentskill.com/skills) | [Submit Skill](https://www.openagentskill.com/submit) | [API Docs](https://www.openagentskill.com/docs)
+
+</div>
