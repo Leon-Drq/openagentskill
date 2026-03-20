@@ -38,29 +38,28 @@ export interface CandidateRepo {
  * every query gets fresh results over time without hitting rate limits.
  */
 const SEARCH_QUERIES: Array<{ q: string; sort: 'stars' | 'updated' }> = [
-  // ── Skill collections ──────────────────────────────────────────────────────
-  { q: 'topic:agent-skills',               sort: 'stars'   },
-  { q: 'topic:openclaw-skills',            sort: 'stars'   },
-  { q: 'topic:clawdbot-skill',             sort: 'stars'   },
-  { q: 'topic:mcp-skills',                 sort: 'stars'   },
-  { q: '"awesome" "agent skills"',         sort: 'stars'   },
-  { q: '"awesome" "mcp servers"',          sort: 'stars'   },
-  { q: 'filename:SKILL.md',                sort: 'stars'   },
+  // ── Skill collections (high value, many skills per repo) ───────────────────
+  { q: 'topic:agent-skills stars:>50',     sort: 'stars'   },
+  { q: 'topic:mcp-server stars:>100',      sort: 'stars'   },
+  { q: '"awesome" "mcp" stars:>50',        sort: 'stars'   },
+  { q: '"awesome" "agent" stars:>50',      sort: 'stars'   },
+  { q: 'topic:mcp-skills stars:>50',       sort: 'stars'   },
 
-  // ── Single MCP tool / plugin repos ────────────────────────────────────────
-  { q: 'topic:mcp-tool stars:>10',         sort: 'stars'   },
-  { q: 'topic:mcp-plugin stars:>5',        sort: 'stars'   },
-  { q: 'topic:claude-tool stars:>5',       sort: 'stars'   },
-  { q: 'topic:openai-plugin stars:>10',    sort: 'stars'   },
-  { q: 'topic:langchain-tool stars:>10',   sort: 'stars'   },
-  { q: 'topic:crewai stars:>10',           sort: 'stars'   },
-  { q: 'topic:autogen stars:>10',          sort: 'stars'   },
-  { q: '"mcp server" stars:>20 -topic:n8n',sort: 'stars'   },
-  { q: 'topic:voltagent-skill',            sort: 'stars'   },
-  { q: 'topic:ai-skill',                   sort: 'stars'   },
-  { q: '"agent tool" stars:>10',           sort: 'updated' },
-  { q: '"agent plugin" stars:>10',         sort: 'updated' },
-  { q: 'topic:browser-use',               sort: 'stars'   },
+  // ── Popular MCP / Agent tools ──────────────────────────────────────────────
+  { q: 'topic:mcp-tool stars:>50',         sort: 'stars'   },
+  { q: 'topic:claude-tool stars:>50',      sort: 'stars'   },
+  { q: 'topic:openai-plugin stars:>50',    sort: 'stars'   },
+  { q: 'topic:langchain-tool stars:>50',   sort: 'stars'   },
+  { q: '"mcp server" stars:>100',          sort: 'stars'   },
+  { q: 'topic:ai-agent stars:>100',        sort: 'stars'   },
+  { q: 'topic:llm-tool stars:>50',         sort: 'stars'   },
+
+  // ── Frameworks & ecosystems ────────────────────────────────────────────────
+  { q: 'topic:crewai stars:>50',           sort: 'stars'   },
+  { q: 'topic:autogen stars:>50',          sort: 'stars'   },
+  { q: 'topic:browser-use stars:>50',      sort: 'stars'   },
+  { q: '"agent skill" stars:>50',          sort: 'updated' },
+  { q: '"ai tool" stars:>100',             sort: 'updated' },
 ]
 
 /**
@@ -91,7 +90,7 @@ export async function searchSkillRepos(
 
   return (data.items as any[])
     .filter((r) => !r.archived && !r.fork)          // skip archived and forks
-    .filter((r) => r.stargazers_count >= 3)          // minimum quality bar
+    .filter((r) => r.stargazers_count >= 50)         // minimum quality bar: 50+ stars
     .map((r) => ({
       owner:       r.owner.login,
       repo:        r.name,
