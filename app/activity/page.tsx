@@ -5,9 +5,17 @@ import { ActivityPageClient } from '@/components/activity-page-client'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Activity Feed — Open Agent Skill',
-  description:
-    'Real-time activity from the Open Agent Skill platform. See what humans and agents are publishing, composing, and discovering.',
+  title: 'Activity Feed - Latest Skill Updates',
+  description: 'Real-time activity from Open Agent Skill. See new skills, trending tools, and what agents are using right now.',
+  openGraph: {
+    title: 'Activity Feed — Open Agent Skill',
+    description: 'Real-time activity from Open Agent Skill. New skills, trending tools, and agent usage.',
+    type: 'website',
+    url: 'https://www.openagentskill.com/activity',
+  },
+  alternates: {
+    canonical: 'https://www.openagentskill.com/activity',
+  },
 }
 
 export default async function ActivityPage() {
