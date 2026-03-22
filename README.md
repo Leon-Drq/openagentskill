@@ -40,6 +40,7 @@
 | [Crawl4AI](https://github.com/unclecode/crawl4ai) | 42K | LLM-friendly web crawler and scraper | Extract structured data from any website |
 | [Firecrawl](https://github.com/mendableai/firecrawl) | 28K | Turn websites into LLM-ready markdown | Build RAG pipelines, content indexing |
 | [MediaCrawler](https://github.com/NanmiCoder/MediaCrawler) | 43K | Multi-platform social media crawler | Scrape Xiaohongshu, Douyin, Bilibili, Weibo, Zhihu |
+| [WeChat Article Exporter](https://github.com/wechat-article/wechat-article-exporter) | 7.9K | Batch download WeChat articles | Export articles with reading stats, supports Docker/Cloudflare |
 
 ### MCP Servers (Model Context Protocol)
 
