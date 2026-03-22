@@ -170,7 +170,7 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
               href="https://github.com/Leon-Drq/openagentskill"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-secondary hover:text-foreground transition-colors hidden sm:inline"
+              className="text-secondary hover:text-foreground transition-colors"
               aria-label="GitHub"
             >
               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
