@@ -69,6 +69,12 @@
 | [Finance Skills](https://github.com/himself65/finance-skills) | 94 | Options, stocks, sentiment analysis | Build trading bots, financial research agents |
 | [Claude Scientific Skills](https://github.com/K-Dense-AI/claude-scientific-skills) | 10K | Research and scientific skills | Academic research, data analysis |
 
+### Business and Consulting
+
+| Skill | Stars | Description | Use Case |
+|-------|-------|-------------|----------|
+| [DBSkill](https://github.com/dontbesilent2025/dbskill) | - | Business diagnosis toolkit with 4,176 knowledge atoms | Business model analysis, competitive benchmarking, strategy consulting |
+
 ### Productivity
 
 | Skill | Stars | Description | Use Case |
