@@ -40,6 +40,7 @@
 | [Crawl4AI](https://github.com/unclecode/crawl4ai) | 42K | LLM-friendly web crawler and scraper | Extract structured data from any website |
 | [Firecrawl](https://github.com/mendableai/firecrawl) | 28K | Turn websites into LLM-ready markdown | Build RAG pipelines, content indexing |
 | [MediaCrawler](https://github.com/NanmiCoder/MediaCrawler) | 43K | Multi-platform social media crawler | Scrape Xiaohongshu, Douyin, Bilibili, Weibo, Zhihu |
+| [WeChat Article Exporter](https://github.com/wechat-article/wechat-article-exporter) | 7.9K | Batch download WeChat articles | Export articles with reading stats, supports Docker/Cloudflare |
 
 ### MCP Servers (Model Context Protocol)
 
@@ -62,10 +63,11 @@
 | [Cursor Rules](https://github.com/PatrickJS/awesome-cursorrules) | 7.8K | Curated cursor rules for frameworks | Improve AI coding with framework-specific rules |
 | [Awesome Claude Code](https://github.com/hesreallyhim/awesome-claude-code) | 25K | Tools for Claude Code workflows | Enhance Claude coding capabilities |
 
-### Finance and Research
+### Finance and Crypto
 
 | Skill | Stars | Description | Use Case |
 |-------|-------|-------------|----------|
+| [BlockBeats Skill](https://clawhub.ai/BlockBeatsOfficial/blockbeats-skill) | - | Crypto news, market data, on-chain analytics | Track ETF flows, derivatives, macro trends via 1,500+ sources |
 | [Finance Skills](https://github.com/himself65/finance-skills) | 94 | Options, stocks, sentiment analysis | Build trading bots, financial research agents |
 | [Claude Scientific Skills](https://github.com/K-Dense-AI/claude-scientific-skills) | 10K | Research and scientific skills | Academic research, data analysis |
 
