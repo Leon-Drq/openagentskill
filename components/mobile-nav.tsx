@@ -60,11 +60,12 @@ export function MobileNav() {
         </svg>
       </button>
 
-      {/* Full-screen Menu */}
+      {/* Full-screen Menu - using explicit color to ensure opacity */}
       <div
-        className={`fixed inset-0 bg-background z-50 transform transition-transform duration-300 ease-out ${
+        className={`fixed inset-0 z-50 transform transition-transform duration-300 ease-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
+        style={{ backgroundColor: '#F8F7F3' }}
       >
         {/* Menu Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
