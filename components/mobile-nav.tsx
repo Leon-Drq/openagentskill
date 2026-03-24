@@ -70,17 +70,13 @@ export function MobileNav() {
 
       {/* Slide-out Menu */}
       <div
-        className={`fixed top-0 right-0 bottom-0 w-64 border-l border-border shadow-xl z-50 transform transition-transform duration-300 ease-out ${
+        className={`fixed top-0 right-0 h-full w-64 bg-[#F8F7F3] dark:bg-[#1a1a1a] border-l border-border shadow-xl z-50 transform transition-transform duration-300 ease-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
-        style={{ backgroundColor: '#F8F7F3' }}
       >
         {/* Menu Header */}
-        <div 
-          className="flex items-center justify-between p-4 border-b border-border"
-          style={{ backgroundColor: '#F8F7F3' }}
-        >
-          <span className="font-display font-semibold text-sm text-foreground">Menu</span>
+        <div className="flex items-center justify-between p-4 border-b border-border bg-[#F8F7F3] dark:bg-[#1a1a1a]">
+          <span className="font-display font-semibold text-sm">Menu</span>
           <button
             onClick={() => setIsOpen(false)}
             className="p-1 text-secondary hover:text-foreground transition-colors"
@@ -93,10 +89,7 @@ export function MobileNav() {
         </div>
 
         {/* Navigation Links */}
-        <nav 
-          className="p-4 overflow-y-auto"
-          style={{ backgroundColor: '#F8F7F3', height: 'calc(100% - 57px)' }}
-        >
+        <nav className="p-4 bg-[#F8F7F3] dark:bg-[#1a1a1a] h-full">
           <ul className="space-y-1">
             <li>
               <Link
