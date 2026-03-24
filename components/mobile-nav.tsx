@@ -31,7 +31,10 @@ export function MobileNav() {
     <div className="md:hidden">
       {/* Hamburger Button */}
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          console.log('[v0] MobileNav: Opening menu')
+          setIsOpen(true)
+        }}
         className="p-2 -mr-2 text-secondary hover:text-foreground transition-colors"
         aria-label="Open menu"
       >
@@ -51,6 +54,7 @@ export function MobileNav() {
       </button>
 
       {/* Full-screen Menu Overlay */}
+      {isOpen && console.log('[v0] MobileNav: Rendering menu overlay')}
       {isOpen && (
         <div
           className="fixed top-0 left-0 right-0 bottom-0 overflow-y-auto"
