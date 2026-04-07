@@ -83,7 +83,7 @@ export function SkillsPageClient({ skills, query, sort, category, categories }: 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex items-center justify-between mb-6">
             <Link href="/" className="flex items-center gap-2 hover:opacity-60 transition-opacity">
-              <span className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-foreground rounded-full flex items-center justify-center font-display font-bold text-xs sm:text-sm">
+              <span className="hidden sm:flex w-6 h-6 border-2 border-foreground rounded-full items-center justify-center font-display font-bold text-sm">
                 O
               </span>
               <span className="text-lg sm:text-xl md:text-2xl font-display font-bold">Open Agent Skill</span>

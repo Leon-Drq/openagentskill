@@ -26,7 +26,7 @@ export function ActivityPageClient({ activities }: ActivityPageClientProps) {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2 hover:opacity-60 transition-opacity">
-              <span className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-foreground rounded-full flex items-center justify-center font-display font-bold text-xs sm:text-sm">
+              <span className="hidden sm:flex w-6 h-6 border-2 border-foreground rounded-full items-center justify-center font-display font-bold text-sm">
                 O
               </span>
               <span className="font-display text-base sm:text-lg lg:text-xl font-semibold">
