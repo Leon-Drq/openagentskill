@@ -134,9 +134,7 @@ export default function APIDocsPage() {
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Request'}</h3>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-4 sm:mb-6">
-                <code>
-                  {'GET /api/agent/skills?q=web+research&format=text'}
-                </code>
+                <code>{'GET /api/agent/skills?q=web+research&format=text'}</code>
               </div>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Response (text format)'}</h3>
@@ -184,9 +182,7 @@ Total: 2 skills found
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Request'}</h3>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-4 sm:mb-6">
-                <code>
-                  {'GET /api/agent/skills/advanced-web-research?format=text'}
-                </code>
+                <code>{'GET /api/agent/skills/advanced-web-research?format=text'}</code>
               </div>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Response (text format)'}</h3>
@@ -218,7 +214,6 @@ This skill enables agents to perform comprehensive web research...`}</code>
               </div>
             </div>
           </div>
-        </section>
 
           {/* POST /api/skills/submit */}
           <div className="border border-border mb-8 sm:mb-10">
@@ -306,7 +301,6 @@ Content-Type: application/json
           </p>
 
           <div className="space-y-8">
-            {/* Step 1 */}
             <div className="flex gap-4 sm:gap-6">
               <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 border border-foreground flex items-center justify-center font-mono text-xs sm:text-sm font-bold">
                 {'1'}
@@ -328,7 +322,6 @@ publish:
               </div>
             </div>
 
-            {/* Step 2 */}
             <div className="flex gap-4 sm:gap-6">
               <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 border border-foreground flex items-center justify-center font-mono text-xs sm:text-sm font-bold">
                 {'2'}
@@ -343,7 +336,6 @@ openclaw publish --target openagentskill --repo owner/my-skill`}</code>
               </div>
             </div>
 
-            {/* Step 3 */}
             <div className="flex gap-4 sm:gap-6">
               <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 border border-foreground flex items-center justify-center font-mono text-xs sm:text-sm font-bold">
                 {'3'}
@@ -355,7 +347,6 @@ openclaw publish --target openagentskill --repo owner/my-skill`}</code>
             </div>
           </div>
 
-          {/* Direct curl example */}
           <div className="mt-8 p-4 sm:p-6 border border-border">
             <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Or call the API directly (no OpenClaw required)'}</h3>
             <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
@@ -400,7 +391,6 @@ openclaw publish --target openagentskill --repo owner/my-skill`}</code>
         </section>
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-border bg-background mt-12 sm:mt-20">
         <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="max-w-4xl mx-auto text-center">
