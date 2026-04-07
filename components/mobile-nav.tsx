@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useI18n } from '@/lib/i18n/context'
@@ -8,7 +9,12 @@ import { useI18n } from '@/lib/i18n/context'
 export function MobileNav() {
   const { t } = useI18n()
   const [isOpen, setIsOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Close menu when route changes
   useEffect(() => {
@@ -50,10 +56,10 @@ export function MobileNav() {
         </svg>
       </button>
 
-      {/* Full-screen Menu Overlay */}
-      {isOpen && (
+      {/* Full-screen Menu Overlay — rendered via portal to escape parent stacking context */}
+      {mounted && isOpen && createPortal(
         <div
-          className="fixed top-0 left-0 right-0 bottom-0 overflow-y-auto"
+          className="fixed inset-0 overflow-y-auto"
           style={{ 
             backgroundColor: '#F8F7F3',
             zIndex: 9999,
@@ -78,7 +84,6 @@ export function MobileNav() {
               </svg>
             </button>
           </div>
-
           {/* Navigation Links */}
           <nav className="px-6 py-8">
             <ul className="space-y-1">
@@ -93,6 +98,19 @@ export function MobileNav() {
                   }}
                 >
                   {t.nav.skills}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/blog"
+                  onClick={() => setIsOpen(false)}
+                  className="block py-4 text-xl"
+                  style={{ 
+                    color: pathname === '/blog' || pathname.startsWith('/blog/') ? '#1A1A1A' : '#666666',
+                    fontWeight: pathname === '/blog' || pathname.startsWith('/blog/') ? 500 : 400,
+                  }}
+                >
+                  Blog
                 </Link>
               </li>
               <li>
@@ -171,7 +189,8 @@ export function MobileNav() {
               </li>
             </ul>
           </nav>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

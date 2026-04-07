@@ -160,6 +160,9 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
               <Link href="/skills" className="text-sm text-secondary hover:text-foreground transition-colors">
                 {t.nav.skills}
               </Link>
+              <Link href="/blog" className="text-sm text-secondary hover:text-foreground transition-colors">
+                Blog
+              </Link>
               <Link href="/submit" className="text-sm text-secondary hover:text-foreground transition-colors">
                 {t.nav.submit}
               </Link>

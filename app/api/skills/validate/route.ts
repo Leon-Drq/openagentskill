@@ -16,6 +16,20 @@ export async function POST(request: NextRequest) {
     // Validate GitHub repository
     const repoData = await validateGitHubRepo(repository)
 
+    // Check minimum star threshold
+    const MIN_STARS = 50
+    if (repoData.stars < MIN_STARS) {
+      return NextResponse.json(
+        {
+          valid: false,
+          error: `该仓库目前有 ${repoData.stars} 个 star，未达到最低 ${MIN_STARS} star 的要求。请积累更多社区认可后再提交。`,
+          stars: repoData.stars,
+          minStars: MIN_STARS,
+        },
+        { status: 400 }
+      )
+    }
+
     // Check basic requirements
     if (!repoData.hasReadme) {
       return NextResponse.json(
@@ -30,6 +44,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       valid: true,
       repository: repoData,
+      stars: repoData.stars,
     })
   } catch (error) {
     console.error('[v0] Validation error:', error)

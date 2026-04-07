@@ -23,6 +23,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
   const [tags, setTags] = useState<string[]>([])
   const [validating, setValidating] = useState(false)
   const [repoValid, setRepoValid] = useState<boolean | null>(null)
+  const [repoStars, setRepoStars] = useState<number | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -66,9 +67,11 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
 
       if (response.ok && data.valid) {
         setRepoValid(true)
+        setRepoStars(data.stars ?? null)
         setError('')
       } else {
         setRepoValid(false)
+        setRepoStars(data.stars ?? null)
         setError(data.error || t.submitPage.form.validationFailed)
       }
     } catch (err) {
@@ -82,6 +85,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
   const handleRepoChange = (value: string) => {
     setRepository(value)
     setRepoValid(null)
+    setRepoStars(null)
     setError('')
   }
 
@@ -143,21 +147,36 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
         <label htmlFor="repository" className="block text-sm font-semibold mb-2">
           {t.submitPage.form.repository}
         </label>
-        <input
-          id="repository"
-          type="text"
-          value={repository}
-          onChange={(e) => handleRepoChange(e.target.value)}
-          onBlur={handleRepoBlur}
-          placeholder={t.submitPage.form.repositoryPlaceholder}
-          className="w-full border border-border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-serif focus:border-foreground focus:outline-none"
-          required
-        />
+        <div className="relative">
+          <input
+            id="repository"
+            type="text"
+            value={repository}
+            onChange={(e) => handleRepoChange(e.target.value)}
+            onBlur={handleRepoBlur}
+            placeholder={t.submitPage.form.repositoryPlaceholder}
+            className="w-full border border-border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-serif focus:border-foreground focus:outline-none pr-24"
+            required
+          />
+          {repoStars !== null && repoValid === true && (
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-secondary border border-border px-2 py-0.5 bg-background">
+              {repoStars.toLocaleString()} stars
+            </span>
+          )}
+        </div>
+        <p className="mt-1.5 text-xs text-secondary">
+          至少需要 <span className="font-semibold text-foreground">50 star</span> 才能提交
+        </p>
         {validating && (
           <p className="mt-2 text-sm text-secondary">{t.submitPage.form.validating}</p>
         )}
         {repoValid === true && (
-          <p className="mt-2 text-sm text-foreground">{t.submitPage.form.repoValidSuccess}</p>
+          <p className="mt-2 text-sm text-foreground">
+            {t.submitPage.form.repoValidSuccess}
+            {repoStars !== null && (
+              <span className="ml-1 text-secondary">({repoStars.toLocaleString()} stars)</span>
+            )}
+          </p>
         )}
         {repoValid === false && error && (
           <p className="mt-2 text-sm text-destructive">{error}</p>

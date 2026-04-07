@@ -91,6 +91,7 @@ export function SkillsPageClient({ skills, query, sort, category, categories }: 
             <div className="flex items-center gap-4">
               {/* Desktop Navigation */}
               <div className="hidden md:flex gap-6 text-sm">
+                <Link href="/blog" className="text-secondary hover:text-foreground transition-colors">Blog</Link>
                 <Link href="/submit" className="text-secondary hover:text-foreground transition-colors">{t.nav.submit}</Link>
                 <Link href="/docs" className="text-secondary hover:text-foreground transition-colors">{t.nav.docs}</Link>
                 <Link href="/activity" className="text-secondary hover:text-foreground transition-colors">{t.nav.activity}</Link>

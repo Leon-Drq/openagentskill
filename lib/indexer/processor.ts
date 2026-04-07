@@ -10,6 +10,7 @@
 import { createServiceClient } from '@/lib/supabase/public'
 import { generateText } from 'ai'
 import type { CandidateRepo } from './github-search'
+import { generateBlogPostForSkill } from '@/lib/blog/generate'
 
 const GITHUB_HEADERS = () => ({
   Accept: 'application/vnd.github.v3+json',
@@ -189,6 +190,11 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
       actor_type: 'agent',
       description: `Auto-indexed ${skillData.name} from GitHub (${candidate.stars} stars)`,
       metadata: { stars: candidate.stars, source: 'auto-indexer', score: review.score },
+    })
+
+    // 6. Async blog post generation (non-blocking, failure does not affect skill indexing)
+    generateBlogPostForSkill(skillRecord.id).catch(() => {
+      // Silently ignore blog generation errors
     })
 
     return { repo: repoRef, status: 'indexed', slug }
