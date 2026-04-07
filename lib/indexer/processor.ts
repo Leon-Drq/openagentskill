@@ -109,15 +109,23 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
   try {
     const supabase = createServiceClient()
 
-    // 1. Check if already indexed
+    // 1. Check if already indexed — if so, refresh star count and return
     const { data: existing } = await supabase
       .from('skills')
-      .select('id')
+      .select('id, github_stars')
       .eq('slug', slug)
       .maybeSingle()
 
     if (existing) {
-      return { repo: repoRef, status: 'skipped', reason: 'Already indexed' }
+      // Refresh star count if it changed
+      if (existing.github_stars !== candidate.stars) {
+        await supabase
+          .from('skills')
+          .update({ github_stars: candidate.stars, last_synced_at: new Date().toISOString() })
+          .eq('slug', slug)
+        return { repo: repoRef, status: 'skipped', reason: `Stars refreshed: ${existing.github_stars} → ${candidate.stars}` }
+      }
+      return { repo: repoRef, status: 'skipped', reason: 'Already indexed, stars unchanged' }
     }
 
     // 2. Fetch README

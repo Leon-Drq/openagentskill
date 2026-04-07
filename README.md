@@ -23,7 +23,7 @@
 
 | Problem | Solution |
 |---------|----------|
-| Finding quality skills is hard | Curated directory with **35+ verified skills**, auto-indexed daily |
+| Finding quality skills is hard | Curated directory with **40+ verified skills**, auto-indexed every 6 hours |
 | GitHub stars don't reflect real usage | **Agent Feedback Loop** — real usage data from AI agents |
 | No incentive for skill authors | **Points system** rewards authors for every successful call |
 | Skills scattered across GitHub | **One-stop marketplace** with search, filters, and categories |
@@ -40,7 +40,6 @@
 | [Crawl4AI](https://github.com/unclecode/crawl4ai) | 42K | LLM-friendly web crawler and scraper | Extract structured data from any website |
 | [Firecrawl](https://github.com/mendableai/firecrawl) | 28K | Turn websites into LLM-ready markdown | Build RAG pipelines, content indexing |
 | [MediaCrawler](https://github.com/NanmiCoder/MediaCrawler) | 43K | Multi-platform social media crawler | Scrape Xiaohongshu, Douyin, Bilibili, Weibo, Zhihu |
-| [WeChat Article Exporter](https://github.com/wechat-article/wechat-article-exporter) | 7.9K | Batch download WeChat articles | Export articles with reading stats, supports Docker/Cloudflare |
 
 ### MCP Servers (Model Context Protocol)
 
@@ -71,11 +70,15 @@
 | [Finance Skills](https://github.com/himself65/finance-skills) | 94 | Options, stocks, sentiment analysis | Build trading bots, financial research agents |
 | [Claude Scientific Skills](https://github.com/K-Dense-AI/claude-scientific-skills) | 10K | Research and scientific skills | Academic research, data analysis |
 
-### Business and Consulting
+### Chinese Skills 中文精选
+
+> 专为中文 AI 社区构建的 skills。在网站上点击「中文 Chinese」分类筛选查看。
 
 | Skill | Stars | Description | Use Case |
 |-------|-------|-------------|----------|
-| [DBSkill](https://github.com/dontbesilent2025/dbskill) | - | Business diagnosis toolkit with 4,176 knowledge atoms | Business model analysis, competitive benchmarking, strategy consulting |
+| [同事.Skill](https://github.com/titanwings/colleague-skill) | 6.8K | 把同事的工作经验和性格永久保存为 AI Skill | 用同事的语气写代码、回答问题，支持飞书/钉钉/微信数据源 |
+| [WeChat Article Exporter](https://github.com/wechat-article/wechat-article-exporter) | 7.9K | 微信公众号文章批量下载工具 | 导出文章含阅读量、评论，支持 Docker/Cloudflare 部署 |
+| [DBSkill](https://github.com/dontbesilent2025/dbskill) | - | 从 12,307 条推文提炼的商业诊断工具箱 | 商业模式诊断、对标分析、内容创作、执行力诊断 |
 
 ### Productivity
 
@@ -87,7 +90,7 @@
 
 <div align="center">
 
-**[View all 35+ skills →](https://www.openagentskill.com/skills)**
+**[View all 40+ skills →](https://www.openagentskill.com/skills)**
 
 </div>
 

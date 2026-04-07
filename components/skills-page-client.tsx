@@ -184,7 +184,7 @@ export function SkillsPageClient({ skills, query, sort, category, categories }: 
                     : 'border-border text-secondary hover:border-foreground hover:text-foreground'
                 }`}
               >
-                {cat}
+                {cat === 'chinese' ? '中文 Chinese' : cat}
               </button>
             ))}
           </div>
@@ -299,7 +299,7 @@ export function SkillsPageClient({ skills, query, sort, category, categories }: 
                           onClick={() => navigate({ sort, category: skill.category })}
                           className="text-xs border border-border px-2 py-1 text-secondary capitalize hover:border-foreground hover:text-foreground transition-colors"
                         >
-                          {skill.category}
+                          {skill.category === 'chinese' ? '中文' : skill.category}
                         </button>
                       )}
                       {skill.compatibility.slice(0, 5).map((c) => (
