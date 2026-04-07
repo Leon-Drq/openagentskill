@@ -97,6 +97,19 @@ export function MobileNav() {
               </li>
               <li>
                 <Link
+                  href="/blog"
+                  onClick={() => setIsOpen(false)}
+                  className="block py-4 text-xl"
+                  style={{ 
+                    color: pathname === '/blog' || pathname.startsWith('/blog/') ? '#1A1A1A' : '#666666',
+                    fontWeight: pathname === '/blog' || pathname.startsWith('/blog/') ? 500 : 400,
+                  }}
+                >
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/submit"
                   onClick={() => setIsOpen(false)}
                   className="block py-4 text-xl"
