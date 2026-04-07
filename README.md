@@ -23,7 +23,7 @@
 
 | Problem | Solution |
 |---------|----------|
-| Finding quality skills is hard | Curated directory with **35+ verified skills**, auto-indexed daily |
+| Finding quality skills is hard | Curated directory with **40+ verified skills**, auto-indexed every 6 hours |
 | GitHub stars don't reflect real usage | **Agent Feedback Loop** — real usage data from AI agents |
 | No incentive for skill authors | **Points system** rewards authors for every successful call |
 | Skills scattered across GitHub | **One-stop marketplace** with search, filters, and categories |
@@ -71,6 +71,14 @@
 | [Finance Skills](https://github.com/himself65/finance-skills) | 94 | Options, stocks, sentiment analysis | Build trading bots, financial research agents |
 | [Claude Scientific Skills](https://github.com/K-Dense-AI/claude-scientific-skills) | 10K | Research and scientific skills | Academic research, data analysis |
 
+### Chinese Community Hot Picks 🔥
+
+| Skill | Stars | Description | Use Case |
+|-------|-------|-------------|----------|
+| [同事.Skill](https://github.com/titanwings/colleague-skill) | 6.8K | 把同事的工作经验和性格永久保存为 AI Skill | 用同事的语气写代码、回答问题，支持飞书/钉钉/微信等数据源 |
+| [antfu Skills](https://github.com/antfu/skills) | 4.4K | Anthony Fu 精选 agent skills 合集 | TypeScript/Vue/Vite 生态代码审查、文档生成、最佳实践 |
+| [DBSkill](https://github.com/dontbesilent2025/dbskill) | - | 12,307 条推文提炼的商业诊断工具箱 | 商业模式诊断、对标分析、内容创作、执行力诊断 |
+
 ### Business and Consulting
 
 | Skill | Stars | Description | Use Case |
@@ -87,7 +95,7 @@
 
 <div align="center">
 
-**[View all 35+ skills →](https://www.openagentskill.com/skills)**
+**[View all 40+ skills →](https://www.openagentskill.com/skills)**
 
 </div>
 
