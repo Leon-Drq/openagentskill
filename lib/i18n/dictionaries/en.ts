@@ -274,7 +274,7 @@ Built by everyone (and every Agent), for everyone.`,
     guidelines: {
       title: 'Submission Guidelines',
       items: [
-        'Repository must have at least 50 GitHub stars (minimum community validation threshold)',
+        'Repository must have at least 3 GitHub stars',
         'Skill must be hosted on a public GitHub repository',
         'Recommended to include skill.json manifest file in repository',
         'README should contain clear installation instructions and usage examples',

@@ -17,12 +17,12 @@ export async function POST(request: NextRequest) {
     const repoData = await validateGitHubRepo(repository)
 
     // Check minimum star threshold
-    const MIN_STARS = 50
+    const MIN_STARS = 3
     if (repoData.stars < MIN_STARS) {
       return NextResponse.json(
         {
           valid: false,
-          error: `该仓库目前有 ${repoData.stars} 个 star，未达到最低 ${MIN_STARS} star 的要求。请积累更多社区认可后再提交。`,
+          error: `该仓库目前有 ${repoData.stars} 个 star，未达到最低 ${MIN_STARS} star 的要求。`,
           stars: repoData.stars,
           minStars: MIN_STARS,
         },
