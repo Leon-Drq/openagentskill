@@ -35,7 +35,7 @@ export function StructuredData() {
     foundingDate: '2026',
     sameAs: [
       'https://github.com/Leon-Drq/openagentskill',
-      'https://twitter.com/drq_ai',
+      'https://x.com/openagentskill',
     ],
   }
 

@@ -341,7 +341,7 @@ export function SkillsPageClient({ skills, query, sort, category, categories }: 
               <ul className="space-y-2 text-secondary">
                 <li><a href="https://github.com/openagentskill" className="hover:text-foreground">{t.skillsPage.footer.github}</a></li>
                 <li><a href="https://discord.gg/openagentskill" className="hover:text-foreground">{t.skillsPage.footer.discord}</a></li>
-                <li><a href="https://twitter.com/openagentskill" className="hover:text-foreground">{t.skillsPage.footer.twitter}</a></li>
+                <li><a href="https://x.com/openagentskill" className="hover:text-foreground">{t.skillsPage.footer.twitter}</a></li>
               </ul>
             </div>
             <div>
