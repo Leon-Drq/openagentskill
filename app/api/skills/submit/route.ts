@@ -32,6 +32,15 @@ export async function POST(request: NextRequest) {
     console.log('[v0] Validating repository...')
     const repoData = await validateGitHubRepo(repository)
 
+    // Enforce minimum star threshold (also checked client-side but enforced here)
+    const MIN_STARS = 50
+    if (repoData.stars < MIN_STARS) {
+      return NextResponse.json(
+        { error: `该仓库仅有 ${repoData.stars} 个 star，未达到最低 ${MIN_STARS} star 的要求` },
+        { status: 400 }
+      )
+    }
+
     if (!repoData.hasReadme) {
       return NextResponse.json(
         { error: '仓库缺少 README 文件' },
