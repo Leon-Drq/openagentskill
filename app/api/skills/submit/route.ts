@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     const repoData = await validateGitHubRepo(repository)
 
     // Enforce minimum star threshold (also checked client-side but enforced here)
-    const MIN_STARS = 50
+    const MIN_STARS = 3
     if (repoData.stars < MIN_STARS) {
       return NextResponse.json(
         { error: `该仓库仅有 ${repoData.stars} 个 star，未达到最低 ${MIN_STARS} star 的要求` },

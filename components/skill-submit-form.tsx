@@ -165,7 +165,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
           )}
         </div>
         <p className="mt-1.5 text-xs text-secondary">
-          至少需要 <span className="font-semibold text-foreground">50 star</span> 才能提交
+          至少需要 <span className="font-semibold text-foreground">3 star</span> 才能提交
         </p>
         {validating && (
           <p className="mt-2 text-sm text-secondary">{t.submitPage.form.validating}</p>

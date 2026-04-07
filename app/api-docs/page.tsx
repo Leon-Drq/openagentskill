@@ -229,7 +229,7 @@ This skill enables agents to perform comprehensive web research...`}</code>
             </div>
             <div className="p-4 sm:p-6">
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
-                {'Submit a GitHub repository as a skill. The repository must have at least 50 stars. Used by OpenClaw and other agents to auto-publish skills.'}
+                {'Submit a GitHub repository as a skill. The repository must have at least 3 stars. Used by OpenClaw and other agents to auto-publish skills.'}
               </p>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Request Body'}</h3>
@@ -328,7 +328,7 @@ publish:
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold mb-2 text-sm sm:text-base">{'OpenClaw will POST automatically when the threshold is reached'}</h3>
-                <p className="text-secondary text-sm mb-3">{'Once configured, every time a monitored repo crosses 50 stars, OpenClaw will call the submit API with the repo details. You can also trigger it manually:'}</p>
+                <p className="text-secondary text-sm mb-3">{'Once configured, every time a monitored repo crosses 3 stars, OpenClaw will call the submit API with the repo details. You can also trigger it manually:'}</p>
                 <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
                   <code>{`# Manually submit a specific repo via OpenClaw
 openclaw publish --target openagentskill --repo owner/my-skill`}</code>
