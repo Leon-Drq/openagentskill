@@ -40,7 +40,6 @@
 | [Crawl4AI](https://github.com/unclecode/crawl4ai) | 42K | LLM-friendly web crawler and scraper | Extract structured data from any website |
 | [Firecrawl](https://github.com/mendableai/firecrawl) | 28K | Turn websites into LLM-ready markdown | Build RAG pipelines, content indexing |
 | [MediaCrawler](https://github.com/NanmiCoder/MediaCrawler) | 43K | Multi-platform social media crawler | Scrape Xiaohongshu, Douyin, Bilibili, Weibo, Zhihu |
-| [WeChat Article Exporter](https://github.com/wechat-article/wechat-article-exporter) | 7.9K | Batch download WeChat articles | Export articles with reading stats, supports Docker/Cloudflare |
 
 ### MCP Servers (Model Context Protocol)
 
@@ -71,19 +70,15 @@
 | [Finance Skills](https://github.com/himself65/finance-skills) | 94 | Options, stocks, sentiment analysis | Build trading bots, financial research agents |
 | [Claude Scientific Skills](https://github.com/K-Dense-AI/claude-scientific-skills) | 10K | Research and scientific skills | Academic research, data analysis |
 
-### Chinese Community Hot Picks 🔥
+### Chinese Skills 中文精选
+
+> 专为中文 AI 社区构建的 skills。在网站上点击「中文 Chinese」分类筛选查看。
 
 | Skill | Stars | Description | Use Case |
 |-------|-------|-------------|----------|
-| [同事.Skill](https://github.com/titanwings/colleague-skill) | 6.8K | 把同事的工作经验和性格永久保存为 AI Skill | 用同事的语气写代码、回答问题，支持飞书/钉钉/微信等数据源 |
-| [antfu Skills](https://github.com/antfu/skills) | 4.4K | Anthony Fu 精选 agent skills 合集 | TypeScript/Vue/Vite 生态代码审查、文档生成、最佳实践 |
-| [DBSkill](https://github.com/dontbesilent2025/dbskill) | - | 12,307 条推文提炼的商业诊断工具箱 | 商业模式诊断、对标分析、内容创作、执行力诊断 |
-
-### Business and Consulting
-
-| Skill | Stars | Description | Use Case |
-|-------|-------|-------------|----------|
-| [DBSkill](https://github.com/dontbesilent2025/dbskill) | - | Business diagnosis toolkit with 4,176 knowledge atoms | Business model analysis, competitive benchmarking, strategy consulting |
+| [同事.Skill](https://github.com/titanwings/colleague-skill) | 6.8K | 把同事的工作经验和性格永久保存为 AI Skill | 用同事的语气写代码、回答问题，支持飞书/钉钉/微信数据源 |
+| [WeChat Article Exporter](https://github.com/wechat-article/wechat-article-exporter) | 7.9K | 微信公众号文章批量下载工具 | 导出文章含阅读量、评论，支持 Docker/Cloudflare 部署 |
+| [DBSkill](https://github.com/dontbesilent2025/dbskill) | - | 从 12,307 条推文提炼的商业诊断工具箱 | 商业模式诊断、对标分析、内容创作、执行力诊断 |
 
 ### Productivity
 
