@@ -9,7 +9,7 @@ import {
 } from '@/lib/github/api'
 import { reviewSkill } from '@/lib/ai-review/reviewer'
 import { analyzeCode } from '@/lib/security/static-analysis'
-import { createActivity } from '@/lib/db/activity'
+import { createPublicClient } from '@/lib/supabase/public'
 
 const SkillSubmitRequestSchema = z.object({
   repository: z.string().min(1),
@@ -170,66 +170,73 @@ export async function POST(request: NextRequest) {
       verified: review.approved && review.totalScore >= 35,
     }
 
-    // Save to database
-    const { createSkill, createSubmissionRecord } = await import('@/lib/db/skills')
-    
     try {
-      const skillRecord = await createSkill({
-        slug,
-        name: skillName,
-        description: manifestData?.description || repoData.description || '',
-        long_description: readmeContent.slice(0, 1000),
-        tagline: manifestData?.tagline || repoData.description || '',
-        author_name: owner,
-        author_url: `https://github.com/${owner}`,
-        repository: `https://github.com/${owner}/${repo}`,
-        github_repo: `${owner}/${repo}`,
-        github_stars: repoData.stars,
-        github_forks: repoData.forks,
-        category,
-        tags,
-        frameworks: manifestData?.frameworks || [],
-        version: manifestData?.version || '1.0.0',
-        license: repoData.license || 'Unknown',
-        install_command: `npx skills add ${owner}/${repo}`,
-        verified: review.approved && review.totalScore >= 35,
-        submission_source: submissionSource,
-        submitted_by_agent: body.submittedByAgent,
-        ai_review_score: review.scores,
-        ai_review_approved: review.approved,
-        ai_review_issues: review.issues,
-        ai_review_suggestions: review.suggestions,
+      const serverSecret = process.env.INDEXER_SECRET
+      if (!serverSecret) {
+        throw new Error('Missing INDEXER_SECRET for reviewed skill submission.')
+      }
+
+      const supabase = createPublicClient()
+      const activity = {
+        event_type: submissionSource === 'agent' ? 'agent_submitted' : 'skill_published',
+        actor_name: submissionSource === 'agent' ? (body.submittedByAgent || 'Unknown Agent') : owner,
+        actor_type: submissionSource === 'agent' ? 'agent' : 'human',
+        description: `${submissionSource === 'agent' ? 'Discovered and submitted' : 'Published'} ${skillName} — ${repoData.description || ''}`,
+        metadata: {
+          stars: repoData.stars,
+          source: submissionSource,
+          static_analysis: staticResult,
+        },
+      }
+
+      const { data: saveResult, error: saveError } = await supabase.rpc('submit_reviewed_skill', {
+        p_server_secret: serverSecret,
+        p_skill: {
+          slug,
+          name: skillName,
+          description: manifestData?.description || repoData.description || '',
+          long_description: readmeContent.slice(0, 1000),
+          tagline: manifestData?.tagline || repoData.description || '',
+          author_name: owner,
+          author_url: `https://github.com/${owner}`,
+          repository: `https://github.com/${owner}/${repo}`,
+          github_repo: `${owner}/${repo}`,
+          github_stars: repoData.stars,
+          github_forks: repoData.forks,
+          category,
+          tags,
+          frameworks: manifestData?.frameworks || [],
+          version: manifestData?.version || '1.0.0',
+          license: repoData.license || 'Unknown',
+          install_command: `npx skills add ${owner}/${repo}`,
+          verified: review.approved && review.totalScore >= 35,
+          submission_source: submissionSource,
+          submitted_by_agent: body.submittedByAgent,
+          ai_review_score: review.scores,
+          ai_review_approved: review.approved,
+          ai_review_issues: review.issues,
+          ai_review_suggestions: review.suggestions,
+        },
+        p_submission: {
+          github_repo: `${owner}/${repo}`,
+          submission_source: submissionSource,
+          submitted_by_agent: body.submittedByAgent,
+          ai_review_result: review,
+          status: review.approved ? 'approved' : 'rejected',
+        },
+        p_activity: activity,
       })
 
-      // Create submission record
-      await createSubmissionRecord({
-        skill_id: skillRecord.id,
-        github_repo: `${owner}/${repo}`,
-        submission_source: submissionSource,
-        submitted_by_agent: body.submittedByAgent,
-        ai_review_result: review,
-        status: review.approved ? 'approved' : 'rejected',
-      })
+      if (saveError) {
+        throw saveError
+      }
+
+      const skillRecord = saveResult?.skill
+      if (!skillRecord?.id) {
+        throw new Error('Reviewed skill submission did not return a skill record.')
+      }
 
       console.log('[v0] Skill saved to database:', skillRecord.id)
-
-      // Record activity
-      try {
-        await createActivity({
-          event_type: submissionSource === 'agent' ? 'agent_submitted' : 'skill_published',
-          skill_id: skillRecord.id,
-          actor_name: submissionSource === 'agent' ? (body.submittedByAgent || 'Unknown Agent') : owner,
-          actor_type: submissionSource === 'agent' ? 'agent' : 'human',
-          description: `${submissionSource === 'agent' ? 'Discovered and submitted' : 'Published'} ${skillName} — ${repoData.description || ''}`,
-          metadata: {
-            stars: repoData.stars,
-            source: submissionSource,
-            static_analysis: staticResult,
-          },
-        })
-      } catch (activityError) {
-        console.error('[v0] Failed to record activity:', activityError)
-      }
 
       return NextResponse.json({
         success: true,

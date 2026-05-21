@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { createPublicClient } from '@/lib/supabase/public'
 
 const FeedbackSchema = z.object({
@@ -47,75 +46,29 @@ export async function POST(request: NextRequest) {
 
     const { skill_slug, agent_id, success, latency_ms, error_message, metadata } = parsed.data
 
-    const supabase = createAdminClient()
+    const supabase = createPublicClient()
+    const { data, error } = await supabase.rpc('record_agent_feedback', {
+      p_skill_slug: skill_slug,
+      p_agent_id: agent_id,
+      p_success: success,
+      p_latency_ms: latency_ms ?? null,
+      p_error_message: error_message ?? null,
+      p_metadata: metadata || {},
+    })
 
-    // 1. 验证 skill 存在，并获取作者 user_id
-    const { data: skill, error: skillError } = await supabase
-      .from('skills')
-      .select('id, slug, author_name, author_user_id')
-      .eq('slug', skill_slug)
-      .single()
-
-    if (skillError || !skill) {
-      return NextResponse.json({ error: 'Skill not found' }, { status: 404 })
-    }
-
-    // 2. 插入 feedback 记录
-    const { error: insertError } = await supabase
-      .from('skill_feedback')
-      .insert({
-        skill_slug,
-        agent_id,
-        success,
-        latency_ms: latency_ms ?? null,
-        error_message: error_message ?? null,
-        metadata: metadata || {},
-      })
-
-    if (insertError) {
-      console.error('[feedback] Insert error:', insertError)
+    if (error) {
+      console.error('[feedback] RPC error:', error)
       return NextResponse.json({ error: 'Failed to record feedback' }, { status: 500 })
     }
 
-    // 3. 如果成功调用，给作者发放积分
-    let pointsAwarded = 0
-    if (success && skill.author_user_id) {
-      // 每次成功调用奖励 1 积分
-      const { error: pointsError } = await supabase
-        .from('point_events')
-        .insert({
-          user_id: skill.author_user_id,
-          amount: 1,
-          event_type: 'skill_called',
-          description: `Skill "${skill_slug}" called by ${agent_id}`,
-          ref_id: skill_slug,
-        })
-      
-      if (!pointsError) {
-        pointsAwarded = 1
-      }
-    }
-
-    // 4. 记录到 activity_feed
-    if (success) {
-      const { error: activityError } = await supabase.from('activity_feed').insert({
-        event_type: 'skill_called',
-        skill_id: skill.id,
-        actor_name: agent_id,
-        actor_type: 'agent',
-        description: `Called ${skill_slug}`,
-        metadata: { latency_ms, success: true, points_awarded: pointsAwarded },
-      })
-      // Ignore activity write failures so feedback recording remains reliable.
-      if (activityError) {
-        console.warn('[feedback] Activity write skipped:', activityError.message)
-      }
+    if (data?.error === 'skill_not_found') {
+      return NextResponse.json({ error: 'Skill not found' }, { status: 404 })
     }
 
     return NextResponse.json({ 
       success: true, 
       message: 'Feedback recorded',
-      data: { skill_slug, agent_id, success, points_awarded: pointsAwarded }
+      data
     })
 
   } catch (error) {
