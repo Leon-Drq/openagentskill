@@ -43,6 +43,8 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM anon, authenticated, public;
+
 -- 3. Skill Points (SP) ledger
 CREATE TABLE IF NOT EXISTS public.point_events (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -75,7 +77,11 @@ GRANT SELECT ON public.user_points TO authenticated;
 
 -- 5. Helper: get user level from points
 CREATE OR REPLACE FUNCTION public.get_user_level(points INTEGER)
-RETURNS JSONB LANGUAGE sql IMMUTABLE AS $$
+RETURNS JSONB
+LANGUAGE sql
+IMMUTABLE
+SET search_path = public
+AS $$
   SELECT CASE
     WHEN points >= 100000 THEN '{"level":6,"title":"Legend","next":null}'::jsonb
     WHEN points >= 25000  THEN jsonb_build_object('level',5,'title','Sage','next',100000,'progress',((points-25000)::float/(100000-25000)*100)::int)

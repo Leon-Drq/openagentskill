@@ -1,51 +1,57 @@
 -- ============================================================
--- 003: Activity feed + agent feedback loop
+-- 005: Supabase security advisor fixes
 -- ============================================================
 
--- Link skills to an owning profile when the author has signed in.
-ALTER TABLE public.skills
-  ADD COLUMN IF NOT EXISTS author_user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL;
+-- Keep helper functions on a fixed search path.
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$;
 
-CREATE INDEX IF NOT EXISTS idx_skills_author_user_id ON public.skills(author_user_id);
+CREATE OR REPLACE FUNCTION public.get_user_level(points INTEGER)
+RETURNS JSONB
+LANGUAGE sql
+IMMUTABLE
+SET search_path = public
+AS $$
+  SELECT CASE
+    WHEN points >= 100000 THEN '{"level":6,"title":"Legend","next":null}'::jsonb
+    WHEN points >= 25000  THEN jsonb_build_object('level',5,'title','Sage','next',100000,'progress',((points-25000)::float/(100000-25000)*100)::int)
+    WHEN points >= 8000   THEN jsonb_build_object('level',4,'title','Architect','next',25000,'progress',((points-8000)::float/(25000-8000)*100)::int)
+    WHEN points >= 2000   THEN jsonb_build_object('level',3,'title','Artisan','next',8000,'progress',((points-2000)::float/(8000-2000)*100)::int)
+    WHEN points >= 500    THEN jsonb_build_object('level',2,'title','Builder','next',2000,'progress',((points-500)::float/(2000-500)*100)::int)
+    ELSE                       jsonb_build_object('level',1,'title','Explorer','next',500,'progress',(points::float/500*100)::int)
+  END;
+$$;
 
--- Public activity feed. Raw writes are server-side only; public clients can read.
-CREATE TABLE IF NOT EXISTS public.activity_feed (
-  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  event_type  TEXT NOT NULL,
-  skill_id    UUID REFERENCES public.skills(id) ON DELETE SET NULL,
-  actor_name  TEXT NOT NULL,
-  actor_type  TEXT NOT NULL DEFAULT 'human' CHECK (actor_type IN ('human', 'agent', 'system')),
-  description TEXT,
-  metadata    JSONB NOT NULL DEFAULT '{}'::jsonb,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM anon, authenticated, public;
 
-ALTER TABLE public.activity_feed ENABLE ROW LEVEL SECURITY;
+-- skill_relations is read-only from public clients.
+ALTER TABLE public.skill_relations ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "activity_feed_select_public" ON public.activity_feed;
-CREATE POLICY "activity_feed_select_public"
-  ON public.activity_feed
+DROP POLICY IF EXISTS "relations_insert_public" ON public.skill_relations;
+DROP POLICY IF EXISTS "relations_select_all" ON public.skill_relations;
+
+CREATE POLICY "relations_select_all"
+  ON public.skill_relations
   FOR SELECT
   TO anon, authenticated
   USING (true);
 
-CREATE INDEX IF NOT EXISTS idx_activity_feed_created_at ON public.activity_feed(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_activity_feed_actor_type ON public.activity_feed(actor_type);
-CREATE INDEX IF NOT EXISTS idx_activity_feed_skill_id ON public.activity_feed(skill_id);
-
--- Raw agent feedback. This contains per-agent identifiers, so do not expose rows publicly.
-CREATE TABLE IF NOT EXISTS public.skill_feedback (
-  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  skill_slug    TEXT NOT NULL REFERENCES public.skills(slug) ON DELETE CASCADE,
-  agent_id      TEXT NOT NULL,
-  success       BOOLEAN NOT NULL,
-  latency_ms    INTEGER CHECK (latency_ms IS NULL OR latency_ms >= 0),
-  error_message TEXT,
-  metadata      JSONB NOT NULL DEFAULT '{}'::jsonb,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-ALTER TABLE public.skill_feedback ENABLE ROW LEVEL SECURITY;
+-- Private tables intentionally deny browser/API key access. Service role still bypasses RLS.
+DROP POLICY IF EXISTS "skill_submissions_no_public_access" ON public.skill_submissions;
+CREATE POLICY "skill_submissions_no_public_access"
+  ON public.skill_submissions
+  FOR ALL
+  TO anon, authenticated
+  USING (false)
+  WITH CHECK (false);
 
 DROP POLICY IF EXISTS "skill_feedback_no_public_access" ON public.skill_feedback;
 CREATE POLICY "skill_feedback_no_public_access"
@@ -55,11 +61,23 @@ CREATE POLICY "skill_feedback_no_public_access"
   USING (false)
   WITH CHECK (false);
 
-CREATE INDEX IF NOT EXISTS idx_skill_feedback_skill_slug ON public.skill_feedback(skill_slug);
-CREATE INDEX IF NOT EXISTS idx_skill_feedback_created_at ON public.skill_feedback(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_skill_feedback_agent_id ON public.skill_feedback(agent_id);
+-- Replace the security-definer aggregate view with a real cache table maintained
+-- by a trigger, so public users see aggregate stats without raw feedback access.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public'
+      AND c.relname = 'skill_stats'
+      AND c.relkind = 'v'
+  ) THEN
+    DROP VIEW public.skill_stats;
+  END IF;
+END;
+$$;
 
--- Aggregate-only public stats. Raw skill_feedback rows remain protected by RLS.
 CREATE TABLE IF NOT EXISTS public.skill_stats (
   skill_slug      TEXT PRIMARY KEY REFERENCES public.skills(slug) ON DELETE CASCADE,
   total_calls     INTEGER NOT NULL DEFAULT 0,
@@ -81,6 +99,39 @@ CREATE POLICY "skill_stats_select_public"
   USING (true);
 
 GRANT SELECT ON public.skill_stats TO anon, authenticated;
+
+INSERT INTO public.skill_stats (
+  skill_slug,
+  total_calls,
+  success_calls,
+  success_rate,
+  avg_latency_ms,
+  unique_agents,
+  last_called_at,
+  updated_at
+)
+SELECT
+  skill_slug,
+  COUNT(*)::INTEGER,
+  COUNT(*) FILTER (WHERE success)::INTEGER,
+  CASE
+    WHEN COUNT(*) = 0 THEN NULL
+    ELSE ROUND((COUNT(*) FILTER (WHERE success))::NUMERIC / COUNT(*)::NUMERIC * 100, 2)
+  END,
+  ROUND(AVG(latency_ms), 0)::INTEGER,
+  COUNT(DISTINCT agent_id)::INTEGER,
+  MAX(created_at),
+  NOW()
+FROM public.skill_feedback
+GROUP BY skill_slug
+ON CONFLICT (skill_slug) DO UPDATE SET
+  total_calls = EXCLUDED.total_calls,
+  success_calls = EXCLUDED.success_calls,
+  success_rate = EXCLUDED.success_rate,
+  avg_latency_ms = EXCLUDED.avg_latency_ms,
+  unique_agents = EXCLUDED.unique_agents,
+  last_called_at = EXCLUDED.last_called_at,
+  updated_at = NOW();
 
 CREATE OR REPLACE FUNCTION public.refresh_skill_stats_for_feedback()
 RETURNS TRIGGER

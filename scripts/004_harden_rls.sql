@@ -21,6 +21,14 @@ CREATE POLICY "skills_select_approved_public"
 -- Submission history should be private to server/admin paths.
 ALTER TABLE public.skill_submissions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "skill_submissions_no_public_access" ON public.skill_submissions;
+CREATE POLICY "skill_submissions_no_public_access"
+  ON public.skill_submissions
+  FOR ALL
+  TO anon, authenticated
+  USING (false)
+  WITH CHECK (false);
+
 -- Activity rows are public to read but only server routes may write.
 ALTER TABLE public.activity_feed ENABLE ROW LEVEL SECURITY;
 
@@ -48,6 +56,14 @@ CREATE POLICY "activity_feed_select_public"
 -- Feedback rows can include agent identifiers and errors. Keep raw rows private;
 -- expose only the aggregate skill_stats view.
 ALTER TABLE public.skill_feedback ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "skill_feedback_no_public_access" ON public.skill_feedback;
+CREATE POLICY "skill_feedback_no_public_access"
+  ON public.skill_feedback
+  FOR ALL
+  TO anon, authenticated
+  USING (false)
+  WITH CHECK (false);
 
 UPDATE public.skill_feedback
 SET metadata = '{}'::jsonb

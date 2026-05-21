@@ -75,12 +75,15 @@ CREATE INDEX IF NOT EXISTS idx_skills_tags ON public.skills USING GIN(tags);
 
 -- Create updated_at trigger
 CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
 BEGIN
   NEW.updated_at = NOW();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 CREATE TRIGGER update_skills_updated_at
   BEFORE UPDATE ON public.skills
@@ -100,6 +103,14 @@ CREATE TABLE IF NOT EXISTS public.skill_submissions (
 );
 
 ALTER TABLE public.skill_submissions ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "skill_submissions_no_public_access" ON public.skill_submissions;
+CREATE POLICY "skill_submissions_no_public_access"
+  ON public.skill_submissions
+  FOR ALL
+  TO anon, authenticated
+  USING (false)
+  WITH CHECK (false);
 
 CREATE INDEX IF NOT EXISTS idx_submissions_skill_id ON public.skill_submissions(skill_id);
 CREATE INDEX IF NOT EXISTS idx_submissions_status ON public.skill_submissions(status);
