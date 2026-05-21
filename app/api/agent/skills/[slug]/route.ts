@@ -38,6 +38,7 @@ Technical Details:
 - Tags: ${(skill.tags || []).join(', ')}
 
 Statistics:
+- Quality Score: ${Number(skill.quality_score || 0)}
 - GitHub Stars: ${skill.github_stars}
 - Downloads: ${skill.downloads}
 - Rating: ${skill.rating}/5 (${skill.review_count} reviews)
@@ -76,7 +77,9 @@ Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
         downloads: skill.downloads,
         rating: skill.rating,
         review_count: skill.review_count,
+        quality_score: Number(skill.quality_score || 0),
       },
+      quality_signals: skill.quality_signals || {},
       platforms: skill.frameworks,
       install: skill.install_command || `npx skills add ${skill.github_repo}`,
       repository: skill.repository,

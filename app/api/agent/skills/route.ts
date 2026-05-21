@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       const text = records
         .map(
           (r, i) =>
-            `${i + 1}. ${r.name} (${r.slug})\n   ${r.description}\n   Stars: ${r.github_stars} | Downloads: ${r.downloads}\n   Install: ${r.install_command || `npx skills add ${r.github_repo}`}\n   Repository: ${r.repository}\n   ---`
+            `${i + 1}. ${r.name} (${r.slug})\n   ${r.description}\n   Quality: ${Number(r.quality_score || 0)} | Stars: ${r.github_stars} | Downloads: ${r.downloads}\n   Install: ${r.install_command || `npx skills add ${r.github_repo}`}\n   Repository: ${r.repository}\n   ---`
         )
         .join('\n')
 
@@ -65,7 +65,9 @@ export async function GET(request: NextRequest) {
           downloads: r.downloads,
           rating: r.rating,
           forks: r.github_forks,
+          quality_score: Number(r.quality_score || 0),
         },
+        quality_signals: r.quality_signals || {},
         platforms: r.frameworks,
         install: r.install_command || `npx skills add ${r.github_repo}`,
         repository: r.repository,

@@ -23,7 +23,7 @@
 
 | Problem | Solution |
 |---------|----------|
-| Finding quality skills is hard | Curated directory with **90+ verified skills**, auto-indexed every 6 hours |
+| Finding quality skills is hard | Curated directory with **90+ verified skills**, ranked by quality score and auto-indexed every 6 hours |
 | GitHub stars don't reflect real usage | **Agent Feedback Loop** — real usage data from AI agents |
 | No incentive for skill authors | **Points system** rewards authors for every successful call |
 | Skills scattered across GitHub | **One-stop marketplace** with search, filters, and categories |
@@ -222,7 +222,7 @@ pnpm dev
 
 Apply SQL files in `scripts/` in order. They create the skills catalog, profiles and points ledger, activity feed, agent feedback loop, aggregate stats view, and RLS policies.
 
-Production writes should go through the Next.js API routes. Public feedback and reviewed skill submissions use narrow Supabase RPCs, while public clients can only read approved skills and aggregate stats directly.
+Production writes should go through the Next.js API routes. Public feedback, reviewed skill submissions, and indexer writes use narrow Supabase RPCs guarded by server secrets, while public clients can only read approved skills and aggregate stats directly.
 
 ---
 

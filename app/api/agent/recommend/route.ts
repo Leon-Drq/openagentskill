@@ -62,6 +62,7 @@ export async function GET(request: NextRequest) {
           stars: r.skill.github_stars,
           downloads: r.skill.downloads,
           rating: r.skill.rating,
+          quality_score: Number(r.skill.quality_score || 0),
         },
         reasoning: generateReasoning(r.skill, r.score),
       })),
@@ -121,6 +122,8 @@ function calculateRelevanceScore(skill: SkillRecord, task: string): number {
 
   if (skill.verified) score += 5
 
+  score += Math.min(20, Number(skill.quality_score || 0) / 5)
+
   return score
 }
 
@@ -138,6 +141,9 @@ function generateReasoning(skill: SkillRecord, score: number): string {
   }
   if (skill.verified) {
     parts.push('verified author')
+  }
+  if (skill.quality_score > 0) {
+    parts.push(`${Math.round(skill.quality_score)} quality score`)
   }
 
   const quality = score > 80 ? 'Strong match' : score > 50 ? 'Good match' : 'Partial match'

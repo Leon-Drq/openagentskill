@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createPublicClient } from '@/lib/supabase/public'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 
 export const maxDuration = 300
@@ -14,12 +14,18 @@ function isAuthorized(request: NextRequest): boolean {
  * Called by Vercel Cron daily at 03:00 UTC.
  */
 async function refreshAllStars(): Promise<{ updated: number; unchanged: number; errors: number }> {
-  const supabase = createAdminClient()
+  const serverSecret = process.env.INDEXER_SECRET
+  if (!serverSecret) {
+    throw new Error('Missing INDEXER_SECRET for controlled star refresh writes.')
+  }
+
+  const supabase = createPublicClient()
 
   // Fetch all skills with a GitHub repo
   const { data: skills, error } = await supabase
     .from('skills')
-    .select('id, slug, github_repo, github_stars')
+    .select('slug, github_repo, github_stars')
+    .eq('ai_review_approved', true)
     .not('github_repo', 'is', null)
 
   if (error) throw new Error(`Failed to fetch skills: ${error.message}`)
@@ -55,15 +61,38 @@ async function refreshAllStars(): Promise<{ updated: number; unchanged: number; 
 
         const data = await res.json()
         const newStars: number = data.stargazers_count ?? 0
+        const newForks: number | null = data.forks_count ?? null
+        const language: string | null = data.language ?? null
+        const pushedAt: string | null = data.pushed_at ?? null
 
         if (newStars !== skill.github_stars) {
-          await supabase
-            .from('skills')
-            .update({ github_stars: newStars, last_synced_at: new Date().toISOString() })
-            .eq('id', skill.id)
-          console.log(`[refresh-stars] ${skill.slug}: ${skill.github_stars} → ${newStars}`)
+          const { error: updateError } = await supabase.rpc('update_skill_github_metadata', {
+            p_server_secret: serverSecret,
+            p_slug: skill.slug,
+            p_github_stars: newStars,
+            p_github_forks: newForks,
+            p_github_language: language,
+            p_github_last_pushed_at: pushedAt,
+          })
+
+          if (updateError) {
+            throw new Error(updateError.message)
+          }
+
+          console.log(`[refresh-stars] ${skill.slug}: ${skill.github_stars} -> ${newStars}`)
           updated++
         } else {
+          const { error: updateError } = await supabase.rpc('update_skill_github_metadata', {
+            p_server_secret: serverSecret,
+            p_slug: skill.slug,
+            p_github_stars: newStars,
+            p_github_forks: newForks,
+            p_github_language: language,
+            p_github_last_pushed_at: pushedAt,
+          })
+          if (updateError) {
+            throw new Error(updateError.message)
+          }
           unchanged++
         }
       } catch (err: any) {

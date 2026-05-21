@@ -34,14 +34,18 @@ export interface SkillRecord {
   used_by: number
   rating: number
   review_count: number
+  quality_score: number
+  quality_signals: Record<string, unknown> | null
+  github_language: string | null
+  github_last_pushed_at: string | null
   created_at: string
   updated_at: string
 }
 
-export type SkillSortMode = 'downloads' | 'stars' | 'new' | 'trending'
+export type SkillSortMode = 'quality' | 'downloads' | 'stars' | 'new' | 'trending'
 
 export async function getAllSkills(
-  sort: SkillSortMode = 'stars',
+  sort: SkillSortMode = 'quality',
   category?: string
 ): Promise<SkillRecord[]> {
   const supabase = createPublicClient()
@@ -56,6 +60,9 @@ export async function getAllSkills(
   }
 
   switch (sort) {
+    case 'quality':
+      query = query.order('quality_score', { ascending: false }).order('github_stars', { ascending: false })
+      break
     case 'stars':
       query = query.order('github_stars', { ascending: false })
       break
@@ -172,7 +179,7 @@ export async function searchSkills(query: string): Promise<SkillRecord[]> {
     .select('*')
     .eq('ai_review_approved', true)
     .or(`name.ilike.%${query}%,description.ilike.%${query}%,tags.cs.{${query}}`)
-    .order('downloads', { ascending: false })
+    .order('quality_score', { ascending: false })
   
   if (error) throw error
   return data || []
@@ -192,7 +199,7 @@ export async function getRelatedSkills(
     .eq('ai_review_approved', true)
     .eq('category', category)
     .neq('id', skillId)
-    .order('downloads', { ascending: false })
+    .order('quality_score', { ascending: false })
     .limit(limit)
 
   if (error) return []
@@ -232,6 +239,7 @@ export function convertSkillRecordToManifest(record: SkillRecord): Skill {
       usedBy: record.used_by || 0,
       rating: record.rating || 0,
       reviewCount: record.review_count || 0,
+      qualityScore: Number(record.quality_score || 0),
       trending24h: 0,
       weeklyGrowth: 0,
     },

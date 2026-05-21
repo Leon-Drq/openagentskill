@@ -4,10 +4,10 @@
  * For each candidate repository, runs the pipeline:
  *   1. Fetch repo metadata + README from GitHub
  *   2. AI quality review (gpt-4o-mini via AI Gateway)
- *   3. Write to Supabase via service-role client (bypasses RLS)
+ *   3. Write to Supabase through a narrow INDEXER_SECRET-guarded RPC
  */
 
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createPublicClient } from '@/lib/supabase/public'
 import { generateText } from 'ai'
 import type { CandidateRepo } from './github-search'
 import { generateBlogPostForSkill } from '@/lib/blog/generate'
@@ -26,13 +26,21 @@ export interface ProcessResult {
 
 // ─── GitHub helpers ───────────────────────────────────────────────────────────
 
-async function fetchDefaultBranch(owner: string, repo: string): Promise<string> {
+interface GitHubRepoMetadata {
+  description: string | null
+  stargazers_count: number
+  forks_count: number
+  language: string | null
+  pushed_at: string | null
+  license: { spdx_id: string | null } | null
+}
+
+async function fetchRepoMetadata(owner: string, repo: string): Promise<GitHubRepoMetadata> {
   const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
     headers: GITHUB_HEADERS(),
   })
   if (!res.ok) throw new Error(`GitHub repo fetch failed: ${res.status}`)
-  const data = await res.json()
-  return data.default_branch || 'main'
+  return res.json() as Promise<GitHubRepoMetadata>
 }
 
 async function fetchReadme(owner: string, repo: string): Promise<string> {
@@ -108,7 +116,25 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
   const slug = `${owner}-${repo}`.toLowerCase().replace(/[^a-z0-9-]/g, '-')
 
   try {
-    const supabase = createAdminClient()
+    const serverSecret = process.env.INDEXER_SECRET
+    if (!serverSecret) {
+      throw new Error('Missing INDEXER_SECRET for controlled indexer writes.')
+    }
+
+    const supabase = createPublicClient()
+    const repoMeta = await fetchRepoMetadata(owner, repo)
+    const stars = repoMeta.stargazers_count ?? candidate.stars
+    const forks = repoMeta.forks_count ?? 0
+    const license =
+      repoMeta.license?.spdx_id && repoMeta.license.spdx_id !== 'NOASSERTION'
+        ? repoMeta.license.spdx_id
+        : 'Unknown'
+    const enrichedCandidate: CandidateRepo = {
+      ...candidate,
+      description: repoMeta.description || candidate.description,
+      stars,
+      language: repoMeta.language || candidate.language,
+    }
 
     // 1. Check if already indexed — if so, refresh star count and return
     const { data: existing } = await supabase
@@ -118,15 +144,23 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
       .maybeSingle()
 
     if (existing) {
-      // Refresh star count if it changed
-      if (existing.github_stars !== candidate.stars) {
-        await supabase
-          .from('skills')
-          .update({ github_stars: candidate.stars, last_synced_at: new Date().toISOString() })
-          .eq('slug', slug)
-        return { repo: repoRef, status: 'skipped', reason: `Stars refreshed: ${existing.github_stars} → ${candidate.stars}` }
+      const { error: refreshError } = await supabase.rpc('update_skill_github_metadata', {
+        p_server_secret: serverSecret,
+        p_slug: slug,
+        p_github_stars: stars,
+        p_github_forks: forks,
+        p_github_language: repoMeta.language,
+        p_github_last_pushed_at: repoMeta.pushed_at,
+      })
+
+      if (refreshError) {
+        throw new Error(`DB metadata refresh failed: ${refreshError.message}`)
       }
-      return { repo: repoRef, status: 'skipped', reason: 'Already indexed, stars unchanged' }
+
+      if (existing.github_stars !== stars) {
+        return { repo: repoRef, status: 'skipped', reason: `Stars refreshed: ${existing.github_stars} → ${stars}` }
+      }
+      return { repo: repoRef, status: 'skipped', reason: 'Already indexed, metadata refreshed' }
     }
 
     // 2. Fetch README
@@ -136,7 +170,7 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
     }
 
     // 3. AI Review
-    const review = await aiReview(candidate, readme)
+    const review = await aiReview(enrichedCandidate, readme)
 
     if (!review.approved) {
       return { repo: repoRef, status: 'rejected', reason: review.reason || 'Did not pass review' }
@@ -148,20 +182,22 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
       name: repo.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
       description: review.summary,
       long_description: readme.slice(0, 2000),
-      tagline: candidate.description || review.summary,
+      tagline: enrichedCandidate.description || review.summary,
       author_name: owner,
       author_url: `https://github.com/${owner}`,
       repository: `https://github.com/${owner}/${repo}`,
       github_repo: repoRef,
-      github_stars: candidate.stars,
-      github_forks: 0,
+      github_stars: stars,
+      github_forks: forks,
+      github_language: repoMeta.language,
+      github_last_pushed_at: repoMeta.pushed_at,
       category: review.category,
       tags: review.tags,
-      frameworks: [],
+      frameworks: repoMeta.language ? [repoMeta.language] : [],
       version: '1.0.0',
-      license: 'Unknown',
+      license,
       install_command: `npx skills add ${repoRef}`,
-      verified: candidate.stars >= 100,
+      verified: stars >= 100,
       submission_source: 'auto-indexer',
       submitted_by_agent: 'open-agent-skill-indexer',
       ai_review_score: { total: review.score },
@@ -174,28 +210,31 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
       review_count: 0,
     }
 
-    const { data: skillRecord, error: skillError } = await supabase
-      .from('skills')
-      .insert(skillData)
-      .select('id')
-      .single()
+    const { data: saveResult, error: skillError } = await supabase.rpc('upsert_indexed_skill', {
+      p_server_secret: serverSecret,
+      p_skill: skillData,
+      p_activity: {
+        event_type: 'skill_published',
+        actor_name: 'Open Agent Skill Indexer',
+        actor_type: 'agent',
+        description: `Auto-indexed ${skillData.name} from GitHub (${stars} stars)`,
+        metadata: { stars, source: 'auto-indexer', score: review.score },
+      },
+    })
 
     if (skillError) throw new Error(`DB insert failed: ${skillError.message}`)
 
-    // 5. Log to activity feed
-    await supabase.from('activity_feed').insert({
-      event_type: 'skill_published',
-      skill_id: skillRecord.id,
-      actor_name: 'Open Agent Skill Indexer',
-      actor_type: 'agent',
-      description: `Auto-indexed ${skillData.name} from GitHub (${candidate.stars} stars)`,
-      metadata: { stars: candidate.stars, source: 'auto-indexer', score: review.score },
-    })
-
-    // 6. Async blog post generation (non-blocking, failure does not affect skill indexing)
-    generateBlogPostForSkill(skillRecord.id).catch(() => {
-      // Silently ignore blog generation errors
-    })
+    // Blog generation still needs privileged DB credentials; skip it when Vercel has
+    // only the controlled INDEXER_SECRET path available.
+    const savedSkill = saveResult as { skill?: { id?: string } } | null
+    if (
+      savedSkill?.skill?.id &&
+      (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY)
+    ) {
+      generateBlogPostForSkill(savedSkill.skill.id).catch(() => {
+        // Silently ignore blog generation errors
+      })
+    }
 
     return { repo: repoRef, status: 'indexed', slug }
   } catch (error: any) {

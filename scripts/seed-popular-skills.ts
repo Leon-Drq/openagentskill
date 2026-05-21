@@ -371,6 +371,17 @@ function normalizeLicense(repo: GitHubRepo) {
   return license
 }
 
+function estimateQualityScore(repo: GitHubRepo) {
+  const starScore = Math.min(35, (Math.log10(repo.stargazers_count + 1) * 7))
+  const freshnessAt = repo.pushed_at ? new Date(repo.pushed_at).getTime() : 0
+  const ageDays = freshnessAt ? (Date.now() - freshnessAt) / 86_400_000 : Infinity
+  const freshnessScore =
+    ageDays <= 30 ? 15 : ageDays <= 90 ? 12 : ageDays <= 180 ? 8 : ageDays <= 365 ? 4 : 0
+  const metadataScore = 15
+  const reviewScore = 13.5
+  return Math.min(100, Math.round((starScore + freshnessScore + metadataScore + reviewScore) * 100) / 100)
+}
+
 async function fetchRepo(repo: string): Promise<GitHubRepo> {
   const response = await fetch(`https://api.github.com/repos/${repo}`, {
     headers: {
@@ -403,6 +414,8 @@ function buildSkill(entry: CuratedSkillRepo, repo: GitHubRepo) {
     github_repo: repo.full_name,
     github_stars: repo.stargazers_count,
     github_forks: repo.forks_count,
+    github_language: repo.language,
+    github_last_pushed_at: repo.pushed_at,
     category: entry.category,
     tags: entry.tags,
     frameworks: entry.frameworks,
@@ -423,6 +436,11 @@ function buildSkill(entry: CuratedSkillRepo, repo: GitHubRepo) {
     used_by: 0,
     rating: 0,
     review_count: 0,
+    quality_score: estimateQualityScore(repo),
+    quality_signals: {
+      source: 'seed:popular',
+      model: 'v1',
+    },
     last_synced_at: new Date().toISOString(),
   }
 }
@@ -444,6 +462,7 @@ async function main() {
         slug: skill.slug,
         repo: skill.github_repo,
         stars: skill.github_stars,
+        quality: skill.quality_score,
         category: skill.category,
       }))
     )

@@ -27,6 +27,7 @@ interface Skill {
     downloads: number
     stars: number
     rating: number
+    qualityScore?: number
     weeklyGrowth?: number
   }
   technical: {
@@ -40,6 +41,7 @@ interface Skill {
 }
 
 const SORT_TABS = [
+  { key: 'quality', label: 'Recommended', description: 'Best blend of quality, stars, freshness, and agent usage' },
   { key: 'downloads', label: 'Hall of Fame', description: 'Most installed of all time' },
   { key: 'trending', label: 'Trending', description: 'Growing fast right now' },
   { key: 'stars', label: 'Most Starred', description: 'Highest GitHub stars' },
@@ -294,6 +296,11 @@ export function SkillsPageClient({ skills, query, sort, category, categories }: 
                           ? `${(skill.stats.stars / 1000).toFixed(1)}K`
                           : skill.stats.stars} stars
                       </span>
+                      {typeof skill.stats.qualityScore === 'number' && skill.stats.qualityScore > 0 && (
+                        <span title="Quality Score">
+                          {Math.round(skill.stats.qualityScore)} quality
+                        </span>
+                      )}
                       {skill.stats.downloads > 0 && (
                         <span title="Downloads">
                           {skill.stats.downloads >= 1000

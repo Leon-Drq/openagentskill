@@ -8,8 +8,9 @@ async function getFeaturedSkills() {
   const supabase = createPublicClient()
   const { data, error } = await supabase
     .from('skills')
-    .select('slug, name, description, github_stars, downloads')
+    .select('slug, name, description, github_stars, downloads, quality_score')
     .eq('ai_review_approved', true)
+    .order('quality_score', { ascending: false })
     .order('github_stars', { ascending: false })
     .limit(6)
   if (error) return []

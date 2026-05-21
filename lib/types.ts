@@ -38,6 +38,7 @@ export interface SkillStats {
   usedBy: number
   rating: number
   reviewCount: number
+  qualityScore?: number
   trending24h?: number // Trending score in last 24h
   weeklyGrowth?: number // Weekly growth percentage
 }
