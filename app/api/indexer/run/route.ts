@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { searchSkillRepos, type CandidateRepo } from '@/lib/indexer/github-search'
 import { processBatch, processRepo } from '@/lib/indexer/processor'
+import { bulkImportHighStarSkills } from '@/lib/indexer/high-star-import'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 
 // Allow up to 5 minutes (Vercel Pro max)
@@ -17,6 +18,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json().catch(() => ({}))
+    const mode = String(body.mode || 'bulk')
     const page = Math.max(1, Number(body.page) || 1)
     const limit = Math.min(Number(body.limit) || 20, 30)
 
@@ -34,6 +36,29 @@ export async function POST(request: NextRequest) {
       }
       const result = await processRepo(candidate)
       return NextResponse.json({ success: true, summary: { found: 1, indexed: result.status === 'indexed' ? 1 : 0, rejected: result.status === 'rejected' ? 1 : 0, skipped: result.status === 'skipped' ? 1 : 0, errors: result.status === 'error' ? 1 : 0 }, results: [result] })
+    }
+
+    if (mode !== 'reviewed') {
+      const targetNew = Math.min(Math.max(Number(body.targetNew) || 200, 1), 500)
+      const minStars = Math.max(Number(body.minStars) || 1000, 100)
+      const maxSearchRequests = Math.min(
+        Math.max(Number(body.maxSearchRequests) || (process.env.GITHUB_TOKEN ? 20 : 10), 1),
+        process.env.GITHUB_TOKEN ? 30 : 10
+      )
+      const pageSeed =
+        body.pageSeed === undefined ? undefined : Math.max(0, Number(body.pageSeed) || 0)
+
+      console.log(
+        `[indexer] Bulk high-star import — targetNew=${targetNew}, minStars=${minStars}, maxSearchRequests=${maxSearchRequests}`
+      )
+      const result = await bulkImportHighStarSkills({
+        targetNew,
+        minStars,
+        maxSearchRequests,
+        pageSeed,
+      })
+      console.log('[indexer] Bulk import complete:', result.summary)
+      return NextResponse.json({ success: true, mode: 'bulk', ...result })
     }
 
     console.log(`[indexer] Starting — page=${page}, limit=${limit}`)
@@ -74,6 +99,11 @@ export async function GET(request: NextRequest) {
   return POST(new NextRequest(request.url, {
     method: 'POST',
     headers: request.headers,
-    body: JSON.stringify({ page: 1, limit: 20 }),
+    body: JSON.stringify({
+      mode: 'bulk',
+      targetNew: Number(process.env.INDEXER_DAILY_TARGET || 200),
+      minStars: Number(process.env.INDEXER_MIN_STARS || 1000),
+      maxSearchRequests: Number(process.env.INDEXER_MAX_SEARCH_REQUESTS || (process.env.GITHUB_TOKEN ? 20 : 10)),
+    }),
   }))
 }

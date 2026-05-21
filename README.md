@@ -216,6 +216,9 @@ pnpm dev
 | `SUPABASE_SECRET_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Server-only Supabase key for privileged automation/admin routes |
 | `GITHUB_TOKEN` | GitHub token for API access |
 | `INDEXER_SECRET` | Bearer secret required for indexer/blog routes and reviewed skill-submission RPC writes in production |
+| `INDEXER_DAILY_TARGET` | Optional. Daily bulk-import target, defaults to `200`, max `500` |
+| `INDEXER_MIN_STARS` | Optional. Minimum GitHub stars for bulk import, defaults to `1000` |
+| `INDEXER_MAX_SEARCH_REQUESTS` | Optional. GitHub search requests per bulk run, defaults to `10` without `GITHUB_TOKEN` |
 | `CRON_SECRET` | Bearer secret required for cron-triggered maintenance routes in production |
 
 ### Database Setup
@@ -223,6 +226,8 @@ pnpm dev
 Apply SQL files in `scripts/` in order. They create the skills catalog, profiles and points ledger, activity feed, agent feedback loop, aggregate stats view, and RLS policies.
 
 Production writes should go through the Next.js API routes. Public feedback, reviewed skill submissions, and indexer writes use narrow Supabase RPCs guarded by server secrets, while public clients can only read approved skills and aggregate stats directly.
+
+The daily indexer defaults to high-star bulk discovery. It scans GitHub repositories matching agent, MCP, browser automation, RAG, workflow, and developer-tool signals, then imports up to `INDEXER_DAILY_TARGET` new approved skills per run. Use `POST /api/indexer/run` with `mode: "reviewed"` for the slower README/AI-review path.
 
 ---
 
