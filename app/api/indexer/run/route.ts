@@ -1,22 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { searchSkillRepos, type CandidateRepo } from '@/lib/indexer/github-search'
 import { processBatch, processRepo } from '@/lib/indexer/processor'
+import { isAutomationAuthorized } from '@/lib/security/route-auth'
 
 // Allow up to 5 minutes (Vercel Pro max)
 export const maxDuration = 300
 
 function isAuthorized(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization')
-  const indexerSecret = process.env.INDEXER_SECRET
-  const cronSecret = process.env.CRON_SECRET
-
-  // No secrets configured — allow all (useful for initial setup)
-  if (!indexerSecret && !cronSecret) return true
-
-  if (!authHeader) return false
-  const token = authHeader.replace('Bearer ', '')
-  return (!!indexerSecret && token === indexerSecret) ||
-         (!!cronSecret && token === cronSecret)
+  return isAutomationAuthorized(request)
 }
 
 export async function POST(request: NextRequest) {

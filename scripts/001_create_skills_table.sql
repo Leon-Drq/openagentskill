@@ -55,17 +55,14 @@ CREATE TABLE IF NOT EXISTS public.skills (
 -- Enable Row Level Security
 ALTER TABLE public.skills ENABLE ROW LEVEL SECURITY;
 
--- Public read access for all skills
-CREATE POLICY "skills_select_all" ON public.skills
-  FOR SELECT USING (true);
+-- Public read access is limited to AI-approved skills.
+CREATE POLICY "skills_select_approved_public" ON public.skills
+  FOR SELECT
+  TO anon, authenticated
+  USING (ai_review_approved = true);
 
--- Anyone can insert (submissions go through AI review)
-CREATE POLICY "skills_insert_public" ON public.skills
-  FOR INSERT WITH CHECK (true);
-
--- Only allow updates to own skills (future: when we add user auth)
-CREATE POLICY "skills_update_verified" ON public.skills
-  FOR UPDATE USING (verified = true);
+-- Writes are intentionally handled by server-side API routes with service credentials.
+-- Do not grant public INSERT/UPDATE policies here; submissions must pass validation/review.
 
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_skills_slug ON public.skills(slug);
@@ -101,6 +98,8 @@ CREATE TABLE IF NOT EXISTS public.skill_submissions (
   status TEXT NOT NULL, -- 'pending', 'approved', 'rejected'
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+ALTER TABLE public.skill_submissions ENABLE ROW LEVEL SECURITY;
 
 CREATE INDEX IF NOT EXISTS idx_submissions_skill_id ON public.skill_submissions(skill_id);
 CREATE INDEX IF NOT EXISTS idx_submissions_status ON public.skill_submissions(status);

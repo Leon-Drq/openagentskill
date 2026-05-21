@@ -104,6 +104,7 @@ export const SkillManifestSchema = z.object({
   name: z.string(),
   version: z.string(),
   description: z.string(),
+  tagline: z.string().optional(),
   author: z.union([
     z.string(),
     z.object({

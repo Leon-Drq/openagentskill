@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/public'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { isAutomationAuthorized } from '@/lib/security/route-auth'
 
 export const maxDuration = 300
 
 function isAuthorized(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization')
-  const cronSecret = process.env.CRON_SECRET
-  const indexerSecret = process.env.INDEXER_SECRET
-  if (!cronSecret && !indexerSecret) return true
-  if (!authHeader) return false
-  const token = authHeader.replace('Bearer ', '')
-  return (!!cronSecret && token === cronSecret) || (!!indexerSecret && token === indexerSecret)
+  return isAutomationAuthorized(request)
 }
 
 /**
@@ -19,7 +14,7 @@ function isAuthorized(request: NextRequest): boolean {
  * Called by Vercel Cron daily at 03:00 UTC.
  */
 async function refreshAllStars(): Promise<{ updated: number; unchanged: number; errors: number }> {
-  const supabase = createServiceClient()
+  const supabase = createAdminClient()
 
   // Fetch all skills with a GitHub repo
   const { data: skills, error } = await supabase

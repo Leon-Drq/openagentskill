@@ -5,7 +5,8 @@
  * using AI (gpt-4o-mini via Vercel AI Gateway).
  */
 
-import { createServiceClient } from '@/lib/supabase/public'
+import { createPublicClient } from '@/lib/supabase/public'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { generateText } from 'ai'
 
 export interface BlogGenerateResult {
@@ -96,7 +97,7 @@ Respond with JSON only:
 // ─── Main Entry Point ─────────────────────────────────────────────────────────
 
 export async function generateBlogPostForSkill(skillId: string): Promise<BlogGenerateResult> {
-  const supabase = createServiceClient()
+  const supabase = createAdminClient()
 
   try {
     // 1. Fetch skill data
@@ -146,7 +147,7 @@ export async function generateBlogPostForSkill(skillId: string): Promise<BlogGen
 // ─── Fetch helpers for pages ──────────────────────────────────────────────────
 
 export async function getBlogPosts(limit = 20) {
-  const supabase = createServiceClient()
+  const supabase = createPublicClient()
   const { data, error } = await supabase
     .from('blog_posts')
     .select(`
@@ -161,7 +162,7 @@ export async function getBlogPosts(limit = 20) {
 }
 
 export async function getBlogPostBySlug(slug: string) {
-  const supabase = createServiceClient()
+  const supabase = createPublicClient()
   const { data, error } = await supabase
     .from('blog_posts')
     .select(`

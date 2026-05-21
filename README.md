@@ -213,8 +213,16 @@ pnpm dev
 |----------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (for indexer) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only Supabase service role key for privileged writes |
 | `GITHUB_TOKEN` | GitHub token for API access |
+| `INDEXER_SECRET` | Bearer secret required for indexer and blog-generation routes in production |
+| `CRON_SECRET` | Bearer secret required for cron-triggered maintenance routes in production |
+
+### Database Setup
+
+Apply SQL files in `scripts/` in order. They create the skills catalog, profiles and points ledger, activity feed, agent feedback loop, aggregate stats view, and RLS policies.
+
+Production writes should go through the Next.js API routes. Public clients should only read approved skills and aggregate stats.
 
 ---
 

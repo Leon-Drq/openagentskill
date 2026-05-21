@@ -7,7 +7,7 @@
  *   3. Write to Supabase via service-role client (bypasses RLS)
  */
 
-import { createServiceClient } from '@/lib/supabase/public'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { generateText } from 'ai'
 import type { CandidateRepo } from './github-search'
 import { generateBlogPostForSkill } from '@/lib/blog/generate'
@@ -108,7 +108,7 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
   const slug = `${owner}-${repo}`.toLowerCase().replace(/[^a-z0-9-]/g, '-')
 
   try {
-    const supabase = createServiceClient()
+    const supabase = createAdminClient()
 
     // 1. Check if already indexed — if so, refresh star count and return
     const { data: existing } = await supabase

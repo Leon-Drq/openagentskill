@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateBlogPostForSkill } from '@/lib/blog/generate'
-import { createServiceClient } from '@/lib/supabase/public'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { isAutomationAuthorized } from '@/lib/security/route-auth'
 
 export const maxDuration = 60
 
 export async function POST(req: NextRequest) {
-  // Verify secret to prevent abuse
-  const authHeader = req.headers.get('authorization')
-  const secret = process.env.INDEXER_SECRET
-  if (secret && authHeader !== `Bearer ${secret}`) {
+  if (!isAutomationAuthorized(req, ['INDEXER_SECRET'])) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -23,7 +21,7 @@ export async function POST(req: NextRequest) {
 
   // Resolve slug to ID if needed
   if (!resolvedSkillId && skill_slug) {
-    const supabase = createServiceClient()
+    const supabase = createAdminClient()
     const { data } = await supabase
       .from('skills')
       .select('id')

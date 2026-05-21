@@ -6,7 +6,15 @@ import { defaultLocale } from './config'
 import en from './dictionaries/en'
 import zh from './dictionaries/zh'
 
-type Dictionary = typeof en
+type DeepWiden<T> =
+  T extends string ? string :
+  T extends number ? number :
+  T extends boolean ? boolean :
+  T extends readonly (infer U)[] ? readonly DeepWiden<U>[] :
+  T extends object ? { [K in keyof T]: DeepWiden<T[K]> } :
+  T
+
+type Dictionary = DeepWiden<typeof en>
 
 const dictionaries: Record<Locale, Dictionary> = {
   en,

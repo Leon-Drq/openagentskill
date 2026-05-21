@@ -1,5 +1,5 @@
 import { createPublicClient } from '@/lib/supabase/public'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import type { Skill } from '@/lib/types'
 
 export interface SkillRecord {
@@ -132,7 +132,7 @@ export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> 
 }
 
 export async function createSkill(skill: Partial<SkillRecord>): Promise<SkillRecord> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   
   const { data, error } = await supabase
     .from('skills')
@@ -152,7 +152,7 @@ export async function createSubmissionRecord(submission: {
   ai_review_result: any
   status: string
 }) {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   
   const { data, error } = await supabase
     .from('skill_submissions')

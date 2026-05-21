@@ -19,7 +19,7 @@ interface HomePageEnhancedProps {
     event_type: string
     actor_name: string
     actor_type: string
-    description: string
+    description: string | null
     created_at: string
   }>
   featuredSkills: Array<{
@@ -34,7 +34,7 @@ interface HomePageEnhancedProps {
 interface Recommendation {
   skill: string
   slug: string
-  confidence: number
+  confidence: number | string
   install: string
   reasoning: string
 }
@@ -304,7 +304,7 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
                                 {rec.skill}
                               </Link>
                               <span className="text-xs font-mono text-secondary bg-muted px-2 py-0.5">
-                                {Math.round(rec.confidence * 100)}% {t.hero.confidence}
+                                {Math.round(Number(rec.confidence) * 100)}% {t.hero.confidence}
                               </span>
                             </div>
                             <p className="text-xs sm:text-sm text-secondary leading-relaxed line-clamp-2">

@@ -1,5 +1,5 @@
 import { createPublicClient } from '@/lib/supabase/public'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export interface ActivityRecord {
   id: string
@@ -33,7 +33,7 @@ export async function createActivity(activity: {
   description: string
   metadata?: Record<string, unknown>
 }) {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const { data, error } = await supabase
     .from('activity_feed')

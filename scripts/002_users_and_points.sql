@@ -56,14 +56,22 @@ CREATE TABLE IF NOT EXISTS public.point_events (
 
 ALTER TABLE public.point_events ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "point_events_select_own" ON public.point_events FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "point_events_insert_own" ON public.point_events FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "point_events_select_own"
+  ON public.point_events
+  FOR SELECT
+  TO authenticated
+  USING ((SELECT auth.uid()) = user_id);
+-- Points are a server-awarded ledger. Do not allow client-side inserts.
 
 -- 4. Computed total points view (for fast reads)
-CREATE OR REPLACE VIEW public.user_points AS
+CREATE OR REPLACE VIEW public.user_points
+WITH (security_invoker = true) AS
   SELECT user_id, COALESCE(SUM(amount), 0)::INTEGER AS total_points
   FROM public.point_events
   GROUP BY user_id;
+
+REVOKE SELECT ON public.user_points FROM anon, public;
+GRANT SELECT ON public.user_points TO authenticated;
 
 -- 5. Helper: get user level from points
 CREATE OR REPLACE FUNCTION public.get_user_level(points INTEGER)

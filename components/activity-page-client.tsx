@@ -2,18 +2,12 @@
 
 import Link from 'next/link'
 import { useI18n } from '@/lib/i18n/context'
+import type { ActivityRecord } from '@/lib/db/activity'
 import { ActivityFeed } from './activity-feed'
 import { LanguageSwitcher } from './language-switcher'
 
 interface ActivityPageClientProps {
-  activities: Array<{
-    id: string
-    event_type: string
-    actor_name: string
-    actor_type: string
-    description: string
-    created_at: string
-  }>
+  activities: ActivityRecord[]
 }
 
 export function ActivityPageClient({ activities }: ActivityPageClientProps) {

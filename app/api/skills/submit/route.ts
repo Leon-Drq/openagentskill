@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import {
   validateGitHubRepo,
   fetchReadme,
@@ -10,23 +11,45 @@ import { reviewSkill } from '@/lib/ai-review/reviewer'
 import { analyzeCode } from '@/lib/security/static-analysis'
 import { createActivity } from '@/lib/db/activity'
 
+const SkillSubmitRequestSchema = z.object({
+  repository: z.string().min(1),
+  category: z.string().min(1),
+  tags: z.array(z.string().min(1).max(40)).min(1).max(10),
+  submissionSource: z.enum(['web', 'api', 'agent']).default('web'),
+  submittedByAgent: z.string().min(1).max(200).optional(),
+})
+
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { repository, category, tags, submissionSource = 'web' } = body
+    const parsed = SkillSubmitRequestSchema.safeParse(await request.json())
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid submission payload',
+          issues: parsed.error.issues.map((issue) => ({
+            path: issue.path.join('.'),
+            message: issue.message,
+          })),
+        },
+        { status: 400 }
+      )
+    }
+
+    const body = parsed.data
+    const { repository, category, tags, submissionSource } = body
 
     console.log('[v0] Skill submission received:', { repository, category, tags })
 
     // Parse GitHub URL
-    const parsed = parseGitHubUrl(repository)
-    if (!parsed) {
+    const repoRef = parseGitHubUrl(repository)
+    if (!repoRef) {
       return NextResponse.json(
         { error: '无效的 GitHub 仓库格式' },
         { status: 400 }
       )
     }
 
-    const { owner, repo } = parsed
+    const { owner, repo } = repoRef
 
     // Step 1: Validate GitHub repository
     console.log('[v0] Validating repository...')
@@ -219,14 +242,23 @@ export async function POST(request: NextRequest) {
       })
     } catch (dbError: any) {
       console.error('[v0] Database save error:', dbError)
-      // Still return success with review, but note the DB error
+
+      if (dbError?.code === '23505') {
+        return NextResponse.json(
+          {
+            error: 'Skill already exists',
+            slug,
+          },
+          { status: 409 }
+        )
+      }
+
       return NextResponse.json({
-        success: true,
+        success: false,
         approved: review.approved,
         review,
-        skill: newSkill,
-        warning: 'Skill created but database save failed',
-      })
+        error: 'Skill reviewed but database save failed',
+      }, { status: 500 })
     }
   } catch (error: any) {
     console.error('[v0] Submission error:', error)
