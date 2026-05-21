@@ -99,7 +99,7 @@ end;
 $$;
 
 revoke all on function public.record_agent_feedback(text, text, boolean, integer, text, jsonb) from public;
-grant execute on function public.record_agent_feedback(text, text, boolean, integer, text, jsonb) to anon, authenticated;
+grant execute on function public.record_agent_feedback(text, text, boolean, integer, text, jsonb) to anon;
 
 create or replace function public.submit_reviewed_skill(
   p_server_secret text,
@@ -222,4 +222,4 @@ end;
 $$;
 
 revoke all on function public.submit_reviewed_skill(text, jsonb, jsonb, jsonb) from public;
-grant execute on function public.submit_reviewed_skill(text, jsonb, jsonb, jsonb) to anon, authenticated;
+grant execute on function public.submit_reviewed_skill(text, jsonb, jsonb, jsonb) to anon;
