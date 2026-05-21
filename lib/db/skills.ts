@@ -41,7 +41,7 @@ export interface SkillRecord {
 export type SkillSortMode = 'downloads' | 'stars' | 'new' | 'trending'
 
 export async function getAllSkills(
-  sort: SkillSortMode = 'downloads',
+  sort: SkillSortMode = 'stars',
   category?: string
 ): Promise<SkillRecord[]> {
   const supabase = createPublicClient()

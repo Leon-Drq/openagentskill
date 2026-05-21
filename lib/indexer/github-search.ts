@@ -44,6 +44,9 @@ const SEARCH_QUERIES: Array<{ q: string; sort: 'stars' | 'updated' }> = [
   { q: '"awesome" "mcp" stars:>50',        sort: 'stars'   },
   { q: '"awesome" "agent" stars:>50',      sort: 'stars'   },
   { q: 'topic:mcp-skills stars:>50',       sort: 'stars'   },
+  { q: 'topic:ai-agents stars:>1000',      sort: 'stars'   },
+  { q: 'topic:llm-agent stars:>1000',      sort: 'stars'   },
+  { q: '"agent framework" stars:>1000',    sort: 'stars'   },
 
   // ── Popular MCP / Agent tools ──────────────────────────────────────────────
   { q: 'topic:mcp-tool stars:>50',         sort: 'stars'   },
@@ -58,6 +61,9 @@ const SEARCH_QUERIES: Array<{ q: string; sort: 'stars' | 'updated' }> = [
   { q: 'topic:crewai stars:>50',           sort: 'stars'   },
   { q: 'topic:autogen stars:>50',          sort: 'stars'   },
   { q: 'topic:browser-use stars:>50',      sort: 'stars'   },
+  { q: 'topic:browser-automation stars:>1000', sort: 'stars' },
+  { q: 'topic:web-scraping stars:>5000',   sort: 'stars'   },
+  { q: 'topic:rag stars:>5000',            sort: 'stars'   },
   { q: '"agent skill" stars:>50',          sort: 'updated' },
   { q: '"ai tool" stars:>100',             sort: 'updated' },
 ]

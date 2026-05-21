@@ -1,278 +1,486 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const supabase = createClient(supabaseUrl, supabaseKey)
+type CuratedSkillRepo = {
+  repo: string
+  category: string
+  tags: string[]
+  frameworks: string[]
+  name?: string
+  tagline?: string
+}
 
-const popularSkills = [
+type GitHubRepo = {
+  name: string
+  full_name: string
+  description: string | null
+  html_url: string
+  stargazers_count: number
+  forks_count: number
+  pushed_at: string | null
+  language: string | null
+  license: { spdx_id: string | null } | null
+  owner: { login: string; html_url: string }
+}
+
+const curatedRepos: CuratedSkillRepo[] = [
   {
-    slug: 'find-skills',
-    name: 'Find Skills',
-    description: 'Helps AI agents discover and recommend relevant skills from the marketplace',
-    long_description: 'This skill enables AI agents to search through available skills, understand their capabilities, and recommend the most suitable ones based on user needs. Perfect for agents that need to dynamically discover tools.',
-    tagline: 'Discover the right skill for any task',
-    author_name: 'skills-community',
-    repository: 'https://github.com/skills/find-skills',
-    github_repo: 'skills/find-skills',
-    github_stars: 245,
-    github_forks: 32,
-    category: 'productivity',
-    tags: ['search', 'discovery', 'ai-agent'],
-    frameworks: ['Claude', 'GPT-4', 'Cursor'],
-    version: '1.2.0',
-    license: 'MIT',
-    install_command: 'npx skills add skills/find-skills',
-    verified: true,
-    submission_source: 'api',
-    ai_review_approved: true,
-    downloads: 1250,
-    used_by: 456,
-    rating: 4.8,
+    repo: 'Significant-Gravitas/AutoGPT',
+    category: 'agent-frameworks',
+    tags: ['autonomous-agent', 'workflow', 'python'],
+    frameworks: ['AutoGPT', 'Python', 'LLM'],
+    tagline: 'Build and run autonomous AI agents for open-ended tasks',
   },
   {
-    slug: 'vercel-react-best-practices',
-    name: 'Vercel React Best Practices',
-    description: 'Code review assistant focused on React and Next.js best practices',
-    long_description: 'Automatically reviews React and Next.js code for common issues, performance problems, and suggests improvements based on Vercel best practices.',
-    tagline: 'Write better React code with AI guidance',
-    author_name: 'vercel',
-    repository: 'https://github.com/vercel/react-best-practices',
-    github_repo: 'vercel/react-best-practices',
-    github_stars: 892,
-    github_forks: 124,
-    category: 'code-review',
-    tags: ['react', 'nextjs', 'code-quality'],
-    frameworks: ['Cursor', 'Windsurf', 'Copilot'],
-    version: '2.1.0',
-    license: 'MIT',
-    install_command: 'npx skills add vercel/react-best-practices',
-    verified: true,
-    submission_source: 'api',
-    ai_review_approved: true,
-    downloads: 3420,
-    used_by: 1234,
-    rating: 4.9,
+    repo: 'n8n-io/n8n',
+    category: 'automation',
+    tags: ['workflow', 'integrations', 'automation'],
+    frameworks: ['MCP', 'Node.js', 'AI Agents'],
+    tagline: 'Connect agents to hundreds of workflow automations',
   },
   {
-    slug: 'web-design-guidelines',
-    name: 'Web Design Guidelines',
-    description: 'Provides design system recommendations and UI/UX best practices',
-    long_description: 'This skill helps agents create beautiful, accessible web designs by following established design principles and modern UI patterns.',
-    tagline: 'Build stunning interfaces with AI assistance',
-    author_name: 'design-systems',
-    repository: 'https://github.com/design-systems/guidelines',
-    github_repo: 'design-systems/guidelines',
-    github_stars: 567,
-    github_forks: 89,
+    repo: 'langchain-ai/langchain',
+    category: 'agent-frameworks',
+    tags: ['agents', 'rag', 'tools'],
+    frameworks: ['LangChain', 'Python', 'JavaScript'],
+    tagline: 'Agent engineering primitives for tools, memory, and RAG',
+  },
+  {
+    repo: 'microsoft/markitdown',
+    category: 'data',
+    tags: ['documents', 'markdown', 'rag'],
+    frameworks: ['Python', 'RAG', 'LLM'],
+    tagline: 'Convert documents into Markdown for agent-readable context',
+  },
+  {
+    repo: 'google-gemini/gemini-cli',
+    category: 'development',
+    tags: ['coding-agent', 'cli', 'gemini'],
+    frameworks: ['Gemini', 'CLI', 'TypeScript'],
+    tagline: 'Bring a coding agent directly into the terminal',
+  },
+  {
+    repo: 'infiniflow/ragflow',
+    category: 'data',
+    tags: ['rag', 'documents', 'retrieval'],
+    frameworks: ['RAG', 'Python', 'LLM'],
+    tagline: 'Build document intelligence and RAG workflows for agents',
+  },
+  {
+    repo: 'FoundationAgents/MetaGPT',
+    category: 'agent-frameworks',
+    tags: ['multi-agent', 'software-company', 'planning'],
+    frameworks: ['MetaGPT', 'Python', 'Multi-Agent'],
+    tagline: 'Coordinate multi-agent teams for software and product work',
+  },
+  {
+    repo: 'scrapy/scrapy',
+    category: 'web-automation',
+    tags: ['crawler', 'scraping', 'data-extraction'],
+    frameworks: ['Python', 'Crawler', 'RAG'],
+    tagline: 'High-throughput crawling and scraping for agent data pipelines',
+  },
+  {
+    repo: 'microsoft/autogen',
+    category: 'agent-frameworks',
+    tags: ['multi-agent', 'orchestration', 'python'],
+    frameworks: ['AutoGen', 'Python', 'LLM'],
+    tagline: 'Program multi-agent conversations and tool-using workflows',
+  },
+  {
+    repo: 'FlowiseAI/Flowise',
+    category: 'automation',
+    tags: ['visual-builder', 'agents', 'rag'],
+    frameworks: ['LangChain', 'TypeScript', 'RAG'],
+    tagline: 'Visually compose agent and RAG workflows',
+  },
+  {
+    repo: 'crewAIInc/crewAI',
+    category: 'agent-frameworks',
+    tags: ['multi-agent', 'roles', 'workflow'],
+    frameworks: ['CrewAI', 'Python', 'LLM'],
+    tagline: 'Orchestrate role-based AI agent teams',
+  },
+  {
+    repo: 'run-llama/llama_index',
+    category: 'data',
+    tags: ['rag', 'data-agents', 'retrieval'],
+    frameworks: ['LlamaIndex', 'Python', 'RAG'],
+    tagline: 'Connect agents to private data and retrieval workflows',
+  },
+  {
+    repo: 'D4Vinci/Scrapling',
+    category: 'web-automation',
+    tags: ['scraping', 'crawler', 'browser'],
+    frameworks: ['Python', 'Web Automation', 'RAG'],
+    tagline: 'Adaptive web scraping for agent data collection',
+  },
+  {
+    repo: 'ChromeDevTools/chrome-devtools-mcp',
+    category: 'mcp-servers',
+    tags: ['mcp', 'browser', 'debugging'],
+    frameworks: ['MCP', 'Chrome', 'Codex'],
+    tagline: 'Expose Chrome DevTools to coding agents through MCP',
+  },
+  {
+    repo: 'bytedance/UI-TARS-desktop',
+    category: 'automation',
+    tags: ['desktop-agent', 'multimodal', 'computer-use'],
+    frameworks: ['UI-TARS', 'Desktop', 'TypeScript'],
+    tagline: 'Run multimodal agents that operate desktop interfaces',
+  },
+  {
+    repo: 'OpenBMB/ChatDev',
+    category: 'development',
+    tags: ['multi-agent', 'software-dev', 'planning'],
+    frameworks: ['Python', 'Multi-Agent', 'LLM'],
+    tagline: 'Use multi-agent collaboration for software development',
+  },
+  {
+    repo: 'langchain-ai/langgraph',
+    category: 'agent-frameworks',
+    tags: ['graph', 'agents', 'state-machine'],
+    frameworks: ['LangGraph', 'Python', 'LangChain'],
+    tagline: 'Build resilient stateful agents with graph workflows',
+  },
+  {
+    repo: 'punkpeye/awesome-mcp-servers',
+    category: 'mcp-servers',
+    tags: ['mcp', 'directory', 'tools'],
+    frameworks: ['MCP', 'Claude', 'Codex'],
+    tagline: 'Discover a large catalog of MCP servers for agents',
+  },
+  {
+    repo: 'microsoft/playwright-mcp',
+    category: 'mcp-servers',
+    tags: ['mcp', 'browser', 'testing'],
+    frameworks: ['MCP', 'Playwright', 'Browser'],
+    tagline: 'Give agents browser automation through Playwright MCP',
+  },
+  {
+    repo: 'github/github-mcp-server',
+    category: 'mcp-servers',
+    tags: ['mcp', 'github', 'developer-tools'],
+    frameworks: ['MCP', 'GitHub', 'Codex'],
+    tagline: 'Let agents inspect and automate GitHub through MCP',
+  },
+  {
+    repo: 'assafelovic/gpt-researcher',
+    category: 'research',
+    tags: ['research', 'reports', 'agents'],
+    frameworks: ['Python', 'Research Agent', 'LLM'],
+    tagline: 'Run autonomous deep research over web and local sources',
+  },
+  {
+    repo: 'PrefectHQ/fastmcp',
+    category: 'mcp-servers',
+    tags: ['mcp', 'sdk', 'python'],
+    frameworks: ['MCP', 'Python', 'Server'],
+    tagline: 'Build MCP servers and clients quickly in Python',
+  },
+  {
+    repo: 'ScrapeGraphAI/Scrapegraph-ai',
+    category: 'web-automation',
+    tags: ['scraping', 'llm', 'graphs'],
+    frameworks: ['Python', 'LLM', 'Web Automation'],
+    tagline: 'Extract web data with LLM-guided scraping graphs',
+  },
+  {
+    repo: 'modelcontextprotocol/python-sdk',
+    category: 'mcp-servers',
+    tags: ['mcp', 'sdk', 'python'],
+    frameworks: ['MCP', 'Python', 'Claude'],
+    tagline: 'Official Python SDK for MCP servers and clients',
+  },
+  {
+    repo: 'activepieces/activepieces',
+    category: 'integrations',
+    tags: ['automation', 'integrations', 'mcp'],
+    frameworks: ['MCP', 'TypeScript', 'Workflow'],
+    tagline: 'Connect agents to workflow automations and app integrations',
+  },
+  {
+    repo: 'Skyvern-AI/skyvern',
+    category: 'web-automation',
+    tags: ['browser', 'automation', 'agents'],
+    frameworks: ['Python', 'Browser', 'LLM'],
+    tagline: 'Automate browser workflows with AI agents',
+  },
+  {
+    repo: 'browserbase/stagehand',
+    category: 'web-automation',
+    tags: ['browser', 'sdk', 'automation'],
+    frameworks: ['TypeScript', 'Browserbase', 'Playwright'],
+    tagline: 'Build browser agents with natural language actions',
+  },
+  {
+    repo: 'googleapis/mcp-toolbox',
+    category: 'mcp-servers',
+    tags: ['mcp', 'database', 'tools'],
+    frameworks: ['MCP', 'Go', 'Database'],
+    tagline: 'Expose databases to agents through an MCP toolbox',
+  },
+  {
+    repo: 'GLips/Figma-Context-MCP',
     category: 'design',
-    tags: ['ui', 'ux', 'design-systems'],
-    frameworks: ['Claude', 'v0', 'Cursor'],
-    version: '1.5.2',
-    license: 'MIT',
-    install_command: 'npx skills add design-systems/guidelines',
-    verified: true,
-    submission_source: 'api',
-    ai_review_approved: true,
-    downloads: 2100,
-    used_by: 789,
-    rating: 4.7,
+    tags: ['mcp', 'figma', 'design'],
+    frameworks: ['MCP', 'Figma', 'Cursor'],
+    tagline: 'Provide Figma layout context to coding agents',
   },
   {
-    slug: 'git-commit-helper',
-    name: 'Git Commit Helper',
-    description: 'Generates meaningful commit messages following conventional commit standards',
-    long_description: 'Analyzes code changes and automatically generates clear, descriptive commit messages that follow best practices.',
-    tagline: 'Never write a bad commit message again',
-    author_name: 'dev-tools',
-    repository: 'https://github.com/dev-tools/git-commit-helper',
-    github_repo: 'dev-tools/git-commit-helper',
-    github_stars: 1234,
-    github_forks: 156,
-    category: 'developer-tools',
-    tags: ['git', 'version-control', 'productivity'],
-    frameworks: ['Cursor', 'Cline', 'Windsurf'],
-    version: '1.8.0',
-    license: 'MIT',
-    install_command: 'npx skills add dev-tools/git-commit-helper',
-    verified: true,
-    submission_source: 'api',
-    ai_review_approved: true,
-    downloads: 4500,
-    used_by: 2100,
-    rating: 4.8,
+    repo: 'pydantic/pydantic-ai',
+    category: 'agent-frameworks',
+    tags: ['agents', 'typed', 'python'],
+    frameworks: ['PydanticAI', 'Python', 'LLM'],
+    tagline: 'Build typed AI agents with Pydantic patterns',
   },
   {
-    slug: 'api-documentation-generator',
-    name: 'API Documentation Generator',
-    description: 'Automatically generates comprehensive API documentation from code',
-    long_description: 'Scans your codebase and creates detailed, interactive API documentation with examples and usage guides.',
-    tagline: 'Beautiful docs without the manual work',
-    author_name: 'docs-ai',
-    repository: 'https://github.com/docs-ai/api-docs-gen',
-    github_repo: 'docs-ai/api-docs-gen',
-    github_stars: 678,
-    github_forks: 92,
-    category: 'documentation',
-    tags: ['api', 'docs', 'automation'],
-    frameworks: ['GPT-4', 'Claude', 'Cursor'],
-    version: '2.0.1',
-    license: 'Apache-2.0',
-    install_command: 'npx skills add docs-ai/api-docs-gen',
-    verified: true,
-    submission_source: 'api',
-    ai_review_approved: true,
-    downloads: 1890,
-    used_by: 567,
-    rating: 4.6,
+    repo: 'camel-ai/camel',
+    category: 'agent-frameworks',
+    tags: ['multi-agent', 'societies', 'python'],
+    frameworks: ['CAMEL', 'Python', 'Multi-Agent'],
+    tagline: 'Research-grade multi-agent framework and environments',
   },
   {
-    slug: 'sql-query-optimizer',
-    name: 'SQL Query Optimizer',
-    description: 'Analyzes and optimizes database queries for better performance',
-    long_description: 'Identifies slow queries, suggests indexes, and rewrites SQL for optimal performance across PostgreSQL, MySQL, and other databases.',
-    tagline: 'Make your database queries lightning fast',
-    author_name: 'db-experts',
-    repository: 'https://github.com/db-experts/sql-optimizer',
-    github_repo: 'db-experts/sql-optimizer',
-    github_stars: 445,
-    github_forks: 67,
-    category: 'database',
-    tags: ['sql', 'optimization', 'performance'],
-    frameworks: ['OpenClaw', 'Claude', 'GPT-4'],
-    version: '1.4.3',
-    license: 'MIT',
-    install_command: 'npx skills add db-experts/sql-optimizer',
-    verified: true,
-    submission_source: 'api',
-    ai_review_approved: true,
-    downloads: 1567,
-    used_by: 432,
-    rating: 4.7,
+    repo: 'QwenLM/Qwen-Agent',
+    category: 'agent-frameworks',
+    tags: ['qwen', 'function-calling', 'rag'],
+    frameworks: ['Qwen', 'Python', 'MCP'],
+    tagline: 'Build Qwen-powered agents with tools, RAG, and MCP',
   },
   {
-    slug: 'test-case-generator',
-    name: 'Test Case Generator',
-    description: 'Automatically generates comprehensive unit and integration tests',
-    long_description: 'Creates thorough test suites for your code, including edge cases and error scenarios, supporting Jest, Vitest, and more.',
-    tagline: 'Achieve 100% test coverage effortlessly',
-    author_name: 'testing-tools',
-    repository: 'https://github.com/testing-tools/test-gen',
-    github_repo: 'testing-tools/test-gen',
-    github_stars: 789,
-    github_forks: 103,
-    category: 'testing',
-    tags: ['testing', 'unit-tests', 'quality-assurance'],
-    frameworks: ['Cursor', 'Copilot', 'Cline'],
-    version: '1.6.0',
-    license: 'MIT',
-    install_command: 'npx skills add testing-tools/test-gen',
-    verified: true,
-    submission_source: 'api',
-    ai_review_approved: true,
-    downloads: 2890,
-    used_by: 1100,
-    rating: 4.8,
-  },
-  {
-    slug: 'accessibility-checker',
-    name: 'Accessibility Checker',
-    description: 'Identifies and fixes web accessibility issues (WCAG compliance)',
-    long_description: 'Scans your web application for accessibility problems and provides actionable fixes to ensure WCAG 2.1 AA compliance.',
-    tagline: 'Build inclusive web experiences',
-    author_name: 'a11y-tools',
-    repository: 'https://github.com/a11y-tools/checker',
-    github_repo: 'a11y-tools/checker',
-    github_stars: 534,
-    github_forks: 78,
-    category: 'accessibility',
-    tags: ['a11y', 'wcag', 'inclusive-design'],
-    frameworks: ['v0', 'Claude', 'Cursor'],
-    version: '1.3.2',
-    license: 'MIT',
-    install_command: 'npx skills add a11y-tools/checker',
-    verified: true,
-    submission_source: 'api',
-    ai_review_approved: true,
-    downloads: 1234,
-    used_by: 456,
-    rating: 4.9,
-  },
-  {
-    slug: 'code-refactoring-assistant',
-    name: 'Code Refactoring Assistant',
-    description: 'Suggests and applies intelligent code refactoring improvements',
-    long_description: 'Identifies code smells, duplicate code, and complexity issues, then suggests refactoring strategies to improve maintainability.',
-    tagline: 'Keep your codebase clean and maintainable',
-    author_name: 'refactor-ai',
-    repository: 'https://github.com/refactor-ai/assistant',
-    github_repo: 'refactor-ai/assistant',
-    github_stars: 923,
-    github_forks: 134,
-    category: 'code-quality',
-    tags: ['refactoring', 'clean-code', 'maintainability'],
-    frameworks: ['Cursor', 'Windsurf', 'Cline'],
-    version: '2.2.0',
-    license: 'MIT',
-    install_command: 'npx skills add refactor-ai/assistant',
-    verified: true,
-    submission_source: 'api',
-    ai_review_approved: true,
-    downloads: 3100,
-    used_by: 1450,
-    rating: 4.8,
-  },
-  {
-    slug: 'security-vulnerability-scanner',
-    name: 'Security Vulnerability Scanner',
-    description: 'Detects security vulnerabilities and suggests fixes',
-    long_description: 'Comprehensive security scanner that identifies common vulnerabilities (OWASP Top 10), dependency issues, and provides remediation guidance.',
-    tagline: 'Secure your code before deployment',
-    author_name: 'security-first',
-    repository: 'https://github.com/security-first/scanner',
-    github_repo: 'security-first/scanner',
-    github_stars: 1567,
-    github_forks: 234,
+    repo: 'GreyDGL/PentestGPT',
     category: 'security',
-    tags: ['security', 'vulnerability', 'owasp'],
-    frameworks: ['OpenClaw', 'Claude', 'GPT-4'],
-    version: '3.1.0',
-    license: 'Apache-2.0',
-    install_command: 'npx skills add security-first/scanner',
-    verified: true,
-    submission_source: 'api',
-    ai_review_approved: true,
-    downloads: 5670,
-    used_by: 2340,
-    rating: 4.9,
+    tags: ['security', 'pentest', 'agent'],
+    frameworks: ['Python', 'Security', 'LLM'],
+    tagline: 'Assist penetration testing workflows with agentic reasoning',
+  },
+  {
+    repo: 'simular-ai/Agent-S',
+    category: 'automation',
+    tags: ['computer-use', 'desktop', 'agent'],
+    frameworks: ['Python', 'Computer Use', 'LLM'],
+    tagline: 'Use computers through an open agentic framework',
+  },
+  {
+    repo: 'microsoft/semantic-kernel',
+    category: 'agent-frameworks',
+    tags: ['agents', 'orchestration', 'enterprise'],
+    frameworks: ['Semantic Kernel', 'C#', 'Python'],
+    tagline: 'Compose enterprise LLM agents and plugins',
+  },
+  {
+    repo: 'e2b-dev/E2B',
+    category: 'development',
+    tags: ['sandbox', 'code-execution', 'agents'],
+    frameworks: ['Python', 'Sandbox', 'Code Interpreter'],
+    tagline: 'Run agent code safely in cloud sandboxes',
+  },
+  {
+    repo: 'apify/crawlee',
+    category: 'web-automation',
+    tags: ['crawler', 'browser', 'scraping'],
+    frameworks: ['TypeScript', 'Playwright', 'Puppeteer'],
+    tagline: 'Build reliable crawlers for LLM and RAG data ingestion',
+  },
+  {
+    repo: 'dgtlmoon/changedetection.io',
+    category: 'web-automation',
+    tags: ['monitoring', 'web', 'alerts'],
+    frameworks: ['Python', 'Web Monitoring', 'Automation'],
+    tagline: 'Monitor web changes and trigger agent workflows',
+  },
+  {
+    repo: 'AutomaApp/automa',
+    category: 'automation',
+    tags: ['browser', 'workflow', 'no-code'],
+    frameworks: ['Browser Extension', 'Workflow', 'Automation'],
+    tagline: 'Automate browser workflows with visual blocks',
+  },
+  {
+    repo: 'lightpanda-io/browser',
+    category: 'web-automation',
+    tags: ['browser', 'headless', 'automation'],
+    frameworks: ['Zig', 'Browser', 'Automation'],
+    tagline: 'Use a lightweight headless browser for agent automation',
+  },
+  {
+    repo: 'getmaxun/maxun',
+    category: 'web-automation',
+    tags: ['scraping', 'no-code', 'apis'],
+    frameworks: ['TypeScript', 'Crawler', 'RAG'],
+    tagline: 'Turn websites into structured APIs for agents',
+  },
+  {
+    repo: 'hangwin/mcp-chrome',
+    category: 'mcp-servers',
+    tags: ['mcp', 'chrome', 'browser'],
+    frameworks: ['MCP', 'Chrome', 'Browser'],
+    tagline: 'Connect Chrome browser capabilities to MCP clients',
+  },
+  {
+    repo: 'alibaba/page-agent',
+    category: 'web-automation',
+    tags: ['browser', 'gui-agent', 'automation'],
+    frameworks: ['TypeScript', 'Browser', 'LLM'],
+    tagline: 'Control web interfaces with natural language agents',
+  },
+  {
+    repo: 'agentscope-ai/agentscope',
+    category: 'agent-frameworks',
+    tags: ['agents', 'observability', 'python'],
+    frameworks: ['AgentScope', 'Python', 'LLM'],
+    tagline: 'Build agents that are visible, understandable, and trusted',
+  },
+  {
+    repo: 'letta-ai/letta',
+    category: 'memory',
+    tags: ['memory', 'stateful-agents', 'platform'],
+    frameworks: ['Letta', 'Python', 'LLM'],
+    tagline: 'Build stateful agents with long-term memory',
   },
 ]
 
-async function seedSkills() {
-  console.log('🌱 开始添加热门技能到数据库...')
+const dryRun = process.argv.includes('--dry-run')
+const githubToken = process.env.GITHUB_TOKEN
 
-  for (const skill of popularSkills) {
-    try {
-      const { data, error } = await supabase
-        .from('skills')
-        .insert([skill])
-        .select()
-        .single()
-
-      if (error) {
-        if (error.code === '23505') {
-          console.log(`⏭️  技能已存在: ${skill.name}`)
-        } else {
-          console.error(`❌ 添加失败 ${skill.name}:`, error.message)
-        }
-      } else {
-        console.log(`✅ 成功添加: ${skill.name}`)
-      }
-    } catch (err: any) {
-      console.error(`❌ 错误 ${skill.name}:`, err.message)
-    }
+function requireEnv(name: string) {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`)
   }
-
-  console.log('✨ 完成！所有热门技能已添加。')
+  return value
 }
 
-seedSkills()
+function slugForRepo(repo: string) {
+  return repo.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+
+function titleFromRepo(repoName: string) {
+  return repoName
+    .replace(/[-_]+/g, ' ')
+    .replace(/\bmcp\b/gi, 'MCP')
+    .replace(/\bai\b/gi, 'AI')
+    .replace(/\bapi\b/gi, 'API')
+    .replace(/\brag\b/gi, 'RAG')
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
+function normalizeLicense(repo: GitHubRepo) {
+  const license = repo.license?.spdx_id
+  if (!license || license === 'NOASSERTION') return 'Unknown'
+  return license
+}
+
+async function fetchRepo(repo: string): Promise<GitHubRepo> {
+  const response = await fetch(`https://api.github.com/repos/${repo}`, {
+    headers: {
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      ...(githubToken ? { Authorization: `Bearer ${githubToken}` } : {}),
+    },
+  })
+
+  if (!response.ok) {
+    const body = await response.text()
+    throw new Error(`GitHub fetch failed for ${repo}: ${response.status} ${body}`)
+  }
+
+  return response.json() as Promise<GitHubRepo>
+}
+
+function buildSkill(entry: CuratedSkillRepo, repo: GitHubRepo) {
+  const description = repo.description || entry.tagline || `${repo.full_name} for AI agent workflows`
+
+  return {
+    slug: slugForRepo(repo.full_name),
+    name: entry.name || titleFromRepo(repo.name),
+    description,
+    long_description: `${description}\n\nImported from GitHub because it is a high-star, actively maintained project that can extend AI agent workflows.`,
+    tagline: entry.tagline || description,
+    author_name: repo.owner.login,
+    author_url: repo.owner.html_url,
+    repository: repo.html_url,
+    github_repo: repo.full_name,
+    github_stars: repo.stargazers_count,
+    github_forks: repo.forks_count,
+    category: entry.category,
+    tags: entry.tags,
+    frameworks: entry.frameworks,
+    version: '1.0.0',
+    license: normalizeLicense(repo),
+    install_command: `npx skills add ${repo.full_name}`,
+    verified: repo.stargazers_count >= 1000,
+    submission_source: 'github-star-import',
+    submitted_by_agent: 'open-agent-skill-curator',
+    ai_review_score: {
+      total: repo.stargazers_count >= 10000 ? 90 : 82,
+      source: 'github-star-import',
+    },
+    ai_review_approved: true,
+    ai_review_issues: [],
+    ai_review_suggestions: [],
+    downloads: 0,
+    used_by: 0,
+    rating: 0,
+    review_count: 0,
+    last_synced_at: new Date().toISOString(),
+  }
+}
+
+async function main() {
+  const skills = []
+
+  for (const entry of curatedRepos) {
+    const repo = await fetchRepo(entry.repo)
+    skills.push(buildSkill(entry, repo))
+    await new Promise((resolve) => setTimeout(resolve, 150))
+  }
+
+  skills.sort((a, b) => b.github_stars - a.github_stars)
+
+  if (dryRun) {
+    console.table(
+      skills.map((skill) => ({
+        slug: skill.slug,
+        repo: skill.github_repo,
+        stars: skill.github_stars,
+        category: skill.category,
+      }))
+    )
+    return
+  }
+
+  const supabaseUrl = requireEnv('NEXT_PUBLIC_SUPABASE_URL')
+  const supabaseKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
+
+  if (!supabaseKey) {
+    throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SECRET_KEY')
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+
+  let insertedOrUpdated = 0
+
+  for (const skill of skills) {
+    const { error } = await supabase.from('skills').upsert(skill, {
+      onConflict: 'slug',
+    })
+
+    if (error) {
+      throw new Error(`Failed to upsert ${skill.github_repo}: ${error.message}`)
+    }
+
+    insertedOrUpdated += 1
+    console.log(`upserted ${skill.github_repo} (${skill.github_stars} stars)`)
+  }
+
+  console.log(`Done. Upserted ${insertedOrUpdated} high-star skills.`)
+}
+
+main().catch((error: unknown) => {
+  console.error(error instanceof Error ? error.message : error)
+  process.exitCode = 1
+})

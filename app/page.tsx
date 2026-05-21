@@ -10,7 +10,7 @@ async function getFeaturedSkills() {
     .from('skills')
     .select('slug, name, description, github_stars, downloads')
     .eq('ai_review_approved', true)
-    .order('downloads', { ascending: false })
+    .order('github_stars', { ascending: false })
     .limit(6)
   if (error) return []
   return data || []

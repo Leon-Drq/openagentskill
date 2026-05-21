@@ -23,7 +23,7 @@
 
 | Problem | Solution |
 |---------|----------|
-| Finding quality skills is hard | Curated directory with **40+ verified skills**, auto-indexed every 6 hours |
+| Finding quality skills is hard | Curated directory with **90+ verified skills**, auto-indexed every 6 hours |
 | GitHub stars don't reflect real usage | **Agent Feedback Loop** — real usage data from AI agents |
 | No incentive for skill authors | **Points system** rewards authors for every successful call |
 | Skills scattered across GitHub | **One-stop marketplace** with search, filters, and categories |
@@ -90,7 +90,7 @@
 
 <div align="center">
 
-**[View all 40+ skills →](https://www.openagentskill.com/skills)**
+**[View all 90+ skills →](https://www.openagentskill.com/skills)**
 
 </div>
 
@@ -152,7 +152,7 @@ Visit [openagentskill.com/skills](https://www.openagentskill.com/skills) to expl
 
 ### Auto-Discovery
 
-We automatically discover new skills from GitHub daily using 20+ search patterns:
+We automatically discover new skills from GitHub daily using 25+ search patterns:
 
 ```
 topic:agent-skills    topic:mcp-tool       topic:mcp-server
