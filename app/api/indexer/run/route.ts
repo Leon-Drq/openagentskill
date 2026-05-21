@@ -39,8 +39,8 @@ export async function POST(request: NextRequest) {
     }
 
     if (mode !== 'reviewed') {
-      const targetNew = Math.min(Math.max(Number(body.targetNew) || 200, 1), 500)
-      const minStars = Math.max(Number(body.minStars) || 1000, 100)
+      const targetNew = Math.min(Math.max(Number(body.targetNew) || 500, 1), 500)
+      const minStars = Math.max(Number(body.minStars) || 500, 100)
       const maxSearchRequests = Math.min(
         Math.max(Number(body.maxSearchRequests) || (process.env.GITHUB_TOKEN ? 20 : 10), 1),
         process.env.GITHUB_TOKEN ? 30 : 10
@@ -101,8 +101,8 @@ export async function GET(request: NextRequest) {
     headers: request.headers,
     body: JSON.stringify({
       mode: 'bulk',
-      targetNew: Number(process.env.INDEXER_DAILY_TARGET || 200),
-      minStars: Number(process.env.INDEXER_MIN_STARS || 1000),
+      targetNew: Number(process.env.INDEXER_DAILY_TARGET || 500),
+      minStars: Number(process.env.INDEXER_MIN_STARS || 500),
       maxSearchRequests: Number(process.env.INDEXER_MAX_SEARCH_REQUESTS || (process.env.GITHUB_TOKEN ? 20 : 10)),
     }),
   }))

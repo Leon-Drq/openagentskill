@@ -216,8 +216,8 @@ pnpm dev
 | `SUPABASE_SECRET_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Server-only Supabase key for privileged automation/admin routes |
 | `GITHUB_TOKEN` | GitHub token for API access |
 | `INDEXER_SECRET` | Bearer secret required for indexer/blog routes and reviewed skill-submission RPC writes in production |
-| `INDEXER_DAILY_TARGET` | Optional. Daily bulk-import target, defaults to `200`, max `500` |
-| `INDEXER_MIN_STARS` | Optional. Minimum GitHub stars for bulk import, defaults to `1000` |
+| `INDEXER_DAILY_TARGET` | Optional. Daily bulk-import target, defaults to `500`, max `500` |
+| `INDEXER_MIN_STARS` | Optional. Minimum GitHub stars for bulk import, defaults to `500` |
 | `INDEXER_MAX_SEARCH_REQUESTS` | Optional. GitHub search requests per bulk run, defaults to `10` without `GITHUB_TOKEN` |
 | `CRON_SECRET` | Bearer secret required for cron-triggered maintenance routes in production |
 

@@ -311,8 +311,8 @@ function getSearchPlan(maxSearchRequests: number, pageSeed: number) {
 export async function bulkImportHighStarSkills(
   options: BulkImportOptions = {}
 ): Promise<{ summary: BulkImportSummary; results: Array<{ repo: string; status: string; slug?: string; reason?: string }> }> {
-  const targetNew = clamp(Math.floor(options.targetNew || 200), 1, 500)
-  const minStars = clamp(Math.floor(options.minStars || 1000), 100, 1_000_000)
+  const targetNew = clamp(Math.floor(options.targetNew || 500), 1, 500)
+  const minStars = clamp(Math.floor(options.minStars || 500), 100, 1_000_000)
   const perPage = clamp(Math.floor(options.perPage || 100), 10, 100)
   const maxSearchRequests = clamp(
     Math.floor(options.maxSearchRequests || (process.env.GITHUB_TOKEN ? 20 : 10)),
