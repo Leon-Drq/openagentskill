@@ -23,7 +23,7 @@
 
 | Problem | Solution |
 |---------|----------|
-| Finding quality skills is hard | Curated directory with **90+ verified skills**, ranked by quality score and auto-indexed every 6 hours |
+| Finding quality skills is hard | Curated directory with **90+ verified skills**, ranked by quality score and auto-indexed hourly |
 | GitHub stars don't reflect real usage | **Agent Feedback Loop** — real usage data from AI agents |
 | No incentive for skill authors | **Points system** rewards authors for every successful call |
 | Skills scattered across GitHub | **One-stop marketplace** with search, filters, and categories |
@@ -145,7 +145,7 @@ Visit [openagentskill.com/skills](https://www.openagentskill.com/skills) to expl
 
 ### Auto-Discovery
 
-We automatically discover new skills from GitHub daily using a skill-only search matrix. MCP servers and Model Context Protocol integrations are intentionally excluded from automated imports.
+We automatically discover new skills from GitHub hourly using a skill-only search matrix. MCP servers and Model Context Protocol integrations are intentionally excluded from automated imports.
 
 ```
 topic:agent-skills    "agent skill"        topic:ai-agent
@@ -209,7 +209,7 @@ pnpm dev
 | `SUPABASE_SECRET_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Server-only Supabase key for privileged automation/admin routes |
 | `GITHUB_TOKEN` | GitHub token for API access |
 | `INDEXER_SECRET` | Bearer secret required for indexer/blog routes and reviewed skill-submission RPC writes in production |
-| `INDEXER_DAILY_TARGET` | Optional. Daily bulk-import target, defaults to `500`, max `500` |
+| `INDEXER_RUN_TARGET` | Optional. Hourly bulk-import target per run, defaults to `10`, max `500` |
 | `INDEXER_MIN_STARS` | Optional. Minimum GitHub stars for bulk import, defaults to `500` |
 | `INDEXER_MAX_SEARCH_REQUESTS` | Optional. GitHub search requests per bulk run, defaults to `10` without `GITHUB_TOKEN` |
 | `CRON_SECRET` | Bearer secret required for cron-triggered maintenance routes in production |
@@ -220,7 +220,7 @@ Apply SQL files in `scripts/` in order. They create the skills catalog, profiles
 
 Production writes should go through the Next.js API routes. Public feedback, reviewed skill submissions, and indexer writes use narrow Supabase RPCs guarded by server secrets, while public clients can only read approved skills and aggregate stats directly.
 
-The daily indexer defaults to high-star, skill-only bulk discovery. It scans GitHub repositories matching agent skill, browser automation, RAG, workflow, and developer-tool signals, excludes MCP repositories, then imports up to `INDEXER_DAILY_TARGET` new approved skills per run. Use `GET /api/indexer/logs` with automation auth to inspect recent run summaries. Use `POST /api/indexer/run` with `mode: "reviewed"` for the slower README/AI-review path.
+The hourly indexer defaults to high-star, skill-only bulk discovery. It scans GitHub repositories matching agent skill, browser automation, RAG, workflow, and developer-tool signals, excludes MCP repositories, then imports up to `INDEXER_RUN_TARGET` new approved skills per run. Use `GET /api/indexer/logs` with automation auth to inspect recent run summaries. Use `POST /api/indexer/run` with `mode: "reviewed"` for the slower README/AI-review path.
 
 ---
 
