@@ -7,6 +7,10 @@
     {
       "path": "/api/indexer/refresh-stars",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/x/post-daily",
+      "schedule": "0 16 * * *"
     }
   ]
 }

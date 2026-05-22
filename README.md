@@ -213,6 +213,9 @@ pnpm dev
 | `INDEXER_MIN_STARS` | Optional. Minimum GitHub stars for bulk import, defaults to `500` |
 | `INDEXER_MAX_SEARCH_REQUESTS` | Optional. GitHub search requests per bulk run, defaults to `10` without `GITHUB_TOKEN` |
 | `CRON_SECRET` | Bearer secret required for cron-triggered maintenance routes in production |
+| `X_CLIENT_ID` | X OAuth 2.0 client ID for authorizing the posting account |
+| `X_CLIENT_SECRET` | X OAuth 2.0 client secret for token exchange and refresh |
+| `X_ALLOWED_USERNAME` | Optional. X username allowed for OAuth storage, defaults to `openagentskill` |
 
 ### Database Setup
 
@@ -221,6 +224,8 @@ Apply SQL files in `scripts/` in order. They create the skills catalog, profiles
 Production writes should go through the Next.js API routes. Public feedback, reviewed skill submissions, and indexer writes use narrow Supabase RPCs guarded by server secrets, while public clients can only read approved skills and aggregate stats directly.
 
 The hourly indexer defaults to high-star, skill-only bulk discovery. It scans GitHub repositories matching agent skill, browser automation, RAG, workflow, and developer-tool signals, excludes MCP repositories, then imports up to `INDEXER_RUN_TARGET` new approved skills per run. Use `GET /api/indexer/logs` with automation auth to inspect recent run summaries. Use `POST /api/indexer/run` with `mode: "reviewed"` for the slower README/AI-review path.
+
+X posting uses OAuth 2.0 with PKCE. Visit `/api/x/auth` while signed in as the allowed X account to store an encrypted refresh token, then `/api/x/post-daily` can publish one high-quality unposted skill per day through Vercel Cron.
 
 ---
 
