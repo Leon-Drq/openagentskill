@@ -32,6 +32,10 @@ export interface XIntentDraft {
   status: 'ready' | 'skipped'
   reason?: string
   skill?: XPostSkill
+  mainText?: string
+  mainIntentUrl?: string
+  replyText?: string
+  replyIntentUrl?: string
   text?: string
   intentUrl?: string
 }
@@ -60,8 +64,12 @@ function truncate(value: string, maxLength: number) {
   return `${normalized.slice(0, Math.max(0, maxLength - 3)).trim()}...`
 }
 
+function getSkillUrl(skill: XPostSkill) {
+  return `https://www.openagentskill.com/skills/${skill.slug}`
+}
+
 export function buildSkillPostText(skill: XPostSkill) {
-  const url = `https://www.openagentskill.com/skills/${skill.slug}`
+  const url = getSkillUrl(skill)
   const installCommand = truncate(skill.install_command || `npx skills add ${skill.github_repo}`, 72)
   const title = `Skill pick: ${truncate(skill.name, 72)}`
   const stats = `${formatStars(skill.github_stars)} GitHub stars - ${truncate(skill.category, 36)}`
@@ -86,9 +94,69 @@ export function buildSkillPostText(skill: XPostSkill) {
   return build('', false).slice(0, 280)
 }
 
-export function buildXIntentUrl(text: string) {
+function inferUseCase(skill: XPostSkill) {
+  const text = [
+    skill.name,
+    skill.description,
+    skill.category,
+    skill.github_repo,
+    ...(skill.tags || []),
+  ].join(' ').toLowerCase()
+
+  if (/(code|coding|developer|dev|github|claude|cursor|terminal|repo)/.test(text)) {
+    return 'you want your coding agent to carry more repo context and ship repetitive changes faster.'
+  }
+  if (/(rag|search|knowledge|memory|document|pdf|data|vector)/.test(text)) {
+    return 'your agent needs to turn docs, data, or knowledge bases into answers and actions.'
+  }
+  if (/(browser|web|crawl|scrap|page|site|monitor)/.test(text)) {
+    return 'you need an agent to browse, extract, or monitor web pages without building a scraper from scratch.'
+  }
+  if (/(workflow|productivity|task|calendar|email|notion|slack|ops)/.test(text)) {
+    return 'you want to move a repeatable work routine from manual steps into an agent workflow.'
+  }
+  if (/(image|video|design|figma|creative)/.test(text)) {
+    return 'you want an agent to help with creative production instead of only text chat.'
+  }
+
+  return 'you want a practical agent capability you can plug into real work, not just another demo.'
+}
+
+export function buildManualXMainText(skill: XPostSkill) {
+  const title = 'OpenAgentSkill Update'
+  const pick = `Today: ${truncate(skill.name, 64)}`
+  const useCase = `Use it when ${inferUseCase(skill)}`
+  const stats = `${formatStars(skill.github_stars)} stars - ${truncate(skill.category, 32)}`
+  const footer = 'Link in reply.'
+
+  const build = (scenario: string) => [
+    title,
+    pick,
+    '',
+    scenario,
+    '',
+    stats,
+    footer,
+    '#AIAgents #OpenAgentSkill',
+  ].join('\n')
+
+  const fixedLength = build('').length
+  return build(truncate(useCase, 280 - fixedLength)).slice(0, 280)
+}
+
+export function buildManualXReplyText(skill: XPostSkill) {
+  const installCommand = truncate(skill.install_command || `npx skills add ${skill.github_repo}`, 84)
+  const title = `Link for ${truncate(skill.name, 72)}:`
+  const footer = `Install: ${installCommand}`
+  const text = [title, getSkillUrl(skill), '', footer].join('\n')
+
+  return text.slice(0, 280)
+}
+
+export function buildXIntentUrl(text: string, tweetId?: string) {
   const intentUrl = new URL('https://twitter.com/intent/tweet')
   intentUrl.searchParams.set('text', text)
+  if (tweetId) intentUrl.searchParams.set('in_reply_to', tweetId)
   return intentUrl.toString()
 }
 
@@ -108,13 +176,35 @@ export async function createManualXIntentDraft(offset = 0): Promise<XIntentDraft
 
   const dayNumber = Math.floor(Date.now() / 86_400_000)
   const skill = candidates[positiveModulo(dayNumber + offset, candidates.length)] as XPostSkill
-  const text = buildSkillPostText(skill)
+  const mainText = buildManualXMainText(skill)
+  const replyText = buildManualXReplyText(skill)
+  const mainIntentUrl = buildXIntentUrl(mainText)
+  const replyIntentUrl = buildXIntentUrl(replyText)
 
   return {
     status: 'ready',
     skill,
-    text,
-    intentUrl: buildXIntentUrl(text),
+    mainText,
+    mainIntentUrl,
+    replyText,
+    replyIntentUrl,
+    text: mainText,
+    intentUrl: mainIntentUrl,
+  }
+}
+
+export async function createManualXReplyIntentDraft(
+  tweetId: string,
+  offset = 0
+): Promise<XIntentDraft> {
+  const draft = await createManualXIntentDraft(offset)
+  if (draft.status !== 'ready' || !draft.replyText) return draft
+
+  return {
+    ...draft,
+    text: draft.replyText,
+    intentUrl: buildXIntentUrl(draft.replyText, tweetId),
+    replyIntentUrl: buildXIntentUrl(draft.replyText, tweetId),
   }
 }
 

@@ -225,7 +225,7 @@ Production writes should go through the Next.js API routes. Public feedback, rev
 
 The hourly indexer defaults to high-star, skill-only bulk discovery. It scans GitHub repositories matching agent skill, browser automation, RAG, workflow, and developer-tool signals, excludes MCP repositories, then imports up to `INDEXER_RUN_TARGET` new approved skills per run. Use `GET /api/indexer/logs` with automation auth to inspect recent run summaries. Use `POST /api/indexer/run` with `mode: "reviewed"` for the slower README/AI-review path.
 
-X posting supports two paths. The free, manual path is `/api/x/intent`, which generates a daily skill draft and redirects to the official X Web Intent composer; the user must click Post, and no X API credits are used. The paid API path uses OAuth 2.0 with PKCE: visit `/api/x/auth` while signed in as the allowed X account to store an encrypted refresh token, then `/api/x/post-daily` can publish one high-quality unposted skill when called with automation auth. It is intentionally not scheduled in `vercel.json`.
+X posting supports two paths. The free, manual path is `/api/x/intent`, which generates a scenario-led `OpenAgentSkill Update` draft and redirects to the official X Web Intent composer; the user must click Post, and no X API credits are used. Links are kept out of the main post by default; use `/api/x/intent/reply?tweet_id=<posted-tweet-id>` to prefill a manual reply with the skill URL. The paid API path uses OAuth 2.0 with PKCE: visit `/api/x/auth` while signed in as the allowed X account to store an encrypted refresh token, then `/api/x/post-daily` can publish one high-quality unposted skill when called with automation auth. It is intentionally not scheduled in `vercel.json`.
 
 ---
 

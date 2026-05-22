@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
       meta: {
         requires_manual_publish: true,
         x_api_credits_used: false,
+        link_strategy: 'reply',
       },
     })
   }
