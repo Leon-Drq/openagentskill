@@ -48,10 +48,17 @@ function isMcpText(value: string) {
   return /(^|[\s/_-])mcp($|[\s/_-])/i.test(value) || /\bmodel context protocol\b/i.test(value)
 }
 
-function isMcpSkillRecord(record: Pick<SkillRecord, 'name' | 'description' | 'category' | 'tags' | 'frameworks' | 'github_repo'>) {
+type SkillOnlyScopeRecord = Pick<
+  SkillRecord,
+  'name' | 'description' | 'long_description' | 'tagline' | 'category' | 'tags' | 'frameworks' | 'github_repo'
+>
+
+function isMcpSkillRecord(record: SkillOnlyScopeRecord) {
   const text = [
     record.name,
     record.description,
+    record.long_description,
+    record.tagline,
     record.category,
     record.github_repo,
     ...(record.tags || []),
@@ -61,9 +68,7 @@ function isMcpSkillRecord(record: Pick<SkillRecord, 'name' | 'description' | 'ca
   return isMcpText(text)
 }
 
-function filterSkillOnly<T extends Pick<SkillRecord, 'name' | 'description' | 'category' | 'tags' | 'frameworks' | 'github_repo'>>(
-  records: T[]
-) {
+function filterSkillOnly<T extends SkillOnlyScopeRecord>(records: T[]) {
   return records.filter((record) => !isMcpSkillRecord(record))
 }
 
