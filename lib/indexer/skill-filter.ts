@@ -16,7 +16,7 @@ export interface SkillCandidateEvaluation {
 }
 
 const MCP_PATTERNS = [
-  /(^|[\s/_-])mcp($|[\s/_-])/i,
+  /(^|[^a-z0-9])mcp([^a-z0-9]|$)/i,
   /\bmcp[-_\s]?(server|tool|client|host|protocol)s?\b/i,
   /\bmodel context protocol\b/i,
 ]

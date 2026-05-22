@@ -45,7 +45,7 @@ export interface SkillRecord {
 export type SkillSortMode = 'quality' | 'downloads' | 'stars' | 'new' | 'trending'
 
 function isMcpText(value: string) {
-  return /(^|[\s/_-])mcp($|[\s/_-])/i.test(value) || /\bmodel context protocol\b/i.test(value)
+  return /(^|[^a-z0-9])mcp([^a-z0-9]|$)/i.test(value) || /\bmodel context protocol\b/i.test(value)
 }
 
 type SkillOnlyScopeRecord = Pick<
