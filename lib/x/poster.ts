@@ -127,7 +127,8 @@ export function buildManualXMainText(skill: XPostSkill) {
   const pick = `Today: ${truncate(skill.name, 64)}`
   const useCase = `Use it when ${inferUseCase(skill)}`
   const stats = `${formatStars(skill.github_stars)} stars - ${truncate(skill.category, 32)}`
-  const footer = 'Link in reply.'
+  const link = `Link: ${getSkillUrl(skill)}`
+  const footer = '#AIAgents #OpenAgentSkill'
 
   const build = (scenario: string) => [
     title,
@@ -136,8 +137,8 @@ export function buildManualXMainText(skill: XPostSkill) {
     scenario,
     '',
     stats,
+    link,
     footer,
-    '#AIAgents #OpenAgentSkill',
   ].join('\n')
 
   const fixedLength = build('').length
