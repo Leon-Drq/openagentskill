@@ -18,6 +18,15 @@ export async function generateMetadata({
   
   const starsText = skill.stats.stars >= 1000 ? `${(skill.stats.stars / 1000).toFixed(1)}K` : skill.stats.stars
   const description = `${skill.description} ${starsText} GitHub stars. Install with npx skills add ${skill.slug}.`
+  const pageUrl = `https://www.openagentskill.com/skills/${slug}`
+  const imageAlt = `${skill.name} - OpenAgentSkill`
+  const image = {
+    url: `${pageUrl}/opengraph-image`,
+    width: 1200,
+    height: 630,
+    alt: imageAlt,
+    type: 'image/png',
+  }
   
   return {
     title: `${skill.name} - AI Agent Skill`,
@@ -27,15 +36,22 @@ export async function generateMetadata({
       title: `${skill.name} — Open Agent Skill`,
       description,
       type: 'article',
-      url: `https://www.openagentskill.com/skills/${slug}`,
+      url: pageUrl,
+      images: [image],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${skill.name} — AI Agent Skill`,
       description,
+      images: [
+        {
+          url: `${pageUrl}/twitter-image`,
+          alt: imageAlt,
+        },
+      ],
     },
     alternates: {
-      canonical: `https://www.openagentskill.com/skills/${slug}`,
+      canonical: pageUrl,
     },
   }
 }

@@ -64,8 +64,10 @@ function truncate(value: string, maxLength: number) {
   return `${normalized.slice(0, Math.max(0, maxLength - 3)).trim()}...`
 }
 
-function getSkillUrl(skill: XPostSkill) {
-  return `https://www.openagentskill.com/skills/${skill.slug}`
+function getSkillUrl(skill: XPostSkill, source?: 'x') {
+  const url = `https://www.openagentskill.com/skills/${skill.slug}`
+  if (source === 'x') return `${url}?ref=x`
+  return url
 }
 
 export function buildSkillPostText(skill: XPostSkill) {
@@ -127,7 +129,7 @@ export function buildManualXMainText(skill: XPostSkill) {
   const pick = `Today: ${truncate(skill.name, 64)}`
   const useCase = `Use it when ${inferUseCase(skill)}`
   const stats = `${formatStars(skill.github_stars)} stars - ${truncate(skill.category, 32)}`
-  const link = `Link: ${getSkillUrl(skill)}`
+  const link = `Link: ${getSkillUrl(skill, 'x')}`
   const footer = '#AIAgents #OpenAgentSkill'
 
   const build = (scenario: string) => [
@@ -149,7 +151,7 @@ export function buildManualXReplyText(skill: XPostSkill) {
   const installCommand = truncate(skill.install_command || `npx skills add ${skill.github_repo}`, 84)
   const title = `Link for ${truncate(skill.name, 72)}:`
   const footer = `Install: ${installCommand}`
-  const text = [title, getSkillUrl(skill), '', footer].join('\n')
+  const text = [title, getSkillUrl(skill, 'x'), '', footer].join('\n')
 
   return text.slice(0, 280)
 }
