@@ -1,4 +1,5 @@
 import { createPublicClient } from '@/lib/supabase/public'
+import { getAllSkills } from '@/lib/db/skills'
 import {
   createXPost,
   refreshXAccessToken,
@@ -14,7 +15,7 @@ interface XOAuthConnection {
   scope?: string
 }
 
-interface XPostSkill {
+export interface XPostSkill {
   id: string
   slug: string
   name: string
@@ -25,6 +26,14 @@ interface XPostSkill {
   github_stars: number
   quality_score: number
   install_command: string | null
+}
+
+export interface XIntentDraft {
+  status: 'ready' | 'skipped'
+  reason?: string
+  skill?: XPostSkill
+  text?: string
+  intentUrl?: string
 }
 
 export interface XPostResult {
@@ -46,34 +55,67 @@ function formatStars(stars: number) {
 
 function truncate(value: string, maxLength: number) {
   const normalized = value.replace(/\s+/g, ' ').trim()
+  if (maxLength <= 0) return ''
   if (normalized.length <= maxLength) return normalized
   return `${normalized.slice(0, Math.max(0, maxLength - 3)).trim()}...`
 }
 
 export function buildSkillPostText(skill: XPostSkill) {
   const url = `https://www.openagentskill.com/skills/${skill.slug}`
-  const installCommand = skill.install_command || `npx skills add ${skill.github_repo}`
-  const title = `Skill pick: ${skill.name}`
-  const stats = `${formatStars(skill.github_stars)} GitHub stars - ${skill.category}`
+  const installCommand = truncate(skill.install_command || `npx skills add ${skill.github_repo}`, 72)
+  const title = `Skill pick: ${truncate(skill.name, 72)}`
+  const stats = `${formatStars(skill.github_stars)} GitHub stars - ${truncate(skill.category, 36)}`
   const footer = `${url}\n\n#AIAgents #AgentSkills`
-  const fixedLength =
-    title.length +
-    stats.length +
-    installCommand.length +
-    footer.length +
-    14
-  const description = truncate(skill.description, Math.max(60, 270 - fixedLength))
-
-  return [
+  const build = (description: string, includeInstall: boolean) => [
     title,
-    '',
-    description,
+    ...(description ? ['', description] : []),
     '',
     stats,
-    `Install: ${installCommand}`,
+    ...(includeInstall ? [`Install: ${installCommand}`] : []),
     '',
     footer,
   ].join('\n')
+
+  const withEmptyDescription = build('', true)
+  const descriptionBudget = 280 - withEmptyDescription.length - 1
+  const description = truncate(skill.description, Math.max(0, descriptionBudget))
+  const text = build(description, true)
+
+  if (text.length <= 280) return text
+
+  return build('', false).slice(0, 280)
+}
+
+export function buildXIntentUrl(text: string) {
+  const intentUrl = new URL('https://twitter.com/intent/tweet')
+  intentUrl.searchParams.set('text', text)
+  return intentUrl.toString()
+}
+
+function positiveModulo(value: number, divisor: number) {
+  return ((value % divisor) + divisor) % divisor
+}
+
+export async function createManualXIntentDraft(offset = 0): Promise<XIntentDraft> {
+  const records = await getAllSkills('quality')
+  const candidates = records.filter(
+    (record) => record.ai_review_approved && record.github_stars >= 500 && Number(record.quality_score || 0) > 0
+  )
+
+  if (!candidates.length) {
+    return { status: 'skipped', reason: 'No eligible skill found' }
+  }
+
+  const dayNumber = Math.floor(Date.now() / 86_400_000)
+  const skill = candidates[positiveModulo(dayNumber + offset, candidates.length)] as XPostSkill
+  const text = buildSkillPostText(skill)
+
+  return {
+    status: 'ready',
+    skill,
+    text,
+    intentUrl: buildXIntentUrl(text),
+  }
 }
 
 async function getStoredConnection(supabase: ReturnType<typeof createPublicClient>, serverSecret: string) {
