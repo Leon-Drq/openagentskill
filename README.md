@@ -41,13 +41,6 @@
 | [Firecrawl](https://github.com/mendableai/firecrawl) | 28K | Turn websites into LLM-ready markdown | Build RAG pipelines, content indexing |
 | [MediaCrawler](https://github.com/NanmiCoder/MediaCrawler) | 43K | Multi-platform social media crawler | Scrape Xiaohongshu, Douyin, Bilibili, Weibo, Zhihu |
 
-### MCP Servers (Model Context Protocol)
-
-| Skill | Stars | Description | Use Case |
-|-------|-------|-------------|----------|
-| [MCP Memory](https://github.com/modelcontextprotocol/servers) | 18K | Persistent memory using knowledge graphs | Give agents long-term memory across sessions |
-| [MCP Filesystem](https://github.com/modelcontextprotocol/servers) | 18K | Secure file operations with access controls | Let agents read/write files safely |
-
 ### Integrations and Automation
 
 | Skill | Stars | Description | Use Case |
@@ -152,12 +145,12 @@ Visit [openagentskill.com/skills](https://www.openagentskill.com/skills) to expl
 
 ### Auto-Discovery
 
-We automatically discover new skills from GitHub daily using 25+ search patterns:
+We automatically discover new skills from GitHub daily using a skill-only search matrix. MCP servers and Model Context Protocol integrations are intentionally excluded from automated imports.
 
 ```
-topic:agent-skills    topic:mcp-tool       topic:mcp-server
+topic:agent-skills    "agent skill"        topic:ai-agent
 topic:claude-tool     topic:openai-plugin  topic:langchain-tool
-"awesome" "agent skills"                   filename:SKILL.md
+topic:browser-use     topic:rag            topic:workflow-automation
 ```
 
 ---
@@ -227,7 +220,7 @@ Apply SQL files in `scripts/` in order. They create the skills catalog, profiles
 
 Production writes should go through the Next.js API routes. Public feedback, reviewed skill submissions, and indexer writes use narrow Supabase RPCs guarded by server secrets, while public clients can only read approved skills and aggregate stats directly.
 
-The daily indexer defaults to high-star bulk discovery. It scans GitHub repositories matching agent, MCP, browser automation, RAG, workflow, and developer-tool signals, then imports up to `INDEXER_DAILY_TARGET` new approved skills per run. Use `POST /api/indexer/run` with `mode: "reviewed"` for the slower README/AI-review path.
+The daily indexer defaults to high-star, skill-only bulk discovery. It scans GitHub repositories matching agent skill, browser automation, RAG, workflow, and developer-tool signals, excludes MCP repositories, then imports up to `INDEXER_DAILY_TARGET` new approved skills per run. Use `GET /api/indexer/logs` with automation auth to inspect recent run summaries. Use `POST /api/indexer/run` with `mode: "reviewed"` for the slower README/AI-review path.
 
 ---
 

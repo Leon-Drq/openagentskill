@@ -6,11 +6,11 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Browse 90+ AI Agent Skills',
-  description: 'Discover AI agent skills for MCP servers, web automation, coding agents, RAG, data processing, and more. Filter by category, GitHub stars, popularity, or recent updates.',
-  keywords: ['AI agent skills', 'MCP servers', 'Claude tools', 'GPT plugins', 'LangChain tools', 'agent marketplace'],
+  description: 'Discover AI agent skills for web automation, coding agents, RAG, data processing, workflow automation, and more. Filter by category, GitHub stars, popularity, or recent updates.',
+  keywords: ['AI agent skills', 'agent tools', 'Claude tools', 'GPT plugins', 'LangChain tools', 'agent marketplace'],
   openGraph: {
     title: 'Browse 90+ AI Agent Skills — Open Agent Skill',
-    description: 'Discover high-star AI agent skills, MCP servers, browser automation tools, and agent frameworks.',
+    description: 'Discover high-star AI agent skills, browser automation tools, coding agents, RAG tools, and agent frameworks.',
     type: 'website',
     url: 'https://www.openagentskill.com/skills',
   },

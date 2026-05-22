@@ -31,8 +31,8 @@ export const metadata: Metadata = {
     default: 'Open Agent Skill — The Open Marketplace for AI Agent Skills',
     template: '%s | Open Agent Skill',
   },
-  description: 'Discover 35+ AI agent skills ranked by real agent usage. Browse skills for data processing, automation, finance, and more. Install any skill with npx skills add.',
-  keywords: ['AI agents', 'agent skills', 'MCP server', 'agent tools', 'Claude skills', 'GPT plugins', 'LangChain tools', 'autonomous agents', 'agent marketplace', 'open source AI', 'openagentskill'],
+  description: 'Discover AI agent skills ranked by real agent usage. Browse skills for data processing, automation, finance, coding, and more. Install any skill with npx skills add.',
+  keywords: ['AI agents', 'agent skills', 'agent tools', 'Claude skills', 'GPT plugins', 'LangChain tools', 'autonomous agents', 'agent marketplace', 'open source AI', 'openagentskill'],
   authors: [{ name: 'Open Agent Skill Team' }],
   creator: 'Open Agent Skill',
   publisher: 'Open Agent Skill',
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Open Agent Skill — The Open Marketplace for AI Agent Skills',
-    description: 'Discover 35+ AI agent skills ranked by real agent usage. Browse skills for data processing, automation, finance, and more.',
+    description: 'Discover AI agent skills ranked by real agent usage. Browse skills for data processing, automation, finance, coding, and more.',
     url: 'https://www.openagentskill.com',
     siteName: 'Open Agent Skill',
     locale: 'en_US',
@@ -81,7 +81,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Open Agent Skill — The Open Marketplace for AI Agent Skills',
-    description: 'Discover 35+ AI agent skills ranked by real agent usage. Browse skills for data processing, automation, finance, and more.',
+    description: 'Discover AI agent skills ranked by real agent usage. Browse skills for data processing, automation, finance, coding, and more.',
     creator: '@openagentskill',
     site: '@openagentskill',
     images: ['https://www.openagentskill.com/opengraph-image'],

@@ -22,7 +22,7 @@ export async function generateMetadata({
   return {
     title: `${skill.name} - AI Agent Skill`,
     description,
-    keywords: [skill.name, ...skill.tags, 'AI agent skill', 'MCP server', skill.category],
+    keywords: [skill.name, ...skill.tags, 'AI agent skill', 'agent tool', skill.category],
     openGraph: {
       title: `${skill.name} — Open Agent Skill`,
       description,

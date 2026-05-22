@@ -5,6 +5,8 @@
  * which signals they are designed to be Open Agent Skills.
  */
 
+import { evaluateSkillCandidate } from './skill-filter'
+
 const GITHUB_API_BASE = 'https://api.github.com'
 
 function githubHeaders() {
@@ -23,6 +25,7 @@ export interface CandidateRepo {
   description: string
   stars: number
   language: string | null
+  topics?: string[]
   updatedAt: string
   htmlUrl: string
 }
@@ -31,29 +34,24 @@ export interface CandidateRepo {
  * Search strategy matrix — each entry targets a distinct category of agent skills.
  *
  * Two axes:
- *  - "skill collections" (awesome-lists / curated skill packs): high value, many skills per repo
- *  - "single skill repos" (focused MCP tool / agent plugin): broad long-tail discovery
+ *  - "skill-native" repos with explicit agent skill signals
+ *  - "single skill repos" focused on agent tools, automation, and plugin workflows
  *
  * Ordered by expected signal quality. Rotated round-robin across cron runs so
  * every query gets fresh results over time without hitting rate limits.
  */
 const SEARCH_QUERIES: Array<{ q: string; sort: 'stars' | 'updated' }> = [
-  // ── Skill collections (high value, many skills per repo) ───────────────────
+  // ── Skill-native repos ─────────────────────────────────────────────────────
   { q: 'topic:agent-skills stars:>50',     sort: 'stars'   },
-  { q: 'topic:mcp-server stars:>100',      sort: 'stars'   },
-  { q: '"awesome" "mcp" stars:>50',        sort: 'stars'   },
-  { q: '"awesome" "agent" stars:>50',      sort: 'stars'   },
-  { q: 'topic:mcp-skills stars:>50',       sort: 'stars'   },
+  { q: '"agent skill" stars:>50',          sort: 'updated' },
   { q: 'topic:ai-agents stars:>1000',      sort: 'stars'   },
   { q: 'topic:llm-agent stars:>1000',      sort: 'stars'   },
   { q: '"agent framework" stars:>1000',    sort: 'stars'   },
 
-  // ── Popular MCP / Agent tools ──────────────────────────────────────────────
-  { q: 'topic:mcp-tool stars:>50',         sort: 'stars'   },
+  // ── Popular agent tools ────────────────────────────────────────────────────
   { q: 'topic:claude-tool stars:>50',      sort: 'stars'   },
   { q: 'topic:openai-plugin stars:>50',    sort: 'stars'   },
   { q: 'topic:langchain-tool stars:>50',   sort: 'stars'   },
-  { q: '"mcp server" stars:>100',          sort: 'stars'   },
   { q: 'topic:ai-agent stars:>100',        sort: 'stars'   },
   { q: 'topic:llm-tool stars:>50',         sort: 'stars'   },
 
@@ -64,7 +62,6 @@ const SEARCH_QUERIES: Array<{ q: string; sort: 'stars' | 'updated' }> = [
   { q: 'topic:browser-automation stars:>1000', sort: 'stars' },
   { q: 'topic:web-scraping stars:>5000',   sort: 'stars'   },
   { q: 'topic:rag stars:>5000',            sort: 'stars'   },
-  { q: '"agent skill" stars:>50',          sort: 'updated' },
   { q: '"ai tool" stars:>100',             sort: 'updated' },
 ]
 
@@ -97,6 +94,16 @@ export async function searchSkillRepos(
   return (data.items as any[])
     .filter((r) => !r.archived && !r.fork)          // skip archived and forks
     .filter((r) => r.stargazers_count >= 50)         // minimum quality bar: 50+ stars
+    .filter((r) =>
+      evaluateSkillCandidate({
+        fullName: r.full_name,
+        name: r.name,
+        description: r.description,
+        topics: r.topics || [],
+        language: r.language,
+        query: q,
+      }).accepted
+    )
     .map((r) => ({
       owner:       r.owner.login,
       repo:        r.name,
@@ -104,6 +111,7 @@ export async function searchSkillRepos(
       description: r.description || '',
       stars:       r.stargazers_count ?? 0,
       language:    r.language ?? null,
+      topics:      r.topics || [],
       updatedAt:   r.updated_at,
       htmlUrl:     r.html_url,
     }))

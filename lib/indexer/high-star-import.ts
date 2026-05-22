@@ -1,4 +1,5 @@
 import { createPublicClient } from '@/lib/supabase/public'
+import { evaluateSkillCandidate, type SkillCandidateEvaluation } from './skill-filter'
 
 type SearchSort = 'stars' | 'updated'
 
@@ -50,11 +51,14 @@ export interface BulkImportOptions {
 }
 
 export interface BulkImportSummary {
+  filterMode: 'skills-only'
   targetNew: number
   minStars: number
   searchRequests: number
   candidatesFound: number
   skippedExisting: number
+  skippedMcp: number
+  skippedLowRelevance: number
   imported: number
   updated: number
   errors: number
@@ -86,24 +90,6 @@ const HIGH_STAR_QUERIES: HighStarQuery[] = [
     category: 'agent-frameworks',
     tags: ['agent-framework', 'orchestration'],
     frameworks: ['LLM'],
-  },
-  {
-    q: 'topic:mcp-server',
-    category: 'mcp-servers',
-    tags: ['mcp', 'server'],
-    frameworks: ['MCP'],
-  },
-  {
-    q: '"mcp server"',
-    category: 'mcp-servers',
-    tags: ['mcp', 'server'],
-    frameworks: ['MCP'],
-  },
-  {
-    q: 'topic:mcp-tool',
-    category: 'mcp-servers',
-    tags: ['mcp', 'tool'],
-    frameworks: ['MCP'],
   },
   {
     q: 'topic:browser-automation',
@@ -171,6 +157,31 @@ const HIGH_STAR_QUERIES: HighStarQuery[] = [
     tags: ['computer-use', 'desktop-agent'],
     frameworks: ['Computer Use'],
   },
+  {
+    q: 'topic:agent-skills',
+    category: 'agent-skills',
+    tags: ['agent-skills', 'skills'],
+    frameworks: ['AI Agents'],
+  },
+  {
+    q: '"agent skill"',
+    category: 'agent-skills',
+    tags: ['agent-skill', 'skills'],
+    frameworks: ['AI Agents'],
+    sort: 'updated',
+  },
+  {
+    q: 'topic:claude-tool',
+    category: 'development',
+    tags: ['claude-tool', 'developer-tools'],
+    frameworks: ['Claude'],
+  },
+  {
+    q: 'topic:langchain-tool',
+    category: 'development',
+    tags: ['langchain-tool', 'developer-tools'],
+    frameworks: ['LangChain'],
+  },
 ]
 
 function githubHeaders() {
@@ -224,7 +235,7 @@ function uniqueStrings(values: Array<string | null | undefined>, limit: number) 
   return result
 }
 
-function buildSkill(repo: GitHubSearchRepo, query: HighStarQuery) {
+function buildSkill(repo: GitHubSearchRepo, query: HighStarQuery, evaluation: SkillCandidateEvaluation) {
   const description =
     repo.description ||
     `${repo.full_name} is a high-star GitHub project relevant to AI agent workflows.`
@@ -240,7 +251,7 @@ function buildSkill(repo: GitHubSearchRepo, query: HighStarQuery) {
     slug: normalizeSlug(repo.full_name),
     name: titleFromRepo(repo.name),
     description,
-    long_description: `${description}\n\nImported by the high-star GitHub discovery pipeline because it matches agent, MCP, automation, RAG, or developer-tool signals.`,
+    long_description: `${description}\n\nImported by the skill-only GitHub discovery pipeline because it matches agent skill, automation, RAG, or developer-tool signals. MCP projects are excluded from automated imports.`,
     tagline: description,
     author_name: repo.owner.login,
     author_url: repo.owner.html_url,
@@ -263,10 +274,27 @@ function buildSkill(repo: GitHubSearchRepo, query: HighStarQuery) {
       total: repo.stargazers_count >= 10000 ? 88 : 78,
       source: 'github-star-discovery',
       github_stars: repo.stargazers_count,
+      relevance_score: evaluation.score,
+      relevance_signals: evaluation.signals,
     },
     ai_review_approved: true,
     ai_review_issues: [],
     ai_review_suggestions: [],
+  }
+}
+
+async function recordIndexerRun(
+  supabase: ReturnType<typeof createPublicClient>,
+  serverSecret: string,
+  run: Record<string, unknown>
+) {
+  const { error } = await supabase.rpc('record_indexer_run', {
+    p_server_secret: serverSecret,
+    p_run: run,
+  })
+
+  if (error) {
+    console.error('[indexer] Failed to record run log:', error.message)
   }
 }
 
@@ -323,6 +351,7 @@ export async function bulkImportHighStarSkills(
     0,
     Math.floor(options.pageSeed ?? Math.floor(Date.now() / 86_400_000))
   )
+  const startedAt = new Date().toISOString()
   const serverSecret = process.env.INDEXER_SECRET
 
   if (!serverSecret) {
@@ -343,11 +372,14 @@ export async function bulkImportHighStarSkills(
   const seenSlugs = new Set(existingSlugs)
   const results: Array<{ repo: string; status: string; slug?: string; reason?: string }> = []
   const summary: BulkImportSummary = {
+    filterMode: 'skills-only',
     targetNew,
     minStars,
     searchRequests: 0,
     candidatesFound: 0,
     skippedExisting: 0,
+    skippedMcp: 0,
+    skippedLowRelevance: 0,
     imported: 0,
     updated: 0,
     errors: 0,
@@ -381,9 +413,29 @@ export async function bulkImportHighStarSkills(
         summary.skippedExisting += 1
         continue
       }
+
+      const evaluation = evaluateSkillCandidate({
+        fullName: repo.full_name,
+        name: repo.name,
+        description: repo.description,
+        topics: repo.topics || [],
+        language: repo.language,
+        query: query.q,
+        category: query.category,
+      })
+
+      if (!evaluation.accepted) {
+        if (evaluation.reason === 'mcp') {
+          summary.skippedMcp += 1
+        } else {
+          summary.skippedLowRelevance += 1
+        }
+        continue
+      }
+
       seenSlugs.add(slug)
 
-      const skill = buildSkill(repo, query)
+      const skill = buildSkill(repo, query, evaluation)
       const { data, error } = await supabase.rpc('upsert_indexed_skill', {
         p_server_secret: serverSecret,
         p_skill: skill,
@@ -394,7 +446,10 @@ export async function bulkImportHighStarSkills(
           description: `Bulk-indexed ${skill.name} from GitHub (${repo.stargazers_count} stars)`,
           metadata: {
             source: 'github-star-discovery',
+            filter_mode: 'skills-only',
             stars: repo.stargazers_count,
+            relevance_score: evaluation.score,
+            relevance_signals: evaluation.signals,
             query: query.q,
             page,
           },
@@ -417,6 +472,29 @@ export async function bulkImportHighStarSkills(
       }
     }
   }
+
+  await recordIndexerRun(supabase, serverSecret, {
+    mode: 'bulk',
+    status: summary.errors > 0 ? 'completed_with_errors' : 'completed',
+    filter_mode: summary.filterMode,
+    started_at: startedAt,
+    completed_at: new Date().toISOString(),
+    target_new: targetNew,
+    min_stars: minStars,
+    max_search_requests: maxSearchRequests,
+    search_requests: summary.searchRequests,
+    candidates_found: summary.candidatesFound,
+    skipped_existing: summary.skippedExisting,
+    skipped_mcp: summary.skippedMcp,
+    skipped_low_relevance: summary.skippedLowRelevance,
+    imported: summary.imported,
+    updated: summary.updated,
+    errors: summary.errors,
+    metadata: {
+      page_seed: pageSeed,
+      per_page: perPage,
+    },
+  })
 
   return { summary, results }
 }

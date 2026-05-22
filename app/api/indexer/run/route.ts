@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         body.pageSeed === undefined ? undefined : Math.max(0, Number(body.pageSeed) || 0)
 
       console.log(
-        `[indexer] Bulk high-star import — targetNew=${targetNew}, minStars=${minStars}, maxSearchRequests=${maxSearchRequests}`
+        `[indexer] Skill-only high-star import — targetNew=${targetNew}, minStars=${minStars}, maxSearchRequests=${maxSearchRequests}`
       )
       const result = await bulkImportHighStarSkills({
         targetNew,

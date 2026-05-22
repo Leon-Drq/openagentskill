@@ -11,6 +11,7 @@ import { createPublicClient } from '@/lib/supabase/public'
 import { generateText } from 'ai'
 import type { CandidateRepo } from './github-search'
 import { generateBlogPostForSkill } from '@/lib/blog/generate'
+import { isMcpCandidate } from './skill-filter'
 
 const GITHUB_HEADERS = () => ({
   Accept: 'application/vnd.github.v3+json',
@@ -63,7 +64,7 @@ interface ReviewResult {
 }
 
 async function aiReview(candidate: CandidateRepo, readme: string): Promise<ReviewResult> {
-  const prompt = `You are an AI curator for Open Agent Skill, a registry of MCP servers and AI agent tools.
+  const prompt = `You are an AI curator for Open Agent Skill, a registry of AI agent skills and agent tools. MCP servers are out of scope for this product.
 
 Evaluate this GitHub repository and decide if it should be listed:
 
@@ -76,8 +77,8 @@ README (first 1500 chars):
 ${readme.slice(0, 1500)}
 
 Rules:
-- APPROVE if: it is an MCP server, AI agent tool, LLM utility, or automation skill with clear documentation
-- REJECT if: it is a demo/tutorial/example repo, has no clear use case, is a fork with no changes, or has under 5 stars unless very unique
+- APPROVE if: it is an AI agent skill, reusable agent tool, LLM utility, or automation skill with clear documentation
+- REJECT if: it is an MCP server, Model Context Protocol integration, demo/tutorial/example repo, has no clear use case, is a fork with no changes, or has under 5 stars unless very unique
 - Score 0-100 based on quality, documentation, and usefulness
 - Pick ONE category from: data, development, productivity, media, security, utility
 - Pick 1-5 relevant tags
@@ -134,6 +135,16 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
       description: repoMeta.description || candidate.description,
       stars,
       language: repoMeta.language || candidate.language,
+    }
+
+    if (isMcpCandidate({
+      fullName: enrichedCandidate.fullName,
+      name: enrichedCandidate.repo,
+      description: enrichedCandidate.description,
+      topics: enrichedCandidate.topics || [],
+      language: enrichedCandidate.language,
+    })) {
+      return { repo: repoRef, status: 'skipped', reason: 'MCP projects are excluded from skill-only imports' }
     }
 
     // 1. Check if already indexed — if so, refresh star count and return
