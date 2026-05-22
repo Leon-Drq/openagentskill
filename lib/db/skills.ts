@@ -44,6 +44,29 @@ export interface SkillRecord {
 
 export type SkillSortMode = 'quality' | 'downloads' | 'stars' | 'new' | 'trending'
 
+function isMcpText(value: string) {
+  return /(^|[\s/_-])mcp($|[\s/_-])/i.test(value) || /\bmodel context protocol\b/i.test(value)
+}
+
+function isMcpSkillRecord(record: Pick<SkillRecord, 'name' | 'description' | 'category' | 'tags' | 'frameworks' | 'github_repo'>) {
+  const text = [
+    record.name,
+    record.description,
+    record.category,
+    record.github_repo,
+    ...(record.tags || []),
+    ...(record.frameworks || []),
+  ].join(' ')
+
+  return isMcpText(text)
+}
+
+function filterSkillOnly<T extends Pick<SkillRecord, 'name' | 'description' | 'category' | 'tags' | 'frameworks' | 'github_repo'>>(
+  records: T[]
+) {
+  return records.filter((record) => !isMcpSkillRecord(record))
+}
+
 export async function getAllSkills(
   sort: SkillSortMode = 'quality',
   category?: string
@@ -79,7 +102,7 @@ export async function getAllSkills(
 
   const { data, error } = await query
   if (error) throw error
-  return data || []
+  return filterSkillOnly(data || [])
 }
 
 export interface SkillAgentStats {
@@ -122,6 +145,7 @@ export async function getCategories(): Promise<string[]> {
     .eq('ai_review_approved', true)
   if (error) return []
   const unique = [...new Set((data || []).map((r) => r.category).filter(Boolean))]
+    .filter((category) => !isMcpText(category))
   return unique.sort()
 }
 
@@ -134,7 +158,7 @@ export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> 
     .eq('slug', slug)
     .single()
   
-  if (error) return null
+  if (error || !data || isMcpSkillRecord(data)) return null
   return data
 }
 
@@ -182,7 +206,7 @@ export async function searchSkills(query: string): Promise<SkillRecord[]> {
     .order('quality_score', { ascending: false })
   
   if (error) throw error
-  return data || []
+  return filterSkillOnly(data || [])
 }
 
 export async function getRelatedSkills(
@@ -203,7 +227,7 @@ export async function getRelatedSkills(
     .limit(limit)
 
   if (error) return []
-  return data || []
+  return filterSkillOnly(data || [])
 }
 
 export function convertSkillRecordToManifest(record: SkillRecord): Skill {

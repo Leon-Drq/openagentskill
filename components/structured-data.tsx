@@ -7,7 +7,7 @@ export function StructuredData() {
     name: 'Open Agent Skill',
     alternateName: 'OpenAgentSkill',
     url: BASE_URL,
-    description: 'The open marketplace for AI agent skills. Discover 35+ skills ranked by real agent usage.',
+    description: 'The open marketplace for AI agent skills ranked by real agent usage.',
     potentialAction: {
       '@type': 'SearchAction',
       target: `${BASE_URL}/skills?q={search_term_string}`,
@@ -48,7 +48,7 @@ export function StructuredData() {
         name: 'What is Open Agent Skill?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Open Agent Skill is an open marketplace for AI agent skills. It helps developers discover, publish, and share skills (tools, plugins, MCP servers) for AI agents like Claude, GPT, and LangChain.',
+          text: 'Open Agent Skill is an open marketplace for AI agent skills. It helps developers discover, publish, and share reusable skills, tools, plugins, and workflows for AI agents like Claude, GPT, and LangChain.',
         },
       },
       {
