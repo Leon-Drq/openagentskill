@@ -251,7 +251,7 @@ function buildSkill(repo: GitHubSearchRepo, query: HighStarQuery, evaluation: Sk
     slug: normalizeSlug(repo.full_name),
     name: titleFromRepo(repo.name),
     description,
-    long_description: `${description}\n\nImported by the skill-only GitHub discovery pipeline because it matches agent skill, automation, RAG, or developer-tool signals. MCP projects are excluded from automated imports.`,
+    long_description: `${description}\n\nImported by the skill-only GitHub discovery pipeline because it matches agent skill, automation, RAG, or developer-tool signals. Protocol-server projects are excluded from automated imports.`,
     tagline: description,
     author_name: repo.owner.login,
     author_url: repo.owner.html_url,
