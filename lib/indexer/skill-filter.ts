@@ -33,6 +33,12 @@ const POSITIVE_SIGNALS: Array<{ label: string; pattern: RegExp; weight: number }
   { label: 'crawler', pattern: /\b(crawler|scraper|scraping|data[-_\s]?extraction)\b/i, weight: 3 },
   { label: 'tool', pattern: /\b(llm[-_\s]?tool|claude[-_\s]?tool|openai[-_\s]?plugin|langchain[-_\s]?tool)\b/i, weight: 3 },
   { label: 'integration', pattern: /\b(agent[-_\s]?(integration|connector)|ai[-_\s]?connector)\b/i, weight: 3 },
+  { label: 'document-processing', pattern: /\b(document[-_\s]?(ai|processing|parser)|pdf[-_\s]?(parser|extract|ocr)|ocr)\b/i, weight: 3 },
+  { label: 'code-quality', pattern: /\b(code[-_\s]?(review|quality|analysis)|static[-_\s]?analysis|test[-_\s]?(automation|generation)|e2e[-_\s]?test)\b/i, weight: 3 },
+  { label: 'data-analysis', pattern: /\b(data[-_\s]?(analysis|analytics|pipeline|visualization)|notebook[-_\s]?agent|csv[-_\s]?(agent|automation))\b/i, weight: 3 },
+  { label: 'knowledge-search', pattern: /\b(semantic[-_\s]?search|vector[-_\s]?(search|database)|knowledge[-_\s]?(base|graph|agent))\b/i, weight: 3 },
+  { label: 'content-workflow', pattern: /\b(content[-_\s]?(generation|automation|workflow)|copywriting[-_\s]?agent|markdown[-_\s]?(agent|automation))\b/i, weight: 3 },
+  { label: 'security-workflow', pattern: /\b(security[-_\s]?(automation|agent|scanner)|vulnerability[-_\s]?(scanner|analysis)|secret[-_\s]?scanning)\b/i, weight: 3 },
 ]
 
 const COLLECTION_PATTERNS = [
@@ -88,7 +94,7 @@ export function evaluateSkillCandidate(candidate: SkillCandidateProfile): SkillC
     score += 1
   }
 
-  if (candidate.topics?.some((topic) => /skill|agent|automation|rag|crawler|scraping/i.test(topic))) {
+  if (candidate.topics?.some((topic) => /skill|agent|automation|rag|crawler|scraping|browser|document|pdf|ocr|testing|security|semantic-search|vector/i.test(topic))) {
     score += 1
   }
 

@@ -7,6 +7,9 @@ import { isAutomationAuthorized } from '@/lib/security/route-auth'
 // Allow up to 5 minutes (Vercel Pro max)
 export const maxDuration = 300
 
+const DEFAULT_TARGET_NEW_PER_RUN = 25
+const DEFAULT_TOKEN_SEARCH_REQUESTS = 30
+
 function isAuthorized(request: NextRequest): boolean {
   return isAutomationAuthorized(request)
 }
@@ -39,11 +42,11 @@ export async function POST(request: NextRequest) {
     }
 
     if (mode !== 'reviewed') {
-      const targetNew = Math.min(Math.max(Number(body.targetNew) || 10, 1), 500)
+      const targetNew = Math.min(Math.max(Number(body.targetNew) || DEFAULT_TARGET_NEW_PER_RUN, 1), 500)
       const minStars = Math.max(Number(body.minStars) || 500, 100)
       const maxSearchRequests = Math.min(
-        Math.max(Number(body.maxSearchRequests) || (process.env.GITHUB_TOKEN ? 20 : 10), 1),
-        process.env.GITHUB_TOKEN ? 30 : 10
+        Math.max(Number(body.maxSearchRequests) || (process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10), 1),
+        process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10
       )
       const pageSeed =
         body.pageSeed === undefined ? undefined : Math.max(0, Number(body.pageSeed) || 0)
@@ -101,9 +104,9 @@ export async function GET(request: NextRequest) {
     headers: request.headers,
     body: JSON.stringify({
       mode: 'bulk',
-      targetNew: Number(process.env.INDEXER_RUN_TARGET || 10),
+      targetNew: Number(process.env.INDEXER_RUN_TARGET || DEFAULT_TARGET_NEW_PER_RUN),
       minStars: Number(process.env.INDEXER_MIN_STARS || 500),
-      maxSearchRequests: Number(process.env.INDEXER_MAX_SEARCH_REQUESTS || (process.env.GITHUB_TOKEN ? 20 : 10)),
+      maxSearchRequests: Number(process.env.INDEXER_MAX_SEARCH_REQUESTS || (process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10)),
     }),
   }))
 }

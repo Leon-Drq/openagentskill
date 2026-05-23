@@ -62,6 +62,7 @@ export default function APIDocsPage() {
               { method: 'GET', path: '/api/agent/skills' },
               { method: 'GET', path: '/api/agent/skills/{slug}' },
               { method: 'GET', path: '/api/agent/recommend' },
+              { method: 'GET', path: '/api/agent/rankings' },
               { method: 'POST', path: '/api/agent/feedback' },
               { method: 'POST', path: '/api/skills/submit' },
               { method: 'POST', path: '/api/subscribe' },
@@ -169,6 +170,42 @@ Total: 2 skills found
               </p>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
                 <code>{'GET /api/agent/recommend?task=scrape+websites+and+extract+tables&limit=3'}</code>
+              </div>
+            </div>
+          </div>
+
+          {/* GET /api/agent/rankings */}
+          <div className="border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/agent/rankings'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Get ranked skill shortlists by quality, stars, freshness, new arrivals, or workflow-specific use cases.'}
+              </p>
+              <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 text-sm sm:text-base">
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'slug'}</code>
+                  <span className="text-secondary ml-2">{'- Ranking slug, e.g. best-web-scraping-skills'}</span>
+                </div>
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'limit'}</code>
+                  <span className="text-secondary ml-2">{'- Number of skills to return, max 30'}</span>
+                </div>
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'format'}</code>
+                  <span className="text-secondary ml-2">{'- Response format: json or text'}</span>
+                </div>
+              </div>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <code>{'GET /api/agent/rankings?slug=best-web-scraping-skills&limit=5&format=text'}</code>
               </div>
             </div>
           </div>

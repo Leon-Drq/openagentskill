@@ -5,6 +5,7 @@ import { SiteHeader } from '@/components/site-header'
 import { SubscribeCard } from '@/components/subscribe-card'
 import { getBlogHubData, getBlogPosts, type BlogSkillPreview } from '@/lib/blog/generate'
 import { SKILL_STACKS } from '@/lib/collections'
+import { CORE_RANKINGS, getRankingDefinitions } from '@/lib/rankings'
 import { USE_CASES } from '@/lib/use-cases'
 
 export const dynamic = 'force-dynamic'
@@ -70,6 +71,7 @@ function SkillLink({ skill }: { skill: BlogSkillPreview }) {
 export default async function BlogPage() {
   const [posts, hub] = await Promise.all([getBlogPosts(30), getBlogHubData()])
   const featureSkill = hub.topRecentSkills[0] || hub.latestSkills[0]
+  const rankingGuides = getRankingDefinitions()
 
   return (
     <div className="min-h-screen bg-background">
@@ -186,6 +188,29 @@ export default async function BlogPage() {
                   Best {useCase.shortTitle.toLowerCase()} skills
                 </h3>
                 <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-secondary">{useCase.description}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-secondary mb-3">Ranking guides</p>
+            <h2 className="font-display text-2xl font-bold text-foreground">Turn the index into searchable lists.</h2>
+            <p className="mt-3 text-sm leading-relaxed text-secondary">
+              Ranking pages target high-intent searches like most starred, recently updated, and best skills for each workflow.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {[...CORE_RANKINGS, ...rankingGuides.filter((ranking) => ranking.kind === 'use-case').slice(0, 4)].map((ranking) => (
+              <Link
+                key={ranking.slug}
+                href={`/rankings/${ranking.slug}`}
+                className="border border-border p-4 transition-colors hover:border-foreground"
+              >
+                <p className="text-xs uppercase tracking-widest text-secondary">{ranking.eyebrow}</p>
+                <h3 className="mt-2 font-display text-lg font-semibold">{ranking.shortTitle}</h3>
+                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-secondary">{ranking.description}</p>
               </Link>
             ))}
           </div>

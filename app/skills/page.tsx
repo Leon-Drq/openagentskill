@@ -7,11 +7,11 @@ import { getUseCaseBySlug, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cas
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Browse 650+ AI Agent Skills',
+  title: 'Browse AI Agent Skills',
   description: 'Discover AI agent skills for web automation, coding agents, RAG, data processing, workflow automation, and more. Filter by category, GitHub stars, popularity, or recent updates.',
   keywords: ['AI agent skills', 'agent tools', 'Claude tools', 'GPT plugins', 'LangChain tools', 'agent marketplace'],
   openGraph: {
-    title: 'Browse 650+ AI Agent Skills — Open Agent Skill',
+    title: 'Browse AI Agent Skills — Open Agent Skill',
     description: 'Discover high-star AI agent skills, browser automation tools, coding agents, RAG tools, and agent frameworks.',
     type: 'website',
     url: 'https://www.openagentskill.com/skills',

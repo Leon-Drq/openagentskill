@@ -65,6 +65,8 @@ export interface BulkImportSummary {
 }
 
 const GITHUB_API_BASE = 'https://api.github.com'
+const DEFAULT_TARGET_NEW_PER_RUN = 25
+const DEFAULT_TOKEN_SEARCH_REQUESTS = 30
 
 const HIGH_STAR_QUERIES: HighStarQuery[] = [
   {
@@ -98,6 +100,18 @@ const HIGH_STAR_QUERIES: HighStarQuery[] = [
     frameworks: ['Browser Automation'],
   },
   {
+    q: 'topic:playwright',
+    category: 'browser-automation',
+    tags: ['browser', 'testing', 'automation'],
+    frameworks: ['Playwright'],
+  },
+  {
+    q: 'topic:puppeteer',
+    category: 'browser-automation',
+    tags: ['browser', 'automation'],
+    frameworks: ['Puppeteer'],
+  },
+  {
     q: 'topic:web-scraping',
     category: 'web-automation',
     tags: ['scraping', 'crawler'],
@@ -116,6 +130,36 @@ const HIGH_STAR_QUERIES: HighStarQuery[] = [
     frameworks: ['RAG'],
   },
   {
+    q: 'topic:semantic-search',
+    category: 'rag-knowledge',
+    tags: ['semantic-search', 'retrieval', 'knowledge'],
+    frameworks: ['Semantic Search'],
+  },
+  {
+    q: 'topic:vector-database',
+    category: 'rag-knowledge',
+    tags: ['vector-database', 'retrieval', 'knowledge'],
+    frameworks: ['Vector Search'],
+  },
+  {
+    q: 'topic:document-ai',
+    category: 'document-processing',
+    tags: ['document-ai', 'documents', 'extraction'],
+    frameworks: ['Document AI'],
+  },
+  {
+    q: 'topic:pdf',
+    category: 'document-processing',
+    tags: ['pdf', 'documents', 'extraction'],
+    frameworks: ['PDF'],
+  },
+  {
+    q: 'topic:ocr',
+    category: 'document-processing',
+    tags: ['ocr', 'documents', 'extraction'],
+    frameworks: ['OCR'],
+  },
+  {
     q: 'topic:llmops',
     category: 'development',
     tags: ['llmops', 'developer-tools'],
@@ -126,6 +170,24 @@ const HIGH_STAR_QUERIES: HighStarQuery[] = [
     category: 'development',
     tags: ['coding-agent', 'developer-tools'],
     frameworks: ['Coding Agent'],
+  },
+  {
+    q: 'topic:code-review',
+    category: 'development',
+    tags: ['code-review', 'developer-tools'],
+    frameworks: ['Code Review'],
+  },
+  {
+    q: 'topic:static-analysis',
+    category: 'development',
+    tags: ['static-analysis', 'code-quality'],
+    frameworks: ['Static Analysis'],
+  },
+  {
+    q: 'topic:test-automation',
+    category: 'testing-qa',
+    tags: ['testing', 'automation'],
+    frameworks: ['Testing'],
   },
   {
     q: 'topic:workflow-automation',
@@ -144,6 +206,36 @@ const HIGH_STAR_QUERIES: HighStarQuery[] = [
     category: 'research',
     tags: ['research', 'agent'],
     frameworks: ['Research Agent'],
+  },
+  {
+    q: 'topic:market-research',
+    category: 'research',
+    tags: ['market-research', 'analysis'],
+    frameworks: ['Research Agent'],
+  },
+  {
+    q: 'topic:data-analysis',
+    category: 'data-analysis',
+    tags: ['data-analysis', 'analytics'],
+    frameworks: ['Data Analysis'],
+  },
+  {
+    q: 'topic:data-pipeline',
+    category: 'data-analysis',
+    tags: ['data-pipeline', 'automation'],
+    frameworks: ['Data Pipeline'],
+  },
+  {
+    q: 'topic:content-generation',
+    category: 'content-automation',
+    tags: ['content-generation', 'workflow'],
+    frameworks: ['Content Automation'],
+  },
+  {
+    q: 'topic:security-scanner',
+    category: 'security',
+    tags: ['security', 'scanner'],
+    frameworks: ['Security'],
   },
   {
     q: 'topic:multi-agent',
@@ -181,6 +273,20 @@ const HIGH_STAR_QUERIES: HighStarQuery[] = [
     category: 'development',
     tags: ['langchain-tool', 'developer-tools'],
     frameworks: ['LangChain'],
+  },
+  {
+    q: '"Claude Code" tool',
+    category: 'development',
+    tags: ['claude-code', 'developer-tools'],
+    frameworks: ['Claude Code'],
+    sort: 'updated',
+  },
+  {
+    q: '"AI agent" "GitHub"',
+    category: 'github-automation',
+    tags: ['github', 'automation', 'agents'],
+    frameworks: ['GitHub'],
+    sort: 'updated',
   },
 ]
 
@@ -339,17 +445,17 @@ function getSearchPlan(maxSearchRequests: number, pageSeed: number) {
 export async function bulkImportHighStarSkills(
   options: BulkImportOptions = {}
 ): Promise<{ summary: BulkImportSummary; results: Array<{ repo: string; status: string; slug?: string; reason?: string }> }> {
-  const targetNew = clamp(Math.floor(options.targetNew || 10), 1, 500)
+  const targetNew = clamp(Math.floor(options.targetNew || DEFAULT_TARGET_NEW_PER_RUN), 1, 500)
   const minStars = clamp(Math.floor(options.minStars || 500), 100, 1_000_000)
   const perPage = clamp(Math.floor(options.perPage || 100), 10, 100)
   const maxSearchRequests = clamp(
-    Math.floor(options.maxSearchRequests || (process.env.GITHUB_TOKEN ? 20 : 10)),
+    Math.floor(options.maxSearchRequests || (process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10)),
     1,
-    process.env.GITHUB_TOKEN ? 30 : 10
+    process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10
   )
   const pageSeed = Math.max(
     0,
-    Math.floor(options.pageSeed ?? Math.floor(Date.now() / 86_400_000))
+    Math.floor(options.pageSeed ?? Math.floor(Date.now() / 3_600_000))
   )
   const startedAt = new Date().toISOString()
   const serverSecret = process.env.INDEXER_SECRET

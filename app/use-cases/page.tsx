@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: 'AI Agent Skill Use Cases',
   description:
-    'Explore OpenAgentSkill use-case guides for web scraping, coding agents, RAG, browser automation, research agents, and workflow automation.',
+    'Explore OpenAgentSkill use-case guides for web scraping, coding agents, RAG, browser automation, document processing, data analysis, testing, security, and more.',
   alternates: {
     canonical: 'https://www.openagentskill.com/use-cases',
   },
