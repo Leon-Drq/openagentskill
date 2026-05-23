@@ -22,6 +22,12 @@ export function SiteFooter() {
           <Link href="/use-cases" className="hover:text-foreground">
             Use Cases
           </Link>
+          <Link href="/collections" className="hover:text-foreground">
+            Stacks
+          </Link>
+          <Link href="/compare" className="hover:text-foreground">
+            Compare
+          </Link>
           <Link href="/blog" className="hover:text-foreground">
             Blog
           </Link>

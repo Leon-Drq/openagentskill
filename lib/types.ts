@@ -103,7 +103,7 @@ export interface SearchFilters {
   tags?: string[]
   verified?: boolean
   featured?: boolean
-  sortBy?: 'popular' | 'recent' | 'stars' | 'downloads' | 'rating'
+  sortBy?: 'popular' | 'recent' | 'stars' | 'downloads' | 'rating' | 'quality' | 'fresh'
 }
 
 // Agent-readable structured data

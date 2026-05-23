@@ -3,8 +3,12 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getSkillBySlug, convertSkillRecordToManifest, getRelatedSkills } from '@/lib/db/skills'
 import { InstallCommand } from '@/components/install-command'
+import { SaveSkillButton } from '@/components/save-skill-button'
+import { SkillFeedbackPanel } from '@/components/skill-feedback-panel'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { getStacksForSkill } from '@/lib/collections'
+import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
 export const dynamic = 'force-dynamic'
@@ -115,7 +119,10 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   const relatedSkills = await getRelatedSkills(skill.id, skill.category, 4).catch(() => [])
   const aiScore = dbSkill?.ai_review_score?.score as number | undefined
   const matchedUseCases = dbSkill ? getUseCasesForSkill(dbSkill, 3) : []
+  const matchedStacks = dbSkill ? getStacksForSkill(dbSkill, 3) : []
   const primaryUseCase = matchedUseCases[0]
+  const qualityProfile = dbSkill ? getSkillQualityProfile(dbSkill) : null
+  const platformHints = dbSkill ? getPlatformHints(dbSkill) : []
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -211,6 +218,12 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                   <span className="text-secondary">Version </span>
                   <span className="font-semibold">{skill.technical.version}</span>
                 </div>
+                {qualityProfile && (
+                  <div>
+                    <span className="text-secondary">Quality </span>
+                    <span className="font-semibold">{qualityProfile.score}/100 · {qualityProfile.label}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -252,6 +265,37 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
               </div>
             </section>
 
+            {qualityProfile && (
+              <section className="mb-10 border border-border p-5">
+                <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                  <div>
+                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Quality profile</p>
+                    <h2 className="font-display text-2xl font-semibold">
+                      {qualityProfile.label} candidate for agent workflows
+                    </h2>
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">{qualityProfile.summary}</p>
+                  </div>
+                  <div className="font-mono text-3xl font-semibold">{qualityProfile.score}</div>
+                </div>
+                <div className="mb-5 h-1.5 bg-muted">
+                  <div className="h-full bg-foreground" style={{ width: `${qualityProfile.score}%` }} />
+                </div>
+                <div className="grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+                  {qualityProfile.signals.map((signal) => (
+                    <div key={signal.label} className="bg-background p-4">
+                      <div className="text-xs uppercase tracking-widest text-secondary">{signal.label}</div>
+                      <div className="mt-2 font-mono text-sm">{signal.value}</div>
+                    </div>
+                  ))}
+                </div>
+                {qualityProfile.warnings.length > 0 && (
+                  <div className="mt-4 border-l border-border pl-3 text-sm leading-relaxed text-secondary">
+                    Check before install: {qualityProfile.warnings.slice(0, 3).join(' · ')}
+                  </div>
+                )}
+              </section>
+            )}
+
             {matchedUseCases.length > 0 && (
               <section className="mb-10">
                 <div className="mb-5 flex items-end justify-between gap-4">
@@ -270,6 +314,30 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                       <p className="text-xs uppercase tracking-widest text-secondary">{useCase.eyebrow}</p>
                       <h3 className="mt-2 font-display text-lg font-semibold">{useCase.shortTitle}</h3>
                       <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary">{useCase.heroPrompt}</p>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {matchedStacks.length > 0 && (
+              <section className="mb-10">
+                <div className="mb-5 flex items-end justify-between gap-4">
+                  <div>
+                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Stack fit</p>
+                    <h2 className="font-display text-2xl font-semibold">Add it to a complete workflow</h2>
+                  </div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {matchedStacks.map((stack) => (
+                    <Link
+                      key={stack.slug}
+                      href={`/collections/${stack.slug}`}
+                      className="border border-border p-4 transition-colors hover:border-foreground"
+                    >
+                      <p className="text-xs uppercase tracking-widest text-secondary">{stack.eyebrow}</p>
+                      <h3 className="mt-2 font-display text-lg font-semibold">{stack.shortTitle}</h3>
+                      <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary">{stack.description}</p>
                     </Link>
                   ))}
                 </div>
@@ -372,6 +440,13 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 <h3 className="font-display text-lg font-semibold mb-3">Install</h3>
                 <p className="text-xs text-secondary mb-4">Free and open source</p>
                 <div className="space-y-2">
+                  <SaveSkillButton skillSlug={skill.slug} />
+                  <Link
+                    href={`/compare?skills=${encodeURIComponent([skill.slug, ...relatedSkills.slice(0, 3).map((rs) => rs.slug)].join(','))}`}
+                    className="block w-full border border-border py-2.5 text-center text-sm text-foreground hover:border-foreground transition-colors"
+                  >
+                    Compare Alternatives
+                  </Link>
                   {skill.technical.repository && (
                     <a
                       href={skill.technical.repository}
@@ -432,6 +507,23 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 </div>
               )}
 
+              {platformHints.length > 0 && (
+                <div className="border border-border p-5">
+                  <h3 className="font-display text-lg font-semibold mb-3">Platform Fit</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {platformHints.map((hint) => (
+                      <Link
+                        key={hint}
+                        href={`/skills?platform=${encodeURIComponent(hint)}`}
+                        className="border border-border px-2.5 py-1 text-xs text-secondary hover:border-foreground hover:text-foreground transition-colors"
+                      >
+                        {hint}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="border border-border p-5">
                 <h3 className="font-display text-lg font-semibold mb-3">Health Signals</h3>
                 <dl className="space-y-3 text-xs">
@@ -453,6 +545,8 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                   </div>
                 </dl>
               </div>
+
+              <SkillFeedbackPanel skillSlug={skill.slug} />
 
               {/* Trust info */}
               <div className="border border-border p-5">

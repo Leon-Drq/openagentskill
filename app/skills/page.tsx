@@ -1,6 +1,8 @@
 import { Metadata } from 'next'
 import { getAllSkills, getCategories, convertSkillRecordToManifest, type SkillSortMode, getSkillStats } from '@/lib/db/skills'
 import { SkillsPageClient } from '@/components/skills-page-client'
+import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
+import { getUseCaseBySlug, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,33 +24,75 @@ export const metadata: Metadata = {
 export default async function SkillsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; sort?: string; category?: string }>
+  searchParams: Promise<{
+    q?: string
+    sort?: string
+    category?: string
+    useCase?: string
+    platform?: string
+    quality?: string
+    minStars?: string
+  }>
 }) {
   const params = await searchParams
   const sort = (params.sort as SkillSortMode) || 'quality'
   const category = params.category || 'all'
+  const useCase = params.useCase || 'all'
+  const platform = params.platform || 'all'
+  const quality = params.quality || 'all'
+  const minStars = Number(params.minStars || 0)
 
   const [records, categories, statsMap] = await Promise.all([
-    getAllSkills(sort, category),
+    getAllSkills(sort),
     getCategories(),
     getSkillStats(),
   ])
 
-  let skills = records.map((r) => ({
-    ...convertSkillRecordToManifest(r),
-    agentStats: statsMap[r.slug] || null,
-  }))
+  const platformOptions = [...new Set(records.flatMap((record) => [
+    ...(record.frameworks || []),
+    ...getPlatformHints(record),
+  ]).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b))
+
+  const selectedUseCase = useCase !== 'all' ? getUseCaseBySlug(useCase) : undefined
+
+  let filteredRecords = records.filter((record) => {
+    if (category !== 'all' && record.category !== category) return false
+    if (selectedUseCase && scoreSkillForUseCase(record, selectedUseCase) < 6) return false
+    if (platform !== 'all') {
+      const platforms = [
+        ...(record.frameworks || []),
+        ...getPlatformHints(record),
+      ].map((item) => item.toLowerCase())
+      if (!platforms.includes(platform.toLowerCase())) return false
+    }
+    if (minStars > 0 && Number(record.github_stars || 0) < minStars) return false
+    if (quality !== 'all' && getSkillQualityProfile(record, statsMap[record.slug] || null).tier !== quality) return false
+    return true
+  })
 
   if (params.q) {
     const query = params.q.toLowerCase()
-    skills = skills.filter(
-      (skill) =>
-        skill.name.toLowerCase().includes(query) ||
-        skill.description.toLowerCase().includes(query) ||
-        skill.tags.some((tag) => tag.toLowerCase().includes(query)) ||
-        skill.technical.githubRepo?.toLowerCase().includes(query)
+    filteredRecords = filteredRecords.filter(
+      (record) =>
+        record.name.toLowerCase().includes(query) ||
+        record.description.toLowerCase().includes(query) ||
+        (record.long_description || '').toLowerCase().includes(query) ||
+        (record.tags || []).some((tag) => tag.toLowerCase().includes(query)) ||
+        (record.frameworks || []).some((framework) => framework.toLowerCase().includes(query)) ||
+        record.github_repo?.toLowerCase().includes(query)
     )
   }
+
+  const skills = filteredRecords.map((r) => {
+    const agentStats = statsMap[r.slug] || null
+    return {
+      ...convertSkillRecordToManifest(r),
+      agentStats,
+      qualityProfile: getSkillQualityProfile(r, agentStats),
+      platformHints: getPlatformHints(r),
+    }
+  })
 
   return (
     <SkillsPageClient
@@ -57,6 +101,12 @@ export default async function SkillsPage({
       sort={sort}
       category={category}
       categories={categories}
+      useCase={useCase}
+      useCases={USE_CASES}
+      platform={platform}
+      platformOptions={platformOptions}
+      quality={quality}
+      minStars={Number.isFinite(minStars) ? minStars : 0}
     />
   )
 }

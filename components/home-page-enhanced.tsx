@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { useI18n } from '@/lib/i18n/context'
+import { SKILL_STACKS } from '@/lib/collections'
 import { USE_CASES } from '@/lib/use-cases'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
@@ -40,6 +41,7 @@ interface Recommendation {
 }
 
 const HOME_USE_CASES = USE_CASES.slice(0, 6)
+const HOME_STACKS = SKILL_STACKS.slice(0, 3)
 
 function AnimatedNumber({ 
   value, 
@@ -388,6 +390,41 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
                 <p className="mb-3 text-xs uppercase tracking-widest text-secondary">{useCase.eyebrow}</p>
                 <h3 className="font-display text-xl font-semibold group-hover:text-secondary">{useCase.shortTitle}</h3>
                 <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-secondary">{useCase.description}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-border px-4 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-8 flex flex-col justify-between gap-4 sm:mb-10 sm:flex-row sm:items-end">
+            <div>
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Skill stacks</p>
+              <h2 className="font-display text-2xl font-bold sm:text-3xl">Install a workflow, not just a tool</h2>
+            </div>
+            <Link href="/collections" className="text-sm text-secondary underline underline-offset-2 transition-colors hover:text-foreground">
+              Browse stacks
+            </Link>
+          </div>
+
+          <div className="grid gap-3 lg:grid-cols-3">
+            {HOME_STACKS.map((stack) => (
+              <Link
+                key={stack.slug}
+                href={`/collections/${stack.slug}`}
+                className="group border border-border bg-card p-5 transition-colors hover:border-foreground"
+              >
+                <p className="mb-3 text-xs uppercase tracking-widest text-secondary">{stack.eyebrow}</p>
+                <h3 className="font-display text-xl font-semibold group-hover:text-secondary">{stack.shortTitle}</h3>
+                <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-secondary">{stack.description}</p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {stack.outcomes.slice(0, 2).map((outcome) => (
+                    <span key={outcome} className="border border-border px-2 py-1 text-xs text-secondary">
+                      {outcome}
+                    </span>
+                  ))}
+                </div>
               </Link>
             ))}
           </div>

@@ -42,7 +42,7 @@ export interface SkillRecord {
   updated_at: string
 }
 
-export type SkillSortMode = 'quality' | 'downloads' | 'stars' | 'new' | 'trending'
+export type SkillSortMode = 'quality' | 'downloads' | 'stars' | 'new' | 'trending' | 'fresh'
 
 function isMcpText(value: string) {
   return /(^|[^a-z0-9])mcp([^a-z0-9]|$)/i.test(value) || /\bmodel context protocol\b/i.test(value)
@@ -96,6 +96,9 @@ export async function getAllSkills(
       break
     case 'new':
       query = query.order('created_at', { ascending: false })
+      break
+    case 'fresh':
+      query = query.order('github_last_pushed_at', { ascending: false, nullsFirst: false }).order('quality_score', { ascending: false })
       break
     case 'trending':
       // Trending: high downloads relative to age (recent + popular)

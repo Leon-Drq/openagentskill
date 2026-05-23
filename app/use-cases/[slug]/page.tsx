@@ -5,6 +5,7 @@ import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { convertSkillRecordToManifest, getAllSkills } from '@/lib/db/skills'
+import { SKILL_STACKS } from '@/lib/collections'
 import { USE_CASES, getUseCaseBySlug, selectSkillsForUseCase } from '@/lib/use-cases'
 
 export const dynamic = 'force-dynamic'
@@ -63,6 +64,7 @@ export default async function UseCasePage({
   const allSkills = await getAllSkills('quality').catch(() => [])
   const matchedSkills = selectSkillsForUseCase(allSkills, useCase, 18)
   const heroSkills = matchedSkills.slice(0, 3)
+  const relatedStacks = SKILL_STACKS.filter((stack) => stack.useCaseSlug === useCase.slug)
 
   return (
     <div className="min-h-screen bg-background">
@@ -84,10 +86,16 @@ export default async function UseCasePage({
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">{useCase.description}</p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
-                href={`/skills?q=${encodeURIComponent(useCase.keywords[0])}`}
+                href={`/skills?useCase=${useCase.slug}`}
                 className="border border-foreground bg-foreground px-5 py-2 text-sm text-background transition-colors hover:bg-background hover:text-foreground"
               >
                 Browse matching skills
+              </Link>
+              <Link
+                href={`/blog/use-cases/${useCase.slug}`}
+                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+              >
+                Read guide
               </Link>
               <Link
                 href={`/api/agent/recommend?task=${encodeURIComponent(useCase.heroPrompt)}&format=text`}
@@ -114,6 +122,28 @@ export default async function UseCasePage({
             </div>
           </div>
         </section>
+
+        {relatedStacks.length > 0 && (
+          <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
+            <div>
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Recommended stack</p>
+              <h2 className="font-display text-2xl font-semibold">Turn this use case into a workflow</h2>
+            </div>
+            <div className="grid gap-3">
+              {relatedStacks.map((stack) => (
+                <Link
+                  key={stack.slug}
+                  href={`/collections/${stack.slug}`}
+                  className="border border-border bg-card p-5 transition-colors hover:border-foreground"
+                >
+                  <p className="text-xs uppercase tracking-widest text-secondary">{stack.eyebrow}</p>
+                  <h3 className="mt-2 font-display text-xl font-semibold">{stack.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-secondary">{stack.description}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
           <div>

@@ -22,7 +22,8 @@ export default function LoginPage() {
       setError(error.message)
       setLoading(false)
     } else {
-      router.push('/profile')
+      const nextPath = new URLSearchParams(window.location.search).get('next') || '/profile'
+      router.push(nextPath)
       router.refresh()
     }
   }

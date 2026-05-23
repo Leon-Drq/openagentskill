@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { getAllSkills } from '@/lib/db/skills'
+import { SKILL_STACKS } from '@/lib/collections'
 import { USE_CASES, selectSkillsForUseCase } from '@/lib/use-cases'
 
 export const dynamic = 'force-dynamic'
@@ -100,6 +101,31 @@ export default async function UseCasesPage() {
               </Link>
             )
           })}
+        </section>
+
+        <section className="border-t border-border py-10">
+          <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">From use case to stack</p>
+              <h2 className="font-display text-2xl font-semibold">Ready-made workflows</h2>
+            </div>
+            <Link href="/collections" className="text-sm text-secondary underline underline-offset-2 hover:text-foreground">
+              Browse all stacks
+            </Link>
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
+            {SKILL_STACKS.slice(0, 3).map((stack) => (
+              <Link
+                key={stack.slug}
+                href={`/collections/${stack.slug}`}
+                className="border border-border bg-card p-5 transition-colors hover:border-foreground"
+              >
+                <p className="text-xs uppercase tracking-widest text-secondary">{stack.eyebrow}</p>
+                <h3 className="mt-2 font-display text-xl font-semibold">{stack.shortTitle}</h3>
+                <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary">{stack.description}</p>
+              </Link>
+            ))}
+          </div>
         </section>
       </main>
 

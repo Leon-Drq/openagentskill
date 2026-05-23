@@ -61,7 +61,10 @@ export default function APIDocsPage() {
             {[
               { method: 'GET', path: '/api/agent/skills' },
               { method: 'GET', path: '/api/agent/skills/{slug}' },
+              { method: 'GET', path: '/api/agent/recommend' },
+              { method: 'POST', path: '/api/agent/feedback' },
               { method: 'POST', path: '/api/skills/submit' },
+              { method: 'POST', path: '/api/subscribe' },
             ].map(({ method, path }) => (
               <div key={path} className="flex items-center gap-2 border border-border px-3 py-1.5 text-xs font-mono">
                 <span className={method === 'POST' ? 'text-foreground font-bold' : 'text-secondary'}>
@@ -105,7 +108,7 @@ export default function APIDocsPage() {
                 </div>
                 <div>
                   <code className="font-mono bg-muted px-2 py-1">{'sort'}</code>
-                  <span className="text-secondary ml-2">{'- Sort by: downloads, stars, rating, trending'}</span>
+                  <span className="text-secondary ml-2">{'- Sort by: quality, downloads, stars, trending, fresh, new'}</span>
                 </div>
                 <div>
                   <code className="font-mono bg-muted px-2 py-1">{'format'}</code>
@@ -140,6 +143,32 @@ Total: 2 skills found
 - Downloads: 38,912
 - Rating: 4.7/5
 - Description: Automated code review with security analysis`}</code>
+              </div>
+
+              <p className="mt-4 text-sm text-secondary">
+                {'JSON responses include quality profiles, platform hints, install commands, repository links, and detail URLs.'}
+              </p>
+            </div>
+          </div>
+
+          {/* GET /api/agent/recommend */}
+          <div className="border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/agent/recommend'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Describe a task and get skill recommendations plus related stack suggestions.'}
+              </p>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <code>{'GET /api/agent/recommend?task=scrape+websites+and+extract+tables&limit=3'}</code>
               </div>
             </div>
           </div>

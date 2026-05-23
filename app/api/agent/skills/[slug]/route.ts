@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSkillBySlug } from '@/lib/db/skills'
+import { getStacksForSkill } from '@/lib/collections'
+import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
+import { getUseCasesForSkill } from '@/lib/use-cases'
 
 /**
  * GET /api/agent/skills/{slug}
@@ -79,8 +82,19 @@ Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
         review_count: skill.review_count,
         quality_score: Number(skill.quality_score || 0),
       },
+      quality: getSkillQualityProfile(skill),
       quality_signals: skill.quality_signals || {},
-      platforms: skill.frameworks,
+      platforms: [...new Set([...(skill.frameworks || []), ...getPlatformHints(skill)])],
+      use_cases: getUseCasesForSkill(skill, 4).map((useCase) => ({
+        slug: useCase.slug,
+        title: useCase.shortTitle,
+        url: `https://www.openagentskill.com/use-cases/${useCase.slug}`,
+      })),
+      stacks: getStacksForSkill(skill, 3).map((stack) => ({
+        slug: stack.slug,
+        title: stack.shortTitle,
+        url: `https://www.openagentskill.com/collections/${stack.slug}`,
+      })),
       install: skill.install_command || `npx skills add ${skill.github_repo}`,
       repository: skill.repository,
       github_repo: skill.github_repo,

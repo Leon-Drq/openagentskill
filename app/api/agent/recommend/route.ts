@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAllSkills, type SkillRecord } from '@/lib/db/skills'
+import { SKILL_STACKS, type SkillStackDefinition } from '@/lib/collections'
+import { getSkillQualityProfile } from '@/lib/quality'
 
 /**
  * Agent Recommend API — Describe a task, get the best skills.
@@ -27,6 +29,14 @@ export async function GET(request: NextRequest) {
 
   try {
     const allSkills = await getAllSkills()
+    const stackMatches = SKILL_STACKS
+      .map((stack) => ({
+        stack,
+        score: calculateStackRelevance(stack, task),
+      }))
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 2)
 
     // Score each skill based on relevance to the task
     const scored = allSkills.map((skill) => ({
@@ -64,9 +74,16 @@ export async function GET(request: NextRequest) {
           rating: r.skill.rating,
           quality_score: Number(r.skill.quality_score || 0),
         },
+        quality: getSkillQualityProfile(r.skill),
         reasoning: generateReasoning(r.skill, r.score),
       })),
       suggested_composition: compositionSuggestion,
+      suggested_stacks: stackMatches.map(({ stack }) => ({
+        slug: stack.slug,
+        name: stack.title,
+        url: `https://www.openagentskill.com/collections/${stack.slug}`,
+        use_case: stack.useCaseSlug,
+      })),
       meta: {
         timestamp: new Date().toISOString(),
         api_version: '1.0',
@@ -148,4 +165,22 @@ function generateReasoning(skill: SkillRecord, score: number): string {
 
   const quality = score > 80 ? 'Strong match' : score > 50 ? 'Good match' : 'Partial match'
   return `${quality}. ${parts.join(', ')}. ${skill.description}`
+}
+
+function calculateStackRelevance(stack: SkillStackDefinition, task: string): number {
+  const taskWords = task
+    .toLowerCase()
+    .split(/[\s+,.\-_]+/)
+    .filter((word) => word.length > 2)
+  const text = [
+    stack.title,
+    stack.description,
+    stack.persona,
+    stack.useCaseSlug,
+    ...stack.keywords,
+    ...stack.outcomes,
+    ...stack.idealFor,
+  ].join(' ').toLowerCase()
+
+  return taskWords.reduce((score, word) => score + (text.includes(word) ? 10 : 0), 0)
 }

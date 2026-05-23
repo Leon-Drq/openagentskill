@@ -2,7 +2,10 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { SubscribeCard } from '@/components/subscribe-card'
 import { getBlogHubData, getBlogPosts, type BlogSkillPreview } from '@/lib/blog/generate'
+import { SKILL_STACKS } from '@/lib/collections'
+import { USE_CASES } from '@/lib/use-cases'
 
 export const dynamic = 'force-dynamic'
 
@@ -161,6 +164,60 @@ export default async function BlogPage() {
               </Link>
             ))}
           </div>
+        </section>
+
+        <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-secondary mb-3">SEO playbooks</p>
+            <h2 className="font-display text-2xl font-bold text-foreground">Evergreen guides for agent builders.</h2>
+            <p className="mt-3 text-sm leading-relaxed text-secondary">
+              These pages turn marketplace data into search-friendly guides that link back to skills, use cases, and stacks.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {USE_CASES.slice(0, 6).map((useCase) => (
+              <Link
+                key={useCase.slug}
+                href={`/blog/use-cases/${useCase.slug}`}
+                className="border border-border p-4 transition-colors hover:border-foreground"
+              >
+                <p className="text-xs uppercase tracking-widest text-secondary">{useCase.eyebrow}</p>
+                <h3 className="mt-2 font-display text-lg font-semibold">
+                  Best {useCase.shortTitle.toLowerCase()} skills
+                </h3>
+                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-secondary">{useCase.description}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-secondary mb-3">Stack guides</p>
+            <h2 className="font-display text-2xl font-bold text-foreground">Turn discovery into adoption.</h2>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {SKILL_STACKS.slice(0, 4).map((stack) => (
+              <Link
+                key={stack.slug}
+                href={`/collections/${stack.slug}`}
+                className="border border-border p-4 transition-colors hover:border-foreground"
+              >
+                <p className="text-xs uppercase tracking-widest text-secondary">{stack.eyebrow}</p>
+                <h3 className="mt-2 font-display text-lg font-semibold">{stack.shortTitle}</h3>
+                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-secondary">{stack.description}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="border-b border-border py-10">
+          <SubscribeCard
+            source="blog"
+            topics={['skills', 'stacks', 'seo-guides']}
+            title="Follow OpenAgentSkill Update"
+            description="Get the strongest new skills, practical stacks, and guide ideas without scanning the full index."
+          />
         </section>
 
         <section className="py-10">

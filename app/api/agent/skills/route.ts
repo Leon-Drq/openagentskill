@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAllSkills, searchSkills } from '@/lib/db/skills'
+import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 
 /**
  * Agent-friendly API endpoint for searching skills.
@@ -67,8 +68,9 @@ export async function GET(request: NextRequest) {
           forks: r.github_forks,
           quality_score: Number(r.quality_score || 0),
         },
+        quality: getSkillQualityProfile(r),
         quality_signals: r.quality_signals || {},
-        platforms: r.frameworks,
+        platforms: [...new Set([...(r.frameworks || []), ...getPlatformHints(r)])],
         install: r.install_command || `npx skills add ${r.github_repo}`,
         repository: r.repository,
         github_repo: r.github_repo,

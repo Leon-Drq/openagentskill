@@ -120,6 +120,7 @@ async function fetchApprovedSkillRows() {
 // ─── AI Content Generator ─────────────────────────────────────────────────────
 
 async function generateBlogContent(skill: {
+  slug: string
   name: string
   description: string
   long_description: string | null
@@ -149,7 +150,7 @@ ${(skill.long_description || '').slice(0, 1200)}
 Write a blog post in Markdown with this exact structure:
 
 ## Where this fits
-(2-3 sentences explaining the developer workflow or user problem this skill helps with)
+(2-3 sentences explaining the developer workflow or user problem this skill helps with. Start from a concrete user scenario.)
 
 ## Why agents benefit
 (3-5 bullets describing concrete agent capabilities, not generic features)
@@ -159,6 +160,9 @@ Write a blog post in Markdown with this exact structure:
 
 ## Add it to your agent workflow
 (Installation and a small usage example using the install command)
+
+## Compare before adopting
+(Mention what to compare: quality signals, maintenance freshness, alternatives, and workflow fit)
 
 ## Why it is worth tracking
 (1 paragraph on quality signals, community momentum, and when to evaluate it)
@@ -170,6 +174,7 @@ Rules:
 - Keep the total length between 400-600 words
 - Be useful and specific. Avoid hype, vague claims, and feature-list padding.
 - Mention OpenAgentSkill only when it adds context.
+- Include one natural internal-link sentence using this exact URL when relevant: https://www.openagentskill.com/skills/${skill.slug}
 
 Respond with JSON only:
 {"title":"Blog post title (max 60 chars)","summary":"One sentence meta description (max 155 chars)","content":"Full markdown content"}`
