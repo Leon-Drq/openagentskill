@@ -4,7 +4,7 @@ export default function SignUpSuccessPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 text-center">
       <Link href="/" className="font-display text-lg font-bold tracking-tight mb-12 hover:opacity-70 transition-opacity block">
-        OPEN AGENT SKILL
+        OpenAgentSkill
       </Link>
       <h1 className="font-display text-3xl font-bold mb-3">Check your inbox</h1>
       <p className="text-secondary max-w-xs leading-relaxed mb-8">

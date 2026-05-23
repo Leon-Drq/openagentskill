@@ -1,28 +1,19 @@
 import type { Metadata } from 'next'
-import { Crimson_Text, EB_Garamond, IBM_Plex_Mono } from 'next/font/google'
+import { Geist, Geist_Mono } from 'next/font/google'
 import { StructuredData } from '@/components/structured-data'
 import { I18nProvider } from '@/lib/i18n/context'
 import './globals.css'
 
-const crimsonText = Crimson_Text({ 
-  weight: ['400', '600', '700'],
+const geistSans = Geist({
   subsets: ['latin'],
-  variable: '--font-serif',
+  variable: '--font-geist-sans',
   display: 'swap',
 })
 
-const ebGaramond = EB_Garamond({ 
-  weight: ['400', '500', '600', '700'],
+const geistMono = Geist_Mono({
   subsets: ['latin'],
-  variable: '--font-display',
   display: 'swap',
-})
-
-const ibmPlexMono = IBM_Plex_Mono({ 
-  weight: ['400', '500'],
-  subsets: ['latin'],
-  variable: '--font-mono',
-  display: 'swap',
+  variable: '--font-geist-mono',
 })
 
 export const metadata: Metadata = {
@@ -100,11 +91,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${crimsonText.variable} ${ebGaramond.variable} ${ibmPlexMono.variable}`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>
         <StructuredData />
       </head>
-      <body className="font-serif antialiased">
+      <body className="font-sans antialiased">
         <I18nProvider>
           {children}
         </I18nProvider>

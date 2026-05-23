@@ -4,7 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { SkillSubmitForm, SubmitFormData } from '@/components/skill-submit-form'
 import { useI18n } from '@/lib/i18n/context'
-import { LanguageSwitcher } from '@/components/language-switcher'
+import { SiteFooter } from '@/components/site-footer'
+import { SiteHeader } from '@/components/site-header'
 
 export default function SubmitPage() {
   const { t } = useI18n()
@@ -35,32 +36,7 @@ export default function SubmitPage() {
   if (submitted && reviewResult) {
     return (
       <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b border-border bg-background">
-          <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
-            <div className="flex items-baseline justify-between">
-              <Link href="/" className="flex items-center gap-2 hover:opacity-60 transition-opacity">
-                <span className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-foreground rounded-full flex items-center justify-center font-display font-bold text-xs sm:text-sm">
-                  O
-                </span>
-                <span className="text-xl sm:text-2xl font-display font-bold text-foreground">
-                  Open Agent Skill
-                </span>
-              </Link>
-              <div className="flex items-center gap-4 sm:gap-6">
-                <nav className="flex gap-3 sm:gap-6 text-xs sm:text-sm">
-                  <Link href="/skills" className="text-secondary hover:text-foreground">
-                    {t.nav.skills}
-                  </Link>
-                  <Link href="/docs" className="text-secondary hover:text-foreground">
-                    {t.nav.docs}
-                  </Link>
-                </nav>
-                <LanguageSwitcher />
-              </div>
-            </div>
-          </div>
-        </header>
+        <SiteHeader />
 
         {/* Result */}
         <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
@@ -158,38 +134,14 @@ export default function SubmitPage() {
             )}
           </div>
         </main>
+        <SiteFooter />
       </div>
     )
   }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-background">
-        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
-          <div className="flex items-baseline justify-between">
-            <Link href="/" className="flex items-center gap-2 hover:opacity-60 transition-opacity">
-              <span className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-foreground rounded-full flex items-center justify-center font-display font-bold text-xs sm:text-sm">
-                O
-              </span>
-              <span className="text-xl sm:text-2xl font-display font-bold text-foreground">
-                Open Agent Skill
-              </span>
-            </Link>
-            <div className="flex items-center gap-3 sm:gap-6">
-              <nav className="hidden sm:flex gap-6 text-sm">
-                <Link href="/skills" className="text-secondary hover:text-foreground">
-                  {t.nav.skills}
-                </Link>
-                <Link href="/docs" className="text-secondary hover:text-foreground">
-                  {t.nav.docs}
-                </Link>
-              </nav>
-              <LanguageSwitcher />
-            </div>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
@@ -214,6 +166,7 @@ export default function SubmitPage() {
           </ul>
         </div>
       </main>
+      <SiteFooter />
     </div>
   )
 }

@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getSkillBySlug, convertSkillRecordToManifest, getRelatedSkills } from '@/lib/db/skills'
 import { InstallCommand } from '@/components/install-command'
+import { SiteFooter } from '@/components/site-footer'
+import { SiteHeader } from '@/components/site-header'
 
 export const dynamic = 'force-dynamic'
 
@@ -125,24 +127,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      {/* Header */}
-      <header className="border-b border-border">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
-          <div className="flex items-baseline justify-between">
-            <Link href="/" className="flex items-center gap-2 hover:opacity-60 transition-opacity">
-              <span className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-foreground rounded-full flex items-center justify-center font-display font-bold text-xs">
-                O
-              </span>
-              <span className="text-xl sm:text-2xl font-display font-bold">Open Agent Skill</span>
-            </Link>
-            <nav className="flex gap-4 sm:gap-6 text-xs sm:text-sm">
-              <Link href="/skills" className="text-secondary hover:text-foreground">Browse</Link>
-              <Link href="/submit" className="text-secondary hover:text-foreground">Submit</Link>
-              <Link href="/docs" className="text-secondary hover:text-foreground">Docs</Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Breadcrumb */}
@@ -306,7 +291,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="sticky top-6 space-y-5">
+            <div className="sticky top-24 space-y-5">
               {/* Install card */}
               <div className="border border-border p-5">
                 <h3 className="font-display text-lg font-semibold mb-3">Install</h3>
@@ -423,13 +408,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
         </div>
       </main>
 
-      <footer className="border-t border-border mt-20">
-        <div className="max-w-5xl mx-auto px-6 py-12">
-          <p className="text-center text-sm text-secondary">
-            Open Agent Skill © 2026 · Built with care for the agent community
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

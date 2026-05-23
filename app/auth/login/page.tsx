@@ -31,7 +31,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <Link href="/" className="block text-center font-display text-lg font-bold tracking-tight mb-8 hover:opacity-70 transition-opacity">
-          OPEN AGENT SKILL
+          OpenAgentSkill
         </Link>
 
         <h1 className="font-display text-2xl font-bold mb-1">Sign in</h1>

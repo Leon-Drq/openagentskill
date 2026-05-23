@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
+import { SiteFooter } from './site-footer'
+import { SiteHeader } from './site-header'
 
 interface PointEvent {
   id: string
@@ -64,17 +66,7 @@ export function ProfileClient({ user, profile, totalPoints, pointEvents, bookmar
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Nav */}
-      <nav className="border-b border-border">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-display text-lg font-bold tracking-tight hover:opacity-70 transition-opacity">
-            OPEN AGENT SKILL
-          </Link>
-          <button onClick={handleSignOut} className="text-sm text-secondary hover:text-foreground transition-colors">
-            Sign out
-          </button>
-        </div>
-      </nav>
+      <SiteHeader />
 
       <main className="max-w-4xl mx-auto px-6 py-12">
         {/* Header */}
@@ -87,6 +79,9 @@ export function ProfileClient({ user, profile, totalPoints, pointEvents, bookmar
           <div className="text-right">
             <div className="font-display text-4xl font-bold">{totalPoints.toLocaleString()}</div>
             <div className="text-xs uppercase tracking-widest text-secondary mt-0.5">points</div>
+            <button onClick={handleSignOut} className="mt-3 text-xs text-secondary hover:text-foreground transition-colors">
+              Sign out
+            </button>
           </div>
         </div>
 
@@ -223,6 +218,7 @@ export function ProfileClient({ user, profile, totalPoints, pointEvents, bookmar
           </div>
         )}
       </main>
+      <SiteFooter />
     </div>
   )
 }

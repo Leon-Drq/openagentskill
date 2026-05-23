@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { SiteFooter } from '@/components/site-footer'
+import { SiteHeader } from '@/components/site-header'
 import { getBlogHubData, getBlogPosts, type BlogSkillPreview } from '@/lib/blog/generate'
 
 export const dynamic = 'force-dynamic'
@@ -67,28 +69,8 @@ export default async function BlogPage() {
   const featureSkill = hub.topRecentSkills[0] || hub.latestSkills[0]
 
   return (
-    <div className="min-h-screen bg-background font-serif">
-      <header className="border-b border-border">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link
-            href="/"
-            className="font-display font-bold text-sm tracking-wide uppercase text-foreground hover:text-secondary transition-colors"
-          >
-            Open Agent Skill
-          </Link>
-          <nav className="flex items-center gap-6 text-sm text-secondary">
-            <Link href="/skills" className="hover:text-foreground transition-colors">
-              Skills
-            </Link>
-            <Link href="/blog" className="text-foreground font-medium">
-              Blog
-            </Link>
-            <Link href="/submit" className="hover:text-foreground transition-colors">
-              Submit
-            </Link>
-          </nav>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
 
       <main className="max-w-5xl mx-auto px-6 py-14">
         <section className="border-b border-border pb-12">
@@ -247,6 +229,7 @@ export default async function BlogPage() {
           )}
         </section>
       </main>
+      <SiteFooter />
     </div>
   )
 }

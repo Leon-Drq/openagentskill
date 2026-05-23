@@ -155,7 +155,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
             onChange={(e) => handleRepoChange(e.target.value)}
             onBlur={handleRepoBlur}
             placeholder={t.submitPage.form.repositoryPlaceholder}
-            className="w-full border border-border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-serif focus:border-foreground focus:outline-none pr-24"
+            className="w-full border border-border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:border-foreground focus:outline-none pr-24"
             required
           />
           {repoStars !== null && repoValid === true && (
@@ -192,7 +192,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
           id="category"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="w-full border border-border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-serif focus:border-foreground focus:outline-none"
+          className="w-full border border-border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:border-foreground focus:outline-none"
           required
         >
           <option value="">{t.submitPage.form.categoryPlaceholder}</option>
@@ -222,7 +222,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
               }
             }}
             placeholder={t.submitPage.form.tagsPlaceholder}
-            className="flex-1 border border-border bg-background px-3 sm:px-4 py-2 text-xs sm:text-sm font-serif focus:border-foreground focus:outline-none"
+            className="flex-1 border border-border bg-background px-3 sm:px-4 py-2 text-xs sm:text-sm focus:border-foreground focus:outline-none"
           />
           <button
             type="button"

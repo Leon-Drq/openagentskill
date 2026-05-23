@@ -5,21 +5,27 @@ import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useI18n } from '@/lib/i18n/context'
+import { cn } from '@/lib/utils'
+
+const navItems = [
+  { href: '/', labelKey: 'home', exact: true },
+  { href: '/skills', labelKey: 'skills' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/docs', labelKey: 'docs' },
+  { href: '/api-docs', labelKey: 'apiDocs' },
+  { href: '/activity', labelKey: 'activity' },
+  { href: '/submit', labelKey: 'submit' },
+] as const
+
+function isActivePath(pathname: string, href: string, exact?: boolean) {
+  if (exact) return pathname === href
+  return pathname === href || pathname.startsWith(`${href}/`)
+}
 
 export function MobileNav() {
   const { t } = useI18n()
   const [isOpen, setIsOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  // Close menu when route changes
-  useEffect(() => {
-    setIsOpen(false)
-  }, [pathname])
 
   // Prevent body scroll when menu is open (lock both html and body for iOS Safari)
   useEffect(() => {
@@ -37,8 +43,7 @@ export function MobileNav() {
   }, [isOpen])
 
   return (
-    <div className="md:hidden">
-      {/* Hamburger Button */}
+    <div className="lg:hidden">
       <button
         onClick={() => setIsOpen(true)}
         className="p-2 -mr-2 text-secondary hover:text-foreground transition-colors"
@@ -59,16 +64,18 @@ export function MobileNav() {
         </svg>
       </button>
 
-      {/* Full-screen Menu Overlay — rendered via portal to escape parent stacking context */}
-      {mounted && isOpen && createPortal(
+      {/* Render through a portal so the overlay is not clipped by the sticky header. */}
+      {isOpen && typeof document !== 'undefined' && createPortal(
         <div
           className="fixed inset-0 overflow-y-auto bg-background"
           style={{ zIndex: 9999 }}
         >
-          {/* Menu Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-            <span className="font-semibold text-base text-foreground">
-              Open Agent Skill
+            <span className="flex items-center gap-2 font-display text-base font-semibold text-foreground">
+              <span className="flex h-7 w-7 items-center justify-center border border-foreground text-sm leading-none">
+                O
+              </span>
+              OpenAgentSkill
             </span>
             <button
               onClick={() => setIsOpen(false)}
@@ -80,60 +87,32 @@ export function MobileNav() {
               </svg>
             </button>
           </div>
-          {/* Navigation Links */}
           <nav className="px-6 py-8">
             <ul className="space-y-1">
-              <li>
-                <Link
-                  href="/skills"
-                  onClick={() => setIsOpen(false)}
-                  className={`block py-4 text-xl transition-colors ${pathname === '/skills' ? 'text-foreground font-medium' : 'text-secondary'}`}
-                >
-                  {t.nav.skills}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/blog"
-                  onClick={() => setIsOpen(false)}
-                  className={`block py-4 text-xl transition-colors ${pathname === '/blog' || pathname.startsWith('/blog/') ? 'text-foreground font-medium' : 'text-secondary'}`}
-                >
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/submit"
-                  onClick={() => setIsOpen(false)}
-                  className={`block py-4 text-xl transition-colors ${pathname === '/submit' ? 'text-foreground font-medium' : 'text-secondary'}`}
-                >
-                  {t.nav.submit}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/docs"
-                  onClick={() => setIsOpen(false)}
-                  className={`block py-4 text-xl transition-colors ${pathname === '/docs' ? 'text-foreground font-medium' : 'text-secondary'}`}
-                >
-                  {t.nav.docs}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/activity"
-                  onClick={() => setIsOpen(false)}
-                  className={`block py-4 text-xl transition-colors ${pathname === '/activity' ? 'text-foreground font-medium' : 'text-secondary'}`}
-                >
-                  {t.nav.activity}
-                </Link>
-              </li>
+              {navItems.map((item) => {
+                const active = isActivePath(pathname, item.href, 'exact' in item ? item.exact : false)
+                const label = 'label' in item ? item.label : t.nav[item.labelKey]
+
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className={cn(
+                        'block py-4 text-xl transition-colors',
+                        active ? 'font-medium text-foreground' : 'text-secondary hover:text-foreground'
+                      )}
+                      aria-current={active ? 'page' : undefined}
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                )
+              })}
             </ul>
 
-            {/* Divider */}
             <div className="my-8 border-t border-border" />
 
-            {/* External Links */}
             <ul className="space-y-1">
               <li>
                 <a

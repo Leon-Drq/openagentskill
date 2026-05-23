@@ -1,10 +1,10 @@
 'use client'
 
-import Link from 'next/link'
 import { useI18n } from '@/lib/i18n/context'
 import type { ActivityRecord } from '@/lib/db/activity'
 import { ActivityFeed } from './activity-feed'
-import { LanguageSwitcher } from './language-switcher'
+import { SiteFooter } from './site-footer'
+import { SiteHeader } from './site-header'
 
 interface ActivityPageClientProps {
   activities: ActivityRecord[]
@@ -15,44 +15,7 @@ export function ActivityPageClient({ activities }: ActivityPageClientProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="flex items-center gap-2 hover:opacity-60 transition-opacity">
-              <span className="hidden sm:flex w-6 h-6 border-2 border-foreground rounded-full items-center justify-center font-display font-bold text-sm">
-                O
-              </span>
-              <span className="font-display text-base sm:text-lg lg:text-xl font-semibold">
-                Open Agent Skill
-              </span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <nav className="hidden sm:flex gap-1">
-              <Link
-                href="/"
-                className="px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity"
-              >
-                {t.nav.home}
-              </Link>
-              <Link
-                href="/skills"
-                className="px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity"
-              >
-                {t.nav.skills}
-              </Link>
-              <Link
-                href="/submit"
-                className="px-2 sm:px-3 lg:px-4 py-1.5 text-xs sm:text-sm hover:opacity-60 transition-opacity"
-              >
-                {t.nav.submit}
-              </Link>
-            </nav>
-            <LanguageSwitcher />
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Content */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
@@ -90,6 +53,7 @@ export function ActivityPageClient({ activities }: ActivityPageClientProps) {
           </p>
         </div>
       </main>
+      <SiteFooter />
     </div>
   )
 }

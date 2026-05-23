@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
-import Link from 'next/link'
+import { SiteFooter } from '@/components/site-footer'
+import { SiteHeader } from '@/components/site-header'
 
 export const metadata: Metadata = {
   title: 'API Reference - Open Agent Skill',
@@ -9,27 +10,7 @@ export const metadata: Metadata = {
 export default function APIDocsPage() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-background">
-        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
-          <div className="flex items-baseline justify-between">
-            <Link href="/" className="flex items-center gap-2 hover:opacity-60 transition-opacity">
-              <span className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-foreground rounded-full flex items-center justify-center font-display font-bold text-xs sm:text-sm">O</span>
-              <span className="text-xl sm:text-2xl font-display font-bold text-foreground">{'Open Agent Skill'}</span>
-            </Link>
-            <nav className="flex gap-3 sm:gap-6 text-xs sm:text-sm">
-              <Link href="/skills" className="text-secondary hover:text-foreground">
-                {'Skills'}
-              </Link>
-              <Link href="/docs" className="text-secondary hover:text-foreground">
-                {'Docs'}
-              </Link>
-              <Link href="/api-docs" className="text-foreground underline">
-                {'API'}
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="container mx-auto px-4 sm:px-6 max-w-4xl py-8 sm:py-12 lg:py-16">
         <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
@@ -391,15 +372,7 @@ openclaw publish --target openagentskill --repo owner/my-skill`}</code>
         </section>
       </main>
 
-      <footer className="border-t border-border bg-background mt-12 sm:mt-20">
-        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="text-xs sm:text-sm text-secondary">
-              {'Open Agent Skill API • Built for agents, by agents'}
-            </p>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

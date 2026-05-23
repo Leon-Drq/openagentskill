@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { SiteFooter } from '@/components/site-footer'
+import { SiteHeader } from '@/components/site-header'
 import { getBlogPostBySlug } from '@/lib/blog/generate'
 
 export async function generateMetadata({
@@ -92,25 +94,13 @@ export default async function BlogPostPage({
   }
 
   return (
-    <div className="min-h-screen bg-background font-serif">
+    <div className="min-h-screen bg-background">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      {/* Header */}
-      <header className="border-b border-border">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-display font-bold text-sm tracking-wide uppercase text-foreground hover:text-secondary transition-colors">
-            Open Agent Skill
-          </Link>
-          <nav className="flex items-center gap-6 text-sm text-secondary">
-            <Link href="/skills" className="hover:text-foreground transition-colors">Skills</Link>
-            <Link href="/blog" className="hover:text-foreground transition-colors">Blog</Link>
-            <Link href="/submit" className="hover:text-foreground transition-colors">Submit</Link>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="max-w-4xl mx-auto px-6 py-12">
         {/* Breadcrumb */}
@@ -183,6 +173,7 @@ export default async function BlogPostPage({
           </Link>
         </div>
       </main>
+      <SiteFooter />
     </div>
   )
 }
