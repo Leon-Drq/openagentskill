@@ -15,10 +15,106 @@ export interface BlogGenerateResult {
   reason?: string
 }
 
+export interface BlogSkillPreview {
+  slug: string
+  name: string
+  description: string
+  category: string
+  tags: string[]
+  github_repo: string
+  github_stars: number
+  created_at: string
+  quality_score: number
+  author_name: string
+}
+
+export interface BlogHubData {
+  totalSkills: number
+  recentLaunchCount: number
+  launchWindowHours: number
+  latestSkills: BlogSkillPreview[]
+  topRecentSkills: BlogSkillPreview[]
+  categoryHighlights: Array<{ category: string; count: number }>
+}
+
+interface BlogSkillRow extends BlogSkillPreview {
+  long_description: string | null
+  tagline: string | null
+  frameworks: string[]
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function buildBlogSlug(skillSlug: string): string {
   return `introducing-${skillSlug}`
+}
+
+function isMcpText(value: string) {
+  return /(^|[^a-z0-9])mcp([^a-z0-9]|$)/i.test(value) || /\bmodel context protocol\b/i.test(value)
+}
+
+export function isBlogMcpSkillRecord(record: {
+  name?: string | null
+  description?: string | null
+  long_description?: string | null
+  tagline?: string | null
+  category?: string | null
+  tags?: string[] | null
+  frameworks?: string[] | null
+  github_repo?: string | null
+}) {
+  const text = [
+    record.name,
+    record.description,
+    record.long_description,
+    record.tagline,
+    record.category,
+    record.github_repo,
+    ...(record.tags || []),
+    ...(record.frameworks || []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  return isMcpText(text)
+}
+
+function toSkillPreview(row: BlogSkillRow): BlogSkillPreview {
+  return {
+    slug: row.slug,
+    name: row.name,
+    description: row.description,
+    category: row.category,
+    tags: row.tags || [],
+    github_repo: row.github_repo,
+    github_stars: Number(row.github_stars || 0),
+    created_at: row.created_at,
+    quality_score: Number(row.quality_score || 0),
+    author_name: row.author_name,
+  }
+}
+
+async function fetchApprovedSkillRows() {
+  const supabase = createPublicClient()
+  const rows: BlogSkillRow[] = []
+
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await supabase
+      .from('skills')
+      .select(`
+        slug, name, description, long_description, tagline, category, tags, frameworks,
+        github_repo, github_stars, created_at, quality_score, author_name
+      `)
+      .eq('ai_review_approved', true)
+      .order('created_at', { ascending: false })
+      .range(from, from + 999)
+
+    if (error) throw new Error(error.message)
+    rows.push(...((data || []) as BlogSkillRow[]))
+    if (!data || data.length < 1000) break
+  }
+
+  return rows.filter((row) => !isBlogMcpSkillRecord(row))
 }
 
 // ─── AI Content Generator ─────────────────────────────────────────────────────
@@ -34,9 +130,9 @@ async function generateBlogContent(skill: {
   author_name: string
   install_command: string | null
 }): Promise<{ title: string; summary: string; content: string }> {
-  const prompt = `You are a technical writer for Open Agent Skill (openagentskill.com), the open marketplace for AI agent skills.
+  const prompt = `You are the editorial voice for OpenAgentSkill Update, a practical dispatch for developers building AI agents.
 
-Write an engaging blog post introducing this skill to developers:
+Write a scenario-driven blog post introducing this skill to developers:
 
 Skill Name: ${skill.name}
 Description: ${skill.description}
@@ -52,27 +148,28 @@ ${(skill.long_description || '').slice(0, 1200)}
 
 Write a blog post in Markdown with this exact structure:
 
-## What is ${skill.name}?
-(2-3 sentences explaining what it does and why it matters for AI agents)
+## Where this fits
+(2-3 sentences explaining the developer workflow or user problem this skill helps with)
 
-## Key Features
-(3-5 bullet points of standout features)
+## Why agents benefit
+(3-5 bullets describing concrete agent capabilities, not generic features)
 
-## Use Cases
-(3 real-world use cases with brief explanations, written as subheadings)
+## Practical scenarios
+(3 real-world scenarios with brief explanations, written as subheadings)
 
-## Quick Start
-(Installation and basic usage code example using the install command)
+## Add it to your agent workflow
+(Installation and a small usage example using the install command)
 
-## Why We Love It
-(1 paragraph on why this skill is worth using, mention stars/community if notable)
+## Why it is worth tracking
+(1 paragraph on quality signals, community momentum, and when to evaluate it)
 
 Rules:
 - Write in English, clear and concise
 - Code blocks must use proper markdown fencing with language tags
 - Do NOT include a top-level H1 title (it will be added separately)
 - Keep the total length between 400-600 words
-- Be enthusiastic but accurate
+- Be useful and specific. Avoid hype, vague claims, and feature-list padding.
+- Mention OpenAgentSkill only when it adds context.
 
 Respond with JSON only:
 {"title":"Blog post title (max 60 chars)","summary":"One sentence meta description (max 155 chars)","content":"Full markdown content"}`
@@ -139,8 +236,8 @@ export async function generateBlogPostForSkill(skillId: string): Promise<BlogGen
     if (insertError) throw new Error(`DB insert failed: ${insertError.message}`)
 
     return { success: true, slug: blogSlug }
-  } catch (error: any) {
-    return { success: false, reason: error.message }
+  } catch (error: unknown) {
+    return { success: false, reason: error instanceof Error ? error.message : 'Blog generation failed' }
   }
 }
 
@@ -174,4 +271,34 @@ export async function getBlogPostBySlug(slug: string) {
 
   if (error) return null
   return data
+}
+
+export async function getBlogHubData(): Promise<BlogHubData> {
+  const rows = await fetchApprovedSkillRows()
+  const previews = rows.map(toSkillPreview)
+  const launchWindowHours = 24
+  const recentCutoff = Date.now() - launchWindowHours * 60 * 60 * 1000
+  const recentSkills = previews.filter((skill) => new Date(skill.created_at).getTime() >= recentCutoff)
+  const categoryCounts = new Map<string, number>()
+
+  for (const skill of previews) {
+    if (!skill.category) continue
+    categoryCounts.set(skill.category, (categoryCounts.get(skill.category) || 0) + 1)
+  }
+
+  return {
+    totalSkills: previews.length,
+    recentLaunchCount: recentSkills.length,
+    launchWindowHours,
+    latestSkills: recentSkills
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 8),
+    topRecentSkills: recentSkills
+      .sort((a, b) => b.github_stars - a.github_stars)
+      .slice(0, 8),
+    categoryHighlights: [...categoryCounts.entries()]
+      .map(([category, count]) => ({ category, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8),
+  }
 }

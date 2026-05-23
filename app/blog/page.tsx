@@ -1,18 +1,27 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getBlogPosts } from '@/lib/blog/generate'
+import { getBlogHubData, getBlogPosts, type BlogSkillPreview } from '@/lib/blog/generate'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Blog - AI Agent Skill Updates & Guides',
-  description: 'Latest AI agent skill introductions, tutorials, and updates from Open Agent Skill.',
+  title: 'OpenAgentSkill Update - AI Agent Skill Guides & Launch Notes',
+  description:
+    'OpenAgentSkill Update tracks newly indexed AI agent skills, practical developer workflows, and high-star tools from the agent ecosystem.',
   alternates: {
     canonical: 'https://www.openagentskill.com/blog',
   },
   openGraph: {
-    title: 'Blog — Open Agent Skill',
-    description: 'Latest AI agent skill introductions, tutorials, and updates.',
+    title: 'OpenAgentSkill Update',
+    description: 'Launch notes, skill roundups, and practical guides for AI agent builders.',
     url: 'https://www.openagentskill.com/blog',
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'OpenAgentSkill Update',
+    description: 'Launch notes, skill roundups, and practical guides for AI agent builders.',
+    images: ['/opengraph-image'],
   },
 }
 
@@ -24,91 +33,219 @@ function formatDate(dateStr: string) {
   })
 }
 
+function formatStars(stars: number) {
+  if (stars >= 1000) return `${(stars / 1000).toFixed(stars >= 10000 ? 0 : 1)}K`
+  return stars.toLocaleString()
+}
+
+function SkillLink({ skill }: { skill: BlogSkillPreview }) {
+  return (
+    <Link
+      href={`/skills/${skill.slug}`}
+      className="group block border-b border-border py-4 transition-colors hover:border-foreground"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="font-display text-lg font-semibold text-foreground group-hover:text-secondary">
+              {skill.name}
+            </h3>
+            <span className="text-xs font-mono text-secondary">{formatStars(skill.github_stars)} stars</span>
+          </div>
+          <p className="mt-1 text-sm leading-relaxed text-secondary line-clamp-2">{skill.description}</p>
+        </div>
+        <span className="shrink-0 text-xs uppercase tracking-widest text-secondary border border-border px-2 py-1">
+          {skill.category === 'chinese' ? 'ZH' : skill.category}
+        </span>
+      </div>
+    </Link>
+  )
+}
+
 export default async function BlogPage() {
-  const posts = await getBlogPosts(30)
+  const [posts, hub] = await Promise.all([getBlogPosts(30), getBlogHubData()])
+  const featureSkill = hub.topRecentSkills[0] || hub.latestSkills[0]
 
   return (
     <div className="min-h-screen bg-background font-serif">
-      {/* Header */}
       <header className="border-b border-border">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-display font-bold text-sm tracking-wide uppercase text-foreground hover:text-secondary transition-colors">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link
+            href="/"
+            className="font-display font-bold text-sm tracking-wide uppercase text-foreground hover:text-secondary transition-colors"
+          >
             Open Agent Skill
           </Link>
           <nav className="flex items-center gap-6 text-sm text-secondary">
-            <Link href="/skills" className="hover:text-foreground transition-colors">Skills</Link>
-            <Link href="/blog" className="text-foreground font-medium">Blog</Link>
-            <Link href="/submit" className="hover:text-foreground transition-colors">Submit</Link>
+            <Link href="/skills" className="hover:text-foreground transition-colors">
+              Skills
+            </Link>
+            <Link href="/blog" className="text-foreground font-medium">
+              Blog
+            </Link>
+            <Link href="/submit" className="hover:text-foreground transition-colors">
+              Submit
+            </Link>
           </nav>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-16">
-        {/* Page Title */}
-        <div className="mb-12 border-b border-border pb-8">
-          <p className="text-xs uppercase tracking-widest text-secondary mb-3">Editorial</p>
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground text-balance">
-            Skill Journal
-          </h1>
-          <p className="mt-4 text-secondary text-lg leading-relaxed">
-            AI-generated introductions and guides for every new skill added to the marketplace.
-          </p>
-        </div>
+      <main className="max-w-5xl mx-auto px-6 py-14">
+        <section className="border-b border-border pb-12">
+          <p className="text-xs uppercase tracking-widest text-secondary mb-4">OpenAgentSkill Update</p>
+          <div className="grid gap-10 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
+            <div>
+              <h1 className="font-display text-4xl md:text-6xl font-bold text-foreground text-balance leading-tight">
+                New skills, practical workflows, and agent-builder notes.
+              </h1>
+              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
+                The blog now follows the marketplace itself: launch batches, high-signal skill picks, and guides
+                written around real developer scenarios.
+              </p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Link
+                  href="/skills?sort=new"
+                  className="border border-foreground bg-foreground px-5 py-2 text-sm text-background transition-colors hover:bg-background hover:text-foreground"
+                >
+                  Browse New Arrivals
+                </Link>
+                <Link
+                  href="/skills?sort=stars"
+                  className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                >
+                  Most Starred
+                </Link>
+              </div>
+            </div>
 
-        {/* Posts */}
-        {posts.length === 0 ? (
-          <div className="text-center py-24">
-            <p className="text-secondary text-lg">No posts yet. New skills will appear here automatically.</p>
-            <Link href="/skills" className="mt-6 inline-block border border-foreground px-6 py-3 text-sm hover:bg-foreground hover:text-background transition-colors">
-              Browse Skills
+            <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
+              <div className="bg-background p-4">
+                <div className="font-mono text-2xl text-foreground">{hub.totalSkills.toLocaleString()}</div>
+                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Skills</div>
+              </div>
+              <div className="bg-background p-4">
+                <div className="font-mono text-2xl text-foreground">{hub.recentLaunchCount.toLocaleString()}</div>
+                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Last 24h</div>
+              </div>
+              <div className="bg-background p-4">
+                <div className="font-mono text-2xl text-foreground">{hub.categoryHighlights.length}</div>
+                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Tracks</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {featureSkill && (
+          <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-secondary mb-3">Launch Desk</p>
+              <h2 className="font-display text-2xl font-bold text-foreground">The latest batch is live.</h2>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
+                {hub.recentLaunchCount.toLocaleString()} new high-star skills were added in the last {hub.launchWindowHours}{' '}
+                hours, led by {featureSkill.name} and other agent, automation, RAG, and developer-tool projects.
+              </p>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2">
+              <div>
+                <h3 className="mb-2 text-xs uppercase tracking-widest text-secondary">Top by stars</h3>
+                {hub.topRecentSkills.slice(0, 4).map((skill) => (
+                  <SkillLink key={skill.slug} skill={skill} />
+                ))}
+              </div>
+              <div>
+                <h3 className="mb-2 text-xs uppercase tracking-widest text-secondary">Newest indexed</h3>
+                {hub.latestSkills.slice(0, 4).map((skill) => (
+                  <SkillLink key={skill.slug} skill={skill} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-secondary mb-3">Explore by use case</p>
+            <h2 className="font-display text-2xl font-bold text-foreground">Find the right workflow faster.</h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {hub.categoryHighlights.map((item) => (
+              <Link
+                key={item.category}
+                href={`/skills?category=${encodeURIComponent(item.category)}`}
+                className="border border-border px-3 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+              >
+                {item.category === 'chinese' ? 'Chinese' : item.category}
+                <span className="ml-2 font-mono text-xs">{item.count}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="py-10">
+          <div className="mb-6 flex items-end justify-between gap-6">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-secondary mb-3">Field Notes</p>
+              <h2 className="font-display text-2xl font-bold text-foreground">Latest guides</h2>
+            </div>
+            <Link href="/skills?sort=quality" className="text-sm text-secondary underline underline-offset-2 hover:text-foreground">
+              Browse quality ranking
             </Link>
           </div>
-        ) : (
-          <div className="divide-y divide-border">
-            {posts.map((post) => {
-              const skill = Array.isArray(post.skills) ? post.skills[0] : post.skills
-              return (
-                <article key={post.id} className="py-8 group">
-                  <div className="flex items-start gap-6">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        {skill?.category && (
-                          <span className="text-xs uppercase tracking-widest text-secondary border border-border px-2 py-0.5">
-                            {skill.category === 'chinese' ? '中文' : skill.category}
-                          </span>
-                        )}
-                        <time className="text-xs text-secondary">
-                          {formatDate(post.published_at)}
-                        </time>
-                      </div>
-                      <Link href={`/blog/${post.slug}`}>
-                        <h2 className="font-display text-xl font-bold text-foreground group-hover:text-secondary transition-colors text-balance leading-snug mb-2">
-                          {post.title}
-                        </h2>
-                      </Link>
-                      <p className="text-secondary leading-relaxed text-sm line-clamp-2">
-                        {post.summary}
-                      </p>
-                      <div className="mt-3 flex items-center gap-4 text-xs text-secondary">
-                        {skill && (
-                          <>
-                            <span>by {skill.author_name}</span>
-                            {skill.github_stars > 0 && (
-                              <span>{skill.github_stars.toLocaleString()} stars</span>
-                            )}
-                          </>
-                        )}
-                        <Link href={`/blog/${post.slug}`} className="text-foreground hover:text-secondary transition-colors underline underline-offset-2">
-                          Read more
+
+          {posts.length === 0 ? (
+            <div className="border border-border p-8">
+              <p className="text-secondary text-lg">No guides yet. New skill notes will appear here automatically.</p>
+              <Link
+                href="/skills"
+                className="mt-6 inline-block border border-foreground px-6 py-3 text-sm hover:bg-foreground hover:text-background transition-colors"
+              >
+                Browse Skills
+              </Link>
+            </div>
+          ) : (
+            <div className="divide-y divide-border">
+              {posts.map((post) => {
+                const skill = Array.isArray(post.skills) ? post.skills[0] : post.skills
+                return (
+                  <article key={post.id} className="py-8 group">
+                    <div className="flex items-start gap-6">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2">
+                          {skill?.category && (
+                            <span className="text-xs uppercase tracking-widest text-secondary border border-border px-2 py-0.5">
+                              {skill.category === 'chinese' ? '中文' : skill.category}
+                            </span>
+                          )}
+                          <time className="text-xs text-secondary">{formatDate(post.published_at)}</time>
+                        </div>
+                        <Link href={`/blog/${post.slug}`}>
+                          <h3 className="font-display text-xl font-bold text-foreground group-hover:text-secondary transition-colors text-balance leading-snug mb-2">
+                            {post.title}
+                          </h3>
                         </Link>
+                        <p className="text-secondary leading-relaxed text-sm line-clamp-2">{post.summary}</p>
+                        <div className="mt-3 flex items-center gap-4 text-xs text-secondary">
+                          {skill && (
+                            <>
+                              <span>by {skill.author_name}</span>
+                              {skill.github_stars > 0 && <span>{skill.github_stars.toLocaleString()} stars</span>}
+                            </>
+                          )}
+                          <Link
+                            href={`/blog/${post.slug}`}
+                            className="text-foreground hover:text-secondary transition-colors underline underline-offset-2"
+                          >
+                            Read more
+                          </Link>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </article>
-              )
-            })}
-          </div>
-        )}
+                  </article>
+                )
+              })}
+            </div>
+          )}
+        </section>
       </main>
     </div>
   )

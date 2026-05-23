@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateBlogPostForSkill } from '@/lib/blog/generate'
+import { generateBlogPostForSkill, isBlogMcpSkillRecord } from '@/lib/blog/generate'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 
 export const maxDuration = 300
+
+interface BlogBatchSkill {
+  id: string
+  slug: string
+  name: string
+  description: string | null
+  long_description: string | null
+  tagline: string | null
+  category: string | null
+  tags: string[] | null
+  frameworks: string[] | null
+  github_repo: string | null
+}
 
 export async function POST(req: NextRequest) {
   if (!isAutomationAuthorized(req, ['INDEXER_SECRET'])) {
@@ -11,17 +24,17 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => ({}))
-  const { limit = 10 } = body
+  const limit = Math.min(Math.max(Number(body.limit) || 10, 1), 25)
 
   const supabase = createAdminClient()
 
   // Fetch skills that don't have a blog post yet
   const { data: skills, error } = await supabase
     .from('skills')
-    .select('id, slug, name')
+    .select('id, slug, name, description, long_description, tagline, category, tags, frameworks, github_repo')
     .eq('ai_review_approved', true)
-    .order('github_stars', { ascending: false })
-    .limit(limit)
+    .order('created_at', { ascending: false })
+    .limit(limit * 4)
 
   if (error || !skills) {
     return NextResponse.json({ error: 'Failed to fetch skills' }, { status: 500 })
@@ -32,8 +45,10 @@ export async function POST(req: NextRequest) {
     .from('blog_posts')
     .select('skill_id')
 
-  const existingSkillIds = new Set((existingPosts.data || []).map((p: any) => p.skill_id))
-  const skillsNeedingBlog = skills.filter((s: any) => !existingSkillIds.has(s.id))
+  const existingSkillIds = new Set((existingPosts.data || []).map((post: { skill_id: string | null }) => post.skill_id))
+  const skillsNeedingBlog = (skills as BlogBatchSkill[])
+    .filter((skill) => !existingSkillIds.has(skill.id) && !isBlogMcpSkillRecord(skill))
+    .slice(0, limit)
 
   const results = []
   for (const skill of skillsNeedingBlog) {
