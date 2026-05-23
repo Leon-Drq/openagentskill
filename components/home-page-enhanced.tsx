@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { useI18n } from '@/lib/i18n/context'
+import { USE_CASES } from '@/lib/use-cases'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
 
@@ -37,6 +38,8 @@ interface Recommendation {
   install: string
   reasoning: string
 }
+
+const HOME_USE_CASES = USE_CASES.slice(0, 6)
 
 function AnimatedNumber({ 
   value, 
@@ -103,12 +106,14 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
     setMounted(true)
   }, [])
 
-  const handleFindSkills = async () => {
-    if (!taskQuery.trim() || isSearching) return
+  const runRecommendation = async (query: string) => {
+    const normalizedQuery = query.trim()
+    if (!normalizedQuery || isSearching) return
+    setTaskQuery(normalizedQuery)
     setIsSearching(true)
     setShowResults(true)
     try {
-      const res = await fetch(`/api/agent/recommend?task=${encodeURIComponent(taskQuery)}&limit=3`)
+      const res = await fetch(`/api/agent/recommend?task=${encodeURIComponent(normalizedQuery)}&limit=3`)
       const data = await res.json()
       setRecommendations(data.recommendations || [])
     } catch {
@@ -116,6 +121,10 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
     } finally {
       setIsSearching(false)
     }
+  }
+
+  const handleFindSkills = async () => {
+    await runRecommendation(taskQuery)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -201,22 +210,40 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
                   {t.hero.orDescribeTask}
                 </label>
               </div>
-              <div className="flex items-stretch">
+              <div className="flex flex-col sm:flex-row sm:items-stretch">
                 <input
                   type="text"
                   value={taskQuery}
                   onChange={(e) => setTaskQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder={t.hero.taskPlaceholder}
-                  className="flex-1 bg-transparent px-4 sm:px-5 py-3 text-sm sm:text-base outline-none placeholder:text-secondary/50"
+                  className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm outline-none placeholder:text-secondary/50 sm:px-5 sm:text-base"
                 />
                 <button
                   onClick={handleFindSkills}
                   disabled={isSearching || !taskQuery.trim()}
-                  className="px-5 sm:px-8 bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 whitespace-nowrap"
+                  className="w-full border-t border-border bg-foreground px-5 py-3 text-sm font-semibold text-background transition-opacity hover:opacity-90 disabled:opacity-40 sm:w-auto sm:border-t-0 sm:px-8"
                 >
                   {isSearching ? t.hero.searching : t.hero.findSkills}
                 </button>
+              </div>
+            </div>
+
+            <div className="border-x border-b border-border bg-card px-4 py-3 sm:px-5">
+              <div className="mb-2 text-xs font-mono uppercase tracking-wider text-secondary">
+                Start from a workflow
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {HOME_USE_CASES.slice(0, 4).map((useCase) => (
+                  <button
+                    key={useCase.slug}
+                    type="button"
+                    onClick={() => runRecommendation(useCase.heroPrompt)}
+                    className="border border-border px-3 py-1.5 text-xs text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                  >
+                    {useCase.shortTitle}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -335,6 +362,34 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
               </div>
               <div className="text-xs sm:text-sm text-secondary">{t.stats.agentSubmissions}</div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-border px-4 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-8 flex flex-col justify-between gap-4 sm:mb-10 sm:flex-row sm:items-end">
+            <div>
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Use-case discovery</p>
+              <h2 className="font-display text-2xl font-bold sm:text-3xl">Browse by what your agent needs to do</h2>
+            </div>
+            <Link href="/use-cases" className="text-sm text-secondary underline underline-offset-2 transition-colors hover:text-foreground">
+              View all use cases
+            </Link>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {HOME_USE_CASES.map((useCase) => (
+              <Link
+                key={useCase.slug}
+                href={`/use-cases/${useCase.slug}`}
+                className="group border border-border bg-card p-5 transition-colors hover:border-foreground"
+              >
+                <p className="mb-3 text-xs uppercase tracking-widest text-secondary">{useCase.eyebrow}</p>
+                <h3 className="font-display text-xl font-semibold group-hover:text-secondary">{useCase.shortTitle}</h3>
+                <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-secondary">{useCase.description}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

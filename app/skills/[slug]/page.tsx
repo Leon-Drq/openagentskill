@@ -5,6 +5,7 @@ import { getSkillBySlug, convertSkillRecordToManifest, getRelatedSkills } from '
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { getUseCasesForSkill } from '@/lib/use-cases'
 
 export const dynamic = 'force-dynamic'
 
@@ -87,6 +88,24 @@ function formatNumber(n: number): string {
   return String(n)
 }
 
+function formatDate(value: string | null | undefined): string {
+  if (!value) return 'Unknown'
+  return new Date(value).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
+function formatFreshness(value: string | null | undefined): string {
+  if (!value) return 'No recent GitHub push data'
+  const days = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 86_400_000))
+  if (days === 0) return 'Pushed today'
+  if (days < 31) return `Pushed ${days}d ago`
+  if (days < 365) return `Pushed ${Math.round(days / 30)}mo ago`
+  return `Pushed ${Math.round(days / 365)}y ago`
+}
+
 export default async function SkillDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const dbSkill = await getSkillBySlug(slug)
@@ -95,6 +114,8 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
 
   const relatedSkills = await getRelatedSkills(skill.id, skill.category, 4).catch(() => [])
   const aiScore = dbSkill?.ai_review_score?.score as number | undefined
+  const matchedUseCases = dbSkill ? getUseCasesForSkill(dbSkill, 3) : []
+  const primaryUseCase = matchedUseCases[0]
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -147,7 +168,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
 
         <div className="grid gap-10 lg:grid-cols-3">
           {/* Main content */}
-          <div className="lg:col-span-2">
+          <div className="min-w-0 lg:col-span-2">
             {/* Title block */}
             <div className="mb-8">
               <div className="flex items-start gap-3 flex-wrap mb-3">
@@ -162,7 +183,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 {skill.tagline}
               </p>
               {/* Key stats row */}
-              <div className="flex flex-wrap gap-6 border-y border-border py-4 text-sm font-mono">
+              <div className="grid gap-3 border-y border-border py-4 text-sm font-mono sm:grid-cols-2">
                 <div>
                   <span className="text-secondary">Downloads </span>
                   <span className="font-semibold">{formatNumber(skill.stats.downloads)}</span>
@@ -200,6 +221,60 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 skillSlug={skill.slug}
               />
             </div>
+
+            <section className="mb-10">
+              <div className="grid gap-px border border-border bg-border md:grid-cols-3">
+                <div className="bg-background p-5">
+                  <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Best for</p>
+                  <h2 className="font-display text-xl font-semibold">
+                    {primaryUseCase?.shortTitle || skill.category}
+                  </h2>
+                  <p className="mt-3 text-sm leading-relaxed text-secondary">
+                    {primaryUseCase?.description || `Use ${skill.name} when your agent needs ${skill.category} capabilities with an installable open-source workflow.`}
+                  </p>
+                </div>
+                <div className="bg-background p-5">
+                  <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Choose it when</p>
+                  <ul className="space-y-2 text-sm leading-relaxed text-secondary">
+                    <li>You want a GitHub-backed skill with {formatNumber(skill.stats.stars)} stars.</li>
+                    <li>You need a reusable install command for agents.</li>
+                    <li>You want to compare it with related marketplace skills.</li>
+                  </ul>
+                </div>
+                <div className="bg-background p-5">
+                  <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Check before install</p>
+                  <ul className="space-y-2 text-sm leading-relaxed text-secondary">
+                    <li>{formatFreshness(dbSkill?.github_last_pushed_at)}</li>
+                    <li>License: {skill.technical.license}</li>
+                    <li>{aiScore !== undefined ? `AI review score: ${aiScore}/100` : 'Review the repository README and examples.'}</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            {matchedUseCases.length > 0 && (
+              <section className="mb-10">
+                <div className="mb-5 flex items-end justify-between gap-4">
+                  <div>
+                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Workflow fit</p>
+                    <h2 className="font-display text-2xl font-semibold">Use this skill in these scenarios</h2>
+                  </div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {matchedUseCases.map((useCase) => (
+                    <Link
+                      key={useCase.slug}
+                      href={`/use-cases/${useCase.slug}`}
+                      className="border border-border p-4 transition-colors hover:border-foreground"
+                    >
+                      <p className="text-xs uppercase tracking-widest text-secondary">{useCase.eyebrow}</p>
+                      <h3 className="mt-2 font-display text-lg font-semibold">{useCase.shortTitle}</h3>
+                      <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary">{useCase.heroPrompt}</p>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {/* Description */}
             <section className="mb-10">
@@ -290,7 +365,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1">
+          <div className="min-w-0 lg:col-span-1">
             <div className="sticky top-24 space-y-5">
               {/* Install card */}
               <div className="border border-border p-5">
@@ -356,6 +431,28 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                   </div>
                 </div>
               )}
+
+              <div className="border border-border p-5">
+                <h3 className="font-display text-lg font-semibold mb-3">Health Signals</h3>
+                <dl className="space-y-3 text-xs">
+                  <div className="flex items-center justify-between gap-4">
+                    <dt className="text-secondary">GitHub stars</dt>
+                    <dd className="font-mono">{formatNumber(skill.stats.stars)}</dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <dt className="text-secondary">Quality score</dt>
+                    <dd className="font-mono">{Math.round(skill.stats.qualityScore || aiScore || 0)}/100</dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <dt className="text-secondary">Last GitHub push</dt>
+                    <dd className="font-mono text-right">{formatDate(dbSkill?.github_last_pushed_at)}</dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <dt className="text-secondary">Framework hints</dt>
+                    <dd className="font-mono">{skill.technical.frameworks.length || 'Unknown'}</dd>
+                  </div>
+                </dl>
+              </div>
 
               {/* Trust info */}
               <div className="border border-border p-5">

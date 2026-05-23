@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 const navItems = [
   { href: '/', labelKey: 'home', exact: true },
   { href: '/skills', labelKey: 'skills' },
+  { href: '/use-cases', label: 'Use Cases' },
   { href: '/blog', label: 'Blog' },
   { href: '/docs', labelKey: 'docs' },
   { href: '/api-docs', labelKey: 'apiDocs' },

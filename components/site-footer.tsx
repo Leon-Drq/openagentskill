@@ -19,6 +19,9 @@ export function SiteFooter() {
           <Link href="/skills" className="hover:text-foreground">
             {t.nav.skills}
           </Link>
+          <Link href="/use-cases" className="hover:text-foreground">
+            Use Cases
+          </Link>
           <Link href="/blog" className="hover:text-foreground">
             Blog
           </Link>
