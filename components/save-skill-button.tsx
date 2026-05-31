@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Bookmark } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { trackSkillEvent } from '@/components/skill-event-tracker'
 import { cn } from '@/lib/utils'
 
 interface SaveSkillButtonProps {
@@ -68,7 +69,10 @@ export function SaveSkillButton({ skillSlug, compact, className }: SaveSkillButt
       const { error } = await supabase
         .from('bookmarks')
         .insert({ user_id: user.id, skill_slug: skillSlug })
-      if (!error) setSaved(true)
+      if (!error) {
+        setSaved(true)
+        trackSkillEvent(skillSlug, 'save')
+      }
     }
     setLoading(false)
   }

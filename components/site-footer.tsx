@@ -25,6 +25,9 @@ export function SiteFooter() {
           <Link href="/rankings" className="hover:text-foreground">
             Rankings
           </Link>
+          <Link href="/reports/weekly" className="hover:text-foreground">
+            Reports
+          </Link>
           <Link href="/collections" className="hover:text-foreground">
             Stacks
           </Link>

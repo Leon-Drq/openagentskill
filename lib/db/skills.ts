@@ -122,6 +122,36 @@ export interface SkillAgentStats {
   last_called_at: string | null
 }
 
+export interface SkillEventStats {
+  skill_slug: string
+  total_events: number
+  views: number
+  install_copies: number
+  saves: number
+  compares: number
+  outbound_clicks: number
+  claim_starts: number
+  claim_submits: number
+  last_event_at: string | null
+  updated_at: string
+}
+
+export interface SkillClaimRecord {
+  id: string
+  skill_slug: string
+  user_id: string
+  github_username: string
+  repo_url: string | null
+  verification_method: string
+  evidence_url: string | null
+  evidence_note: string | null
+  status: 'pending' | 'approved' | 'rejected'
+  reviewer_note: string | null
+  metadata: Record<string, unknown> | null
+  created_at: string
+  updated_at: string
+}
+
 /**
  * 获取所有 skill 的 Agent 调用统计
  * 返回以 slug 为 key 的 map
@@ -143,6 +173,45 @@ export async function getSkillStats(): Promise<Record<string, SkillAgentStats>> 
     }
   }
   return map
+}
+
+export async function getSkillEventStatsMap(): Promise<Record<string, SkillEventStats>> {
+  const supabase = createPublicClient()
+  const { data, error } = await supabase.from('skill_event_stats').select('*')
+  if (error || !data) return {}
+
+  const map: Record<string, SkillEventStats> = {}
+  for (const row of data as SkillEventStats[]) {
+    map[row.skill_slug] = row
+  }
+  return map
+}
+
+export async function getSkillEventStats(skillSlug: string): Promise<SkillEventStats | null> {
+  const supabase = createPublicClient()
+  const { data, error } = await supabase
+    .from('skill_event_stats')
+    .select('*')
+    .eq('skill_slug', skillSlug)
+    .maybeSingle()
+
+  if (error || !data) return null
+  return data as SkillEventStats
+}
+
+export async function getApprovedClaimBySkillSlug(skillSlug: string): Promise<SkillClaimRecord | null> {
+  const supabase = createPublicClient()
+  const { data, error } = await supabase
+    .from('skill_claims')
+    .select('*')
+    .eq('skill_slug', skillSlug)
+    .eq('status', 'approved')
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle()
+
+  if (error || !data) return null
+  return data as SkillClaimRecord
 }
 
 export async function getCategories(): Promise<string[]> {

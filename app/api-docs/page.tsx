@@ -63,6 +63,7 @@ export default function APIDocsPage() {
               { method: 'GET', path: '/api/agent/skills/{slug}' },
               { method: 'GET', path: '/api/agent/recommend' },
               { method: 'GET', path: '/api/agent/rankings' },
+              { method: 'GET', path: '/api/agent/weekly-report' },
               { method: 'POST', path: '/api/agent/feedback' },
               { method: 'POST', path: '/api/skills/submit' },
               { method: 'POST', path: '/api/subscribe' },
@@ -206,6 +207,28 @@ Total: 2 skills found
               </div>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
                 <code>{'GET /api/agent/rankings?slug=best-web-scraping-skills&limit=5&format=text'}</code>
+              </div>
+            </div>
+          </div>
+
+          {/* GET /api/agent/weekly-report */}
+          <div className="border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/agent/weekly-report'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Get a weekly operating report with editor picks, new skills, maintained projects, and engagement signals.'}
+              </p>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <code>{'GET /api/agent/weekly-report?format=text'}</code>
               </div>
             </div>
           </div>

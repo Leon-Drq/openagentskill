@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { InstallCommand } from '@/components/install-command'
+import { SkillEventTracker } from '@/components/skill-event-tracker'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
-import { getAllSkills, getSkillBySlug, type SkillRecord } from '@/lib/db/skills'
+import { getAllSkills, getSkillBySlug, getSkillEventStatsMap, type SkillEventStats, type SkillRecord } from '@/lib/db/skills'
 import { getStacksForSkill } from '@/lib/collections'
+import { getCompareDecisionSummary } from '@/lib/decision'
 import { formatCompactNumber, getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
@@ -49,9 +51,20 @@ export default async function ComparePage({
   const fallbackSkills = comparedSkills.length === 0
     ? (await getAllSkills('quality').catch(() => [])).slice(0, 6)
     : []
+  const eventStatsMap = comparedSkills.length
+    ? await getSkillEventStatsMap().catch(() => ({} as Record<string, SkillEventStats>))
+    : {}
+  const decisionSummary = comparedSkills.length > 0 ? getCompareDecisionSummary(comparedSkills, eventStatsMap) : null
+  const decisionBySlug = new Map(
+    decisionSummary?.ranked.map(({ skill, decision }) => [skill.slug, decision]) || []
+  )
 
   return (
     <div className="min-h-screen bg-background">
+      {comparedSkills.map((skill) => (
+        <SkillEventTracker key={skill.slug} skillSlug={skill.slug} eventType="compare" />
+      ))}
+
       <SiteHeader />
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
@@ -112,6 +125,30 @@ export default async function ComparePage({
               </Link>
             </div>
 
+            {decisionSummary && (
+              <div className="mb-6 grid gap-px border border-border bg-border md:grid-cols-3">
+                <div className="bg-background p-5 md:col-span-3">
+                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Decision summary</p>
+                  <h3 className="font-display text-2xl font-semibold">{decisionSummary.summary}</h3>
+                </div>
+                <div className="bg-background p-5">
+                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Strongest overall</p>
+                  <p className="font-display text-xl font-semibold">{decisionSummary.winner?.skill.name}</p>
+                  <p className="mt-2 text-sm text-secondary">{decisionSummary.winner?.decision.recommendation}</p>
+                </div>
+                <div className="bg-background p-5">
+                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Fastest prototype</p>
+                  <p className="font-display text-xl font-semibold">{decisionSummary.fastestPrototype?.skill.name}</p>
+                  <p className="mt-2 text-sm text-secondary">Best first install candidate based on install readiness and adoption.</p>
+                </div>
+                <div className="bg-background p-5">
+                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Freshest repo</p>
+                  <p className="font-display text-xl font-semibold">{decisionSummary.freshest?.skill.name}</p>
+                  <p className="mt-2 text-sm text-secondary">Most recent maintenance signal among this shortlist.</p>
+                </div>
+              </div>
+            )}
+
             <div className="overflow-x-auto border border-border">
               <table className="w-full min-w-[860px] border-collapse text-left text-sm">
                 <thead>
@@ -139,6 +176,19 @@ export default async function ComparePage({
                           <div className="mt-3 h-1.5 bg-muted">
                             <div className="h-full bg-foreground" style={{ width: `${quality.score}%` }} />
                           </div>
+                        </td>
+                      )
+                    })}
+                  </tr>
+                  <tr>
+                    <td className="p-4 text-xs uppercase tracking-widest text-secondary">Decision verdict</td>
+                    {comparedSkills.map((skill) => {
+                      const decision = decisionBySlug.get(skill.slug)
+                      return (
+                        <td key={skill.slug} className="p-4 align-top">
+                          <div className="font-mono text-lg">{decision?.readinessScore ?? 0}/100</div>
+                          <div className="mt-1 text-xs text-secondary">{decision?.readinessLabel}</div>
+                          <p className="mt-3 text-sm leading-relaxed text-secondary">{decision?.recommendation}</p>
                         </td>
                       )
                     })}
@@ -207,10 +257,38 @@ export default async function ComparePage({
                   <tr>
                     <td className="p-4 text-xs uppercase tracking-widest text-secondary">Warnings</td>
                     {comparedSkills.map((skill) => {
-                      const warnings = getSkillQualityProfile(skill).warnings
+                      const warnings = decisionBySlug.get(skill.slug)?.riskNotes || getSkillQualityProfile(skill).warnings
                       return (
                         <td key={skill.slug} className="p-4 align-top text-sm text-secondary">
                           {warnings.length > 0 ? warnings.slice(0, 3).join(' · ') : 'No major warning signals'}
+                        </td>
+                      )
+                    })}
+                  </tr>
+                  <tr>
+                    <td className="p-4 text-xs uppercase tracking-widest text-secondary">Best for</td>
+                    {comparedSkills.map((skill) => (
+                      <td key={skill.slug} className="p-4 align-top text-sm text-secondary">
+                        {(decisionBySlug.get(skill.slug)?.bestFor || []).slice(0, 3).join(' · ')}
+                      </td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="p-4 text-xs uppercase tracking-widest text-secondary">Not ideal for</td>
+                    {comparedSkills.map((skill) => (
+                      <td key={skill.slug} className="p-4 align-top text-sm text-secondary">
+                        {(decisionBySlug.get(skill.slug)?.notIdealFor || []).slice(0, 2).join(' · ')}
+                      </td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="p-4 text-xs uppercase tracking-widest text-secondary">OpenAgentSkill engagement</td>
+                    {comparedSkills.map((skill) => {
+                      const stats = eventStatsMap[skill.slug]
+                      return (
+                        <td key={skill.slug} className="p-4 align-top font-mono text-sm">
+                          {formatCompactNumber(stats?.views || 0)} views
+                          <div className="mt-1 text-xs text-secondary">{formatCompactNumber(stats?.install_copies || 0)} install copies</div>
                         </td>
                       )
                     })}

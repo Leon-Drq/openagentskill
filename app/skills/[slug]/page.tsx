@@ -1,13 +1,23 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getSkillBySlug, convertSkillRecordToManifest, getRelatedSkills } from '@/lib/db/skills'
+import {
+  getApprovedClaimBySkillSlug,
+  getSkillBySlug,
+  convertSkillRecordToManifest,
+  getRelatedSkills,
+  getSkillEventStats,
+} from '@/lib/db/skills'
+import { ClaimSkillPanel } from '@/components/claim-skill-panel'
 import { InstallCommand } from '@/components/install-command'
 import { SaveSkillButton } from '@/components/save-skill-button'
+import { SkillActionLink } from '@/components/skill-action-link'
+import { SkillEventTracker } from '@/components/skill-event-tracker'
 import { SkillFeedbackPanel } from '@/components/skill-feedback-panel'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { getStacksForSkill } from '@/lib/collections'
+import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
@@ -101,28 +111,24 @@ function formatDate(value: string | null | undefined): string {
   })
 }
 
-function formatFreshness(value: string | null | undefined): string {
-  if (!value) return 'No recent GitHub push data'
-  const days = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 86_400_000))
-  if (days === 0) return 'Pushed today'
-  if (days < 31) return `Pushed ${days}d ago`
-  if (days < 365) return `Pushed ${Math.round(days / 30)}mo ago`
-  return `Pushed ${Math.round(days / 365)}y ago`
-}
-
 export default async function SkillDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const dbSkill = await getSkillBySlug(slug)
   const skill = dbSkill ? convertSkillRecordToManifest(dbSkill) : null
   if (!skill) notFound()
 
-  const relatedSkills = await getRelatedSkills(skill.id, skill.category, 4).catch(() => [])
+  const [relatedSkills, eventStats, approvedClaim] = await Promise.all([
+    getRelatedSkills(skill.id, skill.category, 4).catch(() => []),
+    getSkillEventStats(skill.slug).catch(() => null),
+    getApprovedClaimBySkillSlug(skill.slug).catch(() => null),
+  ])
   const aiScore = dbSkill?.ai_review_score?.score as number | undefined
   const matchedUseCases = dbSkill ? getUseCasesForSkill(dbSkill, 3) : []
   const matchedStacks = dbSkill ? getStacksForSkill(dbSkill, 3) : []
-  const primaryUseCase = matchedUseCases[0]
   const qualityProfile = dbSkill ? getSkillQualityProfile(dbSkill) : null
   const platformHints = dbSkill ? getPlatformHints(dbSkill) : []
+  const decisionProfile = dbSkill ? getSkillDecisionProfile(dbSkill, eventStats) : null
+  const compareHref = `/compare?skills=${encodeURIComponent([skill.slug, ...relatedSkills.slice(0, 3).map((rs) => rs.slug)].join(','))}`
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -154,6 +160,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
+      <SkillEventTracker skillSlug={skill.slug} />
 
       <SiteHeader />
 
@@ -235,35 +242,45 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
               />
             </div>
 
-            <section className="mb-10">
-              <div className="grid gap-px border border-border bg-border md:grid-cols-3">
-                <div className="bg-background p-5">
-                  <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Best for</p>
-                  <h2 className="font-display text-xl font-semibold">
-                    {primaryUseCase?.shortTitle || skill.category}
-                  </h2>
-                  <p className="mt-3 text-sm leading-relaxed text-secondary">
-                    {primaryUseCase?.description || `Use ${skill.name} when your agent needs ${skill.category} capabilities with an installable open-source workflow.`}
-                  </p>
+            {decisionProfile && (
+              <section className="mb-10 border border-border p-5">
+                <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+                  <div>
+                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Decision summary</p>
+                    <h2 className="font-display text-2xl font-semibold">
+                      {decisionProfile.readinessLabel} for {decisionProfile.primaryFit}
+                    </h2>
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
+                      {decisionProfile.recommendation}
+                    </p>
+                  </div>
+                  <div className="border border-border px-4 py-3 text-center">
+                    <div className="font-mono text-3xl font-semibold">{decisionProfile.readinessScore}</div>
+                    <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Readiness</div>
+                  </div>
                 </div>
-                <div className="bg-background p-5">
-                  <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Choose it when</p>
-                  <ul className="space-y-2 text-sm leading-relaxed text-secondary">
-                    <li>You want a GitHub-backed skill with {formatNumber(skill.stats.stars)} stars.</li>
-                    <li>You need a reusable install command for agents.</li>
-                    <li>You want to compare it with related marketplace skills.</li>
-                  </ul>
+                <div className="grid gap-px border border-border bg-border md:grid-cols-3">
+                  <div className="bg-background p-4">
+                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Best for</p>
+                    <ul className="space-y-2 text-sm leading-relaxed text-secondary">
+                      {decisionProfile.bestFor.map((item) => <li key={item}>{item}</li>)}
+                    </ul>
+                  </div>
+                  <div className="bg-background p-4">
+                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Not ideal for</p>
+                    <ul className="space-y-2 text-sm leading-relaxed text-secondary">
+                      {decisionProfile.notIdealFor.map((item) => <li key={item}>{item}</li>)}
+                    </ul>
+                  </div>
+                  <div className="bg-background p-4">
+                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Risk notes</p>
+                    <ul className="space-y-2 text-sm leading-relaxed text-secondary">
+                      {decisionProfile.riskNotes.map((item) => <li key={item}>{item}</li>)}
+                    </ul>
+                  </div>
                 </div>
-                <div className="bg-background p-5">
-                  <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Check before install</p>
-                  <ul className="space-y-2 text-sm leading-relaxed text-secondary">
-                    <li>{formatFreshness(dbSkill?.github_last_pushed_at)}</li>
-                    <li>License: {skill.technical.license}</li>
-                    <li>{aiScore !== undefined ? `AI review score: ${aiScore}/100` : 'Review the repository README and examples.'}</li>
-                  </ul>
-                </div>
-              </div>
-            </section>
+              </section>
+            )}
 
             {qualityProfile && (
               <section className="mb-10 border border-border p-5">
@@ -441,32 +458,45 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 <p className="text-xs text-secondary mb-4">Free and open source</p>
                 <div className="space-y-2">
                   <SaveSkillButton skillSlug={skill.slug} />
-                  <Link
-                    href={`/compare?skills=${encodeURIComponent([skill.slug, ...relatedSkills.slice(0, 3).map((rs) => rs.slug)].join(','))}`}
+                  <SkillActionLink
+                    href={compareHref}
+                    skillSlug={skill.slug}
+                    eventType="compare"
                     className="block w-full border border-border py-2.5 text-center text-sm text-foreground hover:border-foreground transition-colors"
                   >
                     Compare Alternatives
-                  </Link>
+                  </SkillActionLink>
                   {skill.technical.repository && (
-                    <a
+                    <SkillActionLink
                       href={skill.technical.repository}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      skillSlug={skill.slug}
+                      eventType="outbound_github"
+                      external
                       className="block w-full border border-foreground bg-foreground py-2.5 text-center text-sm font-semibold text-background hover:opacity-80 transition-opacity"
                     >
                       View on GitHub
-                    </a>
+                    </SkillActionLink>
                   )}
-                  <a
+                  <SkillActionLink
                     href={skill.technical.documentation}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    skillSlug={skill.slug}
+                    eventType="outbound_docs"
+                    external
                     className="block w-full border border-border py-2.5 text-center text-sm text-foreground hover:border-foreground transition-colors"
                   >
                     Documentation
-                  </a>
+                  </SkillActionLink>
                 </div>
               </div>
+
+              <ClaimSkillPanel
+                skillSlug={skill.slug}
+                repository={skill.technical.repository}
+                approvedClaim={approvedClaim ? {
+                  github_username: approvedClaim.github_username,
+                  evidence_url: approvedClaim.evidence_url,
+                } : null}
+              />
 
               {/* Author */}
               <div className="border border-border p-5">
@@ -543,6 +573,18 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                     <dt className="text-secondary">Framework hints</dt>
                     <dd className="font-mono">{skill.technical.frameworks.length || 'Unknown'}</dd>
                   </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <dt className="text-secondary">OpenAgentSkill views</dt>
+                    <dd className="font-mono">{formatNumber(eventStats?.views || 0)}</dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <dt className="text-secondary">Install copies</dt>
+                    <dd className="font-mono">{formatNumber(eventStats?.install_copies || 0)}</dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <dt className="text-secondary">Outbound clicks</dt>
+                    <dd className="font-mono">{formatNumber(eventStats?.outbound_clicks || 0)}</dd>
+                  </div>
                 </dl>
               </div>
 
@@ -568,6 +610,12 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                     <li className="flex items-center gap-2">
                       <span className="w-4 text-center">—</span>
                       Manually verified by team
+                    </li>
+                  )}
+                  {approvedClaim && (
+                    <li className="flex items-center gap-2">
+                      <span className="w-4 text-center">—</span>
+                      Owner claim approved for @{approvedClaim.github_username}
                     </li>
                   )}
                 </ul>

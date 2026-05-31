@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { trackSkillEvent } from '@/components/skill-event-tracker'
 
 interface InstallCommandProps {
   command: string
@@ -16,6 +17,7 @@ export function InstallCommand({ command, skillSlug, compact = false }: InstallC
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(fullCommand)
+      trackSkillEvent(skillSlug, 'install_copy', { command: fullCommand })
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
