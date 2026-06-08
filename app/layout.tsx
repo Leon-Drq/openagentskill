@@ -38,19 +38,40 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  generator: 'v0.app',
   icons: {
     icon: [
       {
         url: '/favicon.ico',
-        sizes: '32x32',
+        sizes: '16x16 32x32 48x48',
+        type: 'image/x-icon',
+      },
+      {
+        url: '/favicon-48x48.png',
+        sizes: '48x48',
+        type: 'image/png',
       },
       {
         url: '/icon.svg',
         type: 'image/svg+xml',
       },
+      {
+        url: '/icon-192.png',
+        sizes: '192x192',
+        type: 'image/png',
+      },
+      {
+        url: '/icon-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+      },
     ],
-    apple: '/apple-icon.png',
+    apple: [
+      {
+        url: '/apple-icon.png',
+        sizes: '180x180',
+        type: 'image/png',
+      },
+    ],
   },
   openGraph: {
     title: 'Open Agent Skill — The Open Marketplace for AI Agent Skills',
