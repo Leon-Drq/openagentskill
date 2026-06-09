@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSkillBySlug } from '@/lib/db/skills'
 import { getStacksForSkill } from '@/lib/collections'
 import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
+import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
 /**
@@ -42,6 +43,7 @@ Technical Details:
 
 Statistics:
 - Quality Score: ${Number(skill.quality_score || 0)}
+- Trust Score: ${getSkillTrustProfile(skill).score}
 - GitHub Stars: ${skill.github_stars}
 - Downloads: ${skill.downloads}
 - Rating: ${skill.rating}/5 (${skill.review_count} reviews)
@@ -83,6 +85,7 @@ Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
         quality_score: Number(skill.quality_score || 0),
       },
       quality: getSkillQualityProfile(skill),
+      trust: getSkillTrustProfile(skill),
       quality_signals: skill.quality_signals || {},
       platforms: [...new Set([...(skill.frameworks || []), ...getPlatformHints(skill)])],
       use_cases: getUseCasesForSkill(skill, 4).map((useCase) => ({

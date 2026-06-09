@@ -7,6 +7,7 @@ import { InstallCommand } from './install-command'
 import { SaveSkillButton } from './save-skill-button'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
+import type { SkillTrustProfile } from '@/lib/trust'
 import type { UseCaseDefinition } from '@/lib/use-cases'
 
 interface AgentStats {
@@ -45,6 +46,7 @@ interface Skill {
     summary: string
     warnings: string[]
   }
+  trustProfile?: SkillTrustProfile
   platformHints?: string[]
 }
 
@@ -71,6 +73,14 @@ const STAR_OPTIONS = [
   { value: '5000', label: '5K+ stars' },
 ] as const
 
+const TRUST_OPTIONS = [
+  { key: 'all', label: 'Any trust' },
+  { key: 'production', label: 'Production candidate' },
+  { key: 'strong', label: 'Strong shortlist' },
+  { key: 'review', label: 'Manual review' },
+  { key: 'risk', label: 'High review required' },
+] as const
+
 interface Props {
   skills: Skill[]
   query?: string
@@ -82,6 +92,7 @@ interface Props {
   platform: string
   platformOptions: string[]
   quality: string
+  trust: string
   minStars: number
 }
 
@@ -96,6 +107,7 @@ export function SkillsPageClient({
   platform,
   platformOptions,
   quality,
+  trust,
   minStars,
 }: Props) {
   const router = useRouter()
@@ -217,7 +229,7 @@ export function SkillsPageClient({
             </button>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-5">
             <label className="block">
               <span className="mb-1 block text-xs text-secondary">Use case</span>
               <select
@@ -254,6 +266,19 @@ export function SkillsPageClient({
                 className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
               >
                 {QUALITY_TABS.map((item) => (
+                  <option key={item.key} value={item.key}>{item.label}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="mb-1 block text-xs text-secondary">Trust profile</span>
+              <select
+                value={trust}
+                onChange={(e) => navigate({ trust: e.target.value })}
+                className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
+              >
+                {TRUST_OPTIONS.map((item) => (
                   <option key={item.key} value={item.key}>{item.label}</option>
                 ))}
               </select>
@@ -304,12 +329,13 @@ export function SkillsPageClient({
         )}
 
         {/* Context line */}
-        <div className="mb-8 flex items-baseline justify-between">
+        <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
           <p className="text-sm text-secondary">
             {skills.length} {skills.length === 1 ? 'skill' : 'skills'}
             {query && <> matching <em>&quot;{query}&quot;</em></>}
             {category !== 'all' && <> in <em>{category}</em></>}
             {useCase !== 'all' && <> for <em>{useCases.find((item) => item.slug === useCase)?.shortTitle || useCase}</em></>}
+            {trust !== 'all' && <> with <em>{TRUST_OPTIONS.find((item) => item.key === trust)?.label || trust}</em></>}
           </p>
           <p className="text-xs text-secondary italic">{activeSort.description}</p>
         </div>
@@ -356,6 +382,11 @@ export function SkillsPageClient({
                         {skill.qualityProfile && (
                           <span className="text-xs font-mono border border-border px-2 py-0.5 text-secondary shrink-0">
                             {skill.qualityProfile.label.toUpperCase()} · {skill.qualityProfile.score}
+                          </span>
+                        )}
+                        {skill.trustProfile && (
+                          <span className="text-xs font-mono border border-border px-2 py-0.5 text-secondary shrink-0">
+                            TRUST · {skill.trustProfile.score}
                           </span>
                         )}
                       </div>
@@ -406,6 +437,11 @@ export function SkillsPageClient({
                           {Math.round(skill.stats.qualityScore)} quality
                         </span>
                       )}
+                      {skill.trustProfile && (
+                        <span title="Trust Score">
+                          {skill.trustProfile.score} trust
+                        </span>
+                      )}
                       {skill.platformHints && skill.platformHints.length > 0 && (
                         <span title="Platform fit">
                           {skill.platformHints.slice(0, 2).join(' + ')}
@@ -421,13 +457,33 @@ export function SkillsPageClient({
                       )}
                     </div>
 
-                    {skill.qualityProfile && (
-                      <div className="mb-4 max-w-2xl border-l border-border pl-3 text-xs leading-relaxed text-secondary">
-                        {skill.qualityProfile.summary}
-                        {skill.qualityProfile.warnings.length > 0 && (
-                          <span className="block mt-1">
-                            Check: {skill.qualityProfile.warnings.slice(0, 2).join(' · ')}
-                          </span>
+                    {(skill.qualityProfile || skill.trustProfile) && (
+                      <div className="mb-4 grid max-w-3xl gap-3 sm:grid-cols-2">
+                        {skill.qualityProfile && (
+                          <div className="border-l border-border pl-3 text-xs leading-relaxed text-secondary">
+                            <span className="mb-1 block font-mono text-[10px] uppercase tracking-widest text-secondary">
+                              Quality
+                            </span>
+                            {skill.qualityProfile.summary}
+                            {skill.qualityProfile.warnings.length > 0 && (
+                              <span className="mt-1 block">
+                                Check: {skill.qualityProfile.warnings.slice(0, 2).join(' · ')}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        {skill.trustProfile && (
+                          <div className="border-l border-border pl-3 text-xs leading-relaxed text-secondary">
+                            <span className="mb-1 block font-mono text-[10px] uppercase tracking-widest text-secondary">
+                              Trust
+                            </span>
+                            {skill.trustProfile.summary}
+                            {skill.trustProfile.warnings.length > 0 && (
+                              <span className="mt-1 block">
+                                Review: {skill.trustProfile.warnings.slice(0, 2).join(' · ')}
+                              </span>
+                            )}
+                          </div>
                         )}
                       </div>
                     )}

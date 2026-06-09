@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { getAllSkills, getCategories, convertSkillRecordToManifest, type SkillSortMode, getSkillStats } from '@/lib/db/skills'
 import { SkillsPageClient } from '@/components/skills-page-client'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
+import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCaseBySlug, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
 
 export const dynamic = 'force-dynamic'
@@ -31,6 +32,7 @@ export default async function SkillsPage({
     useCase?: string
     platform?: string
     quality?: string
+    trust?: string
     minStars?: string
   }>
 }) {
@@ -40,6 +42,7 @@ export default async function SkillsPage({
   const useCase = params.useCase || 'all'
   const platform = params.platform || 'all'
   const quality = params.quality || 'all'
+  const trust = params.trust || 'all'
   const minStars = Number(params.minStars || 0)
 
   const [records, categories, statsMap] = await Promise.all([
@@ -56,25 +59,38 @@ export default async function SkillsPage({
 
   const selectedUseCase = useCase !== 'all' ? getUseCaseBySlug(useCase) : undefined
 
-  let filteredRecords = records.filter((record) => {
+  const enrichedRecords = records.map((record) => {
+    const agentStats = statsMap[record.slug] || null
+    return {
+      record,
+      agentStats,
+      qualityProfile: getSkillQualityProfile(record, agentStats),
+      trustProfile: getSkillTrustProfile(record),
+      platformHints: getPlatformHints(record),
+    }
+  })
+
+  let filteredRecords = enrichedRecords.filter((item) => {
+    const { record } = item
     if (category !== 'all' && record.category !== category) return false
     if (selectedUseCase && scoreSkillForUseCase(record, selectedUseCase) < 6) return false
     if (platform !== 'all') {
       const platforms = [
         ...(record.frameworks || []),
-        ...getPlatformHints(record),
+        ...item.platformHints,
       ].map((item) => item.toLowerCase())
       if (!platforms.includes(platform.toLowerCase())) return false
     }
     if (minStars > 0 && Number(record.github_stars || 0) < minStars) return false
-    if (quality !== 'all' && getSkillQualityProfile(record, statsMap[record.slug] || null).tier !== quality) return false
+    if (quality !== 'all' && item.qualityProfile.tier !== quality) return false
+    if (trust !== 'all' && item.trustProfile.tier !== trust) return false
     return true
   })
 
   if (params.q) {
     const query = params.q.toLowerCase()
     filteredRecords = filteredRecords.filter(
-      (record) =>
+      ({ record }) =>
         record.name.toLowerCase().includes(query) ||
         record.description.toLowerCase().includes(query) ||
         (record.long_description || '').toLowerCase().includes(query) ||
@@ -84,13 +100,13 @@ export default async function SkillsPage({
     )
   }
 
-  const skills = filteredRecords.map((r) => {
-    const agentStats = statsMap[r.slug] || null
+  const skills = filteredRecords.map(({ record, agentStats, qualityProfile, platformHints, trustProfile }) => {
     return {
-      ...convertSkillRecordToManifest(r),
+      ...convertSkillRecordToManifest(record),
       agentStats,
-      qualityProfile: getSkillQualityProfile(r, agentStats),
-      platformHints: getPlatformHints(r),
+      qualityProfile,
+      platformHints,
+      trustProfile,
     }
   })
 
@@ -106,6 +122,7 @@ export default async function SkillsPage({
       platform={platform}
       platformOptions={platformOptions}
       quality={quality}
+      trust={trust}
       minStars={Number.isFinite(minStars) ? minStars : 0}
     />
   )

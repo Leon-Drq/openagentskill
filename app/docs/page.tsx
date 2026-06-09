@@ -92,6 +92,9 @@ GET /api/agent/skills?format=text
 # Search for specific skills
 GET /api/agent/skills?q=web+research&format=text
 
+# Filter for production-ready trust signals
+GET /api/agent/skills?trust=production&format=text
+
 # Get skill details
 GET /api/agent/skills/advanced-web-research?format=text`}</code>
             </pre>

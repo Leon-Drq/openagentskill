@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAllSkills, searchSkills } from '@/lib/db/skills'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
+import { getSkillTrustProfile } from '@/lib/trust'
 
 /**
  * Agent-friendly API endpoint for searching skills.
@@ -13,6 +14,7 @@ export async function GET(request: NextRequest) {
   const query = searchParams.get('q') || ''
   const category = searchParams.get('category')
   const platform = searchParams.get('platform')
+  const trust = searchParams.get('trust')
   const format = searchParams.get('format') || 'json'
   const limit = Math.min(parseInt(searchParams.get('limit') || '10', 10), 50)
 
@@ -27,6 +29,9 @@ export async function GET(request: NextRequest) {
         r.frameworks.some((f) => f.toLowerCase().includes(platform.toLowerCase()))
       )
     }
+    if (trust) {
+      records = records.filter((r) => getSkillTrustProfile(r).tier === trust)
+    }
 
     records = records.slice(0, limit)
 
@@ -34,12 +39,12 @@ export async function GET(request: NextRequest) {
       const text = records
         .map(
           (r, i) =>
-            `${i + 1}. ${r.name} (${r.slug})\n   ${r.description}\n   Quality: ${Number(r.quality_score || 0)} | Stars: ${r.github_stars} | Downloads: ${r.downloads}\n   Install: ${r.install_command || `npx skills add ${r.github_repo}`}\n   Repository: ${r.repository}\n   ---`
+            `${i + 1}. ${r.name} (${r.slug})\n   ${r.description}\n   Quality: ${Number(r.quality_score || 0)} | Trust: ${getSkillTrustProfile(r).score} | Stars: ${r.github_stars} | Downloads: ${r.downloads}\n   Install: ${r.install_command || `npx skills add ${r.github_repo}`}\n   Repository: ${r.repository}\n   ---`
         )
         .join('\n')
 
       return new NextResponse(
-        `Open Agent Skill — Search Results\nQuery: "${query}"\nFound: ${records.length} skills\n---\n${text}`,
+        `Open Agent Skill — Search Results\nQuery: "${query}"\nFound: ${records.length} skills\nTrust filter: ${trust || 'any'}\n---\n${text}`,
         {
           headers: {
             'Content-Type': 'text/plain; charset=utf-8',
@@ -51,7 +56,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       query,
-      filters: { category, platform },
+      filters: { category, platform, trust },
       total: records.length,
       skills: records.map((r) => ({
         slug: r.slug,
@@ -69,6 +74,7 @@ export async function GET(request: NextRequest) {
           quality_score: Number(r.quality_score || 0),
         },
         quality: getSkillQualityProfile(r),
+        trust: getSkillTrustProfile(r),
         quality_signals: r.quality_signals || {},
         platforms: [...new Set([...(r.frameworks || []), ...getPlatformHints(r)])],
         install: r.install_command || `npx skills add ${r.github_repo}`,

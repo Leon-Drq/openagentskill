@@ -109,6 +109,10 @@ export default function APIDocsPage() {
                   <span className="text-secondary ml-2">{'- Filter by platform'}</span>
                 </div>
                 <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'trust'}</code>
+                  <span className="text-secondary ml-2">{'- Filter by trust tier: production, strong, review, risk'}</span>
+                </div>
+                <div>
                   <code className="font-mono bg-muted px-2 py-1">{'sort'}</code>
                   <span className="text-secondary ml-2">{'- Sort by: quality, downloads, stars, trending, fresh, new'}</span>
                 </div>
@@ -120,7 +124,7 @@ export default function APIDocsPage() {
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Request'}</h3>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-4 sm:mb-6">
-                <code>{'GET /api/agent/skills?q=web+research&format=text'}</code>
+                <code>{'GET /api/agent/skills?q=web+research&trust=production&format=text'}</code>
               </div>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Response (text format)'}</h3>
@@ -134,6 +138,7 @@ Total: 2 skills found
 - Slug: advanced-web-research
 - Category: Research & Analysis
 - Install: npx skills add openagentskill/web-research
+- Trust: 91/100 Production candidate
 - Downloads: 45,230
 - Rating: 4.8/5
 - Description: Comprehensive web research with multi-source aggregation
@@ -142,6 +147,7 @@ Total: 2 skills found
 - Slug: code-review-assistant
 - Category: Developer Tools
 - Install: npx skills add openagentskill/code-review
+- Trust: 77/100 Strong shortlist
 - Downloads: 38,912
 - Rating: 4.7/5
 - Description: Automated code review with security analysis`}</code>
@@ -283,6 +289,7 @@ PLATFORMS: LangChain, LlamaIndex
 STATS:
 - Downloads: 45,230
 - Stars: 3,421
+- Trust: 91/100 Production candidate
 - Rating: 4.8/5 (423 reviews)
 
 TECHNICAL:
@@ -383,11 +390,11 @@ Content-Type: application/json
           </p>
 
           <div className="space-y-8">
-            <div className="flex gap-4 sm:gap-6">
+            <div className="flex min-w-0 gap-4 sm:gap-6">
               <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 border border-foreground flex items-center justify-center font-mono text-xs sm:text-sm font-bold">
                 {'1'}
               </div>
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <h3 className="font-semibold mb-2 text-sm sm:text-base">{'Add the webhook to your OpenClaw config'}</h3>
                 <p className="text-secondary text-sm mb-3">{'In your openclaw.config.yaml, add the submit endpoint as a publish target:'}</p>
                 <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
@@ -404,11 +411,11 @@ publish:
               </div>
             </div>
 
-            <div className="flex gap-4 sm:gap-6">
+            <div className="flex min-w-0 gap-4 sm:gap-6">
               <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 border border-foreground flex items-center justify-center font-mono text-xs sm:text-sm font-bold">
                 {'2'}
               </div>
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <h3 className="font-semibold mb-2 text-sm sm:text-base">{'OpenClaw will POST automatically when the threshold is reached'}</h3>
                 <p className="text-secondary text-sm mb-3">{'Once configured, every time a monitored repo crosses 3 stars, OpenClaw will call the submit API with the repo details. You can also trigger it manually:'}</p>
                 <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
@@ -418,11 +425,11 @@ openclaw publish --target openagentskill --repo owner/my-skill`}</code>
               </div>
             </div>
 
-            <div className="flex gap-4 sm:gap-6">
+            <div className="flex min-w-0 gap-4 sm:gap-6">
               <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 border border-foreground flex items-center justify-center font-mono text-xs sm:text-sm font-bold">
                 {'3'}
               </div>
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <h3 className="font-semibold mb-2 text-sm sm:text-base">{'AI review runs automatically'}</h3>
                 <p className="text-secondary text-sm">{'Submitted skills go through the same AI review pipeline as manual submissions — static security analysis + quality scoring. If approved, the skill appears on the platform immediately with the activity feed noting it was "discovered by OpenClaw".'}</p>
               </div>

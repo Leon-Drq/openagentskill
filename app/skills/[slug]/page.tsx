@@ -19,6 +19,7 @@ import { SiteHeader } from '@/components/site-header'
 import { getStacksForSkill } from '@/lib/collections'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
+import { getSkillTrustProfile, type SkillTrustProfile, type TrustCheckStatus } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
 export const dynamic = 'force-dynamic'
@@ -73,25 +74,30 @@ export async function generateMetadata({
   }
 }
 
-// Trust level based on review status
-function TrustBadge({ verified, score }: { verified: boolean; score?: number }) {
-  if (verified) {
-    return (
-      <span className="inline-flex items-center gap-1.5 border border-foreground px-3 py-1 text-xs font-mono">
-        VERIFIED
-      </span>
-    )
-  }
-  if (score && score >= 80) {
-    return (
-      <span className="inline-flex items-center gap-1.5 border border-border px-3 py-1 text-xs font-mono text-secondary">
-        AI REVIEWED
-      </span>
-    )
-  }
+function getStatusLabel(status: TrustCheckStatus) {
+  if (status === 'pass') return 'PASS'
+  if (status === 'warn') return 'CHECK'
+  if (status === 'fail') return 'FIX'
+  return 'INFO'
+}
+
+function getStatusTone(status: TrustCheckStatus) {
+  if (status === 'pass') return 'border-foreground text-foreground'
+  if (status === 'fail') return 'border-red-300 text-red-700'
+  if (status === 'warn') return 'border-amber-300 text-amber-700'
+  return 'border-border text-secondary'
+}
+
+function TrustBadge({ profile }: { profile: SkillTrustProfile }) {
+  const label = profile.tier === 'production'
+    ? 'TRUSTED'
+    : profile.tier === 'strong'
+      ? 'STRONG'
+      : 'REVIEW'
+
   return (
-    <span className="inline-flex items-center gap-1.5 border border-border px-3 py-1 text-xs font-mono text-secondary">
-      COMMUNITY
+    <span className={`inline-flex items-center gap-1.5 border px-3 py-1 text-xs font-mono ${profile.tier === 'production' ? 'border-foreground text-foreground' : 'border-border text-secondary'}`}>
+      {label} · {profile.score}
     </span>
   )
 }
@@ -128,6 +134,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   const qualityProfile = dbSkill ? getSkillQualityProfile(dbSkill) : null
   const platformHints = dbSkill ? getPlatformHints(dbSkill) : []
   const decisionProfile = dbSkill ? getSkillDecisionProfile(dbSkill, eventStats) : null
+  const trustProfile = dbSkill ? getSkillTrustProfile(dbSkill, Boolean(approvedClaim), eventStats) : null
   const compareHref = `/compare?skills=${encodeURIComponent([skill.slug, ...relatedSkills.slice(0, 3).map((rs) => rs.slug)].join(','))}`
   const relatedDecisionRows = relatedSkills.map((relatedSkill) => ({
     skill: relatedSkill,
@@ -194,9 +201,11 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
                   {skill.name}
                 </h1>
-                <div className="pt-2">
-                  <TrustBadge verified={skill.verified} score={aiScore} />
-                </div>
+                {trustProfile && (
+                  <div className="pt-2">
+                    <TrustBadge profile={trustProfile} />
+                  </div>
+                )}
               </div>
               <p className="text-lg italic text-secondary leading-relaxed mb-4">
                 {skill.tagline}
@@ -234,6 +243,12 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                   <div>
                     <span className="text-secondary">Quality </span>
                     <span className="font-semibold">{qualityProfile.score}/100 · {qualityProfile.label}</span>
+                  </div>
+                )}
+                {trustProfile && (
+                  <div>
+                    <span className="text-secondary">Trust </span>
+                    <span className="font-semibold">{trustProfile.score}/100 · {trustProfile.label}</span>
                   </div>
                 )}
               </div>
@@ -318,6 +333,76 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                       </li>
                     ))}
                   </ol>
+                </div>
+              </section>
+            )}
+
+            {trustProfile && (
+              <section className="mb-10 border border-border bg-card">
+                <div className="border-b border-border p-5">
+                  <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                    <div>
+                      <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Trust profile</p>
+                      <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+                        {trustProfile.label}
+                      </h2>
+                      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
+                        {trustProfile.summary}
+                      </p>
+                    </div>
+                    <div className="shrink-0 border border-border px-5 py-4 text-center sm:min-w-32">
+                      <div className="font-mono text-4xl font-semibold">{trustProfile.score}</div>
+                      <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Trust score</div>
+                    </div>
+                  </div>
+
+                  <div className="mb-5 h-1.5 bg-muted">
+                    <div className="h-full bg-foreground" style={{ width: `${trustProfile.score}%` }} />
+                  </div>
+
+                  <div className="grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+                    {trustProfile.checks.slice(0, 4).map((check) => (
+                      <div key={check.label} className="min-w-0 bg-background p-4">
+                        <div className="mb-3 flex items-center justify-between gap-3">
+                          <p className="text-xs uppercase tracking-widest text-secondary">{check.label}</p>
+                          <span className={`shrink-0 border px-2 py-0.5 text-[10px] font-mono ${getStatusTone(check.status)}`}>
+                            {getStatusLabel(check.status)}
+                          </span>
+                        </div>
+                        <p className="break-words font-mono text-sm text-foreground [overflow-wrap:anywhere]">{check.detail}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid gap-px bg-border md:grid-cols-2">
+                  <div className="bg-card p-5">
+                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Good signals</p>
+                    {trustProfile.strengths.length > 0 ? (
+                      <ul className="space-y-2 text-sm leading-relaxed text-secondary">
+                        {trustProfile.strengths.map((item) => <li key={item}>{item}</li>)}
+                      </ul>
+                    ) : (
+                      <p className="text-sm leading-relaxed text-secondary">No standout trust signals yet.</p>
+                    )}
+                  </div>
+                  <div className="bg-card p-5">
+                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Review before install</p>
+                    {trustProfile.warnings.length > 0 ? (
+                      <ul className="space-y-2 text-sm leading-relaxed text-secondary">
+                        {trustProfile.warnings.map((item) => <li key={item}>{item}</li>)}
+                      </ul>
+                    ) : (
+                      <p className="text-sm leading-relaxed text-secondary">
+                        No major trust warnings detected from available metadata.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="border-t border-border p-5">
+                  <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Recommended action</p>
+                  <p className="text-sm leading-relaxed text-secondary">{trustProfile.recommendedAction}</p>
                 </div>
               </section>
             )}
@@ -703,36 +788,30 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
 
               <SkillFeedbackPanel skillSlug={skill.slug} />
 
-              {/* Trust info */}
-              <div className="border border-border p-5">
-                <h3 className="font-display text-lg font-semibold mb-3">Trust & Safety</h3>
-                <ul className="space-y-2 text-xs text-secondary">
-                  <li className="flex items-center gap-2">
-                    <span className="w-4 text-center">—</span>
-                    Open source (public GitHub repo)
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="w-4 text-center">—</span>
-                    AI static analysis passed
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="w-4 text-center">—</span>
-                    License: {skill.technical.license}
-                  </li>
-                  {skill.verified && (
-                    <li className="flex items-center gap-2">
-                      <span className="w-4 text-center">—</span>
-                      Manually verified by team
-                    </li>
-                  )}
-                  {approvedClaim && (
-                    <li className="flex items-center gap-2">
-                      <span className="w-4 text-center">—</span>
-                      Owner claim approved for @{approvedClaim.github_username}
-                    </li>
-                  )}
-                </ul>
-              </div>
+              {trustProfile && (
+                <div className="border border-border p-5">
+                  <div className="mb-4 flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="font-display text-lg font-semibold">Trust & Safety</h3>
+                      <p className="mt-1 text-xs text-secondary">{trustProfile.label}</p>
+                    </div>
+                    <div className="font-mono text-2xl font-semibold">{trustProfile.score}</div>
+                  </div>
+                  <ul className="space-y-2 text-xs text-secondary">
+                    {trustProfile.checks.slice(0, 6).map((check) => (
+                      <li key={check.label} className="flex items-start justify-between gap-3">
+                        <span className="min-w-0">
+                          <span className="block text-foreground">{check.label}</span>
+                          <span className="block break-words [overflow-wrap:anywhere]">{check.detail}</span>
+                        </span>
+                        <span className={`shrink-0 border px-1.5 py-0.5 font-mono text-[10px] ${getStatusTone(check.status)}`}>
+                          {getStatusLabel(check.status)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* Related skills */}
               {relatedSkills.length > 0 && (
