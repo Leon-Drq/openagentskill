@@ -39,45 +39,6 @@ export function StructuredData() {
     ],
   }
 
-  const faqData = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: 'What is OpenAgentSkill?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'OpenAgentSkill is an open marketplace for AI agent skills. It helps developers discover, publish, and share reusable skills, tools, plugins, and workflows for AI agents like Claude, GPT, and LangChain.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How do I install a skill?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'You can install any skill using the command: npx skills add <owner/repo>. Each skill page also shows specific installation instructions.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How are skills ranked?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Skills are ranked by real agent usage data, not just GitHub stars. We track actual API calls from agents, success rates, and response times to surface the most reliable skills.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How do I submit my own skill?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Visit the Submit page and provide your GitHub repository URL. Our AI will review your skill for quality and security, then it will be listed in the marketplace.',
-        },
-      },
-    ],
-  }
-
   return (
     <>
       <script
@@ -87,10 +48,6 @@ export function StructuredData() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationData) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqData) }}
       />
     </>
   )
