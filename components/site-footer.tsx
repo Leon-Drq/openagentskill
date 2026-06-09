@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { BrandMark } from '@/components/brand-mark'
 import { useI18n } from '@/lib/i18n/context'
 
 export function SiteFooter() {
@@ -10,7 +11,8 @@ export function SiteFooter() {
     <footer className="border-t border-border bg-background">
       <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-10 sm:px-6 sm:py-12 md:flex-row md:items-center md:justify-between">
         <div>
-          <Link href="/" className="font-display text-sm font-semibold tracking-tight transition-opacity hover:opacity-70">
+          <Link href="/" className="inline-flex items-center gap-2 font-display text-sm font-semibold tracking-tight transition-opacity hover:opacity-70">
+            <BrandMark className="h-6 w-6" />
             OpenAgentSkill
           </Link>
           <p className="mt-1 text-xs text-secondary">Open infrastructure for agent skills.</p>

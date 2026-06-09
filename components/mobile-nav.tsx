@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { BrandMark } from '@/components/brand-mark'
 import { useI18n } from '@/lib/i18n/context'
 import { cn } from '@/lib/utils'
 
@@ -83,9 +84,7 @@ export function MobileNav() {
         >
           <div className="flex items-center justify-between px-6 py-4 border-b border-border">
             <span className="flex items-center gap-2 font-display text-base font-semibold text-foreground">
-              <span className="flex h-7 w-7 items-center justify-center border border-foreground text-sm leading-none">
-                O
-              </span>
+              <BrandMark className="h-7 w-7" />
               OpenAgentSkill
             </span>
             <button

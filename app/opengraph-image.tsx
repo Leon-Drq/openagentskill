@@ -70,21 +70,16 @@ export default async function Image() {
               marginBottom: '8px',
             }}
           >
-            <div
-              style={{
-                width: '48px',
-                height: '48px',
-                border: '2px solid rgba(255,255,255,0.3)',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '24px',
-                color: '#ffffff',
-              }}
-            >
-              {'/>'}
-            </div>
+            <svg width="58" height="58" viewBox="0 0 128 128" style={{ display: 'flex' }}>
+              <path
+                fill="#ffffff"
+                d="M58.5 12.5C35.1 15.4 17.5 40.8 17.5 64c0 23.2 17.6 48.6 41 51.5C43.2 114.3 35.5 91.7 35.5 64S43.2 13.7 58.5 12.5Z"
+              />
+              <path
+                fill="#ffffff"
+                d="M69.5 12.5c23.4 2.9 41 28.3 41 51.5 0 23.2-17.6 48.6-41 51.5C84.8 114.3 92.5 91.7 92.5 64S84.8 13.7 69.5 12.5Z"
+              />
+            </svg>
           </div>
 
           {/* Title */}
