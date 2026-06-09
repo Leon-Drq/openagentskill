@@ -103,9 +103,6 @@ export const metadata: Metadata = {
     canonical: 'https://www.openagentskill.com',
     languages: getLocalizedLanguageAlternates(),
   },
-  verification: {
-    google: 'your-google-verification-code',
-  },
 }
 
 export default function RootLayout({
