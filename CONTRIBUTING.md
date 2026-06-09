@@ -1,21 +1,26 @@
-# Contributing to Open Agent Skill
+# Contributing to OpenAgentSkill
 
-Thank you for your interest in contributing to Open Agent Skill! This document provides guidelines and information for contributors.
+OpenAgentSkill is an open discovery, audit, and recommendation layer for AI agent skills. Contributions should make the catalog more useful, more accurate, or easier for agents and builders to consume.
 
 ## How to Contribute
 
-### Reporting Bugs
+### Submit or Fix a Skill
 
-- Check if the bug has already been reported in Issues
-- If not, create a new issue with a clear title and description
-- Include steps to reproduce, expected behavior, and actual behavior
-- Add screenshots if applicable
+- Submit a skill through [openagentskill.com/submit](https://www.openagentskill.com/submit) when possible.
+- Open an issue if a listed skill has stale metadata, wrong category, broken install instructions, or missing audit context.
+- Automated bulk imports are skill-only. MCP servers and Model Context Protocol repos are intentionally excluded.
+
+### Report Bugs
+
+- Check whether the bug is already reported.
+- Include the affected page or API route.
+- Include steps to reproduce, expected behavior, actual behavior, and screenshots when relevant.
 
 ### Suggesting Features
 
-- Check existing issues and discussions for similar ideas
-- Create a new issue with the `enhancement` label
-- Describe the feature and its potential benefits
+- Explain the user or agent workflow the feature improves.
+- Include example skills, queries, or pages when possible.
+- Prefer concrete changes to ranking, audit, search, submission, API, or SEO behavior.
 
 ### Pull Requests
 
@@ -35,12 +40,14 @@ pnpm install
 # Run development server
 pnpm dev
 
-# Run type checking
-pnpm type-check
-
 # Run linting
-pnpm lint
+pnpm run lint
+
+# Build production bundle
+pnpm run build
 ```
+
+For UI changes, also check the affected pages on desktop and mobile widths.
 
 ## Commit Message Convention
 
@@ -60,6 +67,9 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 - Follow existing component patterns
 - Use Tailwind CSS for styling
 - Keep components small and focused
+- Keep privileged routes protected by server-side secrets
+- Never expose service-role Supabase keys or X OAuth secrets to the browser
+- Keep SEO pages useful and specific; avoid thin copied content
 
 ## Questions?
 

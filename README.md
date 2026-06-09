@@ -1,292 +1,265 @@
 <div align="center">
 
-# Open Agent Skill
+<img src="./public/placeholder-logo.svg" alt="OpenAgentSkill" width="240" />
 
-### The Open Marketplace for AI Agent Skills
+# OpenAgentSkill
 
-[![Website](https://img.shields.io/badge/Website-openagentskill.com-blue?style=for-the-badge)](https://www.openagentskill.com)
+Open discovery, audit, and recommendation infrastructure for AI agent skills.
+
+[![Website](https://img.shields.io/badge/Website-openagentskill.com-black?style=for-the-badge)](https://www.openagentskill.com)
 [![GitHub Stars](https://img.shields.io/github/stars/Leon-Drq/openagentskill?style=for-the-badge&logo=github)](https://github.com/Leon-Drq/openagentskill)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](./LICENSE)
 [![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com)
 
-**Discover, publish, and share skills for Claude, GPT, Copilot, and other AI agents.**
-
-[Browse Skills](https://www.openagentskill.com/skills) | [Submit Skill](https://www.openagentskill.com/submit) | [API Docs](https://www.openagentskill.com/docs)
-
-</div>
-
----
-
-## Why Open Agent Skill?
-
-> **"The only skill ranking based on real agent usage, not vanity metrics."**
-
-| Problem | Solution |
-|---------|----------|
-| Finding quality skills is hard | Curated directory with **90+ verified skills**, ranked by quality score and auto-indexed hourly |
-| GitHub stars don't reflect real usage | **Agent Feedback Loop** — real usage data from AI agents |
-| No incentive for skill authors | **Points system** rewards authors for every successful call |
-| Skills scattered across GitHub | **One-stop marketplace** with search, filters, and categories |
-
----
-
-## Featured Skills by Use Case
-
-### Web Automation and Data Extraction
-
-| Skill | Stars | Description | Use Case |
-|-------|-------|-------------|----------|
-| [Browser Use](https://github.com/browser-use/browser-use) | 52K | Make AI agents interact with websites using natural language | Automate form filling, web testing, data entry |
-| [Crawl4AI](https://github.com/unclecode/crawl4ai) | 42K | LLM-friendly web crawler and scraper | Extract structured data from any website |
-| [Firecrawl](https://github.com/mendableai/firecrawl) | 28K | Turn websites into LLM-ready markdown | Build RAG pipelines, content indexing |
-| [MediaCrawler](https://github.com/NanmiCoder/MediaCrawler) | 43K | Multi-platform social media crawler | Scrape Xiaohongshu, Douyin, Bilibili, Weibo, Zhihu |
-
-### Integrations and Automation
-
-| Skill | Stars | Description | Use Case |
-|-------|-------|-------------|----------|
-| [Composio](https://github.com/ComposioHQ/composio) | 15K | 250+ app connectors for AI agents | Connect agents to Slack, GitHub, Notion, etc. |
-| [Google Workspace CLI](https://github.com/googleworkspace/cli) | 11K | CLI for Google Workspace APIs | Automate Gmail, Docs, Calendar with agents |
-
-### Developer Tools
-
-| Skill | Stars | Description | Use Case |
-|-------|-------|-------------|----------|
-| [Cursor Rules](https://github.com/PatrickJS/awesome-cursorrules) | 7.8K | Curated cursor rules for frameworks | Improve AI coding with framework-specific rules |
-| [Awesome Claude Code](https://github.com/hesreallyhim/awesome-claude-code) | 25K | Tools for Claude Code workflows | Enhance Claude coding capabilities |
-
-### Finance and Crypto
-
-| Skill | Stars | Description | Use Case |
-|-------|-------|-------------|----------|
-| [BlockBeats Skill](https://clawhub.ai/BlockBeatsOfficial/blockbeats-skill) | - | Crypto news, market data, on-chain analytics | Track ETF flows, derivatives, macro trends via 1,500+ sources |
-| [Finance Skills](https://github.com/himself65/finance-skills) | 94 | Options, stocks, sentiment analysis | Build trading bots, financial research agents |
-| [Claude Scientific Skills](https://github.com/K-Dense-AI/claude-scientific-skills) | 10K | Research and scientific skills | Academic research, data analysis |
-
-### Chinese Skills 中文精选
-
-> 专为中文 AI 社区构建的 skills。在网站上点击「中文 Chinese」分类筛选查看。
-
-| Skill | Stars | Description | Use Case |
-|-------|-------|-------------|----------|
-| [同事.Skill](https://github.com/titanwings/colleague-skill) | 6.8K | 把同事的工作经验和性格永久保存为 AI Skill | 用同事的语气写代码、回答问题，支持飞书/钉钉/微信数据源 |
-| [WeChat Article Exporter](https://github.com/wechat-article/wechat-article-exporter) | 7.9K | 微信公众号文章批量下载工具 | 导出文章含阅读量、评论，支持 Docker/Cloudflare 部署 |
-| [DBSkill](https://github.com/dontbesilent2025/dbskill) | - | 从 12,307 条推文提炼的商业诊断工具箱 | 商业模式诊断、对标分析、内容创作、执行力诊断 |
-
-### Productivity
-
-| Skill | Stars | Description | Use Case |
-|-------|-------|-------------|----------|
-| [ClawFeed](https://github.com/kevinho/clawfeed) | 1.6K | AI-powered news digest from multiple sources | Curate Twitter, RSS, HackerNews, Reddit into summaries |
-| [Planning With Files](https://github.com/OthmanAdi/planning-with-files) | 14K | Persistent markdown planning workflows | Project management with AI agents |
-| [Eigent](https://github.com/eigent-ai/eigent) | 12K | Build custom AI workforce | Multi-agent team collaboration |
-
-<div align="center">
-
-**[View all 90+ skills →](https://www.openagentskill.com/skills)**
+[Browse Skills](https://www.openagentskill.com/skills) |
+[Trending](https://www.openagentskill.com/trending) |
+[Audit Reports](https://www.openagentskill.com/audits) |
+[API Docs](https://www.openagentskill.com/api-docs) |
+[Submit](https://www.openagentskill.com/submit)
 
 </div>
 
 ---
 
-## Agent Feedback API
+## What Is OpenAgentSkill?
 
-**The unique feature that sets us apart.** Track real agent usage, not just GitHub stars.
+OpenAgentSkill is a public index for finding, comparing, auditing, and recommending AI agent skills.
 
-### Report Skill Usage
+The product is built for three audiences:
+
+| Audience | What they need | OpenAgentSkill surface |
+| --- | --- | --- |
+| Agent builders | Find reliable skills for a task | Search, rankings, audits, comparisons, agent-friendly APIs |
+| Skill authors | Make their skills discoverable and trusted | Submit flow, claim pages, badges, audit reports |
+| AI agents | Query skills programmatically | `/api/agent/skills`, `/api/agent/recommend`, `/api/audits/[slug]` |
+
+The long-term goal is to become the trust and routing layer for agent skills: not just a directory, but the place where humans and agents can decide what is safe, useful, maintained, and worth installing.
+
+## Product Surfaces
+
+| Surface | Link | Purpose |
+| --- | --- | --- |
+| Skill directory | [/skills](https://www.openagentskill.com/skills) | Search and filter the full catalog |
+| Trending | [/trending](https://www.openagentskill.com/trending) | Skills with recent activity signals |
+| Hot | [/hot](https://www.openagentskill.com/hot) | High-momentum skills |
+| Best lists | [/best](https://www.openagentskill.com/best) | SEO-ready rankings by use case and category |
+| Audits | [/audits](https://www.openagentskill.com/audits) | Security, quality, trust, and adoption-readiness reports |
+| Agent pages | [/agents](https://www.openagentskill.com/agents) | Agent-specific skill discovery |
+| Official creators | [/official](https://www.openagentskill.com/official) | Creator and organization directories |
+| Comparisons | [/compare](https://www.openagentskill.com/compare) | Competitive and alternative pages |
+| API docs | [/api-docs](https://www.openagentskill.com/api-docs) | Programmatic access for agents and apps |
+| Submit | [/submit](https://www.openagentskill.com/submit) | Submit a new skill for review |
+
+## Key Capabilities
+
+- High-star GitHub skill indexing with a skill-only search matrix.
+- MCP repositories are intentionally excluded from automated imports.
+- Quality, trust, and audit scoring for each skill.
+- Daily activity aggregates for trending and hot rankings.
+- Agent-friendly search and recommendation APIs.
+- Skill audit pages and embeddable README badges.
+- SEO pages for use cases, alternatives, guides, reports, rankings, and collections.
+- Manual X Web Intent drafts for compliant social sharing.
+- Optional X OAuth flow for API-based posting when a paid X API plan is available.
+
+## Agent API
+
+### Recommend Skills For A Task
 
 ```bash
-curl -X POST https://www.openagentskill.com/api/agent/feedback \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill_slug": "browser-use",
-    "agent_id": "claude-3.5",
-    "success": true,
-    "latency_ms": 1200
-  }'
+curl "https://www.openagentskill.com/api/agent/recommend?task=scrape+websites+and+extract+tables&limit=4"
 ```
 
-### Query Skill Stats
+Returns a ranked shortlist with confidence, install command, repository URL, quality profile, decision profile, use cases, and suggested stacks.
+
+### Search Skills
 
 ```bash
-# Get stats for a specific skill
-curl "https://www.openagentskill.com/api/agent/feedback?skill_slug=browser-use"
-
-# Get leaderboard (sorted by agent calls)
-curl "https://www.openagentskill.com/api/agent/feedback"
+curl "https://www.openagentskill.com/api/agent/skills?q=browser+automation&trust=production&limit=5"
 ```
 
-### Response Example
+Supported filters include `q`, `category`, `platform`, `trust`, `limit`, and `format=text`.
 
-```json
-{
-  "skill_slug": "browser-use",
-  "total_calls": 12847,
-  "success_rate": 94.2,
-  "avg_latency_ms": 850,
-  "unique_agents": 156
-}
+### Fetch An Audit
+
+```bash
+curl "https://www.openagentskill.com/api/audits/crawl4ai"
 ```
 
----
+Returns the stored audit report for a skill, including score, risk level, findings, evidence, and recommendation.
 
-## Quick Start
+### Fetch Rankings
 
-### Browse Skills
-
-Visit [openagentskill.com/skills](https://www.openagentskill.com/skills) to explore all skills with filters by category, popularity, and trending.
-
-### Submit a Skill
-
-1. Go to [openagentskill.com/submit](https://www.openagentskill.com/submit)
-2. Enter your GitHub repository URL
-3. AI reviews your skill automatically
-4. Approved skills appear in the directory within minutes
-
-### Auto-Discovery
-
-We automatically discover new skills from GitHub hourly using a skill-only search matrix. MCP servers and Model Context Protocol integrations are intentionally excluded from automated imports.
-
-```
-topic:agent-skills    "agent skill"        topic:ai-agent
-topic:claude-tool     topic:openai-plugin  topic:langchain-tool
-topic:browser-use     topic:rag            topic:workflow-automation
+```bash
+curl "https://www.openagentskill.com/api/agent/rankings"
 ```
 
----
+Returns ranked skills for agent workflows.
 
-## Points System
+## README Badges For Skill Authors
 
-Skill authors earn points for contributions:
+Skill authors can add OpenAgentSkill badges to their own repository README.
 
-| Event | Points |
-|-------|--------|
-| Skill called successfully by an agent | +1 |
-| Skill submitted and approved | +50 |
-| Invite a new user | +100 |
+```md
+[![OpenAgentSkill Trust](https://www.openagentskill.com/api/badge/crawl4ai?metric=trust&label=Trust)](https://www.openagentskill.com/skills/crawl4ai)
+[![OpenAgentSkill Audit](https://www.openagentskill.com/api/badge/crawl4ai?metric=audit&label=Audit)](https://www.openagentskill.com/skills/crawl4ai/audit)
+[![OpenAgentSkill Quality](https://www.openagentskill.com/api/badge/crawl4ai?metric=quality&label=Quality)](https://www.openagentskill.com/skills/crawl4ai)
+```
 
-Points unlock badges and future rewards.
+Replace `crawl4ai` with the skill slug.
 
----
+## Auto-Discovery
+
+The indexer scans GitHub for high-signal skill repositories and imports approved matches.
+
+Current import rules:
+
+- Minimum GitHub stars are controlled by `INDEXER_MIN_STARS`.
+- Per-run target is controlled by `INDEXER_RUN_TARGET`.
+- Search budget is controlled by `INDEXER_MAX_SEARCH_REQUESTS`.
+- MCP and Model Context Protocol repositories are excluded from automated imports.
+- Production indexer routes require `INDEXER_SECRET`.
+
+Useful routes:
+
+```bash
+# Run the indexer with automation auth
+POST /api/indexer/run
+
+# Inspect recent import summaries
+GET /api/indexer/logs
+
+# Refresh GitHub star counts
+POST /api/indexer/refresh-stars
+```
 
 ## Tech Stack
 
 | Layer | Technology |
-|-------|------------|
-| Framework | Next.js 16 (App Router) |
-| Database | Supabase (PostgreSQL + Auth) |
-| Styling | Tailwind CSS v4 |
-| Components | shadcn/ui |
+| --- | --- |
+| Framework | Next.js 16 App Router |
+| UI | React 19, Tailwind CSS v4, shadcn/ui patterns |
+| Database | Supabase Postgres |
+| Auth and privileged writes | Supabase SSR plus server-only service role routes |
+| Analytics | Vercel Analytics |
 | Deployment | Vercel |
-| AI Review | Vercel AI Gateway |
-
----
+| Automation | Vercel Cron routes and protected API jobs |
+| AI review | Vercel AI SDK / Gateway-compatible review flow |
 
 ## Local Development
 
 ```bash
-# Clone
 git clone https://github.com/Leon-Drq/openagentskill.git
 cd openagentskill
 
-# Install
 pnpm install
-
-# Setup environment
 cp .env.example .env.local
-# Fill in your Supabase credentials
-
-# Run
 pnpm dev
 ```
 
-### Environment Variables
+Validation:
 
-| Variable | Description |
-|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key |
-| `SUPABASE_SECRET_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Server-only Supabase key for privileged automation/admin routes |
-| `GITHUB_TOKEN` | GitHub token for API access |
-| `INDEXER_SECRET` | Bearer secret required for indexer/blog routes and reviewed skill-submission RPC writes in production |
-| `INDEXER_RUN_TARGET` | Optional. Hourly bulk-import target per run, defaults to `10`, max `500` |
-| `INDEXER_MIN_STARS` | Optional. Minimum GitHub stars for bulk import, defaults to `500` |
-| `INDEXER_MAX_SEARCH_REQUESTS` | Optional. GitHub search requests per bulk run, defaults to `10` without `GITHUB_TOKEN` |
-| `CRON_SECRET` | Bearer secret required for cron-triggered maintenance routes in production |
-| `X_CLIENT_ID` | X OAuth 2.0 client ID for authorizing the posting account |
-| `X_CLIENT_SECRET` | X OAuth 2.0 client secret for token exchange and refresh |
-| `X_ALLOWED_USERNAME` | Optional. X username allowed for OAuth storage, defaults to `openagentskill` |
+```bash
+pnpm run lint
+pnpm run build
+```
 
-### Database Setup
+## Environment Variables
 
-Apply SQL files in `scripts/` in order. They create the skills catalog, profiles and points ledger, activity feed, agent feedback loop, aggregate stats view, and RLS policies.
+| Variable | Required | Description |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Public Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Public Supabase anon key |
+| `SUPABASE_SECRET_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Production | Server-only Supabase key for privileged routes |
+| `GITHUB_TOKEN` | Recommended | GitHub API token for higher indexer rate limits |
+| `INDEXER_SECRET` | Production | Bearer secret for protected indexer routes |
+| `CRON_SECRET` | Production | Bearer secret for scheduled maintenance routes |
+| `INDEXER_RUN_TARGET` | Optional | Number of new skills to import per run |
+| `INDEXER_MIN_STARS` | Optional | Minimum GitHub stars for bulk imports |
+| `INDEXER_MAX_SEARCH_REQUESTS` | Optional | GitHub search request budget per run |
+| `X_CLIENT_ID` | Optional | X OAuth client ID |
+| `X_CLIENT_SECRET` | Optional | X OAuth client secret |
+| `X_ALLOWED_USERNAME` | Optional | Allowed X username for token storage |
 
-Production writes should go through the Next.js API routes. Public feedback, reviewed skill submissions, and indexer writes use narrow Supabase RPCs guarded by server secrets, while public clients can only read approved skills and aggregate stats directly.
+Never commit production secrets. Keep privileged Supabase and X credentials server-only.
 
-The hourly indexer defaults to high-star, skill-only bulk discovery. It scans GitHub repositories matching agent skill, browser automation, RAG, workflow, and developer-tool signals, excludes MCP repositories, then imports up to `INDEXER_RUN_TARGET` new approved skills per run. Use `GET /api/indexer/logs` with automation auth to inspect recent run summaries. Use `POST /api/indexer/run` with `mode: "reviewed"` for the slower README/AI-review path.
+## Database Setup
 
-X posting supports two paths. The free, manual path is `/api/x/intent`, which generates a scenario-led `OpenAgentSkill Update` draft and redirects to the official X Web Intent composer; the user must click Post, and no X API credits are used. The main draft includes the skill URL so it can be moved into a reply before posting; `/api/x/intent/reply?tweet_id=<posted-tweet-id>` can also prefill a manual reply with the same skill URL. The paid API path uses OAuth 2.0 with PKCE: visit `/api/x/auth` while signed in as the allowed X account to store an encrypted refresh token, then `/api/x/post-daily` can publish one high-quality unposted skill when called with automation auth. It is intentionally not scheduled in `vercel.json`.
+Apply SQL files in `scripts/` in order. The current schema includes:
 
----
+- Skills catalog
+- Profiles and points
+- Activity and feedback events
+- Secure public-write RPCs
+- Indexer run logs
+- X OAuth token storage
+- Claims and skill events
+- Hardened RLS policies
+- Skill audits and daily event aggregates
+
+The latest audit and daily-events migration is:
+
+```text
+scripts/013_skill_audits_and_daily_events.sql
+```
 
 ## Project Structure
 
-```
+```text
 app/
-├── api/
-│   ├── agent/feedback/   # Agent Feedback API
-│   ├── indexer/          # Auto-indexer endpoints
-│   └── skills/           # Skills CRUD
-├── skills/               # Skills listing and detail pages
-├── submit/               # Skill submission flow
-└── profile/              # User profile and points
+  api/
+    agent/        Agent-friendly search, rankings, recommendation, feedback
+    audits/       Skill audit API
+    badge/        SVG badge API
+    indexer/      Protected import and maintenance jobs
+    x/            X OAuth, Web Intent, and optional posting routes
+  skills/         Skill directory and detail pages
+  audits/         Audit index
+  best/           Best-of ranking pages
+  trending/       Trending skills
+  hot/            Hot skills
+  agents/         Agent-specific pages
+  official/       Creator pages
+  compare/        Comparison pages
+  guides/         Guides and SEO content
 
 lib/
-├── indexer/              # GitHub auto-discovery
-├── ai-review/            # AI-powered skill review
-└── db/                   # Database queries
-```
+  audits.ts       Audit scoring and normalization
+  quality.ts      Quality profiles
+  trust.ts        Trust scoring
+  decision.ts     Adoption-readiness profile
+  rankings.ts     Ranking logic
+  indexer/        GitHub discovery and import pipeline
+  db/             Supabase data access
+  seo/            Programmatic SEO page data
 
----
+scripts/
+  *.sql           Supabase migrations
+  *.mjs, *.ts     Content and seed scripts
+```
 
 ## Roadmap
 
-- [x] Skill marketplace with search and filters
-- [x] Auto-indexer for GitHub skill discovery
-- [x] User authentication and profiles
-- [x] Points and rewards system
-- [x] Agent Feedback Loop API
-- [ ] Skill composition engine
-- [ ] Bounty system for skill requests
-- [ ] Revenue sharing for popular skills
-
----
+- [x] Public skill directory
+- [x] GitHub auto-indexer for high-star skills
+- [x] Skill-only imports with MCP exclusion
+- [x] Quality and trust profiles
+- [x] Audit reports
+- [x] Trending and hot rankings from daily activity
+- [x] README badges
+- [x] Agent recommendation API
+- [x] Programmatic SEO pages
+- [ ] Task-based skill evaluations
+- [ ] Agent-specific fit scoring for Claude Code, Codex, Cursor, and other agent surfaces
+- [ ] Creator claim pages with verified ownership
+- [ ] Anonymous install and usage telemetry
+- [ ] Semantic search and reranking
+- [ ] Public benchmark reports for high-impact skill categories
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
-
-**Ways to contribute:**
-- Submit your skills to the directory
-- Report bugs or suggest features via Issues
-- Improve documentation
-- Add new integrations
-
----
+See [CONTRIBUTING.md](./CONTRIBUTING.md). Useful contribution types include skill submissions, metadata fixes, audit improvements, SEO guide contributions, API improvements, and UI fixes.
 
 ## License
 
-MIT License — see [LICENSE](./LICENSE)
-
----
-
-<div align="center">
-
-**Built with love for the AI agent ecosystem.**
-
-[![Website](https://img.shields.io/badge/Visit-openagentskill.com-blue?style=flat-square)](https://www.openagentskill.com)
-[![Twitter](https://img.shields.io/badge/Follow-@drq__ai-1DA1F2?style=flat-square&logo=twitter)](https://twitter.com/drq_ai)
-
-[Browse Skills](https://www.openagentskill.com/skills) | [Submit Skill](https://www.openagentskill.com/submit) | [API Docs](https://www.openagentskill.com/docs)
-
-</div>
+MIT. See [LICENSE](./LICENSE).
