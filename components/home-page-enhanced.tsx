@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { useI18n } from '@/lib/i18n/context'
 import { SKILL_STACKS } from '@/lib/collections'
@@ -91,51 +91,14 @@ const HOME_BEST_PAGES = FEATURED_BEST_PAGES.slice(0, 3)
 
 function AnimatedNumber({ 
   value, 
-  suffix = '', 
-  duration = 1800 
+  suffix = '',
 }: { 
   value: number
   suffix?: string
   duration?: number 
 }) {
-  const [display, setDisplay] = useState(0)
-  const [hasAnimated, setHasAnimated] = useState(false)
-  const ref = useRef<HTMLSpanElement>(null)
-
-  useEffect(() => {
-    if (!ref.current || hasAnimated) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setHasAnimated(true)
-          const startTime = performance.now()
-          const animate = (currentTime: number) => {
-            const elapsed = currentTime - startTime
-            const progress = Math.min(elapsed / duration, 1)
-            // Ease-out cubic for satisfying deceleration
-            const eased = 1 - Math.pow(1 - progress, 3)
-            setDisplay(Math.floor(eased * value))
-            if (progress < 1) {
-              requestAnimationFrame(animate)
-            } else {
-              setDisplay(value)
-            }
-          }
-          requestAnimationFrame(animate)
-        }
-      },
-      { threshold: 0.3 }
-    )
-
-    observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [value, duration, hasAnimated])
-
   return (
-    <span ref={ref}>
-      {display.toLocaleString()}{suffix}
-    </span>
+    <span>{value.toLocaleString()}{suffix}</span>
   )
 }
 
@@ -213,25 +176,49 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
       {/* HERO: The core innovation - action-first hero */}
       {/* ============================================= */}
       <section className="pt-16 pb-16 sm:pt-20 sm:pb-24 lg:pt-24 px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-5 flex justify-center">
+            <Link
+              href="/agent-skills-registry"
+              className="border border-border bg-card px-3 py-1.5 text-center text-xs font-mono uppercase tracking-wider text-secondary transition-colors hover:border-foreground hover:text-foreground"
+            >
+              AI Agent Skills Registry & Recommendation API
+            </Link>
+          </div>
           {/* Animated Title */}
-          <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 tracking-tight leading-[1.05] text-center">
-            {t.hero.title.split(' ').map((word, i) => (
-              <span
-                key={i}
-                className="inline-block mr-2 sm:mr-3"
-                style={{ animation: `fadeInUp 0.7s ease-out ${i * 0.12}s both` }}
-              >
-                {word}
-              </span>
-            ))}
+          <h1
+            className="mx-auto max-w-5xl text-balance text-center font-display text-3xl font-bold leading-[1.06] tracking-tight sm:text-5xl lg:text-6xl"
+            style={{ animation: 'fadeInUp 0.7s ease-out both' }}
+          >
+            {t.hero.title}
           </h1>
 
           <p
-            className="text-center text-lg sm:text-xl text-secondary mb-10 sm:mb-14 leading-relaxed max-w-2xl mx-auto"
+            className="mx-auto mb-8 mt-5 max-w-3xl text-center text-base leading-relaxed text-secondary sm:mb-10 sm:mt-6 sm:text-xl"
           >
             {t.hero.subtitle}
           </p>
+
+          <div className="mx-auto mb-10 grid max-w-3xl gap-2 sm:grid-cols-3">
+            <Link
+              href="/agent-skill"
+              className="border border-border bg-card px-3 py-2 text-center text-xs font-mono text-secondary transition-colors hover:border-foreground hover:text-foreground"
+            >
+              What is an agent skill?
+            </Link>
+            <Link
+              href="/agent-skills-directory"
+              className="border border-border bg-card px-3 py-2 text-center text-xs font-mono text-secondary transition-colors hover:border-foreground hover:text-foreground"
+            >
+              Agent skills directory
+            </Link>
+            <Link
+              href="/api-docs"
+              className="border border-border bg-card px-3 py-2 text-center text-xs font-mono text-secondary transition-colors hover:border-foreground hover:text-foreground"
+            >
+              Agent recommendation API
+            </Link>
+          </div>
 
           {/* ============================== */}
           {/* THE KEY FEATURE: Task Search   */}
@@ -239,7 +226,7 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
           {/* ============================== */}
           <div
             ref={searchRef}
-            className="mb-8"
+            className="mx-auto mb-8 max-w-3xl"
           >
             {/* Install Command Preview */}
             <div className="bg-foreground text-background font-mono text-xs sm:text-sm px-4 sm:px-5 py-3 flex items-center justify-between">
@@ -527,6 +514,32 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
             >
               {t.hero.cta.forAgents}
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-border bg-muted/20 px-4 py-10 sm:px-6 sm:py-14">
+        <div className="mx-auto grid max-w-5xl gap-px border border-border bg-border md:grid-cols-3">
+          <div className="bg-background p-5 sm:p-6">
+            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Discover</p>
+            <h2 className="font-display text-xl font-semibold">Agent-facing skill registry</h2>
+            <p className="mt-3 text-sm leading-relaxed text-secondary">
+              Turn a task description into a shortlist of reusable AI agent skills with install commands and repository links.
+            </p>
+          </div>
+          <div className="bg-background p-5 sm:p-6">
+            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Compare</p>
+            <h2 className="font-display text-xl font-semibold">Trust, quality, and audit signals</h2>
+            <p className="mt-3 text-sm leading-relaxed text-secondary">
+              Check GitHub adoption, maintenance, platform hints, risk notes, and audit scores before an agent installs a skill.
+            </p>
+          </div>
+          <div className="bg-background p-5 sm:p-6">
+            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Install</p>
+            <h2 className="font-display text-xl font-semibold">npm-style discovery for skills</h2>
+            <p className="mt-3 text-sm leading-relaxed text-secondary">
+              OpenAgentSkill is built around the same simple idea as package registries: discover the right capability, then install it.
+            </p>
           </div>
         </div>
       </section>

@@ -20,11 +20,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.openagentskill.com'),
   title: {
-    default: 'OpenAgentSkill — The Open Marketplace for AI Agent Skills',
+    default: 'AI Agent Skills Registry & Recommendation API | OpenAgentSkill',
     template: '%s | Open Agent Skill',
   },
-  description: 'OpenAgentSkill helps builders discover, compare, and install AI agent skills ranked by quality, GitHub signals, and real usage. Install any skill with npx skills add.',
-  keywords: ['AI agents', 'agent skills', 'agent tools', 'Claude skills', 'GPT plugins', 'LangChain tools', 'autonomous agents', 'agent marketplace', 'open source AI', 'openagentskill'],
+  description: 'Let your AI agent find and install the right skill automatically. OpenAgentSkill is an AI agent skills registry, audit layer, and recommendation API for Codex, Claude Code, Cursor, and other agent workflows.',
+  keywords: ['AI agent skills registry', 'AI agent skills directory', 'agent skill', 'agent skills', 'AgentSkill', 'agent tools', 'Claude Code skills', 'Codex skills', 'Cursor skills', 'agent recommendation API', 'openagentskill'],
   authors: [{ name: 'Open Agent Skill Team' }],
   creator: 'Open Agent Skill',
   publisher: 'Open Agent Skill',
@@ -77,8 +77,8 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'OpenAgentSkill — The Open Marketplace for AI Agent Skills',
-    description: 'OpenAgentSkill helps builders discover, compare, and install AI agent skills ranked by quality, GitHub signals, and real usage.',
+    title: 'AI Agent Skills Registry & Recommendation API | OpenAgentSkill',
+    description: 'Let your AI agent find and install the right skill automatically. Discover, compare, audit, and install reusable AI agent skills.',
     url: 'https://www.openagentskill.com',
     siteName: 'Open Agent Skill',
     locale: 'en_US',
@@ -95,8 +95,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OpenAgentSkill — The Open Marketplace for AI Agent Skills',
-    description: 'OpenAgentSkill helps builders discover, compare, and install AI agent skills ranked by quality, GitHub signals, and real usage.',
+    title: 'AI Agent Skills Registry & Recommendation API | OpenAgentSkill',
+    description: 'Let your AI agent find and install the right skill automatically. Discover, compare, audit, and install reusable AI agent skills.',
     creator: '@openagentskill',
     site: '@openagentskill',
     images: ['https://www.openagentskill.com/opengraph-image'],

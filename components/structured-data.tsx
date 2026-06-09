@@ -5,9 +5,9 @@ export function StructuredData() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'OpenAgentSkill',
-    alternateName: 'Open Agent Skill',
+    alternateName: ['Open Agent Skill', 'AI Agent Skills Registry', 'AgentSkill Registry'],
     url: BASE_URL,
-    description: 'The open marketplace for AI agent skills ranked by real agent usage.',
+    description: 'AI agent skills registry, audit layer, and recommendation API for discovering and installing reusable agent skills.',
     potentialAction: {
       '@type': 'SearchAction',
       target: `${BASE_URL}/skills?q={search_term_string}`,
@@ -30,13 +30,39 @@ export function StructuredData() {
     name: 'OpenAgentSkill',
     url: BASE_URL,
     logo: `${BASE_URL}/icon.svg`,
-    description: 'OpenAgentSkill is the open marketplace for AI agent skills. Discover, publish, and share skills for AI agents.',
+    description: 'OpenAgentSkill helps agents and builders discover, compare, audit, and install reusable AI agent skills.',
     image: `${BASE_URL}/opengraph-image`,
     foundingDate: '2026',
     sameAs: [
       'https://github.com/Leon-Drq/openagentskill',
       'https://x.com/openagentskill',
     ],
+  }
+
+  const softwareApplicationData = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'OpenAgentSkill',
+    alternateName: 'npm for AI Agent Skills',
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Web',
+    url: BASE_URL,
+    description: 'Let your AI agent find and install the right skill automatically with an agent-facing skills registry and recommendation API.',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+  }
+
+  const apiData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebAPI',
+    name: 'OpenAgentSkill Recommendation API',
+    url: `${BASE_URL}/api-docs`,
+    documentation: `${BASE_URL}/api-docs`,
+    endpointUrl: `${BASE_URL}/api/agent/recommend`,
+    description: 'Agent-facing API for recommending AI agent skills from a task description.',
   }
 
   return (
@@ -48,6 +74,14 @@ export function StructuredData() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(apiData) }}
       />
     </>
   )
