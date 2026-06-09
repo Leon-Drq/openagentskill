@@ -28,6 +28,9 @@ export function SiteFooter() {
           <Link href="/hot" className="hover:text-foreground">
             Hot
           </Link>
+          <Link href="/audits" className="hover:text-foreground">
+            Audits
+          </Link>
           <Link href="/official" className="hover:text-foreground">
             Official
           </Link>

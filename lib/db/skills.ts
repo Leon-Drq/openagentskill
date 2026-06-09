@@ -136,6 +136,41 @@ export interface SkillEventStats {
   updated_at: string
 }
 
+export interface SkillEventDailyStats {
+  skill_slug: string
+  event_date: string
+  total_events: number
+  views: number
+  install_copies: number
+  saves: number
+  compares: number
+  outbound_clicks: number
+  claim_starts: number
+  claim_submits: number
+  first_event_at: string | null
+  last_event_at: string | null
+  updated_at: string
+}
+
+export type SkillAuditRiskLevel = 'safe_to_try' | 'needs_review' | 'risky'
+
+export interface SkillAuditRecord {
+  skill_slug: string
+  audit_score: number
+  risk_level: SkillAuditRiskLevel
+  quality_score: number
+  trust_score: number
+  maintenance_score: number
+  security_score: number
+  install_score: number
+  checks: Array<Record<string, unknown>>
+  signals: Array<Record<string, unknown>>
+  warnings: string[]
+  metadata: Record<string, unknown>
+  generated_at: string
+  updated_at: string
+}
+
 export interface SkillClaimRecord {
   id: string
   skill_slug: string
@@ -197,6 +232,53 @@ export async function getSkillEventStats(skillSlug: string): Promise<SkillEventS
 
   if (error || !data) return null
   return data as SkillEventStats
+}
+
+export async function getSkillEventDailyStats(days = 7): Promise<SkillEventDailyStats[]> {
+  const supabase = createPublicClient()
+  const since = new Date(Date.now() - Math.max(1, days) * 86_400_000).toISOString().slice(0, 10)
+  const { data, error } = await supabase
+    .from('skill_events_daily')
+    .select('*')
+    .gte('event_date', since)
+    .order('event_date', { ascending: false })
+
+  if (error || !data) return []
+  return data as SkillEventDailyStats[]
+}
+
+export async function getSkillEventDailyStatsMap(days = 7): Promise<Record<string, SkillEventDailyStats[]>> {
+  const rows = await getSkillEventDailyStats(days)
+  const map: Record<string, SkillEventDailyStats[]> = {}
+  for (const row of rows) {
+    if (!map[row.skill_slug]) map[row.skill_slug] = []
+    map[row.skill_slug].push(row)
+  }
+  return map
+}
+
+export async function getSkillAuditBySlug(skillSlug: string): Promise<SkillAuditRecord | null> {
+  const supabase = createPublicClient()
+  const { data, error } = await supabase
+    .from('skill_audits')
+    .select('*')
+    .eq('skill_slug', skillSlug)
+    .maybeSingle()
+
+  if (error || !data) return null
+  return data as SkillAuditRecord
+}
+
+export async function getSkillAuditsMap(): Promise<Record<string, SkillAuditRecord>> {
+  const supabase = createPublicClient()
+  const { data, error } = await supabase.from('skill_audits').select('*')
+  if (error || !data) return {}
+
+  const map: Record<string, SkillAuditRecord> = {}
+  for (const row of data as SkillAuditRecord[]) {
+    map[row.skill_slug] = row
+  }
+  return map
 }
 
 export async function getApprovedClaimBySkillSlug(skillSlug: string): Promise<SkillClaimRecord | null> {

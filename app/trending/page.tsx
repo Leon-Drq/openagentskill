@@ -3,9 +3,15 @@ import Link from 'next/link'
 import { GrowthSkillList } from '@/components/growth-skill-list'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
-import { getAllSkills, getSkillEventStatsMap, type SkillEventStats } from '@/lib/db/skills'
+import {
+  getAllSkills,
+  getSkillEventDailyStatsMap,
+  getSkillEventStatsMap,
+  type SkillEventDailyStats,
+  type SkillEventStats,
+} from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
-import { rankTrendingSkills } from '@/lib/seo/growth-directories'
+import { rankTrendingSkills, summarizeSkillDailyStats } from '@/lib/seo/growth-directories'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,14 +31,23 @@ export const metadata: Metadata = {
 }
 
 export default async function TrendingSkillsPage() {
-  const [skills, eventStatsMap] = await Promise.all([
+  const [skills, eventStatsMap, dailyStatsMap] = await Promise.all([
     getAllSkills('quality').catch(() => []),
     getSkillEventStatsMap().catch((): Record<string, SkillEventStats> => ({})),
+    getSkillEventDailyStatsMap(7).catch((): Record<string, SkillEventDailyStats[]> => ({})),
   ])
-  const ranked = rankTrendingSkills(skills, eventStatsMap, 40)
-  const totalEvents = Object.values(eventStatsMap).reduce((sum, stats) => sum + Number(stats.total_events || 0), 0)
-  const totalCopies = Object.values(eventStatsMap).reduce((sum, stats) => sum + Number(stats.install_copies || 0), 0)
-  const totalViews = Object.values(eventStatsMap).reduce((sum, stats) => sum + Number(stats.views || 0), 0)
+  const ranked = rankTrendingSkills(skills, eventStatsMap, dailyStatsMap, 40)
+  const dailySummaries = Object.values(dailyStatsMap).map((rows) => summarizeSkillDailyStats(rows))
+  const hasDailyStats = dailySummaries.some((stats) => stats.total_events > 0)
+  const totalEvents = hasDailyStats
+    ? dailySummaries.reduce((sum, stats) => sum + Number(stats.total_events || 0), 0)
+    : Object.values(eventStatsMap).reduce((sum, stats) => sum + Number(stats.total_events || 0), 0)
+  const totalCopies = hasDailyStats
+    ? dailySummaries.reduce((sum, stats) => sum + Number(stats.install_copies || 0), 0)
+    : Object.values(eventStatsMap).reduce((sum, stats) => sum + Number(stats.install_copies || 0), 0)
+  const totalViews = hasDailyStats
+    ? dailySummaries.reduce((sum, stats) => sum + Number(stats.views || 0), 0)
+    : Object.values(eventStatsMap).reduce((sum, stats) => sum + Number(stats.views || 0), 0)
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -70,7 +85,9 @@ export default async function TrendingSkillsPage() {
             <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
               <div className="bg-background p-4">
                 <div className="font-mono text-2xl">{formatCompactNumber(totalEvents)}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Events</div>
+                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">
+                  {hasDailyStats ? 'Events / 7d' : 'Events'}
+                </div>
               </div>
               <div className="bg-background p-4">
                 <div className="font-mono text-2xl">{formatCompactNumber(totalViews)}</div>
@@ -84,7 +101,7 @@ export default async function TrendingSkillsPage() {
           </div>
         </section>
 
-        <section className="grid gap-3 border-b border-border py-8 md:grid-cols-3">
+        <section className="grid gap-3 border-b border-border py-8 md:grid-cols-4">
           <Link href="/hot" className="border border-border p-5 transition-colors hover:border-foreground">
             <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Hot list</p>
             <h2 className="font-display text-xl font-semibold">Skills heating up now</h2>
@@ -94,6 +111,11 @@ export default async function TrendingSkillsPage() {
             <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Official</p>
             <h2 className="font-display text-xl font-semibold">Technology makers</h2>
             <p className="mt-2 text-sm leading-relaxed text-secondary">Browse skills from recognized ecosystem creators.</p>
+          </Link>
+          <Link href="/audits" className="border border-border p-5 transition-colors hover:border-foreground">
+            <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Audits</p>
+            <h2 className="font-display text-xl font-semibold">Review before install</h2>
+            <p className="mt-2 text-sm leading-relaxed text-secondary">Check trust, quality, maintenance, and install readiness.</p>
           </Link>
           <Link href="/agents" className="border border-border p-5 transition-colors hover:border-foreground">
             <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Agents</p>

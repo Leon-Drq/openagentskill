@@ -1,4 +1,4 @@
-import type { SkillEventStats, SkillRecord } from '@/lib/db/skills'
+import type { SkillEventDailyStats, SkillEventStats, SkillRecord } from '@/lib/db/skills'
 import { getFreshnessDays, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
 
@@ -8,6 +8,19 @@ export interface GrowthRankedSkill {
   score: number
   badge: string
   reason: string
+}
+
+export interface SkillDailyEventSummary {
+  total_events: number
+  views: number
+  install_copies: number
+  saves: number
+  compares: number
+  outbound_clicks: number
+  claim_starts: number
+  claim_submits: number
+  weighted_engagement: number
+  latest_event_at: string | null
 }
 
 export interface AgentProfile {
@@ -295,6 +308,52 @@ function eventRecencyScore(stats?: SkillEventStats | null) {
   return dateScore(stats.last_event_at, 14)
 }
 
+function dailyEngagement(row: SkillEventDailyStats) {
+  return (
+    (row.views || 0) +
+    (row.install_copies || 0) * 8 +
+    (row.compares || 0) * 5 +
+    (row.outbound_clicks || 0) * 4 +
+    (row.saves || 0) * 4 +
+    (row.claim_starts || 0) * 6 +
+    (row.claim_submits || 0) * 10
+  )
+}
+
+export function summarizeSkillDailyStats(rows?: SkillEventDailyStats[] | null): SkillDailyEventSummary {
+  const sorted = [...(rows || [])].sort((a, b) => a.event_date.localeCompare(b.event_date))
+  const summary: SkillDailyEventSummary = {
+    total_events: 0,
+    views: 0,
+    install_copies: 0,
+    saves: 0,
+    compares: 0,
+    outbound_clicks: 0,
+    claim_starts: 0,
+    claim_submits: 0,
+    weighted_engagement: 0,
+    latest_event_at: null,
+  }
+
+  for (const [index, row] of sorted.entries()) {
+    const recencyWeight = 0.65 + ((index + 1) / Math.max(1, sorted.length)) * 0.7
+    summary.total_events += Number(row.total_events || 0)
+    summary.views += Number(row.views || 0)
+    summary.install_copies += Number(row.install_copies || 0)
+    summary.saves += Number(row.saves || 0)
+    summary.compares += Number(row.compares || 0)
+    summary.outbound_clicks += Number(row.outbound_clicks || 0)
+    summary.claim_starts += Number(row.claim_starts || 0)
+    summary.claim_submits += Number(row.claim_submits || 0)
+    summary.weighted_engagement += dailyEngagement(row) * recencyWeight
+    if (row.last_event_at && (!summary.latest_event_at || row.last_event_at > summary.latest_event_at)) {
+      summary.latest_event_at = row.last_event_at
+    }
+  }
+
+  return summary
+}
+
 function officialMatch(skill: SkillRecord, creator: OfficialCreator) {
   const owner = repoOwner(skill)
   if (creator.repoOwners.includes(owner)) return true
@@ -394,20 +453,24 @@ export function rankSkillsForAgent(skills: SkillRecord[], profile: AgentProfile,
 export function rankTrendingSkills(
   skills: SkillRecord[],
   eventStatsMap: Record<string, SkillEventStats>,
+  dailyStatsMap: Record<string, SkillEventDailyStats[]> = {},
   limit = 48
 ): GrowthRankedSkill[] {
   return skills
     .map((skill) => {
       const stats = eventStatsMap[skill.slug]
+      const daily = summarizeSkillDailyStats(dailyStatsMap[skill.slug])
       const quality = getSkillQualityProfile(skill)
       const trust = getSkillTrustProfile(skill, false, stats)
-      const engagement =
+      const aggregateEngagement =
         (stats?.views || 0) +
         (stats?.install_copies || 0) * 8 +
         (stats?.compares || 0) * 5 +
         (stats?.outbound_clicks || 0) * 4 +
         (stats?.saves || 0) * 4
-      const recency = eventRecencyScore(stats) * 20
+      const hasRecentActivity = daily.total_events > 0
+      const engagement = hasRecentActivity ? daily.weighted_engagement : aggregateEngagement
+      const recency = (daily.latest_event_at ? dateScore(daily.latest_event_at, 10) : eventRecencyScore(stats)) * 22
       const score =
         engagement * 1.8 +
         recency +
@@ -417,9 +480,15 @@ export function rankTrendingSkills(
       return {
         skill,
         score,
-        badge: stats?.total_events ? `${stats.total_events} events` : `${quality.label} · ${quality.score}`,
-        reason: stats?.total_events
-          ? `${stats.views} views, ${stats.install_copies} install copies, and ${quality.label.toLowerCase()} quality signals.`
+        badge: hasRecentActivity
+          ? `${daily.total_events} events / 7d`
+          : stats?.total_events
+            ? `${stats.total_events} events`
+            : `${quality.label} · ${quality.score}`,
+        reason: hasRecentActivity
+          ? `${daily.views} views, ${daily.install_copies} install copies, and ${daily.compares} compares in the last 7 days, plus ${quality.label.toLowerCase()} quality signals.`
+          : stats?.total_events
+            ? `${stats.views} views, ${stats.install_copies} install copies, and ${quality.label.toLowerCase()} quality signals.`
           : `${quality.label} quality with strong adoption signals; usage events will lift it as people interact.`,
       }
     })
@@ -431,20 +500,25 @@ export function rankTrendingSkills(
 export function rankHotSkills(
   skills: SkillRecord[],
   eventStatsMap: Record<string, SkillEventStats>,
+  dailyStatsMap: Record<string, SkillEventDailyStats[]> = {},
   limit = 48
 ): GrowthRankedSkill[] {
   return skills
     .map((skill) => {
       const stats = eventStatsMap[skill.slug]
+      const daily = summarizeSkillDailyStats(dailyStatsMap[skill.slug])
       const quality = getSkillQualityProfile(skill)
-      const eventRecency = eventRecencyScore(stats)
+      const hasRecentActivity = daily.total_events > 0
+      const eventRecency = daily.latest_event_at ? dateScore(daily.latest_event_at, 7) : eventRecencyScore(stats)
       const pushRecency = dateScore(skill.github_last_pushed_at || skill.updated_at, 45)
       const launchRecency = dateScore(skill.created_at, 21)
-      const actionScore =
+      const aggregateActionScore =
         (stats?.install_copies || 0) * 12 +
         (stats?.outbound_clicks || 0) * 8 +
         (stats?.compares || 0) * 6 +
         (stats?.views || 0) * 1.5
+      const recentActionScore = daily.weighted_engagement * 1.35 + daily.install_copies * 8 + daily.outbound_clicks * 5
+      const actionScore = hasRecentActivity ? recentActionScore : aggregateActionScore
       const score =
         actionScore +
         eventRecency * 35 +
@@ -452,12 +526,20 @@ export function rankHotSkills(
         launchRecency * 18 +
         quality.score * 0.18 +
         Math.log10(Math.max(1, skill.github_stars || 1)) * 4
-      const freshnessLabel = pushRecency > 0.7 ? 'Fresh repo' : eventRecency > 0.5 ? 'Active page' : 'Hot candidate'
+      const freshnessLabel = hasRecentActivity
+        ? 'Active this week'
+        : pushRecency > 0.7
+          ? 'Fresh repo'
+          : eventRecency > 0.5
+            ? 'Active page'
+            : 'Hot candidate'
       return {
         skill,
         score,
-        badge: freshnessLabel,
-        reason: `${freshnessLabel} with ${quality.label.toLowerCase()} quality and current OpenAgentSkill activity signals.`,
+        badge: hasRecentActivity ? `${daily.total_events} recent events` : freshnessLabel,
+        reason: hasRecentActivity
+          ? `${freshnessLabel} with ${daily.install_copies} install copies, ${daily.outbound_clicks} outbound clicks, and ${quality.label.toLowerCase()} quality.`
+          : `${freshnessLabel} with ${quality.label.toLowerCase()} quality and current OpenAgentSkill activity signals.`,
       }
     })
     .sort((a, b) => b.score - a.score || b.skill.github_stars - a.skill.github_stars)

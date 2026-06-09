@@ -17,6 +17,7 @@ import { SkillFeedbackPanel } from '@/components/skill-feedback-panel'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { getStacksForSkill } from '@/lib/collections'
+import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillTrustProfile, type SkillTrustProfile, type TrustCheckStatus } from '@/lib/trust'
@@ -88,6 +89,12 @@ function getStatusTone(status: TrustCheckStatus) {
   return 'border-border text-secondary'
 }
 
+function getAuditTone(level: string) {
+  if (level === 'safe_to_try') return 'border-foreground text-foreground'
+  if (level === 'needs_review') return 'border-amber-300 text-amber-700'
+  return 'border-red-300 text-red-700'
+}
+
 function TrustBadge({ profile }: { profile: SkillTrustProfile }) {
   const label = profile.tier === 'production'
     ? 'TRUSTED'
@@ -135,6 +142,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   const platformHints = dbSkill ? getPlatformHints(dbSkill) : []
   const decisionProfile = dbSkill ? getSkillDecisionProfile(dbSkill, eventStats) : null
   const trustProfile = dbSkill ? getSkillTrustProfile(dbSkill, Boolean(approvedClaim), eventStats) : null
+  const auditProfile = dbSkill ? buildSkillAudit(dbSkill, eventStats) : null
   const compareHref = `/compare?skills=${encodeURIComponent([skill.slug, ...relatedSkills.slice(0, 3).map((rs) => rs.slug)].join(','))}`
   const relatedDecisionRows = relatedSkills.map((relatedSkill) => ({
     skill: relatedSkill,
@@ -251,6 +259,12 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                     <span className="font-semibold">{trustProfile.score}/100 · {trustProfile.label}</span>
                   </div>
                 )}
+                {auditProfile && (
+                  <div>
+                    <span className="text-secondary">Audit </span>
+                    <span className="font-semibold">{auditProfile.audit_score}/100 · {auditRiskLabel(auditProfile.risk_level)}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -261,6 +275,29 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 skillSlug={skill.slug}
               />
             </div>
+
+            {auditProfile && (
+              <section className="mb-10 border border-border bg-card p-5">
+                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                  <div>
+                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Audit report</p>
+                    <h2 className="font-display text-2xl font-semibold">
+                      {auditRiskLabel(auditProfile.risk_level)} · {auditProfile.audit_score}/100
+                    </h2>
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
+                      Review install readiness, maintenance, trust, quality, and metadata warnings before adding this
+                      skill to an agent workflow.
+                    </p>
+                  </div>
+                  <Link
+                    href={`/skills/${skill.slug}/audit`}
+                    className="w-full border border-foreground bg-foreground px-4 py-2.5 text-center text-sm font-semibold text-background transition-opacity hover:opacity-80 sm:w-auto"
+                  >
+                    View audit report
+                  </Link>
+                </div>
+              </section>
+            )}
 
             {decisionProfile && (
               <section className="mb-10 border border-border bg-card">
@@ -647,6 +684,41 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                     </div>
                   </div>
                   <p className="mt-4 text-sm leading-relaxed text-secondary">{decisionProfile.proofPoints[0]}</p>
+                </div>
+              )}
+
+              {auditProfile && (
+                <div className="border border-border p-5">
+                  <div className="mb-4 flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="font-display text-lg font-semibold">Audit Snapshot</h3>
+                      <p className="mt-1 text-xs text-secondary">Install and adoption review</p>
+                    </div>
+                    <div className="font-mono text-2xl font-semibold">{auditProfile.audit_score}</div>
+                  </div>
+                  <span className={`inline-flex border px-2 py-0.5 font-mono text-xs ${getAuditTone(auditProfile.risk_level)}`}>
+                    {auditRiskLabel(auditProfile.risk_level)}
+                  </span>
+                  <dl className="mt-4 space-y-3 text-xs">
+                    <div className="flex items-center justify-between gap-4">
+                      <dt className="text-secondary">Security</dt>
+                      <dd className="font-mono">{auditProfile.security_score}/100</dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <dt className="text-secondary">Maintenance</dt>
+                      <dd className="font-mono">{auditProfile.maintenance_score}/100</dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <dt className="text-secondary">Install</dt>
+                      <dd className="font-mono">{auditProfile.install_score}/100</dd>
+                    </div>
+                  </dl>
+                  <Link
+                    href={`/skills/${skill.slug}/audit`}
+                    className="mt-4 block border border-border px-3 py-2 text-center text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                  >
+                    Open full audit
+                  </Link>
                 </div>
               )}
 

@@ -13,6 +13,7 @@ const navItems = [
   { href: '/skills', labelKey: 'skills' },
   { href: '/best', label: 'Best' },
   { href: '/trending', label: 'Trending' },
+  { href: '/audits', label: 'Audits' },
   { href: '/official', label: 'Official' },
   { href: '/agents', label: 'Agents' },
   { href: '/rankings', label: 'Rankings' },

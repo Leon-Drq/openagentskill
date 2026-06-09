@@ -627,13 +627,13 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
               </p>
             </Link>
             <Link
-              href="/api-docs#skill-badges"
+              href="/audits"
               className="group border border-border bg-card p-5 transition-colors hover:border-foreground"
             >
-              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">README badges</p>
-              <h3 className="font-display text-xl font-semibold group-hover:text-secondary">Earn natural backlinks</h3>
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Audit reports</p>
+              <h3 className="font-display text-xl font-semibold group-hover:text-secondary">Review before install</h3>
               <p className="mt-3 text-sm leading-relaxed text-secondary">
-                Add an OpenAgentSkill trust badge to a GitHub README and link back to the skill page.
+                Check install readiness, maintenance, trust, quality, and metadata warnings for indexed skills.
               </p>
             </Link>
           </div>
@@ -656,6 +656,12 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
               className="border border-border px-4 py-3 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
             >
               Monthly Agent Skills Index
+            </Link>
+            <Link
+              href="/api-docs#skill-badges"
+              className="border border-border px-4 py-3 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+            >
+              README audit badges
             </Link>
             {HOME_BEST_PAGES.map((page) => (
               <Link

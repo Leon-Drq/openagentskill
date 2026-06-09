@@ -13,6 +13,7 @@ const navItems = [
   { href: '/best', label: 'Best' },
   { href: '/trending', label: 'Trending' },
   { href: '/hot', label: 'Hot' },
+  { href: '/audits', label: 'Audits' },
   { href: '/official', label: 'Official' },
   { href: '/agents', label: 'Agents' },
   { href: '/use-cases', label: 'Use Cases' },

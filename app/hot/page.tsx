@@ -3,9 +3,15 @@ import Link from 'next/link'
 import { GrowthSkillList } from '@/components/growth-skill-list'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
-import { getAllSkills, getSkillEventStatsMap, type SkillEventStats } from '@/lib/db/skills'
+import {
+  getAllSkills,
+  getSkillEventDailyStatsMap,
+  getSkillEventStatsMap,
+  type SkillEventDailyStats,
+  type SkillEventStats,
+} from '@/lib/db/skills'
 import { formatCompactNumber, getFreshnessDays } from '@/lib/quality'
-import { rankHotSkills } from '@/lib/seo/growth-directories'
+import { rankHotSkills, summarizeSkillDailyStats } from '@/lib/seo/growth-directories'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,11 +31,14 @@ export const metadata: Metadata = {
 }
 
 export default async function HotSkillsPage() {
-  const [skills, eventStatsMap] = await Promise.all([
+  const [skills, eventStatsMap, dailyStatsMap] = await Promise.all([
     getAllSkills('quality').catch(() => []),
     getSkillEventStatsMap().catch((): Record<string, SkillEventStats> => ({})),
+    getSkillEventDailyStatsMap(7).catch((): Record<string, SkillEventDailyStats[]> => ({})),
   ])
-  const ranked = rankHotSkills(skills, eventStatsMap, 40)
+  const ranked = rankHotSkills(skills, eventStatsMap, dailyStatsMap, 40)
+  const dailySummaries = Object.values(dailyStatsMap).map((rows) => summarizeSkillDailyStats(rows))
+  const totalRecentEvents = dailySummaries.reduce((sum, stats) => sum + Number(stats.total_events || 0), 0)
   const freshRepoCount = ranked.filter((item) => {
     const days = getFreshnessDays(item.skill.github_last_pushed_at)
     return days !== null && days < 45
@@ -71,8 +80,8 @@ export default async function HotSkillsPage() {
             </div>
             <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
               <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{ranked.length}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Ranked</div>
+                <div className="font-mono text-2xl">{formatCompactNumber(totalRecentEvents)}</div>
+                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Events / 7d</div>
               </div>
               <div className="bg-background p-4">
                 <div className="font-mono text-2xl">{freshRepoCount}</div>
@@ -86,7 +95,7 @@ export default async function HotSkillsPage() {
           </div>
         </section>
 
-        <section className="grid gap-3 border-b border-border py-8 md:grid-cols-3">
+        <section className="grid gap-3 border-b border-border py-8 md:grid-cols-4">
           <Link href="/trending" className="border border-border p-5 transition-colors hover:border-foreground">
             <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Trending</p>
             <h2 className="font-display text-xl font-semibold">Broader growth signals</h2>
@@ -96,6 +105,11 @@ export default async function HotSkillsPage() {
             <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Best</p>
             <h2 className="font-display text-xl font-semibold">Use-case shortlists</h2>
             <p className="mt-2 text-sm leading-relaxed text-secondary">Ranked by workflow fit instead of only activity.</p>
+          </Link>
+          <Link href="/audits" className="border border-border p-5 transition-colors hover:border-foreground">
+            <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Audits</p>
+            <h2 className="font-display text-xl font-semibold">Install confidence</h2>
+            <p className="mt-2 text-sm leading-relaxed text-secondary">Inspect risk, trust, quality, and maintenance signals.</p>
           </Link>
           <Link href="/reports/monthly" className="border border-border p-5 transition-colors hover:border-foreground">
             <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Monthly index</p>

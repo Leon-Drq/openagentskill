@@ -18,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/best`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.92 },
     { url: `${baseUrl}/trending`, lastModified: new Date(), changeFrequency: 'hourly', priority: 0.92 },
     { url: `${baseUrl}/hot`, lastModified: new Date(), changeFrequency: 'hourly', priority: 0.9 },
+    { url: `${baseUrl}/audits`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/official`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/agents`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/use-cases`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
@@ -61,6 +62,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(skill.updated_at),
       changeFrequency: 'weekly',
       priority: 0.78,
+    }))
+
+  const auditPages: MetadataRoute.Sitemap = skills
+    .filter((skill) => Number(skill.github_stars || 0) >= 500)
+    .slice(0, 350)
+    .map((skill) => ({
+      url: `${baseUrl}/skills/${skill.slug}/audit`,
+      lastModified: new Date(skill.updated_at),
+      changeFrequency: 'weekly',
+      priority: 0.76,
     }))
 
   const posts = await getBlogPosts(100).catch(() => [])
@@ -139,6 +150,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...guidePages,
     ...blogUseCasePages,
     ...skillPages,
+    ...auditPages,
     ...alternativePages,
     ...blogPages,
   ]

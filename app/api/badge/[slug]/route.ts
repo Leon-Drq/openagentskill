@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getSkillBySlug } from '@/lib/db/skills'
+import { auditRiskColor, auditRiskLabel, buildSkillAudit, normalizeAuditRecord } from '@/lib/audits'
+import { getSkillAuditBySlug, getSkillBySlug } from '@/lib/db/skills'
 import { getSkillTrustProfile } from '@/lib/trust'
 
 export const dynamic = 'force-dynamic'
@@ -64,20 +65,30 @@ export async function GET(
   const url = new URL(request.url)
   const mode = url.searchParams.get('metric') || 'trust'
   const trust = getSkillTrustProfile(skill)
+  const storedAudit = mode === 'audit' ? await getSkillAuditBySlug(skill.slug).catch(() => null) : null
+  const audit = mode === 'audit'
+    ? storedAudit
+      ? normalizeAuditRecord(storedAudit)
+      : buildSkillAudit(skill)
+    : null
   const label = url.searchParams.get('label') || 'OpenAgentSkill'
   const value =
     mode === 'stars'
       ? `${Number(skill.github_stars || 0).toLocaleString()} stars`
       : mode === 'quality'
         ? `${Math.round(Number(skill.quality_score || 0))}/100 quality`
-        : `${trust.score}/100 ${trust.tier === 'production' ? 'trusted' : 'trust'}`
-  const color = trust.tier === 'production'
-    ? '#111111'
-    : trust.tier === 'strong'
-      ? '#2563eb'
-      : trust.tier === 'review'
-        ? '#b45309'
-        : '#991b1b'
+        : mode === 'audit' && audit
+          ? `${audit.audit_score}/100 ${auditRiskLabel(audit.risk_level).toLowerCase()}`
+          : `${trust.score}/100 ${trust.tier === 'production' ? 'trusted' : 'trust'}`
+  const color = mode === 'audit' && audit
+    ? auditRiskColor(audit.risk_level)
+    : trust.tier === 'production'
+      ? '#111111'
+      : trust.tier === 'strong'
+        ? '#2563eb'
+        : trust.tier === 'review'
+          ? '#b45309'
+          : '#991b1b'
 
   return new NextResponse(makeBadge(label, value, color), {
     headers: {
