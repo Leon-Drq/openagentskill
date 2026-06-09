@@ -1,0 +1,272 @@
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { InstallCommand } from '@/components/install-command'
+import { SiteFooter } from '@/components/site-footer'
+import { SiteHeader } from '@/components/site-header'
+import { convertSkillRecordToManifest, getAllSkills, getSkillStats, type SkillAgentStats } from '@/lib/db/skills'
+import { formatCompactNumber, getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
+import {
+  getRankingCompareHref,
+  rankSkillsForDefinition,
+  type RankingDefinition,
+} from '@/lib/rankings'
+import { BEST_SKILL_PAGES, getBestSkillPage } from '@/lib/seo/growth-pages'
+import { getSkillTrustProfile } from '@/lib/trust'
+import { getUseCaseBySlug } from '@/lib/use-cases'
+
+export const dynamic = 'force-dynamic'
+
+export function generateStaticParams() {
+  return BEST_SKILL_PAGES.map((page) => ({ slug: page.slug }))
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const page = getBestSkillPage(slug)
+  if (!page) return { title: 'Best Skills Not Found' }
+
+  return {
+    title: page.title,
+    description: `${page.description} Ranked with OpenAgentSkill quality, trust, GitHub adoption, and maintenance signals.`,
+    alternates: {
+      canonical: `https://www.openagentskill.com/best/${page.slug}`,
+    },
+    openGraph: {
+      title: `${page.title} - OpenAgentSkill`,
+      description: page.description,
+      url: `https://www.openagentskill.com/best/${page.slug}`,
+      type: 'website',
+    },
+  }
+}
+
+function toRanking(page: NonNullable<ReturnType<typeof getBestSkillPage>>): RankingDefinition {
+  return {
+    slug: `best-${page.slug}-skills`,
+    title: page.title,
+    shortTitle: page.shortTitle,
+    eyebrow: page.eyebrow,
+    description: page.description,
+    kind: 'use-case',
+    useCaseSlug: page.useCaseSlug,
+  }
+}
+
+function formatDate(value: string | null | undefined) {
+  if (!value) return 'Unknown'
+  return new Date(value).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
+export default async function BestSkillDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const page = getBestSkillPage(slug)
+  if (!page) notFound()
+
+  const useCase = getUseCaseBySlug(page.useCaseSlug)
+  const ranking = toRanking(page)
+  const [skills, statsMap] = await Promise.all([
+    getAllSkills('quality').catch(() => []),
+    getSkillStats().catch((): Record<string, SkillAgentStats> => ({})),
+  ])
+  const rankedSkills = rankSkillsForDefinition(skills, ranking, statsMap, 30)
+  const compareHref = getRankingCompareHref(rankedSkills)
+  const topSkill = rankedSkills[0]?.skill
+
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: page.title,
+    description: page.description,
+    url: `https://www.openagentskill.com/best/${page.slug}`,
+    mainEntity: rankedSkills.slice(0, 10).map((item) => ({
+      '@type': 'SoftwareApplication',
+      position: item.rank,
+      name: item.skill.name,
+      url: `https://www.openagentskill.com/skills/${item.skill.slug}`,
+      applicationCategory: item.skill.category,
+    })),
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <SiteHeader />
+
+      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+        <nav className="mb-8 flex flex-wrap items-center gap-2 text-sm text-secondary">
+          <Link href="/best" className="hover:text-foreground">Best skills</Link>
+          <span>/</span>
+          <span className="text-foreground">{page.shortTitle}</span>
+        </nav>
+
+        <section className="grid gap-10 border-b border-border pb-10 lg:grid-cols-[1.15fr_0.85fr]">
+          <div>
+            <p className="mb-4 text-xs uppercase tracking-widest text-secondary">{page.eyebrow}</p>
+            <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">{page.title}</h1>
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">{page.description}</p>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-secondary">
+              {page.audience} Ranked from the OpenAgentSkill index using quality, trust, freshness, adoption, and install readiness.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              {rankedSkills.length > 1 && (
+                <Link
+                  href={compareHref}
+                  className="border border-foreground bg-foreground px-5 py-2 text-sm font-semibold text-background transition-opacity hover:opacity-80"
+                >
+                  Compare top 4
+                </Link>
+              )}
+              <Link
+                href={`/skills?useCase=${encodeURIComponent(page.useCaseSlug)}&trust=production`}
+                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+              >
+                Filter production candidates
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-px self-end border border-border bg-border text-center">
+            <div className="bg-background p-4">
+              <div className="font-mono text-2xl">{rankedSkills.length}</div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Ranked</div>
+            </div>
+            <div className="bg-background p-4">
+              <div className="font-mono text-2xl">
+                {formatCompactNumber(rankedSkills.reduce((sum, item) => sum + Number(item.skill.github_stars || 0), 0))}
+              </div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Stars</div>
+            </div>
+            <div className="bg-background p-4">
+              <div className="font-mono text-2xl">{topSkill ? getSkillTrustProfile(topSkill).score : 0}</div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Top trust</div>
+            </div>
+          </div>
+        </section>
+
+        {useCase && (
+          <section className="grid gap-px border-b border-border bg-border py-10 md:grid-cols-3">
+            {useCase.workflows.slice(0, 3).map((workflow) => (
+              <div key={workflow} className="bg-background p-5">
+                <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Workflow</p>
+                <p className="font-display text-xl font-semibold">{workflow}</p>
+              </div>
+            ))}
+          </section>
+        )}
+
+        <section className="py-10">
+          {rankedSkills.length === 0 ? (
+            <div className="border border-border p-8">
+              <h2 className="font-display text-2xl font-semibold">No matching skills yet.</h2>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
+                The indexer is still expanding this workflow category.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-border border-y border-border">
+              {rankedSkills.map((item) => {
+                const skill = item.skill
+                const manifest = convertSkillRecordToManifest(skill)
+                const quality = getSkillQualityProfile(skill, statsMap[skill.slug] || null)
+                const trust = getSkillTrustProfile(skill)
+                const platforms = [...new Set([...(skill.frameworks || []), ...getPlatformHints(skill)])]
+
+                return (
+                  <article key={skill.slug} className="grid gap-5 py-7 lg:grid-cols-[auto_1fr_280px]">
+                    <div className="font-mono text-2xl text-secondary tabular-nums">#{item.rank}</div>
+                    <div className="min-w-0">
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <Link href={`/skills/${skill.slug}`} className="min-w-0">
+                          <h2 className="font-display text-2xl font-semibold leading-tight hover:text-secondary">
+                            {skill.name}
+                          </h2>
+                        </Link>
+                        <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
+                          {item.badge}
+                        </span>
+                        <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
+                          Trust {trust.score}
+                        </span>
+                        <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
+                          {quality.label} {quality.score}
+                        </span>
+                      </div>
+                      <p className="max-w-3xl text-sm leading-relaxed text-secondary">{skill.description}</p>
+                      <p className="mt-3 max-w-3xl text-sm leading-relaxed">{item.reason}</p>
+                      <div className="mt-4 flex flex-wrap gap-4 text-xs font-mono text-secondary">
+                        <span>{formatCompactNumber(skill.github_stars || 0)} stars</span>
+                        <span>{formatDate(skill.github_last_pushed_at || skill.updated_at)} push</span>
+                        <span>{trust.label}</span>
+                        {platforms.slice(0, 2).map((platform) => <span key={platform}>{platform}</span>)}
+                      </div>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <Link
+                          href={`/alternatives/${skill.slug}`}
+                          className="border border-border px-2.5 py-1 text-xs text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                        >
+                          Alternatives
+                        </Link>
+                        <Link
+                          href={`/compare?skills=${encodeURIComponent([skill.slug, ...rankedSkills.filter((row) => row.skill.slug !== skill.slug).slice(0, 3).map((row) => row.skill.slug)].join(','))}`}
+                          className="border border-border px-2.5 py-1 text-xs text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                        >
+                          Compare
+                        </Link>
+                      </div>
+                    </div>
+                    <div className="min-w-0">
+                      <InstallCommand
+                        command={manifest.technical.installCommand || `npx skills add ${skill.github_repo}`}
+                        skillSlug={skill.slug}
+                        compact
+                      />
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+          )}
+        </section>
+
+        <section className="border-t border-border py-10">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div>
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Selection method</p>
+              <h2 className="font-display text-2xl font-semibold">How this list is ranked</h2>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
+                OpenAgentSkill scores each candidate against the workflow keywords, then balances fit with GitHub stars,
+                quality signals, trust profile, maintenance freshness, and whether there is a clear install path.
+              </p>
+            </div>
+            <div className="border border-border p-5">
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">FAQ</p>
+              <h3 className="font-display text-xl font-semibold">Should I install the top skill immediately?</h3>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
+                Treat this as a shortlist. Open the skill detail page, inspect the repository, and test the install command
+                in a controlled agent workflow before production use.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <SiteFooter />
+    </div>
+  )
+}

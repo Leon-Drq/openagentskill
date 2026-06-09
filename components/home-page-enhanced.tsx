@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useI18n } from '@/lib/i18n/context'
 import { SKILL_STACKS } from '@/lib/collections'
 import { CORE_RANKINGS } from '@/lib/rankings'
+import { FEATURED_BEST_PAGES } from '@/lib/seo/growth-pages'
 import { FEATURED_GROWTH_GUIDES } from '@/lib/seo/growth-guides'
 import { USE_CASES } from '@/lib/use-cases'
 import { SiteFooter } from './site-footer'
@@ -86,6 +87,7 @@ const HOME_USE_CASES = USE_CASES.slice(0, 6)
 const HOME_STACKS = SKILL_STACKS.slice(0, 3)
 const HOME_RANKINGS = CORE_RANKINGS.slice(0, 3)
 const HOME_GUIDES = FEATURED_GROWTH_GUIDES.slice(0, 3)
+const HOME_BEST_PAGES = FEATURED_BEST_PAGES.slice(0, 3)
 
 function AnimatedNumber({ 
   value, 
@@ -146,8 +148,6 @@ function formatCompact(value: number) {
 
 export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePageEnhancedProps) {
   const { t } = useI18n()
-  const [mounted, setMounted] = useState(false)
-
   const [taskQuery, setTaskQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const [recommendations, setRecommendations] = useState<Recommendation[]>([])
@@ -157,10 +157,6 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
   const [showResults, setShowResults] = useState(false)
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null)
   const searchRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   const runRecommendation = async (query: string) => {
     const normalizedQuery = query.trim()
@@ -220,18 +216,15 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
         <div className="max-w-3xl mx-auto">
           {/* Animated Title */}
           <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 tracking-tight leading-[1.05] text-center">
-            {mounted
-              ? t.hero.title.split(' ').map((word, i) => (
-                  <span
-                    key={i}
-                    className="inline-block mr-2 sm:mr-3"
-                    style={{ animation: `fadeInUp 0.7s ease-out ${i * 0.12}s both` }}
-                  >
-                    {word}
-                  </span>
-                ))
-              : t.hero.title
-            }
+            {t.hero.title.split(' ').map((word, i) => (
+              <span
+                key={i}
+                className="inline-block mr-2 sm:mr-3"
+                style={{ animation: `fadeInUp 0.7s ease-out ${i * 0.12}s both` }}
+              >
+                {word}
+              </span>
+            ))}
           </h1>
 
           <p
@@ -574,6 +567,75 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
         <div className="mx-auto max-w-5xl">
           <div className="mb-8 flex flex-col justify-between gap-4 sm:mb-10 sm:flex-row sm:items-end">
             <div>
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Growth hubs</p>
+              <h2 className="font-display text-2xl font-bold sm:text-3xl">Find, compare, and share trusted skills</h2>
+            </div>
+            <Link href="/best" className="text-sm text-secondary underline underline-offset-2 transition-colors hover:text-foreground">
+              Browse best-of lists
+            </Link>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+            <Link
+              href="/best"
+              className="group border border-border bg-card p-5 transition-colors hover:border-foreground"
+            >
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Best lists</p>
+              <h3 className="font-display text-xl font-semibold group-hover:text-secondary">Use-case rankings</h3>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
+                Shortlists for web scraping, coding agents, RAG, browser automation, and more.
+              </p>
+            </Link>
+            <Link
+              href={`/alternatives/${featuredSkills[0]?.slug || 'crawl4ai'}`}
+              className="group border border-border bg-card p-5 transition-colors hover:border-foreground"
+            >
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Alternatives</p>
+              <h3 className="font-display text-xl font-semibold group-hover:text-secondary">Compare before switching</h3>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
+                Find similar skills by category, tags, trust, quality, freshness, and install readiness.
+              </p>
+            </Link>
+            <Link
+              href="/reports/monthly"
+              className="group border border-border bg-card p-5 transition-colors hover:border-foreground"
+            >
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Monthly index</p>
+              <h3 className="font-display text-xl font-semibold group-hover:text-secondary">Track ecosystem shifts</h3>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
+                Production candidates, newly indexed skills, maintained repos, and engagement signals.
+              </p>
+            </Link>
+            <Link
+              href="/api-docs#skill-badges"
+              className="group border border-border bg-card p-5 transition-colors hover:border-foreground"
+            >
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">README badges</p>
+              <h3 className="font-display text-xl font-semibold group-hover:text-secondary">Earn natural backlinks</h3>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
+                Add an OpenAgentSkill trust badge to a GitHub README and link back to the skill page.
+              </p>
+            </Link>
+          </div>
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+            {HOME_BEST_PAGES.map((page) => (
+              <Link
+                key={page.slug}
+                href={`/best/${page.slug}`}
+                className="border border-border px-4 py-3 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+              >
+                Best {page.shortTitle.toLowerCase()} skills
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-border px-4 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-8 flex flex-col justify-between gap-4 sm:mb-10 sm:flex-row sm:items-end">
+            <div>
               <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Use-case discovery</p>
               <h2 className="font-display text-2xl font-bold sm:text-3xl">Browse by what your agent needs to do</h2>
             </div>
@@ -716,7 +778,7 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
                 key={skill.slug}
                 href={`/skills/${skill.slug}`}
                 className="flex items-center gap-4 sm:gap-6 px-4 sm:px-6 py-4 hover:bg-muted/40 transition-colors group"
-                style={{ animation: mounted ? `fadeInUp 0.5s ease-out ${index * 0.06 + 0.2}s both` : 'none' }}
+                style={{ animation: `fadeInUp 0.5s ease-out ${index * 0.06 + 0.2}s both` }}
               >
                 {/* Rank */}
                 <span className="text-xl sm:text-2xl font-display font-bold text-secondary/40 w-8 text-right shrink-0">
@@ -761,7 +823,7 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
               <div
                 key={activity.id}
                 className="pl-5 sm:pl-6 py-3 relative hover:bg-muted/20 transition-colors"
-                style={{ animation: mounted ? `slideInLeft 0.4s ease-out ${index * 0.07}s both` : 'none' }}
+                style={{ animation: `slideInLeft 0.4s ease-out ${index * 0.07}s both` }}
               >
                 {/* Timeline dot */}
                 <div className={`absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 ${

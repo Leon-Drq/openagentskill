@@ -1,0 +1,88 @@
+import { NextResponse } from 'next/server'
+import { getSkillBySlug } from '@/lib/db/skills'
+import { getSkillTrustProfile } from '@/lib/trust'
+
+export const dynamic = 'force-dynamic'
+
+function escapeXml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
+
+function estimateWidth(text: string, base = 10) {
+  return Math.max(48, Math.round(text.length * 6.2 + base))
+}
+
+function makeBadge(label: string, value: string, color = '#111111') {
+  const safeLabel = escapeXml(label)
+  const safeValue = escapeXml(value)
+  const labelWidth = estimateWidth(label, 16)
+  const valueWidth = estimateWidth(value, 18)
+  const width = labelWidth + valueWidth
+  const valueX = labelWidth + valueWidth / 2
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="20" role="img" aria-label="${safeLabel}: ${safeValue}">
+  <title>${safeLabel}: ${safeValue}</title>
+  <linearGradient id="s" x2="0" y2="100%">
+    <stop offset="0" stop-color="#fff" stop-opacity=".08"/>
+    <stop offset="1" stop-color="#000" stop-opacity=".08"/>
+  </linearGradient>
+  <clipPath id="r"><rect width="${width}" height="20" rx="0" fill="#fff"/></clipPath>
+  <g clip-path="url(#r)">
+    <rect width="${labelWidth}" height="20" fill="#555"/>
+    <rect x="${labelWidth}" width="${valueWidth}" height="20" fill="${color}"/>
+    <rect width="${width}" height="20" fill="url(#s)"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11">
+    <text x="${labelWidth / 2}" y="14">${safeLabel}</text>
+    <text x="${valueX}" y="14">${safeValue}</text>
+  </g>
+</svg>`
+}
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await params
+  const skill = await getSkillBySlug(slug).catch(() => null)
+
+  if (!skill) {
+    return new NextResponse(makeBadge('OpenAgentSkill', 'not found', '#737373'), {
+      status: 404,
+      headers: {
+        'Content-Type': 'image/svg+xml; charset=utf-8',
+        'Cache-Control': 'public, max-age=300',
+      },
+    })
+  }
+
+  const url = new URL(request.url)
+  const mode = url.searchParams.get('metric') || 'trust'
+  const trust = getSkillTrustProfile(skill)
+  const label = url.searchParams.get('label') || 'OpenAgentSkill'
+  const value =
+    mode === 'stars'
+      ? `${Number(skill.github_stars || 0).toLocaleString()} stars`
+      : mode === 'quality'
+        ? `${Math.round(Number(skill.quality_score || 0))}/100 quality`
+        : `${trust.score}/100 ${trust.tier === 'production' ? 'trusted' : 'trust'}`
+  const color = trust.tier === 'production'
+    ? '#111111'
+    : trust.tier === 'strong'
+      ? '#2563eb'
+      : trust.tier === 'review'
+        ? '#b45309'
+        : '#991b1b'
+
+  return new NextResponse(makeBadge(label, value, color), {
+    headers: {
+      'Content-Type': 'image/svg+xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+    },
+  })
+}

@@ -304,6 +304,45 @@ This skill enables agents to perform comprehensive web research...`}</code>
             </div>
           </div>
 
+          <div id="skill-badges" className="scroll-mt-24 border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/badge/{slug}'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Generate a README-friendly SVG badge for a skill trust score, quality score, or GitHub stars.'}
+              </p>
+
+              <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Markdown'}</h3>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-4 sm:mb-6 whitespace-pre-wrap">
+                <code>{`[![OpenAgentSkill](https://www.openagentskill.com/api/badge/crawl4ai)](https://www.openagentskill.com/skills/crawl4ai)
+
+[![Quality](https://www.openagentskill.com/api/badge/crawl4ai?metric=quality&label=Quality)](https://www.openagentskill.com/skills/crawl4ai)
+
+[![Stars](https://www.openagentskill.com/api/badge/crawl4ai?metric=stars&label=GitHub)](https://www.openagentskill.com/skills/crawl4ai)`}</code>
+              </div>
+
+              <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Query Parameters'}</h3>
+              <div className="space-y-3 text-sm sm:text-base">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
+                  <code className="font-mono bg-muted px-2 py-1 w-fit shrink-0">{'metric'}</code>
+                  <span className="text-secondary">{'trust, quality, or stars. Defaults to trust.'}</span>
+                </div>
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
+                  <code className="font-mono bg-muted px-2 py-1 w-fit shrink-0">{'label'}</code>
+                  <span className="text-secondary">{'Optional badge label, such as Quality or GitHub.'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* POST /api/skills/submit */}
           <div className="border border-border mb-8 sm:mb-10">
             <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">

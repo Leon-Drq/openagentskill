@@ -19,6 +19,9 @@ export function SiteFooter() {
           <Link href="/skills" className="hover:text-foreground">
             {t.nav.skills}
           </Link>
+          <Link href="/best" className="hover:text-foreground">
+            Best
+          </Link>
           <Link href="/use-cases" className="hover:text-foreground">
             Use Cases
           </Link>
@@ -27,6 +30,9 @@ export function SiteFooter() {
           </Link>
           <Link href="/reports/weekly" className="hover:text-foreground">
             Reports
+          </Link>
+          <Link href="/reports/monthly" className="hover:text-foreground">
+            Monthly Index
           </Link>
           <Link href="/collections" className="hover:text-foreground">
             Stacks

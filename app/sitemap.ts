@@ -4,6 +4,7 @@ import { getBlogPosts } from '@/lib/blog/generate'
 import { SKILL_STACKS } from '@/lib/collections'
 import { getRankingDefinitions } from '@/lib/rankings'
 import { LOCALIZED_LANDING_PAGES, getLocalizedLanguageAlternates } from '@/lib/seo/localized-pages'
+import { BEST_SKILL_PAGES } from '@/lib/seo/growth-pages'
 import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
 import { USE_CASES } from '@/lib/use-cases'
 
@@ -13,9 +14,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
     { url: `${baseUrl}/skills`, lastModified: new Date(), changeFrequency: 'hourly', priority: 0.9 },
+    { url: `${baseUrl}/best`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.92 },
     { url: `${baseUrl}/use-cases`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/rankings`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/reports/weekly`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.85 },
+    { url: `${baseUrl}/reports/monthly`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.86 },
     { url: `${baseUrl}/collections`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/compare`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${baseUrl}/guides`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
@@ -42,6 +45,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'weekly',
     priority: 0.8,
   }))
+
+  const alternativePages: MetadataRoute.Sitemap = skills
+    .filter((skill) => Number(skill.github_stars || 0) >= 500)
+    .slice(0, 250)
+    .map((skill) => ({
+      url: `${baseUrl}/alternatives/${skill.slug}`,
+      lastModified: new Date(skill.updated_at),
+      changeFrequency: 'weekly',
+      priority: 0.78,
+    }))
 
   const posts = await getBlogPosts(100).catch(() => [])
   const blogPages: MetadataRoute.Sitemap = posts.map((post) => ({
@@ -79,6 +92,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: ranking.kind === 'use-case' ? 0.82 : 0.85,
   }))
 
+  const bestPages: MetadataRoute.Sitemap = BEST_SKILL_PAGES.map((page) => ({
+    url: `${baseUrl}/best/${page.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'daily',
+    priority: 0.88,
+  }))
+
   const guidePages: MetadataRoute.Sitemap = GROWTH_GUIDES.map((guide) => ({
     url: `${baseUrl}/guides/${guide.slug}`,
     lastModified: new Date(),
@@ -90,11 +110,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticPages,
     ...localizedPages,
     ...useCasePages,
+    ...bestPages,
     ...collectionPages,
     ...rankingPages,
     ...guidePages,
     ...blogUseCasePages,
     ...skillPages,
+    ...alternativePages,
     ...blogPages,
   ]
 }
