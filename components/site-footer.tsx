@@ -34,6 +34,9 @@ export function SiteFooter() {
           <Link href="/compare" className="hover:text-foreground">
             Compare
           </Link>
+          <Link href="/guides" className="hover:text-foreground">
+            Guides
+          </Link>
           <Link href="/blog" className="hover:text-foreground">
             Blog
           </Link>

@@ -14,6 +14,7 @@ const navItems = [
   { href: '/use-cases', label: 'Use Cases' },
   { href: '/rankings', label: 'Rankings' },
   { href: '/collections', label: 'Stacks' },
+  { href: '/guides', label: 'Guides' },
   { href: '/blog', label: 'Blog' },
   { href: '/docs', labelKey: 'docs' },
   { href: '/api-docs', labelKey: 'apiDocs' },
@@ -52,8 +53,8 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex min-w-0 items-center gap-2.5 transition-opacity hover:opacity-70">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+        <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5 transition-opacity hover:opacity-70">
           <span className="flex h-7 w-7 shrink-0 items-center justify-center border border-foreground font-display text-sm font-semibold leading-none">
             O
           </span>

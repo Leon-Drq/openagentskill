@@ -4,6 +4,7 @@ import { getBlogPosts } from '@/lib/blog/generate'
 import { SKILL_STACKS } from '@/lib/collections'
 import { getRankingDefinitions } from '@/lib/rankings'
 import { LOCALIZED_LANDING_PAGES, getLocalizedLanguageAlternates } from '@/lib/seo/localized-pages'
+import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
 import { USE_CASES } from '@/lib/use-cases'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -17,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/reports/weekly`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.85 },
     { url: `${baseUrl}/collections`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/compare`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${baseUrl}/guides`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
     { url: `${baseUrl}/submit`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/docs`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
@@ -77,12 +79,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: ranking.kind === 'use-case' ? 0.82 : 0.85,
   }))
 
+  const guidePages: MetadataRoute.Sitemap = GROWTH_GUIDES.map((guide) => ({
+    url: `${baseUrl}/guides/${guide.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: guide.intent === 'compare' ? 0.86 : 0.88,
+  }))
+
   return [
     ...staticPages,
     ...localizedPages,
     ...useCasePages,
     ...collectionPages,
     ...rankingPages,
+    ...guidePages,
     ...blogUseCasePages,
     ...skillPages,
     ...blogPages,

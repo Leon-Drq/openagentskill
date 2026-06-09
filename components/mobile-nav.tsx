@@ -13,6 +13,7 @@ const navItems = [
   { href: '/use-cases', label: 'Use Cases' },
   { href: '/rankings', label: 'Rankings' },
   { href: '/collections', label: 'Stacks' },
+  { href: '/guides', label: 'Guides' },
   { href: '/blog', label: 'Blog' },
   { href: '/docs', labelKey: 'docs' },
   { href: '/api-docs', labelKey: 'apiDocs' },
