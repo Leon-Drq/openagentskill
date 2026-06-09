@@ -9,16 +9,18 @@ import {
   getSkillEventStats,
 } from '@/lib/db/skills'
 import { ClaimSkillPanel } from '@/components/claim-skill-panel'
-import { InstallCommand } from '@/components/install-command'
 import { SaveSkillButton } from '@/components/save-skill-button'
 import { SkillActionLink } from '@/components/skill-action-link'
 import { SkillEventTracker } from '@/components/skill-event-tracker'
 import { SkillFeedbackPanel } from '@/components/skill-feedback-panel'
+import { SkillInstallTargets } from '@/components/skill-install-targets'
+import { SkillScorePanel } from '@/components/skill-score-panel'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { getStacksForSkill } from '@/lib/collections'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getSkillDecisionProfile } from '@/lib/decision'
+import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillTrustProfile, type SkillTrustProfile, type TrustCheckStatus } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
@@ -143,6 +145,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   const decisionProfile = dbSkill ? getSkillDecisionProfile(dbSkill, eventStats) : null
   const trustProfile = dbSkill ? getSkillTrustProfile(dbSkill, Boolean(approvedClaim), eventStats) : null
   const auditProfile = dbSkill ? buildSkillAudit(dbSkill, eventStats) : null
+  const installTargets = dbSkill ? getSkillInstallTargets(dbSkill) : []
   const compareHref = `/compare?skills=${encodeURIComponent([skill.slug, ...relatedSkills.slice(0, 3).map((rs) => rs.slug)].join(','))}`
   const relatedDecisionRows = relatedSkills.map((relatedSkill) => ({
     skill: relatedSkill,
@@ -268,13 +271,9 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
               </div>
             </div>
 
-            {/* Install */}
-            <div className="mb-10">
-              <InstallCommand
-                command={skill.technical.installCommand || `npx skills add ${skill.slug}`}
-                skillSlug={skill.slug}
-              />
-            </div>
+            <SkillScorePanel quality={qualityProfile} trust={trustProfile} audit={auditProfile} />
+
+            <SkillInstallTargets skillSlug={skill.slug} targets={installTargets} />
 
             {auditProfile && (
               <section className="mb-10 border border-border bg-card p-5">

@@ -213,10 +213,10 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
               Agent skills directory
             </Link>
             <Link
-              href="/api-docs"
+              href="/skill-packs"
               className="border border-border bg-card px-3 py-2 text-center text-xs font-mono text-secondary transition-colors hover:border-foreground hover:text-foreground"
             >
-              Agent recommendation API
+              Skill packs for agents
             </Link>
           </div>
 

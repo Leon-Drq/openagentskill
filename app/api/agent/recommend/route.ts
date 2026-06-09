@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAllSkills, getSkillEventStatsMap, type SkillEventStats, type SkillRecord } from '@/lib/db/skills'
 import { SKILL_STACKS, type SkillStackDefinition } from '@/lib/collections'
+import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
 import { getSkillDecisionProfile } from '@/lib/decision'
+import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
 
 /**
@@ -16,7 +19,9 @@ import { getUseCasesForSkill, scoreSkillForUseCase, USE_CASES } from '@/lib/use-
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const task = searchParams.get('task') || ''
-  const limit = Math.min(parseInt(searchParams.get('limit') || '3', 10), 10)
+  const parsedLimit = parseInt(searchParams.get('limit') || '3', 10)
+  const limit = Math.min(Math.max(Number.isFinite(parsedLimit) ? parsedLimit : 3, 1), 10)
+  const format = searchParams.get('format') || 'json'
 
   if (!task) {
     return NextResponse.json(
@@ -72,11 +77,14 @@ export async function GET(request: NextRequest) {
           }
         : null
 
-    return NextResponse.json({
+    const payload = {
       task,
       recommendations: recommendations.map((r, index) => {
+        const eventStats = eventStatsMap[r.skill.slug] || null
         const decision = getSkillDecisionProfile(r.skill, eventStatsMap[r.skill.slug] || null)
         const useCases = getUseCasesForSkill(r.skill, 2)
+        const trust = getSkillTrustProfile(r.skill, false, eventStats)
+        const audit = buildSkillAudit(r.skill, eventStats)
         return {
           rank: index + 1,
           skill: r.skill.name,
@@ -93,6 +101,20 @@ export async function GET(request: NextRequest) {
             quality_score: Number(r.skill.quality_score || 0),
           },
           quality: getSkillQualityProfile(r.skill),
+          trust,
+          audit: {
+            audit_score: audit.audit_score,
+            risk_level: audit.risk_level,
+            risk_label: auditRiskLabel(audit.risk_level),
+            warnings: audit.warnings.slice(0, 4),
+          },
+          install_targets: getSkillInstallTargets(r.skill),
+          urls: {
+            web: `https://www.openagentskill.com/skills/${r.skill.slug}`,
+            api: `https://www.openagentskill.com/api/agent/skills/${r.skill.slug}`,
+            audit: `https://www.openagentskill.com/skills/${r.skill.slug}/audit`,
+            repository: r.skill.repository,
+          },
           decision: {
             readiness_score: decision.readinessScore,
             readiness_label: decision.readinessLabel,
@@ -126,7 +148,30 @@ export async function GET(request: NextRequest) {
         total_skills_searched: allSkills.length,
         agent_friendly: true,
       },
-    })
+    }
+
+    if (format === 'text') {
+      const text = payload.recommendations.map((item) => (
+        `${item.rank}. ${item.skill} (${item.slug})\n` +
+        `   Match: ${item.match_label} | Confidence: ${item.confidence}\n` +
+        `   Trust: ${item.trust.score}/100 ${item.trust.label} | Audit: ${item.audit.audit_score}/100 ${item.audit.risk_label}\n` +
+        `   Install: ${item.install}\n` +
+        `   URL: ${item.urls.web}\n` +
+        `   Reasoning: ${item.reasoning}`
+      )).join('\n---\n')
+
+      return new NextResponse(
+        `OpenAgentSkill Recommendation API\nTask: ${payload.task}\nFound: ${payload.recommendations.length}\n---\n${text}`,
+        {
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'X-Agent-Friendly': 'true',
+          },
+        }
+      )
+    }
+
+    return NextResponse.json(payload)
   } catch (error) {
     console.error('Agent recommend API error:', error)
     return NextResponse.json(

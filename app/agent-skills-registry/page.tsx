@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { AgentRecommendationDemo } from '@/components/agent-recommendation-demo'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { getAllSkills } from '@/lib/db/skills'
@@ -102,9 +103,17 @@ export default async function AgentSkillsRegistryPage() {
               >
                 Browse registry
               </Link>
+              <Link
+                href="/skill-packs"
+                className="border border-border px-5 py-3 text-center text-sm font-semibold transition-colors hover:border-foreground"
+              >
+                Open skill packs
+              </Link>
             </div>
           </div>
         </section>
+
+        <AgentRecommendationDemo />
 
         <section className="border-b border-border px-4 py-12 sm:px-6 sm:py-16">
           <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1fr_1.1fr]">
@@ -133,7 +142,7 @@ export default async function AgentSkillsRegistryPage() {
                 ['Registry', `${formatCompact(skills.length)}+ indexed skills with repository and install metadata.`],
                 ['Audit', 'Trust, quality, maintenance, and risk signals before installation.'],
                 ['Recommend', 'Task-based ranking for agents and agent-building apps.'],
-                ['Install', 'npm-style install commands and repository paths for real workflows.'],
+                ['Install', 'CLI commands plus Codex, Claude Code, and Cursor install prompts.'],
               ].map(([title, copy]) => (
                 <div key={title} className="bg-background p-5">
                   <h2 className="font-display text-lg font-semibold">{title}</h2>

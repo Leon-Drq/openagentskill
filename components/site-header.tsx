@@ -14,6 +14,7 @@ const navItems = [
   { href: '/skills', labelKey: 'skills' },
   { href: '/best', label: 'Best' },
   { href: '/trending', label: 'Trending' },
+  { href: '/skill-packs', label: 'Packs' },
   { href: '/audits', label: 'Audits' },
   { href: '/official', label: 'Official' },
   { href: '/agents', label: 'Agents' },
@@ -64,7 +65,7 @@ export function SiteHeader() {
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">
+          <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary navigation">
             {navItems.map((item) => {
               const active = isActivePath(pathname, item.href, 'exact' in item ? item.exact : false)
               const label = 'label' in item ? item.label : t.nav[item.labelKey]

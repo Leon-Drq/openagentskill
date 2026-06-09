@@ -7,6 +7,7 @@ import { LOCALIZED_LANDING_PAGES, getLocalizedLanguageAlternates } from '@/lib/s
 import { BEST_SKILL_PAGES } from '@/lib/seo/growth-pages'
 import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
 import { AGENT_PROFILES, OFFICIAL_CREATORS } from '@/lib/seo/growth-directories'
+import { SKILL_PACKS } from '@/lib/skill-packs'
 import { USE_CASES } from '@/lib/use-cases'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -29,6 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/reports/weekly`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.85 },
     { url: `${baseUrl}/reports/monthly`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.86 },
     { url: `${baseUrl}/collections`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/skill-packs`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/compare`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${baseUrl}/compare/openagentskill-vs-skills-sh`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.82 },
     { url: `${baseUrl}/alternatives/skills-sh`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.82 },
@@ -99,6 +101,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.85,
   }))
 
+  const skillPackPages: MetadataRoute.Sitemap = SKILL_PACKS.map((pack) => ({
+    url: `${baseUrl}/skill-packs/${pack.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.86,
+  }))
+
   const blogUseCasePages: MetadataRoute.Sitemap = USE_CASES.map((useCase) => ({
     url: `${baseUrl}/blog/use-cases/${useCase.slug}`,
     lastModified: new Date(),
@@ -149,6 +158,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...officialPages,
     ...agentPages,
     ...collectionPages,
+    ...skillPackPages,
     ...rankingPages,
     ...guidePages,
     ...blogUseCasePages,

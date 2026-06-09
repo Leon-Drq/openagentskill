@@ -14,6 +14,7 @@ const navItems = [
   { href: '/best', label: 'Best' },
   { href: '/trending', label: 'Trending' },
   { href: '/hot', label: 'Hot' },
+  { href: '/skill-packs', label: 'Packs' },
   { href: '/audits', label: 'Audits' },
   { href: '/official', label: 'Official' },
   { href: '/agents', label: 'Agents' },
@@ -55,7 +56,7 @@ export function MobileNav() {
   }, [isOpen])
 
   return (
-    <div className="lg:hidden">
+    <div className="xl:hidden">
       <button
         onClick={() => setIsOpen(true)}
         className="p-2 -mr-2 text-secondary hover:text-foreground transition-colors"

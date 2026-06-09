@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getSkillBySlug } from '@/lib/db/skills'
 import { getStacksForSkill } from '@/lib/collections'
+import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
@@ -26,6 +28,10 @@ export async function GET(
       )
     }
 
+    const trustProfile = getSkillTrustProfile(skill)
+    const audit = buildSkillAudit(skill)
+    const installTargets = getSkillInstallTargets(skill)
+
     if (format === 'text') {
       const text = `${skill.name}
 ${'='.repeat(skill.name.length)}
@@ -43,7 +49,8 @@ Technical Details:
 
 Statistics:
 - Quality Score: ${Number(skill.quality_score || 0)}
-- Trust Score: ${getSkillTrustProfile(skill).score}
+- Trust Score: ${trustProfile.score} (${trustProfile.label})
+- Audit Score: ${audit.audit_score} (${auditRiskLabel(audit.risk_level)})
 - GitHub Stars: ${skill.github_stars}
 - Downloads: ${skill.downloads}
 - Rating: ${skill.rating}/5 (${skill.review_count} reviews)
@@ -52,6 +59,9 @@ Author: ${skill.author_name}${skill.verified ? ' (Verified)' : ''}
 
 Install:
 ${skill.install_command || `npx skills add ${skill.github_repo}`}
+
+Agent install targets:
+${installTargets.map((target) => `- ${target.title}: ${target.value}`).join('\n')}
 
 Repository: ${skill.repository}
 
@@ -85,7 +95,18 @@ Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
         quality_score: Number(skill.quality_score || 0),
       },
       quality: getSkillQualityProfile(skill),
-      trust: getSkillTrustProfile(skill),
+      trust: trustProfile,
+      audit: {
+        audit_score: audit.audit_score,
+        risk_level: audit.risk_level,
+        risk_label: auditRiskLabel(audit.risk_level),
+        quality_score: audit.quality_score,
+        trust_score: audit.trust_score,
+        maintenance_score: audit.maintenance_score,
+        security_score: audit.security_score,
+        install_score: audit.install_score,
+        warnings: audit.warnings,
+      },
       quality_signals: skill.quality_signals || {},
       platforms: [...new Set([...(skill.frameworks || []), ...getPlatformHints(skill)])],
       use_cases: getUseCasesForSkill(skill, 4).map((useCase) => ({
@@ -99,6 +120,7 @@ Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
         url: `https://www.openagentskill.com/collections/${stack.slug}`,
       })),
       install: skill.install_command || `npx skills add ${skill.github_repo}`,
+      install_targets: installTargets,
       repository: skill.repository,
       github_repo: skill.github_repo,
       version: skill.version,

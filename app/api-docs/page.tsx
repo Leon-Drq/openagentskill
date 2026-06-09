@@ -62,6 +62,8 @@ export default function APIDocsPage() {
               { method: 'GET', path: '/api/agent/skills' },
               { method: 'GET', path: '/api/agent/skills/{slug}' },
               { method: 'GET', path: '/api/agent/recommend' },
+              { method: 'GET', path: '/api/agent/packs' },
+              { method: 'GET', path: '/api/agent/packs/{slug}' },
               { method: 'GET', path: '/api/agent/rankings' },
               { method: 'GET', path: '/api/agent/weekly-report' },
               { method: 'GET', path: '/api/audits/{slug}' },
@@ -178,18 +180,72 @@ Total: 2 skills found
               </p>
               <div className="mb-4 grid gap-2 text-sm sm:grid-cols-2">
                 {[
-                  'decision.readiness_score',
-                  'decision.role',
-                  'decision.risks',
-                  'decision.next_steps',
-                ].map((field) => (
-                  <code key={field} className="border border-border bg-card px-3 py-2 font-mono text-xs">
-                    {field}
+                'install_targets',
+                'trust.score',
+                'audit.audit_score',
+                'decision.next_steps',
+              ].map((field) => (
+                <code key={field} className="border border-border bg-card px-3 py-2 font-mono text-xs">
+                  {field}
                   </code>
                 ))}
               </div>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
                 <code>{'GET /api/agent/recommend?task=scrape+websites+and+extract+tables&limit=4'}</code>
+              </div>
+            </div>
+          </div>
+
+          {/* GET /api/agent/packs */}
+          <div className="border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/agent/packs'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Get curated skill packs for complete workflows, including top skills, trust signals, and install targets.'}
+              </p>
+              <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 text-sm sm:text-base">
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'limit'}</code>
+                  <span className="text-secondary ml-2">{'- Skills per pack, max 10'}</span>
+                </div>
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'format'}</code>
+                  <span className="text-secondary ml-2">{'- Response format: json or text'}</span>
+                </div>
+              </div>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <code>{'GET /api/agent/packs?limit=5&format=text'}</code>
+              </div>
+            </div>
+          </div>
+
+          {/* GET /api/agent/packs/[slug] */}
+          <div className="border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/agent/packs/{slug}'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Get one skill pack with ranked skills, audit scores, trust profiles, install commands, and agent-specific prompts.'}
+              </p>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <code>{'GET /api/agent/packs/frontend-engineer-agent-pack?limit=8'}</code>
               </div>
             </div>
           </div>
