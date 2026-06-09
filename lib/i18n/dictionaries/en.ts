@@ -11,7 +11,7 @@ export default {
   
   // Hero
   hero: {
-    title: 'OPEN AGENT SKILL',
+    title: 'OpenAgentSkill',
     subtitle: 'The Open Infrastructure for Agent Intelligence.',
     tryItNow: 'Try it now',
     installPrefix: '$ npx skills add',

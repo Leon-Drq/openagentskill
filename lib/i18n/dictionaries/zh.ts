@@ -11,7 +11,7 @@ export default {
   
   // Hero
   hero: {
-    title: 'OPEN AGENT SKILL',
+    title: 'OpenAgentSkill',
     subtitle: 'Agent 智能的开放基础设施',
     tryItNow: '立即体验',
     installPrefix: '$ npx skills add',

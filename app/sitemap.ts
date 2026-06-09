@@ -3,6 +3,7 @@ import { getAllSkills } from '@/lib/db/skills'
 import { getBlogPosts } from '@/lib/blog/generate'
 import { SKILL_STACKS } from '@/lib/collections'
 import { getRankingDefinitions } from '@/lib/rankings'
+import { LOCALIZED_LANDING_PAGES, getLocalizedLanguageAlternates } from '@/lib/seo/localized-pages'
 import { USE_CASES } from '@/lib/use-cases'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -21,6 +22,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/docs`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
     { url: `${baseUrl}/activity`, lastModified: new Date(), changeFrequency: 'hourly', priority: 0.6 },
   ]
+
+  const localizedPages: MetadataRoute.Sitemap = Object.entries(LOCALIZED_LANDING_PAGES).map(([locale]) => ({
+    url: `${baseUrl}/${locale}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.88,
+    alternates: {
+      languages: getLocalizedLanguageAlternates(baseUrl),
+    },
+  }))
 
   const skills = await getAllSkills().catch(() => [])
   const skillPages: MetadataRoute.Sitemap = skills.map((skill) => ({
@@ -68,6 +79,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticPages,
+    ...localizedPages,
     ...useCasePages,
     ...collectionPages,
     ...rankingPages,

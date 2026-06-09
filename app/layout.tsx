@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Geist_Mono, Inter } from 'next/font/google'
 import { StructuredData } from '@/components/structured-data'
 import { I18nProvider } from '@/lib/i18n/context'
+import { getLocalizedLanguageAlternates } from '@/lib/seo/localized-pages'
 import './globals.css'
 
 const inter = Inter({
@@ -19,10 +20,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.openagentskill.com'),
   title: {
-    default: 'Open Agent Skill — The Open Marketplace for AI Agent Skills',
+    default: 'OpenAgentSkill — The Open Marketplace for AI Agent Skills',
     template: '%s | Open Agent Skill',
   },
-  description: 'Discover AI agent skills ranked by real agent usage. Browse skills for data processing, automation, finance, coding, and more. Install any skill with npx skills add.',
+  description: 'OpenAgentSkill helps builders discover, compare, and install AI agent skills ranked by quality, GitHub signals, and real usage. Install any skill with npx skills add.',
   keywords: ['AI agents', 'agent skills', 'agent tools', 'Claude skills', 'GPT plugins', 'LangChain tools', 'autonomous agents', 'agent marketplace', 'open source AI', 'openagentskill'],
   authors: [{ name: 'Open Agent Skill Team' }],
   creator: 'Open Agent Skill',
@@ -74,8 +75,8 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'Open Agent Skill — The Open Marketplace for AI Agent Skills',
-    description: 'Discover AI agent skills ranked by real agent usage. Browse skills for data processing, automation, finance, coding, and more.',
+    title: 'OpenAgentSkill — The Open Marketplace for AI Agent Skills',
+    description: 'OpenAgentSkill helps builders discover, compare, and install AI agent skills ranked by quality, GitHub signals, and real usage.',
     url: 'https://www.openagentskill.com',
     siteName: 'Open Agent Skill',
     locale: 'en_US',
@@ -85,21 +86,22 @@ export const metadata: Metadata = {
         url: 'https://www.openagentskill.com/opengraph-image',
         width: 1200,
         height: 630,
-        alt: 'Open Agent Skill — The Open Marketplace for AI Agent Skills',
+        alt: 'OpenAgentSkill — The Open Marketplace for AI Agent Skills',
         type: 'image/png',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Open Agent Skill — The Open Marketplace for AI Agent Skills',
-    description: 'Discover AI agent skills ranked by real agent usage. Browse skills for data processing, automation, finance, coding, and more.',
+    title: 'OpenAgentSkill — The Open Marketplace for AI Agent Skills',
+    description: 'OpenAgentSkill helps builders discover, compare, and install AI agent skills ranked by quality, GitHub signals, and real usage.',
     creator: '@openagentskill',
     site: '@openagentskill',
     images: ['https://www.openagentskill.com/opengraph-image'],
   },
   alternates: {
     canonical: 'https://www.openagentskill.com',
+    languages: getLocalizedLanguageAlternates(),
   },
   verification: {
     google: 'your-google-verification-code',

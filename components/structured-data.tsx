@@ -4,8 +4,8 @@ export function StructuredData() {
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Open Agent Skill',
-    alternateName: 'OpenAgentSkill',
+    name: 'OpenAgentSkill',
+    alternateName: 'Open Agent Skill',
     url: BASE_URL,
     description: 'The open marketplace for AI agent skills ranked by real agent usage.',
     potentialAction: {
@@ -15,7 +15,7 @@ export function StructuredData() {
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Open Agent Skill',
+      name: 'OpenAgentSkill',
       url: BASE_URL,
       logo: {
         '@type': 'ImageObject',
@@ -27,10 +27,10 @@ export function StructuredData() {
   const organizationData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Open Agent Skill',
+    name: 'OpenAgentSkill',
     url: BASE_URL,
     logo: `${BASE_URL}/icon.svg`,
-    description: 'The open marketplace for AI agent skills. Discover, publish, and share skills for AI agents.',
+    description: 'OpenAgentSkill is the open marketplace for AI agent skills. Discover, publish, and share skills for AI agents.',
     image: `${BASE_URL}/opengraph-image`,
     foundingDate: '2026',
     sameAs: [
@@ -45,10 +45,10 @@ export function StructuredData() {
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'What is Open Agent Skill?',
+        name: 'What is OpenAgentSkill?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Open Agent Skill is an open marketplace for AI agent skills. It helps developers discover, publish, and share reusable skills, tools, plugins, and workflows for AI agents like Claude, GPT, and LangChain.',
+          text: 'OpenAgentSkill is an open marketplace for AI agent skills. It helps developers discover, publish, and share reusable skills, tools, plugins, and workflows for AI agents like Claude, GPT, and LangChain.',
         },
       },
       {
