@@ -575,7 +575,7 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
             </Link>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             <Link
               href="/best"
               className="group border border-border bg-card p-5 transition-colors hover:border-foreground"
@@ -587,6 +587,36 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
               </p>
             </Link>
             <Link
+              href="/trending"
+              className="group border border-border bg-card p-5 transition-colors hover:border-foreground"
+            >
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Trending</p>
+              <h3 className="font-display text-xl font-semibold group-hover:text-secondary">Find current momentum</h3>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
+                Track skills gaining page activity, install-copy intent, GitHub adoption, and quality signals.
+              </p>
+            </Link>
+            <Link
+              href="/official"
+              className="group border border-border bg-card p-5 transition-colors hover:border-foreground"
+            >
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Official makers</p>
+              <h3 className="font-display text-xl font-semibold group-hover:text-secondary">Start with trusted sources</h3>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
+                Browse skills from recognized technology makers with trust, quality, and freshness signals.
+              </p>
+            </Link>
+            <Link
+              href="/agents"
+              className="group border border-border bg-card p-5 transition-colors hover:border-foreground"
+            >
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Agent fit</p>
+              <h3 className="font-display text-xl font-semibold group-hover:text-secondary">Choose by agent</h3>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
+                Claude Code, Codex, Cursor, Copilot, Windsurf, Gemini, Cline, AMP, and Antigravity.
+              </p>
+            </Link>
+            <Link
               href={`/alternatives/${featuredSkills[0]?.slug || 'crawl4ai'}`}
               className="group border border-border bg-card p-5 transition-colors hover:border-foreground"
             >
@@ -594,16 +624,6 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
               <h3 className="font-display text-xl font-semibold group-hover:text-secondary">Compare before switching</h3>
               <p className="mt-3 text-sm leading-relaxed text-secondary">
                 Find similar skills by category, tags, trust, quality, freshness, and install readiness.
-              </p>
-            </Link>
-            <Link
-              href="/reports/monthly"
-              className="group border border-border bg-card p-5 transition-colors hover:border-foreground"
-            >
-              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Monthly index</p>
-              <h3 className="font-display text-xl font-semibold group-hover:text-secondary">Track ecosystem shifts</h3>
-              <p className="mt-3 text-sm leading-relaxed text-secondary">
-                Production candidates, newly indexed skills, maintained repos, and engagement signals.
               </p>
             </Link>
             <Link
@@ -619,6 +639,24 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
           </div>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
+            <Link
+              href="/compare/openagentskill-vs-skills-sh"
+              className="border border-border px-4 py-3 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+            >
+              OpenAgentSkill vs skills.sh
+            </Link>
+            <Link
+              href="/alternatives/skills-sh"
+              className="border border-border px-4 py-3 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+            >
+              skills.sh alternatives
+            </Link>
+            <Link
+              href="/reports/monthly"
+              className="border border-border px-4 py-3 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+            >
+              Monthly Agent Skills Index
+            </Link>
             {HOME_BEST_PAGES.map((page) => (
               <Link
                 key={page.slug}

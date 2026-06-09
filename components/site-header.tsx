@@ -12,14 +12,13 @@ const navItems = [
   { href: '/', labelKey: 'home', exact: true },
   { href: '/skills', labelKey: 'skills' },
   { href: '/best', label: 'Best' },
-  { href: '/use-cases', label: 'Use Cases' },
+  { href: '/trending', label: 'Trending' },
+  { href: '/official', label: 'Official' },
+  { href: '/agents', label: 'Agents' },
   { href: '/rankings', label: 'Rankings' },
-  { href: '/collections', label: 'Stacks' },
   { href: '/guides', label: 'Guides' },
-  { href: '/blog', label: 'Blog' },
   { href: '/docs', labelKey: 'docs' },
   { href: '/api-docs', labelKey: 'apiDocs' },
-  { href: '/activity', labelKey: 'activity' },
   { href: '/submit', labelKey: 'submit' },
 ] as const
 

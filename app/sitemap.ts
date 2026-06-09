@@ -6,6 +6,7 @@ import { getRankingDefinitions } from '@/lib/rankings'
 import { LOCALIZED_LANDING_PAGES, getLocalizedLanguageAlternates } from '@/lib/seo/localized-pages'
 import { BEST_SKILL_PAGES } from '@/lib/seo/growth-pages'
 import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
+import { AGENT_PROFILES, OFFICIAL_CREATORS } from '@/lib/seo/growth-directories'
 import { USE_CASES } from '@/lib/use-cases'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -15,12 +16,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
     { url: `${baseUrl}/skills`, lastModified: new Date(), changeFrequency: 'hourly', priority: 0.9 },
     { url: `${baseUrl}/best`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.92 },
+    { url: `${baseUrl}/trending`, lastModified: new Date(), changeFrequency: 'hourly', priority: 0.92 },
+    { url: `${baseUrl}/hot`, lastModified: new Date(), changeFrequency: 'hourly', priority: 0.9 },
+    { url: `${baseUrl}/official`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/agents`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/use-cases`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/rankings`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/reports/weekly`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.85 },
     { url: `${baseUrl}/reports/monthly`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.86 },
     { url: `${baseUrl}/collections`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/compare`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${baseUrl}/compare/openagentskill-vs-skills-sh`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.82 },
+    { url: `${baseUrl}/alternatives/skills-sh`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.82 },
     { url: `${baseUrl}/guides`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
     { url: `${baseUrl}/submit`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
@@ -99,6 +106,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.88,
   }))
 
+  const officialPages: MetadataRoute.Sitemap = OFFICIAL_CREATORS.map((creator) => ({
+    url: `${baseUrl}/official/${creator.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.84,
+  }))
+
+  const agentPages: MetadataRoute.Sitemap = AGENT_PROFILES.map((profile) => ({
+    url: `${baseUrl}/agents/${profile.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.84,
+  }))
+
   const guidePages: MetadataRoute.Sitemap = GROWTH_GUIDES.map((guide) => ({
     url: `${baseUrl}/guides/${guide.slug}`,
     lastModified: new Date(),
@@ -111,6 +132,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...localizedPages,
     ...useCasePages,
     ...bestPages,
+    ...officialPages,
+    ...agentPages,
     ...collectionPages,
     ...rankingPages,
     ...guidePages,

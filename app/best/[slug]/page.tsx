@@ -160,13 +160,15 @@ export default async function BestSkillDetailPage({
         </section>
 
         {useCase && (
-          <section className="grid gap-px border-b border-border bg-border py-10 md:grid-cols-3">
-            {useCase.workflows.slice(0, 3).map((workflow) => (
-              <div key={workflow} className="bg-background p-5">
-                <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Workflow</p>
-                <p className="font-display text-xl font-semibold">{workflow}</p>
-              </div>
-            ))}
+          <section className="border-b border-border py-10">
+            <div className="grid gap-px bg-border md:grid-cols-3">
+              {useCase.workflows.slice(0, 3).map((workflow) => (
+                <div key={workflow} className="bg-background p-5">
+                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Workflow</p>
+                  <p className="font-display text-xl font-semibold">{workflow}</p>
+                </div>
+              ))}
+            </div>
           </section>
         )}
 

@@ -22,6 +22,18 @@ export function SiteFooter() {
           <Link href="/best" className="hover:text-foreground">
             Best
           </Link>
+          <Link href="/trending" className="hover:text-foreground">
+            Trending
+          </Link>
+          <Link href="/hot" className="hover:text-foreground">
+            Hot
+          </Link>
+          <Link href="/official" className="hover:text-foreground">
+            Official
+          </Link>
+          <Link href="/agents" className="hover:text-foreground">
+            Agents
+          </Link>
           <Link href="/use-cases" className="hover:text-foreground">
             Use Cases
           </Link>
@@ -39,6 +51,9 @@ export function SiteFooter() {
           </Link>
           <Link href="/compare" className="hover:text-foreground">
             Compare
+          </Link>
+          <Link href="/compare/openagentskill-vs-skills-sh" className="hover:text-foreground">
+            vs skills.sh
           </Link>
           <Link href="/guides" className="hover:text-foreground">
             Guides
