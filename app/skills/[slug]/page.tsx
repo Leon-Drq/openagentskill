@@ -129,6 +129,11 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   const platformHints = dbSkill ? getPlatformHints(dbSkill) : []
   const decisionProfile = dbSkill ? getSkillDecisionProfile(dbSkill, eventStats) : null
   const compareHref = `/compare?skills=${encodeURIComponent([skill.slug, ...relatedSkills.slice(0, 3).map((rs) => rs.slug)].join(','))}`
+  const relatedDecisionRows = relatedSkills.map((relatedSkill) => ({
+    skill: relatedSkill,
+    quality: getSkillQualityProfile(relatedSkill),
+    decision: getSkillDecisionProfile(relatedSkill),
+  }))
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -243,41 +248,76 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
             </div>
 
             {decisionProfile && (
-              <section className="mb-10 border border-border p-5">
-                <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-                  <div>
-                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Decision summary</p>
-                    <h2 className="font-display text-2xl font-semibold">
-                      {decisionProfile.readinessLabel} for {decisionProfile.primaryFit}
-                    </h2>
-                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
-                      {decisionProfile.recommendation}
-                    </p>
+              <section className="mb-10 border border-border bg-card">
+                <div className="border-b border-border p-5">
+                  <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+                    <div>
+                      <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Agent decision cockpit</p>
+                      <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+                        {decisionProfile.decisionHeadline}
+                      </h2>
+                      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
+                        {decisionProfile.recommendation}
+                      </p>
+                    </div>
+                    <div className="grid min-w-28 grid-cols-2 border border-border text-center sm:block">
+                      <div className="border-r border-border px-4 py-3 sm:border-r-0 sm:border-b">
+                        <div className="font-mono text-3xl font-semibold">{decisionProfile.readinessScore}</div>
+                        <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Readiness</div>
+                      </div>
+                      <div className="px-4 py-3">
+                        <div className="font-mono text-lg font-semibold">{decisionProfile.adoptionStage}</div>
+                        <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Stage</div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="border border-border px-4 py-3 text-center">
-                    <div className="font-mono text-3xl font-semibold">{decisionProfile.readinessScore}</div>
-                    <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Readiness</div>
+
+                  <div className="grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+                    {[
+                      { label: 'Role in stack', value: decisionProfile.agentRole },
+                      { label: 'Primary fit', value: decisionProfile.primaryFit },
+                      { label: 'Trust label', value: decisionProfile.readinessLabel },
+                      { label: 'Install path', value: skill.technical.installCommand ? 'Command ready' : 'Repo install' },
+                    ].map((item) => (
+                      <div key={item.label} className="bg-background p-4">
+                        <p className="text-xs uppercase tracking-widest text-secondary">{item.label}</p>
+                        <p className="mt-2 font-mono text-sm">{item.value}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div className="grid gap-px border border-border bg-border md:grid-cols-3">
-                  <div className="bg-background p-4">
-                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Best for</p>
+
+                <div className="grid gap-px bg-border lg:grid-cols-3">
+                  <div className="bg-card p-5">
+                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Use when</p>
                     <ul className="space-y-2 text-sm leading-relaxed text-secondary">
                       {decisionProfile.bestFor.map((item) => <li key={item}>{item}</li>)}
                     </ul>
                   </div>
-                  <div className="bg-background p-4">
-                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Not ideal for</p>
+                  <div className="bg-card p-5">
+                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Evidence</p>
                     <ul className="space-y-2 text-sm leading-relaxed text-secondary">
-                      {decisionProfile.notIdealFor.map((item) => <li key={item}>{item}</li>)}
+                      {decisionProfile.proofPoints.map((item) => <li key={item}>{item}</li>)}
                     </ul>
                   </div>
-                  <div className="bg-background p-4">
-                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Risk notes</p>
+                  <div className="bg-card p-5">
+                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Review first</p>
                     <ul className="space-y-2 text-sm leading-relaxed text-secondary">
                       {decisionProfile.riskNotes.map((item) => <li key={item}>{item}</li>)}
                     </ul>
                   </div>
+                </div>
+
+                <div className="border-t border-border p-5">
+                  <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Implementation path</p>
+                  <ol className="grid gap-3 text-sm leading-relaxed text-secondary md:grid-cols-3">
+                    {decisionProfile.implementationPlan.map((step, index) => (
+                      <li key={step} className="border border-border p-4">
+                        <span className="mb-2 block font-mono text-foreground">{index + 1}</span>
+                        {step}
+                      </li>
+                    ))}
+                  </ol>
                 </div>
               </section>
             )}
@@ -355,6 +395,61 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                       <p className="text-xs uppercase tracking-widest text-secondary">{stack.eyebrow}</p>
                       <h3 className="mt-2 font-display text-lg font-semibold">{stack.shortTitle}</h3>
                       <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary">{stack.description}</p>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {relatedDecisionRows.length > 0 && (
+              <section className="mb-10 border border-border p-5">
+                <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                  <div>
+                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Alternative shortlist</p>
+                    <h2 className="font-display text-2xl font-semibold">Compare before you install</h2>
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
+                      Similar skills in this category, ranked with the same readiness and quality signals.
+                    </p>
+                  </div>
+                  <SkillActionLink
+                    href={compareHref}
+                    skillSlug={skill.slug}
+                    eventType="compare"
+                    className="w-full border border-foreground bg-foreground px-4 py-2.5 text-center text-sm font-semibold text-background transition-opacity hover:opacity-80 sm:w-auto"
+                  >
+                    Compare all
+                  </SkillActionLink>
+                </div>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {relatedDecisionRows.map((row) => (
+                    <Link
+                      key={row.skill.slug}
+                      href={`/skills/${row.skill.slug}`}
+                      className="border border-border p-4 transition-colors hover:border-foreground"
+                    >
+                      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="min-w-0">
+                          <h3 className="font-display text-lg font-semibold">{row.skill.name}</h3>
+                          <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-secondary">{row.skill.description}</p>
+                        </div>
+                        <span className="shrink-0 border border-border px-2 py-1 text-xs font-mono text-secondary">
+                          {row.decision.adoptionStage}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-px border border-border bg-border text-xs">
+                        <div className="bg-background p-2">
+                          <span className="block text-secondary">Ready</span>
+                          <span className="font-mono">{row.decision.readinessScore}</span>
+                        </div>
+                        <div className="bg-background p-2">
+                          <span className="block text-secondary">Quality</span>
+                          <span className="font-mono">{row.quality.score}</span>
+                        </div>
+                        <div className="bg-background p-2">
+                          <span className="block text-secondary">Stars</span>
+                          <span className="font-mono">{formatNumber(row.skill.github_stars || 0)}</span>
+                        </div>
+                      </div>
                     </Link>
                   ))}
                 </div>
@@ -452,6 +547,24 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
           {/* Sidebar */}
           <div className="min-w-0 lg:col-span-1">
             <div className="sticky top-24 space-y-5">
+              {decisionProfile && (
+                <div className="border border-border bg-card p-5">
+                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Decision snapshot</p>
+                  <h3 className="font-display text-lg font-semibold">{decisionProfile.agentRole}</h3>
+                  <div className="mt-4 grid grid-cols-2 gap-px border border-border bg-border text-center">
+                    <div className="bg-background p-3">
+                      <div className="font-mono text-2xl font-semibold">{decisionProfile.readinessScore}</div>
+                      <div className="mt-1 text-xs text-secondary">Ready</div>
+                    </div>
+                    <div className="bg-background p-3">
+                      <div className="font-mono text-sm font-semibold">{decisionProfile.adoptionStage}</div>
+                      <div className="mt-1 text-xs text-secondary">Stage</div>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-sm leading-relaxed text-secondary">{decisionProfile.proofPoints[0]}</p>
+                </div>
+              )}
+
               {/* Install card */}
               <div className="border border-border p-5">
                 <h3 className="font-display text-lg font-semibold mb-3">Install</h3>

@@ -34,11 +34,51 @@ interface HomePageEnhancedProps {
 }
 
 interface Recommendation {
+  rank?: number
   skill: string
   slug: string
+  description?: string
   confidence: number | string
+  match_label?: string
   install: string
+  stats?: {
+    stars: number
+    downloads: number
+    rating: number
+    quality_score: number
+  }
+  decision?: {
+    readiness_score: number
+    readiness_label: string
+    headline: string
+    role: string
+    adoption_stage: string
+    primary_fit: string
+    best_for: string[]
+    risks: string[]
+    proof_points: string[]
+    next_steps: string[]
+  }
+  use_cases?: Array<{
+    slug: string
+    title: string
+    url: string
+  }>
   reasoning: string
+}
+
+interface SuggestedComposition {
+  name: string
+  description: string
+  skills: string[]
+  steps?: string[]
+}
+
+interface SuggestedStack {
+  slug: string
+  name: string
+  url: string
+  use_case: string
 }
 
 const HOME_USE_CASES = USE_CASES.slice(0, 6)
@@ -95,6 +135,13 @@ function AnimatedNumber({
   )
 }
 
+function formatCompact(value: number) {
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
+  if (value >= 10_000) return `${Math.round(value / 1000)}K`
+  if (value >= 1_000) return `${(value / 1000).toFixed(1)}K`
+  return value.toLocaleString()
+}
+
 export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePageEnhancedProps) {
   const { t } = useI18n()
   const [mounted, setMounted] = useState(false)
@@ -102,6 +149,9 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
   const [taskQuery, setTaskQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+  const [suggestedComposition, setSuggestedComposition] = useState<SuggestedComposition | null>(null)
+  const [suggestedStacks, setSuggestedStacks] = useState<SuggestedStack[]>([])
+  const [searchedCount, setSearchedCount] = useState(0)
   const [showResults, setShowResults] = useState(false)
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null)
   const searchRef = useRef<HTMLDivElement>(null)
@@ -117,11 +167,17 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
     setIsSearching(true)
     setShowResults(true)
     try {
-      const res = await fetch(`/api/agent/recommend?task=${encodeURIComponent(normalizedQuery)}&limit=3`)
+      const res = await fetch(`/api/agent/recommend?task=${encodeURIComponent(normalizedQuery)}&limit=4`)
       const data = await res.json()
       setRecommendations(data.recommendations || [])
+      setSuggestedComposition(data.suggested_composition || null)
+      setSuggestedStacks(data.suggested_stacks || [])
+      setSearchedCount(data.meta?.total_skills_searched || 0)
     } catch {
       setRecommendations([])
+      setSuggestedComposition(null)
+      setSuggestedStacks([])
+      setSearchedCount(0)
     } finally {
       setIsSearching(false)
     }
@@ -178,7 +234,6 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
 
           <p
             className="text-center text-lg sm:text-xl text-secondary mb-10 sm:mb-14 leading-relaxed max-w-2xl mx-auto"
-            style={{ animation: mounted ? 'fadeInUp 0.7s ease-out 0.5s both' : 'none' }}
           >
             {t.hero.subtitle}
           </p>
@@ -190,7 +245,6 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
           <div
             ref={searchRef}
             className="mb-8"
-            style={{ animation: mounted ? 'fadeInUp 0.7s ease-out 0.7s both' : 'none' }}
           >
             {/* Install Command Preview */}
             <div className="bg-foreground text-background font-mono text-xs sm:text-sm px-4 sm:px-5 py-3 flex items-center justify-between">
@@ -254,45 +308,191 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
             {/* Recommendation Results */}
             {showResults && (
               <div className="border border-t-0 border-border bg-card">
-                <div className="px-4 sm:px-5 py-3 border-b border-border">
-                  <span className="text-xs font-mono text-secondary uppercase tracking-wider">
-                    {t.hero.recommendedSkills}
-                  </span>
+                <div className="border-b border-border px-4 py-4 sm:px-5">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <span className="text-xs font-mono text-secondary uppercase tracking-wider">
+                        Agent Skill Plan
+                      </span>
+                      {recommendations[0] && !isSearching && (
+                        <h2 className="mt-1 font-display text-xl font-semibold sm:text-2xl">
+                          Start with {recommendations[0].skill}
+                        </h2>
+                      )}
+                    </div>
+                    {!isSearching && searchedCount > 0 && (
+                      <div className="border border-border px-3 py-2 text-xs font-mono text-secondary">
+                        Searched {formatCompact(searchedCount)} skills
+                      </div>
+                    )}
+                  </div>
                 </div>
                 {isSearching ? (
                   <div className="px-5 py-8 text-center text-sm text-secondary">
                     <span className="inline-block animate-pulse">{'>'} {t.hero.searching}</span>
                   </div>
                 ) : recommendations.length > 0 ? (
-                  <div className="divide-y divide-border">
-                    {recommendations.map((rec, i) => (
-                      <div key={i} className="px-4 sm:px-5 py-4 hover:bg-muted/50 transition-colors group">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Link href={`/skills/${rec.slug}`} className="font-semibold text-sm sm:text-base hover:underline">
+                  <div>
+                    <div className="grid border-b border-border md:grid-cols-3">
+                      <div className="border-b border-border p-4 md:border-b-0 md:border-r">
+                        <p className="text-xs uppercase tracking-widest text-secondary">Primary pick</p>
+                        <p className="mt-2 font-display text-lg font-semibold">{recommendations[0].skill}</p>
+                        <p className="mt-2 text-sm leading-relaxed text-secondary">
+                          {recommendations[0].decision?.headline || recommendations[0].match_label || 'Best available match'}
+                        </p>
+                      </div>
+                      <div className="border-b border-border p-4 md:border-b-0 md:border-r">
+                        <p className="text-xs uppercase tracking-widest text-secondary">Recommended stack</p>
+                        <p className="mt-2 font-display text-lg font-semibold">
+                          {suggestedStacks[0]?.name || suggestedComposition?.name || 'Single-skill prototype'}
+                        </p>
+                        <p className="mt-2 text-sm leading-relaxed text-secondary">
+                          {suggestedComposition?.description || 'Install one skill first, test the workflow, then add companions only where needed.'}
+                        </p>
+                      </div>
+                      <div className="p-4">
+                        <p className="text-xs uppercase tracking-widest text-secondary">Next move</p>
+                        <p className="mt-2 font-display text-lg font-semibold">
+                          {recommendations[0].decision?.adoption_stage || 'Prototype'}
+                        </p>
+                        <p className="mt-2 text-sm leading-relaxed text-secondary">
+                          {recommendations[0].decision?.next_steps?.[0] || 'Run one task end to end before adding more skills.'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="divide-y divide-border">
+                      {recommendations.map((rec, i) => (
+                        <div key={rec.slug} className="px-4 py-5 transition-colors hover:bg-muted/50 sm:px-5">
+                          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                            <div className="min-w-0 flex-1">
+                              <div className="mb-2 flex flex-wrap items-center gap-2">
+                                <span className="border border-border px-2 py-1 text-xs font-mono text-secondary">
+                                  #{rec.rank || i + 1}
+                                </span>
+                                <span className="border border-border px-2 py-1 text-xs font-mono text-secondary">
+                                  {rec.decision?.role || rec.match_label || 'Candidate'}
+                                </span>
+                                <span className="bg-muted px-2 py-1 text-xs font-mono text-secondary">
+                                  {Math.round(Number(rec.confidence) * 100)}% {t.hero.confidence}
+                                </span>
+                                {rec.decision && (
+                                  <span className="bg-foreground px-2 py-1 text-xs font-mono text-background">
+                                    {rec.decision.readiness_score}/100 readiness
+                                  </span>
+                                )}
+                              </div>
+                              <Link href={`/skills/${rec.slug}`} className="font-display text-xl font-semibold hover:underline">
                                 {rec.skill}
                               </Link>
-                              <span className="text-xs font-mono text-secondary bg-muted px-2 py-0.5">
-                                {Math.round(Number(rec.confidence) * 100)}% {t.hero.confidence}
-                              </span>
+                              <p className="mt-2 text-sm leading-relaxed text-secondary">
+                                {rec.reasoning}
+                              </p>
+
+                              <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                                <div className="border border-border p-3">
+                                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Use when</p>
+                                  <ul className="space-y-1.5 text-secondary">
+                                    {(rec.decision?.best_for || [rec.description || 'You need this capability in an agent workflow'])
+                                      .slice(0, 2)
+                                      .map((item) => (
+                                        <li key={item}>{item}</li>
+                                      ))}
+                                  </ul>
+                                </div>
+                                <div className="border border-border p-3">
+                                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Review first</p>
+                                  <ul className="space-y-1.5 text-secondary">
+                                    {(rec.decision?.risks || ['Review repository permissions and maintenance signals'])
+                                      .slice(0, 2)
+                                      .map((item) => (
+                                        <li key={item}>{item}</li>
+                                      ))}
+                                  </ul>
+                                </div>
+                              </div>
+
+                              <div className="mt-3 flex flex-wrap gap-2 text-xs text-secondary">
+                                {rec.stats && (
+                                  <>
+                                    <span className="border border-border px-2 py-1 font-mono">
+                                      {formatCompact(rec.stats.stars)} stars
+                                    </span>
+                                    <span className="border border-border px-2 py-1 font-mono">
+                                      {Math.round(rec.stats.quality_score || 0)}/100 quality
+                                    </span>
+                                  </>
+                                )}
+                                {(rec.use_cases || []).map((useCase) => (
+                                  <Link
+                                    key={useCase.slug}
+                                    href={`/use-cases/${useCase.slug}`}
+                                    className="border border-border px-2 py-1 transition-colors hover:border-foreground hover:text-foreground"
+                                  >
+                                    {useCase.title}
+                                  </Link>
+                                ))}
+                              </div>
                             </div>
-                            <p className="text-xs sm:text-sm text-secondary leading-relaxed line-clamp-2">
-                              {rec.reasoning}
-                            </p>
+
+                            <div className="flex w-full shrink-0 flex-col gap-2 sm:w-40">
+                              <button
+                                onClick={() => copyToClipboard(rec.install)}
+                                className="w-full bg-foreground px-3 py-2.5 text-xs font-mono text-background transition-opacity hover:opacity-80"
+                              >
+                                {copiedCmd === rec.install ? 'Copied!' : t.hero.installCommand}
+                              </button>
+                              <Link
+                                href={`/skills/${rec.slug}`}
+                                className="w-full border border-border px-3 py-2.5 text-center text-xs font-mono transition-colors hover:border-foreground"
+                              >
+                                Decision page
+                              </Link>
+                            </div>
                           </div>
-                          <button
-                            onClick={() => copyToClipboard(rec.install)}
-                            className="text-xs font-mono bg-foreground text-background px-3 py-1.5 hover:opacity-80 transition-opacity shrink-0"
-                          >
-                            {copiedCmd === rec.install ? 'Copied!' : t.hero.installCommand}
-                          </button>
+                          <div className="mt-3 break-all border border-border bg-background p-2 font-mono text-xs text-secondary">
+                            {rec.install}
+                          </div>
                         </div>
-                        <div className="mt-2 font-mono text-xs text-secondary/60 truncate">
-                          {rec.install}
+                      ))}
+                    </div>
+
+                    {(suggestedStacks.length > 0 || suggestedComposition?.steps?.length) && (
+                      <div className="border-t border-border p-4 sm:p-5">
+                        <div className="grid gap-4 md:grid-cols-2">
+                          {suggestedComposition?.steps?.length && (
+                            <div>
+                              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Implementation path</p>
+                              <ol className="space-y-2 text-sm leading-relaxed text-secondary">
+                                {suggestedComposition.steps.map((step, index) => (
+                                  <li key={step} className="flex gap-3">
+                                    <span className="font-mono text-foreground">{index + 1}</span>
+                                    <span>{step}</span>
+                                  </li>
+                                ))}
+                              </ol>
+                            </div>
+                          )}
+                          {suggestedStacks.length > 0 && (
+                            <div>
+                              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Related stacks</p>
+                              <div className="space-y-2">
+                                {suggestedStacks.map((stack) => (
+                                  <Link
+                                    key={stack.slug}
+                                    href={`/collections/${stack.slug}`}
+                                    className="block border border-border p-3 text-sm transition-colors hover:border-foreground"
+                                  >
+                                    <span className="font-semibold">{stack.name}</span>
+                                    <span className="mt-1 block text-xs text-secondary">View stack playbook</span>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    ))}
+                    )}
                   </div>
                 ) : (
                   <div className="px-5 py-6 text-center text-sm text-secondary">
@@ -306,7 +506,6 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
           {/* Agent API Hint */}
           <div
             className="text-center text-xs font-mono text-secondary/60 mb-10 sm:mb-14"
-            style={{ animation: mounted ? 'fadeInUp 0.7s ease-out 0.9s both' : 'none' }}
           >
             {'>'} GET /api/agent/recommend?task=your+task
           </div>
@@ -314,7 +513,6 @@ export function HomePageEnhanced({ stats, activities, featuredSkills }: HomePage
           {/* CTA Row */}
           <div
             className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4"
-            style={{ animation: mounted ? 'fadeInUp 0.7s ease-out 1s both' : 'none' }}
           >
             <Link
               href="/skills"

@@ -167,10 +167,22 @@ Total: 2 skills found
             </div>
             <div className="p-4 sm:p-6">
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
-                {'Describe a task and get skill recommendations plus related stack suggestions.'}
+                {'Describe a task and get skill recommendations with readiness scores, role fit, risk notes, implementation steps, and related stack suggestions.'}
               </p>
+              <div className="mb-4 grid gap-2 text-sm sm:grid-cols-2">
+                {[
+                  'decision.readiness_score',
+                  'decision.role',
+                  'decision.risks',
+                  'decision.next_steps',
+                ].map((field) => (
+                  <code key={field} className="border border-border bg-card px-3 py-2 font-mono text-xs">
+                    {field}
+                  </code>
+                ))}
+              </div>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
-                <code>{'GET /api/agent/recommend?task=scrape+websites+and+extract+tables&limit=3'}</code>
+                <code>{'GET /api/agent/recommend?task=scrape+websites+and+extract+tables&limit=4'}</code>
               </div>
             </div>
           </div>

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAllSkills, type SkillRecord } from '@/lib/db/skills'
+import { getAllSkills, getSkillEventStatsMap, type SkillEventStats, type SkillRecord } from '@/lib/db/skills'
 import { SKILL_STACKS, type SkillStackDefinition } from '@/lib/collections'
 import { getSkillQualityProfile } from '@/lib/quality'
+import { getSkillDecisionProfile } from '@/lib/decision'
+import { getUseCasesForSkill, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
 
 /**
  * Agent Recommend API — Describe a task, get the best skills.
@@ -28,7 +30,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const allSkills = await getAllSkills()
+    const [allSkills, eventStatsMap] = await Promise.all([
+      getAllSkills(),
+      getSkillEventStatsMap().catch((): Record<string, SkillEventStats> => ({})),
+    ])
     const stackMatches = SKILL_STACKS
       .map((stack) => ({
         stack,
@@ -53,30 +58,61 @@ export async function GET(request: NextRequest) {
     const compositionSuggestion =
       recommendations.length >= 2
         ? {
-            name: `${recommendations[0]?.skill.slug}-pipeline`,
-            description: `Suggested composition of ${topSlugs.join(' + ')} for: ${task}`,
+            name: `${recommendations[0]?.skill.slug}-agent-stack`,
+            description: `Start with ${recommendations[0]?.skill.name}, then add ${recommendations
+              .slice(1)
+              .map((item) => item.skill.name)
+              .join(' + ')} only if the workflow needs extra coverage.`,
             skills: topSlugs,
+            steps: [
+              `Prototype the task with ${recommendations[0]?.skill.name} as the primary skill.`,
+              'Add the second skill only if the first one leaves a capability gap.',
+              'Keep the third skill as a fallback during evaluation instead of installing everything at once.',
+            ],
           }
         : null
 
     return NextResponse.json({
       task,
-      recommendations: recommendations.map((r) => ({
-        skill: r.skill.name,
-        slug: r.skill.slug,
-        description: r.skill.description,
-        confidence: Math.min(r.score / 100, 1.0).toFixed(2),
-        install: r.skill.install_command || `npx skills add ${r.skill.github_repo}`,
-        repository: r.skill.repository,
-        stats: {
-          stars: r.skill.github_stars,
-          downloads: r.skill.downloads,
-          rating: r.skill.rating,
-          quality_score: Number(r.skill.quality_score || 0),
-        },
-        quality: getSkillQualityProfile(r.skill),
-        reasoning: generateReasoning(r.skill, r.score),
-      })),
+      recommendations: recommendations.map((r, index) => {
+        const decision = getSkillDecisionProfile(r.skill, eventStatsMap[r.skill.slug] || null)
+        const useCases = getUseCasesForSkill(r.skill, 2)
+        return {
+          rank: index + 1,
+          skill: r.skill.name,
+          slug: r.skill.slug,
+          description: r.skill.description,
+          confidence: Math.min(r.score / 100, 1.0).toFixed(2),
+          match_label: getMatchLabel(r.score),
+          install: r.skill.install_command || `npx skills add ${r.skill.github_repo}`,
+          repository: r.skill.repository,
+          stats: {
+            stars: r.skill.github_stars,
+            downloads: r.skill.downloads,
+            rating: r.skill.rating,
+            quality_score: Number(r.skill.quality_score || 0),
+          },
+          quality: getSkillQualityProfile(r.skill),
+          decision: {
+            readiness_score: decision.readinessScore,
+            readiness_label: decision.readinessLabel,
+            headline: decision.decisionHeadline,
+            role: decision.agentRole,
+            adoption_stage: decision.adoptionStage,
+            primary_fit: decision.primaryFit,
+            best_for: decision.bestFor,
+            risks: decision.riskNotes,
+            proof_points: decision.proofPoints,
+            next_steps: decision.implementationPlan,
+          },
+          use_cases: useCases.map((useCase) => ({
+            slug: useCase.slug,
+            title: useCase.shortTitle,
+            url: `https://www.openagentskill.com/use-cases/${useCase.slug}`,
+          })),
+          reasoning: generateReasoning(r.skill, r.score),
+        }
+      }),
       suggested_composition: compositionSuggestion,
       suggested_stacks: stackMatches.map(({ stack }) => ({
         slug: stack.slug,
@@ -114,6 +150,8 @@ function calculateRelevanceScore(skill: SkillRecord, task: string): number {
   const nameDesc = `${skill.name} ${skill.description} ${skill.long_description || ''}`.toLowerCase()
   const tags = (skill.tags || []).map((t) => t.toLowerCase())
   const category = skill.category.toLowerCase()
+  const normalizedTask = task.toLowerCase()
+  const fullSkillText = `${nameDesc} ${tags.join(' ')} ${category}`
 
   for (const word of taskWords) {
     // Name match (highest weight)
@@ -125,6 +163,38 @@ function calculateRelevanceScore(skill: SkillRecord, task: string): number {
     // Description match
     if (nameDesc.includes(word)) score += 10
   }
+
+  const matchedUseCases = USE_CASES
+    .map((useCase) => {
+      let useCaseScore = 0
+      if (normalizedTask.includes(useCase.shortTitle.toLowerCase())) useCaseScore += 24
+      if (normalizedTask.includes(useCase.slug.replace(/-/g, ' '))) useCaseScore += 18
+      for (const keyword of useCase.keywords) {
+        const normalizedKeyword = keyword.toLowerCase()
+        if (normalizedTask.includes(normalizedKeyword)) {
+          useCaseScore += normalizedKeyword.includes(' ') ? 14 : 8
+        }
+      }
+      return { useCase, useCaseScore }
+    })
+    .filter((item) => item.useCaseScore > 0)
+    .sort((a, b) => b.useCaseScore - a.useCaseScore)
+    .slice(0, 2)
+
+  for (const { useCase, useCaseScore } of matchedUseCases) {
+    const skillUseCaseScore = scoreSkillForUseCase(skill, useCase)
+    score += Math.min(60, skillUseCaseScore * Math.min(4, Math.max(1, useCaseScore / 12)))
+  }
+
+  const isGenericWebTask = /\b(websites?|web pages?|html|crawl|crawler|scrape|scraper|web scraping)\b/.test(normalizedTask)
+  const isGenericWebSkill = /\b(web-crawling|crawler|crawl|scraper|scrape|browser|playwright|puppeteer|html|markdown)\b/.test(fullSkillText)
+  const isLLMWebSkill = /\b(llm-friendly|llm friendly|web crawler|web scraper|turn.*markdown|markdown)\b/.test(fullSkillText)
+  const isPlatformSpecificExtractor = /\b(streaming|youtube|google play|google maps|app store|twitter|reddit|spotify|instagram|tiktok)\b/.test(fullSkillText)
+
+  if (isGenericWebTask && isGenericWebSkill) score += 35
+  if (isGenericWebTask && isLLMWebSkill) score += 30
+  if (isGenericWebTask && isGenericWebSkill && skill.github_stars > 10_000) score += 25
+  if (isGenericWebTask && isPlatformSpecificExtractor) score -= 45
 
   // Boost by popularity signals
   if (skill.github_stars > 10000) score += 15
@@ -142,6 +212,13 @@ function calculateRelevanceScore(skill: SkillRecord, task: string): number {
   score += Math.min(20, Number(skill.quality_score || 0) / 5)
 
   return score
+}
+
+function getMatchLabel(score: number): string {
+  if (score >= 90) return 'Strong task match'
+  if (score >= 65) return 'Good task match'
+  if (score >= 35) return 'Useful shortlist'
+  return 'Partial match'
 }
 
 function generateReasoning(skill: SkillRecord, score: number): string {
@@ -163,8 +240,8 @@ function generateReasoning(skill: SkillRecord, score: number): string {
     parts.push(`${Math.round(skill.quality_score)} quality score`)
   }
 
-  const quality = score > 80 ? 'Strong match' : score > 50 ? 'Good match' : 'Partial match'
-  return `${quality}. ${parts.join(', ')}. ${skill.description}`
+  const evidence = parts.length > 0 ? parts.join(', ') : 'limited public signals'
+  return `${getMatchLabel(score)}. Evidence: ${evidence}. ${skill.description}`
 }
 
 function calculateStackRelevance(stack: SkillStackDefinition, task: string): number {

@@ -5,10 +5,15 @@ import { getUseCasesForSkill } from '@/lib/use-cases'
 export interface SkillDecisionProfile {
   readinessScore: number
   readinessLabel: 'Production-ready' | 'Strong shortlist' | 'Prototype first' | 'Needs manual review'
+  decisionHeadline: string
+  agentRole: 'Primary pick' | 'Companion skill' | 'Fallback candidate' | 'Needs validation'
+  adoptionStage: 'Adopt' | 'Shortlist' | 'Prototype' | 'Review'
   primaryFit: string
   bestFor: string[]
   notIdealFor: string[]
   riskNotes: string[]
+  proofPoints: string[]
+  implementationPlan: string[]
   recommendation: string
 }
 
@@ -21,6 +26,20 @@ function getReadinessLabel(score: number): SkillDecisionProfile['readinessLabel'
   if (score >= 72) return 'Strong shortlist'
   if (score >= 58) return 'Prototype first'
   return 'Needs manual review'
+}
+
+function getAgentRole(score: number): SkillDecisionProfile['agentRole'] {
+  if (score >= 84) return 'Primary pick'
+  if (score >= 72) return 'Companion skill'
+  if (score >= 58) return 'Fallback candidate'
+  return 'Needs validation'
+}
+
+function getAdoptionStage(score: number): SkillDecisionProfile['adoptionStage'] {
+  if (score >= 84) return 'Adopt'
+  if (score >= 72) return 'Shortlist'
+  if (score >= 58) return 'Prototype'
+  return 'Review'
 }
 
 export function getSkillDecisionProfile(
@@ -65,14 +84,35 @@ export function getSkillDecisionProfile(
   ].filter((note): note is string => Boolean(note))
 
   const readinessLabel = getReadinessLabel(readinessScore)
+  const agentRole = getAgentRole(readinessScore)
+  const adoptionStage = getAdoptionStage(readinessScore)
+  const primaryFit = useCases[0]?.shortTitle || skill.category
+  const proofPoints = [
+    hasAdoption ? `${skill.github_stars.toLocaleString()} GitHub stars` : null,
+    hasRecentPush ? 'recent repository activity' : null,
+    hasInstall ? 'install command or GitHub repo available' : null,
+    quality.score > 0 ? `${quality.score}/100 quality profile` : null,
+    hasEngagement ? `${eventStats?.total_events || 0} OpenAgentSkill engagement events` : null,
+  ].filter((point): point is string => Boolean(point))
+
+  const implementationPlan = [
+    `Install it in a sandbox agent and run one ${primaryFit} task end to end.`,
+    'Compare output quality, latency, and failure behavior against at least one alternative.',
+    'Promote it into production only after reviewing repository permissions, license, and maintenance signals.',
+  ]
 
   return {
     readinessScore,
     readinessLabel,
-    primaryFit: useCases[0]?.shortTitle || skill.category,
+    decisionHeadline: `${agentRole} for ${primaryFit}`,
+    agentRole,
+    adoptionStage,
+    primaryFit,
     bestFor,
     notIdealFor,
     riskNotes: riskNotes.length > 0 ? riskNotes : ['No major risk signals from current metadata'],
+    proofPoints: proofPoints.length > 0 ? proofPoints : ['Current metadata is limited; validate manually before adoption'],
+    implementationPlan,
     recommendation:
       readinessScore >= 84
         ? 'Use this as a leading candidate, then validate the README and install path in your own agent stack.'
