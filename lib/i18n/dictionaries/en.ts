@@ -12,7 +12,7 @@ export default {
   // Hero
   hero: {
     title: 'Let your AI agent find and install the right skill automatically.',
-    subtitle: 'A registry and recommendation API for reusable AI agent skills. Search by task, compare trust signals, then install.',
+    subtitle: 'OpenAgentSkill is npm for AI Agent Skills. Let your agent discover, compare, and install reusable skills automatically.',
     tryItNow: 'Try it now',
     installPrefix: '$ npx skills add',
     installPlaceholder: 'owner/repo',
@@ -25,7 +25,7 @@ export default {
     confidence: 'match',
     installCommand: 'Install',
     cta: {
-      browse: 'Browse All Skills',
+      browse: 'Find Skills for My Agent',
       submit: 'Submit a Skill',
       forAgents: 'Agent API',
     },

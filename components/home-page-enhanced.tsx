@@ -2,9 +2,8 @@
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Boxes, Search, ShieldCheck, Star, Terminal } from 'lucide-react'
+import { ArrowRight, Bot, CheckCircle2, Code2, Database, Search, ShieldCheck } from 'lucide-react'
 import { useI18n } from '@/lib/i18n/context'
-import { SKILL_PACKS } from '@/lib/skill-packs'
 import { USE_CASES } from '@/lib/use-cases'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
@@ -82,39 +81,58 @@ interface SuggestedStack {
 }
 
 const HOME_USE_CASES = USE_CASES.slice(0, 4)
-const HOME_SKILL_PACKS = SKILL_PACKS.slice(0, 5)
-const VALUE_PROPS = [
+const DEMO_TASK = 'Scrape competitor pricing pages every week'
+const AGENT_PLATFORMS = ['Codex', 'Claude Code', 'Cursor', 'MCP agents', 'OpenCode', 'Custom API']
+const DEMO_RECOMMENDATIONS = [
   {
-    label: 'Discover',
-    title: 'Task-to-skill recommendations',
-    description: 'Describe the workflow and get a focused shortlist instead of browsing a giant catalog.',
+    name: 'Crawl4AI',
+    fit: 'Primary crawler',
+    score: '96',
+    install: 'npx skills add unclecode/crawl4ai',
+  },
+  {
+    name: 'Firecrawl',
+    fit: 'LLM-ready extraction',
+    score: '92',
+    install: 'npx skills add firecrawl/firecrawl',
+  },
+  {
+    name: 'Browser automation pack',
+    fit: 'Fallback for dynamic pages',
+    score: '89',
+    install: 'open pack',
+  },
+]
+const SCENARIO_RECOMMENDATIONS = [
+  {
+    slug: 'web-scraping',
+    title: 'Web scraping',
+    task: 'Monitor pricing and extract tables',
+    skills: ['Crawl4AI', 'Firecrawl', 'Browser automation'],
     Icon: Search,
   },
   {
-    label: 'Evaluate',
-    title: 'Trust, quality, and audit signals',
-    description: 'Compare stars, maintenance, install paths, and fit signals before giving a skill to an agent.',
-    Icon: ShieldCheck,
+    slug: 'coding-agents',
+    title: 'Coding agents',
+    task: 'Inspect repos, patch bugs, verify changes',
+    skills: ['GitHub', 'Playwright', 'Code review'],
+    Icon: Code2,
   },
   {
-    label: 'Install',
-    title: 'CLI plus Codex, Claude Code, and Cursor prompts',
-    description: 'Move from discovery to usage with install commands and agent-ready instructions.',
-    Icon: Terminal,
+    slug: 'rag-knowledge',
+    title: 'RAG workflows',
+    task: 'Turn documents into grounded answers',
+    skills: ['MarkItDown', 'LlamaIndex', 'Vector search'],
+    Icon: Database,
+  },
+  {
+    slug: 'workflow-automation',
+    title: 'Workflow automation',
+    task: 'Connect repeated ops across tools',
+    skills: ['n8n', 'Zapier', 'Scheduled agents'],
+    Icon: Bot,
   },
 ]
-
-const EXPLORE_LINKS = [
-  { href: '/agent-skills-registry', label: 'Registry API' },
-  { href: '/skill-packs', label: 'Skill packs' },
-  { href: '/best', label: 'Best lists' },
-  { href: '/trending', label: 'Trending' },
-  { href: '/audits', label: 'Audits' },
-  { href: '/guides', label: 'Guides' },
-  { href: '/api-docs', label: 'API docs' },
-  { href: '/submit', label: 'Submit skill' },
-]
-
 function formatCompact(value: number) {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
   if (value >= 10_000) return `${Math.round(value / 1000)}K`
@@ -122,7 +140,7 @@ function formatCompact(value: number) {
   return value.toLocaleString()
 }
 
-export function HomePageEnhanced({ stats, featuredSkills }: HomePageEnhancedProps) {
+export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
   const { t } = useI18n()
   const [taskQuery, setTaskQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
@@ -141,7 +159,7 @@ export function HomePageEnhanced({ stats, featuredSkills }: HomePageEnhancedProp
     setIsSearching(true)
     setShowResults(true)
     try {
-      const res = await fetch(`/api/agent/recommend?task=${encodeURIComponent(normalizedQuery)}&limit=4`)
+      const res = await fetch(`/api/agent/recommend?task=${encodeURIComponent(normalizedQuery)}&limit=3`)
       const data = await res.json()
       setRecommendations(data.recommendations || [])
       setSuggestedComposition(data.suggested_composition || null)
@@ -175,65 +193,46 @@ export function HomePageEnhanced({ stats, featuredSkills }: HomePageEnhancedProp
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
-      {/* ============================================= */}
-      {/* HERO: The core innovation - action-first hero */}
-      {/* ============================================= */}
-      <section className="px-4 pb-10 pt-8 sm:px-6 sm:pb-14 sm:pt-16 lg:pt-20">
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-4 flex justify-center">
-            <Link
-              href="/agent-skills-registry"
-              className="border border-border bg-card px-3 py-1.5 text-center text-xs font-mono uppercase tracking-wider text-secondary transition-colors hover:border-foreground hover:text-foreground"
-            >
-              Agent Skills Registry
-            </Link>
-          </div>
-          {/* Animated Title */}
-          <h1
-            className="mx-auto max-w-4xl text-balance text-center font-display text-3xl font-bold leading-[1.06] tracking-tight sm:text-5xl lg:text-6xl"
-            style={{ animation: 'fadeInUp 0.7s ease-out both' }}
-          >
-            {t.hero.title}
-          </h1>
+      <section className="px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-14 lg:pt-18">
+        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div className="min-w-0">
+            <div className="mb-4 flex justify-center lg:justify-start">
+              <Link
+                href="/agent-skills-registry"
+                className="max-w-full border border-border bg-card px-2.5 py-1.5 text-center font-mono text-[10px] uppercase tracking-normal text-secondary transition-colors hover:border-foreground hover:text-foreground sm:px-3 sm:text-xs sm:tracking-wider"
+              >
+                <span className="hidden sm:inline">OpenAgentSkill is npm for AI Agent Skills</span>
+                <span className="sm:hidden">npm for AI Agent Skills</span>
+              </Link>
+            </div>
 
-          <p
-            className="mx-auto mb-6 mt-4 max-w-2xl text-center text-base leading-relaxed text-secondary sm:mb-8 sm:mt-5 sm:text-lg"
-          >
-            {t.hero.subtitle}
-          </p>
+            <h1
+              className="mx-auto max-w-4xl text-balance text-center font-display text-3xl font-bold leading-[1.06] tracking-tight sm:text-5xl lg:mx-0 lg:text-left lg:text-6xl"
+              style={{ animation: 'fadeInUp 0.7s ease-out both' }}
+            >
+              {t.hero.title}
+            </h1>
 
-          <div className="mx-auto mb-7 grid max-w-2xl grid-cols-3 gap-2">
-            <Link
-              href="/agent-skills-registry"
-              className="border border-border bg-card px-2 py-2 text-center font-mono text-[11px] text-secondary transition-colors hover:border-foreground hover:text-foreground sm:px-3 sm:text-xs"
-            >
-              Registry API
-            </Link>
-            <Link
-              href="/skill-packs"
-              className="border border-border bg-card px-2 py-2 text-center font-mono text-[11px] text-secondary transition-colors hover:border-foreground hover:text-foreground sm:px-3 sm:text-xs"
-            >
-              Skill packs
-            </Link>
-            <Link
-              href="/skills"
-              className="border border-border bg-card px-2 py-2 text-center font-mono text-[11px] text-secondary transition-colors hover:border-foreground hover:text-foreground sm:px-3 sm:text-xs"
-            >
-              Browse skills
-            </Link>
-          </div>
+            <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-secondary sm:mt-5 sm:text-lg lg:mx-0 lg:text-left">
+              {t.hero.subtitle}
+            </p>
 
-          {/* ============================== */}
-          {/* THE KEY FEATURE: Task Search   */}
-          {/* Agents can use this in one API */}
-          {/* ============================== */}
-          <div
-            ref={searchRef}
-            className="mx-auto mb-8 max-w-3xl"
-          >
+            <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {AGENT_PLATFORMS.map((platform) => (
+                <div
+                  key={platform}
+                  className="flex items-center gap-2 rounded-[8px] border border-border/80 bg-card px-3 py-2 text-xs font-semibold text-secondary shadow-[0_10px_28px_rgba(23,23,23,0.03)]"
+                >
+                  <CheckCircle2 className="h-3.5 w-3.5 text-foreground" aria-hidden="true" />
+                  <span>{platform}</span>
+                </div>
+              ))}
+            </div>
+
+            <div ref={searchRef} id="task-search" className="mt-7">
             {/* Natural Language Task Input */}
-            <div className="border border-border bg-card">
-              <div className="px-4 sm:px-5 pt-4 pb-2">
+            <div className="rounded-t-[8px] border border-border/80 bg-card shadow-[0_18px_45px_rgba(23,23,23,0.04)]">
+              <div className="px-4 pb-2 pt-4 sm:px-5">
                 <label className="text-xs text-secondary font-mono uppercase tracking-wider">
                   {t.hero.orDescribeTask}
                 </label>
@@ -250,18 +249,26 @@ export function HomePageEnhanced({ stats, featuredSkills }: HomePageEnhancedProp
                 <button
                   onClick={handleFindSkills}
                   disabled={isSearching || !taskQuery.trim()}
-                  className="w-full border-t border-border bg-foreground px-5 py-3 text-sm font-semibold text-background transition-opacity hover:opacity-90 disabled:opacity-40 sm:w-auto sm:border-t-0 sm:px-8"
+                  className="inline-flex w-full items-center justify-center gap-2 border-t border-border bg-foreground px-5 py-3 text-sm font-semibold text-background transition-opacity hover:opacity-90 disabled:opacity-40 sm:w-auto sm:border-t-0 sm:px-7"
                 >
+                  <Search className="h-4 w-4" aria-hidden="true" />
                   {isSearching ? t.hero.searching : t.hero.findSkills}
                 </button>
               </div>
             </div>
 
-            <div className="border-x border-b border-border bg-card px-4 py-3 sm:px-5">
+            <div className="rounded-b-[8px] border-x border-b border-border/80 bg-card px-4 py-3 sm:px-5">
               <div className="mb-2 text-xs font-mono uppercase tracking-wider text-secondary">
                 Start from a workflow
               </div>
               <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => runRecommendation(DEMO_TASK)}
+                  className="border border-foreground bg-foreground px-3 py-1.5 text-xs font-semibold text-background transition-opacity hover:opacity-85"
+                >
+                  Try demo task
+                </button>
                 {HOME_USE_CASES.slice(0, 4).map((useCase) => (
                   <button
                     key={useCase.slug}
@@ -332,7 +339,7 @@ export function HomePageEnhanced({ stats, featuredSkills }: HomePageEnhancedProp
                     </div>
 
                     <div className="divide-y divide-border">
-                      {recommendations.map((rec, i) => (
+                      {recommendations.slice(0, 3).map((rec, i) => (
                         <div key={rec.slug} className="px-4 py-5 transition-colors hover:bg-muted/50 sm:px-5">
                           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                             <div className="min-w-0 flex-1">
@@ -355,11 +362,11 @@ export function HomePageEnhanced({ stats, featuredSkills }: HomePageEnhancedProp
                               <Link href={`/skills/${rec.slug}`} className="font-display text-xl font-semibold hover:underline">
                                 {rec.skill}
                               </Link>
-                              <p className="mt-2 text-sm leading-relaxed text-secondary">
+                              <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary sm:line-clamp-none">
                                 {rec.reasoning}
                               </p>
 
-                              <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                              <div className="mt-4 hidden gap-3 text-sm sm:grid sm:grid-cols-2">
                                 <div className="border border-border p-3">
                                   <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Use when</p>
                                   <ul className="space-y-1.5 text-secondary">
@@ -473,90 +480,152 @@ export function HomePageEnhanced({ stats, featuredSkills }: HomePageEnhancedProp
             )}
           </div>
 
-          {/* CTA Row */}
-          <div
-            className="flex flex-col items-center justify-center gap-3 sm:flex-row"
-          >
-            <Link
-              href="/skills"
-              className="w-full bg-foreground px-7 py-3 text-center text-sm font-semibold text-background transition-opacity hover:opacity-90 sm:w-auto"
-            >
-              {t.hero.cta.browse}
-            </Link>
-            <Link
-              href="/skill-packs"
-              className="w-full border border-border px-7 py-3 text-center text-sm font-semibold transition-colors hover:border-foreground sm:w-auto"
-            >
-              Skill Packs
-            </Link>
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => runRecommendation(DEMO_TASK)}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] bg-foreground px-6 py-3 text-center text-sm font-semibold text-background transition-opacity hover:opacity-90 sm:w-auto"
+              >
+                {t.hero.cta.browse}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </button>
+              <Link
+                href="/api-docs"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] border border-border/80 bg-card px-6 py-3 text-center text-sm font-semibold transition-colors hover:border-foreground sm:w-auto"
+              >
+                Try Registry API
+              </Link>
+              <Link
+                href="/skill-packs"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] border border-border/80 bg-card px-6 py-3 text-center text-sm font-semibold transition-colors hover:border-foreground sm:w-auto"
+              >
+                Install a Skill Pack
+              </Link>
+            </div>
+          </div>
+
+          <div className="min-w-0 rounded-[8px] border border-border/80 bg-card shadow-[0_24px_70px_rgba(23,23,23,0.08)]">
+            <div className="border-b border-border/80 p-4 sm:p-5">
+              <p className="text-xs font-mono uppercase tracking-wider text-secondary">Example registry response</p>
+              <h2 className="mt-2 font-display text-2xl font-bold leading-tight">
+                {DEMO_TASK}
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-secondary">
+                The registry turns a messy task into installable skills, fit reasons, and agent-ready next steps.
+              </p>
+            </div>
+
+            <div className="divide-y divide-border/80">
+              {DEMO_RECOMMENDATIONS.map((item, index) => (
+                <div key={item.name} className="grid grid-cols-[auto_1fr_auto] items-center gap-3 p-4 sm:p-5">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-muted font-mono text-xs font-bold">
+                    {index + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-display text-base font-semibold">{item.name}</p>
+                      <span className="rounded-[8px] bg-muted px-2 py-1 text-[11px] font-mono text-secondary">
+                        {item.score}/100 fit
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm text-secondary">{item.fit}</p>
+                    <p className="mt-2 truncate font-mono text-xs text-secondary">{item.install}</p>
+                  </div>
+                  <ShieldCheck className="h-5 w-5 text-secondary" aria-hidden="true" />
+                </div>
+              ))}
+            </div>
+
+            <div className="grid gap-3 border-t border-border/80 p-4 sm:grid-cols-3 sm:p-5">
+              {[
+                ['Trust score', 'Stars + freshness + metadata'],
+                ['Install ready', 'CLI and agent prompts'],
+                ['API first', 'Readable by humans and agents'],
+              ].map(([label, copy]) => (
+                <div key={label} className="rounded-[8px] bg-muted p-3">
+                  <p className="text-xs font-mono uppercase tracking-wider text-secondary">{label}</p>
+                  <p className="mt-1 text-sm font-semibold">{copy}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t border-border/80 bg-foreground p-4 text-background sm:p-5">
+              <p className="mb-2 text-xs font-mono uppercase tracking-wider text-background/60">Agent API</p>
+              <code className="block overflow-x-auto whitespace-nowrap font-mono text-xs sm:text-sm">
+                GET /api/agent/recommend?task=scrape+pricing
+              </code>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="px-4 py-8 sm:px-6 sm:py-12">
-        <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-3">
-          {VALUE_PROPS.map(({ label, title, description, Icon }) => (
-            <div
-              key={label}
-              className="rounded-[8px] border border-border/80 bg-card p-5 shadow-[0_16px_40px_rgba(23,23,23,0.04)] transition-transform hover:-translate-y-0.5"
-            >
-              <div className="mb-5 flex h-9 w-9 items-center justify-center rounded-[8px] bg-foreground text-background">
-                <Icon className="h-4 w-4" aria-hidden="true" />
-              </div>
-              <p className="mb-2 text-xs uppercase tracking-widest text-secondary">{label}</p>
-              <h2 className="font-display text-xl font-semibold leading-tight">{title}</h2>
-              <p className="mt-3 text-sm leading-relaxed text-secondary">{description}</p>
+      <section className="px-4 pb-8 sm:px-6 sm:pb-12">
+        <div className="mx-auto max-w-6xl rounded-[8px] border border-border/80 bg-card p-4 shadow-[0_18px_45px_rgba(23,23,23,0.04)] sm:p-5">
+          <div className="grid gap-3 md:grid-cols-[0.85fr_1.15fr] md:items-center">
+            <div>
+              <p className="text-xs font-mono uppercase tracking-wider text-secondary">Agent compatibility</p>
+              <h2 className="mt-2 font-display text-2xl font-bold">One registry for every agent surface</h2>
             </div>
-          ))}
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {AGENT_PLATFORMS.map((platform) => (
+                <div key={platform} className="flex items-center gap-2 rounded-[8px] bg-muted px-3 py-2 text-sm font-semibold">
+                  <Bot className="h-4 w-4 text-secondary" aria-hidden="true" />
+                  {platform}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="mt-5 grid grid-cols-2 gap-2 border-t border-border/80 pt-5 sm:grid-cols-4">
+            {[
+              [stats.totalSkills.toLocaleString(), 'skills indexed'],
+              [`${Math.round(stats.totalDownloads / 1000)}K+`, 'downloads'],
+              [stats.activePlatforms.toLocaleString(), 'platforms'],
+              [stats.agentSubmissions.toLocaleString(), 'agent submissions'],
+            ].map(([value, label]) => (
+              <div key={label} className="rounded-[8px] bg-muted px-3 py-3">
+                <p className="font-display text-xl font-bold">{value}</p>
+                <p className="mt-1 text-xs text-secondary">{label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="px-4 pb-12 sm:px-6 sm:pb-16">
-        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 text-center md:grid-cols-4">
-          {[
-            [stats.totalSkills.toLocaleString(), t.stats.skills],
-            [`${Math.round(stats.totalDownloads / 1000)}K+`, t.stats.downloads],
-            [stats.activePlatforms.toLocaleString(), t.stats.platforms],
-            [stats.agentSubmissions.toLocaleString(), t.stats.agentSubmissions],
-          ].map(([value, label]) => (
-            <div key={label} className="rounded-[8px] border border-border/80 bg-card p-4 shadow-[0_12px_32px_rgba(23,23,23,0.035)] sm:p-5">
-              <div className="font-display text-2xl font-bold sm:text-3xl">{value}</div>
-              <div className="mt-1 text-xs text-secondary">{label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="bg-card/55 px-4 py-12 sm:px-6 sm:py-16">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Skill packs</p>
-              <h2 className="font-display text-2xl font-bold sm:text-3xl">Start from a complete workflow</h2>
+              <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Scenario recommendations</p>
+              <h2 className="font-display text-2xl font-bold sm:text-3xl">Start from the job your agent needs to do</h2>
             </div>
-            <Link href="/skill-packs" className="inline-flex items-center gap-1 text-sm font-semibold text-secondary transition-colors hover:text-foreground">
-              View all packs
+            <Link href="/use-cases" className="inline-flex items-center gap-1 text-sm font-semibold text-secondary transition-colors hover:text-foreground">
+              View all use cases
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {HOME_SKILL_PACKS.map((pack) => (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {SCENARIO_RECOMMENDATIONS.map(({ slug, title, task, skills, Icon }) => (
               <Link
-                key={pack.slug}
-                href={`/skill-packs/${pack.slug}`}
-                className="group flex min-h-48 flex-col rounded-[8px] border border-border/80 bg-background p-4 shadow-[0_16px_40px_rgba(23,23,23,0.04)] transition-transform hover:-translate-y-0.5 hover:border-foreground sm:p-5"
+                key={slug}
+                href={`/use-cases/${slug}`}
+                className="group flex min-h-64 flex-col rounded-[8px] border border-border/80 bg-card p-5 shadow-[0_16px_40px_rgba(23,23,23,0.04)] transition-transform hover:-translate-y-0.5 hover:border-foreground"
               >
-                <div className="mb-5 flex h-9 w-9 items-center justify-center rounded-[8px] bg-muted text-foreground">
-                  <Boxes className="h-4 w-4" aria-hidden="true" />
+                <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-[8px] bg-foreground text-background">
+                  <Icon className="h-4 w-4" aria-hidden="true" />
                 </div>
-                <p className="mb-2 text-xs uppercase tracking-widest text-secondary">{pack.shortTitle}</p>
-                <h3 className="font-display text-lg font-semibold leading-tight group-hover:text-secondary">
-                  {pack.title.replace(' agent pack', '')}
-                </h3>
-                <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-secondary">{pack.eyebrow}</p>
-                <span className="mt-auto pt-5 text-xs font-semibold text-foreground">
-                  Open pack
+                <h3 className="font-display text-xl font-semibold">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-secondary">{task}</p>
+                <div className="mt-5 space-y-2">
+                  {skills.map((skill) => (
+                    <div key={skill} className="rounded-[8px] bg-muted px-3 py-2 text-xs font-semibold text-secondary">
+                      {skill}
+                    </div>
+                  ))}
+                </div>
+                <span className="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-semibold">
+                  Get recommendations
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                 </span>
               </Link>
             ))}
@@ -564,58 +633,37 @@ export function HomePageEnhanced({ stats, featuredSkills }: HomePageEnhancedProp
         </div>
       </section>
 
-      <section className="px-4 py-12 sm:px-6 sm:py-16">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-6 flex items-end justify-between gap-4">
-            <h2 className="font-display text-2xl font-bold sm:text-3xl">{t.featured.title}</h2>
-            <Link href="/skills" className="inline-flex items-center gap-1 text-sm font-semibold text-secondary transition-colors hover:text-foreground">
-              {t.featured.viewAll}
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
+      <section className="px-4 pb-12 sm:px-6 sm:pb-16">
+        <div className="mx-auto grid min-w-0 max-w-6xl overflow-hidden rounded-[8px] bg-foreground text-background shadow-[0_24px_70px_rgba(23,23,23,0.12)] lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="min-w-0 p-5 sm:p-8">
+            <p className="text-xs font-mono uppercase tracking-wider text-background/60">Registry layer</p>
+            <h2 className="mt-3 font-display text-3xl font-bold leading-tight sm:text-4xl">
+              Search for humans. API for agents.
+            </h2>
+            <p className="mt-4 max-w-lg text-sm leading-relaxed text-background/70 sm:text-base">
+              Browse the registry when you are exploring. Call the recommendation API when your agent needs to pick, compare, and install a skill automatically.
+            </p>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2">
-            {featuredSkills.slice(0, 8).map((skill, index) => (
-              <Link
-                key={skill.slug}
-                href={`/skills/${skill.slug}`}
-                className="group grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-[8px] border border-border/80 bg-card p-4 shadow-[0_12px_32px_rgba(23,23,23,0.035)] transition-transform hover:-translate-y-0.5 hover:border-foreground sm:gap-4"
-                style={{ animation: `fadeInUp 0.5s ease-out ${index * 0.04 + 0.1}s both` }}
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-muted font-display text-sm font-bold text-secondary">
-                  {index + 1}
-                </span>
-                <div className="min-w-0">
-                  <h3 className="truncate text-sm font-semibold group-hover:underline sm:text-base">{skill.name}</h3>
-                  <p className="truncate text-xs leading-relaxed text-secondary sm:text-sm">{skill.description}</p>
+          <div className="min-w-0 border-t border-background/15 p-5 sm:p-8 lg:border-l lg:border-t-0">
+            <div className="grid gap-3 sm:grid-cols-3">
+              {[
+                ['recommend', 'Rank skills by task fit'],
+                ['compare', 'Expose trust signals'],
+                ['install', 'Return agent-ready commands'],
+              ].map(([label, copy]) => (
+                <div key={label} className="rounded-[8px] bg-background/10 p-4">
+                  <p className="font-mono text-xs uppercase tracking-wider text-background/55">{label}</p>
+                  <p className="mt-2 text-sm font-semibold leading-snug">{copy}</p>
                 </div>
-                <span className="inline-flex items-center gap-1 rounded-[8px] bg-muted px-2 py-1 font-mono text-xs text-secondary">
-                  <Star className="h-3.5 w-3.5" aria-hidden="true" />
-                  {formatCompact(skill.github_stars)}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-card/55 px-4 py-12 sm:px-6 sm:py-16">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-6">
-            <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Explore</p>
-            <h2 className="font-display text-2xl font-bold sm:text-3xl">More ways into the registry</h2>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {EXPLORE_LINKS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="group flex items-center justify-between rounded-[8px] border border-border/80 bg-background px-4 py-3 text-sm font-semibold text-secondary shadow-[0_10px_28px_rgba(23,23,23,0.03)] transition-colors hover:border-foreground hover:text-foreground"
-              >
-                <span>{item.label}</span>
-                <ArrowRight className="h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" aria-hidden="true" />
-              </Link>
-            ))}
+              ))}
+            </div>
+            <div className="mt-4 min-w-0 rounded-[8px] bg-background p-4 text-foreground">
+              <p className="mb-2 text-xs font-mono uppercase tracking-wider text-secondary">Open endpoint</p>
+              <code className="block break-all font-mono text-xs sm:break-normal sm:text-sm">
+                GET /api/agent/recommend?task=review+pull+requests
+              </code>
+            </div>
           </div>
         </div>
       </section>

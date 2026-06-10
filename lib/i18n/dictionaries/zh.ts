@@ -12,7 +12,7 @@ export default {
   // Hero
   hero: {
     title: '让你的 AI Agent 自动发现并安装正确的技能',
-    subtitle: '面向 AI Agent Skills 的注册表和推荐 API。按任务搜索，比较信任信号，然后安装。',
+    subtitle: 'OpenAgentSkill 是 AI Agent Skills 的 npm。让 Agent 自动发现、比较并安装可复用技能。',
     tryItNow: '立即体验',
     installPrefix: '$ npx skills add',
     installPlaceholder: 'owner/repo',
@@ -25,7 +25,7 @@ export default {
     confidence: '匹配度',
     installCommand: '安装',
     cta: {
-      browse: '浏览全部技能',
+      browse: '为我的 Agent 找技能',
       submit: '提交技能',
       forAgents: 'Agent API',
     },
