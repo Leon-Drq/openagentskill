@@ -10,18 +10,12 @@ import { useI18n } from '@/lib/i18n/context'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { href: '/', labelKey: 'home', exact: true },
   { href: '/skills', labelKey: 'skills' },
-  { href: '/best', label: 'Best' },
-  { href: '/trending', label: 'Trending' },
   { href: '/skill-packs', label: 'Packs' },
-  { href: '/audits', label: 'Audits' },
-  { href: '/official', label: 'Official' },
-  { href: '/agents', label: 'Agents' },
-  { href: '/rankings', label: 'Rankings' },
-  { href: '/guides', label: 'Guides' },
-  { href: '/docs', labelKey: 'docs' },
+  { href: '/use-cases', label: 'Use Cases' },
+  { href: '/compare', label: 'Compare' },
   { href: '/api-docs', labelKey: 'apiDocs' },
+  { href: '/docs', labelKey: 'docs' },
   { href: '/submit', labelKey: 'submit' },
 ] as const
 
@@ -67,7 +61,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-2 sm:gap-3">
           <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary navigation">
             {navItems.map((item) => {
-              const active = isActivePath(pathname, item.href, 'exact' in item ? item.exact : false)
+              const active = isActivePath(pathname, item.href)
               const label = 'label' in item ? item.label : t.nav[item.labelKey]
 
               return (
