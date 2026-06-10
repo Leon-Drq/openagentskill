@@ -82,8 +82,10 @@ export default function APIDocsPage() {
               { method: 'GET', path: '/api/agent/skills' },
               { method: 'GET', path: '/api/agent/skills/{slug}' },
               { method: 'GET', path: '/api/agent/recommend' },
+              { method: 'GET', path: '/api/agent/evals' },
               { method: 'GET', path: '/api/skills/search' },
               { method: 'GET', path: '/api/skills/{slug}/install' },
+              { method: 'GET', path: '/api/badge/{slug}' },
               { method: 'GET', path: '/api/agent/packs' },
               { method: 'GET', path: '/api/agent/packs/{slug}' },
               { method: 'GET', path: '/api/agent/rankings' },
@@ -154,6 +156,48 @@ export default function APIDocsPage() {
               </p>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
                 <code>{'GET /api/skills/crawl4ai/install?format=text'}</code>
+              </div>
+            </div>
+          </div>
+
+          <div className="border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/agent/evals'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Run fixed regression checks against task-to-skill recommendation quality. Use this before changing ranking logic or import filters.'}
+              </p>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <code>{'GET /api/agent/evals'}</code>
+              </div>
+            </div>
+          </div>
+
+          <div className="border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/badge/{slug}'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Return an SVG README badge for a listed skill. Use metric=trust, quality, stars, or audit.'}
+              </p>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <code>{'GET /api/badge/crawl4ai?metric=audit'}</code>
               </div>
             </div>
           </div>

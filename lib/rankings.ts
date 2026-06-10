@@ -1,5 +1,6 @@
 import type { SkillAgentStats, SkillRecord } from '@/lib/db/skills'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
+import { dedupeRankedSkills } from '@/lib/registry'
 import { USE_CASES, getUseCaseBySlug, scoreSkillForUseCase } from '@/lib/use-cases'
 
 export type RankingKind =
@@ -129,10 +130,12 @@ function rankByUseCase(
   const useCase = definition.useCaseSlug ? getUseCaseBySlug(definition.useCaseSlug) : null
   if (!useCase) return []
 
-  return skills
+  const scored = skills
     .map((skill) => ({ skill, score: scoreSkillForUseCase(skill, useCase) }))
     .filter((item) => item.score >= 6)
     .sort((a, b) => b.score - a.score || b.skill.github_stars - a.skill.github_stars)
+
+  return dedupeRankedSkills(scored)
     .slice(0, limit)
     .map((item, index) => ({
       skill: item.skill,
@@ -216,7 +219,9 @@ export function rankSkillsForDefinition(
       return b.score - a.score || b.skill.github_stars - a.skill.github_stars
     })
 
-  return scored.slice(0, limit).map((item, index) => ({ ...item, rank: index + 1 }))
+  return dedupeRankedSkills(scored)
+    .slice(0, limit)
+    .map((item, index) => ({ ...item, rank: index + 1 }))
 }
 
 export function getRankingCompareHref(rankedSkills: RankedSkill[]) {

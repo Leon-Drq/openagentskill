@@ -65,9 +65,58 @@ export default async function UseCasePage({
   const matchedSkills = selectSkillsForUseCase(allSkills, useCase, 18)
   const heroSkills = matchedSkills.slice(0, 3)
   const relatedStacks = SKILL_STACKS.filter((stack) => stack.useCaseSlug === useCase.slug)
+  const faqEntries = [
+    {
+      question: `What are the best AI agent skills for ${useCase.shortTitle.toLowerCase()}?`,
+      answer:
+        heroSkills.length > 0
+          ? `Start by comparing ${heroSkills.map((skill) => skill.name).join(', ')}. OpenAgentSkill ranks them by workflow fit, GitHub adoption, quality, and install readiness.`
+          : `Use the matching skills list on this page as a shortlist, then inspect each repository and install path before production use.`,
+    },
+    {
+      question: 'Can an AI agent use this page directly?',
+      answer:
+        `Yes. Use the linked Registry API prompt to query /api/skills/search with the task: "${useCase.heroPrompt}" and retrieve install handoff links for the top results.`,
+    },
+    {
+      question: 'Should I install every recommended skill?',
+      answer:
+        'No. Start with the highest-fit skill, test it in a sandbox workflow, and add companion skills only when the task needs extra coverage.',
+    },
+  ]
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        name: useCase.title,
+        description: useCase.description,
+        url: `https://www.openagentskill.com/use-cases/${useCase.slug}`,
+        mainEntity: matchedSkills.slice(0, 10).map((skill, index) => ({
+          '@type': 'SoftwareApplication',
+          position: index + 1,
+          name: skill.name,
+          url: `https://www.openagentskill.com/skills/${skill.slug}`,
+          applicationCategory: skill.category,
+        })),
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: faqEntries.map((entry) => ({
+          '@type': 'Question',
+          name: entry.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: entry.answer,
+          },
+        })),
+      },
+    ],
+  }
 
   return (
     <div className="min-h-screen bg-background">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <SiteHeader />
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
@@ -229,6 +278,26 @@ export default async function UseCasePage({
                 </div>
               </Link>
             ))}
+          </div>
+        </section>
+
+        <section className="border-t border-border py-10">
+          <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr]">
+            <div>
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">FAQ</p>
+              <h2 className="font-display text-2xl font-semibold">How to choose skills for this workflow</h2>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
+                These answers are written for both human builders and agents consuming the Registry API.
+              </p>
+            </div>
+            <div className="grid gap-3">
+              {faqEntries.map((entry) => (
+                <div key={entry.question} className="border border-border bg-card p-5">
+                  <h3 className="font-display text-lg font-semibold">{entry.question}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-secondary">{entry.answer}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </main>

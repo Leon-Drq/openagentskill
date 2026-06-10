@@ -4,6 +4,7 @@ import { getAllSkills, getSkillEventStatsMap, type SkillEventStats, type SkillRe
 import { SKILL_STACKS, type SkillStackDefinition } from '@/lib/collections'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
+import { dedupeRankedSkills, getRecommendationReasons } from '@/lib/registry'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     // Sort by score descending, take top N
     scored.sort((a, b) => b.score - a.score)
-    const recommendations = scored.slice(0, limit).filter((s) => s.score > 0)
+    const recommendations = dedupeRankedSkills(scored).slice(0, limit).filter((s) => s.score > 0)
 
     // Find composition suggestions — skills that enhance each other
     const topSlugs = recommendations.map((r) => r.skill.slug)
@@ -133,6 +134,7 @@ export async function GET(request: NextRequest) {
             title: useCase.shortTitle,
             url: `https://www.openagentskill.com/use-cases/${useCase.slug}`,
           })),
+          recommendation_reasons: getRecommendationReasons(r.skill, task, r.score),
           reasoning: generateReasoning(r.skill, r.score),
         }
       }),

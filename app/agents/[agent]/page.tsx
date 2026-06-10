@@ -50,20 +50,58 @@ export default async function AgentDetailPage({
   const skills = await getAllSkills('quality').catch(() => [])
   const ranked = rankSkillsForAgent(skills, profile, 48)
   const totalStars = ranked.reduce((sum, item) => sum + Number(item.skill.github_stars || 0), 0)
+  const installSteps = [
+    `Pick a ${profile.shortName} skill from the ranked shortlist.`,
+    'Open the skill detail page and review trust, audit, repository, and install signals.',
+    'Use the install command or /api/skills/{slug}/install handoff in a sandbox workflow first.',
+  ]
+  const faqEntries = [
+    {
+      question: `What are the best skills for ${profile.name}?`,
+      answer:
+        ranked.length > 0
+          ? `The current top picks include ${ranked.slice(0, 3).map((item) => item.skill.name).join(', ')}. They are ranked by ${profile.shortName} workflow fit, quality, trust, adoption, and freshness.`
+          : `OpenAgentSkill is still indexing strong matches for ${profile.name}. Use the broader skills directory while the shortlist grows.`,
+    },
+    {
+      question: `How do I install skills for ${profile.name}?`,
+      answer: installSteps.join(' '),
+    },
+    {
+      question: 'Can an agent fetch this shortlist programmatically?',
+      answer:
+        'Yes. Use /api/skills/search for task-driven discovery or /api/agent/recommend for full recommendation payloads with install handoff links.',
+    },
+  ]
 
   const structuredData = {
     '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: `Best ${profile.name} Skills`,
-    description: profile.description,
-    url: `https://www.openagentskill.com/agents/${profile.slug}`,
-    mainEntity: ranked.slice(0, 10).map((item) => ({
-      '@type': 'SoftwareApplication',
-      position: item.rank,
-      name: item.skill.name,
-      url: `https://www.openagentskill.com/skills/${item.skill.slug}`,
-      applicationCategory: item.skill.category,
-    })),
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        name: `Best ${profile.name} Skills`,
+        description: profile.description,
+        url: `https://www.openagentskill.com/agents/${profile.slug}`,
+        mainEntity: ranked.slice(0, 10).map((item) => ({
+          '@type': 'SoftwareApplication',
+          position: item.rank,
+          name: item.skill.name,
+          url: `https://www.openagentskill.com/skills/${item.skill.slug}`,
+          applicationCategory: item.skill.category,
+        })),
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: faqEntries.map((entry) => ({
+          '@type': 'Question',
+          name: entry.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: entry.answer,
+          },
+        })),
+      },
+    ],
   }
 
   return (
@@ -127,12 +165,47 @@ export default async function AgentDetailPage({
           </div>
         </section>
 
+        <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
+          <div>
+            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Install path</p>
+            <h2 className="font-display text-2xl font-semibold">How to use skills with {profile.name}</h2>
+            <p className="mt-3 text-sm leading-relaxed text-secondary">
+              The goal is to hand your agent one reviewed skill path, not a broad directory.
+            </p>
+          </div>
+          <ol className="grid gap-3 sm:grid-cols-3">
+            {installSteps.map((step, index) => (
+              <li key={step} className="border border-border bg-card p-5">
+                <span className="font-mono text-xs text-secondary">{String(index + 1).padStart(2, '0')}</span>
+                <p className="mt-3 text-sm leading-relaxed">{step}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
         <section className="py-10">
           <div className="mb-6">
             <p className="mb-3 text-xs uppercase tracking-widest text-secondary">{profile.shortName} shortlist</p>
             <h2 className="font-display text-2xl font-semibold">Skills ranked for this agent</h2>
           </div>
           <GrowthSkillList items={ranked} />
+        </section>
+
+        <section className="border-t border-border py-10">
+          <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr]">
+            <div>
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">FAQ</p>
+              <h2 className="font-display text-2xl font-semibold">{profile.name} skills FAQ</h2>
+            </div>
+            <div className="grid gap-3">
+              {faqEntries.map((entry) => (
+                <div key={entry.question} className="border border-border bg-card p-5">
+                  <h3 className="font-display text-lg font-semibold">{entry.question}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-secondary">{entry.answer}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
       </main>
 

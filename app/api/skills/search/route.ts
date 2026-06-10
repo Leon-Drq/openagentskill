@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAllSkills } from '@/lib/db/skills'
-import { rankSkillsForQuery, toRegistrySkill } from '@/lib/registry'
+import { dedupeRankedSkills, getRecommendationReasons, rankSkillsForQuery, toRegistrySkill } from '@/lib/registry'
 
 function clampLimit(value: string | null) {
   const parsed = Number(value || 10)
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const skills = await getAllSkills('quality')
-    const ranked = rankSkillsForQuery(skills, query)
+    const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, query))
       .filter(({ skill }) => {
         if (category && skill.category.toLowerCase() !== category.toLowerCase()) return false
         if (Number.isFinite(minStars) && minStars > 0 && Number(skill.github_stars || 0) < minStars) return false
@@ -74,6 +74,7 @@ ${text}`,
         rank: index + 1,
         match_score: score,
         ...toRegistrySkill(skill),
+        recommendation_reasons: getRecommendationReasons(skill, query, score),
       })),
       meta: {
         endpoint: '/api/skills/search',

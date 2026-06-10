@@ -53,6 +53,11 @@ export async function GET() {
         method: 'GET',
         description: 'Get full details for a specific skill by slug',
       },
+      evals: {
+        url: '/api/agent/evals',
+        method: 'GET',
+        description: 'Run fixed regression checks for task-to-skill recommendation quality.',
+      },
       install: {
         url: '/api/skills/{slug}/install',
         method: 'GET',
@@ -77,6 +82,11 @@ export async function GET() {
         params: {
           limit: 'Max entries, default 20, max 100 (optional)',
         },
+      },
+      badge: {
+        url: '/api/badge/{slug}',
+        method: 'GET',
+        description: 'Return an SVG badge for a listed skill. Supports metric=trust, quality, stars, or audit.',
       },
     },
 

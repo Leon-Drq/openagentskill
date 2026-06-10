@@ -84,20 +84,52 @@ export default async function BestSkillDetailPage({
   const rankedSkills = rankSkillsForDefinition(skills, ranking, statsMap, 30)
   const compareHref = getRankingCompareHref(rankedSkills)
   const topSkill = rankedSkills[0]?.skill
+  const faqEntries = [
+    {
+      question: `How does OpenAgentSkill rank ${page.shortTitle.toLowerCase()}?`,
+      answer:
+        'The ranking combines workflow fit, quality score, trust profile, GitHub adoption, maintenance freshness, and whether a clear install path exists.',
+    },
+    {
+      question: 'Should I install the top skill immediately?',
+      answer:
+        'No. Treat the list as a shortlist, open the skill detail page, inspect the repository and license, then test the install command in a sandbox workflow.',
+    },
+    {
+      question: 'Can my agent consume this ranking through an API?',
+      answer:
+        `Yes. Use /api/skills/search with the related task or /api/agent/rankings?slug=${ranking.slug} to fetch ranked skill data.`,
+    },
+  ]
 
   const structuredData = {
     '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: page.title,
-    description: page.description,
-    url: `https://www.openagentskill.com/best/${page.slug}`,
-    mainEntity: rankedSkills.slice(0, 10).map((item) => ({
-      '@type': 'SoftwareApplication',
-      position: item.rank,
-      name: item.skill.name,
-      url: `https://www.openagentskill.com/skills/${item.skill.slug}`,
-      applicationCategory: item.skill.category,
-    })),
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        name: page.title,
+        description: page.description,
+        url: `https://www.openagentskill.com/best/${page.slug}`,
+        mainEntity: rankedSkills.slice(0, 10).map((item) => ({
+          '@type': 'SoftwareApplication',
+          position: item.rank,
+          name: item.skill.name,
+          url: `https://www.openagentskill.com/skills/${item.skill.slug}`,
+          applicationCategory: item.skill.category,
+        })),
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: faqEntries.map((entry) => ({
+          '@type': 'Question',
+          name: entry.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: entry.answer,
+          },
+        })),
+      },
+    ],
   }
 
   return (
@@ -247,7 +279,7 @@ export default async function BestSkillDetailPage({
         </section>
 
         <section className="border-t border-border py-10">
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr]">
             <div>
               <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Selection method</p>
               <h2 className="font-display text-2xl font-semibold">How this list is ranked</h2>
@@ -256,13 +288,13 @@ export default async function BestSkillDetailPage({
                 quality signals, trust profile, maintenance freshness, and whether there is a clear install path.
               </p>
             </div>
-            <div className="border border-border p-5">
-              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">FAQ</p>
-              <h3 className="font-display text-xl font-semibold">Should I install the top skill immediately?</h3>
-              <p className="mt-3 text-sm leading-relaxed text-secondary">
-                Treat this as a shortlist. Open the skill detail page, inspect the repository, and test the install command
-                in a controlled agent workflow before production use.
-              </p>
+            <div className="grid gap-3">
+              {faqEntries.map((entry) => (
+                <div key={entry.question} className="border border-border bg-card p-5">
+                  <h3 className="font-display text-lg font-semibold">{entry.question}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-secondary">{entry.answer}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>

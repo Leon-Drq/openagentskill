@@ -33,6 +33,31 @@ function skillSearchText(skill: SkillRecord) {
     .toLowerCase()
 }
 
+export function getCanonicalSkillKey(skill: SkillRecord) {
+  const repo = (skill.github_repo || skill.repository || '')
+    .toLowerCase()
+    .replace(/^https?:\/\/github\.com\//, '')
+    .replace(/^github\.com\//, '')
+    .replace(/\/$/, '')
+
+  if (repo) {
+    const [owner, name] = repo.split('/')
+    if (owner && name) return `${owner}/${name}`
+  }
+
+  return skill.name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+function getNameDuplicateKey(skill: SkillRecord) {
+  return skill.name
+    .toLowerCase()
+    .replace(/\b(ai|agent|skill|tool|server|mcp)\b/g, '')
+    .replace(/[^a-z0-9]+/g, '')
+}
+
 export function getSkillUrl(slug: string) {
   return `${SITE_URL}/skills/${slug}`
 }
@@ -87,10 +112,16 @@ export function rankSkillsForQuery(skills: SkillRecord[], query: string) {
         const isGenericWebSkill = /\b(web-crawling|crawler|crawl|scraper|scrape|browser|playwright|puppeteer|html|markdown|extraction)\b/.test(text)
         const isLLMReadyWebSkill = /\b(llm-friendly|llm friendly|markdown|structured data|extract structured|web crawler|web scraper)\b/.test(text)
         const isPlatformSpecificExtractor = /\b(google maps|app store|google play|youtube|twitter|x.com|reddit|spotify|instagram|tiktok|linkedin|amazon|ebay|walmart|shopify store)\b/.test(text)
+        const isContentTask = /\b(content|blog|post|posts|newsletter|social|copy|copywriting|writing|publish|publishing|product updates?|launch notes?)\b/.test(normalizedQuery)
+        const isContentSkill = /\b(content|copywriting|writing|blog|markdown|newsletter|social|summary|summarize|publishing|content-generation|content automation)\b/.test(text)
+        const isUnrelatedContentTool = /\b(data-analysis|database|security|scanner|vulnerability|browser-automation|web-automation|testing|qa)\b/.test(text)
 
         if (isGenericWebTask && isGenericWebSkill) score += 42
         if (isGenericWebTask && isLLMReadyWebSkill) score += 28
         if (isGenericWebTask && isPlatformSpecificExtractor && !normalizedQuery.includes('google maps')) score -= 65
+        if (isContentTask && skill.category === 'content-automation') score += 70
+        if (isContentTask && isContentSkill) score += 42
+        if (isContentTask && isUnrelatedContentTool && !isContentSkill) score -= 55
       }
 
       score += Math.min(24, Number(skill.quality_score || 0) / 4)
@@ -102,6 +133,57 @@ export function rankSkillsForQuery(skills: SkillRecord[], query: string) {
     })
     .filter((item) => !query.trim() || item.score > 18)
     .sort((a, b) => b.score - a.score)
+}
+
+export function dedupeRankedSkills<T extends { skill: SkillRecord; score?: number }>(items: T[]) {
+  const seenRepoKeys = new Set<string>()
+  const seenNames = new Set<string>()
+  const deduped: T[] = []
+
+  for (const item of items) {
+    const repoKey = getCanonicalSkillKey(item.skill)
+    const nameKey = getNameDuplicateKey(item.skill)
+    const duplicateByRepo = repoKey && seenRepoKeys.has(repoKey)
+    const duplicateByName = nameKey.length >= 5 && seenNames.has(nameKey)
+
+    if (duplicateByRepo || duplicateByName) continue
+    if (repoKey) seenRepoKeys.add(repoKey)
+    if (nameKey.length >= 5) seenNames.add(nameKey)
+    deduped.push(item)
+  }
+
+  return deduped
+}
+
+export function getRecommendationReasons(skill: SkillRecord, query: string, score?: number) {
+  const reasons: string[] = []
+  const text = skillSearchText(skill)
+  const normalizedQuery = query.trim().toLowerCase()
+  const queryTokens = tokenize(query)
+  const matchedTokens = queryTokens.filter((token) => text.includes(token)).slice(0, 4)
+
+  if (matchedTokens.length > 0) {
+    reasons.push(`Matches task terms: ${matchedTokens.join(', ')}`)
+  }
+  if (Number(skill.github_stars || 0) >= 10_000) {
+    reasons.push(`Strong GitHub adoption: ${Number(skill.github_stars || 0).toLocaleString()} stars`)
+  } else if (Number(skill.github_stars || 0) >= 500) {
+    reasons.push(`Useful GitHub adoption: ${Number(skill.github_stars || 0).toLocaleString()} stars`)
+  }
+  if (Number(skill.quality_score || 0) >= 70) {
+    reasons.push(`Quality score ${Math.round(Number(skill.quality_score || 0))}/100`)
+  }
+  if (skill.install_command || skill.github_repo) {
+    reasons.push('Install handoff is available')
+  }
+  if (skill.github_last_pushed_at) {
+    reasons.push('Repository freshness signal is available')
+  }
+  if (normalizedQuery && score !== undefined) {
+    reasons.push(`Registry match score ${Math.round(score)}`)
+  }
+
+  return reasons.slice(0, 5)
 }
 
 export function toRegistrySkill(skill: SkillRecord, eventStats?: SkillEventStats | null) {
@@ -162,6 +244,8 @@ export function toRegistrySkill(skill: SkillRecord, eventStats?: SkillEventStats
     version: skill.version,
     license: skill.license,
     updated_at: skill.updated_at,
+    canonical_key: getCanonicalSkillKey(skill),
+    recommendation_reasons: getRecommendationReasons(skill, '', undefined),
     urls: {
       web: getSkillUrl(skill.slug),
       api: getAgentSkillApiUrl(skill.slug),

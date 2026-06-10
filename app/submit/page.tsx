@@ -92,6 +92,15 @@ export default function SubmitPage() {
                 >
                   {t.submitPage.result.approved.viewSkill}
                 </Link>
+                <div className="mt-8 border border-border p-4 text-left sm:p-5">
+                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">README badge</p>
+                  <p className="mb-3 text-sm leading-relaxed text-secondary">
+                    Add this badge to the repository README after the listing is live.
+                  </p>
+                  <pre className="overflow-x-auto border border-border bg-background p-3 font-mono text-[11px] leading-relaxed text-secondary">
+                    <code>{`[![OpenAgentSkill](https://www.openagentskill.com/api/badge/${reviewResult.skill.slug})](https://www.openagentskill.com/skills/${reviewResult.skill.slug})`}</code>
+                  </pre>
+                </div>
               </>
             ) : (
               <>
@@ -160,6 +169,30 @@ export default function SubmitPage() {
 
         <div className="mx-auto max-w-4xl px-6 py-10 sm:py-12">
           <SkillSubmitForm onSubmit={handleSubmit} />
+
+          <section className="mx-auto mt-8 max-w-2xl border border-border bg-card p-5 sm:mt-10 sm:p-6">
+            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">After approval</p>
+            <h2 className="font-display text-2xl font-semibold">Add the OpenAgentSkill badge to your README</h2>
+            <p className="mt-3 text-sm leading-relaxed text-secondary">
+              Approved skills get a public listing, install handoff API, and badge endpoint. Add the badge to your
+              GitHub README so users and agents can verify the listing from the repository.
+            </p>
+            <pre className="mt-5 overflow-x-auto border border-border bg-background p-3 font-mono text-[11px] leading-relaxed text-secondary">
+              <code>{`[![OpenAgentSkill](https://www.openagentskill.com/api/badge/YOUR-SKILL-SLUG)](https://www.openagentskill.com/skills/YOUR-SKILL-SLUG)`}</code>
+            </pre>
+            <div className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
+              {[
+                ['1', 'Submit a GitHub repository with clear README and install path.'],
+                ['2', 'Claim the listing after approval to show verified ownership.'],
+                ['3', 'Add the badge and link back to the OpenAgentSkill skill page.'],
+              ].map(([step, copy]) => (
+                <div key={step} className="border border-border bg-background p-4">
+                  <span className="font-mono text-xs text-secondary">{step}</span>
+                  <p className="mt-2 leading-relaxed">{copy}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* Info */}
           <div className="max-w-2xl mx-auto mt-8 sm:mt-12 border-t border-border pt-6 sm:pt-8">
