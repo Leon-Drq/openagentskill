@@ -297,6 +297,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                   </div>
                   <Link
                     href={`/api/agent/resolve?task=${encodeURIComponent(`Use ${skill.name}`)}&agent=codex&max_risk=medium`}
+                    prefetch={false}
                     className="w-full border border-border px-4 py-2.5 text-center text-sm font-semibold transition-colors hover:border-foreground sm:w-auto"
                   >
                     Resolve via API

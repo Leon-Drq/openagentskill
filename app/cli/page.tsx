@@ -81,6 +81,7 @@ export default function CliPage() {
               </Link>
               <Link
                 href="/api/agent/resolve?task=scrape+pricing+pages&agent=codex&format=text"
+                prefetch={false}
                 className="inline-flex items-center justify-center rounded-[8px] border border-border px-4 py-3 text-sm font-semibold transition-colors hover:border-foreground"
               >
                 Try resolve endpoint
