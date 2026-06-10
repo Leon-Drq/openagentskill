@@ -66,20 +66,6 @@ interface Recommendation {
   reasoning: string
 }
 
-interface SuggestedComposition {
-  name: string
-  description: string
-  skills: string[]
-  steps?: string[]
-}
-
-interface SuggestedStack {
-  slug: string
-  name: string
-  url: string
-  use_case: string
-}
-
 const HOME_USE_CASES = USE_CASES.slice(0, 4)
 const DEMO_TASK = 'Scrape competitor pricing pages every week'
 const DEMO_RECOMMENDATIONS = [
@@ -195,8 +181,6 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
   const [taskQuery, setTaskQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const [recommendations, setRecommendations] = useState<Recommendation[]>([])
-  const [suggestedComposition, setSuggestedComposition] = useState<SuggestedComposition | null>(null)
-  const [suggestedStacks, setSuggestedStacks] = useState<SuggestedStack[]>([])
   const [searchedCount, setSearchedCount] = useState(0)
   const [showResults, setShowResults] = useState(false)
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null)
@@ -221,13 +205,9 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
       const res = await fetch(`/api/agent/recommend?task=${encodeURIComponent(normalizedQuery)}&limit=3`)
       const data = await res.json()
       setRecommendations(data.recommendations || [])
-      setSuggestedComposition(data.suggested_composition || null)
-      setSuggestedStacks(data.suggested_stacks || [])
       setSearchedCount(data.meta?.total_skills_searched || 0)
     } catch {
       setRecommendations([])
-      setSuggestedComposition(null)
-      setSuggestedStacks([])
       setSearchedCount(0)
     } finally {
       setIsSearching(false)
@@ -254,13 +234,13 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
 
       <section className="relative overflow-hidden border-b border-[#e4e0d8] px-4 pb-12 pt-12 sm:px-6 sm:pb-16 sm:pt-20 lg:pt-24">
         <div
-          className="pointer-events-none absolute inset-0 -z-10 opacity-80"
+          className="pointer-events-none absolute inset-0 z-0 opacity-75"
           style={{
-            backgroundImage: 'radial-gradient(circle, rgba(29,27,24,0.10) 1px, transparent 1px)',
-            backgroundSize: '18px 18px',
+            backgroundImage: 'radial-gradient(circle, rgba(29,27,24,0.16) 1px, transparent 1px)',
+            backgroundSize: '17px 17px',
           }}
         />
-        <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+        <div className="relative z-10 mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div className="min-w-0">
             <div className="mb-4 flex justify-center lg:justify-start">
               <Link
@@ -304,257 +284,6 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
                 </div>
               ))}
             </div>
-
-            <div className="hidden" aria-hidden="true">
-            {/* Natural Language Task Input */}
-            <div className="rounded-t-[8px] border border-[#d8d2c6] bg-[#fffdf8]/90 shadow-[0_18px_45px_rgba(29,27,24,0.05)]">
-              <div className="px-4 pb-2 pt-4 sm:px-5">
-                <label className="text-xs text-[#6d675e] font-mono uppercase tracking-wider">
-                  {t.hero.orDescribeTask}
-                </label>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:items-stretch">
-                <input
-                  type="text"
-                  value={taskQuery}
-                  onChange={(e) => setTaskQuery(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder={t.hero.taskPlaceholder}
-                  className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm outline-none placeholder:text-[#6d675e]/50 sm:px-5 sm:text-base"
-                />
-                <button
-                  onClick={handleFindSkills}
-                  disabled={isSearching || !taskQuery.trim()}
-                  className="inline-flex w-full items-center justify-center gap-2 border-t border-[#d8d2c6] bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40 sm:w-auto sm:border-t-0 sm:px-7"
-                >
-                  <Search className="h-4 w-4" aria-hidden="true" />
-                  {isSearching ? t.hero.searching : t.hero.findSkills}
-                </button>
-              </div>
-            </div>
-
-            <div className="rounded-b-[8px] border-x border-b border-[#d8d2c6] bg-[#fffdf8]/90 px-4 py-3 sm:px-5">
-              <div className="mb-2 text-xs font-mono uppercase tracking-wider text-[#6d675e]">
-                Start from a workflow
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => runRecommendation(DEMO_TASK)}
-                  className="rounded-full border border-[#006b4f] bg-[#006b4f] px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-85"
-                >
-                  Try demo task
-                </button>
-                {HOME_USE_CASES.slice(0, 4).map((useCase) => (
-                  <button
-                    key={useCase.slug}
-                    type="button"
-                    onClick={() => runRecommendation(useCase.heroPrompt)}
-                    className="rounded-full border border-[#d8d2c6] px-3 py-1.5 text-xs text-[#5f5a52] transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
-                  >
-                    {useCase.shortTitle}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Recommendation Results */}
-            {showResults && (
-              <div className="border border-t-0 border-border bg-card">
-                <div className="border-b border-border px-4 py-4 sm:px-5">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <span className="text-xs font-mono text-secondary uppercase tracking-wider">
-                        Agent Skill Plan
-                      </span>
-                      {recommendations[0] && !isSearching && (
-                        <h2 className="mt-1 font-display text-xl font-semibold sm:text-2xl">
-                          Start with {recommendations[0].skill}
-                        </h2>
-                      )}
-                    </div>
-                    {!isSearching && searchedCount > 0 && (
-                      <div className="border border-border px-3 py-2 text-xs font-mono text-secondary">
-                        Searched {formatCompact(searchedCount)} skills
-                      </div>
-                    )}
-                  </div>
-                </div>
-                {isSearching ? (
-                  <div className="px-5 py-8 text-center text-sm text-secondary">
-                    <span className="inline-block animate-pulse">{'>'} {t.hero.searching}</span>
-                  </div>
-                ) : recommendations.length > 0 ? (
-                  <div>
-                    <div className="grid border-b border-border md:grid-cols-3">
-                      <div className="border-b border-border p-4 md:border-b-0 md:border-r">
-                        <p className="text-xs uppercase tracking-widest text-secondary">Primary pick</p>
-                        <p className="mt-2 font-display text-lg font-semibold">{recommendations[0].skill}</p>
-                        <p className="mt-2 text-sm leading-relaxed text-secondary">
-                          {recommendations[0].decision?.headline || recommendations[0].match_label || 'Best available match'}
-                        </p>
-                      </div>
-                      <div className="border-b border-border p-4 md:border-b-0 md:border-r">
-                        <p className="text-xs uppercase tracking-widest text-secondary">Recommended stack</p>
-                        <p className="mt-2 font-display text-lg font-semibold">
-                          {suggestedStacks[0]?.name || suggestedComposition?.name || 'Single-skill prototype'}
-                        </p>
-                        <p className="mt-2 text-sm leading-relaxed text-secondary">
-                          {suggestedComposition?.description || 'Install one skill first, test the workflow, then add companions only where needed.'}
-                        </p>
-                      </div>
-                      <div className="p-4">
-                        <p className="text-xs uppercase tracking-widest text-secondary">Next move</p>
-                        <p className="mt-2 font-display text-lg font-semibold">
-                          {recommendations[0].decision?.adoption_stage || 'Prototype'}
-                        </p>
-                        <p className="mt-2 text-sm leading-relaxed text-secondary">
-                          {recommendations[0].decision?.next_steps?.[0] || 'Run one task end to end before adding more skills.'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="divide-y divide-border">
-                      {recommendations.slice(0, 3).map((rec, i) => (
-                        <div key={rec.slug} className="px-4 py-5 transition-colors hover:bg-muted/50 sm:px-5">
-                          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                            <div className="min-w-0 flex-1">
-                              <div className="mb-2 flex flex-wrap items-center gap-2">
-                                <span className="border border-border px-2 py-1 text-xs font-mono text-secondary">
-                                  #{rec.rank || i + 1}
-                                </span>
-                                <span className="border border-border px-2 py-1 text-xs font-mono text-secondary">
-                                  {rec.decision?.role || rec.match_label || 'Candidate'}
-                                </span>
-                                <span className="bg-muted px-2 py-1 text-xs font-mono text-secondary">
-                                  {Math.round(Number(rec.confidence) * 100)}% {t.hero.confidence}
-                                </span>
-                                {rec.decision && (
-                                  <span className="bg-foreground px-2 py-1 text-xs font-mono text-background">
-                                    {rec.decision.readiness_score}/100 readiness
-                                  </span>
-                                )}
-                              </div>
-                              <Link href={`/skills/${rec.slug}`} className="font-display text-xl font-semibold hover:underline">
-                                {rec.skill}
-                              </Link>
-                              <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary sm:line-clamp-none">
-                                {rec.reasoning}
-                              </p>
-
-                              <div className="mt-4 hidden gap-3 text-sm sm:grid sm:grid-cols-2">
-                                <div className="border border-border p-3">
-                                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Use when</p>
-                                  <ul className="space-y-1.5 text-secondary">
-                                    {(rec.decision?.best_for || [rec.description || 'You need this capability in an agent workflow'])
-                                      .slice(0, 2)
-                                      .map((item) => (
-                                        <li key={item}>{item}</li>
-                                      ))}
-                                  </ul>
-                                </div>
-                                <div className="border border-border p-3">
-                                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Review first</p>
-                                  <ul className="space-y-1.5 text-secondary">
-                                    {(rec.decision?.risks || ['Review repository permissions and maintenance signals'])
-                                      .slice(0, 2)
-                                      .map((item) => (
-                                        <li key={item}>{item}</li>
-                                      ))}
-                                  </ul>
-                                </div>
-                              </div>
-
-                              <div className="mt-3 flex flex-wrap gap-2 text-xs text-secondary">
-                                {rec.stats && (
-                                  <>
-                                    <span className="border border-border px-2 py-1 font-mono">
-                                      {formatCompact(rec.stats.stars)} stars
-                                    </span>
-                                    <span className="border border-border px-2 py-1 font-mono">
-                                      {Math.round(rec.stats.quality_score || 0)}/100 quality
-                                    </span>
-                                  </>
-                                )}
-                                {(rec.use_cases || []).map((useCase) => (
-                                  <Link
-                                    key={useCase.slug}
-                                    href={`/use-cases/${useCase.slug}`}
-                                    className="border border-border px-2 py-1 transition-colors hover:border-foreground hover:text-foreground"
-                                  >
-                                    {useCase.title}
-                                  </Link>
-                                ))}
-                              </div>
-                            </div>
-
-                            <div className="flex w-full shrink-0 flex-col gap-2 sm:w-40">
-                              <button
-                                onClick={() => copyToClipboard(rec.install)}
-                                className="w-full bg-foreground px-3 py-2.5 text-xs font-mono text-background transition-opacity hover:opacity-80"
-                              >
-                                {copiedCmd === rec.install ? 'Copied!' : t.hero.installCommand}
-                              </button>
-                              <Link
-                                href={`/skills/${rec.slug}`}
-                                className="w-full border border-border px-3 py-2.5 text-center text-xs font-mono transition-colors hover:border-foreground"
-                              >
-                                Decision page
-                              </Link>
-                            </div>
-                          </div>
-                          <div className="mt-3 break-all border border-border bg-background p-2 font-mono text-xs text-secondary">
-                            {rec.install}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {(suggestedStacks.length > 0 || suggestedComposition?.steps?.length) && (
-                      <div className="border-t border-border p-4 sm:p-5">
-                        <div className="grid gap-4 md:grid-cols-2">
-                          {suggestedComposition?.steps?.length && (
-                            <div>
-                              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Implementation path</p>
-                              <ol className="space-y-2 text-sm leading-relaxed text-secondary">
-                                {suggestedComposition.steps.map((step, index) => (
-                                  <li key={step} className="flex gap-3">
-                                    <span className="font-mono text-foreground">{index + 1}</span>
-                                    <span>{step}</span>
-                                  </li>
-                                ))}
-                              </ol>
-                            </div>
-                          )}
-                          {suggestedStacks.length > 0 && (
-                            <div>
-                              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Related stacks</p>
-                              <div className="space-y-2">
-                                {suggestedStacks.map((stack) => (
-                                  <Link
-                                    key={stack.slug}
-                                    href={`/collections/${stack.slug}`}
-                                    className="block border border-border p-3 text-sm transition-colors hover:border-foreground"
-                                  >
-                                    <span className="font-semibold">{stack.name}</span>
-                                    <span className="mt-1 block text-xs text-secondary">View stack playbook</span>
-                                  </Link>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="px-5 py-6 text-center text-sm text-secondary">
-                    {t.hero.noResults}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
 
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
               <a
@@ -643,13 +372,13 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
         className="relative overflow-hidden border-b border-[#e4e0d8] px-4 py-12 sm:px-6 sm:py-16"
       >
         <div
-          className="pointer-events-none absolute inset-0 -z-10 opacity-45"
+          className="pointer-events-none absolute inset-0 z-0 opacity-55"
           style={{
-            backgroundImage: 'radial-gradient(circle, rgba(29,27,24,0.08) 1px, transparent 1px)',
-            backgroundSize: '18px 18px',
+            backgroundImage: 'radial-gradient(circle, rgba(29,27,24,0.13) 1px, transparent 1px)',
+            backgroundSize: '17px 17px',
           }}
         />
-        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.42fr_0.58fr] lg:items-start">
+        <div className="relative z-10 mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.42fr_0.58fr] lg:items-start">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#6d675e]">Agent recommendation</p>
             <h2
