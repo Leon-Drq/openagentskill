@@ -49,10 +49,10 @@ export function SiteHeader() {
   const pathname = usePathname()
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
+    <header className="sticky top-0 z-50 border-b border-[#e4e0d8] bg-[#fbfaf6]/92 backdrop-blur supports-[backdrop-filter]:bg-[#fbfaf6]/82">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5 transition-opacity hover:opacity-70">
-          <BrandMark className="h-7 w-7" />
+          <BrandMark className="h-7 w-7 text-[#1d1b18]" />
           <span className="hidden truncate font-display text-base font-semibold tracking-tight sm:inline sm:text-lg">
             OpenAgentSkill
           </span>
@@ -70,7 +70,7 @@ export function SiteHeader() {
                   href={item.href}
                   className={cn(
                     'px-2.5 py-1.5 text-sm transition-colors',
-                    active ? 'text-foreground' : 'text-secondary hover:text-foreground'
+                    active ? 'text-[#1d1b18]' : 'text-[#5f5a52] hover:text-[#1d1b18]'
                   )}
                   aria-current={active ? 'page' : undefined}
                 >
@@ -85,16 +85,17 @@ export function SiteHeader() {
               href="https://github.com/Leon-Drq/openagentskill"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-8 w-8 items-center justify-center border border-transparent text-secondary transition-colors hover:border-border hover:text-foreground"
+              className="flex h-8 items-center gap-2 rounded-[8px] bg-[#006b4f] px-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               aria-label="OpenAgentSkill on GitHub"
             >
               <GitHubIcon />
+              <span>GitHub</span>
             </a>
             <a
               href="https://x.com/openagentskill"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-8 w-8 items-center justify-center border border-transparent text-secondary transition-colors hover:border-border hover:text-foreground"
+              className="flex h-8 w-8 items-center justify-center rounded-[8px] border border-transparent text-[#5f5a52] transition-colors hover:border-[#d8d2c6] hover:text-[#1d1b18]"
               aria-label="OpenAgentSkill on X"
             >
               <XIcon />

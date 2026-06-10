@@ -9,24 +9,12 @@ import { useI18n } from '@/lib/i18n/context'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { href: '/', labelKey: 'home', exact: true },
   { href: '/skills', labelKey: 'skills' },
-  { href: '/best', label: 'Best' },
-  { href: '/trending', label: 'Trending' },
-  { href: '/hot', label: 'Hot' },
   { href: '/skill-packs', label: 'Packs' },
-  { href: '/audits', label: 'Audits' },
-  { href: '/official', label: 'Official' },
-  { href: '/agents', label: 'Agents' },
   { href: '/use-cases', label: 'Use Cases' },
-  { href: '/rankings', label: 'Rankings' },
-  { href: '/collections', label: 'Stacks' },
-  { href: '/compare/openagentskill-vs-skills-sh', label: 'vs skills.sh' },
-  { href: '/guides', label: 'Guides' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/docs', labelKey: 'docs' },
+  { href: '/compare', label: 'Compare' },
   { href: '/api-docs', labelKey: 'apiDocs' },
-  { href: '/activity', labelKey: 'activity' },
+  { href: '/docs', labelKey: 'docs' },
   { href: '/submit', labelKey: 'submit' },
 ] as const
 
@@ -101,7 +89,7 @@ export function MobileNav() {
           <nav className="px-6 py-8">
             <ul className="space-y-1">
               {navItems.map((item) => {
-                const active = isActivePath(pathname, item.href, 'exact' in item ? item.exact : false)
+                const active = isActivePath(pathname, item.href)
                 const label = 'label' in item ? item.label : t.nav[item.labelKey]
 
                 return (

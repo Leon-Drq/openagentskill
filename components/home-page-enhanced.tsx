@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Bot, CheckCircle2, Code2, Database, Search, ShieldCheck } from 'lucide-react'
+import { ArrowRight, Bot, Code2, Database, Github, Search, ShieldCheck } from 'lucide-react'
 import { useI18n } from '@/lib/i18n/context'
 import { USE_CASES } from '@/lib/use-cases'
 import { SiteFooter } from './site-footer'
@@ -82,7 +82,6 @@ interface SuggestedStack {
 
 const HOME_USE_CASES = USE_CASES.slice(0, 4)
 const DEMO_TASK = 'Scrape competitor pricing pages every week'
-const AGENT_PLATFORMS = ['Codex', 'Claude Code', 'Cursor', 'MCP agents', 'OpenCode', 'Custom API']
 const DEMO_RECOMMENDATIONS = [
   {
     name: 'Crawl4AI',
@@ -102,6 +101,11 @@ const DEMO_RECOMMENDATIONS = [
     score: '89',
     install: 'open pack',
   },
+]
+const TRUST_SIGNALS = [
+  ['Task fit', '96/100', 'Recommended for web extraction workflows'],
+  ['Maintenance', 'Active', 'Stars, freshness, metadata, and repo health'],
+  ['Install review', 'Ready', 'Agent-safe next steps before execution'],
 ]
 const SCENARIO_RECOMMENDATIONS = [
   {
@@ -198,14 +202,14 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null)
   const searchRef = useRef<HTMLDivElement>(null)
   const isZh = locale === 'zh'
-  const heroMain = isZh ? '开放的' : 'The open registry for'
-  const heroAccent = isZh ? 'AI Agent 技能。' : 'AI agent skills.'
+  const heroMain = isZh ? 'AI Agent 技能的' : 'The trust layer for'
+  const heroAccent = isZh ? '信任层。' : 'AI agent skills.'
   const heroSubtitle = isZh
-    ? 'OpenAgentSkill 是 AI Agent Skills 的 npm：让 Agent 自动发现、比较并安装可复用技能。'
-    : 'OpenAgentSkill is npm for AI Agent Skills - helping agents discover, compare, and install reusable skills across Codex, Claude Code, Cursor, and more.'
+    ? '发现、审计、比较并推荐可靠的 AI agent skills，让 Agent 安装前先看清质量、风险和适配度。'
+    : 'Find, audit, compare, and recommend reliable AI agent skills before an agent installs them.'
   const heroEyebrow = isZh
-    ? 'OPEN REGISTRY · AGENT SKILLS · API FIRST'
-    : 'OPEN REGISTRY · AGENT SKILLS · API FIRST'
+    ? 'TRUST · AUDIT · RECOMMENDATION API'
+    : 'TRUST · AUDIT · RECOMMENDATION API'
 
   const runRecommendation = async (query: string) => {
     const normalizedQuery = query.trim()
@@ -288,19 +292,20 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
               {heroSubtitle}
             </p>
 
-            <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {AGENT_PLATFORMS.map((platform) => (
-                <div
-                  key={platform}
-                  className="flex items-center gap-2 rounded-[8px] border border-[#e0dbd2] bg-[#fffdf8]/75 px-3 py-2 text-xs font-semibold text-[#5f5a52] shadow-[0_10px_28px_rgba(29,27,24,0.03)]"
-                >
-                  <CheckCircle2 className="h-3.5 w-3.5 text-[#006b4f]" aria-hidden="true" />
-                  <span>{platform}</span>
+            <div className="mt-8 grid gap-px overflow-hidden rounded-[12px] border border-[#ddd7ca] bg-[#ddd7ca] sm:grid-cols-3">
+              {[
+                [stats.totalSkills.toLocaleString(), 'indexed skills'],
+                ['Audit', 'trust reports'],
+                ['API', 'agent recommendations'],
+              ].map(([value, label]) => (
+                <div key={label} className="bg-[#fffdf8]/85 px-4 py-3">
+                  <p className="font-mono text-lg leading-none text-[#1d1b18]">{value}</p>
+                  <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.2em] text-[#6d675e]">{label}</p>
                 </div>
               ))}
             </div>
 
-            <div ref={searchRef} id="task-search" className="mt-7">
+            <div className="hidden" aria-hidden="true">
             {/* Natural Language Task Input */}
             <div className="rounded-t-[8px] border border-[#d8d2c6] bg-[#fffdf8]/90 shadow-[0_18px_45px_rgba(29,27,24,0.05)]">
               <div className="px-4 pb-2 pt-4 sm:px-5">
@@ -552,40 +557,42 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
           </div>
 
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-              <button
-                type="button"
-                onClick={() => runRecommendation(DEMO_TASK)}
+              <a
+                href="#task-search"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] bg-[#006b4f] px-6 py-3 text-center text-sm font-semibold text-white shadow-[0_14px_28px_rgba(0,107,79,0.18)] transition-opacity hover:opacity-90 sm:w-auto"
               >
                 {t.hero.cta.browse}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </button>
+              </a>
+              <a
+                href="https://github.com/Leon-Drq/openagentskill"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] border border-[#d8d2c6] bg-[#fffdf8]/90 px-6 py-3 text-center text-sm font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f] sm:w-auto"
+              >
+                <Github className="h-4 w-4" aria-hidden="true" />
+                View on GitHub
+              </a>
               <Link
                 href="/api-docs"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] border border-[#d8d2c6] bg-[#fffdf8]/90 px-6 py-3 text-center text-sm font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f] sm:w-auto"
               >
                 Try Registry API
               </Link>
-              <Link
-                href="/skill-packs"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] border border-[#d8d2c6] bg-[#fffdf8]/90 px-6 py-3 text-center text-sm font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f] sm:w-auto"
-              >
-                Install a Skill Pack
-              </Link>
             </div>
           </div>
 
           <div className="min-w-0 rounded-[12px] border border-[#d8d2c6] bg-[#fffdf8]/92 shadow-[0_24px_70px_rgba(29,27,24,0.08)]">
             <div className="p-4 sm:p-6">
-              <p className="text-xs font-mono uppercase tracking-wider text-[#6d675e]">Example registry response</p>
+              <p className="text-xs font-mono uppercase tracking-wider text-[#6d675e]">Trust layer preview</p>
               <h2
                 className="mt-2 text-3xl font-normal leading-tight sm:text-4xl"
                 style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
               >
-                {DEMO_TASK}
+                Audit before your agent installs.
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-[#5f5a52]">
-                The registry turns a messy task into installable skills, fit reasons, and agent-ready next steps.
+                OpenAgentSkill turns scattered GitHub repos into task fit, quality signals, risks, and agent-ready next steps.
               </p>
             </div>
 
@@ -611,14 +618,11 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
             </div>
 
             <div className="grid gap-3 border-t border-[#e0dbd2] p-4 sm:grid-cols-3 sm:p-5">
-              {[
-                ['Trust score', 'Stars + freshness + metadata'],
-                ['Install ready', 'CLI and agent prompts'],
-                ['API first', 'Readable by humans and agents'],
-              ].map(([label, copy]) => (
+              {TRUST_SIGNALS.map(([label, value, copy]) => (
                 <div key={label} className="rounded-[8px] bg-[#f2f0e9] p-3">
                   <p className="text-xs font-mono uppercase tracking-wider text-[#6d675e]">{label}</p>
-                  <p className="mt-1 text-sm font-semibold">{copy}</p>
+                  <p className="mt-1 font-mono text-sm font-semibold text-[#006b4f]">{value}</p>
+                  <p className="mt-1 text-xs leading-snug text-[#5f5a52]">{copy}</p>
                 </div>
               ))}
             </div>
@@ -629,6 +633,160 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
                 GET /api/agent/recommend?task=scrape+pricing
               </code>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        ref={searchRef}
+        id="task-search"
+        className="relative overflow-hidden border-b border-[#e4e0d8] px-4 py-12 sm:px-6 sm:py-16"
+      >
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 opacity-45"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(29,27,24,0.08) 1px, transparent 1px)',
+            backgroundSize: '18px 18px',
+          }}
+        />
+        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.42fr_0.58fr] lg:items-start">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#6d675e]">Agent recommendation</p>
+            <h2
+              className="mt-4 max-w-lg text-4xl font-normal leading-[1.02] sm:text-5xl"
+              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+            >
+              Describe the task. Get the trusted skill path.
+            </h2>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-[#5f5a52] sm:text-base">
+              The API ranks skills by task fit, quality, maintenance, audit notes, and install readiness before an agent acts.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {HOME_USE_CASES.slice(0, 4).map((useCase) => (
+                <button
+                  key={useCase.slug}
+                  type="button"
+                  onClick={() => runRecommendation(useCase.heroPrompt)}
+                  className="rounded-full border border-[#d8d2c6] bg-[#fffdf8]/80 px-3 py-1.5 text-xs font-medium text-[#5f5a52] transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
+                >
+                  {useCase.shortTitle}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="min-w-0 rounded-[14px] border border-[#d8d2c6] bg-[#fffdf8]/88 shadow-[0_18px_55px_rgba(29,27,24,0.05)]">
+            <div className="border-b border-[#e4e0d8] p-4 sm:p-5">
+              <label className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">
+                What should your agent do?
+              </label>
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                <input
+                  type="text"
+                  value={taskQuery}
+                  onChange={(e) => setTaskQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Scrape websites and extract structured data..."
+                  className="min-w-0 flex-1 rounded-[10px] border border-[#d8d2c6] bg-[#fbfaf6] px-4 py-3 text-sm outline-none placeholder:text-[#6d675e]/50 focus:border-[#006b4f]"
+                />
+                <button
+                  onClick={handleFindSkills}
+                  disabled={isSearching || !taskQuery.trim()}
+                  className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
+                >
+                  <Search className="h-4 w-4" aria-hidden="true" />
+                  {isSearching ? t.hero.searching : t.hero.findSkills}
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={() => runRecommendation(DEMO_TASK)}
+                className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-[#006b4f] transition-opacity hover:opacity-75"
+              >
+                Try demo task
+                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            </div>
+
+            {showResults ? (
+              <div>
+                <div className="flex flex-col gap-2 border-b border-[#e4e0d8] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                  <div>
+                    <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">Agent skill plan</p>
+                    <h3 className="mt-1 text-xl font-semibold">
+                      {isSearching
+                        ? 'Reviewing trust signals...'
+                        : recommendations[0]
+                          ? `Start with ${recommendations[0].skill}`
+                          : 'No reliable match yet'}
+                    </h3>
+                  </div>
+                  {!isSearching && searchedCount > 0 && (
+                    <div className="rounded-full border border-[#d8d2c6] px-3 py-1.5 font-mono text-xs text-[#6d675e]">
+                      Searched {formatCompact(searchedCount)} skills
+                    </div>
+                  )}
+                </div>
+
+                {isSearching ? (
+                  <div className="px-5 py-10 text-center text-sm text-[#5f5a52]">
+                    <span className="inline-block animate-pulse">{'>'} {t.hero.searching}</span>
+                  </div>
+                ) : recommendations.length > 0 ? (
+                  <div className="grid gap-px bg-[#e4e0d8] md:grid-cols-3">
+                    {recommendations.slice(0, 3).map((rec, i) => (
+                      <div key={rec.slug} className="min-w-0 bg-[#fffdf8] p-4 sm:p-5">
+                        <div className="mb-3 flex flex-wrap items-center gap-2">
+                          <span className="rounded-full bg-[#e8f1ed] px-2 py-1 font-mono text-[11px] font-semibold text-[#006b4f]">
+                            #{rec.rank || i + 1}
+                          </span>
+                          <span className="rounded-full border border-[#d8d2c6] px-2 py-1 font-mono text-[11px] text-[#6d675e]">
+                            {Math.round(Number(rec.confidence) * 100)}% fit
+                          </span>
+                        </div>
+                        <Link href={`/skills/${rec.slug}`} className="text-lg font-semibold hover:text-[#006b4f]">
+                          {rec.skill}
+                        </Link>
+                        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[#5f5a52]">
+                          {rec.decision?.headline || rec.reasoning}
+                        </p>
+                        <div className="mt-4 break-all rounded-[8px] border border-[#e0dbd2] bg-[#fbfaf6] p-2 font-mono text-[11px] text-[#6d675e]">
+                          {rec.install}
+                        </div>
+                        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                          <button
+                            onClick={() => copyToClipboard(rec.install)}
+                            className="rounded-[8px] bg-[#1d1b18] px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-85"
+                          >
+                            {copiedCmd === rec.install ? 'Copied!' : 'Copy install'}
+                          </button>
+                          <Link
+                            href={`/skills/${rec.slug}`}
+                            className="rounded-[8px] border border-[#d8d2c6] px-3 py-2 text-center text-xs font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
+                          >
+                            Audit page
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="px-5 py-8 text-center text-sm text-[#5f5a52]">
+                    {t.hero.noResults}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="grid gap-px bg-[#e4e0d8] sm:grid-cols-3">
+                {TRUST_SIGNALS.map(([label, value, copy]) => (
+                  <div key={label} className="bg-[#fffdf8] p-4">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">{label}</p>
+                    <p className="mt-2 font-mono text-sm font-semibold text-[#006b4f]">{value}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-[#5f5a52]">{copy}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
