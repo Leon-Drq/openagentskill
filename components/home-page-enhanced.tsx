@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
+import { ArrowRight, Boxes, Search, ShieldCheck, Star, Terminal } from 'lucide-react'
 import { useI18n } from '@/lib/i18n/context'
 import { SKILL_PACKS } from '@/lib/skill-packs'
 import { USE_CASES } from '@/lib/use-cases'
@@ -82,6 +83,27 @@ interface SuggestedStack {
 
 const HOME_USE_CASES = USE_CASES.slice(0, 4)
 const HOME_SKILL_PACKS = SKILL_PACKS.slice(0, 5)
+const VALUE_PROPS = [
+  {
+    label: 'Discover',
+    title: 'Task-to-skill recommendations',
+    description: 'Describe the workflow and get a focused shortlist instead of browsing a giant catalog.',
+    Icon: Search,
+  },
+  {
+    label: 'Evaluate',
+    title: 'Trust, quality, and audit signals',
+    description: 'Compare stars, maintenance, install paths, and fit signals before giving a skill to an agent.',
+    Icon: ShieldCheck,
+  },
+  {
+    label: 'Install',
+    title: 'CLI plus Codex, Claude Code, and Cursor prompts',
+    description: 'Move from discovery to usage with install commands and agent-ready instructions.',
+    Icon: Terminal,
+  },
+]
+
 const EXPLORE_LINKS = [
   { href: '/agent-skills-registry', label: 'Registry API' },
   { href: '/skill-packs', label: 'Skill packs' },
@@ -471,113 +493,127 @@ export function HomePageEnhanced({ stats, featuredSkills }: HomePageEnhancedProp
         </div>
       </section>
 
-      <section className="border-y border-border bg-muted/20 px-4 py-8 sm:px-6 sm:py-10">
-        <div className="mx-auto grid max-w-5xl gap-px border border-border bg-border md:grid-cols-3">
-          {[
-            ['Discover', 'Task-to-skill recommendations'],
-            ['Evaluate', 'Trust, quality, and audit signals'],
-            ['Install', 'CLI plus Codex, Claude Code, and Cursor prompts'],
-          ].map(([label, copy]) => (
-            <div key={label} className="bg-background p-5">
+      <section className="px-4 py-8 sm:px-6 sm:py-12">
+        <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-3">
+          {VALUE_PROPS.map(({ label, title, description, Icon }) => (
+            <div
+              key={label}
+              className="rounded-[8px] border border-border/80 bg-card p-5 shadow-[0_16px_40px_rgba(23,23,23,0.04)] transition-transform hover:-translate-y-0.5"
+            >
+              <div className="mb-5 flex h-9 w-9 items-center justify-center rounded-[8px] bg-foreground text-background">
+                <Icon className="h-4 w-4" aria-hidden="true" />
+              </div>
               <p className="mb-2 text-xs uppercase tracking-widest text-secondary">{label}</p>
-              <h2 className="font-display text-xl font-semibold">{copy}</h2>
+              <h2 className="font-display text-xl font-semibold leading-tight">{title}</h2>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">{description}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="border-b border-border py-8 sm:py-10">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <div className="grid grid-cols-2 gap-px border border-border bg-border text-center md:grid-cols-4">
-            {[
-              [stats.totalSkills.toLocaleString(), t.stats.skills],
-              [`${Math.round(stats.totalDownloads / 1000)}K+`, t.stats.downloads],
-              [stats.activePlatforms.toLocaleString(), t.stats.platforms],
-              [stats.agentSubmissions.toLocaleString(), t.stats.agentSubmissions],
-            ].map(([value, label]) => (
-              <div key={label} className="bg-background p-4 sm:p-5">
-                <div className="font-display text-2xl font-bold sm:text-3xl">{value}</div>
-                <div className="mt-1 text-xs text-secondary">{label}</div>
-              </div>
-            ))}
-          </div>
+      <section className="px-4 pb-12 sm:px-6 sm:pb-16">
+        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 text-center md:grid-cols-4">
+          {[
+            [stats.totalSkills.toLocaleString(), t.stats.skills],
+            [`${Math.round(stats.totalDownloads / 1000)}K+`, t.stats.downloads],
+            [stats.activePlatforms.toLocaleString(), t.stats.platforms],
+            [stats.agentSubmissions.toLocaleString(), t.stats.agentSubmissions],
+          ].map(([value, label]) => (
+            <div key={label} className="rounded-[8px] border border-border/80 bg-card p-4 shadow-[0_12px_32px_rgba(23,23,23,0.035)] sm:p-5">
+              <div className="font-display text-2xl font-bold sm:text-3xl">{value}</div>
+              <div className="mt-1 text-xs text-secondary">{label}</div>
+            </div>
+          ))}
         </div>
       </section>
 
-      <section className="border-b border-border px-4 py-10 sm:px-6 sm:py-14">
+      <section className="bg-card/55 px-4 py-12 sm:px-6 sm:py-16">
         <div className="mx-auto max-w-5xl">
           <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>
               <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Skill packs</p>
               <h2 className="font-display text-2xl font-bold sm:text-3xl">Start from a complete workflow</h2>
             </div>
-            <Link href="/skill-packs" className="text-sm text-secondary underline underline-offset-2 transition-colors hover:text-foreground">
+            <Link href="/skill-packs" className="inline-flex items-center gap-1 text-sm font-semibold text-secondary transition-colors hover:text-foreground">
               View all packs
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {HOME_SKILL_PACKS.map((pack) => (
               <Link
                 key={pack.slug}
                 href={`/skill-packs/${pack.slug}`}
-                className="group border border-border bg-card p-4 transition-colors hover:border-foreground"
+                className="group flex min-h-48 flex-col rounded-[8px] border border-border/80 bg-background p-4 shadow-[0_16px_40px_rgba(23,23,23,0.04)] transition-transform hover:-translate-y-0.5 hover:border-foreground sm:p-5"
               >
+                <div className="mb-5 flex h-9 w-9 items-center justify-center rounded-[8px] bg-muted text-foreground">
+                  <Boxes className="h-4 w-4" aria-hidden="true" />
+                </div>
                 <p className="mb-2 text-xs uppercase tracking-widest text-secondary">{pack.shortTitle}</p>
                 <h3 className="font-display text-lg font-semibold leading-tight group-hover:text-secondary">
                   {pack.title.replace(' agent pack', '')}
                 </h3>
+                <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-secondary">{pack.eyebrow}</p>
+                <span className="mt-auto pt-5 text-xs font-semibold text-foreground">
+                  Open pack
+                </span>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="border-b border-border px-4 py-10 sm:px-6 sm:py-14">
-        <div className="mx-auto max-w-4xl">
+      <section className="px-4 py-12 sm:px-6 sm:py-16">
+        <div className="mx-auto max-w-5xl">
           <div className="mb-6 flex items-end justify-between gap-4">
             <h2 className="font-display text-2xl font-bold sm:text-3xl">{t.featured.title}</h2>
-            <Link href="/skills" className="text-sm text-secondary underline underline-offset-2 transition-colors hover:text-foreground">
+            <Link href="/skills" className="inline-flex items-center gap-1 text-sm font-semibold text-secondary transition-colors hover:text-foreground">
               {t.featured.viewAll}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
 
-          <div className="divide-y divide-border border-y border-border">
+          <div className="grid gap-3 md:grid-cols-2">
             {featuredSkills.slice(0, 8).map((skill, index) => (
               <Link
                 key={skill.slug}
                 href={`/skills/${skill.slug}`}
-                className="group grid grid-cols-[auto_1fr_auto] items-center gap-3 py-3 transition-colors hover:bg-muted/40 sm:gap-5 sm:px-2"
+                className="group grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-[8px] border border-border/80 bg-card p-4 shadow-[0_12px_32px_rgba(23,23,23,0.035)] transition-transform hover:-translate-y-0.5 hover:border-foreground sm:gap-4"
                 style={{ animation: `fadeInUp 0.5s ease-out ${index * 0.04 + 0.1}s both` }}
               >
-                <span className="w-7 text-right font-display text-lg font-bold text-secondary/40 sm:text-xl">
+                <span className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-muted font-display text-sm font-bold text-secondary">
                   {index + 1}
                 </span>
                 <div className="min-w-0">
                   <h3 className="truncate text-sm font-semibold group-hover:underline sm:text-base">{skill.name}</h3>
                   <p className="truncate text-xs leading-relaxed text-secondary sm:text-sm">{skill.description}</p>
                 </div>
-                <span className="font-mono text-xs text-secondary">{formatCompact(skill.github_stars)}</span>
+                <span className="inline-flex items-center gap-1 rounded-[8px] bg-muted px-2 py-1 font-mono text-xs text-secondary">
+                  <Star className="h-3.5 w-3.5" aria-hidden="true" />
+                  {formatCompact(skill.github_stars)}
+                </span>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="px-4 py-10 sm:px-6 sm:py-14">
+      <section className="bg-card/55 px-4 py-12 sm:px-6 sm:py-16">
         <div className="mx-auto max-w-5xl">
           <div className="mb-6">
             <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Explore</p>
             <h2 className="font-display text-2xl font-bold sm:text-3xl">More ways into the registry</h2>
           </div>
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {EXPLORE_LINKS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="border border-border px-4 py-3 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                className="group flex items-center justify-between rounded-[8px] border border-border/80 bg-background px-4 py-3 text-sm font-semibold text-secondary shadow-[0_10px_28px_rgba(23,23,23,0.03)] transition-colors hover:border-foreground hover:text-foreground"
               >
-                {item.label}
+                <span>{item.label}</span>
+                <ArrowRight className="h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" aria-hidden="true" />
               </Link>
             ))}
           </div>
