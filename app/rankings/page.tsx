@@ -36,15 +36,16 @@ export default async function RankingsPage() {
   const useCaseRankings = rankingDefinitions.filter((ranking) => ranking.kind === 'use-case')
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
       <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="border-b border-border pb-10">
-          <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Rankings</p>
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+        <section className="relative -mx-4 overflow-hidden border-b border-border px-4 pb-10 pt-2 sm:-mx-6 sm:px-6">
+          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
+          <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
-              <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">
+              <p className="mb-5 font-mono text-xs uppercase tracking-[0.24em] text-secondary">Rankings</p>
+              <h1 className="font-display text-4xl font-normal leading-[0.98] text-balance md:text-6xl">
                 Ranked shortlists for choosing agent skills faster.
               </h1>
               <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">

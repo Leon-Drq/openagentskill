@@ -42,8 +42,8 @@
 
 @theme inline {
   --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: Georgia, "Times New Roman", ui-serif, serif;
+  --font-display: Georgia, "Times New Roman", ui-serif, serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -94,6 +94,7 @@
     @apply bg-background text-foreground font-sans;
     letter-spacing: 0;
     overflow-x: clip;
+    text-rendering: optimizeLegibility;
   }
 
   h1,
@@ -103,5 +104,12 @@
   h5,
   h6 {
     letter-spacing: 0;
+  }
+}
+
+@layer utilities {
+  .brand-grain {
+    background-image: radial-gradient(circle at 1px 1px, rgba(29, 27, 24, 0.11) 1px, transparent 0);
+    background-size: 18px 18px;
   }
 }

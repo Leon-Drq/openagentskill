@@ -226,7 +226,7 @@ function formatCompact(value: number) {
 
 function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
-    <div className="max-w-3xl">
+    <div className="min-w-0 max-w-3xl">
       <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d675e]">{eyebrow}</p>
       <h2
         className="mt-4 text-balance text-3xl font-normal leading-tight tracking-normal md:text-5xl"
@@ -531,8 +531,8 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
       </section>
 
       <section className="border-b border-[#e4e0d8] px-6 py-20 md:py-28">
-        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-12">
-          <div className="md:col-span-7">
+        <div className="mx-auto grid min-w-0 max-w-6xl gap-10 md:grid-cols-12">
+          <div className="min-w-0 md:col-span-7">
             <SectionHeading
               eyebrow="Why OpenAgentSkill"
               title="Stop sending agents into random directories."
@@ -566,7 +566,7 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
             </ul>
           </div>
 
-          <div className="md:col-span-5">
+          <div className="min-w-0 md:col-span-5">
             <div className="sticky top-24 overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8] shadow-[0_18px_55px_rgba(29,27,24,0.05)]">
               <div className="border-b border-[#e4e0d8] p-5">
                 <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#6d675e]">Registry response</p>
@@ -597,8 +597,8 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
 
       <section className="border-b border-[#e4e0d8] bg-[#f3f1ea]/55 px-6 py-20 md:py-28">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-8 md:grid-cols-12 md:items-end">
-            <div className="md:col-span-7">
+          <div className="grid min-w-0 gap-8 md:grid-cols-12 md:items-end">
+            <div className="min-w-0 md:col-span-7">
               <SectionHeading
                 eyebrow="Architecture"
                 title="Four layers between intent and install."
@@ -610,7 +610,7 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
               </p>
             </div>
 
-            <div className="md:col-span-5">
+            <div className="min-w-0 md:col-span-5">
               <div className="grid overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8] sm:grid-cols-3">
                 {[
                   ['Indexed', stats.totalSkills.toLocaleString()],
@@ -626,12 +626,12 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
             </div>
           </div>
 
-          <div className="mt-12 grid gap-8 lg:grid-cols-12">
+          <div className="mt-12 grid min-w-0 gap-8 lg:grid-cols-12">
             <ol className="space-y-3 lg:col-span-7">
               {REGISTRY_LAYERS.map((layer, index) => (
                 <li
                   key={layer.label}
-                  className={`grid grid-cols-[3rem_1fr] gap-4 rounded-[10px] border p-4 md:grid-cols-[3.5rem_1fr_auto] md:items-center md:p-5 ${
+                  className={`grid min-w-0 grid-cols-[3rem_1fr] gap-4 rounded-[10px] border p-4 md:grid-cols-[3.5rem_1fr_auto] md:items-center md:p-5 ${
                     layer.accent
                       ? 'border-[#006b4f]/45 bg-[#e8f1ed] shadow-[0_0_0_1px_rgba(0,107,79,0.10)]'
                       : 'border-[#d8d2c6] bg-[#fffdf8]'

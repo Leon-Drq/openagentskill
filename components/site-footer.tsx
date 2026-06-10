@@ -8,85 +8,81 @@ export function SiteFooter() {
   const { t } = useI18n()
 
   return (
-    <footer className="border-t border-border bg-background">
-      <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-10 sm:px-6 sm:py-12 md:flex-row md:items-center md:justify-between">
-        <div>
-          <Link href="/" className="inline-flex items-center gap-2 font-display text-sm font-semibold tracking-tight transition-opacity hover:opacity-70">
-            <BrandMark className="h-6 w-6" />
-            OpenAgentSkill
-          </Link>
-          <p className="mt-1 text-xs text-secondary">Open infrastructure for agent skills.</p>
+    <footer className="relative overflow-hidden border-t border-border bg-background">
+      <div className="brand-grain pointer-events-none absolute inset-0 opacity-45" />
+      <div className="relative mx-auto max-w-6xl px-6 py-12 sm:py-14">
+        <div className="grid gap-10 border-b border-border pb-10 lg:grid-cols-[1.15fr_1.85fr]">
+          <div>
+            <Link href="/" className="inline-flex items-center gap-2 font-sans text-sm font-semibold tracking-tight transition-opacity hover:opacity-70">
+              <BrandMark className="h-7 w-7" />
+              OpenAgentSkill
+            </Link>
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-secondary">
+              Open infrastructure for agent skills: discover, compare, and install reusable capabilities across Codex, Claude Code, Cursor, and agent runtimes.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <a
+                href="https://github.com/Leon-Drq/openagentskill"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="border border-border bg-card px-3 py-2 text-xs font-semibold transition-colors hover:border-foreground"
+              >
+                GitHub
+              </a>
+              <a
+                href="https://x.com/openagentskill"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="border border-border bg-card px-3 py-2 text-xs font-semibold transition-colors hover:border-foreground"
+              >
+                X
+              </a>
+            </div>
+          </div>
+
+          <nav className="grid gap-8 text-sm sm:grid-cols-3" aria-label="Footer navigation">
+            <div>
+              <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Explore</h2>
+              <div className="mt-4 grid gap-2 text-secondary">
+                <Link href="/skills" className="hover:text-foreground">{t.nav.skills}</Link>
+                <Link href="/skill-packs" className="hover:text-foreground">Skill Packs</Link>
+                <Link href="/best" className="hover:text-foreground">Best Skills</Link>
+                <Link href="/trending" className="hover:text-foreground">Trending</Link>
+                <Link href="/collections" className="hover:text-foreground">Stacks</Link>
+                <Link href="/use-cases" className="hover:text-foreground">Use Cases</Link>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Trust</h2>
+              <div className="mt-4 grid gap-2 text-secondary">
+                <Link href="/compare" className="hover:text-foreground">Compare</Link>
+                <Link href="/rankings" className="hover:text-foreground">Rankings</Link>
+                <Link href="/audits" className="hover:text-foreground">Audits</Link>
+                <Link href="/official" className="hover:text-foreground">Official</Link>
+                <Link href="/reports/weekly" className="hover:text-foreground">Weekly Reports</Link>
+                <Link href="/compare/openagentskill-vs-skills-sh" className="hover:text-foreground">vs skills.sh</Link>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Build</h2>
+              <div className="mt-4 grid gap-2 text-secondary">
+                <Link href="/docs" className="hover:text-foreground">{t.nav.docs}</Link>
+                <Link href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</Link>
+                <Link href="/submit" className="hover:text-foreground">{t.nav.submit}</Link>
+                <Link href="/blog" className="hover:text-foreground">Blog</Link>
+                <Link href="/guides" className="hover:text-foreground">Guides</Link>
+                <Link href="/activity" className="hover:text-foreground">{t.nav.activity}</Link>
+              </div>
+            </div>
+          </nav>
         </div>
-        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-secondary" aria-label="Footer navigation">
-          <Link href="/skills" className="hover:text-foreground">
-            {t.nav.skills}
-          </Link>
-          <Link href="/best" className="hover:text-foreground">
-            Best
-          </Link>
-          <Link href="/trending" className="hover:text-foreground">
-            Trending
-          </Link>
-          <Link href="/hot" className="hover:text-foreground">
-            Hot
-          </Link>
-          <Link href="/audits" className="hover:text-foreground">
-            Audits
-          </Link>
-          <Link href="/official" className="hover:text-foreground">
-            Official
-          </Link>
-          <Link href="/agents" className="hover:text-foreground">
-            Agents
-          </Link>
-          <Link href="/use-cases" className="hover:text-foreground">
-            Use Cases
-          </Link>
-          <Link href="/rankings" className="hover:text-foreground">
-            Rankings
-          </Link>
-          <Link href="/reports/weekly" className="hover:text-foreground">
-            Reports
-          </Link>
-          <Link href="/reports/monthly" className="hover:text-foreground">
-            Monthly Index
-          </Link>
-          <Link href="/collections" className="hover:text-foreground">
-            Stacks
-          </Link>
-          <Link href="/compare" className="hover:text-foreground">
-            Compare
-          </Link>
-          <Link href="/compare/openagentskill-vs-skills-sh" className="hover:text-foreground">
-            vs skills.sh
-          </Link>
-          <Link href="/guides" className="hover:text-foreground">
-            Guides
-          </Link>
-          <Link href="/blog" className="hover:text-foreground">
-            Blog
-          </Link>
-          <Link href="/docs" className="hover:text-foreground">
-            {t.nav.docs}
-          </Link>
-          <Link href="/api-docs" className="hover:text-foreground">
-            {t.nav.apiDocs}
-          </Link>
-          <Link href="/activity" className="hover:text-foreground">
-            {t.nav.activity}
-          </Link>
-          <a
-            href="https://github.com/Leon-Drq/openagentskill"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-foreground"
-          >
-            GitHub
-          </a>
-          <a href="https://x.com/openagentskill" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
-            X
-          </a>
-        </nav>
+
+        <div className="flex flex-col gap-3 pt-6 font-mono text-[11px] uppercase tracking-[0.18em] text-secondary sm:flex-row sm:items-center sm:justify-between">
+          <span>OpenAgentSkill Registry</span>
+          <span>Built for agent-native discovery</span>
+        </div>
       </div>
     </footer>
   )

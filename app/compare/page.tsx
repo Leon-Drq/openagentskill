@@ -60,7 +60,7 @@ export default async function ComparePage({
   )
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       {comparedSkills.map((skill) => (
         <SkillEventTracker key={skill.slug} skillSlug={skill.slug} eventType="compare" />
       ))}
@@ -68,15 +68,18 @@ export default async function ComparePage({
       <SiteHeader />
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-        <section className="border-b border-border pb-10">
-          <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Skill comparison</p>
-          <h1 className="font-display text-4xl font-bold leading-tight text-balance sm:text-6xl">
-            Compare agent skills before installing.
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-            Put high-signal skills side by side and inspect quality, adoption, freshness, install readiness,
-            use-case fit, and warnings in one place.
-          </p>
+        <section className="relative -mx-4 overflow-hidden border-b border-border px-4 pb-10 pt-2 sm:-mx-6 sm:px-6">
+          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
+          <div className="relative">
+            <p className="mb-5 font-mono text-xs uppercase tracking-[0.24em] text-secondary">Skill comparison</p>
+            <h1 className="max-w-4xl font-display text-4xl font-normal leading-[0.98] text-balance sm:text-6xl">
+              Compare agent skills before installing.
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-secondary">
+              Put high-signal skills side by side and inspect quality, adoption, freshness, install readiness,
+              use-case fit, and warnings in one place.
+            </p>
+          </div>
         </section>
 
         {comparedSkills.length === 0 ? (

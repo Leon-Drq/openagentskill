@@ -43,16 +43,17 @@ export default async function SkillPacksPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <SiteHeader />
 
       <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="border-b border-border pb-12">
-          <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Skill packs</p>
-          <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+        <section className="relative -mx-4 overflow-hidden border-b border-border px-4 pb-12 pt-2 sm:-mx-6 sm:px-6">
+          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
+          <div className="relative grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
             <div>
-              <h1 className="font-display text-4xl font-bold leading-tight text-balance sm:text-6xl">
+              <p className="mb-5 font-mono text-xs uppercase tracking-[0.24em] text-secondary">Skill packs</p>
+              <h1 className="font-display text-4xl font-normal leading-[0.98] text-balance sm:text-6xl">
                 Install complete skill packs for real agent workflows.
               </h1>
               <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">

@@ -10,16 +10,24 @@ export const metadata: Metadata = {
 
 export default function DocsPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
-      <main className="container mx-auto px-4 sm:px-6 max-w-3xl py-8 sm:py-12 lg:py-16">
-        <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
-          {'Documentation'}
-        </h1>
-        <p className="text-base sm:text-lg lg:text-xl text-secondary mb-10 sm:mb-12 lg:mb-16 leading-relaxed">
-          {'Learn how to discover, install, and use skills with your AI agents.'}
-        </p>
+      <main>
+        <section className="relative overflow-hidden border-b border-border">
+          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
+          <div className="relative mx-auto max-w-6xl px-6 py-14 sm:py-16 lg:py-20">
+            <p className="font-mono text-xs uppercase tracking-[0.24em] text-secondary">Documentation</p>
+            <h1 className="mt-5 max-w-4xl font-display text-4xl font-normal leading-[0.98] text-balance sm:text-5xl lg:text-6xl">
+              Build with the OpenAgentSkill registry.
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-secondary sm:text-lg">
+              Learn how to discover, install, submit, and expose skills through agent-friendly APIs.
+            </p>
+          </div>
+        </section>
+
+        <div className="mx-auto max-w-4xl px-6 py-12 sm:py-14 lg:py-16">
 
         {/* What are skills? */}
         <section className="mb-10 sm:mb-12 lg:mb-16">
@@ -161,6 +169,7 @@ GET /api/agent/skills/advanced-web-research?format=text`}</code>
             {'.'}
           </p>
         </section>
+        </div>
       </main>
 
       <SiteFooter />

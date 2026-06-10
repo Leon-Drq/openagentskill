@@ -49,12 +49,15 @@ export function SiteHeader() {
   const pathname = usePathname()
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#e4e0d8] bg-[#fbfaf6]/92 backdrop-blur supports-[backdrop-filter]:bg-[#fbfaf6]/82">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/92 backdrop-blur supports-[backdrop-filter]:bg-background/82">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5 transition-opacity hover:opacity-70">
-          <BrandMark className="h-7 w-7 text-[#1d1b18]" />
-          <span className="hidden truncate font-display text-base font-semibold tracking-tight sm:inline sm:text-lg">
+          <BrandMark className="h-7 w-7 text-foreground" />
+          <span className="hidden truncate font-sans text-base font-semibold tracking-tight sm:inline sm:text-lg">
             OpenAgentSkill
+          </span>
+          <span className="hidden rounded-full border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-secondary md:inline-flex">
+            Registry
           </span>
         </Link>
 
@@ -69,8 +72,8 @@ export function SiteHeader() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'px-2.5 py-1.5 text-sm transition-colors',
-                    active ? 'text-[#1d1b18]' : 'text-[#5f5a52] hover:text-[#1d1b18]'
+                    'rounded-full px-2.5 py-1.5 text-sm transition-colors',
+                    active ? 'bg-muted text-foreground' : 'text-secondary hover:bg-muted/60 hover:text-foreground'
                   )}
                   aria-current={active ? 'page' : undefined}
                 >
@@ -95,7 +98,7 @@ export function SiteHeader() {
               href="https://x.com/openagentskill"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-8 w-8 items-center justify-center rounded-[8px] border border-transparent text-[#5f5a52] transition-colors hover:border-[#d8d2c6] hover:text-[#1d1b18]"
+              className="flex h-8 w-8 items-center justify-center rounded-[8px] border border-transparent text-secondary transition-colors hover:border-border hover:text-foreground"
               aria-label="OpenAgentSkill on X"
             >
               <XIcon />

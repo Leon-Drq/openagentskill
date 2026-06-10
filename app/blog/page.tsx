@@ -74,15 +74,16 @@ export default async function BlogPage() {
   const rankingGuides = getRankingDefinitions()
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
-      <main className="max-w-5xl mx-auto px-6 py-14">
-        <section className="border-b border-border pb-12">
-          <p className="text-xs uppercase tracking-widest text-secondary mb-4">OpenAgentSkill Update</p>
-          <div className="grid gap-10 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
+      <main className="max-w-6xl mx-auto px-6 py-14">
+        <section className="relative -mx-6 overflow-hidden border-b border-border px-6 pb-12 pt-2 md:pb-16">
+          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
+          <div className="relative grid gap-10 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
             <div>
-              <h1 className="font-display text-4xl md:text-6xl font-bold text-foreground text-balance leading-tight">
+              <p className="mb-5 font-mono text-xs uppercase tracking-[0.24em] text-secondary">OpenAgentSkill Update</p>
+              <h1 className="font-display text-4xl font-normal leading-[0.98] text-foreground text-balance md:text-6xl">
                 New skills, practical workflows, and agent-builder notes.
               </h1>
               <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
@@ -92,7 +93,7 @@ export default async function BlogPage() {
               <div className="mt-7 flex flex-wrap gap-3">
                 <Link
                   href="/skills?sort=new"
-                  className="border border-foreground bg-foreground px-5 py-2 text-sm text-background transition-colors hover:bg-background hover:text-foreground"
+                  className="rounded-[8px] border border-[#006b4f] bg-[#006b4f] px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
                 >
                   Browse New Arrivals
                 </Link>

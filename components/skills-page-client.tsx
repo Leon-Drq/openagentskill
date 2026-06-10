@@ -162,38 +162,65 @@ export function SkillsPageClient({
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
-      <section className="border-b border-border bg-background">
-        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              const q = (e.currentTarget.elements.namedItem('q') as HTMLInputElement).value
-              navigate({ q: q || undefined })
-            }}
-            className="relative"
-          >
-            <input
-              type="text"
-              name="q"
-              defaultValue={query}
-              placeholder="Describe a task, repo need, platform, or skill name..."
-              className="w-full border border-border bg-card py-3 pl-4 pr-20 text-sm focus:border-foreground focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-secondary hover:text-foreground"
+      <section className="relative overflow-hidden border-b border-border">
+        <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
+        <div className="relative mx-auto grid max-w-6xl gap-8 px-6 py-12 md:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.24em] text-secondary">Skill Registry</p>
+            <h1 className="mt-5 max-w-3xl font-display text-4xl font-normal leading-[0.98] text-balance md:text-6xl">
+              Find the right skill for the job your agent is doing.
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-secondary md:text-lg">
+              Search by task, platform, trust profile, or GitHub adoption. OpenAgentSkill keeps the interface human-readable and the API ready for agents.
+            </p>
+          </div>
+
+          <div className="border border-border bg-card/85 p-4 shadow-[0_18px_60px_rgba(23,23,23,0.05)] backdrop-blur">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                const q = (e.currentTarget.elements.namedItem('q') as HTMLInputElement).value
+                navigate({ q: q || undefined })
+              }}
+              className="relative"
             >
-              Search
-            </button>
-          </form>
+              <input
+                type="text"
+                name="q"
+                defaultValue={query}
+                placeholder="Describe a task, repo need, platform, or skill name..."
+                className="w-full border border-border bg-background py-3 pl-4 pr-24 text-sm focus:border-foreground focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-[8px] bg-[#006b4f] px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+              >
+                Search
+              </button>
+            </form>
+            <div className="mt-4 grid grid-cols-3 gap-px border border-border bg-border text-center">
+              <div className="bg-background p-3">
+                <div className="font-mono text-lg text-foreground">{skills.length.toLocaleString()}</div>
+                <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">Results</div>
+              </div>
+              <div className="bg-background p-3">
+                <div className="font-mono text-lg text-foreground">{categories.length.toLocaleString()}</div>
+                <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">Tracks</div>
+              </div>
+              <div className="bg-background p-3">
+                <div className="font-mono text-lg text-foreground">{platformOptions.length.toLocaleString()}</div>
+                <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">Targets</div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Sort Tabs */}
-      <div className="border-b border-border bg-background sticky top-16 z-40">
+      <div className="sticky top-14 z-40 border-b border-border bg-background/92 backdrop-blur">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex max-w-full flex-wrap gap-0">
             {SORT_TABS.map((tab) => (
@@ -213,12 +240,12 @@ export function SkillsPageClient({
         </div>
       </div>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-        <section className="mb-8 border border-border bg-card p-4">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        <section className="mb-8 border border-border bg-card/80 p-4 shadow-[0_16px_48px_rgba(23,23,23,0.04)] sm:p-5">
           <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>
-              <p className="text-xs uppercase tracking-widest text-secondary">Decision filters</p>
-              <h1 className="mt-2 font-display text-2xl font-semibold">Choose skills by scenario, quality, and trust signals.</h1>
+              <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Decision filters</p>
+              <h2 className="mt-2 font-display text-2xl font-normal">Choose by scenario, quality, and trust signals.</h2>
             </div>
             <button
               type="button"
@@ -342,22 +369,22 @@ export function SkillsPageClient({
 
         {/* Skills List */}
         {skills.length === 0 ? (
-          <div className="border border-border p-12 text-center">
+          <div className="border border-border bg-card/70 p-12 text-center">
             <p className="text-secondary mb-4">No skills found.</p>
             <Link href="/skills" className="text-foreground underline text-sm">
               Clear filters
             </Link>
           </div>
         ) : (
-          <div className="space-y-10">
+          <div className="grid min-w-0 gap-4">
             {skills.map((skill, index) => (
               <article
                 key={skill.id}
-                className="border-b border-border pb-10 last:border-0 last:pb-0"
+                className="min-w-0 overflow-hidden border border-border bg-card/75 p-5 transition-colors hover:border-foreground/50 sm:p-6"
               >
-                <div className="flex gap-4 sm:gap-6 items-start">
+                <div className="flex min-w-0 items-start gap-3 sm:gap-6">
                   {/* Rank */}
-                  <div className="font-mono text-lg text-secondary shrink-0 w-8 text-right pt-1 tabular-nums">
+                  <div className="w-6 shrink-0 pt-1 text-right font-mono text-base tabular-nums text-secondary sm:w-8 sm:text-lg">
                     {index + 1}
                   </div>
 
@@ -539,7 +566,7 @@ export function SkillsPageClient({
 
       {compareSlugs.length > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 px-4 py-3 backdrop-blur">
-          <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0 text-sm">
               <span className="font-mono text-xs uppercase tracking-widest text-secondary">Compare</span>
               <div className="mt-1 flex flex-wrap gap-2">

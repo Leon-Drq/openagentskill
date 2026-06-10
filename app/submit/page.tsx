@@ -35,7 +35,7 @@ export default function SubmitPage() {
 
   if (submitted && reviewResult) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
 
         {/* Result */}
@@ -140,30 +140,36 @@ export default function SubmitPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <div className="text-center mb-8 sm:mb-12">
-          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
-            {t.submitPage.title}
-          </h1>
-          <p className="text-base sm:text-lg text-secondary max-w-2xl mx-auto px-4">
-            {t.submitPage.subtitle}
-          </p>
-        </div>
+      <main>
+        <section className="relative overflow-hidden border-b border-border">
+          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
+          <div className="relative mx-auto max-w-6xl px-6 py-14 text-center sm:py-16 lg:py-20">
+            <p className="font-mono text-xs uppercase tracking-[0.24em] text-secondary">Submit a skill</p>
+            <h1 className="mx-auto mt-5 max-w-4xl font-display text-4xl font-normal leading-[0.98] text-balance sm:text-5xl lg:text-6xl">
+              {t.submitPage.title}
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-secondary sm:text-lg">
+              {t.submitPage.subtitle}
+            </p>
+          </div>
+        </section>
 
-        <SkillSubmitForm onSubmit={handleSubmit} />
+        <div className="mx-auto max-w-4xl px-6 py-10 sm:py-12">
+          <SkillSubmitForm onSubmit={handleSubmit} />
 
-        {/* Info */}
-        <div className="max-w-2xl mx-auto mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-border">
-          <h2 className="font-semibold text-lg sm:text-xl mb-4">{t.submitPage.guidelines.title}</h2>
-          <ul className="space-y-2 text-sm text-secondary">
-            {t.submitPage.guidelines.items.map((item, i) => (
-              <li key={i}>• {item}</li>
-            ))}
-          </ul>
+          {/* Info */}
+          <div className="max-w-2xl mx-auto mt-8 sm:mt-12 border-t border-border pt-6 sm:pt-8">
+            <h2 className="font-semibold text-lg sm:text-xl mb-4">{t.submitPage.guidelines.title}</h2>
+            <ul className="space-y-2 text-sm text-secondary">
+              {t.submitPage.guidelines.items.map((item, i) => (
+                <li key={i}>• {item}</li>
+              ))}
+            </ul>
+          </div>
         </div>
       </main>
       <SiteFooter />
