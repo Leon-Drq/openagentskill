@@ -33,9 +33,21 @@ export default function APIDocsPage() {
           <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
             {'Base URL'}
           </h2>
-          <div className="bg-card p-4 sm:p-6 font-mono text-sm sm:text-base overflow-x-auto border border-border">
-            {'https://openagentskill.com/api/agent'}
+          <div className="grid gap-3">
+            <div className="bg-card p-4 sm:p-6 font-mono text-sm sm:text-base overflow-x-auto border border-border">
+              {'https://www.openagentskill.com/api/agent'}
+            </div>
+            <div className="bg-card p-4 sm:p-6 font-mono text-sm sm:text-base overflow-x-auto border border-border">
+              {'https://www.openagentskill.com/api/skills'}
+            </div>
           </div>
+          <p className="mt-4 text-sm leading-relaxed text-secondary">
+            {'Use '}
+            <code className="bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">{'/api/agent/*'}</code>
+            {' for full agent payloads, or '}
+            <code className="bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">{'/api/skills/*'}</code>
+            {' for simple registry search and install handoffs.'}
+          </p>
         </section>
 
         {/* Format Parameter */}
@@ -70,6 +82,8 @@ export default function APIDocsPage() {
               { method: 'GET', path: '/api/agent/skills' },
               { method: 'GET', path: '/api/agent/skills/{slug}' },
               { method: 'GET', path: '/api/agent/recommend' },
+              { method: 'GET', path: '/api/skills/search' },
+              { method: 'GET', path: '/api/skills/{slug}/install' },
               { method: 'GET', path: '/api/agent/packs' },
               { method: 'GET', path: '/api/agent/packs/{slug}' },
               { method: 'GET', path: '/api/agent/rankings' },
@@ -86,6 +100,62 @@ export default function APIDocsPage() {
                 <span className="text-secondary">{path}</span>
               </div>
             ))}
+          </div>
+
+          <div className="border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/skills/search'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Simple public registry search for humans, tools, and lightweight agents. Accepts task-style queries and returns ranked skills with trust, audit, URLs, and install handoffs.'}
+              </p>
+              <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 text-sm sm:text-base">
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'q'}</code>
+                  <span className="text-secondary ml-2">{'- Skill, task, platform, or workflow query'}</span>
+                </div>
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'task'}</code>
+                  <span className="text-secondary ml-2">{'- Alias for q when an agent sends a job description'}</span>
+                </div>
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'min_stars'}</code>
+                  <span className="text-secondary ml-2">{'- Optional minimum GitHub stars filter'}</span>
+                </div>
+              </div>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <code>{'GET /api/skills/search?task=scrape+pricing+pages&min_stars=500&limit=5'}</code>
+              </div>
+            </div>
+          </div>
+
+          <div className="border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/skills/{slug}/install'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Get the install command, agent prompt, target-specific install options, safety checklist, and canonical URLs for one skill.'}
+              </p>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <code>{'GET /api/skills/crawl4ai/install?format=text'}</code>
+              </div>
+            </div>
           </div>
 
           {/* GET /api/agent/skills */}

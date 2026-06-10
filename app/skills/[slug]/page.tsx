@@ -22,6 +22,7 @@ import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
+import { getSkillInstallApiUrl } from '@/lib/registry'
 import { getSkillTrustProfile, type SkillTrustProfile, type TrustCheckStatus } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
@@ -147,6 +148,10 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   const auditProfile = dbSkill ? buildSkillAudit(dbSkill, eventStats) : null
   const installTargets = dbSkill ? getSkillInstallTargets(dbSkill) : []
   const compareHref = `/compare?skills=${encodeURIComponent([skill.slug, ...relatedSkills.slice(0, 3).map((rs) => rs.slug)].join(','))}`
+  const installApiHref = `/api/skills/${skill.slug}/install`
+  const installTextHref = `${installApiHref}?format=text`
+  const searchApiHref = `/api/skills/search?q=${encodeURIComponent(skill.name)}&limit=3`
+  const absoluteInstallApiUrl = getSkillInstallApiUrl(skill.slug)
   const relatedDecisionRows = relatedSkills.map((relatedSkill) => ({
     skill: relatedSkill,
     quality: getSkillQualityProfile(relatedSkill),
@@ -274,6 +279,67 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
             <SkillScorePanel quality={qualityProfile} trust={trustProfile} audit={auditProfile} />
 
             <SkillInstallTargets skillSlug={skill.slug} targets={installTargets} />
+
+            <section className="mb-10 overflow-hidden border border-border bg-card">
+              <div className="border-b border-border p-5">
+                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+                  <div>
+                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Agent handoff</p>
+                    <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+                      Give an agent the install path, not another directory page.
+                    </h2>
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
+                      Use the public install endpoint to fetch the command, safety checklist, target prompts, and
+                      canonical links for this skill.
+                    </p>
+                  </div>
+                  <Link
+                    href={installApiHref}
+                    className="w-full border border-foreground bg-foreground px-4 py-2.5 text-center text-sm font-semibold text-background transition-opacity hover:opacity-80 sm:w-auto"
+                  >
+                    Open install API
+                  </Link>
+                </div>
+              </div>
+
+              <div className="grid gap-px bg-border lg:grid-cols-3">
+                {[
+                  {
+                    label: 'Install handoff',
+                    value: installApiHref,
+                    href: installApiHref,
+                  },
+                  {
+                    label: 'LLM text format',
+                    value: installTextHref,
+                    href: installTextHref,
+                  },
+                  {
+                    label: 'Find alternatives',
+                    value: searchApiHref,
+                    href: searchApiHref,
+                  },
+                ].map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className="min-w-0 bg-background p-4 transition-colors hover:bg-muted/40"
+                  >
+                    <p className="text-xs uppercase tracking-widest text-secondary">{item.label}</p>
+                    <p className="mt-2 break-all font-mono text-xs leading-relaxed text-foreground [overflow-wrap:anywhere]">
+                      {item.value}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+
+              <div className="border-t border-border p-5">
+                <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Agent prompt</p>
+                <pre className="overflow-x-auto border border-border bg-background p-4 font-mono text-xs leading-relaxed text-secondary">
+                  <code>{`Use ${skill.name} for this task. Review ${absoluteInstallApiUrl}, then install with: ${skill.technical.installCommand}`}</code>
+                </pre>
+              </div>
+            </section>
 
             {auditProfile && (
               <section className="mb-10 border border-border bg-card p-5">

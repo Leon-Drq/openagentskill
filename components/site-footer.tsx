@@ -50,6 +50,7 @@ export function SiteFooter() {
                 <Link href="/trending" className="hover:text-foreground">Trending</Link>
                 <Link href="/collections" className="hover:text-foreground">Stacks</Link>
                 <Link href="/use-cases" className="hover:text-foreground">Use Cases</Link>
+                <Link href="/agents" className="hover:text-foreground">Agents</Link>
               </div>
             </div>
 

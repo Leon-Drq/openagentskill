@@ -13,6 +13,7 @@ const navItems = [
   { href: '/skills', labelKey: 'skills' },
   { href: '/skill-packs', label: 'Packs' },
   { href: '/use-cases', label: 'Use Cases' },
+  { href: '/agents', label: 'Agents' },
   { href: '/compare', label: 'Compare' },
   { href: '/api-docs', labelKey: 'apiDocs' },
   { href: '/docs', labelKey: 'docs' },

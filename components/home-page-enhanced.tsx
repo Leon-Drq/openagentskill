@@ -63,6 +63,13 @@ interface Recommendation {
     title: string
     url: string
   }>
+  urls?: {
+    web?: string
+    api?: string
+    install_api?: string
+    audit?: string
+    repository?: string
+  }
   reasoning: string
 }
 
@@ -126,22 +133,22 @@ const QUICKSTART_STEPS = [
   {
     title: 'Ask for a skill path',
     desc: 'Send the task your agent needs to complete.',
-    code: 'GET /api/agent/recommend?task=scrape+pricing+pages',
+    code: 'GET /api/skills/search?task=scrape+pricing+pages&min_stars=500',
   },
   {
     title: 'Inspect the trust profile',
     desc: 'Review fit, repository health, risks, and install readiness.',
-    code: 'GET /skills/crawl4ai/audit',
+    code: 'GET /api/agent/skills/crawl4ai',
   },
   {
     title: 'Install in an agent workflow',
     desc: 'Copy the command or hand it to Codex, Claude Code, Cursor, or a custom agent.',
-    code: 'npx skills add unclecode/crawl4ai',
+    code: 'GET /api/skills/crawl4ai/install?format=text',
   },
   {
     title: 'Automate discovery',
     desc: 'Use the API as the registry layer behind your own agent runtime.',
-    code: 'curl "https://www.openagentskill.com/api/agent/skills?agent=codex"',
+    code: 'curl "https://www.openagentskill.com/api/agent/recommend?task=review+pull+requests"',
   },
 ]
 
@@ -492,7 +499,7 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
                         <div className="mt-4 break-all rounded-[8px] border border-[#e0dbd2] bg-[#fbfaf6] p-2 font-mono text-[11px] text-[#6d675e]">
                           {rec.install}
                         </div>
-                        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                        <div className="mt-3 grid gap-2 sm:grid-cols-3">
                           <button
                             onClick={() => copyToClipboard(rec.install)}
                             className="rounded-[8px] bg-[#1d1b18] px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-85"
@@ -500,10 +507,16 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
                             {copiedCmd === rec.install ? 'Copied!' : 'Copy install'}
                           </button>
                           <Link
+                            href={rec.urls?.install_api || `/api/skills/${rec.slug}/install`}
+                            className="rounded-[8px] border border-[#d8d2c6] px-3 py-2 text-center text-xs font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
+                          >
+                            Install API
+                          </Link>
+                          <Link
                             href={`/skills/${rec.slug}`}
                             className="rounded-[8px] border border-[#d8d2c6] px-3 py-2 text-center text-xs font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
                           >
-                            Audit page
+                            Details
                           </Link>
                         </div>
                       </div>
@@ -585,7 +598,8 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
       "skill": "Crawl4AI",
       "fit": 0.96,
       "readiness": "ready",
-      "install": "npx skills add unclecode/crawl4ai"
+      "install": "npx skills add unclecode/crawl4ai",
+      "install_api": "/api/skills/crawl4ai/install"
     }
   ]
 }`}</code>

@@ -98,7 +98,7 @@ export default async function UseCasePage({
                 Read guide
               </Link>
               <Link
-                href={`/api/agent/recommend?task=${encodeURIComponent(useCase.heroPrompt)}&format=text`}
+                href={`/api/skills/search?task=${encodeURIComponent(useCase.heroPrompt)}&format=text`}
                 className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
               >
                 Agent API prompt

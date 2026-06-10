@@ -112,6 +112,7 @@ export async function GET(request: NextRequest) {
           urls: {
             web: `https://www.openagentskill.com/skills/${r.skill.slug}`,
             api: `https://www.openagentskill.com/api/agent/skills/${r.skill.slug}`,
+            install_api: `https://www.openagentskill.com/api/skills/${r.skill.slug}/install`,
             audit: `https://www.openagentskill.com/skills/${r.skill.slug}/audit`,
             repository: r.skill.repository,
           },
@@ -146,6 +147,7 @@ export async function GET(request: NextRequest) {
         timestamp: new Date().toISOString(),
         api_version: '1.0',
         total_skills_searched: allSkills.length,
+        public_search_endpoint: 'https://www.openagentskill.com/api/skills/search',
         agent_friendly: true,
       },
     }

@@ -97,6 +97,7 @@ export async function GET(request: NextRequest) {
           urls: {
             detail: `https://www.openagentskill.com/skills/${r.slug}`,
             api: `https://www.openagentskill.com/api/agent/skills/${r.slug}`,
+            install_api: `https://www.openagentskill.com/api/skills/${r.slug}/install`,
             audit: `https://www.openagentskill.com/skills/${r.slug}/audit`,
             repository: r.repository,
           },

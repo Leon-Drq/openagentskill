@@ -129,6 +129,7 @@ Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
         web: `https://openagentskill.com/skills/${skill.slug}`,
         repository: skill.repository,
         api: `/api/agent/skills/${skill.slug}`,
+        install_api: `/api/skills/${skill.slug}/install`,
       },
       meta: {
         created_at: skill.created_at,

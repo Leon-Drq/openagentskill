@@ -10,7 +10,7 @@ export async function GET() {
   const manifest = {
     name: 'Open Agent Skill',
     description: 'The open infrastructure for agent intelligence. Discover, publish, compose, and share agent skills.',
-    url: 'https://openagentskill.com',
+    url: 'https://www.openagentskill.com',
     protocol: 'oasp/v0.1',
     api_version: '1.0',
 
@@ -23,6 +23,18 @@ export async function GET() {
           q: 'Search query (optional)',
           category: 'Filter by category (optional)',
           platform: 'Filter by platform e.g. claude, cursor (optional)',
+          limit: 'Max results, default 10, max 50 (optional)',
+          format: 'Response format: json (default) or text (optional)',
+        },
+      },
+      registry_search: {
+        url: '/api/skills/search',
+        method: 'GET',
+        description: 'Simple public registry search. Send a task or query and get ranked skills plus install API links.',
+        params: {
+          q: 'Skill, task, platform, or workflow query (optional)',
+          task: 'Alias for q when an agent sends a job description (optional)',
+          min_stars: 'Minimum GitHub stars (optional)',
           limit: 'Max results, default 10, max 50 (optional)',
           format: 'Response format: json (default) or text (optional)',
         },
@@ -40,6 +52,14 @@ export async function GET() {
         url: '/api/agent/skills/{slug}',
         method: 'GET',
         description: 'Get full details for a specific skill by slug',
+      },
+      install: {
+        url: '/api/skills/{slug}/install',
+        method: 'GET',
+        description: 'Get an install command, agent prompt, target prompts, safety checklist, and canonical links for one skill.',
+        params: {
+          format: 'Response format: json (default) or text (optional)',
+        },
       },
       submit: {
         url: '/api/skills/submit',
@@ -90,7 +110,7 @@ export async function GET() {
 
     contact: {
       github: 'https://github.com/openagentskill',
-      website: 'https://openagentskill.com',
+      website: 'https://www.openagentskill.com',
     },
   }
 
