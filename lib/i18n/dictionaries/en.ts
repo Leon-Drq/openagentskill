@@ -12,12 +12,12 @@ export default {
   // Hero
   hero: {
     title: 'Let your AI agent find and install the right skill automatically.',
-    subtitle: 'OpenAgentSkill is an AI agent skills registry, audit layer, and recommendation API for Codex, Claude Code, Cursor, and other agent workflows. Think of it as npm-style discovery for AI agent skills.',
+    subtitle: 'A registry and recommendation API for reusable AI agent skills. Search by task, compare trust signals, then install.',
     tryItNow: 'Try it now',
     installPrefix: '$ npx skills add',
     installPlaceholder: 'owner/repo',
-    orDescribeTask: 'or describe what your agent needs',
-    taskPlaceholder: 'I need my agent to scrape websites and extract structured data...',
+    orDescribeTask: 'Describe a task',
+    taskPlaceholder: 'Scrape websites and extract structured data...',
     findSkills: 'Find Skills',
     searching: 'Searching...',
     recommendedSkills: 'Recommended Skills',

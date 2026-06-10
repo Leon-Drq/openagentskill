@@ -12,12 +12,12 @@ export default {
   // Hero
   hero: {
     title: '让你的 AI Agent 自动发现并安装正确的技能',
-    subtitle: 'OpenAgentSkill 是 AI Agent Skills 的开放注册表、审计层和推荐 API，面向 Codex、Claude Code、Cursor 和其他 Agent 工作流。可以把它理解成 AI Agent Skills 的 npm 式发现入口。',
+    subtitle: '面向 AI Agent Skills 的注册表和推荐 API。按任务搜索，比较信任信号，然后安装。',
     tryItNow: '立即体验',
     installPrefix: '$ npx skills add',
     installPlaceholder: 'owner/repo',
-    orDescribeTask: '或描述你的 Agent 需要什么能力',
-    taskPlaceholder: '我需要 Agent 能够爬取网页并提取结构化数据...',
+    orDescribeTask: '描述任务',
+    taskPlaceholder: '爬取网页并提取结构化数据...',
     findSkills: '查找技能',
     searching: '搜索中...',
     recommendedSkills: '推荐技能',
