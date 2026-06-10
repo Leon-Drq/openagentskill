@@ -50,7 +50,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#e4e0d8] bg-[#fbfaf6]/92 backdrop-blur supports-[backdrop-filter]:bg-[#fbfaf6]/82">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5 transition-opacity hover:opacity-70">
           <BrandMark className="h-7 w-7 text-[#1d1b18]" />
           <span className="hidden truncate font-display text-base font-semibold tracking-tight sm:inline sm:text-lg">

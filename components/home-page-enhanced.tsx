@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Bot, Code2, Database, Github, Search, ShieldCheck } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Github, Search } from 'lucide-react'
 import { useI18n } from '@/lib/i18n/context'
 import { USE_CASES } from '@/lib/use-cases'
 import { SiteFooter } from './site-footer'
@@ -93,34 +93,82 @@ const TRUST_SIGNALS = [
   ['Maintenance', 'Active', 'Stars, freshness, metadata, and repo health'],
   ['Install review', 'Ready', 'Agent-safe next steps before execution'],
 ]
+
+const REGISTRY_LAYERS = [
+  {
+    label: 'Intent capture',
+    code: 'Task · Agent · Context',
+    desc: 'A human or upstream agent describes the job in natural language.',
+    contract: 'Intent',
+  },
+  {
+    label: 'Recommendation engine',
+    code: 'Fit · Quality · Freshness',
+    desc: 'Skills are ranked by workflow fit, maintenance, stars, and audit signals.',
+    contract: 'Rank',
+    accent: true,
+  },
+  {
+    label: 'Skill trust profile',
+    code: 'Risk · Install · Evidence',
+    desc: 'Each candidate gets readiness notes, install commands, and review prompts.',
+    contract: 'Audit',
+  },
+  {
+    label: 'Agent install path',
+    code: 'Codex · Claude Code · Cursor',
+    desc: 'The registry returns the next action an agent can safely execute.',
+    contract: 'Install',
+  },
+]
+
+const QUICKSTART_STEPS = [
+  {
+    title: 'Ask for a skill path',
+    desc: 'Send the task your agent needs to complete.',
+    code: 'GET /api/agent/recommend?task=scrape+pricing+pages',
+  },
+  {
+    title: 'Inspect the trust profile',
+    desc: 'Review fit, repository health, risks, and install readiness.',
+    code: 'GET /skills/crawl4ai/audit',
+  },
+  {
+    title: 'Install in an agent workflow',
+    desc: 'Copy the command or hand it to Codex, Claude Code, Cursor, or a custom agent.',
+    code: 'npx skills add unclecode/crawl4ai',
+  },
+  {
+    title: 'Automate discovery',
+    desc: 'Use the API as the registry layer behind your own agent runtime.',
+    code: 'curl "https://www.openagentskill.com/api/agent/skills?agent=codex"',
+  },
+]
+
 const SCENARIO_RECOMMENDATIONS = [
   {
     slug: 'web-scraping',
     title: 'Web scraping',
     task: 'Monitor pricing and extract tables',
     skills: ['Crawl4AI', 'Firecrawl', 'Browser automation'],
-    Icon: Search,
   },
   {
     slug: 'coding-agents',
     title: 'Coding agents',
     task: 'Inspect repos, patch bugs, verify changes',
     skills: ['GitHub', 'Playwright', 'Code review'],
-    Icon: Code2,
   },
   {
     slug: 'rag-knowledge',
     title: 'RAG workflows',
     task: 'Turn documents into grounded answers',
     skills: ['MarkItDown', 'LlamaIndex', 'Vector search'],
-    Icon: Database,
   },
   {
     slug: 'workflow-automation',
     title: 'Workflow automation',
     task: 'Connect repeated ops across tools',
     skills: ['n8n', 'Zapier', 'Scheduled agents'],
-    Icon: Bot,
   },
 ]
 
@@ -176,6 +224,20 @@ function formatCompact(value: number) {
   return value.toLocaleString()
 }
 
+function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
+  return (
+    <div className="max-w-3xl">
+      <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d675e]">{eyebrow}</p>
+      <h2
+        className="mt-4 text-balance text-3xl font-normal leading-tight tracking-normal md:text-5xl"
+        style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+      >
+        {title}
+      </h2>
+    </div>
+  )
+}
+
 export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
   const { t, locale } = useI18n()
   const [taskQuery, setTaskQuery] = useState('')
@@ -186,14 +248,14 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null)
   const searchRef = useRef<HTMLDivElement>(null)
   const isZh = locale === 'zh'
-  const heroMain = isZh ? 'AI Agent 技能的' : 'The trust layer for'
-  const heroAccent = isZh ? '信任层。' : 'AI agent skills.'
+  const heroMain = isZh ? 'AI Agent Skills 的' : 'The open registry'
+  const heroAccent = isZh ? '开放注册表。' : 'AI agent skills.'
   const heroSubtitle = isZh
-    ? '发现、审计、比较并推荐可靠的 AI agent skills，让 Agent 安装前先看清质量、风险和适配度。'
-    : 'Find, audit, compare, and recommend reliable AI agent skills before an agent installs them.'
+    ? 'OpenAgentSkill 是 AI Agent Skills 的 npm：让 agent 在安装前自动发现、比较、审计并选择正确的技能。'
+    : 'OpenAgentSkill is npm for AI Agent Skills: a registry and recommendation API that helps agents discover, compare, audit, and install reusable skills.'
   const heroEyebrow = isZh
-    ? 'TRUST · AUDIT · RECOMMENDATION API'
-    : 'TRUST · AUDIT · RECOMMENDATION API'
+    ? 'OPEN REGISTRY · TRUST SIGNALS · AGENT INSTALLS'
+    : 'OPEN REGISTRY · TRUST SIGNALS · AGENT INSTALLS'
 
   const runRecommendation = async (query: string) => {
     const normalizedQuery = query.trim()
@@ -232,136 +294,87 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
     <div className="min-h-screen bg-[#fbfaf6] text-[#1d1b18]">
       <SiteHeader />
 
-      <section className="relative overflow-hidden border-b border-[#e4e0d8] px-4 pb-12 pt-12 sm:px-6 sm:pb-16 sm:pt-20 lg:pt-24">
+      <section className="relative overflow-hidden border-b border-[#e4e0d8]">
         <div
           className="pointer-events-none absolute inset-0 z-0 opacity-75"
           style={{
-            backgroundImage: 'radial-gradient(circle, rgba(29,27,24,0.16) 1px, transparent 1px)',
-            backgroundSize: '17px 17px',
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(29,27,24,0.12) 1px, transparent 0)',
+            backgroundSize: '18px 18px',
           }}
         />
-        <div className="relative z-10 mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <div className="min-w-0">
-            <div className="mb-4 flex justify-center lg:justify-start">
-              <Link
-                href="/agent-skills-registry"
-                className="max-w-full rounded-full border border-[#d8d2c6] bg-[#fffdf8]/80 px-3 py-1.5 text-center font-mono text-[10px] uppercase tracking-normal text-[#6d675e] shadow-[0_8px_24px_rgba(29,27,24,0.04)] transition-colors hover:border-[#006b4f] hover:text-[#006b4f] sm:text-xs sm:tracking-wider"
-              >
-                <span className="hidden sm:inline">OpenAgentSkill is npm for AI Agent Skills</span>
-                <span className="sm:hidden">npm for AI Agent Skills</span>
-              </Link>
-            </div>
-
-            <p className="mb-6 flex items-center justify-center gap-2 font-mono text-[11px] uppercase tracking-[0.28em] text-[#6d675e] lg:justify-start">
-              <span className="h-2 w-2 rounded-full bg-[#006b4f]" aria-hidden="true" />
-              {heroEyebrow}
-            </p>
-
-            <h1
-              className="mx-auto max-w-4xl text-balance text-center text-[3rem] font-normal leading-[0.96] tracking-normal sm:text-[4.8rem] lg:mx-0 lg:text-left lg:text-[6.1rem]"
-              style={{
-                fontFamily: 'Georgia, "Times New Roman", serif',
-              }}
-            >
-              {heroMain}
-              <br />
-              <span className="italic text-[#006b4f]">{heroAccent}</span>
-            </h1>
-
-            <p className="mx-auto mt-6 max-w-2xl text-center text-base leading-relaxed text-[#5f5a52] sm:text-xl lg:mx-0 lg:text-left">
-              {heroSubtitle}
-            </p>
-
-            <div className="mt-8 grid gap-px overflow-hidden rounded-[12px] border border-[#ddd7ca] bg-[#ddd7ca] sm:grid-cols-3">
-              {[
-                [stats.totalSkills.toLocaleString(), 'indexed skills'],
-                ['Audit', 'trust reports'],
-                ['API', 'agent recommendations'],
-              ].map(([value, label]) => (
-                <div key={label} className="bg-[#fffdf8]/85 px-4 py-3">
-                  <p className="font-mono text-lg leading-none text-[#1d1b18]">{value}</p>
-                  <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.2em] text-[#6d675e]">{label}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="#task-search"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] bg-[#006b4f] px-6 py-3 text-center text-sm font-semibold text-white shadow-[0_14px_28px_rgba(0,107,79,0.18)] transition-opacity hover:opacity-90 sm:w-auto"
-              >
-                {t.hero.cta.browse}
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </a>
-              <a
-                href="https://github.com/Leon-Drq/openagentskill"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] border border-[#d8d2c6] bg-[#fffdf8]/90 px-6 py-3 text-center text-sm font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f] sm:w-auto"
-              >
-                <Github className="h-4 w-4" aria-hidden="true" />
-                View on GitHub
-              </a>
-              <Link
-                href="/api-docs"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] border border-[#d8d2c6] bg-[#fffdf8]/90 px-6 py-3 text-center text-sm font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f] sm:w-auto"
-              >
-                Try Registry API
-              </Link>
-            </div>
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-20 pt-20 md:pb-24 md:pt-28">
+          <div className="mb-8 flex items-center gap-3">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#d7a642]" aria-hidden="true" />
+            <span className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d675e]">{heroEyebrow}</span>
           </div>
 
-          <div className="min-w-0 rounded-[12px] border border-[#d8d2c6] bg-[#fffdf8]/92 shadow-[0_24px_70px_rgba(29,27,24,0.08)]">
-            <div className="p-4 sm:p-6">
-              <p className="text-xs font-mono uppercase tracking-wider text-[#6d675e]">Trust layer preview</p>
-              <h2
-                className="mt-2 text-3xl font-normal leading-tight sm:text-4xl"
-                style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-              >
-                Audit before your agent installs.
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-[#5f5a52]">
-                OpenAgentSkill turns scattered GitHub repos into task fit, quality signals, risks, and agent-ready next steps.
-              </p>
-            </div>
+          <h1
+            className="max-w-5xl text-balance text-5xl font-normal leading-[1.02] tracking-normal md:text-7xl lg:text-[5.6rem]"
+            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+          >
+            {isZh ? (
+              <>
+                {heroMain}
+                <br className="hidden md:block" />
+                <span className="italic text-[#006b4f]">{heroAccent}</span>
+              </>
+            ) : (
+              <>
+                {heroMain}
+                <br className="hidden md:block" />
+                {' '}for <span className="italic text-[#006b4f]">{heroAccent}</span>
+              </>
+            )}
+          </h1>
 
-            <div className="space-y-2 px-4 pb-4 sm:px-6">
-              {DEMO_RECOMMENDATIONS.map((item, index) => (
-                <div key={item.name} className="grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-[10px] border border-[#e0dbd2] bg-[#fbfaf6] p-3 sm:p-4">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#e8f1ed] font-mono text-xs font-bold text-[#006b4f]">
-                    {index + 1}
-                  </span>
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-display text-base font-semibold">{item.name}</p>
-                      <span className="rounded-full bg-[#e8f1ed] px-2 py-1 text-[11px] font-mono text-[#006b4f]">
-                        {item.score}/100 fit
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm text-[#5f5a52]">{item.fit}</p>
-                    <p className="mt-2 truncate font-mono text-xs text-[#6d675e]">{item.install}</p>
-                  </div>
-                  <ShieldCheck className="h-5 w-5 text-[#006b4f]" aria-hidden="true" />
-                </div>
-              ))}
-            </div>
+          <p className="mt-8 max-w-3xl text-pretty text-lg leading-relaxed text-[#5f5a52] md:text-xl">
+            {heroSubtitle}
+          </p>
 
-            <div className="grid gap-3 border-t border-[#e0dbd2] p-4 sm:grid-cols-3 sm:p-5">
-              {TRUST_SIGNALS.map(([label, value, copy]) => (
-                <div key={label} className="rounded-[8px] bg-[#f2f0e9] p-3">
-                  <p className="text-xs font-mono uppercase tracking-wider text-[#6d675e]">{label}</p>
-                  <p className="mt-1 font-mono text-sm font-semibold text-[#006b4f]">{value}</p>
-                  <p className="mt-1 text-xs leading-snug text-[#5f5a52]">{copy}</p>
-                </div>
-              ))}
-            </div>
+          <div className="mt-12 flex flex-wrap items-center gap-3">
+            <a
+              href="#task-search"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] bg-[#006b4f] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:w-auto"
+            >
+              Find skills for my agent
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+            <a
+              href="https://github.com/Leon-Drq/openagentskill"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border border-[#d8d2c6] bg-[#fffdf8]/85 px-5 text-sm font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f] sm:w-auto"
+            >
+              <Github className="h-4 w-4" aria-hidden="true" />
+              View on GitHub
+              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </a>
+            <Link
+              href="/api-docs"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border border-transparent px-2 font-mono text-xs text-[#6d675e] transition-colors hover:text-[#1d1b18] sm:w-auto"
+            >
+              Registry API
+              <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
+            </Link>
+          </div>
 
-            <div className="rounded-b-[12px] border-t border-[#006b4f]/20 bg-[#006b4f] p-4 text-white sm:p-5">
-              <p className="mb-2 text-xs font-mono uppercase tracking-wider text-white/60">Agent API</p>
-              <code className="block overflow-x-auto whitespace-nowrap font-mono text-xs sm:text-sm">
-                GET /api/agent/recommend?task=scrape+pricing
-              </code>
-            </div>
+          <div className="mt-20 grid grid-cols-2 gap-y-6 border-t border-[#d8d2c6] pt-8 md:grid-cols-4">
+            {[
+              [stats.totalSkills.toLocaleString(), 'Indexed skills'],
+              [`${Math.round(stats.totalDownloads / 1000)}K+`, 'Downloads'],
+              [stats.activePlatforms.toLocaleString(), 'Agent surfaces'],
+              ['API', 'Recommendation layer'],
+            ].map(([value, label]) => (
+              <div key={label} className="flex flex-col gap-1">
+                <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#6d675e]">{label}</span>
+                <span
+                  className="text-2xl tracking-normal"
+                  style={{ fontFamily: value === 'API' ? 'var(--font-mono)' : 'Georgia, "Times New Roman", serif' }}
+                >
+                  {value}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -369,24 +382,21 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
       <section
         ref={searchRef}
         id="task-search"
-        className="relative overflow-hidden border-b border-[#e4e0d8] px-4 py-12 sm:px-6 sm:py-16"
+        className="relative overflow-hidden border-b border-[#e4e0d8] px-6 py-20 md:py-24"
       >
         <div
-          className="pointer-events-none absolute inset-0 z-0 opacity-55"
+          className="pointer-events-none absolute inset-0 z-0 opacity-50"
           style={{
-            backgroundImage: 'radial-gradient(circle, rgba(29,27,24,0.13) 1px, transparent 1px)',
-            backgroundSize: '17px 17px',
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(29,27,24,0.10) 1px, transparent 0)',
+            backgroundSize: '18px 18px',
           }}
         />
-        <div className="relative z-10 mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.42fr_0.58fr] lg:items-start">
+        <div className="relative z-10 mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.42fr_0.58fr] lg:items-start">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#6d675e]">Agent recommendation</p>
-            <h2
-              className="mt-4 max-w-lg text-4xl font-normal leading-[1.02] sm:text-5xl"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-            >
-              Describe the task. Get the trusted skill path.
-            </h2>
+            <SectionHeading
+              eyebrow="Agent recommendation"
+              title="Describe the task. Get the trusted skill path."
+            />
             <p className="mt-4 max-w-md text-sm leading-relaxed text-[#5f5a52] sm:text-base">
               The API ranks skills by task fit, quality, maintenance, audit notes, and install readiness before an agent acts.
             </p>
@@ -404,7 +414,7 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
             </div>
           </div>
 
-          <div className="min-w-0 rounded-[14px] border border-[#d8d2c6] bg-[#fffdf8]/88 shadow-[0_18px_55px_rgba(29,27,24,0.05)]">
+          <div className="min-w-0 overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8]/92 shadow-[0_18px_55px_rgba(29,27,24,0.05)]">
             <div className="border-b border-[#e4e0d8] p-4 sm:p-5">
               <label className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">
                 What should your agent do?
@@ -416,12 +426,12 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
                   onChange={(e) => setTaskQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Scrape websites and extract structured data..."
-                  className="min-w-0 flex-1 rounded-[10px] border border-[#d8d2c6] bg-[#fbfaf6] px-4 py-3 text-sm outline-none placeholder:text-[#6d675e]/50 focus:border-[#006b4f]"
+                  className="min-w-0 flex-1 rounded-[8px] border border-[#d8d2c6] bg-[#fbfaf6] px-4 py-3 text-sm outline-none placeholder:text-[#6d675e]/50 focus:border-[#006b4f]"
                 />
                 <button
                   onClick={handleFindSkills}
                   disabled={isSearching || !taskQuery.trim()}
-                  className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
+                  className="inline-flex items-center justify-center gap-2 rounded-[8px] bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
                 >
                   <Search className="h-4 w-4" aria-hidden="true" />
                   {isSearching ? t.hero.searching : t.hero.findSkills}
@@ -520,52 +530,227 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
         </div>
       </section>
 
-      <section className="border-b border-[#e4e0d8] px-4 py-10 sm:px-6 sm:py-12">
-        <div className="mx-auto max-w-6xl">
-          <div className="grid overflow-hidden rounded-[12px] border border-[#d8d2c6] bg-[#fffdf8]/70 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              [stats.totalSkills.toLocaleString(), 'Skills indexed'],
-              [`${Math.round(stats.totalDownloads / 1000)}K+`, 'Downloads'],
-              [stats.activePlatforms.toLocaleString(), 'Platforms'],
-              [stats.agentSubmissions.toLocaleString(), 'Agent submissions'],
-            ].map(([value, label]) => (
-              <div key={label} className="border-b border-[#e0dbd2] p-5 last:border-b-0 sm:even:border-l lg:border-b-0 lg:border-l lg:first:border-l-0">
-                <p
-                  className="text-3xl font-normal leading-none sm:text-4xl"
-                  style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-                >
-                  {value}
-                </p>
-                <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">{label}</p>
-              </div>
-            ))}
+      <section className="border-b border-[#e4e0d8] px-6 py-20 md:py-28">
+        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-12">
+          <div className="md:col-span-7">
+            <SectionHeading
+              eyebrow="Why OpenAgentSkill"
+              title="Stop sending agents into random directories."
+            />
+            <p className="mt-6 text-lg leading-relaxed text-[#5f5a52] md:text-xl">
+              A skill registry only becomes useful when an agent can trust it.
+              OpenAgentSkill turns scattered GitHub projects into ranked, auditable,
+              install-ready capabilities that can be called from Codex, Claude Code,
+              Cursor, MCP-compatible agents, and custom runtimes.
+            </p>
+
+            <ul className="mt-8 space-y-5">
+              {[
+                ['01', 'Task-to-skill recommendations', 'Agents start with intent, not category pages. The registry maps a job to a ranked shortlist with fit reasons.'],
+                ['02', 'Trust before install', 'Stars, freshness, quality score, risks, and readiness notes sit beside the command an agent will run.'],
+                ['03', 'Human browse, agent API', 'People can browse the index; agents can call the same registry through recommendation and skill endpoints.'],
+              ].map(([tag, title, body]) => (
+                <li key={title} className="grid grid-cols-[auto_1fr] gap-5 border-t border-[#d8d2c6] pt-5">
+                  <span className="font-mono text-xs text-[#6d675e]">{tag}</span>
+                  <div>
+                    <h3
+                      className="text-xl tracking-normal"
+                      style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+                    >
+                      {title}
+                    </h3>
+                    <p className="mt-2 leading-relaxed text-[#5f5a52]">{body}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <div className="mt-8 grid gap-3 md:grid-cols-3">
-            {[
-              ['Discover', 'Task-to-skill recommendations', 'Describe the job. OpenAgentSkill returns the best skills, fit reasons, and install path.'],
-              ['Evaluate', 'Trust, quality, and audit signals', 'Compare stars, freshness, readiness notes, use cases, and review prompts before install.'],
-              ['Install', 'CLI plus agent prompts', 'Give Codex, Claude Code, Cursor, or your own agent a clean next action instead of a raw directory link.'],
-            ].map(([kicker, title, copy]) => (
-              <div key={title} className="rounded-[12px] border border-[#d8d2c6] bg-[#fffdf8]/70 p-5">
-                <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-[#6d675e]">{kicker}</p>
-                <h2 className="mt-3 text-lg font-semibold leading-snug">{title}</h2>
-                <p className="mt-3 text-sm leading-relaxed text-[#5f5a52]">{copy}</p>
+          <div className="md:col-span-5">
+            <div className="sticky top-24 overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8] shadow-[0_18px_55px_rgba(29,27,24,0.05)]">
+              <div className="border-b border-[#e4e0d8] p-5">
+                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#6d675e]">Registry response</p>
+                <h3
+                  className="mt-2 text-2xl leading-tight"
+                  style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+                >
+                  One call, ranked install path.
+                </h3>
               </div>
-            ))}
+              <pre className="overflow-x-auto bg-[#f2f0e9]/70 p-5 font-mono text-[12px] leading-relaxed text-[#3f3b35]">
+                <code>{`{
+  "task": "scrape pricing pages",
+  "recommendations": [
+    {
+      "skill": "Crawl4AI",
+      "fit": 0.96,
+      "readiness": "ready",
+      "install": "npx skills add unclecode/crawl4ai"
+    }
+  ]
+}`}</code>
+              </pre>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="border-b border-[#e4e0d8] px-4 py-12 sm:px-6 sm:py-16">
+      <section className="border-b border-[#e4e0d8] bg-[#f3f1ea]/55 px-6 py-20 md:py-28">
         <div className="mx-auto max-w-6xl">
-          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#6d675e]">Compare</p>
-          <h2
-            className="mt-4 max-w-4xl text-4xl font-normal leading-[1.04] sm:text-5xl"
-            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-          >
-            How OpenAgentSkill differs from other skill platforms.
-          </h2>
+          <div className="grid gap-8 md:grid-cols-12 md:items-end">
+            <div className="md:col-span-7">
+              <SectionHeading
+                eyebrow="Architecture"
+                title="Four layers between intent and install."
+              />
+              <p className="mt-6 max-w-2xl leading-relaxed text-[#5f5a52]">
+                The homepage should make the product feel real. OpenAgentSkill is not
+                another static list; it is a registry loop an agent can call before it
+                writes files, opens browsers, or installs third-party code.
+              </p>
+            </div>
+
+            <div className="md:col-span-5">
+              <div className="grid overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8] sm:grid-cols-3">
+                {[
+                  ['Indexed', stats.totalSkills.toLocaleString()],
+                  ['Signals', 'Fit · Risk'],
+                  ['Surface', 'API · UI'],
+                ].map(([label, value]) => (
+                  <div key={label} className="border-b border-[#e4e0d8] px-4 py-3 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6d675e]">{label}</p>
+                    <p className="mt-1 whitespace-nowrap font-mono text-sm text-[#1d1b18]">{value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 grid gap-8 lg:grid-cols-12">
+            <ol className="space-y-3 lg:col-span-7">
+              {REGISTRY_LAYERS.map((layer, index) => (
+                <li
+                  key={layer.label}
+                  className={`grid grid-cols-[3rem_1fr] gap-4 rounded-[10px] border p-4 md:grid-cols-[3.5rem_1fr_auto] md:items-center md:p-5 ${
+                    layer.accent
+                      ? 'border-[#006b4f]/45 bg-[#e8f1ed] shadow-[0_0_0_1px_rgba(0,107,79,0.10)]'
+                      : 'border-[#d8d2c6] bg-[#fffdf8]'
+                  }`}
+                >
+                  <span
+                    className={`grid h-12 w-12 place-items-center rounded-[8px] border font-mono text-sm ${
+                      layer.accent
+                        ? 'border-[#006b4f]/40 bg-[#006b4f] text-white'
+                        : 'border-[#d8d2c6] bg-[#f2f0e9] text-[#6d675e]'
+                    }`}
+                  >
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+
+                  <div>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <h3
+                        className="text-xl leading-tight"
+                        style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+                      >
+                        {layer.label}
+                      </h3>
+                      {layer.accent && (
+                        <span className="rounded-full border border-[#006b4f]/25 bg-[#fbfaf6] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-[#006b4f]">
+                          ranker
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1.5 text-sm leading-relaxed text-[#5f5a52]">{layer.desc}</p>
+                  </div>
+
+                  <div className="col-span-2 flex flex-wrap items-center gap-2 md:col-span-1 md:justify-end">
+                    <span className="rounded-full border border-[#d8d2c6] bg-[#fbfaf6] px-3 py-1 font-mono text-[11px] text-[#6d675e]">
+                      {layer.code}
+                    </span>
+                    <span className="rounded-full border border-[#d8d2c6] bg-[#f2f0e9] px-3 py-1 font-mono text-[11px] text-[#1d1b18]">
+                      {layer.contract}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <aside className="lg:col-span-5">
+              <div className="sticky top-24 overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8] shadow-[0_18px_55px_rgba(29,27,24,0.05)]">
+                <div className="border-b border-[#d8d2c6] bg-[#f2f0e9]/70 px-5 py-4">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#6d675e]">Execution loop</p>
+                  <h3
+                    className="mt-1 text-2xl leading-none"
+                    style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+                  >
+                    Discover → Inspect → Install
+                  </h3>
+                </div>
+                <div className="divide-y divide-[#e4e0d8]">
+                  {DEMO_RECOMMENDATIONS.map((item, index) => (
+                    <div key={item.name} className="grid grid-cols-[2.25rem_1fr] gap-4 p-5">
+                      <span className="grid h-9 w-9 place-items-center rounded-[8px] border border-[#d8d2c6] bg-[#fbfaf6] font-mono text-[11px] text-[#006b4f]">
+                        0{index + 1}
+                      </span>
+                      <div>
+                        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6d675e]">{item.score}/100 fit</p>
+                        <h4 className="mt-1 font-medium">{item.name}</h4>
+                        <p className="mt-1.5 text-sm leading-relaxed text-[#5f5a52]">{item.fit}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-[#e4e0d8] px-6 py-20 md:py-28">
+        <div className="mx-auto max-w-6xl">
+          <SectionHeading
+            eyebrow="Quickstart"
+            title="From task description to install command."
+          />
+
+          <ol className="mt-12 grid gap-6 md:grid-cols-2">
+            {QUICKSTART_STEPS.map((step, index) => (
+              <li key={step.title} className="overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8]">
+                <div className="flex items-start gap-4 px-6 pt-6">
+                  <span className="font-mono text-xs tabular-nums text-[#6d675e]">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <div>
+                    <h3
+                      className="text-xl tracking-normal"
+                      style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+                    >
+                      {step.title}
+                    </h3>
+                    <p className="mt-1 text-sm leading-relaxed text-[#5f5a52]">{step.desc}</p>
+                  </div>
+                </div>
+                <pre className="mt-5 overflow-x-auto border-t border-[#e4e0d8] bg-[#f2f0e9]/70 p-5 font-mono text-[12.5px] leading-relaxed text-[#3f3b35]">
+                  <code>{step.code}</code>
+                </pre>
+              </li>
+            ))}
+          </ol>
+
+          <div className="mt-10 flex flex-wrap items-center gap-3 rounded-[10px] border border-dashed border-[#d8d2c6] bg-[#fffdf8] p-5 text-sm text-[#5f5a52]">
+            <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#1d1b18]">Agent surfaces</span>
+            <span>Codex, Claude Code, Cursor, MCP-compatible agents, and custom internal runners.</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-[#e4e0d8] px-6 py-20 md:py-28">
+        <div className="mx-auto max-w-6xl">
+          <SectionHeading
+            eyebrow="Compare"
+            title="How OpenAgentSkill differs from other skill platforms."
+          />
           <p className="mt-4 max-w-3xl text-base leading-relaxed text-[#5f5a52]">
             The big bet is simple: ordinary directories are for people to browse. OpenAgentSkill is built so an AI agent can discover, compare, and install the right skill automatically.
           </p>
@@ -621,17 +806,14 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
         </div>
       </section>
 
-      <section className="px-4 py-12 sm:px-6 sm:py-16">
+      <section className="border-b border-[#e4e0d8] px-6 py-20 md:py-28">
         <div className="mx-auto max-w-6xl">
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.24em] text-[#6d675e]">Scenario recommendations</p>
-              <h2
-                className="text-3xl font-normal leading-tight sm:text-4xl"
-                style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-              >
-                Start from the job your agent needs to do.
-              </h2>
+              <SectionHeading
+                eyebrow="Workflow starts"
+                title="Start from the job your agent needs to do."
+              />
             </div>
             <Link href="/use-cases" className="inline-flex items-center gap-1 text-sm font-semibold text-[#5f5a52] transition-colors hover:text-[#006b4f]">
               View all use cases
@@ -639,21 +821,24 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
             </Link>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {SCENARIO_RECOMMENDATIONS.map(({ slug, title, task, skills, Icon }) => (
+          <div className="grid gap-px overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#d8d2c6] md:grid-cols-2 lg:grid-cols-4">
+            {SCENARIO_RECOMMENDATIONS.map(({ slug, title, task, skills }, index) => (
               <Link
                 key={slug}
                 href={`/use-cases/${slug}`}
-                className="group flex min-h-64 flex-col rounded-[12px] border border-[#d8d2c6] bg-[#fffdf8]/70 p-5 transition-transform hover:-translate-y-0.5 hover:border-[#006b4f]"
+                className="group flex min-h-64 flex-col bg-[#fffdf8] p-5 transition-colors hover:bg-[#f7f4ec]"
               >
-                <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-[#e8f1ed] text-[#006b4f]">
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                </div>
-                <h3 className="font-display text-xl font-semibold">{title}</h3>
+                <span className="font-mono text-xs text-[#6d675e]">{String(index + 1).padStart(2, '0')}</span>
+                <h3
+                  className="mt-4 text-xl leading-tight"
+                  style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+                >
+                  {title}
+                </h3>
                 <p className="mt-2 text-sm leading-relaxed text-[#5f5a52]">{task}</p>
                 <div className="mt-5 space-y-2">
                   {skills.map((skill) => (
-                    <div key={skill} className="rounded-full border border-[#e0dbd2] bg-[#fbfaf6] px-3 py-2 text-xs font-semibold text-[#5f5a52]">
+                    <div key={skill} className="rounded-full border border-[#e0dbd2] bg-[#fbfaf6] px-3 py-2 font-mono text-[11px] text-[#5f5a52]">
                       {skill}
                     </div>
                   ))}
@@ -668,39 +853,35 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
         </div>
       </section>
 
-      <section className="px-4 pb-12 sm:px-6 sm:pb-16">
-        <div className="mx-auto grid min-w-0 max-w-6xl overflow-hidden rounded-[14px] bg-[#063f31] text-white shadow-[0_24px_70px_rgba(6,63,49,0.16)] lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="min-w-0 p-5 sm:p-8">
-            <p className="text-xs font-mono uppercase tracking-wider text-white/60">Registry layer</p>
-            <h2
-              className="mt-3 text-4xl font-normal leading-tight sm:text-5xl"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-            >
-              Search for humans. API for agents.
-            </h2>
-            <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/70 sm:text-base">
-              Browse the registry when you are exploring. Call the recommendation API when your agent needs to pick, compare, and install a skill automatically.
-            </p>
-          </div>
-
-          <div className="min-w-0 border-t border-white/15 p-5 sm:p-8 lg:border-l lg:border-t-0">
-            <div className="grid gap-3 sm:grid-cols-3">
-              {[
-                ['recommend', 'Rank skills by task fit'],
-                ['compare', 'Expose trust signals'],
-                ['install', 'Return agent-ready commands'],
-              ].map(([label, copy]) => (
-                <div key={label} className="rounded-[10px] bg-white/10 p-4">
-                  <p className="font-mono text-xs uppercase tracking-wider text-white/55">{label}</p>
-                  <p className="mt-2 text-sm font-semibold leading-snug">{copy}</p>
-                </div>
-              ))}
+      <section className="px-6 py-20 md:py-28">
+        <div className="mx-auto max-w-6xl border-t border-[#d8d2c6] pt-12">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d675e]">Open registry</p>
+          <div className="mt-5 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div>
+              <h2
+                className="max-w-4xl text-4xl font-normal leading-tight tracking-normal md:text-6xl"
+                style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+              >
+                Search for humans. API for agents.
+              </h2>
+              <p className="mt-5 max-w-2xl text-base leading-relaxed text-[#5f5a52] md:text-lg">
+                Browse when you are exploring. Call the recommendation API when your
+                agent needs to pick, compare, and install a skill automatically.
+              </p>
             </div>
-            <div className="mt-4 min-w-0 rounded-[10px] bg-[#fbfaf6] p-4 text-[#1d1b18]">
-              <p className="mb-2 text-xs font-mono uppercase tracking-wider text-[#6d675e]">Open endpoint</p>
-              <code className="block break-all font-mono text-xs sm:break-normal sm:text-sm">
-                GET /api/agent/recommend?task=review+pull+requests
-              </code>
+            <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
+              <Link
+                href="/skills"
+                className="inline-flex h-11 items-center justify-center rounded-[8px] bg-[#006b4f] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              >
+                Browse skills
+              </Link>
+              <Link
+                href="/api-docs"
+                className="inline-flex h-11 items-center justify-center rounded-[8px] border border-[#d8d2c6] bg-[#fffdf8] px-5 text-sm font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
+              >
+                Read API docs
+              </Link>
             </div>
           </div>
         </div>
