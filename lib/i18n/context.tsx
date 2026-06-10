@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import type { Locale } from './config'
-import { defaultLocale } from './config'
+import { defaultLocale, isLocale } from './config'
 import en from './dictionaries/en'
 import zh from './dictionaries/zh'
 
@@ -19,6 +19,17 @@ type Dictionary = DeepWiden<typeof en>
 const dictionaries: Record<Locale, Dictionary> = {
   en,
   zh,
+  ja: en,
+  ko: en,
+  es: en,
+  de: en,
+  fr: en,
+}
+
+function getLocaleFromPath(pathname: string): Locale | null {
+  if (pathname === '/') return 'en'
+  const firstSegment = pathname.split('/').filter(Boolean)[0]
+  return isLocale(firstSegment) ? firstSegment : null
 }
 
 interface I18nContextType {
@@ -34,9 +45,18 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   // Load locale from localStorage on mount
   useEffect(() => {
-    const savedLocale = localStorage.getItem('locale') as Locale
-    if (savedLocale && (savedLocale === 'en' || savedLocale === 'zh')) {
+    const pathLocale = getLocaleFromPath(window.location.pathname)
+    if (pathLocale) {
+      setLocaleState(pathLocale)
+      localStorage.setItem('locale', pathLocale)
+      document.documentElement.lang = pathLocale
+      return
+    }
+
+    const savedLocale = localStorage.getItem('locale')
+    if (isLocale(savedLocale)) {
       setLocaleState(savedLocale)
+      document.documentElement.lang = savedLocale
     }
   }, [])
 
