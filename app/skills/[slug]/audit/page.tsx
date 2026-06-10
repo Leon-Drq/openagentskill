@@ -11,6 +11,7 @@ import {
   type ComputedSkillAudit,
   type SkillAuditCheck,
 } from '@/lib/audits'
+import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { getRelatedSkills, getSkillAuditBySlug, getSkillBySlug, getSkillEventStats } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
 
@@ -81,6 +82,7 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
     getRelatedSkills(skill.id, skill.category, 3).catch(() => []),
   ])
   const audit = storedAudit ? normalizeAuditRecord(storedAudit) : buildSkillAudit(skill, eventStats)
+  const safety = getAgentSafetyProfile(skill, audit, { max_risk: 'medium', needs_install_command: true })
   const installCommand = skill.install_command || `npx skills add ${skill.github_repo || skill.slug}`
   const passCount = audit.checks.filter((check) => check.status === 'pass').length
   const reviewCount = audit.checks.filter((check) => check.status === 'warn' || check.status === 'fail').length + audit.warnings.length
@@ -126,7 +128,7 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
         <section className="border-b border-border pb-10">
           <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
             <div>
-              <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Skill audit report</p>
+              <p className="mb-4 text-xs uppercase text-secondary">Skill audit report</p>
               <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">
                 {skill.name} audit report.
               </h1>
@@ -155,7 +157,7 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
               ].map((item) => (
                 <div key={item.label} className="bg-background p-4">
                   <div className="font-mono text-3xl font-semibold">{item.value}</div>
-                  <div className="mt-1 text-xs uppercase tracking-widest text-secondary">{item.label}</div>
+                  <div className="mt-1 text-xs uppercase text-secondary">{item.label}</div>
                 </div>
               ))}
             </div>
@@ -166,7 +168,7 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
           <div className="min-w-0">
             <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
               <div>
-                <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Checks</p>
+                <p className="mb-2 text-xs uppercase text-secondary">Checks</p>
                 <h2 className="font-display text-2xl font-semibold">Install and adoption review</h2>
               </div>
               <div className="font-mono text-sm text-secondary">
@@ -179,7 +181,7 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
                 <div key={check.label} className="min-w-0 bg-background p-5">
                   <div className="mb-4 flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-xs uppercase tracking-widest text-secondary">{check.label}</p>
+                      <p className="text-xs uppercase text-secondary">{check.label}</p>
                       <p className="mt-2 font-mono text-2xl font-semibold">{check.score}</p>
                     </div>
                     <span className={`shrink-0 border px-2 py-0.5 font-mono text-[10px] ${checkTone(check.status)}`}>
@@ -195,7 +197,7 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
 
             <div className="mt-8 grid gap-4 md:grid-cols-2">
               <div className="border border-border p-5">
-                <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Warnings</p>
+                <p className="mb-3 text-xs uppercase text-secondary">Warnings</p>
                 {audit.warnings.length > 0 ? (
                   <ul className="space-y-2 text-sm leading-relaxed text-secondary">
                     {audit.warnings.map((warning) => <li key={warning}>{warning}</li>)}
@@ -207,7 +209,7 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
                 )}
               </div>
               <div className="border border-border p-5">
-                <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Method</p>
+                <p className="mb-3 text-xs uppercase text-secondary">Method</p>
                 <p className="text-sm leading-relaxed text-secondary">
                   This report combines public metadata, AI review output, repository freshness, install readiness,
                   OpenAgentSkill events, quality scoring, and trust checks. It is not a full source-code security review.
@@ -243,6 +245,30 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
               </dl>
             </div>
 
+            <div className="border border-border p-5">
+              <p className="mb-2 text-xs uppercase text-secondary">Agent safety v2</p>
+              <h2 className="font-display text-lg font-semibold">{safety.score}/100 · {safety.label}</h2>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
+                Safety v2 combines audit score, install readiness, inferred permission surface, and policy limits.
+              </p>
+              <div className="mt-4 space-y-3">
+                {safety.permission_hints.slice(0, 4).map((hint) => (
+                  <div key={hint.id} className="border border-border p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="font-semibold">{hint.label}</p>
+                      <span className="font-mono text-[10px] uppercase text-secondary">{hint.severity}</span>
+                    </div>
+                    <p className="mt-2 text-xs leading-relaxed text-secondary">{hint.reason}</p>
+                  </div>
+                ))}
+              </div>
+              {safety.policy_warnings.length > 0 && (
+                <ul className="mt-4 space-y-2 border-t border-border pt-4 text-xs leading-relaxed text-secondary">
+                  {safety.policy_warnings.map((warning) => <li key={warning}>{warning}</li>)}
+                </ul>
+              )}
+            </div>
+
             <div className="grid gap-2 text-sm">
               <Link
                 href={`/skills/${skill.slug}`}
@@ -269,7 +295,7 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
         {relatedSkills.length > 0 && (
           <section className="py-10">
             <div className="mb-6">
-              <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Compare nearby options</p>
+              <p className="mb-2 text-xs uppercase text-secondary">Compare nearby options</p>
               <h2 className="font-display text-2xl font-semibold">Related skills to audit next</h2>
             </div>
             <div className="grid gap-3 md:grid-cols-3">

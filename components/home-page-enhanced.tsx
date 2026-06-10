@@ -132,8 +132,8 @@ const REGISTRY_LAYERS = [
 const QUICKSTART_STEPS = [
   {
     title: 'Ask for a skill path',
-    desc: 'Send the task your agent needs to complete.',
-    code: 'GET /api/skills/search?task=scrape+pricing+pages&min_stars=500',
+    desc: 'Resolve the task into one selected skill, alternatives, safety score, and install plan.',
+    code: 'POST /api/agent/resolve',
   },
   {
     title: 'Inspect the trust profile',
@@ -148,7 +148,7 @@ const QUICKSTART_STEPS = [
   {
     title: 'Automate discovery',
     desc: 'Use the API as the registry layer behind your own agent runtime.',
-    code: 'curl "https://www.openagentskill.com/api/agent/recommend?task=review+pull+requests"',
+    code: 'curl "https://www.openagentskill.com/api/agent/resolve?task=review+pull+requests&agent=codex"',
   },
 ]
 
@@ -559,9 +559,9 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
 
             <ul className="mt-8 space-y-5">
               {[
-                ['01', 'Task-to-skill recommendations', 'Agents start with intent, not category pages. The registry maps a job to a ranked shortlist with fit reasons.'],
-                ['02', 'Trust before install', 'Stars, freshness, quality score, risks, and readiness notes sit beside the command an agent will run.'],
-                ['03', 'Human browse, agent API', 'People can browse the index; agents can call the same registry through recommendation and skill endpoints.'],
+                ['01', 'Task-to-skill resolution', 'Agents start with intent, not category pages. The registry maps a job to one selected skill, alternatives, and fit reasons.'],
+                ['02', 'Safety before install', 'Stars, freshness, quality score, permission hints, risks, and readiness notes sit beside the command an agent will run.'],
+                ['03', 'Human browse, agent API', 'People can browse the index; agents can call the same registry through resolve, recommendation, and skill endpoints.'],
               ].map(([tag, title, body]) => (
                 <li key={title} className="grid grid-cols-[auto_1fr] gap-5 border-t border-[#d8d2c6] pt-5">
                   <span className="font-mono text-xs text-[#6d675e]">{tag}</span>
@@ -593,15 +593,13 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
               <pre className="overflow-x-auto bg-[#f2f0e9]/70 p-5 font-mono text-[12px] leading-relaxed text-[#3f3b35]">
                 <code>{`{
   "task": "scrape pricing pages",
-  "recommendations": [
-    {
-      "skill": "Crawl4AI",
-      "fit": 0.96,
-      "readiness": "ready",
-      "install": "npx skills add unclecode/crawl4ai",
-      "install_api": "/api/skills/crawl4ai/install"
-    }
-  ]
+  "selected": {
+    "skill": "Crawl4AI",
+    "safety": "80/100",
+    "policy": "human_review_required",
+    "install_plan": "npx skills add unclecode/crawl4ai"
+  },
+  "alternatives": ["Firecrawl", "AnyCrawl"]
 }`}</code>
               </pre>
             </div>

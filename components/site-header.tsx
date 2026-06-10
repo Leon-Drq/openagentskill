@@ -16,6 +16,7 @@ const navItems = [
   { href: '/agents', label: 'Agents' },
   { href: '/compare', label: 'Compare' },
   { href: '/api-docs', labelKey: 'apiDocs' },
+  { href: '/cli', label: 'CLI' },
   { href: '/docs', labelKey: 'docs' },
   { href: '/submit', labelKey: 'submit' },
 ] as const

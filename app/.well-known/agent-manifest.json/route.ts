@@ -48,6 +48,19 @@ export async function GET() {
           limit: 'Max recommendations, default 3, max 10 (optional)',
         },
       },
+      resolve: {
+        url: '/api/agent/resolve',
+        method: 'GET or POST',
+        description: 'Resolve one task into a selected skill, alternatives, safety profile, policy decision, and install plan.',
+        params: {
+          task: 'Description of the task you need a skill for (required)',
+          agent: 'Target agent: codex, claude-code, cursor, openagentskill-cli, or auto (optional)',
+          max_risk: 'Allowed risk: low, medium, high, safe_to_try, needs_review, or risky (optional)',
+          needs_install_command: 'Require install handoff, default true (optional)',
+          min_stars: 'Minimum GitHub stars (optional)',
+          format: 'Response format: json (default) or text (optional)',
+        },
+      },
       detail: {
         url: '/api/agent/skills/{slug}',
         method: 'GET',
@@ -94,6 +107,7 @@ export async function GET() {
     rate_limits: {
       search: '100 requests/hour',
       recommend: '50 requests/hour',
+      resolve: '50 requests/hour',
       submit: '10 requests/hour',
       activity: '100 requests/hour',
     },

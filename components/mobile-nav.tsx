@@ -14,6 +14,7 @@ const navItems = [
   { href: '/use-cases', label: 'Use Cases' },
   { href: '/compare', label: 'Compare' },
   { href: '/api-docs', labelKey: 'apiDocs' },
+  { href: '/cli', label: 'CLI' },
   { href: '/docs', labelKey: 'docs' },
   { href: '/submit', labelKey: 'submit' },
 ] as const

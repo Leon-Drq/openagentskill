@@ -19,6 +19,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { getStacksForSkill } from '@/lib/collections'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
+import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
@@ -146,6 +147,9 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   const decisionProfile = dbSkill ? getSkillDecisionProfile(dbSkill, eventStats) : null
   const trustProfile = dbSkill ? getSkillTrustProfile(dbSkill, Boolean(approvedClaim), eventStats) : null
   const auditProfile = dbSkill ? buildSkillAudit(dbSkill, eventStats) : null
+  const safetyProfile = dbSkill && auditProfile
+    ? getAgentSafetyProfile(dbSkill, auditProfile, { max_risk: 'medium', needs_install_command: true })
+    : null
   const installTargets = dbSkill ? getSkillInstallTargets(dbSkill) : []
   const compareHref = `/compare?skills=${encodeURIComponent([skill.slug, ...relatedSkills.slice(0, 3).map((rs) => rs.slug)].join(','))}`
   const installApiHref = `/api/skills/${skill.slug}/install`
@@ -278,13 +282,52 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
 
             <SkillScorePanel quality={qualityProfile} trust={trustProfile} audit={auditProfile} />
 
+            {safetyProfile && (
+              <section className="mb-10 border border-border bg-card p-5 sm:p-6">
+                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+                  <div>
+                    <p className="mb-2 text-xs uppercase text-secondary">Agent safety v2</p>
+                    <h2 className="font-display text-2xl font-semibold">
+                      {safetyProfile.score}/100 · {safetyProfile.label}
+                    </h2>
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
+                      Safety v2 estimates whether an agent should auto-install this skill by combining audit risk,
+                      install readiness, inferred permission surface, and policy constraints.
+                    </p>
+                  </div>
+                  <Link
+                    href={`/api/agent/resolve?task=${encodeURIComponent(`Use ${skill.name}`)}&agent=codex&max_risk=medium`}
+                    className="w-full border border-border px-4 py-2.5 text-center text-sm font-semibold transition-colors hover:border-foreground sm:w-auto"
+                  >
+                    Resolve via API
+                  </Link>
+                </div>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  {safetyProfile.permission_hints.slice(0, 4).map((hint) => (
+                    <div key={hint.id} className="border border-border bg-background p-4">
+                      <p className="font-mono text-xs uppercase text-secondary">{hint.severity}</p>
+                      <h3 className="mt-2 font-semibold">{hint.label}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-secondary">{hint.reason}</p>
+                    </div>
+                  ))}
+                </div>
+                {safetyProfile.policy_warnings.length > 0 && (
+                  <ul className="mt-5 space-y-2 border-t border-border pt-4 text-sm leading-relaxed text-secondary">
+                    {safetyProfile.policy_warnings.map((warning) => (
+                      <li key={warning}>{warning}</li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            )}
+
             <SkillInstallTargets skillSlug={skill.slug} targets={installTargets} />
 
             <section className="mb-10 overflow-hidden border border-border bg-card">
               <div className="border-b border-border p-5">
                 <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                   <div>
-                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Agent handoff</p>
+                    <p className="mb-2 text-xs uppercase text-secondary">Agent handoff</p>
                     <h2 className="font-display text-2xl font-semibold sm:text-3xl">
                       Give an agent the install path, not another directory page.
                     </h2>
@@ -325,7 +368,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                     href={item.href}
                     className="min-w-0 bg-background p-4 transition-colors hover:bg-muted/40"
                   >
-                    <p className="text-xs uppercase tracking-widest text-secondary">{item.label}</p>
+                    <p className="text-xs uppercase text-secondary">{item.label}</p>
                     <p className="mt-2 break-all font-mono text-xs leading-relaxed text-foreground [overflow-wrap:anywhere]">
                       {item.value}
                     </p>
@@ -334,7 +377,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
               </div>
 
               <div className="border-t border-border p-5">
-                <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Agent prompt</p>
+                <p className="mb-3 text-xs uppercase text-secondary">Agent prompt</p>
                 <pre className="overflow-x-auto border border-border bg-background p-4 font-mono text-xs leading-relaxed text-secondary">
                   <code>{`Use ${skill.name} for this task. Review ${absoluteInstallApiUrl}, then install with: ${skill.technical.installCommand}`}</code>
                 </pre>
@@ -345,7 +388,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
               <section className="mb-10 border border-border bg-card p-5">
                 <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                   <div>
-                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Audit report</p>
+                    <p className="mb-2 text-xs uppercase text-secondary">Audit report</p>
                     <h2 className="font-display text-2xl font-semibold">
                       {auditRiskLabel(auditProfile.risk_level)} · {auditProfile.audit_score}/100
                     </h2>
@@ -369,7 +412,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 <div className="border-b border-border p-5">
                   <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                     <div>
-                      <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Agent decision cockpit</p>
+                      <p className="mb-2 text-xs uppercase text-secondary">Agent decision cockpit</p>
                       <h2 className="font-display text-2xl font-semibold sm:text-3xl">
                         {decisionProfile.decisionHeadline}
                       </h2>
@@ -380,11 +423,11 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                     <div className="grid min-w-28 grid-cols-2 border border-border text-center sm:block">
                       <div className="border-r border-border px-4 py-3 sm:border-r-0 sm:border-b">
                         <div className="font-mono text-3xl font-semibold">{decisionProfile.readinessScore}</div>
-                        <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Readiness</div>
+                        <div className="mt-1 text-xs uppercase text-secondary">Readiness</div>
                       </div>
                       <div className="px-4 py-3">
                         <div className="font-mono text-lg font-semibold">{decisionProfile.adoptionStage}</div>
-                        <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Stage</div>
+                        <div className="mt-1 text-xs uppercase text-secondary">Stage</div>
                       </div>
                     </div>
                   </div>
@@ -397,7 +440,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                       { label: 'Install path', value: skill.technical.installCommand ? 'Command ready' : 'Repo install' },
                     ].map((item) => (
                       <div key={item.label} className="bg-background p-4">
-                        <p className="text-xs uppercase tracking-widest text-secondary">{item.label}</p>
+                        <p className="text-xs uppercase text-secondary">{item.label}</p>
                         <p className="mt-2 font-mono text-sm">{item.value}</p>
                       </div>
                     ))}
@@ -406,19 +449,19 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
 
                 <div className="grid gap-px bg-border lg:grid-cols-3">
                   <div className="bg-card p-5">
-                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Use when</p>
+                    <p className="mb-3 text-xs uppercase text-secondary">Use when</p>
                     <ul className="space-y-2 text-sm leading-relaxed text-secondary">
                       {decisionProfile.bestFor.map((item) => <li key={item}>{item}</li>)}
                     </ul>
                   </div>
                   <div className="bg-card p-5">
-                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Evidence</p>
+                    <p className="mb-3 text-xs uppercase text-secondary">Evidence</p>
                     <ul className="space-y-2 text-sm leading-relaxed text-secondary">
                       {decisionProfile.proofPoints.map((item) => <li key={item}>{item}</li>)}
                     </ul>
                   </div>
                   <div className="bg-card p-5">
-                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Review first</p>
+                    <p className="mb-3 text-xs uppercase text-secondary">Review first</p>
                     <ul className="space-y-2 text-sm leading-relaxed text-secondary">
                       {decisionProfile.riskNotes.map((item) => <li key={item}>{item}</li>)}
                     </ul>
@@ -426,7 +469,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 </div>
 
                 <div className="border-t border-border p-5">
-                  <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Implementation path</p>
+                  <p className="mb-3 text-xs uppercase text-secondary">Implementation path</p>
                   <ol className="grid gap-3 text-sm leading-relaxed text-secondary md:grid-cols-3">
                     {decisionProfile.implementationPlan.map((step, index) => (
                       <li key={step} className="border border-border p-4">
@@ -444,7 +487,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 <div className="border-b border-border p-5">
                   <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                     <div>
-                      <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Trust profile</p>
+                      <p className="mb-2 text-xs uppercase text-secondary">Trust profile</p>
                       <h2 className="font-display text-2xl font-semibold sm:text-3xl">
                         {trustProfile.label}
                       </h2>
@@ -454,7 +497,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                     </div>
                     <div className="shrink-0 border border-border px-5 py-4 text-center sm:min-w-32">
                       <div className="font-mono text-4xl font-semibold">{trustProfile.score}</div>
-                      <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Trust score</div>
+                      <div className="mt-1 text-xs uppercase text-secondary">Trust score</div>
                     </div>
                   </div>
 
@@ -466,7 +509,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                     {trustProfile.checks.slice(0, 4).map((check) => (
                       <div key={check.label} className="min-w-0 bg-background p-4">
                         <div className="mb-3 flex items-center justify-between gap-3">
-                          <p className="text-xs uppercase tracking-widest text-secondary">{check.label}</p>
+                          <p className="text-xs uppercase text-secondary">{check.label}</p>
                           <span className={`shrink-0 border px-2 py-0.5 text-[10px] font-mono ${getStatusTone(check.status)}`}>
                             {getStatusLabel(check.status)}
                           </span>
@@ -479,7 +522,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
 
                 <div className="grid gap-px bg-border md:grid-cols-2">
                   <div className="bg-card p-5">
-                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Good signals</p>
+                    <p className="mb-3 text-xs uppercase text-secondary">Good signals</p>
                     {trustProfile.strengths.length > 0 ? (
                       <ul className="space-y-2 text-sm leading-relaxed text-secondary">
                         {trustProfile.strengths.map((item) => <li key={item}>{item}</li>)}
@@ -489,7 +532,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                     )}
                   </div>
                   <div className="bg-card p-5">
-                    <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Review before install</p>
+                    <p className="mb-3 text-xs uppercase text-secondary">Review before install</p>
                     {trustProfile.warnings.length > 0 ? (
                       <ul className="space-y-2 text-sm leading-relaxed text-secondary">
                         {trustProfile.warnings.map((item) => <li key={item}>{item}</li>)}
@@ -503,7 +546,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 </div>
 
                 <div className="border-t border-border p-5">
-                  <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Recommended action</p>
+                  <p className="mb-3 text-xs uppercase text-secondary">Recommended action</p>
                   <p className="text-sm leading-relaxed text-secondary">{trustProfile.recommendedAction}</p>
                 </div>
               </section>
@@ -513,7 +556,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
               <section className="mb-10 border border-border p-5">
                 <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                   <div>
-                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Quality profile</p>
+                    <p className="mb-2 text-xs uppercase text-secondary">Quality profile</p>
                     <h2 className="font-display text-2xl font-semibold">
                       {qualityProfile.label} candidate for agent workflows
                     </h2>
@@ -527,7 +570,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 <div className="grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
                   {qualityProfile.signals.map((signal) => (
                     <div key={signal.label} className="bg-background p-4">
-                      <div className="text-xs uppercase tracking-widest text-secondary">{signal.label}</div>
+                      <div className="text-xs uppercase text-secondary">{signal.label}</div>
                       <div className="mt-2 font-mono text-sm">{signal.value}</div>
                     </div>
                   ))}
@@ -544,7 +587,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
               <section className="mb-10">
                 <div className="mb-5 flex items-end justify-between gap-4">
                   <div>
-                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Workflow fit</p>
+                    <p className="mb-2 text-xs uppercase text-secondary">Workflow fit</p>
                     <h2 className="font-display text-2xl font-semibold">Use this skill in these scenarios</h2>
                   </div>
                 </div>
@@ -555,7 +598,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                       href={`/use-cases/${useCase.slug}`}
                       className="border border-border p-4 transition-colors hover:border-foreground"
                     >
-                      <p className="text-xs uppercase tracking-widest text-secondary">{useCase.eyebrow}</p>
+                      <p className="text-xs uppercase text-secondary">{useCase.eyebrow}</p>
                       <h3 className="mt-2 font-display text-lg font-semibold">{useCase.shortTitle}</h3>
                       <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary">{useCase.heroPrompt}</p>
                     </Link>
@@ -568,7 +611,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
               <section className="mb-10">
                 <div className="mb-5 flex items-end justify-between gap-4">
                   <div>
-                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Stack fit</p>
+                    <p className="mb-2 text-xs uppercase text-secondary">Stack fit</p>
                     <h2 className="font-display text-2xl font-semibold">Add it to a complete workflow</h2>
                   </div>
                 </div>
@@ -579,7 +622,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                       href={`/collections/${stack.slug}`}
                       className="border border-border p-4 transition-colors hover:border-foreground"
                     >
-                      <p className="text-xs uppercase tracking-widest text-secondary">{stack.eyebrow}</p>
+                      <p className="text-xs uppercase text-secondary">{stack.eyebrow}</p>
                       <h3 className="mt-2 font-display text-lg font-semibold">{stack.shortTitle}</h3>
                       <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary">{stack.description}</p>
                     </Link>
@@ -592,7 +635,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
               <section className="mb-10 border border-border p-5">
                 <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                   <div>
-                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Alternative shortlist</p>
+                    <p className="mb-2 text-xs uppercase text-secondary">Alternative shortlist</p>
                     <h2 className="font-display text-2xl font-semibold">Compare before you install</h2>
                     <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
                       Similar skills in this category, ranked with the same readiness and quality signals.
@@ -736,7 +779,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
             <div className="sticky top-24 space-y-5">
               {decisionProfile && (
                 <div className="border border-border bg-card p-5">
-                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Decision snapshot</p>
+                  <p className="mb-2 text-xs uppercase text-secondary">Decision snapshot</p>
                   <h3 className="font-display text-lg font-semibold">{decisionProfile.agentRole}</h3>
                   <div className="mt-4 grid grid-cols-2 gap-px border border-border bg-border text-center">
                     <div className="bg-background p-3">

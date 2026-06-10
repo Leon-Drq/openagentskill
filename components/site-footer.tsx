@@ -71,6 +71,7 @@ export function SiteFooter() {
               <div className="mt-4 grid gap-2 text-secondary">
                 <Link href="/docs" className="hover:text-foreground">{t.nav.docs}</Link>
                 <Link href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</Link>
+                <Link href="/cli" className="hover:text-foreground">CLI</Link>
                 <Link href="/submit" className="hover:text-foreground">{t.nav.submit}</Link>
                 <Link href="/blog" className="hover:text-foreground">Blog</Link>
                 <Link href="/guides" className="hover:text-foreground">Guides</Link>

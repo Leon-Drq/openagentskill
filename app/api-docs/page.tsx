@@ -4,7 +4,7 @@ import { SiteHeader } from '@/components/site-header'
 
 export const metadata: Metadata = {
   title: 'API Reference - Open Agent Skill',
-  description: 'Agent-friendly API for discovering and integrating skills programmatically.',
+  description: 'Agent-friendly Resolve API for selecting, auditing, and installing AI agent skills programmatically.',
 }
 
 export default function APIDocsPage() {
@@ -81,6 +81,7 @@ export default function APIDocsPage() {
             {[
               { method: 'GET', path: '/api/agent/skills' },
               { method: 'GET', path: '/api/agent/skills/{slug}' },
+              { method: 'POST', path: '/api/agent/resolve' },
               { method: 'GET', path: '/api/agent/recommend' },
               { method: 'GET', path: '/api/agent/evals' },
               { method: 'GET', path: '/api/skills/search' },
@@ -102,6 +103,57 @@ export default function APIDocsPage() {
                 <span className="text-secondary">{path}</span>
               </div>
             ))}
+          </div>
+
+          <div className="border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'POST'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/agent/resolve'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Resolve a task into one selected skill, alternatives, an agent safety profile, a policy decision, and a target-specific install plan. This is the canonical endpoint for agent runtime use.'}
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2 mb-4 sm:mb-6 text-sm sm:text-base">
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'task'}</code>
+                  <span className="text-secondary ml-2">{'- Required task description'}</span>
+                </div>
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'agent'}</code>
+                  <span className="text-secondary ml-2">{'- codex, claude-code, cursor, or auto'}</span>
+                </div>
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'constraints.max_risk'}</code>
+                  <span className="text-secondary ml-2">{'- low, medium, or high'}</span>
+                </div>
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'constraints.needs_install_command'}</code>
+                  <span className="text-secondary ml-2">{'- Require install handoff'}</span>
+                </div>
+              </div>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
+                <code>{`POST /api/agent/resolve
+{
+  "task": "review a pull request and summarize risky changes",
+  "agent": "codex",
+  "constraints": {
+    "max_risk": "medium",
+    "needs_install_command": true,
+    "min_stars": 500
+  }
+}`}</code>
+              </div>
+              <div className="mt-4 bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <code>{'GET /api/agent/resolve?task=scrape+pricing+pages&agent=codex&max_risk=medium&format=text'}</code>
+              </div>
+            </div>
           </div>
 
           <div className="border border-border mb-8 sm:mb-10">
