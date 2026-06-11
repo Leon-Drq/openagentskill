@@ -210,6 +210,9 @@ export function SiteHeader() {
           </div>
 
           <NavUserMenu />
+          <div className="xl:hidden">
+            <LanguageSwitcher compact />
+          </div>
           <div className="hidden xl:block">
             <LanguageSwitcher />
           </div>
