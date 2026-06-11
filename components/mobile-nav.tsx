@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Activity, Braces, FileJson2, Github, Menu, Plus, Terminal, X } from 'lucide-react'
+import { Activity, Braces, FileJson2, Menu, Plus, Terminal, X } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'
+import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { useI18n } from '@/lib/i18n/context'
 import { cn } from '@/lib/utils'
@@ -101,7 +102,7 @@ export function MobileNav() {
   }, [isOpen])
 
   return (
-    <div className="lg:hidden">
+    <div className="xl:hidden">
       <button
         onClick={() => setIsOpen(true)}
         className="-mr-2 flex h-10 w-10 items-center justify-center rounded-[8px] text-secondary transition-colors hover:bg-muted hover:text-foreground"
@@ -203,20 +204,12 @@ export function MobileNav() {
                 <Link
                   href="/submit"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center gap-2 rounded-[8px] bg-[#006b4f] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  className="flex items-center justify-center gap-2 rounded-[8px] border border-border bg-card/70 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
                 >
                   <Plus className="h-5 w-5" aria-hidden="true" />
                   Submit Skill
                 </Link>
-                <a
-                  href="https://github.com/Leon-Drq/openagentskill"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 rounded-[8px] border border-border px-4 py-2.5 text-sm font-semibold text-secondary transition-colors hover:border-foreground/40 hover:text-foreground"
-                >
-                  <Github className="h-5 w-5" aria-hidden="true" />
-                  GitHub
-                </a>
+                <GitHubStarButton fullWidth className="h-10" />
               </div>
             </div>
           </nav>

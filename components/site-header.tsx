@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Activity, Bot, Braces, ChevronDown, FileJson2, Github, Plus, Terminal } from 'lucide-react'
+import { Activity, Bot, Braces, ChevronDown, FileJson2, Plus, Terminal } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'
+import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
 import { NavUserMenu } from '@/components/nav-user-menu'
@@ -163,7 +164,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/92 backdrop-blur supports-[backdrop-filter]:bg-background/82">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5 transition-opacity hover:opacity-70">
           <BrandMark className="h-7 w-7 text-foreground" />
           <span className="hidden truncate font-sans text-base font-semibold sm:inline sm:text-lg">
@@ -175,7 +176,7 @@ export function SiteHeader() {
         </Link>
 
         <div className="flex h-full items-center gap-2 sm:gap-3">
-          <nav className="hidden h-full items-center gap-1 lg:flex" aria-label="Primary navigation">
+          <nav className="hidden h-full items-center gap-0.5 xl:flex" aria-label="Primary navigation">
             {primaryNavItems.map((item) => {
               const active = isActivePath(pathname, item.href)
               const label = 'label' in item ? item.label : t.nav[item.labelKey]
@@ -197,19 +198,11 @@ export function SiteHeader() {
             <ForAgentsDropdown pathname={pathname} />
           </nav>
 
-          <div className="hidden items-center gap-2 sm:flex">
-            <a
-              href="https://github.com/Leon-Drq/openagentskill"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-border text-secondary transition-colors hover:border-foreground/40 hover:text-foreground"
-              aria-label="OpenAgentSkill on GitHub"
-            >
-              <Github className="h-4 w-4" aria-hidden="true" />
-            </a>
+          <div className="hidden items-center gap-2 xl:flex">
+            <GitHubStarButton />
             <Link
               href="/submit"
-              className="hidden h-9 items-center gap-2 rounded-[8px] bg-[#006b4f] px-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 md:flex"
+              className="flex h-9 shrink-0 items-center gap-2 rounded-[8px] border border-border bg-card/70 px-3 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
               Submit Skill
@@ -217,7 +210,7 @@ export function SiteHeader() {
           </div>
 
           <NavUserMenu />
-          <div className="hidden md:block">
+          <div className="hidden xl:block">
             <LanguageSwitcher />
           </div>
           <MobileNav />
