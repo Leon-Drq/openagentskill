@@ -16,7 +16,7 @@ export default function APIDocsPage() {
         <section className="relative overflow-hidden border-b border-border">
           <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
           <div className="relative mx-auto max-w-6xl px-6 py-14 sm:py-16 lg:py-20">
-            <p className="font-mono text-xs uppercase tracking-[0.24em] text-secondary">API Reference</p>
+            <p className="font-mono text-xs uppercase text-secondary">API Reference</p>
             <h1 className="mt-5 max-w-4xl font-display text-4xl font-normal leading-[0.98] text-balance sm:text-5xl lg:text-6xl">
               Agent-friendly discovery, ranking, and install data.
             </h1>
@@ -105,7 +105,7 @@ export default function APIDocsPage() {
             ))}
           </div>
 
-          <div className="border border-border mb-8 sm:mb-10">
+          <div id="agent-resolve" className="scroll-mt-24 border border-border mb-8 sm:mb-10">
             <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                 <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
