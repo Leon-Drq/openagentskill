@@ -15,6 +15,7 @@ import { SkillEventTracker } from '@/components/skill-event-tracker'
 import { SkillFeedbackPanel } from '@/components/skill-feedback-panel'
 import { SkillInstallTargets } from '@/components/skill-install-targets'
 import { SkillScorePanel } from '@/components/skill-score-panel'
+import { SkillXSharePanel } from '@/components/skill-x-share-panel'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { getStacksForSkill } from '@/lib/collections'
@@ -26,6 +27,7 @@ import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillInstallApiUrl } from '@/lib/registry'
 import { getSkillTrustProfile, type SkillTrustProfile, type TrustCheckStatus } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
+import { buildManualXMainText, buildManualXReplyText, buildXIntentUrl } from '@/lib/x/poster'
 
 export const dynamic = 'force-dynamic'
 
@@ -156,6 +158,8 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   const installTextHref = `${installApiHref}?format=text`
   const searchApiHref = `/api/skills/search?q=${encodeURIComponent(skill.name)}&limit=3`
   const absoluteInstallApiUrl = getSkillInstallApiUrl(skill.slug)
+  const xMainText = dbSkill ? buildManualXMainText(dbSkill) : ''
+  const xReplyText = dbSkill ? buildManualXReplyText(dbSkill) : ''
   const relatedDecisionRows = relatedSkills.map((relatedSkill) => ({
     skill: relatedSkill,
     quality: getSkillQualityProfile(relatedSkill),
@@ -868,6 +872,25 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 </div>
               </div>
 
+              {xMainText && (
+                <SkillXSharePanel
+                  skillName={skill.name}
+                  mainText={xMainText}
+                  mainIntentUrl={buildXIntentUrl(xMainText)}
+                  replyText={xReplyText}
+                  replyIntentUrl={xReplyText ? buildXIntentUrl(xReplyText) : undefined}
+                />
+              )}
+
+              <ClaimSkillPanel
+                skillSlug={skill.slug}
+                repository={skill.technical.repository}
+                approvedClaim={approvedClaim ? {
+                  github_username: approvedClaim.github_username,
+                  evidence_url: approvedClaim.evidence_url,
+                } : null}
+              />
+
               <div className="border border-border p-5">
                 <h3 className="font-display text-lg font-semibold mb-3">README badge</h3>
                 <p className="mb-4 text-xs leading-relaxed text-secondary">
@@ -891,15 +914,6 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                   </Link>
                 </div>
               </div>
-
-              <ClaimSkillPanel
-                skillSlug={skill.slug}
-                repository={skill.technical.repository}
-                approvedClaim={approvedClaim ? {
-                  github_username: approvedClaim.github_username,
-                  evidence_url: approvedClaim.evidence_url,
-                } : null}
-              />
 
               {/* Author */}
               <div className="border border-border p-5">

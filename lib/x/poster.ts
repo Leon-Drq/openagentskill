@@ -105,14 +105,14 @@ function inferUseCase(skill: XPostSkill) {
     ...(skill.tags || []),
   ].join(' ').toLowerCase()
 
-  if (/(code|coding|developer|dev|github|claude|cursor|terminal|repo)/.test(text)) {
+  if (/(browser|web|crawl|scrap|page|site|monitor)/.test(text)) {
+    return 'you need an agent to browse, extract, or monitor web pages without building a scraper from scratch.'
+  }
+  if (/\b(code|coding|developer|dev|github|claude|cursor|terminal|repo)\b/.test(text)) {
     return 'you want your coding agent to carry more repo context and ship repetitive changes faster.'
   }
   if (/(rag|search|knowledge|memory|document|pdf|data|vector)/.test(text)) {
     return 'your agent needs to turn docs, data, or knowledge bases into answers and actions.'
-  }
-  if (/(browser|web|crawl|scrap|page|site|monitor)/.test(text)) {
-    return 'you need an agent to browse, extract, or monitor web pages without building a scraper from scratch.'
   }
   if (/(workflow|productivity|task|calendar|email|notion|slack|ops)/.test(text)) {
     return 'you want to move a repeatable work routine from manual steps into an agent workflow.'

@@ -72,6 +72,7 @@ export function SiteFooter() {
                 <Link href="/docs" className="hover:text-foreground">{t.nav.docs}</Link>
                 <Link href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</Link>
                 <Link href="/cli" className="hover:text-foreground">CLI</Link>
+                <Link href="/x-kit" className="hover:text-foreground">X Growth Kit</Link>
                 <Link href="/submit" className="hover:text-foreground">{t.nav.submit}</Link>
                 <Link href="/blog" className="hover:text-foreground">Blog</Link>
                 <Link href="/guides" className="hover:text-foreground">Guides</Link>

@@ -32,45 +32,64 @@ interface HomePageEnhancedProps {
   }>
 }
 
-interface Recommendation {
-  rank?: number
-  skill: string
-  slug: string
-  description?: string
-  confidence: number | string
-  match_label?: string
-  install: string
-  stats?: {
-    stars: number
-    downloads: number
-    rating: number
-    quality_score: number
+interface ResolveCandidate {
+  rank: number
+  match_score: number
+  skill: {
+    slug: string
+    name: string
+    description: string
+    category: string
+    repository?: string
+    github_repo?: string
+  }
+  recommendation_reasons: string[]
+  audit: {
+    audit_score: number
+    risk_label: string
+    warnings: string[]
+  }
+  safety: {
+    score: number
+    label: string
+    auto_install_allowed: boolean
+    policy_warnings: string[]
   }
   decision?: {
     readiness_score: number
     readiness_label: string
     headline: string
     role: string
-    adoption_stage: string
-    primary_fit: string
     best_for: string[]
     risks: string[]
-    proof_points: string[]
     next_steps: string[]
   }
-  use_cases?: Array<{
-    slug: string
-    title: string
-    url: string
-  }>
-  urls?: {
-    web?: string
-    api?: string
-    install_api?: string
-    audit?: string
+  install_plan: {
+    target: string
+    label: string
+    value: string
+    command: string
+  }
+  urls: {
+    web: string
+    install_api: string
+    audit: string
     repository?: string
   }
-  reasoning: string
+}
+
+interface ResolveResult {
+  task: string
+  selected: ResolveCandidate | null
+  alternatives: ResolveCandidate[]
+  policy_decision: {
+    status: string
+    summary: string
+  }
+  meta: {
+    total_skills_searched: number
+    total_candidates: number
+  }
 }
 
 const HOME_USE_CASES = USE_CASES.slice(0, 4)
@@ -249,11 +268,14 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
   const { t, locale } = useI18n()
   const [taskQuery, setTaskQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+  const [resolveResult, setResolveResult] = useState<ResolveResult | null>(null)
   const [searchedCount, setSearchedCount] = useState(0)
   const [showResults, setShowResults] = useState(false)
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null)
   const searchRef = useRef<HTMLDivElement>(null)
+  const resolvedCandidates = resolveResult
+    ? [resolveResult.selected, ...resolveResult.alternatives].filter((item): item is ResolveCandidate => Boolean(item))
+    : []
   const isZh = locale === 'zh'
   const heroMain = isZh ? 'AI Agent Skills 的' : 'The open registry'
   const heroAccent = isZh ? '开放注册表。' : 'AI agent skills.'
@@ -270,13 +292,27 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
     setTaskQuery(normalizedQuery)
     setIsSearching(true)
     setShowResults(true)
+    setResolveResult(null)
     try {
-      const res = await fetch(`/api/agent/recommend?task=${encodeURIComponent(normalizedQuery)}&limit=3`)
-      const data = await res.json()
-      setRecommendations(data.recommendations || [])
+      const res = await fetch('/api/agent/resolve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          task: normalizedQuery,
+          agent: 'codex',
+          limit: 3,
+          constraints: {
+            max_risk: 'medium',
+            needs_install_command: true,
+          },
+        }),
+      })
+      if (!res.ok) throw new Error('Resolve request failed')
+      const data = (await res.json()) as ResolveResult
+      setResolveResult(data)
       setSearchedCount(data.meta?.total_skills_searched || 0)
     } catch {
-      setRecommendations([])
+      setResolveResult(null)
       setSearchedCount(0)
     } finally {
       setIsSearching(false)
@@ -401,11 +437,11 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
         <div className="relative z-10 mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.42fr_0.58fr] lg:items-start">
           <div>
             <SectionHeading
-              eyebrow="Agent recommendation"
-              title="Describe the task. Get the trusted skill path."
+              eyebrow="Agent resolve"
+              title="Describe the task. Get one safe skill plan."
             />
             <p className="mt-4 max-w-md text-sm leading-relaxed text-[#5f5a52] sm:text-base">
-              The API ranks skills by task fit, quality, maintenance, audit notes, and install readiness before an agent acts.
+              The API returns a selected skill, alternatives, policy decision, audit notes, and install plan before an agent acts.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {HOME_USE_CASES.slice(0, 4).map((useCase) => (
@@ -458,14 +494,19 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
               <div>
                 <div className="flex flex-col gap-2 border-b border-[#e4e0d8] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                   <div>
-                    <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">Agent skill plan</p>
+                    <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">Selected skill plan</p>
                     <h3 className="mt-1 text-xl font-semibold">
                       {isSearching
                         ? 'Reviewing trust signals...'
-                        : recommendations[0]
-                          ? `Start with ${recommendations[0].skill}`
+                        : resolvedCandidates[0]
+                          ? `Start with ${resolvedCandidates[0].skill.name}`
                           : 'No reliable match yet'}
                     </h3>
+                    {!isSearching && resolveResult?.policy_decision.summary && (
+                      <p className="mt-1 max-w-xl text-xs leading-relaxed text-[#6d675e]">
+                        {resolveResult.policy_decision.summary}
+                      </p>
+                    )}
                   </div>
                   {!isSearching && searchedCount > 0 && (
                     <div className="rounded-full border border-[#d8d2c6] px-3 py-1.5 font-mono text-xs text-[#6d675e]">
@@ -478,42 +519,55 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
                   <div className="px-5 py-10 text-center text-sm text-[#5f5a52]">
                     <span className="inline-block animate-pulse">{'>'} {t.hero.searching}</span>
                   </div>
-                ) : recommendations.length > 0 ? (
+                ) : resolvedCandidates.length > 0 ? (
                   <div className="grid gap-px bg-[#e4e0d8] md:grid-cols-3">
-                    {recommendations.slice(0, 3).map((rec, i) => (
-                      <div key={rec.slug} className="min-w-0 bg-[#fffdf8] p-4 sm:p-5">
+                    {resolvedCandidates.slice(0, 3).map((rec, i) => (
+                      <div key={rec.skill.slug} className="min-w-0 bg-[#fffdf8] p-4 sm:p-5">
                         <div className="mb-3 flex flex-wrap items-center gap-2">
                           <span className="rounded-full bg-[#e8f1ed] px-2 py-1 font-mono text-[11px] font-semibold text-[#006b4f]">
-                            #{rec.rank || i + 1}
+                            {i === 0 ? 'Selected' : `#${rec.rank}`}
                           </span>
                           <span className="rounded-full border border-[#d8d2c6] px-2 py-1 font-mono text-[11px] text-[#6d675e]">
-                            {Math.round(Number(rec.confidence) * 100)}% fit
+                            {Math.min(99, Math.max(1, Math.round(Number(rec.match_score || 0))))}% fit
+                          </span>
+                          <span className="rounded-full border border-[#d8d2c6] px-2 py-1 font-mono text-[11px] text-[#6d675e]">
+                            Safety {rec.safety.score}
                           </span>
                         </div>
-                        <Link href={`/skills/${rec.slug}`} className="text-lg font-semibold hover:text-[#006b4f]">
-                          {rec.skill}
+                        <Link href={`/skills/${rec.skill.slug}`} className="text-lg font-semibold hover:text-[#006b4f]">
+                          {rec.skill.name}
                         </Link>
                         <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[#5f5a52]">
-                          {rec.decision?.headline || rec.reasoning}
+                          {rec.decision?.headline || rec.recommendation_reasons[0] || rec.skill.description}
                         </p>
+                        <div className="mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-[8px] border border-[#e0dbd2] bg-[#e0dbd2] text-center">
+                          <div className="bg-[#fbfaf6] p-2">
+                            <p className="font-mono text-[11px] text-[#6d675e]">Audit</p>
+                            <p className="mt-1 font-mono text-sm font-semibold text-[#1d1b18]">{rec.audit.audit_score}/100</p>
+                          </div>
+                          <div className="bg-[#fbfaf6] p-2">
+                            <p className="font-mono text-[11px] text-[#6d675e]">Target</p>
+                            <p className="mt-1 truncate font-mono text-sm font-semibold text-[#1d1b18]">{rec.install_plan.label}</p>
+                          </div>
+                        </div>
                         <div className="mt-4 break-all rounded-[8px] border border-[#e0dbd2] bg-[#fbfaf6] p-2 font-mono text-[11px] text-[#6d675e]">
-                          {rec.install}
+                          {rec.install_plan.value}
                         </div>
                         <div className="mt-3 grid gap-2 sm:grid-cols-3">
                           <button
-                            onClick={() => copyToClipboard(rec.install)}
+                            onClick={() => copyToClipboard(rec.install_plan.value)}
                             className="rounded-[8px] bg-[#1d1b18] px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-85"
                           >
-                            {copiedCmd === rec.install ? 'Copied!' : 'Copy install'}
+                            {copiedCmd === rec.install_plan.value ? 'Copied!' : 'Copy install'}
                           </button>
                           <Link
-                            href={rec.urls?.install_api || `/api/skills/${rec.slug}/install`}
+                            href={rec.urls.install_api || `/api/skills/${rec.skill.slug}/install`}
                             className="rounded-[8px] border border-[#d8d2c6] px-3 py-2 text-center text-xs font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
                           >
                             Install API
                           </Link>
                           <Link
-                            href={`/skills/${rec.slug}`}
+                            href={`/skills/${rec.skill.slug}`}
                             className="rounded-[8px] border border-[#d8d2c6] px-3 py-2 text-center text-xs font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
                           >
                             Details

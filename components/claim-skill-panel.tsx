@@ -95,9 +95,9 @@ export function ClaimSkillPanel({ skillSlug, repository, approvedClaim }: ClaimS
   if (approvedClaim) {
     return (
       <div className="border border-border p-5">
-        <h3 className="font-display text-lg font-semibold">Claimed by owner</h3>
+        <h3 className="font-display text-lg font-semibold">Verified maintainer</h3>
         <p className="mt-2 text-xs leading-relaxed text-secondary">
-          This skill has an approved owner claim from @{approvedClaim.github_username}.
+          This skill has an approved maintainer claim from @{approvedClaim.github_username}.
         </p>
         {approvedClaim.evidence_url && (
           <a
@@ -115,9 +115,9 @@ export function ClaimSkillPanel({ skillSlug, repository, approvedClaim }: ClaimS
 
   return (
     <div className="border border-border p-5">
-      <h3 className="font-display text-lg font-semibold">Claim this skill</h3>
+      <h3 className="font-display text-lg font-semibold">Are you the maintainer?</h3>
       <p className="mt-2 text-xs leading-relaxed text-secondary">
-        Project owners can request ownership review. Approved claims unlock a stronger trust signal.
+        Claim this listing to add a verified owner signal and make future launch, install, and audit updates easier to trust.
       </p>
 
       {existingClaim && !open ? (
@@ -132,7 +132,7 @@ export function ClaimSkillPanel({ skillSlug, repository, approvedClaim }: ClaimS
           onClick={openPanel}
           className="mt-4 w-full border border-border px-3 py-2 text-sm transition-colors hover:border-foreground"
         >
-          {hasUser ? 'Start claim' : 'Sign in to claim'}
+          {hasUser ? 'Verify maintainer claim' : 'Sign in to claim'}
         </button>
       ) : (
         <div className="mt-4 space-y-3">
