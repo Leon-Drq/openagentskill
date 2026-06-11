@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils'
 
 const primaryNavItems = [
   { href: '/skills', labelKey: 'skills' },
+  { href: '/tasks', label: 'Tasks' },
   { href: '/skill-packs', label: 'Packs' },
   { href: '/compare', label: 'Compare' },
   { href: '/api-docs', labelKey: 'apiDocs' },
@@ -27,6 +28,19 @@ const agentItems: Array<{
   icon: LucideIcon
   prefetch?: false
 }> = [
+  {
+    href: '/agent',
+    label: 'Agent Entry',
+    description: 'Start here',
+    icon: Bot,
+  },
+  {
+    href: '/api/agent/tasks',
+    label: 'Tasks API',
+    description: 'Jobs to routes',
+    icon: Braces,
+    prefetch: false,
+  },
   {
     href: '/api-docs#agent-resolve',
     label: 'Resolve API',
@@ -44,6 +58,20 @@ const agentItems: Array<{
     label: 'Manifest',
     description: 'Machine-readable contract',
     icon: FileJson2,
+    prefetch: false,
+  },
+  {
+    href: '/openapi.json',
+    label: 'OpenAPI',
+    description: 'Tool schema',
+    icon: FileJson2,
+    prefetch: false,
+  },
+  {
+    href: '/api/agent/discovery',
+    label: 'Discovery',
+    description: 'GitHub indexer status',
+    icon: Activity,
     prefetch: false,
   },
   {

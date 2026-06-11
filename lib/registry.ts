@@ -259,24 +259,38 @@ export function toRegistrySkill(skill: SkillRecord, eventStats?: SkillEventStats
 export function buildInstallHandoff(skill: SkillRecord) {
   const install = getSkillInstallCommand(skill)
   const targets = getSkillInstallTargets(skill)
+  const detailUrl = getSkillUrl(skill.slug)
 
   return {
     skill: {
       slug: skill.slug,
       name: skill.name,
+      description: skill.description,
       repository: skill.repository,
     },
     recommended_command: install,
     install_targets: targets,
     agent_prompt:
-      `Use the ${skill.name} skill for this task. Review ${getSkillUrl(skill.slug)} first, then install with: ${install}`,
+      `Install the "${skill.name}" agent skill only after reviewing the OpenAgentSkill profile and source repository. Start with ${detailUrl}, inspect the trust and audit notes, then use the recommended install handoff: ${install}. After installation, summarize changed files, required setup, and a minimal verification result before using the skill for real work.`,
     safety_checklist: [
       'Review the repository and license before running third-party code.',
       'Prefer a sandbox or isolated project when testing a new skill.',
       'Start with the recommended command, then inspect generated files before committing changes.',
+      'Do not execute external side effects, payments, account changes, or credentialed actions without explicit user approval.',
+    ],
+    verification_steps: [
+      'Open the skill documentation or SKILL.md and identify required setup.',
+      'Run the smallest safe example for the target task.',
+      'Confirm outputs match the task before allowing broader agent use.',
+      'Record any missing credentials, policy risks, or manual approvals needed.',
+    ],
+    do_not_auto_install_when: [
+      'The repository or license cannot be reviewed.',
+      'The skill requires broad credentials or production account access.',
+      'The task involves regulated, private, or high-impact data without user approval.',
     ],
     urls: {
-      web: getSkillUrl(skill.slug),
+      web: detailUrl,
       api: getAgentSkillApiUrl(skill.slug),
       install_api: getSkillInstallApiUrl(skill.slug),
       repository: skill.repository,

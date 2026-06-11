@@ -44,6 +44,9 @@ const SEARCH_QUERIES: Array<{ q: string; sort: 'stars' | 'updated' }> = [
   // ── Skill-native repos ─────────────────────────────────────────────────────
   { q: 'topic:agent-skills stars:>50',     sort: 'stars'   },
   { q: '"agent skill" stars:>50',          sort: 'updated' },
+  { q: '"Codex skill" stars:>50',          sort: 'updated' },
+  { q: '"Claude Code" "skill" stars:>50',  sort: 'updated' },
+  { q: '"Cursor rules" "agent" stars:>50', sort: 'updated' },
   { q: 'topic:ai-agents stars:>1000',      sort: 'stars'   },
   { q: 'topic:llm-agent stars:>1000',      sort: 'stars'   },
   { q: '"agent framework" stars:>1000',    sort: 'stars'   },

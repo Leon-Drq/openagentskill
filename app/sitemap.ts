@@ -9,6 +9,7 @@ import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
 import { AGENT_PROFILES, OFFICIAL_CREATORS } from '@/lib/seo/growth-directories'
 import { SKILL_PACKS } from '@/lib/skill-packs'
 import { USE_CASES } from '@/lib/use-cases'
+import { AGENT_TASKS } from '@/lib/agent-tasks'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.openagentskill.com'
@@ -17,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
     { url: `${baseUrl}/skills`, lastModified: new Date(), changeFrequency: 'hourly', priority: 0.9 },
     { url: `${baseUrl}/agent-skill`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/agent`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.93 },
     { url: `${baseUrl}/agent-skills-directory`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/agent-skills-registry`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.92 },
     { url: `${baseUrl}/best`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.92 },
@@ -26,6 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/official`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/agents`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/use-cases`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/tasks`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.91 },
     { url: `${baseUrl}/rankings`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/reports/weekly`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.85 },
     { url: `${baseUrl}/reports/monthly`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.86 },
@@ -96,6 +99,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.85,
   }))
 
+  const taskPages: MetadataRoute.Sitemap = AGENT_TASKS.map((task) => ({
+    url: `${baseUrl}/tasks/${task.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'daily',
+    priority: 0.86,
+  }))
+
   const collectionPages: MetadataRoute.Sitemap = SKILL_STACKS.map((stack) => ({
     url: `${baseUrl}/collections/${stack.slug}`,
     lastModified: new Date(),
@@ -156,6 +166,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticPages,
     ...localizedPages,
     ...useCasePages,
+    ...taskPages,
     ...bestPages,
     ...officialPages,
     ...agentPages,

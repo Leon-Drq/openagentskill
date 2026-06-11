@@ -32,6 +32,12 @@ ${payload.agent_prompt}
 Safety checklist:
 ${payload.safety_checklist.map((item) => `- ${item}`).join('\n')}
 
+Verification steps:
+${payload.verification_steps.map((item) => `- ${item}`).join('\n')}
+
+Do not auto-install when:
+${payload.do_not_auto_install_when.map((item) => `- ${item}`).join('\n')}
+
 Detail page:
 ${payload.urls.web}`,
         {

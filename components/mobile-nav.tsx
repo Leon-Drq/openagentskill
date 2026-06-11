@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils'
 
 const navItems = [
   { href: '/skills', labelKey: 'skills' },
+  { href: '/tasks', label: 'Tasks' },
   { href: '/skill-packs', label: 'Packs' },
   { href: '/compare', label: 'Compare' },
   { href: '/api-docs', labelKey: 'apiDocs' },
@@ -26,6 +27,19 @@ const agentItems: Array<{
   icon: LucideIcon
   prefetch?: false
 }> = [
+  {
+    href: '/agent',
+    label: 'Agent Entry',
+    description: 'Low-noise registry map',
+    icon: Braces,
+  },
+  {
+    href: '/api/agent/tasks',
+    label: 'Tasks API',
+    description: 'Task catalog for agents',
+    icon: Braces,
+    prefetch: false,
+  },
   {
     href: '/api-docs#agent-resolve',
     label: 'Resolve API',
@@ -43,6 +57,13 @@ const agentItems: Array<{
     label: 'Agent Manifest',
     description: 'Machine-readable registry contract',
     icon: FileJson2,
+    prefetch: false,
+  },
+  {
+    href: '/api/agent/discovery',
+    label: 'GitHub Discovery',
+    description: 'Auto-import status',
+    icon: Activity,
     prefetch: false,
   },
   {

@@ -45,12 +45,14 @@ export function SiteFooter() {
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Explore</h2>
               <div className="mt-4 grid gap-2 text-secondary">
                 <Link href="/skills" className="hover:text-foreground">{t.nav.skills}</Link>
+                <Link href="/tasks" className="hover:text-foreground">Tasks</Link>
                 <Link href="/skill-packs" className="hover:text-foreground">Skill Packs</Link>
                 <Link href="/best" className="hover:text-foreground">Best Skills</Link>
                 <Link href="/trending" className="hover:text-foreground">Trending</Link>
                 <Link href="/collections" className="hover:text-foreground">Stacks</Link>
                 <Link href="/use-cases" className="hover:text-foreground">Use Cases</Link>
                 <Link href="/agents" className="hover:text-foreground">Agents</Link>
+                <Link href="/agent" className="hover:text-foreground">Agent Entry</Link>
               </div>
             </div>
 
@@ -71,6 +73,8 @@ export function SiteFooter() {
               <div className="mt-4 grid gap-2 text-secondary">
                 <Link href="/docs" className="hover:text-foreground">{t.nav.docs}</Link>
                 <Link href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</Link>
+                <Link href="/llms.txt" prefetch={false} className="hover:text-foreground">llms.txt</Link>
+                <Link href="/openapi.json" prefetch={false} className="hover:text-foreground">OpenAPI</Link>
                 <Link href="/cli" className="hover:text-foreground">CLI</Link>
                 <Link href="/x-kit" className="hover:text-foreground">X Growth Kit</Link>
                 <Link href="/submit" className="hover:text-foreground">{t.nav.submit}</Link>

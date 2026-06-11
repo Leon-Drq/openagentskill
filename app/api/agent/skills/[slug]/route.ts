@@ -126,7 +126,7 @@ Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
       version: skill.version,
       license: skill.license,
       urls: {
-        web: `https://openagentskill.com/skills/${skill.slug}`,
+        web: `https://www.openagentskill.com/skills/${skill.slug}`,
         repository: skill.repository,
         api: `/api/agent/skills/${skill.slug}`,
         install_api: `/api/skills/${skill.slug}/install`,

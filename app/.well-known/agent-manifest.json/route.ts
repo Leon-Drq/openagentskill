@@ -15,6 +15,38 @@ export async function GET() {
     api_version: '1.0',
 
     endpoints: {
+      agent_entry: {
+        url: '/agent',
+        method: 'GET',
+        description: 'Low-noise agent entry page with registry flow, task routes, key APIs, and GitHub discovery status.',
+      },
+      llms: {
+        url: '/llms.txt',
+        method: 'GET',
+        description: 'Plain text instructions for LLMs and browser agents using OpenAgentSkill.',
+      },
+      openapi: {
+        url: '/openapi.json',
+        method: 'GET',
+        description: 'OpenAPI 3.1 schema for agent tooling and API clients.',
+      },
+      tasks: {
+        url: '/api/agent/tasks',
+        method: 'GET',
+        description: 'Task-first catalog. Use when the agent knows the job but not the right skill.',
+        params: {
+          format: 'Response format: json (default) or text (optional)',
+        },
+      },
+      task_detail: {
+        url: '/api/agent/tasks/{slug}',
+        method: 'GET',
+        description: 'Get one task definition, ranked skills, decision notes, and Resolve API handoff.',
+        params: {
+          limit: 'Max ranked skills, default 5, max 10 (optional)',
+          format: 'Response format: json (default) or text (optional)',
+        },
+      },
       search: {
         url: '/api/agent/skills',
         method: 'GET',
@@ -71,6 +103,11 @@ export async function GET() {
         method: 'GET',
         description: 'Run fixed regression checks for task-to-skill recommendation quality.',
       },
+      github_discovery: {
+        url: '/api/agent/discovery',
+        method: 'GET',
+        description: 'Public-safe status for the GitHub auto-discovery pipeline, including schedule and import thresholds.',
+      },
       install: {
         url: '/api/skills/{slug}/install',
         method: 'GET',
@@ -108,6 +145,7 @@ export async function GET() {
       search: '100 requests/hour',
       recommend: '50 requests/hour',
       resolve: '50 requests/hour',
+      tasks: '100 requests/hour',
       submit: '10 requests/hour',
       activity: '100 requests/hour',
     },
@@ -129,6 +167,7 @@ export async function GET() {
     contribution: {
       humans: 'Submit skills via /submit or POST /api/skills/submit',
       agents: 'Submit skills via POST /api/skills/submit with source=agent',
+      github_auto_discovery: 'OpenAgentSkill also imports high-star skill-like GitHub repositories hourly through /api/indexer/run.',
       protocol: 'Follow OASP v0.1 standard for skill.json',
     },
 

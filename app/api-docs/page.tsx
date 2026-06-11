@@ -81,7 +81,10 @@ export default function APIDocsPage() {
             {[
               { method: 'GET', path: '/api/agent/skills' },
               { method: 'GET', path: '/api/agent/skills/{slug}' },
+              { method: 'GET', path: '/api/agent/tasks' },
+              { method: 'GET', path: '/api/agent/tasks/{slug}' },
               { method: 'POST', path: '/api/agent/resolve' },
+              { method: 'GET', path: '/api/agent/discovery' },
               { method: 'GET', path: '/api/agent/recommend' },
               { method: 'GET', path: '/api/agent/evals' },
               { method: 'GET', path: '/api/skills/search' },
@@ -152,6 +155,48 @@ export default function APIDocsPage() {
               </div>
               <div className="mt-4 bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
                 <code>{'GET /api/agent/resolve?task=scrape+pricing+pages&agent=codex&max_risk=medium&format=text'}</code>
+              </div>
+            </div>
+          </div>
+
+          <div className="border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/agent/tasks'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Task-first catalog for agents. Use it when the agent knows the job to be done but has not selected a skill yet.'}
+              </p>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <code>{'GET /api/agent/tasks?format=text'}</code>
+              </div>
+            </div>
+          </div>
+
+          <div className="border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/agent/discovery'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Public-safe status for the GitHub auto-discovery pipeline. Shows schedule, filters, thresholds, and recent run summaries.'}
+              </p>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <code>{'GET /api/agent/discovery'}</code>
               </div>
             </div>
           </div>
