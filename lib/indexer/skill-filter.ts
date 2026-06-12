@@ -39,6 +39,12 @@ const POSITIVE_SIGNALS: Array<{ label: string; pattern: RegExp; weight: number }
   { label: 'knowledge-search', pattern: /\b(semantic[-_\s]?search|vector[-_\s]?(search|database)|knowledge[-_\s]?(base|graph|agent))\b/i, weight: 3 },
   { label: 'content-workflow', pattern: /\b(content[-_\s]?(generation|automation|workflow)|copywriting[-_\s]?agent|markdown[-_\s]?(agent|automation))\b/i, weight: 3 },
   { label: 'security-workflow', pattern: /\b(security[-_\s]?(automation|agent|scanner)|vulnerability[-_\s]?(scanner|analysis)|secret[-_\s]?scanning)\b/i, weight: 3 },
+  { label: 'finance-workflow', pattern: /\b(quant(itative)?[-_\s]?finance|algorithmic[-_\s]?trading|trading[-_\s]?bot|backtesting|stock[-_\s]?market|financial[-_\s]?data|sec[-_\s]?filings|portfolio[-_\s]?optimization|risk[-_\s]?model|market[-_\s]?data)\b/i, weight: 3 },
+  { label: 'research-workflow', pattern: /\b(deep[-_\s]?research|research[-_\s]?agent|market[-_\s]?research|literature[-_\s]?review|arxiv|paper[-_\s]?(search|summarization))\b/i, weight: 3 },
+  { label: 'business-automation', pattern: /\b(e[-_\s]?commerce|price[-_\s]?(tracking|monitoring)|lead[-_\s]?generation|sales[-_\s]?automation|business[-_\s]?intelligence)\b/i, weight: 3 },
+  { label: 'devops-workflow', pattern: /\b(devops|kubernetes|terraform|observability|incident[-_\s]?response|ci[-_\s]?cd|infrastructure[-_\s]?automation)\b/i, weight: 3 },
+  { label: 'ml-media-workflow', pattern: /\b(mlops|machine[-_\s]?learning|image[-_\s]?generation|video[-_\s]?processing|speech[-_\s]?recognition|text[-_\s]?to[-_\s]?speech)\b/i, weight: 3 },
+  { label: 'science-workflow', pattern: /\b(geospatial|gis|scientific[-_\s]?computing|bioinformatics|healthcare[-_\s]?data|health[-_\s]?data)\b/i, weight: 3 },
 ]
 
 const COLLECTION_PATTERNS = [
@@ -94,7 +100,7 @@ export function evaluateSkillCandidate(candidate: SkillCandidateProfile): SkillC
     score += 1
   }
 
-  if (candidate.topics?.some((topic) => /skill|agent|automation|rag|crawler|scraping|browser|document|pdf|ocr|testing|security|semantic-search|vector/i.test(topic))) {
+  if (candidate.topics?.some((topic) => /skill|agent|automation|rag|crawler|scraping|browser|document|pdf|ocr|testing|security|semantic-search|vector|finance|quant|trading|backtesting|portfolio|research|arxiv|etl|analytics|business-intelligence|ecommerce|sales|devops|kubernetes|terraform|observability|mlops|geospatial|bioinformatics/i.test(topic))) {
     score += 1
   }
 

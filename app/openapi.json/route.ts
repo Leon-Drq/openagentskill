@@ -86,7 +86,7 @@ export async function GET() {
         '/api/agent/discovery': {
           get: {
             summary: 'Public-safe GitHub auto-discovery status',
-            responses: { '200': { description: 'Discovery pipeline status' } },
+            responses: { '200': { description: 'Discovery pipeline status, filters, schedule, and cross-domain query coverage' } },
           },
         },
       },

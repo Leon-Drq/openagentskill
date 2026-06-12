@@ -9,6 +9,7 @@ interface HighStarQuery {
   tags: string[]
   frameworks: string[]
   sort?: SearchSort
+  domain?: string
 }
 
 interface GitHubSearchRepo {
@@ -54,6 +55,8 @@ export interface BulkImportSummary {
   filterMode: 'skills-only'
   targetNew: number
   minStars: number
+  queryPoolSize: number
+  domainsCovered: string[]
   searchRequests: number
   candidatesFound: number
   skippedExisting: number
@@ -68,7 +71,7 @@ const GITHUB_API_BASE = 'https://api.github.com'
 const DEFAULT_TARGET_NEW_PER_RUN = 25
 const DEFAULT_TOKEN_SEARCH_REQUESTS = 30
 
-const HIGH_STAR_QUERIES: HighStarQuery[] = [
+const CORE_HIGH_STAR_QUERIES: HighStarQuery[] = [
   {
     q: 'topic:ai-agents',
     category: 'agent-frameworks',
@@ -318,6 +321,494 @@ const HIGH_STAR_QUERIES: HighStarQuery[] = [
   },
 ]
 
+const DOMAIN_QUERY_GROUPS: Array<{
+  key: string
+  label: string
+  description: string
+  queries: HighStarQuery[]
+}> = [
+  {
+    key: 'finance',
+    label: 'Finance, quant, trading, and filings',
+    description: 'Financial data, quant research, backtesting, portfolio analysis, SEC filings, and risk workflows.',
+    queries: [
+      {
+        q: 'topic:quantitative-finance',
+        category: 'finance',
+        tags: ['finance', 'quant', 'research'],
+        frameworks: ['Finance'],
+      },
+      {
+        q: 'topic:algorithmic-trading',
+        category: 'finance',
+        tags: ['finance', 'trading', 'automation'],
+        frameworks: ['Trading'],
+      },
+      {
+        q: 'topic:backtesting',
+        category: 'finance',
+        tags: ['finance', 'backtesting', 'analysis'],
+        frameworks: ['Backtesting'],
+      },
+      {
+        q: 'topic:stock-market',
+        category: 'finance',
+        tags: ['finance', 'stocks', 'market-data'],
+        frameworks: ['Market Data'],
+      },
+      {
+        q: 'topic:portfolio-optimization',
+        category: 'finance',
+        tags: ['finance', 'portfolio', 'optimization'],
+        frameworks: ['Portfolio Analysis'],
+      },
+      {
+        q: 'topic:trading-bot',
+        category: 'finance',
+        tags: ['finance', 'trading-bot', 'automation'],
+        frameworks: ['Trading Bot'],
+      },
+      {
+        q: '"financial data"',
+        category: 'finance',
+        tags: ['finance', 'financial-data', 'analysis'],
+        frameworks: ['Financial Data'],
+      },
+      {
+        q: '"SEC filings"',
+        category: 'finance',
+        tags: ['finance', 'sec-filings', 'document-analysis'],
+        frameworks: ['SEC Filings'],
+      },
+      {
+        q: '"risk model" finance',
+        category: 'finance',
+        tags: ['finance', 'risk', 'analysis'],
+        frameworks: ['Risk Analysis'],
+        sort: 'updated',
+      },
+      {
+        q: 'topic:openbb',
+        category: 'finance',
+        tags: ['finance', 'market-data', 'research'],
+        frameworks: ['OpenBB'],
+      },
+    ],
+  },
+  {
+    key: 'research',
+    label: 'Research and intelligence',
+    description: 'Deep research, paper search, literature review, market research, and knowledge synthesis workflows.',
+    queries: [
+      {
+        q: 'topic:research-agent',
+        category: 'research',
+        tags: ['research', 'agent'],
+        frameworks: ['Research Agent'],
+      },
+      {
+        q: 'topic:market-research',
+        category: 'research',
+        tags: ['market-research', 'analysis'],
+        frameworks: ['Market Research'],
+      },
+      {
+        q: 'topic:arxiv',
+        category: 'research',
+        tags: ['research', 'papers', 'arxiv'],
+        frameworks: ['Research'],
+      },
+      {
+        q: 'topic:literature-review',
+        category: 'research',
+        tags: ['research', 'literature-review'],
+        frameworks: ['Research'],
+      },
+      {
+        q: '"deep research" agent',
+        category: 'research',
+        tags: ['deep-research', 'agent', 'research'],
+        frameworks: ['Research Agent'],
+        sort: 'updated',
+      },
+    ],
+  },
+  {
+    key: 'data',
+    label: 'Data analysis, BI, and pipelines',
+    description: 'Data analysis, notebooks, ETL, SQL, dashboards, CSV workflows, and business intelligence.',
+    queries: [
+      {
+        q: 'topic:data-analysis',
+        category: 'data-analysis',
+        tags: ['data-analysis', 'analytics'],
+        frameworks: ['Data Analysis'],
+      },
+      {
+        q: 'topic:data-pipeline',
+        category: 'data-analysis',
+        tags: ['data-pipeline', 'automation'],
+        frameworks: ['Data Pipeline'],
+      },
+      {
+        q: 'topic:data-visualization',
+        category: 'data-analysis',
+        tags: ['data-visualization', 'analytics'],
+        frameworks: ['Data Visualization'],
+      },
+      {
+        q: 'topic:business-intelligence',
+        category: 'data-analysis',
+        tags: ['business-intelligence', 'analytics'],
+        frameworks: ['BI'],
+      },
+      {
+        q: 'topic:etl',
+        category: 'data-analysis',
+        tags: ['etl', 'data-pipeline'],
+        frameworks: ['ETL'],
+      },
+      {
+        q: 'topic:sql',
+        category: 'data-analysis',
+        tags: ['sql', 'data-analysis'],
+        frameworks: ['SQL'],
+      },
+      {
+        q: 'topic:notebook',
+        category: 'data-analysis',
+        tags: ['notebook', 'data-analysis'],
+        frameworks: ['Notebook'],
+      },
+      {
+        q: 'topic:csv',
+        category: 'data-analysis',
+        tags: ['csv', 'data-analysis'],
+        frameworks: ['CSV'],
+      },
+    ],
+  },
+  {
+    key: 'documents',
+    label: 'Documents, PDF, OCR, and extraction',
+    description: 'Document parsing, PDF extraction, OCR, invoices, forms, Markdown, and structured extraction.',
+    queries: [
+      {
+        q: 'topic:document-ai',
+        category: 'document-processing',
+        tags: ['document-ai', 'documents', 'extraction'],
+        frameworks: ['Document AI'],
+      },
+      {
+        q: 'topic:pdf',
+        category: 'document-processing',
+        tags: ['pdf', 'documents', 'extraction'],
+        frameworks: ['PDF'],
+      },
+      {
+        q: 'topic:ocr',
+        category: 'document-processing',
+        tags: ['ocr', 'documents', 'extraction'],
+        frameworks: ['OCR'],
+      },
+      {
+        q: '"document extraction"',
+        category: 'document-processing',
+        tags: ['documents', 'extraction'],
+        frameworks: ['Document Extraction'],
+      },
+      {
+        q: 'topic:invoice',
+        category: 'document-processing',
+        tags: ['invoice', 'documents', 'extraction'],
+        frameworks: ['Invoice'],
+      },
+      {
+        q: 'topic:markdown',
+        category: 'document-processing',
+        tags: ['markdown', 'documents'],
+        frameworks: ['Markdown'],
+      },
+    ],
+  },
+  {
+    key: 'browser-commerce',
+    label: 'Browser, commerce, and go-to-market automation',
+    description: 'Browser automation, scraping, price monitoring, ecommerce, lead generation, and sales workflows.',
+    queries: [
+      {
+        q: 'topic:browser-automation',
+        category: 'web-automation',
+        tags: ['browser', 'automation'],
+        frameworks: ['Browser Automation'],
+      },
+      {
+        q: 'topic:web-scraping',
+        category: 'web-automation',
+        tags: ['scraping', 'crawler'],
+        frameworks: ['Web Automation'],
+      },
+      {
+        q: 'topic:ecommerce',
+        category: 'commerce-automation',
+        tags: ['ecommerce', 'commerce', 'automation'],
+        frameworks: ['Commerce'],
+      },
+      {
+        q: '"price tracking"',
+        category: 'commerce-automation',
+        tags: ['price-tracking', 'monitoring', 'automation'],
+        frameworks: ['Price Monitoring'],
+      },
+      {
+        q: 'topic:lead-generation',
+        category: 'growth-automation',
+        tags: ['lead-generation', 'sales', 'automation'],
+        frameworks: ['Sales Automation'],
+      },
+      {
+        q: 'topic:sales-automation',
+        category: 'growth-automation',
+        tags: ['sales-automation', 'workflow'],
+        frameworks: ['Sales Automation'],
+      },
+    ],
+  },
+  {
+    key: 'security',
+    label: 'Security, compliance, and OSINT',
+    description: 'Security scanning, vulnerability analysis, secrets detection, OSINT, and compliance workflows.',
+    queries: [
+      {
+        q: 'topic:security-scanner',
+        category: 'security',
+        tags: ['security', 'scanner'],
+        frameworks: ['Security'],
+      },
+      {
+        q: 'topic:vulnerability-scanner',
+        category: 'security',
+        tags: ['security', 'vulnerability-scanner'],
+        frameworks: ['Security'],
+      },
+      {
+        q: 'topic:secret-scanning',
+        category: 'security',
+        tags: ['security', 'secret-scanning'],
+        frameworks: ['Security'],
+      },
+      {
+        q: 'topic:sast',
+        category: 'security',
+        tags: ['security', 'static-analysis'],
+        frameworks: ['SAST'],
+      },
+      {
+        q: 'topic:osint',
+        category: 'security',
+        tags: ['osint', 'research', 'security'],
+        frameworks: ['OSINT'],
+      },
+      {
+        q: 'topic:compliance',
+        category: 'security',
+        tags: ['compliance', 'security'],
+        frameworks: ['Compliance'],
+      },
+    ],
+  },
+  {
+    key: 'devops',
+    label: 'DevOps, cloud, and reliability',
+    description: 'Kubernetes, Terraform, CI/CD, observability, incident response, and infrastructure automation.',
+    queries: [
+      {
+        q: 'topic:devops',
+        category: 'devops',
+        tags: ['devops', 'automation'],
+        frameworks: ['DevOps'],
+      },
+      {
+        q: 'topic:kubernetes',
+        category: 'devops',
+        tags: ['kubernetes', 'devops'],
+        frameworks: ['Kubernetes'],
+      },
+      {
+        q: 'topic:terraform',
+        category: 'devops',
+        tags: ['terraform', 'infrastructure'],
+        frameworks: ['Terraform'],
+      },
+      {
+        q: 'topic:observability',
+        category: 'devops',
+        tags: ['observability', 'monitoring'],
+        frameworks: ['Observability'],
+      },
+      {
+        q: 'topic:incident-response',
+        category: 'devops',
+        tags: ['incident-response', 'reliability'],
+        frameworks: ['Incident Response'],
+      },
+      {
+        q: 'topic:ci-cd',
+        category: 'devops',
+        tags: ['ci-cd', 'automation'],
+        frameworks: ['CI/CD'],
+      },
+    ],
+  },
+  {
+    key: 'knowledge',
+    label: 'RAG, search, and knowledge systems',
+    description: 'RAG, semantic search, knowledge graphs, embeddings, reranking, and vector search workflows.',
+    queries: [
+      {
+        q: 'topic:rag',
+        category: 'rag-knowledge',
+        tags: ['rag', 'retrieval'],
+        frameworks: ['RAG'],
+      },
+      {
+        q: 'topic:semantic-search',
+        category: 'rag-knowledge',
+        tags: ['semantic-search', 'retrieval', 'knowledge'],
+        frameworks: ['Semantic Search'],
+      },
+      {
+        q: 'topic:knowledge-graph',
+        category: 'rag-knowledge',
+        tags: ['knowledge-graph', 'retrieval'],
+        frameworks: ['Knowledge Graph'],
+      },
+      {
+        q: 'topic:embeddings',
+        category: 'rag-knowledge',
+        tags: ['embeddings', 'retrieval'],
+        frameworks: ['Embeddings'],
+      },
+      {
+        q: 'topic:reranking',
+        category: 'rag-knowledge',
+        tags: ['reranking', 'search'],
+        frameworks: ['Reranking'],
+      },
+      {
+        q: 'topic:search-engine',
+        category: 'rag-knowledge',
+        tags: ['search-engine', 'retrieval'],
+        frameworks: ['Search'],
+      },
+    ],
+  },
+  {
+    key: 'ml-media',
+    label: 'ML, media, voice, and creative workflows',
+    description: 'ML pipelines, image/video processing, speech recognition, text-to-speech, and creative automation.',
+    queries: [
+      {
+        q: 'topic:mlops',
+        category: 'ml-automation',
+        tags: ['mlops', 'machine-learning'],
+        frameworks: ['MLOps'],
+      },
+      {
+        q: 'topic:machine-learning',
+        category: 'ml-automation',
+        tags: ['machine-learning', 'automation'],
+        frameworks: ['Machine Learning'],
+      },
+      {
+        q: 'topic:image-generation',
+        category: 'media-automation',
+        tags: ['image-generation', 'media'],
+        frameworks: ['Image Generation'],
+      },
+      {
+        q: 'topic:video-processing',
+        category: 'media-automation',
+        tags: ['video-processing', 'media'],
+        frameworks: ['Video'],
+      },
+      {
+        q: 'topic:speech-recognition',
+        category: 'media-automation',
+        tags: ['speech-recognition', 'voice'],
+        frameworks: ['Speech'],
+      },
+      {
+        q: 'topic:text-to-speech',
+        category: 'media-automation',
+        tags: ['text-to-speech', 'voice'],
+        frameworks: ['Voice'],
+      },
+    ],
+  },
+  {
+    key: 'geo-science',
+    label: 'Geospatial, science, and health data',
+    description: 'Geospatial analysis, GIS, scientific computing, bioinformatics, and health-data tooling.',
+    queries: [
+      {
+        q: 'topic:geospatial',
+        category: 'geo-science',
+        tags: ['geospatial', 'analysis'],
+        frameworks: ['Geospatial'],
+      },
+      {
+        q: 'topic:gis',
+        category: 'geo-science',
+        tags: ['gis', 'geospatial'],
+        frameworks: ['GIS'],
+      },
+      {
+        q: 'topic:scientific-computing',
+        category: 'geo-science',
+        tags: ['scientific-computing', 'analysis'],
+        frameworks: ['Scientific Computing'],
+      },
+      {
+        q: 'topic:bioinformatics',
+        category: 'geo-science',
+        tags: ['bioinformatics', 'analysis'],
+        frameworks: ['Bioinformatics'],
+      },
+      {
+        q: 'topic:healthcare',
+        category: 'geo-science',
+        tags: ['healthcare', 'data-analysis'],
+        frameworks: ['Health Data'],
+      },
+    ],
+  },
+]
+
+export const HIGH_STAR_DISCOVERY_DOMAINS = DOMAIN_QUERY_GROUPS.map(
+  ({ key, label, description, queries }) => ({
+    key,
+    label,
+    description,
+    query_count: queries.length,
+  })
+)
+
+const DOMAIN_HIGH_STAR_QUERIES: HighStarQuery[] = DOMAIN_QUERY_GROUPS.flatMap((group) =>
+  group.queries.map((query) => ({
+    ...query,
+    domain: group.key,
+    tags: Array.from(new Set([...query.tags, group.key])),
+  }))
+)
+
+const HIGH_STAR_QUERIES: HighStarQuery[] = [
+  ...CORE_HIGH_STAR_QUERIES,
+  ...DOMAIN_HIGH_STAR_QUERIES,
+]
+
+export const HIGH_STAR_QUERY_POOL_SIZE = HIGH_STAR_QUERIES.length
+
 function githubHeaders() {
   return {
     Accept: 'application/vnd.github+json',
@@ -385,7 +876,7 @@ function buildSkill(repo: GitHubSearchRepo, query: HighStarQuery, evaluation: Sk
     slug: normalizeSlug(repo.full_name),
     name: titleFromRepo(repo.name),
     description,
-    long_description: `${description}\n\nImported by the skill-only GitHub discovery pipeline because it matches agent skill, automation, RAG, or developer-tool signals. Protocol-server projects are excluded from automated imports.`,
+    long_description: `${description}\n\nImported by the skill-only GitHub discovery pipeline because it matches agent skill, automation, domain workflow, RAG, document-processing, data, finance, security, or developer-tool signals. Protocol-server projects are excluded from automated imports.`,
     tagline: description,
     author_name: repo.owner.login,
     author_url: repo.owner.html_url,
@@ -460,10 +951,12 @@ async function searchGitHubRepos(
 function getSearchPlan(maxSearchRequests: number, pageSeed: number) {
   const plan: Array<{ query: HighStarQuery; page: number }> = []
   const maxPage = 10
+  const offset = pageSeed * maxSearchRequests
 
   for (let i = 0; i < maxSearchRequests; i += 1) {
-    const queryIndex = (pageSeed + i) % HIGH_STAR_QUERIES.length
-    const page = 1 + (Math.floor((pageSeed + i) / HIGH_STAR_QUERIES.length) % maxPage)
+    const cursor = offset + i
+    const queryIndex = cursor % HIGH_STAR_QUERIES.length
+    const page = 1 + (Math.floor(cursor / HIGH_STAR_QUERIES.length) % maxPage)
     plan.push({ query: HIGH_STAR_QUERIES[queryIndex], page })
   }
 
@@ -505,10 +998,13 @@ export async function bulkImportHighStarSkills(
   const existingSlugs = new Set((existingRows || []).map((row) => row.slug as string))
   const seenSlugs = new Set(existingSlugs)
   const results: Array<{ repo: string; status: string; slug?: string; reason?: string }> = []
+  const domainsCovered = new Set<string>()
   const summary: BulkImportSummary = {
     filterMode: 'skills-only',
     targetNew,
     minStars,
+    queryPoolSize: HIGH_STAR_QUERIES.length,
+    domainsCovered: [],
     searchRequests: 0,
     candidatesFound: 0,
     skippedExisting: 0,
@@ -523,6 +1019,7 @@ export async function bulkImportHighStarSkills(
     if (summary.imported >= targetNew) break
 
     summary.searchRequests += 1
+    if (query.domain) domainsCovered.add(query.domain)
 
     let repos: GitHubSearchRepo[]
     try {
@@ -584,6 +1081,7 @@ export async function bulkImportHighStarSkills(
             stars: repo.stargazers_count,
             relevance_score: evaluation.score,
             relevance_signals: evaluation.signals,
+            domain: query.domain || 'core',
             query: query.q,
             page,
           },
@@ -607,6 +1105,8 @@ export async function bulkImportHighStarSkills(
     }
   }
 
+  summary.domainsCovered = Array.from(domainsCovered)
+
   await recordIndexerRun(supabase, serverSecret, {
     mode: 'bulk',
     status: summary.errors > 0 ? 'completed_with_errors' : 'completed',
@@ -627,6 +1127,9 @@ export async function bulkImportHighStarSkills(
     metadata: {
       page_seed: pageSeed,
       per_page: perPage,
+      query_pool_size: HIGH_STAR_QUERIES.length,
+      domains_covered: summary.domainsCovered,
+      discovery_domains: HIGH_STAR_DISCOVERY_DOMAINS,
     },
   })
 

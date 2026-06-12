@@ -66,6 +66,18 @@ const SEARCH_QUERIES: Array<{ q: string; sort: 'stars' | 'updated' }> = [
   { q: 'topic:web-scraping stars:>5000',   sort: 'stars'   },
   { q: 'topic:rag stars:>5000',            sort: 'stars'   },
   { q: '"ai tool" stars:>100',             sort: 'updated' },
+
+  // ── Domain capabilities that agents can install or call as reusable skills ─
+  { q: 'topic:quantitative-finance stars:>500', sort: 'stars' },
+  { q: 'topic:algorithmic-trading stars:>500',  sort: 'stars' },
+  { q: 'topic:backtesting stars:>500',          sort: 'stars' },
+  { q: '"SEC filings" stars:>500',              sort: 'stars' },
+  { q: 'topic:business-intelligence stars:>500', sort: 'stars' },
+  { q: 'topic:etl stars:>500',                  sort: 'stars' },
+  { q: 'topic:document-ai stars:>500',          sort: 'stars' },
+  { q: 'topic:vulnerability-scanner stars:>500', sort: 'stars' },
+  { q: 'topic:observability stars:>500',        sort: 'stars' },
+  { q: 'topic:geospatial stars:>500',           sort: 'stars' },
 ]
 
 /**

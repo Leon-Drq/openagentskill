@@ -110,13 +110,14 @@ Replace `crawl4ai` with the skill slug.
 
 ## Auto-Discovery
 
-The indexer scans GitHub for high-signal skill repositories and imports approved matches.
+The indexer scans GitHub for high-signal skill repositories and imports approved matches. It now rotates across cross-domain query groups so the catalog can expand beyond developer tools into finance, quant research, documents, data analysis, security, DevOps, RAG, browser automation, commerce, ML/media, and science workflows.
 
 Current import rules:
 
 - Minimum GitHub stars are controlled by `INDEXER_MIN_STARS`.
 - Per-run target is controlled by `INDEXER_RUN_TARGET`.
 - Search budget is controlled by `INDEXER_MAX_SEARCH_REQUESTS`.
+- Search windows rotate across domain query groups each hour, including finance and other vertical workflows.
 - MCP and Model Context Protocol repositories are excluded from automated imports.
 - Production indexer routes require `INDEXER_SECRET`.
 

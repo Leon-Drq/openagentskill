@@ -187,7 +187,7 @@ export default async function AgentPage() {
             <p className="mb-3 text-xs uppercase text-secondary">Auto-discovery</p>
             <h2 className="font-display text-2xl font-semibold">GitHub collection is already automated</h2>
             <p className="mt-3 text-sm leading-relaxed text-secondary">
-              Production cron calls the indexer hourly. It imports high-star skill-like GitHub projects, excludes MCP-only projects, records runs, and refreshes stars daily.
+              Production cron calls the indexer hourly. It imports high-star skill-like GitHub projects across finance, data, documents, security, DevOps, RAG, browser automation, and other domain workflows, excludes MCP-only projects, records runs, and refreshes stars daily.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">

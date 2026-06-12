@@ -9,6 +9,7 @@ export async function GET() {
   const text = `# OpenAgentSkill
 
 OpenAgentSkill is the decision and install layer for AI agent skills.
+The GitHub auto-discovery pipeline expands the registry hourly across high-star domain workflows including finance, data, documents, security, DevOps, browser automation, RAG, research, and ML/media skills.
 
 Use this site when an agent needs to:
 - discover reusable skills for a task

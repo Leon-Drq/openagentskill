@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createPublicClient } from '@/lib/supabase/public'
+import { HIGH_STAR_DISCOVERY_DOMAINS, HIGH_STAR_QUERY_POOL_SIZE } from '@/lib/indexer/high-star-import'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,6 +26,12 @@ async function getRecentRuns() {
     min_stars: run.min_stars,
     target_new: run.target_new,
     filter_mode: run.filter_mode,
+    domains_covered: run.metadata &&
+      typeof run.metadata === 'object' &&
+      !Array.isArray(run.metadata) &&
+      'domains_covered' in run.metadata
+      ? (run.metadata as Record<string, unknown>).domains_covered
+      : undefined,
   }))
 }
 
@@ -38,6 +45,8 @@ export async function GET() {
     target_new_per_run: targetNew,
     estimated_daily_capacity: targetNew * 24,
     max_search_requests_per_run: maxSearchRequests,
+    query_pool_size: HIGH_STAR_QUERY_POOL_SIZE,
+    domain_rotation: 'hourly rotating query windows',
     excludes: ['mcp-only projects', 'archived repositories', 'forks', 'low-relevance repositories'],
   }
   const schedule = {
@@ -56,6 +65,8 @@ export async function GET() {
     github_discovery: {
       status: 'active',
       source: 'github_search',
+      strategy: 'high-star, skills-only, cross-domain rotating discovery',
+      domains: HIGH_STAR_DISCOVERY_DOMAINS,
       filters,
       schedule,
     },

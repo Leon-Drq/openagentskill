@@ -193,7 +193,7 @@ export default function APIDocsPage() {
             </div>
             <div className="p-4 sm:p-6">
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
-                {'Public-safe status for the GitHub auto-discovery pipeline. Shows schedule, filters, thresholds, and recent run summaries.'}
+                {'Public-safe status for the GitHub auto-discovery pipeline. Shows schedule, filters, thresholds, cross-domain query coverage, and recent run summaries.'}
               </p>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
                 <code>{'GET /api/agent/discovery'}</code>
