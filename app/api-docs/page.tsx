@@ -198,6 +198,11 @@ export default function APIDocsPage() {
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
                 <code>{'GET /api/agent/discovery'}</code>
               </div>
+              <p className="mt-4 text-sm leading-relaxed text-secondary">
+                {'Private imports can target a domain such as '}
+                <code className="bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">{'domains:["finance"]'}</code>
+                {' for finance, quant, trading, market-data, portfolio, and filings skills.'}
+              </p>
             </div>
           </div>
 

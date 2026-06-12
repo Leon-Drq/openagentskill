@@ -127,6 +127,15 @@ Useful routes:
 # Run the indexer with automation auth
 POST /api/indexer/run
 
+# Run a finance/quant-only import
+POST /api/indexer/run
+{
+  "targetNew": 500,
+  "minStars": 500,
+  "domains": ["finance"],
+  "maxSearchRequests": 100
+}
+
 # Inspect recent import summaries
 GET /api/indexer/logs
 

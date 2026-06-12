@@ -67,6 +67,16 @@ export async function GET() {
       source: 'github_search',
       strategy: 'high-star, skills-only, cross-domain rotating discovery',
       domains: HIGH_STAR_DISCOVERY_DOMAINS,
+      targeted_import: {
+        supported: true,
+        private_endpoint: '/api/indexer/run',
+        example_body: {
+          targetNew: 500,
+          minStars: 500,
+          domains: ['finance'],
+          maxSearchRequests: 100,
+        },
+      },
       filters,
       schedule,
     },

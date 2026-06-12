@@ -9,6 +9,8 @@ export const maxDuration = 300
 
 const DEFAULT_TARGET_NEW_PER_RUN = 25
 const DEFAULT_TOKEN_SEARCH_REQUESTS = 30
+const DEFAULT_DOMAIN_SEARCH_REQUESTS = 80
+const MAX_TOKEN_SEARCH_REQUESTS = 100
 
 function isAuthorized(request: NextRequest): boolean {
   return isAutomationAuthorized(request)
@@ -44,21 +46,28 @@ export async function POST(request: NextRequest) {
     if (mode !== 'reviewed') {
       const targetNew = Math.min(Math.max(Number(body.targetNew) || DEFAULT_TARGET_NEW_PER_RUN, 1), 500)
       const minStars = Math.max(Number(body.minStars) || 500, 100)
+      const domains = Array.isArray(body.domains)
+        ? body.domains.map((domain: unknown) => String(domain)).filter(Boolean)
+        : body.domain
+          ? [String(body.domain)]
+          : []
+      const defaultSearchRequests = domains.length > 0 ? DEFAULT_DOMAIN_SEARCH_REQUESTS : DEFAULT_TOKEN_SEARCH_REQUESTS
       const maxSearchRequests = Math.min(
-        Math.max(Number(body.maxSearchRequests) || (process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10), 1),
-        process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10
+        Math.max(Number(body.maxSearchRequests) || (process.env.GITHUB_TOKEN ? defaultSearchRequests : 10), 1),
+        process.env.GITHUB_TOKEN ? MAX_TOKEN_SEARCH_REQUESTS : 10
       )
       const pageSeed =
         body.pageSeed === undefined ? undefined : Math.max(0, Number(body.pageSeed) || 0)
 
       console.log(
-        `[indexer] Skill-only high-star import — targetNew=${targetNew}, minStars=${minStars}, maxSearchRequests=${maxSearchRequests}`
+        `[indexer] Skill-only high-star import — targetNew=${targetNew}, minStars=${minStars}, maxSearchRequests=${maxSearchRequests}, domains=${domains.join(',') || 'all'}`
       )
       const result = await bulkImportHighStarSkills({
         targetNew,
         minStars,
         maxSearchRequests,
         pageSeed,
+        domains,
       })
       console.log('[indexer] Bulk import complete:', result.summary)
       return NextResponse.json({ success: true, mode: 'bulk', ...result })

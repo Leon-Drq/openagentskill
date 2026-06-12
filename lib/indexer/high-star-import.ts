@@ -49,12 +49,14 @@ export interface BulkImportOptions {
   maxSearchRequests?: number
   perPage?: number
   pageSeed?: number
+  domains?: string[]
 }
 
 export interface BulkImportSummary {
   filterMode: 'skills-only'
   targetNew: number
   minStars: number
+  requestedDomains: string[]
   queryPoolSize: number
   domainsCovered: string[]
   searchRequests: number
@@ -70,6 +72,8 @@ export interface BulkImportSummary {
 const GITHUB_API_BASE = 'https://api.github.com'
 const DEFAULT_TARGET_NEW_PER_RUN = 25
 const DEFAULT_TOKEN_SEARCH_REQUESTS = 30
+const DEFAULT_DOMAIN_SEARCH_REQUESTS = 80
+const MAX_TOKEN_SEARCH_REQUESTS = 100
 
 const CORE_HIGH_STAR_QUERIES: HighStarQuery[] = [
   {
@@ -392,6 +396,150 @@ const DOMAIN_QUERY_GROUPS: Array<{
         category: 'finance',
         tags: ['finance', 'market-data', 'research'],
         frameworks: ['OpenBB'],
+      },
+      {
+        q: 'topic:quant',
+        category: 'finance',
+        tags: ['finance', 'quant', 'analysis'],
+        frameworks: ['Quant'],
+      },
+      {
+        q: 'topic:finance',
+        category: 'finance',
+        tags: ['finance', 'analysis'],
+        frameworks: ['Finance'],
+      },
+      {
+        q: 'topic:fintech',
+        category: 'finance',
+        tags: ['finance', 'fintech'],
+        frameworks: ['Fintech'],
+      },
+      {
+        q: 'topic:trading',
+        category: 'finance',
+        tags: ['finance', 'trading'],
+        frameworks: ['Trading'],
+      },
+      {
+        q: 'topic:technical-analysis',
+        category: 'finance',
+        tags: ['finance', 'technical-analysis', 'trading'],
+        frameworks: ['Technical Analysis'],
+      },
+      {
+        q: 'topic:market-data',
+        category: 'finance',
+        tags: ['finance', 'market-data'],
+        frameworks: ['Market Data'],
+      },
+      {
+        q: 'topic:risk-management',
+        category: 'finance',
+        tags: ['finance', 'risk-management'],
+        frameworks: ['Risk Management'],
+      },
+      {
+        q: 'topic:portfolio-management',
+        category: 'finance',
+        tags: ['finance', 'portfolio-management'],
+        frameworks: ['Portfolio Management'],
+      },
+      {
+        q: 'topic:options-pricing',
+        category: 'finance',
+        tags: ['finance', 'options-pricing', 'quant'],
+        frameworks: ['Options Pricing'],
+      },
+      {
+        q: 'topic:financial-machine-learning',
+        category: 'finance',
+        tags: ['finance', 'machine-learning', 'quant'],
+        frameworks: ['Financial ML'],
+      },
+      {
+        q: '"portfolio management"',
+        category: 'finance',
+        tags: ['finance', 'portfolio-management'],
+        frameworks: ['Portfolio Management'],
+      },
+      {
+        q: '"technical analysis" trading',
+        category: 'finance',
+        tags: ['finance', 'technical-analysis', 'trading'],
+        frameworks: ['Technical Analysis'],
+      },
+      {
+        q: '"options pricing"',
+        category: 'finance',
+        tags: ['finance', 'options-pricing', 'quant'],
+        frameworks: ['Options Pricing'],
+      },
+      {
+        q: '"financial machine learning"',
+        category: 'finance',
+        tags: ['finance', 'machine-learning', 'quant'],
+        frameworks: ['Financial ML'],
+      },
+      {
+        q: '"economic data"',
+        category: 'finance',
+        tags: ['finance', 'economic-data', 'analysis'],
+        frameworks: ['Economic Data'],
+      },
+      {
+        q: 'yfinance',
+        category: 'finance',
+        tags: ['finance', 'market-data', 'python'],
+        frameworks: ['yfinance'],
+      },
+      {
+        q: 'backtrader',
+        category: 'finance',
+        tags: ['finance', 'backtesting', 'trading'],
+        frameworks: ['Backtrader'],
+      },
+      {
+        q: 'zipline trading',
+        category: 'finance',
+        tags: ['finance', 'backtesting', 'trading'],
+        frameworks: ['Zipline'],
+      },
+      {
+        q: 'vectorbt',
+        category: 'finance',
+        tags: ['finance', 'backtesting', 'quant'],
+        frameworks: ['vectorbt'],
+      },
+      {
+        q: 'quantlib',
+        category: 'finance',
+        tags: ['finance', 'quant', 'risk-management'],
+        frameworks: ['QuantLib'],
+      },
+      {
+        q: 'freqtrade',
+        category: 'finance',
+        tags: ['finance', 'trading-bot', 'automation'],
+        frameworks: ['Freqtrade'],
+      },
+      {
+        q: 'ta-lib',
+        category: 'finance',
+        tags: ['finance', 'technical-analysis'],
+        frameworks: ['TA-Lib'],
+      },
+      {
+        q: 'topic:cryptocurrency topic:trading',
+        category: 'finance',
+        tags: ['finance', 'crypto', 'trading'],
+        frameworks: ['Crypto Trading'],
+      },
+      {
+        q: 'topic:defi topic:analytics',
+        category: 'finance',
+        tags: ['finance', 'defi', 'analytics'],
+        frameworks: ['DeFi Analytics'],
       },
     ],
   },
@@ -809,6 +957,30 @@ const HIGH_STAR_QUERIES: HighStarQuery[] = [
 
 export const HIGH_STAR_QUERY_POOL_SIZE = HIGH_STAR_QUERIES.length
 
+function normalizeRequestedDomains(domains?: string[]) {
+  return Array.from(
+    new Set(
+      (domains || [])
+        .map((domain) => domain.trim().toLowerCase())
+        .filter(Boolean)
+    )
+  )
+}
+
+function getQueryPoolForDomains(domains: string[]) {
+  if (domains.length === 0) return HIGH_STAR_QUERIES
+
+  const queryPool = HIGH_STAR_QUERIES.filter((query) =>
+    query.domain ? domains.includes(query.domain) : false
+  )
+
+  if (queryPool.length === 0) {
+    throw new Error(`No GitHub discovery queries configured for domains: ${domains.join(', ')}`)
+  }
+
+  return queryPool
+}
+
 function githubHeaders() {
   return {
     Accept: 'application/vnd.github+json',
@@ -948,16 +1120,16 @@ async function searchGitHubRepos(
   )
 }
 
-function getSearchPlan(maxSearchRequests: number, pageSeed: number) {
+function getSearchPlan(maxSearchRequests: number, pageSeed: number, queryPool: HighStarQuery[]) {
   const plan: Array<{ query: HighStarQuery; page: number }> = []
   const maxPage = 10
   const offset = pageSeed * maxSearchRequests
 
   for (let i = 0; i < maxSearchRequests; i += 1) {
     const cursor = offset + i
-    const queryIndex = cursor % HIGH_STAR_QUERIES.length
-    const page = 1 + (Math.floor(cursor / HIGH_STAR_QUERIES.length) % maxPage)
-    plan.push({ query: HIGH_STAR_QUERIES[queryIndex], page })
+    const queryIndex = cursor % queryPool.length
+    const page = 1 + (Math.floor(cursor / queryPool.length) % maxPage)
+    plan.push({ query: queryPool[queryIndex], page })
   }
 
   return plan
@@ -969,10 +1141,15 @@ export async function bulkImportHighStarSkills(
   const targetNew = clamp(Math.floor(options.targetNew || DEFAULT_TARGET_NEW_PER_RUN), 1, 500)
   const minStars = clamp(Math.floor(options.minStars || 500), 100, 1_000_000)
   const perPage = clamp(Math.floor(options.perPage || 100), 10, 100)
+  const requestedDomains = normalizeRequestedDomains(options.domains)
+  const queryPool = getQueryPoolForDomains(requestedDomains)
+  const defaultSearchRequests =
+    requestedDomains.length > 0 ? DEFAULT_DOMAIN_SEARCH_REQUESTS : DEFAULT_TOKEN_SEARCH_REQUESTS
+  const maxAllowedSearchRequests = process.env.GITHUB_TOKEN ? MAX_TOKEN_SEARCH_REQUESTS : 10
   const maxSearchRequests = clamp(
-    Math.floor(options.maxSearchRequests || (process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10)),
+    Math.floor(options.maxSearchRequests || (process.env.GITHUB_TOKEN ? defaultSearchRequests : 10)),
     1,
-    process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10
+    maxAllowedSearchRequests
   )
   const pageSeed = Math.max(
     0,
@@ -1003,7 +1180,8 @@ export async function bulkImportHighStarSkills(
     filterMode: 'skills-only',
     targetNew,
     minStars,
-    queryPoolSize: HIGH_STAR_QUERIES.length,
+    requestedDomains,
+    queryPoolSize: queryPool.length,
     domainsCovered: [],
     searchRequests: 0,
     candidatesFound: 0,
@@ -1015,7 +1193,7 @@ export async function bulkImportHighStarSkills(
     errors: 0,
   }
 
-  for (const { query, page } of getSearchPlan(maxSearchRequests, pageSeed)) {
+  for (const { query, page } of getSearchPlan(maxSearchRequests, pageSeed, queryPool)) {
     if (summary.imported >= targetNew) break
 
     summary.searchRequests += 1
@@ -1127,7 +1305,8 @@ export async function bulkImportHighStarSkills(
     metadata: {
       page_seed: pageSeed,
       per_page: perPage,
-      query_pool_size: HIGH_STAR_QUERIES.length,
+      requested_domains: requestedDomains,
+      query_pool_size: queryPool.length,
       domains_covered: summary.domainsCovered,
       discovery_domains: HIGH_STAR_DISCOVERY_DOMAINS,
     },
