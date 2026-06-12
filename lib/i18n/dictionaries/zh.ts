@@ -3,10 +3,15 @@ export default {
   nav: {
     home: '首页',
     skills: '技能',
+    tasks: '任务',
+    packs: '技能包',
+    compare: '对比',
     submit: '提交',
+    submitSkill: '提交技能',
     docs: '文档',
     apiDocs: 'API',
     activity: '动态',
+    forAgents: 'Agent 入口',
   },
   
   // Hero

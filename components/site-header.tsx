@@ -15,9 +15,9 @@ import { cn } from '@/lib/utils'
 
 const primaryNavItems = [
   { href: '/skills', labelKey: 'skills' },
-  { href: '/tasks', label: 'Tasks' },
-  { href: '/skill-packs', label: 'Packs' },
-  { href: '/compare', label: 'Compare' },
+  { href: '/tasks', labelKey: 'tasks' },
+  { href: '/skill-packs', labelKey: 'packs' },
+  { href: '/compare', labelKey: 'compare' },
   { href: '/api-docs', labelKey: 'apiDocs' },
   { href: '/docs', labelKey: 'docs' },
 ] as const
@@ -90,6 +90,7 @@ function isActivePath(pathname: string, href: string) {
 }
 
 function ForAgentsDropdown({ pathname }: { pathname: string }) {
+  const { t } = useI18n()
   const [open, setOpen] = useState(false)
   const active = pathname === '/cli'
 
@@ -111,7 +112,7 @@ function ForAgentsDropdown({ pathname }: { pathname: string }) {
         aria-expanded={open}
       >
         <Bot className="h-3.5 w-3.5" aria-hidden="true" />
-        For Agents
+        {t.nav.forAgents}
         <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-180')} aria-hidden="true" />
       </button>
 
@@ -179,7 +180,7 @@ export function SiteHeader() {
           <nav className="hidden h-full items-center gap-0.5 xl:flex" aria-label="Primary navigation">
             {primaryNavItems.map((item) => {
               const active = isActivePath(pathname, item.href)
-              const label = 'label' in item ? item.label : t.nav[item.labelKey]
+              const label = t.nav[item.labelKey]
 
               return (
                 <Link
@@ -205,7 +206,7 @@ export function SiteHeader() {
               className="flex h-9 shrink-0 items-center gap-2 rounded-[8px] border border-border bg-card/70 px-3 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
-              Submit Skill
+              {t.nav.submitSkill}
             </Link>
           </div>
 

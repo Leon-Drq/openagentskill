@@ -1,10 +1,16 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { usePathname } from 'next/navigation'
 import type { Locale } from './config'
 import { defaultLocale, isLocale } from './config'
 import en from './dictionaries/en'
 import zh from './dictionaries/zh'
+import ja from './dictionaries/ja'
+import ko from './dictionaries/ko'
+import es from './dictionaries/es'
+import de from './dictionaries/de'
+import fr from './dictionaries/fr'
 
 type DeepWiden<T> =
   T extends string ? string :
@@ -19,11 +25,11 @@ type Dictionary = DeepWiden<typeof en>
 const dictionaries: Record<Locale, Dictionary> = {
   en,
   zh,
-  ja: en,
-  ko: en,
-  es: en,
-  de: en,
-  fr: en,
+  ja,
+  ko,
+  es,
+  de,
+  fr,
 }
 
 function getLocaleFromPath(pathname: string): Locale | null {
@@ -41,11 +47,12 @@ interface I18nContextType {
 const I18nContext = createContext<I18nContextType | undefined>(undefined)
 
 export function I18nProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname()
   const [locale, setLocaleState] = useState<Locale>(defaultLocale)
 
-  // Load locale from localStorage on mount
+  // Keep locale synced with localized routes and browser preference.
   useEffect(() => {
-    const pathLocale = getLocaleFromPath(window.location.pathname)
+    const pathLocale = getLocaleFromPath(pathname || window.location.pathname)
     if (pathLocale) {
       setLocaleState(pathLocale)
       localStorage.setItem('locale', pathLocale)
@@ -58,7 +65,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       setLocaleState(savedLocale)
       document.documentElement.lang = savedLocale
     }
-  }, [])
+  }, [pathname])
 
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale)

@@ -3,10 +3,15 @@ export default {
   nav: {
     home: 'Home',
     skills: 'Skills',
+    tasks: 'Tasks',
+    packs: 'Packs',
+    compare: 'Compare',
     submit: 'Submit',
+    submitSkill: 'Submit Skill',
     docs: 'Docs',
     apiDocs: 'API',
     activity: 'Activity',
+    forAgents: 'For Agents',
   },
   
   // Hero
