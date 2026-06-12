@@ -46,7 +46,7 @@ export async function generateMetadata({
   const pageUrl = `https://www.openagentskill.com/skills/${slug}`
   const imageAlt = `${skill.name} - OpenAgentSkill`
   const image = {
-    url: `${pageUrl}/opengraph-image`,
+    url: `${pageUrl}/opengraph-image?v=2`,
     width: 1200,
     height: 630,
     alt: imageAlt,
@@ -70,7 +70,7 @@ export async function generateMetadata({
       description,
       images: [
         {
-          url: `${pageUrl}/twitter-image`,
+          url: `${pageUrl}/twitter-image?v=2`,
           alt: imageAlt,
         },
       ],

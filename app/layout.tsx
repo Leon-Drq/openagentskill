@@ -85,7 +85,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://www.openagentskill.com/opengraph-image',
+        url: 'https://www.openagentskill.com/opengraph-image?v=2',
         width: 1200,
         height: 630,
         alt: 'OpenAgentSkill — The Open Marketplace for AI Agent Skills',
@@ -99,7 +99,7 @@ export const metadata: Metadata = {
     description: 'Let your AI agent find and install the right skill automatically. Discover, compare, audit, and install reusable AI agent skills.',
     creator: '@openagentskill',
     site: '@openagentskill',
-    images: ['https://www.openagentskill.com/opengraph-image'],
+    images: ['https://www.openagentskill.com/opengraph-image?v=2'],
   },
   alternates: {
     canonical: 'https://www.openagentskill.com',

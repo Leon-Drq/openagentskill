@@ -31,7 +31,7 @@ export function StructuredData() {
     url: BASE_URL,
     logo: `${BASE_URL}/icon.svg`,
     description: 'OpenAgentSkill helps agents and builders discover, compare, audit, and install reusable AI agent skills.',
-    image: `${BASE_URL}/opengraph-image`,
+    image: `${BASE_URL}/opengraph-image?v=2`,
     foundingDate: '2026',
     sameAs: [
       'https://github.com/Leon-Drq/openagentskill',

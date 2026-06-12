@@ -47,7 +47,7 @@ export async function generateMetadata({
       type: 'website',
       images: [
         {
-          url: 'https://www.openagentskill.com/opengraph-image',
+          url: 'https://www.openagentskill.com/opengraph-image?v=2',
           width: 1200,
           height: 630,
           alt: page.title,
@@ -59,7 +59,7 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: page.title,
       description: page.description,
-      images: ['https://www.openagentskill.com/opengraph-image'],
+      images: ['https://www.openagentskill.com/opengraph-image?v=2'],
     },
   }
 }

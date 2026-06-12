@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'OpenAgentSkill Update',
     description: 'Launch notes, skill roundups, and practical guides for AI agent builders.',
-    images: ['/opengraph-image'],
+    images: ['/opengraph-image?v=2'],
   },
 }
 
