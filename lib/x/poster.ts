@@ -108,6 +108,9 @@ function inferUseCase(skill: XPostSkill) {
   if (/(browser|web|crawl|scrap|page|site|monitor)/.test(text)) {
     return 'you need an agent to browse, extract, or monitor web pages without building a scraper from scratch.'
   }
+  if (/(finance|stock|investment|market|equity|quant|trading|supply-chain|bottleneck|research)/.test(text)) {
+    return 'you want an agent to turn market noise into source-backed research, ranked candidates, and risk checks.'
+  }
   if (/\b(code|coding|developer|dev|github|claude|cursor|terminal|repo)\b/.test(text)) {
     return 'you want your coding agent to carry more repo context and ship repetitive changes faster.'
   }
