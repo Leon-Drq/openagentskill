@@ -239,11 +239,21 @@ function calculateRelevanceScore(skill: SkillRecord, task: string): number {
   const isGenericWebSkill = /\b(web-crawling|crawler|crawl|scraper|scrape|browser|playwright|puppeteer|html|markdown)\b/.test(fullSkillText)
   const isLLMWebSkill = /\b(llm-friendly|llm friendly|web crawler|web scraper|turn.*markdown|markdown)\b/.test(fullSkillText)
   const isPlatformSpecificExtractor = /\b(streaming|youtube|google play|google maps|app store|twitter|reddit|spotify|instagram|tiktok)\b/.test(fullSkillText)
+  const isFinanceTask = /\b(finance|financial|quant|trading|portfolio|markets?|stocks?|equity|crypto|filings?|edgar|sec filings?|investor|earnings|10-k|10-q|alpha|factor|backtest|risk model)\b/.test(normalizedTask)
+  const isFinanceSkill = /\b(finance|financial|quant|trading|portfolio|market-data|markets?|stocks?|equity|crypto|filings?|edgar|sec filing|investor|earnings|10-k|10-q|alpha|factor|backtest|risk model)\b/.test(fullSkillText)
+  const isSecurityOnlySkill = /\b(security|vulnerability|scanner|nuclei|pentest|cve|sast|exploit|secret scanning)\b/.test(fullSkillText) && !isFinanceSkill
+  const isSportsTask = /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(normalizedTask)
+  const isSportsSkill = /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(fullSkillText)
 
   if (isGenericWebTask && isGenericWebSkill) score += 35
   if (isGenericWebTask && isLLMWebSkill) score += 30
   if (isGenericWebTask && isGenericWebSkill && skill.github_stars > 10_000) score += 25
   if (isGenericWebTask && isPlatformSpecificExtractor) score -= 45
+  if (isFinanceTask && category === 'finance-quant') score += 85
+  if (isFinanceTask && isFinanceSkill) score += 58
+  if (isFinanceTask && isSecurityOnlySkill) score -= 90
+  if (isSportsTask && category === 'sports-analytics') score += 85
+  if (isSportsTask && isSportsSkill) score += 58
 
   // Boost by popularity signals
   if (skill.github_stars > 10000) score += 15

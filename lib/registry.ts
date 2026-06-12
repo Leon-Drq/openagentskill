@@ -115,6 +115,11 @@ export function rankSkillsForQuery(skills: SkillRecord[], query: string) {
         const isContentTask = /\b(content|blog|post|posts|newsletter|social|copy|copywriting|writing|publish|publishing|product updates?|launch notes?)\b/.test(normalizedQuery)
         const isContentSkill = /\b(content|copywriting|writing|blog|markdown|newsletter|social|summary|summarize|publishing|content-generation|content automation)\b/.test(text)
         const isUnrelatedContentTool = /\b(data-analysis|database|security|scanner|vulnerability|browser-automation|web-automation|testing|qa)\b/.test(text)
+        const isFinanceTask = /\b(finance|financial|quant|trading|portfolio|markets?|stocks?|equity|crypto|filings?|edgar|sec filings?|investor|earnings|10-k|10-q|alpha|factor|backtest|risk model)\b/.test(normalizedQuery)
+        const isFinanceSkill = /\b(finance|financial|quant|trading|portfolio|market-data|markets?|stocks?|equity|crypto|filings?|edgar|sec filing|investor|earnings|10-k|10-q|alpha|factor|backtest|risk model)\b/.test(text)
+        const isSecurityOnlySkill = /\b(security|vulnerability|scanner|nuclei|pentest|cve|sast|exploit|secret scanning)\b/.test(text) && !isFinanceSkill
+        const isSportsTask = /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(normalizedQuery)
+        const isSportsSkill = /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(text)
 
         if (isGenericWebTask && isGenericWebSkill) score += 42
         if (isGenericWebTask && isLLMReadyWebSkill) score += 28
@@ -122,6 +127,11 @@ export function rankSkillsForQuery(skills: SkillRecord[], query: string) {
         if (isContentTask && skill.category === 'content-automation') score += 70
         if (isContentTask && isContentSkill) score += 42
         if (isContentTask && isUnrelatedContentTool && !isContentSkill) score -= 55
+        if (isFinanceTask && skill.category === 'finance-quant') score += 85
+        if (isFinanceTask && isFinanceSkill) score += 58
+        if (isFinanceTask && isSecurityOnlySkill) score -= 90
+        if (isSportsTask && skill.category === 'sports-analytics') score += 85
+        if (isSportsTask && isSportsSkill) score += 58
       }
 
       score += Math.min(24, Number(skill.quality_score || 0) / 4)

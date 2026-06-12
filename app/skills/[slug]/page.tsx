@@ -157,6 +157,10 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   const installApiHref = `/api/skills/${skill.slug}/install`
   const installTextHref = `${installApiHref}?format=text`
   const searchApiHref = `/api/skills/search?q=${encodeURIComponent(skill.name)}&limit=3`
+  const registryManifestHref = `/api/registry/manifest/${skill.slug}`
+  const registryManifestTextHref = `${registryManifestHref}?format=text`
+  const registryInstallHref = `/api/registry/install/${skill.slug}`
+  const registryRecommendHref = `/api/registry/recommend?task=${encodeURIComponent(`Use ${skill.name} in an agent workflow`)}&limit=3`
   const absoluteInstallApiUrl = getSkillInstallApiUrl(skill.slug)
   const xMainText = dbSkill ? buildManualXMainText(dbSkill) : ''
   const xReplyText = dbSkill ? buildManualXReplyText(dbSkill) : ''
@@ -386,6 +390,79 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 <pre className="overflow-x-auto border border-border bg-background p-4 font-mono text-xs leading-relaxed text-secondary">
                   <code>{`Use ${skill.name} for this task. Review ${absoluteInstallApiUrl}, then install with: ${skill.technical.installCommand}`}</code>
                 </pre>
+              </div>
+            </section>
+
+            <section className="mb-10 overflow-hidden border border-border bg-card">
+              <div className="border-b border-border p-5">
+                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+                  <div>
+                    <p className="mb-2 text-xs uppercase text-secondary">Registry metadata</p>
+                    <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+                      Agent-readable profile for automatic skill selection.
+                    </h2>
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
+                      This page exposes the same decision, trust, audit, use-case, and install signals through the
+                      Registry API, so agents can rank this skill without scraping the UI.
+                    </p>
+                  </div>
+                  <Link
+                    href={registryManifestHref}
+                    className="w-full border border-foreground bg-foreground px-4 py-2.5 text-center text-sm font-semibold text-background transition-opacity hover:opacity-80 sm:w-auto"
+                  >
+                    Open manifest
+                  </Link>
+                </div>
+              </div>
+
+              <div className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  { label: 'Manifest', value: registryManifestHref, href: registryManifestHref },
+                  { label: 'LLM text', value: registryManifestTextHref, href: registryManifestTextHref },
+                  { label: 'Install alias', value: registryInstallHref, href: registryInstallHref },
+                  { label: 'Recommend', value: registryRecommendHref, href: registryRecommendHref },
+                ].map((item) => (
+                  <Link key={item.label} href={item.href} className="min-w-0 bg-background p-4 transition-colors hover:bg-muted/40">
+                    <p className="text-xs uppercase text-secondary">{item.label}</p>
+                    <p className="mt-2 break-all font-mono text-xs leading-relaxed text-foreground [overflow-wrap:anywhere]">
+                      {item.value}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+
+              <div className="grid gap-px bg-border md:grid-cols-3">
+                <div className="bg-card p-5">
+                  <p className="mb-3 text-xs uppercase text-secondary">Agent fit</p>
+                  <div className="font-mono text-2xl font-semibold">
+                    {decisionProfile?.readinessScore ?? qualityProfile?.score ?? 0}/100
+                  </div>
+                  <p className="mt-2 text-sm leading-relaxed text-secondary">
+                    {decisionProfile?.primaryFit || 'General reusable skill candidate'}
+                  </p>
+                </div>
+                <div className="bg-card p-5">
+                  <p className="mb-3 text-xs uppercase text-secondary">Use-case tags</p>
+                  <div className="flex flex-wrap gap-2">
+                    {matchedUseCases.length > 0 ? matchedUseCases.map((useCase) => (
+                      <Link
+                        key={useCase.slug}
+                        href={`/use-cases/${useCase.slug}`}
+                        className="border border-border px-2 py-1 text-xs text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                      >
+                        {useCase.shortTitle}
+                      </Link>
+                    )) : (
+                      <span className="text-sm text-secondary">General agent workflow</span>
+                    )}
+                  </div>
+                </div>
+                <div className="bg-card p-5">
+                  <p className="mb-3 text-xs uppercase text-secondary">Platforms</p>
+                  <p className="text-sm leading-relaxed text-secondary">
+                    {[...new Set([...(skill.technical.frameworks || []), ...platformHints])].slice(0, 6).join(', ') || 'Codex, Claude Code, Cursor, and custom agents'}
+                  </p>
+                </div>
               </div>
             </section>
 

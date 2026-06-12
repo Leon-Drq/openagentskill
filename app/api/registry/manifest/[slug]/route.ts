@@ -1,0 +1,69 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getSkillBySlug } from '@/lib/db/skills'
+import { toRegistrySkill } from '@/lib/registry'
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await params
+  const format = request.nextUrl.searchParams.get('format') || 'json'
+
+  try {
+    const skill = await getSkillBySlug(slug)
+
+    if (!skill) {
+      return NextResponse.json({ error: `Skill not found: ${slug}` }, { status: 404 })
+    }
+
+    const manifest = toRegistrySkill(skill)
+
+    if (format === 'text') {
+      return new NextResponse(
+        `OpenAgentSkill Registry Manifest
+Skill: ${manifest.name}
+Slug: ${manifest.slug}
+Category: ${manifest.category}
+Description: ${manifest.description}
+
+Agent fit:
+- Decision: ${manifest.decision.readiness_score}/100 ${manifest.decision.readiness_label}
+- Primary fit: ${manifest.decision.primary_fit}
+- Role: ${manifest.decision.role}
+
+Trust:
+- Trust score: ${manifest.trust.score}/100 ${manifest.trust.label}
+- Audit: ${manifest.audit.audit_score}/100 ${manifest.audit.risk_label}
+
+Install:
+${manifest.install}
+
+URLs:
+- Web: ${manifest.urls.web}
+- API: ${manifest.urls.api}
+- Install API: ${manifest.urls.install_api}
+- Repository: ${manifest.urls.repository || 'Unknown'}`,
+        {
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'X-Agent-Friendly': 'true',
+          },
+        }
+      )
+    }
+
+    return NextResponse.json({
+      ...manifest,
+      meta: {
+        endpoint: '/api/registry/manifest/{slug}',
+        canonical_agent_endpoint: `/api/agent/skills/${skill.slug}`,
+        agent_friendly: true,
+        api_version: '1.0',
+        generated_at: new Date().toISOString(),
+      },
+    })
+  } catch (error) {
+    console.error('Registry manifest API error:', error)
+    return NextResponse.json({ error: 'Failed to build registry manifest' }, { status: 500 })
+  }
+}

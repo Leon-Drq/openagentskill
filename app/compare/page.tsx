@@ -84,6 +84,28 @@ export default async function ComparePage({
 
         {comparedSkills.length === 0 ? (
           <section className="py-10">
+            <div className="mb-8 grid gap-3 md:grid-cols-2">
+              <Link
+                href="/compare/openagentskill-vs-agentskills-io"
+                className="border border-border bg-card p-5 transition-colors hover:border-foreground"
+              >
+                <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Platform comparison</p>
+                <h2 className="font-display text-xl font-semibold">OpenAgentSkill vs AgentSkills.io</h2>
+                <p className="mt-2 text-sm leading-relaxed text-secondary">
+                  Compare documentation-first skill browsing with an agent-readable registry and install API.
+                </p>
+              </Link>
+              <Link
+                href="/compare/openagentskill-vs-skills-sh"
+                className="border border-border bg-card p-5 transition-colors hover:border-foreground"
+              >
+                <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Platform comparison</p>
+                <h2 className="font-display text-xl font-semibold">OpenAgentSkill vs skills.sh</h2>
+                <p className="mt-2 text-sm leading-relaxed text-secondary">
+                  Compare task-first registry discovery with CLI-centered skill distribution.
+                </p>
+              </Link>
+            </div>
             <div className="mb-6">
               <h2 className="font-display text-2xl font-semibold">Start with popular skills</h2>
               <p className="mt-2 text-sm text-secondary">

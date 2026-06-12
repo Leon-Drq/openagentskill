@@ -35,6 +35,9 @@ export default function APIDocsPage() {
           </h2>
           <div className="grid gap-3">
             <div className="bg-card p-4 sm:p-6 font-mono text-sm sm:text-base overflow-x-auto border border-border">
+              {'https://www.openagentskill.com/api/registry'}
+            </div>
+            <div className="bg-card p-4 sm:p-6 font-mono text-sm sm:text-base overflow-x-auto border border-border">
               {'https://www.openagentskill.com/api/agent'}
             </div>
             <div className="bg-card p-4 sm:p-6 font-mono text-sm sm:text-base overflow-x-auto border border-border">
@@ -43,6 +46,8 @@ export default function APIDocsPage() {
           </div>
           <p className="mt-4 text-sm leading-relaxed text-secondary">
             {'Use '}
+            <code className="bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">{'/api/registry/*'}</code>
+            {' for public registry-style discovery and install handoffs, '}
             <code className="bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">{'/api/agent/*'}</code>
             {' for full agent payloads, or '}
             <code className="bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">{'/api/skills/*'}</code>
@@ -87,6 +92,11 @@ export default function APIDocsPage() {
               { method: 'GET', path: '/api/agent/discovery' },
               { method: 'GET', path: '/api/agent/recommend' },
               { method: 'GET', path: '/api/agent/evals' },
+              { method: 'GET', path: '/api/registry' },
+              { method: 'GET', path: '/api/registry/search' },
+              { method: 'GET', path: '/api/registry/recommend' },
+              { method: 'GET', path: '/api/registry/manifest/{slug}' },
+              { method: 'GET', path: '/api/registry/install/{slug}' },
               { method: 'GET', path: '/api/skills/search' },
               { method: 'GET', path: '/api/skills/{slug}/install' },
               { method: 'GET', path: '/api/badge/{slug}' },
@@ -106,6 +116,39 @@ export default function APIDocsPage() {
                 <span className="text-secondary">{path}</span>
               </div>
             ))}
+          </div>
+
+          <div id="registry-api" className="scroll-mt-24 border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/registry/*'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Public registry aliases for agents that need clean, predictable endpoints: search by task, request ranked recommendations, fetch one manifest, or get an install handoff.'}
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2 mb-4 sm:mb-6">
+                {[
+                  'GET /api/registry/search?task=analyze+SEC+filings&limit=5',
+                  'GET /api/registry/recommend?task=build+a+World+Cup+dashboard',
+                  'GET /api/registry/manifest/crawl4ai',
+                  'GET /api/registry/install/crawl4ai?format=text',
+                ].map((example) => (
+                  <code key={example} className="border border-border bg-card px-3 py-2 font-mono text-xs leading-relaxed">
+                    {example}
+                  </code>
+                ))}
+              </div>
+              <p className="text-sm leading-relaxed text-secondary">
+                {'These aliases point to the same ranking, trust, audit, and install data used by the main agent endpoints, but the URL shape is easier to remember and market as a skill registry.'}
+              </p>
+            </div>
           </div>
 
           <div id="agent-resolve" className="scroll-mt-24 border border-border mb-8 sm:mb-10">

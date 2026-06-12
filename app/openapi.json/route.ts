@@ -11,6 +11,58 @@ export async function GET() {
       },
       servers: [{ url: 'https://www.openagentskill.com' }],
       paths: {
+        '/api/registry': {
+          get: {
+            summary: 'Get Registry API index and canonical endpoints',
+            responses: { '200': { description: 'Registry API index' } },
+          },
+        },
+        '/api/registry/search': {
+          get: {
+            summary: 'Search the skill registry by task, platform, category, or query',
+            parameters: [
+              { name: 'task', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'q', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'category', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'platform', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'min_stars', in: 'query', required: false, schema: { type: 'number' } },
+              { name: 'limit', in: 'query', required: false, schema: { type: 'number' } },
+              { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
+            ],
+            responses: { '200': { description: 'Ranked registry search results' } },
+          },
+        },
+        '/api/registry/recommend': {
+          get: {
+            summary: 'Recommend skills for one task using registry ranking and trust signals',
+            parameters: [
+              { name: 'task', in: 'query', required: true, schema: { type: 'string' } },
+              { name: 'limit', in: 'query', required: false, schema: { type: 'number' } },
+              { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
+            ],
+            responses: { '200': { description: 'Task-to-skill recommendations' } },
+          },
+        },
+        '/api/registry/manifest/{slug}': {
+          get: {
+            summary: 'Get one agent-readable registry manifest',
+            parameters: [
+              { name: 'slug', in: 'path', required: true, schema: { type: 'string' } },
+              { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
+            ],
+            responses: { '200': { description: 'Registry skill manifest' } },
+          },
+        },
+        '/api/registry/install/{slug}': {
+          get: {
+            summary: 'Get install handoff for one registry skill',
+            parameters: [
+              { name: 'slug', in: 'path', required: true, schema: { type: 'string' } },
+              { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
+            ],
+            responses: { '200': { description: 'Registry install handoff' } },
+          },
+        },
         '/api/agent/resolve': {
           get: {
             summary: 'Resolve a task into a selected skill and install plan',
