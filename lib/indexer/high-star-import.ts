@@ -544,6 +544,121 @@ const DOMAIN_QUERY_GROUPS: Array<{
     ],
   },
   {
+    key: 'sports',
+    label: 'World Cup, football, and sports analytics',
+    description: 'Football data, World Cup datasets, sports analytics, expected goals, match prediction, and fantasy workflows.',
+    queries: [
+      {
+        q: 'topic:soccer',
+        category: 'sports-analytics',
+        tags: ['sports', 'soccer', 'analytics'],
+        frameworks: ['Sports Data'],
+      },
+      {
+        q: 'topic:football',
+        category: 'sports-analytics',
+        tags: ['sports', 'football', 'analytics'],
+        frameworks: ['Sports Data'],
+      },
+      {
+        q: 'topic:sports-analytics',
+        category: 'sports-analytics',
+        tags: ['sports', 'analytics'],
+        frameworks: ['Sports Analytics'],
+      },
+      {
+        q: 'topic:sports-data',
+        category: 'sports-analytics',
+        tags: ['sports-data', 'analytics'],
+        frameworks: ['Sports Data'],
+      },
+      {
+        q: 'topic:world-cup',
+        category: 'sports-analytics',
+        tags: ['world-cup', 'football', 'sports'],
+        frameworks: ['World Cup'],
+      },
+      {
+        q: '"FIFA World Cup"',
+        category: 'sports-analytics',
+        tags: ['fifa', 'world-cup', 'football'],
+        frameworks: ['World Cup'],
+      },
+      {
+        q: '"world cup data"',
+        category: 'sports-analytics',
+        tags: ['world-cup', 'sports-data'],
+        frameworks: ['World Cup Data'],
+      },
+      {
+        q: '"football analytics"',
+        category: 'sports-analytics',
+        tags: ['football', 'analytics'],
+        frameworks: ['Football Analytics'],
+      },
+      {
+        q: '"soccer analytics"',
+        category: 'sports-analytics',
+        tags: ['soccer', 'analytics'],
+        frameworks: ['Soccer Analytics'],
+      },
+      {
+        q: '"football data"',
+        category: 'sports-analytics',
+        tags: ['football', 'sports-data'],
+        frameworks: ['Football Data'],
+      },
+      {
+        q: '"soccer data"',
+        category: 'sports-analytics',
+        tags: ['soccer', 'sports-data'],
+        frameworks: ['Soccer Data'],
+      },
+      {
+        q: 'topic:statsbomb',
+        category: 'sports-analytics',
+        tags: ['statsbomb', 'football', 'analytics'],
+        frameworks: ['StatsBomb'],
+      },
+      {
+        q: '"expected goals"',
+        category: 'sports-analytics',
+        tags: ['xg', 'football', 'analytics'],
+        frameworks: ['Expected Goals'],
+      },
+      {
+        q: 'topic:match-prediction',
+        category: 'sports-analytics',
+        tags: ['match-prediction', 'sports', 'analytics'],
+        frameworks: ['Match Prediction'],
+      },
+      {
+        q: 'topic:fantasy-football',
+        category: 'sports-analytics',
+        tags: ['fantasy-football', 'sports-data'],
+        frameworks: ['Fantasy Sports'],
+      },
+      {
+        q: 'topic:sports-betting',
+        category: 'sports-analytics',
+        tags: ['sports-betting', 'analytics'],
+        frameworks: ['Sports Analytics'],
+      },
+      {
+        q: 'topic:openfootball',
+        category: 'sports-analytics',
+        tags: ['openfootball', 'football-data'],
+        frameworks: ['OpenFootball'],
+      },
+      {
+        q: 'topic:football-api',
+        category: 'sports-analytics',
+        tags: ['football-api', 'sports-data'],
+        frameworks: ['Football API'],
+      },
+    ],
+  },
+  {
     key: 'research',
     label: 'Research and intelligence',
     description: 'Deep research, paper search, literature review, market research, and knowledge synthesis workflows.',
@@ -1153,7 +1268,7 @@ export async function bulkImportHighStarSkills(
   )
   const pageSeed = Math.max(
     0,
-    Math.floor(options.pageSeed ?? Math.floor(Date.now() / 3_600_000))
+    Math.floor(options.pageSeed ?? (requestedDomains.length > 0 ? 0 : Math.floor(Date.now() / 3_600_000)))
   )
   const startedAt = new Date().toISOString()
   const serverSecret = process.env.INDEXER_SECRET
