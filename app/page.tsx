@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { HomePageEnhanced } from '@/components/home-page-enhanced'
-import { getRecentActivity, getPlatformStats } from '@/lib/db/activity'
-import { createPublicClient } from '@/lib/supabase/public'
+import { getHomePageData } from '@/lib/home-page-data'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,25 +13,8 @@ export const metadata: Metadata = {
   },
 }
 
-async function getFeaturedSkills() {
-  const supabase = createPublicClient()
-  const { data, error } = await supabase
-    .from('skills')
-    .select('slug, name, description, github_stars, downloads, quality_score')
-    .eq('ai_review_approved', true)
-    .order('quality_score', { ascending: false })
-    .order('github_stars', { ascending: false })
-    .limit(6)
-  if (error) return []
-  return data || []
-}
-
 export default async function Page() {
-  const [stats, activities, featuredSkills] = await Promise.all([
-    getPlatformStats(),
-    getRecentActivity(8),
-    getFeaturedSkills(),
-  ])
+  const { stats, activities, featuredSkills } = await getHomePageData()
 
   return (
     <HomePageEnhanced

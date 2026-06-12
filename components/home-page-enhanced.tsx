@@ -3,12 +3,14 @@
 import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ArrowUpRight, Github, Search } from 'lucide-react'
+import type { Locale } from '@/lib/i18n/config'
 import { useI18n } from '@/lib/i18n/context'
 import { USE_CASES } from '@/lib/use-cases'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
 
 interface HomePageEnhancedProps {
+  initialLocale?: Locale
   stats: {
     totalSkills: number
     totalDownloads: number
@@ -264,8 +266,9 @@ function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) 
   )
 }
 
-export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
+export function HomePageEnhanced({ initialLocale, stats }: HomePageEnhancedProps) {
   const { t, locale } = useI18n()
+  const activeLocale = initialLocale || locale
   const [taskQuery, setTaskQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const [resolveResult, setResolveResult] = useState<ResolveResult | null>(null)
@@ -276,15 +279,24 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
   const resolvedCandidates = resolveResult
     ? [resolveResult.selected, ...resolveResult.alternatives].filter((item): item is ResolveCandidate => Boolean(item))
     : []
-  const isZh = locale === 'zh'
+  const isZh = activeLocale === 'zh'
   const heroMain = isZh ? 'AI Agent Skills 的' : 'The open registry'
   const heroAccent = isZh ? '开放注册表。' : 'AI agent skills.'
   const heroSubtitle = isZh
     ? 'OpenAgentSkill 是 AI Agent Skills 的 npm：让 agent 在安装前自动发现、比较、审计并选择正确的技能。'
     : 'OpenAgentSkill is npm for AI Agent Skills: a registry and recommendation API that helps agents discover, compare, audit, and install reusable skills.'
   const heroEyebrow = isZh
-    ? 'OPEN REGISTRY · TRUST SIGNALS · AGENT INSTALLS'
+    ? '开放注册表 · 信任信号 · AGENT 安装'
     : 'OPEN REGISTRY · TRUST SIGNALS · AGENT INSTALLS'
+  const primaryCta = isZh ? '为我的 Agent 找技能' : 'Find skills for my agent'
+  const githubCta = isZh ? '查看 GitHub' : 'View on GitHub'
+  const registryApiLabel = isZh ? '注册表 API' : 'Registry API'
+  const statItems = [
+    [stats.totalSkills.toLocaleString(), isZh ? '已收录技能' : 'Indexed skills'],
+    [`${Math.round(stats.totalDownloads / 1000)}K+`, isZh ? '下载量' : 'Downloads'],
+    [stats.activePlatforms.toLocaleString(), isZh ? 'Agent 平台' : 'Agent surfaces'],
+    ['API', isZh ? '推荐层' : 'Recommendation layer'],
+  ]
 
   const runRecommendation = async (query: string) => {
     const normalizedQuery = query.trim()
@@ -379,7 +391,7 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
               href="#task-search"
               className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] bg-[#006b4f] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:w-auto"
             >
-              Find skills for my agent
+              {primaryCta}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>
             <a
@@ -389,25 +401,20 @@ export function HomePageEnhanced({ stats }: HomePageEnhancedProps) {
               className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border border-[#d8d2c6] bg-[#fffdf8]/85 px-5 text-sm font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f] sm:w-auto"
             >
               <Github className="h-4 w-4" aria-hidden="true" />
-              View on GitHub
+              {githubCta}
               <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
             </a>
             <Link
               href="/api-docs"
               className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border border-transparent px-2 font-mono text-xs text-[#6d675e] transition-colors hover:text-[#1d1b18] sm:w-auto"
             >
-              Registry API
+              {registryApiLabel}
               <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
             </Link>
           </div>
 
           <div className="mt-20 grid grid-cols-2 gap-y-6 border-t border-[#d8d2c6] pt-8 md:grid-cols-4">
-            {[
-              [stats.totalSkills.toLocaleString(), 'Indexed skills'],
-              [`${Math.round(stats.totalDownloads / 1000)}K+`, 'Downloads'],
-              [stats.activePlatforms.toLocaleString(), 'Agent surfaces'],
-              ['API', 'Recommendation layer'],
-            ].map(([value, label]) => (
+            {statItems.map(([value, label]) => (
               <div key={label} className="flex flex-col gap-1">
                 <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#6d675e]">{label}</span>
                 <span
