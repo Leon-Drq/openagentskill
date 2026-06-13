@@ -50,7 +50,7 @@ const comparisonRows = [
   },
   {
     signal: 'Positioning',
-    openAgentSkill: 'npm for AI Agent Skills: discover, compare, install, and compose skills automatically.',
+    openAgentSkill: 'The skill layer for AI agents: discover, compare, install, and compose skills automatically. Think npm for AI Agent Skills.',
     agentSkills: 'A reference destination for the skill concept and examples.',
   },
 ]

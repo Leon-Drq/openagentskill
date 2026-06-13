@@ -4,7 +4,9 @@
 
 # OpenAgentSkill
 
-Open discovery, audit, and recommendation infrastructure for AI agent skills.
+OpenAgentSkill is the skill layer for AI agents: helping agents find, compare, and install the right reusable skill automatically.
+
+Think npm for AI Agent Skills: a registry, trust layer, and recommendation API for Codex, Claude Code, Cursor, and other agent runtimes.
 
 [![Website](https://img.shields.io/badge/Website-openagentskill.com-black?style=for-the-badge)](https://www.openagentskill.com)
 [![GitHub Stars](https://img.shields.io/github/stars/Leon-Drq/openagentskill?style=for-the-badge&logo=github)](https://github.com/Leon-Drq/openagentskill)
@@ -23,7 +25,7 @@ Open discovery, audit, and recommendation infrastructure for AI agent skills.
 
 ## What Is OpenAgentSkill?
 
-OpenAgentSkill is a public index for finding, comparing, auditing, and recommending AI agent skills.
+OpenAgentSkill is a public registry for finding, comparing, auditing, and recommending AI agent skills.
 
 The product is built for three audiences:
 
@@ -40,6 +42,9 @@ The long-term goal is to become the trust and routing layer for agent skills: no
 | Surface | Link | Purpose |
 | --- | --- | --- |
 | Skill directory | [/skills](https://www.openagentskill.com/skills) | Search and filter the full catalog |
+| Agent skills | [/agent-skills](https://www.openagentskill.com/agent-skills) | Search entry for reusable agent skills |
+| AI agent skills | [/ai-agent-skills](https://www.openagentskill.com/ai-agent-skills) | Cross-agent discovery for Codex, Claude Code, Cursor, and more |
+| Skills registry | [/skills-registry](https://www.openagentskill.com/skills-registry) | Registry positioning, trust signals, and install handoffs |
 | Trending | [/trending](https://www.openagentskill.com/trending) | Skills with recent activity signals |
 | Hot | [/hot](https://www.openagentskill.com/hot) | High-momentum skills |
 | Best lists | [/best](https://www.openagentskill.com/best) | SEO-ready rankings by use case and category |
@@ -47,6 +52,7 @@ The long-term goal is to become the trust and routing layer for agent skills: no
 | Agent pages | [/agents](https://www.openagentskill.com/agents) | Agent-specific skill discovery |
 | Official creators | [/official](https://www.openagentskill.com/official) | Creator and organization directories |
 | Comparisons | [/compare](https://www.openagentskill.com/compare) | Competitive and alternative pages |
+| AgentSkills.io alternative | [/alternatives/agentskills-io](https://www.openagentskill.com/alternatives/agentskills-io) | Alternative page for agent skill discovery searches |
 | API docs | [/api-docs](https://www.openagentskill.com/api-docs) | Programmatic access for agents and apps |
 | Submit | [/submit](https://www.openagentskill.com/submit) | Submit a new skill for review |
 

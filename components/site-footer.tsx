@@ -18,7 +18,7 @@ export function SiteFooter() {
               OpenAgentSkill
             </Link>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-secondary">
-              Open infrastructure for agent skills: discover, compare, and install reusable capabilities across Codex, Claude Code, Cursor, and agent runtimes.
+              The skill layer for AI agents: discover, compare, audit, and install reusable capabilities across Codex, Claude Code, Cursor, and agent runtimes.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <a
@@ -45,6 +45,8 @@ export function SiteFooter() {
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Explore</h2>
               <div className="mt-4 grid gap-2 text-secondary">
                 <Link href="/skills" className="hover:text-foreground">{t.nav.skills}</Link>
+                <Link href="/agent-skills" className="hover:text-foreground">Agent Skills</Link>
+                <Link href="/ai-agent-skills" className="hover:text-foreground">AI Agent Skills</Link>
                 <Link href="/tasks" className="hover:text-foreground">Tasks</Link>
                 <Link href="/skill-packs" className="hover:text-foreground">Skill Packs</Link>
                 <Link href="/best" className="hover:text-foreground">Best Skills</Link>
@@ -60,11 +62,13 @@ export function SiteFooter() {
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Trust</h2>
               <div className="mt-4 grid gap-2 text-secondary">
                 <Link href="/compare" className="hover:text-foreground">Compare</Link>
+                <Link href="/skills-registry" className="hover:text-foreground">Skills Registry</Link>
                 <Link href="/rankings" className="hover:text-foreground">Rankings</Link>
                 <Link href="/audits" className="hover:text-foreground">Audits</Link>
                 <Link href="/official" className="hover:text-foreground">Official</Link>
                 <Link href="/reports/weekly" className="hover:text-foreground">Weekly Reports</Link>
                 <Link href="/compare/openagentskill-vs-skills-sh" className="hover:text-foreground">vs skills.sh</Link>
+                <Link href="/alternatives/agentskills-io" className="hover:text-foreground">AgentSkills.io Alternative</Link>
               </div>
             </div>
 
@@ -72,6 +76,7 @@ export function SiteFooter() {
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Build</h2>
               <div className="mt-4 grid gap-2 text-secondary">
                 <Link href="/docs" className="hover:text-foreground">{t.nav.docs}</Link>
+                <Link href="/openagentskill" className="hover:text-foreground">What is OpenAgentSkill?</Link>
                 <Link href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</Link>
                 <Link href="/llms.txt" prefetch={false} className="hover:text-foreground">llms.txt</Link>
                 <Link href="/openapi.json" prefetch={false} className="hover:text-foreground">OpenAPI</Link>
