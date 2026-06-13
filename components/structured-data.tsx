@@ -7,7 +7,7 @@ export function StructuredData() {
     name: 'OpenAgentSkill',
     alternateName: ['Open Agent Skill', 'AI Agent Skills Registry', 'AgentSkill Registry'],
     url: BASE_URL,
-    description: 'AI agent skills registry, audit layer, and recommendation API for discovering and installing reusable agent skills.',
+    description: 'The skill layer for AI agents: a registry, audit layer, and recommendation API for discovering, comparing, and installing reusable agent skills.',
     potentialAction: {
       '@type': 'SearchAction',
       target: `${BASE_URL}/skills?q={search_term_string}`,
@@ -30,8 +30,8 @@ export function StructuredData() {
     name: 'OpenAgentSkill',
     url: BASE_URL,
     logo: `${BASE_URL}/icon.svg`,
-    description: 'OpenAgentSkill helps agents and builders discover, compare, audit, and install reusable AI agent skills.',
-    image: `${BASE_URL}/opengraph-image?v=2`,
+    description: 'OpenAgentSkill helps AI agents and builders discover, compare, audit, and install the right reusable skill automatically.',
+    image: `${BASE_URL}/opengraph-image?v=3`,
     foundingDate: '2026',
     sameAs: [
       'https://github.com/Leon-Drq/openagentskill',
@@ -47,7 +47,7 @@ export function StructuredData() {
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     url: BASE_URL,
-    description: 'Let your AI agent find and install the right skill automatically with an agent-facing skills registry and recommendation API.',
+    description: 'Let your AI agent find, compare, and install the right reusable skill automatically with an agent-facing skills registry and recommendation API.',
     offers: {
       '@type': 'Offer',
       price: '0',
@@ -62,7 +62,7 @@ export function StructuredData() {
     url: `${BASE_URL}/api-docs`,
     documentation: `${BASE_URL}/api-docs`,
     endpointUrl: `${BASE_URL}/api/agent/recommend`,
-    description: 'Agent-facing API for recommending AI agent skills from a task description.',
+    description: 'Agent-facing API for recommending the right reusable AI agent skill from a task description.',
   }
 
   return (

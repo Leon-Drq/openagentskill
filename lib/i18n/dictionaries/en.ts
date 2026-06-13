@@ -16,8 +16,8 @@ export default {
   
   // Hero
   hero: {
-    title: 'Let your AI agent find and install the right skill automatically.',
-    subtitle: 'OpenAgentSkill is npm for AI Agent Skills. Let your agent discover, compare, and install reusable skills automatically.',
+    title: 'The skill layer for AI agents.',
+    subtitle: 'Let your AI agent find, compare, and install the right reusable skill automatically. OpenAgentSkill is npm for AI Agent Skills.',
     tryItNow: 'Try it now',
     installPrefix: '$ npx skills add',
     installPlaceholder: 'owner/repo',

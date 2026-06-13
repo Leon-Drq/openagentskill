@@ -238,6 +238,8 @@ const HOME_COPY: Record<Locale, {
   heroLine2Prefix: string
   heroAccent: string
   heroSubtitle: string
+  heroProofLabel: string
+  heroProof: string
   primaryCta: string
   githubCta: string
   registryApi: string
@@ -278,11 +280,13 @@ const HOME_COPY: Record<Locale, {
   compareIntro: string
 }> = {
   en: {
-    heroEyebrow: 'OPEN REGISTRY · TRUST SIGNALS · AGENT INSTALLS',
-    heroLine1: 'The open registry',
+    heroEyebrow: 'SKILL LAYER · AGENT REGISTRY · AUTO INSTALLS',
+    heroLine1: 'The skill layer',
     heroLine2Prefix: 'for ',
-    heroAccent: 'AI agent skills.',
-    heroSubtitle: 'OpenAgentSkill is npm for AI Agent Skills: a registry and recommendation API that helps agents discover, compare, audit, and install reusable skills.',
+    heroAccent: 'AI agents.',
+    heroSubtitle: 'Let your AI agent find, compare, and install the right reusable skill automatically.',
+    heroProofLabel: 'Position',
+    heroProof: 'OpenAgentSkill is npm for AI Agent Skills.',
     primaryCta: 'Find skills for my agent',
     githubCta: 'View on GitHub',
     registryApi: 'Registry API',
@@ -331,11 +335,13 @@ const HOME_COPY: Record<Locale, {
     compareIntro: 'The big bet is simple: ordinary directories are for people to browse. OpenAgentSkill is built so an AI agent can discover, compare, and install the right skill automatically.',
   },
   zh: {
-    heroEyebrow: '开放注册表 · 信任信号 · AGENT 安装',
-    heroLine1: 'AI Agent Skills 的',
+    heroEyebrow: 'SKILL LAYER · AGENT 注册表 · 自动安装',
+    heroLine1: 'AI Agent 的',
     heroLine2Prefix: '',
-    heroAccent: '开放注册表。',
-    heroSubtitle: 'OpenAgentSkill 是 AI Agent Skills 的 npm：让 agent 在安装前自动发现、比较、审计并选择正确的技能。',
+    heroAccent: '技能层。',
+    heroSubtitle: '让你的 AI Agent 自动发现、比较并安装正确的可复用 Skill。',
+    heroProofLabel: '定位',
+    heroProof: 'OpenAgentSkill 是 AI Agent Skills 的 npm。',
     primaryCta: '为我的 Agent 找技能',
     githubCta: '查看 GitHub',
     registryApi: '注册表 API',
@@ -384,11 +390,13 @@ const HOME_COPY: Record<Locale, {
     compareIntro: '核心判断很简单：普通目录是给人浏览的。OpenAgentSkill 是为了让 AI Agent 自动发现、比较并安装正确 Skill 而构建。',
   },
   ja: {
-    heroEyebrow: 'OPEN REGISTRY · TRUST SIGNALS · AGENT INSTALLS',
-    heroLine1: 'AI Agent Skills の',
+    heroEyebrow: 'SKILL LAYER · AGENT REGISTRY · AUTO INSTALLS',
+    heroLine1: 'AI agents の',
     heroLine2Prefix: '',
-    heroAccent: 'オープンレジストリ。',
-    heroSubtitle: 'OpenAgentSkill は AI Agent Skills の npm です。Agent がインストール前に Skill を発見、比較、監査し、正しいものを選べます。',
+    heroAccent: 'Skill layer.',
+    heroSubtitle: 'AI agent が適切な再利用可能 Skill を自動で発見、比較、インストールできるようにします。',
+    heroProofLabel: '位置づけ',
+    heroProof: 'OpenAgentSkill は AI Agent Skills の npm です。',
     primaryCta: 'Agent に合う Skill を探す',
     githubCta: 'GitHub を見る',
     registryApi: 'Registry API',
@@ -437,11 +445,13 @@ const HOME_COPY: Record<Locale, {
     compareIntro: '普通のディレクトリは人が閲覧するものです。OpenAgentSkill は AI Agent が正しい Skill を自動で発見、比較、インストールするために作られています。',
   },
   ko: {
-    heroEyebrow: 'OPEN REGISTRY · TRUST SIGNALS · AGENT INSTALLS',
-    heroLine1: 'AI Agent Skills를 위한',
+    heroEyebrow: 'SKILL LAYER · AGENT REGISTRY · AUTO INSTALLS',
+    heroLine1: 'AI agents를 위한',
     heroLine2Prefix: '',
-    heroAccent: '오픈 레지스트리.',
-    heroSubtitle: 'OpenAgentSkill은 AI Agent Skills의 npm입니다. Agent가 설치 전에 Skill을 발견, 비교, 감사하고 올바른 선택을 할 수 있습니다.',
+    heroAccent: 'Skill layer.',
+    heroSubtitle: 'AI agent가 올바른 재사용 가능 Skill을 자동으로 찾고, 비교하고, 설치하게 합니다.',
+    heroProofLabel: '포지션',
+    heroProof: 'OpenAgentSkill은 AI Agent Skills의 npm입니다.',
     primaryCta: 'Agent에 맞는 Skill 찾기',
     githubCta: 'GitHub 보기',
     registryApi: 'Registry API',
@@ -490,11 +500,13 @@ const HOME_COPY: Record<Locale, {
     compareIntro: '일반 디렉터리는 사람이 탐색하기 위한 것입니다. OpenAgentSkill은 AI Agent가 올바른 Skill을 자동으로 발견, 비교, 설치하도록 설계되었습니다.',
   },
   es: {
-    heroEyebrow: 'OPEN REGISTRY · TRUST SIGNALS · AGENT INSTALLS',
-    heroLine1: 'El registro abierto',
+    heroEyebrow: 'SKILL LAYER · AGENT REGISTRY · AUTO INSTALLS',
+    heroLine1: 'La capa de skills',
     heroLine2Prefix: 'para ',
-    heroAccent: 'AI agent skills.',
-    heroSubtitle: 'OpenAgentSkill es npm para AI Agent Skills: una registry y API de recomendacion para descubrir, comparar, auditar e instalar skills reutilizables.',
+    heroAccent: 'AI agents.',
+    heroSubtitle: 'Permite que tu AI agent encuentre, compare e instale automaticamente el skill reutilizable correcto.',
+    heroProofLabel: 'Posicion',
+    heroProof: 'OpenAgentSkill es npm para AI Agent Skills.',
     primaryCta: 'Buscar skills para mi agent',
     githubCta: 'Ver en GitHub',
     registryApi: 'Registry API',
@@ -543,11 +555,13 @@ const HOME_COPY: Record<Locale, {
     compareIntro: 'La apuesta es simple: los directorios normales son para humanos. OpenAgentSkill esta construido para que un AI agent descubra, compare e instale el skill correcto automaticamente.',
   },
   de: {
-    heroEyebrow: 'OPEN REGISTRY · TRUST SIGNALS · AGENT INSTALLS',
-    heroLine1: 'Die offene Registry',
+    heroEyebrow: 'SKILL LAYER · AGENT REGISTRY · AUTO INSTALLS',
+    heroLine1: 'Die Skill-Schicht',
     heroLine2Prefix: 'fur ',
-    heroAccent: 'AI agent skills.',
-    heroSubtitle: 'OpenAgentSkill ist npm fur AI Agent Skills: Registry und Empfehlungs-API zum Entdecken, Vergleichen, Prufen und Installieren wiederverwendbarer Skills.',
+    heroAccent: 'AI agents.',
+    heroSubtitle: 'Lass deinen AI agent automatisch den richtigen wiederverwendbaren Skill finden, vergleichen und installieren.',
+    heroProofLabel: 'Position',
+    heroProof: 'OpenAgentSkill ist npm fur AI Agent Skills.',
     primaryCta: 'Skills fur meinen Agent finden',
     githubCta: 'Auf GitHub ansehen',
     registryApi: 'Registry API',
@@ -596,11 +610,13 @@ const HOME_COPY: Record<Locale, {
     compareIntro: 'Der Kern: Normale Verzeichnisse sind fur Menschen. OpenAgentSkill ist gebaut, damit ein AI Agent den richtigen Skill automatisch entdeckt, vergleicht und installiert.',
   },
   fr: {
-    heroEyebrow: 'OPEN REGISTRY · TRUST SIGNALS · AGENT INSTALLS',
-    heroLine1: 'Le registre ouvert',
+    heroEyebrow: 'SKILL LAYER · AGENT REGISTRY · AUTO INSTALLS',
+    heroLine1: 'La couche de skills',
     heroLine2Prefix: 'pour ',
-    heroAccent: 'AI agent skills.',
-    heroSubtitle: 'OpenAgentSkill est npm pour AI Agent Skills : un registre et une API de recommandation pour decouvrir, comparer, auditer et installer des skills reutilisables.',
+    heroAccent: 'AI agents.',
+    heroSubtitle: 'Permettez a votre AI agent de trouver, comparer et installer automatiquement le bon skill reutilisable.',
+    heroProofLabel: 'Position',
+    heroProof: 'OpenAgentSkill est npm pour AI Agent Skills.',
     primaryCta: 'Trouver des skills pour mon agent',
     githubCta: 'Voir sur GitHub',
     registryApi: 'Registry API',
@@ -778,6 +794,13 @@ export function HomePageEnhanced({ initialLocale, stats }: HomePageEnhancedProps
           <p className="mt-8 max-w-3xl text-pretty text-lg leading-relaxed text-[#5f5a52] md:text-xl">
             {copy.heroSubtitle}
           </p>
+
+          <div className="mt-5 inline-flex max-w-full flex-wrap items-center gap-2 rounded-full border border-[#d8d2c6] bg-[#fffdf8]/80 px-3 py-2 text-sm text-[#5f5a52] shadow-[0_8px_24px_rgba(29,27,24,0.04)]">
+            <span className="rounded-full bg-[#e8f1ed] px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#006b4f]">
+              {copy.heroProofLabel}
+            </span>
+            <span className="min-w-0 text-pretty font-semibold text-[#1d1b18]">{copy.heroProof}</span>
+          </div>
 
           <div className="mt-12 flex flex-wrap items-center gap-3">
             <a
@@ -1312,14 +1335,14 @@ export function HomePageEnhanced({ initialLocale, stats }: HomePageEnhancedProps
 
       <section className="px-6 py-20 md:py-28">
         <div className="mx-auto max-w-6xl border-t border-[#d8d2c6] pt-12">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d675e]">Open registry</p>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d675e]">Skill layer</p>
           <div className="mt-5 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
               <h2
                 className="max-w-4xl text-4xl font-normal leading-tight tracking-normal md:text-6xl"
                 style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
               >
-                Search for humans. API for agents.
+                Registry for humans. Skill layer for agents.
               </h2>
               <p className="mt-5 max-w-2xl text-base leading-relaxed text-[#5f5a52] md:text-lg">
                 Browse when you are exploring. Call the recommendation API when your

@@ -18,8 +18,8 @@ const ja = {
   },
   hero: {
     ...en.hero,
-    title: 'AI Agent が最適な Skill を自動で見つけてインストールできるように。',
-    subtitle: 'OpenAgentSkill は AI Agent Skills の npm です。Agent が再利用可能な Skill を発見、比較、監査、インストールできます。',
+    title: 'AI agents の Skill layer.',
+    subtitle: 'AI agent が適切な再利用可能 Skill を自動で発見、比較、インストールできるようにします。OpenAgentSkill は AI Agent Skills の npm です。',
     tryItNow: '試してみる',
     orDescribeTask: 'タスクを説明',
     taskPlaceholder: 'Web サイトをクロールして構造化データを抽出...',

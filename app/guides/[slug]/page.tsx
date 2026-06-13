@@ -43,7 +43,7 @@ export async function generateMetadata({
       type: 'article',
       images: [
         {
-          url: 'https://www.openagentskill.com/opengraph-image?v=2',
+          url: 'https://www.openagentskill.com/opengraph-image?v=3',
           width: 1200,
           height: 630,
           alt: guide.title,
@@ -54,7 +54,7 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: guide.title,
       description: guide.description,
-      images: ['https://www.openagentskill.com/opengraph-image?v=2'],
+      images: ['https://www.openagentskill.com/opengraph-image?v=3'],
     },
   }
 }

@@ -16,8 +16,8 @@ export default {
   
   // Hero
   hero: {
-    title: '让你的 AI Agent 自动发现并安装正确的技能',
-    subtitle: 'OpenAgentSkill 是 AI Agent Skills 的 npm。让 Agent 自动发现、比较并安装可复用技能。',
+    title: 'AI Agent 的 Skill Layer。',
+    subtitle: '让你的 AI Agent 自动发现、比较并安装正确的可复用 Skill。OpenAgentSkill 是 AI Agent Skills 的 npm。',
     tryItNow: '立即体验',
     installPrefix: '$ npx skills add',
     installPlaceholder: 'owner/repo',

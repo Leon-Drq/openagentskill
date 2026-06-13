@@ -18,8 +18,8 @@ const ko = {
   },
   hero: {
     ...en.hero,
-    title: 'AI Agent가 알맞은 Skill을 자동으로 찾고 설치하게 하세요.',
-    subtitle: 'OpenAgentSkill은 AI Agent Skills의 npm입니다. Agent가 재사용 가능한 Skill을 발견, 비교, 감사, 설치할 수 있습니다.',
+    title: 'AI agents를 위한 Skill layer.',
+    subtitle: 'AI agent가 올바른 재사용 가능 Skill을 자동으로 찾고, 비교하고, 설치하게 합니다. OpenAgentSkill은 AI Agent Skills의 npm입니다.',
     tryItNow: '지금 사용',
     orDescribeTask: '작업 설명',
     taskPlaceholder: '웹사이트를 크롤링하고 구조화 데이터를 추출...',

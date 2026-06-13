@@ -18,8 +18,8 @@ const es = {
   },
   hero: {
     ...en.hero,
-    title: 'Haz que tu AI agent encuentre e instale el skill correcto automáticamente.',
-    subtitle: 'OpenAgentSkill es npm para AI Agent Skills: un registro y API de recomendación para descubrir, comparar, auditar e instalar skills reutilizables.',
+    title: 'La capa de skills para AI agents.',
+    subtitle: 'Permite que tu AI agent encuentre, compare e instale automaticamente el skill reutilizable correcto. OpenAgentSkill es npm para AI Agent Skills.',
     tryItNow: 'Probar ahora',
     orDescribeTask: 'Describe una tarea',
     taskPlaceholder: 'Extraer sitios web y datos estructurados...',

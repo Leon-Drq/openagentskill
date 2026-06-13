@@ -2,13 +2,13 @@ export const LOCALIZED_LANDING_PAGES = {
   zh: {
     lang: 'zh-CN',
     label: '中文',
-    title: 'OpenAgentSkill — AI Agent 技能市场',
+    title: 'OpenAgentSkill — AI Agent 的 Skill Layer',
     description:
-      'OpenAgentSkill 帮助开发者发现、比较、安装 AI Agent Skills，覆盖网页抓取、代码智能体、RAG、浏览器自动化和工作流工具。',
-    eyebrow: 'AI Agent 技能市场',
-    heading: '发现、比较并安装 AI Agent Skills',
+      'OpenAgentSkill 是 AI Agent Skills 的 npm，帮助 AI Agent 自动发现、比较并安装正确的可复用 Skill。',
+    eyebrow: 'AI Agent Skill Layer',
+    heading: 'AI Agent 的 Skill Layer',
     intro:
-      'OpenAgentSkill 收录 GitHub 上高质量的 AI Agent 技能，按质量、Stars、维护活跃度和真实站内行为信号排序。',
+      '让你的 AI Agent 自动发现、比较并安装正确的可复用 Skill，并在执行前查看质量、Stars、维护状态和信任信号。',
     highlights: [
       '按任务场景查找可安装技能',
       '比较质量、维护情况和采用信号',
@@ -20,13 +20,13 @@ export const LOCALIZED_LANDING_PAGES = {
   ja: {
     lang: 'ja',
     label: '日本語',
-    title: 'OpenAgentSkill — AI Agent Skill マーケットプレイス',
+    title: 'OpenAgentSkill — AI Agents の Skill Layer',
     description:
-      'OpenAgentSkill は、Web スクレイピング、コード生成、RAG、ブラウザ自動化などの AI Agent Skills を発見、比較、インストールするためのオープンなディレクトリです。',
-    eyebrow: 'AI Agent Skill ディレクトリ',
-    heading: 'AI Agent Skills を発見、比較、インストール',
+      'OpenAgentSkill は AI Agent Skills の npm です。AI agent が適切な再利用可能 Skill を自動で発見、比較、インストールできます。',
+    eyebrow: 'AI Agent Skill Layer',
+    heading: 'AI agents の Skill layer',
     intro:
-      'OpenAgentSkill は GitHub 上の高品質な Agent Skills を収集し、品質、Stars、更新状況、利用シグナルで評価します。',
+      '品質、Stars、更新状況、利用シグナルを確認しながら、Agent が実行前に信頼できる Skill を選べるようにします。',
     highlights: [
       'タスク別にインストール可能な Skill を探せます',
       '品質、メンテナンス、採用シグナルを比較できます',
@@ -38,13 +38,13 @@ export const LOCALIZED_LANDING_PAGES = {
   ko: {
     lang: 'ko',
     label: '한국어',
-    title: 'OpenAgentSkill — AI Agent Skill 마켓플레이스',
+    title: 'OpenAgentSkill — AI Agents를 위한 Skill Layer',
     description:
-      'OpenAgentSkill은 웹 스크래핑, 코딩 에이전트, RAG, 브라우저 자동화 등 AI Agent Skills를 찾고 비교하고 설치할 수 있는 오픈 디렉터리입니다.',
-    eyebrow: 'AI Agent Skill 디렉터리',
-    heading: 'AI Agent Skills를 찾고 비교하고 설치하세요',
+      'OpenAgentSkill은 AI Agent Skills의 npm입니다. AI agent가 올바른 재사용 가능 Skill을 자동으로 찾고, 비교하고, 설치하게 합니다.',
+    eyebrow: 'AI Agent Skill Layer',
+    heading: 'AI agents를 위한 Skill layer',
     intro:
-      'OpenAgentSkill은 GitHub의 고품질 Agent Skills를 수집하고 품질, Stars, 유지보수 상태, 사용 신호로 정렬합니다.',
+      '품질, Stars, 유지보수 상태, 사용 신호를 함께 보여줘 Agent가 실행 전에 신뢰할 수 있는 Skill을 고를 수 있게 합니다.',
     highlights: [
       '작업 시나리오별로 설치 가능한 Skill 검색',
       '품질, 유지보수, 채택 신호 비교',
@@ -56,13 +56,13 @@ export const LOCALIZED_LANDING_PAGES = {
   es: {
     lang: 'es',
     label: 'Español',
-    title: 'OpenAgentSkill — Marketplace de AI Agent Skills',
+    title: 'OpenAgentSkill — La capa de skills para AI agents',
     description:
-      'OpenAgentSkill ayuda a descubrir, comparar e instalar AI Agent Skills para web scraping, agentes de código, RAG, automatización de navegador y flujos de trabajo.',
-    eyebrow: 'Directorio de AI Agent Skills',
-    heading: 'Descubre, compara e instala AI Agent Skills',
+      'OpenAgentSkill es npm para AI Agent Skills: ayuda a tu AI agent a encontrar, comparar e instalar automaticamente el skill reutilizable correcto.',
+    eyebrow: 'AI Agent Skill Layer',
+    heading: 'La capa de skills para AI agents',
     intro:
-      'OpenAgentSkill indexa skills de alta calidad en GitHub y las ordena por calidad, stars, mantenimiento y señales reales de uso.',
+      'Convierte repos y skills de GitHub en una capa de descubrimiento con calidad, stars, mantenimiento y senales de confianza antes de instalar.',
     highlights: [
       'Encuentra skills instalables por caso de uso',
       'Compara calidad, mantenimiento y adopción',
@@ -74,13 +74,13 @@ export const LOCALIZED_LANDING_PAGES = {
   de: {
     lang: 'de',
     label: 'Deutsch',
-    title: 'OpenAgentSkill — Marketplace für AI Agent Skills',
+    title: 'OpenAgentSkill — Die Skill-Schicht fur AI agents',
     description:
-      'OpenAgentSkill hilft beim Finden, Vergleichen und Installieren von AI Agent Skills für Web Scraping, Coding Agents, RAG, Browser-Automatisierung und Workflows.',
-    eyebrow: 'Verzeichnis für AI Agent Skills',
-    heading: 'AI Agent Skills finden, vergleichen und installieren',
+      'OpenAgentSkill ist npm fur AI Agent Skills: Lass deinen AI agent automatisch den richtigen wiederverwendbaren Skill finden, vergleichen und installieren.',
+    eyebrow: 'AI Agent Skill Layer',
+    heading: 'Die Skill-Schicht fur AI agents',
     intro:
-      'OpenAgentSkill indexiert hochwertige Agent Skills von GitHub und bewertet sie nach Qualität, Stars, Wartung und realen Nutzungssignalen.',
+      'OpenAgentSkill macht GitHub-Skills zu einer Discovery-Schicht mit Qualitat, Stars, Wartung und Vertrauenssignalen vor der Installation.',
     highlights: [
       'Installierbare Skills nach Aufgabe finden',
       'Qualität, Wartung und Adoption vergleichen',
@@ -92,13 +92,13 @@ export const LOCALIZED_LANDING_PAGES = {
   fr: {
     lang: 'fr',
     label: 'Français',
-    title: 'OpenAgentSkill — Marketplace d’AI Agent Skills',
+    title: 'OpenAgentSkill — La couche de skills pour AI agents',
     description:
-      'OpenAgentSkill aide à découvrir, comparer et installer des AI Agent Skills pour le web scraping, les agents de code, le RAG, l’automatisation navigateur et les workflows.',
-    eyebrow: 'Répertoire d’AI Agent Skills',
-    heading: 'Découvrez, comparez et installez des AI Agent Skills',
+      'OpenAgentSkill est npm pour AI Agent Skills : aidez votre AI agent a trouver, comparer et installer automatiquement le bon skill reutilisable.',
+    eyebrow: 'AI Agent Skill Layer',
+    heading: 'La couche de skills pour AI agents',
     intro:
-      'OpenAgentSkill indexe des Agent Skills de qualité depuis GitHub et les classe par qualité, stars, maintenance et signaux réels d’usage.',
+      'OpenAgentSkill transforme les skills GitHub en couche de decouverte avec qualite, stars, maintenance et signaux de confiance avant installation.',
     highlights: [
       'Trouver des skills installables par cas d’usage',
       'Comparer qualité, maintenance et adoption',

@@ -10,16 +10,16 @@ const BASE_URL = 'https://www.openagentskill.com'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'AI Agent Skills Registry & Recommendation API',
+  title: 'The Skill Layer for AI Agents',
   description:
-    'OpenAgentSkill is npm-style discovery for AI agent skills: a registry, audit layer, and recommendation API that helps agents find and install the right skill automatically.',
+    'The skill layer for AI agents. OpenAgentSkill is npm for AI Agent Skills: a registry, audit layer, and recommendation API that helps agents find, compare, and install the right reusable skill automatically.',
   alternates: {
     canonical: `${BASE_URL}/agent-skills-registry`,
   },
   openGraph: {
-    title: 'AI Agent Skills Registry & Recommendation API',
+    title: 'The Skill Layer for AI Agents',
     description:
-      'npm-style discovery for AI agent skills: search, compare, audit, and recommend the right skill automatically.',
+      'Let your AI agent find, compare, and install the right reusable skill automatically.',
     url: `${BASE_URL}/agent-skills-registry`,
     type: 'website',
   },
@@ -74,7 +74,7 @@ export default async function AgentSkillsRegistryPage() {
     url: `${BASE_URL}/agent-skills-registry`,
     endpointUrl: `${BASE_URL}/api/agent/recommend`,
     documentation: `${BASE_URL}/api-docs`,
-    description: 'Recommendation API for helping AI agents find and install the right reusable skill automatically.',
+    description: 'Recommendation API for helping AI agents find, compare, and install the right reusable skill automatically.',
   }
 
   return (
@@ -85,10 +85,10 @@ export default async function AgentSkillsRegistryPage() {
           <div className="mx-auto max-w-5xl">
             <p className="mb-4 text-xs uppercase tracking-widest text-secondary">AI Agent Skills Registry</p>
             <h1 className="max-w-4xl text-balance font-display text-4xl font-bold leading-tight sm:text-6xl">
-              npm-style discovery for AI agent skills.
+              The skill layer for AI agents.
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-relaxed text-secondary sm:text-xl">
-              Let your AI agent find and install the right skill automatically with a registry, audit layer, and recommendation API.
+              Let your AI agent find, compare, and install the right reusable skill automatically with a registry, audit layer, and recommendation API.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link

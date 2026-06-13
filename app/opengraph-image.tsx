@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
-export const alt = 'OpenAgentSkill - npm for AI Agent Skills'
+export const alt = 'OpenAgentSkill - The skill layer for AI agents'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -138,20 +138,20 @@ export default async function Image() {
                 }}
               >
                 <span style={{ display: 'flex', color: gold }}>-</span>
-                OPEN REGISTRY - AGENT DISCOVERY
+                SKILL LAYER - AGENT DISCOVERY
               </div>
 
               <div
                 style={{
                   display: 'flex',
                   marginTop: 28,
-                  fontSize: 78,
-                  lineHeight: 0.94,
+                  fontSize: 72,
+                  lineHeight: 0.96,
                   fontWeight: 780,
                   color: ink,
                 }}
               >
-                npm for AI Agent Skills
+                The skill layer for AI agents
               </div>
 
               <div
@@ -258,7 +258,7 @@ export default async function Image() {
             }}
           >
             <div style={{ display: 'flex', gap: 28 }}>
-              <span style={{ display: 'flex' }}>1,000+ skills</span>
+              <span style={{ display: 'flex' }}>npm for AI Agent Skills</span>
               <span style={{ display: 'flex' }}>Agent-ready APIs</span>
               <span style={{ display: 'flex' }}>Open source registry</span>
             </div>
