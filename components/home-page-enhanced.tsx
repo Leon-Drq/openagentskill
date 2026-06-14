@@ -238,8 +238,6 @@ const HOME_COPY: Record<Locale, {
   heroLine2Prefix: string
   heroAccent: string
   heroSubtitle: string
-  heroProofLabel: string
-  heroProof: string
   primaryCta: string
   githubCta: string
   registryApi: string
@@ -285,8 +283,6 @@ const HOME_COPY: Record<Locale, {
     heroLine2Prefix: 'for ',
     heroAccent: 'AI agents.',
     heroSubtitle: 'Let your AI agent find, compare, and install the right reusable skill automatically.',
-    heroProofLabel: 'Position',
-    heroProof: 'OpenAgentSkill is npm for AI Agent Skills.',
     primaryCta: 'Find skills for my agent',
     githubCta: 'View on GitHub',
     registryApi: 'Registry API',
@@ -340,8 +336,6 @@ const HOME_COPY: Record<Locale, {
     heroLine2Prefix: '',
     heroAccent: '技能层。',
     heroSubtitle: '让你的 AI Agent 自动发现、比较并安装正确的可复用 Skill。',
-    heroProofLabel: '定位',
-    heroProof: 'OpenAgentSkill 是 AI Agent Skills 的 npm。',
     primaryCta: '为我的 Agent 找技能',
     githubCta: '查看 GitHub',
     registryApi: '注册表 API',
@@ -395,8 +389,6 @@ const HOME_COPY: Record<Locale, {
     heroLine2Prefix: '',
     heroAccent: 'Skill layer.',
     heroSubtitle: 'AI agent が適切な再利用可能 Skill を自動で発見、比較、インストールできるようにします。',
-    heroProofLabel: '位置づけ',
-    heroProof: 'OpenAgentSkill は AI Agent Skills の npm です。',
     primaryCta: 'Agent に合う Skill を探す',
     githubCta: 'GitHub を見る',
     registryApi: 'Registry API',
@@ -450,8 +442,6 @@ const HOME_COPY: Record<Locale, {
     heroLine2Prefix: '',
     heroAccent: 'Skill layer.',
     heroSubtitle: 'AI agent가 올바른 재사용 가능 Skill을 자동으로 찾고, 비교하고, 설치하게 합니다.',
-    heroProofLabel: '포지션',
-    heroProof: 'OpenAgentSkill은 AI Agent Skills의 npm입니다.',
     primaryCta: 'Agent에 맞는 Skill 찾기',
     githubCta: 'GitHub 보기',
     registryApi: 'Registry API',
@@ -505,8 +495,6 @@ const HOME_COPY: Record<Locale, {
     heroLine2Prefix: 'para ',
     heroAccent: 'AI agents.',
     heroSubtitle: 'Permite que tu AI agent encuentre, compare e instale automaticamente el skill reutilizable correcto.',
-    heroProofLabel: 'Posicion',
-    heroProof: 'OpenAgentSkill es npm para AI Agent Skills.',
     primaryCta: 'Buscar skills para mi agent',
     githubCta: 'Ver en GitHub',
     registryApi: 'Registry API',
@@ -560,8 +548,6 @@ const HOME_COPY: Record<Locale, {
     heroLine2Prefix: 'fur ',
     heroAccent: 'AI agents.',
     heroSubtitle: 'Lass deinen AI agent automatisch den richtigen wiederverwendbaren Skill finden, vergleichen und installieren.',
-    heroProofLabel: 'Position',
-    heroProof: 'OpenAgentSkill ist npm fur AI Agent Skills.',
     primaryCta: 'Skills fur meinen Agent finden',
     githubCta: 'Auf GitHub ansehen',
     registryApi: 'Registry API',
@@ -615,8 +601,6 @@ const HOME_COPY: Record<Locale, {
     heroLine2Prefix: 'pour ',
     heroAccent: 'AI agents.',
     heroSubtitle: 'Permettez a votre AI agent de trouver, comparer et installer automatiquement le bon skill reutilisable.',
-    heroProofLabel: 'Position',
-    heroProof: 'OpenAgentSkill est npm pour AI Agent Skills.',
     primaryCta: 'Trouver des skills pour mon agent',
     githubCta: 'Voir sur GitHub',
     registryApi: 'Registry API',
@@ -794,13 +778,6 @@ export function HomePageEnhanced({ initialLocale, stats }: HomePageEnhancedProps
           <p className="mt-8 max-w-3xl text-pretty text-lg leading-relaxed text-[#5f5a52] md:text-xl">
             {copy.heroSubtitle}
           </p>
-
-          <div className="mt-5 inline-flex max-w-full flex-wrap items-center gap-2 rounded-full border border-[#d8d2c6] bg-[#fffdf8]/80 px-3 py-2 text-sm text-[#5f5a52] shadow-[0_8px_24px_rgba(29,27,24,0.04)]">
-            <span className="rounded-full bg-[#e8f1ed] px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#006b4f]">
-              {copy.heroProofLabel}
-            </span>
-            <span className="min-w-0 text-pretty font-semibold text-[#1d1b18]">{copy.heroProof}</span>
-          </div>
 
           <div className="mt-12 flex flex-wrap items-center gap-3">
             <a
