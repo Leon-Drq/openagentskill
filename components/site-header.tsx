@@ -9,7 +9,6 @@ import { BrandMark } from '@/components/brand-mark'
 import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
-import { NavUserMenu } from '@/components/nav-user-menu'
 import { useI18n } from '@/lib/i18n/context'
 import { cn } from '@/lib/utils'
 
@@ -210,7 +209,9 @@ export function SiteHeader() {
             </Link>
           </div>
 
-          <NavUserMenu />
+          <div className="xl:hidden">
+            <GitHubStarButton className="h-9" />
+          </div>
           <div className="xl:hidden">
             <LanguageSwitcher compact />
           </div>
