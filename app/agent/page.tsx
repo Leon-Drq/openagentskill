@@ -60,6 +60,12 @@ function endpointRows() {
       href: '/openapi.json',
       description: 'API schema for tools and agent runtimes.',
     },
+    {
+      label: 'IndexNow',
+      method: 'POST',
+      href: '/api/indexnow/submit',
+      description: 'Protected growth automation endpoint for notifying search engines after new skill pages are published.',
+    },
   ]
 }
 
@@ -105,7 +111,7 @@ export default async function AgentPage() {
                 </Link>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
+            <div className="grid grid-cols-2 gap-px border border-border bg-border text-center sm:grid-cols-4">
               <div className="bg-background p-4">
                 <div className="font-mono text-2xl">{skills.length.toLocaleString()}</div>
                 <div className="mt-1 text-xs uppercase text-secondary">Skills</div>
@@ -117,6 +123,10 @@ export default async function AgentPage() {
               <div className="bg-background p-4">
                 <div className="font-mono text-2xl">1h</div>
                 <div className="mt-1 text-xs uppercase text-secondary">GitHub scan</div>
+              </div>
+              <div className="bg-background p-4">
+                <div className="font-mono text-2xl">Live</div>
+                <div className="mt-1 text-xs uppercase text-secondary">Index ping</div>
               </div>
             </div>
           </div>
@@ -190,7 +200,7 @@ export default async function AgentPage() {
               Production cron calls the indexer hourly. It imports high-star skill-like GitHub projects across finance, data, documents, security, DevOps, RAG, browser automation, and other domain workflows, excludes MCP-only projects, records runs, and refreshes stars daily.
             </p>
           </div>
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="grid gap-3 md:grid-cols-3">
             <Link href="/api/agent/discovery" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground">
               <p className="text-xs uppercase text-secondary">Status API</p>
               <h3 className="mt-2 font-display text-xl font-semibold">/api/agent/discovery</h3>
@@ -200,6 +210,11 @@ export default async function AgentPage() {
               <p className="text-xs uppercase text-secondary">Private cron</p>
               <h3 className="mt-2 font-display text-xl font-semibold">/api/indexer/run</h3>
               <p className="mt-2 text-sm leading-relaxed text-secondary">Requires automation bearer token. Production Vercel Cron runs it every hour.</p>
+            </Link>
+            <Link href="/api/indexnow/submit" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground">
+              <p className="text-xs uppercase text-secondary">Index notification</p>
+              <h3 className="mt-2 font-display text-xl font-semibold">/api/indexnow/submit</h3>
+              <p className="mt-2 text-sm leading-relaxed text-secondary">Protected endpoint that submits newly published skill URLs and sitemap updates to IndexNow.</p>
             </Link>
           </div>
         </section>

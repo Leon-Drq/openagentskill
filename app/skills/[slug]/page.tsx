@@ -157,6 +157,8 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   const installApiHref = `/api/skills/${skill.slug}/install`
   const installTextHref = `${installApiHref}?format=text`
   const searchApiHref = `/api/skills/search?q=${encodeURIComponent(skill.name)}&limit=3`
+  const resolveApiHref = `/api/agent/resolve?task=${encodeURIComponent(`Use ${skill.name} for an agent workflow`)}&agent=codex&max_risk=medium`
+  const resolveTextHref = `${resolveApiHref}&format=text`
   const registryManifestHref = `/api/registry/manifest/${skill.slug}`
   const registryManifestTextHref = `${registryManifestHref}?format=text`
   const registryInstallHref = `/api/registry/install/${skill.slug}`
@@ -164,6 +166,13 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   const absoluteInstallApiUrl = getSkillInstallApiUrl(skill.slug)
   const xMainText = dbSkill ? buildManualXMainText(dbSkill) : ''
   const xReplyText = dbSkill ? buildManualXReplyText(dbSkill) : ''
+  const agentResolvePrompt = [
+    `Task: Use ${skill.name} in this workspace.`,
+    `Resolve first: https://www.openagentskill.com${resolveApiHref}`,
+    `Review install handoff: ${absoluteInstallApiUrl}`,
+    `Install command: ${skill.technical.installCommand}`,
+    'Before running it, summarize audit warnings, required permissions, and the fallback skill if install is risky.',
+  ].join('\n')
   const relatedDecisionRows = relatedSkills.map((relatedSkill) => ({
     skill: relatedSkill,
     quality: getSkillQualityProfile(relatedSkill),
@@ -192,6 +201,14 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
     },
     downloadUrl: skill.technical.repository,
     codeRepository: skill.technical.repository,
+    potentialAction: {
+      '@type': 'InstallAction',
+      target: `https://www.openagentskill.com${installApiHref}`,
+      object: {
+        '@type': 'SoftwareApplication',
+        name: skill.name,
+      },
+    },
   }
 
   return (
@@ -331,6 +348,79 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
             )}
 
             <SkillInstallTargets skillSlug={skill.slug} targets={installTargets} />
+
+            <section className="mb-10 overflow-hidden border border-border bg-card">
+              <div className="border-b border-border p-5">
+                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+                  <div>
+                    <p className="mb-2 text-xs uppercase text-secondary">Agent resolve plan</p>
+                    <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+                      Let an agent verify fit before installing.
+                    </h2>
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
+                      The Resolve API returns the selected skill, alternatives, safety policy, audit notes, install
+                      target, and copy-paste prompt an agent can follow without scraping this page.
+                    </p>
+                  </div>
+                  <Link
+                    href={resolveTextHref}
+                    prefetch={false}
+                    className="w-full border border-foreground bg-foreground px-4 py-2.5 text-center text-sm font-semibold text-background transition-opacity hover:opacity-80 sm:w-auto"
+                  >
+                    Open text plan
+                  </Link>
+                </div>
+              </div>
+
+              <div className="grid gap-px bg-border lg:grid-cols-3">
+                {[
+                  {
+                    label: 'Resolve JSON',
+                    value: resolveApiHref,
+                    href: resolveApiHref,
+                  },
+                  {
+                    label: 'Resolve text',
+                    value: resolveTextHref,
+                    href: resolveTextHref,
+                  },
+                  {
+                    label: 'Install handoff',
+                    value: installApiHref,
+                    href: installApiHref,
+                  },
+                ].map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    prefetch={false}
+                    className="min-w-0 bg-background p-4 transition-colors hover:bg-muted/40"
+                  >
+                    <p className="text-xs uppercase text-secondary">{item.label}</p>
+                    <p className="mt-2 break-all font-mono text-xs leading-relaxed text-foreground [overflow-wrap:anywhere]">
+                      {item.value}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+
+              <div className="grid gap-px bg-border md:grid-cols-[0.9fr_1.1fr]">
+                <div className="bg-card p-5">
+                  <p className="mb-3 text-xs uppercase text-secondary">Agent should check</p>
+                  <ul className="space-y-2 text-sm leading-relaxed text-secondary">
+                    <li>Task fit and alternatives from Resolve API.</li>
+                    <li>Audit score, trust score, and safety policy warnings.</li>
+                    <li>Install target compatibility for Codex, Claude Code, Cursor, or CLI.</li>
+                  </ul>
+                </div>
+                <div className="min-w-0 bg-card p-5">
+                  <p className="mb-3 text-xs uppercase text-secondary">Copy prompt</p>
+                  <pre className="overflow-x-auto border border-border bg-background p-4 font-mono text-xs leading-relaxed text-secondary">
+                    <code>{agentResolvePrompt}</code>
+                  </pre>
+                </div>
+              </div>
+            </section>
 
             <section className="mb-10 overflow-hidden border border-border bg-card">
               <div className="border-b border-border p-5">
@@ -926,6 +1016,13 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                   >
                     Compare Alternatives
                   </SkillActionLink>
+                  <Link
+                    href={resolveTextHref}
+                    prefetch={false}
+                    className="block w-full border border-border py-2.5 text-center text-sm text-foreground transition-colors hover:border-foreground"
+                  >
+                    Auto-resolve Plan
+                  </Link>
                   {skill.technical.repository && (
                     <SkillActionLink
                       href={skill.technical.repository}

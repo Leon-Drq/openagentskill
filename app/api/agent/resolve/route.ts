@@ -26,6 +26,16 @@ Install: ${selected.install_plan.value}
 URL: ${selected.urls.web}
 Why: ${selected.recommendation_reasons.join('; ')}` : 'No match'}
 
+Agent Workflow:
+${payload.agent_workflow ? `Action: ${payload.agent_workflow.recommended_action}
+Install API: ${payload.agent_workflow.install.api}
+Command: ${payload.agent_workflow.install.command}
+Prompt:
+${payload.agent_workflow.copy_paste_prompt}
+
+Review checklist:
+${payload.agent_workflow.review_checklist.map((item) => `- ${item}`).join('\n')}` : 'No workflow generated'}
+
 Alternatives:
 ${alternatives || 'No alternatives'}
 `,

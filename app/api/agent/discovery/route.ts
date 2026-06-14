@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { INDEXNOW_KEY_LOCATION } from '@/lib/indexnow'
 import { createPublicClient } from '@/lib/supabase/public'
 import { HIGH_STAR_DISCOVERY_DOMAINS, HIGH_STAR_QUERY_POOL_SIZE } from '@/lib/indexer/high-star-import'
 
@@ -54,6 +55,8 @@ export async function GET() {
     import_frequency: 'hourly on production',
     star_refresh_cron: '0 3 * * *',
     star_refresh_frequency: 'daily at 03:00 UTC',
+    indexnow_cron: '15 3 * * *',
+    indexnow_frequency: 'daily baseline submission plus automatic submission after new skill imports',
   }
 
   return NextResponse.json({
@@ -80,10 +83,31 @@ export async function GET() {
       filters,
       schedule,
     },
+    indexing: {
+      status: process.env.INDEXNOW_DISABLED === 'true' ? 'disabled' : 'active',
+      provider: 'IndexNow',
+      key_location: INDEXNOW_KEY_LOCATION,
+      protected_submit_endpoint: '/api/indexnow/submit',
+      automatic_triggers: [
+        'new skill imported by GitHub discovery',
+        'existing skill updated by GitHub discovery',
+        'daily baseline submission for core discovery pages and sitemap',
+      ],
+      submitted_url_types: [
+        'skill detail pages',
+        'skill audit pages',
+        'agent-readable skill API pages',
+        'skills directory',
+        'trending and hot pages',
+        'agent entry pages',
+        'sitemap',
+      ],
+    },
     endpoints: {
       private_import: '/api/indexer/run',
       private_refresh_stars: '/api/indexer/refresh-stars',
       private_logs: '/api/indexer/logs',
+      private_indexnow_submit: '/api/indexnow/submit',
       public_status: '/api/agent/discovery',
     },
     recent_runs: runs,

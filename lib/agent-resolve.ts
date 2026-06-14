@@ -154,6 +154,83 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
   const alternatives = candidates
     .filter((candidate) => candidate.skill.slug !== selected?.skill.slug)
     .slice(0, Math.max(0, limit - 1))
+  const agentWorkflow = selected
+    ? {
+        mode: 'resolve_review_install',
+        recommended_action: selected.safety.auto_install_allowed
+          ? 'Install after normal workspace review.'
+          : 'Pause for human review before installing.',
+        selected_skill: {
+          slug: selected.skill.slug,
+          name: selected.skill.name,
+          url: selected.urls.web,
+          repository: selected.urls.repository,
+        },
+        install: {
+          target: selected.install_plan.target,
+          label: selected.install_plan.label,
+          kind: selected.install_plan.kind,
+          command: selected.install_plan.command,
+          value: selected.install_plan.value,
+          api: selected.urls.install_api,
+        },
+        copy_paste_prompt: [
+          `Task: ${task}`,
+          `Use ${selected.skill.name} from ${selected.urls.web}.`,
+          `Review the audit first: ${selected.urls.audit}`,
+          `Install handoff: ${selected.urls.install_api}`,
+          `Install command: ${selected.install_plan.command}`,
+          'If audit or policy warnings look unsafe for this workspace, use one of the alternatives instead.',
+        ].join('\n'),
+        api_sequence: [
+          {
+            step: 1,
+            label: 'Resolve task',
+            method: 'GET',
+            url: `${SITE_URL}/api/agent/resolve?task=${encodeURIComponent(task)}&agent=${encodeURIComponent(agent)}&max_risk=${encodeURIComponent(constraints.max_risk || 'medium')}`,
+          },
+          {
+            step: 2,
+            label: 'Fetch selected skill profile',
+            method: 'GET',
+            url: selected.urls.api,
+          },
+          {
+            step: 3,
+            label: 'Fetch install handoff',
+            method: 'GET',
+            url: selected.urls.install_api,
+          },
+          {
+            step: 4,
+            label: 'Review audit',
+            method: 'GET',
+            url: selected.urls.audit,
+          },
+        ],
+        review_checklist: [
+          `Safety score: ${selected.safety.score}/100 ${selected.safety.label}`,
+          `Audit score: ${selected.audit.audit_score}/100 ${selected.audit.risk_label}`,
+          `Trust score: ${selected.trust.score}/100 ${selected.trust.label}`,
+          `Readiness: ${selected.decision.readiness_score}/100 ${selected.decision.readiness_label}`,
+          ...selected.safety.policy_warnings.slice(0, 3),
+          ...selected.audit.warnings.slice(0, 3),
+        ],
+        fallback_strategy: alternatives.slice(0, 3).map((candidate) => ({
+          slug: candidate.skill.slug,
+          name: candidate.skill.name,
+          reason: candidate.recommendation_reasons[0] || 'Alternative task match',
+          url: candidate.urls.web,
+          install_api: candidate.urls.install_api,
+        })),
+        expected_agent_output: {
+          selected_skill: 'slug and name',
+          install_command: 'command or agent prompt used',
+          risk_summary: 'audit, trust, and policy notes',
+          next_step: 'what the agent will do after install',
+        },
+      }
+    : null
 
   return {
     task,
@@ -161,6 +238,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     constraints,
     selected,
     alternatives,
+    agent_workflow: agentWorkflow,
     policy_decision: selected
       ? buildPolicyDecision(selected.safety.auto_install_allowed, selected.safety.policy_warnings)
       : {

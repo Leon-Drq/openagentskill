@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { searchSkillRepos, type CandidateRepo } from '@/lib/indexer/github-search'
 import { processBatch, processRepo } from '@/lib/indexer/processor'
 import { bulkImportHighStarSkills } from '@/lib/indexer/high-star-import'
+import { collectIndexNowUrlsFromIndexerResults, submitIndexNowUrls } from '@/lib/indexnow'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 
 // Allow up to 5 minutes (Vercel Pro max)
@@ -40,7 +41,16 @@ export async function POST(request: NextRequest) {
         updatedAt: new Date().toISOString(), htmlUrl: body.repoUrl,
       }
       const result = await processRepo(candidate)
-      return NextResponse.json({ success: true, summary: { found: 1, indexed: result.status === 'indexed' ? 1 : 0, rejected: result.status === 'rejected' ? 1 : 0, skipped: result.status === 'skipped' ? 1 : 0, errors: result.status === 'error' ? 1 : 0 }, results: [result] })
+      const indexing = result.slug && result.status === 'indexed'
+        ? await submitIndexNowUrls(collectIndexNowUrlsFromIndexerResults([result])).catch((error) => ({
+            skipped: false,
+            success: false,
+            status: null,
+            submitted: [],
+            message: error instanceof Error ? error.message : 'IndexNow submission failed.',
+          }))
+        : null
+      return NextResponse.json({ success: true, summary: { found: 1, indexed: result.status === 'indexed' ? 1 : 0, rejected: result.status === 'rejected' ? 1 : 0, skipped: result.status === 'skipped' ? 1 : 0, errors: result.status === 'error' ? 1 : 0 }, results: [result], indexing })
     }
 
     if (mode !== 'reviewed') {
@@ -70,7 +80,20 @@ export async function POST(request: NextRequest) {
         domains,
       })
       console.log('[indexer] Bulk import complete:', result.summary)
-      return NextResponse.json({ success: true, mode: 'bulk', ...result })
+      const indexingUrls = collectIndexNowUrlsFromIndexerResults(result.results)
+      const indexing = await submitIndexNowUrls(indexingUrls).catch((error) => ({
+        skipped: false,
+        success: false,
+        status: null,
+        submitted: indexingUrls,
+        message: error instanceof Error ? error.message : 'IndexNow submission failed.',
+      }))
+      console.log('[indexer] IndexNow submission complete:', {
+        success: indexing.success,
+        submitted: indexing.submitted.length,
+        skipped: indexing.skipped,
+      })
+      return NextResponse.json({ success: true, mode: 'bulk', ...result, indexing })
     }
 
     console.log(`[indexer] Starting — page=${page}, limit=${limit}`)
@@ -95,7 +118,15 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('[indexer] Run complete:', summary)
-    return NextResponse.json({ success: true, summary, results })
+    const indexingUrls = collectIndexNowUrlsFromIndexerResults(results)
+    const indexing = await submitIndexNowUrls(indexingUrls).catch((error) => ({
+      skipped: false,
+      success: false,
+      status: null,
+      submitted: indexingUrls,
+      message: error instanceof Error ? error.message : 'IndexNow submission failed.',
+    }))
+    return NextResponse.json({ success: true, summary, results, indexing })
 
   } catch (error: any) {
     console.error('[indexer] Fatal error:', error)

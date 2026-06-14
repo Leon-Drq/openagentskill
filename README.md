@@ -125,6 +125,8 @@ Current import rules:
 - Search budget is controlled by `INDEXER_MAX_SEARCH_REQUESTS`.
 - Search windows rotate across domain query groups each hour, including finance and other vertical workflows.
 - MCP and Model Context Protocol repositories are excluded from automated imports.
+- Newly imported or updated skill URLs are automatically submitted through the protected IndexNow notification route.
+- A daily baseline IndexNow cron refreshes core discovery pages and the sitemap.
 - Production indexer routes require `INDEXER_SECRET`.
 
 Useful routes:
@@ -147,6 +149,13 @@ GET /api/indexer/logs
 
 # Refresh GitHub star counts
 POST /api/indexer/refresh-stars
+
+# Submit fresh URLs to IndexNow with automation auth
+POST /api/indexnow/submit
+{
+  "slugs": ["crawl4ai"],
+  "includeBaseline": true
+}
 ```
 
 ## Tech Stack
