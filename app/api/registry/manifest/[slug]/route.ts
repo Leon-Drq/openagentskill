@@ -35,6 +35,12 @@ Trust:
 - Trust score: ${manifest.trust.score}/100 ${manifest.trust.label}
 - Audit: ${manifest.audit.audit_score}/100 ${manifest.audit.risk_label}
 
+Attribution:
+- Status: ${manifest.attribution.statusLabel}
+- Source: ${manifest.attribution.sourceLabel}
+- Creator: ${manifest.attribution.creatorName}
+- Claim URL: ${manifest.attribution.claimUrl}
+
 Install:
 ${manifest.install}
 

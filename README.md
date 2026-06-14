@@ -65,6 +65,8 @@ The long-term goal is to become the trust and routing layer for agent skills: no
 - Agent-friendly search and recommendation APIs.
 - Skill audit pages and embeddable README badges.
 - SEO pages for use cases, alternatives, guides, reports, rankings, and collections.
+- Claimable community-indexed listings with creator/source attribution.
+- Creator-aware X reply drafts for turning public skill discoveries into claimable listings.
 - Manual X Web Intent drafts for compliant social sharing.
 - Optional X OAuth flow for API-based posting when a paid X API plan is available.
 
@@ -113,6 +115,22 @@ Skill authors can add OpenAgentSkill badges to their own repository README.
 ```
 
 Replace `crawl4ai` with the skill slug.
+
+## Creator Claim And X Discovery Loop
+
+OpenAgentSkill can index public skills discovered from GitHub, X, creator websites, or community submissions without pretending they are official. Unverified pages are shown as claimable, community-indexed listings until a maintainer verifies ownership.
+
+Useful routes:
+
+```bash
+# Generate a normal share draft for one listed skill
+GET /api/x/share?skill_slug=crawl4ai
+
+# Generate a manual X reply draft for a creator post
+GET /api/x/reply-draft?skill_slug=crawl4ai&tweet_url=https://x.com/user/status/123&format=json
+```
+
+The reply draft invites the creator to claim or update the listing. It opens X Web Intent only; OpenAgentSkill does not auto-publish replies.
 
 ## Auto-Discovery
 
@@ -276,7 +294,7 @@ scripts/
 - [x] Programmatic SEO pages
 - [ ] Task-based skill evaluations
 - [ ] Agent-specific fit scoring for Claude Code, Codex, Cursor, and other agent surfaces
-- [ ] Creator claim pages with verified ownership
+- [x] Creator claim pages with verified ownership
 - [ ] Anonymous install and usage telemetry
 - [ ] Semantic search and reranking
 - [ ] Public benchmark reports for high-impact skill categories

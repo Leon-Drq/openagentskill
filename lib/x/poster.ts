@@ -1,5 +1,5 @@
 import { createPublicClient } from '@/lib/supabase/public'
-import { getAllSkills } from '@/lib/db/skills'
+import { getAllSkills, type SkillRecord } from '@/lib/db/skills'
 import {
   createXPost,
   refreshXAccessToken,
@@ -64,10 +64,14 @@ function truncate(value: string, maxLength: number) {
   return `${normalized.slice(0, Math.max(0, maxLength - 3)).trim()}...`
 }
 
-function getSkillUrl(skill: XPostSkill, source?: 'x') {
-  const url = `https://www.openagentskill.com/skills/${skill.slug}`
+function getSkillUrlBySlug(slug: string, source?: 'x') {
+  const url = `https://www.openagentskill.com/skills/${slug}`
   if (source === 'x') return `${url}?ref=x`
   return url
+}
+
+function getSkillUrl(skill: XPostSkill, source?: 'x') {
+  return getSkillUrlBySlug(skill.slug, source)
 }
 
 export function buildSkillPostText(skill: XPostSkill) {
@@ -157,6 +161,40 @@ export function buildManualXReplyText(skill: XPostSkill) {
   const text = [title, getSkillUrl(skill, 'x'), '', footer].join('\n')
 
   return text.slice(0, 280)
+}
+
+export function buildCommunityIndexedReplyText(
+  skill: Pick<SkillRecord, 'slug' | 'name' | 'author_name' | 'github_repo'>,
+  options: {
+    creatorName?: string | null
+    sourceUrl?: string | null
+  } = {}
+) {
+  const creatorName = truncate(options.creatorName || skill.author_name || skill.github_repo?.split('/')[0] || '', 32)
+  const skillName = truncate(skill.name, 52)
+  const url = `${getSkillUrlBySlug(skill.slug, 'x')}&utm_source=x_reply`
+
+  const intro = creatorName
+    ? `Love this. Added ${creatorName}'s ${skillName} to OpenAgentSkill as a community-indexed skill.`
+    : `Love this. Added ${skillName} to OpenAgentSkill as a community-indexed skill.`
+
+  const claimLine = 'Happy to update or verify the listing if you want to claim it.'
+  const build = (middle: string, includeClaim: boolean) => [
+    intro,
+    middle,
+    '',
+    url,
+    ...(includeClaim ? ['', claimLine] : []),
+  ].join('\n')
+
+  const middle = 'Now agents/builders can discover it, compare trust signals, and find the install path from one page.'
+  const full = build(middle, true)
+  if (full.length <= 280) return full
+
+  const shorter = build('Now agents/builders can discover and compare it from one page.', true)
+  if (shorter.length <= 280) return shorter
+
+  return build('', false).slice(0, 280)
 }
 
 export function buildXIntentUrl(text: string, tweetId?: string) {

@@ -7,6 +7,8 @@ import { trackSkillEvent } from '@/components/skill-event-tracker'
 interface ClaimSkillPanelProps {
   skillSlug: string
   repository?: string
+  creatorName?: string
+  sourceLabel?: string
   approvedClaim?: {
     github_username: string
     evidence_url: string | null
@@ -20,7 +22,13 @@ interface ClaimState {
   evidence_note: string | null
 }
 
-export function ClaimSkillPanel({ skillSlug, repository, approvedClaim }: ClaimSkillPanelProps) {
+export function ClaimSkillPanel({
+  skillSlug,
+  repository,
+  creatorName,
+  sourceLabel = 'community-indexed',
+  approvedClaim,
+}: ClaimSkillPanelProps) {
   const [open, setOpen] = useState(false)
   const [hasUser, setHasUser] = useState<boolean | null>(null)
   const [existingClaim, setExistingClaim] = useState<ClaimState | null>(null)
@@ -57,12 +65,13 @@ export function ClaimSkillPanel({ skillSlug, repository, approvedClaim }: ClaimS
   }, [skillSlug, repository])
 
   function openPanel() {
+    trackSkillEvent(skillSlug, 'claim_start')
+
     if (!hasUser) {
       window.location.href = `/auth/login?next=${encodeURIComponent(`/skills/${skillSlug}`)}`
       return
     }
     setOpen(true)
-    trackSkillEvent(skillSlug, 'claim_start')
   }
 
   async function submitClaim() {
@@ -94,7 +103,8 @@ export function ClaimSkillPanel({ skillSlug, repository, approvedClaim }: ClaimS
 
   if (approvedClaim) {
     return (
-      <div className="border border-border p-5">
+      <div id="claim-this-skill" className="scroll-mt-24 border border-border p-5">
+        <p className="mb-2 text-xs uppercase text-secondary">Owner claim</p>
         <h3 className="font-display text-lg font-semibold">Verified maintainer</h3>
         <p className="mt-2 text-xs leading-relaxed text-secondary">
           This skill has an approved maintainer claim from @{approvedClaim.github_username}.
@@ -114,10 +124,13 @@ export function ClaimSkillPanel({ skillSlug, repository, approvedClaim }: ClaimS
   }
 
   return (
-    <div className="border border-border p-5">
-      <h3 className="font-display text-lg font-semibold">Are you the maintainer?</h3>
+    <div id="claim-this-skill" className="scroll-mt-24 border border-border p-5">
+      <p className="mb-2 text-xs uppercase text-secondary">Owner claim</p>
+      <h3 className="font-display text-lg font-semibold">Claim this skill listing</h3>
       <p className="mt-2 text-xs leading-relaxed text-secondary">
-        Claim this listing to add a verified owner signal and make future launch, install, and audit updates easier to trust.
+        This {sourceLabel} listing is attributed to {creatorName || 'the public creator/source'} but is not marked
+        official yet. Claim it to add a verified owner signal and make future launch, install, and audit updates easier
+        to trust.
       </p>
 
       {existingClaim && !open ? (
@@ -132,7 +145,7 @@ export function ClaimSkillPanel({ skillSlug, repository, approvedClaim }: ClaimS
           onClick={openPanel}
           className="mt-4 w-full border border-border px-3 py-2 text-sm transition-colors hover:border-foreground"
         >
-          {hasUser ? 'Verify maintainer claim' : 'Sign in to claim'}
+          {hasUser ? 'Verify maintainer claim' : 'Claim this skill'}
         </button>
       ) : (
         <div className="mt-4 space-y-3">

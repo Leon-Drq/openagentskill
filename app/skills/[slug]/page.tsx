@@ -10,6 +10,7 @@ import {
 } from '@/lib/db/skills'
 import { ClaimSkillPanel } from '@/components/claim-skill-panel'
 import { SaveSkillButton } from '@/components/save-skill-button'
+import { SkillAttributionPanel } from '@/components/skill-attribution-panel'
 import { SkillActionLink } from '@/components/skill-action-link'
 import { SkillEventTracker } from '@/components/skill-event-tracker'
 import { SkillFeedbackPanel } from '@/components/skill-feedback-panel'
@@ -25,6 +26,7 @@ import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillInstallApiUrl } from '@/lib/registry'
+import { getSkillAttribution } from '@/lib/skill-attribution'
 import { getSkillTrustProfile, type SkillTrustProfile, type TrustCheckStatus } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 import { buildManualXMainText, buildManualXReplyText, buildXIntentUrl } from '@/lib/x/poster'
@@ -148,6 +150,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   const platformHints = dbSkill ? getPlatformHints(dbSkill) : []
   const decisionProfile = dbSkill ? getSkillDecisionProfile(dbSkill, eventStats) : null
   const trustProfile = dbSkill ? getSkillTrustProfile(dbSkill, Boolean(approvedClaim), eventStats) : null
+  const attribution = dbSkill ? getSkillAttribution(dbSkill, approvedClaim) : null
   const auditProfile = dbSkill ? buildSkillAudit(dbSkill, eventStats) : null
   const safetyProfile = dbSkill && auditProfile
     ? getAgentSafetyProfile(dbSkill, auditProfile, { max_risk: 'medium', needs_install_command: true })
@@ -198,7 +201,9 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
     author: {
       '@type': skill.author.verified ? 'Organization' : 'Person',
       name: skill.author.name,
+      url: attribution?.creatorUrl || undefined,
     },
+    sameAs: [attribution?.sourceUrl, attribution?.creatorUrl].filter(Boolean),
     downloadUrl: skill.technical.repository,
     codeRepository: skill.technical.repository,
     potentialAction: {
@@ -249,6 +254,13 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 {trustProfile && (
                   <div className="pt-2">
                     <TrustBadge profile={trustProfile} />
+                  </div>
+                )}
+                {attribution && (
+                  <div className="pt-2">
+                    <span className="inline-flex items-center gap-1.5 border border-border px-3 py-1 font-mono text-xs uppercase text-secondary">
+                      {attribution.statusLabel}
+                    </span>
                   </div>
                 )}
               </div>
@@ -1056,9 +1068,13 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 />
               )}
 
+              {attribution && <SkillAttributionPanel attribution={attribution} />}
+
               <ClaimSkillPanel
                 skillSlug={skill.slug}
                 repository={skill.technical.repository}
+                creatorName={attribution?.creatorName}
+                sourceLabel={attribution?.statusLabel.toLowerCase()}
                 approvedClaim={approvedClaim ? {
                   github_username: approvedClaim.github_username,
                   evidence_url: approvedClaim.evidence_url,

@@ -3,6 +3,7 @@ import type { SkillEventStats, SkillRecord } from '@/lib/db/skills'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
+import { getSkillAttribution } from '@/lib/skill-attribution'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
 
@@ -202,6 +203,7 @@ export function toRegistrySkill(skill: SkillRecord, eventStats?: SkillEventStats
   const audit = buildSkillAudit(skill, eventStats || null)
   const decision = getSkillDecisionProfile(skill, eventStats || null)
   const install = getSkillInstallCommand(skill)
+  const attribution = getSkillAttribution(skill)
 
   return {
     slug: skill.slug,
@@ -215,6 +217,7 @@ export function toRegistrySkill(skill: SkillRecord, eventStats?: SkillEventStats
       verified: skill.verified,
       url: skill.author_url,
     },
+    attribution,
     stats: {
       stars: Number(skill.github_stars || 0),
       forks: Number(skill.github_forks || 0),

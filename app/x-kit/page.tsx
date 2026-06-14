@@ -4,7 +4,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { getAllSkills } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
-import { buildManualXMainText, buildManualXReplyText, buildXIntentUrl } from '@/lib/x/poster'
+import { buildCommunityIndexedReplyText, buildManualXMainText, buildManualXReplyText, buildXIntentUrl } from '@/lib/x/poster'
 
 export const dynamic = 'force-dynamic'
 
@@ -68,6 +68,23 @@ export default async function XKitPage() {
         </section>
 
         <section className="py-10">
+          <div className="mb-8 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+            <div className="border border-border bg-card p-5">
+              <p className="mb-2 text-xs uppercase text-secondary">Creator reply loop</p>
+              <h2 className="font-display text-2xl font-semibold">Turn X discovery into claimable listings.</h2>
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
+                When a creator shares a useful skill, add the public listing, then open a manual reply draft that gives
+                attribution and invites them to claim it. No X API credits and no automatic posting.
+              </p>
+            </div>
+            <div className="min-w-0 border border-border bg-background p-5">
+              <p className="mb-3 text-xs uppercase text-secondary">Reply draft API</p>
+              <pre className="overflow-x-auto whitespace-pre-wrap rounded-[8px] border border-border bg-card p-4 font-mono text-xs leading-relaxed text-secondary">
+                <code>{`GET /api/x/reply-draft?skill_slug=crawl4ai&tweet_url=https://x.com/user/status/123&format=json`}</code>
+              </pre>
+            </div>
+          </div>
+
           {candidates.length === 0 ? (
             <div className="border border-border p-8">
               <h2 className="font-display text-2xl font-semibold">No share candidates yet.</h2>
@@ -80,6 +97,7 @@ export default async function XKitPage() {
               {candidates.map((skill) => {
                 const mainText = buildManualXMainText(skill)
                 const replyText = buildManualXReplyText(skill)
+                const creatorReplyText = buildCommunityIndexedReplyText(skill)
 
                 return (
                   <article key={skill.slug} className="flex min-w-0 flex-col border border-border bg-card p-5">
@@ -119,7 +137,7 @@ export default async function XKitPage() {
 
                     <details className="mt-4 border-t border-border pt-4">
                       <summary className="cursor-pointer text-xs font-semibold text-secondary hover:text-foreground">
-                        Reply draft
+                        Link reply draft
                       </summary>
                       <pre className="mt-3 whitespace-pre-wrap break-words rounded-[8px] border border-border bg-background p-3 font-mono text-[11px] leading-relaxed text-secondary">
                         {replyText}
@@ -132,6 +150,32 @@ export default async function XKitPage() {
                       >
                         Open reply draft
                       </a>
+                    </details>
+
+                    <details className="mt-3 border-t border-border pt-4">
+                      <summary className="cursor-pointer text-xs font-semibold text-secondary hover:text-foreground">
+                        Creator claim reply
+                      </summary>
+                      <pre className="mt-3 whitespace-pre-wrap break-words rounded-[8px] border border-border bg-background p-3 font-mono text-[11px] leading-relaxed text-secondary">
+                        {creatorReplyText}
+                      </pre>
+                      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                        <a
+                          href={buildXIntentUrl(creatorReplyText)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="border border-border px-3 py-2 text-center text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                        >
+                          Open creator reply
+                        </a>
+                        <Link
+                          href={`/api/x/reply-draft?skill_slug=${encodeURIComponent(skill.slug)}&format=json`}
+                          prefetch={false}
+                          className="border border-border px-3 py-2 text-center text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                        >
+                          Reply API
+                        </Link>
+                      </div>
                     </details>
                   </article>
                 )

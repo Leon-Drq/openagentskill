@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
-import { getSkillBySlug } from '@/lib/db/skills'
+import { getApprovedClaimBySkillSlug, getSkillBySlug } from '@/lib/db/skills'
 import { getStacksForSkill } from '@/lib/collections'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
+import { getSkillAttribution } from '@/lib/skill-attribution'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
@@ -28,9 +29,11 @@ export async function GET(
       )
     }
 
-    const trustProfile = getSkillTrustProfile(skill)
+    const approvedClaim = await getApprovedClaimBySkillSlug(skill.slug).catch(() => null)
+    const trustProfile = getSkillTrustProfile(skill, Boolean(approvedClaim))
     const audit = buildSkillAudit(skill)
     const installTargets = getSkillInstallTargets(skill)
+    const attribution = getSkillAttribution(skill, approvedClaim)
 
     if (format === 'text') {
       const text = `${skill.name}
@@ -56,6 +59,13 @@ Statistics:
 - Rating: ${skill.rating}/5 (${skill.review_count} reviews)
 
 Author: ${skill.author_name}${skill.verified ? ' (Verified)' : ''}
+
+Attribution:
+- Status: ${attribution.statusLabel}
+- Source: ${attribution.sourceLabel}
+- Creator: ${attribution.creatorName}
+- Claim URL: ${attribution.claimUrl}
+- Note: ${attribution.trustNote}
 
 Install:
 ${skill.install_command || `npx skills add ${skill.github_repo}`}
@@ -86,6 +96,7 @@ Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
       tags: skill.tags,
       author: skill.author_name,
       verified: skill.verified,
+      attribution,
       stats: {
         stars: skill.github_stars,
         forks: skill.github_forks,

@@ -108,7 +108,21 @@ export async function GET() {
       private_refresh_stars: '/api/indexer/refresh-stars',
       private_logs: '/api/indexer/logs',
       private_indexnow_submit: '/api/indexnow/submit',
+      public_skill_claims: '/api/claims',
+      public_x_share_draft: '/api/x/share?skill_slug={slug}',
+      public_x_reply_draft: '/api/x/reply-draft?skill_slug={slug}&tweet_url={tweet_url}',
       public_status: '/api/agent/discovery',
+    },
+    creator_growth_loop: {
+      status: 'active',
+      workflow: [
+        'index public skill from repository or creator source',
+        'show listing as community indexed until a maintainer claim is approved',
+        'generate a manual X reply draft with attribution and claim invitation',
+        'creator can claim the listing through the skill detail page',
+      ],
+      safe_automation_policy:
+        'OpenAgentSkill generates Web Intent drafts only; publishing or replying on X requires a human click.',
     },
     recent_runs: runs,
     meta: {
