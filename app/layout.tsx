@@ -3,6 +3,12 @@ import { Geist_Mono, Inter } from 'next/font/google'
 import { StructuredData } from '@/components/structured-data'
 import { I18nProvider } from '@/lib/i18n/context'
 import { getLocalizedLanguageAlternates } from '@/lib/seo/localized-pages'
+import {
+  HOME_SOCIAL_DESCRIPTION,
+  HOME_SOCIAL_IMAGE_URL,
+  HOME_SOCIAL_TITLE,
+  SITE_URL,
+} from '@/lib/seo/social'
 import './globals.css'
 
 const inter = Inter({
@@ -20,7 +26,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.openagentskill.com'),
   title: {
-    default: 'The Skill Layer for AI Agents | OpenAgentSkill',
+    default: HOME_SOCIAL_TITLE,
     template: '%s | Open Agent Skill',
   },
   description: 'The skill layer for AI agents. Let your AI agent find, compare, and install the right reusable skill automatically. OpenAgentSkill is npm for AI Agent Skills.',
@@ -77,15 +83,15 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'The Skill Layer for AI Agents | OpenAgentSkill',
-    description: 'Let your AI agent find, compare, and install the right reusable skill automatically. OpenAgentSkill is npm for AI Agent Skills.',
-    url: 'https://www.openagentskill.com',
+    title: HOME_SOCIAL_TITLE,
+    description: HOME_SOCIAL_DESCRIPTION,
+    url: SITE_URL,
     siteName: 'Open Agent Skill',
     locale: 'en_US',
     type: 'website',
     images: [
       {
-        url: 'https://www.openagentskill.com/opengraph-image?v=3',
+        url: HOME_SOCIAL_IMAGE_URL,
         width: 1200,
         height: 630,
         alt: 'OpenAgentSkill — The skill layer for AI agents',
@@ -95,14 +101,21 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'The Skill Layer for AI Agents | OpenAgentSkill',
-    description: 'Let your AI agent find, compare, and install the right reusable skill automatically. OpenAgentSkill is npm for AI Agent Skills.',
+    title: HOME_SOCIAL_TITLE,
+    description: HOME_SOCIAL_DESCRIPTION,
     creator: '@openagentskill',
     site: '@openagentskill',
-    images: ['https://www.openagentskill.com/opengraph-image?v=3'],
+    images: [
+      {
+        url: HOME_SOCIAL_IMAGE_URL,
+        alt: 'OpenAgentSkill — The skill layer for AI agents',
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
   alternates: {
-    canonical: 'https://www.openagentskill.com',
+    canonical: SITE_URL,
     languages: getLocalizedLanguageAlternates(),
   },
 }

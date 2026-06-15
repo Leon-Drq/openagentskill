@@ -1,3 +1,5 @@
+import { HOME_SOCIAL_IMAGE_URL } from '@/lib/seo/social'
+
 const BASE_URL = 'https://www.openagentskill.com'
 
 export function StructuredData() {
@@ -31,7 +33,7 @@ export function StructuredData() {
     url: BASE_URL,
     logo: `${BASE_URL}/icon.svg`,
     description: 'OpenAgentSkill helps AI agents and builders discover, compare, audit, and install the right reusable skill automatically.',
-    image: `${BASE_URL}/opengraph-image?v=3`,
+    image: HOME_SOCIAL_IMAGE_URL,
     foundingDate: '2026',
     sameAs: [
       'https://github.com/Leon-Drq/openagentskill',
