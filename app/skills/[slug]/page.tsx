@@ -44,11 +44,13 @@ export async function generateMetadata({
   if (!skill) return { title: 'Skill Not Found' }
   
   const starsText = skill.stats.stars >= 1000 ? `${(skill.stats.stars / 1000).toFixed(1)}K` : skill.stats.stars
-  const description = `${skill.description} ${starsText} GitHub stars. Install with npx skills add ${skill.slug}.`
+  const installCommand = skill.technical.installCommand || `npx skills add ${skill.slug}`
+  const description = `${skill.description} ${starsText} GitHub stars. Install with ${installCommand}.`
   const pageUrl = `https://www.openagentskill.com/skills/${slug}`
   const imageAlt = `${skill.name} - OpenAgentSkill`
+  const imageVersion = '3'
   const image = {
-    url: `${pageUrl}/opengraph-image?v=2`,
+    url: `${pageUrl}/opengraph-image?v=${imageVersion}`,
     width: 1200,
     height: 630,
     alt: imageAlt,
@@ -72,7 +74,7 @@ export async function generateMetadata({
       description,
       images: [
         {
-          url: `${pageUrl}/twitter-image?v=2`,
+          url: `${pageUrl}/twitter-image?v=${imageVersion}`,
           alt: imageAlt,
         },
       ],

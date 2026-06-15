@@ -48,12 +48,16 @@ function titleCase(value: string) {
 function getScenario(category: string, tags: string[], description: string) {
   const text = [category, description, ...tags].join(' ').toLowerCase()
 
-  if (/finance|quant|trading|market|stock|portfolio/.test(text)) {
-    return 'Use it when your agent needs to analyze markets, research assets, or build quant workflows.'
+  if (/research|deep[-_\s]?research|recency|trends?|social[-_\s]?media|reddit|youtube|hackernews|polymarket|web[-_\s]?search|twitter|\bx\b/.test(text)) {
+    return 'Use it when your agent needs recent cross-source research, trend signals, or a grounded brief.'
   }
 
   if (/football|soccer|sports|world cup|match|statsbomb/.test(text)) {
     return 'Use it when your agent needs football analytics, match data, or tournament research.'
+  }
+
+  if (/finance|quant|trading|financial[-_\s]?market|stock|portfolio/.test(text)) {
+    return 'Use it when your agent needs to analyze markets, research assets, or build quant workflows.'
   }
 
   if (/scrap|crawl|browser|web|playwright|puppeteer/.test(text)) {
