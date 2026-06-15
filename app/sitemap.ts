@@ -7,6 +7,7 @@ import { LOCALIZED_LANDING_PAGES, getLocalizedLanguageAlternates } from '@/lib/s
 import { BEST_SKILL_PAGES } from '@/lib/seo/growth-pages'
 import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
 import { AGENT_PROFILES, OFFICIAL_CREATORS } from '@/lib/seo/growth-directories'
+import { SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
 import { SKILL_PACKS } from '@/lib/skill-packs'
 import { USE_CASES } from '@/lib/use-cases'
 import { AGENT_TASKS } from '@/lib/agent-tasks'
@@ -112,6 +113,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.86,
   }))
 
+  const skillClusterPages: MetadataRoute.Sitemap = SKILL_CLUSTERS.map((cluster) => ({
+    url: `${baseUrl}${cluster.path}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: cluster.slug === 'world-cup-football' ? 0.9 : 0.88,
+  }))
+
   const collectionPages: MetadataRoute.Sitemap = SKILL_STACKS.map((stack) => ({
     url: `${baseUrl}/collections/${stack.slug}`,
     lastModified: new Date(),
@@ -171,6 +179,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticPages,
     ...localizedPages,
+    ...skillClusterPages,
     ...useCasePages,
     ...taskPages,
     ...bestPages,

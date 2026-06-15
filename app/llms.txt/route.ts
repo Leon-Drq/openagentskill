@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
 import { AGENT_TASKS } from '@/lib/agent-tasks'
+import { FEATURED_SKILL_CLUSTERS, SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
 
 export async function GET() {
   const featuredTasks = AGENT_TASKS.slice(0, 12)
     .map((task) => `- ${task.title}: https://www.openagentskill.com/tasks/${task.slug}`)
+    .join('\n')
+  const featuredClusters = FEATURED_SKILL_CLUSTERS
+    .map((cluster) => `- ${cluster.primaryKeyword}: https://www.openagentskill.com${cluster.path}`)
     .join('\n')
 
   const text = `# OpenAgentSkill
@@ -35,8 +39,15 @@ Important URLs:
 - OpenAPI schema: https://www.openagentskill.com/openapi.json
 - GitHub auto-discovery status: https://www.openagentskill.com/api/agent/discovery
 
+High-intent skill cluster routes:
+${featuredClusters}
+
 Featured task routes:
 ${featuredTasks}
+
+Coverage:
+- Skill cluster pages: ${SKILL_CLUSTERS.length}
+- Task pages: ${AGENT_TASKS.length}
 
 Install safety:
 - Review repository and license before running third-party code.

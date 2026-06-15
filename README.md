@@ -44,6 +44,7 @@ The long-term goal is to become the trust and routing layer for agent skills: no
 | Skill directory | [/skills](https://www.openagentskill.com/skills) | Search and filter the full catalog |
 | Agent skills | [/agent-skills](https://www.openagentskill.com/agent-skills) | Search entry for reusable agent skills |
 | AI agent skills | [/ai-agent-skills](https://www.openagentskill.com/ai-agent-skills) | Cross-agent discovery for Codex, Claude Code, Cursor, and more |
+| Skill clusters | [/ai-agent-skills/web-scraping](https://www.openagentskill.com/ai-agent-skills/web-scraping) | High-intent scenario pages for web scraping, coding agents, finance, RAG, World Cup analytics, and more |
 | Skills registry | [/skills-registry](https://www.openagentskill.com/skills-registry) | Registry positioning, trust signals, and install handoffs |
 | Trending | [/trending](https://www.openagentskill.com/trending) | Skills with recent activity signals |
 | Hot | [/hot](https://www.openagentskill.com/hot) | High-momentum skills |
@@ -65,6 +66,7 @@ The long-term goal is to become the trust and routing layer for agent skills: no
 - Agent-friendly search and recommendation APIs.
 - Skill audit pages and embeddable README badges.
 - SEO pages for use cases, alternatives, guides, reports, rankings, and collections.
+- High-intent AI agent skill clusters for concrete workflows such as web scraping, coding agents, finance/quant, RAG, PDF extraction, browser automation, security, and World Cup football analytics.
 - Claimable community-indexed listings with creator/source attribution.
 - Creator-aware X reply drafts for turning public skill discoveries into claimable listings.
 - Manual X Web Intent drafts for compliant social sharing.

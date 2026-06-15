@@ -7,6 +7,7 @@ import {
   HIGH_STAR_QUERY_POOL_SIZE,
   HIGH_STAR_SKILL_COVERAGE_TARGET,
 } from '@/lib/indexer/high-star-import'
+import { FEATURED_SKILL_CLUSTERS, SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
 
 export const dynamic = 'force-dynamic'
 
@@ -145,6 +146,26 @@ export async function GET() {
       },
       filters,
       schedule,
+    },
+    seo_growth: {
+      status: 'active',
+      strategy:
+        'Publish high-intent, task-first skill cluster pages so Google and AI search can map OpenAgentSkill to concrete agent workflows.',
+      cluster_count: SKILL_CLUSTERS.length,
+      featured_clusters: FEATURED_SKILL_CLUSTERS.map((cluster) => ({
+        slug: cluster.slug,
+        title: cluster.title,
+        primary_keyword: cluster.primaryKeyword,
+        use_case: cluster.useCaseSlug,
+        url: `https://www.openagentskill.com${cluster.path}`,
+      })),
+      ranking_surfaces: [
+        '/ai-agent-skills/{cluster}',
+        '/best/{use_case}',
+        '/use-cases/{use_case}',
+        '/tasks/{task}',
+        '/api/agent/resolve',
+      ],
     },
     indexing: {
       status: process.env.INDEXNOW_DISABLED === 'true' ? 'disabled' : 'active',
