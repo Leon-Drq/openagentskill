@@ -134,14 +134,14 @@ The reply draft invites the creator to claim or update the listing. It opens X W
 
 ## Auto-Discovery
 
-The indexer scans GitHub for high-signal skill repositories and imports approved matches. It now rotates across cross-domain query groups so the catalog can expand beyond developer tools into finance, quant research, documents, data analysis, security, DevOps, RAG, browser automation, commerce, ML/media, and science workflows.
+The indexer scans GitHub for high-signal skill repositories and imports approved matches. It now rotates across scenario-specific query groups so the catalog can expand toward 10,000+ approved skills across developer tools, finance, quant research, documents, data analysis, security, DevOps, RAG, browser automation, commerce, marketing, support, legal, education, productivity, Web3, sports analytics, ML/media, science, and robotics workflows.
 
 Current import rules:
 
 - Minimum GitHub stars are controlled by `INDEXER_MIN_STARS`.
 - Per-run target is controlled by `INDEXER_RUN_TARGET`.
 - Search budget is controlled by `INDEXER_MAX_SEARCH_REQUESTS`.
-- Search windows rotate across domain query groups each hour, including finance and other vertical workflows.
+- Search windows rotate across domain query groups each hour, including finance, World Cup/sports analytics, marketing, legal, education, support, productivity, Web3, and other vertical workflows.
 - MCP and Model Context Protocol repositories are excluded from automated imports.
 - Newly imported or updated skill URLs are automatically submitted through the protected IndexNow notification route.
 - A daily baseline IndexNow cron refreshes core discovery pages and the sitemap.
@@ -285,6 +285,7 @@ scripts/
 
 - [x] Public skill directory
 - [x] GitHub auto-indexer for high-star skills
+- [x] Scenario coverage matrix for 10,000+ skill growth
 - [x] Skill-only imports with MCP exclusion
 - [x] Quality and trust profiles
 - [x] Audit reports

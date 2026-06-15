@@ -4,6 +4,11 @@ import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { AGENT_TASKS, FEATURED_AGENT_TASKS } from '@/lib/agent-tasks'
 import { getAllSkills } from '@/lib/db/skills'
+import {
+  HIGH_STAR_DISCOVERY_DOMAINS,
+  HIGH_STAR_QUERY_POOL_SIZE,
+  HIGH_STAR_SKILL_COVERAGE_TARGET,
+} from '@/lib/indexer/high-star-import'
 
 export const dynamic = 'force-dynamic'
 
@@ -72,6 +77,7 @@ function endpointRows() {
 export default async function AgentPage() {
   const skills = await getAllSkills('quality').catch(() => [])
   const topSkills = skills.slice(0, 4)
+  const discoveryDomains = HIGH_STAR_DISCOVERY_DOMAINS
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -195,27 +201,65 @@ export default async function AgentPage() {
         <section className="grid gap-8 py-10 lg:grid-cols-[0.75fr_1.25fr]">
           <div>
             <p className="mb-3 text-xs uppercase text-secondary">Auto-discovery</p>
-            <h2 className="font-display text-2xl font-semibold">GitHub collection is already automated</h2>
+            <h2 className="font-display text-2xl font-semibold">GitHub collection is scaling toward 10k+ skills</h2>
             <p className="mt-3 text-sm leading-relaxed text-secondary">
-              Production cron calls the indexer hourly. It imports high-star skill-like GitHub projects across finance, data, documents, security, DevOps, RAG, browser automation, and other domain workflows, excludes MCP-only projects, records runs, and refreshes stars daily.
+              Production cron calls the indexer hourly. It imports high-star, skill-like GitHub projects across scenario groups, excludes MCP-only projects, records runs, refreshes stars, and submits fresh URLs to search indexes.
             </p>
           </div>
-          <div className="grid gap-3 md:grid-cols-3">
-            <Link href="/api/agent/discovery" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground">
-              <p className="text-xs uppercase text-secondary">Status API</p>
-              <h3 className="mt-2 font-display text-xl font-semibold">/api/agent/discovery</h3>
-              <p className="mt-2 text-sm leading-relaxed text-secondary">Public-safe schedule, thresholds, and recent run summary.</p>
-            </Link>
-            <Link href="/api/indexer/run" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground">
-              <p className="text-xs uppercase text-secondary">Private cron</p>
-              <h3 className="mt-2 font-display text-xl font-semibold">/api/indexer/run</h3>
-              <p className="mt-2 text-sm leading-relaxed text-secondary">Requires automation bearer token. Production Vercel Cron runs it every hour.</p>
-            </Link>
-            <Link href="/api/indexnow/submit" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground">
-              <p className="text-xs uppercase text-secondary">Index notification</p>
-              <h3 className="mt-2 font-display text-xl font-semibold">/api/indexnow/submit</h3>
-              <p className="mt-2 text-sm leading-relaxed text-secondary">Protected endpoint that submits newly published skill URLs and sitemap updates to IndexNow.</p>
-            </Link>
+          <div>
+            <div className="grid gap-px overflow-hidden border border-border bg-border text-center sm:grid-cols-2 lg:grid-cols-4">
+              <div className="bg-card p-4">
+                <div className="font-mono text-2xl">{HIGH_STAR_SKILL_COVERAGE_TARGET.toLocaleString()}+</div>
+                <div className="mt-1 text-xs uppercase text-secondary">Coverage target</div>
+              </div>
+              <div className="bg-card p-4">
+                <div className="font-mono text-2xl">{discoveryDomains.length}</div>
+                <div className="mt-1 text-xs uppercase text-secondary">Scenario groups</div>
+              </div>
+              <div className="bg-card p-4">
+                <div className="font-mono text-2xl">{HIGH_STAR_QUERY_POOL_SIZE}</div>
+                <div className="mt-1 text-xs uppercase text-secondary">GitHub queries</div>
+              </div>
+              <div className="bg-card p-4">
+                <div className="font-mono text-2xl">1h</div>
+                <div className="mt-1 text-xs uppercase text-secondary">Import cadence</div>
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {discoveryDomains.map((domain) => (
+                <div key={domain.key} className="border border-border bg-card p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-mono text-xs uppercase text-secondary">{domain.key}</p>
+                      <h3 className="mt-2 font-display text-lg font-semibold leading-snug">{domain.label}</h3>
+                    </div>
+                    <span className="shrink-0 border border-border px-2 py-1 font-mono text-xs text-secondary">
+                      {domain.query_count}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-secondary">{domain.description}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 grid gap-3 md:grid-cols-3">
+              <Link href="/api/agent/discovery" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground">
+                <p className="text-xs uppercase text-secondary">Status API</p>
+                <h3 className="mt-2 font-display text-xl font-semibold">/api/agent/discovery</h3>
+                <p className="mt-2 text-sm leading-relaxed text-secondary">Public-safe scale plan, coverage matrix, thresholds, and recent run summary.</p>
+              </Link>
+              <Link href="/api/indexer/run" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground">
+                <p className="text-xs uppercase text-secondary">Private cron</p>
+                <h3 className="mt-2 font-display text-xl font-semibold">/api/indexer/run</h3>
+                <p className="mt-2 text-sm leading-relaxed text-secondary">Requires automation bearer token. Production Vercel Cron runs it every hour.</p>
+              </Link>
+              <Link href="/api/indexnow/submit" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground">
+                <p className="text-xs uppercase text-secondary">Index notification</p>
+                <h3 className="mt-2 font-display text-xl font-semibold">/api/indexnow/submit</h3>
+                <p className="mt-2 text-sm leading-relaxed text-secondary">Protected endpoint that submits newly published skill URLs and sitemap updates to IndexNow.</p>
+              </Link>
+            </div>
           </div>
         </section>
 

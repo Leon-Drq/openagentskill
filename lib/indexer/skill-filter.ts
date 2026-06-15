@@ -46,6 +46,13 @@ const POSITIVE_SIGNALS: Array<{ label: string; pattern: RegExp; weight: number }
   { label: 'devops-workflow', pattern: /\b(devops|kubernetes|terraform|observability|incident[-_\s]?response|ci[-_\s]?cd|infrastructure[-_\s]?automation)\b/i, weight: 3 },
   { label: 'ml-media-workflow', pattern: /\b(mlops|machine[-_\s]?learning|image[-_\s]?generation|video[-_\s]?processing|speech[-_\s]?recognition|text[-_\s]?to[-_\s]?speech)\b/i, weight: 3 },
   { label: 'science-workflow', pattern: /\b(geospatial|gis|scientific[-_\s]?computing|bioinformatics|healthcare[-_\s]?data|health[-_\s]?data)\b/i, weight: 3 },
+  { label: 'marketing-workflow', pattern: /\b(seo|keyword[-_\s]?research|content[-_\s]?marketing|web[-_\s]?analytics|crm|email[-_\s]?automation|growth[-_\s]?marketing)\b/i, weight: 3 },
+  { label: 'legal-workflow', pattern: /\b(legal[-_\s]?tech|contract[-_\s]?analysis|policy[-_\s]?analysis|privacy|gdpr|compliance[-_\s]?review)\b/i, weight: 3 },
+  { label: 'education-workflow', pattern: /\b(education|tutoring|course[-_\s]?generation|quiz[-_\s]?generation|learning[-_\s]?analytics)\b/i, weight: 3 },
+  { label: 'support-workflow', pattern: /\b(customer[-_\s]?support|helpdesk|ticket[-_\s]?triage|chatbot|knowledge[-_\s]?base)\b/i, weight: 3 },
+  { label: 'productivity-workflow', pattern: /\b(productivity|email[-_\s]?agent|calendar[-_\s]?agent|notes?[-_\s]?agent|task[-_\s]?management|desktop[-_\s]?automation|file[-_\s]?automation)\b/i, weight: 3 },
+  { label: 'web3-workflow', pattern: /\b(blockchain|web3|on[-_\s]?chain|defi|smart[-_\s]?contract(s)?|transaction[-_\s]?monitoring)\b/i, weight: 3 },
+  { label: 'robotics-workflow', pattern: /\b(robotics|ros|computer[-_\s]?vision|iot|sensor[-_\s]?data)\b/i, weight: 3 },
 ]
 
 const COLLECTION_PATTERNS = [
@@ -101,7 +108,7 @@ export function evaluateSkillCandidate(candidate: SkillCandidateProfile): SkillC
     score += 1
   }
 
-  if (candidate.topics?.some((topic) => /skill|agent|automation|rag|crawler|scraping|browser|document|pdf|ocr|testing|security|semantic-search|vector|finance|quant|trading|backtesting|portfolio|fintech|market-data|risk-management|technical-analysis|options-pricing|research|arxiv|etl|analytics|business-intelligence|ecommerce|sales|world-cup|fifa|football|soccer|sports|statsbomb|fantasy-football|match-prediction|devops|kubernetes|terraform|observability|mlops|geospatial|bioinformatics/i.test(topic))) {
+  if (candidate.topics?.some((topic) => /skill|agent|automation|rag|crawler|scraping|browser|document|pdf|ocr|testing|security|semantic-search|vector|finance|quant|trading|backtesting|portfolio|fintech|market-data|risk-management|technical-analysis|options-pricing|research|arxiv|etl|analytics|business-intelligence|ecommerce|sales|world-cup|fifa|football|soccer|sports|statsbomb|fantasy-football|match-prediction|devops|kubernetes|terraform|observability|mlops|geospatial|bioinformatics|seo|marketing|crm|legal|privacy|gdpr|education|tutoring|support|helpdesk|chatbot|productivity|calendar|notes|task-management|desktop-automation|blockchain|web3|defi|robotics|computer-vision|iot/i.test(topic))) {
     score += 1
   }
 

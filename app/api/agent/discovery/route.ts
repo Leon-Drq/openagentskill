@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server'
 import { INDEXNOW_KEY_LOCATION } from '@/lib/indexnow'
 import { createPublicClient } from '@/lib/supabase/public'
-import { HIGH_STAR_DISCOVERY_DOMAINS, HIGH_STAR_QUERY_POOL_SIZE } from '@/lib/indexer/high-star-import'
+import {
+  HIGH_STAR_DISCOVERY_DOMAINS,
+  HIGH_STAR_INDEXER_VERSION,
+  HIGH_STAR_QUERY_POOL_SIZE,
+  HIGH_STAR_SKILL_COVERAGE_TARGET,
+} from '@/lib/indexer/high-star-import'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,11 +41,22 @@ async function getRecentRuns() {
   }))
 }
 
+async function getApprovedSkillCount() {
+  const supabase = createPublicClient()
+  const { count, error } = await supabase
+    .from('skills')
+    .select('slug', { count: 'exact', head: true })
+    .eq('ai_review_approved', true)
+
+  if (error) return null
+  return count
+}
+
 export async function GET() {
   const minStars = Number(process.env.INDEXER_MIN_STARS || 500)
   const targetNew = Number(process.env.INDEXER_RUN_TARGET || 25)
   const maxSearchRequests = Number(process.env.INDEXER_MAX_SEARCH_REQUESTS || (process.env.GITHUB_TOKEN ? 30 : 10))
-  const runs = await getRecentRuns()
+  const [runs, approvedSkillCount] = await Promise.all([getRecentRuns(), getApprovedSkillCount()])
   const filters = {
     min_stars: minStars,
     target_new_per_run: targetNew,
@@ -58,17 +74,45 @@ export async function GET() {
     indexnow_cron: '15 3 * * *',
     indexnow_frequency: 'daily baseline submission plus automatic submission after new skill imports',
   }
+  const estimatedDailyCapacity = targetNew * 24
+  const remainingToTarget =
+    typeof approvedSkillCount === 'number'
+      ? Math.max(HIGH_STAR_SKILL_COVERAGE_TARGET - approvedSkillCount, 0)
+      : null
+  const estimatedDaysToTarget =
+    remainingToTarget === null
+      ? null
+      : Math.ceil(remainingToTarget / Math.max(estimatedDailyCapacity, 1))
 
   return NextResponse.json({
     status: 'active',
     source: 'github',
     scope: 'skills-only',
+    scale_plan: {
+      indexer_version: HIGH_STAR_INDEXER_VERSION,
+      target_approved_skills: HIGH_STAR_SKILL_COVERAGE_TARGET,
+      current_approved_skills: approvedSkillCount,
+      remaining_to_target: remainingToTarget,
+      estimated_daily_capacity: estimatedDailyCapacity,
+      estimated_days_to_target_at_current_target: estimatedDaysToTarget,
+      strategy:
+        'Grow toward a 10k+ skill registry with high-star GitHub discovery, scenario-specific query groups, MCP exclusion, trust metadata, and hourly imports.',
+      quality_gates: [
+        'GitHub stars threshold',
+        'archived and fork exclusion',
+        'skill relevance scoring',
+        'MCP-only exclusion',
+        'repository freshness and metadata capture',
+      ],
+    },
     schedule,
     filters,
     github_discovery: {
       status: 'active',
       source: 'github_search',
       strategy: 'high-star, skills-only, cross-domain rotating discovery',
+      target_approved_skills: HIGH_STAR_SKILL_COVERAGE_TARGET,
+      domain_count: HIGH_STAR_DISCOVERY_DOMAINS.length,
       domains: HIGH_STAR_DISCOVERY_DOMAINS,
       targeted_import: {
         supported: true,
@@ -76,9 +120,28 @@ export async function GET() {
         example_body: {
           targetNew: 500,
           minStars: 500,
-          domains: ['finance'],
+          domains: ['finance', 'sports', 'marketing-seo'],
           maxSearchRequests: 100,
         },
+        domain_specific_examples: [
+          {
+            label: 'Finance and quant',
+            body: { targetNew: 500, minStars: 500, domains: ['finance'], maxSearchRequests: 100 },
+          },
+          {
+            label: 'World Cup and sports analytics',
+            body: { targetNew: 200, minStars: 300, domains: ['sports'], maxSearchRequests: 80 },
+          },
+          {
+            label: 'Marketing and customer operations',
+            body: {
+              targetNew: 300,
+              minStars: 500,
+              domains: ['marketing-seo', 'customer-support'],
+              maxSearchRequests: 100,
+            },
+          },
+        ],
       },
       filters,
       schedule,

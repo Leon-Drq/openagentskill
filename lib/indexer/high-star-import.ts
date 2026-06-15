@@ -74,6 +74,8 @@ const DEFAULT_TARGET_NEW_PER_RUN = 25
 const DEFAULT_TOKEN_SEARCH_REQUESTS = 30
 const DEFAULT_DOMAIN_SEARCH_REQUESTS = 80
 const MAX_TOKEN_SEARCH_REQUESTS = 100
+export const HIGH_STAR_INDEXER_VERSION = 'scenario-coverage-v2'
+export const HIGH_STAR_SKILL_COVERAGE_TARGET = 10_000
 
 const CORE_HIGH_STAR_QUERIES: HighStarQuery[] = [
   {
@@ -1046,6 +1048,283 @@ const DOMAIN_QUERY_GROUPS: Array<{
       },
     ],
   },
+  {
+    key: 'marketing-seo',
+    label: 'Marketing, SEO, and growth automation',
+    description: 'SEO research, content operations, web analytics, attribution, email, CRM, and growth workflows.',
+    queries: [
+      {
+        q: 'topic:seo',
+        category: 'growth-marketing',
+        tags: ['seo', 'growth', 'marketing'],
+        frameworks: ['SEO'],
+      },
+      {
+        q: '"keyword research"',
+        category: 'growth-marketing',
+        tags: ['keyword-research', 'seo', 'marketing'],
+        frameworks: ['SEO'],
+      },
+      {
+        q: 'topic:content-marketing',
+        category: 'growth-marketing',
+        tags: ['content-marketing', 'growth'],
+        frameworks: ['Content Marketing'],
+      },
+      {
+        q: 'topic:web-analytics',
+        category: 'growth-marketing',
+        tags: ['web-analytics', 'growth'],
+        frameworks: ['Analytics'],
+      },
+      {
+        q: 'topic:crm',
+        category: 'growth-marketing',
+        tags: ['crm', 'sales', 'automation'],
+        frameworks: ['CRM'],
+      },
+      {
+        q: 'topic:email-automation',
+        category: 'growth-marketing',
+        tags: ['email-automation', 'marketing'],
+        frameworks: ['Email Automation'],
+      },
+    ],
+  },
+  {
+    key: 'legal-compliance',
+    label: 'Legal, policy, and compliance review',
+    description: 'Contract analysis, legal search, privacy, policy review, governance, and compliance automation.',
+    queries: [
+      {
+        q: 'topic:legal-tech',
+        category: 'legal-compliance',
+        tags: ['legal-tech', 'compliance', 'documents'],
+        frameworks: ['Legal Tech'],
+      },
+      {
+        q: '"contract analysis"',
+        category: 'legal-compliance',
+        tags: ['contract-analysis', 'legal', 'documents'],
+        frameworks: ['Contract Review'],
+      },
+      {
+        q: '"policy analysis"',
+        category: 'legal-compliance',
+        tags: ['policy-analysis', 'compliance'],
+        frameworks: ['Policy Review'],
+      },
+      {
+        q: 'topic:privacy',
+        category: 'legal-compliance',
+        tags: ['privacy', 'compliance'],
+        frameworks: ['Privacy'],
+      },
+      {
+        q: 'topic:gdpr',
+        category: 'legal-compliance',
+        tags: ['gdpr', 'privacy', 'compliance'],
+        frameworks: ['GDPR'],
+      },
+    ],
+  },
+  {
+    key: 'education',
+    label: 'Education, tutoring, and learning workflows',
+    description: 'Tutoring, course generation, quiz creation, learning analytics, notebooks, and classroom automation.',
+    queries: [
+      {
+        q: 'topic:education',
+        category: 'education',
+        tags: ['education', 'learning'],
+        frameworks: ['Education'],
+      },
+      {
+        q: 'topic:tutoring',
+        category: 'education',
+        tags: ['tutoring', 'learning', 'agent'],
+        frameworks: ['Tutoring'],
+      },
+      {
+        q: '"course generation"',
+        category: 'education',
+        tags: ['course-generation', 'education'],
+        frameworks: ['Course Generation'],
+      },
+      {
+        q: '"quiz generation"',
+        category: 'education',
+        tags: ['quiz-generation', 'education'],
+        frameworks: ['Quiz Generation'],
+      },
+      {
+        q: 'topic:learning-analytics',
+        category: 'education',
+        tags: ['learning-analytics', 'education'],
+        frameworks: ['Learning Analytics'],
+      },
+    ],
+  },
+  {
+    key: 'customer-support',
+    label: 'Customer support and operations',
+    description: 'Support bots, helpdesk automation, ticket triage, knowledge-base workflows, and customer ops.',
+    queries: [
+      {
+        q: 'topic:customer-support',
+        category: 'support-automation',
+        tags: ['customer-support', 'automation'],
+        frameworks: ['Support Automation'],
+      },
+      {
+        q: 'topic:helpdesk',
+        category: 'support-automation',
+        tags: ['helpdesk', 'support', 'automation'],
+        frameworks: ['Helpdesk'],
+      },
+      {
+        q: '"ticket triage"',
+        category: 'support-automation',
+        tags: ['ticket-triage', 'support'],
+        frameworks: ['Ticket Triage'],
+      },
+      {
+        q: 'topic:chatbot',
+        category: 'support-automation',
+        tags: ['chatbot', 'support', 'automation'],
+        frameworks: ['Chatbot'],
+      },
+      {
+        q: '"knowledge base" support',
+        category: 'support-automation',
+        tags: ['knowledge-base', 'support'],
+        frameworks: ['Knowledge Base'],
+      },
+    ],
+  },
+  {
+    key: 'productivity',
+    label: 'Personal productivity and workspace automation',
+    description: 'Email, calendar, notes, task management, desktop automation, file workflows, and team collaboration.',
+    queries: [
+      {
+        q: 'topic:productivity',
+        category: 'productivity-automation',
+        tags: ['productivity', 'automation'],
+        frameworks: ['Productivity'],
+      },
+      {
+        q: 'topic:email',
+        category: 'productivity-automation',
+        tags: ['email', 'automation'],
+        frameworks: ['Email'],
+      },
+      {
+        q: 'topic:calendar',
+        category: 'productivity-automation',
+        tags: ['calendar', 'automation'],
+        frameworks: ['Calendar'],
+      },
+      {
+        q: 'topic:notes',
+        category: 'productivity-automation',
+        tags: ['notes', 'knowledge'],
+        frameworks: ['Notes'],
+      },
+      {
+        q: 'topic:task-management',
+        category: 'productivity-automation',
+        tags: ['task-management', 'workflow'],
+        frameworks: ['Task Management'],
+      },
+      {
+        q: 'topic:desktop-automation',
+        category: 'productivity-automation',
+        tags: ['desktop-automation', 'computer-use'],
+        frameworks: ['Desktop Automation'],
+      },
+    ],
+  },
+  {
+    key: 'web3',
+    label: 'Crypto, Web3, and on-chain analytics',
+    description: 'On-chain analysis, DeFi analytics, wallets, smart-contract review, transaction monitoring, and crypto data.',
+    queries: [
+      {
+        q: 'topic:blockchain',
+        category: 'web3-analytics',
+        tags: ['blockchain', 'web3', 'analytics'],
+        frameworks: ['Blockchain'],
+      },
+      {
+        q: 'topic:web3',
+        category: 'web3-analytics',
+        tags: ['web3', 'crypto'],
+        frameworks: ['Web3'],
+      },
+      {
+        q: 'topic:on-chain',
+        category: 'web3-analytics',
+        tags: ['on-chain', 'analytics'],
+        frameworks: ['On-chain Analytics'],
+      },
+      {
+        q: 'topic:defi',
+        category: 'web3-analytics',
+        tags: ['defi', 'crypto', 'analytics'],
+        frameworks: ['DeFi'],
+      },
+      {
+        q: '"smart contract analysis"',
+        category: 'web3-analytics',
+        tags: ['smart-contracts', 'security', 'analysis'],
+        frameworks: ['Smart Contracts'],
+      },
+      {
+        q: '"transaction monitoring" crypto',
+        category: 'web3-analytics',
+        tags: ['transaction-monitoring', 'crypto'],
+        frameworks: ['Transaction Monitoring'],
+      },
+    ],
+  },
+  {
+    key: 'robotics-iot',
+    label: 'Robotics, IoT, and physical-world agents',
+    description: 'Robotics control, ROS, computer vision, sensor data, IoT automation, and physical-world workflows.',
+    queries: [
+      {
+        q: 'topic:robotics',
+        category: 'robotics-iot',
+        tags: ['robotics', 'automation'],
+        frameworks: ['Robotics'],
+      },
+      {
+        q: 'topic:ros',
+        category: 'robotics-iot',
+        tags: ['ros', 'robotics'],
+        frameworks: ['ROS'],
+      },
+      {
+        q: 'topic:computer-vision',
+        category: 'robotics-iot',
+        tags: ['computer-vision', 'automation'],
+        frameworks: ['Computer Vision'],
+      },
+      {
+        q: 'topic:iot',
+        category: 'robotics-iot',
+        tags: ['iot', 'automation'],
+        frameworks: ['IoT'],
+      },
+      {
+        q: 'topic:sensor-data',
+        category: 'robotics-iot',
+        tags: ['sensor-data', 'analysis'],
+        frameworks: ['Sensor Data'],
+      },
+    ],
+  },
 ]
 
 export const HIGH_STAR_DISCOVERY_DOMAINS = DOMAIN_QUERY_GROUPS.map(
@@ -1054,6 +1333,8 @@ export const HIGH_STAR_DISCOVERY_DOMAINS = DOMAIN_QUERY_GROUPS.map(
     label,
     description,
     query_count: queries.length,
+    categories: Array.from(new Set(queries.map((query) => query.category))).slice(0, 4),
+    example_tags: Array.from(new Set(queries.flatMap((query) => query.tags))).slice(0, 6),
   })
 )
 
