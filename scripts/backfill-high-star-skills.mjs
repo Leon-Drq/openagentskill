@@ -28,7 +28,7 @@ function loadEnvFile(file) {
 for (const file of ENV_FILES) loadEnvFile(file)
 
 const siteUrl = process.env.BACKFILL_SITE_URL || 'https://www.openagentskill.com'
-const token = process.env.CRON_SECRET || process.env.INDEXER_SECRET
+const token = process.env.INDEXER_TRIGGER_SECRET || process.env.CRON_SECRET || process.env.INDEXER_SECRET
 const runs = Math.max(1, Number(process.env.BACKFILL_RUNS || 20))
 const targetNew = Math.max(1, Number(process.env.BACKFILL_TARGET_NEW || 500))
 const targetTotal = Math.max(1, Number(process.env.BACKFILL_TARGET_TOTAL || 10_000))
@@ -42,7 +42,7 @@ const domains = (process.env.BACKFILL_DOMAINS || '')
   .filter(Boolean)
 
 if (!token) {
-  console.error('Missing CRON_SECRET or INDEXER_SECRET. Run `vercel env pull .env.production.local` or provide one in the shell.')
+  console.error('Missing INDEXER_TRIGGER_SECRET, CRON_SECRET, or INDEXER_SECRET. Run `vercel env pull .env.production.local` or provide one in the shell.')
   process.exit(1)
 }
 

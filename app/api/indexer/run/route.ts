@@ -14,7 +14,7 @@ const DEFAULT_DOMAIN_SEARCH_REQUESTS = 80
 const MAX_TOKEN_SEARCH_REQUESTS = 120
 
 function isAuthorized(request: NextRequest): boolean {
-  return isAutomationAuthorized(request)
+  return isAutomationAuthorized(request, ['INDEXER_SECRET', 'CRON_SECRET', 'INDEXER_TRIGGER_SECRET'])
 }
 
 export async function POST(request: NextRequest) {
