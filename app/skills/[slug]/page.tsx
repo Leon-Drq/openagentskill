@@ -27,6 +27,7 @@ import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillInstallApiUrl } from '@/lib/registry'
 import { getSkillAttribution } from '@/lib/skill-attribution'
+import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile, type SkillTrustProfile, type TrustCheckStatus } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 import { buildManualXMainText, buildManualXReplyText, buildXIntentUrl } from '@/lib/x/poster'
@@ -162,6 +163,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
   const platformHints = dbSkill ? getPlatformHints(dbSkill) : []
   const decisionProfile = dbSkill ? getSkillDecisionProfile(dbSkill, eventStats) : null
   const trustProfile = dbSkill ? getSkillTrustProfile(dbSkill, Boolean(approvedClaim), eventStats) : null
+  const supplyProfile = dbSkill ? getSkillSupplyProfile(dbSkill, eventStats) : null
   const attribution = dbSkill ? getSkillAttribution(dbSkill, approvedClaim) : null
   const auditProfile = dbSkill ? buildSkillAudit(dbSkill, eventStats) : null
   const safetyProfile = dbSkill && auditProfile
@@ -328,6 +330,94 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                 )}
               </div>
             </div>
+
+            {supplyProfile && (
+              <section className="mb-10 overflow-hidden border border-border bg-card">
+                <div className="border-b border-border p-5">
+                  <p className="mb-2 text-xs uppercase text-secondary">Supply asset profile</p>
+                  <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+                    <div>
+                      <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+                        {supplyProfile.track.label}
+                      </h2>
+                      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
+                        {supplyProfile.track.description}
+                      </p>
+                    </div>
+                    <Link
+                      href={`/skills?track=${supplyProfile.track.slug}`}
+                      className="w-full border border-border px-4 py-2.5 text-center text-sm font-semibold transition-colors hover:border-foreground sm:w-auto"
+                    >
+                      Browse track
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-5">
+                  {[
+                    {
+                      label: 'Scenario',
+                      value: supplyProfile.scenario.label,
+                      detail: supplyProfile.scenario.description,
+                    },
+                    {
+                      label: 'Agent fit',
+                      value: supplyProfile.applicableAgents.slice(0, 3).join(' + '),
+                      detail: 'Codex, Claude Code, Cursor, CLI, or custom agents.',
+                    },
+                    {
+                      label: 'Install',
+                      value: supplyProfile.install.ready ? 'Ready' : 'Review',
+                      detail: supplyProfile.install.command,
+                    },
+                    {
+                      label: 'Maintenance',
+                      value: supplyProfile.maintenance.status,
+                      detail: supplyProfile.maintenance.label,
+                    },
+                    {
+                      label: 'Risk',
+                      value: supplyProfile.risk.label,
+                      detail: supplyProfile.risk.notes.slice(0, 1).join(''),
+                    },
+                  ].map((item) => (
+                    <div key={item.label} className="min-w-0 bg-background p-4">
+                      <p className="font-mono text-[10px] uppercase tracking-widest text-secondary">{item.label}</p>
+                      <p className="mt-2 truncate font-semibold capitalize text-foreground">{item.value}</p>
+                      <p className="mt-2 line-clamp-3 break-words text-xs leading-relaxed text-secondary [overflow-wrap:anywhere]">
+                        {item.detail}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid gap-px bg-border sm:grid-cols-3">
+                  <div className="bg-card p-5">
+                    <p className="text-xs uppercase text-secondary">GitHub quality</p>
+                    <p className="mt-2 font-mono text-2xl font-semibold">{supplyProfile.githubQuality.starsLabel}</p>
+                    <p className="mt-1 text-sm text-secondary">
+                      {supplyProfile.githubQuality.qualityScore}/100 quality · {supplyProfile.githubQuality.trustScore}/100 trust
+                    </p>
+                  </div>
+                  <div className="bg-card p-5">
+                    <p className="text-xs uppercase text-secondary">Coverage tags</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {supplyProfile.coverageTags.slice(0, 5).map((tag) => (
+                        <span key={tag} className="border border-border px-2 py-1 text-xs text-secondary">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="bg-card p-5">
+                    <p className="text-xs uppercase text-secondary">Review notes</p>
+                    <p className="mt-2 text-sm leading-relaxed text-secondary">
+                      {supplyProfile.risk.notes.slice(0, 2).join(' · ')}
+                    </p>
+                  </div>
+                </div>
+              </section>
+            )}
 
             <SkillScorePanel quality={qualityProfile} trust={trustProfile} audit={auditProfile} />
 

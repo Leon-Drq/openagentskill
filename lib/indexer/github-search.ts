@@ -78,6 +78,15 @@ const SEARCH_QUERIES: Array<{ q: string; sort: 'stars' | 'updated' }> = [
   { q: 'topic:vulnerability-scanner stars:>500', sort: 'stars' },
   { q: 'topic:observability stars:>500',        sort: 'stars' },
   { q: 'topic:geospatial stars:>500',           sort: 'stars' },
+  { q: 'topic:seo stars:>500',                  sort: 'stars' },
+  { q: 'topic:design-system stars:>500',        sort: 'stars' },
+  { q: 'topic:figma stars:>500',                sort: 'stars' },
+  { q: 'topic:legal-tech stars:>100',           sort: 'stars' },
+  { q: 'topic:education stars:>500',            sort: 'stars' },
+  { q: 'topic:world-cup stars:>100',            sort: 'stars' },
+  { q: '"coding agent" stars:>100',             sort: 'updated' },
+  { q: '"contract analysis" stars:>100',        sort: 'updated' },
+  { q: '"course generation" stars:>100',        sort: 'updated' },
 ]
 
 /**

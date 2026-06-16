@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAllSkills } from '@/lib/db/skills'
 import { dedupeRankedSkills, getRecommendationReasons, rankSkillsForQuery, toRegistrySkill } from '@/lib/registry'
+import { getSkillSupplyProfile } from '@/lib/supply'
 
 function clampLimit(value: string | null) {
   const parsed = Number(value || 10)
@@ -12,6 +13,7 @@ export async function GET(request: NextRequest) {
   const query = searchParams.get('q') || searchParams.get('task') || ''
   const category = searchParams.get('category')
   const platform = searchParams.get('platform')
+  const track = searchParams.get('track')
   const minStars = Number(searchParams.get('min_stars') || searchParams.get('minStars') || 0)
   const format = searchParams.get('format') || 'json'
   const limit = clampLimit(searchParams.get('limit'))
@@ -21,6 +23,7 @@ export async function GET(request: NextRequest) {
     const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, query))
       .filter(({ skill }) => {
         if (category && skill.category.toLowerCase() !== category.toLowerCase()) return false
+        if (track && getSkillSupplyProfile(skill).track.slug !== track) return false
         if (Number.isFinite(minStars) && minStars > 0 && Number(skill.github_stars || 0) < minStars) return false
         if (platform) {
           const platformText = [
@@ -41,6 +44,7 @@ export async function GET(request: NextRequest) {
         return `${index + 1}. ${item.name} (${item.slug})
    Match score: ${score}
    ${item.description}
+   Supply: ${item.supply_profile.track.shortLabel} | Scenario: ${item.supply_profile.scenario.label}
    Trust: ${item.trust.score}/100 ${item.trust.label} | Audit: ${item.audit.audit_score}/100 ${item.audit.risk_label}
    Install: ${item.install}
    URL: ${item.urls.web}
@@ -67,6 +71,7 @@ ${text}`,
       filters: {
         category,
         platform,
+        track,
         min_stars: Number.isFinite(minStars) ? minStars : 0,
       },
       total: ranked.length,

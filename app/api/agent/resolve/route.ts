@@ -20,6 +20,9 @@ Policy: ${payload.policy_decision.status}
 Selected:
 ${selected ? `${selected.skill.name} (${selected.skill.slug})
 Match: ${selected.match_score}
+Supply: ${selected.supply_profile.track.shortLabel} / ${selected.supply_profile.scenario.label}
+Maintenance: ${selected.supply_profile.maintenance.label}
+Risk: ${selected.supply_profile.risk.label}
 Safety: ${selected.safety.score}/100 ${selected.safety.label}
 Audit: ${selected.audit.audit_score}/100 ${selected.audit.risk_label}
 Install: ${selected.install_plan.value}

@@ -5,6 +5,7 @@ import { getStacksForSkill } from '@/lib/collections'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillAttribution } from '@/lib/skill-attribution'
+import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
@@ -34,6 +35,7 @@ export async function GET(
     const audit = buildSkillAudit(skill)
     const installTargets = getSkillInstallTargets(skill)
     const attribution = getSkillAttribution(skill, approvedClaim)
+    const supplyProfile = getSkillSupplyProfile(skill)
 
     if (format === 'text') {
       const text = `${skill.name}
@@ -49,6 +51,13 @@ Technical Details:
 - License: ${skill.license}
 - Platforms: ${(skill.frameworks || []).join(', ')}
 - Tags: ${(skill.tags || []).join(', ')}
+
+Supply Profile:
+- Track: ${supplyProfile.track.label}
+- Scenario: ${supplyProfile.scenario.label}
+- Applicable agents: ${supplyProfile.applicableAgents.join(', ')}
+- Maintenance: ${supplyProfile.maintenance.label}
+- Risk: ${supplyProfile.risk.label}
 
 Statistics:
 - Quality Score: ${Number(skill.quality_score || 0)}
@@ -107,6 +116,7 @@ Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
       },
       quality: getSkillQualityProfile(skill),
       trust: trustProfile,
+      supply_profile: supplyProfile,
       audit: {
         audit_score: audit.audit_score,
         risk_level: audit.risk_level,

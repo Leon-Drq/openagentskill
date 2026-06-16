@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { getAllSkills, getCategories, convertSkillRecordToManifest, type SkillSortMode, getSkillStats } from '@/lib/db/skills'
 import { SkillsPageClient } from '@/components/skills-page-client'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
+import { getSkillSupplyProfile, getSupplyTrackSummaries } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCaseBySlug, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
 
@@ -33,6 +34,7 @@ export default async function SkillsPage({
     platform?: string
     quality?: string
     trust?: string
+    track?: string
     minStars?: string
   }>
 }) {
@@ -43,6 +45,7 @@ export default async function SkillsPage({
   const platform = params.platform || 'all'
   const quality = params.quality || 'all'
   const trust = params.trust || 'all'
+  const supplyTrack = params.track || 'all'
   const minStars = Number(params.minStars || 0)
 
   const [records, categories, statsMap] = await Promise.all([
@@ -67,12 +70,16 @@ export default async function SkillsPage({
       qualityProfile: getSkillQualityProfile(record, agentStats),
       trustProfile: getSkillTrustProfile(record),
       platformHints: getPlatformHints(record),
+      supplyProfile: getSkillSupplyProfile(record),
     }
   })
+
+  const supplyTracks = getSupplyTrackSummaries(enrichedRecords.map((item) => item.supplyProfile))
 
   let filteredRecords = enrichedRecords.filter((item) => {
     const { record } = item
     if (category !== 'all' && record.category !== category) return false
+    if (supplyTrack !== 'all' && item.supplyProfile.track.slug !== supplyTrack) return false
     if (selectedUseCase && scoreSkillForUseCase(record, selectedUseCase) < 6) return false
     if (platform !== 'all') {
       const platforms = [
@@ -89,24 +96,32 @@ export default async function SkillsPage({
 
   if (params.q) {
     const query = params.q.toLowerCase()
-    filteredRecords = filteredRecords.filter(
-      ({ record }) =>
+    filteredRecords = filteredRecords.filter((item) => {
+      const { record } = item
+      return (
         record.name.toLowerCase().includes(query) ||
         record.description.toLowerCase().includes(query) ||
         (record.long_description || '').toLowerCase().includes(query) ||
+        item.supplyProfile.scenario.label.toLowerCase().includes(query) ||
+        item.supplyProfile.scenario.description.toLowerCase().includes(query) ||
+        item.supplyProfile.track.label.toLowerCase().includes(query) ||
+        item.supplyProfile.applicableAgents.some((agent) => agent.toLowerCase().includes(query)) ||
+        item.supplyProfile.risk.notes.some((note) => note.toLowerCase().includes(query)) ||
         (record.tags || []).some((tag) => tag.toLowerCase().includes(query)) ||
         (record.frameworks || []).some((framework) => framework.toLowerCase().includes(query)) ||
         record.github_repo?.toLowerCase().includes(query)
-    )
+      )
+    })
   }
 
-  const skills = filteredRecords.map(({ record, agentStats, qualityProfile, platformHints, trustProfile }) => {
+  const skills = filteredRecords.map(({ record, agentStats, qualityProfile, platformHints, trustProfile, supplyProfile }) => {
     return {
       ...convertSkillRecordToManifest(record),
       agentStats,
       qualityProfile,
       platformHints,
       trustProfile,
+      supplyProfile,
     }
   })
 
@@ -123,6 +138,8 @@ export default async function SkillsPage({
       platformOptions={platformOptions}
       quality={quality}
       trust={trust}
+      supplyTrack={supplyTrack}
+      supplyTracks={supplyTracks}
       minStars={Number.isFinite(minStars) ? minStars : 0}
     />
   )

@@ -5,6 +5,7 @@ import { getAllSkills, getSkillEventStatsMap, type SkillEventStats, type SkillRe
 import { getPrimaryInstallCommand, getSkillInstallTargets, type InstallTargetId } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
 import { dedupeRankedSkills, getRecommendationReasons, rankSkillsForQuery } from '@/lib/registry'
+import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
@@ -102,6 +103,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     const trust = getSkillTrustProfile(skill, false, eventStats)
     const decision = getSkillDecisionProfile(skill, eventStats)
     const useCases = getUseCasesForSkill(skill, 3)
+    const supplyProfile = getSkillSupplyProfile(skill, eventStats)
 
     return {
       rank: index + 1,
@@ -115,6 +117,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         github_repo: skill.github_repo,
       },
       recommendation_reasons: getRecommendationReasons(skill, task, score),
+      supply_profile: supplyProfile,
       quality: getSkillQualityProfile(skill),
       trust,
       audit: {

@@ -211,6 +211,30 @@ export const USE_CASES: UseCaseDefinition[] = [
     agentTasks: ['Summarize source material', 'Adapt tone for channels', 'Create reusable publishing drafts'],
   },
   {
+    slug: 'marketing-growth',
+    shortTitle: 'Marketing and growth',
+    title: 'Marketing, SEO, and growth automation skills',
+    eyebrow: 'Grow distribution',
+    description:
+      'Discover skills for SEO research, keyword workflows, content operations, web analytics, lead generation, CRM cleanup, and repeatable growth automation.',
+    heroPrompt: 'I need my agent to research keywords, improve SEO, analyze growth channels, and prepare marketing workflows.',
+    keywords: ['marketing', 'seo', 'keyword', 'growth', 'analytics', 'crm', 'lead generation', 'email automation', 'content marketing'],
+    workflows: ['Research SEO keywords', 'Analyze growth channels', 'Prepare lead lists', 'Automate marketing ops'],
+    agentTasks: ['Collect channel signals', 'Prioritize opportunities', 'Draft structured campaign assets'],
+  },
+  {
+    slug: 'design-creative',
+    shortTitle: 'Design and creative',
+    title: 'Design and creative production skills for agents',
+    eyebrow: 'Create assets',
+    description:
+      'Find skills for design systems, Figma workflows, UI generation, presentations, image and video production, and creative automation.',
+    heroPrompt: 'I need my agent to produce design assets, UI directions, presentations, or creative media workflows.',
+    keywords: ['design', 'figma', 'ui generation', 'ux', 'presentation', 'creative', 'image generation', 'video generation', 'design system'],
+    workflows: ['Prepare design assets', 'Generate UI directions', 'Build presentation materials', 'Automate creative production'],
+    agentTasks: ['Inspect visual requirements', 'Generate reusable assets', 'Package output for review'],
+  },
+  {
     slug: 'security-compliance',
     shortTitle: 'Security and compliance',
     title: 'Security and compliance skills for agents',
@@ -221,6 +245,30 @@ export const USE_CASES: UseCaseDefinition[] = [
     keywords: ['security', 'vulnerability', 'scanner', 'secret', 'compliance', 'policy', 'dependency', 'sast', 'audit'],
     workflows: ['Scan dependencies', 'Find exposed secrets', 'Review security findings', 'Prepare audit notes'],
     agentTasks: ['Inspect risky files', 'Prioritize findings', 'Explain remediation steps'],
+  },
+  {
+    slug: 'legal-compliance',
+    shortTitle: 'Legal and compliance',
+    title: 'Legal, policy, and compliance review skills',
+    eyebrow: 'Review risk',
+    description:
+      'Browse skills for contract analysis, policy review, privacy checks, compliance workflows, governance notes, and document risk review.',
+    heroPrompt: 'I need my agent to review contracts, privacy policies, or compliance documents and summarize risks.',
+    keywords: ['legal', 'contract', 'policy', 'privacy', 'gdpr', 'compliance', 'governance', 'terms', 'risk review'],
+    workflows: ['Review contracts', 'Summarize policy risk', 'Check privacy requirements', 'Prepare compliance notes'],
+    agentTasks: ['Extract obligations', 'Highlight risky clauses', 'Prepare review-ready summaries'],
+  },
+  {
+    slug: 'education-tutoring',
+    shortTitle: 'Education and tutoring',
+    title: 'Education, tutoring, and learning workflow skills',
+    eyebrow: 'Teach better',
+    description:
+      'Find skills for tutoring, course generation, quiz creation, learning analytics, classroom automation, and structured study workflows.',
+    heroPrompt: 'I need my agent to teach a topic, generate course material, create quizzes, or analyze learning progress.',
+    keywords: ['education', 'tutoring', 'teaching', 'course generation', 'quiz generation', 'learning analytics', 'classroom', 'student'],
+    workflows: ['Generate lessons', 'Create quizzes', 'Tutor step by step', 'Analyze learning progress'],
+    agentTasks: ['Break down concepts', 'Create practice material', 'Adapt explanations to the learner'],
   },
   {
     slug: 'database-sql',

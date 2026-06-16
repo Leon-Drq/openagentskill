@@ -3,6 +3,7 @@ import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAllSkills, searchSkills } from '@/lib/db/skills'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
+import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 
 /**
@@ -17,6 +18,7 @@ export async function GET(request: NextRequest) {
   const category = searchParams.get('category')
   const platform = searchParams.get('platform')
   const trust = searchParams.get('trust')
+  const track = searchParams.get('track')
   const format = searchParams.get('format') || 'json'
   const limit = Math.min(parseInt(searchParams.get('limit') || '10', 10), 50)
 
@@ -34,6 +36,9 @@ export async function GET(request: NextRequest) {
     if (trust) {
       records = records.filter((r) => getSkillTrustProfile(r).tier === trust)
     }
+    if (track) {
+      records = records.filter((r) => getSkillSupplyProfile(r).track.slug === track)
+    }
 
     records = records.slice(0, limit)
 
@@ -42,7 +47,8 @@ export async function GET(request: NextRequest) {
         .map((r, i) => {
           const trustProfile = getSkillTrustProfile(r)
           const audit = buildSkillAudit(r)
-          return `${i + 1}. ${r.name} (${r.slug})\n   ${r.description}\n   Quality: ${Number(r.quality_score || 0)} | Trust: ${trustProfile.score} ${trustProfile.label} | Audit: ${audit.audit_score} ${auditRiskLabel(audit.risk_level)}\n   Stars: ${r.github_stars} | Downloads: ${r.downloads}\n   Install: ${r.install_command || `npx skills add ${r.github_repo}`}\n   URL: https://www.openagentskill.com/skills/${r.slug}\n   ---`
+          const supply = getSkillSupplyProfile(r)
+          return `${i + 1}. ${r.name} (${r.slug})\n   ${r.description}\n   Supply: ${supply.track.shortLabel} | Scenario: ${supply.scenario.label} | Agents: ${supply.applicableAgents.slice(0, 3).join(', ')}\n   Quality: ${Number(r.quality_score || 0)} | Trust: ${trustProfile.score} ${trustProfile.label} | Audit: ${audit.audit_score} ${auditRiskLabel(audit.risk_level)}\n   Maintenance: ${supply.maintenance.label} | Risk: ${supply.risk.label}\n   Stars: ${r.github_stars} | Downloads: ${r.downloads}\n   Install: ${r.install_command || `npx skills add ${r.github_repo}`}\n   URL: https://www.openagentskill.com/skills/${r.slug}\n   ---`
         })
         .join('\n')
 
@@ -59,10 +65,11 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       query,
-      filters: { category, platform, trust },
+      filters: { category, platform, trust, track },
       total: records.length,
       skills: records.map((r) => {
         const audit = buildSkillAudit(r)
+        const supplyProfile = getSkillSupplyProfile(r)
         return {
           slug: r.slug,
           name: r.name,
@@ -86,6 +93,7 @@ export async function GET(request: NextRequest) {
             risk_label: auditRiskLabel(audit.risk_level),
             warnings: audit.warnings.slice(0, 4),
           },
+          supply_profile: supplyProfile,
           quality_signals: r.quality_signals || {},
           platforms: [...new Set([...(r.frameworks || []), ...getPlatformHints(r)])],
           install: r.install_command || `npx skills add ${r.github_repo}`,

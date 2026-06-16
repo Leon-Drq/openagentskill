@@ -6,6 +6,7 @@ import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
 import { dedupeRankedSkills, getRecommendationReasons } from '@/lib/registry'
 import { getSkillDecisionProfile } from '@/lib/decision'
+import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
 
@@ -86,6 +87,7 @@ export async function GET(request: NextRequest) {
         const useCases = getUseCasesForSkill(r.skill, 2)
         const trust = getSkillTrustProfile(r.skill, false, eventStats)
         const audit = buildSkillAudit(r.skill, eventStats)
+        const supplyProfile = getSkillSupplyProfile(r.skill, eventStats)
         return {
           rank: index + 1,
           skill: r.skill.name,
@@ -103,6 +105,7 @@ export async function GET(request: NextRequest) {
           },
           quality: getSkillQualityProfile(r.skill),
           trust,
+          supply_profile: supplyProfile,
           audit: {
             audit_score: audit.audit_score,
             risk_level: audit.risk_level,
@@ -158,6 +161,7 @@ export async function GET(request: NextRequest) {
       const text = payload.recommendations.map((item) => (
         `${item.rank}. ${item.skill} (${item.slug})\n` +
         `   Match: ${item.match_label} | Confidence: ${item.confidence}\n` +
+        `   Supply: ${item.supply_profile.track.shortLabel} | Scenario: ${item.supply_profile.scenario.label} | Maintenance: ${item.supply_profile.maintenance.label}\n` +
         `   Trust: ${item.trust.score}/100 ${item.trust.label} | Audit: ${item.audit.audit_score}/100 ${item.audit.risk_label}\n` +
         `   Install: ${item.install}\n` +
         `   URL: ${item.urls.web}\n` +

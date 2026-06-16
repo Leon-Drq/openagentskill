@@ -7,6 +7,7 @@ import { InstallCommand } from './install-command'
 import { SaveSkillButton } from './save-skill-button'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
+import type { SkillSupplyProfile, SupplyTrackSummary } from '@/lib/supply'
 import type { SkillTrustProfile } from '@/lib/trust'
 import type { UseCaseDefinition } from '@/lib/use-cases'
 
@@ -48,6 +49,7 @@ interface Skill {
   }
   trustProfile?: SkillTrustProfile
   platformHints?: string[]
+  supplyProfile?: SkillSupplyProfile
 }
 
 const SORT_TABS = [
@@ -93,6 +95,8 @@ interface Props {
   platformOptions: string[]
   quality: string
   trust: string
+  supplyTrack: string
+  supplyTracks: SupplyTrackSummary[]
   minStars: number
 }
 
@@ -108,6 +112,8 @@ export function SkillsPageClient({
   platformOptions,
   quality,
   trust,
+  supplyTrack,
+  supplyTracks,
   minStars,
 }: Props) {
   const router = useRouter()
@@ -143,6 +149,7 @@ export function SkillsPageClient({
   )
 
   const activeSort = SORT_TABS.find((t) => t.key === sort) || SORT_TABS[0]
+  const activeTrack = supplyTracks.find((track) => track.slug === supplyTrack)
   const compareSkills = useMemo(
     () => compareSlugs
       .map((slug) => skills.find((skill) => skill.slug === slug) || { slug, name: slug })
@@ -219,6 +226,57 @@ export function SkillsPageClient({
         </div>
       </section>
 
+      <section className="border-b border-border bg-card/35">
+        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+          <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Supply tracks</p>
+              <h2 className="mt-2 font-display text-2xl font-normal">Build the registry by domain, not just by count.</h2>
+            </div>
+            {supplyTrack !== 'all' && (
+              <Link
+                href="/skills"
+                className="self-start border border-border px-3 py-1.5 text-xs text-secondary transition-colors hover:border-foreground hover:text-foreground sm:self-auto"
+              >
+                Clear track
+              </Link>
+            )}
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {supplyTracks.map((track) => (
+              <Link
+                key={track.slug}
+                href={track.href}
+                className={`min-w-0 border p-4 transition-colors ${
+                  supplyTrack === track.slug
+                    ? 'border-foreground bg-foreground text-background'
+                    : 'border-border bg-background/80 hover:border-foreground'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className={`font-mono text-[10px] uppercase tracking-[0.18em] ${supplyTrack === track.slug ? 'text-background/70' : 'text-secondary'}`}>
+                      {track.shortLabel}
+                    </p>
+                    <h3 className="mt-2 font-display text-xl font-semibold">{track.label}</h3>
+                  </div>
+                  <span className={`shrink-0 font-mono text-sm ${supplyTrack === track.slug ? 'text-background' : 'text-secondary'}`}>
+                    {track.count.toLocaleString()}
+                  </span>
+                </div>
+                <p className={`mt-3 line-clamp-2 text-sm leading-relaxed ${supplyTrack === track.slug ? 'text-background/75' : 'text-secondary'}`}>
+                  {track.description}
+                </p>
+                <div className={`mt-4 flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-wider ${supplyTrack === track.slug ? 'text-background/70' : 'text-secondary'}`}>
+                  <span>{track.highQualityCount.toLocaleString()} quality</span>
+                  <span>{track.maintainedCount.toLocaleString()} maintained</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Sort Tabs */}
       <div className="sticky top-14 z-40 border-b border-border bg-background/92 backdrop-blur">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -246,6 +304,11 @@ export function SkillsPageClient({
             <div>
               <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Decision filters</p>
               <h2 className="mt-2 font-display text-2xl font-normal">Choose by scenario, quality, and trust signals.</h2>
+              {activeTrack && (
+                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-secondary">
+                  Active supply track: <span className="text-foreground">{activeTrack.label}</span>. {activeTrack.description}
+                </p>
+              )}
             </div>
             <button
               type="button"
@@ -361,6 +424,7 @@ export function SkillsPageClient({
             {skills.length} {skills.length === 1 ? 'skill' : 'skills'}
             {query && <> matching <em>&quot;{query}&quot;</em></>}
             {category !== 'all' && <> in <em>{category}</em></>}
+            {supplyTrack !== 'all' && <> inside <em>{activeTrack?.shortLabel || supplyTrack}</em></>}
             {useCase !== 'all' && <> for <em>{useCases.find((item) => item.slug === useCase)?.shortTitle || useCase}</em></>}
             {trust !== 'all' && <> with <em>{TRUST_OPTIONS.find((item) => item.key === trust)?.label || trust}</em></>}
           </p>
@@ -414,6 +478,11 @@ export function SkillsPageClient({
                         {skill.trustProfile && (
                           <span className="text-xs font-mono border border-border px-2 py-0.5 text-secondary shrink-0">
                             TRUST · {skill.trustProfile.score}
+                          </span>
+                        )}
+                        {skill.supplyProfile && (
+                          <span className="text-xs font-mono border border-border px-2 py-0.5 text-secondary shrink-0">
+                            {skill.supplyProfile.track.shortLabel.toUpperCase()}
                           </span>
                         )}
                       </div>
@@ -474,6 +543,16 @@ export function SkillsPageClient({
                           {skill.platformHints.slice(0, 2).join(' + ')}
                         </span>
                       )}
+                      {skill.supplyProfile && (
+                        <>
+                          <span title="Maintenance">
+                            {skill.supplyProfile.maintenance.label}
+                          </span>
+                          <span title="Risk">
+                            {skill.supplyProfile.risk.label}
+                          </span>
+                        </>
+                      )}
                       {skill.stats.downloads > 0 && (
                         <span title="Downloads">
                           {skill.stats.downloads >= 1000
@@ -512,6 +591,39 @@ export function SkillsPageClient({
                             )}
                           </div>
                         )}
+                      </div>
+                    )}
+
+                    {skill.supplyProfile && (
+                      <div className="mb-4 grid max-w-4xl gap-px border border-border bg-border text-xs sm:grid-cols-2 lg:grid-cols-4">
+                        {[
+                          {
+                            label: 'Scenario',
+                            value: skill.supplyProfile.scenario.label,
+                            detail: skill.supplyProfile.scenario.description,
+                          },
+                          {
+                            label: 'Agents',
+                            value: skill.supplyProfile.applicableAgents.slice(0, 3).join(' + '),
+                            detail: `${skill.supplyProfile.install.targetCount} install targets`,
+                          },
+                          {
+                            label: 'Maintenance',
+                            value: skill.supplyProfile.maintenance.status,
+                            detail: skill.supplyProfile.maintenance.label,
+                          },
+                          {
+                            label: 'Risk',
+                            value: skill.supplyProfile.risk.label,
+                            detail: skill.supplyProfile.risk.notes.slice(0, 1).join(''),
+                          },
+                        ].map((item) => (
+                          <div key={item.label} className="min-w-0 bg-background p-3">
+                            <p className="font-mono text-[10px] uppercase tracking-widest text-secondary">{item.label}</p>
+                            <p className="mt-1 truncate font-semibold capitalize text-foreground">{item.value}</p>
+                            <p className="mt-1 line-clamp-2 leading-relaxed text-secondary">{item.detail}</p>
+                          </div>
+                        ))}
                       </div>
                     )}
 

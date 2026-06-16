@@ -334,6 +334,56 @@ const DOMAIN_QUERY_GROUPS: Array<{
   queries: HighStarQuery[]
 }> = [
   {
+    key: 'coding',
+    label: 'Coding, repositories, and developer agents',
+    description: 'Coding agents, code review, test generation, repository analysis, CI, GitHub automation, and developer workflow skills.',
+    queries: [
+      {
+        q: 'topic:code-agent',
+        category: 'coding-agents',
+        tags: ['coding-agent', 'developer-tools'],
+        frameworks: ['Coding Agent'],
+      },
+      {
+        q: '"coding agent"',
+        category: 'coding-agents',
+        tags: ['coding-agent', 'developer-tools'],
+        frameworks: ['Coding Agent'],
+        sort: 'updated',
+      },
+      {
+        q: 'topic:code-review',
+        category: 'coding-agents',
+        tags: ['code-review', 'developer-tools'],
+        frameworks: ['Code Review'],
+      },
+      {
+        q: 'topic:test-generation',
+        category: 'testing-qa',
+        tags: ['test-generation', 'qa', 'developer-tools'],
+        frameworks: ['Testing'],
+      },
+      {
+        q: 'topic:developer-tools',
+        category: 'coding-agents',
+        tags: ['developer-tools', 'automation'],
+        frameworks: ['Developer Tools'],
+      },
+      {
+        q: 'topic:github-actions',
+        category: 'github-automation',
+        tags: ['github-actions', 'automation'],
+        frameworks: ['GitHub'],
+      },
+      {
+        q: 'topic:ci-cd',
+        category: 'devops',
+        tags: ['ci-cd', 'automation'],
+        frameworks: ['CI/CD'],
+      },
+    ],
+  },
+  {
     key: 'finance',
     label: 'Finance, quant, trading, and filings',
     description: 'Financial data, quant research, backtesting, portfolio analysis, SEC filings, and risk workflows.',
@@ -1088,6 +1138,62 @@ const DOMAIN_QUERY_GROUPS: Array<{
         category: 'growth-marketing',
         tags: ['email-automation', 'marketing'],
         frameworks: ['Email Automation'],
+      },
+    ],
+  },
+  {
+    key: 'design',
+    label: 'Design, creative, and media production',
+    description: 'Design systems, Figma workflows, UI generation, creative automation, images, video, presentations, and multimodal production.',
+    queries: [
+      {
+        q: 'topic:design-system',
+        category: 'design-creative',
+        tags: ['design-system', 'design', 'ui'],
+        frameworks: ['Design Systems'],
+      },
+      {
+        q: 'topic:figma',
+        category: 'design-creative',
+        tags: ['figma', 'design', 'ui'],
+        frameworks: ['Figma'],
+      },
+      {
+        q: '"ui generation"',
+        category: 'design-creative',
+        tags: ['ui-generation', 'design', 'ai'],
+        frameworks: ['UI Generation'],
+      },
+      {
+        q: '"design automation"',
+        category: 'design-creative',
+        tags: ['design-automation', 'workflow'],
+        frameworks: ['Design Automation'],
+        sort: 'updated',
+      },
+      {
+        q: 'topic:image-generation',
+        category: 'media-automation',
+        tags: ['image-generation', 'creative', 'media'],
+        frameworks: ['Image Generation'],
+      },
+      {
+        q: 'topic:video-generation',
+        category: 'media-automation',
+        tags: ['video-generation', 'creative', 'media'],
+        frameworks: ['Video Generation'],
+      },
+      {
+        q: 'topic:presentation',
+        category: 'design-creative',
+        tags: ['presentation', 'design', 'workflow'],
+        frameworks: ['Presentation'],
+      },
+      {
+        q: 'topic:creative-coding',
+        category: 'design-creative',
+        tags: ['creative-coding', 'design'],
+        frameworks: ['Creative Coding'],
       },
     ],
   },

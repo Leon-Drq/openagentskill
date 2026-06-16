@@ -4,6 +4,7 @@ import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillAttribution } from '@/lib/skill-attribution'
+import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
 
@@ -204,6 +205,7 @@ export function toRegistrySkill(skill: SkillRecord, eventStats?: SkillEventStats
   const decision = getSkillDecisionProfile(skill, eventStats || null)
   const install = getSkillInstallCommand(skill)
   const attribution = getSkillAttribution(skill)
+  const supplyProfile = getSkillSupplyProfile(skill, eventStats || null)
 
   return {
     slug: skill.slug,
@@ -228,6 +230,7 @@ export function toRegistrySkill(skill: SkillRecord, eventStats?: SkillEventStats
     },
     quality,
     trust,
+    supply_profile: supplyProfile,
     audit: {
       audit_score: audit.audit_score,
       risk_level: audit.risk_level,

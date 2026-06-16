@@ -31,6 +31,13 @@ Agent fit:
 - Primary fit: ${manifest.decision.primary_fit}
 - Role: ${manifest.decision.role}
 
+Supply profile:
+- Track: ${manifest.supply_profile.track.label}
+- Scenario: ${manifest.supply_profile.scenario.label}
+- Applicable agents: ${manifest.supply_profile.applicableAgents.join(', ')}
+- Maintenance: ${manifest.supply_profile.maintenance.label}
+- Risk: ${manifest.supply_profile.risk.label}
+
 Trust:
 - Trust score: ${manifest.trust.score}/100 ${manifest.trust.label}
 - Audit: ${manifest.audit.audit_score}/100 ${manifest.audit.risk_label}
