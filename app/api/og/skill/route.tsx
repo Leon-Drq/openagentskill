@@ -82,7 +82,7 @@ function getScenario(category: string, tags: string[], description: string) {
   return 'Use it when your agent needs a practical capability it can plug into a real workflow.'
 }
 
-function Pill({ children, active = false }: { children: string; active?: boolean }) {
+function Chip({ children, active = false }: { children: string; active?: boolean }) {
   return (
     <div
       style={{
@@ -101,6 +101,24 @@ function Pill({ children, active = false }: { children: string; active?: boolean
   )
 }
 
+function SignalRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 20,
+        borderTop: `1px solid ${border}`,
+        padding: '18px 0',
+      }}
+    >
+      <div style={{ display: 'flex', color: muted, fontSize: 15 }}>{label}</div>
+      <div style={{ display: 'flex', color: ink, fontSize: 18, fontWeight: 760, textAlign: 'right' }}>{value}</div>
+    </div>
+  )
+}
+
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams
   const name = truncate(params.get('name') || 'AI Agent Skill', 46)
@@ -112,11 +130,10 @@ export async function GET(request: NextRequest) {
     .map((tag) => tag.trim())
     .filter(Boolean)
     .slice(0, 3)
-  const install = truncate(params.get('install') || 'npx skills add', 64)
   const scenario = getScenario(category, tags, description)
   const categoryLabel = titleCase(category)
   const starLabel = stars > 0 ? `${compactNumber(stars)} stars` : 'Open registry'
-  const visibleTags = tags.length > 0 ? tags.map(titleCase) : ['Agent Skill', 'Open Registry']
+  const visibleTags = tags.length > 0 ? tags.map(titleCase) : ['Agent Skill']
 
   return new ImageResponse(
     (
@@ -130,7 +147,7 @@ export async function GET(request: NextRequest) {
           backgroundColor: paper,
           color: ink,
           fontFamily: 'Inter, Arial, sans-serif',
-          padding: '52px 64px',
+          padding: '58px 72px',
         }}
       >
         <div
@@ -139,44 +156,55 @@ export async function GET(request: NextRequest) {
             inset: 0,
             display: 'flex',
             backgroundImage: 'radial-gradient(circle, rgba(23,20,16,0.15) 1px, transparent 1px)',
-            backgroundSize: '24px 24px',
-            opacity: 0.3,
+            backgroundSize: '26px 26px',
+            opacity: 0.22,
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            left: 72,
+            right: 72,
+            bottom: 96,
+            display: 'flex',
+            height: 1,
+            backgroundColor: border,
+            opacity: 0.85,
           }}
         />
 
         <div style={{ display: 'flex', width: '100%', height: '100%', flexDirection: 'column', position: 'relative' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <BrandMark size={42} />
-              <div style={{ display: 'flex', fontSize: 23, fontWeight: 780 }}>OpenAgentSkill</div>
+              <BrandMark size={38} />
+              <div style={{ display: 'flex', fontSize: 20, fontWeight: 760 }}>OpenAgentSkill</div>
             </div>
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
                 border: `1px solid ${border}`,
                 borderRadius: 999,
-                backgroundColor: card,
-                padding: '9px 13px',
-                color: green,
-                fontSize: 13,
+                backgroundColor: 'rgba(255,253,248,0.72)',
+                padding: '8px 13px',
+                color: muted,
+                fontSize: 12,
                 fontWeight: 780,
-                letterSpacing: 1.4,
+                letterSpacing: 1.8,
               }}
             >
-              REGISTRY DECISION
+              OPEN REGISTRY
             </div>
           </div>
 
-          <div style={{ display: 'flex', flex: 1, alignItems: 'center', gap: 50 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', width: 655 }}>
+          <div style={{ display: 'flex', flex: 1, alignItems: 'center', gap: 58, paddingBottom: 54 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', width: 700 }}>
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 10,
-                  color: muted,
+                  color: '#7a746a',
                   fontSize: 15,
                   fontWeight: 740,
                   letterSpacing: 4,
@@ -189,10 +217,10 @@ export async function GET(request: NextRequest) {
               <div
                 style={{
                   display: 'flex',
-                  marginTop: 26,
-                  fontSize: name.length > 24 ? 58 : 68,
-                  lineHeight: 0.98,
-                  fontWeight: 800,
+                  marginTop: 28,
+                  fontSize: name.length > 24 ? 64 : 78,
+                  lineHeight: 0.94,
+                  fontWeight: 760,
                   color: ink,
                   wordBreak: 'break-word',
                 }}
@@ -203,115 +231,70 @@ export async function GET(request: NextRequest) {
               <div
                 style={{
                   display: 'flex',
-                  marginTop: 24,
-                  fontSize: 25,
-                  lineHeight: 1.28,
+                  marginTop: 26,
+                  fontSize: 28,
+                  lineHeight: 1.2,
                   color: '#4f4940',
-                  maxWidth: 610,
+                  maxWidth: 650,
                 }}
               >
-                {truncate(scenario, 142)}
+                {truncate(scenario, 118)}
               </div>
 
-              <div style={{ display: 'flex', gap: 10, marginTop: 28, flexWrap: 'wrap' }}>
-                <Pill active>Recommended</Pill>
-                <Pill>{starLabel}</Pill>
+              <div style={{ display: 'flex', gap: 10, marginTop: 34, flexWrap: 'wrap' }}>
+                <Chip active>Recommended</Chip>
+                <Chip>{starLabel}</Chip>
                 {visibleTags.slice(0, 3).map((tag) => (
-                  <Pill key={tag}>{tag}</Pill>
+                  <Chip key={tag}>{tag}</Chip>
                 ))}
               </div>
             </div>
 
             <div
               style={{
-                width: 385,
+                width: 320,
                 display: 'flex',
                 flexDirection: 'column',
-                backgroundColor: card,
+                backgroundColor: 'rgba(255,253,248,0.84)',
                 border: `1px solid ${border}`,
-                borderRadius: 22,
-                padding: '28px 28px 18px',
-                boxShadow: '0 22px 60px rgba(23,20,16,0.08)',
+                borderRadius: 26,
+                padding: '30px 28px 18px',
+                boxShadow: '0 22px 58px rgba(23,20,16,0.075)',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                  <div style={{ display: 'flex', color: muted, fontSize: 14, fontWeight: 730 }}>Recommendation</div>
-                  <div style={{ display: 'flex', color: ink, fontSize: 30, fontWeight: 800 }}>Recommended</div>
-                </div>
-                <div
-                  style={{
-                    width: 82,
-                    height: 82,
-                    borderRadius: 999,
-                    backgroundColor: green,
-                    color: '#ffffff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexDirection: 'column',
-                    gap: 2,
-                  }}
-                >
-                  <div style={{ display: 'flex', fontSize: 29, fontWeight: 760 }}>100</div>
-                  <div style={{ display: 'flex', fontSize: 10, letterSpacing: 1.4 }}>SCORE</div>
-                </div>
-              </div>
-
               <div
                 style={{
                   display: 'flex',
-                  marginTop: 22,
-                  border: `1px solid ${border}`,
-                  backgroundColor: '#f1ede4',
-                  borderRadius: 12,
-                  padding: '14px 16px',
-                  color: ink,
-                  fontSize: 18,
-                  lineHeight: 1.28,
+                  flexDirection: 'column',
+                  gap: 7,
+                  marginBottom: 12,
                 }}
               >
-                {truncate(description, 112)}
+                <div style={{ display: 'flex', color: muted, fontSize: 13, fontWeight: 760, letterSpacing: 2 }}>
+                  SKILL SIGNAL
+                </div>
+                <div style={{ display: 'flex', color: ink, fontSize: 31, fontWeight: 760 }}>Agent-ready</div>
+                <div style={{ display: 'flex', color: '#5f584f', fontSize: 16, lineHeight: 1.3 }}>
+                  {truncate(description, 92)}
+                </div>
               </div>
 
-              {[
-                ['GitHub signal', starLabel],
-                ['Install path', 'Ready'],
-                ['Works with', 'Codex + Claude Code'],
-                ['Registry URL', 'openagentskill.com'],
-              ].map(([label, value]) => (
-                <div
-                  key={label}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    gap: 16,
-                    borderTop: `1px solid ${border}`,
-                    padding: '15px 0',
-                  }}
-                >
-                  <div style={{ display: 'flex', color: muted, fontSize: 16 }}>{label}</div>
-                  <div style={{ display: 'flex', color: ink, fontSize: 16, fontWeight: 760, textAlign: 'right' }}>
-                    {value}
-                  </div>
-                </div>
-              ))}
+              <SignalRow label="GitHub" value={starLabel} />
+              <SignalRow label="Category" value={categoryLabel} />
+              <SignalRow label="Install" value="Ready" />
             </div>
           </div>
 
           <div
             style={{
-              height: 54,
-              borderTop: `1px solid ${border}`,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              justifyContent: 'flex-end',
               color: muted,
               fontSize: 15,
             }}
           >
-            <div style={{ display: 'flex' }}>{install}</div>
-            <div style={{ display: 'flex', color: green, fontWeight: 760 }}>Find the right skill automatically</div>
+            <div style={{ display: 'flex', color: green, fontSize: 17, fontWeight: 760 }}>openagentskill.com</div>
           </div>
         </div>
       </div>

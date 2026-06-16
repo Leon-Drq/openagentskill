@@ -48,7 +48,7 @@ export async function generateMetadata({
   const description = `${skill.description} ${starsText} GitHub stars. Install with ${installCommand}.`
   const pageUrl = `https://www.openagentskill.com/skills/${slug}`
   const imageAlt = `${skill.name} - OpenAgentSkill`
-  const imageVersion = '4'
+  const imageVersion = '5'
   const imageParams = new URLSearchParams({
     v: imageVersion,
     name: skill.name,
