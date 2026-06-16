@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
+import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { getAllSkills, getSkillEventStatsMap, type SkillEventStats, type SkillRecord } from '@/lib/db/skills'
 import { SKILL_STACKS, type SkillStackDefinition } from '@/lib/collections'
 import { getSkillInstallTargets } from '@/lib/install-targets'
@@ -56,9 +57,45 @@ export async function GET(request: NextRequest) {
       score: calculateRelevanceScore(skill, task),
     }))
 
-    // Sort by score descending, take top N
-    scored.sort((a, b) => b.score - a.score)
-    const recommendations = dedupeRankedSkills(scored).slice(0, limit).filter((s) => s.score > 0)
+    const candidates = dedupeRankedSkills(scored)
+      .filter((item) => item.score > 0)
+      .map((item) => {
+        const eventStats = eventStatsMap[item.skill.slug] || null
+        const audit = buildSkillAudit(item.skill, eventStats)
+        const safety = getAgentSafetyProfile(item.skill, audit, {
+          max_risk: 'medium',
+          needs_install_command: true,
+        })
+        const gateBoost =
+          safety.safety_tier.tier === 'verified'
+            ? 22
+            : safety.safety_tier.tier === 'reviewed'
+              ? 12
+              : safety.safety_tier.tier === 'experimental'
+                ? -10
+                : -100
+
+        return {
+          ...item,
+          eventStats,
+          audit,
+          safety,
+          safety_adjusted_score: item.score + gateBoost,
+        }
+      })
+      .sort((a, b) => b.safety_adjusted_score - a.safety_adjusted_score)
+
+    const recommendations = candidates.filter((item) => !item.safety.blocked).slice(0, limit)
+    const blockedCandidates = candidates
+      .filter((item) => item.safety.blocked)
+      .slice(0, 5)
+      .map((item) => ({
+        slug: item.skill.slug,
+        name: item.skill.name,
+        match_score: item.score,
+        safety_gate: item.safety.safety_tier,
+        url: `https://www.openagentskill.com/skills/${item.skill.slug}/audit`,
+      }))
 
     // Find composition suggestions — skills that enhance each other
     const topSlugs = recommendations.map((r) => r.skill.slug)
@@ -82,11 +119,12 @@ export async function GET(request: NextRequest) {
     const payload = {
       task,
       recommendations: recommendations.map((r, index) => {
-        const eventStats = eventStatsMap[r.skill.slug] || null
-        const decision = getSkillDecisionProfile(r.skill, eventStatsMap[r.skill.slug] || null)
+        const eventStats = r.eventStats
+        const decision = getSkillDecisionProfile(r.skill, eventStats)
         const useCases = getUseCasesForSkill(r.skill, 2)
         const trust = getSkillTrustProfile(r.skill, false, eventStats)
-        const audit = buildSkillAudit(r.skill, eventStats)
+        const audit = r.audit
+        const safety = r.safety
         const supplyProfile = getSkillSupplyProfile(r.skill, eventStats)
         return {
           rank: index + 1,
@@ -95,6 +133,7 @@ export async function GET(request: NextRequest) {
           description: r.skill.description,
           confidence: Math.min(r.score / 100, 1.0).toFixed(2),
           match_label: getMatchLabel(r.score),
+          safety_adjusted_score: r.safety_adjusted_score,
           install: r.skill.install_command || `npx skills add ${r.skill.github_repo}`,
           repository: r.skill.repository,
           stats: {
@@ -105,6 +144,18 @@ export async function GET(request: NextRequest) {
           },
           quality: getSkillQualityProfile(r.skill),
           trust,
+          safety,
+          safety_gate: {
+            tier: safety.safety_tier.tier,
+            label: safety.safety_tier.label,
+            badge: safety.safety_tier.badge,
+            auto_install_policy: safety.safety_tier.auto_install_policy,
+            auto_install_allowed: safety.auto_install_allowed,
+            human_review_required: safety.human_review_required,
+            blocked: safety.blocked,
+            recommended_action: safety.safety_tier.recommended_action,
+            reasons: safety.safety_tier.reasons,
+          },
           supply_profile: supplyProfile,
           audit: {
             audit_score: audit.audit_score,
@@ -141,6 +192,7 @@ export async function GET(request: NextRequest) {
           reasoning: generateReasoning(r.skill, r.score),
         }
       }),
+      blocked_candidates: blockedCandidates,
       suggested_composition: compositionSuggestion,
       suggested_stacks: stackMatches.map(({ stack }) => ({
         slug: stack.slug,
@@ -152,6 +204,8 @@ export async function GET(request: NextRequest) {
         timestamp: new Date().toISOString(),
         api_version: '1.0',
         total_skills_searched: allSkills.length,
+        blocked_candidates: blockedCandidates.length,
+        safety_policy: 'Blocked candidates are excluded from recommendations. Verified and reviewed candidates receive ranking priority.',
         public_search_endpoint: 'https://www.openagentskill.com/api/skills/search',
         agent_friendly: true,
       },
@@ -161,6 +215,7 @@ export async function GET(request: NextRequest) {
       const text = payload.recommendations.map((item) => (
         `${item.rank}. ${item.skill} (${item.slug})\n` +
         `   Match: ${item.match_label} | Confidence: ${item.confidence}\n` +
+        `   Safety: ${item.safety_gate.label} | Policy: ${item.safety_gate.auto_install_policy} | Score: ${item.safety.score}/100\n` +
         `   Supply: ${item.supply_profile.track.shortLabel} | Scenario: ${item.supply_profile.scenario.label} | Maintenance: ${item.supply_profile.maintenance.label}\n` +
         `   Trust: ${item.trust.score}/100 ${item.trust.label} | Audit: ${item.audit.audit_score}/100 ${item.audit.risk_label}\n` +
         `   Install: ${item.install}\n` +

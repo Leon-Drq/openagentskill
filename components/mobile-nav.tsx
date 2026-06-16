@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Activity, Braces, FileJson2, Menu, Plus, Terminal, X } from 'lucide-react'
+import { Activity, Braces, FileJson2, Menu, Plus, ShieldCheck, Terminal, X } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'
 import { GitHubStarButton } from '@/components/github-star-button'
@@ -46,6 +46,12 @@ const agentItems: Array<{
     label: 'Resolve API',
     description: 'Turn a task into a safe install plan',
     icon: Braces,
+  },
+  {
+    href: '/safety',
+    label: 'Safety Gate',
+    description: 'Verified, reviewed, experimental, blocked',
+    icon: ShieldCheck,
   },
   {
     href: '/cli',

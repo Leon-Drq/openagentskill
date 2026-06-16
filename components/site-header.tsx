@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Activity, Bot, Braces, ChevronDown, FileJson2, Plus, Terminal } from 'lucide-react'
+import { Activity, Bot, Braces, ChevronDown, FileJson2, Plus, ShieldCheck, Terminal } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'
 import { GitHubStarButton } from '@/components/github-star-button'
@@ -46,6 +46,12 @@ const agentItems: Array<{
     label: 'Resolve API',
     description: 'Task to skill plan',
     icon: Braces,
+  },
+  {
+    href: '/safety',
+    label: 'Safety Gate',
+    description: 'Trust policy',
+    icon: ShieldCheck,
   },
   {
     href: '/cli',

@@ -14,6 +14,8 @@ export async function GET(request: NextRequest) {
   const category = searchParams.get('category')
   const platform = searchParams.get('platform')
   const track = searchParams.get('track')
+  const safety = searchParams.get('safety')
+  const includeBlocked = searchParams.get('include_blocked') === 'true'
   const minStars = Number(searchParams.get('min_stars') || searchParams.get('minStars') || 0)
   const format = searchParams.get('format') || 'json'
   const limit = clampLimit(searchParams.get('limit'))
@@ -36,15 +38,25 @@ export async function GET(request: NextRequest) {
         }
         return true
       })
+      .map(({ skill, score }) => ({
+        skill,
+        score,
+        registrySkill: toRegistrySkill(skill),
+      }))
+      .filter(({ registrySkill }) => {
+        if (!includeBlocked && registrySkill.safety_gate.blocked) return false
+        if (safety && safety !== 'all' && registrySkill.safety_gate.tier !== safety) return false
+        return true
+      })
       .slice(0, limit)
 
     if (format === 'text') {
-      const text = ranked.map(({ skill, score }, index) => {
-        const item = toRegistrySkill(skill)
+      const text = ranked.map(({ score, registrySkill: item }, index) => {
         return `${index + 1}. ${item.name} (${item.slug})
    Match score: ${score}
    ${item.description}
    Supply: ${item.supply_profile.track.shortLabel} | Scenario: ${item.supply_profile.scenario.label}
+   Safety: ${item.safety_gate.label} | Policy: ${item.safety_gate.auto_install_policy}
    Trust: ${item.trust.score}/100 ${item.trust.label} | Audit: ${item.audit.audit_score}/100 ${item.audit.risk_label}
    Install: ${item.install}
    URL: ${item.urls.web}
@@ -72,18 +84,21 @@ ${text}`,
         category,
         platform,
         track,
+        safety,
+        include_blocked: includeBlocked,
         min_stars: Number.isFinite(minStars) ? minStars : 0,
       },
       total: ranked.length,
-      skills: ranked.map(({ skill, score }, index) => ({
+      skills: ranked.map(({ skill, score, registrySkill }, index) => ({
         rank: index + 1,
         match_score: score,
-        ...toRegistrySkill(skill),
+        ...registrySkill,
         recommendation_reasons: getRecommendationReasons(skill, query, score),
       })),
       meta: {
         endpoint: '/api/skills/search',
-        canonical_agent_endpoint: '/api/agent/recommend',
+        canonical_agent_endpoint: '/api/agent/resolve',
+        safety_policy: 'Blocked candidates are excluded by default. Pass include_blocked=true only for manual audit workflows.',
         agent_friendly: true,
         api_version: '1.0',
         generated_at: new Date().toISOString(),

@@ -25,6 +25,8 @@ export async function GET() {
               { name: 'q', in: 'query', required: false, schema: { type: 'string' } },
               { name: 'category', in: 'query', required: false, schema: { type: 'string' } },
               { name: 'platform', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'safety', in: 'query', required: false, schema: { type: 'string', enum: ['verified', 'reviewed', 'experimental', 'blocked', 'all'] } },
+              { name: 'include_blocked', in: 'query', required: false, schema: { type: 'boolean' } },
               { name: 'min_stars', in: 'query', required: false, schema: { type: 'number' } },
               { name: 'limit', in: 'query', required: false, schema: { type: 'number' } },
               { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
@@ -34,7 +36,7 @@ export async function GET() {
         },
         '/api/registry/recommend': {
           get: {
-            summary: 'Recommend skills for one task using registry ranking and trust signals',
+            summary: 'Recommend skills for one task using registry ranking, trust signals, and safety gates',
             parameters: [
               { name: 'task', in: 'query', required: true, schema: { type: 'string' } },
               { name: 'limit', in: 'query', required: false, schema: { type: 'number' } },
@@ -65,7 +67,7 @@ export async function GET() {
         },
         '/api/agent/resolve': {
           get: {
-            summary: 'Resolve a task into a selected skill and install plan',
+            summary: 'Resolve a task into a selected skill, safety gate, and install plan',
             parameters: [
               { name: 'task', in: 'query', required: true, schema: { type: 'string' } },
               { name: 'agent', in: 'query', required: false, schema: { type: 'string', enum: ['auto', 'codex', 'claude-code', 'cursor', 'openagentskill-cli'] } },
@@ -115,11 +117,29 @@ export async function GET() {
             responses: { '200': { description: 'Task detail and ranked skills' } },
           },
         },
+        '/api/agent/skills': {
+          get: {
+            summary: 'Search agent-readable skill profiles with trust, audit, supply, and safety fields',
+            parameters: [
+              { name: 'q', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'category', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'platform', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'trust', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'safety', in: 'query', required: false, schema: { type: 'string', enum: ['verified', 'reviewed', 'experimental', 'blocked', 'all'] } },
+              { name: 'track', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'max_risk', in: 'query', required: false, schema: { type: 'string', enum: ['low', 'medium', 'high'] } },
+              { name: 'limit', in: 'query', required: false, schema: { type: 'number' } },
+              { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
+            ],
+            responses: { '200': { description: 'Skill search results with safety_gate and safety profile fields' } },
+          },
+        },
         '/api/agent/skills/{slug}': {
           get: {
             summary: 'Get one agent-readable skill profile',
             parameters: [
               { name: 'slug', in: 'path', required: true, schema: { type: 'string' } },
+              { name: 'max_risk', in: 'query', required: false, schema: { type: 'string', enum: ['low', 'medium', 'high'] } },
               { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
             ],
             responses: { '200': { description: 'Skill profile' } },

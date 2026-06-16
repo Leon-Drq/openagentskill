@@ -1,4 +1,5 @@
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
+import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import type { SkillEventStats, SkillRecord } from '@/lib/db/skills'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillInstallTargets } from '@/lib/install-targets'
@@ -202,6 +203,7 @@ export function toRegistrySkill(skill: SkillRecord, eventStats?: SkillEventStats
   const quality = getSkillQualityProfile(skill)
   const trust = getSkillTrustProfile(skill, false, eventStats || null)
   const audit = buildSkillAudit(skill, eventStats || null)
+  const safety = getAgentSafetyProfile(skill, audit, { max_risk: 'medium', needs_install_command: true })
   const decision = getSkillDecisionProfile(skill, eventStats || null)
   const install = getSkillInstallCommand(skill)
   const attribution = getSkillAttribution(skill)
@@ -230,6 +232,18 @@ export function toRegistrySkill(skill: SkillRecord, eventStats?: SkillEventStats
     },
     quality,
     trust,
+    safety,
+    safety_gate: {
+      tier: safety.safety_tier.tier,
+      label: safety.safety_tier.label,
+      badge: safety.safety_tier.badge,
+      auto_install_policy: safety.safety_tier.auto_install_policy,
+      auto_install_allowed: safety.auto_install_allowed,
+      human_review_required: safety.human_review_required,
+      blocked: safety.blocked,
+      recommended_action: safety.safety_tier.recommended_action,
+      reasons: safety.safety_tier.reasons,
+    },
     supply_profile: supplyProfile,
     audit: {
       audit_score: audit.audit_score,
@@ -276,6 +290,8 @@ export function buildInstallHandoff(skill: SkillRecord) {
   const install = getSkillInstallCommand(skill)
   const targets = getSkillInstallTargets(skill)
   const detailUrl = getSkillUrl(skill.slug)
+  const audit = buildSkillAudit(skill)
+  const safety = getAgentSafetyProfile(skill, audit, { max_risk: 'medium', needs_install_command: true })
 
   return {
     skill: {
@@ -286,9 +302,22 @@ export function buildInstallHandoff(skill: SkillRecord) {
     },
     recommended_command: install,
     install_targets: targets,
+    safety_gate: {
+      tier: safety.safety_tier.tier,
+      label: safety.safety_tier.label,
+      badge: safety.safety_tier.badge,
+      auto_install_policy: safety.safety_tier.auto_install_policy,
+      auto_install_allowed: safety.auto_install_allowed,
+      human_review_required: safety.human_review_required,
+      blocked: safety.blocked,
+      recommended_action: safety.safety_tier.recommended_action,
+      reasons: safety.safety_tier.reasons,
+    },
     agent_prompt:
-      `Install the "${skill.name}" agent skill only after reviewing the OpenAgentSkill profile and source repository. Start with ${detailUrl}, inspect the trust and audit notes, then use the recommended install handoff: ${install}. After installation, summarize changed files, required setup, and a minimal verification result before using the skill for real work.`,
+      `Install the "${skill.name}" agent skill only after reviewing the OpenAgentSkill profile and source repository. Safety gate: ${safety.safety_tier.label} (${safety.safety_tier.auto_install_policy}). Start with ${detailUrl}, inspect the trust and audit notes, then use the recommended install handoff: ${install}. After installation, summarize changed files, required setup, and a minimal verification result before using the skill for real work.`,
     safety_checklist: [
+      `Safety gate: ${safety.safety_tier.label}. Policy: ${safety.safety_tier.auto_install_policy}.`,
+      safety.safety_tier.recommended_action,
       'Review the repository and license before running third-party code.',
       'Prefer a sandbox or isolated project when testing a new skill.',
       'Start with the recommended command, then inspect generated files before committing changes.',

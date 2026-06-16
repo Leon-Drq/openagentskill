@@ -62,6 +62,7 @@ export function SiteFooter() {
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Trust</h2>
               <div className="mt-4 grid gap-2 text-secondary">
                 <Link href="/compare" className="hover:text-foreground">Compare</Link>
+                <Link href="/safety" className="hover:text-foreground">Safety Gate</Link>
                 <Link href="/skills-registry" className="hover:text-foreground">Skills Registry</Link>
                 <Link href="/rankings" className="hover:text-foreground">Rankings</Link>
                 <Link href="/audits" className="hover:text-foreground">Audits</Link>

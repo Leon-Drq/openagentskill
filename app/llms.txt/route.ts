@@ -35,6 +35,7 @@ Important URLs:
 - Task API: https://www.openagentskill.com/api/agent/tasks
 - Resolve API: https://www.openagentskill.com/api/agent/resolve
 - Skill search API: https://www.openagentskill.com/api/skills/search
+- Safety gate: https://www.openagentskill.com/safety
 - Agent manifest: https://www.openagentskill.com/.well-known/agent-manifest.json
 - OpenAPI schema: https://www.openagentskill.com/openapi.json
 - GitHub auto-discovery status: https://www.openagentskill.com/api/agent/discovery
@@ -50,6 +51,10 @@ Coverage:
 - Task pages: ${AGENT_TASKS.length}
 
 Install safety:
+- Prefer /api/agent/resolve over raw search because it applies the OpenAgentSkill safety gate.
+- Treat safety_gate.blocked as "do not auto-install".
+- Treat safety_gate.experimental as manual test only.
+- Treat safety_gate.reviewed as human-review-before-install unless auto_install_policy is allow.
 - Review repository and license before running third-party code.
 - Prefer sandboxed installation first.
 - Do not perform external side effects without user approval.
