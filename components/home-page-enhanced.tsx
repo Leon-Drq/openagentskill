@@ -88,6 +88,17 @@ interface ResolveResult {
     status: string
     summary: string
   }
+  agent_decision?: {
+    install_command: string
+    why_recommended: string[]
+    risk_summary: {
+      level: string
+      safety: string
+      trust: string
+      notes: string[]
+    }
+    agent_next_steps: string[]
+  } | null
   meta: {
     total_skills_searched: number
     total_candidates: number
@@ -953,6 +964,21 @@ export function HomePageEnhanced({ initialLocale, stats }: HomePageEnhancedProps
                         <div className="mt-4 break-all rounded-[8px] border border-[#e0dbd2] bg-[#fbfaf6] p-2 font-mono text-[11px] text-[#6d675e]">
                           {rec.install_plan.value}
                         </div>
+                        {i === 0 && resolveResult?.agent_decision?.risk_summary && (
+                          <div className="mt-3 rounded-[8px] border border-[#e0dbd2] bg-[#fbfaf6] p-3">
+                            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6d675e]">
+                              Risk summary
+                            </p>
+                            <p className="mt-1 text-xs leading-relaxed text-[#5f5a52]">
+                              {resolveResult.agent_decision.risk_summary.safety} · {resolveResult.agent_decision.risk_summary.trust}
+                            </p>
+                            {resolveResult.agent_decision.risk_summary.notes[0] && (
+                              <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[#5f5a52]">
+                                {resolveResult.agent_decision.risk_summary.notes[0]}
+                              </p>
+                            )}
+                          </div>
+                        )}
                         <div className="mt-3 grid gap-2 sm:grid-cols-3">
                           <button
                             onClick={() => copyToClipboard(rec.install_plan.value)}
@@ -1039,14 +1065,20 @@ export function HomePageEnhanced({ initialLocale, stats }: HomePageEnhancedProps
               </div>
               <pre className="overflow-x-auto bg-[#f2f0e9]/70 p-5 font-mono text-[12px] leading-relaxed text-[#3f3b35]">
                 <code>{`{
-  "task": "scrape pricing pages",
-  "selected": {
-    "skill": "Crawl4AI",
-    "safety": "80/100",
-    "policy": "human_review_required",
-    "install_plan": "npx skills add unclecode/crawl4ai"
-  },
-  "alternatives": ["Firecrawl", "AnyCrawl"]
+  "task": "analyze stock news",
+  "agent_decision": {
+    "recommended_skill": "Last30days Skill",
+    "install_command": "npx skills add ...",
+    "why_recommended": [
+      "matches research workflow",
+      "strong Trust Score",
+      "audit warnings included"
+    ],
+    "risk_summary": {
+      "safety": "review before install",
+      "notes": ["network access", "verify sources"]
+    }
+  }
 }`}</code>
               </pre>
             </div>

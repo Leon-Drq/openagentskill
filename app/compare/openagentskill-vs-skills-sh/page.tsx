@@ -1,9 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAllSkills } from '@/lib/db/skills'
-import { formatCompactNumber } from '@/lib/quality'
+import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
+import { getSkillTrustProfile } from '@/lib/trust'
 
 export const dynamic = 'force-dynamic'
 
@@ -53,6 +56,15 @@ const comparisonRows = [
 export default async function OpenAgentSkillVsSkillsShPage() {
   const skills = await getAllSkills('quality').catch(() => [])
   const totalStars = skills.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0)
+  const decisionSkills = skills
+    .slice(0, 8)
+    .map((skill) => ({
+      skill,
+      quality: getSkillQualityProfile(skill),
+      trust: getSkillTrustProfile(skill),
+      audit: buildSkillAudit(skill),
+      installCommand: skill.install_command || `npx skills add ${skill.github_repo || skill.slug}`,
+    }))
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -146,6 +158,59 @@ export default async function OpenAgentSkillVsSkillsShPage() {
             <h2 className="font-display text-xl font-semibold">Compare directories</h2>
             <p className="mt-2 text-sm leading-relaxed text-secondary">See how OpenAgentSkill fits beside skills.sh.</p>
           </Link>
+        </section>
+
+        <section className="border-b border-border py-10">
+          <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Real marketplace data</p>
+              <h2 className="font-display text-2xl font-semibold">OpenAgentSkill turns the catalog into a decision shortlist.</h2>
+              <p className="mt-3 max-w-3xl text-sm leading-relaxed text-secondary">
+                These are live indexed skills with quality, Trust Score, audit risk, and install handoff. This is the
+                layer ordinary directories usually do not provide.
+              </p>
+            </div>
+            <Link href="/audits" className="text-sm text-secondary underline underline-offset-4 hover:text-foreground">
+              View all audits
+            </Link>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            {decisionSkills.map(({ skill, quality, trust, audit, installCommand }) => (
+              <article key={skill.slug} className="min-w-0 border border-border bg-card p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <Link href={`/skills/${skill.slug}`} className="font-display text-2xl font-semibold leading-tight hover:text-secondary">
+                      {skill.name}
+                    </Link>
+                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-secondary">{skill.description}</p>
+                  </div>
+                  <span className="border border-border px-2.5 py-1 font-mono text-xs text-secondary">
+                    {formatCompactNumber(skill.github_stars || 0)} stars
+                  </span>
+                </div>
+
+                <div className="mt-5 grid grid-cols-3 gap-px border border-border bg-border text-center">
+                  <div className="bg-background p-3">
+                    <p className="font-mono text-lg">{quality.score}</p>
+                    <p className="mt-1 text-[10px] uppercase text-secondary">Quality</p>
+                  </div>
+                  <div className="bg-background p-3">
+                    <p className="font-mono text-lg">{trust.score}</p>
+                    <p className="mt-1 text-[10px] uppercase text-secondary">Trust</p>
+                  </div>
+                  <div className="bg-background p-3">
+                    <p className="font-mono text-lg">{audit.audit_score}</p>
+                    <p className="mt-1 text-[10px] uppercase text-secondary">{auditRiskLabel(audit.risk_level)}</p>
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <InstallCommand command={installCommand} skillSlug={skill.slug} compact />
+                </div>
+              </article>
+            ))}
+          </div>
         </section>
 
         <section className="py-10">

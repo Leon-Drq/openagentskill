@@ -82,13 +82,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
 
   const auditPages: MetadataRoute.Sitemap = skills
-    .filter((skill) => Number(skill.github_stars || 0) >= 500)
-    .slice(0, 350)
     .map((skill) => ({
       url: `${baseUrl}/skills/${skill.slug}/audit`,
       lastModified: new Date(skill.updated_at),
       changeFrequency: 'weekly',
-      priority: 0.76,
+      priority: Number(skill.github_stars || 0) >= 500 ? 0.76 : 0.68,
     }))
 
   const posts = await getBlogPosts(100).catch(() => [])

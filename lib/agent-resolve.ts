@@ -76,6 +76,25 @@ function buildPolicyDecision(autoInstallAllowed: boolean, policyWarnings: string
   }
 }
 
+function summarizeRisks(candidate: {
+  audit: { risk_label: string; warnings: string[] }
+  trust: { score: number; label: string; warnings: string[] }
+  safety: { score: number; label: string; policy_warnings: string[] }
+}) {
+  const notes = [
+    ...candidate.safety.policy_warnings,
+    ...candidate.audit.warnings,
+    ...candidate.trust.warnings,
+  ].filter(Boolean)
+
+  return {
+    level: candidate.audit.risk_label,
+    safety: `${candidate.safety.score}/100 ${candidate.safety.label}`,
+    trust: `${candidate.trust.score}/100 ${candidate.trust.label}`,
+    notes: [...new Set(notes)].slice(0, 5),
+  }
+}
+
 export async function resolveAgentSkill(input: AgentResolveInput) {
   const task = input.task.trim()
   if (!task) throw new Error('Missing required field: task')
@@ -157,6 +176,43 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
   const alternatives = candidates
     .filter((candidate) => candidate.skill.slug !== selected?.skill.slug)
     .slice(0, Math.max(0, limit - 1))
+  const agentDecision = selected
+    ? {
+        input_task: task,
+        recommended_skill: {
+          slug: selected.skill.slug,
+          name: selected.skill.name,
+          url: selected.urls.web,
+          audit_url: selected.urls.audit,
+          repository: selected.urls.repository,
+        },
+        alternative_skills: alternatives.slice(0, 3).map((candidate) => ({
+          slug: candidate.skill.slug,
+          name: candidate.skill.name,
+          url: candidate.urls.web,
+          install_command: candidate.install_plan.command,
+          why_consider: candidate.recommendation_reasons[0] || candidate.decision.headline,
+          risk: summarizeRisks(candidate),
+        })),
+        install_command: selected.install_plan.command,
+        install_target: selected.install_plan.label,
+        why_recommended: [
+          ...selected.recommendation_reasons,
+          selected.decision.headline,
+          `${selected.trust.score}/100 OpenAgentSkill Trust Score`,
+          `${selected.audit.audit_score}/100 audit score`,
+        ].filter(Boolean).slice(0, 6),
+        risk_summary: summarizeRisks(selected),
+        agent_next_steps: [
+          'Read the audit URL before installing.',
+          selected.safety.auto_install_allowed
+            ? 'Install in a sandbox or low-risk workspace first.'
+            : 'Ask for human approval before installing.',
+          `Use install command: ${selected.install_plan.command}`,
+          'After installation, run one narrow task and report output, warnings, and files touched.',
+        ],
+      }
+    : null
   const agentWorkflow = selected
     ? {
         mode: 'resolve_review_install',
@@ -248,6 +304,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           status: 'no_match',
           summary: 'No matching skill passed the current filters.',
         },
+    agent_decision: agentDecision,
     benchmark: {
       endpoint: `${SITE_URL}/api/agent/evals`,
       note: 'Use the evals endpoint to regression-test recommendation quality before changing ranking logic.',

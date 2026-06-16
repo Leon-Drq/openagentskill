@@ -483,6 +483,134 @@ export const GROWTH_GUIDES: GrowthGuideDefinition[] = [
     relatedGuideSlugs: ['best-agent-skills-for-codex', 'best-agent-skills-for-claude-code', 'install-agent-skills-in-claude-code'],
   },
   {
+    slug: 'best-codex-skills-for-finance-analysis',
+    shortTitle: 'Codex finance skills',
+    title: 'Best Codex Skills for Finance Analysis',
+    eyebrow: 'Finance shortlist',
+    description:
+      'A real-skill shortlist for Codex users who want market research, stock news analysis, filings review, portfolio checks, and quant workflows with audit and trust signals.',
+    intent: 'best',
+    heroPrompt:
+      'I need Codex skills to analyze stock news, market data, SEC filings, portfolio risk, and finance research sources.',
+    useCaseSlug: 'finance-quant',
+    platformLabel: 'Codex',
+    platformKeywords: ['codex', 'openai', 'agent', 'finance', 'stock', 'market', 'analysis'],
+    skillKeywords: ['finance', 'stock', 'market', 'news', 'sec', 'filings', 'portfolio', 'quant', 'risk', 'trading', 'codex'],
+    sections: [
+      {
+        title: 'Finance skills need source discipline',
+        body:
+          'A useful finance skill should help a coding agent gather evidence, separate facts from interpretation, and make assumptions visible before producing analysis.',
+        bullets: [
+          'Prefer skills that cite public sources, filings, market data, or input datasets.',
+          'Treat outputs as research support, not financial advice.',
+          'Use audit notes to check network access, dependency risk, and maintenance freshness.',
+        ],
+      },
+      {
+        title: 'Where Codex creates leverage',
+        body:
+          'Codex can pair finance analysis with reproducible code: scrape source data, clean CSVs, build notebooks, compare tickers, and generate a reviewed summary.',
+        bullets: [
+          'Use data and research skills for stock news workflows.',
+          'Use document skills for filings and PDFs.',
+          'Use security and dependency checks before installing data-fetching tools.',
+        ],
+      },
+    ],
+    steps: [
+      {
+        title: 'Start with the finance task',
+        description: 'Use a concrete task such as analyze stock news, summarize an earnings release, or compare portfolio risk.',
+      },
+      {
+        title: 'Inspect trust and audit first',
+        description: 'Check license, recent maintenance, README/SKILL.md completeness, dependency risk, and installability.',
+      },
+      {
+        title: 'Run one reproducible analysis',
+        description: 'Ask Codex to show sources, assumptions, data transformations, and a concise risk summary.',
+      },
+    ],
+    faq: [
+      {
+        question: 'Can Codex finance skills give investment advice?',
+        answer:
+          'No. Treat these as research and workflow automation skills. Human review is required before any financial decision.',
+      },
+      {
+        question: 'What should I install first?',
+        answer:
+          'Start with a research or data-analysis skill that can cite sources and produce reproducible outputs, then add filing or portfolio-specific skills as needed.',
+      },
+    ],
+    relatedGuideSlugs: ['best-agent-skills-for-codex', 'best-agent-skills-for-rag', 'install-agent-skills-in-codex'],
+  },
+  {
+    slug: 'claude-code-skills-for-pdf-parsing',
+    shortTitle: 'Claude Code PDF skills',
+    title: 'Claude Code Skills for PDF Parsing',
+    eyebrow: 'Document shortlist',
+    description:
+      'A practical guide to PDF parsing skills for Claude Code users: extract tables, convert PDFs to markdown, prepare documents for RAG, and review audit risk before installing.',
+    intent: 'best',
+    heroPrompt:
+      'I need Claude Code skills to parse PDFs, extract tables, convert documents to markdown, and prepare files for RAG.',
+    useCaseSlug: 'document-processing',
+    platformLabel: 'Claude Code',
+    platformKeywords: ['claude', 'anthropic', 'code', 'pdf', 'document', 'markdown'],
+    skillKeywords: ['pdf', 'document', 'ocr', 'table extraction', 'markdown', 'rag', 'parse', 'parser', 'claude'],
+    sections: [
+      {
+        title: 'PDF parsing is an accuracy problem',
+        body:
+          'The best PDF skills do not just extract text. They preserve layout, headings, tables, metadata, and uncertainty so an agent can reason over the document safely.',
+        bullets: [
+          'Check whether tables, scanned pages, and headings survive conversion.',
+          'Prefer skills that surface OCR or layout uncertainty.',
+          'Use source-preserving output when the next step is RAG or legal/finance review.',
+        ],
+      },
+      {
+        title: 'How Claude Code should use these skills',
+        body:
+          'Install one document skill, run it against a representative PDF, inspect output quality, then pair it with RAG or data-analysis only after extraction works.',
+        bullets: [
+          'Use a sandbox folder with non-sensitive sample files first.',
+          'Review dependency risk for OCR, native binaries, or external services.',
+          'Keep human review for legal, medical, finance, or compliance documents.',
+        ],
+      },
+    ],
+    steps: [
+      {
+        title: 'Choose a representative PDF',
+        description: 'Test one simple PDF and one messy real document with tables, scans, or long sections.',
+      },
+      {
+        title: 'Compare extraction output',
+        description: 'Look for table quality, markdown structure, source traceability, and visible failure modes.',
+      },
+      {
+        title: 'Add a downstream skill only after parsing works',
+        description: 'RAG, data analysis, or legal review skills should consume clean extracted content, not raw broken text.',
+      },
+    ],
+    faq: [
+      {
+        question: 'Can Claude Code parse PDFs by itself?',
+        answer:
+          'It can reason over provided context, but a dedicated skill can make extraction, table handling, OCR, and repeatable conversion more reliable.',
+      },
+      {
+        question: 'What is the biggest PDF skill risk?',
+        answer:
+          'Silent extraction errors. Good workflows expose missing text, OCR uncertainty, table failures, and document privacy boundaries.',
+      },
+    ],
+    relatedGuideSlugs: ['best-agent-skills-for-claude-code', 'best-agent-skills-for-rag', 'install-agent-skills-in-claude-code'],
+  },
+  {
     slug: 'agentskills-io-compatible-skills-marketplace',
     shortTitle: 'AgentSkills.io alternative',
     title: 'AgentSkills.io-Compatible Agent Skills Marketplace',

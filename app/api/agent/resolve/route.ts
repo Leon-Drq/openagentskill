@@ -29,6 +29,17 @@ Install: ${selected.install_plan.value}
 URL: ${selected.urls.web}
 Why: ${selected.recommendation_reasons.join('; ')}` : 'No match'}
 
+Agent Decision:
+${payload.agent_decision ? `Recommended skill: ${payload.agent_decision.recommended_skill.name}
+Install command: ${payload.agent_decision.install_command}
+Why recommended:
+${payload.agent_decision.why_recommended.map((item) => `- ${item}`).join('\n')}
+Risk summary: ${payload.agent_decision.risk_summary.level}; ${payload.agent_decision.risk_summary.safety}; ${payload.agent_decision.risk_summary.trust}
+Risk notes:
+${payload.agent_decision.risk_summary.notes.map((item) => `- ${item}`).join('\n')}
+Next steps:
+${payload.agent_decision.agent_next_steps.map((item) => `- ${item}`).join('\n')}` : 'No agent decision generated'}
+
 Agent Workflow:
 ${payload.agent_workflow ? `Action: ${payload.agent_workflow.recommended_action}
 Install API: ${payload.agent_workflow.install.api}

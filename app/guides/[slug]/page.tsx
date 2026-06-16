@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAllSkills, type SkillRecord } from '@/lib/db/skills'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { formatCompactNumber, getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
@@ -13,6 +14,7 @@ import {
   getGrowthGuideBySlug,
   getRelatedGrowthGuides,
 } from '@/lib/seo/growth-guides'
+import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCaseBySlug, getUseCasesForSkill, scoreSkillForUseCase } from '@/lib/use-cases'
 
 export const dynamic = 'force-dynamic'
@@ -79,15 +81,6 @@ function searchableSkillText(skill: SkillRecord) {
     .filter(Boolean)
     .join(' ')
     .toLowerCase()
-}
-
-function formatDate(value: string | null) {
-  if (!value) return 'Unknown'
-  return new Date(value).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
 }
 
 function getInstallCommand(skill: SkillRecord) {
@@ -179,6 +172,8 @@ function getGuideSkillModels(skills: SkillRecord[], guide: GrowthGuideDefinition
     skill,
     score: scoreSkillForGuide(skill, guide),
     quality: getSkillQualityProfile(skill),
+    trust: getSkillTrustProfile(skill),
+    audit: buildSkillAudit(skill),
     decision: getSkillDecisionProfile(skill),
     platforms: getPlatformHints(skill),
     useCases: getUseCasesForSkill(skill, 2),
@@ -237,10 +232,10 @@ export default async function GrowthGuidePage({
 
             <div className="mt-7 flex flex-wrap gap-3">
               <a
-                href={`/api/agent/recommend?task=${encodeURIComponent(guide.heroPrompt)}&limit=4`}
+                href={`/api/agent/resolve?task=${encodeURIComponent(guide.heroPrompt)}&agent=${encodeURIComponent((guide.platformLabel || 'auto').toLowerCase().replace(/\s+/g, '-'))}&limit=4&format=text`}
                 className="border border-foreground bg-foreground px-5 py-2 text-sm text-background transition-colors hover:bg-background hover:text-foreground"
               >
-                Run recommendation API
+                Run resolve API
               </a>
               <Link
                 href={useCase ? `/use-cases/${useCase.slug}` : '/skills?sort=quality'}
@@ -289,7 +284,7 @@ export default async function GrowthGuidePage({
               <h2 className="font-display text-2xl font-semibold">Which one should an agent builder try first?</h2>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
-              {primarySkills.map(({ skill, quality, decision, platforms }) => (
+              {primarySkills.map(({ skill, quality, trust, audit, decision, platforms }) => (
                 <article key={skill.slug} className="border border-border bg-card p-5">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
@@ -309,16 +304,16 @@ export default async function GrowthGuidePage({
                       <p className="mt-1 font-mono">{quality.label}</p>
                     </div>
                     <div className="bg-background p-3">
-                      <p className="text-xs uppercase tracking-widest text-secondary">Stars</p>
-                      <p className="mt-1 font-mono">{formatCompactNumber(Number(skill.github_stars || 0))}</p>
+                      <p className="text-xs uppercase tracking-widest text-secondary">Trust</p>
+                      <p className="mt-1 font-mono">{trust.score}/100</p>
                     </div>
                     <div className="bg-background p-3">
-                      <p className="text-xs uppercase tracking-widest text-secondary">Freshness</p>
-                      <p className="mt-1 font-mono">{formatDate(skill.github_last_pushed_at)}</p>
+                      <p className="text-xs uppercase tracking-widest text-secondary">Audit</p>
+                      <p className="mt-1 font-mono">{audit.audit_score}/100</p>
                     </div>
                     <div className="bg-background p-3">
-                      <p className="text-xs uppercase tracking-widest text-secondary">Fit</p>
-                      <p className="mt-1 font-mono">{decision.primaryFit}</p>
+                      <p className="text-xs uppercase tracking-widest text-secondary">Risk</p>
+                      <p className="mt-1 font-mono">{auditRiskLabel(audit.risk_level)}</p>
                     </div>
                   </div>
 
@@ -359,7 +354,7 @@ export default async function GrowthGuidePage({
           </div>
 
           <div className="grid gap-4 lg:grid-cols-4">
-            {primarySkills.map(({ skill, quality, decision, platforms, useCases }) => (
+            {primarySkills.map(({ skill, quality, trust, audit, decision, platforms, useCases }) => (
               <article key={skill.slug} className="flex flex-col justify-between border border-border bg-card p-5">
                 <div>
                   <div className="mb-3 flex flex-wrap gap-2">
@@ -381,12 +376,20 @@ export default async function GrowthGuidePage({
                       <span>{formatCompactNumber(Number(skill.github_stars || 0))}</span>
                     </div>
                     <div className="flex justify-between gap-3">
+                      <span>Trust</span>
+                      <span>{trust.score}/100</span>
+                    </div>
+                    <div className="flex justify-between gap-3">
+                      <span>Audit</span>
+                      <span>{audit.audit_score}/100</span>
+                    </div>
+                    <div className="flex justify-between gap-3">
                       <span>Quality</span>
                       <span>{quality.score}/100</span>
                     </div>
                     <div className="flex justify-between gap-3">
-                      <span>Updated</span>
-                      <span>{formatDate(skill.github_last_pushed_at || skill.updated_at)}</span>
+                      <span>Risk</span>
+                      <span>{auditRiskLabel(audit.risk_level)}</span>
                     </div>
                   </div>
 

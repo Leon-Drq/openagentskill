@@ -14,6 +14,7 @@ import {
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { getRelatedSkills, getSkillAuditBySlug, getSkillBySlug, getSkillEventStats } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
+import { getSkillTrustProfile, type TrustCheckStatus } from '@/lib/trust'
 
 export const dynamic = 'force-dynamic'
 
@@ -62,6 +63,13 @@ function statusLabel(status: SkillAuditCheck['status']) {
   return 'INFO'
 }
 
+function trustStatusTone(status: TrustCheckStatus) {
+  if (status === 'pass') return 'border-foreground text-foreground'
+  if (status === 'fail') return 'border-red-300 text-red-700'
+  if (status === 'warn') return 'border-amber-300 text-amber-700'
+  return 'border-border text-secondary'
+}
+
 function formatDate(value: string | null | undefined) {
   if (!value) return 'Unknown'
   return new Date(value).toLocaleDateString('en-US', {
@@ -82,6 +90,7 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
     getRelatedSkills(skill.id, skill.category, 3).catch(() => []),
   ])
   const audit = storedAudit ? normalizeAuditRecord(storedAudit) : buildSkillAudit(skill, eventStats)
+  const trust = getSkillTrustProfile(skill, false, eventStats)
   const safety = getAgentSafetyProfile(skill, audit, { max_risk: 'medium', needs_install_command: true })
   const installCommand = skill.install_command || `npx skills add ${skill.github_repo || skill.slug}`
   const passCount = audit.checks.filter((check) => check.status === 'pass').length
@@ -166,6 +175,48 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
 
         <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[1fr_320px]">
           <div className="min-w-0">
+            <div className="mb-10 overflow-hidden border border-border bg-card">
+              <div className="border-b border-border p-5">
+                <p className="mb-2 text-xs uppercase tracking-widest text-secondary">OpenAgentSkill Trust Score</p>
+                <div className="grid gap-5 md:grid-cols-[auto_1fr] md:items-end">
+                  <div>
+                    <div className="font-mono text-6xl font-semibold leading-none">{trust.score}</div>
+                    <div className="mt-2 text-sm font-semibold">{trust.label}</div>
+                  </div>
+                  <div>
+                    <h2 className="font-display text-2xl font-semibold">
+                      Stars, maintenance, license, docs, dependency risk, and installability.
+                    </h2>
+                    <p className="mt-3 max-w-3xl text-sm leading-relaxed text-secondary">
+                      The Trust Score is OpenAgentSkill&apos;s adoption layer. It is designed to help an agent decide
+                      whether a skill is safe enough to shortlist before installation.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
+                {trust.dimensions.map((dimension) => (
+                  <div key={dimension.id} className="min-w-0 bg-background p-4">
+                    <div className="mb-3 flex items-start justify-between gap-3">
+                      <p className="font-mono text-[10px] uppercase tracking-widest text-secondary">
+                        {dimension.label}
+                      </p>
+                      <span className={`shrink-0 border px-2 py-0.5 font-mono text-[10px] ${trustStatusTone(dimension.status)}`}>
+                        {dimension.status.toUpperCase()}
+                      </span>
+                    </div>
+                    <p className="font-mono text-2xl font-semibold">{dimension.score}</p>
+                    <div className="mt-3 h-1 bg-muted">
+                      <div className="h-full bg-foreground" style={{ width: `${dimension.score}%` }} />
+                    </div>
+                    <p className="mt-3 line-clamp-3 break-words text-xs leading-relaxed text-secondary [overflow-wrap:anywhere]">
+                      {dimension.detail}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
               <div>
                 <p className="mb-2 text-xs uppercase text-secondary">Checks</p>

@@ -107,10 +107,12 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
   const trust = getSkillTrustProfile(skill, false, eventStats || null)
   const freshnessDays = getFreshnessDays(skill.github_last_pushed_at || skill.updated_at)
   const maintenanceScore = scoreFreshness(freshnessDays)
+  const dependencyScore = trust.dimensions.find((dimension) => dimension.id === 'dependency_risk')?.score || 60
+  const documentationScore = trust.dimensions.find((dimension) => dimension.id === 'documentation')?.score || 48
   const installScore = hasInstallPath(skill) ? 92 : 20
   const repositoryScore = hasRepository(skill) ? 88 : 18
   const licenseScore = licenseKnown(skill) ? 86 : 45
-  const docsScore = hasEnoughDocumentation(skill) ? 84 : 48
+  const docsScore = Math.max(hasEnoughDocumentation(skill) ? 84 : 48, documentationScore)
   const aiReviewScore = skill.ai_review_approved && (skill.ai_review_issues || []).length === 0 ? 88 : 55
   const adoptionScore = (skill.github_stars || 0) >= 500
     ? 88
@@ -120,8 +122,9 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
   const securityScore = clampScore(
     repositoryScore * 0.22 +
     licenseScore * 0.2 +
-    docsScore * 0.16 +
-    aiReviewScore * 0.24 +
+    docsScore * 0.14 +
+    aiReviewScore * 0.2 +
+    dependencyScore * 0.16 +
     adoptionScore * 0.1 +
     installScore * 0.08
   )
@@ -139,6 +142,7 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
   if (!hasRepository(skill)) warnings.add('Repository link is missing')
   if (!licenseKnown(skill)) warnings.add('License is unclear')
   if (!hasEnoughDocumentation(skill)) warnings.add('Documentation summary is thin')
+  if (dependencyScore < 62) warnings.add('Dependency or permission surface needs review')
   if (freshnessDays !== null && freshnessDays > 365) warnings.add('Repository appears stale')
   for (const issue of skill.ai_review_issues || []) warnings.add(issue)
   for (const warning of quality.warnings) warnings.add(warning)
@@ -180,10 +184,16 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
         : 'Review approval is missing',
     },
     {
-      label: 'Documentation',
+      label: 'README/SKILL.md completeness',
       status: hasEnoughDocumentation(skill) ? 'pass' : 'warn',
       score: docsScore,
       detail: hasEnoughDocumentation(skill) ? 'Usable description available' : 'Description is too thin for confident adoption',
+    },
+    {
+      label: 'Dependency risk',
+      status: statusForScore(dependencyScore),
+      score: dependencyScore,
+      detail: trust.dimensions.find((dimension) => dimension.id === 'dependency_risk')?.detail || 'Heuristic dependency risk from public metadata',
     },
     {
       label: 'Adoption',
@@ -225,6 +235,9 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
     metadata: {
       algorithm: 'heuristic-v1',
       note: 'This is a heuristic adoption audit based on public metadata, not a full source-code security review.',
+      trust_dimensions: trust.dimensions,
+      trust_formula:
+        'OpenAgentSkill Trust Score combines GitHub stars, recent maintenance, license clarity, README/SKILL.md completeness, dependency risk, install availability, repository evidence, and review status.',
     },
     generated_at: now,
     updated_at: now,
