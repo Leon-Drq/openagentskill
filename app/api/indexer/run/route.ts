@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { searchSkillRepos, type CandidateRepo } from '@/lib/indexer/github-search'
 import { processBatch, processRepo } from '@/lib/indexer/processor'
-import { bulkImportHighStarSkills } from '@/lib/indexer/high-star-import'
+import { bulkImportHighStarSkills, HIGH_STAR_SKILL_COVERAGE_TARGET } from '@/lib/indexer/high-star-import'
 import { collectIndexNowUrlsFromIndexerResults, submitIndexNowUrls } from '@/lib/indexnow'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 
 // Allow up to 5 minutes (Vercel Pro max)
 export const maxDuration = 300
 
-const DEFAULT_TARGET_NEW_PER_RUN = 25
+const DEFAULT_TARGET_NEW_PER_RUN = 250
 const DEFAULT_TOKEN_SEARCH_REQUESTS = 30
 const DEFAULT_DOMAIN_SEARCH_REQUESTS = 80
-const MAX_TOKEN_SEARCH_REQUESTS = 100
+const MAX_TOKEN_SEARCH_REQUESTS = 120
 
 function isAuthorized(request: NextRequest): boolean {
   return isAutomationAuthorized(request)
@@ -54,8 +54,12 @@ export async function POST(request: NextRequest) {
     }
 
     if (mode !== 'reviewed') {
-      const targetNew = Math.min(Math.max(Number(body.targetNew) || DEFAULT_TARGET_NEW_PER_RUN, 1), 500)
+      const targetNew = Math.min(Math.max(Number(body.targetNew) || DEFAULT_TARGET_NEW_PER_RUN, 1), 1000)
+      const targetTotal = Math.max(Number(body.targetTotal) || HIGH_STAR_SKILL_COVERAGE_TARGET, 1)
       const minStars = Math.max(Number(body.minStars) || 500, 100)
+      const maxStaleDays = Math.max(Number(body.maxStaleDays) || 1460, 30)
+      const strictQuality = body.strictQuality === undefined ? true : Boolean(body.strictQuality)
+      const includeCollections = body.includeCollections === true
       const domains = Array.isArray(body.domains)
         ? body.domains.map((domain: unknown) => String(domain)).filter(Boolean)
         : body.domain
@@ -70,14 +74,18 @@ export async function POST(request: NextRequest) {
         body.pageSeed === undefined ? undefined : Math.max(0, Number(body.pageSeed) || 0)
 
       console.log(
-        `[indexer] Skill-only high-star import — targetNew=${targetNew}, minStars=${minStars}, maxSearchRequests=${maxSearchRequests}, domains=${domains.join(',') || 'all'}`
+        `[indexer] Skill-only high-star import — targetNew=${targetNew}, targetTotal=${targetTotal}, minStars=${minStars}, maxSearchRequests=${maxSearchRequests}, domains=${domains.join(',') || 'all'}`
       )
       const result = await bulkImportHighStarSkills({
         targetNew,
+        targetTotal,
         minStars,
         maxSearchRequests,
         pageSeed,
         domains,
+        maxStaleDays,
+        strictQuality,
+        includeCollections,
       })
       console.log('[indexer] Bulk import complete:', result.summary)
       const indexingUrls = collectIndexNowUrlsFromIndexerResults(result.results)
@@ -145,8 +153,12 @@ export async function GET(request: NextRequest) {
     body: JSON.stringify({
       mode: 'bulk',
       targetNew: Number(process.env.INDEXER_RUN_TARGET || DEFAULT_TARGET_NEW_PER_RUN),
+      targetTotal: Number(process.env.INDEXER_TARGET_TOTAL || HIGH_STAR_SKILL_COVERAGE_TARGET),
       minStars: Number(process.env.INDEXER_MIN_STARS || 500),
       maxSearchRequests: Number(process.env.INDEXER_MAX_SEARCH_REQUESTS || (process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10)),
+      maxStaleDays: Number(process.env.INDEXER_MAX_STALE_DAYS || 1460),
+      strictQuality: process.env.INDEXER_STRICT_QUALITY === 'false' ? false : true,
+      includeCollections: process.env.INDEXER_INCLUDE_COLLECTIONS === 'true',
     }),
   }))
 }

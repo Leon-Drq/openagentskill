@@ -45,16 +45,23 @@ interface IndexedSkillRpcResult {
 
 export interface BulkImportOptions {
   targetNew?: number
+  targetTotal?: number
   minStars?: number
   maxSearchRequests?: number
   perPage?: number
   pageSeed?: number
   domains?: string[]
+  strictQuality?: boolean
+  maxStaleDays?: number
+  includeCollections?: boolean
 }
 
 export interface BulkImportSummary {
   filterMode: 'skills-only'
   targetNew: number
+  targetTotal: number
+  existingApproved: number
+  remainingToTarget: number
   minStars: number
   requestedDomains: string[]
   queryPoolSize: number
@@ -64,16 +71,21 @@ export interface BulkImportSummary {
   skippedExisting: number
   skippedMcp: number
   skippedLowRelevance: number
+  skippedStale: number
+  skippedCollections: number
+  skippedWeakMetadata: number
   imported: number
   updated: number
   errors: number
 }
 
 const GITHUB_API_BASE = 'https://api.github.com'
-const DEFAULT_TARGET_NEW_PER_RUN = 25
+const DEFAULT_TARGET_NEW_PER_RUN = 250
 const DEFAULT_TOKEN_SEARCH_REQUESTS = 30
 const DEFAULT_DOMAIN_SEARCH_REQUESTS = 80
-const MAX_TOKEN_SEARCH_REQUESTS = 100
+const MAX_TOKEN_SEARCH_REQUESTS = 120
+const DEFAULT_MAX_STALE_DAYS = 1460
+const EXISTING_SLUG_PAGE_SIZE = 1000
 export const HIGH_STAR_INDEXER_VERSION = 'scenario-coverage-v2'
 export const HIGH_STAR_SKILL_COVERAGE_TARGET = 10_000
 
@@ -1582,6 +1594,87 @@ function buildSkill(repo: GitHubSearchRepo, query: HighStarQuery, evaluation: Sk
   }
 }
 
+function daysSince(value: string | null | undefined) {
+  if (!value) return Number.POSITIVE_INFINITY
+  const time = new Date(value).getTime()
+  if (!Number.isFinite(time)) return Number.POSITIVE_INFINITY
+  return Math.floor((Date.now() - time) / 86_400_000)
+}
+
+function evaluateImportQuality(
+  repo: GitHubSearchRepo,
+  evaluation: SkillCandidateEvaluation,
+  options: {
+    strictQuality: boolean
+    maxStaleDays: number
+    includeCollections: boolean
+  }
+): { accepted: true } | { accepted: false; reason: 'stale' | 'collection' | 'weak-metadata' | 'low-relevance' | 'mcp' } {
+  if (!evaluation.accepted) {
+    return { accepted: false, reason: evaluation.reason === 'mcp' ? 'mcp' : 'low-relevance' }
+  }
+
+  if (!options.strictQuality) return { accepted: true }
+
+  const updatedDays = Math.min(daysSince(repo.pushed_at), daysSince(repo.updated_at))
+  if (updatedDays > options.maxStaleDays) {
+    return { accepted: false, reason: 'stale' }
+  }
+
+  const isCollection = evaluation.signals.includes('collection-like')
+  const hasExplicitSkillSignal =
+    evaluation.signals.includes('agent-skill') ||
+    evaluation.signals.includes('skill')
+
+  if (isCollection && !options.includeCollections && !hasExplicitSkillSignal) {
+    return { accepted: false, reason: 'collection' }
+  }
+
+  const descriptionLength = (repo.description || '').trim().length
+  const topicCount = repo.topics?.length || 0
+  if (descriptionLength < 24 && topicCount < 2) {
+    return { accepted: false, reason: 'weak-metadata' }
+  }
+
+  return { accepted: true }
+}
+
+async function fetchExistingApprovedSlugs(supabase: ReturnType<typeof createPublicClient>) {
+  const slugs = new Set<string>()
+  let exactCount = 0
+
+  const { count, error: countError } = await supabase
+    .from('skills')
+    .select('slug', { count: 'exact', head: true })
+    .eq('ai_review_approved', true)
+
+  if (countError) {
+    throw new Error(`Failed to count existing skills: ${countError.message}`)
+  }
+
+  exactCount = count || 0
+
+  for (let from = 0; ; from += EXISTING_SLUG_PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from('skills')
+      .select('slug')
+      .eq('ai_review_approved', true)
+      .range(from, from + EXISTING_SLUG_PAGE_SIZE - 1)
+
+    if (error) {
+      throw new Error(`Failed to fetch existing skills: ${error.message}`)
+    }
+
+    if (!data?.length) break
+    for (const row of data) {
+      if (row.slug) slugs.add(row.slug as string)
+    }
+    if (data.length < EXISTING_SLUG_PAGE_SIZE) break
+  }
+
+  return { slugs, count: exactCount }
+}
+
 async function recordIndexerRun(
   supabase: ReturnType<typeof createPublicClient>,
   serverSecret: string,
@@ -1640,7 +1733,8 @@ function getSearchPlan(maxSearchRequests: number, pageSeed: number, queryPool: H
 export async function bulkImportHighStarSkills(
   options: BulkImportOptions = {}
 ): Promise<{ summary: BulkImportSummary; results: Array<{ repo: string; status: string; slug?: string; reason?: string }> }> {
-  const targetNew = clamp(Math.floor(options.targetNew || DEFAULT_TARGET_NEW_PER_RUN), 1, 500)
+  const requestedTargetNew = clamp(Math.floor(options.targetNew || DEFAULT_TARGET_NEW_PER_RUN), 1, 1000)
+  const targetTotal = Math.max(1, Math.floor(options.targetTotal || HIGH_STAR_SKILL_COVERAGE_TARGET))
   const minStars = clamp(Math.floor(options.minStars || 500), 100, 1_000_000)
   const perPage = clamp(Math.floor(options.perPage || 100), 10, 100)
   const requestedDomains = normalizeRequestedDomains(options.domains)
@@ -1657,6 +1751,9 @@ export async function bulkImportHighStarSkills(
     0,
     Math.floor(options.pageSeed ?? (requestedDomains.length > 0 ? 0 : Math.floor(Date.now() / 3_600_000)))
   )
+  const strictQuality = options.strictQuality !== false
+  const maxStaleDays = Math.max(30, Math.floor(options.maxStaleDays || DEFAULT_MAX_STALE_DAYS))
+  const includeCollections = options.includeCollections === true
   const startedAt = new Date().toISOString()
   const serverSecret = process.env.INDEXER_SECRET
 
@@ -1665,22 +1762,19 @@ export async function bulkImportHighStarSkills(
   }
 
   const supabase = createPublicClient()
-  const { data: existingRows, error: existingError } = await supabase
-    .from('skills')
-    .select('slug')
-    .eq('ai_review_approved', true)
-
-  if (existingError) {
-    throw new Error(`Failed to fetch existing skills: ${existingError.message}`)
-  }
-
-  const existingSlugs = new Set((existingRows || []).map((row) => row.slug as string))
+  const existing = await fetchExistingApprovedSlugs(supabase)
+  const existingSlugs = existing.slugs
   const seenSlugs = new Set(existingSlugs)
   const results: Array<{ repo: string; status: string; slug?: string; reason?: string }> = []
   const domainsCovered = new Set<string>()
+  const remainingToTarget = Math.max(0, targetTotal - existing.count)
+  const targetNew = Math.min(requestedTargetNew, remainingToTarget)
   const summary: BulkImportSummary = {
     filterMode: 'skills-only',
     targetNew,
+    targetTotal,
+    existingApproved: existing.count,
+    remainingToTarget,
     minStars,
     requestedDomains,
     queryPoolSize: queryPool.length,
@@ -1690,9 +1784,44 @@ export async function bulkImportHighStarSkills(
     skippedExisting: 0,
     skippedMcp: 0,
     skippedLowRelevance: 0,
+    skippedStale: 0,
+    skippedCollections: 0,
+    skippedWeakMetadata: 0,
     imported: 0,
     updated: 0,
     errors: 0,
+  }
+
+  if (targetNew === 0) {
+    summary.domainsCovered = []
+    await recordIndexerRun(supabase, serverSecret, {
+      mode: 'bulk',
+      status: 'target_reached',
+      filter_mode: summary.filterMode,
+      started_at: startedAt,
+      completed_at: new Date().toISOString(),
+      target_new: summary.targetNew,
+      target_total: summary.targetTotal,
+      existing_approved: summary.existingApproved,
+      remaining_to_target: summary.remainingToTarget,
+      min_stars: summary.minStars,
+      max_search_requests: 0,
+      search_requests: 0,
+      candidates_found: 0,
+      skipped_existing: 0,
+      skipped_mcp: 0,
+      skipped_low_relevance: 0,
+      imported: 0,
+      updated: 0,
+      errors: 0,
+      metadata: {
+        reason: 'coverage target reached',
+        requested_domains: requestedDomains,
+        discovery_domains: HIGH_STAR_DISCOVERY_DOMAINS,
+      },
+    })
+
+    return { summary, results }
   }
 
   for (const { query, page } of getSearchPlan(maxSearchRequests, pageSeed, queryPool)) {
@@ -1735,12 +1864,18 @@ export async function bulkImportHighStarSkills(
         category: query.category,
       })
 
-      if (!evaluation.accepted) {
-        if (evaluation.reason === 'mcp') {
-          summary.skippedMcp += 1
-        } else {
-          summary.skippedLowRelevance += 1
-        }
+      const qualityGate = evaluateImportQuality(repo, evaluation, {
+        strictQuality,
+        maxStaleDays,
+        includeCollections,
+      })
+
+      if (!qualityGate.accepted) {
+        if (qualityGate.reason === 'mcp') summary.skippedMcp += 1
+        else if (qualityGate.reason === 'stale') summary.skippedStale += 1
+        else if (qualityGate.reason === 'collection') summary.skippedCollections += 1
+        else if (qualityGate.reason === 'weak-metadata') summary.skippedWeakMetadata += 1
+        else summary.skippedLowRelevance += 1
         continue
       }
 
@@ -1801,12 +1936,21 @@ export async function bulkImportHighStarSkills(
     skipped_existing: summary.skippedExisting,
     skipped_mcp: summary.skippedMcp,
     skipped_low_relevance: summary.skippedLowRelevance,
+    skipped_stale: summary.skippedStale,
+    skipped_collections: summary.skippedCollections,
+    skipped_weak_metadata: summary.skippedWeakMetadata,
     imported: summary.imported,
     updated: summary.updated,
     errors: summary.errors,
     metadata: {
       page_seed: pageSeed,
       per_page: perPage,
+      target_total: targetTotal,
+      existing_approved: existing.count,
+      remaining_to_target: remainingToTarget,
+      strict_quality: strictQuality,
+      max_stale_days: maxStaleDays,
+      include_collections: includeCollections,
       requested_domains: requestedDomains,
       query_pool_size: queryPool.length,
       domains_covered: summary.domainsCovered,

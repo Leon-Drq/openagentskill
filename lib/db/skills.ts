@@ -44,6 +44,8 @@ export interface SkillRecord {
 
 export type SkillSortMode = 'quality' | 'downloads' | 'stars' | 'new' | 'trending' | 'fresh'
 
+const SKILLS_PAGE_SIZE = 1000
+
 function isMcpText(value: string) {
   return /(^|[^a-z0-9])mcp([^a-z0-9]|$)/i.test(value) || /\bmodel context protocol\b/i.test(value)
 }
@@ -77,40 +79,47 @@ export async function getAllSkills(
   category?: string
 ): Promise<SkillRecord[]> {
   const supabase = createPublicClient()
+  const rows: SkillRecord[] = []
 
-  let query = supabase
-    .from('skills')
-    .select('*')
-    .eq('ai_review_approved', true)
+  for (let from = 0; ; from += SKILLS_PAGE_SIZE) {
+    let query = supabase
+      .from('skills')
+      .select('*')
+      .eq('ai_review_approved', true)
 
-  if (category && category !== 'all') {
-    query = query.eq('category', category)
+    if (category && category !== 'all') {
+      query = query.eq('category', category)
+    }
+
+    switch (sort) {
+      case 'quality':
+        query = query.order('quality_score', { ascending: false }).order('github_stars', { ascending: false })
+        break
+      case 'stars':
+        query = query.order('github_stars', { ascending: false })
+        break
+      case 'new':
+        query = query.order('created_at', { ascending: false })
+        break
+      case 'fresh':
+        query = query.order('github_last_pushed_at', { ascending: false, nullsFirst: false }).order('quality_score', { ascending: false })
+        break
+      case 'trending':
+        query = query.order('downloads', { ascending: false }).order('created_at', { ascending: false })
+        break
+      default:
+        query = query.order('downloads', { ascending: false })
+    }
+
+    const { data, error } = await query.range(from, from + SKILLS_PAGE_SIZE - 1)
+    if (error) throw error
+    if (!data?.length) break
+
+    rows.push(...(data as SkillRecord[]))
+    if (data.length < SKILLS_PAGE_SIZE) break
   }
 
-  switch (sort) {
-    case 'quality':
-      query = query.order('quality_score', { ascending: false }).order('github_stars', { ascending: false })
-      break
-    case 'stars':
-      query = query.order('github_stars', { ascending: false })
-      break
-    case 'new':
-      query = query.order('created_at', { ascending: false })
-      break
-    case 'fresh':
-      query = query.order('github_last_pushed_at', { ascending: false, nullsFirst: false }).order('quality_score', { ascending: false })
-      break
-    case 'trending':
-      // Trending: high downloads relative to age (recent + popular)
-      query = query.order('downloads', { ascending: false }).order('created_at', { ascending: false })
-      break
-    default:
-      query = query.order('downloads', { ascending: false })
-  }
-
-  const { data, error } = await query
-  if (error) throw error
-  return filterSkillOnly(data || [])
+  return filterSkillOnly(rows)
 }
 
 export interface SkillAgentStats {
@@ -271,11 +280,21 @@ export async function getSkillAuditBySlug(skillSlug: string): Promise<SkillAudit
 
 export async function getSkillAuditsMap(): Promise<Record<string, SkillAuditRecord>> {
   const supabase = createPublicClient()
-  const { data, error } = await supabase.from('skill_audits').select('*')
-  if (error || !data) return {}
+  const rows: SkillAuditRecord[] = []
+
+  for (let from = 0; ; from += SKILLS_PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from('skill_audits')
+      .select('*')
+      .range(from, from + SKILLS_PAGE_SIZE - 1)
+
+    if (error || !data?.length) break
+    rows.push(...(data as SkillAuditRecord[]))
+    if (data.length < SKILLS_PAGE_SIZE) break
+  }
 
   const map: Record<string, SkillAuditRecord> = {}
-  for (const row of data as SkillAuditRecord[]) {
+  for (const row of rows) {
     map[row.skill_slug] = row
   }
   return map
@@ -298,12 +317,21 @@ export async function getApprovedClaimBySkillSlug(skillSlug: string): Promise<Sk
 
 export async function getCategories(): Promise<string[]> {
   const supabase = createPublicClient()
-  const { data, error } = await supabase
-    .from('skills')
-    .select('category')
-    .eq('ai_review_approved', true)
-  if (error) return []
-  const unique = [...new Set((data || []).map((r) => r.category).filter(Boolean))]
+  const categories: string[] = []
+
+  for (let from = 0; ; from += SKILLS_PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from('skills')
+      .select('category')
+      .eq('ai_review_approved', true)
+      .range(from, from + SKILLS_PAGE_SIZE - 1)
+
+    if (error || !data?.length) break
+    categories.push(...data.map((r) => r.category).filter(Boolean))
+    if (data.length < SKILLS_PAGE_SIZE) break
+  }
+
+  const unique = [...new Set(categories)]
     .filter((category) => !isMcpText(category))
   return unique.sort()
 }
@@ -356,16 +384,25 @@ export async function createSubmissionRecord(submission: {
 
 export async function searchSkills(query: string): Promise<SkillRecord[]> {
   const supabase = createPublicClient()
+  const rows: SkillRecord[] = []
 
-  const { data, error } = await supabase
-    .from('skills')
-    .select('*')
-    .eq('ai_review_approved', true)
-    .or(`name.ilike.%${query}%,description.ilike.%${query}%,tags.cs.{${query}}`)
-    .order('quality_score', { ascending: false })
-  
-  if (error) throw error
-  return filterSkillOnly(data || [])
+  for (let from = 0; ; from += SKILLS_PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from('skills')
+      .select('*')
+      .eq('ai_review_approved', true)
+      .or(`name.ilike.%${query}%,description.ilike.%${query}%,tags.cs.{${query}}`)
+      .order('quality_score', { ascending: false })
+      .range(from, from + SKILLS_PAGE_SIZE - 1)
+
+    if (error) throw error
+    if (!data?.length) break
+
+    rows.push(...(data as SkillRecord[]))
+    if (data.length < SKILLS_PAGE_SIZE) break
+  }
+
+  return filterSkillOnly(rows)
 }
 
 export async function getRelatedSkills(

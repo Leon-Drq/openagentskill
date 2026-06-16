@@ -160,9 +160,22 @@ export async function filterNewRepos(
 export async function fetchExistingSlugs(): Promise<Set<string>> {
   const { createPublicClient } = await import('@/lib/supabase/public')
   const supabase = createPublicClient()
+  const slugs = new Set<string>()
 
-  const { data, error } = await supabase.from('skills').select('slug')
-  if (error) throw new Error(`Failed to fetch existing slugs: ${error.message}`)
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await supabase
+      .from('skills')
+      .select('slug')
+      .range(from, from + 999)
 
-  return new Set((data || []).map((r: { slug: string }) => r.slug))
+    if (error) throw new Error(`Failed to fetch existing slugs: ${error.message}`)
+    if (!data?.length) break
+
+    for (const row of data as Array<{ slug: string }>) {
+      if (row.slug) slugs.add(row.slug)
+    }
+    if (data.length < 1000) break
+  }
+
+  return slugs
 }

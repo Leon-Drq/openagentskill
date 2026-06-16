@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "seed:popular": "node scripts/seed-popular-skills.ts",
+    "indexer:backfill": "node scripts/backfill-high-star-skills.mjs",
     "lint": "eslint ."
   },
   "dependencies": {

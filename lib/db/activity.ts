@@ -53,28 +53,38 @@ export async function getPlatformStats(): Promise<{
 }> {
   const supabase = createPublicClient()
 
-  const [{ data: skills, error: skillsError }, { count: totalSkillCount, error: countError }] = await Promise.all([
-    supabase
-    .from('skills')
-    .select('downloads, frameworks')
-      .eq('ai_review_approved', true),
+  const [{ count: totalSkillCount, error: countError }] = await Promise.all([
     supabase
       .from('skills')
       .select('id', { count: 'exact', head: true })
       .eq('ai_review_approved', true),
   ])
 
-  if (skillsError) throw skillsError
   if (countError) throw countError
 
   const totalSkills = totalSkillCount || 0
-  const totalDownloads = skills?.reduce((sum, s) => sum + (s.downloads || 0), 0) || 0
+  let totalDownloads = 0
 
   // Count unique platforms across all skills
   const allPlatforms = new Set<string>()
-  skills?.forEach(s => {
-    ;(s.frameworks || []).forEach((f: string) => allPlatforms.add(f))
-  })
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await supabase
+      .from('skills')
+      .select('downloads, frameworks')
+      .eq('ai_review_approved', true)
+      .range(from, from + 999)
+
+    if (error) throw error
+    if (!data?.length) break
+
+    for (const skill of data) {
+      totalDownloads += skill.downloads || 0
+      ;(skill.frameworks || []).forEach((framework: string) => allPlatforms.add(framework))
+    }
+
+    if (data.length < 1000) break
+  }
+
   // Ensure a minimum count based on known supported platforms
   const platformCount = Math.max(allPlatforms.size, 8)
 
