@@ -48,9 +48,19 @@ export async function generateMetadata({
   const description = `${skill.description} ${starsText} GitHub stars. Install with ${installCommand}.`
   const pageUrl = `https://www.openagentskill.com/skills/${slug}`
   const imageAlt = `${skill.name} - OpenAgentSkill`
-  const imageVersion = '3'
+  const imageVersion = '4'
+  const imageParams = new URLSearchParams({
+    v: imageVersion,
+    name: skill.name,
+    category: skill.category,
+    description: skill.description,
+    stars: String(skill.stats.stars || 0),
+    tags: skill.tags.slice(0, 3).join(','),
+    install: installCommand,
+  })
+  const imageUrl = `https://www.openagentskill.com/api/og/skill?${imageParams.toString()}`
   const image = {
-    url: `${pageUrl}/opengraph-image?v=${imageVersion}`,
+    url: imageUrl,
     width: 1200,
     height: 630,
     alt: imageAlt,
@@ -74,7 +84,7 @@ export async function generateMetadata({
       description,
       images: [
         {
-          url: `${pageUrl}/twitter-image?v=${imageVersion}`,
+          url: imageUrl,
           alt: imageAlt,
         },
       ],
