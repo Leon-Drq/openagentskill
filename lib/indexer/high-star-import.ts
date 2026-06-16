@@ -217,6 +217,12 @@ const CORE_HIGH_STAR_QUERIES: HighStarQuery[] = [
     frameworks: ['Workflow'],
   },
   {
+    q: 'topic:automation',
+    category: 'automation',
+    tags: ['automation', 'workflow'],
+    frameworks: ['Automation'],
+  },
+  {
     q: 'topic:ai-automation',
     category: 'automation',
     tags: ['ai-automation', 'workflow'],
@@ -241,6 +247,24 @@ const CORE_HIGH_STAR_QUERIES: HighStarQuery[] = [
     frameworks: ['Data Analysis'],
   },
   {
+    q: 'topic:data-science data-analysis',
+    category: 'data-analysis',
+    tags: ['data-science', 'data-analysis', 'analytics'],
+    frameworks: ['Data Science'],
+  },
+  {
+    q: 'topic:dashboard data-analysis',
+    category: 'data-analysis',
+    tags: ['dashboard', 'data-analysis', 'visualization'],
+    frameworks: ['Dashboard'],
+  },
+  {
+    q: 'topic:data-visualization data-analysis',
+    category: 'data-analysis',
+    tags: ['data-visualization', 'data-analysis'],
+    frameworks: ['Data Visualization'],
+  },
+  {
     q: 'topic:data-pipeline',
     category: 'data-analysis',
     tags: ['data-pipeline', 'automation'],
@@ -257,6 +281,36 @@ const CORE_HIGH_STAR_QUERIES: HighStarQuery[] = [
     category: 'security',
     tags: ['security', 'scanner'],
     frameworks: ['Security'],
+  },
+  {
+    q: 'topic:monitoring automation',
+    category: 'devops',
+    tags: ['monitoring', 'automation', 'observability'],
+    frameworks: ['Monitoring'],
+  },
+  {
+    q: 'topic:command-line-tool automation',
+    category: 'productivity-automation',
+    tags: ['cli', 'automation', 'productivity'],
+    frameworks: ['CLI'],
+  },
+  {
+    q: 'topic:api-client automation',
+    category: 'integrations',
+    tags: ['api-client', 'automation', 'integration'],
+    frameworks: ['API Client'],
+  },
+  {
+    q: 'topic:natural-language-processing document-processing',
+    category: 'document-processing',
+    tags: ['nlp', 'document-processing', 'extraction'],
+    frameworks: ['NLP'],
+  },
+  {
+    q: 'topic:test-automation topic:pytest',
+    category: 'testing-qa',
+    tags: ['testing', 'pytest', 'automation'],
+    frameworks: ['Testing'],
   },
   {
     q: 'topic:multi-agent',
