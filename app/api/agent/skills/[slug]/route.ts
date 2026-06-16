@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
+import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { getApprovedClaimBySkillSlug, getSkillBySlug } from '@/lib/db/skills'
 import { getStacksForSkill } from '@/lib/collections'
 import { getSkillInstallTargets } from '@/lib/install-targets'
@@ -33,6 +34,10 @@ export async function GET(
     const approvedClaim = await getApprovedClaimBySkillSlug(skill.slug).catch(() => null)
     const trustProfile = getSkillTrustProfile(skill, Boolean(approvedClaim))
     const audit = buildSkillAudit(skill)
+    const safetyProfile = getAgentSafetyProfile(skill, audit, {
+      max_risk: request.nextUrl.searchParams.get('max_risk') || 'medium',
+      needs_install_command: true,
+    })
     const installTargets = getSkillInstallTargets(skill)
     const attribution = getSkillAttribution(skill, approvedClaim)
     const supplyProfile = getSkillSupplyProfile(skill)
@@ -63,6 +68,8 @@ Statistics:
 - Quality Score: ${Number(skill.quality_score || 0)}
 - Trust Score: ${trustProfile.score} (${trustProfile.label})
 - Audit Score: ${audit.audit_score} (${auditRiskLabel(audit.risk_level)})
+- Safety Gate: ${safetyProfile.safety_tier.label} (${safetyProfile.safety_tier.auto_install_policy})
+- Agent Safety Score: ${safetyProfile.score}/100
 - GitHub Stars: ${skill.github_stars}
 - Downloads: ${skill.downloads}
 - Rating: ${skill.rating}/5 (${skill.review_count} reviews)
@@ -116,6 +123,18 @@ Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
       },
       quality: getSkillQualityProfile(skill),
       trust: trustProfile,
+      safety: safetyProfile,
+      safety_gate: {
+        tier: safetyProfile.safety_tier.tier,
+        label: safetyProfile.safety_tier.label,
+        badge: safetyProfile.safety_tier.badge,
+        auto_install_policy: safetyProfile.safety_tier.auto_install_policy,
+        auto_install_allowed: safetyProfile.auto_install_allowed,
+        blocked: safetyProfile.blocked,
+        human_review_required: safetyProfile.human_review_required,
+        recommended_action: safetyProfile.safety_tier.recommended_action,
+        reasons: safetyProfile.safety_tier.reasons,
+      },
       supply_profile: supplyProfile,
       audit: {
         audit_score: audit.audit_score,

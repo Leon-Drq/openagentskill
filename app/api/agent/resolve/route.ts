@@ -9,7 +9,10 @@ function parseLimit(value: string | null) {
 function textResponse(payload: Awaited<ReturnType<typeof resolveAgentSkill>>) {
   const selected = payload.selected
   const alternatives = payload.alternatives
-    .map((item) => `${item.rank}. ${item.skill.name} (${item.skill.slug}) — safety ${item.safety.score}/100, audit ${item.audit.audit_score}/100`)
+    .map((item) => `${item.rank}. ${item.skill.name} (${item.skill.slug}) — ${item.safety.safety_tier.label}, safety ${item.safety.score}/100, audit ${item.audit.audit_score}/100`)
+    .join('\n')
+  const blocked = payload.blocked_candidates
+    .map((item) => `${item.rank}. ${item.skill.name} (${item.skill.slug}) — ${item.safety.safety_tier.recommended_action}`)
     .join('\n')
 
   return new NextResponse(
@@ -24,6 +27,8 @@ Supply: ${selected.supply_profile.track.shortLabel} / ${selected.supply_profile.
 Maintenance: ${selected.supply_profile.maintenance.label}
 Risk: ${selected.supply_profile.risk.label}
 Safety: ${selected.safety.score}/100 ${selected.safety.label}
+Safety tier: ${selected.safety.safety_tier.label}
+Auto-install policy: ${selected.safety.safety_tier.auto_install_policy}
 Audit: ${selected.audit.audit_score}/100 ${selected.audit.risk_label}
 Install: ${selected.install_plan.value}
 URL: ${selected.urls.web}
@@ -32,9 +37,10 @@ Why: ${selected.recommendation_reasons.join('; ')}` : 'No match'}
 Agent Decision:
 ${payload.agent_decision ? `Recommended skill: ${payload.agent_decision.recommended_skill.name}
 Install command: ${payload.agent_decision.install_command}
+Safety gate: ${payload.agent_decision.safety_gate.label} (${payload.agent_decision.safety_gate.auto_install_policy})
 Why recommended:
 ${payload.agent_decision.why_recommended.map((item) => `- ${item}`).join('\n')}
-Risk summary: ${payload.agent_decision.risk_summary.level}; ${payload.agent_decision.risk_summary.safety}; ${payload.agent_decision.risk_summary.trust}
+Risk summary: ${payload.agent_decision.risk_summary.level}; ${payload.agent_decision.risk_summary.safety_tier}; ${payload.agent_decision.risk_summary.safety}; ${payload.agent_decision.risk_summary.trust}
 Risk notes:
 ${payload.agent_decision.risk_summary.notes.map((item) => `- ${item}`).join('\n')}
 Next steps:
@@ -52,6 +58,9 @@ ${payload.agent_workflow.review_checklist.map((item) => `- ${item}`).join('\n')}
 
 Alternatives:
 ${alternatives || 'No alternatives'}
+
+Blocked for auto-install:
+${blocked || 'No blocked candidates'}
 `,
     {
       headers: {

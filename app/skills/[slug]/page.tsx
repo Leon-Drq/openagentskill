@@ -145,6 +145,13 @@ function formatDate(value: string | null | undefined): string {
   })
 }
 
+function safetyTierTone(tier: string) {
+  if (tier === 'verified') return 'border-[#006b4f] text-[#006b4f]'
+  if (tier === 'reviewed') return 'border-foreground text-foreground'
+  if (tier === 'blocked') return 'border-red-300 text-red-700'
+  return 'border-amber-300 text-amber-700'
+}
+
 export default async function SkillDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const dbSkill = await getSkillBySlug(slug)
@@ -429,9 +436,19 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
                     <h2 className="font-display text-2xl font-semibold">
                       {safetyProfile.score}/100 · {safetyProfile.label}
                     </h2>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className={`border px-2 py-1 font-mono text-[10px] ${safetyTierTone(safetyProfile.safety_tier.tier)}`}>
+                        {safetyProfile.safety_tier.label}
+                      </span>
+                      <span className="border border-border px-2 py-1 font-mono text-[10px] uppercase text-secondary">
+                        {safetyProfile.safety_tier.auto_install_policy}
+                      </span>
+                    </div>
                     <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
-                      Safety v2 estimates whether an agent should auto-install this skill by combining audit risk,
-                      install readiness, inferred permission surface, and policy constraints.
+                      {safetyProfile.safety_tier.summary}
+                    </p>
+                    <p className="mt-2 max-w-2xl text-xs leading-relaxed text-secondary">
+                      {safetyProfile.safety_tier.recommended_action}
                     </p>
                   </div>
                   <Link

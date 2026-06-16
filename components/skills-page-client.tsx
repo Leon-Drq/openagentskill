@@ -7,6 +7,7 @@ import { InstallCommand } from './install-command'
 import { SaveSkillButton } from './save-skill-button'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
+import type { AgentSafetyProfile } from '@/lib/agent-safety'
 import type { SkillSupplyProfile, SupplyTrackSummary } from '@/lib/supply'
 import type { SkillTrustProfile } from '@/lib/trust'
 import type { UseCaseDefinition } from '@/lib/use-cases'
@@ -48,6 +49,7 @@ interface Skill {
     warnings: string[]
   }
   trustProfile?: SkillTrustProfile
+  safetyProfile?: AgentSafetyProfile
   platformHints?: string[]
   supplyProfile?: SkillSupplyProfile
 }
@@ -83,6 +85,14 @@ const TRUST_OPTIONS = [
   { key: 'risk', label: 'High review required' },
 ] as const
 
+const SAFETY_OPTIONS = [
+  { key: 'all', label: 'Any safety' },
+  { key: 'verified', label: 'Verified' },
+  { key: 'reviewed', label: 'Reviewed' },
+  { key: 'experimental', label: 'Experimental' },
+  { key: 'blocked', label: 'Blocked' },
+] as const
+
 interface Props {
   skills: Skill[]
   query?: string
@@ -95,6 +105,7 @@ interface Props {
   platformOptions: string[]
   quality: string
   trust: string
+  safety: string
   supplyTrack: string
   supplyTracks: SupplyTrackSummary[]
   minStars: number
@@ -112,6 +123,7 @@ export function SkillsPageClient({
   platformOptions,
   quality,
   trust,
+  safety,
   supplyTrack,
   supplyTracks,
   minStars,
@@ -319,7 +331,7 @@ export function SkillsPageClient({
             </button>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             <label className="block">
               <span className="mb-1 block text-xs text-secondary">Use case</span>
               <select
@@ -369,6 +381,19 @@ export function SkillsPageClient({
                 className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
               >
                 {TRUST_OPTIONS.map((item) => (
+                  <option key={item.key} value={item.key}>{item.label}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="mb-1 block text-xs text-secondary">Safety gate</span>
+              <select
+                value={safety}
+                onChange={(e) => navigate({ safety: e.target.value })}
+                className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
+              >
+                {SAFETY_OPTIONS.map((item) => (
                   <option key={item.key} value={item.key}>{item.label}</option>
                 ))}
               </select>
@@ -427,6 +452,7 @@ export function SkillsPageClient({
             {supplyTrack !== 'all' && <> inside <em>{activeTrack?.shortLabel || supplyTrack}</em></>}
             {useCase !== 'all' && <> for <em>{useCases.find((item) => item.slug === useCase)?.shortTitle || useCase}</em></>}
             {trust !== 'all' && <> with <em>{TRUST_OPTIONS.find((item) => item.key === trust)?.label || trust}</em></>}
+            {safety !== 'all' && <> gated as <em>{SAFETY_OPTIONS.find((item) => item.key === safety)?.label || safety}</em></>}
           </p>
           <p className="text-xs text-secondary italic">{activeSort.description}</p>
         </div>
@@ -478,6 +504,17 @@ export function SkillsPageClient({
                         {skill.trustProfile && (
                           <span className="text-xs font-mono border border-border px-2 py-0.5 text-secondary shrink-0">
                             TRUST · {skill.trustProfile.score}
+                          </span>
+                        )}
+                        {skill.safetyProfile && (
+                          <span className={`shrink-0 border px-2 py-0.5 font-mono text-xs ${
+                            skill.safetyProfile.blocked
+                              ? 'border-red-300 text-red-700'
+                              : skill.safetyProfile.safety_tier.tier === 'verified'
+                                ? 'border-[#006b4f] text-[#006b4f]'
+                                : 'border-border text-secondary'
+                          }`}>
+                            SAFE · {skill.safetyProfile.safety_tier.badge}
                           </span>
                         )}
                         {skill.supplyProfile && (
@@ -538,6 +575,11 @@ export function SkillsPageClient({
                           {skill.trustProfile.score} trust
                         </span>
                       )}
+                      {skill.safetyProfile && (
+                        <span title="Safety gate">
+                          {skill.safetyProfile.safety_tier.label}
+                        </span>
+                      )}
                       {skill.platformHints && skill.platformHints.length > 0 && (
                         <span title="Platform fit">
                           {skill.platformHints.slice(0, 2).join(' + ')}
@@ -563,8 +605,8 @@ export function SkillsPageClient({
                       )}
                     </div>
 
-                    {(skill.qualityProfile || skill.trustProfile) && (
-                      <div className="mb-4 grid max-w-3xl gap-3 sm:grid-cols-2">
+                    {(skill.qualityProfile || skill.trustProfile || skill.safetyProfile) && (
+                      <div className="mb-4 grid max-w-4xl gap-3 sm:grid-cols-2 lg:grid-cols-3">
                         {skill.qualityProfile && (
                           <div className="border-l border-border pl-3 text-xs leading-relaxed text-secondary">
                             <span className="mb-1 block font-mono text-[10px] uppercase tracking-widest text-secondary">
@@ -589,6 +631,17 @@ export function SkillsPageClient({
                                 Review: {skill.trustProfile.warnings.slice(0, 2).join(' · ')}
                               </span>
                             )}
+                          </div>
+                        )}
+                        {skill.safetyProfile && (
+                          <div className="border-l border-border pl-3 text-xs leading-relaxed text-secondary">
+                            <span className="mb-1 block font-mono text-[10px] uppercase tracking-widest text-secondary">
+                              Safety gate
+                            </span>
+                            {skill.safetyProfile.safety_tier.summary}
+                            <span className="mt-1 block">
+                              Action: {skill.safetyProfile.safety_tier.recommended_action}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -617,6 +670,11 @@ export function SkillsPageClient({
                             value: skill.supplyProfile.risk.label,
                             detail: skill.supplyProfile.risk.notes.slice(0, 1).join(''),
                           },
+                          ...(skill.safetyProfile ? [{
+                            label: 'Gate',
+                            value: skill.safetyProfile.safety_tier.auto_install_policy,
+                            detail: skill.safetyProfile.safety_tier.label,
+                          }] : []),
                         ].map((item) => (
                           <div key={item.label} className="min-w-0 bg-background p-3">
                             <p className="font-mono text-[10px] uppercase tracking-widest text-secondary">{item.label}</p>

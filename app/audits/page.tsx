@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { auditRiskLabel, buildSkillAudit, normalizeAuditRecord, type ComputedSkillAudit } from '@/lib/audits'
+import { getAgentSafetyProfile, type AgentSafetyProfile } from '@/lib/agent-safety'
 import {
   getAllSkills,
   getSkillAuditsMap,
@@ -33,6 +34,7 @@ export const metadata: Metadata = {
 interface AuditRow {
   skill: SkillRecord
   audit: ComputedSkillAudit
+  safety: AgentSafetyProfile
   rank: number
 }
 
@@ -40,6 +42,13 @@ function riskTone(risk: ComputedSkillAudit['risk_level']) {
   if (risk === 'safe_to_try') return 'border-foreground text-foreground'
   if (risk === 'needs_review') return 'border-amber-300 text-amber-700'
   return 'border-red-300 text-red-700'
+}
+
+function safetyTierTone(tier: string) {
+  if (tier === 'verified') return 'border-[#006b4f] text-[#006b4f]'
+  if (tier === 'reviewed') return 'border-foreground text-foreground'
+  if (tier === 'blocked') return 'border-red-300 text-red-700'
+  return 'border-amber-300 text-amber-700'
 }
 
 function formatDate(value: string | null | undefined) {
@@ -56,11 +65,15 @@ function buildRows(
   eventStatsMap: Record<string, SkillEventStats>
 ): AuditRow[] {
   return skills
-    .map((skill) => ({
-      skill,
-      audit: buildSkillAudit(skill, eventStatsMap[skill.slug]),
-      rank: 0,
-    }))
+    .map((skill) => {
+      const audit = buildSkillAudit(skill, eventStatsMap[skill.slug])
+      return {
+        skill,
+        audit,
+        safety: getAgentSafetyProfile(skill, audit, { max_risk: 'medium', needs_install_command: true }),
+        rank: 0,
+      }
+    })
     .sort((a, b) => b.audit.audit_score - a.audit.audit_score || b.skill.github_stars - a.skill.github_stars)
     .map((row, index) => ({ ...row, rank: index + 1 }))
 }
@@ -75,7 +88,13 @@ export default async function AuditsPage() {
   const rows = buildRows(skills, eventStatsMap)
     .map((row) => {
       const stored = auditsMap[row.skill.slug]
-      return stored ? { ...row, audit: normalizeAuditRecord(stored) } : row
+      if (!stored) return row
+      const audit = normalizeAuditRecord(stored)
+      return {
+        ...row,
+        audit,
+        safety: getAgentSafetyProfile(row.skill, audit, { max_risk: 'medium', needs_install_command: true }),
+      }
     })
     .sort((a, b) => b.audit.audit_score - a.audit.audit_score || b.skill.github_stars - a.skill.github_stars)
     .map((row, index) => ({ ...row, rank: index + 1 }))
@@ -83,6 +102,8 @@ export default async function AuditsPage() {
   const safeCount = rows.filter((row) => row.audit.risk_level === 'safe_to_try').length
   const reviewCount = rows.filter((row) => row.audit.risk_level === 'needs_review').length
   const riskyCount = rows.filter((row) => row.audit.risk_level === 'risky').length
+  const blockedCount = rows.filter((row) => row.safety.blocked).length
+  const reviewedCount = rows.filter((row) => row.safety.safety_tier.tier === 'reviewed' || row.safety.safety_tier.tier === 'verified').length
   const averageAudit = rows.length
     ? Math.round(rows.reduce((sum, row) => sum + row.audit.audit_score, 0) / rows.length)
     : 0
@@ -120,7 +141,7 @@ export default async function AuditsPage() {
                 reports are heuristic metadata audits, not full source-code security reviews.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-px border border-border bg-border text-center sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-px border border-border bg-border text-center sm:grid-cols-5">
               <div className="bg-background p-4">
                 <div className="font-mono text-2xl">{averageAudit}</div>
                 <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Avg audit</div>
@@ -136,6 +157,10 @@ export default async function AuditsPage() {
               <div className="bg-background p-4">
                 <div className="font-mono text-2xl">{riskyCount}</div>
                 <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Risky</div>
+              </div>
+              <div className="bg-background p-4">
+                <div className="font-mono text-2xl">{blockedCount}</div>
+                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Blocked</div>
               </div>
             </div>
           </div>
@@ -169,6 +194,9 @@ export default async function AuditsPage() {
           <div className="mb-6">
             <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Highest confidence</p>
             <h2 className="font-display text-2xl font-semibold">Audited skill shortlist</h2>
+            <p className="mt-2 text-sm leading-relaxed text-secondary">
+              {reviewedCount.toLocaleString()} skills are verified or reviewed by the safety gate; blocked candidates are excluded from autonomous install recommendations.
+            </p>
           </div>
 
           <div className="divide-y divide-border border-y border-border">
@@ -196,6 +224,9 @@ export default async function AuditsPage() {
                       <span className="border border-border px-2 py-0.5 font-mono text-xs text-secondary">
                         Trust {row.audit.trust_score}
                       </span>
+                      <span className={`border px-2 py-0.5 font-mono text-xs ${safetyTierTone(row.safety.safety_tier.tier)}`}>
+                        {row.safety.safety_tier.badge}
+                      </span>
                     </div>
                     <p className="max-w-3xl text-sm leading-relaxed text-secondary">{row.skill.description}</p>
                     <p className="mt-3 max-w-3xl text-sm leading-relaxed">
@@ -206,6 +237,7 @@ export default async function AuditsPage() {
                       <span>{formatDate(row.skill.github_last_pushed_at || row.skill.updated_at)} push</span>
                       <span>Quality {row.audit.quality_score}</span>
                       <span>Maintenance {row.audit.maintenance_score}</span>
+                      <span>{row.safety.safety_tier.auto_install_policy} policy</span>
                     </div>
                   </div>
                   <div className="grid gap-2 text-sm">

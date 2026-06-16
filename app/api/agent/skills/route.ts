@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
+import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { getAllSkills, searchSkills } from '@/lib/db/skills'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
@@ -18,9 +19,11 @@ export async function GET(request: NextRequest) {
   const category = searchParams.get('category')
   const platform = searchParams.get('platform')
   const trust = searchParams.get('trust')
+  const safety = searchParams.get('safety')
   const track = searchParams.get('track')
   const format = searchParams.get('format') || 'json'
   const limit = Math.min(parseInt(searchParams.get('limit') || '10', 10), 50)
+  const maxRisk = searchParams.get('max_risk') || 'medium'
 
   try {
     let records = query ? await searchSkills(query) : await getAllSkills()
@@ -39,6 +42,16 @@ export async function GET(request: NextRequest) {
     if (track) {
       records = records.filter((r) => getSkillSupplyProfile(r).track.slug === track)
     }
+    if (safety && safety !== 'all') {
+      records = records.filter((r) => {
+        const audit = buildSkillAudit(r)
+        const safetyProfile = getAgentSafetyProfile(r, audit, {
+          max_risk: maxRisk,
+          needs_install_command: true,
+        })
+        return safetyProfile.safety_tier.tier === safety
+      })
+    }
 
     records = records.slice(0, limit)
 
@@ -48,12 +61,16 @@ export async function GET(request: NextRequest) {
           const trustProfile = getSkillTrustProfile(r)
           const audit = buildSkillAudit(r)
           const supply = getSkillSupplyProfile(r)
-          return `${i + 1}. ${r.name} (${r.slug})\n   ${r.description}\n   Supply: ${supply.track.shortLabel} | Scenario: ${supply.scenario.label} | Agents: ${supply.applicableAgents.slice(0, 3).join(', ')}\n   Quality: ${Number(r.quality_score || 0)} | Trust: ${trustProfile.score} ${trustProfile.label} | Audit: ${audit.audit_score} ${auditRiskLabel(audit.risk_level)}\n   Maintenance: ${supply.maintenance.label} | Risk: ${supply.risk.label}\n   Stars: ${r.github_stars} | Downloads: ${r.downloads}\n   Install: ${r.install_command || `npx skills add ${r.github_repo}`}\n   URL: https://www.openagentskill.com/skills/${r.slug}\n   ---`
+          const safetyProfile = getAgentSafetyProfile(r, audit, {
+            max_risk: maxRisk,
+            needs_install_command: true,
+          })
+          return `${i + 1}. ${r.name} (${r.slug})\n   ${r.description}\n   Supply: ${supply.track.shortLabel} | Scenario: ${supply.scenario.label} | Agents: ${supply.applicableAgents.slice(0, 3).join(', ')}\n   Safety: ${safetyProfile.safety_tier.label} | Policy: ${safetyProfile.safety_tier.auto_install_policy} | Score: ${safetyProfile.score}/100\n   Quality: ${Number(r.quality_score || 0)} | Trust: ${trustProfile.score} ${trustProfile.label} | Audit: ${audit.audit_score} ${auditRiskLabel(audit.risk_level)}\n   Maintenance: ${supply.maintenance.label} | Risk: ${supply.risk.label}\n   Stars: ${r.github_stars} | Downloads: ${r.downloads}\n   Install: ${r.install_command || `npx skills add ${r.github_repo}`}\n   URL: https://www.openagentskill.com/skills/${r.slug}\n   ---`
         })
         .join('\n')
 
       return new NextResponse(
-        `Open Agent Skill — Search Results\nQuery: "${query}"\nFound: ${records.length} skills\nTrust filter: ${trust || 'any'}\n---\n${text}`,
+        `Open Agent Skill — Search Results\nQuery: "${query}"\nFound: ${records.length} skills\nTrust filter: ${trust || 'any'}\nSafety filter: ${safety || 'any'}\n---\n${text}`,
         {
           headers: {
             'Content-Type': 'text/plain; charset=utf-8',
@@ -65,10 +82,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       query,
-      filters: { category, platform, trust, track },
+      filters: { category, platform, trust, safety, track, max_risk: maxRisk },
       total: records.length,
       skills: records.map((r) => {
         const audit = buildSkillAudit(r)
+        const safetyProfile = getAgentSafetyProfile(r, audit, {
+          max_risk: maxRisk,
+          needs_install_command: true,
+        })
         const supplyProfile = getSkillSupplyProfile(r)
         return {
           slug: r.slug,
@@ -92,6 +113,18 @@ export async function GET(request: NextRequest) {
             risk_level: audit.risk_level,
             risk_label: auditRiskLabel(audit.risk_level),
             warnings: audit.warnings.slice(0, 4),
+          },
+          safety: safetyProfile,
+          safety_gate: {
+            tier: safetyProfile.safety_tier.tier,
+            label: safetyProfile.safety_tier.label,
+            badge: safetyProfile.safety_tier.badge,
+            auto_install_policy: safetyProfile.safety_tier.auto_install_policy,
+            auto_install_allowed: safetyProfile.auto_install_allowed,
+            blocked: safetyProfile.blocked,
+            human_review_required: safetyProfile.human_review_required,
+            recommended_action: safetyProfile.safety_tier.recommended_action,
+            reasons: safetyProfile.safety_tier.reasons,
           },
           supply_profile: supplyProfile,
           quality_signals: r.quality_signals || {},

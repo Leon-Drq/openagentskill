@@ -1,4 +1,6 @@
 import { Metadata } from 'next'
+import { buildSkillAudit } from '@/lib/audits'
+import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { getAllSkills, getCategories, convertSkillRecordToManifest, type SkillSortMode, getSkillStats } from '@/lib/db/skills'
 import { SkillsPageClient } from '@/components/skills-page-client'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
@@ -34,6 +36,7 @@ export default async function SkillsPage({
     platform?: string
     quality?: string
     trust?: string
+    safety?: string
     track?: string
     minStars?: string
   }>
@@ -45,6 +48,7 @@ export default async function SkillsPage({
   const platform = params.platform || 'all'
   const quality = params.quality || 'all'
   const trust = params.trust || 'all'
+  const safety = params.safety || 'all'
   const supplyTrack = params.track || 'all'
   const minStars = Number(params.minStars || 0)
 
@@ -69,6 +73,10 @@ export default async function SkillsPage({
       agentStats,
       qualityProfile: getSkillQualityProfile(record, agentStats),
       trustProfile: getSkillTrustProfile(record),
+      safetyProfile: getAgentSafetyProfile(record, buildSkillAudit(record), {
+        max_risk: 'medium',
+        needs_install_command: true,
+      }),
       platformHints: getPlatformHints(record),
       supplyProfile: getSkillSupplyProfile(record),
     }
@@ -91,6 +99,7 @@ export default async function SkillsPage({
     if (minStars > 0 && Number(record.github_stars || 0) < minStars) return false
     if (quality !== 'all' && item.qualityProfile.tier !== quality) return false
     if (trust !== 'all' && item.trustProfile.tier !== trust) return false
+    if (safety !== 'all' && item.safetyProfile.safety_tier.tier !== safety) return false
     return true
   })
 
@@ -107,6 +116,8 @@ export default async function SkillsPage({
         item.supplyProfile.track.label.toLowerCase().includes(query) ||
         item.supplyProfile.applicableAgents.some((agent) => agent.toLowerCase().includes(query)) ||
         item.supplyProfile.risk.notes.some((note) => note.toLowerCase().includes(query)) ||
+        item.safetyProfile.safety_tier.label.toLowerCase().includes(query) ||
+        item.safetyProfile.safety_tier.summary.toLowerCase().includes(query) ||
         (record.tags || []).some((tag) => tag.toLowerCase().includes(query)) ||
         (record.frameworks || []).some((framework) => framework.toLowerCase().includes(query)) ||
         record.github_repo?.toLowerCase().includes(query)
@@ -114,13 +125,14 @@ export default async function SkillsPage({
     })
   }
 
-  const skills = filteredRecords.map(({ record, agentStats, qualityProfile, platformHints, trustProfile, supplyProfile }) => {
+  const skills = filteredRecords.map(({ record, agentStats, qualityProfile, platformHints, trustProfile, safetyProfile, supplyProfile }) => {
     return {
       ...convertSkillRecordToManifest(record),
       agentStats,
       qualityProfile,
       platformHints,
       trustProfile,
+      safetyProfile,
       supplyProfile,
     }
   })
@@ -138,6 +150,7 @@ export default async function SkillsPage({
       platformOptions={platformOptions}
       quality={quality}
       trust={trust}
+      safety={safety}
       supplyTrack={supplyTrack}
       supplyTracks={supplyTracks}
       minStars={Number.isFinite(minStars) ? minStars : 0}

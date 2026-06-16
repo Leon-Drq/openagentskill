@@ -2,6 +2,8 @@ import { auditRiskLabel, type ComputedSkillAudit } from '@/lib/audits'
 import type { SkillRecord } from '@/lib/db/skills'
 
 export type AgentSafetyLevel = 'safe_to_install' | 'review_before_install' | 'avoid_auto_install'
+export type SkillSafetyTier = 'verified' | 'reviewed' | 'experimental' | 'blocked'
+export type AutoInstallPolicy = 'allow' | 'review' | 'block'
 
 export interface AgentResolveConstraints {
   max_risk?: string
@@ -14,6 +16,34 @@ export interface PermissionHint {
   label: string
   reason: string
   severity: 'low' | 'medium' | 'high'
+}
+
+export interface SkillSafetyTierProfile {
+  tier: SkillSafetyTier
+  label: string
+  badge: string
+  summary: string
+  recommended_action: string
+  auto_install_policy: AutoInstallPolicy
+  reasons: string[]
+}
+
+export interface AgentSafetyProfile {
+  score: number
+  level: AgentSafetyLevel
+  label: string
+  safety_tier: SkillSafetyTierProfile
+  auto_install_allowed: boolean
+  human_review_required: boolean
+  blocked: boolean
+  audit_risk: ComputedSkillAudit['risk_level']
+  permission_hints: PermissionHint[]
+  policy_warnings: string[]
+  constraints_applied: {
+    max_risk: string
+    needs_install_command: boolean
+    min_stars: number
+  }
 }
 
 const PERMISSION_PATTERNS: Array<{
@@ -104,6 +134,104 @@ function safetyLabel(level: AgentSafetyLevel) {
   return 'Avoid automatic install'
 }
 
+function safetyTierProfile({
+  skill,
+  audit,
+  score,
+  hasInstallPath,
+  currentRiskRank,
+  requiredRiskRank,
+  highRiskHints,
+  policyWarnings,
+}: {
+  skill: SkillRecord
+  audit: ComputedSkillAudit
+  score: number
+  hasInstallPath: boolean
+  currentRiskRank: number
+  requiredRiskRank: number
+  highRiskHints: PermissionHint[]
+  policyWarnings: Set<string>
+}): SkillSafetyTierProfile {
+  const reasons = new Set<string>()
+  const highRiskIds = new Set(highRiskHints.map((hint) => hint.id))
+  const hasSecretsAndShell = highRiskIds.has('secrets') && highRiskIds.has('shell')
+  const hardBlock =
+    currentRiskRank > requiredRiskRank ||
+    !hasInstallPath ||
+    audit.risk_level === 'risky' ||
+    (hasSecretsAndShell && audit.audit_score < 82)
+
+  if (currentRiskRank > requiredRiskRank) reasons.add('Audit risk exceeds the requested agent policy')
+  if (!hasInstallPath) reasons.add('No install command or repository source is available')
+  if (audit.risk_level === 'risky') reasons.add('Audit classified this skill as risky')
+  if (hasSecretsAndShell) reasons.add('Metadata combines secrets access with shell or command execution')
+  if (policyWarnings.size > 0) reasons.add([...policyWarnings][0])
+
+  if (hardBlock) {
+    return {
+      tier: 'blocked',
+      label: 'Blocked for auto-install',
+      badge: 'BLOCKED',
+      summary: 'This skill should not be selected by an agent without explicit human security review.',
+      recommended_action: 'Do not auto-install. Inspect the source, dependencies, and permission surface first.',
+      auto_install_policy: 'block',
+      reasons: [...reasons].slice(0, 5),
+    }
+  }
+
+  if (
+    skill.verified &&
+    audit.risk_level === 'safe_to_try' &&
+    score >= 82 &&
+    policyWarnings.size === 0
+  ) {
+    return {
+      tier: 'verified',
+      label: 'Verified',
+      badge: 'VERIFIED',
+      summary: 'Strong metadata, audit, install, and review signals. Suitable for agent shortlists after normal workspace review.',
+      recommended_action: 'Allow agent install in a sandbox or low-risk workspace, then promote after one successful narrow task.',
+      auto_install_policy: 'allow',
+      reasons: ['Verified listing', 'Safe-to-try audit', `${score}/100 agent safety score`],
+    }
+  }
+
+  if (audit.risk_level === 'safe_to_try' && score >= 68 && highRiskHints.length === 0) {
+    return {
+      tier: 'reviewed',
+      label: 'Reviewed',
+      badge: 'REVIEWED',
+      summary: 'Good audit and safety signals with no high-risk permission hints in public metadata.',
+      recommended_action: 'Review the audit page, then allow agent install in a sandboxed workflow.',
+      auto_install_policy: policyWarnings.size === 0 ? 'allow' : 'review',
+      reasons: ['Safe-to-try audit', `${score}/100 agent safety score`],
+    }
+  }
+
+  if (audit.risk_level !== 'risky' && score >= 58) {
+    return {
+      tier: 'reviewed',
+      label: 'Reviewed with permission notes',
+      badge: 'REVIEWED',
+      summary: 'Usable candidate, but the agent should surface permission and audit notes before installation.',
+      recommended_action: 'Require human approval before installing into a real workspace.',
+      auto_install_policy: 'review',
+      reasons: [...reasons, `${score}/100 agent safety score`].slice(0, 5),
+    }
+  }
+
+  return {
+    tier: 'experimental',
+    label: 'Experimental',
+    badge: 'EXPERIMENTAL',
+    summary: 'Sparse or mixed signals. Useful for discovery, but not for autonomous installation.',
+    recommended_action: 'Test manually in an isolated workspace and compare against safer alternatives.',
+    auto_install_policy: 'review',
+    reasons: [...reasons, `${score}/100 agent safety score`].slice(0, 5),
+  }
+}
+
 export function getPermissionHints(skill: SkillRecord): PermissionHint[] {
   const text = skillPolicyText(skill)
   const hints = PERMISSION_PATTERNS
@@ -128,7 +256,7 @@ export function getAgentSafetyProfile(
   skill: SkillRecord,
   audit: ComputedSkillAudit,
   constraints: AgentResolveConstraints = {}
-) {
+): AgentSafetyProfile {
   const permissionHints = getPermissionHints(skill)
   const highRiskHints = permissionHints.filter((hint) => hint.severity === 'high')
   const mediumRiskHints = permissionHints.filter((hint) => hint.severity === 'medium')
@@ -171,11 +299,25 @@ export function getAgentSafetyProfile(
         ? 'review_before_install'
         : 'avoid_auto_install'
 
+  const safetyTier = safetyTierProfile({
+    skill,
+    audit,
+    score,
+    hasInstallPath,
+    currentRiskRank,
+    requiredRiskRank,
+    highRiskHints,
+    policyWarnings,
+  })
+
   return {
     score,
     level,
     label: safetyLabel(level),
-    auto_install_allowed: level === 'safe_to_install',
+    safety_tier: safetyTier,
+    auto_install_allowed: safetyTier.auto_install_policy === 'allow' && level === 'safe_to_install',
+    human_review_required: safetyTier.auto_install_policy !== 'allow',
+    blocked: safetyTier.auto_install_policy === 'block',
     audit_risk: audit.risk_level,
     permission_hints: permissionHints,
     policy_warnings: [...policyWarnings].slice(0, 8),

@@ -1,5 +1,5 @@
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
-import { getAgentSafetyProfile, type AgentResolveConstraints } from '@/lib/agent-safety'
+import { getAgentSafetyProfile, type AgentResolveConstraints, type AgentSafetyProfile } from '@/lib/agent-safety'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getAllSkills, getSkillEventStatsMap, type SkillEventStats, type SkillRecord } from '@/lib/db/skills'
 import { getPrimaryInstallCommand, getSkillInstallTargets, type InstallTargetId } from '@/lib/install-targets'
@@ -76,10 +76,35 @@ function buildPolicyDecision(autoInstallAllowed: boolean, policyWarnings: string
   }
 }
 
+function buildSafetyPolicyDecision(safety: AgentSafetyProfile) {
+  if (safety.blocked) {
+    return {
+      status: 'blocked_for_auto_install',
+      summary: safety.safety_tier.recommended_action,
+    }
+  }
+
+  if (safety.auto_install_allowed) {
+    return {
+      status: 'approved_for_agent_install',
+      summary: safety.safety_tier.recommended_action,
+    }
+  }
+
+  if (safety.policy_warnings.length > 0 || safety.human_review_required) {
+    return {
+      status: 'human_review_required',
+      summary: safety.safety_tier.recommended_action,
+    }
+  }
+
+  return buildPolicyDecision(safety.auto_install_allowed, safety.policy_warnings)
+}
+
 function summarizeRisks(candidate: {
   audit: { risk_label: string; warnings: string[] }
   trust: { score: number; label: string; warnings: string[] }
-  safety: { score: number; label: string; policy_warnings: string[] }
+  safety: AgentSafetyProfile
 }) {
   const notes = [
     ...candidate.safety.policy_warnings,
@@ -89,6 +114,7 @@ function summarizeRisks(candidate: {
 
   return {
     level: candidate.audit.risk_label,
+    safety_tier: candidate.safety.safety_tier.label,
     safety: `${candidate.safety.score}/100 ${candidate.safety.label}`,
     trust: `${candidate.trust.score}/100 ${candidate.trust.label}`,
     notes: [...new Set(notes)].slice(0, 5),
@@ -146,6 +172,17 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         warnings: audit.warnings.slice(0, 5),
       },
       safety,
+      safety_gate: {
+        tier: safety.safety_tier.tier,
+        label: safety.safety_tier.label,
+        badge: safety.safety_tier.badge,
+        auto_install_policy: safety.safety_tier.auto_install_policy,
+        auto_install_allowed: safety.auto_install_allowed,
+        human_review_required: safety.human_review_required,
+        blocked: safety.blocked,
+        recommended_action: safety.safety_tier.recommended_action,
+        reasons: safety.safety_tier.reasons,
+      },
       decision: {
         readiness_score: decision.readinessScore,
         readiness_label: decision.readinessLabel,
@@ -172,10 +209,22 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     }
   })
 
-  const selected = candidates.find((candidate) => candidate.safety.auto_install_allowed) || candidates[0] || null
-  const alternatives = candidates
+  const eligibleCandidates = candidates.filter((candidate) => !candidate.safety.blocked)
+  const safeCandidates = eligibleCandidates.filter((candidate) =>
+    candidate.safety.safety_tier.tier === 'verified' || candidate.safety.safety_tier.tier === 'reviewed'
+  )
+  const selected =
+    safeCandidates.find((candidate) => candidate.safety.auto_install_allowed) ||
+    safeCandidates[0] ||
+    eligibleCandidates[0] ||
+    candidates[0] ||
+    null
+  const alternatives = eligibleCandidates
     .filter((candidate) => candidate.skill.slug !== selected?.skill.slug)
     .slice(0, Math.max(0, limit - 1))
+  const blockedCandidates = candidates
+    .filter((candidate) => candidate.safety.blocked)
+    .slice(0, 5)
   const agentDecision = selected
     ? {
         input_task: task,
@@ -185,6 +234,8 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           url: selected.urls.web,
           audit_url: selected.urls.audit,
           repository: selected.urls.repository,
+          safety_tier: selected.safety.safety_tier.label,
+          auto_install_policy: selected.safety.safety_tier.auto_install_policy,
         },
         alternative_skills: alternatives.slice(0, 3).map((candidate) => ({
           slug: candidate.skill.slug,
@@ -201,13 +252,22 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           selected.decision.headline,
           `${selected.trust.score}/100 OpenAgentSkill Trust Score`,
           `${selected.audit.audit_score}/100 audit score`,
+          `${selected.safety.safety_tier.label} safety gate`,
         ].filter(Boolean).slice(0, 6),
         risk_summary: summarizeRisks(selected),
+        safety_gate: {
+          tier: selected.safety.safety_tier.tier,
+          label: selected.safety.safety_tier.label,
+          auto_install_policy: selected.safety.safety_tier.auto_install_policy,
+          action: selected.safety.safety_tier.recommended_action,
+        },
         agent_next_steps: [
           'Read the audit URL before installing.',
           selected.safety.auto_install_allowed
             ? 'Install in a sandbox or low-risk workspace first.'
-            : 'Ask for human approval before installing.',
+            : selected.safety.blocked
+              ? 'Do not install automatically. Pick a safer alternative or ask for explicit human review.'
+              : 'Ask for human approval before installing.',
           `Use install command: ${selected.install_plan.command}`,
           'After installation, run one narrow task and report output, warnings, and files touched.',
         ],
@@ -216,9 +276,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
   const agentWorkflow = selected
     ? {
         mode: 'resolve_review_install',
-        recommended_action: selected.safety.auto_install_allowed
-          ? 'Install after normal workspace review.'
-          : 'Pause for human review before installing.',
+        recommended_action: selected.safety.safety_tier.recommended_action,
         selected_skill: {
           slug: selected.skill.slug,
           name: selected.skill.name,
@@ -268,6 +326,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           },
         ],
         review_checklist: [
+          `Safety tier: ${selected.safety.safety_tier.label}`,
           `Safety score: ${selected.safety.score}/100 ${selected.safety.label}`,
           `Audit score: ${selected.audit.audit_score}/100 ${selected.audit.risk_label}`,
           `Trust score: ${selected.trust.score}/100 ${selected.trust.label}`,
@@ -297,9 +356,10 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     constraints,
     selected,
     alternatives,
+    blocked_candidates: blockedCandidates,
     agent_workflow: agentWorkflow,
     policy_decision: selected
-      ? buildPolicyDecision(selected.safety.auto_install_allowed, selected.safety.policy_warnings)
+      ? buildSafetyPolicyDecision(selected.safety)
       : {
           status: 'no_match',
           summary: 'No matching skill passed the current filters.',

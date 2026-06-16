@@ -70,6 +70,13 @@ function trustStatusTone(status: TrustCheckStatus) {
   return 'border-border text-secondary'
 }
 
+function safetyTierTone(tier: string) {
+  if (tier === 'verified') return 'border-[#006b4f] text-[#006b4f]'
+  if (tier === 'reviewed') return 'border-foreground text-foreground'
+  if (tier === 'blocked') return 'border-red-300 text-red-700'
+  return 'border-amber-300 text-amber-700'
+}
+
 function formatDate(value: string | null | undefined) {
   if (!value) return 'Unknown'
   return new Date(value).toLocaleDateString('en-US', {
@@ -143,6 +150,9 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
               </h1>
               <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">{skill.description}</p>
               <div className="mt-5 flex flex-wrap gap-2">
+                <span className={`border px-3 py-1 font-mono text-xs ${safetyTierTone(safety.safety_tier.tier)}`}>
+                  {safety.safety_tier.badge} · {safety.safety_tier.auto_install_policy.toUpperCase()}
+                </span>
                 <span className={`border px-3 py-1 font-mono text-xs ${riskTone(audit.risk_level)}`}>
                   {auditRiskLabel(audit.risk_level)}
                 </span>
@@ -263,7 +273,8 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
                 <p className="mb-3 text-xs uppercase text-secondary">Method</p>
                 <p className="text-sm leading-relaxed text-secondary">
                   This report combines public metadata, AI review output, repository freshness, install readiness,
-                  OpenAgentSkill events, quality scoring, and trust checks. It is not a full source-code security review.
+                  OpenAgentSkill events, quality scoring, trust checks, and the agent safety gate. It is not a full
+                  source-code security review.
                 </p>
               </div>
             </div>
@@ -299,9 +310,25 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
             <div className="border border-border p-5">
               <p className="mb-2 text-xs uppercase text-secondary">Agent safety v2</p>
               <h2 className="font-display text-lg font-semibold">{safety.score}/100 · {safety.label}</h2>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className={`border px-2 py-1 font-mono text-[10px] ${safetyTierTone(safety.safety_tier.tier)}`}>
+                  {safety.safety_tier.label}
+                </span>
+                <span className="border border-border px-2 py-1 font-mono text-[10px] uppercase text-secondary">
+                  {safety.safety_tier.auto_install_policy}
+                </span>
+              </div>
               <p className="mt-3 text-sm leading-relaxed text-secondary">
-                Safety v2 combines audit score, install readiness, inferred permission surface, and policy limits.
+                {safety.safety_tier.summary}
               </p>
+              <p className="mt-2 text-xs leading-relaxed text-secondary">
+                {safety.safety_tier.recommended_action}
+              </p>
+              {safety.safety_tier.reasons.length > 0 && (
+                <ul className="mt-4 space-y-1 border-t border-border pt-4 text-xs leading-relaxed text-secondary">
+                  {safety.safety_tier.reasons.map((reason) => <li key={reason}>{reason}</li>)}
+                </ul>
+              )}
               <div className="mt-4 space-y-3">
                 {safety.permission_hints.slice(0, 4).map((hint) => (
                   <div key={hint.id} className="border border-border p-3">
