@@ -36,6 +36,7 @@ const minStars = Math.max(100, Number(process.env.BACKFILL_MIN_STARS || 500))
 const maxSearchRequests = Math.max(1, Number(process.env.BACKFILL_MAX_SEARCH_REQUESTS || 30))
 const maxStaleDays = Math.max(30, Number(process.env.BACKFILL_MAX_STALE_DAYS || 1460))
 const startSeed = Math.max(0, Number(process.env.BACKFILL_PAGE_SEED || 0))
+const runDelayMs = Math.max(0, Number(process.env.BACKFILL_RUN_DELAY_MS || (runs > 1 ? 65_000 : 0)))
 const domains = (process.env.BACKFILL_DOMAINS || '')
   .split(',')
   .map((domain) => domain.trim())
@@ -92,6 +93,7 @@ console.log(
       minStars,
       maxSearchRequests,
       maxStaleDays,
+      runDelayMs,
       domains,
     },
     null,
@@ -132,6 +134,10 @@ for (let i = 0; i < runs; i += 1) {
   )
 
   if (summary.remainingToTarget === 0 || summary.targetNew === 0) break
+  if (runDelayMs > 0 && i + 1 < runs) {
+    console.log(`[backfill] waiting ${runDelayMs}ms before the next run to respect GitHub Search API limits`)
+    await new Promise((resolve) => setTimeout(resolve, runDelayMs))
+  }
 }
 
 console.log(
