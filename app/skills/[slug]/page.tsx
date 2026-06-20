@@ -23,6 +23,7 @@ import { withTimeout } from '@/lib/async'
 import { getStacksForSkill } from '@/lib/collections'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
+import { buildAgentReadableSkillMetadata } from '@/lib/agent-readable'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
@@ -200,26 +201,6 @@ function formatDate(value: string | null | undefined): string {
   })
 }
 
-function uniqueStrings(
-  values: Array<string | null | undefined>,
-  limit: number
-) {
-  const seen = new Set<string>()
-  const result: string[] = []
-
-  for (const value of values) {
-    const normalized = (value || '').trim()
-    if (!normalized) continue
-    const key = normalized.toLowerCase()
-    if (seen.has(key)) continue
-    seen.add(key)
-    result.push(normalized)
-    if (result.length >= limit) break
-  }
-
-  return result
-}
-
 function safetyTierTone(tier: string) {
   if (tier === 'verified') return 'border-[#006b4f] text-[#006b4f]'
   if (tier === 'reviewed') return 'border-foreground text-foreground'
@@ -293,96 +274,21 @@ export default async function SkillDetailPage({
   const installCommand =
     skill.technical.installCommand ||
     `npx skills add ${dbSkill?.github_repo || skill.slug}`
-  const suitableTasks = uniqueStrings(
-    [
-      ...(decisionProfile?.bestFor || []),
-      ...(matchedUseCases.flatMap((useCase) => useCase.agentTasks) || []),
-      ...(matchedUseCases.flatMap((useCase) => useCase.workflows) || []),
-      supplyProfile?.scenario.label,
-      skill.description,
-    ],
-    8
-  )
-  const suitableAgents = uniqueStrings(
-    [
-      ...(trustProfile?.agentCompatibility || []),
-      ...(supplyProfile?.applicableAgents || []),
-      ...(skill.technical.frameworks || []),
-      ...platformHints,
-      'Codex',
-      'Claude Code',
-      'Cursor',
-    ],
-    8
-  )
-  const doNotUseWhen = uniqueStrings(
-    [
-      ...(decisionProfile?.notIdealFor || []),
-      ...(decisionProfile?.riskNotes || []),
-      ...(safetyProfile?.policy_warnings || []),
-      ...(auditProfile?.warnings || []),
-      ...(trustProfile?.riskSummary.notes || []),
-    ],
-    8
-  )
-  const agentAlternatives = relatedSkills.slice(0, 4).map((relatedSkill) => ({
-    slug: relatedSkill.slug,
-    name: relatedSkill.name,
-    url: `https://www.openagentskill.com/skills/${relatedSkill.slug}`,
-    stars: relatedSkill.github_stars || 0,
-    install_command:
-      relatedSkill.install_command ||
-      (relatedSkill.github_repo
-        ? `npx skills add ${relatedSkill.github_repo}`
-        : `npx skills add ${relatedSkill.slug}`),
-  }))
-  const agentReadableMetadata = {
-    version: 'openagentskill-agent-metadata-v1',
-    skill: {
-      slug: skill.slug,
-      name: skill.name,
-      category: skill.category,
-      url: `https://www.openagentskill.com/skills/${skill.slug}`,
-      repository: skill.technical.repository || null,
-    },
-    suited_tasks: suitableTasks,
-    suited_agents: suitableAgents,
-    install: {
-      command: installCommand,
-      handoff_url: `https://www.openagentskill.com${installApiHref}`,
-      manifest_url: `https://www.openagentskill.com${registryManifestHref}`,
-    },
-    trust: trustProfile
-      ? {
-          score: trustProfile.score,
-          label: trustProfile.label,
-          version: trustProfile.version,
-          install_policy: trustProfile.installReadiness.policy,
-        }
-      : null,
-    risk: auditProfile
-      ? {
-          audit_score: auditProfile.audit_score,
-          risk_level: auditProfile.risk_level,
-          risk_label: auditRiskLabel(auditProfile.risk_level),
-          auto_install_policy:
-            safetyProfile?.safety_tier.auto_install_policy || 'review',
-        }
-      : null,
-    alternative_skills: agentAlternatives,
-    do_not_use_when:
-      doNotUseWhen.length > 0
-        ? doNotUseWhen
-        : [
-            'Do not skip repository, license, permission, and dependency review before production use.',
-          ],
-    endpoints: {
-      audit: `https://www.openagentskill.com/skills/${skill.slug}/audit`,
-      resolve: `https://www.openagentskill.com${resolveApiHref}`,
-      install: `https://www.openagentskill.com${installApiHref}`,
-      manifest: `https://www.openagentskill.com${registryManifestHref}`,
-    },
-  }
+  const agentReadableMetadata = dbSkill
+    ? buildAgentReadableSkillMetadata(dbSkill, {
+        eventStats,
+        approvedClaim: Boolean(approvedClaim),
+        alternatives: relatedSkills,
+        task: `Use ${skill.name} for an agent workflow`,
+      })
+    : null
+  const suitableTasks = agentReadableMetadata?.suited_tasks || []
+  const suitableAgents = agentReadableMetadata?.suited_agents || []
+  const agentAlternatives = agentReadableMetadata?.alternative_skills || []
+  const doNotUseWhen =
+    agentReadableMetadata?.do_not_use_when || [
+      'Do not skip repository, license, permission, and dependency review before production use.',
+    ]
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -815,9 +721,7 @@ export default async function SkillDetailPage({
                     Do not use when
                   </p>
                   <ul className="space-y-2 text-sm leading-relaxed text-secondary">
-                    {agentReadableMetadata.do_not_use_when
-                      .slice(0, 5)
-                      .map((warning) => (
+                    {doNotUseWhen.slice(0, 5).map((warning) => (
                         <li key={warning} className="flex gap-2">
                           <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-amber-600" />
                           <span>{warning}</span>

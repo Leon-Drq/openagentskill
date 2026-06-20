@@ -78,7 +78,7 @@ export async function GET() {
             responses: {
               '200': {
                 description:
-                  'Resolved skill plan. Read recommendation.best_skill, recommendation.install, recommendation.why_recommended, recommendation.trust_score_v3, recommendation.risk, and recommendation.alternatives for the stable agent contract. recommendation.trust_score_v2 remains as a backwards-compatible alias.',
+                  'Resolved skill plan. Read recommendation.agent_contract for the stable machine contract, plus recommendation.best_skill, recommendation.install, recommendation.why_recommended, recommendation.trust_score_v3, recommendation.risk, recommendation.machine_metadata, and recommendation.alternatives. recommendation.trust_score_v2 remains as a backwards-compatible alias.',
               },
             },
           },
@@ -104,7 +104,7 @@ export async function GET() {
             responses: {
               '200': {
                 description:
-                  'Resolved skill plan with the same recommendation.* contract returned by GET.',
+                  'Resolved skill plan with the same recommendation.agent_contract and recommendation.* fields returned by GET.',
               },
             },
           },
@@ -152,7 +152,7 @@ export async function GET() {
               { name: 'max_risk', in: 'query', required: false, schema: { type: 'string', enum: ['low', 'medium', 'high'] } },
               { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
             ],
-            responses: { '200': { description: 'Skill profile' } },
+            responses: { '200': { description: 'Skill profile with agent_readable_metadata and machine_metadata fields' } },
           },
         },
         '/api/skills/{slug}/install': {

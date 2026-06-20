@@ -37,7 +37,15 @@ Risk: ${payload.recommendation.risk.level}; ${payload.recommendation.risk.safety
 Why:
 ${payload.recommendation.why_recommended.map((item) => `- ${item}`).join('\n')}
 Agent instruction:
-${payload.recommendation.agent_instruction}` : 'No recommendation generated'}
+${payload.recommendation.agent_instruction}
+Agent contract:
+- Version: ${payload.recommendation.agent_contract.version}
+- Install policy: ${payload.recommendation.agent_contract.install_policy}
+- Auto-install allowed: ${payload.recommendation.agent_contract.auto_install_allowed ? 'yes' : 'no'}
+- Human review required: ${payload.recommendation.agent_contract.human_review_required ? 'yes' : 'no'}
+- Audit URL: ${payload.recommendation.agent_contract.audit_url}
+- Do not use when:
+${payload.recommendation.agent_contract.do_not_use_when.slice(0, 4).map((item) => `  - ${item}`).join('\n')}` : 'No recommendation generated'}
 
 Selected:
 ${selected ? `${selected.skill.name} (${selected.skill.slug})

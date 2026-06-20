@@ -1,5 +1,6 @@
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
+import { buildAgentReadableSkillMetadata } from '@/lib/agent-readable'
 import type { SkillEventStats, SkillRecord } from '@/lib/db/skills'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillInstallTargets } from '@/lib/install-targets'
@@ -208,6 +209,9 @@ export function toRegistrySkill(skill: SkillRecord, eventStats?: SkillEventStats
   const install = getSkillInstallCommand(skill)
   const attribution = getSkillAttribution(skill)
   const supplyProfile = getSkillSupplyProfile(skill, eventStats || null)
+  const agentReadableMetadata = buildAgentReadableSkillMetadata(skill, {
+    eventStats: eventStats || null,
+  })
 
   return {
     slug: skill.slug,
@@ -261,6 +265,8 @@ export function toRegistrySkill(skill: SkillRecord, eventStats?: SkillEventStats
       risks: decision.riskNotes,
       next_steps: decision.implementationPlan,
     },
+    agent_readable_metadata: agentReadableMetadata,
+    machine_metadata: agentReadableMetadata,
     platforms: [...new Set([...(skill.frameworks || []), ...getPlatformHints(skill)])],
     use_cases: getUseCasesForSkill(skill, 4).map((useCase) => ({
       slug: useCase.slug,

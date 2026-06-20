@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
+import { buildAgentReadableSkillMetadata } from '@/lib/agent-readable'
 import { withTimeout } from '@/lib/async'
 import { getApprovedClaimBySkillSlug } from '@/lib/db/skills'
 import { getStacksForSkill } from '@/lib/collections'
@@ -65,6 +66,9 @@ export async function GET(
     const installTargets = getSkillInstallTargets(skill)
     const attribution = getSkillAttribution(skill, approvedClaim)
     const supplyProfile = getSkillSupplyProfile(skill)
+    const agentReadableMetadata = buildAgentReadableSkillMetadata(skill, {
+      approvedClaim: Boolean(approvedClaim),
+    })
 
     if (format === 'text') {
       const text = `${skill.name}
@@ -112,6 +116,12 @@ ${skill.install_command || `npx skills add ${skill.github_repo}`}
 
 Agent install targets:
 ${installTargets.map((target) => `- ${target.title}: ${target.value}`).join('\n')}
+
+Agent-readable metadata:
+- Suited tasks: ${agentReadableMetadata.suited_tasks.slice(0, 4).join('; ')}
+- Suited agents: ${agentReadableMetadata.suited_agents.slice(0, 5).join(', ')}
+- Install policy: ${agentReadableMetadata.safety_gate.auto_install_policy}
+- Do not use when: ${agentReadableMetadata.do_not_use_when.slice(0, 3).join('; ')}
 
 Repository: ${skill.repository}
 
@@ -161,6 +171,8 @@ Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
           recommended_action: safetyProfile.safety_tier.recommended_action,
           reasons: safetyProfile.safety_tier.reasons,
         },
+        agent_readable_metadata: agentReadableMetadata,
+        machine_metadata: agentReadableMetadata,
         supply_profile: supplyProfile,
         audit: {
           audit_score: audit.audit_score,

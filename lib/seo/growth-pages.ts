@@ -184,6 +184,78 @@ const CUSTOM_BEST_SKILL_PAGES: BestSkillPageDefinition[] = [
       'Prepare a market brief before earnings',
     ],
   },
+  {
+    slug: 'research-briefs',
+    title: 'Best AI agent skills for research briefs',
+    shortTitle: 'Research briefs',
+    eyebrow: 'Research agents',
+    description:
+      'Ranked OpenAgentSkill shortlist for agents that gather sources, compare claims, summarize recent changes, and produce concise evidence-backed research briefs.',
+    useCaseSlug: 'research-agents',
+    searchIntent: 'Find AI agent skills for web research, source comparison, recent-event scanning, and evidence-backed briefing workflows.',
+    audience: 'Builders creating research, competitive intelligence, market monitoring, and analyst-style briefing agents.',
+    agentSurface: 'AI agents',
+    primaryKeyword: 'best AI agent skills for research briefs',
+    exampleTasks: [
+      'Research a market and summarize the strongest sources',
+      'Compare claims across web, Reddit, X, YouTube, and Hacker News',
+      'Produce a grounded brief with links and risk notes',
+    ],
+  },
+  {
+    slug: 'marketing-seo-automation',
+    title: 'Best AI agent skills for marketing and SEO automation',
+    shortTitle: 'Marketing SEO',
+    eyebrow: 'Growth agents',
+    description:
+      'Ranked OpenAgentSkill shortlist for agents that research keywords, analyze content gaps, prepare campaigns, clean CRM data, and automate repeatable growth workflows.',
+    useCaseSlug: 'marketing-growth',
+    searchIntent: 'Find AI agent skills for SEO research, keyword workflows, content operations, lead generation, web analytics, and marketing automation.',
+    audience: 'Founders, growth teams, and builders creating marketing, SEO, lead-generation, and content operations agents.',
+    agentSurface: 'AI agents',
+    primaryKeyword: 'best AI agent skills for marketing automation',
+    exampleTasks: [
+      'Research SEO keywords for an agent product launch',
+      'Analyze content gaps and turn them into article briefs',
+      'Prepare a weekly growth report from web analytics and CRM exports',
+    ],
+  },
+  {
+    slug: 'security-review',
+    title: 'Best AI agent skills for security review',
+    shortTitle: 'Security review',
+    eyebrow: 'Security agents',
+    description:
+      'Ranked OpenAgentSkill shortlist for agents that scan dependencies, review permissions, inspect secrets, summarize vulnerabilities, and prepare safe remediation steps.',
+    useCaseSlug: 'security-compliance',
+    searchIntent: 'Find AI agent skills for vulnerability scanning, secret review, dependency risk, security audit notes, and safe remediation workflows.',
+    audience: 'Developers and security-minded teams that want agents to inspect repositories before running third-party code or shipping changes.',
+    agentSurface: 'AI agents',
+    primaryKeyword: 'best AI agent skills for security review',
+    exampleTasks: [
+      'Scan a repository for exposed secrets and risky dependencies',
+      'Review an install command before allowing an agent to run it',
+      'Summarize vulnerability findings with safe remediation steps',
+    ],
+  },
+  {
+    slug: 'legal-compliance-review',
+    title: 'Best AI agent skills for legal and compliance review',
+    shortTitle: 'Legal compliance',
+    eyebrow: 'Compliance agents',
+    description:
+      'Ranked OpenAgentSkill shortlist for agents that review policies, summarize contracts, inspect privacy requirements, and prepare compliance notes with clear risk boundaries.',
+    useCaseSlug: 'legal-compliance',
+    searchIntent: 'Find AI agent skills for contract review, privacy policy analysis, compliance summaries, governance notes, and document risk review.',
+    audience: 'Teams building legal operations, policy review, privacy, and compliance support agents.',
+    agentSurface: 'AI agents',
+    primaryKeyword: 'best AI agent skills for legal compliance review',
+    exampleTasks: [
+      'Summarize risky clauses in a contract',
+      'Review a privacy policy for compliance obligations',
+      'Prepare governance notes from legal or policy documents',
+    ],
+  },
 ]
 
 function titleCase(value: string) {
@@ -217,7 +289,7 @@ export const BEST_SKILL_PAGES: BestSkillPageDefinition[] = [
 ]
 
 export const FEATURED_BEST_PAGES = BEST_SKILL_PAGES.filter((page) =>
-  ['web-scraping', 'stock-analysis', 'codex-web-scraping', 'codex-finance-analysis', 'claude-code-pdf-parsing', 'sports-analytics', 'football-analytics', 'coding-agents', 'browser-automation', 'rag-knowledge', 'data-analysis', 'github-automation']
+  ['web-scraping', 'stock-analysis', 'codex-web-scraping', 'codex-finance-analysis', 'claude-code-pdf-parsing', 'sports-analytics', 'football-analytics', 'research-briefs', 'marketing-seo-automation', 'security-review', 'legal-compliance-review', 'coding-agents', 'browser-automation', 'rag-knowledge', 'data-analysis', 'github-automation']
     .includes(page.slug)
 )
 

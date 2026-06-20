@@ -1,6 +1,7 @@
 import { unstable_cache } from 'next/cache'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile, type AgentResolveConstraints, type AgentSafetyProfile } from '@/lib/agent-safety'
+import { buildAgentReadableSkillMetadata, type AgentReadableSkillMetadata } from '@/lib/agent-readable'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getAllSkills, getSkillEventStatsMap, type SkillEventStats, type SkillRecord } from '@/lib/db/skills'
 import { getPrimaryInstallCommand, getSkillInstallTargets, type InstallTargetId } from '@/lib/install-targets'
@@ -401,6 +402,7 @@ interface ResolverRecommendationCandidate {
   decision: {
     headline: string
   }
+  machine_metadata: AgentReadableSkillMetadata
 }
 
 function buildResolverRecommendation(
@@ -467,6 +469,22 @@ function buildResolverRecommendation(
     },
     risk,
     safety_gate: selected.safety_gate,
+    machine_metadata: selected.machine_metadata,
+    agent_contract: {
+      version: 'openagentskill-resolve-contract-v1',
+      input_task: task,
+      recommended_skill_slug: selected.skill.slug,
+      recommended_skill_name: selected.skill.name,
+      install_command: selected.install_plan.command,
+      install_policy: selected.safety.safety_tier.auto_install_policy,
+      auto_install_allowed: selected.safety.auto_install_allowed,
+      human_review_required: selected.safety.human_review_required,
+      audit_url: selected.urls.audit,
+      skill_api_url: selected.urls.api,
+      do_not_use_when: selected.machine_metadata.do_not_use_when,
+      minimum_review_before_use: selected.machine_metadata.agent_contract.minimum_review_before_use,
+      expected_agent_output: selected.machine_metadata.agent_contract.expected_agent_output,
+    },
     supply_asset: {
       track: selected.supply_profile.track,
       scenario: selected.supply_profile.scenario,
@@ -575,6 +593,10 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         next_steps: decision.implementationPlan,
       },
       install_plan: buildInstallPlan(skill, agent),
+      machine_metadata: buildAgentReadableSkillMetadata(skill, {
+        eventStats,
+        task,
+      }),
       use_cases: useCases.map((useCase) => ({
         slug: useCase.slug,
         title: useCase.shortTitle,

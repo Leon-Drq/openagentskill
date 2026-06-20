@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { buildAgentReadableSkillMetadata } from '@/lib/agent-readable'
 import {
   auditRiskLabel,
   buildSkillAudit,
@@ -105,6 +106,11 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
   const trust = getSkillTrustProfile(skill, false, eventStats)
   const safety = getAgentSafetyProfile(skill, audit, { max_risk: 'medium', needs_install_command: true })
   const installCommand = skill.install_command || `npx skills add ${skill.github_repo || skill.slug}`
+  const agentReadableMetadata = buildAgentReadableSkillMetadata(skill, {
+    eventStats,
+    alternatives: relatedSkills,
+    task: `Audit ${skill.name} before installing it into an agent workflow`,
+  })
   const passCount = audit.checks.filter((check) => check.status === 'pass').length
   const reviewCount = audit.checks.filter((check) => check.status === 'warn' || check.status === 'fail').length + audit.warnings.length
   const generatedAt = formatDate(audit.generated_at)
@@ -135,6 +141,11 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
   return (
     <div className="min-h-screen bg-background">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      <script
+        id="openagentskill-agent-metadata"
+        type="application/json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(agentReadableMetadata) }}
+      />
       <SiteHeader />
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
@@ -290,6 +301,36 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
               <h2 className="font-display text-lg font-semibold">Install path</h2>
               <p className="mb-4 mt-1 text-xs text-secondary">Review the report before installing into production agents.</p>
               <InstallCommand command={installCommand} skillSlug={skill.slug} compact />
+            </div>
+
+            <div className="border border-border p-5">
+              <p className="mb-2 text-xs uppercase text-secondary">Agent-readable metadata</p>
+              <h2 className="font-display text-lg font-semibold">Machine decision packet</h2>
+              <p className="mt-2 text-sm leading-relaxed text-secondary">
+                Embedded JSON exposes suited tasks, suited agents, install command, trust score, safety gate,
+                alternatives, and do-not-use conditions for agent review.
+              </p>
+              <dl className="mt-4 space-y-3 text-xs">
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="text-secondary">Install policy</dt>
+                  <dd className="font-mono text-right">{agentReadableMetadata.safety_gate.auto_install_policy}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="text-secondary">Best agents</dt>
+                  <dd className="font-mono text-right">{agentReadableMetadata.suited_agents.slice(0, 2).join(' + ')}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="text-secondary">Alternatives</dt>
+                  <dd className="font-mono">{agentReadableMetadata.alternative_skills.length}</dd>
+                </div>
+              </dl>
+              <Link
+                href={`/api/agent/skills/${skill.slug}`}
+                prefetch={false}
+                className="mt-4 block border border-border px-4 py-2.5 text-center text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+              >
+                Open agent JSON
+              </Link>
             </div>
 
             <div className="border border-border p-5">
