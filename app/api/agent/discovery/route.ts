@@ -94,6 +94,7 @@ function buildIndexerHealth({
   const latestSearchRequests = toNumber(latestRun?.search_requests)
   const latestMaxSearchRequests = toNumber(latestRun?.max_search_requests)
   const latestCandidatesFound = toNumber(latestRun?.candidates_found)
+  const latestPageSeed = toNumber(latestRun?.page_seed)
   const latestSkippedExisting = toNumber(latestRun?.skipped_existing)
   const latestSkippedMcp = toNumber(latestRun?.skipped_mcp)
   const latestSkippedLowRelevance = toNumber(latestRun?.skipped_low_relevance)
@@ -172,6 +173,7 @@ function buildIndexerHealth({
     latest_run_search_requests: latestSearchRequests,
     latest_run_max_search_requests: latestMaxSearchRequests,
     latest_run_candidates_found: latestCandidatesFound,
+    latest_run_page_seed: latestPageSeed,
     latest_run_skipped_existing: latestSkippedExisting,
     latest_run_skipped_mcp: latestSkippedMcp,
     latest_run_skipped_low_relevance: latestSkippedLowRelevance,
@@ -216,6 +218,12 @@ async function getRecentRuns() {
     min_stars: run.min_stars,
     target_new: run.target_new,
     filter_mode: run.filter_mode,
+    page_seed: run.metadata &&
+      typeof run.metadata === 'object' &&
+      !Array.isArray(run.metadata) &&
+      'page_seed' in run.metadata
+      ? (run.metadata as Record<string, unknown>).page_seed
+      : undefined,
     domains_covered: run.metadata &&
       typeof run.metadata === 'object' &&
       !Array.isArray(run.metadata) &&

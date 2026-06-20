@@ -63,6 +63,7 @@ export interface BulkImportSummary {
   existingApproved: number
   remainingToTarget: number
   minStars: number
+  pageSeed: number
   requestedDomains: string[]
   queryPoolSize: number
   domainsCovered: string[]
@@ -1808,10 +1809,7 @@ export async function bulkImportHighStarSkills(
     1,
     maxAllowedSearchRequests
   )
-  const pageSeed = Math.max(
-    0,
-    Math.floor(options.pageSeed ?? (requestedDomains.length > 0 ? 0 : Math.floor(Date.now() / 3_600_000)))
-  )
+  const pageSeed = Math.max(0, Math.floor(options.pageSeed ?? Math.floor(Date.now() / 3_600_000)))
   const strictQuality = options.strictQuality !== false
   const maxStaleDays = Math.max(30, Math.floor(options.maxStaleDays || DEFAULT_MAX_STALE_DAYS))
   const includeCollections = options.includeCollections === true
@@ -1837,6 +1835,7 @@ export async function bulkImportHighStarSkills(
     existingApproved: existing.count,
     remainingToTarget,
     minStars,
+    pageSeed,
     requestedDomains,
     queryPoolSize: queryPool.length,
     domainsCovered: [],
