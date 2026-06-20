@@ -186,7 +186,7 @@ export async function GET() {
         '/api/agent/discovery': {
           get: {
             summary: 'Public-safe GitHub auto-discovery status',
-            responses: { '200': { description: 'Discovery pipeline status, filters, schedule, and cross-domain query coverage' } },
+            responses: { '200': { description: 'Discovery pipeline status, health, filters, schedule, and cross-domain query coverage' } },
           },
         },
       },

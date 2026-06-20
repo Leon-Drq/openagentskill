@@ -20,6 +20,107 @@ function parsePositiveNumber(value: unknown, fallback: number) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
 }
 
+function toNumber(value: unknown) {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+function toIso(value: unknown) {
+  if (typeof value !== 'string') return null
+  const time = Date.parse(value)
+  return Number.isFinite(time) ? new Date(time).toISOString() : null
+}
+
+function getNextHourlyCronIso(now: Date) {
+  const next = new Date(now)
+  next.setUTCMinutes(0, 0, 0)
+  if (next <= now) next.setUTCHours(next.getUTCHours() + 1)
+  return next.toISOString()
+}
+
+function buildIndexerHealth({
+  runs,
+  generatedAt,
+  targetNew,
+  coverageTarget,
+  approvedSkillCount,
+  remainingToTarget,
+}: {
+  runs: Array<Record<string, unknown>>
+  generatedAt: Date
+  targetNew: number
+  coverageTarget: number
+  approvedSkillCount: number | null
+  remainingToTarget: number | null
+}) {
+  const latestRun = runs[0]
+  const latestStartedAt = toIso(latestRun?.started_at)
+  const latestStartedMs = latestStartedAt ? Date.parse(latestStartedAt) : null
+  const minutesSinceLatestRun =
+    latestStartedMs === null
+      ? null
+      : Math.max(0, Math.round((generatedAt.getTime() - latestStartedMs) / 60_000))
+  const latestStatus = typeof latestRun?.status === 'string' ? latestRun.status : null
+  const latestTargetNew = toNumber(latestRun?.target_new)
+  const latestImported = toNumber(latestRun?.imported)
+  const latestErrors = toNumber(latestRun?.errors)
+  const belowTarget = typeof remainingToTarget === 'number' && remainingToTarget > 0
+  const latestEffectiveDailyRate =
+    latestImported === null ? null : latestImported * 24
+  const estimatedDaysAtLatestImportRate =
+    belowTarget && latestEffectiveDailyRate && latestEffectiveDailyRate > 0
+      ? Math.ceil((remainingToTarget || 0) / latestEffectiveDailyRate)
+      : null
+  const lastRunUsedOldLowerTarget =
+    belowTarget &&
+    latestStatus === 'target_reached' &&
+    latestTargetNew === 0
+
+  let status = 'active'
+  let action = 'No action needed. Continue hourly imports toward the 20k coverage target.'
+
+  if (approvedSkillCount === null || remainingToTarget === null) {
+    status = 'unknown'
+    action = 'Skill count query timed out; retry the public discovery endpoint or inspect private indexer logs.'
+  } else if (remainingToTarget === 0) {
+    status = 'target_reached'
+    action = 'Coverage target reached. Keep refreshing stars and audits.'
+  } else if (lastRunUsedOldLowerTarget) {
+    status = 'awaiting_next_guarded_run'
+    action = 'Recent runs used the old lower target and stopped early; the deployed target guard should resume imports on the next cron.'
+  } else if ((latestImported || 0) > 0 && (latestErrors || 0) > 0) {
+    status = 'importing_with_warnings'
+    action = 'Imports are landing, but one or more query windows reported errors. Continue monitoring and inspect private logs if warnings persist.'
+  } else if (latestStatus?.includes('error') || (latestErrors || 0) > 0) {
+    status = 'degraded'
+    action = 'Inspect private indexer logs before relying on automated growth.'
+  } else if (minutesSinceLatestRun !== null && minutesSinceLatestRun > 90) {
+    status = 'stale'
+    action = 'No recent import run detected. Check Vercel Cron delivery and route authorization.'
+  } else if ((latestImported || 0) > 0) {
+    status = 'importing'
+    action = 'Imports are landing. Continue monitoring approved skill count and run quality gates.'
+  }
+
+  return {
+    status,
+    action,
+    target_guard_active: true,
+    target_guard_minimum: coverageTarget,
+    expected_target_new_per_run: targetNew,
+    latest_run_status: latestStatus,
+    latest_run_started_at: latestStartedAt,
+    minutes_since_latest_run: minutesSinceLatestRun,
+    latest_run_target_new: latestTargetNew,
+    latest_run_imported: latestImported,
+    latest_run_errors: latestErrors,
+    latest_effective_daily_import_rate: latestEffectiveDailyRate,
+    estimated_days_to_target_at_latest_import_rate: estimatedDaysAtLatestImportRate,
+    last_run_used_old_lower_target: lastRunUsedOldLowerTarget,
+    next_import_cron_utc: getNextHourlyCronIso(generatedAt),
+  }
+}
+
 async function getRecentRuns() {
   const serverSecret = process.env.INDEXER_SECRET
   if (!serverSecret) return []
@@ -77,6 +178,7 @@ async function getApprovedSkillCount() {
 }
 
 export async function GET() {
+  const generatedAt = new Date()
   const minStars = Number(process.env.INDEXER_MIN_STARS || 500)
   const defaultTargetNewPerRun = 250
   const targetNew = Math.max(
@@ -114,6 +216,14 @@ export async function GET() {
     remainingToTarget === null
       ? null
       : Math.ceil(remainingToTarget / Math.max(estimatedDailyCapacity, 1))
+  const indexerHealth = buildIndexerHealth({
+    runs,
+    generatedAt,
+    targetNew,
+    coverageTarget: effectiveCoverageTarget,
+    approvedSkillCount,
+    remainingToTarget,
+  })
 
   return NextResponse.json({
     status: 'active',
@@ -141,6 +251,7 @@ export async function GET() {
     },
     schedule,
     filters,
+    indexer_health: indexerHealth,
     github_discovery: {
       status: 'active',
       source: 'github_search',
@@ -245,7 +356,7 @@ export async function GET() {
     meta: {
       agent_friendly: true,
       api_version: '1.0',
-      generated_at: new Date().toISOString(),
+      generated_at: generatedAt.toISOString(),
     },
   })
 }
