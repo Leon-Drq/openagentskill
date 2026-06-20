@@ -82,6 +82,15 @@ curl "https://www.openagentskill.com/api/agent/recommend?task=scrape+websites+an
 
 Returns a ranked shortlist with confidence, install command, repository URL, quality profile, decision profile, use cases, and suggested stacks.
 
+### Resolve And Eval Before Installing
+
+```bash
+curl "https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&agent=codex&max_risk=medium"
+curl "https://www.openagentskill.com/api/agent/evals?task=analyze+stock+news&agent=codex&max_risk=medium"
+```
+
+The resolve endpoint returns the recommended skill, install handoff, audit URL, alternatives, and agent workflow. The task eval endpoint turns that recommendation into a pre-install gate with pass/review/fail checks for match quality, install readiness, Trust Score, audit score, and safety policy.
+
 ### Search Skills
 
 ```bash
