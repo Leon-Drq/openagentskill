@@ -9,11 +9,30 @@ import {
   HIGH_STAR_SKILL_COVERAGE_TARGET,
   resolveHighStarCoverageTarget,
 } from '@/lib/indexer/high-star-import'
+import { INDEXER_RUN_PROFILES } from '@/lib/indexer/run-profiles'
 import { FEATURED_SKILL_CLUSTERS, SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
 
 export const dynamic = 'force-dynamic'
 
 const DISCOVERY_QUERY_TIMEOUT_MS = 1000
+const BASE_IMPORT_CRON_MINUTE_UTC = 0
+
+function getCronMinute(schedule: string) {
+  const [minute] = schedule.split(' ')
+  const parsed = Number(minute)
+  return Number.isInteger(parsed) && parsed >= 0 && parsed < 60 ? parsed : null
+}
+
+function getImportCronMinutesUtc() {
+  return Array.from(
+    new Set([
+      BASE_IMPORT_CRON_MINUTE_UTC,
+      ...INDEXER_RUN_PROFILES
+        .map((profile) => getCronMinute(profile.schedule))
+        .filter((minute): minute is number => minute !== null),
+    ])
+  ).sort((a, b) => a - b)
+}
 
 function parsePositiveNumber(value: unknown, fallback: number) {
   const parsed = Number(value)
@@ -31,10 +50,18 @@ function toIso(value: unknown) {
   return Number.isFinite(time) ? new Date(time).toISOString() : null
 }
 
-function getNextHourlyCronIso(now: Date) {
+function getNextImportCronIso(now: Date) {
+  const minutes = getImportCronMinutesUtc()
   const next = new Date(now)
-  next.setUTCMinutes(0, 0, 0)
-  if (next <= now) next.setUTCHours(next.getUTCHours() + 1)
+
+  for (const minute of minutes) {
+    next.setTime(now.getTime())
+    next.setUTCMinutes(minute, 0, 0)
+    if (next > now) return next.toISOString()
+  }
+
+  next.setTime(now.getTime())
+  next.setUTCHours(next.getUTCHours() + 1, minutes[0] || 0, 0, 0)
   return next.toISOString()
 }
 
@@ -64,6 +91,12 @@ function buildIndexerHealth({
   const latestTargetNew = toNumber(latestRun?.target_new)
   const latestImported = toNumber(latestRun?.imported)
   const latestErrors = toNumber(latestRun?.errors)
+  const latestSearchRequests = toNumber(latestRun?.search_requests)
+  const latestMaxSearchRequests = toNumber(latestRun?.max_search_requests)
+  const latestCandidatesFound = toNumber(latestRun?.candidates_found)
+  const latestSkippedExisting = toNumber(latestRun?.skipped_existing)
+  const latestSkippedMcp = toNumber(latestRun?.skipped_mcp)
+  const latestSkippedLowRelevance = toNumber(latestRun?.skipped_low_relevance)
   const belowTarget = typeof remainingToTarget === 'number' && remainingToTarget > 0
   const latestEffectiveDailyRate =
     latestImported === null ? null : latestImported * 24
@@ -91,6 +124,28 @@ function buildIndexerHealth({
   } else if ((latestImported || 0) > 0 && (latestErrors || 0) > 0) {
     status = 'importing_with_warnings'
     action = 'Imports are landing, but one or more query windows reported errors. Continue monitoring and inspect private logs if warnings persist.'
+  } else if (
+    belowTarget &&
+    latestSearchRequests !== null &&
+    latestMaxSearchRequests !== null &&
+    latestSearchRequests < latestMaxSearchRequests
+  ) {
+    status = 'underfilled_search_window'
+    action = 'The latest run did not use the full search budget. Inspect search diagnostics and domain sweep cron coverage.'
+  } else if (
+    belowTarget &&
+    latestImported === 0 &&
+    (latestCandidatesFound || 0) > 0 &&
+    (latestSkippedExisting || 0) / Math.max(latestCandidatesFound || 1, 1) >= 0.6
+  ) {
+    status = 'duplicate_heavy_window'
+    action = 'The latest domain window found candidates, but most were already indexed. Continue profile rotation and consider broadening query groups for this domain.'
+  } else if (belowTarget && latestImported === 0 && (latestCandidatesFound || 0) > 0) {
+    status = 'filtered_window'
+    action = 'The latest run found candidates but no new skill passed the import gates. Inspect skipped MCP and low-relevance counts before loosening quality filters.'
+  } else if (belowTarget && latestImported === 0 && latestCandidatesFound === 0) {
+    status = 'empty_search_window'
+    action = 'The latest run used its search window but found no candidates. Rotate domains or broaden GitHub queries.'
   } else if (latestStatus?.includes('error') || (latestErrors || 0) > 0) {
     status = 'degraded'
     action = 'Inspect private indexer logs before relying on automated growth.'
@@ -114,10 +169,16 @@ function buildIndexerHealth({
     latest_run_target_new: latestTargetNew,
     latest_run_imported: latestImported,
     latest_run_errors: latestErrors,
+    latest_run_search_requests: latestSearchRequests,
+    latest_run_max_search_requests: latestMaxSearchRequests,
+    latest_run_candidates_found: latestCandidatesFound,
+    latest_run_skipped_existing: latestSkippedExisting,
+    latest_run_skipped_mcp: latestSkippedMcp,
+    latest_run_skipped_low_relevance: latestSkippedLowRelevance,
     latest_effective_daily_import_rate: latestEffectiveDailyRate,
     estimated_days_to_target_at_latest_import_rate: estimatedDaysAtLatestImportRate,
     last_run_used_old_lower_target: lastRunUsedOldLowerTarget,
-    next_import_cron_utc: getNextHourlyCronIso(generatedAt),
+    next_import_cron_utc: getNextImportCronIso(generatedAt),
   }
 }
 
@@ -146,7 +207,12 @@ async function getRecentRuns() {
     imported: run.imported,
     updated: run.updated,
     errors: run.errors,
+    search_requests: run.search_requests,
+    max_search_requests: run.max_search_requests,
     candidates_found: run.candidates_found,
+    skipped_existing: run.skipped_existing,
+    skipped_mcp: run.skipped_mcp,
+    skipped_low_relevance: run.skipped_low_relevance,
     min_stars: run.min_stars,
     target_new: run.target_new,
     filter_mode: run.filter_mode,
@@ -155,6 +221,12 @@ async function getRecentRuns() {
       !Array.isArray(run.metadata) &&
       'domains_covered' in run.metadata
       ? (run.metadata as Record<string, unknown>).domains_covered
+      : undefined,
+    error_samples: run.metadata &&
+      typeof run.metadata === 'object' &&
+      !Array.isArray(run.metadata) &&
+      'error_samples' in run.metadata
+      ? (run.metadata as Record<string, unknown>).error_samples
       : undefined,
   }))
 }
@@ -186,6 +258,11 @@ export async function GET() {
     defaultTargetNewPerRun
   )
   const maxSearchRequests = Number(process.env.INDEXER_MAX_SEARCH_REQUESTS || (process.env.GITHUB_TOKEN ? 30 : 10))
+  const profileHourlyTargetNew = INDEXER_RUN_PROFILES.reduce(
+    (total, profile) => total + profile.targetNew,
+    0
+  )
+  const scheduledHourlyTargetNew = targetNew + profileHourlyTargetNew
   const effectiveCoverageTarget = resolveHighStarCoverageTarget(
     parsePositiveNumber(process.env.INDEXER_TARGET_TOTAL, HIGH_STAR_SKILL_COVERAGE_TARGET)
   )
@@ -193,7 +270,8 @@ export async function GET() {
   const filters = {
     min_stars: minStars,
     target_new_per_run: targetNew,
-    estimated_daily_capacity: targetNew * 24,
+    scheduled_hourly_target_new: scheduledHourlyTargetNew,
+    estimated_daily_capacity: scheduledHourlyTargetNew * 24,
     max_search_requests_per_run: maxSearchRequests,
     query_pool_size: HIGH_STAR_QUERY_POOL_SIZE,
     domain_rotation: 'hourly rotating query windows',
@@ -201,13 +279,22 @@ export async function GET() {
   }
   const schedule = {
     import_cron: '0 * * * *',
-    import_frequency: 'hourly on production',
+    import_frequency: 'hourly base import plus staggered domain profile imports on production',
+    profile_crons: INDEXER_RUN_PROFILES.map((profile) => ({
+      profile: profile.key,
+      path: profile.path,
+      schedule: profile.schedule,
+      domains: profile.domains,
+      target_new: profile.targetNew,
+      min_stars: profile.minStars,
+      max_search_requests: profile.maxSearchRequests,
+    })),
     star_refresh_cron: '0 3 * * *',
     star_refresh_frequency: 'daily at 03:00 UTC',
     indexnow_cron: '15 3 * * *',
     indexnow_frequency: 'daily baseline submission plus automatic submission after new skill imports',
   }
-  const estimatedDailyCapacity = targetNew * 24
+  const estimatedDailyCapacity = scheduledHourlyTargetNew * 24
   const remainingToTarget =
     typeof approvedSkillCount === 'number'
       ? Math.max(effectiveCoverageTarget - approvedSkillCount, 0)
@@ -236,6 +323,8 @@ export async function GET() {
         'The runtime target is pinned to at least the code-level 20k coverage goal, so older Vercel env values cannot stop imports early.',
       current_approved_skills: approvedSkillCount,
       remaining_to_target: remainingToTarget,
+      scheduled_hourly_target_new: scheduledHourlyTargetNew,
+      profile_hourly_target_new: profileHourlyTargetNew,
       estimated_daily_capacity: estimatedDailyCapacity,
       estimated_days_to_target_at_current_target: estimatedDaysToTarget,
       strategy:
@@ -262,6 +351,16 @@ export async function GET() {
       targeted_import: {
         supported: true,
         private_endpoint: '/api/indexer/run',
+        profile_endpoints: INDEXER_RUN_PROFILES.map((profile) => ({
+          profile: profile.key,
+          label: profile.label,
+          private_endpoint: profile.path,
+          schedule: profile.schedule,
+          domains: profile.domains,
+          target_new: profile.targetNew,
+          min_stars: profile.minStars,
+          max_search_requests: profile.maxSearchRequests,
+        })),
         example_body: {
           targetNew: 500,
           minStars: 500,

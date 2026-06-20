@@ -22,6 +22,18 @@ function parsePositiveNumber(value: unknown, fallback: number) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
 }
 
+function parseBooleanParam(value: string | null, fallback: boolean) {
+  if (value === null) return fallback
+  return value === 'true' || value === '1'
+}
+
+function parseDomainsParam(value: string | null) {
+  return (value || '')
+    .split(',')
+    .map((domain) => domain.trim())
+    .filter(Boolean)
+}
+
 function isAuthorized(request: NextRequest): boolean {
   return isAutomationAuthorized(request, ['INDEXER_SECRET', 'CRON_SECRET', 'INDEXER_TRIGGER_SECRET'])
 }
@@ -156,6 +168,8 @@ export async function GET(request: NextRequest) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  const params = request.nextUrl.searchParams
+  const domains = parseDomainsParam(params.get('domains') || params.get('domain'))
   return POST(
     new NextRequest(request.url, {
       method: 'POST',
@@ -163,17 +177,22 @@ export async function GET(request: NextRequest) {
       body: JSON.stringify({
         mode: 'bulk',
         targetNew: Math.max(
-          parsePositiveNumber(process.env.INDEXER_RUN_TARGET, DEFAULT_TARGET_NEW_PER_RUN),
+          parsePositiveNumber(params.get('targetNew'), parsePositiveNumber(process.env.INDEXER_RUN_TARGET, DEFAULT_TARGET_NEW_PER_RUN)),
           DEFAULT_TARGET_NEW_PER_RUN
         ),
         targetTotal: resolveHighStarCoverageTarget(
-          parsePositiveNumber(process.env.INDEXER_TARGET_TOTAL, HIGH_STAR_SKILL_COVERAGE_TARGET)
+          parsePositiveNumber(params.get('targetTotal'), parsePositiveNumber(process.env.INDEXER_TARGET_TOTAL, HIGH_STAR_SKILL_COVERAGE_TARGET))
         ),
-        minStars: Number(process.env.INDEXER_MIN_STARS || 500),
-        maxSearchRequests: Number(process.env.INDEXER_MAX_SEARCH_REQUESTS || (process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10)),
-        maxStaleDays: Number(process.env.INDEXER_MAX_STALE_DAYS || 1460),
-        strictQuality: process.env.INDEXER_STRICT_QUALITY === 'false' ? false : true,
-        includeCollections: process.env.INDEXER_INCLUDE_COLLECTIONS === 'true',
+        minStars: parsePositiveNumber(params.get('minStars'), parsePositiveNumber(process.env.INDEXER_MIN_STARS, 500)),
+        maxSearchRequests: parsePositiveNumber(
+          params.get('maxSearchRequests'),
+          parsePositiveNumber(process.env.INDEXER_MAX_SEARCH_REQUESTS, process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10)
+        ),
+        maxStaleDays: parsePositiveNumber(params.get('maxStaleDays'), parsePositiveNumber(process.env.INDEXER_MAX_STALE_DAYS, 1460)),
+        strictQuality: parseBooleanParam(params.get('strictQuality'), process.env.INDEXER_STRICT_QUALITY === 'false' ? false : true),
+        includeCollections: parseBooleanParam(params.get('includeCollections'), process.env.INDEXER_INCLUDE_COLLECTIONS === 'true'),
+        ...(domains.length > 0 ? { domains } : {}),
+        ...(params.get('pageSeed') ? { pageSeed: parsePositiveNumber(params.get('pageSeed'), 0) } : {}),
       }),
     })
   )

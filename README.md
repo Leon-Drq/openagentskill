@@ -145,6 +145,7 @@ Current import rules:
 - Total approved-skill coverage is pinned to at least 20,000, so old `INDEXER_TARGET_TOTAL` values cannot stop production imports early.
 - Search budget is controlled by `INDEXER_MAX_SEARCH_REQUESTS`.
 - Search windows rotate across domain query groups each hour, including finance, World Cup/sports analytics, marketing, legal, education, support, productivity, Web3, and other vertical workflows.
+- Production runs one base hourly import plus three staggered domain profile crons: coding/data at minute 10, finance/research/sports at minute 25, and growth/ops/security/legal/education at minute 40.
 - MCP and Model Context Protocol repositories are excluded from automated imports.
 - Newly imported or updated skill URLs are automatically submitted through the protected IndexNow notification route.
 - A daily baseline IndexNow cron refreshes core discovery pages and the sitemap.
@@ -164,6 +165,11 @@ POST /api/indexer/run
   "domains": ["finance"],
   "maxSearchRequests": 100
 }
+
+# Staggered production cron profile routes
+GET /api/indexer/run/coding-data
+GET /api/indexer/run/finance-research
+GET /api/indexer/run/growth-ops
 
 # Inspect recent import summaries
 GET /api/indexer/logs

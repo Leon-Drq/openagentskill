@@ -5,6 +5,18 @@
       "schedule": "0 * * * *"
     },
     {
+      "path": "/api/indexer/run/coding-data",
+      "schedule": "10 * * * *"
+    },
+    {
+      "path": "/api/indexer/run/finance-research",
+      "schedule": "25 * * * *"
+    },
+    {
+      "path": "/api/indexer/run/growth-ops",
+      "schedule": "40 * * * *"
+    },
+    {
       "path": "/api/indexer/refresh-stars",
       "schedule": "0 3 * * *"
     },

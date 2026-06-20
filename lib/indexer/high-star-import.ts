@@ -77,6 +77,7 @@ export interface BulkImportSummary {
   imported: number
   updated: number
   errors: number
+  errorSamples: Array<{ repo: string; reason?: string }>
 }
 
 const GITHUB_API_BASE = 'https://api.github.com'
@@ -1850,6 +1851,7 @@ export async function bulkImportHighStarSkills(
     imported: 0,
     updated: 0,
     errors: 0,
+    errorSamples: [],
   }
 
   if (targetNew === 0) {
@@ -1900,6 +1902,10 @@ export async function bulkImportHighStarSkills(
         status: 'error',
         reason: error instanceof Error ? error.message : 'GitHub search failed',
       })
+      summary.errorSamples = results
+        .filter((result) => result.status === 'error')
+        .slice(-5)
+        .map((result) => ({ repo: result.repo, reason: result.reason }))
       continue
     }
 
@@ -1966,6 +1972,10 @@ export async function bulkImportHighStarSkills(
       if (error) {
         summary.errors += 1
         results.push({ repo: repo.full_name, status: 'error', slug, reason: error.message })
+        summary.errorSamples = results
+          .filter((result) => result.status === 'error')
+          .slice(-5)
+          .map((result) => ({ repo: result.repo, reason: result.reason }))
         continue
       }
 
@@ -2014,6 +2024,7 @@ export async function bulkImportHighStarSkills(
       requested_domains: requestedDomains,
       query_pool_size: queryPool.length,
       domains_covered: summary.domainsCovered,
+      error_samples: summary.errorSamples,
       discovery_domains: HIGH_STAR_DISCOVERY_DOMAINS,
     },
   })
