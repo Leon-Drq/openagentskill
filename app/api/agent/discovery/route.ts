@@ -96,6 +96,9 @@ function buildIndexerHealth({
   const latestCandidatesFound = toNumber(latestRun?.candidates_found)
   const latestPageSeed = toNumber(latestRun?.page_seed)
   const latestDuplicateRecoveryUsed = toNumber(latestRun?.duplicate_recovery_used)
+  const latestSearchDelayMs = toNumber(latestRun?.search_delay_ms)
+  const latestRateLimitRetries = toNumber(latestRun?.rate_limit_retries)
+  const latestRateLimitWaitMs = toNumber(latestRun?.rate_limit_wait_ms)
   const latestSkippedExisting = toNumber(latestRun?.skipped_existing)
   const latestSkippedMcp = toNumber(latestRun?.skipped_mcp)
   const latestSkippedLowRelevance = toNumber(latestRun?.skipped_low_relevance)
@@ -181,6 +184,9 @@ function buildIndexerHealth({
     latest_run_candidates_found: latestCandidatesFound,
     latest_run_page_seed: latestPageSeed,
     latest_run_duplicate_recovery_used: latestDuplicateRecoveryUsed,
+    latest_run_search_delay_ms: latestSearchDelayMs,
+    latest_run_rate_limit_retries: latestRateLimitRetries,
+    latest_run_rate_limit_wait_ms: latestRateLimitWaitMs,
     latest_run_skipped_existing: latestSkippedExisting,
     latest_run_skipped_mcp: latestSkippedMcp,
     latest_run_skipped_low_relevance: latestSkippedLowRelevance,
@@ -263,6 +269,24 @@ async function getRecentRuns() {
       !Array.isArray(run.metadata) &&
       'duplicate_recovery_used' in run.metadata
       ? (run.metadata as Record<string, unknown>).duplicate_recovery_used
+      : undefined,
+    search_delay_ms: run.metadata &&
+      typeof run.metadata === 'object' &&
+      !Array.isArray(run.metadata) &&
+      'search_delay_ms' in run.metadata
+      ? (run.metadata as Record<string, unknown>).search_delay_ms
+      : undefined,
+    rate_limit_retries: run.metadata &&
+      typeof run.metadata === 'object' &&
+      !Array.isArray(run.metadata) &&
+      'rate_limit_retries' in run.metadata
+      ? (run.metadata as Record<string, unknown>).rate_limit_retries
+      : undefined,
+    rate_limit_wait_ms: run.metadata &&
+      typeof run.metadata === 'object' &&
+      !Array.isArray(run.metadata) &&
+      'rate_limit_wait_ms' in run.metadata
+      ? (run.metadata as Record<string, unknown>).rate_limit_wait_ms
       : undefined,
     domains_covered: run.metadata &&
       typeof run.metadata === 'object' &&

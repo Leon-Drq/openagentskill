@@ -153,6 +153,7 @@ Current import rules:
 - Per-run target is controlled by `INDEXER_RUN_TARGET`.
 - Total approved-skill coverage is pinned to at least 20,000, so old `INDEXER_TARGET_TOTAL` values cannot stop production imports early.
 - Search budget is controlled by `INDEXER_MAX_SEARCH_REQUESTS`.
+- GitHub search pacing is controlled by `INDEXER_GITHUB_SEARCH_DELAY_MS` and defaults to a small delay when `GITHUB_TOKEN` is present, with one bounded retry for GitHub Search rate-limit responses.
 - Search windows rotate across domain query groups each hour, including finance, World Cup/sports analytics, marketing, legal, education, support, productivity, Web3, and other vertical workflows.
 - Production runs one base hourly import plus four staggered domain profile crons: coding/data at minute 10, finance/research/sports at minute 25, growth/ops/security/legal/education at minute 40, and frontier ML/media/design/science/Web3/robotics coverage at minute 55.
 - Domain profile imports rotate GitHub result pages hourly through `pageSeed`, so duplicate-heavy domains do not keep rescanning the same first-page repositories.

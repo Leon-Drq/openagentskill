@@ -71,6 +71,9 @@ export interface BulkImportSummary {
   searchRequests: number
   duplicateRecoverySearchRequests: number
   duplicateRecoveryUsed: number
+  searchDelayMs: number
+  rateLimitRetries: number
+  rateLimitWaitMs: number
   candidatesFound: number
   skippedExisting: number
   skippedMcp: number
@@ -91,6 +94,9 @@ const DEFAULT_DOMAIN_SEARCH_REQUESTS = 80
 const MAX_TOKEN_SEARCH_REQUESTS = 120
 const DEFAULT_MAX_STALE_DAYS = 1460
 const EXISTING_SLUG_PAGE_SIZE = 1000
+const DEFAULT_GITHUB_SEARCH_DELAY_MS = 1200
+const MAX_RATE_LIMIT_RETRIES = 1
+const RATE_LIMIT_RETRY_CAP_MS = 8_000
 export const HIGH_STAR_INDEXER_VERSION = 'scenario-coverage-v3-20k'
 export const HIGH_STAR_SKILL_COVERAGE_TARGET = 20_000
 
@@ -1574,6 +1580,38 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max)
 }
 
+function parseNonNegativeInteger(value: string | undefined, fallback: number) {
+  const parsed = Math.floor(Number(value))
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
+}
+
+function sleep(ms: number) {
+  if (ms <= 0) return Promise.resolve()
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function parseRateLimitWaitMs(response: Response) {
+  const retryAfter = Number(response.headers.get('retry-after') || 0)
+  if (Number.isFinite(retryAfter) && retryAfter > 0) {
+    return Math.min(retryAfter * 1000, RATE_LIMIT_RETRY_CAP_MS)
+  }
+
+  const resetSeconds = Number(response.headers.get('x-ratelimit-reset') || 0)
+  if (Number.isFinite(resetSeconds) && resetSeconds > 0) {
+    const waitMs = resetSeconds * 1000 - Date.now() + 500
+    if (waitMs > 0) return Math.min(waitMs, RATE_LIMIT_RETRY_CAP_MS)
+  }
+
+  return Math.min(DEFAULT_GITHUB_SEARCH_DELAY_MS * 2, RATE_LIMIT_RETRY_CAP_MS)
+}
+
+function isGitHubRateLimitResponse(response: Response, body: string) {
+  if (response.status === 429) return true
+  if (response.status !== 403) return false
+
+  return /rate limit|secondary rate limit|abuse detection/i.test(body)
+}
+
 function normalizeSlug(fullName: string) {
   return fullName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 }
@@ -1767,17 +1805,38 @@ async function searchGitHubRepos(
     `?q=${encodeURIComponent(q)}` +
     `&sort=${query.sort || 'stars'}&order=desc&per_page=${perPage}&page=${page}`
 
-  const response = await fetch(url, { headers: githubHeaders() } as RequestInit)
+  let rateLimitRetries = 0
+  let rateLimitWaitMs = 0
+  let response = await fetch(url, { headers: githubHeaders() } as RequestInit)
 
   if (!response.ok) {
-    const body = await response.text()
-    throw new Error(`GitHub search failed [${q} page=${page}]: ${response.status} ${body}`)
+    let body = await response.text()
+
+    if (
+      isGitHubRateLimitResponse(response, body) &&
+      rateLimitRetries < MAX_RATE_LIMIT_RETRIES
+    ) {
+      const waitMs = parseRateLimitWaitMs(response)
+      rateLimitRetries += 1
+      rateLimitWaitMs += waitMs
+      await sleep(waitMs)
+      response = await fetch(url, { headers: githubHeaders() } as RequestInit)
+      if (!response.ok) body = await response.text()
+    }
+
+    if (!response.ok) {
+      throw new Error(`GitHub search failed [${q} page=${page}]: ${response.status} ${body}`)
+    }
   }
 
   const data = (await response.json()) as GitHubSearchResponse
-  return (data.items || []).filter(
-    (repo) => !repo.archived && !repo.fork && repo.stargazers_count >= minStars
-  )
+  return {
+    repos: (data.items || []).filter(
+      (repo) => !repo.archived && !repo.fork && repo.stargazers_count >= minStars
+    ),
+    rateLimitRetries,
+    rateLimitWaitMs,
+  }
 }
 
 function getSearchPlan(maxSearchRequests: number, pageSeed: number, queryPool: HighStarQuery[]) {
@@ -1830,6 +1889,14 @@ export async function bulkImportHighStarSkills(
   const strictQuality = options.strictQuality !== false
   const maxStaleDays = Math.max(30, Math.floor(options.maxStaleDays || DEFAULT_MAX_STALE_DAYS))
   const includeCollections = options.includeCollections === true
+  const searchDelayMs = clamp(
+    parseNonNegativeInteger(
+      process.env.INDEXER_GITHUB_SEARCH_DELAY_MS,
+      process.env.GITHUB_TOKEN ? DEFAULT_GITHUB_SEARCH_DELAY_MS : 0
+    ),
+    0,
+    5_000
+  )
   const startedAt = new Date().toISOString()
   const serverSecret = process.env.INDEXER_SECRET
 
@@ -1859,6 +1926,9 @@ export async function bulkImportHighStarSkills(
     searchRequests: 0,
     duplicateRecoverySearchRequests,
     duplicateRecoveryUsed: 0,
+    searchDelayMs,
+    rateLimitRetries: 0,
+    rateLimitWaitMs: 0,
     candidatesFound: 0,
     skippedExisting: 0,
     skippedMcp: 0,
@@ -1924,7 +1994,11 @@ export async function bulkImportHighStarSkills(
 
     let repos: GitHubSearchRepo[]
     try {
-      repos = await searchGitHubRepos(query, minStars, page, perPage)
+      if (summary.searchRequests > 1) await sleep(searchDelayMs)
+      const searchResult = await searchGitHubRepos(query, minStars, page, perPage)
+      repos = searchResult.repos
+      summary.rateLimitRetries += searchResult.rateLimitRetries
+      summary.rateLimitWaitMs += searchResult.rateLimitWaitMs
     } catch (error) {
       summary.errors += 1
       results.push({
@@ -2034,6 +2108,8 @@ export async function bulkImportHighStarSkills(
     search_requests: summary.searchRequests,
     duplicate_recovery_search_requests: duplicateRecoverySearchRequests,
     duplicate_recovery_used: summary.duplicateRecoveryUsed,
+    rate_limit_retries: summary.rateLimitRetries,
+    rate_limit_wait_ms: summary.rateLimitWaitMs,
     candidates_found: summary.candidatesFound,
     skipped_existing: summary.skippedExisting,
     skipped_mcp: summary.skippedMcp,
@@ -2050,6 +2126,9 @@ export async function bulkImportHighStarSkills(
       duplicate_recovery_search_requests: duplicateRecoverySearchRequests,
       duplicate_recovery_used: summary.duplicateRecoveryUsed,
       duplicate_recovery_triggered: summary.duplicateRecoveryUsed > 0,
+      search_delay_ms: searchDelayMs,
+      rate_limit_retries: summary.rateLimitRetries,
+      rate_limit_wait_ms: summary.rateLimitWaitMs,
       target_total: targetTotal,
       existing_approved: existing.count,
       remaining_to_target: remainingToTarget,
