@@ -107,6 +107,7 @@ export async function POST(request: NextRequest) {
         maxStaleDays,
         strictQuality,
         includeCollections,
+        duplicateRecoverySearchRequests: Math.max(Number(body.duplicateRecoverySearchRequests) || 0, 0),
       })
       console.log('[indexer] Bulk import complete:', result.summary)
       const indexingUrls = collectIndexNowUrlsFromIndexerResults(result.results)
@@ -188,6 +189,7 @@ export async function GET(request: NextRequest) {
           params.get('maxSearchRequests'),
           parsePositiveNumber(process.env.INDEXER_MAX_SEARCH_REQUESTS, process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10)
         ),
+        duplicateRecoverySearchRequests: parsePositiveNumber(params.get('duplicateRecoverySearchRequests'), 0),
         maxStaleDays: parsePositiveNumber(params.get('maxStaleDays'), parsePositiveNumber(process.env.INDEXER_MAX_STALE_DAYS, 1460)),
         strictQuality: parseBooleanParam(params.get('strictQuality'), process.env.INDEXER_STRICT_QUALITY === 'false' ? false : true),
         includeCollections: parseBooleanParam(params.get('includeCollections'), process.env.INDEXER_INCLUDE_COLLECTIONS === 'true'),

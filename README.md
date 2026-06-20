@@ -147,6 +147,7 @@ Current import rules:
 - Search windows rotate across domain query groups each hour, including finance, World Cup/sports analytics, marketing, legal, education, support, productivity, Web3, and other vertical workflows.
 - Production runs one base hourly import plus three staggered domain profile crons: coding/data at minute 10, finance/research/sports at minute 25, and growth/ops/security/legal/education at minute 40.
 - Domain profile imports rotate GitHub result pages hourly through `pageSeed`, so duplicate-heavy domains do not keep rescanning the same first-page repositories.
+- Duplicate-heavy domain windows can run a small recovery search budget after the primary window to reach deeper GitHub results while keeping each profile under the normal search-rate ceiling.
 - MCP and Model Context Protocol repositories are excluded from automated imports.
 - Newly imported or updated skill URLs are automatically submitted through the protected IndexNow notification route.
 - A daily baseline IndexNow cron refreshes core discovery pages and the sitemap.

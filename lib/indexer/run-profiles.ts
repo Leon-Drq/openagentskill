@@ -7,6 +7,7 @@ export interface IndexerRunProfile {
   targetNew: number
   minStars: number
   maxSearchRequests: number
+  duplicateRecoverySearchRequests: number
   strictQuality: boolean
   includeCollections: boolean
 }
@@ -21,6 +22,7 @@ export const INDEXER_RUN_PROFILES: IndexerRunProfile[] = [
     targetNew: 250,
     minStars: 500,
     maxSearchRequests: 25,
+    duplicateRecoverySearchRequests: 5,
     strictQuality: true,
     includeCollections: false,
   },
@@ -33,6 +35,7 @@ export const INDEXER_RUN_PROFILES: IndexerRunProfile[] = [
     targetNew: 250,
     minStars: 500,
     maxSearchRequests: 25,
+    duplicateRecoverySearchRequests: 5,
     strictQuality: true,
     includeCollections: false,
   },
@@ -53,6 +56,7 @@ export const INDEXER_RUN_PROFILES: IndexerRunProfile[] = [
     targetNew: 250,
     minStars: 500,
     maxSearchRequests: 25,
+    duplicateRecoverySearchRequests: 5,
     strictQuality: true,
     includeCollections: false,
   },

@@ -54,6 +54,7 @@ export interface BulkImportOptions {
   strictQuality?: boolean
   maxStaleDays?: number
   includeCollections?: boolean
+  duplicateRecoverySearchRequests?: number
 }
 
 export interface BulkImportSummary {
@@ -68,6 +69,8 @@ export interface BulkImportSummary {
   queryPoolSize: number
   domainsCovered: string[]
   searchRequests: number
+  duplicateRecoverySearchRequests: number
+  duplicateRecoveryUsed: number
   candidatesFound: number
   skippedExisting: number
   skippedMcp: number
@@ -1792,6 +1795,15 @@ function getSearchPlan(maxSearchRequests: number, pageSeed: number, queryPool: H
   return plan
 }
 
+function shouldRunDuplicateRecovery(summary: BulkImportSummary, primarySearchRequests: number) {
+  if (summary.searchRequests < primarySearchRequests) return false
+  if (summary.imported > 0) return false
+  if (summary.candidatesFound < 50) return false
+
+  const duplicateRate = summary.skippedExisting / Math.max(summary.candidatesFound, 1)
+  return duplicateRate >= 0.5
+}
+
 export async function bulkImportHighStarSkills(
   options: BulkImportOptions = {}
 ): Promise<{ summary: BulkImportSummary; results: Array<{ repo: string; status: string; slug?: string; reason?: string }> }> {
@@ -1808,6 +1820,11 @@ export async function bulkImportHighStarSkills(
     Math.floor(options.maxSearchRequests || (process.env.GITHUB_TOKEN ? defaultSearchRequests : 10)),
     1,
     maxAllowedSearchRequests
+  )
+  const duplicateRecoverySearchRequests = clamp(
+    Math.floor(options.duplicateRecoverySearchRequests || 0),
+    0,
+    process.env.GITHUB_TOKEN ? Math.max(0, MAX_TOKEN_SEARCH_REQUESTS - maxSearchRequests) : 0
   )
   const pageSeed = Math.max(0, Math.floor(options.pageSeed ?? Math.floor(Date.now() / 3_600_000)))
   const strictQuality = options.strictQuality !== false
@@ -1840,6 +1857,8 @@ export async function bulkImportHighStarSkills(
     queryPoolSize: queryPool.length,
     domainsCovered: [],
     searchRequests: 0,
+    duplicateRecoverySearchRequests,
+    duplicateRecoveryUsed: 0,
     candidatesFound: 0,
     skippedExisting: 0,
     skippedMcp: 0,
@@ -1885,10 +1904,22 @@ export async function bulkImportHighStarSkills(
     return { summary, results }
   }
 
-  for (const { query, page } of getSearchPlan(maxSearchRequests, pageSeed, queryPool)) {
+  const searchPlan = getSearchPlan(
+    maxSearchRequests + duplicateRecoverySearchRequests,
+    pageSeed,
+    queryPool
+  )
+
+  for (const [index, { query, page }] of searchPlan.entries()) {
     if (summary.imported >= targetNew) break
+    const isRecoveryWindow = index >= maxSearchRequests
+
+    if (isRecoveryWindow && !shouldRunDuplicateRecovery(summary, maxSearchRequests)) {
+      break
+    }
 
     summary.searchRequests += 1
+    if (isRecoveryWindow) summary.duplicateRecoveryUsed += 1
     if (query.domain) domainsCovered.add(query.domain)
 
     let repos: GitHubSearchRepo[]
@@ -2001,6 +2032,8 @@ export async function bulkImportHighStarSkills(
     min_stars: minStars,
     max_search_requests: maxSearchRequests,
     search_requests: summary.searchRequests,
+    duplicate_recovery_search_requests: duplicateRecoverySearchRequests,
+    duplicate_recovery_used: summary.duplicateRecoveryUsed,
     candidates_found: summary.candidatesFound,
     skipped_existing: summary.skippedExisting,
     skipped_mcp: summary.skippedMcp,
@@ -2014,6 +2047,9 @@ export async function bulkImportHighStarSkills(
     metadata: {
       page_seed: pageSeed,
       per_page: perPage,
+      duplicate_recovery_search_requests: duplicateRecoverySearchRequests,
+      duplicate_recovery_used: summary.duplicateRecoveryUsed,
+      duplicate_recovery_triggered: summary.duplicateRecoveryUsed > 0,
       target_total: targetTotal,
       existing_approved: existing.count,
       remaining_to_target: remainingToTarget,

@@ -95,9 +95,13 @@ function buildIndexerHealth({
   const latestMaxSearchRequests = toNumber(latestRun?.max_search_requests)
   const latestCandidatesFound = toNumber(latestRun?.candidates_found)
   const latestPageSeed = toNumber(latestRun?.page_seed)
+  const latestDuplicateRecoveryUsed = toNumber(latestRun?.duplicate_recovery_used)
   const latestSkippedExisting = toNumber(latestRun?.skipped_existing)
   const latestSkippedMcp = toNumber(latestRun?.skipped_mcp)
   const latestSkippedLowRelevance = toNumber(latestRun?.skipped_low_relevance)
+  const latestSkippedStale = toNumber(latestRun?.skipped_stale)
+  const latestSkippedCollections = toNumber(latestRun?.skipped_collections)
+  const latestSkippedWeakMetadata = toNumber(latestRun?.skipped_weak_metadata)
   const belowTarget = typeof remainingToTarget === 'number' && remainingToTarget > 0
   const latestEffectiveDailyRate =
     latestImported === null ? null : latestImported * 24
@@ -140,7 +144,9 @@ function buildIndexerHealth({
     (latestSkippedExisting || 0) / Math.max(latestCandidatesFound || 1, 1) >= 0.6
   ) {
     status = 'duplicate_heavy_window'
-    action = 'The latest domain window found candidates, but most were already indexed. Continue profile rotation and consider broadening query groups for this domain.'
+    action = latestDuplicateRecoveryUsed && latestDuplicateRecoveryUsed > 0
+      ? 'The latest domain window used duplicate-recovery search but still found mostly indexed candidates. Broaden query groups or add a lower-star high-quality lane for this domain.'
+      : 'The latest domain window found candidates, but most were already indexed. Duplicate-recovery search should run on duplicate-heavy profile windows.'
   } else if (belowTarget && latestImported === 0 && (latestCandidatesFound || 0) > 0) {
     status = 'filtered_window'
     action = 'The latest run found candidates but no new skill passed the import gates. Inspect skipped MCP and low-relevance counts before loosening quality filters.'
@@ -174,9 +180,13 @@ function buildIndexerHealth({
     latest_run_max_search_requests: latestMaxSearchRequests,
     latest_run_candidates_found: latestCandidatesFound,
     latest_run_page_seed: latestPageSeed,
+    latest_run_duplicate_recovery_used: latestDuplicateRecoveryUsed,
     latest_run_skipped_existing: latestSkippedExisting,
     latest_run_skipped_mcp: latestSkippedMcp,
     latest_run_skipped_low_relevance: latestSkippedLowRelevance,
+    latest_run_skipped_stale: latestSkippedStale,
+    latest_run_skipped_collections: latestSkippedCollections,
+    latest_run_skipped_weak_metadata: latestSkippedWeakMetadata,
     latest_effective_daily_import_rate: latestEffectiveDailyRate,
     estimated_days_to_target_at_latest_import_rate: estimatedDaysAtLatestImportRate,
     last_run_used_old_lower_target: lastRunUsedOldLowerTarget,
@@ -215,6 +225,24 @@ async function getRecentRuns() {
     skipped_existing: run.skipped_existing,
     skipped_mcp: run.skipped_mcp,
     skipped_low_relevance: run.skipped_low_relevance,
+    skipped_stale: run.metadata &&
+      typeof run.metadata === 'object' &&
+      !Array.isArray(run.metadata) &&
+      'skipped_stale' in run.metadata
+      ? (run.metadata as Record<string, unknown>).skipped_stale
+      : undefined,
+    skipped_collections: run.metadata &&
+      typeof run.metadata === 'object' &&
+      !Array.isArray(run.metadata) &&
+      'skipped_collections' in run.metadata
+      ? (run.metadata as Record<string, unknown>).skipped_collections
+      : undefined,
+    skipped_weak_metadata: run.metadata &&
+      typeof run.metadata === 'object' &&
+      !Array.isArray(run.metadata) &&
+      'skipped_weak_metadata' in run.metadata
+      ? (run.metadata as Record<string, unknown>).skipped_weak_metadata
+      : undefined,
     min_stars: run.min_stars,
     target_new: run.target_new,
     filter_mode: run.filter_mode,
@@ -223,6 +251,18 @@ async function getRecentRuns() {
       !Array.isArray(run.metadata) &&
       'page_seed' in run.metadata
       ? (run.metadata as Record<string, unknown>).page_seed
+      : undefined,
+    duplicate_recovery_search_requests: run.metadata &&
+      typeof run.metadata === 'object' &&
+      !Array.isArray(run.metadata) &&
+      'duplicate_recovery_search_requests' in run.metadata
+      ? (run.metadata as Record<string, unknown>).duplicate_recovery_search_requests
+      : undefined,
+    duplicate_recovery_used: run.metadata &&
+      typeof run.metadata === 'object' &&
+      !Array.isArray(run.metadata) &&
+      'duplicate_recovery_used' in run.metadata
+      ? (run.metadata as Record<string, unknown>).duplicate_recovery_used
       : undefined,
     domains_covered: run.metadata &&
       typeof run.metadata === 'object' &&
@@ -296,6 +336,7 @@ export async function GET() {
       target_new: profile.targetNew,
       min_stars: profile.minStars,
       max_search_requests: profile.maxSearchRequests,
+      duplicate_recovery_search_requests: profile.duplicateRecoverySearchRequests,
     })),
     star_refresh_cron: '0 3 * * *',
     star_refresh_frequency: 'daily at 03:00 UTC',
@@ -368,6 +409,7 @@ export async function GET() {
           target_new: profile.targetNew,
           min_stars: profile.minStars,
           max_search_requests: profile.maxSearchRequests,
+          duplicate_recovery_search_requests: profile.duplicateRecoverySearchRequests,
         })),
         example_body: {
           targetNew: 500,
