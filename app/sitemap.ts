@@ -104,6 +104,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: Number(skill.stars || 0) >= 500 ? 0.76 : 0.68,
     }))
 
+  const evalPages: MetadataRoute.Sitemap = FEATURED_SKILL_SITEMAP_ENTRIES
+    .map((skill) => ({
+      url: `${baseUrl}/skills/${skill.slug}/evals`,
+      lastModified: new Date(skill.updatedAt),
+      changeFrequency: 'weekly',
+      priority: Number(skill.stars || 0) >= 500 ? 0.78 : 0.7,
+    }))
+
   const useCasePages: MetadataRoute.Sitemap = USE_CASES.map((useCase) => ({
     url: `${baseUrl}/use-cases/${useCase.slug}`,
     lastModified: new Date(),
@@ -207,6 +215,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...blogUseCasePages,
     ...skillPages,
     ...auditPages,
+    ...evalPages,
     ...alternativePages,
   ]
 }

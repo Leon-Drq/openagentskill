@@ -93,6 +93,7 @@ export interface AgentReadableSkillMetadata {
     web: string
     api: string
     audit: string
+    eval: string
     resolve: string
     install: string
     manifest: string
@@ -150,6 +151,7 @@ export function buildAgentReadableSkillMetadata(
   const installPath = `/api/skills/${skill.slug}/install`
   const manifestPath = `/api/registry/manifest/${skill.slug}`
   const auditPath = `/skills/${skill.slug}/audit`
+  const evalPath = `/api/agent/evals?slug=${encodeURIComponent(skill.slug)}&task=${encodeURIComponent(task)}&max_risk=medium`
 
   const suitedTasks = uniqueStrings(
     [
@@ -285,6 +287,7 @@ export function buildAgentReadableSkillMetadata(
       web: absoluteUrl(baseUrl, `/skills/${skill.slug}`),
       api: absoluteUrl(baseUrl, `/api/agent/skills/${skill.slug}`),
       audit: absoluteUrl(baseUrl, auditPath),
+      eval: absoluteUrl(baseUrl, evalPath),
       resolve: absoluteUrl(baseUrl, resolvePath),
       install: absoluteUrl(baseUrl, installPath),
       manifest: absoluteUrl(baseUrl, manifestPath),

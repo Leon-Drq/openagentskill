@@ -26,14 +26,16 @@ Preferred agent flow:
 1. Read this file.
 2. Choose a task from /tasks or /api/agent/tasks.
 3. Call /api/agent/resolve with a natural-language task.
-4. Fetch /api/agent/skills/{slug} for the selected skill.
-5. Fetch /api/skills/{slug}/install?format=text before installing.
+4. Fetch /api/agent/evals?slug={slug}&task={task}&format=text and follow the eval decision.
+5. Fetch /api/agent/skills/{slug} for the selected skill.
+6. Fetch /api/skills/{slug}/install?format=text before installing.
 
 Important URLs:
 - Agent entry: https://www.openagentskill.com/agent
 - Tasks: https://www.openagentskill.com/tasks
 - Task API: https://www.openagentskill.com/api/agent/tasks
 - Resolve API: https://www.openagentskill.com/api/agent/resolve
+- Skill Eval API: https://www.openagentskill.com/api/agent/evals?slug=crawl4ai
 - Skill search API: https://www.openagentskill.com/api/skills/search
 - Safety gate: https://www.openagentskill.com/safety
 - Agent manifest: https://www.openagentskill.com/.well-known/agent-manifest.json
@@ -52,6 +54,7 @@ Coverage:
 
 Install safety:
 - Prefer /api/agent/resolve over raw search because it applies the OpenAgentSkill safety gate.
+- Prefer /api/agent/evals?slug={slug} before installation because it returns the Trust + Eval contract, blockers, and validation plan.
 - Treat safety_gate.blocked as "do not auto-install".
 - Treat safety_gate.experimental as manual test only.
 - Treat safety_gate.reviewed as human-review-before-install unless auto_install_policy is allow.

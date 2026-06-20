@@ -320,10 +320,28 @@ export default function APIDocsPage() {
             </div>
             <div className="p-4 sm:p-6">
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
-                {'Run fixed regression checks against task-to-skill recommendation quality. Use this before changing ranking logic or import filters.'}
+                {'Run registry regression checks, or pass slug={skill} to fetch a pre-install Trust + Eval contract for one skill. Agents should call the per-skill eval before installing a reusable skill into a workspace.'}
               </p>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
-                <code>{'GET /api/agent/evals'}</code>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                  <code>{'GET /api/agent/evals'}</code>
+                </div>
+                <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                  <code>{'GET /api/agent/evals?slug=crawl4ai&task=scrape+pricing+pages&format=text'}</code>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-px border border-border bg-border text-sm md:grid-cols-2">
+                {[
+                  ['eval.status', 'passed, review, or failed'],
+                  ['eval.decision', 'shortlist, manual_review, or do_not_auto_install'],
+                  ['eval.checks', 'Required install gates plus supporting trust checks'],
+                  ['eval.validation_plan', 'Concrete sandbox verification steps before production use'],
+                ].map(([field, detail]) => (
+                  <div key={field} className="min-w-0 bg-background p-3">
+                    <code className="font-mono text-xs">{field}</code>
+                    <p className="mt-2 text-xs leading-relaxed text-secondary">{detail}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

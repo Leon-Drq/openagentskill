@@ -701,6 +701,12 @@ export default async function SkillDetailPage({
                       Public audit
                     </Link>
                     <Link
+                      href={`/skills/${skill.slug}/evals`}
+                      className="rounded-[6px] border border-border px-2.5 py-1 text-xs text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                    >
+                      Eval report
+                    </Link>
+                    <Link
                       href={resolveApiHref}
                       prefetch={false}
                       className="rounded-[6px] border border-border px-2.5 py-1 text-xs text-secondary transition-colors hover:border-foreground hover:text-foreground"
@@ -1145,6 +1151,12 @@ export default async function SkillDetailPage({
                     className="w-full rounded-[8px] border border-foreground bg-foreground px-4 py-2.5 text-center text-sm font-semibold text-background transition-opacity hover:opacity-80 sm:w-auto"
                   >
                     View audit report
+                  </Link>
+                  <Link
+                    href={`/skills/${skill.slug}/evals`}
+                    className="w-full rounded-[8px] border border-border px-4 py-2.5 text-center text-sm font-semibold text-foreground transition-colors hover:border-foreground sm:w-auto"
+                  >
+                    View eval report
                   </Link>
                 </div>
               </section>
@@ -1794,6 +1806,12 @@ export default async function SkillDetailPage({
                     className="mx-5 mb-5 block rounded-[8px] border border-border px-3 py-2.5 text-center text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
                   >
                     Open full audit
+                  </Link>
+                  <Link
+                    href={`/skills/${skill.slug}/evals`}
+                    className="mx-5 mb-5 block rounded-[8px] border border-border px-3 py-2.5 text-center text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                  >
+                    Open eval report
                   </Link>
                 </div>
               )}

@@ -7,12 +7,18 @@ import {
   HIGH_STAR_INDEXER_VERSION,
   HIGH_STAR_QUERY_POOL_SIZE,
   HIGH_STAR_SKILL_COVERAGE_TARGET,
+  resolveHighStarCoverageTarget,
 } from '@/lib/indexer/high-star-import'
 import { FEATURED_SKILL_CLUSTERS, SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
 
 export const dynamic = 'force-dynamic'
 
 const DISCOVERY_QUERY_TIMEOUT_MS = 1000
+
+function parsePositiveNumber(value: unknown, fallback: number) {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
+}
 
 async function getRecentRuns() {
   const serverSecret = process.env.INDEXER_SECRET
@@ -72,8 +78,15 @@ async function getApprovedSkillCount() {
 
 export async function GET() {
   const minStars = Number(process.env.INDEXER_MIN_STARS || 500)
-  const targetNew = Number(process.env.INDEXER_RUN_TARGET || 25)
+  const defaultTargetNewPerRun = 250
+  const targetNew = Math.max(
+    parsePositiveNumber(process.env.INDEXER_RUN_TARGET, defaultTargetNewPerRun),
+    defaultTargetNewPerRun
+  )
   const maxSearchRequests = Number(process.env.INDEXER_MAX_SEARCH_REQUESTS || (process.env.GITHUB_TOKEN ? 30 : 10))
+  const effectiveCoverageTarget = resolveHighStarCoverageTarget(
+    parsePositiveNumber(process.env.INDEXER_TARGET_TOTAL, HIGH_STAR_SKILL_COVERAGE_TARGET)
+  )
   const [runs, approvedSkillCount] = await Promise.all([getRecentRuns(), getApprovedSkillCount()])
   const filters = {
     min_stars: minStars,
@@ -95,7 +108,7 @@ export async function GET() {
   const estimatedDailyCapacity = targetNew * 24
   const remainingToTarget =
     typeof approvedSkillCount === 'number'
-      ? Math.max(HIGH_STAR_SKILL_COVERAGE_TARGET - approvedSkillCount, 0)
+      ? Math.max(effectiveCoverageTarget - approvedSkillCount, 0)
       : null
   const estimatedDaysToTarget =
     remainingToTarget === null
@@ -108,19 +121,22 @@ export async function GET() {
     scope: 'skills-only',
     scale_plan: {
       indexer_version: HIGH_STAR_INDEXER_VERSION,
-      target_approved_skills: HIGH_STAR_SKILL_COVERAGE_TARGET,
+      target_approved_skills: effectiveCoverageTarget,
+      target_policy:
+        'The runtime target is pinned to at least the code-level 20k coverage goal, so older Vercel env values cannot stop imports early.',
       current_approved_skills: approvedSkillCount,
       remaining_to_target: remainingToTarget,
       estimated_daily_capacity: estimatedDailyCapacity,
       estimated_days_to_target_at_current_target: estimatedDaysToTarget,
       strategy:
-        'Grow toward a 10k+ skill registry with high-star GitHub discovery, scenario-specific query groups, MCP exclusion, trust metadata, and hourly imports.',
+        'Grow toward a 20k+ skill registry with high-star GitHub discovery, scenario-specific query groups, MCP exclusion, trust metadata, eval metadata, and hourly imports.',
       quality_gates: [
         'GitHub stars threshold',
         'archived and fork exclusion',
         'skill relevance scoring',
         'MCP-only exclusion',
         'repository freshness and metadata capture',
+        'Trust Score and pre-install Eval contract generation',
       ],
     },
     schedule,
@@ -129,7 +145,7 @@ export async function GET() {
       status: 'active',
       source: 'github_search',
       strategy: 'high-star, skills-only, cross-domain rotating discovery',
-      target_approved_skills: HIGH_STAR_SKILL_COVERAGE_TARGET,
+      target_approved_skills: effectiveCoverageTarget,
       domain_count: HIGH_STAR_DISCOVERY_DOMAINS.length,
       domains: HIGH_STAR_DISCOVERY_DOMAINS,
       targeted_import: {

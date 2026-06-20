@@ -86,8 +86,14 @@ const DEFAULT_DOMAIN_SEARCH_REQUESTS = 80
 const MAX_TOKEN_SEARCH_REQUESTS = 120
 const DEFAULT_MAX_STALE_DAYS = 1460
 const EXISTING_SLUG_PAGE_SIZE = 1000
-export const HIGH_STAR_INDEXER_VERSION = 'scenario-coverage-v2'
-export const HIGH_STAR_SKILL_COVERAGE_TARGET = 10_000
+export const HIGH_STAR_INDEXER_VERSION = 'scenario-coverage-v3-20k'
+export const HIGH_STAR_SKILL_COVERAGE_TARGET = 20_000
+
+export function resolveHighStarCoverageTarget(requestedTarget?: number | null) {
+  const parsed = Math.floor(Number(requestedTarget))
+  if (!Number.isFinite(parsed) || parsed <= 0) return HIGH_STAR_SKILL_COVERAGE_TARGET
+  return Math.max(parsed, HIGH_STAR_SKILL_COVERAGE_TARGET)
+}
 
 const CORE_HIGH_STAR_QUERIES: HighStarQuery[] = [
   {
@@ -1788,7 +1794,7 @@ export async function bulkImportHighStarSkills(
   options: BulkImportOptions = {}
 ): Promise<{ summary: BulkImportSummary; results: Array<{ repo: string; status: string; slug?: string; reason?: string }> }> {
   const requestedTargetNew = clamp(Math.floor(options.targetNew || DEFAULT_TARGET_NEW_PER_RUN), 1, 1000)
-  const targetTotal = Math.max(1, Math.floor(options.targetTotal || HIGH_STAR_SKILL_COVERAGE_TARGET))
+  const targetTotal = resolveHighStarCoverageTarget(options.targetTotal)
   const minStars = clamp(Math.floor(options.minStars || 500), 100, 1_000_000)
   const perPage = clamp(Math.floor(options.perPage || 100), 10, 100)
   const requestedDomains = normalizeRequestedDomains(options.domains)

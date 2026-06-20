@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { searchSkillRepos, type CandidateRepo } from '@/lib/indexer/github-search'
 import { processBatch, processRepo } from '@/lib/indexer/processor'
-import { bulkImportHighStarSkills, HIGH_STAR_SKILL_COVERAGE_TARGET } from '@/lib/indexer/high-star-import'
+import {
+  bulkImportHighStarSkills,
+  HIGH_STAR_SKILL_COVERAGE_TARGET,
+  resolveHighStarCoverageTarget,
+} from '@/lib/indexer/high-star-import'
 import { collectIndexNowUrlsFromIndexerResults, submitIndexNowUrls } from '@/lib/indexnow'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 
@@ -12,6 +16,11 @@ const DEFAULT_TARGET_NEW_PER_RUN = 250
 const DEFAULT_TOKEN_SEARCH_REQUESTS = 30
 const DEFAULT_DOMAIN_SEARCH_REQUESTS = 80
 const MAX_TOKEN_SEARCH_REQUESTS = 120
+
+function parsePositiveNumber(value: unknown, fallback: number) {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
+}
 
 function isAuthorized(request: NextRequest): boolean {
   return isAutomationAuthorized(request, ['INDEXER_SECRET', 'CRON_SECRET', 'INDEXER_TRIGGER_SECRET'])
@@ -55,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     if (mode !== 'reviewed') {
       const targetNew = Math.min(Math.max(Number(body.targetNew) || DEFAULT_TARGET_NEW_PER_RUN, 1), 1000)
-      const targetTotal = Math.max(Number(body.targetTotal) || HIGH_STAR_SKILL_COVERAGE_TARGET, 1)
+      const targetTotal = resolveHighStarCoverageTarget(Number(body.targetTotal) || HIGH_STAR_SKILL_COVERAGE_TARGET)
       const minStars = Math.max(Number(body.minStars) || 500, 100)
       const maxStaleDays = Math.max(Number(body.maxStaleDays) || 1460, 30)
       const strictQuality = body.strictQuality === undefined ? true : Boolean(body.strictQuality)
@@ -147,18 +156,25 @@ export async function GET(request: NextRequest) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  return POST(new NextRequest(request.url, {
-    method: 'POST',
-    headers: request.headers,
-    body: JSON.stringify({
-      mode: 'bulk',
-      targetNew: Number(process.env.INDEXER_RUN_TARGET || DEFAULT_TARGET_NEW_PER_RUN),
-      targetTotal: Number(process.env.INDEXER_TARGET_TOTAL || HIGH_STAR_SKILL_COVERAGE_TARGET),
-      minStars: Number(process.env.INDEXER_MIN_STARS || 500),
-      maxSearchRequests: Number(process.env.INDEXER_MAX_SEARCH_REQUESTS || (process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10)),
-      maxStaleDays: Number(process.env.INDEXER_MAX_STALE_DAYS || 1460),
-      strictQuality: process.env.INDEXER_STRICT_QUALITY === 'false' ? false : true,
-      includeCollections: process.env.INDEXER_INCLUDE_COLLECTIONS === 'true',
-    }),
-  }))
+  return POST(
+    new NextRequest(request.url, {
+      method: 'POST',
+      headers: request.headers,
+      body: JSON.stringify({
+        mode: 'bulk',
+        targetNew: Math.max(
+          parsePositiveNumber(process.env.INDEXER_RUN_TARGET, DEFAULT_TARGET_NEW_PER_RUN),
+          DEFAULT_TARGET_NEW_PER_RUN
+        ),
+        targetTotal: resolveHighStarCoverageTarget(
+          parsePositiveNumber(process.env.INDEXER_TARGET_TOTAL, HIGH_STAR_SKILL_COVERAGE_TARGET)
+        ),
+        minStars: Number(process.env.INDEXER_MIN_STARS || 500),
+        maxSearchRequests: Number(process.env.INDEXER_MAX_SEARCH_REQUESTS || (process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10)),
+        maxStaleDays: Number(process.env.INDEXER_MAX_STALE_DAYS || 1460),
+        strictQuality: process.env.INDEXER_STRICT_QUALITY === 'false' ? false : true,
+        includeCollections: process.env.INDEXER_INCLUDE_COLLECTIONS === 'true',
+      }),
+    })
+  )
 }

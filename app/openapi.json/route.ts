@@ -155,6 +155,24 @@ export async function GET() {
             responses: { '200': { description: 'Skill profile with agent_readable_metadata and machine_metadata fields' } },
           },
         },
+        '/api/agent/evals': {
+          get: {
+            summary: 'Run registry evals or fetch a pre-install Trust + Eval contract for one skill',
+            parameters: [
+              { name: 'slug', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'skill_slug', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'task', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'max_risk', in: 'query', required: false, schema: { type: 'string', enum: ['low', 'medium', 'high'] } },
+              { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
+            ],
+            responses: {
+              '200': {
+                description:
+                  'Without slug: registry recommendation regression checks. With slug: eval.status, eval.decision, eval.checks, eval.validation_plan, eval.machine_metadata, and install readiness for one skill.',
+              },
+            },
+          },
+        },
         '/api/skills/{slug}/install': {
           get: {
             summary: 'Get install command, agent prompt, and safety checklist',

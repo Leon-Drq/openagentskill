@@ -8,6 +8,7 @@ import { getStacksForSkill } from '@/lib/collections'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillAttribution } from '@/lib/skill-attribution'
+import { buildSkillEvalProfile } from '@/lib/skill-evals'
 import { getSkillBySlugOrFallback, getSkillSuggestionsForSlug, isCuratedSkillFallback, normalizeSkillSlug } from '@/lib/skill-fallbacks'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
@@ -69,6 +70,11 @@ export async function GET(
     const agentReadableMetadata = buildAgentReadableSkillMetadata(skill, {
       approvedClaim: Boolean(approvedClaim),
     })
+    const evalProfile = buildSkillEvalProfile(skill, {
+      approvedClaim: Boolean(approvedClaim),
+      task: `Evaluate ${skill.name} before installing it in an agent workflow`,
+      maxRisk: request.nextUrl.searchParams.get('max_risk') || 'medium',
+    })
 
     if (format === 'text') {
       const text = `${skill.name}
@@ -123,6 +129,13 @@ Agent-readable metadata:
 - Install policy: ${agentReadableMetadata.safety_gate.auto_install_policy}
 - Do not use when: ${agentReadableMetadata.do_not_use_when.slice(0, 3).join('; ')}
 
+Pre-install Eval:
+- Status: ${evalProfile.status}
+- Score: ${evalProfile.score}/100
+- Risk: ${evalProfile.risk_level}
+- Decision: ${evalProfile.decision.recommendation}
+- Eval URL: https://www.openagentskill.com/api/agent/evals?slug=${skill.slug}&format=text
+
 Repository: ${skill.repository}
 
 ---
@@ -170,6 +183,22 @@ Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
           human_review_required: safetyProfile.human_review_required,
           recommended_action: safetyProfile.safety_tier.recommended_action,
           reasons: safetyProfile.safety_tier.reasons,
+        },
+        eval: {
+          version: evalProfile.version,
+          status: evalProfile.status,
+          score: evalProfile.score,
+          risk_level: evalProfile.risk_level,
+          decision: evalProfile.decision,
+          blockers: evalProfile.blockers,
+          warnings: evalProfile.warnings,
+          validation_plan: evalProfile.validation_plan,
+          checks: evalProfile.checks,
+          endpoints: {
+            web: `https://www.openagentskill.com/skills/${skill.slug}/evals`,
+            api: `/api/agent/evals?slug=${skill.slug}`,
+            text: `/api/agent/evals?slug=${skill.slug}&format=text`,
+          },
         },
         agent_readable_metadata: agentReadableMetadata,
         machine_metadata: agentReadableMetadata,

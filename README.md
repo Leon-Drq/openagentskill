@@ -136,12 +136,13 @@ The reply draft invites the creator to claim or update the listing. It opens X W
 
 ## Auto-Discovery
 
-The indexer scans GitHub for high-signal skill repositories and imports approved matches. It now rotates across scenario-specific query groups so the catalog can expand toward 10,000+ approved skills across developer tools, finance, quant research, documents, data analysis, security, DevOps, RAG, browser automation, commerce, marketing, support, legal, education, productivity, Web3, sports analytics, ML/media, science, and robotics workflows.
+The indexer scans GitHub for high-signal skill repositories and imports approved matches. It now rotates across scenario-specific query groups so the catalog can expand toward 20,000+ approved skills across developer tools, finance, quant research, documents, data analysis, security, DevOps, RAG, browser automation, commerce, marketing, support, legal, education, productivity, Web3, sports analytics, ML/media, science, and robotics workflows.
 
 Current import rules:
 
 - Minimum GitHub stars are controlled by `INDEXER_MIN_STARS`.
 - Per-run target is controlled by `INDEXER_RUN_TARGET`.
+- Total approved-skill coverage is pinned to at least 20,000, so old `INDEXER_TARGET_TOTAL` values cannot stop production imports early.
 - Search budget is controlled by `INDEXER_MAX_SEARCH_REQUESTS`.
 - Search windows rotate across domain query groups each hour, including finance, World Cup/sports analytics, marketing, legal, education, support, productivity, Web3, and other vertical workflows.
 - MCP and Model Context Protocol repositories are excluded from automated imports.
@@ -220,6 +221,7 @@ pnpm run build
 | `INDEXER_SECRET` | Production | Bearer secret for protected indexer routes |
 | `CRON_SECRET` | Production | Bearer secret for scheduled maintenance routes |
 | `INDEXER_RUN_TARGET` | Optional | Number of new skills to import per run |
+| `INDEXER_TARGET_TOTAL` | Optional | Approved-skill coverage target; runtime never allows this below 20,000 |
 | `INDEXER_MIN_STARS` | Optional | Minimum GitHub stars for bulk imports |
 | `INDEXER_MAX_SEARCH_REQUESTS` | Optional | GitHub search request budget per run |
 | `X_CLIENT_ID` | Optional | X OAuth client ID |
@@ -287,7 +289,7 @@ scripts/
 
 - [x] Public skill directory
 - [x] GitHub auto-indexer for high-star skills
-- [x] Scenario coverage matrix for 10,000+ skill growth
+- [x] Scenario coverage matrix for 20,000+ skill growth
 - [x] Skill-only imports with MCP exclusion
 - [x] Quality and trust profiles
 - [x] Audit reports
@@ -295,7 +297,7 @@ scripts/
 - [x] README badges
 - [x] Agent recommendation API
 - [x] Programmatic SEO pages
-- [ ] Task-based skill evaluations
+- [x] Task-based skill evaluations
 - [ ] Agent-specific fit scoring for Claude Code, Codex, Cursor, and other agent surfaces
 - [x] Creator claim pages with verified ownership
 - [ ] Anonymous install and usage telemetry

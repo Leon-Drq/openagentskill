@@ -369,6 +369,7 @@ interface ResolverRecommendationCandidate {
     web: string
     api: string
     audit: string
+    eval: string
     install_api: string
     repository: string
   }
@@ -426,6 +427,7 @@ function buildResolverRecommendation(
       url: selected.urls.web,
       api_url: selected.urls.api,
       audit_url: selected.urls.audit,
+      eval_url: selected.urls.eval,
       repository: selected.urls.repository,
     },
     install: {
@@ -480,6 +482,7 @@ function buildResolverRecommendation(
       auto_install_allowed: selected.safety.auto_install_allowed,
       human_review_required: selected.safety.human_review_required,
       audit_url: selected.urls.audit,
+      eval_url: selected.urls.eval,
       skill_api_url: selected.urls.api,
       do_not_use_when: selected.machine_metadata.do_not_use_when,
       minimum_review_before_use: selected.machine_metadata.agent_contract.minimum_review_before_use,
@@ -607,6 +610,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         api: `${SITE_URL}/api/agent/skills/${skill.slug}`,
         install_api: `${SITE_URL}/api/skills/${skill.slug}/install`,
         audit: `${SITE_URL}/skills/${skill.slug}/audit`,
+        eval: `${SITE_URL}/api/agent/evals?slug=${encodeURIComponent(skill.slug)}&task=${encodeURIComponent(task)}&max_risk=${encodeURIComponent(constraints.max_risk || 'medium')}`,
         badge: `${SITE_URL}/api/badge/${skill.slug}?metric=audit`,
         repository: skill.repository,
       },
@@ -699,6 +703,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           `Task: ${task}`,
           `Use ${selected.skill.name} from ${selected.urls.web}.`,
           `Review the audit first: ${selected.urls.audit}`,
+          `Review the eval first: ${selected.urls.eval}`,
           `Install handoff: ${selected.urls.install_api}`,
           `Install command: ${selected.install_plan.command}`,
           'If audit or policy warnings look unsafe for this workspace, use one of the alternatives instead.',
@@ -712,18 +717,24 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           },
           {
             step: 2,
+            label: 'Fetch pre-install eval',
+            method: 'GET',
+            url: selected.urls.eval,
+          },
+          {
+            step: 3,
             label: 'Fetch selected skill profile',
             method: 'GET',
             url: selected.urls.api,
           },
           {
-            step: 3,
+            step: 4,
             label: 'Fetch install handoff',
             method: 'GET',
             url: selected.urls.install_api,
           },
           {
-            step: 4,
+            step: 5,
             label: 'Review audit',
             method: 'GET',
             url: selected.urls.audit,
