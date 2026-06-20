@@ -48,6 +48,8 @@ export interface BulkImportOptions {
   targetNew?: number
   targetTotal?: number
   minStars?: number
+  adaptiveExpansionMinStars?: number
+  adaptiveExpansionSearchRequests?: number
   maxSearchRequests?: number
   perPage?: number
   pageSeed?: number
@@ -66,6 +68,8 @@ export interface BulkImportSummary {
   existingApproved: number
   remainingToTarget: number
   minStars: number
+  adaptiveExpansionMinStars: number | null
+  adaptiveExpansionMaxStars: number | null
   pageSeed: number
   requestedDomains: string[]
   queryPoolSize: number
@@ -73,6 +77,11 @@ export interface BulkImportSummary {
   searchRequests: number
   duplicateRecoverySearchRequests: number
   duplicateRecoveryUsed: number
+  adaptiveExpansionSearchRequests: number
+  adaptiveExpansionUsed: number
+  adaptiveExpansionCandidatesFound: number
+  adaptiveExpansionImported: number
+  adaptiveExpansionSkippedExisting: number
   searchDelayMs: number
   rateLimitRetries: number
   rateLimitWaitMs: number
@@ -97,6 +106,9 @@ const MAX_TOKEN_SEARCH_REQUESTS = 120
 const DEFAULT_MAX_STALE_DAYS = 1460
 const EXISTING_SLUG_PAGE_SIZE = 1000
 const DEFAULT_GITHUB_SEARCH_DELAY_MS = 1200
+const DEFAULT_ADAPTIVE_EXPANSION_MIN_STARS = 100
+const DEFAULT_ADAPTIVE_EXPANSION_SEARCH_REQUESTS = 20
+const DEFAULT_ADAPTIVE_EXPANSION_MAX_STALE_DAYS = 1095
 const MAX_RATE_LIMIT_RETRIES = 1
 const RATE_LIMIT_RETRY_CAP_MS = 8_000
 export const HIGH_STAR_INDEXER_VERSION = 'scenario-coverage-v3-20k'
@@ -1713,6 +1725,7 @@ function evaluateImportQuality(
     strictQuality: boolean
     maxStaleDays: number
     includeCollections: boolean
+    adaptiveExpansion?: boolean
   }
 ): { accepted: true } | { accepted: false; reason: 'stale' | 'collection' | 'weak-metadata' | 'low-relevance' | 'mcp' } {
   if (!evaluation.accepted) {
@@ -1722,8 +1735,27 @@ function evaluateImportQuality(
   if (!options.strictQuality) return { accepted: true }
 
   const updatedDays = Math.min(daysSince(repo.pushed_at), daysSince(repo.updated_at))
-  if (updatedDays > options.maxStaleDays) {
+  const maxAllowedStaleDays = options.adaptiveExpansion
+    ? Math.min(options.maxStaleDays, DEFAULT_ADAPTIVE_EXPANSION_MAX_STALE_DAYS)
+    : options.maxStaleDays
+  if (updatedDays > maxAllowedStaleDays) {
     return { accepted: false, reason: 'stale' }
+  }
+
+  if (options.adaptiveExpansion) {
+    const hasStrongSkillSignal =
+      evaluation.signals.includes('agent-skill') ||
+      evaluation.signals.includes('skill') ||
+      evaluation.signals.includes('coding-agent') ||
+      evaluation.signals.some((signal) => signal.endsWith('-workflow')) ||
+      evaluation.signals.includes('browser-automation') ||
+      evaluation.signals.includes('document-processing') ||
+      evaluation.signals.includes('data-analysis') ||
+      evaluation.signals.includes('knowledge-search')
+
+    if (evaluation.score < 5 && !hasStrongSkillSignal) {
+      return { accepted: false, reason: 'low-relevance' }
+    }
   }
 
   const isCollection = evaluation.signals.includes('collection-like')
@@ -1799,9 +1831,14 @@ async function searchGitHubRepos(
   query: HighStarQuery,
   minStars: number,
   page: number,
-  perPage: number
+  perPage: number,
+  maxStars?: number | null
 ) {
-  const q = `${query.q} stars:>=${minStars} archived:false fork:false`
+  const starRange =
+    typeof maxStars === 'number' && Number.isFinite(maxStars) && maxStars >= minStars
+      ? `stars:${minStars}..${maxStars}`
+      : `stars:>=${minStars}`
+  const q = `${query.q} ${starRange} archived:false fork:false`
   const url =
     `${GITHUB_API_BASE}/search/repositories` +
     `?q=${encodeURIComponent(q)}` +
@@ -1834,7 +1871,11 @@ async function searchGitHubRepos(
   const data = (await response.json()) as GitHubSearchResponse
   return {
     repos: (data.items || []).filter(
-      (repo) => !repo.archived && !repo.fork && repo.stargazers_count >= minStars
+      (repo) =>
+        !repo.archived &&
+        !repo.fork &&
+        repo.stargazers_count >= minStars &&
+        (typeof maxStars === 'number' ? repo.stargazers_count <= maxStars : true)
     ),
     rateLimitRetries,
     rateLimitWaitMs,
@@ -1865,6 +1906,15 @@ function shouldRunDuplicateRecovery(summary: BulkImportSummary, primarySearchReq
   return duplicateRate >= 0.5
 }
 
+function shouldRunAdaptiveExpansion(summary: BulkImportSummary, targetNew: number) {
+  if (summary.imported >= targetNew) return false
+  if (summary.candidatesFound < 50) return false
+
+  const duplicateRate = summary.skippedExisting / Math.max(summary.candidatesFound, 1)
+  const importRate = summary.imported / Math.max(summary.candidatesFound, 1)
+  return duplicateRate >= 0.6 || importRate < 0.03
+}
+
 export async function bulkImportHighStarSkills(
   options: BulkImportOptions = {}
 ): Promise<{ summary: BulkImportSummary; results: Array<{ repo: string; status: string; slug?: string; reason?: string }> }> {
@@ -1890,6 +1940,32 @@ export async function bulkImportHighStarSkills(
     0,
     process.env.GITHUB_TOKEN ? Math.max(0, MAX_TOKEN_SEARCH_REQUESTS - maxSearchRequests) : 0
   )
+  const adaptiveExpansionMinStars = clamp(
+    parseNonNegativeInteger(
+      process.env.INDEXER_ADAPTIVE_EXPANSION_MIN_STARS,
+      Math.floor(options.adaptiveExpansionMinStars || DEFAULT_ADAPTIVE_EXPANSION_MIN_STARS)
+    ),
+    50,
+    Math.max(50, minStars - 1)
+  )
+  const adaptiveExpansionMaxStars = minStars > adaptiveExpansionMinStars ? minStars - 1 : null
+  const maxAdaptiveExpansionSearchRequests = process.env.GITHUB_TOKEN
+    ? Math.max(0, MAX_TOKEN_SEARCH_REQUESTS - maxSearchRequests - duplicateRecoverySearchRequests)
+    : 0
+  const adaptiveExpansionSearchRequests =
+    adaptiveExpansionMaxStars === null
+      ? 0
+      : clamp(
+          Math.floor(
+            options.adaptiveExpansionSearchRequests ??
+              parseNonNegativeInteger(
+                process.env.INDEXER_ADAPTIVE_EXPANSION_SEARCH_REQUESTS,
+                DEFAULT_ADAPTIVE_EXPANSION_SEARCH_REQUESTS
+              )
+          ),
+          0,
+          maxAdaptiveExpansionSearchRequests
+        )
   const pageSeed = Math.max(0, Math.floor(options.pageSeed ?? Math.floor(Date.now() / 3_600_000)))
   const strictQuality = options.strictQuality !== false
   const maxStaleDays = Math.max(30, Math.floor(options.maxStaleDays || DEFAULT_MAX_STALE_DAYS))
@@ -1925,6 +2001,8 @@ export async function bulkImportHighStarSkills(
     existingApproved: existing.count,
     remainingToTarget,
     minStars,
+    adaptiveExpansionMinStars: adaptiveExpansionSearchRequests > 0 ? adaptiveExpansionMinStars : null,
+    adaptiveExpansionMaxStars: adaptiveExpansionSearchRequests > 0 ? adaptiveExpansionMaxStars : null,
     pageSeed,
     requestedDomains,
     queryPoolSize: queryPool.length,
@@ -1932,6 +2010,11 @@ export async function bulkImportHighStarSkills(
     searchRequests: 0,
     duplicateRecoverySearchRequests,
     duplicateRecoveryUsed: 0,
+    adaptiveExpansionSearchRequests,
+    adaptiveExpansionUsed: 0,
+    adaptiveExpansionCandidatesFound: 0,
+    adaptiveExpansionImported: 0,
+    adaptiveExpansionSkippedExisting: 0,
     searchDelayMs,
     rateLimitRetries: 0,
     rateLimitWaitMs: 0,
@@ -1973,12 +2056,103 @@ export async function bulkImportHighStarSkills(
       metadata: {
         reason: 'coverage target reached',
         profile_key: profileKey,
+        adaptive_expansion_min_stars: summary.adaptiveExpansionMinStars,
+        adaptive_expansion_max_stars: summary.adaptiveExpansionMaxStars,
+        adaptive_expansion_search_requests: adaptiveExpansionSearchRequests,
         requested_domains: requestedDomains,
         discovery_domains: HIGH_STAR_DISCOVERY_DOMAINS,
       },
     })
 
     return { summary, results }
+  }
+
+  async function importCandidateRepo(
+    repo: GitHubSearchRepo,
+    query: HighStarQuery,
+    page: number,
+    importLane: 'primary' | 'duplicate_recovery' | 'adaptive_expansion'
+  ) {
+    const isAdaptiveExpansion = importLane === 'adaptive_expansion'
+    const slug = normalizeSlug(repo.full_name)
+    if (seenSlugs.has(slug)) {
+      summary.skippedExisting += 1
+      if (isAdaptiveExpansion) summary.adaptiveExpansionSkippedExisting += 1
+      return
+    }
+
+    const evaluation = evaluateSkillCandidate({
+      fullName: repo.full_name,
+      name: repo.name,
+      description: repo.description,
+      topics: repo.topics || [],
+      language: repo.language,
+      query: query.q,
+      category: query.category,
+    })
+
+    const qualityGate = evaluateImportQuality(repo, evaluation, {
+      strictQuality,
+      maxStaleDays,
+      includeCollections,
+      adaptiveExpansion: isAdaptiveExpansion,
+    })
+
+    if (!qualityGate.accepted) {
+      if (qualityGate.reason === 'mcp') summary.skippedMcp += 1
+      else if (qualityGate.reason === 'stale') summary.skippedStale += 1
+      else if (qualityGate.reason === 'collection') summary.skippedCollections += 1
+      else if (qualityGate.reason === 'weak-metadata') summary.skippedWeakMetadata += 1
+      else summary.skippedLowRelevance += 1
+      return
+    }
+
+    seenSlugs.add(slug)
+
+    const skill = buildSkill(repo, query, evaluation)
+    const { data, error } = await supabase.rpc('upsert_indexed_skill', {
+      p_server_secret: serverSecret,
+      p_skill: skill,
+      p_activity: {
+        event_type: 'skill_published',
+        actor_name: 'Open Agent Skill Bulk Indexer',
+        actor_type: 'agent',
+        description: `Bulk-indexed ${skill.name} from GitHub (${repo.stargazers_count} stars)`,
+        metadata: {
+          source: 'github-star-discovery',
+          filter_mode: 'skills-only',
+          import_lane: importLane,
+          stars: repo.stargazers_count,
+          relevance_score: evaluation.score,
+          relevance_signals: evaluation.signals,
+          domain: query.domain || 'core',
+          query: query.q,
+          page,
+          search_min_stars: isAdaptiveExpansion ? adaptiveExpansionMinStars : minStars,
+          search_max_stars: isAdaptiveExpansion ? adaptiveExpansionMaxStars : null,
+        },
+      },
+    })
+
+    if (error) {
+      summary.errors += 1
+      results.push({ repo: repo.full_name, status: 'error', slug, reason: error.message })
+      summary.errorSamples = results
+        .filter((result) => result.status === 'error')
+        .slice(-5)
+        .map((result) => ({ repo: result.repo, reason: result.reason }))
+      return
+    }
+
+    const rpcResult = data as IndexedSkillRpcResult | null
+    if (rpcResult?.created) {
+      summary.imported += 1
+      if (isAdaptiveExpansion) summary.adaptiveExpansionImported += 1
+      results.push({ repo: repo.full_name, status: 'indexed', slug })
+    } else {
+      summary.updated += 1
+      results.push({ repo: repo.full_name, status: 'updated', slug })
+    }
   }
 
   const searchPlan = getSearchPlan(
@@ -2024,65 +2198,53 @@ export async function bulkImportHighStarSkills(
 
     for (const repo of repos) {
       if (summary.imported >= targetNew) break
+      await importCandidateRepo(
+        repo,
+        query,
+        page,
+        isRecoveryWindow ? 'duplicate_recovery' : 'primary'
+      )
+    }
+  }
 
-      const slug = normalizeSlug(repo.full_name)
-      if (seenSlugs.has(slug)) {
-        summary.skippedExisting += 1
-        continue
-      }
+  if (
+    adaptiveExpansionSearchRequests > 0 &&
+    adaptiveExpansionMaxStars !== null &&
+    shouldRunAdaptiveExpansion(summary, targetNew)
+  ) {
+    const adaptiveSearchPlan = getSearchPlan(
+      adaptiveExpansionSearchRequests,
+      pageSeed + 37,
+      queryPool
+    )
 
-      const evaluation = evaluateSkillCandidate({
-        fullName: repo.full_name,
-        name: repo.name,
-        description: repo.description,
-        topics: repo.topics || [],
-        language: repo.language,
-        query: query.q,
-        category: query.category,
-      })
+    for (const { query, page } of adaptiveSearchPlan) {
+      if (summary.imported >= targetNew) break
 
-      const qualityGate = evaluateImportQuality(repo, evaluation, {
-        strictQuality,
-        maxStaleDays,
-        includeCollections,
-      })
+      summary.searchRequests += 1
+      summary.adaptiveExpansionUsed += 1
+      if (query.domain) domainsCovered.add(query.domain)
 
-      if (!qualityGate.accepted) {
-        if (qualityGate.reason === 'mcp') summary.skippedMcp += 1
-        else if (qualityGate.reason === 'stale') summary.skippedStale += 1
-        else if (qualityGate.reason === 'collection') summary.skippedCollections += 1
-        else if (qualityGate.reason === 'weak-metadata') summary.skippedWeakMetadata += 1
-        else summary.skippedLowRelevance += 1
-        continue
-      }
-
-      seenSlugs.add(slug)
-
-      const skill = buildSkill(repo, query, evaluation)
-      const { data, error } = await supabase.rpc('upsert_indexed_skill', {
-        p_server_secret: serverSecret,
-        p_skill: skill,
-        p_activity: {
-          event_type: 'skill_published',
-          actor_name: 'Open Agent Skill Bulk Indexer',
-          actor_type: 'agent',
-          description: `Bulk-indexed ${skill.name} from GitHub (${repo.stargazers_count} stars)`,
-          metadata: {
-            source: 'github-star-discovery',
-            filter_mode: 'skills-only',
-            stars: repo.stargazers_count,
-            relevance_score: evaluation.score,
-            relevance_signals: evaluation.signals,
-            domain: query.domain || 'core',
-            query: query.q,
-            page,
-          },
-        },
-      })
-
-      if (error) {
+      let repos: GitHubSearchRepo[]
+      try {
+        if (summary.searchRequests > 1) await sleep(searchDelayMs)
+        const searchResult = await searchGitHubRepos(
+          query,
+          adaptiveExpansionMinStars,
+          page,
+          perPage,
+          adaptiveExpansionMaxStars
+        )
+        repos = searchResult.repos
+        summary.rateLimitRetries += searchResult.rateLimitRetries
+        summary.rateLimitWaitMs += searchResult.rateLimitWaitMs
+      } catch (error) {
         summary.errors += 1
-        results.push({ repo: repo.full_name, status: 'error', slug, reason: error.message })
+        results.push({
+          repo: query.q,
+          status: 'error',
+          reason: error instanceof Error ? error.message : 'GitHub adaptive expansion search failed',
+        })
         summary.errorSamples = results
           .filter((result) => result.status === 'error')
           .slice(-5)
@@ -2090,13 +2252,12 @@ export async function bulkImportHighStarSkills(
         continue
       }
 
-      const rpcResult = data as IndexedSkillRpcResult | null
-      if (rpcResult?.created) {
-        summary.imported += 1
-        results.push({ repo: repo.full_name, status: 'indexed', slug })
-      } else {
-        summary.updated += 1
-        results.push({ repo: repo.full_name, status: 'updated', slug })
+      summary.candidatesFound += repos.length
+      summary.adaptiveExpansionCandidatesFound += repos.length
+
+      for (const repo of repos) {
+        if (summary.imported >= targetNew) break
+        await importCandidateRepo(repo, query, page, 'adaptive_expansion')
       }
     }
   }
@@ -2111,10 +2272,15 @@ export async function bulkImportHighStarSkills(
     completed_at: new Date().toISOString(),
     target_new: targetNew,
     min_stars: minStars,
-    max_search_requests: maxSearchRequests,
+    max_search_requests: maxSearchRequests + duplicateRecoverySearchRequests + adaptiveExpansionSearchRequests,
     search_requests: summary.searchRequests,
     duplicate_recovery_search_requests: duplicateRecoverySearchRequests,
     duplicate_recovery_used: summary.duplicateRecoveryUsed,
+    adaptive_expansion_search_requests: adaptiveExpansionSearchRequests,
+    adaptive_expansion_used: summary.adaptiveExpansionUsed,
+    adaptive_expansion_candidates_found: summary.adaptiveExpansionCandidatesFound,
+    adaptive_expansion_imported: summary.adaptiveExpansionImported,
+    adaptive_expansion_skipped_existing: summary.adaptiveExpansionSkippedExisting,
     rate_limit_retries: summary.rateLimitRetries,
     rate_limit_wait_ms: summary.rateLimitWaitMs,
     candidates_found: summary.candidatesFound,
@@ -2134,6 +2300,14 @@ export async function bulkImportHighStarSkills(
       duplicate_recovery_search_requests: duplicateRecoverySearchRequests,
       duplicate_recovery_used: summary.duplicateRecoveryUsed,
       duplicate_recovery_triggered: summary.duplicateRecoveryUsed > 0,
+      adaptive_expansion_min_stars: summary.adaptiveExpansionMinStars,
+      adaptive_expansion_max_stars: summary.adaptiveExpansionMaxStars,
+      adaptive_expansion_search_requests: adaptiveExpansionSearchRequests,
+      adaptive_expansion_used: summary.adaptiveExpansionUsed,
+      adaptive_expansion_triggered: summary.adaptiveExpansionUsed > 0,
+      adaptive_expansion_candidates_found: summary.adaptiveExpansionCandidatesFound,
+      adaptive_expansion_imported: summary.adaptiveExpansionImported,
+      adaptive_expansion_skipped_existing: summary.adaptiveExpansionSkippedExisting,
       search_delay_ms: searchDelayMs,
       rate_limit_retries: summary.rateLimitRetries,
       rate_limit_wait_ms: summary.rateLimitWaitMs,

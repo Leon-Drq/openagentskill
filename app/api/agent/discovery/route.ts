@@ -50,6 +50,15 @@ function toIso(value: unknown) {
   return Number.isFinite(time) ? new Date(time).toISOString() : null
 }
 
+function metadataValue(run: Record<string, unknown>, key: string) {
+  return run.metadata &&
+    typeof run.metadata === 'object' &&
+    !Array.isArray(run.metadata) &&
+    key in run.metadata
+    ? (run.metadata as Record<string, unknown>)[key]
+    : undefined
+}
+
 function getNextImportCronIso(now: Date) {
   const minutes = getImportCronMinutesUtc()
   const next = new Date(now)
@@ -96,6 +105,9 @@ function buildIndexerHealth({
   const latestCandidatesFound = toNumber(latestRun?.candidates_found)
   const latestPageSeed = toNumber(latestRun?.page_seed)
   const latestDuplicateRecoveryUsed = toNumber(latestRun?.duplicate_recovery_used)
+  const latestAdaptiveExpansionUsed = toNumber(latestRun?.adaptive_expansion_used)
+  const latestAdaptiveExpansionImported = toNumber(latestRun?.adaptive_expansion_imported)
+  const latestAdaptiveExpansionCandidatesFound = toNumber(latestRun?.adaptive_expansion_candidates_found)
   const latestSearchDelayMs = toNumber(latestRun?.search_delay_ms)
   const latestRateLimitRetries = toNumber(latestRun?.rate_limit_retries)
   const latestRateLimitWaitMs = toNumber(latestRun?.rate_limit_wait_ms)
@@ -148,8 +160,8 @@ function buildIndexerHealth({
   ) {
     status = 'duplicate_heavy_window'
     action = latestDuplicateRecoveryUsed && latestDuplicateRecoveryUsed > 0
-      ? 'The latest domain window used duplicate-recovery search but still found mostly indexed candidates. Broaden query groups or add a lower-star high-quality lane for this domain.'
-      : 'The latest domain window found candidates, but most were already indexed. Duplicate-recovery search should run on duplicate-heavy profile windows.'
+      ? 'The latest domain window used duplicate-recovery search but still found mostly indexed candidates. Adaptive high-quality expansion should run on the next profile cron and report adaptive_expansion_* fields.'
+      : 'The latest domain window found candidates, but most were already indexed. Duplicate-recovery and adaptive high-quality expansion should run on duplicate-heavy profile windows.'
   } else if (belowTarget && latestImported === 0 && (latestCandidatesFound || 0) > 0) {
     status = 'filtered_window'
     action = 'The latest run found candidates but no new skill passed the import gates. Inspect skipped MCP and low-relevance counts before loosening quality filters.'
@@ -184,6 +196,9 @@ function buildIndexerHealth({
     latest_run_candidates_found: latestCandidatesFound,
     latest_run_page_seed: latestPageSeed,
     latest_run_duplicate_recovery_used: latestDuplicateRecoveryUsed,
+    latest_run_adaptive_expansion_used: latestAdaptiveExpansionUsed,
+    latest_run_adaptive_expansion_imported: latestAdaptiveExpansionImported,
+    latest_run_adaptive_expansion_candidates_found: latestAdaptiveExpansionCandidatesFound,
     latest_run_search_delay_ms: latestSearchDelayMs,
     latest_run_rate_limit_retries: latestRateLimitRetries,
     latest_run_rate_limit_wait_ms: latestRateLimitWaitMs,
@@ -276,6 +291,13 @@ async function getRecentRuns() {
       'duplicate_recovery_used' in run.metadata
       ? (run.metadata as Record<string, unknown>).duplicate_recovery_used
       : undefined,
+    adaptive_expansion_min_stars: metadataValue(run, 'adaptive_expansion_min_stars'),
+    adaptive_expansion_max_stars: metadataValue(run, 'adaptive_expansion_max_stars'),
+    adaptive_expansion_search_requests: metadataValue(run, 'adaptive_expansion_search_requests'),
+    adaptive_expansion_used: metadataValue(run, 'adaptive_expansion_used'),
+    adaptive_expansion_imported: metadataValue(run, 'adaptive_expansion_imported'),
+    adaptive_expansion_candidates_found: metadataValue(run, 'adaptive_expansion_candidates_found'),
+    adaptive_expansion_skipped_existing: metadataValue(run, 'adaptive_expansion_skipped_existing'),
     search_delay_ms: run.metadata &&
       typeof run.metadata === 'object' &&
       !Array.isArray(run.metadata) &&
@@ -339,6 +361,8 @@ function buildProfileRunSummaries(runs: Array<Record<string, unknown>>) {
       domains: profile.domains,
       target_new: profile.targetNew,
       min_stars: profile.minStars,
+      adaptive_expansion_min_stars: profile.adaptiveExpansionMinStars,
+      adaptive_expansion_search_requests: profile.adaptiveExpansionSearchRequests,
       max_search_requests: profile.maxSearchRequests,
       duplicate_recovery_search_requests: profile.duplicateRecoverySearchRequests,
       latest_run_status: latest?.status || null,
@@ -349,6 +373,9 @@ function buildProfileRunSummaries(runs: Array<Record<string, unknown>>) {
       latest_run_candidates_found: toNumber(latest?.candidates_found),
       latest_run_skipped_existing: toNumber(latest?.skipped_existing),
       latest_run_duplicate_recovery_used: toNumber(latest?.duplicate_recovery_used),
+      latest_run_adaptive_expansion_used: toNumber(latest?.adaptive_expansion_used),
+      latest_run_adaptive_expansion_imported: toNumber(latest?.adaptive_expansion_imported),
+      latest_run_adaptive_expansion_candidates_found: toNumber(latest?.adaptive_expansion_candidates_found),
       latest_run_rate_limit_retries: toNumber(latest?.rate_limit_retries),
       status:
         latest === undefined
@@ -402,6 +429,8 @@ export async function GET() {
       domains: profile.domains,
       target_new: profile.targetNew,
       min_stars: profile.minStars,
+      adaptive_expansion_min_stars: profile.adaptiveExpansionMinStars,
+      adaptive_expansion_search_requests: profile.adaptiveExpansionSearchRequests,
       max_search_requests: profile.maxSearchRequests,
       duplicate_recovery_search_requests: profile.duplicateRecoverySearchRequests,
     })),
@@ -478,29 +507,49 @@ export async function GET() {
           domains: profile.domains,
           target_new: profile.targetNew,
           min_stars: profile.minStars,
+          adaptive_expansion_min_stars: profile.adaptiveExpansionMinStars,
+          adaptive_expansion_search_requests: profile.adaptiveExpansionSearchRequests,
           max_search_requests: profile.maxSearchRequests,
           duplicate_recovery_search_requests: profile.duplicateRecoverySearchRequests,
         })),
         example_body: {
           targetNew: 500,
           minStars: 500,
+          adaptiveExpansionMinStars: 100,
+          adaptiveExpansionSearchRequests: 20,
           domains: ['finance', 'sports', 'marketing-seo'],
           maxSearchRequests: 100,
         },
         domain_specific_examples: [
           {
             label: 'Finance and quant',
-            body: { targetNew: 500, minStars: 500, domains: ['finance'], maxSearchRequests: 100 },
+            body: {
+              targetNew: 500,
+              minStars: 500,
+              adaptiveExpansionMinStars: 100,
+              adaptiveExpansionSearchRequests: 20,
+              domains: ['finance'],
+              maxSearchRequests: 100,
+            },
           },
           {
             label: 'World Cup and sports analytics',
-            body: { targetNew: 200, minStars: 300, domains: ['sports'], maxSearchRequests: 80 },
+            body: {
+              targetNew: 200,
+              minStars: 300,
+              adaptiveExpansionMinStars: 100,
+              adaptiveExpansionSearchRequests: 20,
+              domains: ['sports'],
+              maxSearchRequests: 80,
+            },
           },
           {
             label: 'Marketing and customer operations',
             body: {
               targetNew: 300,
               minStars: 500,
+              adaptiveExpansionMinStars: 100,
+              adaptiveExpansionSearchRequests: 20,
               domains: ['marketing-seo', 'customer-support'],
               maxSearchRequests: 100,
             },

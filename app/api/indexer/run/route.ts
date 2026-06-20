@@ -83,6 +83,8 @@ export async function POST(request: NextRequest) {
       const targetNew = Math.min(Math.max(Number(body.targetNew) || DEFAULT_TARGET_NEW_PER_RUN, 1), 1000)
       const targetTotal = resolveHighStarCoverageTarget(Number(body.targetTotal) || HIGH_STAR_SKILL_COVERAGE_TARGET)
       const minStars = Math.max(Number(body.minStars) || 500, 100)
+      const adaptiveExpansionMinStars = Math.max(Number(body.adaptiveExpansionMinStars) || 100, 50)
+      const adaptiveExpansionSearchRequests = Math.max(Number(body.adaptiveExpansionSearchRequests) || 0, 0)
       const maxStaleDays = Math.max(Number(body.maxStaleDays) || 1460, 30)
       const strictQuality = body.strictQuality === undefined ? true : Boolean(body.strictQuality)
       const includeCollections = body.includeCollections === true
@@ -108,6 +110,8 @@ export async function POST(request: NextRequest) {
         targetNew,
         targetTotal,
         minStars,
+        adaptiveExpansionMinStars,
+        adaptiveExpansionSearchRequests,
         maxSearchRequests,
         pageSeed,
         domains,
@@ -193,6 +197,14 @@ export async function GET(request: NextRequest) {
           parsePositiveNumber(params.get('targetTotal'), parsePositiveNumber(process.env.INDEXER_TARGET_TOTAL, HIGH_STAR_SKILL_COVERAGE_TARGET))
         ),
         minStars: parsePositiveNumber(params.get('minStars'), parsePositiveNumber(process.env.INDEXER_MIN_STARS, 500)),
+        adaptiveExpansionMinStars: parsePositiveNumber(
+          params.get('adaptiveExpansionMinStars'),
+          parsePositiveNumber(process.env.INDEXER_ADAPTIVE_EXPANSION_MIN_STARS, 100)
+        ),
+        adaptiveExpansionSearchRequests: parsePositiveNumber(
+          params.get('adaptiveExpansionSearchRequests'),
+          parsePositiveNumber(process.env.INDEXER_ADAPTIVE_EXPANSION_SEARCH_REQUESTS, 20)
+        ),
         maxSearchRequests: parsePositiveNumber(
           params.get('maxSearchRequests'),
           parsePositiveNumber(process.env.INDEXER_MAX_SEARCH_REQUESTS, process.env.GITHUB_TOKEN ? DEFAULT_TOKEN_SEARCH_REQUESTS : 10)

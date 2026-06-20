@@ -14,6 +14,8 @@ function buildProfileRequest(request: NextRequest, profileKey: string) {
   url.searchParams.set('profileKey', profile.key)
   url.searchParams.set('targetNew', String(profile.targetNew))
   url.searchParams.set('minStars', String(profile.minStars))
+  url.searchParams.set('adaptiveExpansionMinStars', String(profile.adaptiveExpansionMinStars))
+  url.searchParams.set('adaptiveExpansionSearchRequests', String(profile.adaptiveExpansionSearchRequests))
   url.searchParams.set('maxSearchRequests', String(profile.maxSearchRequests))
   url.searchParams.set('duplicateRecoverySearchRequests', String(profile.duplicateRecoverySearchRequests))
   url.searchParams.set('strictQuality', String(profile.strictQuality))

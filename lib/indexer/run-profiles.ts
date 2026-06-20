@@ -6,6 +6,8 @@ export interface IndexerRunProfile {
   domains: string[]
   targetNew: number
   minStars: number
+  adaptiveExpansionMinStars: number
+  adaptiveExpansionSearchRequests: number
   maxSearchRequests: number
   duplicateRecoverySearchRequests: number
   strictQuality: boolean
@@ -21,6 +23,8 @@ export const INDEXER_RUN_PROFILES: IndexerRunProfile[] = [
     domains: ['coding', 'data', 'knowledge', 'devops'],
     targetNew: 250,
     minStars: 500,
+    adaptiveExpansionMinStars: 100,
+    adaptiveExpansionSearchRequests: 20,
     maxSearchRequests: 25,
     duplicateRecoverySearchRequests: 5,
     strictQuality: true,
@@ -34,6 +38,8 @@ export const INDEXER_RUN_PROFILES: IndexerRunProfile[] = [
     domains: ['finance', 'research', 'documents', 'sports'],
     targetNew: 250,
     minStars: 500,
+    adaptiveExpansionMinStars: 100,
+    adaptiveExpansionSearchRequests: 20,
     maxSearchRequests: 25,
     duplicateRecoverySearchRequests: 5,
     strictQuality: true,
@@ -55,6 +61,8 @@ export const INDEXER_RUN_PROFILES: IndexerRunProfile[] = [
     ],
     targetNew: 250,
     minStars: 500,
+    adaptiveExpansionMinStars: 100,
+    adaptiveExpansionSearchRequests: 20,
     maxSearchRequests: 25,
     duplicateRecoverySearchRequests: 5,
     strictQuality: true,
@@ -74,6 +82,8 @@ export const INDEXER_RUN_PROFILES: IndexerRunProfile[] = [
     ],
     targetNew: 250,
     minStars: 500,
+    adaptiveExpansionMinStars: 100,
+    adaptiveExpansionSearchRequests: 20,
     maxSearchRequests: 25,
     duplicateRecoverySearchRequests: 5,
     strictQuality: true,
