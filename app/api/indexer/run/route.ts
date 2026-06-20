@@ -34,6 +34,11 @@ function parseDomainsParam(value: string | null) {
     .filter(Boolean)
 }
 
+function parseProfileKey(value: unknown) {
+  const normalized = String(value || '').trim()
+  return normalized || undefined
+}
+
 function isAuthorized(request: NextRequest): boolean {
   return isAutomationAuthorized(request, ['INDEXER_SECRET', 'CRON_SECRET', 'INDEXER_TRIGGER_SECRET'])
 }
@@ -81,6 +86,7 @@ export async function POST(request: NextRequest) {
       const maxStaleDays = Math.max(Number(body.maxStaleDays) || 1460, 30)
       const strictQuality = body.strictQuality === undefined ? true : Boolean(body.strictQuality)
       const includeCollections = body.includeCollections === true
+      const profileKey = parseProfileKey(body.profileKey || body.profile)
       const domains = Array.isArray(body.domains)
         ? body.domains.map((domain: unknown) => String(domain)).filter(Boolean)
         : body.domain
@@ -98,6 +104,7 @@ export async function POST(request: NextRequest) {
         `[indexer] Skill-only high-star import — targetNew=${targetNew}, targetTotal=${targetTotal}, minStars=${minStars}, maxSearchRequests=${maxSearchRequests}, domains=${domains.join(',') || 'all'}`
       )
       const result = await bulkImportHighStarSkills({
+        profileKey,
         targetNew,
         targetTotal,
         minStars,
@@ -171,6 +178,7 @@ export async function GET(request: NextRequest) {
   }
   const params = request.nextUrl.searchParams
   const domains = parseDomainsParam(params.get('domains') || params.get('domain'))
+  const profileKey = parseProfileKey(params.get('profileKey') || params.get('profile'))
   return POST(
     new NextRequest(request.url, {
       method: 'POST',
@@ -193,6 +201,7 @@ export async function GET(request: NextRequest) {
         maxStaleDays: parsePositiveNumber(params.get('maxStaleDays'), parsePositiveNumber(process.env.INDEXER_MAX_STALE_DAYS, 1460)),
         strictQuality: parseBooleanParam(params.get('strictQuality'), process.env.INDEXER_STRICT_QUALITY === 'false' ? false : true),
         includeCollections: parseBooleanParam(params.get('includeCollections'), process.env.INDEXER_INCLUDE_COLLECTIONS === 'true'),
+        ...(profileKey ? { profileKey } : {}),
         ...(domains.length > 0 ? { domains } : {}),
         ...(params.get('pageSeed') ? { pageSeed: parsePositiveNumber(params.get('pageSeed'), 0) } : {}),
       }),

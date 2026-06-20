@@ -11,6 +11,7 @@ function buildProfileRequest(request: NextRequest, profileKey: string) {
   const url = new URL(request.url)
   url.pathname = '/api/indexer/run'
   url.searchParams.set('domains', profile.domains.join(','))
+  url.searchParams.set('profileKey', profile.key)
   url.searchParams.set('targetNew', String(profile.targetNew))
   url.searchParams.set('minStars', String(profile.minStars))
   url.searchParams.set('maxSearchRequests', String(profile.maxSearchRequests))

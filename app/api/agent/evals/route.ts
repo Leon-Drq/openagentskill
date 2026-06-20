@@ -14,6 +14,28 @@ const EVAL_CACHE_HEADERS = {
 type TaskEvalStatus = 'passed' | 'review' | 'failed'
 type TaskEvalCheckStatus = 'pass' | 'warn' | 'fail' | 'info'
 
+function parseBatchSlugs(params: URLSearchParams) {
+  const rawValues = [
+    ...params.getAll('slugs'),
+    ...params.getAll('skill_slugs'),
+    params.get('candidates') || '',
+  ]
+  const seen = new Set<string>()
+  const slugs: string[] = []
+
+  for (const raw of rawValues) {
+    for (const value of raw.split(',')) {
+      const normalized = normalizeSkillSlug(value)
+      if (!normalized || seen.has(normalized)) continue
+      seen.add(normalized)
+      slugs.push(normalized)
+      if (slugs.length >= 12) return slugs
+    }
+  }
+
+  return slugs
+}
+
 function taskEvalCheck(
   id: string,
   label: string,
@@ -49,6 +71,74 @@ function scoreTaskEval(checks: ReturnType<typeof taskEvalCheck>[]) {
   }
   const total = checks.reduce((sum, check) => sum + weights[check.status], 0)
   return Math.round(total / checks.length)
+}
+
+function buildBatchEvalSummary(evals: Array<ReturnType<typeof buildSkillEvalProfile>>, missing: Array<{ slug: string; normalized_slug: string }>) {
+  const recommended = evals[0] || null
+
+  return {
+    total_requested: evals.length + missing.length,
+    evaluated: evals.length,
+    missing: missing.length,
+    passed: evals.filter((item) => item.status === 'passed').length,
+    review: evals.filter((item) => item.status === 'review').length,
+    failed: evals.filter((item) => item.status === 'failed').length,
+    auto_install_allowed: evals.filter((item) => item.decision.auto_install_allowed).length,
+    highest_score: recommended?.score || 0,
+    recommended: recommended
+      ? {
+          slug: recommended.slug,
+          name: recommended.name,
+          status: recommended.status,
+          score: recommended.score,
+          risk_level: recommended.risk_level,
+          install_command: recommended.install.command,
+          eval_url: recommended.endpoints.eval,
+          audit_url: recommended.endpoints.audit,
+        }
+      : null,
+  }
+}
+
+function buildBatchEvalText({
+  evals,
+  missing,
+  task,
+}: {
+  evals: Array<ReturnType<typeof buildSkillEvalProfile>>
+  missing: Array<{ slug: string; normalized_slug: string }>
+  task: string | undefined
+}) {
+  const summary = buildBatchEvalSummary(evals, missing)
+
+  return `OpenAgentSkill Batch Skill Eval
+===============================
+
+Task: ${task || 'Evaluate candidate skills before installation'}
+Evaluated: ${summary.evaluated}/${summary.total_requested}
+Recommended: ${summary.recommended ? `${summary.recommended.name} (${summary.recommended.slug})` : 'No installable candidate'}
+
+Candidates:
+${evals.length
+  ? evals
+      .map(
+        (item, index) =>
+          `${index + 1}. ${item.name} (${item.slug})
+   Status: ${item.status} | Score: ${item.score}/100 | Risk: ${item.risk_level}
+   Decision: ${item.decision.recommendation}
+   Install: ${item.install.command}
+   Audit: ${item.endpoints.audit}
+   Eval: ${item.endpoints.eval}`
+      )
+      .join('\n')
+  : '- No valid candidates found'}
+
+Missing:
+${missing.length ? missing.map((item) => `- ${item.slug}`).join('\n') : '- None'}
+
+Agent rule:
+Use the highest-scoring passed candidate. If the best candidate is review or failed, ask for human approval or compare alternatives before installing.
+`
 }
 
 function buildTaskEvalText(evalProfile: ReturnType<typeof buildTaskEvalProfile>) {
@@ -273,12 +363,86 @@ function buildTaskEvalProfile(resolvePayload: Awaited<ReturnType<typeof resolveA
 export async function GET(request: NextRequest) {
   try {
     const slug = request.nextUrl.searchParams.get('slug') || request.nextUrl.searchParams.get('skill_slug')
+    const batchSlugs = parseBatchSlugs(request.nextUrl.searchParams)
     const format = request.nextUrl.searchParams.get('format') || 'json'
     const task = request.nextUrl.searchParams.get('task') || undefined
     const maxRisk = request.nextUrl.searchParams.get('max_risk') || 'medium'
     const agent = request.nextUrl.searchParams.get('agent') || 'auto'
     const limit = Math.min(Math.max(Number(request.nextUrl.searchParams.get('limit') || 5), 1), 10)
     const minStars = Math.max(Number(request.nextUrl.searchParams.get('min_stars') || 0), 0)
+
+    if (!slug && batchSlugs.length > 0) {
+      const results = await Promise.all(
+        batchSlugs.map(async (candidateSlug) => {
+          const skill = await getSkillBySlugOrFallback(candidateSlug)
+
+          if (!skill) {
+            return {
+              missing: {
+                slug: candidateSlug,
+                normalized_slug: normalizeSkillSlug(candidateSlug),
+              },
+            }
+          }
+
+          const [eventStats, relatedSkills] = isCuratedSkillFallback(skill)
+            ? [null, []]
+            : await Promise.all([
+                getSkillEventStats(skill.slug).catch(() => null),
+                getRelatedSkills(skill.id, skill.category, 4).catch(() => []),
+              ])
+
+          return {
+            eval: buildSkillEvalProfile(skill, {
+              eventStats,
+              alternatives: relatedSkills,
+              task,
+              maxRisk,
+            }),
+          }
+        })
+      )
+      const evals = results
+        .flatMap((item) => ('eval' in item && item.eval ? [item.eval] : []))
+        .sort((a, b) => {
+          const statusRank = { passed: 3, review: 2, failed: 1 }
+          const statusDelta = statusRank[b.status] - statusRank[a.status]
+          return statusDelta || b.score - a.score
+        })
+      const missing = results.flatMap((item) => ('missing' in item && item.missing ? [item.missing] : []))
+      const summary = buildBatchEvalSummary(evals, missing)
+
+      if (format === 'text') {
+        return new NextResponse(buildBatchEvalText({ evals, missing, task }), {
+          headers: {
+            ...EVAL_CACHE_HEADERS,
+            'Content-Type': 'text/plain; charset=utf-8',
+            'X-Agent-Friendly': 'true',
+          },
+        })
+      }
+
+      return NextResponse.json(
+        {
+          summary,
+          evals,
+          missing,
+          meta: {
+            endpoint: '/api/agent/evals',
+            mode: 'batch_skill_eval',
+            purpose:
+              'Batch pre-install Trust + Eval comparison for candidate skills. Agents should use this after resolve/search and before choosing a skill to install.',
+            generated_at: new Date().toISOString(),
+            max_candidates: 12,
+            examples: {
+              json: '/api/agent/evals?slugs=crawl4ai,markitdown&task=parse%20PDFs',
+              text: '/api/agent/evals?slugs=crawl4ai,markitdown&task=parse%20PDFs&format=text',
+            },
+          },
+        },
+        { headers: EVAL_CACHE_HEADERS }
+      )
+    }
 
     if (slug) {
       const skill = await getSkillBySlugOrFallback(slug)

@@ -161,6 +161,9 @@ export async function GET() {
             parameters: [
               { name: 'slug', in: 'query', required: false, schema: { type: 'string' } },
               { name: 'skill_slug', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'slugs', in: 'query', required: false, schema: { type: 'string' }, description: 'Comma-separated candidate skill slugs for batch pre-install comparison.' },
+              { name: 'skill_slugs', in: 'query', required: false, schema: { type: 'string' }, description: 'Alias for slugs.' },
+              { name: 'candidates', in: 'query', required: false, schema: { type: 'string' }, description: 'Alias for slugs.' },
               { name: 'task', in: 'query', required: false, schema: { type: 'string' } },
               { name: 'max_risk', in: 'query', required: false, schema: { type: 'string', enum: ['low', 'medium', 'high'] } },
               { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
@@ -168,7 +171,7 @@ export async function GET() {
             responses: {
               '200': {
                 description:
-                  'Without slug: registry recommendation regression checks. With slug: eval.status, eval.decision, eval.checks, eval.validation_plan, eval.machine_metadata, and install readiness for one skill.',
+                  'Without slug/slugs: registry recommendation regression checks. With slug: one skill eval. With slugs: ranked batch Trust + Eval comparison for candidate skills.',
               },
             },
           },

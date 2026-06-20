@@ -219,6 +219,12 @@ async function getRecentRuns() {
 
   if (error) return []
   return (data || []).map((run: Record<string, unknown>) => ({
+    profile_key: run.metadata &&
+      typeof run.metadata === 'object' &&
+      !Array.isArray(run.metadata) &&
+      'profile_key' in run.metadata
+      ? (run.metadata as Record<string, unknown>).profile_key
+      : undefined,
     status: run.status,
     started_at: run.started_at,
     completed_at: run.completed_at,
@@ -321,6 +327,43 @@ async function getApprovedSkillCount() {
   return count
 }
 
+function buildProfileRunSummaries(runs: Array<Record<string, unknown>>) {
+  return INDEXER_RUN_PROFILES.map((profile) => {
+    const latest = runs.find((run) => run.profile_key === profile.key)
+
+    return {
+      profile: profile.key,
+      label: profile.label,
+      schedule: profile.schedule,
+      path: profile.path,
+      domains: profile.domains,
+      target_new: profile.targetNew,
+      min_stars: profile.minStars,
+      max_search_requests: profile.maxSearchRequests,
+      duplicate_recovery_search_requests: profile.duplicateRecoverySearchRequests,
+      latest_run_status: latest?.status || null,
+      latest_run_started_at: toIso(latest?.started_at),
+      latest_run_imported: toNumber(latest?.imported),
+      latest_run_errors: toNumber(latest?.errors),
+      latest_run_search_requests: toNumber(latest?.search_requests),
+      latest_run_candidates_found: toNumber(latest?.candidates_found),
+      latest_run_skipped_existing: toNumber(latest?.skipped_existing),
+      latest_run_duplicate_recovery_used: toNumber(latest?.duplicate_recovery_used),
+      latest_run_rate_limit_retries: toNumber(latest?.rate_limit_retries),
+      status:
+        latest === undefined
+          ? 'awaiting_observed_run'
+          : toNumber(latest.imported) && Number(latest.imported) > 0
+            ? 'importing'
+            : toNumber(latest.errors) && Number(latest.errors) > 0
+              ? 'needs_log_review'
+              : toNumber(latest.candidates_found) && Number(latest.candidates_found) > 0
+                ? 'duplicate_or_filtered_window'
+                : 'empty_or_pending_window',
+    }
+  })
+}
+
 export async function GET() {
   const generatedAt = new Date()
   const minStars = Number(process.env.INDEXER_MIN_STARS || 500)
@@ -376,14 +419,17 @@ export async function GET() {
     remainingToTarget === null
       ? null
       : Math.ceil(remainingToTarget / Math.max(estimatedDailyCapacity, 1))
-  const indexerHealth = buildIndexerHealth({
-    runs,
-    generatedAt,
-    targetNew,
-    coverageTarget: effectiveCoverageTarget,
-    approvedSkillCount,
-    remainingToTarget,
-  })
+  const indexerHealth = {
+    ...buildIndexerHealth({
+      runs,
+      generatedAt,
+      targetNew,
+      coverageTarget: effectiveCoverageTarget,
+      approvedSkillCount,
+      remainingToTarget,
+    }),
+    profile_runs: buildProfileRunSummaries(runs),
+  }
 
   return NextResponse.json({
     status: 'active',

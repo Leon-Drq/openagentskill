@@ -87,9 +87,10 @@ Returns a ranked shortlist with confidence, install command, repository URL, qua
 ```bash
 curl "https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&agent=codex&max_risk=medium"
 curl "https://www.openagentskill.com/api/agent/evals?task=analyze+stock+news&agent=codex&max_risk=medium"
+curl "https://www.openagentskill.com/api/agent/evals?slugs=crawl4ai,markitdown&task=parse+PDFs+into+markdown"
 ```
 
-The resolve endpoint returns the recommended skill, install handoff, audit URL, alternatives, and agent workflow. The task eval endpoint turns that recommendation into a pre-install gate with pass/review/fail checks for match quality, install readiness, Trust Score, audit score, and safety policy.
+The resolve endpoint returns the recommended skill, install handoff, audit URL, alternatives, and agent workflow. The task eval endpoint turns that recommendation into a pre-install gate with pass/review/fail checks for match quality, install readiness, Trust Score, audit score, and safety policy. The batch eval form (`slugs=a,b,c`) ranks candidate skills against the same gates so an agent can compare alternatives before installing anything.
 
 ### Search Skills
 

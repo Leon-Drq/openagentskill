@@ -44,6 +44,7 @@ interface IndexedSkillRpcResult {
 }
 
 export interface BulkImportOptions {
+  profileKey?: string
   targetNew?: number
   targetTotal?: number
   minStars?: number
@@ -58,6 +59,7 @@ export interface BulkImportOptions {
 }
 
 export interface BulkImportSummary {
+  profileKey: string | null
   filterMode: 'skills-only'
   targetNew: number
   targetTotal: number
@@ -1866,6 +1868,9 @@ function shouldRunDuplicateRecovery(summary: BulkImportSummary, primarySearchReq
 export async function bulkImportHighStarSkills(
   options: BulkImportOptions = {}
 ): Promise<{ summary: BulkImportSummary; results: Array<{ repo: string; status: string; slug?: string; reason?: string }> }> {
+  const profileKey = typeof options.profileKey === 'string' && options.profileKey.trim()
+    ? options.profileKey.trim()
+    : null
   const requestedTargetNew = clamp(Math.floor(options.targetNew || DEFAULT_TARGET_NEW_PER_RUN), 1, 1000)
   const targetTotal = resolveHighStarCoverageTarget(options.targetTotal)
   const minStars = clamp(Math.floor(options.minStars || 500), 100, 1_000_000)
@@ -1913,6 +1918,7 @@ export async function bulkImportHighStarSkills(
   const remainingToTarget = Math.max(0, targetTotal - existing.count)
   const targetNew = Math.min(requestedTargetNew, remainingToTarget)
   const summary: BulkImportSummary = {
+    profileKey,
     filterMode: 'skills-only',
     targetNew,
     targetTotal,
@@ -1966,6 +1972,7 @@ export async function bulkImportHighStarSkills(
       errors: 0,
       metadata: {
         reason: 'coverage target reached',
+        profile_key: profileKey,
         requested_domains: requestedDomains,
         discovery_domains: HIGH_STAR_DISCOVERY_DOMAINS,
       },
@@ -2121,6 +2128,7 @@ export async function bulkImportHighStarSkills(
     updated: summary.updated,
     errors: summary.errors,
     metadata: {
+      profile_key: profileKey,
       page_seed: pageSeed,
       per_page: perPage,
       duplicate_recovery_search_requests: duplicateRecoverySearchRequests,
