@@ -1,13 +1,19 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import {
+  MarketingButtonLink,
+  MarketingHero,
+  MarketingMetricStrip,
+  MarketingPageShell,
+} from '@/components/marketing-page'
 import { getAllSkills, getSkillStats, type SkillAgentStats } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
 import { rankSkillsForDefinition, type RankingDefinition } from '@/lib/rankings'
 import { BEST_SKILL_PAGES, FEATURED_BEST_PAGES } from '@/lib/seo/growth-pages'
+import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 
 export const dynamic = 'force-dynamic'
+const BEST_PAGE_QUERY_TIMEOUT_MS = 2000
 
 export const metadata: Metadata = {
   title: 'Top AI Agent Skills by Use Case',
@@ -36,61 +42,57 @@ function toRanking(page: (typeof BEST_SKILL_PAGES)[number]): RankingDefinition {
   }
 }
 
+async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  let timeout: ReturnType<typeof setTimeout> | undefined
+  const timeoutPromise = new Promise<T>((_, reject) => {
+    timeout = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+  })
+
+  try {
+    return await Promise.race([promise, timeoutPromise])
+  } finally {
+    if (timeout) clearTimeout(timeout)
+  }
+}
+
 export default async function BestSkillsPage() {
   const [skills, statsMap] = await Promise.all([
-    getAllSkills('quality').catch(() => []),
-    getSkillStats().catch((): Record<string, SkillAgentStats> => ({})),
+    withTimeout(getAllSkills('quality', undefined, 1200), BEST_PAGE_QUERY_TIMEOUT_MS, 'best skills query')
+      .catch(() => CURATED_SKILL_SNAPSHOT),
+    withTimeout(getSkillStats(), BEST_PAGE_QUERY_TIMEOUT_MS, 'best stats query')
+      .catch((): Record<string, SkillAgentStats> => ({})),
   ])
   const totalStars = skills.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0)
 
   return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
+    <MarketingPageShell>
+      <MarketingHero
+        eyebrow="Top agent skills"
+        title="Top AI agent skills for real workflows."
+        description="Start from the job your agent needs to do. Each shortlist combines quality, trust, GitHub adoption, freshness, and install readiness so builders can move from search intent to a tested skill faster."
+        actions={
+          <>
+            <MarketingButtonLink href="/resolve" variant="primary">
+              Resolve a task
+            </MarketingButtonLink>
+            <MarketingButtonLink href="/api-docs#agent-resolve">
+              Resolve by API
+            </MarketingButtonLink>
+          </>
+        }
+        aside={
+          <MarketingMetricStrip
+            columns="grid-cols-3"
+            items={[
+              { value: BEST_SKILL_PAGES.length, label: 'Use cases' },
+              { value: skills.length.toLocaleString(), label: 'Skills' },
+              { value: formatCompactNumber(totalStars), label: 'Stars' },
+            ]}
+          />
+        }
+      />
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="border-b border-border pb-10">
-          <p className="mb-4 text-xs uppercase text-secondary">Top agent skills</p>
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-            <div>
-              <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">
-                Top AI agent skills for real workflows.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-                Start from the job your agent needs to do. Each shortlist combines quality, trust, GitHub adoption,
-                freshness, and install readiness so builders can move from search intent to a tested skill faster.
-              </p>
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Link
-                  href="/skills?trust=production"
-                  className="border border-foreground bg-foreground px-5 py-2 text-sm font-semibold text-background transition-opacity hover:opacity-80"
-                >
-                  Browse production skills
-                </Link>
-                <Link
-                  href="/api-docs#agent-resolve"
-                  className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
-                >
-                  Resolve by API
-                </Link>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{BEST_SKILL_PAGES.length}</div>
-                <div className="mt-1 text-xs uppercase text-secondary">Use cases</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{skills.length.toLocaleString()}</div>
-                <div className="mt-1 text-xs uppercase text-secondary">Skills</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{formatCompactNumber(totalStars)}</div>
-                <div className="mt-1 text-xs uppercase text-secondary">Stars</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         <section className="grid gap-4 border-b border-border py-10 lg:grid-cols-3">
           {FEATURED_BEST_PAGES.slice(0, 3).map((page) => {
             const topSkills = rankSkillsForDefinition(skills, toRanking(page), statsMap, 3)
@@ -158,9 +160,7 @@ export default async function BestSkillsPage() {
             })}
           </div>
         </section>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }

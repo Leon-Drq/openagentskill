@@ -1,7 +1,9 @@
 import { Metadata } from 'next'
-import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import {
+  MarketingButtonLink,
+  MarketingHero,
+  MarketingPageShell,
+} from '@/components/marketing-page'
 
 export const metadata: Metadata = {
   title: 'OpenAgentSkill CLI - Resolve and install AI agent skills',
@@ -57,47 +59,39 @@ const lockfile = `{
 
 export default function CliPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
+    <MarketingPageShell>
+      <MarketingHero
+        eyebrow="CLI contract"
+        title="Resolve, audit, and install agent skills from the terminal."
+        description={
+          <>
+            OpenAgentSkill CLI turns a natural-language task into a selected skill, safety policy decision,
+            target-specific install handoff, and audit trail.
+          </>
+        }
+        actions={
+          <>
+            <MarketingButtonLink href="/api-docs" variant="primary">
+              View API contract
+            </MarketingButtonLink>
+            <MarketingButtonLink
+              href="/api/agent/resolve?task=scrape+pricing+pages&agent=codex&format=text"
+              prefetch={false}
+            >
+              Try resolve endpoint
+            </MarketingButtonLink>
+          </>
+        }
+      />
 
-      <main>
-        <section className="relative overflow-hidden border-b border-border">
-          <div className="brand-grain pointer-events-none absolute inset-0 opacity-70" />
-          <div className="relative mx-auto max-w-6xl px-6 py-16 sm:py-20 lg:py-24">
-            <p className="font-mono text-xs uppercase text-secondary">CLI contract</p>
-            <h1 className="mt-5 max-w-4xl font-display text-4xl font-normal leading-[0.98] text-balance sm:text-5xl lg:text-7xl">
-              Resolve, audit, and install agent skills from the terminal.
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-secondary sm:text-lg">
-              OpenAgentSkill CLI turns a natural-language task into a selected skill, safety policy decision,
-              target-specific install handoff, and audit trail.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/api-docs"
-                className="inline-flex items-center justify-center rounded-[8px] bg-[#006b4f] px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              >
-                View API contract
-              </Link>
-              <Link
-                href="/api/agent/resolve?task=scrape+pricing+pages&agent=codex&format=text"
-                prefetch={false}
-                className="inline-flex items-center justify-center rounded-[8px] border border-border px-4 py-3 text-sm font-semibold transition-colors hover:border-foreground"
-              >
-                Try resolve endpoint
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <section className="border-b border-border">
+        <section className="min-w-0 border-b border-border">
           <div className="mx-auto grid max-w-6xl gap-4 px-6 py-12 sm:py-14 lg:grid-cols-3">
             {commands.map((item) => (
-              <article key={item.label} className="border border-border bg-card p-5">
+              <article key={item.label} className="min-w-0 border border-border bg-card p-5">
                 <p className="font-mono text-xs uppercase text-secondary">{item.label}</p>
                 <h2 className="mt-3 font-display text-2xl font-semibold leading-tight">{item.title}</h2>
                 <p className="mt-3 text-sm leading-6 text-secondary">{item.copy}</p>
-                <pre className="mt-5 overflow-x-auto border border-border bg-background p-3 font-mono text-xs leading-relaxed text-secondary">
+                <pre className="mt-5 max-w-full overflow-x-auto border border-border bg-background p-3 font-mono text-xs leading-relaxed text-secondary">
                   <code>{item.command}</code>
                 </pre>
               </article>
@@ -118,24 +112,21 @@ export default function CliPage() {
             </p>
           </div>
 
-          <div className="grid gap-4">
-            <div className="border border-border bg-card p-5">
+          <div className="grid min-w-0 gap-4">
+            <div className="min-w-0 border border-border bg-card p-5">
               <p className="mb-3 font-mono text-xs uppercase text-secondary">Request</p>
-              <pre className="overflow-x-auto border border-border bg-background p-4 font-mono text-xs leading-relaxed text-secondary">
+              <pre className="max-w-full overflow-x-auto border border-border bg-background p-4 font-mono text-xs leading-relaxed text-secondary">
                 <code>{contract}</code>
               </pre>
             </div>
-            <div className="border border-border bg-card p-5">
+            <div className="min-w-0 border border-border bg-card p-5">
               <p className="mb-3 font-mono text-xs uppercase text-secondary">Future lockfile</p>
-              <pre className="overflow-x-auto border border-border bg-background p-4 font-mono text-xs leading-relaxed text-secondary">
+              <pre className="max-w-full overflow-x-auto border border-border bg-background p-4 font-mono text-xs leading-relaxed text-secondary">
                 <code>{lockfile}</code>
               </pre>
             </div>
           </div>
         </section>
-      </main>
-
-      <SiteFooter />
-    </div>
+    </MarketingPageShell>
   )
 }

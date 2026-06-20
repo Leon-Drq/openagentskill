@@ -5,6 +5,7 @@ const de = {
   nav: {
     ...en.nav,
     home: 'Start',
+    resolve: 'Auflosen',
     skills: 'Skills',
     tasks: 'Aufgaben',
     packs: 'Skill Packs',

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import { SubscribeCard } from '@/components/subscribe-card'
 import { getAllSkills } from '@/lib/db/skills'
 import { SKILL_STACKS, selectSkillsForStack } from '@/lib/collections'
@@ -28,39 +27,24 @@ export default async function CollectionsPage() {
   const skills = await getAllSkills('quality').catch(() => [])
 
   return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
+    <MarketingPageShell>
+      <MarketingHero
+        eyebrow="Skill stacks"
+        title="Build agents from complete workflow stacks."
+        description="A single skill rarely solves the whole job. These stacks group high-signal skills into repeatable workflows for crawling, coding, RAG, QA, research, and growth."
+        aside={
+          <MarketingMetricStrip
+            columns="grid-cols-3"
+            items={[
+              { value: SKILL_STACKS.length, label: 'Stacks' },
+              { value: skills.length.toLocaleString(), label: 'Skills' },
+              { value: '4', label: 'Steps' },
+            ]}
+          />
+        }
+      />
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="border-b border-border pb-12">
-          <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Skill stacks</p>
-          <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
-            <div>
-              <h1 className="font-display text-4xl font-bold leading-tight text-balance sm:text-6xl">
-                Build agents from complete workflow stacks.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-                A single skill rarely solves the whole job. These stacks group high-signal skills into repeatable
-                workflows for crawling, coding, RAG, QA, research, and growth.
-              </p>
-            </div>
-            <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{SKILL_STACKS.length}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Stacks</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{skills.length.toLocaleString()}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Skills</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">4</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Steps</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         <section className="grid gap-4 py-10 md:grid-cols-2">
           {SKILL_STACKS.map((stack) => {
             const picks = selectSkillsForStack(skills, stack, 4)
@@ -110,9 +94,7 @@ export default async function CollectionsPage() {
             description="A short digest of agent workflows, recommended skills, and quality signals for builders."
           />
         </section>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }

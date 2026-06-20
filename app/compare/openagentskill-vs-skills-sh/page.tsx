@@ -3,9 +3,11 @@ import Link from 'next/link'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { withTimeout } from '@/lib/async'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAllSkills } from '@/lib/db/skills'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
+import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSkillTrustProfile } from '@/lib/trust'
 
 export const dynamic = 'force-dynamic'
@@ -53,8 +55,11 @@ const comparisonRows = [
   },
 ]
 
+const COMPARE_QUERY_TIMEOUT_MS = 1800
+
 export default async function OpenAgentSkillVsSkillsShPage() {
-  const skills = await getAllSkills('quality').catch(() => [])
+  const skills = await withTimeout(getAllSkills('quality', undefined, 12), COMPARE_QUERY_TIMEOUT_MS, 'skills.sh compare skills query')
+    .catch(() => CURATED_SKILL_SNAPSHOT.slice(0, 12))
   const totalStars = skills.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0)
   const decisionSkills = skills
     .slice(0, 8)

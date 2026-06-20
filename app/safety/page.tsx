@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import { buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile, type SkillSafetyTier } from '@/lib/agent-safety'
 import { getAllSkills, getSkillEventStatsMap, type SkillEventStats } from '@/lib/db/skills'
@@ -81,41 +80,23 @@ export default async function SafetyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <MarketingPageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <SiteHeader />
-
-      <main>
-        <section className="relative overflow-hidden border-b border-border">
-          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
-          <div className="relative mx-auto max-w-6xl px-6 py-14 sm:py-20">
-            <p className="font-mono text-xs uppercase tracking-[0.24em] text-secondary">Trust center</p>
-            <div className="mt-5 grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
-              <div>
-                <h1 className="max-w-4xl font-display text-4xl font-normal leading-[0.98] text-balance md:text-6xl">
-                  Safety gates for reusable AI agent skills.
-                </h1>
-                <p className="mt-6 max-w-2xl text-base leading-7 text-secondary md:text-lg">
-                  OpenAgentSkill does not treat every GitHub repository as equally safe. Each skill gets a safety gate
-                  before it can enter agent recommendations, install handoffs, and audit workflows.
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-px border border-border bg-border text-center">
-                {[
-                  { label: 'Indexed', value: rows.length.toLocaleString() },
-                  { label: 'Auto allow', value: installAllowed.toLocaleString() },
-                  { label: 'Reviewed+', value: (counts.verified + counts.reviewed).toLocaleString() },
-                  { label: 'Blocked', value: counts.blocked.toLocaleString() },
-                ].map((item) => (
-                  <div key={item.label} className="bg-background p-4">
-                    <div className="font-mono text-2xl">{item.value}</div>
-                    <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">{item.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+      <MarketingHero
+        eyebrow="Trust center"
+        title="Safety gates for reusable AI agent skills."
+        description="OpenAgentSkill does not treat every GitHub repository as equally safe. Each skill gets a safety gate before it can enter agent recommendations, install handoffs, and audit workflows."
+        aside={
+          <MarketingMetricStrip
+            items={[
+              { label: 'Indexed', value: rows.length.toLocaleString() },
+              { label: 'Auto allow', value: installAllowed.toLocaleString() },
+              { label: 'Reviewed+', value: (counts.verified + counts.reviewed).toLocaleString() },
+              { label: 'Blocked', value: counts.blocked.toLocaleString() },
+            ]}
+          />
+        }
+      />
 
         <section className="border-b border-border">
           <div className="mx-auto grid max-w-6xl gap-px border-x border-border bg-border md:grid-cols-4">
@@ -222,9 +203,6 @@ export default async function SafetyPage() {
             </div>
           </div>
         </section>
-      </main>
-
-      <SiteFooter />
-    </div>
+    </MarketingPageShell>
   )
 }

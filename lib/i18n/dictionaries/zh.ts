@@ -2,6 +2,7 @@ export default {
   // 导航
   nav: {
     home: '首页',
+    resolve: '解析',
     skills: '技能',
     tasks: '任务',
     packs: '技能包',

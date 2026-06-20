@@ -1,5 +1,6 @@
 import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { withTimeout } from '@/lib/async'
 import type { Skill } from '@/lib/types'
 
 export interface SkillRecord {
@@ -45,6 +46,16 @@ export interface SkillRecord {
 export type SkillSortMode = 'quality' | 'downloads' | 'stars' | 'new' | 'trending' | 'fresh'
 
 const SKILLS_PAGE_SIZE = 1000
+const ALL_SKILLS_CACHE_TTL_MS = 5 * 60 * 1000
+const SKILL_LOOKUP_TIMEOUT_MS = 2500
+
+type AllSkillsCacheEntry = {
+  expiresAt: number
+  value?: SkillRecord[]
+  promise?: Promise<SkillRecord[]>
+}
+
+const allSkillsCache = new Map<string, AllSkillsCacheEntry>()
 
 function isMcpText(value: string) {
   return /(^|[^a-z0-9])mcp([^a-z0-9]|$)/i.test(value) || /\bmodel context protocol\b/i.test(value)
@@ -76,12 +87,50 @@ function filterSkillOnly<T extends SkillOnlyScopeRecord>(records: T[]) {
 
 export async function getAllSkills(
   sort: SkillSortMode = 'quality',
-  category?: string
+  category?: string,
+  maxRows = Number.POSITIVE_INFINITY
+): Promise<SkillRecord[]> {
+  const rowLimit = Number.isFinite(maxRows) ? Math.max(1, Math.floor(maxRows)) : Number.POSITIVE_INFINITY
+  const cacheKey = `${sort}:${category || 'all'}:${rowLimit}`
+  const now = Date.now()
+  const cached = allSkillsCache.get(cacheKey)
+
+  if (cached && cached.expiresAt > now) {
+    if (cached.value) return cached.value
+    if (cached.promise) return cached.promise
+  }
+
+  const promise = fetchAllSkills(sort, category, rowLimit)
+  allSkillsCache.set(cacheKey, {
+    expiresAt: now + ALL_SKILLS_CACHE_TTL_MS,
+    promise,
+  })
+
+  try {
+    const value = await promise
+    allSkillsCache.set(cacheKey, {
+      expiresAt: Date.now() + ALL_SKILLS_CACHE_TTL_MS,
+      value,
+    })
+    return value
+  } catch (error) {
+    allSkillsCache.delete(cacheKey)
+    throw error
+  }
+}
+
+async function fetchAllSkills(
+  sort: SkillSortMode = 'quality',
+  category?: string,
+  maxRows = Number.POSITIVE_INFINITY
 ): Promise<SkillRecord[]> {
   const supabase = createPublicClient()
   const rows: SkillRecord[] = []
 
   for (let from = 0; ; from += SKILLS_PAGE_SIZE) {
+    const remaining = maxRows - rows.length
+    if (remaining <= 0) break
+    const pageSize = Math.min(SKILLS_PAGE_SIZE, remaining)
     let query = supabase
       .from('skills')
       .select('*')
@@ -111,12 +160,12 @@ export async function getAllSkills(
         query = query.order('downloads', { ascending: false })
     }
 
-    const { data, error } = await query.range(from, from + SKILLS_PAGE_SIZE - 1)
+    const { data, error } = await query.range(from, from + pageSize - 1)
     if (error) throw error
     if (!data?.length) break
 
     rows.push(...(data as SkillRecord[]))
-    if (data.length < SKILLS_PAGE_SIZE) break
+    if (data.length < pageSize) break
   }
 
   return filterSkillOnly(rows)
@@ -339,11 +388,19 @@ export async function getCategories(): Promise<string[]> {
 export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> {
   const supabase = createPublicClient()
 
-  const { data, error } = await supabase
-    .from('skills')
-    .select('*')
-    .eq('slug', slug)
-    .single()
+  const { data, error } = await withTimeout(
+    supabase
+      .from('skills')
+      .select('*')
+      .eq('slug', slug)
+      .eq('ai_review_approved', true)
+      .maybeSingle(),
+    SKILL_LOOKUP_TIMEOUT_MS,
+    `skill lookup ${slug}`
+  ).catch((lookupError) => {
+    console.warn('Skill lookup fallback:', lookupError)
+    return { data: null, error: lookupError }
+  })
   
   if (error || !data || isMcpSkillRecord(data)) return null
   return data

@@ -5,6 +5,7 @@ const ja = {
   nav: {
     ...en.nav,
     home: 'ホーム',
+    resolve: '解決',
     skills: 'スキル',
     tasks: 'タスク',
     packs: 'スキルパック',

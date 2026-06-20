@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { GrowthSkillList } from '@/components/growth-skill-list'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import {
   getAllSkills,
   getSkillEventDailyStatsMap,
@@ -61,40 +60,25 @@ export default async function HotSkillsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <MarketingPageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <SiteHeader />
+      <MarketingHero
+        eyebrow="Hot skills"
+        title="Hot agent skills worth checking now."
+        description="This list weights recent activity and fresh repository signals more heavily than the all-time leaderboard, so new and newly maintained skills can surface faster."
+        aside={
+          <MarketingMetricStrip
+            columns="grid-cols-3"
+            items={[
+              { value: formatCompactNumber(totalRecentEvents), label: 'Events / 7d' },
+              { value: freshRepoCount, label: 'Fresh' },
+              { value: formatCompactNumber(totalStars), label: 'Stars' },
+            ]}
+          />
+        }
+      />
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="border-b border-border pb-10">
-          <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Hot skills</p>
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-            <div>
-              <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">
-                Hot agent skills worth checking now.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-                This list weights recent activity and fresh repository signals more heavily than the all-time leaderboard,
-                so new and newly maintained skills can surface faster.
-              </p>
-            </div>
-            <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{formatCompactNumber(totalRecentEvents)}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Events / 7d</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{freshRepoCount}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Fresh</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{formatCompactNumber(totalStars)}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Stars</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         <section className="grid gap-3 border-b border-border py-8 md:grid-cols-4">
           <Link href="/trending" className="border border-border p-5 transition-colors hover:border-foreground">
             <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Trending</p>
@@ -125,9 +109,7 @@ export default async function HotSkillsPage() {
           </div>
           <GrowthSkillList items={ranked} />
         </section>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }

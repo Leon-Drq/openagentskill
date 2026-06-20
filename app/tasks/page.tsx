@@ -1,7 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import {
+  MarketingButtonLink,
+  MarketingHero,
+  MarketingMetricStrip,
+  MarketingPageShell,
+} from '@/components/marketing-page'
 import { AGENT_TASKS } from '@/lib/agent-tasks'
 import { getAllSkills } from '@/lib/db/skills'
 
@@ -32,54 +36,34 @@ export default async function TasksPage() {
   const totalStars = skills.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0)
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
+    <MarketingPageShell>
+      <MarketingHero
+        eyebrow="Agent tasks"
+        title="Start from the job your agent needs to do."
+        description="Each task page turns a real agent workflow into a ranked skill shortlist, install prompts, safety notes, and a Resolve API call."
+        actions={
+          <>
+            <MarketingButtonLink href="/agent" variant="primary">
+              Agent entry
+            </MarketingButtonLink>
+            <MarketingButtonLink href="/api/agent/tasks?format=text" prefetch={false}>
+              Text API
+            </MarketingButtonLink>
+          </>
+        }
+        aside={
+          <MarketingMetricStrip
+            columns="grid-cols-3"
+            items={[
+              { value: AGENT_TASKS.length, label: 'Tasks' },
+              { value: skills.length.toLocaleString(), label: 'Skills' },
+              { value: formatNumber(totalStars), label: 'Stars' },
+            ]}
+          />
+        }
+      />
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="relative -mx-4 overflow-hidden border-b border-border px-4 pb-10 pt-2 sm:-mx-6 sm:px-6">
-          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
-          <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-            <div>
-              <p className="mb-5 font-mono text-xs uppercase text-secondary">Agent tasks</p>
-              <h1 className="font-display text-4xl font-normal leading-[0.98] text-balance md:text-6xl">
-                Start from the job your agent needs to do.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-                Each task page turns a real agent workflow into a ranked skill shortlist, install prompts, safety notes, and a Resolve API call.
-              </p>
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Link
-                  href="/agent"
-                  className="border border-foreground bg-foreground px-5 py-2 text-sm font-semibold text-background transition-opacity hover:opacity-80"
-                >
-                  Agent entry
-                </Link>
-                <Link
-                  href="/api/agent/tasks?format=text"
-                  prefetch={false}
-                  className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
-                >
-                  Text API
-                </Link>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{AGENT_TASKS.length}</div>
-                <div className="mt-1 text-xs uppercase text-secondary">Tasks</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{skills.length.toLocaleString()}</div>
-                <div className="mt-1 text-xs uppercase text-secondary">Skills</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{formatNumber(totalStars)}</div>
-                <div className="mt-1 text-xs uppercase text-secondary">Stars</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         <section className="grid gap-4 py-10 md:grid-cols-2 lg:grid-cols-3">
           {AGENT_TASKS.map((task, index) => (
             <Link
@@ -105,9 +89,7 @@ export default async function TasksPage() {
             </Link>
           ))}
         </section>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }

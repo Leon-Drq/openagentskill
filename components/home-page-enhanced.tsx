@@ -761,6 +761,7 @@ export function HomePageEnhanced({ initialLocale, stats }: HomePageEnhancedProps
     <div className="min-h-screen bg-[#fbfaf6] text-[#1d1b18]">
       <SiteHeader />
 
+      <main>
       <section className="relative overflow-hidden border-b border-[#e4e0d8]">
         <div
           className="pointer-events-none absolute inset-0 z-0 opacity-75"
@@ -1319,15 +1320,15 @@ export function HomePageEnhanced({ initialLocale, stats }: HomePageEnhancedProps
               >
                 <span className="font-mono text-xs text-[#6d675e]">{String(index + 1).padStart(2, '0')}</span>
                 <h3
-                  className="mt-4 text-xl leading-tight"
+                  className="mt-4 min-h-[1.75rem] text-xl leading-tight"
                   style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
                 >
                   {title}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#5f5a52]">{task}</p>
+                <p className="mt-2 min-h-[2.75rem] text-sm leading-relaxed text-[#5f5a52]">{task}</p>
                 <div className="mt-5 space-y-2">
                   {skills.map((skill) => (
-                    <div key={skill} className="rounded-full border border-[#e0dbd2] bg-[#fbfaf6] px-3 py-2 font-mono text-[11px] text-[#5f5a52]">
+                    <div key={skill} className="flex min-h-9 items-center rounded-full border border-[#e0dbd2] bg-[#fbfaf6] px-3 font-mono text-[11px] text-[#5f5a52]">
                       {skill}
                     </div>
                   ))}
@@ -1375,6 +1376,8 @@ export function HomePageEnhanced({ initialLocale, stats }: HomePageEnhancedProps
           </div>
         </div>
       </section>
+
+      </main>
 
       <SiteFooter />
 

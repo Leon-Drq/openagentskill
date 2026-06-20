@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { unstable_cache } from 'next/cache'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
-import { getAllSkills, searchSkills } from '@/lib/db/skills'
+import { withTimeout } from '@/lib/async'
+import { getAllSkills } from '@/lib/db/skills'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
+import { dedupeRankedSkills, rankSkillsForQuery } from '@/lib/registry'
+import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 
@@ -26,10 +30,13 @@ export async function GET(request: NextRequest) {
   const maxRisk = searchParams.get('max_risk') || 'medium'
 
   try {
-    let records = query ? await searchSkills(query) : await getAllSkills()
+    const candidatePool = await getAgentSkillCandidatePool()
+    let records = query
+      ? dedupeRankedSkills(rankSkillsForQuery(candidatePool, query)).map((item) => item.skill)
+      : candidatePool
 
     if (category) {
-      records = records.filter((r) => r.category === category)
+      records = records.filter((r) => r.category.toLowerCase() === category.toLowerCase())
     }
     if (platform) {
       records = records.filter((r) =>
@@ -153,8 +160,32 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Agent skills API error:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch skills' },
-      { status: 500 }
+      {
+        error: 'Failed to fetch skills',
+        fallback: true,
+        hint: 'Use /api/agent/resolve?task=... for the most reliable agent handoff.',
+      },
+      { status: 503 }
     )
   }
+}
+
+const AGENT_SKILLS_QUERY_TIMEOUT_MS = 1000
+const AGENT_SKILLS_CANDIDATE_LIMIT = 500
+
+const getCachedAgentSkillCandidatePool = unstable_cache(
+  async () => getAllSkills('quality', undefined, AGENT_SKILLS_CANDIDATE_LIMIT),
+  ['agent-skills-candidate-pool-v3'],
+  { revalidate: 300 }
+)
+
+async function getAgentSkillCandidatePool() {
+  return withTimeout(
+    getCachedAgentSkillCandidatePool(),
+    AGENT_SKILLS_QUERY_TIMEOUT_MS,
+    'agent skills candidate query'
+  ).catch((error) => {
+    console.warn('Agent skills candidate fallback:', error)
+    return CURATED_SKILL_SNAPSHOT
+  })
 }

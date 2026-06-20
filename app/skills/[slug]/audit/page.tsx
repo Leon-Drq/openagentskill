@@ -12,11 +12,14 @@ import {
   type SkillAuditCheck,
 } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
-import { getRelatedSkills, getSkillAuditBySlug, getSkillBySlug, getSkillEventStats } from '@/lib/db/skills'
+import { withTimeout } from '@/lib/async'
+import { getRelatedSkills, getSkillAuditBySlug, getSkillEventStats } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
+import { getSkillBySlugOrFallback, isCuratedSkillFallback } from '@/lib/skill-fallbacks'
 import { getSkillTrustProfile, type TrustCheckStatus } from '@/lib/trust'
 
 export const dynamic = 'force-dynamic'
+const SKILL_AUDIT_SUPPORT_TIMEOUT_MS = 1200
 
 export async function generateMetadata({
   params,
@@ -24,7 +27,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const skill = await getSkillBySlug(slug)
+  const skill = await getSkillBySlugOrFallback(slug)
   if (!skill) return { title: 'Skill Audit Not Found' }
 
   const pageUrl = `https://www.openagentskill.com/skills/${skill.slug}/audit`
@@ -88,14 +91,16 @@ function formatDate(value: string | null | undefined) {
 
 export default async function SkillAuditPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const skill = await getSkillBySlug(slug)
+  const skill = await getSkillBySlugOrFallback(slug)
   if (!skill) notFound()
 
-  const [storedAudit, eventStats, relatedSkills] = await Promise.all([
-    getSkillAuditBySlug(skill.slug).catch(() => null),
-    getSkillEventStats(skill.slug).catch(() => null),
-    getRelatedSkills(skill.id, skill.category, 3).catch(() => []),
-  ])
+  const [storedAudit, eventStats, relatedSkills] = isCuratedSkillFallback(skill)
+    ? [null, null, []]
+    : await Promise.all([
+        withTimeout(getSkillAuditBySlug(skill.slug), SKILL_AUDIT_SUPPORT_TIMEOUT_MS, 'stored audit query').catch(() => null),
+        withTimeout(getSkillEventStats(skill.slug), SKILL_AUDIT_SUPPORT_TIMEOUT_MS, 'audit event stats query').catch(() => null),
+        withTimeout(getRelatedSkills(skill.id, skill.category, 3), SKILL_AUDIT_SUPPORT_TIMEOUT_MS, 'audit related skills query').catch(() => []),
+      ])
   const audit = storedAudit ? normalizeAuditRecord(storedAudit) : buildSkillAudit(skill, eventStats)
   const trust = getSkillTrustProfile(skill, false, eventStats)
   const safety = getAgentSafetyProfile(skill, audit, { max_risk: 'medium', needs_install_command: true })
@@ -195,7 +200,7 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
                   </div>
                   <div>
                     <h2 className="font-display text-2xl font-semibold">
-                      Stars, maintenance, license, docs, dependency risk, and installability.
+                      Stars, maintenance, license, docs, install safety, permission surface, and installability.
                     </h2>
                     <p className="mt-3 max-w-3xl text-sm leading-relaxed text-secondary">
                       The Trust Score is OpenAgentSkill&apos;s adoption layer. It is designed to help an agent decide

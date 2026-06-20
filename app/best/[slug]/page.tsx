@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { convertSkillRecordToManifest, getAllSkills, getSkillStats, type SkillAgentStats } from '@/lib/db/skills'
 import { formatCompactNumber, getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
 import {
@@ -12,10 +13,12 @@ import {
   type RankingDefinition,
 } from '@/lib/rankings'
 import { BEST_SKILL_PAGES, getBestSkillPage } from '@/lib/seo/growth-pages'
+import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSkillTrustProfile } from '@/lib/trust'
-import { getUseCaseBySlug } from '@/lib/use-cases'
+import { getUseCaseBySlug, getUseCasesForSkill } from '@/lib/use-cases'
 
 export const dynamic = 'force-dynamic'
+const BEST_PAGE_QUERY_TIMEOUT_MS = 2000
 
 export function generateStaticParams() {
   return BEST_SKILL_PAGES.map((page) => ({ slug: page.slug }))
@@ -66,6 +69,19 @@ function formatDate(value: string | null | undefined) {
   })
 }
 
+async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  let timeout: ReturnType<typeof setTimeout> | undefined
+  const timeoutPromise = new Promise<T>((_, reject) => {
+    timeout = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+  })
+
+  try {
+    return await Promise.race([promise, timeoutPromise])
+  } finally {
+    if (timeout) clearTimeout(timeout)
+  }
+}
+
 export default async function BestSkillDetailPage({
   params,
 }: {
@@ -78,8 +94,10 @@ export default async function BestSkillDetailPage({
   const useCase = getUseCaseBySlug(page.useCaseSlug)
   const ranking = toRanking(page)
   const [skills, statsMap] = await Promise.all([
-    getAllSkills('quality').catch(() => []),
-    getSkillStats().catch((): Record<string, SkillAgentStats> => ({})),
+    withTimeout(getAllSkills('quality', undefined, 1200), BEST_PAGE_QUERY_TIMEOUT_MS, 'best skills query')
+      .catch(() => CURATED_SKILL_SNAPSHOT),
+    withTimeout(getSkillStats(), BEST_PAGE_QUERY_TIMEOUT_MS, 'best stats query')
+      .catch((): Record<string, SkillAgentStats> => ({})),
   ])
   const rankedSkills = rankSkillsForDefinition(skills, ranking, statsMap, 30)
   const compareHref = getRankingCompareHref(rankedSkills)
@@ -155,6 +173,18 @@ export default async function BestSkillDetailPage({
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-secondary">
               {page.audience} Ranked from the OpenAgentSkill index using quality, trust, freshness, adoption, and install readiness.
             </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {page.primaryKeyword && (
+                <span className="border border-border px-2.5 py-1 font-mono text-xs text-secondary">
+                  {page.primaryKeyword}
+                </span>
+              )}
+              {page.agentSurface && (
+                <span className="border border-border px-2.5 py-1 font-mono text-xs text-secondary">
+                  {page.agentSurface}
+                </span>
+              )}
+            </div>
             <div className="mt-7 flex flex-wrap gap-3">
               {rankedSkills.length > 1 && (
                 <Link
@@ -169,6 +199,12 @@ export default async function BestSkillDetailPage({
                 className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
               >
                 Filter production candidates
+              </Link>
+              <Link
+                href={`/resolve?task=${encodeURIComponent(page.exampleTasks?.[0] || page.searchIntent)}`}
+                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+              >
+                Resolve this workflow
               </Link>
             </div>
           </div>
@@ -193,13 +229,26 @@ export default async function BestSkillDetailPage({
 
         {useCase && (
           <section className="border-b border-border py-10">
-            <div className="grid gap-px bg-border md:grid-cols-3">
-              {useCase.workflows.slice(0, 3).map((workflow) => (
-                <div key={workflow} className="bg-background p-5">
-                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Workflow</p>
-                  <p className="font-display text-xl font-semibold">{workflow}</p>
-                </div>
-              ))}
+            <div className="grid gap-6 lg:grid-cols-[0.82fr_1.18fr]">
+              <div>
+                <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Search intent</p>
+                <h2 className="font-display text-2xl font-semibold">{page.searchIntent}</h2>
+                <p className="mt-3 text-sm leading-relaxed text-secondary">
+                  These pages are generated from real registry records. The list below is not a generic article; every row links to a skill profile with install, trust, audit, and risk fields.
+                </p>
+              </div>
+              <div className="grid gap-px bg-border md:grid-cols-3">
+                {(page.exampleTasks?.length ? page.exampleTasks : useCase.workflows).slice(0, 3).map((workflow) => (
+                  <Link
+                    key={workflow}
+                    href={`/resolve?task=${encodeURIComponent(workflow)}`}
+                    className="bg-background p-5 transition-colors hover:bg-card"
+                  >
+                    <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Resolve task</p>
+                    <p className="font-display text-xl font-semibold">{workflow}</p>
+                  </Link>
+                ))}
+              </div>
             </div>
           </section>
         )}
@@ -219,7 +268,15 @@ export default async function BestSkillDetailPage({
                 const manifest = convertSkillRecordToManifest(skill)
                 const quality = getSkillQualityProfile(skill, statsMap[skill.slug] || null)
                 const trust = getSkillTrustProfile(skill)
+                const audit = buildSkillAudit(skill)
                 const platforms = [...new Set([...(skill.frameworks || []), ...getPlatformHints(skill)])]
+                const skillUseCases = getUseCasesForSkill(skill, 2)
+                const scenario =
+                  skillUseCases.find((candidate) => candidate.slug === page.useCaseSlug)?.agentTasks[0] ||
+                  skillUseCases[0]?.agentTasks[0] ||
+                  page.exampleTasks?.[0] ||
+                  page.searchIntent
+                const installCommand = manifest.technical.installCommand || `npx skills add ${skill.github_repo || skill.slug}`
 
                 return (
                   <article key={skill.slug} className="grid gap-5 py-7 lg:grid-cols-[auto_1fr_280px]">
@@ -240,9 +297,16 @@ export default async function BestSkillDetailPage({
                         <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
                           {quality.label} {quality.score}
                         </span>
+                        <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
+                          Audit {audit.audit_score} · {auditRiskLabel(audit.risk_level)}
+                        </span>
                       </div>
                       <p className="max-w-3xl text-sm leading-relaxed text-secondary">{skill.description}</p>
                       <p className="mt-3 max-w-3xl text-sm leading-relaxed">{item.reason}</p>
+                      <div className="mt-4 border border-border bg-card p-3">
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-secondary">Best suited scenario</p>
+                        <p className="mt-2 text-sm leading-relaxed text-secondary">{scenario}</p>
+                      </div>
                       <div className="mt-4 flex flex-wrap gap-4 text-xs font-mono text-secondary">
                         <span>{formatCompactNumber(skill.github_stars || 0)} stars</span>
                         <span>{formatDate(skill.github_last_pushed_at || skill.updated_at)} push</span>
@@ -262,11 +326,17 @@ export default async function BestSkillDetailPage({
                         >
                           Compare
                         </Link>
+                        <Link
+                          href={`/skills/${skill.slug}/audit`}
+                          className="border border-border px-2.5 py-1 text-xs text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                        >
+                          Audit
+                        </Link>
                       </div>
                     </div>
                     <div className="min-w-0">
                       <InstallCommand
-                        command={manifest.technical.installCommand || `npx skills add ${skill.github_repo}`}
+                        command={installCommand}
                         skillSlug={skill.slug}
                         compact
                       />

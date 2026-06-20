@@ -1,7 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { unstable_cache } from 'next/cache'
+import { withTimeout } from '@/lib/async'
 import { getAllSkills } from '@/lib/db/skills'
 import { dedupeRankedSkills, getRecommendationReasons, rankSkillsForQuery, toRegistrySkill } from '@/lib/registry'
+import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSkillSupplyProfile } from '@/lib/supply'
+
+export const revalidate = 300
+
+const SEARCH_CANDIDATE_LIMIT = 750
+const SEARCH_QUERY_TIMEOUT_MS = 1000
+const SEARCH_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
+}
+
+const getSearchCandidatePool = unstable_cache(
+  async () => getAllSkills('quality', undefined, SEARCH_CANDIDATE_LIMIT),
+  ['skills-search-candidate-pool-v2'],
+  { revalidate: 300 }
+)
 
 function clampLimit(value: string | null) {
   const parsed = Number(value || 10)
@@ -19,9 +36,17 @@ export async function GET(request: NextRequest) {
   const minStars = Number(searchParams.get('min_stars') || searchParams.get('minStars') || 0)
   const format = searchParams.get('format') || 'json'
   const limit = clampLimit(searchParams.get('limit'))
+  const shortlistLimit = Math.max(limit * 8, 30)
 
   try {
-    const skills = await getAllSkills('quality')
+    const skills = await withTimeout(
+      getSearchCandidatePool(),
+      SEARCH_QUERY_TIMEOUT_MS,
+      'public skill search candidate query'
+    ).catch((error) => {
+      console.warn('Public skill search fallback:', error)
+      return CURATED_SKILL_SNAPSHOT
+    })
     const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, query))
       .filter(({ skill }) => {
         if (category && skill.category.toLowerCase() !== category.toLowerCase()) return false
@@ -38,6 +63,7 @@ export async function GET(request: NextRequest) {
         }
         return true
       })
+      .slice(0, shortlistLimit)
       .map(({ skill, score }) => ({
         skill,
         score,
@@ -71,6 +97,7 @@ Found: ${ranked.length}
 ${text}`,
         {
           headers: {
+            ...SEARCH_CACHE_HEADERS,
             'Content-Type': 'text/plain; charset=utf-8',
             'X-Agent-Friendly': 'true',
           },
@@ -78,34 +105,37 @@ ${text}`,
       )
     }
 
-    return NextResponse.json({
-      query,
-      filters: {
-        category,
-        platform,
-        track,
-        safety,
-        include_blocked: includeBlocked,
-        min_stars: Number.isFinite(minStars) ? minStars : 0,
+    return NextResponse.json(
+      {
+        query,
+        filters: {
+          category,
+          platform,
+          track,
+          safety,
+          include_blocked: includeBlocked,
+          min_stars: Number.isFinite(minStars) ? minStars : 0,
+        },
+        total: ranked.length,
+        skills: ranked.map(({ skill, score, registrySkill }, index) => ({
+          rank: index + 1,
+          match_score: score,
+          ...registrySkill,
+          recommendation_reasons: getRecommendationReasons(skill, query, score),
+        })),
+        meta: {
+          endpoint: '/api/skills/search',
+          canonical_agent_endpoint: '/api/agent/resolve',
+          safety_policy: 'Blocked candidates are excluded by default. Pass include_blocked=true only for manual audit workflows.',
+          agent_friendly: true,
+          api_version: '1.0',
+          generated_at: new Date().toISOString(),
+        },
       },
-      total: ranked.length,
-      skills: ranked.map(({ skill, score, registrySkill }, index) => ({
-        rank: index + 1,
-        match_score: score,
-        ...registrySkill,
-        recommendation_reasons: getRecommendationReasons(skill, query, score),
-      })),
-      meta: {
-        endpoint: '/api/skills/search',
-        canonical_agent_endpoint: '/api/agent/resolve',
-        safety_policy: 'Blocked candidates are excluded by default. Pass include_blocked=true only for manual audit workflows.',
-        agent_friendly: true,
-        api_version: '1.0',
-        generated_at: new Date().toISOString(),
-      },
-    })
+      { headers: SEARCH_CACHE_HEADERS }
+    )
   } catch (error) {
     console.error('Public skill search API error:', error)
-    return NextResponse.json({ error: 'Failed to search skills' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to search skills' }, { status: 503 })
   }
 }

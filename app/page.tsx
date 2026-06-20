@@ -7,8 +7,9 @@ import {
   HOME_SOCIAL_TITLE,
   SITE_URL,
 } from '@/lib/seo/social'
+import { getLocalizedLanguageAlternates } from '@/lib/seo/localized-pages'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'The Skill Layer for AI Agents',
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
     'The skill layer for AI agents. Let your AI agent find, compare, and install the right reusable skill automatically. OpenAgentSkill is npm for AI Agent Skills.',
   alternates: {
     canonical: SITE_URL,
+    languages: getLocalizedLanguageAlternates(),
   },
   openGraph: {
     title: HOME_SOCIAL_TITLE,

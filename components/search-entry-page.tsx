@@ -1,7 +1,10 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import {
+  MarketingHero,
+  MarketingMetricStrip,
+  MarketingPageShell,
+} from '@/components/marketing-page'
 import type { SearchEntryPageSpec } from '@/lib/seo/search-entry-pages'
 
 const BASE_URL = 'https://www.openagentskill.com'
@@ -73,45 +76,36 @@ export function SearchEntryPage({ page }: { page: SearchEntryPageSpec }) {
   ]
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
-      <main>
-        <section className="relative overflow-hidden border-b border-border px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
-          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
-          <div className="relative mx-auto max-w-6xl">
-            <p className="mb-5 font-mono text-xs uppercase tracking-[0.24em] text-secondary">
-              {page.eyebrow}
-            </p>
-            <h1 className="max-w-5xl text-balance font-display text-4xl font-normal leading-[0.98] sm:text-5xl lg:text-7xl">
-              {page.title}
-            </h1>
-            <p className="mt-6 max-w-3xl text-pretty text-lg leading-relaxed text-secondary sm:text-xl">
-              {page.description}
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <SmartLink
-                href={page.primaryCta.href}
-                className="border border-foreground bg-foreground px-5 py-3 text-center text-sm font-semibold text-background transition-opacity hover:opacity-85"
-              >
-                {page.primaryCta.label}
-              </SmartLink>
-              <SmartLink
-                href={page.secondaryCta.href}
-                className="border border-border bg-card px-5 py-3 text-center text-sm font-semibold transition-colors hover:border-foreground"
-              >
-                {page.secondaryCta.label}
-              </SmartLink>
-            </div>
-            <div className="mt-16 grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
-              {page.proof.map((item) => (
-                <div key={item.label} className="bg-background p-5">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-secondary">{item.label}</p>
-                  <p className="mt-3 font-display text-2xl font-normal">{item.value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+    <MarketingPageShell>
+      <MarketingHero
+        eyebrow={page.eyebrow}
+        title={page.title}
+        description={page.description}
+        actions={
+          <>
+            <SmartLink
+              href={page.primaryCta.href}
+              className="inline-flex min-h-11 items-center justify-center rounded-[8px] border border-[#006b4f] bg-[#006b4f] px-5 py-2 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              {page.primaryCta.label}
+            </SmartLink>
+            <SmartLink
+              href={page.secondaryCta.href}
+              className="inline-flex min-h-11 items-center justify-center rounded-[8px] border border-border bg-background px-5 py-2 text-center text-sm font-semibold text-secondary transition-colors hover:border-foreground hover:text-foreground"
+            >
+              {page.secondaryCta.label}
+            </SmartLink>
+          </>
+        }
+        aside={
+          <MarketingMetricStrip
+            items={page.proof.map((item) => ({
+              value: item.value,
+              label: item.label,
+            }))}
+          />
+        }
+      />
 
         <section className="border-b border-border px-4 py-12 sm:px-6 sm:py-16">
           <div className="mx-auto grid max-w-6xl gap-4 lg:grid-cols-2">
@@ -229,8 +223,6 @@ export function SearchEntryPage({ page }: { page: SearchEntryPageSpec }) {
             ))}
           </div>
         </section>
-      </main>
-      <SiteFooter />
       {structuredData.map((item) => (
         <script
           key={item['@type']}
@@ -238,6 +230,6 @@ export function SearchEntryPage({ page }: { page: SearchEntryPageSpec }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
         />
       ))}
-    </div>
+    </MarketingPageShell>
   )
 }

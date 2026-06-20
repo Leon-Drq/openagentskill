@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { InstallCommand } from '@/components/install-command'
+import { MarketingHero, MarketingPageShell } from '@/components/marketing-page'
 import { SkillEventTracker } from '@/components/skill-event-tracker'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
 import { getAllSkills, getSkillBySlug, getSkillEventStatsMap, type SkillEventStats, type SkillRecord } from '@/lib/db/skills'
 import { getStacksForSkill } from '@/lib/collections'
 import { getCompareDecisionSummary } from '@/lib/decision'
@@ -60,28 +59,23 @@ export default async function ComparePage({
   )
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <MarketingPageShell>
       {comparedSkills.map((skill) => (
         <SkillEventTracker key={skill.slug} skillSlug={skill.slug} eventType="compare" />
       ))}
 
-      <SiteHeader />
+      <MarketingHero
+        eyebrow="Skill comparison"
+        title="Compare agent skills before installing."
+        description={
+          <>
+            Put high-signal skills side by side and inspect quality, adoption, freshness, install readiness,
+            use-case fit, and warnings in one place.
+          </>
+        }
+      />
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-        <section className="relative -mx-4 overflow-hidden border-b border-border px-4 pb-10 pt-2 sm:-mx-6 sm:px-6">
-          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
-          <div className="relative">
-            <p className="mb-5 font-mono text-xs uppercase tracking-[0.24em] text-secondary">Skill comparison</p>
-            <h1 className="max-w-4xl font-display text-4xl font-normal leading-[0.98] text-balance sm:text-6xl">
-              Compare agent skills before installing.
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-secondary">
-              Put high-signal skills side by side and inspect quality, adoption, freshness, install readiness,
-              use-case fit, and warnings in one place.
-            </p>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         {comparedSkills.length === 0 ? (
           <section className="py-10">
             <div className="mb-8 grid gap-3 md:grid-cols-2">
@@ -335,9 +329,7 @@ export default async function ComparePage({
             </div>
           </section>
         )}
-      </main>
-
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }

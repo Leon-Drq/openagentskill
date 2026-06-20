@@ -7,6 +7,7 @@
 
 import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { STATIC_BLOG_POSTS, getStaticBlogPostBySlug } from '@/lib/blog/static-posts'
 import { generateText } from 'ai'
 
 export interface BlogGenerateResult {
@@ -259,8 +260,14 @@ export async function getBlogPosts(limit = 20) {
     .order('published_at', { ascending: false })
     .limit(limit)
 
-  if (error) throw new Error(error.message)
-  return data || []
+  const dynamicPosts = error ? [] : (data || [])
+  const seen = new Set(dynamicPosts.map((post) => post.slug))
+  const mergedPosts = [
+    ...STATIC_BLOG_POSTS.filter((post) => !seen.has(post.slug)),
+    ...dynamicPosts,
+  ].sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
+
+  return mergedPosts.slice(0, limit)
 }
 
 export async function getBlogPostBySlug(slug: string) {
@@ -274,7 +281,7 @@ export async function getBlogPostBySlug(slug: string) {
     .eq('slug', slug)
     .single()
 
-  if (error) return null
+  if (error) return getStaticBlogPostBySlug(slug)
   return data
 }
 

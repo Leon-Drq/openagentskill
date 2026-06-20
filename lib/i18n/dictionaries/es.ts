@@ -5,6 +5,7 @@ const es = {
   nav: {
     ...en.nav,
     home: 'Inicio',
+    resolve: 'Resolver',
     skills: 'Skills',
     tasks: 'Tareas',
     packs: 'Packs',

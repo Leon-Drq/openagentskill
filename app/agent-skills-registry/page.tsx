@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { AgentRecommendationDemo } from '@/components/agent-recommendation-demo'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { MarketingButtonLink, MarketingHero, MarketingPageShell } from '@/components/marketing-page'
 import { getAllSkills } from '@/lib/db/skills'
 
 const BASE_URL = 'https://www.openagentskill.com'
@@ -78,40 +77,25 @@ export default async function AgentSkillsRegistryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
-      <main>
-        <section className="border-b border-border px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
-          <div className="mx-auto max-w-5xl">
-            <p className="mb-4 text-xs uppercase tracking-widest text-secondary">AI Agent Skills Registry</p>
-            <h1 className="max-w-4xl text-balance font-display text-4xl font-bold leading-tight sm:text-6xl">
-              The skill layer for AI agents.
-            </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-secondary sm:text-xl">
-              Let your AI agent find, compare, and install the right reusable skill automatically with a registry, audit layer, and recommendation API.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/api-docs"
-                className="border border-foreground bg-foreground px-5 py-3 text-center text-sm font-semibold text-background transition-opacity hover:opacity-85"
-              >
-                View API docs
-              </Link>
-              <Link
-                href="/skills"
-                className="border border-border px-5 py-3 text-center text-sm font-semibold transition-colors hover:border-foreground"
-              >
-                Browse registry
-              </Link>
-              <Link
-                href="/skill-packs"
-                className="border border-border px-5 py-3 text-center text-sm font-semibold transition-colors hover:border-foreground"
-              >
-                Open skill packs
-              </Link>
-            </div>
-          </div>
-        </section>
+    <MarketingPageShell>
+      <MarketingHero
+        eyebrow="AI Agent Skills Registry"
+        title="The skill layer for AI agents."
+        description="Let your AI agent find, compare, and install the right reusable skill automatically with a registry, audit layer, and recommendation API."
+        actions={
+          <>
+            <MarketingButtonLink href="/api-docs" variant="primary">
+              View API docs
+            </MarketingButtonLink>
+            <MarketingButtonLink href="/skills">
+              Browse registry
+            </MarketingButtonLink>
+            <MarketingButtonLink href="/skill-packs">
+              Open skill packs
+            </MarketingButtonLink>
+          </>
+        }
+      />
 
         <AgentRecommendationDemo />
 
@@ -192,8 +176,6 @@ export default async function AgentSkillsRegistryPage() {
             </div>
           </div>
         </section>
-      </main>
-      <SiteFooter />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(apiData) }}
@@ -202,6 +184,6 @@ export default async function AgentSkillsRegistryPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqData) }}
       />
-    </div>
+    </MarketingPageShell>
   )
 }

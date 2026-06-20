@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Geist_Mono, Inter } from 'next/font/google'
 import { StructuredData } from '@/components/structured-data'
 import { I18nProvider } from '@/lib/i18n/context'
-import { getLocalizedLanguageAlternates } from '@/lib/seo/localized-pages'
+import { LOCALIZED_LANDING_PAGES, getLocalizedLanguageAlternates } from '@/lib/seo/localized-pages'
 import {
   HOME_SOCIAL_DESCRIPTION,
   HOME_SOCIAL_IMAGE_URL,
@@ -120,13 +120,22 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode
+  params?: Promise<{ locale?: string }>
 }>) {
+  const resolvedParams = params ? await params : {}
+  const locale = resolvedParams?.locale
+  const lang =
+    locale && locale in LOCALIZED_LANDING_PAGES
+      ? LOCALIZED_LANDING_PAGES[locale as keyof typeof LOCALIZED_LANDING_PAGES].lang
+      : 'en'
+
   return (
-    <html lang="en" className={`${inter.variable} ${geistMono.variable}`}>
+    <html lang={lang} className={`${inter.variable} ${geistMono.variable}`}>
       <head>
         <StructuredData />
       </head>

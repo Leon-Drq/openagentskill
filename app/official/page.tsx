@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { GrowthSkillList } from '@/components/growth-skill-list'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import { getAllSkills } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
 import { getOfficialCreatorSummaries } from '@/lib/seo/growth-directories'
@@ -49,40 +48,25 @@ export default async function OfficialSkillsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <MarketingPageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <SiteHeader />
+      <MarketingHero
+        eyebrow="Official skills"
+        title="Official AI agent skills from technology makers."
+        description="Start with skills from recognizable ecosystem creators, then inspect quality, trust, install readiness, GitHub adoption, and maintenance before adding them to an agent workflow."
+        aside={
+          <MarketingMetricStrip
+            columns="grid-cols-3"
+            items={[
+              { value: summaries.length, label: 'Makers' },
+              { value: officialSkillCount, label: 'Skills' },
+              { value: formatCompactNumber(totalStars), label: 'Stars' },
+            ]}
+          />
+        }
+      />
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="border-b border-border pb-10">
-          <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Official skills</p>
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-            <div>
-              <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">
-                Official AI agent skills from technology makers.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-                Start with skills from recognizable ecosystem creators, then inspect quality, trust, install readiness,
-                GitHub adoption, and maintenance before adding them to an agent workflow.
-              </p>
-            </div>
-            <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{summaries.length}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Makers</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{officialSkillCount}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Skills</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{formatCompactNumber(totalStars)}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Stars</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         <section className="grid gap-3 border-b border-border py-10 md:grid-cols-2 lg:grid-cols-3">
           {summaries.map((summary) => (
             <Link
@@ -125,9 +109,7 @@ export default async function OfficialSkillsPage() {
           </div>
           <GrowthSkillList items={topOfficialSkills} />
         </section>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }

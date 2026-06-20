@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import { getAllSkills } from '@/lib/db/skills'
 import { SKILL_STACKS } from '@/lib/collections'
+import { getSkillTrustProfile } from '@/lib/trust'
 import { USE_CASES, selectSkillsForUseCase } from '@/lib/use-cases'
 
 export const dynamic = 'force-dynamic'
@@ -29,46 +29,34 @@ function formatNumber(value: number) {
 }
 
 export default async function UseCasesPage() {
-  const skills = await getAllSkills('quality').catch(() => [])
+  const skills = await getAllSkills('quality', undefined, 4000).catch(() => [])
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
+    <MarketingPageShell>
+      <MarketingHero
+        eyebrow="Use cases"
+        title="Find agent skills by the work you need done."
+        description="OpenAgentSkill groups the marketplace around practical workflows, so builders can move from a task description to a shortlist of installable, high-signal skills."
+        aside={
+          <MarketingMetricStrip
+            columns="grid-cols-3"
+            items={[
+              { value: skills.length.toLocaleString(), label: 'Skills' },
+              { value: USE_CASES.length, label: 'Use cases' },
+              { value: formatNumber(skills.reduce((sum, skill) => sum + skill.github_stars, 0)), label: 'Stars' },
+            ]}
+          />
+        }
+      />
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="relative -mx-4 overflow-hidden border-b border-border px-4 pb-10 pt-2 sm:-mx-6 sm:px-6">
-          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
-          <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-            <div>
-              <p className="mb-5 font-mono text-xs uppercase tracking-[0.24em] text-secondary">Use cases</p>
-              <h1 className="font-display text-4xl font-normal leading-[0.98] text-balance md:text-6xl">
-                Find agent skills by the work you need done.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-                OpenAgentSkill now groups the marketplace around practical workflows, so builders can move from a task
-                description to a shortlist of installable, high-signal skills.
-              </p>
-            </div>
-            <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{skills.length.toLocaleString()}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Skills</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{USE_CASES.length}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Use cases</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{formatNumber(skills.reduce((sum, skill) => sum + skill.github_stars, 0))}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Stars</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         <section className="grid gap-5 py-10 md:grid-cols-2 lg:grid-cols-3">
           {USE_CASES.map((useCase) => {
-            const topSkills = selectSkillsForUseCase(skills, useCase, 3)
+            const matchedSkills = selectSkillsForUseCase(skills, useCase, 12)
+            const topSkills = matchedSkills.slice(0, 3)
+            const trustProfiles = matchedSkills.map((skill) => getSkillTrustProfile(skill))
+            const strongTrustCount = trustProfiles.filter((profile) => profile.tier === 'production' || profile.tier === 'strong').length
+            const installReadyCount = matchedSkills.filter((skill) => skill.install_command || skill.github_repo || skill.repository).length
 
             return (
               <Link
@@ -82,6 +70,20 @@ export default async function UseCasesPage() {
                     {useCase.shortTitle}
                   </h2>
                   <p className="mt-3 text-sm leading-relaxed text-secondary">{useCase.description}</p>
+                  <div className="mt-5 grid grid-cols-3 gap-px border border-border bg-border text-center">
+                    <div className="bg-background p-3">
+                      <div className="font-mono text-lg">{matchedSkills.length}</div>
+                      <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">Matches</div>
+                    </div>
+                    <div className="bg-background p-3">
+                      <div className="font-mono text-lg">{strongTrustCount}</div>
+                      <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">Trust</div>
+                    </div>
+                    <div className="bg-background p-3">
+                      <div className="font-mono text-lg">{installReadyCount}</div>
+                      <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">Install</div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-8">
@@ -128,9 +130,7 @@ export default async function UseCasesPage() {
             ))}
           </div>
         </section>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }

@@ -1,7 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { MarketingHero, MarketingPageShell } from '@/components/marketing-page'
 
 export const metadata: Metadata = {
   title: 'Documentation - Open Agent Skill',
@@ -10,22 +9,12 @@ export const metadata: Metadata = {
 
 export default function DocsPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
-
-      <main>
-        <section className="relative overflow-hidden border-b border-border">
-          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
-          <div className="relative mx-auto max-w-6xl px-6 py-14 sm:py-16 lg:py-20">
-            <p className="font-mono text-xs uppercase tracking-[0.24em] text-secondary">Documentation</p>
-            <h1 className="mt-5 max-w-4xl font-display text-4xl font-normal leading-[0.98] text-balance sm:text-5xl lg:text-6xl">
-              Build with the OpenAgentSkill registry.
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-secondary sm:text-lg">
-              Learn how to discover, install, submit, and expose skills through agent-friendly APIs.
-            </p>
-          </div>
-        </section>
+    <MarketingPageShell>
+        <MarketingHero
+          eyebrow="Documentation"
+          title="Build with the OpenAgentSkill registry."
+          description="Learn how to discover, install, submit, and expose skills through agent-friendly APIs."
+        />
 
         <div className="mx-auto max-w-4xl px-6 py-12 sm:py-14 lg:py-16">
 
@@ -170,9 +159,6 @@ GET /api/agent/skills/advanced-web-research?format=text`}</code>
           </p>
         </section>
         </div>
-      </main>
-
-      <SiteFooter />
-    </div>
+    </MarketingPageShell>
   )
 }

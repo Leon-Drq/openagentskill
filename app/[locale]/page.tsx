@@ -9,7 +9,7 @@ import {
   getLocalizedLanguageAlternates,
 } from '@/lib/seo/localized-pages'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 export const dynamicParams = false
 
 export function generateStaticParams() {
@@ -35,6 +35,9 @@ export async function generateMetadata({
   return {
     title: page.title,
     description: page.description,
+    other: {
+      'content-language': page.lang,
+    },
     alternates: {
       canonical: `https://www.openagentskill.com/${locale}`,
       languages: getLocalizedLanguageAlternates(),
@@ -77,11 +80,18 @@ export default async function LocalizedHomePage({
   const { stats, activities, featuredSkills } = await getHomePageData()
 
   return (
-    <HomePageEnhanced
-      initialLocale={locale as Locale}
-      stats={stats}
-      activities={activities}
-      featuredSkills={featuredSkills}
-    />
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `document.documentElement.lang=${JSON.stringify(page.lang)};`,
+        }}
+      />
+      <HomePageEnhanced
+        initialLocale={locale as Locale}
+        stats={stats}
+        activities={activities}
+        featuredSkills={featuredSkills}
+      />
+    </>
   )
 }

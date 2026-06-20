@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import { getAllSkills } from '@/lib/db/skills'
 import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
 import { formatCompactNumber } from '@/lib/quality'
@@ -39,40 +38,24 @@ export default async function GuidesPage() {
   }, {})
 
   return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
+    <MarketingPageShell>
+      <MarketingHero
+        eyebrow="Guides"
+        title="Practical guides for choosing agent skills."
+        description="OpenAgentSkill guides turn search intent into action: best skills for a workflow, install paths for a platform, and side-by-side comparisons for real agent builders."
+        aside={
+          <MarketingMetricStrip
+            columns="grid-cols-3"
+            items={[
+              { value: GROWTH_GUIDES.length, label: 'Guides' },
+              { value: skills.length.toLocaleString(), label: 'Skills' },
+              { value: formatCompactNumber(totalStars), label: 'Stars' },
+            ]}
+          />
+        }
+      />
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="border-b border-border pb-10">
-          <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Guides</p>
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-            <div>
-              <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">
-                Practical guides for choosing agent skills.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-                OpenAgentSkill guides turn search intent into action: best skills for a workflow, install paths for a
-                platform, and side-by-side comparisons for real agent builders.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{GROWTH_GUIDES.length}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Guides</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{skills.length.toLocaleString()}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Skills</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{formatCompactNumber(totalStars)}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Stars</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         <section className="border-b border-border py-10">
           <div className="grid gap-4 lg:grid-cols-3">
             {GROWTH_GUIDES.slice(0, 3).map((guide) => (
@@ -138,9 +121,7 @@ export default async function GuidesPage() {
             </div>
           ))}
         </section>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }

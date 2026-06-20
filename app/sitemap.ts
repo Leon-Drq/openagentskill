@@ -1,6 +1,4 @@
 import { MetadataRoute } from 'next'
-import { getAllSkills } from '@/lib/db/skills'
-import { getBlogPosts } from '@/lib/blog/generate'
 import { SKILL_STACKS } from '@/lib/collections'
 import { getRankingDefinitions } from '@/lib/rankings'
 import { LOCALIZED_LANDING_PAGES, getLocalizedLanguageAlternates } from '@/lib/seo/localized-pages'
@@ -12,50 +10,68 @@ import { SKILL_PACKS } from '@/lib/skill-packs'
 import { USE_CASES } from '@/lib/use-cases'
 import { AGENT_TASKS } from '@/lib/agent-tasks'
 
+const FEATURED_SKILL_SITEMAP_ENTRIES = [
+  { slug: 'crawl4ai', updatedAt: '2026-06-01T00:00:00.000Z', stars: 66_000 },
+  { slug: 'firecrawl', updatedAt: '2026-06-01T00:00:00.000Z', stars: 34_000 },
+  { slug: 'n8n', updatedAt: '2026-06-01T00:00:00.000Z', stars: 190_000 },
+  { slug: 'markitdown', updatedAt: '2026-06-01T00:00:00.000Z', stars: 80_000 },
+  { slug: 'llamaindex', updatedAt: '2026-06-01T00:00:00.000Z', stars: 42_000 },
+  { slug: 'openbb', updatedAt: '2026-06-01T00:00:00.000Z', stars: 46_000 },
+  { slug: 'browser-use', updatedAt: '2026-06-01T00:00:00.000Z', stars: 75_000 },
+  { slug: 'playwright', updatedAt: '2026-06-01T00:00:00.000Z', stars: 76_000 },
+  { slug: 'last30days-skill', updatedAt: '2026-06-01T00:00:00.000Z', stars: 42_500 },
+  { slug: 'addyosmani-agent-skills', updatedAt: '2026-06-16T00:13:14.000Z', stars: 61_800 },
+  { slug: 'serenity-skill', updatedAt: '2026-06-01T00:00:00.000Z', stars: 12_000 },
+  { slug: 'seedance-2-0', updatedAt: '2026-06-01T00:00:00.000Z', stars: 8_000 },
+  { slug: 'vectorbt', updatedAt: '2026-06-01T00:00:00.000Z', stars: 5_400 },
+]
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.openagentskill.com'
+  const now = new Date()
 
   const staticPages: MetadataRoute.Sitemap = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
-    { url: `${baseUrl}/skills`, lastModified: new Date(), changeFrequency: 'hourly', priority: 0.9 },
-    { url: `${baseUrl}/agent-skill`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/agent-skills`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.91 },
-    { url: `${baseUrl}/ai-agent-skills`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.91 },
-    { url: `${baseUrl}/skills-registry`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.91 },
-    { url: `${baseUrl}/openagentskill`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/agent`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.93 },
-    { url: `${baseUrl}/agent-skills-directory`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/agent-skills-registry`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.92 },
-    { url: `${baseUrl}/best`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.92 },
-    { url: `${baseUrl}/trending`, lastModified: new Date(), changeFrequency: 'hourly', priority: 0.92 },
-    { url: `${baseUrl}/hot`, lastModified: new Date(), changeFrequency: 'hourly', priority: 0.9 },
-    { url: `${baseUrl}/audits`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/official`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/agents`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/use-cases`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/tasks`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.91 },
-    { url: `${baseUrl}/rankings`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/reports/weekly`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.85 },
-    { url: `${baseUrl}/reports/monthly`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.86 },
-    { url: `${baseUrl}/collections`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/skill-packs`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/compare`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${baseUrl}/compare/openagentskill-vs-skills-sh`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.82 },
-    { url: `${baseUrl}/compare/openagentskill-vs-agentskills-io`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.84 },
-    { url: `${baseUrl}/alternatives/skills-sh`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.82 },
-    { url: `${baseUrl}/alternatives/agentskills-io`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.82 },
-    { url: `${baseUrl}/guides`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
-    { url: `${baseUrl}/submit`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${baseUrl}/docs`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/cli`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.86 },
-    { url: `${baseUrl}/x-kit`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.74 },
-    { url: `${baseUrl}/activity`, lastModified: new Date(), changeFrequency: 'hourly', priority: 0.6 },
+    { url: baseUrl, lastModified: now, changeFrequency: 'daily', priority: 1 },
+    { url: `${baseUrl}/resolve`, lastModified: now, changeFrequency: 'daily', priority: 0.95 },
+    { url: `${baseUrl}/skills`, lastModified: now, changeFrequency: 'hourly', priority: 0.9 },
+    { url: `${baseUrl}/agent-skill`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/agent-skills`, lastModified: now, changeFrequency: 'weekly', priority: 0.91 },
+    { url: `${baseUrl}/ai-agent-skills`, lastModified: now, changeFrequency: 'weekly', priority: 0.91 },
+    { url: `${baseUrl}/skills-registry`, lastModified: now, changeFrequency: 'weekly', priority: 0.91 },
+    { url: `${baseUrl}/openagentskill`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/agent`, lastModified: now, changeFrequency: 'daily', priority: 0.93 },
+    { url: `${baseUrl}/agent-skills-directory`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/agent-skills-registry`, lastModified: now, changeFrequency: 'weekly', priority: 0.92 },
+    { url: `${baseUrl}/best`, lastModified: now, changeFrequency: 'daily', priority: 0.92 },
+    { url: `${baseUrl}/trending`, lastModified: now, changeFrequency: 'hourly', priority: 0.92 },
+    { url: `${baseUrl}/hot`, lastModified: now, changeFrequency: 'hourly', priority: 0.9 },
+    { url: `${baseUrl}/audits`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${baseUrl}/official`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/agents`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/use-cases`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/tasks`, lastModified: now, changeFrequency: 'daily', priority: 0.91 },
+    { url: `${baseUrl}/rankings`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${baseUrl}/reports/weekly`, lastModified: now, changeFrequency: 'daily', priority: 0.85 },
+    { url: `${baseUrl}/reports/monthly`, lastModified: now, changeFrequency: 'weekly', priority: 0.86 },
+    { url: `${baseUrl}/collections`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/skill-packs`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/compare`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${baseUrl}/compare/openagentskill-vs-skills-sh`, lastModified: now, changeFrequency: 'monthly', priority: 0.82 },
+    { url: `${baseUrl}/compare/openagentskill-vs-agentskills-io`, lastModified: now, changeFrequency: 'monthly', priority: 0.84 },
+    { url: `${baseUrl}/alternatives/skills-sh`, lastModified: now, changeFrequency: 'monthly', priority: 0.82 },
+    { url: `${baseUrl}/alternatives/agentskills-io`, lastModified: now, changeFrequency: 'monthly', priority: 0.82 },
+    { url: `${baseUrl}/guides`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/blog`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
+    { url: `${baseUrl}/submit`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/docs`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/cli`, lastModified: now, changeFrequency: 'weekly', priority: 0.86 },
+    { url: `${baseUrl}/x-kit`, lastModified: now, changeFrequency: 'daily', priority: 0.74 },
+    { url: `${baseUrl}/activity`, lastModified: now, changeFrequency: 'hourly', priority: 0.6 },
   ]
 
   const localizedPages: MetadataRoute.Sitemap = Object.entries(LOCALIZED_LANDING_PAGES).map(([locale]) => ({
     url: `${baseUrl}/${locale}`,
-    lastModified: new Date(),
+    lastModified: now,
     changeFrequency: 'weekly',
     priority: 0.88,
     alternates: {
@@ -63,39 +79,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   }))
 
-  const skills = await getAllSkills().catch(() => [])
-  const skillPages: MetadataRoute.Sitemap = skills.map((skill) => ({
+  const skillPages: MetadataRoute.Sitemap = FEATURED_SKILL_SITEMAP_ENTRIES.map((skill) => ({
     url: `${baseUrl}/skills/${skill.slug}`,
-    lastModified: new Date(skill.updated_at),
+    lastModified: new Date(skill.updatedAt),
     changeFrequency: 'weekly',
     priority: 0.8,
   }))
 
-  const alternativePages: MetadataRoute.Sitemap = skills
-    .filter((skill) => Number(skill.github_stars || 0) >= 500)
-    .slice(0, 250)
+  const alternativePages: MetadataRoute.Sitemap = FEATURED_SKILL_SITEMAP_ENTRIES
+    .filter((skill) => Number(skill.stars || 0) >= 500)
+    .slice(0, 120)
     .map((skill) => ({
       url: `${baseUrl}/alternatives/${skill.slug}`,
-      lastModified: new Date(skill.updated_at),
+      lastModified: new Date(skill.updatedAt),
       changeFrequency: 'weekly',
       priority: 0.78,
     }))
 
-  const auditPages: MetadataRoute.Sitemap = skills
+  const auditPages: MetadataRoute.Sitemap = FEATURED_SKILL_SITEMAP_ENTRIES
     .map((skill) => ({
       url: `${baseUrl}/skills/${skill.slug}/audit`,
-      lastModified: new Date(skill.updated_at),
+      lastModified: new Date(skill.updatedAt),
       changeFrequency: 'weekly',
-      priority: Number(skill.github_stars || 0) >= 500 ? 0.76 : 0.68,
+      priority: Number(skill.stars || 0) >= 500 ? 0.76 : 0.68,
     }))
-
-  const posts = await getBlogPosts(100).catch(() => [])
-  const blogPages: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(post.published_at),
-    changeFrequency: 'monthly',
-    priority: 0.7,
-  }))
 
   const useCasePages: MetadataRoute.Sitemap = USE_CASES.map((useCase) => ({
     url: `${baseUrl}/use-cases/${useCase.slug}`,
@@ -138,6 +145,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'weekly',
     priority: 0.8,
   }))
+
+  const staticBlogPages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/blog/introducing-addyosmani-agent-skills`,
+      lastModified: new Date('2026-06-17T00:00:00.000Z'),
+      changeFrequency: 'monthly',
+      priority: 0.82,
+    },
+  ]
 
   const rankingPages: MetadataRoute.Sitemap = getRankingDefinitions().map((ranking) => ({
     url: `${baseUrl}/rankings/${ranking.slug}`,
@@ -187,10 +203,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...skillPackPages,
     ...rankingPages,
     ...guidePages,
+    ...staticBlogPages,
     ...blogUseCasePages,
     ...skillPages,
     ...auditPages,
     ...alternativePages,
-    ...blogPages,
   ]
 }

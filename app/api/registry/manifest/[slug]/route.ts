@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSkillBySlug } from '@/lib/db/skills'
 import { toRegistrySkill } from '@/lib/registry'
+import { getSkillBySlugOrFallback, getSkillSuggestionsForSlug } from '@/lib/skill-fallbacks'
+
+export const revalidate = 300
+
+const MANIFEST_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
+}
 
 export async function GET(
   request: NextRequest,
@@ -10,10 +16,13 @@ export async function GET(
   const format = request.nextUrl.searchParams.get('format') || 'json'
 
   try {
-    const skill = await getSkillBySlug(slug)
+    const skill = await getSkillBySlugOrFallback(slug)
 
     if (!skill) {
-      return NextResponse.json({ error: `Skill not found: ${slug}` }, { status: 404 })
+      return NextResponse.json({
+        error: `Skill not found: ${slug}`,
+        suggestions: getSkillSuggestionsForSlug(slug).map((candidate) => candidate.slug),
+      }, { status: 404 })
     }
 
     const manifest = toRegistrySkill(skill)
@@ -58,6 +67,7 @@ URLs:
 - Repository: ${manifest.urls.repository || 'Unknown'}`,
         {
           headers: {
+            ...MANIFEST_CACHE_HEADERS,
             'Content-Type': 'text/plain; charset=utf-8',
             'X-Agent-Friendly': 'true',
           },
@@ -65,16 +75,19 @@ URLs:
       )
     }
 
-    return NextResponse.json({
-      ...manifest,
-      meta: {
-        endpoint: '/api/registry/manifest/{slug}',
-        canonical_agent_endpoint: `/api/agent/skills/${skill.slug}`,
-        agent_friendly: true,
-        api_version: '1.0',
-        generated_at: new Date().toISOString(),
+    return NextResponse.json(
+      {
+        ...manifest,
+        meta: {
+          endpoint: '/api/registry/manifest/{slug}',
+          canonical_agent_endpoint: `/api/agent/skills/${skill.slug}`,
+          agent_friendly: true,
+          api_version: '1.0',
+          generated_at: new Date().toISOString(),
+        },
       },
-    })
+      { headers: MANIFEST_CACHE_HEADERS }
+    )
   } catch (error) {
     console.error('Registry manifest API error:', error)
     return NextResponse.json({ error: 'Failed to build registry manifest' }, { status: 500 })

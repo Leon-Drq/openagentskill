@@ -1,6 +1,5 @@
 import { Metadata } from 'next'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { MarketingHero, MarketingPageShell } from '@/components/marketing-page'
 
 export const metadata: Metadata = {
   title: 'API Reference - Open Agent Skill',
@@ -9,22 +8,12 @@ export const metadata: Metadata = {
 
 export default function APIDocsPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
-
-      <main>
-        <section className="relative overflow-hidden border-b border-border">
-          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
-          <div className="relative mx-auto max-w-6xl px-6 py-14 sm:py-16 lg:py-20">
-            <p className="font-mono text-xs uppercase text-secondary">API Reference</p>
-            <h1 className="mt-5 max-w-4xl font-display text-4xl font-normal leading-[0.98] text-balance sm:text-5xl lg:text-6xl">
-              Agent-friendly discovery, ranking, and install data.
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-secondary sm:text-lg">
-              Programmatically discover skills with JSON or plain text responses optimized for LLM consumption.
-            </p>
-          </div>
-        </section>
+    <MarketingPageShell>
+        <MarketingHero
+          eyebrow="API Reference"
+          title="Agent-friendly discovery, ranking, and install data."
+          description="Programmatically discover skills with JSON or plain text responses optimized for LLM consumption."
+        />
 
         <div className="mx-auto max-w-5xl px-6 py-12 sm:py-14 lg:py-16">
 
@@ -166,6 +155,19 @@ export default function APIDocsPage() {
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
                 {'Resolve a task into one selected skill, alternatives, an agent safety profile, a policy decision, and a target-specific install plan. This is the canonical endpoint for agent runtime use.'}
               </p>
+              <div className="mb-4 grid gap-px border border-border bg-border text-sm sm:mb-6 md:grid-cols-2">
+                {[
+                  ['recommendation.best_skill', 'Selected skill with web, API, audit, and repository URLs'],
+                  ['recommendation.install', 'Command, target, install API, review requirement, and auto-install policy'],
+                  ['recommendation.why_recommended', 'Short explainable ranking reasons for agent logs'],
+                  ['recommendation.trust_score_v3', 'Trust Score v3 evidence, install safety, permission surface, install policy, compatibility, and risk summary'],
+                ].map(([field, detail]) => (
+                  <div key={field} className="min-w-0 bg-background p-3">
+                    <code className="font-mono text-xs">{field}</code>
+                    <p className="mt-2 text-xs leading-relaxed text-secondary">{detail}</p>
+                  </div>
+                ))}
+              </div>
               <div className="grid gap-3 sm:grid-cols-2 mb-4 sm:mb-6 text-sm sm:text-base">
                 <div>
                   <code className="font-mono bg-muted px-2 py-1">{'task'}</code>
@@ -879,9 +881,6 @@ openclaw publish --target openagentskill --repo owner/my-skill`}</code>
           </p>
         </section>
         </div>
-      </main>
-
-      <SiteFooter />
-    </div>
+    </MarketingPageShell>
   )
 }

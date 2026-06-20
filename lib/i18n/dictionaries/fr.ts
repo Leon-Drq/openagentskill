@@ -5,6 +5,7 @@ const fr = {
   nav: {
     ...en.nav,
     home: 'Accueil',
+    resolve: 'Resoudre',
     skills: 'Skills',
     tasks: 'Taches',
     packs: 'Packs',

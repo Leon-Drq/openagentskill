@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { resolveAgentSkill, type AgentResolveInput } from '@/lib/agent-resolve'
 
+export const revalidate = 300
+
+const RESOLVE_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
+}
+
 function parseLimit(value: string | null) {
   const parsed = Number(value || 5)
   return Math.min(Math.max(Number.isFinite(parsed) ? parsed : 5, 1), 10)
@@ -19,6 +25,19 @@ function textResponse(payload: Awaited<ReturnType<typeof resolveAgentSkill>>) {
     `OpenAgentSkill Resolve API
 Task: ${payload.task}
 Policy: ${payload.policy_decision.status}
+
+Recommendation:
+${payload.recommendation ? `Best skill: ${payload.recommendation.best_skill.name} (${payload.recommendation.best_skill.slug})
+URL: ${payload.recommendation.best_skill.url}
+Repository: ${payload.recommendation.best_skill.repository}
+Install: ${payload.recommendation.install.command}
+Install policy: ${payload.recommendation.install.policy}
+Trust Score v3: ${payload.recommendation.trust_score_v3.score}/100 ${payload.recommendation.trust_score_v3.label}
+Risk: ${payload.recommendation.risk.level}; ${payload.recommendation.risk.safety_tier}; ${payload.recommendation.risk.trust}
+Why:
+${payload.recommendation.why_recommended.map((item) => `- ${item}`).join('\n')}
+Agent instruction:
+${payload.recommendation.agent_instruction}` : 'No recommendation generated'}
 
 Selected:
 ${selected ? `${selected.skill.name} (${selected.skill.slug})
@@ -64,6 +83,7 @@ ${blocked || 'No blocked candidates'}
 `,
     {
       headers: {
+        ...RESOLVE_CACHE_HEADERS,
         'Content-Type': 'text/plain; charset=utf-8',
         'X-Agent-Friendly': 'true',
       },
@@ -96,10 +116,11 @@ export async function GET(request: NextRequest) {
         needs_install_command: searchParams.get('needs_install_command') !== 'false',
         min_stars: Number(searchParams.get('min_stars') || 0),
       },
+      live: searchParams.get('live') === 'true',
     })
 
     if (format === 'text') return textResponse(payload)
-    return NextResponse.json(payload)
+    return NextResponse.json(payload, { headers: RESOLVE_CACHE_HEADERS })
   } catch (error) {
     console.error('Agent resolve API error:', error)
     return NextResponse.json(

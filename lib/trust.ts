@@ -19,7 +19,37 @@ export interface SkillTrustDimension {
   detail: string
 }
 
+export type SkillTrustInstallPolicy = 'agent_install_candidate' | 'human_review_before_install' | 'sandbox_only'
+export type SkillTrustRiskLevel = 'low' | 'medium' | 'high'
+
+export interface SkillTrustEvidence {
+  stars: string
+  repoActivity: string
+  lastPushed: string
+  license: string
+  repository: string
+  install: string
+  installSafety: string
+  permissionSurface: string
+  documentation: string
+}
+
+export interface SkillTrustInstallReadiness {
+  ready: boolean
+  command: string | null
+  policy: SkillTrustInstallPolicy
+  label: string
+  notes: string[]
+}
+
+export interface SkillTrustRiskSummary {
+  level: SkillTrustRiskLevel
+  label: string
+  notes: string[]
+}
+
 export interface SkillTrustProfile {
+  version: 'trust-score-v3'
   score: number
   tier: SkillTrustTier
   label: string
@@ -29,6 +59,10 @@ export interface SkillTrustProfile {
   checks: SkillTrustCheck[]
   strengths: string[]
   warnings: string[]
+  evidence: SkillTrustEvidence
+  installReadiness: SkillTrustInstallReadiness
+  agentCompatibility: string[]
+  riskSummary: SkillTrustRiskSummary
 }
 
 function clampScore(score: number) {
@@ -48,6 +82,16 @@ function hasInstallPath(skill: SkillRecord) {
   return Boolean(skill.install_command || skill.github_repo || skill.npm_package)
 }
 
+function getInstallCommand(skill: SkillRecord) {
+  if (skill.install_command) return skill.install_command
+  if (skill.github_repo) return `npx skills add ${skill.github_repo}`
+  if (skill.repository?.startsWith('https://github.com/')) {
+    return `npx skills add ${skill.repository.replace(/^https:\/\/github\.com\//, '').replace(/\/$/, '')}`
+  }
+  if (skill.npm_package) return `npm install ${skill.npm_package}`
+  return null
+}
+
 function getMaintenanceLabel(days: number | null) {
   if (days === null) return 'Unknown'
   if (days === 0) return 'Pushed today'
@@ -56,13 +100,70 @@ function getMaintenanceLabel(days: number | null) {
   return `${Math.round(days / 365)}y since push`
 }
 
+function getDocumentationLabel(score: number) {
+  if (score >= 82) return 'Strong README/SKILL.md context'
+  if (score >= 62) return 'Usable metadata, review docs'
+  if (score >= 42) return 'Thin public metadata'
+  return 'Missing useful documentation signals'
+}
+
+function getAgentCompatibility(skill: SkillRecord) {
+  return [
+    ...(skill.frameworks || []),
+    'Codex',
+    'Claude Code',
+    'Cursor',
+    'OpenAgentSkill CLI',
+  ]
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .filter((item, index, items) => items.findIndex((candidate) => candidate.toLowerCase() === item.toLowerCase()) === index)
+    .slice(0, 6)
+}
+
+function getInstallPolicy(score: number, hasInstall: boolean, hasRepo: boolean, hasLicense: boolean): SkillTrustInstallPolicy {
+  if (score >= 86 && hasInstall && hasRepo && hasLicense) return 'agent_install_candidate'
+  if (score >= 60 && hasInstall && hasRepo) return 'human_review_before_install'
+  return 'sandbox_only'
+}
+
+function getInstallPolicyLabel(policy: SkillTrustInstallPolicy) {
+  if (policy === 'agent_install_candidate') return 'Agent install candidate'
+  if (policy === 'human_review_before_install') return 'Human review before install'
+  return 'Sandbox only'
+}
+
+function getRiskSummary(score: number, warnings: string[]): SkillTrustRiskSummary {
+  if (score >= 82 && warnings.length <= 1) {
+    return {
+      level: 'low',
+      label: 'Low metadata risk',
+      notes: warnings.length ? warnings.slice(0, 3) : ['No major trust warnings detected from available metadata'],
+    }
+  }
+
+  if (score >= 58) {
+    return {
+      level: 'medium',
+      label: 'Review before production',
+      notes: warnings.slice(0, 5),
+    }
+  }
+
+  return {
+    level: 'high',
+    label: 'High review required',
+    notes: warnings.length ? warnings.slice(0, 5) : ['Trust signals are too sparse for automatic installation'],
+  }
+}
+
 function getTier(score: number): Pick<SkillTrustProfile, 'tier' | 'label' | 'summary' | 'recommendedAction'> {
   if (score >= 86) {
     return {
       tier: 'production',
       label: 'Production candidate',
       summary:
-        'Strong OpenAgentSkill Trust Score across adoption, recent maintenance, license clarity, documentation, dependency risk, and install availability.',
+        'Strong OpenAgentSkill Trust Score across adoption, recent maintenance, license clarity, documentation, dependency/runtime risk, install safety, permission surface, and install availability.',
       recommendedAction: 'Shortlist for production use, then run a normal repository and dependency review.',
     }
   }
@@ -119,6 +220,33 @@ function scoreAdoption(stars: number) {
   return 30
 }
 
+function scoreForks(forks: number) {
+  if (forks >= 5_000) return 100
+  if (forks >= 1_000) return 92
+  if (forks >= 250) return 78
+  if (forks >= 50) return 62
+  if (forks >= 10) return 48
+  return 34
+}
+
+function trustSignalText(skill: SkillRecord) {
+  return [
+    skill.name,
+    skill.description,
+    skill.long_description,
+    skill.tagline,
+    skill.install_command,
+    skill.github_repo,
+    skill.repository,
+    skill.npm_package,
+    ...(skill.tags || []),
+    ...(skill.frameworks || []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+}
+
 function scoreMaintenance(days: number | null) {
   if (days === null) return 42
   if (days <= 30) return 100
@@ -158,21 +286,82 @@ function scoreDocumentation(skill: SkillRecord) {
   return clampScore(score)
 }
 
+function getInstallCommandSafety(skill: SkillRecord) {
+  const command = (getInstallCommand(skill) || '').toLowerCase()
+  let penalty = 0
+  const notes: string[] = []
+
+  if (!command) {
+    return {
+      score: 20,
+      notes: ['missing install command'],
+    }
+  }
+
+  if (/\b(curl|wget)\b.*\|\s*(sh|bash|zsh)/.test(command)) {
+    penalty += 42
+    notes.push('remote shell pipe install')
+  }
+  if (/\bsudo\b/.test(command)) {
+    penalty += 26
+    notes.push('requires sudo or elevated permissions')
+  }
+  if (/\brm\s+-rf\b|chmod\s+777|chown\s+-r/.test(command)) {
+    penalty += 34
+    notes.push('destructive or broad filesystem command')
+  }
+  if (/\b(eval|exec|powershell|bash\s+-c|sh\s+-c)\b/.test(command)) {
+    penalty += 24
+    notes.push('dynamic command execution')
+  }
+  if (/\b(token|secret|api[_-]?key|password)\b/.test(command)) {
+    penalty += 24
+    notes.push('credential-bearing install command')
+  }
+  if (/\b(npx|npm|pnpm|yarn|pip|uv|poetry|brew|docker)\b/.test(command)) {
+    notes.push('standard package or runtime install path')
+  }
+
+  return {
+    score: clampScore(92 - penalty),
+    notes: notes.length ? notes : ['simple repository or package install path'],
+  }
+}
+
+function getPermissionSurface(skill: SkillRecord) {
+  const text = trustSignalText(skill)
+  const notes: string[] = []
+  let exposure = 0
+
+  if (/\b(secret|token|credential|api key|oauth|env|environment variable|password)\b/.test(text)) {
+    exposure += 26
+    notes.push('secrets or environment access')
+  }
+  if (/\b(shell|exec|subprocess|powershell|bash|terminal|cli|command)\b/.test(text)) {
+    exposure += 24
+    notes.push('shell or command execution')
+  }
+  if (/\b(file|filesystem|workspace|repo|repository|pdf|csv|xlsx|document)\b/.test(text)) {
+    exposure += 14
+    notes.push('filesystem or document access')
+  }
+  if (/\b(fetch|http|api|crawl|scrape|browser|playwright|puppeteer|selenium|webhook|network)\b/.test(text)) {
+    exposure += 14
+    notes.push('network or browser access')
+  }
+  if (/\b(database|sql|postgres|mysql|sqlite|schema|migration)\b/.test(text)) {
+    exposure += 12
+    notes.push('database access')
+  }
+
+  return {
+    score: clampScore(100 - Math.min(82, exposure)),
+    notes: notes.length ? notes : ['no high-risk permission surface in public metadata'],
+  }
+}
+
 function getDependencyRisk(skill: SkillRecord) {
-  const text = [
-    skill.name,
-    skill.description,
-    skill.long_description,
-    skill.tagline,
-    skill.install_command,
-    skill.github_repo,
-    skill.repository,
-    ...(skill.tags || []),
-    ...(skill.frameworks || []),
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase()
+  const text = trustSignalText(skill)
 
   let risk = 10
   const notes: string[] = []
@@ -222,9 +411,12 @@ function buildTrustDimensions(
   qualityScore: number
 ): SkillTrustDimension[] {
   const adoptionScore = scoreAdoption(stars)
+  const repoActivityScore = clampScore(scoreAdoption(stars) * 0.62 + scoreForks(Number(skill.github_forks || 0)) * 0.38)
   const maintenanceScore = scoreMaintenance(freshnessDays)
   const documentationScore = scoreDocumentation(skill)
   const dependency = getDependencyRisk(skill)
+  const installSafety = getInstallCommandSafety(skill)
+  const permissionSurface = getPermissionSurface(skill)
   const installScore = hasInstallPath(skill) ? 92 : 24
   const repositoryScore = hasRepository(skill) ? 86 : 24
   const reviewScore =
@@ -239,15 +431,23 @@ function buildTrustDimensions(
       id: 'github_adoption',
       label: 'GitHub adoption',
       score: adoptionScore,
-      weight: 0.16,
+      weight: 0.13,
       status: statusForScore(adoptionScore),
       detail: `${formatCompactNumber(stars)} GitHub stars`,
+    },
+    {
+      id: 'repo_activity',
+      label: 'Stars/forks activity',
+      score: repoActivityScore,
+      weight: 0.08,
+      status: statusForScore(repoActivityScore),
+      detail: `${formatCompactNumber(stars)} stars, ${formatCompactNumber(skill.github_forks || 0)} forks; issue activity unavailable in current metadata`,
     },
     {
       id: 'maintenance',
       label: 'Recent maintenance',
       score: maintenanceScore,
-      weight: 0.18,
+      weight: 0.14,
       status: statusForScore(maintenanceScore),
       detail: getMaintenanceLabel(freshnessDays),
     },
@@ -255,7 +455,7 @@ function buildTrustDimensions(
       id: 'license',
       label: 'License clarity',
       score: scoreLicense(skill),
-      weight: 0.1,
+      weight: 0.09,
       status: hasKnownLicense(skill) ? 'pass' : 'warn',
       detail: skill.license || 'Unknown license',
     },
@@ -263,7 +463,7 @@ function buildTrustDimensions(
       id: 'documentation',
       label: 'README/SKILL.md completeness',
       score: documentationScore,
-      weight: 0.16,
+      weight: 0.14,
       status: statusForScore(documentationScore),
       detail:
         documentationScore >= 82
@@ -272,9 +472,9 @@ function buildTrustDimensions(
     },
     {
       id: 'dependency_risk',
-      label: 'Dependency risk',
+      label: 'Dependency/runtime risk',
       score: dependency.score,
-      weight: 0.14,
+      weight: 0.12,
       status: statusForScore(dependency.score),
       detail: dependency.notes.slice(0, 2).join(', '),
     },
@@ -282,15 +482,31 @@ function buildTrustDimensions(
       id: 'installability',
       label: 'Install availability',
       score: installScore,
-      weight: 0.14,
+      weight: 0.1,
       status: hasInstallPath(skill) ? 'pass' : 'fail',
       detail: skill.install_command || skill.npm_package || skill.github_repo || 'Missing install command',
+    },
+    {
+      id: 'install_safety',
+      label: 'Install command safety',
+      score: installSafety.score,
+      weight: 0.1,
+      status: statusForScore(installSafety.score),
+      detail: installSafety.notes.slice(0, 2).join(', '),
+    },
+    {
+      id: 'permission_surface',
+      label: 'Permission surface',
+      score: permissionSurface.score,
+      weight: 0.07,
+      status: statusForScore(permissionSurface.score),
+      detail: permissionSurface.notes.slice(0, 2).join(', '),
     },
     {
       id: 'repository',
       label: 'Repository evidence',
       score: repositoryScore,
-      weight: 0.06,
+      weight: 0.04,
       status: hasRepository(skill) ? 'pass' : 'fail',
       detail: skill.repository || skill.github_repo || 'Missing repository link',
     },
@@ -298,7 +514,7 @@ function buildTrustDimensions(
       id: 'review_status',
       label: 'Review status',
       score: Math.max(reviewScore, Math.min(qualityScore, 90)),
-      weight: 0.06,
+      weight: 0.05,
       status: statusForScore(reviewScore),
       detail: skill.ai_review_approved ? 'AI review data available' : 'AI review approval is missing',
     },
@@ -365,6 +581,13 @@ export function getSkillTrustProfile(
     warnings.push('Documentation summary is thin')
   }
 
+  const installSafety = dimensions.find((dimension) => dimension.id === 'install_safety')
+  if (installSafety && installSafety.score < 62) warnings.push(`Install command needs review: ${installSafety.detail}`)
+  else if (installSafety) strengths.push('Install command has no obvious high-risk pattern')
+
+  const permissionSurface = dimensions.find((dimension) => dimension.id === 'permission_surface')
+  if (permissionSurface && permissionSurface.score < 62) warnings.push(`Permission surface needs review: ${permissionSurface.detail}`)
+
   if (eventStats && eventStats.total_events > 0) {
     const usageBoost = Math.min(4, Math.floor((eventStats.install_copies + eventStats.outbound_clicks) / 10))
     score += usageBoost
@@ -400,13 +623,43 @@ export function getSkillTrustProfile(
   const dimensionWarnings = dimensions
     .filter((dimension) => dimension.status === 'warn' || dimension.status === 'fail')
     .map((dimension) => `${dimension.label}: ${dimension.detail}`)
+  const finalWarnings = [...new Set([...warnings, ...dimensionWarnings])].slice(0, 10)
+  const documentationDimension = dimensions.find((dimension) => dimension.id === 'documentation')
+  const installCommand = getInstallCommand(skill)
+  const policy = getInstallPolicy(finalScore, hasInstallPath(skill), hasRepository(skill), hasKnownLicense(skill))
 
   return {
+    version: 'trust-score-v3',
     score: finalScore,
     ...tier,
     dimensions,
     checks,
     strengths: [...new Set(strengths)].slice(0, 8),
-    warnings: [...new Set([...warnings, ...dimensionWarnings])].slice(0, 10),
+    warnings: finalWarnings,
+    evidence: {
+      stars: `${formatCompactNumber(stars)} GitHub stars`,
+      repoActivity: `${formatCompactNumber(stars)} stars, ${formatCompactNumber(skill.github_forks || 0)} forks`,
+      lastPushed: getMaintenanceLabel(freshnessDays),
+      license: skill.license || 'Unknown license',
+      repository: skill.repository || skill.github_repo || 'Missing repository link',
+      install: installCommand || 'Missing install command',
+      installSafety: dimensions.find((dimension) => dimension.id === 'install_safety')?.detail || 'Install command safety unavailable',
+      permissionSurface: dimensions.find((dimension) => dimension.id === 'permission_surface')?.detail || 'Permission surface unavailable',
+      documentation: getDocumentationLabel(documentationDimension?.score || 0),
+    },
+    installReadiness: {
+      ready: hasInstallPath(skill),
+      command: installCommand,
+      policy,
+      label: getInstallPolicyLabel(policy),
+      notes: [
+        hasInstallPath(skill) ? 'Install path is available' : 'Install path is missing',
+        hasRepository(skill) ? 'Repository evidence is available' : 'Repository link is missing',
+        hasKnownLicense(skill) ? 'License is declared' : 'License is unclear',
+        getMaintenanceLabel(freshnessDays),
+      ],
+    },
+    agentCompatibility: getAgentCompatibility(skill),
+    riskSummary: getRiskSummary(finalScore, finalWarnings),
   }
 }

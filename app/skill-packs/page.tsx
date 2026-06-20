@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import { getAllSkills } from '@/lib/db/skills'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { selectSkillsForPack, SKILL_PACKS } from '@/lib/skill-packs'
@@ -43,41 +42,25 @@ export default async function SkillPacksPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <MarketingPageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <SiteHeader />
+      <MarketingHero
+        eyebrow="Skill packs"
+        title="Install complete skill packs for real agent workflows."
+        description="Packs group high-signal skills by job-to-be-done, then expose the install commands, trust scores, and workflow steps an agent needs to start using them."
+        aside={
+          <MarketingMetricStrip
+            columns="grid-cols-3"
+            items={[
+              { value: SKILL_PACKS.length, label: 'Packs' },
+              { value: skills.length.toLocaleString(), label: 'Skills' },
+              { value: '4', label: 'Steps' },
+            ]}
+          />
+        }
+      />
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="relative -mx-4 overflow-hidden border-b border-border px-4 pb-12 pt-2 sm:-mx-6 sm:px-6">
-          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
-          <div className="relative grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
-            <div>
-              <p className="mb-5 font-mono text-xs uppercase tracking-[0.24em] text-secondary">Skill packs</p>
-              <h1 className="font-display text-4xl font-normal leading-[0.98] text-balance sm:text-6xl">
-                Install complete skill packs for real agent workflows.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-                Packs group high-signal skills by job-to-be-done, then expose the install commands, trust scores, and
-                workflow steps an agent needs to start using them.
-              </p>
-            </div>
-            <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{SKILL_PACKS.length}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Packs</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{skills.length.toLocaleString()}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Skills</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">4</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Steps</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         <section className="grid gap-4 py-10 md:grid-cols-2">
           {SKILL_PACKS.map((pack) => {
             const picks = selectSkillsForPack(skills, pack, 5)
@@ -118,9 +101,7 @@ export default async function SkillPacksPage() {
             )
           })}
         </section>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }

@@ -1,14 +1,20 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import {
+  MarketingButtonLink,
+  MarketingHero,
+  MarketingMetricStrip,
+  MarketingPageShell,
+} from '@/components/marketing-page'
 import { AGENT_TASKS, FEATURED_AGENT_TASKS } from '@/lib/agent-tasks'
+import { withTimeout } from '@/lib/async'
 import { getAllSkills } from '@/lib/db/skills'
 import {
   HIGH_STAR_DISCOVERY_DOMAINS,
   HIGH_STAR_QUERY_POOL_SIZE,
   HIGH_STAR_SKILL_COVERAGE_TARGET,
 } from '@/lib/indexer/high-star-import'
+import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 
 export const dynamic = 'force-dynamic'
 
@@ -75,69 +81,52 @@ function endpointRows() {
 }
 
 export default async function AgentPage() {
-  const skills = await getAllSkills('quality').catch(() => [])
+  const skills = await withTimeout(
+    getAllSkills('quality', undefined, 200),
+    1000,
+    'agent page skill summary'
+  ).catch((error) => {
+    console.warn('Agent page skill fallback:', error)
+    return CURATED_SKILL_SNAPSHOT
+  })
   const topSkills = skills.slice(0, 4)
   const discoveryDomains = HIGH_STAR_DISCOVERY_DOMAINS
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
+    <MarketingPageShell>
+      <MarketingHero
+        eyebrow="Agent entry"
+        title="Let an agent find, trust, and install the right skill."
+        description="This page is the low-noise map for agent browsers. Start with a task, resolve the best skill, inspect trust signals, then fetch an install handoff."
+        actions={
+          <>
+            <MarketingButtonLink href="/resolve" variant="primary">
+              Resolve a task
+            </MarketingButtonLink>
+            <MarketingButtonLink
+              href="/api/agent/resolve?task=scrape+pricing+pages&agent=codex&max_risk=medium&format=text"
+              prefetch={false}
+            >
+              Try Resolve API
+            </MarketingButtonLink>
+            <MarketingButtonLink href="/llms.txt" prefetch={false}>
+              llms.txt
+            </MarketingButtonLink>
+          </>
+        }
+        aside={
+          <MarketingMetricStrip
+            items={[
+              { value: skills.length.toLocaleString(), label: 'Skills' },
+              { value: AGENT_TASKS.length, label: 'Tasks' },
+              { value: '1h', label: 'GitHub scan' },
+              { value: 'Live', label: 'Index ping' },
+            ]}
+          />
+        }
+      />
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="border-b border-border pb-10">
-          <p className="mb-5 font-mono text-xs uppercase text-secondary">Agent entry</p>
-          <div className="grid gap-10 lg:grid-cols-[1.12fr_0.88fr] lg:items-end">
-            <div>
-              <h1 className="font-display text-4xl font-normal leading-[0.98] text-balance md:text-6xl">
-                Let an agent find, trust, and install the right skill.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-                This page is the low-noise map for agent browsers. Start with a task, resolve the best skill, inspect trust signals, then fetch an install handoff.
-              </p>
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Link
-                  href="/tasks"
-                  className="border border-foreground bg-foreground px-5 py-2 text-sm font-semibold text-background transition-opacity hover:opacity-80"
-                >
-                  Browse tasks
-                </Link>
-                <Link
-                  href="/api/agent/resolve?task=scrape+pricing+pages&agent=codex&max_risk=medium&format=text"
-                  prefetch={false}
-                  className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
-                >
-                  Try Resolve API
-                </Link>
-                <Link
-                  href="/llms.txt"
-                  prefetch={false}
-                  className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
-                >
-                  llms.txt
-                </Link>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-px border border-border bg-border text-center sm:grid-cols-4">
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{skills.length.toLocaleString()}</div>
-                <div className="mt-1 text-xs uppercase text-secondary">Skills</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{AGENT_TASKS.length}</div>
-                <div className="mt-1 text-xs uppercase text-secondary">Tasks</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">1h</div>
-                <div className="mt-1 text-xs uppercase text-secondary">GitHub scan</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">Live</div>
-                <div className="mt-1 text-xs uppercase text-secondary">Index ping</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
           <div>
             <p className="mb-3 text-xs uppercase text-secondary">Recommended flow</p>
@@ -285,9 +274,7 @@ export default async function AgentPage() {
             </div>
           </section>
         )}
-      </main>
-
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }

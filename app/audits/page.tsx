@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import { auditRiskLabel, buildSkillAudit, normalizeAuditRecord, type ComputedSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile, type AgentSafetyProfile } from '@/lib/agent-safety'
 import {
@@ -124,48 +123,27 @@ export default async function AuditsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <MarketingPageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <SiteHeader />
+      <MarketingHero
+        eyebrow="Audit reports"
+        title="Skill audit reports for agent builders."
+        description="A practical review layer for install readiness, trust, quality, maintenance, and adoption risk. These reports are heuristic metadata audits, not full source-code security reviews."
+        aside={
+          <MarketingMetricStrip
+            columns="grid-cols-2 sm:grid-cols-5"
+            items={[
+              { value: averageAudit, label: 'Avg audit' },
+              { value: safeCount, label: 'Safe' },
+              { value: reviewCount, label: 'Review' },
+              { value: riskyCount, label: 'Risky' },
+              { value: blockedCount, label: 'Blocked' },
+            ]}
+          />
+        }
+      />
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="border-b border-border pb-10">
-          <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Audit reports</p>
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-            <div>
-              <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">
-                Skill audit reports for agent builders.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-                A practical review layer for install readiness, trust, quality, maintenance, and adoption risk. These
-                reports are heuristic metadata audits, not full source-code security reviews.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-px border border-border bg-border text-center sm:grid-cols-5">
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{averageAudit}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Avg audit</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{safeCount}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Safe</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{reviewCount}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Review</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{riskyCount}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Risky</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{blockedCount}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Blocked</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         <section className="grid gap-3 border-b border-border py-8 md:grid-cols-3">
           <Link href="/trending" className="border border-border p-5 transition-colors hover:border-foreground">
             <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Momentum</p>
@@ -265,9 +243,7 @@ export default async function AuditsPage() {
             })}
           </div>
         </section>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }

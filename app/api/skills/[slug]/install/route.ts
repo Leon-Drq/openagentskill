@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSkillBySlug } from '@/lib/db/skills'
 import { buildInstallHandoff } from '@/lib/registry'
+import { getSkillBySlugOrFallback, getSkillSuggestionsForSlug } from '@/lib/skill-fallbacks'
+
+export const revalidate = 300
+
+const INSTALL_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
+}
 
 export async function GET(
   request: NextRequest,
@@ -10,9 +16,12 @@ export async function GET(
   const format = request.nextUrl.searchParams.get('format') || 'json'
 
   try {
-    const skill = await getSkillBySlug(slug)
+    const skill = await getSkillBySlugOrFallback(slug)
     if (!skill) {
-      return NextResponse.json({ error: `Skill not found: ${slug}` }, { status: 404 })
+      return NextResponse.json({
+        error: `Skill not found: ${slug}`,
+        suggestions: getSkillSuggestionsForSlug(slug).map((candidate) => candidate.slug),
+      }, { status: 404 })
     }
 
     const payload = buildInstallHandoff(skill)
@@ -42,6 +51,7 @@ Detail page:
 ${payload.urls.web}`,
         {
           headers: {
+            ...INSTALL_CACHE_HEADERS,
             'Content-Type': 'text/plain; charset=utf-8',
             'X-Agent-Friendly': 'true',
           },
@@ -49,7 +59,7 @@ ${payload.urls.web}`,
       )
     }
 
-    return NextResponse.json(payload)
+    return NextResponse.json(payload, { headers: INSTALL_CACHE_HEADERS })
   } catch (error) {
     console.error('Public skill install API error:', error)
     return NextResponse.json({ error: 'Failed to build install handoff' }, { status: 500 })

@@ -5,6 +5,7 @@ const ko = {
   nav: {
     ...en.nav,
     home: '홈',
+    resolve: '해결',
     skills: '스킬',
     tasks: '작업',
     packs: '스킬 팩',

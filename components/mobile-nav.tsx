@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Activity, Braces, FileJson2, Menu, Plus, ShieldCheck, Terminal, X } from 'lucide-react'
+import { Activity, Braces, FileJson2, Menu, Plus, SearchCheck, ShieldCheck, Terminal, X } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'
 import { GitHubStarButton } from '@/components/github-star-button'
@@ -13,6 +13,7 @@ import { useI18n } from '@/lib/i18n/context'
 import { cn } from '@/lib/utils'
 
 const navItems = [
+  { href: '/resolve', labelKey: 'resolve' },
   { href: '/skills', labelKey: 'skills' },
   { href: '/tasks', label: 'Tasks' },
   { href: '/skill-packs', label: 'Packs' },
@@ -28,6 +29,12 @@ const agentItems: Array<{
   icon: LucideIcon
   prefetch?: false
 }> = [
+  {
+    href: '/resolve',
+    label: 'Resolve Workbench',
+    description: 'Task to skill plan',
+    icon: SearchCheck,
+  },
   {
     href: '/agent',
     label: 'Agent Entry',

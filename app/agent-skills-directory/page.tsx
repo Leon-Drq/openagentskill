@@ -1,7 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import {
+  MarketingButtonLink,
+  MarketingHero,
+  MarketingMetricStrip,
+  MarketingPageShell,
+} from '@/components/marketing-page'
 import { getAllSkills, type SkillRecord } from '@/lib/db/skills'
 
 const BASE_URL = 'https://www.openagentskill.com'
@@ -65,51 +69,32 @@ export default async function AgentSkillsDirectoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
-      <main>
-        <section className="border-b border-border px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
-          <div className="mx-auto max-w-5xl">
-            <p className="mb-4 text-xs uppercase tracking-widest text-secondary">AI Agent Skills Directory</p>
-            <h1 className="max-w-4xl text-balance font-display text-4xl font-bold leading-tight sm:text-6xl">
-              Browse reusable skills for AI agents.
-            </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-secondary sm:text-xl">
-              OpenAgentSkill indexes reusable skills for Codex, Claude Code, Cursor, browser automation, data workflows, RAG, coding agents, and more.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/skills"
-                className="border border-foreground bg-foreground px-5 py-3 text-center text-sm font-semibold text-background transition-opacity hover:opacity-85"
-              >
-                Search all skills
-              </Link>
-              <Link
-                href="/audits"
-                className="border border-border px-5 py-3 text-center text-sm font-semibold transition-colors hover:border-foreground"
-              >
-                View audit reports
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <section className="border-b border-border px-4 py-10 sm:px-6">
-          <div className="mx-auto grid max-w-5xl gap-3 sm:grid-cols-3">
-            <div className="border border-border bg-card p-5">
-              <p className="font-display text-3xl font-bold">{formatCompact(skills.length)}+</p>
-              <p className="mt-2 text-sm text-secondary">indexed skill candidates</p>
-            </div>
-            <div className="border border-border bg-card p-5">
-              <p className="font-display text-3xl font-bold">Trust</p>
-              <p className="mt-2 text-sm text-secondary">quality, audit, and maintenance signals</p>
-            </div>
-            <div className="border border-border bg-card p-5">
-              <p className="font-display text-3xl font-bold">API</p>
-              <p className="mt-2 text-sm text-secondary">agent-facing recommendation endpoint</p>
-            </div>
-          </div>
-        </section>
+    <MarketingPageShell>
+      <MarketingHero
+        eyebrow="AI Agent Skills Directory"
+        title="Browse reusable skills for AI agents."
+        description="OpenAgentSkill indexes reusable skills for Codex, Claude Code, Cursor, browser automation, data workflows, RAG, coding agents, and more."
+        actions={
+          <>
+            <MarketingButtonLink href="/skills" variant="primary">
+              Search all skills
+            </MarketingButtonLink>
+            <MarketingButtonLink href="/audits">
+              View audit reports
+            </MarketingButtonLink>
+          </>
+        }
+        aside={
+          <MarketingMetricStrip
+            columns="grid-cols-3"
+            items={[
+              { value: `${formatCompact(skills.length)}+`, label: 'Indexed skills' },
+              { value: 'Trust', label: 'Quality signals' },
+              { value: 'API', label: 'Agent endpoint' },
+            ]}
+          />
+        }
+      />
 
         <section className="border-b border-border px-4 py-12 sm:px-6 sm:py-16">
           <div className="mx-auto max-w-5xl">
@@ -167,8 +152,6 @@ export default async function AgentSkillsDirectoryPage() {
             </div>
           </div>
         </section>
-      </main>
-      <SiteFooter />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListData) }}
@@ -177,6 +160,6 @@ export default async function AgentSkillsDirectoryPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
       />
-    </div>
+    </MarketingPageShell>
   )
 }

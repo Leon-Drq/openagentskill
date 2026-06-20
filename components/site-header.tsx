@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Activity, Bot, Braces, ChevronDown, FileJson2, Plus, ShieldCheck, Terminal } from 'lucide-react'
+import { Activity, Bot, Braces, ChevronDown, FileJson2, Plus, SearchCheck, ShieldCheck, Terminal } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'
 import { GitHubStarButton } from '@/components/github-star-button'
@@ -13,6 +13,7 @@ import { useI18n } from '@/lib/i18n/context'
 import { cn } from '@/lib/utils'
 
 const primaryNavItems = [
+  { href: '/resolve', labelKey: 'resolve' },
   { href: '/skills', labelKey: 'skills' },
   { href: '/tasks', labelKey: 'tasks' },
   { href: '/skill-packs', labelKey: 'packs' },
@@ -28,6 +29,12 @@ const agentItems: Array<{
   icon: LucideIcon
   prefetch?: false
 }> = [
+  {
+    href: '/resolve',
+    label: 'Resolve Workbench',
+    description: 'Task to skill plan',
+    icon: SearchCheck,
+  },
   {
     href: '/agent',
     label: 'Agent Entry',
@@ -97,7 +104,7 @@ function isActivePath(pathname: string, href: string) {
 function ForAgentsDropdown({ pathname }: { pathname: string }) {
   const { t } = useI18n()
   const [open, setOpen] = useState(false)
-  const active = pathname === '/cli'
+  const active = agentItems.some((item) => isActivePath(pathname, item.href))
 
   return (
     <div

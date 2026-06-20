@@ -6,7 +6,7 @@ export async function GET() {
       openapi: '3.1.0',
       info: {
         title: 'OpenAgentSkill Agent API',
-        version: '1.0.0',
+        version: '2.0.0',
         description: 'Resolve, inspect, and install AI agent skills from OpenAgentSkill.',
       },
       servers: [{ url: 'https://www.openagentskill.com' }],
@@ -67,7 +67,7 @@ export async function GET() {
         },
         '/api/agent/resolve': {
           get: {
-            summary: 'Resolve a task into a selected skill, safety gate, and install plan',
+            summary: 'Resolve a task into recommendation.best_skill, alternatives, Trust Score v3, safety gate, and install plan',
             parameters: [
               { name: 'task', in: 'query', required: true, schema: { type: 'string' } },
               { name: 'agent', in: 'query', required: false, schema: { type: 'string', enum: ['auto', 'codex', 'claude-code', 'cursor', 'openagentskill-cli'] } },
@@ -75,7 +75,12 @@ export async function GET() {
               { name: 'min_stars', in: 'query', required: false, schema: { type: 'number' } },
               { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
             ],
-            responses: { '200': { description: 'Resolved skill plan' } },
+            responses: {
+              '200': {
+                description:
+                  'Resolved skill plan. Read recommendation.best_skill, recommendation.install, recommendation.why_recommended, recommendation.trust_score_v3, recommendation.risk, and recommendation.alternatives for the stable agent contract. recommendation.trust_score_v2 remains as a backwards-compatible alias.',
+              },
+            },
           },
           post: {
             summary: 'Resolve a task with JSON constraints',
@@ -96,7 +101,12 @@ export async function GET() {
                 },
               },
             },
-            responses: { '200': { description: 'Resolved skill plan' } },
+            responses: {
+              '200': {
+                description:
+                  'Resolved skill plan with the same recommendation.* contract returned by GET.',
+              },
+            },
           },
         },
         '/api/agent/tasks': {

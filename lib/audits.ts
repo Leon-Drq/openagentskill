@@ -107,8 +107,16 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
   const trust = getSkillTrustProfile(skill, false, eventStats || null)
   const freshnessDays = getFreshnessDays(skill.github_last_pushed_at || skill.updated_at)
   const maintenanceScore = scoreFreshness(freshnessDays)
-  const dependencyScore = trust.dimensions.find((dimension) => dimension.id === 'dependency_risk')?.score || 60
-  const documentationScore = trust.dimensions.find((dimension) => dimension.id === 'documentation')?.score || 48
+  const dependencyDimension = trust.dimensions.find((dimension) => dimension.id === 'dependency_risk')
+  const documentationDimension = trust.dimensions.find((dimension) => dimension.id === 'documentation')
+  const installSafetyDimension = trust.dimensions.find((dimension) => dimension.id === 'install_safety')
+  const permissionSurfaceDimension = trust.dimensions.find((dimension) => dimension.id === 'permission_surface')
+  const repoActivityDimension = trust.dimensions.find((dimension) => dimension.id === 'repo_activity')
+  const dependencyScore = dependencyDimension?.score || 60
+  const documentationScore = documentationDimension?.score || 48
+  const installSafetyScore = installSafetyDimension?.score || (hasInstallPath(skill) ? 82 : 20)
+  const permissionSurfaceScore = permissionSurfaceDimension?.score || 60
+  const repoActivityScore = repoActivityDimension?.score || 50
   const installScore = hasInstallPath(skill) ? 92 : 20
   const repositoryScore = hasRepository(skill) ? 88 : 18
   const licenseScore = licenseKnown(skill) ? 86 : 45
@@ -120,13 +128,14 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
       ? 68
       : 42
   const securityScore = clampScore(
-    repositoryScore * 0.22 +
-    licenseScore * 0.2 +
-    docsScore * 0.14 +
-    aiReviewScore * 0.2 +
-    dependencyScore * 0.16 +
-    adoptionScore * 0.1 +
-    installScore * 0.08
+    repositoryScore * 0.16 +
+    licenseScore * 0.16 +
+    docsScore * 0.12 +
+    aiReviewScore * 0.16 +
+    dependencyScore * 0.14 +
+    installSafetyScore * 0.13 +
+    permissionSurfaceScore * 0.08 +
+    adoptionScore * 0.05
   )
 
   const auditScore = clampScore(
@@ -143,6 +152,8 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
   if (!licenseKnown(skill)) warnings.add('License is unclear')
   if (!hasEnoughDocumentation(skill)) warnings.add('Documentation summary is thin')
   if (dependencyScore < 62) warnings.add('Dependency or permission surface needs review')
+  if (installSafetyScore < 62) warnings.add('Install command contains a high-risk pattern')
+  if (permissionSurfaceScore < 62) warnings.add('Permission surface may require sandboxing')
   if (freshnessDays !== null && freshnessDays > 365) warnings.add('Repository appears stale')
   for (const issue of skill.ai_review_issues || []) warnings.add(issue)
   for (const warning of quality.warnings) warnings.add(warning)
@@ -193,7 +204,25 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
       label: 'Dependency risk',
       status: statusForScore(dependencyScore),
       score: dependencyScore,
-      detail: trust.dimensions.find((dimension) => dimension.id === 'dependency_risk')?.detail || 'Heuristic dependency risk from public metadata',
+      detail: dependencyDimension?.detail || 'Heuristic dependency risk from public metadata',
+    },
+    {
+      label: 'Install command safety',
+      status: statusForScore(installSafetyScore),
+      score: installSafetyScore,
+      detail: installSafetyDimension?.detail || 'Heuristic install safety from public metadata',
+    },
+    {
+      label: 'Permission surface',
+      status: statusForScore(permissionSurfaceScore),
+      score: permissionSurfaceScore,
+      detail: permissionSurfaceDimension?.detail || 'Heuristic permission surface from public metadata',
+    },
+    {
+      label: 'Stars/forks activity',
+      status: statusForScore(repoActivityScore),
+      score: repoActivityScore,
+      detail: repoActivityDimension?.detail || `${formatCompactNumber(skill.github_stars || 0)} GitHub stars`,
     },
     {
       label: 'Adoption',
@@ -207,6 +236,8 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
     { label: 'Audit score', value: `${auditScore}/100`, tone: auditScore >= 80 ? 'positive' : auditScore >= 60 ? 'neutral' : 'warning' },
     { label: 'Quality', value: `${quality.score}/100`, tone: quality.score >= 80 ? 'positive' : quality.score >= 60 ? 'neutral' : 'warning' },
     { label: 'Trust', value: `${trust.score}/100`, tone: trust.score >= 80 ? 'positive' : trust.score >= 60 ? 'neutral' : 'warning' },
+    { label: 'Install safety', value: `${installSafetyScore}/100`, tone: installSafetyScore >= 80 ? 'positive' : installSafetyScore >= 60 ? 'neutral' : 'warning' },
+    { label: 'Permission surface', value: `${permissionSurfaceScore}/100`, tone: permissionSurfaceScore >= 80 ? 'positive' : permissionSurfaceScore >= 60 ? 'neutral' : 'warning' },
     { label: 'Maintenance', value: freshnessLabel(freshnessDays), tone: maintenanceScore >= 80 ? 'positive' : maintenanceScore >= 58 ? 'neutral' : 'warning' },
     { label: 'Events', value: eventStats?.total_events ? `${eventStats.total_events} events` : 'No events yet', tone: eventStats?.total_events ? 'positive' : 'neutral' },
   ]
@@ -233,11 +264,11 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
     signals,
     warnings: [...warnings].slice(0, 12),
     metadata: {
-      algorithm: 'heuristic-v1',
+      algorithm: 'heuristic-v2',
       note: 'This is a heuristic adoption audit based on public metadata, not a full source-code security review.',
       trust_dimensions: trust.dimensions,
       trust_formula:
-        'OpenAgentSkill Trust Score combines GitHub stars, recent maintenance, license clarity, README/SKILL.md completeness, dependency risk, install availability, repository evidence, and review status.',
+        'OpenAgentSkill Trust Score combines GitHub adoption, stars/forks activity, recent maintenance, license clarity, README/SKILL.md completeness, dependency/runtime risk, install availability, install command safety, permission surface, repository evidence, and review status.',
     },
     generated_at: now,
     updated_at: now,

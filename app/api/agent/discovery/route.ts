@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { withTimeout } from '@/lib/async'
 import { INDEXNOW_KEY_LOCATION } from '@/lib/indexnow'
 import { createPublicClient } from '@/lib/supabase/public'
 import {
@@ -11,14 +12,23 @@ import { FEATURED_SKILL_CLUSTERS, SKILL_CLUSTERS } from '@/lib/seo/skill-cluster
 
 export const dynamic = 'force-dynamic'
 
+const DISCOVERY_QUERY_TIMEOUT_MS = 1000
+
 async function getRecentRuns() {
   const serverSecret = process.env.INDEXER_SECRET
   if (!serverSecret) return []
 
   const supabase = createPublicClient()
-  const { data, error } = await supabase.rpc('list_indexer_runs', {
-    p_server_secret: serverSecret,
-    p_limit: 5,
+  const { data, error } = await withTimeout(
+    supabase.rpc('list_indexer_runs', {
+      p_server_secret: serverSecret,
+      p_limit: 5,
+    }),
+    DISCOVERY_QUERY_TIMEOUT_MS,
+    'indexer run status query'
+  ).catch((queryError) => {
+    console.warn('Discovery recent runs fallback:', queryError)
+    return { data: null, error: queryError }
   })
 
   if (error) return []
@@ -44,10 +54,17 @@ async function getRecentRuns() {
 
 async function getApprovedSkillCount() {
   const supabase = createPublicClient()
-  const { count, error } = await supabase
-    .from('skills')
-    .select('slug', { count: 'exact', head: true })
-    .eq('ai_review_approved', true)
+  const { count, error } = await withTimeout(
+    supabase
+      .from('skills')
+      .select('slug', { count: 'exact', head: true })
+      .eq('ai_review_approved', true),
+    DISCOVERY_QUERY_TIMEOUT_MS,
+    'approved skill count query'
+  ).catch((queryError) => {
+    console.warn('Discovery skill count fallback:', queryError)
+    return { count: null, error: queryError }
+  })
 
   if (error) return null
   return count

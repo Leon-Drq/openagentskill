@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import {
+  MarketingHero,
+  MarketingMetricStrip,
+  MarketingPageShell,
+} from '@/components/marketing-page'
 import { getAllSkills } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
 import { buildCommunityIndexedReplyText, buildManualXMainText, buildManualXReplyText, buildXIntentUrl } from '@/lib/x/poster'
@@ -30,43 +33,29 @@ export default async function XKitPage() {
     .slice(0, 8)
 
   return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
+    <MarketingPageShell>
+      <MarketingHero
+        eyebrow="OpenAgentSkill Update"
+        title="Share useful skills with a stronger story."
+        description="Each draft turns a registry listing into a concrete agent use case, then links back to the canonical skill page for discovery and attribution."
+        aside={
+          <MarketingMetricStrip
+            columns="grid-cols-3"
+            items={[
+              { value: candidates.length, label: 'Drafts' },
+              {
+                value: formatCompactNumber(
+                  candidates.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0)
+                ),
+                label: 'Stars',
+              },
+              { value: '0', label: 'API credits' },
+            ]}
+          />
+        }
+      />
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-        <section className="border-b border-border pb-10">
-          <nav className="mb-8 flex flex-wrap items-center gap-2 text-sm text-secondary">
-            <Link href="/" className="hover:text-foreground">Home</Link>
-            <span>/</span>
-            <span className="text-foreground">X Growth Kit</span>
-          </nav>
-          <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
-            <div>
-              <p className="mb-4 text-xs uppercase text-secondary">OpenAgentSkill Update</p>
-              <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">
-                Share useful skills with a stronger story.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-                Each draft turns a registry listing into a concrete agent use case, then links back to the canonical skill page for discovery and attribution.
-              </p>
-            </div>
-            <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{candidates.length}</div>
-                <div className="mt-1 text-xs uppercase text-secondary">Drafts</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{formatCompactNumber(candidates.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0))}</div>
-                <div className="mt-1 text-xs uppercase text-secondary">Stars</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">0</div>
-                <div className="mt-1 text-xs uppercase text-secondary">API credits</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         <section className="py-10">
           <div className="mb-8 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="border border-border bg-card p-5">
@@ -183,9 +172,7 @@ export default async function XKitPage() {
             </div>
           )}
         </section>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }

@@ -4,13 +4,9 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { InstallCommand } from './install-command'
-import { SaveSkillButton } from './save-skill-button'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
-import type { AgentSafetyProfile } from '@/lib/agent-safety'
-import type { SkillSupplyProfile, SupplyTrackSummary } from '@/lib/supply'
-import type { SkillTrustProfile } from '@/lib/trust'
-import type { UseCaseDefinition } from '@/lib/use-cases'
+import type { SupplyTrackSummary } from '@/lib/supply'
 
 interface AgentStats {
   total_calls: number
@@ -18,6 +14,53 @@ interface AgentStats {
   success_rate: number | null
   avg_latency_ms: number | null
   unique_agents: number
+}
+
+interface SkillQualitySummary {
+  score: number
+  tier: string
+  label: string
+  summary: string
+  warnings: string[]
+}
+
+interface SkillTrustSummary {
+  score: number
+  tier: string
+  label: string
+  summary: string
+  warnings: string[]
+}
+
+interface SkillSafetySummary {
+  blocked: boolean
+  safety_tier: {
+    tier: string
+    badge: string
+    label: string
+    summary: string
+  }
+}
+
+interface SkillSupplySummary {
+  track: {
+    slug: string
+    shortLabel: string
+  }
+  scenario: {
+    label: string
+    description: string
+  }
+  applicableAgents: string[]
+  install: {
+    targetCount: number
+  }
+  maintenance: {
+    label: string
+  }
+  risk: {
+    label: string
+  }
 }
 
 interface Skill {
@@ -41,17 +84,11 @@ interface Skill {
   verified: boolean
   createdAt: string
   agentStats?: AgentStats | null
-  qualityProfile?: {
-    score: number
-    tier: string
-    label: string
-    summary: string
-    warnings: string[]
-  }
-  trustProfile?: SkillTrustProfile
-  safetyProfile?: AgentSafetyProfile
+  qualityProfile?: SkillQualitySummary
+  trustProfile?: SkillTrustSummary
+  safetyProfile?: SkillSafetySummary
   platformHints?: string[]
-  supplyProfile?: SkillSupplyProfile
+  supplyProfile?: SkillSupplySummary
 }
 
 const SORT_TABS = [
@@ -100,7 +137,7 @@ interface Props {
   category: string
   categories: string[]
   useCase: string
-  useCases: UseCaseDefinition[]
+  useCases: Array<{ slug: string; shortTitle: string }>
   platform: string
   platformOptions: string[]
   quality: string
@@ -109,6 +146,12 @@ interface Props {
   supplyTrack: string
   supplyTracks: SupplyTrackSummary[]
   minStars: number
+  resultCount: number
+  page: number
+  rankOffset: number
+  hasPreviousResults: boolean
+  hasMoreResults: boolean
+  degraded: boolean
 }
 
 export function SkillsPageClient({
@@ -127,6 +170,12 @@ export function SkillsPageClient({
   supplyTrack,
   supplyTracks,
   minStars,
+  resultCount,
+  page,
+  rankOffset,
+  hasPreviousResults,
+  hasMoreResults,
+  degraded,
 }: Props) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -148,6 +197,7 @@ export function SkillsPageClient({
   const navigate = useCallback(
     (updates: Record<string, string | undefined>) => {
       const params = new URLSearchParams(searchParams.toString())
+      const updatesPage = Object.prototype.hasOwnProperty.call(updates, 'page')
       for (const [key, value] of Object.entries(updates)) {
         if (value && value !== 'all') {
           params.set(key, value)
@@ -155,6 +205,7 @@ export function SkillsPageClient({
           params.delete(key)
         }
       }
+      if (!updatesPage) params.delete('page')
       router.push(`/skills?${params.toString()}`)
     },
     [router, searchParams]
@@ -162,6 +213,8 @@ export function SkillsPageClient({
 
   const activeSort = SORT_TABS.find((t) => t.key === sort) || SORT_TABS[0]
   const activeTrack = supplyTracks.find((track) => track.slug === supplyTrack)
+  const resultStart = skills.length > 0 ? rankOffset + 1 : 0
+  const resultEnd = rankOffset + skills.length
   const compareSkills = useMemo(
     () => compareSlugs
       .map((slug) => skills.find((skill) => skill.slug === slug) || { slug, name: slug })
@@ -210,12 +263,12 @@ export function SkillsPageClient({
                 type="text"
                 name="q"
                 defaultValue={query}
-                placeholder="Describe a task, repo need, platform, or skill name..."
-                className="w-full border border-border bg-background py-3 pl-4 pr-24 text-sm focus:border-foreground focus:outline-none"
+                placeholder="Describe a task or skill name..."
+                className="w-full border border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none sm:pr-24"
               />
               <button
                 type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-[8px] bg-[#006b4f] px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                className="mt-2 w-full rounded-[8px] bg-[#006b4f] px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 sm:absolute sm:right-2 sm:top-1/2 sm:mt-0 sm:w-auto sm:-translate-y-1/2 sm:py-2"
               >
                 Search
               </button>
@@ -223,10 +276,10 @@ export function SkillsPageClient({
             <div className="mt-4 grid grid-cols-3 gap-px border border-border bg-border text-center">
               <div className="bg-background p-3">
                 <div className="font-mono text-lg text-foreground">{skills.length.toLocaleString()}</div>
-                <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">Results</div>
+                <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">Shown</div>
               </div>
               <div className="bg-background p-3">
-                <div className="font-mono text-lg text-foreground">{categories.length.toLocaleString()}</div>
+                <div className="font-mono text-lg text-foreground">{supplyTracks.length.toLocaleString()}</div>
                 <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">Tracks</div>
               </div>
               <div className="bg-background p-3">
@@ -286,7 +339,7 @@ export function SkillsPageClient({
               </Link>
             ))}
           </div>
-        </div>
+      </div>
       </section>
 
       {/* Sort Tabs */}
@@ -311,6 +364,13 @@ export function SkillsPageClient({
       </div>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        {degraded && (
+          <div className="mb-6 border border-amber-300 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-900">
+            Live registry data is temporarily unavailable, so this page is showing a curated OpenAgentSkill snapshot.
+            Search, resolve APIs, and detail pages will use live data again when the database is reachable.
+          </div>
+        )}
+
         <section className="mb-8 border border-border bg-card/80 p-4 shadow-[0_16px_48px_rgba(23,23,23,0.04)] sm:p-5">
           <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>
@@ -446,7 +506,7 @@ export function SkillsPageClient({
         {/* Context line */}
         <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
           <p className="text-sm text-secondary">
-            {skills.length} {skills.length === 1 ? 'skill' : 'skills'}
+            Showing {resultStart.toLocaleString()}-{resultEnd.toLocaleString()} of {resultCount.toLocaleString()} ranked candidates
             {query && <> matching <em>&quot;{query}&quot;</em></>}
             {category !== 'all' && <> in <em>{category}</em></>}
             {supplyTrack !== 'all' && <> inside <em>{activeTrack?.shortLabel || supplyTrack}</em></>}
@@ -475,7 +535,7 @@ export function SkillsPageClient({
                 <div className="flex min-w-0 items-start gap-3 sm:gap-6">
                   {/* Rank */}
                   <div className="w-6 shrink-0 pt-1 text-right font-mono text-base tabular-nums text-secondary sm:w-8 sm:text-lg">
-                    {index + 1}
+                    {rankOffset + index + 1}
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -639,49 +699,21 @@ export function SkillsPageClient({
                               Safety gate
                             </span>
                             {skill.safetyProfile.safety_tier.summary}
-                            <span className="mt-1 block">
-                              Action: {skill.safetyProfile.safety_tier.recommended_action}
-                            </span>
                           </div>
                         )}
                       </div>
                     )}
 
                     {skill.supplyProfile && (
-                      <div className="mb-4 grid max-w-4xl gap-px border border-border bg-border text-xs sm:grid-cols-2 lg:grid-cols-4">
-                        {[
-                          {
-                            label: 'Scenario',
-                            value: skill.supplyProfile.scenario.label,
-                            detail: skill.supplyProfile.scenario.description,
-                          },
-                          {
-                            label: 'Agents',
-                            value: skill.supplyProfile.applicableAgents.slice(0, 3).join(' + '),
-                            detail: `${skill.supplyProfile.install.targetCount} install targets`,
-                          },
-                          {
-                            label: 'Maintenance',
-                            value: skill.supplyProfile.maintenance.status,
-                            detail: skill.supplyProfile.maintenance.label,
-                          },
-                          {
-                            label: 'Risk',
-                            value: skill.supplyProfile.risk.label,
-                            detail: skill.supplyProfile.risk.notes.slice(0, 1).join(''),
-                          },
-                          ...(skill.safetyProfile ? [{
-                            label: 'Gate',
-                            value: skill.safetyProfile.safety_tier.auto_install_policy,
-                            detail: skill.safetyProfile.safety_tier.label,
-                          }] : []),
-                        ].map((item) => (
-                          <div key={item.label} className="min-w-0 bg-background p-3">
-                            <p className="font-mono text-[10px] uppercase tracking-widest text-secondary">{item.label}</p>
-                            <p className="mt-1 truncate font-semibold capitalize text-foreground">{item.value}</p>
-                            <p className="mt-1 line-clamp-2 leading-relaxed text-secondary">{item.detail}</p>
-                          </div>
-                        ))}
+                      <div className="mb-4 flex max-w-4xl flex-col gap-2 border border-border bg-background/70 px-3 py-2 text-xs leading-relaxed text-secondary sm:flex-row sm:items-center sm:justify-between">
+                        <p className="min-w-0">
+                          <span className="font-mono uppercase tracking-widest text-secondary">Scenario</span>{' '}
+                          <span className="font-semibold text-foreground">{skill.supplyProfile.scenario.label}</span>
+                          <span className="hidden sm:inline"> · {skill.supplyProfile.scenario.description}</span>
+                        </p>
+                        <p className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-secondary">
+                          {skill.supplyProfile.applicableAgents.slice(0, 2).join(' + ')} · {skill.supplyProfile.install.targetCount} targets
+                        </p>
                       </div>
                     )}
 
@@ -707,7 +739,12 @@ export function SkillsPageClient({
 
                     <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-secondary">
                       <span>by {skill.author.name}</span>
-                      <SaveSkillButton skillSlug={skill.slug} compact />
+                      <Link
+                        href={`/skills/${skill.slug}`}
+                        className="border border-border px-2.5 py-1 text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                      >
+                        Details
+                      </Link>
                       <button
                         type="button"
                         onClick={() => toggleCompare(skill.slug)}
@@ -730,6 +767,42 @@ export function SkillsPageClient({
                 </div>
               </article>
             ))}
+          </div>
+        )}
+        {(hasPreviousResults || hasMoreResults) && (
+          <div className="mt-6 flex flex-col gap-3 border border-border bg-card/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">
+              Page {page}
+            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                disabled={!hasPreviousResults}
+                onClick={() => navigate({ page: page > 2 ? String(page - 1) : undefined })}
+                className="border border-border px-4 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                disabled={!hasMoreResults}
+                onClick={() => navigate({ page: String(page + 1) })}
+                className="border border-foreground bg-foreground px-4 py-2 text-sm font-semibold text-background transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+        {skills.length > 0 && hasMoreResults && (
+          <div className="mt-6 border border-border bg-card/70 p-5 text-sm leading-relaxed text-secondary">
+            <p>
+              Showing the strongest {skills.length} results to keep the registry fast for humans and agents.
+              Refine by use case, platform, stars, or search query for a narrower shortlist.
+            </p>
+            <Link href="/api/agent/resolve?task=find%20the%20right%20skill&format=text" prefetch={false} className="mt-3 inline-flex text-foreground underline">
+              Try the agent resolve API
+            </Link>
           </div>
         )}
       </main>

@@ -17,16 +17,35 @@ const DANGEROUS_PATTERNS = [
   { pattern: /child_process/, label: 'child_process module usage', risk: 'medium' as const },
   { pattern: /os\.system\s*\(/, label: 'os.system() call detected', risk: 'high' as const },
   { pattern: /os\.remove\s*\(/, label: 'os.remove() call detected', risk: 'high' as const },
-  { pattern: /shutil\.rmtree/, label: 'shutil.rmtree() usage', risk: 'critical' as const },
   { pattern: /rm\s+-rf/, label: 'rm -rf command detected', risk: 'critical' as const },
   { pattern: /base64\.b64decode.*exec/, label: 'Encoded execution pattern', risk: 'critical' as const },
   { pattern: /process\.env\[/, label: 'Environment variable access', risk: 'low' as const },
-  { pattern: /\.env/, label: 'Possible .env file access', risk: 'low' as const },
+  { pattern: /os\.environ(?:\.get|\[)/, label: 'Environment variable access', risk: 'low' as const },
+  { pattern: /(?:^|[/'"`])\.env(?:[.\w-]*|[/'"`])|dotenv\.config|load_dotenv/, label: 'Possible .env file access', risk: 'low' as const },
   { pattern: /crypto\.createCipher/, label: 'Weak crypto usage', risk: 'medium' as const },
   { pattern: /innerHTML\s*=/, label: 'innerHTML assignment (XSS risk)', risk: 'medium' as const },
   { pattern: /document\.write/, label: 'document.write() usage', risk: 'medium' as const },
   { pattern: /\bfetch\s*\([^)]*\$\{/, label: 'Dynamic URL in fetch (injection risk)', risk: 'medium' as const },
 ]
+
+function classifyRmtreeUsage(content: string): { label: string; risk: AnalysisResult['riskLevel'] } | null {
+  if (!/shutil\.rmtree\s*\(/.test(content)) return null
+
+  const hasDestinationGuard = /assert_safe_destination\s*\(\s*destination\s*,\s*skills_dir\s*\)/.test(content)
+  const destinationIsNamedSkill = /destination\s*=\s*skills_dir\s*\/\s*SKILL_NAME/.test(content)
+
+  if (hasDestinationGuard && destinationIsNamedSkill) {
+    return {
+      label: 'guarded shutil.rmtree() usage',
+      risk: 'medium',
+    }
+  }
+
+  return {
+    label: 'shutil.rmtree() usage',
+    risk: 'critical',
+  }
+}
 
 export function analyzeCode(codeFiles: { path: string; content: string }[]): AnalysisResult {
   const issues: string[] = []
@@ -34,6 +53,14 @@ export function analyzeCode(codeFiles: { path: string; content: string }[]): Ana
   const riskOrder = { low: 0, medium: 1, high: 2, critical: 3 }
 
   for (const file of codeFiles) {
+    const rmtreeFinding = classifyRmtreeUsage(file.content)
+    if (rmtreeFinding) {
+      issues.push(`${file.path}: ${rmtreeFinding.label}`)
+      if (riskOrder[rmtreeFinding.risk] > riskOrder[maxRisk]) {
+        maxRisk = rmtreeFinding.risk
+      }
+    }
+
     for (const { pattern, label, risk } of DANGEROUS_PATTERNS) {
       if (pattern.test(file.content)) {
         issues.push(`${file.path}: ${label}`)

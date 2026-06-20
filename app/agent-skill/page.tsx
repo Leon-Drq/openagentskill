@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { MarketingButtonLink, MarketingHero, MarketingPageShell } from '@/components/marketing-page'
 import { USE_CASES } from '@/lib/use-cases'
 
 const BASE_URL = 'https://www.openagentskill.com'
@@ -78,34 +77,22 @@ export default function AgentSkillPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
-      <main>
-        <section className="border-b border-border px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
-          <div className="mx-auto max-w-5xl">
-            <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Agent skill definition</p>
-            <h1 className="max-w-4xl text-balance font-display text-4xl font-bold leading-tight sm:text-6xl">
-              What is an agent skill?
-            </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-secondary sm:text-xl">
-              An agent skill is a reusable capability that an AI agent can discover, evaluate, install, and use to complete a specific workflow.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/agent-skills-registry"
-                className="border border-foreground bg-foreground px-5 py-3 text-center text-sm font-semibold text-background transition-opacity hover:opacity-85"
-              >
-                Explore the registry
-              </Link>
-              <Link
-                href="/api-docs"
-                className="border border-border px-5 py-3 text-center text-sm font-semibold transition-colors hover:border-foreground"
-              >
-                View the recommendation API
-              </Link>
-            </div>
-          </div>
-        </section>
+    <MarketingPageShell>
+      <MarketingHero
+        eyebrow="Agent skill definition"
+        title="What is an agent skill?"
+        description="An agent skill is a reusable capability that an AI agent can discover, evaluate, install, and use to complete a specific workflow."
+        actions={
+          <>
+            <MarketingButtonLink href="/agent-skills-registry" variant="primary">
+              Explore the registry
+            </MarketingButtonLink>
+            <MarketingButtonLink href="/api-docs">
+              View the recommendation API
+            </MarketingButtonLink>
+          </>
+        }
+      />
 
         <section className="border-b border-border px-4 py-12 sm:px-6 sm:py-16">
           <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
@@ -185,8 +172,6 @@ export default function AgentSkillPage() {
             </div>
           </div>
         </section>
-      </main>
-      <SiteFooter />
       {structuredData.map((item) => (
         <script
           key={item['@type']}
@@ -194,6 +179,6 @@ export default function AgentSkillPage() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
         />
       ))}
-    </div>
+    </MarketingPageShell>
   )
 }

@@ -2,6 +2,7 @@ export default {
   // Navigation
   nav: {
     home: 'Home',
+    resolve: 'Resolve',
     skills: 'Skills',
     tasks: 'Tasks',
     packs: 'Packs',

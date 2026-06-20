@@ -4,8 +4,12 @@ import { notFound } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
+import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { convertSkillRecordToManifest, getAllSkills } from '@/lib/db/skills'
 import { SKILL_STACKS } from '@/lib/collections'
+import { getSkillSupplyProfile } from '@/lib/supply'
+import { getSkillTrustProfile } from '@/lib/trust'
 import { USE_CASES, getUseCaseBySlug, selectSkillsForUseCase } from '@/lib/use-cases'
 
 export const dynamic = 'force-dynamic'
@@ -61,16 +65,33 @@ export default async function UseCasePage({
   const useCase = getUseCaseBySlug(slug)
   if (!useCase) notFound()
 
-  const allSkills = await getAllSkills('quality').catch(() => [])
+  const allSkills = await getAllSkills('quality', undefined, 4000).catch(() => [])
   const matchedSkills = selectSkillsForUseCase(allSkills, useCase, 18)
-  const heroSkills = matchedSkills.slice(0, 3)
+  const enrichedSkills = matchedSkills.map((skill) => {
+    const trust = getSkillTrustProfile(skill)
+    const audit = buildSkillAudit(skill)
+    const safety = getAgentSafetyProfile(skill, audit, {
+      max_risk: 'medium',
+      needs_install_command: true,
+    })
+    const supply = getSkillSupplyProfile(skill)
+
+    return { skill, trust, audit, safety, supply }
+  })
+  const heroSkills = enrichedSkills.slice(0, 3)
+  const strongTrustCount = enrichedSkills.filter((item) => item.trust.tier === 'production' || item.trust.tier === 'strong').length
+  const installReadyCount = enrichedSkills.filter((item) => item.supply.install.ready).length
+  const autoInstallCount = enrichedSkills.filter((item) => item.safety.auto_install_allowed).length
+  const highStarCount = enrichedSkills.filter((item) => Number(item.skill.github_stars || 0) >= 500).length
+  const resolveHref = `/api/agent/resolve?task=${encodeURIComponent(useCase.heroPrompt)}&agent=codex&max_risk=medium&limit=5`
+  const resolveTextHref = `${resolveHref}&format=text`
   const relatedStacks = SKILL_STACKS.filter((stack) => stack.useCaseSlug === useCase.slug)
   const faqEntries = [
     {
       question: `What are the best AI agent skills for ${useCase.shortTitle.toLowerCase()}?`,
       answer:
         heroSkills.length > 0
-          ? `Start by comparing ${heroSkills.map((skill) => skill.name).join(', ')}. OpenAgentSkill ranks them by workflow fit, GitHub adoption, quality, and install readiness.`
+          ? `Start by comparing ${heroSkills.map(({ skill }) => skill.name).join(', ')}. OpenAgentSkill ranks them by workflow fit, GitHub adoption, trust score, safety gate, and install readiness.`
           : `Use the matching skills list on this page as a shortlist, then inspect each repository and install path before production use.`,
     },
     {
@@ -147,18 +168,34 @@ export default async function UseCasePage({
                 Read guide
               </Link>
               <Link
-                href={`/api/skills/search?task=${encodeURIComponent(useCase.heroPrompt)}&format=text`}
+                href={resolveTextHref}
                 className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
               >
-                Agent API prompt
+                Resolve via Agent API
               </Link>
             </div>
           </div>
 
-          <div className="border border-border bg-card p-5">
-            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Try this task</p>
-            <p className="text-lg leading-relaxed text-foreground">{useCase.heroPrompt}</p>
-            <div className="mt-5 border-t border-border pt-5">
+          <div className="overflow-hidden border border-border bg-card">
+            <div className="p-5">
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Try this task</p>
+              <p className="text-lg leading-relaxed text-foreground">{useCase.heroPrompt}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-px bg-border text-center sm:grid-cols-3">
+              {[
+                { label: 'Matched', value: matchedSkills.length.toLocaleString() },
+                { label: 'Strong trust', value: strongTrustCount.toLocaleString() },
+                { label: 'Install ready', value: installReadyCount.toLocaleString() },
+                { label: 'Auto allowed', value: autoInstallCount.toLocaleString() },
+                { label: '500+ stars', value: highStarCount.toLocaleString() },
+              ].map((item) => (
+                <div key={item.label} className="bg-background p-4">
+                  <div className="font-mono text-2xl">{item.value}</div>
+                  <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">{item.label}</div>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-border p-5">
               <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Agent should be able to</p>
               <ul className="space-y-2 text-sm text-secondary">
                 {useCase.agentTasks.map((task) => (
@@ -170,6 +207,35 @@ export default async function UseCasePage({
               </ul>
             </div>
           </div>
+        </section>
+
+        <section className="grid gap-px border-b border-border bg-border md:grid-cols-3">
+          {[
+            {
+              label: 'Resolve',
+              title: 'Let the agent pick',
+              detail: 'Returns the best skill, alternatives, install handoff, risk summary, and safety gate.',
+              href: resolveHref,
+            },
+            {
+              label: 'Text plan',
+              title: 'LLM-readable output',
+              detail: 'Plain text version for Codex, Claude Code, Cursor, and custom agent runtimes.',
+              href: resolveTextHref,
+            },
+            {
+              label: 'Browse',
+              title: 'Human shortlist',
+              detail: 'Open the filtered registry view for this workflow and compare candidates manually.',
+              href: `/skills?useCase=${useCase.slug}&sort=quality`,
+            },
+          ].map((item) => (
+            <Link key={item.label} href={item.href} prefetch={false} className="min-w-0 bg-background p-5 transition-colors hover:bg-card">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-secondary">{item.label}</p>
+              <h2 className="mt-3 font-display text-xl font-semibold">{item.title}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-secondary">{item.detail}</p>
+            </Link>
+          ))}
         </section>
 
         {relatedStacks.length > 0 && (
@@ -219,7 +285,7 @@ export default async function UseCasePage({
               <span className="text-sm text-secondary">{matchedSkills.length} matched skills</span>
             </div>
             <div className="grid gap-4 lg:grid-cols-3">
-              {heroSkills.map((skill) => {
+              {heroSkills.map(({ skill, trust, audit, safety, supply }) => {
                 const manifest = convertSkillRecordToManifest(skill)
                 return (
                   <article key={skill.slug} className="border border-border bg-card p-5">
@@ -234,8 +300,27 @@ export default async function UseCasePage({
                     <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-secondary">{skill.description}</p>
                     <div className="mt-4 flex flex-wrap gap-3 text-xs font-mono text-secondary">
                       <span>{formatNumber(skill.github_stars)} stars</span>
-                      <span>{Math.round(Number(skill.quality_score || 0))} quality</span>
-                      <span>{formatDate(skill.github_last_pushed_at)} push</span>
+                      <span>{trust.score} trust</span>
+                      <span>{audit.audit_score} audit</span>
+                      <span>{safety.safety_tier.badge}</span>
+                    </div>
+                    <div className="mt-4 grid gap-px border border-border bg-border text-xs sm:grid-cols-2">
+                      <div className="bg-background p-3">
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-secondary">Install</p>
+                        <p className="mt-1 truncate font-semibold">{trust.installReadiness.label}</p>
+                      </div>
+                      <div className="bg-background p-3">
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-secondary">Risk</p>
+                        <p className="mt-1 truncate font-semibold">{auditRiskLabel(audit.risk_level)}</p>
+                      </div>
+                      <div className="bg-background p-3">
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-secondary">Agent fit</p>
+                        <p className="mt-1 truncate font-semibold">{supply.applicableAgents.slice(0, 2).join(' + ')}</p>
+                      </div>
+                      <div className="bg-background p-3">
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-secondary">Updated</p>
+                        <p className="mt-1 truncate font-semibold">{formatDate(skill.github_last_pushed_at)}</p>
+                      </div>
                     </div>
                     <div className="mt-5">
                       <InstallCommand command={manifest.technical.installCommand || `npx skills add ${skill.github_repo}`} skillSlug={skill.slug} compact />
@@ -259,22 +344,30 @@ export default async function UseCasePage({
           </div>
 
           <div className="divide-y divide-border border-y border-border">
-            {matchedSkills.slice(3).map((skill) => (
+            {enrichedSkills.slice(3).map(({ skill, trust, audit, safety, supply }) => (
               <Link
                 key={skill.slug}
                 href={`/skills/${skill.slug}`}
-                className="grid gap-3 py-5 transition-colors hover:bg-muted/30 sm:grid-cols-[1fr_auto] sm:items-center"
+                className="grid gap-4 py-5 transition-colors hover:bg-muted/30 lg:grid-cols-[1fr_auto] lg:items-center"
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-display text-lg font-semibold">{skill.name}</h3>
                     <span className="border border-border px-2 py-0.5 text-xs text-secondary">{skill.category}</span>
+                    <span className="border border-border px-2 py-0.5 font-mono text-xs text-secondary">
+                      {supply.track.shortLabel}
+                    </span>
                   </div>
                   <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-secondary">{skill.description}</p>
+                  <p className="mt-2 line-clamp-1 text-xs text-secondary">
+                    {trust.riskSummary.label} · {safety.safety_tier.recommended_action}
+                  </p>
                 </div>
-                <div className="flex gap-4 text-xs font-mono text-secondary sm:justify-end">
+                <div className="flex flex-wrap gap-3 text-xs font-mono text-secondary lg:justify-end">
                   <span>{formatNumber(skill.github_stars)} stars</span>
-                  <span>{Math.round(Number(skill.quality_score || 0))} quality</span>
+                  <span>{trust.score} trust</span>
+                  <span>{audit.audit_score} audit</span>
+                  <span>{safety.score} safety</span>
                 </div>
               </Link>
             ))}

@@ -10,12 +10,8 @@ import { getSkillTrustProfile } from '@/lib/trust'
 
 export const dynamic = 'force-dynamic'
 
-export async function generateStaticParams() {
-  const skills = await getAllSkills('quality').catch(() => [])
-  return skills
-    .filter((skill) => Number(skill.github_stars || 0) >= 500)
-    .slice(0, 200)
-    .map((skill) => ({ slug: skill.slug }))
+export function generateStaticParams() {
+  return []
 }
 
 export async function generateMetadata({

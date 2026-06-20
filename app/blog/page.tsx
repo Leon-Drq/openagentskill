@@ -1,7 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import {
+  MarketingButtonLink,
+  MarketingHero,
+  MarketingMetricStrip,
+  MarketingPageShell,
+} from '@/components/marketing-page'
 import { SubscribeCard } from '@/components/subscribe-card'
 import { getBlogHubData, getBlogPosts, type BlogSkillPreview } from '@/lib/blog/generate'
 import { SKILL_STACKS } from '@/lib/collections'
@@ -74,55 +78,39 @@ export default async function BlogPage() {
   const rankingGuides = getRankingDefinitions()
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
+    <MarketingPageShell>
+      <MarketingHero
+        eyebrow="OpenAgentSkill Update"
+        title="New skills, practical workflows, and agent-builder notes."
+        description={
+          <>
+            The blog follows the marketplace itself: launch batches, high-signal skill picks, and guides written
+            around real developer scenarios.
+          </>
+        }
+        actions={
+          <>
+            <MarketingButtonLink href="/skills?sort=new" variant="primary">
+              Browse New Arrivals
+            </MarketingButtonLink>
+            <MarketingButtonLink href="/skills?sort=stars">
+              Most Starred
+            </MarketingButtonLink>
+          </>
+        }
+        aside={
+          <MarketingMetricStrip
+            columns="grid-cols-3"
+            items={[
+              { value: hub.totalSkills.toLocaleString(), label: 'Skills' },
+              { value: hub.recentLaunchCount.toLocaleString(), label: 'Last 24h' },
+              { value: hub.categoryHighlights.length, label: 'Tracks' },
+            ]}
+          />
+        }
+      />
 
-      <main className="max-w-6xl mx-auto px-6 py-14">
-        <section className="relative -mx-6 overflow-hidden border-b border-border px-6 pb-12 pt-2 md:pb-16">
-          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
-          <div className="relative grid gap-10 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
-            <div>
-              <p className="mb-5 font-mono text-xs uppercase tracking-[0.24em] text-secondary">OpenAgentSkill Update</p>
-              <h1 className="font-display text-4xl font-normal leading-[0.98] text-foreground text-balance md:text-6xl">
-                New skills, practical workflows, and agent-builder notes.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-                The blog now follows the marketplace itself: launch batches, high-signal skill picks, and guides
-                written around real developer scenarios.
-              </p>
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Link
-                  href="/skills?sort=new"
-                  className="rounded-[8px] border border-[#006b4f] bg-[#006b4f] px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                >
-                  Browse New Arrivals
-                </Link>
-                <Link
-                  href="/skills?sort=stars"
-                  className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
-                >
-                  Most Starred
-                </Link>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl text-foreground">{hub.totalSkills.toLocaleString()}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Skills</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl text-foreground">{hub.recentLaunchCount.toLocaleString()}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Last 24h</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl text-foreground">{hub.categoryHighlights.length}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Tracks</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         {featureSkill && (
           <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
             <div>
@@ -311,8 +299,7 @@ export default async function BlogPage() {
             </div>
           )}
         </section>
-      </main>
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }

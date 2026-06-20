@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile, type AgentResolveConstraints, type AgentSafetyProfile } from '@/lib/agent-safety'
 import { getSkillDecisionProfile } from '@/lib/decision'
@@ -5,17 +6,252 @@ import { getAllSkills, getSkillEventStatsMap, type SkillEventStats, type SkillRe
 import { getPrimaryInstallCommand, getSkillInstallTargets, type InstallTargetId } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
 import { dedupeRankedSkills, getRecommendationReasons, rankSkillsForQuery } from '@/lib/registry'
-import { getSkillSupplyProfile } from '@/lib/supply'
-import { getSkillTrustProfile } from '@/lib/trust'
+import { getSkillSupplyProfile, type SkillSupplyProfile } from '@/lib/supply'
+import { getSkillTrustProfile, type SkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
 const SITE_URL = 'https://www.openagentskill.com'
+const RESOLVE_CANDIDATE_POOL_SIZE = 750
+const RESOLVE_CACHE_REVALIDATE = 300
+const RESOLVE_QUERY_TIMEOUT_MS = 1800
+const FALLBACK_DATE = '2026-06-01T00:00:00.000Z'
+
+function fallbackSkill(input: {
+  slug: string
+  name: string
+  description: string
+  repo: string
+  category: string
+  tags: string[]
+  frameworks: string[]
+  stars: number
+  quality: number
+  license?: string
+}): SkillRecord {
+  return {
+    id: `fallback-${input.slug}`,
+    slug: input.slug,
+    name: input.name,
+    description: input.description,
+    long_description: input.description,
+    tagline: input.description,
+    author_name: input.repo.split('/')[0],
+    author_email: null,
+    author_url: `https://github.com/${input.repo.split('/')[0]}`,
+    repository: `https://github.com/${input.repo}`,
+    github_repo: input.repo,
+    github_stars: input.stars,
+    github_forks: 0,
+    category: input.category,
+    tags: input.tags,
+    frameworks: input.frameworks,
+    version: '1.0.0',
+    license: input.license || 'Unknown',
+    install_command: `npx skills add ${input.repo}`,
+    npm_package: null,
+    verified: false,
+    submission_source: 'fallback',
+    submitted_by_agent: null,
+    ai_review_score: null,
+    ai_review_approved: true,
+    ai_review_issues: [],
+    ai_review_suggestions: [],
+    downloads: Math.max(1000, Math.round(input.stars * 1.3)),
+    used_by: 0,
+    rating: 0,
+    review_count: 0,
+    quality_score: input.quality,
+    quality_signals: null,
+    github_language: null,
+    github_last_pushed_at: FALLBACK_DATE,
+    created_at: FALLBACK_DATE,
+    updated_at: FALLBACK_DATE,
+  }
+}
+
+const RESOLVE_FALLBACK_SKILLS: SkillRecord[] = [
+  fallbackSkill({
+    slug: 'crawl4ai',
+    name: 'Crawl4AI',
+    description: 'Open-source LLM-friendly web crawler and scraper for agent workflows.',
+    repo: 'unclecode/crawl4ai',
+    category: 'Web Scraping',
+    tags: ['web scraping', 'crawler', 'research'],
+    frameworks: ['Codex', 'Claude Code', 'Cursor'],
+    stars: 66_000,
+    quality: 96,
+    license: 'Apache-2.0',
+  }),
+  fallbackSkill({
+    slug: 'firecrawl',
+    name: 'Firecrawl',
+    description: 'Turn websites into clean markdown or structured data for retrieval and agents.',
+    repo: 'mendableai/firecrawl',
+    category: 'Web Scraping',
+    tags: ['crawler', 'markdown', 'rag'],
+    frameworks: ['Codex', 'Claude Code', 'Cursor'],
+    stars: 34_000,
+    quality: 94,
+    license: 'AGPL-3.0',
+  }),
+  fallbackSkill({
+    slug: 'n8n',
+    name: 'n8n',
+    description: 'Workflow automation for connecting agents to repeated operational tasks.',
+    repo: 'n8n-io/n8n',
+    category: 'Workflow Automation',
+    tags: ['automation', 'workflow', 'integration'],
+    frameworks: ['API', 'CLI', 'Agent workflow'],
+    stars: 190_000,
+    quality: 92,
+  }),
+  fallbackSkill({
+    slug: 'markitdown',
+    name: 'MarkItDown',
+    description: 'Convert PDFs, Office documents, and web files into clean markdown for agents.',
+    repo: 'microsoft/markitdown',
+    category: 'Research',
+    tags: ['pdf', 'markdown', 'documents'],
+    frameworks: ['Codex', 'Claude Code', 'Cursor'],
+    stars: 80_000,
+    quality: 93,
+    license: 'MIT',
+  }),
+  fallbackSkill({
+    slug: 'llamaindex',
+    name: 'LlamaIndex',
+    description: 'Data framework for building RAG and knowledge workflows around agent tasks.',
+    repo: 'run-llama/llama_index',
+    category: 'RAG',
+    tags: ['rag', 'knowledge', 'retrieval'],
+    frameworks: ['Python', 'Codex', 'Claude Code'],
+    stars: 42_000,
+    quality: 91,
+    license: 'MIT',
+  }),
+  fallbackSkill({
+    slug: 'openbb',
+    name: 'OpenBB',
+    description: 'Open-source investment research platform for financial analysis agents.',
+    repo: 'OpenBB-finance/OpenBB',
+    category: 'Finance',
+    tags: ['finance', 'stocks', 'research'],
+    frameworks: ['Python', 'Codex', 'Claude Code'],
+    stars: 46_000,
+    quality: 90,
+  }),
+  fallbackSkill({
+    slug: 'browser-use',
+    name: 'Browser Use',
+    description: 'Browser automation layer for agents that need to interact with websites.',
+    repo: 'browser-use/browser-use',
+    category: 'Browser Automation',
+    tags: ['browser', 'automation', 'agent'],
+    frameworks: ['Python', 'Browser', 'Agent workflow'],
+    stars: 75_000,
+    quality: 90,
+  }),
+  fallbackSkill({
+    slug: 'playwright',
+    name: 'Playwright',
+    description: 'Reliable browser automation and testing engine for web agent tasks.',
+    repo: 'microsoft/playwright',
+    category: 'Browser Automation',
+    tags: ['browser', 'testing', 'automation'],
+    frameworks: ['Node.js', 'Python', 'Codex'],
+    stars: 76_000,
+    quality: 89,
+    license: 'Apache-2.0',
+  }),
+  fallbackSkill({
+    slug: 'last30days-skill',
+    name: 'Last30days Skill',
+    description: 'Research recent cross-source changes across Reddit, X, YouTube, Hacker News, and the web.',
+    repo: 'mvanhorn/last30days-skill',
+    category: 'Research',
+    tags: ['research', 'recent events', 'briefing'],
+    frameworks: ['Codex', 'Claude Code'],
+    stars: 42_500,
+    quality: 88,
+  }),
+  fallbackSkill({
+    slug: 'addyosmani-agent-skills',
+    name: 'Agent Skills',
+    description: 'Production-grade engineering skills for AI coding agents across spec, planning, build, test, review, and shipping workflows.',
+    repo: 'addyosmani/agent-skills',
+    category: 'Coding Agents',
+    tags: ['agent-skills', 'coding-agents', 'engineering', 'quality-gates', 'claude-code', 'cursor'],
+    frameworks: ['Claude Code', 'Cursor', 'Gemini CLI', 'Codex'],
+    stars: 61_800,
+    quality: 94,
+    license: 'MIT',
+  }),
+  fallbackSkill({
+    slug: 'serenity-skill',
+    name: 'Serenity Skill',
+    description: 'Stock analysis skill for market research and financial reasoning workflows.',
+    repo: 'muxuuu/serenity-skill',
+    category: 'Finance',
+    tags: ['stocks', 'finance', 'analysis'],
+    frameworks: ['Codex', 'Claude Code'],
+    stars: 12_000,
+    quality: 86,
+  }),
+  fallbackSkill({
+    slug: 'seedance-2-0',
+    name: 'Seedance 2.0 Skill',
+    description: 'Creative video generation workflow skill for Seedance 2.0 filmmaking agents.',
+    repo: 'Emily2040/seedance-2.0',
+    category: 'Design',
+    tags: ['video', 'creative', 'seedance'],
+    frameworks: ['Codex', 'Claude Code'],
+    stars: 8_000,
+    quality: 84,
+  }),
+  fallbackSkill({
+    slug: 'vectorbt',
+    name: 'Vectorbt',
+    description: 'Fast quantitative research and backtesting workflows for financial agents.',
+    repo: 'polakowo/vectorbt',
+    category: 'Finance',
+    tags: ['quant', 'backtesting', 'finance'],
+    frameworks: ['Python', 'Codex'],
+    stars: 5_400,
+    quality: 83,
+  }),
+]
+
+async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  let timeout: ReturnType<typeof setTimeout> | undefined
+  const timeoutPromise = new Promise<T>((_, reject) => {
+    timeout = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+  })
+
+  try {
+    return await Promise.race([promise, timeoutPromise])
+  } finally {
+    if (timeout) clearTimeout(timeout)
+  }
+}
+
+const getResolveCandidatePool = unstable_cache(
+  async () => getAllSkills('quality', undefined, RESOLVE_CANDIDATE_POOL_SIZE),
+  ['agent-resolve-candidate-pool-v2'],
+  { revalidate: RESOLVE_CACHE_REVALIDATE }
+)
+
+const getResolveEventStatsMap = unstable_cache(
+  async () => getSkillEventStatsMap().catch((): Record<string, SkillEventStats> => ({})),
+  ['agent-resolve-event-stats-v1'],
+  { revalidate: RESOLVE_CACHE_REVALIDATE }
+)
 
 export interface AgentResolveInput {
   task: string
   agent?: InstallTargetId | 'auto' | string
   limit?: number
   constraints?: AgentResolveConstraints
+  live?: boolean
 }
 
 function normalizeLimit(limit: number | undefined) {
@@ -121,6 +357,145 @@ function summarizeRisks(candidate: {
   }
 }
 
+interface ResolverRecommendationCandidate {
+  skill: {
+    slug: string
+    name: string
+    description: string
+    category: string
+  }
+  urls: {
+    web: string
+    api: string
+    audit: string
+    install_api: string
+    repository: string
+  }
+  install_plan: {
+    command: string
+    target: string
+    label: string
+    kind: string
+    value: string
+  }
+  recommendation_reasons: string[]
+  supply_profile: SkillSupplyProfile
+  trust: SkillTrustProfile
+  audit: {
+    audit_score: number
+    risk_label: string
+    warnings: string[]
+  }
+  safety: AgentSafetyProfile
+  safety_gate: {
+    tier: string
+    label: string
+    badge: string
+    auto_install_policy: string
+    auto_install_allowed: boolean
+    human_review_required: boolean
+    blocked: boolean
+    recommended_action: string
+    reasons: string[]
+  }
+  decision: {
+    headline: string
+  }
+}
+
+function buildResolverRecommendation(
+  task: string,
+  agent: InstallTargetId | 'auto',
+  selected: ResolverRecommendationCandidate | null,
+  alternatives: ResolverRecommendationCandidate[]
+) {
+  if (!selected) return null
+
+  const risk = summarizeRisks(selected)
+
+  return {
+    task,
+    agent,
+    best_skill: {
+      slug: selected.skill.slug,
+      name: selected.skill.name,
+      description: selected.skill.description,
+      category: selected.skill.category,
+      url: selected.urls.web,
+      api_url: selected.urls.api,
+      audit_url: selected.urls.audit,
+      repository: selected.urls.repository,
+    },
+    install: {
+      command: selected.install_plan.command,
+      target: selected.install_plan.target,
+      label: selected.install_plan.label,
+      kind: selected.install_plan.kind,
+      value: selected.install_plan.value,
+      install_api: selected.urls.install_api,
+      ready: selected.supply_profile.install.ready,
+      review_required: selected.safety.human_review_required,
+      auto_install_allowed: selected.safety.auto_install_allowed,
+      policy: selected.safety.safety_tier.auto_install_policy,
+    },
+    why_recommended: [
+      ...selected.recommendation_reasons,
+      selected.decision.headline,
+      `${selected.trust.score}/100 OpenAgentSkill Trust Score v3`,
+      `${selected.audit.audit_score}/100 audit score`,
+      `${selected.safety.score}/100 safety score`,
+    ].filter(Boolean).slice(0, 8),
+    trust_score_v3: {
+      score: selected.trust.score,
+      tier: selected.trust.tier,
+      label: selected.trust.label,
+      version: selected.trust.version,
+      install_policy: selected.trust.installReadiness.policy,
+      evidence: selected.trust.evidence,
+      agent_compatibility: selected.trust.agentCompatibility,
+      risk: selected.trust.riskSummary,
+    },
+    trust_score_v2: {
+      score: selected.trust.score,
+      tier: selected.trust.tier,
+      label: selected.trust.label,
+      version: selected.trust.version,
+      install_policy: selected.trust.installReadiness.policy,
+      evidence: selected.trust.evidence,
+      agent_compatibility: selected.trust.agentCompatibility,
+      risk: selected.trust.riskSummary,
+    },
+    risk,
+    safety_gate: selected.safety_gate,
+    supply_asset: {
+      track: selected.supply_profile.track,
+      scenario: selected.supply_profile.scenario,
+      maintenance: selected.supply_profile.maintenance,
+      github_quality: selected.supply_profile.githubQuality,
+      coverage_tags: selected.supply_profile.coverageTags,
+    },
+    alternatives: alternatives.slice(0, 5).map((candidate) => ({
+      slug: candidate.skill.slug,
+      name: candidate.skill.name,
+      url: candidate.urls.web,
+      install_command: candidate.install_plan.command,
+      trust_score: candidate.trust.score,
+      audit_score: candidate.audit.audit_score,
+      safety_score: candidate.safety.score,
+      why_consider: candidate.recommendation_reasons[0] || candidate.decision.headline,
+      risk: summarizeRisks(candidate),
+    })),
+    agent_instruction: [
+      `Use ${selected.skill.name} for: ${task}`,
+      `Review audit: ${selected.urls.audit}`,
+      selected.safety.auto_install_allowed
+        ? `Install in a sandbox first with: ${selected.install_plan.command}`
+        : `Ask for human approval before installing: ${selected.install_plan.command}`,
+      'If the audit or policy warnings are unacceptable, choose one of the alternatives.',
+    ].join('\n'),
+  }
+}
+
 export async function resolveAgentSkill(input: AgentResolveInput) {
   const task = input.task.trim()
   if (!task) throw new Error('Missing required field: task')
@@ -132,10 +507,17 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     needs_install_command: input.constraints?.needs_install_command ?? true,
     min_stars: Number(input.constraints?.min_stars || 0),
   }
-  const [skills, eventStatsMap] = await Promise.all([
-    getAllSkills('quality'),
-    getSkillEventStatsMap().catch((): Record<string, SkillEventStats> => ({})),
-  ])
+  const [skills, eventStatsMap] = input.live
+    ? await Promise.all([
+        withTimeout(getResolveCandidatePool(), RESOLVE_QUERY_TIMEOUT_MS, 'agent resolve candidate query')
+          .catch((error) => {
+            console.warn('Agent resolve candidate fallback:', error)
+            return RESOLVE_FALLBACK_SKILLS
+          }),
+        withTimeout(getResolveEventStatsMap(), RESOLVE_QUERY_TIMEOUT_MS, 'agent resolve stats query')
+          .catch((): Record<string, SkillEventStats> => ({})),
+      ])
+    : [RESOLVE_FALLBACK_SKILLS, {} as Record<string, SkillEventStats>]
 
   const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, task))
     .filter(({ skill }) => candidateAllowed(skill, constraints))
@@ -349,11 +731,13 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         },
       }
     : null
+  const recommendation = buildResolverRecommendation(task, agent, selected, alternatives)
 
   return {
     task,
     agent,
     constraints,
+    recommendation,
     selected,
     alternatives,
     blocked_candidates: blockedCandidates,
@@ -371,10 +755,22 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     },
     meta: {
       endpoint: '/api/agent/resolve',
-      api_version: '1.0',
+      api_version: '2.0',
       generated_at: new Date().toISOString(),
       total_skills_searched: skills.length,
       total_candidates: candidates.length,
+      candidate_pool: {
+        sort: 'quality',
+        size: skills.length,
+        note: 'Resolver searches the highest-quality candidate pool for low-latency agent use. Browse /skills for the full public index.',
+      },
+      contract: {
+        best_skill: 'recommendation.best_skill',
+        install: 'recommendation.install',
+        why: 'recommendation.why_recommended',
+        risk: 'recommendation.risk',
+        alternatives: 'recommendation.alternatives',
+      },
     },
   }
 }

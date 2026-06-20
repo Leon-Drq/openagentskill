@@ -1,9 +1,14 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { withTimeout } from '@/lib/async'
+import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAllSkills } from '@/lib/db/skills'
-import { formatCompactNumber } from '@/lib/quality'
+import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
+import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
+import { getSkillTrustProfile } from '@/lib/trust'
 
 export const dynamic = 'force-dynamic'
 
@@ -55,9 +60,19 @@ const comparisonRows = [
   },
 ]
 
+const COMPARE_QUERY_TIMEOUT_MS = 1800
+
 export default async function OpenAgentSkillVsAgentSkillsIoPage() {
-  const skills = await getAllSkills('quality').catch(() => [])
+  const skills = await withTimeout(getAllSkills('quality', undefined, 12), COMPARE_QUERY_TIMEOUT_MS, 'agentskills compare skills query')
+    .catch(() => CURATED_SKILL_SNAPSHOT.slice(0, 12))
   const totalStars = skills.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0)
+  const decisionSkills = skills.slice(0, 8).map((skill) => ({
+    skill,
+    quality: getSkillQualityProfile(skill),
+    trust: getSkillTrustProfile(skill),
+    audit: buildSkillAudit(skill),
+    installCommand: skill.install_command || `npx skills add ${skill.github_repo || skill.slug}`,
+  }))
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -167,6 +182,59 @@ export default async function OpenAgentSkillVsAgentSkillsIoPage() {
               Turn task intent into ranked, installable shortlists.
             </p>
           </Link>
+        </section>
+
+        <section className="border-b border-border py-10">
+          <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Real skill shortlist</p>
+              <h2 className="font-display text-2xl font-semibold">OpenAgentSkill ranks installable skills, not just concepts.</h2>
+              <p className="mt-3 max-w-3xl text-sm leading-relaxed text-secondary">
+                Each row below is a real indexed skill with quality, Trust Score, audit risk, and an install handoff.
+                This is the practical layer agents need before choosing what to run.
+              </p>
+            </div>
+            <Link href="/best" className="text-sm text-secondary underline underline-offset-4 hover:text-foreground">
+              View best lists
+            </Link>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            {decisionSkills.map(({ skill, quality, trust, audit, installCommand }) => (
+              <article key={skill.slug} className="min-w-0 border border-border bg-card p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <Link href={`/skills/${skill.slug}`} className="font-display text-2xl font-semibold leading-tight hover:text-secondary">
+                      {skill.name}
+                    </Link>
+                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-secondary">{skill.description}</p>
+                  </div>
+                  <span className="border border-border px-2.5 py-1 font-mono text-xs text-secondary">
+                    {formatCompactNumber(skill.github_stars || 0)} stars
+                  </span>
+                </div>
+
+                <div className="mt-5 grid grid-cols-3 gap-px border border-border bg-border text-center">
+                  <div className="bg-background p-3">
+                    <p className="font-mono text-lg">{quality.score}</p>
+                    <p className="mt-1 text-[10px] uppercase text-secondary">Quality</p>
+                  </div>
+                  <div className="bg-background p-3">
+                    <p className="font-mono text-lg">{trust.score}</p>
+                    <p className="mt-1 text-[10px] uppercase text-secondary">Trust</p>
+                  </div>
+                  <Link href={`/skills/${skill.slug}/audit`} className="bg-background p-3 transition-colors hover:bg-card">
+                    <p className="font-mono text-lg">{audit.audit_score}</p>
+                    <p className="mt-1 text-[10px] uppercase text-secondary">{auditRiskLabel(audit.risk_level)}</p>
+                  </Link>
+                </div>
+
+                <div className="mt-4">
+                  <InstallCommand command={installCommand} skillSlug={skill.slug} compact />
+                </div>
+              </article>
+            ))}
+          </div>
         </section>
       </main>
 

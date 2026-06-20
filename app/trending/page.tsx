@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { GrowthSkillList } from '@/components/growth-skill-list'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import {
   getAllSkills,
   getSkillEventDailyStatsMap,
@@ -65,42 +64,25 @@ export default async function TrendingSkillsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <MarketingPageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <SiteHeader />
+      <MarketingHero
+        eyebrow="Trending skills"
+        title="Trending AI agent skills."
+        description="A live growth list based on OpenAgentSkill page activity, install-copy events, compare intent, GitHub adoption, quality, and trust. Use it to spot skills people are actively evaluating."
+        aside={
+          <MarketingMetricStrip
+            columns="grid-cols-3"
+            items={[
+              { value: formatCompactNumber(totalEvents), label: hasDailyStats ? 'Events / 7d' : 'Events' },
+              { value: formatCompactNumber(totalViews), label: 'Views' },
+              { value: formatCompactNumber(totalCopies), label: 'Copies' },
+            ]}
+          />
+        }
+      />
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="border-b border-border pb-10">
-          <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Trending skills</p>
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-            <div>
-              <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">
-                Trending AI agent skills.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-                A live growth list based on OpenAgentSkill page activity, install-copy events, compare intent,
-                GitHub adoption, quality, and trust. Use it to spot skills people are actively evaluating.
-              </p>
-            </div>
-            <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{formatCompactNumber(totalEvents)}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">
-                  {hasDailyStats ? 'Events / 7d' : 'Events'}
-                </div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{formatCompactNumber(totalViews)}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Views</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{formatCompactNumber(totalCopies)}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Copies</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         <section className="grid gap-3 border-b border-border py-8 md:grid-cols-4">
           <Link href="/hot" className="border border-border p-5 transition-colors hover:border-foreground">
             <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Hot list</p>
@@ -131,9 +113,7 @@ export default async function TrendingSkillsPage() {
           </div>
           <GrowthSkillList items={ranked} />
         </section>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }

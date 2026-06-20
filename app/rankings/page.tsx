@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import { getAllSkills, getSkillStats, type SkillAgentStats } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
 import { CORE_RANKINGS, getRankingDefinitions, rankSkillsForDefinition } from '@/lib/rankings'
@@ -36,42 +35,27 @@ export default async function RankingsPage() {
   const useCaseRankings = rankingDefinitions.filter((ranking) => ranking.kind === 'use-case')
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
+    <MarketingPageShell>
+      <MarketingHero
+        eyebrow="Rankings"
+        title="Ranked shortlists for choosing agent skills faster."
+        description="Use rankings when you already know the decision lens: quality, adoption, freshness, new arrivals, or a specific agent workflow."
+        aside={
+          <MarketingMetricStrip
+            columns="grid-cols-3"
+            items={[
+              { value: skills.length.toLocaleString(), label: 'Skills' },
+              { value: rankingDefinitions.length, label: 'Lists' },
+              {
+                value: formatNumber(skills.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0)),
+                label: 'Stars',
+              },
+            ]}
+          />
+        }
+      />
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="relative -mx-4 overflow-hidden border-b border-border px-4 pb-10 pt-2 sm:-mx-6 sm:px-6">
-          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
-          <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-            <div>
-              <p className="mb-5 font-mono text-xs uppercase tracking-[0.24em] text-secondary">Rankings</p>
-              <h1 className="font-display text-4xl font-normal leading-[0.98] text-balance md:text-6xl">
-                Ranked shortlists for choosing agent skills faster.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">
-                Use rankings when you already know the decision lens: quality, adoption, freshness, new arrivals, or
-                a specific agent workflow.
-              </p>
-            </div>
-            <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{skills.length.toLocaleString()}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Skills</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{rankingDefinitions.length}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Lists</div>
-              </div>
-              <div className="bg-background p-4">
-                <div className="font-mono text-2xl">
-                  {formatNumber(skills.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0))}
-                </div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Stars</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <div className="mx-auto max-w-6xl px-6">
         <section className="grid gap-5 border-b border-border py-10 md:grid-cols-2 lg:grid-cols-3">
           {CORE_RANKINGS.map((ranking) => {
             const topSkills = rankSkillsForDefinition(skills, ranking, statsMap, 3)
@@ -140,9 +124,7 @@ export default async function RankingsPage() {
             })}
           </div>
         </section>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </div>
+    </MarketingPageShell>
   )
 }
