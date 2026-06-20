@@ -17,6 +17,10 @@
       "schedule": "40 * * * *"
     },
     {
+      "path": "/api/indexer/run/frontier-expansion",
+      "schedule": "55 * * * *"
+    },
+    {
       "path": "/api/indexer/refresh-stars",
       "schedule": "0 3 * * *"
     },

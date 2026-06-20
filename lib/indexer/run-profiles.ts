@@ -60,6 +60,25 @@ export const INDEXER_RUN_PROFILES: IndexerRunProfile[] = [
     strictQuality: true,
     includeCollections: false,
   },
+  {
+    key: 'frontier-expansion',
+    label: 'ML, media, design, science, Web3, robotics, and IoT',
+    path: '/api/indexer/run/frontier-expansion',
+    schedule: '55 * * * *',
+    domains: [
+      'ml-media',
+      'design',
+      'geo-science',
+      'web3',
+      'robotics-iot',
+    ],
+    targetNew: 250,
+    minStars: 500,
+    maxSearchRequests: 25,
+    duplicateRecoverySearchRequests: 5,
+    strictQuality: true,
+    includeCollections: false,
+  },
 ]
 
 export function getIndexerRunProfile(key: string) {
