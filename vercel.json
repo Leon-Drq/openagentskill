@@ -31,6 +31,10 @@
     {
       "path": "/api/x/post-daily",
       "schedule": "30 15,23 * * *"
+    },
+    {
+      "path": "/api/x/growth/run",
+      "schedule": "10 16 * * *"
     }
   ]
 }

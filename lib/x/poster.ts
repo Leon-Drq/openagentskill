@@ -7,7 +7,8 @@ import {
   type XTokenResponse,
 } from './oauth'
 
-interface XOAuthConnection {
+export interface XOAuthConnection {
+  x_user_id?: string
   username: string
   access_token: string
   refresh_token: string
@@ -252,7 +253,7 @@ export async function createManualXReplyIntentDraft(
   }
 }
 
-async function getStoredConnection(supabase: ReturnType<typeof createPublicClient>, serverSecret: string) {
+export async function getStoredXConnection(supabase: ReturnType<typeof createPublicClient>, serverSecret: string) {
   const { data, error } = await supabase.rpc('get_x_oauth_connection', {
     p_server_secret: serverSecret,
   })
@@ -264,7 +265,7 @@ async function getStoredConnection(supabase: ReturnType<typeof createPublicClien
   return connection
 }
 
-async function saveRefreshedToken(
+export async function saveRefreshedXToken(
   supabase: ReturnType<typeof createPublicClient>,
   serverSecret: string,
   token: XTokenResponse
@@ -289,7 +290,7 @@ async function pickSkill(supabase: ReturnType<typeof createPublicClient>, server
   return (data || null) as XPostSkill | null
 }
 
-async function recordPost(
+export async function recordXPost(
   supabase: ReturnType<typeof createPublicClient>,
   serverSecret: string,
   post: Record<string, unknown>
@@ -307,13 +308,13 @@ export async function postDailySkillToX(): Promise<XPostResult> {
   if (!serverSecret) throw new Error('Missing INDEXER_SECRET')
 
   const supabase = createPublicClient()
-  const connection = await getStoredConnection(supabase, serverSecret)
+  const connection = await getStoredXConnection(supabase, serverSecret)
   if (!connection) {
     return { status: 'skipped', reason: 'X account is not authorized yet' }
   }
 
   const token = await refreshXAccessToken(connection.refresh_token)
-  await saveRefreshedToken(supabase, serverSecret, token)
+  await saveRefreshedXToken(supabase, serverSecret, token)
 
   const skill = await pickSkill(supabase, serverSecret)
   if (!skill) {
@@ -329,7 +330,7 @@ export async function postDailySkillToX(): Promise<XPostResult> {
       throw new Error(`X post response did not include an id: ${JSON.stringify(created)}`)
     }
 
-    await recordPost(supabase, serverSecret, {
+    await recordXPost(supabase, serverSecret, {
       skill_id: skill.id,
       skill_slug: skill.slug,
       status: 'posted',
@@ -352,7 +353,7 @@ export async function postDailySkillToX(): Promise<XPostResult> {
       },
     }
   } catch (error) {
-    await recordPost(supabase, serverSecret, {
+    await recordXPost(supabase, serverSecret, {
       skill_id: skill.id,
       skill_slug: skill.slug,
       status: 'error',

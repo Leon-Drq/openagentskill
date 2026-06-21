@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
-import { postDailySkillToX } from '@/lib/x/poster'
+import { postNextQueuedSkillToX } from '@/lib/x/growth'
 
 async function handlePost(request: NextRequest) {
   if (!isAutomationAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const result = await postDailySkillToX()
+  const result = await postNextQueuedSkillToX({ autoBuildQueue: true, buildLimit: 8 })
   return NextResponse.json({ success: result.status === 'posted', ...result })
 }
 

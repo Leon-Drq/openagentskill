@@ -4,6 +4,7 @@ const X_AUTHORIZE_URL = 'https://x.com/i/oauth2/authorize'
 const X_TOKEN_URL = 'https://api.x.com/2/oauth2/token'
 const X_USER_ME_URL = 'https://api.x.com/2/users/me?user.fields=username'
 const X_CREATE_POST_URL = 'https://api.x.com/2/tweets'
+const X_TWEETS_LOOKUP_URL = 'https://api.x.com/2/tweets'
 
 export const X_SCOPES = ['tweet.read', 'tweet.write', 'users.read', 'offline.access'] as const
 export const X_REDIRECT_URI = 'https://www.openagentskill.com/api/x/callback'
@@ -30,6 +31,49 @@ export interface XCreatePostResponse {
     text: string
   }
   errors?: Array<{ title?: string; detail?: string; status?: number }>
+}
+
+export interface XTweetPublicMetrics {
+  retweet_count?: number
+  reply_count?: number
+  like_count?: number
+  quote_count?: number
+  bookmark_count?: number
+  impression_count?: number
+}
+
+export interface XTweetRecord {
+  id: string
+  text: string
+  created_at?: string
+  author_id?: string
+  conversation_id?: string
+  public_metrics?: XTweetPublicMetrics
+}
+
+export interface XTweetsLookupResponse {
+  data?: XTweetRecord[]
+  errors?: Array<{ title?: string; detail?: string; status?: number; value?: string }>
+}
+
+export interface XUserLookupRecord {
+  id: string
+  name?: string
+  username?: string
+}
+
+export interface XMentionsResponse {
+  data?: XTweetRecord[]
+  includes?: {
+    users?: XUserLookupRecord[]
+  }
+  meta?: {
+    result_count?: number
+    newest_id?: string
+    oldest_id?: string
+    next_token?: string
+  }
+  errors?: Array<{ title?: string; detail?: string; status?: number; value?: string }>
 }
 
 function base64Url(buffer: Buffer) {
@@ -167,4 +211,45 @@ export async function createXPost(accessToken: string, text: string) {
   })
 
   return parseXResponse<XCreatePostResponse>(response, 'X post creation')
+}
+
+export async function getXTweetsByIds(accessToken: string, ids: string[]) {
+  const uniqueIds = Array.from(new Set(ids.filter(Boolean))).slice(0, 100)
+  if (!uniqueIds.length) return { data: [] } satisfies XTweetsLookupResponse
+
+  const url = new URL(X_TWEETS_LOOKUP_URL)
+  url.searchParams.set('ids', uniqueIds.join(','))
+  url.searchParams.set('tweet.fields', 'created_at,public_metrics')
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  })
+
+  return parseXResponse<XTweetsLookupResponse>(response, 'X tweet metrics lookup')
+}
+
+export async function getXUserMentions(
+  accessToken: string,
+  userId: string,
+  options: {
+    maxResults?: number
+    sinceId?: string | null
+  } = {}
+) {
+  const url = new URL(`https://api.x.com/2/users/${userId}/mentions`)
+  url.searchParams.set('max_results', String(Math.min(Math.max(options.maxResults || 20, 5), 100)))
+  url.searchParams.set('tweet.fields', 'author_id,conversation_id,created_at,public_metrics')
+  url.searchParams.set('expansions', 'author_id')
+  url.searchParams.set('user.fields', 'username,name')
+  if (options.sinceId) url.searchParams.set('since_id', options.sinceId)
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  })
+
+  return parseXResponse<XMentionsResponse>(response, 'X mentions lookup')
 }
