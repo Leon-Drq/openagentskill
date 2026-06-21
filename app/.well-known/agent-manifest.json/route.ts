@@ -25,6 +25,14 @@ export async function GET() {
         method: 'GET',
         description: 'Plain text instructions for LLMs and browser agents using OpenAgentSkill.',
       },
+      integration_kit: {
+        url: '/api/agent/integration-kit',
+        method: 'GET',
+        description: 'Codex, Claude Code, and Cursor setup templates plus the stable Resolve API handoff contract.',
+        params: {
+          format: 'Response format: json (default) or text (optional)',
+        },
+      },
       openapi: {
         url: '/openapi.json',
         method: 'GET',
@@ -83,7 +91,7 @@ export async function GET() {
       resolve: {
         url: '/api/agent/resolve',
         method: 'GET or POST',
-        description: 'Resolve one task into a selected skill, alternatives, safety profile, policy decision, and install plan.',
+        description: 'Resolve one task into a selected skill, alternatives, safety profile, policy decision, install plan, and agent_handoff templates.',
         params: {
           task: 'Description of the task you need a skill for (required)',
           agent: 'Target agent: codex, claude-code, cursor, openagentskill-cli, or auto (optional)',
@@ -152,6 +160,8 @@ export async function GET() {
 
     supported_agent_platforms: [
       'Claude',
+      'Claude Code',
+      'Codex',
       'GPT-4',
       'Cursor',
       'Windsurf',

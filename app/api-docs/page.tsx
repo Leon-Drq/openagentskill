@@ -77,6 +77,7 @@ export default function APIDocsPage() {
               { method: 'GET', path: '/api/agent/skills/{slug}' },
               { method: 'GET', path: '/api/agent/tasks' },
               { method: 'GET', path: '/api/agent/tasks/{slug}' },
+              { method: 'GET', path: '/api/agent/integration-kit' },
               { method: 'POST', path: '/api/agent/resolve' },
               { method: 'GET', path: '/api/agent/discovery' },
               { method: 'GET', path: '/api/agent/recommend' },
@@ -105,6 +106,39 @@ export default function APIDocsPage() {
                 <span className="text-secondary">{path}</span>
               </div>
             ))}
+          </div>
+
+          <div id="agent-integration-kit" className="scroll-mt-24 border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/agent/integration-kit'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Copy-paste setup templates and stable response fields for Codex, Claude Code, Cursor, and other agent runtimes. Use this before calling Resolve from an agent workflow.'}
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2 mb-4 sm:mb-6">
+                {[
+                  'GET /api/agent/integration-kit',
+                  'GET /api/agent/integration-kit?format=text',
+                  'GET /agent/integration-kit',
+                  'GET /.well-known/agent-manifest.json',
+                ].map((example) => (
+                  <code key={example} className="border border-border bg-card px-3 py-2 font-mono text-xs leading-relaxed">
+                    {example}
+                  </code>
+                ))}
+              </div>
+              <p className="text-sm leading-relaxed text-secondary">
+                {'The payload includes supported_agents, recommended_flow, stable_response_fields, and safety_rules. Agents should copy the platform template, call Resolve, then read agent_handoff before installing.'}
+              </p>
+            </div>
           </div>
 
           <div id="registry-api" className="scroll-mt-24 border border-border mb-8 sm:mb-10">
@@ -161,6 +195,7 @@ export default function APIDocsPage() {
                   ['recommendation.install', 'Command, target, install API, review requirement, and auto-install policy'],
                   ['recommendation.why_recommended', 'Short explainable ranking reasons for agent logs'],
                   ['recommendation.trust_score_v3', 'Trust Score v3 evidence, install safety, permission surface, install policy, compatibility, and risk summary'],
+                  ['agent_handoff', 'Platform copy prompts, API sequence, review checklist, expected output contract, and blocked actions'],
                 ].map(([field, detail]) => (
                   <div key={field} className="min-w-0 bg-background p-3">
                     <code className="font-mono text-xs">{field}</code>

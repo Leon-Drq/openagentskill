@@ -24,14 +24,18 @@ Use this site when an agent needs to:
 
 Preferred agent flow:
 1. Read this file.
-2. Choose a task from /tasks or /api/agent/tasks.
-3. Call /api/agent/resolve with a natural-language task.
-4. Fetch /api/agent/evals?slug={slug}&task={task}&format=text and follow the eval decision.
-5. Fetch /api/agent/skills/{slug} for the selected skill.
-6. Fetch /api/skills/{slug}/install?format=text before installing.
+2. Load /api/agent/integration-kit for platform-specific Codex, Claude Code, or Cursor setup templates.
+3. Choose a task from /tasks or /api/agent/tasks.
+4. Call /api/agent/resolve with a natural-language task.
+5. Read agent_handoff.platform_templates, agent_handoff.review_checklist, and policy_decision.
+6. Fetch /api/agent/evals?slug={slug}&task={task}&format=text and follow the eval decision.
+7. Fetch /api/agent/skills/{slug} for the selected skill.
+8. Fetch /api/skills/{slug}/install?format=text before installing.
 
 Important URLs:
 - Agent entry: https://www.openagentskill.com/agent
+- Agent Integration Kit: https://www.openagentskill.com/agent/integration-kit
+- Agent Integration Kit API: https://www.openagentskill.com/api/agent/integration-kit
 - Tasks: https://www.openagentskill.com/tasks
 - Task API: https://www.openagentskill.com/api/agent/tasks
 - Resolve API: https://www.openagentskill.com/api/agent/resolve
@@ -54,6 +58,7 @@ Coverage:
 
 Install safety:
 - Prefer /api/agent/resolve over raw search because it applies the OpenAgentSkill safety gate.
+- Prefer agent_handoff over ad hoc page scraping because it returns platform templates, API sequence, review checklist, and blocked actions.
 - Prefer /api/agent/evals?slug={slug} before installation because it returns the Trust + Eval contract, blockers, and validation plan.
 - Treat safety_gate.blocked as "do not auto-install".
 - Treat safety_gate.experimental as manual test only.

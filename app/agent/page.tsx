@@ -42,6 +42,12 @@ function endpointRows() {
       description: 'Task to selected skill, alternatives, policy decision, safety profile, and install plan.',
     },
     {
+      label: 'Integration kit',
+      method: 'GET',
+      href: '/api/agent/integration-kit',
+      description: 'Codex, Claude Code, and Cursor setup templates plus stable Resolve response fields.',
+    },
+    {
       label: 'Task catalog',
       method: 'GET',
       href: '/api/agent/tasks',
@@ -109,6 +115,9 @@ export default async function AgentPage() {
             >
               Try Resolve API
             </MarketingButtonLink>
+            <MarketingButtonLink href="/agent/integration-kit">
+              Integration Kit
+            </MarketingButtonLink>
             <MarketingButtonLink href="/llms.txt" prefetch={false}>
               llms.txt
             </MarketingButtonLink>
@@ -135,7 +144,7 @@ export default async function AgentPage() {
           <div className="grid gap-px overflow-hidden border border-border bg-border md:grid-cols-4">
             {[
               ['01', 'Read /llms.txt'],
-              ['02', 'Choose a task'],
+              ['02', 'Load Integration Kit'],
               ['03', 'Call Resolve API'],
               ['04', 'Fetch install handoff'],
             ].map(([step, label]) => (

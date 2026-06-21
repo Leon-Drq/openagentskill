@@ -83,6 +83,18 @@ ${payload.agent_workflow.copy_paste_prompt}
 Review checklist:
 ${payload.agent_workflow.review_checklist.map((item) => `- ${item}`).join('\n')}` : 'No workflow generated'}
 
+Agent Handoff:
+${payload.agent_handoff ? `Version: ${payload.agent_handoff.version}
+Mode: ${payload.agent_handoff.mode}
+Selected skill: ${payload.agent_handoff.selected_skill.name} (${payload.agent_handoff.selected_skill.slug})
+Install policy: ${payload.agent_handoff.install_plan.policy}
+Auto-install allowed: ${payload.agent_handoff.install_plan.auto_install_allowed ? 'yes' : 'no'}
+Human review required: ${payload.agent_handoff.install_plan.human_review_required ? 'yes' : 'no'}
+Platform templates:
+${payload.agent_handoff.platform_templates.map((template) => `- ${template.name}: use copy_prompt from agent_handoff.platform_templates.${template.id}`).join('\n')}
+Blocked actions:
+${payload.agent_handoff.blocked_actions.map((item) => `- ${item}`).join('\n')}` : 'No agent handoff generated'}
+
 Alternatives:
 ${alternatives || 'No alternatives'}
 

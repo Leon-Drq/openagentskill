@@ -1,5 +1,6 @@
 import { unstable_cache } from 'next/cache'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
+import { buildAgentHandoffTemplates } from '@/lib/agent-integration-kit'
 import { getAgentSafetyProfile, type AgentResolveConstraints, type AgentSafetyProfile } from '@/lib/agent-safety'
 import { buildAgentReadableSkillMetadata, type AgentReadableSkillMetadata } from '@/lib/agent-readable'
 import { getSkillDecisionProfile } from '@/lib/decision'
@@ -764,6 +765,66 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         },
       }
     : null
+  const agentHandoff = selected
+    ? {
+        version: 'openagentskill-agent-handoff-v1',
+        mode: 'resolve_compare_review_install',
+        task,
+        agent,
+        selected_skill: {
+          slug: selected.skill.slug,
+          name: selected.skill.name,
+          url: selected.urls.web,
+          api_url: selected.urls.api,
+          audit_url: selected.urls.audit,
+          eval_url: selected.urls.eval,
+          repository: selected.urls.repository,
+        },
+        install_plan: {
+          command: selected.install_plan.command,
+          target: selected.install_plan.target,
+          label: selected.install_plan.label,
+          kind: selected.install_plan.kind,
+          value: selected.install_plan.value,
+          install_api: selected.urls.install_api,
+          auto_install_allowed: selected.safety.auto_install_allowed,
+          human_review_required: selected.safety.human_review_required,
+          policy: selected.safety.safety_tier.auto_install_policy,
+        },
+        api_sequence: agentWorkflow?.api_sequence || [],
+        platform_templates: buildAgentHandoffTemplates({
+          task,
+          skillName: selected.skill.name,
+          skillSlug: selected.skill.slug,
+          skillUrl: selected.urls.web,
+          auditUrl: selected.urls.audit,
+          evalUrl: selected.urls.eval,
+          installCommand: selected.install_plan.command,
+          installApiUrl: selected.urls.install_api,
+          autoInstallAllowed: selected.safety.auto_install_allowed,
+          humanReviewRequired: selected.safety.human_review_required,
+          alternatives: alternatives.slice(0, 3).map((candidate) => ({
+            name: candidate.skill.name,
+            slug: candidate.skill.slug,
+            url: candidate.urls.web,
+            installCommand: candidate.install_plan.command,
+          })),
+        }),
+        review_checklist: agentWorkflow?.review_checklist || [],
+        expected_output: agentWorkflow?.expected_agent_output || {
+          selected_skill: 'slug and name',
+          install_command: 'command or prompt used',
+          risk_summary: 'audit, trust, and policy notes',
+          next_action: 'install, ask for approval, or choose an alternative',
+        },
+        blocked_actions: [
+          'Do not install when safety_gate.blocked is true.',
+          'Do not install when the audit or eval reports unacceptable workspace risk.',
+          'Do not execute shell commands, access secrets, or call external services without user approval.',
+          'Do not keep the skill as an always-on instruction if it only fits a narrow task.',
+        ],
+      }
+    : null
   const recommendation = buildResolverRecommendation(task, agent, selected, alternatives)
 
   return {
@@ -775,6 +836,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     alternatives,
     blocked_candidates: blockedCandidates,
     agent_workflow: agentWorkflow,
+    agent_handoff: agentHandoff,
     policy_decision: selected
       ? buildSafetyPolicyDecision(selected.safety)
       : {
@@ -803,6 +865,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         why: 'recommendation.why_recommended',
         risk: 'recommendation.risk',
         alternatives: 'recommendation.alternatives',
+        agent_handoff: 'agent_handoff.platform_templates + agent_handoff.review_checklist',
       },
     },
   }

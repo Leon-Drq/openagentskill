@@ -42,6 +42,12 @@ const agentItems: Array<{
     icon: Braces,
   },
   {
+    href: '/agent/integration-kit',
+    label: 'Integration Kit',
+    description: 'Codex, Claude, Cursor templates',
+    icon: Braces,
+  },
+  {
     href: '/api/agent/tasks',
     label: 'Tasks API',
     description: 'Task catalog for agents',

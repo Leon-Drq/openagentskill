@@ -67,7 +67,7 @@ export async function GET() {
         },
         '/api/agent/resolve': {
           get: {
-            summary: 'Resolve a task into recommendation.best_skill, alternatives, Trust Score v3, safety gate, and install plan',
+            summary: 'Resolve a task into recommendation.best_skill, alternatives, Trust Score v3, safety gate, install plan, and agent_handoff',
             parameters: [
               { name: 'task', in: 'query', required: true, schema: { type: 'string' } },
               { name: 'agent', in: 'query', required: false, schema: { type: 'string', enum: ['auto', 'codex', 'claude-code', 'cursor', 'openagentskill-cli'] } },
@@ -78,7 +78,7 @@ export async function GET() {
             responses: {
               '200': {
                 description:
-                  'Resolved skill plan. Read recommendation.agent_contract for the stable machine contract, plus recommendation.best_skill, recommendation.install, recommendation.why_recommended, recommendation.trust_score_v3, recommendation.risk, recommendation.machine_metadata, and recommendation.alternatives. recommendation.trust_score_v2 remains as a backwards-compatible alias.',
+                  'Resolved skill plan. Read recommendation.agent_contract and agent_handoff for the stable machine contract, plus recommendation.best_skill, recommendation.install, recommendation.why_recommended, recommendation.trust_score_v3, recommendation.risk, recommendation.machine_metadata, and recommendation.alternatives. recommendation.trust_score_v2 remains as a backwards-compatible alias.',
               },
             },
           },
@@ -104,7 +104,21 @@ export async function GET() {
             responses: {
               '200': {
                 description:
-                  'Resolved skill plan with the same recommendation.agent_contract and recommendation.* fields returned by GET.',
+                  'Resolved skill plan with the same recommendation.agent_contract, agent_handoff, and recommendation.* fields returned by GET.',
+              },
+            },
+          },
+        },
+        '/api/agent/integration-kit': {
+          get: {
+            summary: 'Get copy-paste integration templates for Codex, Claude Code, Cursor, and agent runtimes',
+            parameters: [
+              { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
+            ],
+            responses: {
+              '200': {
+                description:
+                  'Agent Integration Kit with supported_agents, recommended_flow, stable_response_fields, and safety_rules. Use before calling /api/agent/resolve from an agent runtime.',
               },
             },
           },

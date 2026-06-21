@@ -16,6 +16,7 @@ Think npm for AI Agent Skills: a registry, trust layer, and recommendation API f
 [Browse Skills](https://www.openagentskill.com/skills) |
 [Trending](https://www.openagentskill.com/trending) |
 [Audit Reports](https://www.openagentskill.com/audits) |
+[Agent Kit](https://www.openagentskill.com/agent/integration-kit) |
 [API Docs](https://www.openagentskill.com/api-docs) |
 [Submit](https://www.openagentskill.com/submit)
 
@@ -33,7 +34,7 @@ The product is built for three audiences:
 | --- | --- | --- |
 | Agent builders | Find reliable skills for a task | Search, rankings, audits, comparisons, agent-friendly APIs |
 | Skill authors | Make their skills discoverable and trusted | Submit flow, claim pages, badges, audit reports |
-| AI agents | Query skills programmatically | `/api/agent/skills`, `/api/agent/recommend`, `/api/audits/[slug]` |
+| AI agents | Query skills programmatically | `/api/agent/integration-kit`, `/api/agent/resolve`, `/api/agent/skills`, `/api/audits/[slug]` |
 
 The long-term goal is to become the trust and routing layer for agent skills: not just a directory, but the place where humans and agents can decide what is safe, useful, maintained, and worth installing.
 
@@ -50,6 +51,7 @@ The long-term goal is to become the trust and routing layer for agent skills: no
 | Hot | [/hot](https://www.openagentskill.com/hot) | High-momentum skills |
 | Best lists | [/best](https://www.openagentskill.com/best) | SEO-ready rankings by use case and category |
 | Audits | [/audits](https://www.openagentskill.com/audits) | Security, quality, trust, and adoption-readiness reports |
+| Agent Integration Kit | [/agent/integration-kit](https://www.openagentskill.com/agent/integration-kit) | Copy-paste Codex, Claude Code, and Cursor templates plus stable Resolve API fields |
 | Agent pages | [/agents](https://www.openagentskill.com/agents) | Agent-specific skill discovery |
 | Official creators | [/official](https://www.openagentskill.com/official) | Creator and organization directories |
 | Comparisons | [/compare](https://www.openagentskill.com/compare) | Competitive and alternative pages |
@@ -64,6 +66,7 @@ The long-term goal is to become the trust and routing layer for agent skills: no
 - Quality, trust, and audit scoring for each skill.
 - Daily activity aggregates for trending and hot rankings.
 - Agent-friendly search and recommendation APIs.
+- Agent Integration Kit for Codex, Claude Code, Cursor, and other agent runtimes.
 - Skill audit pages and embeddable README badges.
 - SEO pages for use cases, alternatives, guides, reports, rankings, and collections.
 - High-intent AI agent skill clusters for concrete workflows such as web scraping, coding agents, finance/quant, RAG, PDF extraction, browser automation, security, and World Cup football analytics.
@@ -73,6 +76,14 @@ The long-term goal is to become the trust and routing layer for agent skills: no
 - Optional X OAuth flow for API-based posting when a paid X API plan is available.
 
 ## Agent API
+
+### Add OpenAgentSkill To An Agent
+
+```bash
+curl "https://www.openagentskill.com/api/agent/integration-kit?format=text"
+```
+
+Returns Codex, Claude Code, and Cursor setup templates, the recommended agent flow, stable Resolve response fields, and safety rules.
 
 ### Recommend Skills For A Task
 
@@ -90,7 +101,7 @@ curl "https://www.openagentskill.com/api/agent/evals?task=analyze+stock+news&age
 curl "https://www.openagentskill.com/api/agent/evals?slugs=crawl4ai,markitdown&task=parse+PDFs+into+markdown"
 ```
 
-The resolve endpoint returns the recommended skill, install handoff, audit URL, alternatives, and agent workflow. The task eval endpoint turns that recommendation into a pre-install gate with pass/review/fail checks for match quality, install readiness, Trust Score, audit score, and safety policy. The batch eval form (`slugs=a,b,c`) ranks candidate skills against the same gates so an agent can compare alternatives before installing anything.
+The resolve endpoint returns the recommended skill, install handoff, audit URL, alternatives, agent workflow, and `agent_handoff` templates for Codex, Claude Code, and Cursor. The task eval endpoint turns that recommendation into a pre-install gate with pass/review/fail checks for match quality, install readiness, Trust Score, audit score, and safety policy. The batch eval form (`slugs=a,b,c`) ranks candidate skills against the same gates so an agent can compare alternatives before installing anything.
 
 ### Search Skills
 
