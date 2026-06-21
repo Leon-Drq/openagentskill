@@ -129,13 +129,13 @@ function getQueuePriority(skill: SkillRecord) {
   return Math.round(quality + Math.log10(stars + 10) * 12 + getFreshnessBoost(skill))
 }
 
-function getSkillShareText(skill: SkillRecord) {
+function getSkillShareText(skill: SkillRecord, options: { includeCategory?: boolean } = {}) {
   return [
     skill.name,
     skill.description,
     skill.long_description,
     skill.tagline,
-    skill.category,
+    ...(options.includeCategory ? [skill.category] : []),
     skill.github_repo,
     skill.repository,
     ...(skill.tags || []),
