@@ -79,6 +79,7 @@ export interface BulkImportSummary {
   duplicateRecoveryUsed: number
   adaptiveExpansionSearchRequests: number
   adaptiveExpansionUsed: number
+  adaptiveExpansionLowCandidateFallback: boolean
   adaptiveExpansionCandidatesFound: number
   adaptiveExpansionImported: number
   adaptiveExpansionSkippedExisting: number
@@ -1897,6 +1898,20 @@ function getSearchPlan(maxSearchRequests: number, pageSeed: number, queryPool: H
   return plan
 }
 
+function getFirstPageCoveragePlan(maxSearchRequests: number, pageSeed: number, queryPool: HighStarQuery[]) {
+  const plan: Array<{ query: HighStarQuery; page: number }> = []
+  const maxPage = 3
+  const queryOffset = queryPool.length > 0 ? pageSeed % queryPool.length : 0
+
+  for (let i = 0; i < maxSearchRequests; i += 1) {
+    const queryIndex = (queryOffset + i) % queryPool.length
+    const page = 1 + (Math.floor(i / queryPool.length) % maxPage)
+    plan.push({ query: queryPool[queryIndex], page })
+  }
+
+  return plan
+}
+
 function shouldRunDuplicateRecovery(summary: BulkImportSummary, primarySearchRequests: number) {
   if (summary.searchRequests < primarySearchRequests) return false
   if (summary.imported > 0) return false
@@ -1908,7 +1923,9 @@ function shouldRunDuplicateRecovery(summary: BulkImportSummary, primarySearchReq
 
 function shouldRunAdaptiveExpansion(summary: BulkImportSummary, targetNew: number) {
   if (summary.imported >= targetNew) return false
-  if (summary.candidatesFound < 50) return false
+  if (summary.searchRequests === 0) return false
+  if (summary.candidatesFound === 0) return true
+  if (summary.candidatesFound < 50 && summary.imported === 0) return true
 
   const duplicateRate = summary.skippedExisting / Math.max(summary.candidatesFound, 1)
   const importRate = summary.imported / Math.max(summary.candidatesFound, 1)
@@ -2012,6 +2029,7 @@ export async function bulkImportHighStarSkills(
     duplicateRecoveryUsed: 0,
     adaptiveExpansionSearchRequests,
     adaptiveExpansionUsed: 0,
+    adaptiveExpansionLowCandidateFallback: false,
     adaptiveExpansionCandidatesFound: 0,
     adaptiveExpansionImported: 0,
     adaptiveExpansionSkippedExisting: 0,
@@ -2059,6 +2077,7 @@ export async function bulkImportHighStarSkills(
         adaptive_expansion_min_stars: summary.adaptiveExpansionMinStars,
         adaptive_expansion_max_stars: summary.adaptiveExpansionMaxStars,
         adaptive_expansion_search_requests: adaptiveExpansionSearchRequests,
+        adaptive_expansion_low_candidate_fallback: summary.adaptiveExpansionLowCandidateFallback,
         requested_domains: requestedDomains,
         discovery_domains: HIGH_STAR_DISCOVERY_DOMAINS,
       },
@@ -2212,11 +2231,19 @@ export async function bulkImportHighStarSkills(
     adaptiveExpansionMaxStars !== null &&
     shouldRunAdaptiveExpansion(summary, targetNew)
   ) {
-    const adaptiveSearchPlan = getSearchPlan(
-      adaptiveExpansionSearchRequests,
-      pageSeed + 37,
-      queryPool
-    )
+    const useLowCandidateFallback = summary.candidatesFound < 50 && summary.imported === 0
+    summary.adaptiveExpansionLowCandidateFallback = useLowCandidateFallback
+    const adaptiveSearchPlan = useLowCandidateFallback
+      ? getFirstPageCoveragePlan(
+          adaptiveExpansionSearchRequests,
+          pageSeed + summary.searchRequests,
+          queryPool
+        )
+      : getSearchPlan(
+          adaptiveExpansionSearchRequests,
+          pageSeed + 37,
+          queryPool
+        )
 
     for (const { query, page } of adaptiveSearchPlan) {
       if (summary.imported >= targetNew) break
@@ -2305,6 +2332,7 @@ export async function bulkImportHighStarSkills(
       adaptive_expansion_search_requests: adaptiveExpansionSearchRequests,
       adaptive_expansion_used: summary.adaptiveExpansionUsed,
       adaptive_expansion_triggered: summary.adaptiveExpansionUsed > 0,
+      adaptive_expansion_low_candidate_fallback: summary.adaptiveExpansionLowCandidateFallback,
       adaptive_expansion_candidates_found: summary.adaptiveExpansionCandidatesFound,
       adaptive_expansion_imported: summary.adaptiveExpansionImported,
       adaptive_expansion_skipped_existing: summary.adaptiveExpansionSkippedExisting,

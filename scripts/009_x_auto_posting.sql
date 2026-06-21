@@ -67,7 +67,7 @@ security definer
 set search_path = public, pg_temp
 as $$
 declare
-  v_expected_secret_hash constant text := '8ed2b827e8827c1d1657c0893b4c91653249267863eed5ef1af9157fce205328';
+  v_expected_secret_hash constant text := '074705db488fc272fdd4913f06b11cf5ca05b79ceb8af005ecdb6e2479a0af01';
 begin
   if p_server_secret is null
     or encode(extensions.digest(p_server_secret, 'sha256'), 'hex') <> v_expected_secret_hash

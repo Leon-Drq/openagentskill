@@ -14,7 +14,7 @@ import { FEATURED_SKILL_CLUSTERS, SKILL_CLUSTERS } from '@/lib/seo/skill-cluster
 
 export const dynamic = 'force-dynamic'
 
-const DISCOVERY_QUERY_TIMEOUT_MS = 1000
+const DISCOVERY_QUERY_TIMEOUT_MS = 2500
 const BASE_IMPORT_CRON_MINUTE_UTC = 0
 
 function getCronMinute(schedule: string) {
@@ -106,6 +106,8 @@ function buildIndexerHealth({
   const latestPageSeed = toNumber(latestRun?.page_seed)
   const latestDuplicateRecoveryUsed = toNumber(latestRun?.duplicate_recovery_used)
   const latestAdaptiveExpansionUsed = toNumber(latestRun?.adaptive_expansion_used)
+  const latestAdaptiveExpansionLowCandidateFallback =
+    latestRun?.adaptive_expansion_low_candidate_fallback === true
   const latestAdaptiveExpansionImported = toNumber(latestRun?.adaptive_expansion_imported)
   const latestAdaptiveExpansionCandidatesFound = toNumber(latestRun?.adaptive_expansion_candidates_found)
   const latestSearchDelayMs = toNumber(latestRun?.search_delay_ms)
@@ -167,7 +169,9 @@ function buildIndexerHealth({
     action = 'The latest run found candidates but no new skill passed the import gates. Inspect skipped MCP and low-relevance counts before loosening quality filters.'
   } else if (belowTarget && latestImported === 0 && latestCandidatesFound === 0) {
     status = 'empty_search_window'
-    action = 'The latest run used its search window but found no candidates. Rotate domains or broaden GitHub queries.'
+    action = latestAdaptiveExpansionLowCandidateFallback
+      ? 'The latest run used low-candidate adaptive expansion but still found no candidates. Add more domain query seeds or inspect GitHub Search availability.'
+      : 'The latest run used its search window but found no candidates. Low-candidate adaptive expansion should run on the next profile cron.'
   } else if (latestStatus?.includes('error') || (latestErrors || 0) > 0) {
     status = 'degraded'
     action = 'Inspect private indexer logs before relying on automated growth.'
@@ -197,6 +201,7 @@ function buildIndexerHealth({
     latest_run_page_seed: latestPageSeed,
     latest_run_duplicate_recovery_used: latestDuplicateRecoveryUsed,
     latest_run_adaptive_expansion_used: latestAdaptiveExpansionUsed,
+    latest_run_adaptive_expansion_low_candidate_fallback: latestAdaptiveExpansionLowCandidateFallback,
     latest_run_adaptive_expansion_imported: latestAdaptiveExpansionImported,
     latest_run_adaptive_expansion_candidates_found: latestAdaptiveExpansionCandidatesFound,
     latest_run_search_delay_ms: latestSearchDelayMs,
@@ -291,13 +296,14 @@ async function getRecentRuns() {
       'duplicate_recovery_used' in run.metadata
       ? (run.metadata as Record<string, unknown>).duplicate_recovery_used
       : undefined,
-    adaptive_expansion_min_stars: metadataValue(run, 'adaptive_expansion_min_stars'),
-    adaptive_expansion_max_stars: metadataValue(run, 'adaptive_expansion_max_stars'),
-    adaptive_expansion_search_requests: metadataValue(run, 'adaptive_expansion_search_requests'),
-    adaptive_expansion_used: metadataValue(run, 'adaptive_expansion_used'),
-    adaptive_expansion_imported: metadataValue(run, 'adaptive_expansion_imported'),
-    adaptive_expansion_candidates_found: metadataValue(run, 'adaptive_expansion_candidates_found'),
-    adaptive_expansion_skipped_existing: metadataValue(run, 'adaptive_expansion_skipped_existing'),
+    adaptive_expansion_min_stars: metadataValue(run, 'adaptive_expansion_min_stars') ?? run.adaptive_expansion_min_stars,
+    adaptive_expansion_max_stars: metadataValue(run, 'adaptive_expansion_max_stars') ?? run.adaptive_expansion_max_stars,
+    adaptive_expansion_search_requests: metadataValue(run, 'adaptive_expansion_search_requests') ?? run.adaptive_expansion_search_requests,
+    adaptive_expansion_used: metadataValue(run, 'adaptive_expansion_used') ?? run.adaptive_expansion_used,
+    adaptive_expansion_low_candidate_fallback: metadataValue(run, 'adaptive_expansion_low_candidate_fallback'),
+    adaptive_expansion_imported: metadataValue(run, 'adaptive_expansion_imported') ?? run.adaptive_expansion_imported,
+    adaptive_expansion_candidates_found: metadataValue(run, 'adaptive_expansion_candidates_found') ?? run.adaptive_expansion_candidates_found,
+    adaptive_expansion_skipped_existing: metadataValue(run, 'adaptive_expansion_skipped_existing') ?? run.adaptive_expansion_skipped_existing,
     search_delay_ms: run.metadata &&
       typeof run.metadata === 'object' &&
       !Array.isArray(run.metadata) &&
@@ -374,6 +380,8 @@ function buildProfileRunSummaries(runs: Array<Record<string, unknown>>) {
       latest_run_skipped_existing: toNumber(latest?.skipped_existing),
       latest_run_duplicate_recovery_used: toNumber(latest?.duplicate_recovery_used),
       latest_run_adaptive_expansion_used: toNumber(latest?.adaptive_expansion_used),
+      latest_run_adaptive_expansion_low_candidate_fallback:
+        latest?.adaptive_expansion_low_candidate_fallback === true,
       latest_run_adaptive_expansion_imported: toNumber(latest?.adaptive_expansion_imported),
       latest_run_adaptive_expansion_candidates_found: toNumber(latest?.adaptive_expansion_candidates_found),
       latest_run_rate_limit_retries: toNumber(latest?.rate_limit_retries),
@@ -516,7 +524,7 @@ export async function GET() {
           targetNew: 500,
           minStars: 500,
           adaptiveExpansionMinStars: 100,
-          adaptiveExpansionSearchRequests: 20,
+          adaptiveExpansionSearchRequests: 35,
           domains: ['finance', 'sports', 'marketing-seo'],
           maxSearchRequests: 100,
         },
@@ -527,7 +535,7 @@ export async function GET() {
               targetNew: 500,
               minStars: 500,
               adaptiveExpansionMinStars: 100,
-              adaptiveExpansionSearchRequests: 20,
+              adaptiveExpansionSearchRequests: 35,
               domains: ['finance'],
               maxSearchRequests: 100,
             },
@@ -538,7 +546,7 @@ export async function GET() {
               targetNew: 200,
               minStars: 300,
               adaptiveExpansionMinStars: 100,
-              adaptiveExpansionSearchRequests: 20,
+              adaptiveExpansionSearchRequests: 35,
               domains: ['sports'],
               maxSearchRequests: 80,
             },
@@ -549,7 +557,7 @@ export async function GET() {
               targetNew: 300,
               minStars: 500,
               adaptiveExpansionMinStars: 100,
-              adaptiveExpansionSearchRequests: 20,
+              adaptiveExpansionSearchRequests: 35,
               domains: ['marketing-seo', 'customer-support'],
               maxSearchRequests: 100,
             },
