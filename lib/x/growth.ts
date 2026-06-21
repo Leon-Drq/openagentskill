@@ -129,12 +129,54 @@ function getQueuePriority(skill: SkillRecord) {
   return Math.round(quality + Math.log10(stars + 10) * 12 + getFreshnessBoost(skill))
 }
 
+function getSkillShareText(skill: SkillRecord) {
+  return [
+    skill.name,
+    skill.description,
+    skill.long_description,
+    skill.tagline,
+    skill.category,
+    skill.github_repo,
+    skill.repository,
+    ...(skill.tags || []),
+    ...(skill.frameworks || []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+}
+
+function isGenericHighStarRepo(skill: SkillRecord) {
+  const repo = (skill.github_repo || '').toLowerCase()
+  return [
+    /^freecodecamp\/freecodecamp$/,
+    /^ebookfoundation\/free-programming-books$/,
+    /^thealgorithms\/python$/,
+    /^tensorflow\/tensorflow$/,
+    /^huggingface\/transformers$/,
+    /^ohmyzsh\/ohmyzsh$/,
+  ].some((pattern) => pattern.test(repo))
+}
+
+function hasShareableAgentUseCase(skill: SkillRecord) {
+  const text = getSkillShareText(skill)
+  const category = (skill.category || '').toLowerCase()
+
+  if (/(^|-)agent(s|-|$)|agent-skills|coding-agents|document-processing|web-scraping|browser-automation|research|finance|quant|football|world-cup|marketing|design|data-analysis|legal/.test(category)) {
+    return true
+  }
+
+  return /\b(agent|agents|agentic|skill|skills|codex|claude code|cursor|workflow|automation|automate|scrap(e|ing)|crawl(er|ing)?|browser|playwright|puppeteer|pdf|document|markdown|rag|retrieval|research|stock|stocks|quant|trading|portfolio|football|world cup|soccer|seo|marketing|figma|design|code review|pull request|testing|security audit)\b/.test(text)
+}
+
 function isGoodXCandidate(skill: SkillRecord, minStars: number) {
   if (!skill.ai_review_approved) return false
   if (Number(skill.github_stars || 0) < minStars) return false
   if (Number(skill.quality_score || 0) < 45) return false
   if (!skill.github_repo) return false
   if (!skill.description) return false
+  if (isGenericHighStarRepo(skill)) return false
+  if (!hasShareableAgentUseCase(skill)) return false
   return true
 }
 
