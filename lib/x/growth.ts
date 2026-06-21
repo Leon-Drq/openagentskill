@@ -129,7 +129,10 @@ function getQueuePriority(skill: SkillRecord) {
   return Math.round(quality + Math.log10(stars + 10) * 12 + getFreshnessBoost(skill))
 }
 
-function getSkillShareText(skill: SkillRecord, options: { includeCategory?: boolean } = {}) {
+function getSkillShareText(
+  skill: SkillRecord,
+  options: { includeCategory?: boolean; includeGeneratedSignals?: boolean } = {}
+) {
   return [
     skill.name,
     skill.description,
@@ -138,8 +141,8 @@ function getSkillShareText(skill: SkillRecord, options: { includeCategory?: bool
     ...(options.includeCategory ? [skill.category] : []),
     skill.github_repo,
     skill.repository,
-    ...(skill.tags || []),
-    ...(skill.frameworks || []),
+    ...(options.includeGeneratedSignals ? skill.tags || [] : []),
+    ...(options.includeGeneratedSignals ? skill.frameworks || [] : []),
   ]
     .filter(Boolean)
     .join(' ')
@@ -155,6 +158,8 @@ function isGenericHighStarRepo(skill: SkillRecord) {
     /^tensorflow\/tensorflow$/,
     /^huggingface\/transformers$/,
     /^ohmyzsh\/ohmyzsh$/,
+    /^chalarangelo\/30-seconds-of-code$/,
+    /^excalidraw\/excalidraw$/,
   ].some((pattern) => pattern.test(repo))
 }
 
