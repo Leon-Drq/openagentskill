@@ -30,7 +30,7 @@
     },
     {
       "path": "/api/x/post-daily",
-      "schedule": "30 15,23 * * *"
+      "schedule": "47 9 21 6 *"
     }
   ]
 }
