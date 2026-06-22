@@ -1,4 +1,4 @@
-import type { SkillAgentStats, SkillRecord } from '@/lib/db/skills'
+import type { SkillAgentStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
 
 export type QualityTier = 'excellent' | 'strong' | 'promising' | 'review'
 
@@ -52,7 +52,7 @@ function getTier(score: number): { tier: QualityTier; label: string } {
 
 export function getSkillQualityProfile(
   skill: SkillRecord,
-  agentStats?: SkillAgentStats | null
+  agentStats?: SkillAgentStats | SkillOutcomeStats | null
 ): SkillQualityProfile {
   const baseScore = Math.max(
     Number(skill.quality_score || 0),
@@ -77,7 +77,13 @@ export function getSkillQualityProfile(
   else if (freshnessDays <= 365) score += 1
   else score -= 8
 
-  if (agentStats?.success_rate != null && agentStats.total_calls > 0) {
+  const totalAgentRuns = agentStats
+    ? 'total_outcomes' in agentStats
+      ? agentStats.total_outcomes
+      : agentStats.total_calls
+    : 0
+
+  if (agentStats?.success_rate != null && totalAgentRuns > 0) {
     if (agentStats.success_rate >= 90) score += 5
     else if (agentStats.success_rate < 70) score -= 8
   }
@@ -117,7 +123,7 @@ export function getSkillQualityProfile(
     },
   ]
 
-  if (agentStats && agentStats.total_calls > 0) {
+  if (agentStats && totalAgentRuns > 0) {
     signals.push({
       label: 'Agent success',
       value: agentStats.success_rate == null ? 'Unknown' : `${Math.round(agentStats.success_rate)}%`,

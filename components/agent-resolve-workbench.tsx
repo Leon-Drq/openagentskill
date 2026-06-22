@@ -29,6 +29,15 @@ type ResolvePayload = {
       policy: string
     }
     why_recommended: string[]
+    trust_score_v4?: {
+      score: number
+      label: string
+      version?: string
+      install_policy: string
+      evidence?: Record<string, string> | Array<{ label: string; value: string | number | boolean }>
+      agent_compatibility?: string[]
+      risk?: unknown
+    }
     trust_score_v3?: {
       score: number
       label: string
@@ -87,6 +96,12 @@ type ResolvePayload = {
     }>
     agent_instruction: string
   } | null
+  feedback?: {
+    event_id: string
+    outcome_api: string
+    cli_example: string
+    expected_outcomes: string[]
+  }
   selected?: {
     match_score: number
     supply_profile: {
@@ -190,7 +205,8 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
 
   const recommendation = payload?.recommendation
   const selected = payload?.selected
-  const trustScore = recommendation?.trust_score_v3 || recommendation?.trust_score_v2
+  const trustScore =
+    recommendation?.trust_score_v4 || recommendation?.trust_score_v3 || recommendation?.trust_score_v2
 
   return (
     <div className="grid gap-6 lg:grid-cols-[0.82fr_1.18fr]">
@@ -423,6 +439,25 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
                 </div>
               </div>
             </div>
+
+            {payload.feedback && (
+              <div className="bg-[#fbfaf7] p-4 sm:p-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Outcome feedback</p>
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-secondary">
+                      After one narrow run, report whether this skill worked so future agent rankings learn from real outcomes.
+                    </p>
+                  </div>
+                  <span className="w-fit border border-border bg-background px-2.5 py-1 font-mono text-xs text-secondary">
+                    {payload.feedback.event_id}
+                  </span>
+                </div>
+                <code className="mt-4 block break-words border border-border bg-background p-3 font-mono text-xs leading-5 [overflow-wrap:anywhere]">
+                  {payload.feedback.cli_example}
+                </code>
+              </div>
+            )}
 
             <div className="grid gap-5 p-4 sm:p-5 lg:grid-cols-2">
               <div>

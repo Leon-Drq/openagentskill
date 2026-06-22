@@ -1,6 +1,6 @@
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
-import type { SkillEventStats, SkillRecord } from '@/lib/db/skills'
+import type { SkillEventStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getPrimaryInstallCommand, getSkillInstallTargets } from '@/lib/install-targets'
 import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
@@ -41,6 +41,21 @@ export interface AgentReadableSkillMetadata {
     version: string
     install_policy: string
     evidence: SkillTrustEvidence
+    outcome_evidence: {
+      total: number
+      success_rate: number | null
+      install_attempts: number
+      risk_blocked: number
+      setup_required: number
+      label: string
+    }
+    auto_install: {
+      allowed: boolean
+      sandbox_required: boolean
+      reason: string
+    }
+    best_for: string[]
+    known_risks: string[]
   }
   audit: {
     score: number
@@ -126,6 +141,7 @@ export function buildAgentReadableSkillMetadata(
   options: {
     baseUrl?: string
     eventStats?: SkillEventStats | null
+    outcomeStats?: SkillOutcomeStats | null
     approvedClaim?: boolean
     alternatives?: SkillRecord[]
     task?: string
@@ -140,7 +156,12 @@ export function buildAgentReadableSkillMetadata(
   const decision = getSkillDecisionProfile(skill, options.eventStats || null)
   const useCases = getUseCasesForSkill(skill, 4)
   const supply = getSkillSupplyProfile(skill, options.eventStats || null)
-  const trust = getSkillTrustProfile(skill, Boolean(options.approvedClaim), options.eventStats || null)
+  const trust = getSkillTrustProfile(
+    skill,
+    Boolean(options.approvedClaim),
+    options.eventStats || null,
+    options.outcomeStats || null
+  )
   const audit = buildSkillAudit(skill, options.eventStats || null)
   const safety = getAgentSafetyProfile(skill, audit, {
     max_risk: 'medium',
@@ -183,6 +204,7 @@ export function buildAgentReadableSkillMetadata(
       ...safety.policy_warnings,
       ...audit.warnings,
       ...trust.riskSummary.notes,
+      ...trust.doNotUseFor,
       audit.risk_level !== 'safe_to_try' ? 'production agents without a sandbox test and repository review' : null,
     ],
     8
@@ -235,6 +257,21 @@ export function buildAgentReadableSkillMetadata(
       version: trust.version,
       install_policy: trust.installReadiness.policy,
       evidence: trust.evidence,
+      outcome_evidence: {
+        total: trust.outcomeEvidence.total,
+        success_rate: trust.outcomeEvidence.successRate,
+        install_attempts: trust.outcomeEvidence.installAttempts,
+        risk_blocked: trust.outcomeEvidence.riskBlocked,
+        setup_required: trust.outcomeEvidence.setupRequired,
+        label: trust.outcomeEvidence.label,
+      },
+      auto_install: {
+        allowed: trust.autoInstall.allowed,
+        sandbox_required: trust.autoInstall.sandboxRequired,
+        reason: trust.autoInstall.reason,
+      },
+      best_for: trust.bestFor,
+      known_risks: trust.knownRisks,
     },
     audit: {
       score: audit.audit_score,

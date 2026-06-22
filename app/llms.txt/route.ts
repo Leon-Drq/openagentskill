@@ -31,6 +31,7 @@ Preferred agent flow:
 6. Fetch /api/agent/evals?slug={slug}&task={task}&format=text and follow the eval decision.
 7. Fetch /api/agent/skills/{slug} for the selected skill.
 8. Fetch /api/skills/{slug}/install?format=text before installing.
+9. After one narrow run, POST the result to /api/agent/outcome using feedback.event_id from resolve.
 
 Important URLs:
 - Agent entry: https://www.openagentskill.com/agent
@@ -39,7 +40,9 @@ Important URLs:
 - Tasks: https://www.openagentskill.com/tasks
 - Task API: https://www.openagentskill.com/api/agent/tasks
 - Resolve API: https://www.openagentskill.com/api/agent/resolve
+- Agent outcome API: https://www.openagentskill.com/api/agent/outcome
 - Skill Eval API: https://www.openagentskill.com/api/agent/evals?slug=crawl4ai
+- Resolve eval dashboard: https://www.openagentskill.com/evals/resolve
 - Skill search API: https://www.openagentskill.com/api/skills/search
 - Safety gate: https://www.openagentskill.com/safety
 - Agent manifest: https://www.openagentskill.com/.well-known/agent-manifest.json
@@ -60,6 +63,7 @@ Install safety:
 - Prefer /api/agent/resolve over raw search because it applies the OpenAgentSkill safety gate.
 - Prefer agent_handoff over ad hoc page scraping because it returns platform templates, API sequence, review checklist, and blocked actions.
 - Prefer /api/agent/evals?slug={slug} before installation because it returns the Trust + Eval contract, blockers, and validation plan.
+- Report success, failed, not_relevant, blocked_by_risk, or setup_required to /api/agent/outcome so future rankings learn from real use.
 - Treat safety_gate.blocked as "do not auto-install".
 - Treat safety_gate.experimental as manual test only.
 - Treat safety_gate.reviewed as human-review-before-install unless auto_install_policy is allow.

@@ -3,7 +3,7 @@ import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { buildAgentReadableSkillMetadata } from '@/lib/agent-readable'
 import { withTimeout } from '@/lib/async'
-import { getApprovedClaimBySkillSlug } from '@/lib/db/skills'
+import { getAgentOutcomeStats, getApprovedClaimBySkillSlug, getSkillEventStats } from '@/lib/db/skills'
 import { getStacksForSkill } from '@/lib/collections'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
@@ -51,23 +51,37 @@ export async function GET(
       )
     }
 
-    const approvedClaim = isCuratedSkillFallback(skill)
-      ? null
-      : await withTimeout(
-          getApprovedClaimBySkillSlug(skill.slug),
-          AGENT_SKILL_SUPPORT_TIMEOUT_MS,
-          'agent skill claim query'
-        ).catch(() => null)
-    const trustProfile = getSkillTrustProfile(skill, Boolean(approvedClaim))
-    const audit = buildSkillAudit(skill)
+    const [approvedClaim, eventStats, outcomeStats] = isCuratedSkillFallback(skill)
+      ? [null, null, null]
+      : await Promise.all([
+          withTimeout(
+            getApprovedClaimBySkillSlug(skill.slug),
+            AGENT_SKILL_SUPPORT_TIMEOUT_MS,
+            'agent skill claim query'
+          ).catch(() => null),
+          withTimeout(
+            getSkillEventStats(skill.slug),
+            AGENT_SKILL_SUPPORT_TIMEOUT_MS,
+            'agent skill event stats query'
+          ).catch(() => null),
+          withTimeout(
+            getAgentOutcomeStats(skill.slug),
+            AGENT_SKILL_SUPPORT_TIMEOUT_MS,
+            'agent skill outcome stats query'
+          ).catch(() => null),
+        ])
+    const trustProfile = getSkillTrustProfile(skill, Boolean(approvedClaim), eventStats, outcomeStats)
+    const audit = buildSkillAudit(skill, eventStats)
     const safetyProfile = getAgentSafetyProfile(skill, audit, {
       max_risk: request.nextUrl.searchParams.get('max_risk') || 'medium',
       needs_install_command: true,
     })
     const installTargets = getSkillInstallTargets(skill)
     const attribution = getSkillAttribution(skill, approvedClaim)
-    const supplyProfile = getSkillSupplyProfile(skill)
+    const supplyProfile = getSkillSupplyProfile(skill, eventStats)
     const agentReadableMetadata = buildAgentReadableSkillMetadata(skill, {
+      eventStats,
+      outcomeStats,
       approvedClaim: Boolean(approvedClaim),
     })
     const evalProfile = buildSkillEvalProfile(skill, {
@@ -101,6 +115,7 @@ Supply Profile:
 Statistics:
 - Quality Score: ${Number(skill.quality_score || 0)}
 - Trust Score: ${trustProfile.score} (${trustProfile.label})
+- Agent Outcomes: ${trustProfile.outcomeEvidence.label}
 - Audit Score: ${audit.audit_score} (${auditRiskLabel(audit.risk_level)})
 - Safety Gate: ${safetyProfile.safety_tier.label} (${safetyProfile.safety_tier.auto_install_policy})
 - Agent Safety Score: ${safetyProfile.score}/100

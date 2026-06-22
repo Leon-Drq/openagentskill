@@ -51,6 +51,7 @@ The long-term goal is to become the trust and routing layer for agent skills: no
 | Hot | [/hot](https://www.openagentskill.com/hot) | High-momentum skills |
 | Best lists | [/best](https://www.openagentskill.com/best) | SEO-ready rankings by use case and category |
 | Audits | [/audits](https://www.openagentskill.com/audits) | Security, quality, trust, and adoption-readiness reports |
+| Resolve evals | [/evals/resolve](https://www.openagentskill.com/evals/resolve) | Public benchmark dashboard for agent recommendation quality |
 | Agent Integration Kit | [/agent/integration-kit](https://www.openagentskill.com/agent/integration-kit) | Copy-paste Codex, Claude Code, and Cursor templates plus stable Resolve API fields |
 | Agent pages | [/agents](https://www.openagentskill.com/agents) | Agent-specific skill discovery |
 | Official creators | [/official](https://www.openagentskill.com/official) | Creator and organization directories |
@@ -64,8 +65,10 @@ The long-term goal is to become the trust and routing layer for agent skills: no
 - High-star GitHub skill indexing with a skill-only search matrix.
 - MCP repositories are intentionally excluded from automated imports.
 - Quality, trust, and audit scoring for each skill.
+- Trust Score v4 combines repository quality, install safety, audit readiness, and real agent outcome feedback.
 - Daily activity aggregates for trending and hot rankings.
 - Agent-friendly search and recommendation APIs.
+- Outcome feedback API so agents can report success, failure, setup friction, and risk blocks after a narrow run.
 - Agent Integration Kit for Codex, Claude Code, Cursor, and other agent runtimes.
 - Skill audit pages and embeddable README badges.
 - SEO pages for use cases, alternatives, guides, reports, rankings, and collections.
@@ -102,6 +105,23 @@ curl "https://www.openagentskill.com/api/agent/evals?slugs=crawl4ai,markitdown&t
 ```
 
 The resolve endpoint returns the recommended skill, install handoff, audit URL, alternatives, agent workflow, and `agent_handoff` templates for Codex, Claude Code, and Cursor. The task eval endpoint turns that recommendation into a pre-install gate with pass/review/fail checks for match quality, install readiness, Trust Score, audit score, and safety policy. The batch eval form (`slugs=a,b,c`) ranks candidate skills against the same gates so an agent can compare alternatives before installing anything.
+
+Each Resolve response also includes `feedback.event_id`, `feedback.outcome_api`, and a ready-to-run CLI example. After one narrow run, agents should report the result so future rankings learn from real adoption:
+
+```bash
+curl -X POST "https://www.openagentskill.com/api/agent/outcome" \
+  -H "content-type: application/json" \
+  -d '{
+    "event_id": "resolve_...",
+    "skill_slug": "crawl4ai",
+    "task": "scrape competitor pricing pages",
+    "agent": "codex",
+    "outcome": "success",
+    "install_used": true
+  }'
+```
+
+Supported outcomes are `success`, `failed`, `not_relevant`, `blocked_by_risk`, and `setup_required`.
 
 ### Search Skills
 
@@ -277,11 +297,12 @@ Apply SQL files in `scripts/` in order. The current schema includes:
 - Claims and skill events
 - Hardened RLS policies
 - Skill audits and daily event aggregates
+- Agent outcome feedback and aggregate success signals
 
-The latest audit and daily-events migration is:
+The latest outcome-feedback migration is:
 
 ```text
-scripts/013_skill_audits_and_daily_events.sql
+scripts/015_agent_outcomes_and_resolve_evals.sql
 ```
 
 ## Project Structure
@@ -289,7 +310,7 @@ scripts/013_skill_audits_and_daily_events.sql
 ```text
 app/
   api/
-    agent/        Agent-friendly search, rankings, recommendation, feedback
+    agent/        Agent-friendly search, rankings, recommendation, feedback, outcomes
     audits/       Skill audit API
     badge/        SVG badge API
     indexer/      Protected import and maintenance jobs
@@ -326,15 +347,18 @@ scripts/
 - [x] Scenario coverage matrix for 20,000+ skill growth
 - [x] Skill-only imports with MCP exclusion
 - [x] Quality and trust profiles
+- [x] Trust Score v4 with real agent outcome evidence
 - [x] Audit reports
 - [x] Trending and hot rankings from daily activity
 - [x] README badges
 - [x] Agent recommendation API
+- [x] Agent outcome feedback API and aggregate adoption signals
+- [x] Public Resolve quality eval dashboard
 - [x] Programmatic SEO pages
 - [x] Task-based skill evaluations
 - [ ] Agent-specific fit scoring for Claude Code, Codex, Cursor, and other agent surfaces
 - [x] Creator claim pages with verified ownership
-- [ ] Anonymous install and usage telemetry
+- [x] Anonymous install and usage outcome telemetry
 - [ ] Semantic search and reranking
 - [ ] Public benchmark reports for high-impact skill categories
 

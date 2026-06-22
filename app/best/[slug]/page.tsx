@@ -5,7 +5,7 @@ import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
-import { convertSkillRecordToManifest, getAllSkills, getSkillStats, type SkillAgentStats } from '@/lib/db/skills'
+import { convertSkillRecordToManifest, getAgentOutcomeStatsMap, getAllSkills, type SkillOutcomeStats } from '@/lib/db/skills'
 import { formatCompactNumber, getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
 import {
   getRankingCompareHref,
@@ -96,8 +96,8 @@ export default async function BestSkillDetailPage({
   const [skills, statsMap] = await Promise.all([
     withTimeout(getAllSkills('quality', undefined, 1200), BEST_PAGE_QUERY_TIMEOUT_MS, 'best skills query')
       .catch(() => CURATED_SKILL_SNAPSHOT),
-    withTimeout(getSkillStats(), BEST_PAGE_QUERY_TIMEOUT_MS, 'best stats query')
-      .catch((): Record<string, SkillAgentStats> => ({})),
+    withTimeout(getAgentOutcomeStatsMap(), BEST_PAGE_QUERY_TIMEOUT_MS, 'best outcome stats query')
+      .catch((): Record<string, SkillOutcomeStats> => ({})),
   ])
   const rankedSkills = rankSkillsForDefinition(skills, ranking, statsMap, 30)
   const compareHref = getRankingCompareHref(rankedSkills)
@@ -221,7 +221,7 @@ export default async function BestSkillDetailPage({
               <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Stars</div>
             </div>
             <div className="bg-background p-4">
-              <div className="font-mono text-2xl">{topSkill ? getSkillTrustProfile(topSkill).score : 0}</div>
+              <div className="font-mono text-2xl">{topSkill ? getSkillTrustProfile(topSkill, false, null, statsMap[topSkill.slug] || null).score : 0}</div>
               <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Top trust</div>
             </div>
           </div>
@@ -267,7 +267,7 @@ export default async function BestSkillDetailPage({
                 const skill = item.skill
                 const manifest = convertSkillRecordToManifest(skill)
                 const quality = getSkillQualityProfile(skill, statsMap[skill.slug] || null)
-                const trust = getSkillTrustProfile(skill)
+                const trust = getSkillTrustProfile(skill, false, null, statsMap[skill.slug] || null)
                 const audit = buildSkillAudit(skill)
                 const platforms = [...new Set([...(skill.frameworks || []), ...getPlatformHints(skill)])]
                 const skillUseCases = getUseCasesForSkill(skill, 2)

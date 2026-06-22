@@ -5,6 +5,7 @@ import { cache } from 'react'
 import {
   getApprovedClaimBySkillSlug,
   convertSkillRecordToManifest,
+  getAgentOutcomeStats,
   getRelatedSkills,
   getSkillEventStats,
 } from '@/lib/db/skills'
@@ -54,10 +55,10 @@ const getCachedSkillBySlug = cache(async (slug: string) =>
 const getCachedSkillDetailSupport = cache(
   async (skillId: string, category: string, slug: string) => {
     if (skillId.startsWith('snapshot-')) {
-      return { relatedSkills: [], eventStats: null, approvedClaim: null }
+      return { relatedSkills: [], eventStats: null, outcomeStats: null, approvedClaim: null }
     }
 
-    const [relatedSkills, eventStats, approvedClaim] = await Promise.all([
+    const [relatedSkills, eventStats, outcomeStats, approvedClaim] = await Promise.all([
       withTimeout(
         getRelatedSkills(skillId, category, 4),
         SKILL_DETAIL_SUPPORT_TIMEOUT_MS,
@@ -69,13 +70,18 @@ const getCachedSkillDetailSupport = cache(
         'skill event stats query'
       ).catch(() => null),
       withTimeout(
+        getAgentOutcomeStats(slug),
+        SKILL_DETAIL_SUPPORT_TIMEOUT_MS,
+        'skill outcome stats query'
+      ).catch(() => null),
+      withTimeout(
         getApprovedClaimBySkillSlug(slug),
         SKILL_DETAIL_SUPPORT_TIMEOUT_MS,
         'skill claim query'
       ).catch(() => null),
     ])
 
-    return { relatedSkills, eventStats, approvedClaim }
+    return { relatedSkills, eventStats, outcomeStats, approvedClaim }
   }
 )
 
@@ -218,7 +224,7 @@ export default async function SkillDetailPage({
   const skill = dbSkill ? convertSkillRecordToManifest(dbSkill) : null
   if (!skill) notFound()
 
-  const { relatedSkills, eventStats, approvedClaim } =
+  const { relatedSkills, eventStats, outcomeStats, approvedClaim } =
     await getCachedSkillDetailSupport(skill.id, skill.category, skill.slug)
   const aiScore = dbSkill?.ai_review_score?.score as number | undefined
   const matchedUseCases = dbSkill ? getUseCasesForSkill(dbSkill, 3) : []
@@ -229,7 +235,7 @@ export default async function SkillDetailPage({
     ? getSkillDecisionProfile(dbSkill, eventStats)
     : null
   const trustProfile = dbSkill
-    ? getSkillTrustProfile(dbSkill, Boolean(approvedClaim), eventStats)
+    ? getSkillTrustProfile(dbSkill, Boolean(approvedClaim), eventStats, outcomeStats)
     : null
   const supplyProfile = dbSkill
     ? getSkillSupplyProfile(dbSkill, eventStats)
@@ -277,6 +283,7 @@ export default async function SkillDetailPage({
   const agentReadableMetadata = dbSkill
     ? buildAgentReadableSkillMetadata(dbSkill, {
         eventStats,
+        outcomeStats,
         approvedClaim: Boolean(approvedClaim),
         alternatives: relatedSkills,
         task: `Use ${skill.name} for an agent workflow`,
@@ -1815,6 +1822,58 @@ export default async function SkillDetailPage({
                   </Link>
                 </div>
               )}
+
+              <div className="overflow-hidden rounded-[8px] border border-border bg-card shadow-[0_14px_36px_rgba(22,20,16,0.04)]">
+                <div className="border-b border-border bg-[#fbfaf7] p-5">
+                  <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-secondary">
+                    Agent outcome signals
+                  </p>
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="font-display text-xl font-semibold leading-tight">
+                        Real use feedback
+                      </h3>
+                      <p className="mt-1 text-xs leading-relaxed text-secondary">
+                        Reported by agents after resolve, review, and install.
+                      </p>
+                    </div>
+                    <div className="font-mono text-2xl font-semibold">
+                      {outcomeStats?.success_rate !== null && outcomeStats?.success_rate !== undefined
+                        ? `${Math.round(Number(outcomeStats.success_rate))}%`
+                        : '—'}
+                    </div>
+                  </div>
+                </div>
+                <dl className="grid grid-cols-2 gap-px bg-border text-xs">
+                  <div className="bg-background p-4">
+                    <dt className="text-secondary">Outcomes</dt>
+                    <dd className="mt-1 font-mono text-lg">
+                      {formatNumber(outcomeStats?.total_outcomes || 0)}
+                    </dd>
+                  </div>
+                  <div className="bg-background p-4">
+                    <dt className="text-secondary">Installs</dt>
+                    <dd className="mt-1 font-mono text-lg">
+                      {formatNumber(outcomeStats?.install_attempts || 0)}
+                    </dd>
+                  </div>
+                  <div className="bg-background p-4">
+                    <dt className="text-secondary">Risk blocked</dt>
+                    <dd className="mt-1 font-mono text-lg">
+                      {formatNumber(outcomeStats?.risk_blocked_outcomes || 0)}
+                    </dd>
+                  </div>
+                  <div className="bg-background p-4">
+                    <dt className="text-secondary">Setup needed</dt>
+                    <dd className="mt-1 font-mono text-lg">
+                      {formatNumber(outcomeStats?.setup_required_outcomes || 0)}
+                    </dd>
+                  </div>
+                </dl>
+                <p className="p-5 text-xs leading-relaxed text-secondary">
+                  {trustProfile?.outcomeEvidence.label || 'No agent outcome data yet. The first agent run can report success, setup needs, or risk blocks through /api/agent/outcome.'}
+                </p>
+              </div>
 
               {/* Install card */}
               <div className="rounded-[8px] border border-border bg-card p-5 shadow-[0_14px_36px_rgba(22,20,16,0.04)]">

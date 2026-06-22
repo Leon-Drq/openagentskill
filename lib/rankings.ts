@@ -1,4 +1,4 @@
-import type { SkillAgentStats, SkillRecord } from '@/lib/db/skills'
+import type { SkillAgentStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { dedupeRankedSkills } from '@/lib/registry'
 import { USE_CASES, getUseCaseBySlug, scoreSkillForUseCase } from '@/lib/use-cases'
@@ -149,7 +149,7 @@ function rankByUseCase(
 export function rankSkillsForDefinition(
   skills: SkillRecord[],
   definition: RankingDefinition,
-  statsMap: Record<string, SkillAgentStats> = {},
+  statsMap: Record<string, SkillAgentStats | SkillOutcomeStats> = {},
   limit = 24
 ): RankedSkill[] {
   if (definition.kind === 'use-case') {
@@ -163,12 +163,20 @@ export function rankSkillsForDefinition(
     .map((skill) => {
       const quality = getSkillQualityProfile(skill, statsMap[skill.slug] || null)
       const stats = statsMap[skill.slug]
+      const totalUsage = stats
+        ? 'total_outcomes' in stats
+          ? stats.total_outcomes
+          : stats.total_calls
+        : 0
+      const uniqueAgents = stats && 'unique_agents' in stats ? stats.unique_agents : 0
+      const installAttempts = stats && 'install_attempts' in stats ? stats.install_attempts : 0
       const lastPushedScore = freshnessScore(skill.github_last_pushed_at || skill.updated_at)
       const createdAt = dateValue(skill.created_at)
       const isNewThisWeek = createdAt >= weekAgo
       const usageScore =
-        (stats?.total_calls || 0) * 2 +
-        (stats?.unique_agents || 0) * 5 +
+        totalUsage * 2 +
+        uniqueAgents * 5 +
+        installAttempts * 4 +
         Math.max(0, stats?.success_rate || 0)
 
       switch (definition.kind) {
@@ -197,9 +205,9 @@ export function rankSkillsForDefinition(
           return {
             skill,
             score: usageScore + quality.score / 10,
-            badge: stats?.total_calls ? `${formatCompactNumber(stats.total_calls)} calls` : 'Ready for feedback',
-            reason: stats?.total_calls
-              ? `${formatCompactNumber(stats.total_calls)} agent calls, ${stats.success_rate ?? 'unknown'}% success, and ${quality.label.toLowerCase()} quality.`
+            badge: totalUsage ? `${formatCompactNumber(totalUsage)} outcomes` : 'Ready for feedback',
+            reason: totalUsage
+              ? `${formatCompactNumber(totalUsage)} agent outcomes, ${stats?.success_rate ?? 'unknown'}% success, and ${quality.label.toLowerCase()} quality.`
               : `No public usage yet, but ${quality.label.toLowerCase()} quality makes it a good candidate to test.`,
           }
         case 'highest-quality':

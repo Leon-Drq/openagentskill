@@ -67,7 +67,7 @@ export async function GET() {
         },
         '/api/agent/resolve': {
           get: {
-            summary: 'Resolve a task into recommendation.best_skill, alternatives, Trust Score v3, safety gate, install plan, and agent_handoff',
+            summary: 'Resolve a task into recommendation.best_skill, alternatives, Trust Score v4, safety gate, install plan, feedback contract, and agent_handoff',
             parameters: [
               { name: 'task', in: 'query', required: true, schema: { type: 'string' } },
               { name: 'agent', in: 'query', required: false, schema: { type: 'string', enum: ['auto', 'codex', 'claude-code', 'cursor', 'openagentskill-cli'] } },
@@ -78,7 +78,7 @@ export async function GET() {
             responses: {
               '200': {
                 description:
-                  'Resolved skill plan. Read recommendation.agent_contract and agent_handoff for the stable machine contract, plus recommendation.best_skill, recommendation.install, recommendation.why_recommended, recommendation.trust_score_v3, recommendation.risk, recommendation.machine_metadata, and recommendation.alternatives. recommendation.trust_score_v2 remains as a backwards-compatible alias.',
+                  'Resolved skill plan. Read recommendation.agent_contract, feedback, and agent_handoff for the stable machine contract, plus recommendation.best_skill, recommendation.install, recommendation.why_recommended, recommendation.trust_score_v4, recommendation.risk, recommendation.machine_metadata, and recommendation.alternatives. recommendation.trust_score_v3 remains as a backwards-compatible alias.',
               },
             },
           },
@@ -107,6 +107,46 @@ export async function GET() {
                   'Resolved skill plan with the same recommendation.agent_contract, agent_handoff, and recommendation.* fields returned by GET.',
               },
             },
+          },
+        },
+        '/api/agent/outcome': {
+          get: {
+            summary: 'Read aggregate agent outcome statistics for skill adoption and success signals',
+            parameters: [
+              { name: 'skill_slug', in: 'query', required: false, schema: { type: 'string' } },
+            ],
+            responses: { '200': { description: 'Agent outcome aggregate stats' } },
+          },
+          post: {
+            summary: 'Report the result of an agent trying a resolved skill',
+            requestBody: {
+              required: true,
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    required: ['event_id', 'skill_slug', 'task'],
+                    properties: {
+                      event_id: { type: 'string' },
+                      skill_slug: { type: 'string' },
+                      task: { type: 'string' },
+                      agent: { type: 'string' },
+                      outcome: {
+                        type: 'string',
+                        enum: ['success', 'failed', 'not_relevant', 'blocked_by_risk', 'setup_required'],
+                      },
+                      install_used: { type: 'boolean' },
+                      risk_blocked: { type: 'boolean' },
+                      setup_required: { type: 'boolean' },
+                      time_to_useful_ms: { type: 'number' },
+                      notes: { type: 'string' },
+                      metadata: { type: 'object' },
+                    },
+                  },
+                },
+              },
+            },
+            responses: { '200': { description: 'Outcome recorded through a controlled RPC' } },
           },
         },
         '/api/agent/integration-kit': {

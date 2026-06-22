@@ -1,10 +1,18 @@
 import { unstable_cache } from 'next/cache'
+import { buildResolveFeedback } from '@/lib/agent-outcomes'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { buildAgentHandoffTemplates } from '@/lib/agent-integration-kit'
 import { getAgentSafetyProfile, type AgentResolveConstraints, type AgentSafetyProfile } from '@/lib/agent-safety'
 import { buildAgentReadableSkillMetadata, type AgentReadableSkillMetadata } from '@/lib/agent-readable'
 import { getSkillDecisionProfile } from '@/lib/decision'
-import { getAllSkills, getSkillEventStatsMap, type SkillEventStats, type SkillRecord } from '@/lib/db/skills'
+import {
+  getAgentOutcomeStatsMap,
+  getAllSkills,
+  getSkillEventStatsMap,
+  type SkillEventStats,
+  type SkillOutcomeStats,
+  type SkillRecord,
+} from '@/lib/db/skills'
 import { getPrimaryInstallCommand, getSkillInstallTargets, type InstallTargetId } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
 import { dedupeRankedSkills, getRecommendationReasons, rankSkillsForQuery } from '@/lib/registry'
@@ -248,6 +256,12 @@ const getResolveEventStatsMap = unstable_cache(
   { revalidate: RESOLVE_CACHE_REVALIDATE }
 )
 
+const getResolveOutcomeStatsMap = unstable_cache(
+  async () => getAgentOutcomeStatsMap().catch((): Record<string, SkillOutcomeStats> => ({})),
+  ['agent-resolve-outcome-stats-v1'],
+  { revalidate: RESOLVE_CACHE_REVALIDATE }
+)
+
 export interface AgentResolveInput {
   task: string
   agent?: InstallTargetId | 'auto' | string
@@ -446,10 +460,25 @@ function buildResolverRecommendation(
     why_recommended: [
       ...selected.recommendation_reasons,
       selected.decision.headline,
-      `${selected.trust.score}/100 OpenAgentSkill Trust Score v3`,
+      `${selected.trust.score}/100 OpenAgentSkill Trust Score v4`,
       `${selected.audit.audit_score}/100 audit score`,
       `${selected.safety.score}/100 safety score`,
     ].filter(Boolean).slice(0, 8),
+    trust_score_v4: {
+      score: selected.trust.score,
+      tier: selected.trust.tier,
+      label: selected.trust.label,
+      version: selected.trust.version,
+      install_policy: selected.trust.installReadiness.policy,
+      evidence: selected.trust.evidence,
+      agent_compatibility: selected.trust.agentCompatibility,
+      risk: selected.trust.riskSummary,
+      outcomes: selected.trust.outcomeEvidence,
+      auto_install: selected.trust.autoInstall,
+      best_for: selected.trust.bestFor,
+      do_not_use_for: selected.trust.doNotUseFor,
+      known_risks: selected.trust.knownRisks,
+    },
     trust_score_v3: {
       score: selected.trust.score,
       tier: selected.trust.tier,
@@ -529,7 +558,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     needs_install_command: input.constraints?.needs_install_command ?? true,
     min_stars: Number(input.constraints?.min_stars || 0),
   }
-  const [skills, eventStatsMap] = input.live
+  const [skills, eventStatsMap, outcomeStatsMap] = input.live
     ? await Promise.all([
         withTimeout(getResolveCandidatePool(), RESOLVE_QUERY_TIMEOUT_MS, 'agent resolve candidate query')
           .catch((error) => {
@@ -538,18 +567,21 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           }),
         withTimeout(getResolveEventStatsMap(), RESOLVE_QUERY_TIMEOUT_MS, 'agent resolve stats query')
           .catch((): Record<string, SkillEventStats> => ({})),
+        withTimeout(getResolveOutcomeStatsMap(), RESOLVE_QUERY_TIMEOUT_MS, 'agent resolve outcome query')
+          .catch((): Record<string, SkillOutcomeStats> => ({})),
       ])
-    : [RESOLVE_FALLBACK_SKILLS, {} as Record<string, SkillEventStats>]
+    : [RESOLVE_FALLBACK_SKILLS, {} as Record<string, SkillEventStats>, {} as Record<string, SkillOutcomeStats>]
 
-  const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, task))
+  const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, task, outcomeStatsMap))
     .filter(({ skill }) => candidateAllowed(skill, constraints))
     .slice(0, Math.max(limit * 3, 10))
 
   const candidates = ranked.map(({ skill, score }, index) => {
     const eventStats = eventStatsMap[skill.slug] || null
+    const outcomeStats = outcomeStatsMap[skill.slug] || null
     const audit = buildSkillAudit(skill, eventStats)
     const safety = getAgentSafetyProfile(skill, audit, constraints)
-    const trust = getSkillTrustProfile(skill, false, eventStats)
+    const trust = getSkillTrustProfile(skill, false, eventStats, outcomeStats)
     const decision = getSkillDecisionProfile(skill, eventStats)
     const useCases = getUseCasesForSkill(skill, 3)
     const supplyProfile = getSkillSupplyProfile(skill, eventStats)
@@ -599,6 +631,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
       install_plan: buildInstallPlan(skill, agent),
       machine_metadata: buildAgentReadableSkillMetadata(skill, {
         eventStats,
+        outcomeStats,
         task,
       }),
       use_cases: useCases.map((useCase) => ({
@@ -634,6 +667,13 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
   const blockedCandidates = candidates
     .filter((candidate) => candidate.safety.blocked)
     .slice(0, 5)
+  const feedback = buildResolveFeedback({
+    task,
+    agent,
+    selectedSlug: selected?.skill.slug || null,
+    selectedName: selected?.skill.name || null,
+    alternativeSlugs: alternatives.slice(0, 5).map((candidate) => candidate.skill.slug),
+  })
   const agentDecision = selected
     ? {
         input_task: task,
@@ -670,6 +710,11 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           auto_install_policy: selected.safety.safety_tier.auto_install_policy,
           action: selected.safety.safety_tier.recommended_action,
         },
+        feedback: {
+          event_id: feedback.event_id,
+          outcome_api: feedback.outcome_api,
+          cli_example: feedback.cli_example,
+        },
         agent_next_steps: [
           'Read the audit URL before installing.',
           selected.safety.auto_install_allowed
@@ -678,7 +723,8 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
               ? 'Do not install automatically. Pick a safer alternative or ask for explicit human review.'
               : 'Ask for human approval before installing.',
           `Use install command: ${selected.install_plan.command}`,
-          'After installation, run one narrow task and report output, warnings, and files touched.',
+          `After one narrow task, report the outcome with: ${feedback.cli_example}`,
+          'Summarize output, warnings, files touched, and whether setup or human review was required.',
         ],
       }
     : null
@@ -740,6 +786,13 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
             method: 'GET',
             url: selected.urls.audit,
           },
+          {
+            step: 6,
+            label: 'Report outcome',
+            method: 'POST',
+            url: feedback.outcome_api,
+            body: feedback.json_example,
+          },
         ],
         review_checklist: [
           `Safety tier: ${selected.safety.safety_tier.label}`,
@@ -762,6 +815,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           install_command: 'command or agent prompt used',
           risk_summary: 'audit, trust, and policy notes',
           next_step: 'what the agent will do after install',
+          outcome_event_id: feedback.event_id,
         },
       }
     : null
@@ -817,6 +871,12 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           risk_summary: 'audit, trust, and policy notes',
           next_action: 'install, ask for approval, or choose an alternative',
         },
+        feedback: {
+          event_id: feedback.event_id,
+          outcome_api: feedback.outcome_api,
+          cli_example: feedback.cli_example,
+          expected_outcomes: feedback.expected_outcomes,
+        },
         blocked_actions: [
           'Do not install when safety_gate.blocked is true.',
           'Do not install when the audit or eval reports unacceptable workspace risk.',
@@ -831,6 +891,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     task,
     agent,
     constraints,
+    feedback,
     recommendation,
     selected,
     alternatives,

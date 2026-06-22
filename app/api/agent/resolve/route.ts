@@ -32,7 +32,7 @@ URL: ${payload.recommendation.best_skill.url}
 Repository: ${payload.recommendation.best_skill.repository}
 Install: ${payload.recommendation.install.command}
 Install policy: ${payload.recommendation.install.policy}
-Trust Score v3: ${payload.recommendation.trust_score_v3.score}/100 ${payload.recommendation.trust_score_v3.label}
+Trust Score v4: ${payload.recommendation.trust_score_v4.score}/100 ${payload.recommendation.trust_score_v4.label}
 Risk: ${payload.recommendation.risk.level}; ${payload.recommendation.risk.safety_tier}; ${payload.recommendation.risk.trust}
 Why:
 ${payload.recommendation.why_recommended.map((item) => `- ${item}`).join('\n')}
@@ -46,6 +46,11 @@ Agent contract:
 - Audit URL: ${payload.recommendation.agent_contract.audit_url}
 - Do not use when:
 ${payload.recommendation.agent_contract.do_not_use_when.slice(0, 4).map((item) => `  - ${item}`).join('\n')}` : 'No recommendation generated'}
+
+Feedback:
+Event ID: ${payload.feedback.event_id}
+Outcome API: ${payload.feedback.outcome_api}
+CLI: ${payload.feedback.cli_example}
 
 Selected:
 ${selected ? `${selected.skill.name} (${selected.skill.slug})

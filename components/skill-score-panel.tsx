@@ -65,6 +65,7 @@ export function SkillScorePanel({
           label: 'Permission surface',
           value: trust.evidence.permissionSurface,
         },
+        { label: 'Agent outcomes', value: trust.evidence.agentOutcomes },
         { label: 'Docs', value: trust.evidence.documentation },
       ]
     : []
@@ -125,7 +126,7 @@ export function SkillScorePanel({
           <div className="grid gap-0 lg:grid-cols-[0.86fr_1.14fr]">
             <div className="border-b border-border p-5 sm:p-6 lg:border-b-0 lg:border-r">
               <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">
-                Trust Score v3
+                Trust Score v4
               </p>
               <h3 className="font-display text-2xl font-semibold leading-tight">
                 {trust.installReadiness.label}

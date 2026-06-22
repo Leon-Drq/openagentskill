@@ -180,6 +180,20 @@ export interface SkillAgentStats {
   last_called_at: string | null
 }
 
+export interface SkillOutcomeStats {
+  skill_slug: string
+  total_outcomes: number
+  successful_outcomes: number
+  failed_outcomes: number
+  not_relevant_outcomes: number
+  risk_blocked_outcomes: number
+  setup_required_outcomes: number
+  install_attempts: number
+  success_rate: number | null
+  last_outcome_at: string | null
+  updated_at: string
+}
+
 export interface SkillEventStats {
   skill_slug: string
   total_events: number
@@ -266,6 +280,55 @@ export async function getSkillStats(): Promise<Record<string, SkillAgentStats>> 
     }
   }
   return map
+}
+
+export async function getAgentOutcomeStatsMap(): Promise<Record<string, SkillOutcomeStats>> {
+  const supabase = createPublicClient()
+  const { data, error } = await supabase.from('agent_outcome_stats').select('*')
+  if (error || !data) return {}
+
+  const map: Record<string, SkillOutcomeStats> = {}
+  for (const row of data as Array<Record<string, any>>) {
+    map[row.skill_slug] = {
+      skill_slug: row.skill_slug,
+      total_outcomes: Number(row.total_outcomes || 0),
+      successful_outcomes: Number(row.successful_outcomes || 0),
+      failed_outcomes: Number(row.failed_outcomes || 0),
+      not_relevant_outcomes: Number(row.not_relevant_outcomes || 0),
+      risk_blocked_outcomes: Number(row.risk_blocked_outcomes || 0),
+      setup_required_outcomes: Number(row.setup_required_outcomes || 0),
+      install_attempts: Number(row.install_attempts || 0),
+      success_rate: row.success_rate === null || row.success_rate === undefined ? null : Number(row.success_rate),
+      last_outcome_at: row.last_outcome_at || null,
+      updated_at: row.updated_at,
+    }
+  }
+  return map
+}
+
+export async function getAgentOutcomeStats(skillSlug: string): Promise<SkillOutcomeStats | null> {
+  const supabase = createPublicClient()
+  const { data, error } = await supabase
+    .from('agent_outcome_stats')
+    .select('*')
+    .eq('skill_slug', skillSlug)
+    .maybeSingle()
+
+  if (error || !data) return null
+  const row = data as Record<string, any>
+  return {
+    skill_slug: row.skill_slug,
+    total_outcomes: Number(row.total_outcomes || 0),
+    successful_outcomes: Number(row.successful_outcomes || 0),
+    failed_outcomes: Number(row.failed_outcomes || 0),
+    not_relevant_outcomes: Number(row.not_relevant_outcomes || 0),
+    risk_blocked_outcomes: Number(row.risk_blocked_outcomes || 0),
+    setup_required_outcomes: Number(row.setup_required_outcomes || 0),
+    install_attempts: Number(row.install_attempts || 0),
+    success_rate: row.success_rate === null || row.success_rate === undefined ? null : Number(row.success_rate),
+    last_outcome_at: row.last_outcome_at || null,
+    updated_at: row.updated_at,
+  }
 }
 
 export async function getSkillEventStatsMap(): Promise<Record<string, SkillEventStats>> {

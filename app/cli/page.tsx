@@ -33,6 +33,12 @@ const commands = [
     command: 'openagentskill evals',
     copy: 'Runs the public recommendation benchmark so ranking changes can be checked before deployment.',
   },
+  {
+    label: 'Outcome',
+    title: 'Report whether the skill worked',
+    command: 'openagentskill outcome resolve_... --skill crawl4ai --task "scrape pricing pages" --agent codex --outcome success --install-used',
+    copy: 'Posts the result back to /api/agent/outcome so Trust Score v4 and rankings learn from real agent runs.',
+  },
 ]
 
 const contract = `{
@@ -85,7 +91,7 @@ export default function CliPage() {
       />
 
         <section className="min-w-0 border-b border-border">
-          <div className="mx-auto grid max-w-6xl gap-4 px-6 py-12 sm:py-14 lg:grid-cols-3">
+          <div className="mx-auto grid max-w-6xl gap-4 px-6 py-12 sm:py-14 md:grid-cols-2 xl:grid-cols-4">
             {commands.map((item) => (
               <article key={item.label} className="min-w-0 border border-border bg-card p-5">
                 <p className="font-mono text-xs uppercase text-secondary">{item.label}</p>
@@ -107,8 +113,8 @@ export default function CliPage() {
             </h2>
             <p className="mt-5 text-base leading-7 text-secondary">
               The important product surface is the decision object: selected skill, alternatives, policy result,
-              safety score, install plan, and benchmark link. Agents can call the same endpoint directly without
-              opening a browser.
+              safety score, install plan, benchmark link, and outcome event. Agents can call the same endpoint
+              directly without opening a browser, then report the result after one narrow run.
             </p>
           </div>
 

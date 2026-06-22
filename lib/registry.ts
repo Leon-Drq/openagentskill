@@ -1,7 +1,7 @@
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { buildAgentReadableSkillMetadata } from '@/lib/agent-readable'
-import type { SkillEventStats, SkillRecord } from '@/lib/db/skills'
+import type { SkillAgentStats, SkillEventStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
@@ -78,7 +78,40 @@ export function getSkillInstallCommand(skill: SkillRecord) {
   return skill.install_command || `npx skills add ${skill.github_repo}`
 }
 
-export function rankSkillsForQuery(skills: SkillRecord[], query: string) {
+type SkillRankingStats = SkillAgentStats | SkillOutcomeStats
+
+function getOutcomeUsageScore(stats: SkillRankingStats | null | undefined) {
+  if (!stats) return 0
+  const total =
+    'total_outcomes' in stats
+      ? Number(stats.total_outcomes || 0)
+      : Number(stats.total_calls || 0)
+  const successRate = stats.success_rate === null || stats.success_rate === undefined ? null : Number(stats.success_rate)
+  const riskBlocked =
+    'risk_blocked_outcomes' in stats ? Number(stats.risk_blocked_outcomes || 0) : 0
+  const setupRequired =
+    'setup_required_outcomes' in stats ? Number(stats.setup_required_outcomes || 0) : 0
+  const installAttempts =
+    'install_attempts' in stats ? Number(stats.install_attempts || 0) : 0
+
+  let score = Math.min(18, Math.log10(total + 1) * 9)
+  score += Math.min(8, Math.log10(installAttempts + 1) * 5)
+
+  if (total >= 3 && successRate !== null && Number.isFinite(successRate)) {
+    score += Math.max(-18, Math.min(16, (successRate - 65) / 4))
+  }
+
+  if (riskBlocked >= 2) score -= Math.min(14, riskBlocked * 2.5)
+  if (setupRequired >= 3) score -= Math.min(8, setupRequired * 1.5)
+
+  return score
+}
+
+export function rankSkillsForQuery(
+  skills: SkillRecord[],
+  query: string,
+  statsMap: Record<string, SkillRankingStats> = {}
+) {
   const normalizedQuery = query.trim().toLowerCase()
   const queryTokens = tokenize(query)
 
@@ -141,6 +174,7 @@ export function rankSkillsForQuery(skills: SkillRecord[], query: string) {
       score += Math.min(24, Number(skill.quality_score || 0) / 4)
       score += Math.min(22, Math.log10(Number(skill.github_stars || 0) + 1) * 5)
       score += Math.min(12, Math.log10(Number(skill.downloads || 0) + 1) * 3)
+      score += getOutcomeUsageScore(statsMap[skill.slug])
       if (skill.verified) score += 6
 
       return { skill, score: Math.round(score * 10) / 10 }

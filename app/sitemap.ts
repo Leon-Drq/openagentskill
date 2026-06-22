@@ -41,6 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/openagentskill`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/agent`, lastModified: now, changeFrequency: 'daily', priority: 0.93 },
     { url: `${baseUrl}/agent/integration-kit`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/evals/resolve`, lastModified: now, changeFrequency: 'daily', priority: 0.88 },
     { url: `${baseUrl}/agent-skills-directory`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/agent-skills-registry`, lastModified: now, changeFrequency: 'weekly', priority: 0.92 },
     { url: `${baseUrl}/best`, lastModified: now, changeFrequency: 'daily', priority: 0.92 },

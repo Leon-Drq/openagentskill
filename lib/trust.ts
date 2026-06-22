@@ -1,4 +1,4 @@
-import type { SkillEventStats, SkillRecord } from '@/lib/db/skills'
+import type { SkillAgentStats, SkillEventStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
 import { formatCompactNumber, getFreshnessDays } from '@/lib/quality'
 
 export type SkillTrustTier = 'production' | 'strong' | 'review' | 'risk'
@@ -32,6 +32,7 @@ export interface SkillTrustEvidence {
   installSafety: string
   permissionSurface: string
   documentation: string
+  agentOutcomes: string
 }
 
 export interface SkillTrustInstallReadiness {
@@ -48,8 +49,26 @@ export interface SkillTrustRiskSummary {
   notes: string[]
 }
 
+export interface SkillTrustOutcomeEvidence {
+  total: number
+  successes: number
+  successRate: number | null
+  installAttempts: number
+  riskBlocked: number
+  setupRequired: number
+  lastOutcomeAt: string | null
+  label: string
+}
+
+export interface SkillTrustAutoInstall {
+  allowed: boolean
+  sandboxRequired: boolean
+  policy: SkillTrustInstallPolicy
+  reason: string
+}
+
 export interface SkillTrustProfile {
-  version: 'trust-score-v3'
+  version: 'trust-score-v4'
   score: number
   tier: SkillTrustTier
   label: string
@@ -63,6 +82,11 @@ export interface SkillTrustProfile {
   installReadiness: SkillTrustInstallReadiness
   agentCompatibility: string[]
   riskSummary: SkillTrustRiskSummary
+  outcomeEvidence: SkillTrustOutcomeEvidence
+  autoInstall: SkillTrustAutoInstall
+  bestFor: string[]
+  doNotUseFor: string[]
+  knownRisks: string[]
 }
 
 function clampScore(score: number) {
@@ -155,6 +179,110 @@ function getRiskSummary(score: number, warnings: string[]): SkillTrustRiskSummar
     label: 'High review required',
     notes: warnings.length ? warnings.slice(0, 5) : ['Trust signals are too sparse for automatic installation'],
   }
+}
+
+type TrustOutcomeStats = SkillOutcomeStats | SkillAgentStats | null | undefined
+
+function getOutcomeEvidence(outcomeStats: TrustOutcomeStats): SkillTrustOutcomeEvidence {
+  if (!outcomeStats) {
+    return {
+      total: 0,
+      successes: 0,
+      successRate: null,
+      installAttempts: 0,
+      riskBlocked: 0,
+      setupRequired: 0,
+      lastOutcomeAt: null,
+      label: 'No agent outcome data yet',
+    }
+  }
+
+  if ('total_outcomes' in outcomeStats) {
+    const successRate =
+      outcomeStats.success_rate === null || outcomeStats.success_rate === undefined
+        ? null
+        : Number(outcomeStats.success_rate)
+    return {
+      total: Number(outcomeStats.total_outcomes || 0),
+      successes: Number(outcomeStats.successful_outcomes || 0),
+      successRate,
+      installAttempts: Number(outcomeStats.install_attempts || 0),
+      riskBlocked: Number(outcomeStats.risk_blocked_outcomes || 0),
+      setupRequired: Number(outcomeStats.setup_required_outcomes || 0),
+      lastOutcomeAt: outcomeStats.last_outcome_at || null,
+      label:
+        Number(outcomeStats.total_outcomes || 0) > 0
+          ? `${successRate ?? 'unknown'}% success from ${formatCompactNumber(outcomeStats.total_outcomes)} agent outcomes`
+          : 'No agent outcome data yet',
+    }
+  }
+
+  const successRate =
+    outcomeStats.success_rate === null || outcomeStats.success_rate === undefined
+      ? null
+      : Number(outcomeStats.success_rate)
+  return {
+    total: Number(outcomeStats.total_calls || 0),
+    successes: Number(outcomeStats.success_calls || 0),
+    successRate,
+    installAttempts: 0,
+    riskBlocked: 0,
+    setupRequired: 0,
+    lastOutcomeAt: outcomeStats.last_called_at || null,
+    label:
+      Number(outcomeStats.total_calls || 0) > 0
+        ? `${successRate ?? 'unknown'}% success from ${formatCompactNumber(outcomeStats.total_calls)} agent calls`
+        : 'No agent outcome data yet',
+  }
+}
+
+function scoreAgentOutcomes(evidence: SkillTrustOutcomeEvidence) {
+  if (evidence.total <= 0) return 58
+  let score = 48 + Math.min(20, Math.log10(evidence.total + 1) * 12)
+  if (evidence.successRate !== null && Number.isFinite(evidence.successRate)) {
+    score += (evidence.successRate - 60) * 0.45
+  }
+  score += Math.min(8, Math.log10(evidence.installAttempts + 1) * 5)
+  score -= Math.min(18, evidence.riskBlocked * 3)
+  score -= Math.min(12, evidence.setupRequired * 2)
+  return clampScore(score)
+}
+
+function getBestFor(skill: SkillRecord) {
+  const base = [
+    skill.category,
+    ...(skill.tags || []),
+    ...(skill.frameworks || []),
+  ]
+    .filter(Boolean)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .filter((item, index, items) => items.findIndex((candidate) => candidate.toLowerCase() === item.toLowerCase()) === index)
+
+  if (base.length > 0) return base.slice(0, 6)
+  return ['Reusable AI agent workflow']
+}
+
+function getDoNotUseFor(skill: SkillRecord, policy: SkillTrustInstallPolicy, evidence: SkillTrustOutcomeEvidence) {
+  const items = [
+    'Production credentials, payments, or irreversible account changes without explicit human review',
+    'Sensitive private data before reviewing repository code, license, and permission surface',
+  ]
+
+  if (policy !== 'agent_install_candidate') {
+    items.push('Automatic installation in a production workspace')
+  }
+  if (!hasKnownLicense(skill)) {
+    items.push('Commercial reuse before clarifying license terms')
+  }
+  if (evidence.riskBlocked > 0) {
+    items.push('Workflows similar to prior runs blocked by risk signals')
+  }
+  if (evidence.setupRequired > 0) {
+    items.push('Zero-setup agent runs without checking required keys, data, or configuration')
+  }
+
+  return [...new Set(items)].slice(0, 6)
 }
 
 function getTier(score: number): Pick<SkillTrustProfile, 'tier' | 'label' | 'summary' | 'recommendedAction'> {
@@ -408,7 +536,8 @@ function buildTrustDimensions(
   skill: SkillRecord,
   freshnessDays: number | null,
   stars: number,
-  qualityScore: number
+  qualityScore: number,
+  outcomeEvidence: SkillTrustOutcomeEvidence
 ): SkillTrustDimension[] {
   const adoptionScore = scoreAdoption(stars)
   const repoActivityScore = clampScore(scoreAdoption(stars) * 0.62 + scoreForks(Number(skill.github_forks || 0)) * 0.38)
@@ -425,6 +554,7 @@ function buildTrustDimensions(
       : skill.ai_review_approved
         ? 66
         : 46
+  const agentOutcomeScore = scoreAgentOutcomes(outcomeEvidence)
 
   return [
     {
@@ -518,19 +648,29 @@ function buildTrustDimensions(
       status: statusForScore(reviewScore),
       detail: skill.ai_review_approved ? 'AI review data available' : 'AI review approval is missing',
     },
+    {
+      id: 'agent_outcomes',
+      label: 'Real agent outcomes',
+      score: agentOutcomeScore,
+      weight: 0.08,
+      status: outcomeEvidence.total > 0 ? statusForScore(agentOutcomeScore) : 'info',
+      detail: outcomeEvidence.label,
+    },
   ]
 }
 
 export function getSkillTrustProfile(
   skill: SkillRecord,
   hasApprovedClaim = false,
-  eventStats?: SkillEventStats | null
+  eventStats?: SkillEventStats | null,
+  outcomeStats?: TrustOutcomeStats
 ): SkillTrustProfile {
   const freshnessDays = getFreshnessDays(skill.github_last_pushed_at || skill.updated_at)
   const stars = Number(skill.github_stars || 0)
   const qualityScore = Number(skill.quality_score || skill.ai_review_score?.score || 0)
   const issues = Array.isArray(skill.ai_review_issues) ? skill.ai_review_issues : []
-  const dimensions = buildTrustDimensions(skill, freshnessDays, stars, qualityScore)
+  const outcomeEvidence = getOutcomeEvidence(outcomeStats)
+  const dimensions = buildTrustDimensions(skill, freshnessDays, stars, qualityScore, outcomeEvidence)
   const checks: SkillTrustCheck[] = []
   const strengths: string[] = []
   const warnings: string[] = []
@@ -596,6 +736,22 @@ export function getSkillTrustProfile(
     }
   }
 
+  if (outcomeEvidence.total > 0) {
+    const outcomeBoost =
+      outcomeEvidence.successRate !== null && outcomeEvidence.successRate >= 80
+        ? Math.min(5, Math.floor(outcomeEvidence.total / 2))
+        : 0
+    score += outcomeBoost
+    strengths.push(`Agent outcome feedback available: ${outcomeEvidence.label}`)
+
+    if (outcomeEvidence.successRate !== null && outcomeEvidence.successRate < 55 && outcomeEvidence.total >= 3) {
+      score -= 6
+      warnings.push(`Low reported agent success rate: ${outcomeEvidence.successRate}%`)
+    }
+    if (outcomeEvidence.riskBlocked > 0) warnings.push(`${outcomeEvidence.riskBlocked} agent outcome(s) blocked by risk`)
+    if (outcomeEvidence.setupRequired > 0) warnings.push(`${outcomeEvidence.setupRequired} agent outcome(s) needed setup`)
+  }
+
   for (const dimension of dimensions) {
     addCheck(checks, dimension.status, dimension.label, dimension.detail)
   }
@@ -617,6 +773,12 @@ export function getSkillTrustProfile(
       ? `${formatCompactNumber(eventStats.views || 0)} views, ${formatCompactNumber(eventStats.install_copies || 0)} install copies`
       : 'No local usage activity yet'
   )
+  addCheck(
+    checks,
+    outcomeEvidence.total > 0 ? statusForScore(scoreAgentOutcomes(outcomeEvidence)) : 'info',
+    'Agent outcomes',
+    outcomeEvidence.label
+  )
 
   const finalScore = clampScore(score)
   const tier = getTier(finalScore)
@@ -627,9 +789,10 @@ export function getSkillTrustProfile(
   const documentationDimension = dimensions.find((dimension) => dimension.id === 'documentation')
   const installCommand = getInstallCommand(skill)
   const policy = getInstallPolicy(finalScore, hasInstallPath(skill), hasRepository(skill), hasKnownLicense(skill))
+  const autoInstallAllowed = policy === 'agent_install_candidate' && outcomeEvidence.riskBlocked === 0
 
   return {
-    version: 'trust-score-v3',
+    version: 'trust-score-v4',
     score: finalScore,
     ...tier,
     dimensions,
@@ -646,6 +809,7 @@ export function getSkillTrustProfile(
       installSafety: dimensions.find((dimension) => dimension.id === 'install_safety')?.detail || 'Install command safety unavailable',
       permissionSurface: dimensions.find((dimension) => dimension.id === 'permission_surface')?.detail || 'Permission surface unavailable',
       documentation: getDocumentationLabel(documentationDimension?.score || 0),
+      agentOutcomes: outcomeEvidence.label,
     },
     installReadiness: {
       ready: hasInstallPath(skill),
@@ -661,5 +825,17 @@ export function getSkillTrustProfile(
     },
     agentCompatibility: getAgentCompatibility(skill),
     riskSummary: getRiskSummary(finalScore, finalWarnings),
+    outcomeEvidence,
+    autoInstall: {
+      allowed: autoInstallAllowed,
+      sandboxRequired: policy !== 'agent_install_candidate' || outcomeEvidence.total === 0,
+      policy,
+      reason: autoInstallAllowed
+        ? 'Trust Score v4 allows sandbox-first agent installation after normal workspace review.'
+        : 'Human review or sandbox validation is required before automatic installation.',
+    },
+    bestFor: getBestFor(skill),
+    doNotUseFor: getDoNotUseFor(skill, policy, outcomeEvidence),
+    knownRisks: finalWarnings.slice(0, 8),
   }
 }

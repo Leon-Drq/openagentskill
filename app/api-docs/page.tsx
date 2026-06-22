@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import Link from 'next/link'
 import { MarketingHero, MarketingPageShell } from '@/components/marketing-page'
 
 export const metadata: Metadata = {
@@ -82,6 +83,7 @@ export default function APIDocsPage() {
               { method: 'GET', path: '/api/agent/discovery' },
               { method: 'GET', path: '/api/agent/recommend' },
               { method: 'GET', path: '/api/agent/evals' },
+              { method: 'POST', path: '/api/agent/outcome' },
               { method: 'GET', path: '/api/registry' },
               { method: 'GET', path: '/api/registry/search' },
               { method: 'GET', path: '/api/registry/recommend' },
@@ -194,7 +196,8 @@ export default function APIDocsPage() {
                   ['recommendation.best_skill', 'Selected skill with web, API, audit, and repository URLs'],
                   ['recommendation.install', 'Command, target, install API, review requirement, and auto-install policy'],
                   ['recommendation.why_recommended', 'Short explainable ranking reasons for agent logs'],
-                  ['recommendation.trust_score_v3', 'Trust Score v3 evidence, install safety, permission surface, install policy, compatibility, and risk summary'],
+                  ['recommendation.trust_score_v4', 'Trust Score v4 evidence, outcome signals, install safety, permission surface, install policy, compatibility, and risk summary'],
+                  ['feedback', 'Outcome event id, outcome API URL, expected outcomes, and ready CLI command for reporting adoption results'],
                   ['agent_handoff', 'Platform copy prompts, API sequence, review checklist, expected output contract, and blocked actions'],
                 ].map(([field, detail]) => (
                   <div key={field} className="min-w-0 bg-background p-3">
@@ -256,6 +259,50 @@ export default function APIDocsPage() {
               </p>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
                 <code>{'GET /api/agent/tasks?format=text'}</code>
+              </div>
+            </div>
+          </div>
+
+          <div className="border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'POST'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/agent/outcome'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Report what happened after an agent tried one resolved skill. These aggregate signals feed Trust Score v4, rankings, skill detail pages, and the public Resolve eval dashboard.'}
+              </p>
+              <div className="grid gap-px border border-border bg-border text-sm sm:mb-6 md:grid-cols-2">
+                {[
+                  ['success', 'The skill helped complete the task'],
+                  ['failed', 'The skill was attempted but did not work'],
+                  ['not_relevant', 'The selected skill did not fit the task'],
+                  ['blocked_by_risk', 'The agent stopped because risk was too high'],
+                  ['setup_required', 'The skill may work but required extra setup'],
+                  ['GET /api/agent/outcome?skill_slug=crawl4ai', 'Read aggregate success and install-attempt stats'],
+                ].map(([field, detail]) => (
+                  <div key={field} className="min-w-0 bg-background p-3">
+                    <code className="font-mono text-xs">{field}</code>
+                    <p className="mt-2 text-xs leading-relaxed text-secondary">{detail}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
+                <code>{`POST /api/agent/outcome
+{
+  "event_id": "resolve_...",
+  "skill_slug": "crawl4ai",
+  "task": "scrape pricing pages",
+  "agent": "codex",
+  "outcome": "success",
+  "install_used": true
+}`}</code>
               </div>
             </div>
           </div>
@@ -368,6 +415,13 @@ export default function APIDocsPage() {
                   <code>{'GET /api/agent/evals?slugs=crawl4ai,markitdown&task=parse+PDFs+into+markdown'}</code>
                 </div>
               </div>
+              <p className="mt-4 text-sm leading-relaxed text-secondary">
+                {'Use '}
+                <Link className="underline underline-offset-4" href="/evals/resolve">
+                  {'/evals/resolve'}
+                </Link>
+                {' for the public dashboard view of the same recommendation benchmark.'}
+              </p>
               <div className="mt-4 grid gap-px border border-border bg-border text-sm md:grid-cols-2">
                 {[
                   ['eval.status', 'passed, review, or failed'],

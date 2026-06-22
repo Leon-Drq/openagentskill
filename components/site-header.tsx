@@ -94,11 +94,10 @@ const agentItems: Array<{
     prefetch: false,
   },
   {
-    href: '/api/agent/evals',
+    href: '/evals/resolve',
     label: 'Evals',
     description: 'Recommendation benchmark',
     icon: Activity,
-    prefetch: false,
   },
 ]
 

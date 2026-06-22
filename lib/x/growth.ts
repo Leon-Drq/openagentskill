@@ -91,6 +91,7 @@ export interface XReplyDraftSyncResult {
 
 export interface XGrowthRunResult {
   queue: XQueueBuildResult
+  digest: XQueueBuildResult
   metrics: XMetricsSyncResult | { status: 'error'; error: string }
   replies: XReplyDraftSyncResult | { status: 'error'; error: string }
 }
@@ -233,6 +234,101 @@ async function enqueueQueueItem(
 
   if (error) throw new Error(`Failed to enqueue X content: ${error.message}`)
   return data as QueueRpcResult
+}
+
+function weekKey(date = new Date()) {
+  const firstDay = new Date(Date.UTC(date.getUTCFullYear(), 0, 1))
+  const dayOffset = Math.floor((date.getTime() - firstDay.getTime()) / 86_400_000)
+  const week = Math.ceil((dayOffset + firstDay.getUTCDay() + 1) / 7)
+  return `${date.getUTCFullYear()}-w${String(week).padStart(2, '0')}`
+}
+
+function buildWeeklyDigestPost(skills: SkillRecord[]) {
+  const picks = skills.slice(0, 3)
+  const lines = [
+    'OpenAgentSkill Weekly Radar',
+    '',
+    '3 skills worth shortlisting before your agent starts from scratch:',
+    '',
+    ...picks.map((skill, index) => `${index + 1}. ${truncate(skill.name, 38)} - ${compactNumber(Number(skill.github_stars || 0))} stars`),
+    '',
+    'Resolve -> Trust Score v4 -> install handoff -> outcome feedback.',
+    'https://www.openagentskill.com/evals/resolve',
+  ]
+
+  const text = lines.join('\n')
+  if (text.length <= 280) return text
+  return [
+    'OpenAgentSkill Weekly Radar',
+    '',
+    ...picks.map((skill, index) => `${index + 1}. ${truncate(skill.name, 32)}`),
+    '',
+    'Resolve, trust, install, feedback.',
+    'https://www.openagentskill.com/evals/resolve',
+  ].join('\n').slice(0, 280)
+}
+
+export async function enqueueXDigestPostQueue(
+  options: {
+    minStars?: number
+    candidatePool?: number
+    campaign?: string
+  } = {}
+): Promise<XQueueBuildResult> {
+  const serverSecret = getServerSecret()
+  const supabase = createPublicClient()
+  const minStars = Math.max(options.minStars || 5000, 500)
+  const candidatePool = Math.min(Math.max(options.candidatePool || 120, 20), 500)
+  const campaign = options.campaign || `weekly_radar_${weekKey()}`
+  const candidates = (await getAllSkills('quality', undefined, candidatePool))
+    .filter((skill) => isGoodXCandidate(skill, minStars))
+    .sort((a, b) => getQueuePriority(b) - getQueuePriority(a))
+    .slice(0, 8)
+
+  if (candidates.length < 3) {
+    return { status: 'skipped', queued: 0, skipped: 1, considered: candidates.length, results: [] }
+  }
+
+  const digestSlug = `weekly-radar-${weekKey()}`
+  const { data, error } = await supabase.rpc('enqueue_x_content_queue_item', {
+    p_server_secret: serverSecret,
+    p_item: {
+      skill_id: null,
+      skill_slug: digestSlug,
+      content_type: 'weekly_thread',
+      campaign,
+      status: 'queued',
+      priority: 120,
+      scheduled_for: new Date().toISOString(),
+      post_text: buildWeeklyDigestPost(candidates),
+      reply_text: candidates
+        .slice(0, 5)
+        .map((skill) => `${skill.name}: https://www.openagentskill.com/skills/${skill.slug}?ref=x-weekly`)
+        .join('\n'),
+      source: 'weekly_digest_generator',
+      metadata: {
+        generated_by: 'x_growth_os',
+        digest_type: 'weekly_radar',
+        skills: candidates.map((skill) => ({
+          slug: skill.slug,
+          name: skill.name,
+          stars: skill.github_stars,
+          quality_score: Number(skill.quality_score || 0),
+        })),
+      },
+    },
+  })
+
+  if (error) throw new Error(`Failed to enqueue X digest: ${error.message}`)
+  const result = data as QueueRpcResult
+
+  return {
+    status: result.status === 'queued' ? 'ready' : 'skipped',
+    queued: result.status === 'queued' ? 1 : 0,
+    skipped: result.status === 'queued' ? 0 : 1,
+    considered: candidates.length,
+    results: [result],
+  }
 }
 
 export async function enqueueXSkillPostQueue(
@@ -625,6 +721,13 @@ export async function syncXReplyDrafts(
 
 export async function runXGrowthOS(): Promise<XGrowthRunResult> {
   const queue = await enqueueXSkillPostQueue({ limit: 12 })
+  const digest = await enqueueXDigestPostQueue().catch((error) => ({
+    status: 'skipped' as const,
+    queued: 0,
+    skipped: 1,
+    considered: 0,
+    results: [{ status: 'skipped', reason: error instanceof Error ? error.message : 'Unknown digest error' }],
+  }))
   const metrics = await syncXPostMetrics({ limit: 50 }).catch((error) => ({
     status: 'error' as const,
     error: error instanceof Error ? error.message : 'Unknown X metrics sync error',
@@ -634,5 +737,5 @@ export async function runXGrowthOS(): Promise<XGrowthRunResult> {
     error: error instanceof Error ? error.message : 'Unknown X replies sync error',
   }))
 
-  return { queue, metrics, replies }
+  return { queue, digest, metrics, replies }
 }
