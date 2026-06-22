@@ -22,13 +22,16 @@ function tokenize(value: string) {
 
 function skillSearchText(skill: SkillRecord) {
   return [
+    skill.slug,
     skill.name,
     skill.description,
     skill.long_description,
     skill.tagline,
     skill.category,
+    skill.repository,
     skill.github_repo,
     skill.github_language,
+    skill.install_command,
     ...(skill.tags || []),
     ...(skill.frameworks || []),
   ]
@@ -113,11 +116,19 @@ export function rankSkillsForQuery(
   statsMap: Record<string, SkillRankingStats> = {}
 ) {
   const normalizedQuery = query.trim().toLowerCase()
+  const compactQuery = normalizedQuery.replace(/[^a-z0-9]+/g, '')
   const queryTokens = tokenize(query)
 
   return skills
     .map((skill) => {
       const text = skillSearchText(skill)
+      const name = skill.name.toLowerCase()
+      const slug = skill.slug.toLowerCase()
+      const repo = (skill.github_repo || skill.repository || '').toLowerCase()
+      const install = (skill.install_command || '').toLowerCase()
+      const compactName = name.replace(/[^a-z0-9]+/g, '')
+      const compactSlug = slug.replace(/[^a-z0-9]+/g, '')
+      const compactRepo = repo.replace(/[^a-z0-9]+/g, '')
       const tags = (skill.tags || []).map((tag) => tag.toLowerCase())
       const frameworks = (skill.frameworks || []).map((framework) => framework.toLowerCase())
       let score = 0
@@ -126,12 +137,17 @@ export function rankSkillsForQuery(
         score += Number(skill.quality_score || 0)
         score += Math.min(35, Math.log10(Number(skill.github_stars || 0) + 1) * 8)
       } else {
-        if (skill.name.toLowerCase().includes(normalizedQuery)) score += 80
+        if (name === normalizedQuery) score += 260
+        if (slug === normalizedQuery || repo === normalizedQuery || repo.endsWith(`/${normalizedQuery}`)) score += 230
+        if (compactQuery && (compactName === compactQuery || compactSlug === compactQuery || compactRepo.endsWith(compactQuery))) score += 190
+        if (name.includes(normalizedQuery)) score += 90
+        if (slug.includes(normalizedQuery) || repo.includes(normalizedQuery) || install.includes(normalizedQuery)) score += 72
         if (skill.description.toLowerCase().includes(normalizedQuery)) score += 42
         if (text.includes(normalizedQuery)) score += 28
 
         for (const token of queryTokens) {
-          if (skill.name.toLowerCase().includes(token)) score += 28
+          if (name.includes(token)) score += 30
+          if (slug.includes(token) || repo.includes(token) || install.includes(token)) score += 26
           if (tags.some((tag) => tag.includes(token))) score += 24
           if (frameworks.some((framework) => framework.includes(token))) score += 20
           if (skill.category.toLowerCase().includes(token)) score += 16
@@ -157,6 +173,8 @@ export function rankSkillsForQuery(
         const isSecurityOnlySkill = /\b(security|vulnerability|scanner|nuclei|pentest|cve|sast|exploit|secret scanning)\b/.test(text) && !isFinanceSkill
         const isSportsTask = /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(normalizedQuery)
         const isSportsSkill = /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(text)
+        const isDesignTask = /\b(design|designer|creative|motion|animation|lottie|gsap|figma|ui|ux|shadcn|component|design system|three|3d|map|dashboard|visual|svg)\b/.test(normalizedQuery)
+        const isDesignSkill = /\b(design|creative|motion|animation|lottie|gsap|figma|ui|ux|shadcn|component|design system|three|3d|map|dashboard|visual|svg)\b/.test(text)
 
         if (isGenericWebTask && isGenericWebSkill) score += 42
         if (isGenericWebTask && isLLMReadyWebSkill) score += 28
@@ -169,6 +187,8 @@ export function rankSkillsForQuery(
         if (isFinanceTask && isSecurityOnlySkill) score -= 90
         if (isSportsTask && skill.category === 'sports-analytics') score += 85
         if (isSportsTask && isSportsSkill) score += 58
+        if (isDesignTask && skill.category === 'design-creative') score += 78
+        if (isDesignTask && isDesignSkill) score += 52
       }
 
       score += Math.min(24, Number(skill.quality_score || 0) / 4)

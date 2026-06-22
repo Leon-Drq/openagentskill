@@ -9,6 +9,7 @@ export interface SkillPackDefinition {
   description: string
   persona: string
   keywords: string[]
+  featuredSlugs?: string[]
   outcomes: string[]
   workflowSteps: Array<{
     title: string
@@ -37,6 +38,54 @@ export const SKILL_PACKS: SkillPackDefinition[] = [
     ],
     bestFor: ['React apps', 'Next.js products', 'Design system cleanup', 'Mobile responsive QA'],
     avoidWhen: ['The agent cannot run the app locally', 'The task needs private design files that are unavailable'],
+  },
+  {
+    slug: 'design-agent-pack',
+    shortTitle: 'Design agent',
+    title: 'Design agent skill pack',
+    eyebrow: 'Motion, UI systems, and visual production',
+    description:
+      'A curated pack for agents that turn product direction into motion assets, design-system notes, UI components, interactive maps, and polished creative workflows.',
+    persona: 'Designers, design engineers, and frontend teams using agents for visual production work.',
+    keywords: [
+      'design',
+      'designer',
+      'creative',
+      'motion',
+      'animation',
+      'lottie',
+      'gsap',
+      'svg',
+      'figma',
+      'ui',
+      'ux',
+      'shadcn',
+      'component',
+      'design system',
+      'design-md',
+      'three',
+      '3d',
+      'dashboard',
+      'map',
+      'visual',
+      'presentation',
+    ],
+    featuredSlugs: [
+      'diffusionstudio-lottie',
+      'greensock-gsap-skills',
+      'songsummer920-dazzle-three-scope-map-skill',
+      'paidax01-web-to-design-md',
+      'masonjames-shadcnblocks-skill',
+    ],
+    outcomes: ['Extract design context', 'Generate motion assets', 'Compose UI blocks', 'Prototype visual systems'],
+    workflowSteps: [
+      { title: 'Extract', description: 'Turn public references, UI surfaces, or SVG assets into agent-readable design context.' },
+      { title: 'Animate', description: 'Generate Lottie, GSAP, SVG, or scroll-motion directions with editable output paths.' },
+      { title: 'Compose', description: 'Pick UI blocks, shadcn components, and layout primitives that match the product system.' },
+      { title: 'Verify', description: 'Review license, install command, browser output, responsive states, and production risks.' },
+    ],
+    bestFor: ['Motion design', 'Design-system extraction', 'Shadcn/ui page generation', 'Interactive data visuals'],
+    avoidWhen: ['The source assets are private and unavailable', 'The output will ship without human visual review', 'The license blocks the intended commercial use'],
   },
   {
     slug: 'seo-automation-agent-pack',
@@ -139,6 +188,8 @@ export function getSkillPackBySlug(slug: string) {
 export function scoreSkillForPack(skill: SkillRecord, pack: SkillPackDefinition) {
   const text = searchableSkillText(skill)
   let score = 0
+
+  if (pack.featuredSlugs?.includes(skill.slug)) score += 80
 
   for (const keyword of pack.keywords) {
     const normalized = keyword.toLowerCase()

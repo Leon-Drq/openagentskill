@@ -615,6 +615,7 @@ export async function GET() {
       public_skill_claims: '/api/claims',
       public_x_share_draft: '/api/x/share?skill_slug={slug}',
       public_x_reply_draft: '/api/x/reply-draft?skill_slug={slug}&tweet_url={tweet_url}',
+      private_x_reply: '/api/x/reply',
       public_status: '/api/agent/discovery',
     },
     creator_growth_loop: {
@@ -622,11 +623,12 @@ export async function GET() {
       workflow: [
         'index public skill from repository or creator source',
         'show listing as community indexed until a maintainer claim is approved',
-        'generate a manual X reply draft with attribution and claim invitation',
+        'generate a safe X reply draft with attribution and claim invitation',
+        'optionally post the reply through the protected X OAuth endpoint when automation is authorized',
         'creator can claim the listing through the skill detail page',
       ],
       safe_automation_policy:
-        'OpenAgentSkill generates Web Intent drafts only; publishing or replying on X requires a human click.',
+        'Public endpoints generate Web Intent drafts. Protected automation can publish X posts or replies only after OAuth authorization and an internal automation secret.',
     },
     recent_runs: runs,
     meta: {

@@ -1,31 +1,52 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
-import { getAllSkills } from '@/lib/db/skills'
+import { getAllSkills, getSkillsBySlugs, type SkillRecord } from '@/lib/db/skills'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { selectSkillsForPack, SKILL_PACKS } from '@/lib/skill-packs'
 
 const BASE_URL = 'https://www.openagentskill.com'
+const PACK_CANDIDATE_LIMIT = 1200
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'AI Agent Skill Packs for Builders',
   description:
-    'Curated AI agent skill packs for frontend engineers, SEO automation, data analysts, startup founders, and full-stack SaaS builders.',
+    'Curated AI agent skill packs for frontend engineers, design agents, SEO automation, data analysts, startup founders, and full-stack SaaS builders.',
   alternates: {
     canonical: `${BASE_URL}/skill-packs`,
   },
   openGraph: {
     title: 'AI Agent Skill Packs - OpenAgentSkill',
-    description: 'Install complete packs of reusable skills for real agent workflows.',
+    description: 'Install complete packs of reusable skills for design, frontend, growth, data, founder, and SaaS agent workflows.',
     url: `${BASE_URL}/skill-packs`,
     type: 'website',
   },
 }
 
+function mergeSkills(...pools: SkillRecord[][]) {
+  const seen = new Set<string>()
+  const merged: SkillRecord[] = []
+
+  for (const pool of pools) {
+    for (const skill of pool) {
+      if (seen.has(skill.slug)) continue
+      seen.add(skill.slug)
+      merged.push(skill)
+    }
+  }
+
+  return merged
+}
+
 export default async function SkillPacksPage() {
-  const skills = await getAllSkills('quality').catch(() => [])
+  const featuredSlugs = SKILL_PACKS.flatMap((pack) => pack.featuredSlugs || [])
+  const [featuredSkills, candidateSkills] = await Promise.all([
+    getSkillsBySlugs(featuredSlugs).catch(() => []),
+    getAllSkills('quality', undefined, PACK_CANDIDATE_LIMIT).catch(() => []),
+  ])
+  const skills = mergeSkills(featuredSkills, candidateSkills)
 
   const structuredData = {
     '@context': 'https://schema.org',

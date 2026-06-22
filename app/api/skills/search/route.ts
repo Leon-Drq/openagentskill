@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { unstable_cache } from 'next/cache'
 import { withTimeout } from '@/lib/async'
-import { getAllSkills } from '@/lib/db/skills'
+import { getAllSkills, searchSkills, type SkillRecord } from '@/lib/db/skills'
 import { dedupeRankedSkills, getRecommendationReasons, rankSkillsForQuery, toRegistrySkill } from '@/lib/registry'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSkillSupplyProfile } from '@/lib/supply'
@@ -10,6 +10,7 @@ export const revalidate = 300
 
 const SEARCH_CANDIDATE_LIMIT = 750
 const SEARCH_QUERY_TIMEOUT_MS = 1000
+const SEARCH_EXACT_QUERY_TIMEOUT_MS = 2200
 const SEARCH_CACHE_HEADERS = {
   'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
 }
@@ -23,6 +24,22 @@ const getSearchCandidatePool = unstable_cache(
 function clampLimit(value: string | null) {
   const parsed = Number(value || 10)
   return Math.min(Math.max(Number.isFinite(parsed) ? parsed : 10, 1), 50)
+}
+
+function mergeSkillPools(...pools: SkillRecord[][]) {
+  const seen = new Set<string>()
+  const merged: SkillRecord[] = []
+
+  for (const pool of pools) {
+    for (const skill of pool) {
+      const key = skill.slug || skill.github_repo || skill.id
+      if (!key || seen.has(key)) continue
+      seen.add(key)
+      merged.push(skill)
+    }
+  }
+
+  return merged
 }
 
 export async function GET(request: NextRequest) {
@@ -39,14 +56,27 @@ export async function GET(request: NextRequest) {
   const shortlistLimit = Math.max(limit * 8, 30)
 
   try {
-    const skills = await withTimeout(
-      getSearchCandidatePool(),
-      SEARCH_QUERY_TIMEOUT_MS,
-      'public skill search candidate query'
-    ).catch((error) => {
-      console.warn('Public skill search fallback:', error)
-      return CURATED_SKILL_SNAPSHOT
-    })
+    const [candidatePool, exactPool] = await Promise.all([
+      withTimeout(
+        getSearchCandidatePool(),
+        SEARCH_QUERY_TIMEOUT_MS,
+        'public skill search candidate query'
+      ).catch((error) => {
+        console.warn('Public skill search fallback:', error)
+        return CURATED_SKILL_SNAPSHOT
+      }),
+      query.trim()
+        ? withTimeout(
+            searchSkills(query, 120),
+            SEARCH_EXACT_QUERY_TIMEOUT_MS,
+            'public skill exact search query'
+          ).catch((error) => {
+            console.warn('Public skill exact search fallback:', error)
+            return [] as SkillRecord[]
+          })
+        : Promise.resolve([] as SkillRecord[]),
+    ])
+    const skills = mergeSkillPools(exactPool, candidatePool)
     const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, query))
       .filter(({ skill }) => {
         if (category && skill.category.toLowerCase() !== category.toLowerCase()) return false

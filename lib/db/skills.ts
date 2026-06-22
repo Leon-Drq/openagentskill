@@ -469,6 +469,35 @@ export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> 
   return data
 }
 
+export async function getSkillsBySlugs(slugs: string[]): Promise<SkillRecord[]> {
+  const normalizedSlugs = Array.from(new Set(slugs.map((slug) => slug.trim()).filter(Boolean)))
+  if (!normalizedSlugs.length) return []
+
+  const supabase = createPublicClient()
+  const { data, error } = await withTimeout(
+    supabase
+      .from('skills')
+      .select('*')
+      .eq('ai_review_approved', true)
+      .in('slug', normalizedSlugs),
+    SKILL_LOOKUP_TIMEOUT_MS,
+    'skill batch slug lookup'
+  ).catch((lookupError) => {
+    console.warn('Skill batch slug lookup fallback:', lookupError)
+    return { data: null, error: lookupError }
+  })
+
+  if (error || !data) return []
+
+  const bySlug = new Map(
+    filterSkillOnly(data as SkillRecord[]).map((skill) => [skill.slug, skill])
+  )
+
+  return normalizedSlugs
+    .map((slug) => bySlug.get(slug))
+    .filter((skill): skill is SkillRecord => Boolean(skill))
+}
+
 export async function createSkill(skill: Partial<SkillRecord>): Promise<SkillRecord> {
   const supabase = createAdminClient()
   
@@ -502,27 +531,32 @@ export async function createSubmissionRecord(submission: {
   return data
 }
 
-export async function searchSkills(query: string): Promise<SkillRecord[]> {
+export async function searchSkills(query: string, limit = 120): Promise<SkillRecord[]> {
   const supabase = createPublicClient()
-  const rows: SkillRecord[] = []
+  const normalizedQuery = query.trim().replace(/[%{},()]/g, ' ')
+  if (!normalizedQuery) return []
 
-  for (let from = 0; ; from += SKILLS_PAGE_SIZE) {
-    const { data, error } = await supabase
-      .from('skills')
-      .select('*')
-      .eq('ai_review_approved', true)
-      .or(`name.ilike.%${query}%,description.ilike.%${query}%,tags.cs.{${query}}`)
-      .order('quality_score', { ascending: false })
-      .range(from, from + SKILLS_PAGE_SIZE - 1)
+  const filter = [
+    `name.ilike.%${normalizedQuery}%`,
+    `description.ilike.%${normalizedQuery}%`,
+    `long_description.ilike.%${normalizedQuery}%`,
+    `tagline.ilike.%${normalizedQuery}%`,
+    `category.ilike.%${normalizedQuery}%`,
+    `github_repo.ilike.%${normalizedQuery}%`,
+    `repository.ilike.%${normalizedQuery}%`,
+    `install_command.ilike.%${normalizedQuery}%`,
+  ].join(',')
+  const { data, error } = await supabase
+    .from('skills')
+    .select('*')
+    .eq('ai_review_approved', true)
+    .or(filter)
+    .order('quality_score', { ascending: false })
+    .limit(Math.min(Math.max(limit, 1), 200))
 
-    if (error) throw error
-    if (!data?.length) break
+  if (error) throw error
 
-    rows.push(...(data as SkillRecord[]))
-    if (data.length < SKILLS_PAGE_SIZE) break
-  }
-
-  return filterSkillOnly(rows)
+  return filterSkillOnly((data || []) as SkillRecord[])
 }
 
 export async function getRelatedSkills(

@@ -4,13 +4,14 @@ import { notFound } from 'next/navigation'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
-import { getAllSkills } from '@/lib/db/skills'
+import { getAllSkills, getSkillsBySlugs, type SkillRecord } from '@/lib/db/skills'
 import { getPrimaryInstallCommand } from '@/lib/install-targets'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getSkillPackBySlug, selectSkillsForPack, SKILL_PACKS } from '@/lib/skill-packs'
 
 const BASE_URL = 'https://www.openagentskill.com'
+const PACK_CANDIDATE_LIMIT = 1200
 
 export const dynamic = 'force-dynamic'
 
@@ -38,12 +39,31 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 }
 
+function mergeSkills(...pools: SkillRecord[][]) {
+  const seen = new Set<string>()
+  const merged: SkillRecord[] = []
+
+  for (const pool of pools) {
+    for (const skill of pool) {
+      if (seen.has(skill.slug)) continue
+      seen.add(skill.slug)
+      merged.push(skill)
+    }
+  }
+
+  return merged
+}
+
 export default async function SkillPackDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const pack = getSkillPackBySlug(slug)
   if (!pack) notFound()
 
-  const skills = await getAllSkills('quality').catch(() => [])
+  const [featuredSkills, candidateSkills] = await Promise.all([
+    getSkillsBySlugs(pack.featuredSlugs || []).catch(() => []),
+    getAllSkills('quality', undefined, PACK_CANDIDATE_LIMIT).catch(() => []),
+  ])
+  const skills = mergeSkills(featuredSkills, candidateSkills)
   const picks = selectSkillsForPack(skills, pack, 10)
 
   const structuredData = {

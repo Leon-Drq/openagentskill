@@ -213,6 +213,24 @@ export async function createXPost(accessToken: string, text: string) {
   return parseXResponse<XCreatePostResponse>(response, 'X post creation')
 }
 
+export async function createXReplyPost(accessToken: string, text: string, inReplyToTweetId: string) {
+  const response = await fetch(X_CREATE_POST_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      text,
+      reply: {
+        in_reply_to_tweet_id: inReplyToTweetId,
+      },
+    }),
+  })
+
+  return parseXResponse<XCreatePostResponse>(response, 'X reply creation')
+}
+
 export async function getXTweetsByIds(accessToken: string, ids: string[]) {
   const uniqueIds = Array.from(new Set(ids.filter(Boolean))).slice(0, 100)
   if (!uniqueIds.length) return { data: [] } satisfies XTweetsLookupResponse

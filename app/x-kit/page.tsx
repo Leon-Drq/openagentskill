@@ -49,7 +49,7 @@ export default async function XKitPage() {
                 ),
                 label: 'Stars',
               },
-              { value: '0', label: 'API credits' },
+              { value: 'OAuth', label: 'Reply path' },
             ]}
           />
         }
@@ -62,14 +62,15 @@ export default async function XKitPage() {
               <p className="mb-2 text-xs uppercase text-secondary">Creator reply loop</p>
               <h2 className="font-display text-2xl font-semibold">Turn X discovery into claimable listings.</h2>
               <p className="mt-3 text-sm leading-relaxed text-secondary">
-                When a creator shares a useful skill, add the public listing, then open a manual reply draft that gives
-                attribution and invites them to claim it. No X API credits and no automatic posting.
+                When a creator shares a useful skill, add the public listing, then generate an attribution-first reply
+                that invites them to claim it. Public links stay draft-only; protected automation can post after X OAuth.
               </p>
             </div>
             <div className="min-w-0 border border-border bg-background p-5">
-              <p className="mb-3 text-xs uppercase text-secondary">Reply draft API</p>
+              <p className="mb-3 text-xs uppercase text-secondary">Reply APIs</p>
               <pre className="overflow-x-auto whitespace-pre-wrap rounded-[8px] border border-border bg-card p-4 font-mono text-xs leading-relaxed text-secondary">
-                <code>{`GET /api/x/reply-draft?skill_slug=crawl4ai&tweet_url=https://x.com/user/status/123&format=json`}</code>
+                <code>{`GET  /api/x/reply?skill_slug=crawl4ai&tweet_url=https://x.com/user/status/123
+POST /api/x/reply`}</code>
               </pre>
             </div>
           </div>
@@ -158,7 +159,7 @@ export default async function XKitPage() {
                           Open creator reply
                         </a>
                         <Link
-                          href={`/api/x/reply-draft?skill_slug=${encodeURIComponent(skill.slug)}&format=json`}
+                          href={`/api/x/reply?skill_slug=${encodeURIComponent(skill.slug)}&tweet_url=https://x.com/user/status/123`}
                           prefetch={false}
                           className="border border-border px-3 py-2 text-center text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
                         >

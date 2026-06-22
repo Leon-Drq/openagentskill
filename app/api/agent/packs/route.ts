@@ -1,13 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAllSkills } from '@/lib/db/skills'
+import { getAllSkills, getSkillsBySlugs, type SkillRecord } from '@/lib/db/skills'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { selectSkillsForPack, SKILL_PACKS } from '@/lib/skill-packs'
 
+const PACK_CANDIDATE_LIMIT = 1200
+
 function clampLimit(value: string | null, fallback: number, max: number) {
   const parsed = Number(value || fallback)
   return Math.min(Math.max(Number.isFinite(parsed) ? parsed : fallback, 1), max)
+}
+
+function mergeSkills(...pools: SkillRecord[][]) {
+  const seen = new Set<string>()
+  const merged: SkillRecord[] = []
+
+  for (const pool of pools) {
+    for (const skill of pool) {
+      if (seen.has(skill.slug)) continue
+      seen.add(skill.slug)
+      merged.push(skill)
+    }
+  }
+
+  return merged
 }
 
 export async function GET(request: NextRequest) {
@@ -15,7 +32,12 @@ export async function GET(request: NextRequest) {
   const limit = clampLimit(request.nextUrl.searchParams.get('limit'), 5, 10)
 
   try {
-    const skills = await getAllSkills('quality')
+    const featuredSlugs = SKILL_PACKS.flatMap((pack) => pack.featuredSlugs || [])
+    const [featuredSkills, candidateSkills] = await Promise.all([
+      getSkillsBySlugs(featuredSlugs),
+      getAllSkills('quality', undefined, PACK_CANDIDATE_LIMIT),
+    ])
+    const skills = mergeSkills(featuredSkills, candidateSkills)
     const packs = SKILL_PACKS.map((pack) => {
       const picks = selectSkillsForPack(skills, pack, limit)
       return {
