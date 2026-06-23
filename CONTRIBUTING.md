@@ -10,6 +10,20 @@ OpenAgentSkill is an open discovery, audit, and recommendation layer for AI agen
 - Open an issue if a listed skill has stale metadata, wrong category, broken install instructions, or missing audit context.
 - Automated bulk imports are skill-only. MCP servers and Model Context Protocol repos are intentionally excluded.
 
+### For Skill Authors
+
+- Make the install command explicit and reproducible.
+- Include a `README.md` or `SKILL.md` with the task scenario, supported agents, required secrets, risk notes, and examples.
+- Add a clear license.
+- Keep dependency and shell behavior easy to inspect.
+- Link back to the OpenAgentSkill listing when your skill is indexed.
+- Add Trust and Audit badges after the listing exists:
+
+```md
+[![OpenAgentSkill Trust](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=trust&label=Trust)](https://www.openagentskill.com/skills/YOUR-SLUG)
+[![OpenAgentSkill Audit](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=audit&label=Audit)](https://www.openagentskill.com/skills/YOUR-SLUG/audit)
+```
+
 ### Report Bugs
 
 - Check whether the bug is already reported.
