@@ -17,6 +17,7 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 
 [Try Resolve](https://www.openagentskill.com/resolve) ·
 [Browse Skills](https://www.openagentskill.com/skills) ·
+[GitHub Skill Index](./skills/README.md) ·
 [Outcome Loop](https://www.openagentskill.com/outcomes) ·
 [Audits](https://www.openagentskill.com/audits) ·
 [API Docs](https://www.openagentskill.com/api-docs) ·
@@ -158,6 +159,7 @@ Submit or fix a skill:
 | Skill packs | [/skill-packs](https://www.openagentskill.com/skill-packs) | Workflow bundles for common agent jobs |
 | Comparisons | [/compare](https://www.openagentskill.com/compare) | OpenAgentSkill vs other skill platforms |
 | API Docs | [/api-docs](https://www.openagentskill.com/api-docs) | Programmatic access for agents and apps |
+| GitHub skill index | [skills/](./skills/README.md) | Curated domain lists for GitHub readers and agents |
 
 ## Trust Score
 
