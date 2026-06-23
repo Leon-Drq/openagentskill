@@ -24,7 +24,7 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 
 <br />
 
-<img src="./public/github-social-preview.svg" alt="OpenAgentSkill preview: Resolve, Trust, Install, Outcome Feedback" width="920" />
+<img src="./public/github-social-preview.png" alt="OpenAgentSkill preview: Resolve, Trust, Install, Outcome Feedback" width="920" />
 
 </div>
 
