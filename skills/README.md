@@ -24,16 +24,42 @@ It is intentionally not a vendored code mirror. Source code stays with the upstr
 
 | Domain | GitHub index | Live discovery |
 | --- | --- | --- |
+| Application scenarios | [scenarios.md](./scenarios.md) | [Resolve API](https://www.openagentskill.com/resolve) |
 | Coding agents | [coding.md](./coding.md) | [OpenAgentSkill coding agents](https://www.openagentskill.com/ai-agent-skills/coding-agents) |
 | Web scraping | [web-scraping.md](./web-scraping.md) | [OpenAgentSkill web scraping](https://www.openagentskill.com/ai-agent-skills/web-scraping) |
+| Browser automation | [browser-automation.md](./browser-automation.md) | [OpenAgentSkill browser automation](https://www.openagentskill.com/ai-agent-skills/browser-automation) |
 | Finance and quant | [finance.md](./finance.md) | [OpenAgentSkill finance](https://www.openagentskill.com/ai-agent-skills/finance-quant) |
 | Research | [research.md](./research.md) | [OpenAgentSkill research](https://www.openagentskill.com/use-cases/research-agents) |
+| RAG and knowledge | [rag-knowledge.md](./rag-knowledge.md) | [OpenAgentSkill RAG](https://www.openagentskill.com/ai-agent-skills/rag-knowledge) |
+| Document and PDF processing | [documents-pdf.md](./documents-pdf.md) | [OpenAgentSkill PDF parsing](https://www.openagentskill.com/best/pdf-parsing) |
 | Data analysis | [data.md](./data.md) | [OpenAgentSkill data](https://www.openagentskill.com/ai-agent-skills/data-analysis) |
 | Design and creative | [design.md](./design.md) | [OpenAgentSkill design](https://www.openagentskill.com/skill-packs/design-agent-pack) |
 | Marketing and growth | [marketing.md](./marketing.md) | [OpenAgentSkill growth](https://www.openagentskill.com/skill-packs/seo-automation-agent-pack) |
+| DevOps and infrastructure | [devops-infrastructure.md](./devops-infrastructure.md) | [OpenAgentSkill DevOps](https://www.openagentskill.com/skills?q=devops) |
+| Security | [security.md](./security.md) | [OpenAgentSkill safety](https://www.openagentskill.com/safety) |
+| Customer support | [customer-support.md](./customer-support.md) | [OpenAgentSkill support](https://www.openagentskill.com/skills?q=customer%20support) |
+| Commerce | [commerce.md](./commerce.md) | [OpenAgentSkill commerce](https://www.openagentskill.com/skills?q=ecommerce) |
+| Productivity | [productivity.md](./productivity.md) | [OpenAgentSkill productivity](https://www.openagentskill.com/skills?q=productivity) |
 | Legal, privacy, and compliance | [legal-compliance.md](./legal-compliance.md) | [OpenAgentSkill safety](https://www.openagentskill.com/safety) |
 | Education | [education.md](./education.md) | [OpenAgentSkill education](https://www.openagentskill.com/skills?q=education) |
+| Web3 and crypto | [web3-crypto.md](./web3-crypto.md) | [OpenAgentSkill Web3](https://www.openagentskill.com/skills?q=web3) |
+| ML and media | [ml-media.md](./ml-media.md) | [OpenAgentSkill ML](https://www.openagentskill.com/skills?q=machine%20learning) |
 | Football and World Cup analytics | [football-world-cup.md](./football-world-cup.md) | [OpenAgentSkill football analytics](https://www.openagentskill.com/ai-agent-skills/world-cup-football) |
+
+## Application Scenarios
+
+If you know the job but not the domain, start here:
+
+| Agent job | Scenario map |
+| --- | --- |
+| Scrape competitor pricing | [scenarios.md#scrape-competitor-pricing](./scenarios.md#scrape-competitor-pricing) |
+| Analyze stock news | [scenarios.md#analyze-stock-news](./scenarios.md#analyze-stock-news) |
+| Parse PDFs into markdown or JSON | [scenarios.md#parse-pdfs-into-markdown-or-json](./scenarios.md#parse-pdfs-into-markdown-or-json) |
+| Build a RAG knowledge base | [scenarios.md#build-a-rag-knowledge-base](./scenarios.md#build-a-rag-knowledge-base) |
+| Review a pull request or fix CI | [scenarios.md#review-a-pull-request-or-fix-ci](./scenarios.md#review-a-pull-request-or-fix-ci) |
+| Automate a browser workflow | [scenarios.md#automate-a-browser-workflow](./scenarios.md#automate-a-browser-workflow) |
+| Launch SEO and growth pages | [scenarios.md#launch-seo-and-growth-pages](./scenarios.md#launch-seo-and-growth-pages) |
+| Build a World Cup dashboard | [scenarios.md#build-a-world-cup-dashboard](./scenarios.md#build-a-world-cup-dashboard) |
 
 ## Agent Flow
 
