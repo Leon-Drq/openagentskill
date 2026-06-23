@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { AGENT_OUTCOMES } from '@/lib/agent-outcomes'
+import {
+  createEmptyOutcomeStats,
+  formatOutcomeStatsText,
+} from '@/lib/agent-outcome-summary'
 import { createPublicClient } from '@/lib/supabase/public'
 
 const OutcomeSchema = z.object({
@@ -86,6 +90,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const skillSlug = request.nextUrl.searchParams.get('skill_slug')
+  const format = request.nextUrl.searchParams.get('format')
   const supabase = createPublicClient()
 
   if (skillSlug) {
@@ -96,17 +101,18 @@ export async function GET(request: NextRequest) {
       .maybeSingle()
 
     if (error || !data) {
-      return NextResponse.json({
-        skill_slug: skillSlug,
-        total_outcomes: 0,
-        successful_outcomes: 0,
-        failed_outcomes: 0,
-        not_relevant_outcomes: 0,
-        risk_blocked_outcomes: 0,
-        setup_required_outcomes: 0,
-        install_attempts: 0,
-        success_rate: null,
-        last_outcome_at: null,
+      const emptyStats = createEmptyOutcomeStats(skillSlug)
+      if (format === 'text') {
+        return new NextResponse(formatOutcomeStatsText([emptyStats]), {
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        })
+      }
+      return NextResponse.json(emptyStats)
+    }
+
+    if (format === 'text') {
+      return new NextResponse(formatOutcomeStatsText([data]), {
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
       })
     }
 
@@ -121,6 +127,12 @@ export async function GET(request: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: 'Failed to fetch outcome stats' }, { status: 500 })
+  }
+
+  if (format === 'text') {
+    return new NextResponse(formatOutcomeStatsText(data || []), {
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    })
   }
 
   return NextResponse.json(data || [])

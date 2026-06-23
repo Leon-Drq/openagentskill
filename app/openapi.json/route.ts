@@ -114,6 +114,13 @@ export async function GET() {
             summary: 'Read aggregate agent outcome statistics for skill adoption and success signals',
             parameters: [
               { name: 'skill_slug', in: 'query', required: false, schema: { type: 'string' } },
+              {
+                name: 'format',
+                in: 'query',
+                required: false,
+                schema: { type: 'string', enum: ['json', 'text'] },
+                description: 'Use format=text for a compact machine-readable plain text summary.',
+              },
             ],
             responses: { '200': { description: 'Agent outcome aggregate stats' } },
           },

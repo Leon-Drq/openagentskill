@@ -9,6 +9,7 @@ import {
   HIGH_STAR_SKILL_COVERAGE_TARGET,
   resolveHighStarCoverageTarget,
 } from '@/lib/indexer/high-star-import'
+import { AGENT_OUTCOMES } from '@/lib/agent-outcomes'
 import { INDEXER_RUN_PROFILES } from '@/lib/indexer/run-profiles'
 import { FEATURED_SKILL_CLUSTERS, SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
 
@@ -587,6 +588,26 @@ export async function GET() {
         '/api/agent/resolve',
       ],
     },
+    agent_outcome_loop: {
+      status: 'active',
+      public_dashboard: 'https://www.openagentskill.com/outcomes',
+      write_endpoint: '/api/agent/outcome',
+      read_endpoint: '/api/agent/outcome?skill_slug={slug}',
+      machine_summary: '/api/agent/outcome?format=text',
+      expected_outcomes: AGENT_OUTCOMES,
+      ranking_inputs: [
+        'Trust Score v4 real-agent outcome evidence',
+        'skill detail outcome signal blocks',
+        'rankings adoption evidence',
+        'Resolve recommendation scoring',
+      ],
+      recommended_agent_flow: [
+        'Call /api/agent/resolve with a specific task.',
+        'Run one narrow sandboxed attempt with the selected skill.',
+        'POST success, failed, not_relevant, blocked_by_risk, or setup_required to /api/agent/outcome using feedback.event_id.',
+        'Use /api/agent/outcome?skill_slug={slug} or format=text before reusing the same skill in production.',
+      ],
+    },
     indexing: {
       status: process.env.INDEXNOW_DISABLED === 'true' ? 'disabled' : 'active',
       provider: 'IndexNow',
@@ -612,6 +633,9 @@ export async function GET() {
       private_refresh_stars: '/api/indexer/refresh-stars',
       private_logs: '/api/indexer/logs',
       private_indexnow_submit: '/api/indexnow/submit',
+      public_agent_outcomes: '/api/agent/outcome',
+      public_agent_outcomes_text: '/api/agent/outcome?format=text',
+      public_outcome_dashboard: '/outcomes',
       public_skill_claims: '/api/claims',
       public_x_share_draft: '/api/x/share?skill_slug={slug}',
       public_x_reply_draft: '/api/x/reply-draft?skill_slug={slug}&tweet_url={tweet_url}',

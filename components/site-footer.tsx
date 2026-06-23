@@ -65,6 +65,7 @@ export function SiteFooter() {
                 <Link href="/safety" className="hover:text-foreground">Safety Gate</Link>
                 <Link href="/skills-registry" className="hover:text-foreground">Skills Registry</Link>
                 <Link href="/rankings" className="hover:text-foreground">Rankings</Link>
+                <Link href="/outcomes" className="hover:text-foreground">Outcomes</Link>
                 <Link href="/audits" className="hover:text-foreground">Audits</Link>
                 <Link href="/official" className="hover:text-foreground">Official</Link>
                 <Link href="/reports/weekly" className="hover:text-foreground">Weekly Reports</Link>

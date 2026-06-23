@@ -101,6 +101,28 @@ export async function GET() {
           format: 'Response format: json (default) or text (optional)',
         },
       },
+      outcome: {
+        url: '/api/agent/outcome',
+        method: 'GET or POST',
+        description: 'Report or read aggregate results after an agent tries one resolved skill. Outcome feedback feeds Trust Score v4, rankings, and future Resolve recommendations.',
+        params: {
+          skill_slug: 'Read aggregate stats for one skill (optional)',
+          format: 'Response format: json (default) or text (optional)',
+        },
+        body: {
+          event_id: 'feedback.event_id from /api/agent/resolve (required for POST)',
+          skill_slug: 'Resolved skill slug (required for POST)',
+          task: 'Task attempted by the agent (required for POST)',
+          agent: 'Agent surface such as codex, claude-code, cursor, or auto',
+          outcome: 'success, failed, not_relevant, blocked_by_risk, or setup_required',
+          install_used: 'Whether an install handoff was used',
+        },
+      },
+      outcome_dashboard: {
+        url: '/outcomes',
+        method: 'GET',
+        description: 'Human and agent-readable overview of outcome feedback, success signals, install attempts, setup friction, and risk blocks.',
+      },
       detail: {
         url: '/api/agent/skills/{slug}',
         method: 'GET',
@@ -153,6 +175,7 @@ export async function GET() {
       search: '100 requests/hour',
       recommend: '50 requests/hour',
       resolve: '50 requests/hour',
+      outcome: '100 requests/hour',
       tasks: '100 requests/hour',
       submit: '10 requests/hour',
       activity: '100 requests/hour',

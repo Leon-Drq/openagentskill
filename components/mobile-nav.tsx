@@ -61,6 +61,12 @@ const agentItems: Array<{
     icon: Braces,
   },
   {
+    href: '/outcomes',
+    label: 'Outcome Loop',
+    description: 'Real agent success signals',
+    icon: Activity,
+  },
+  {
     href: '/safety',
     label: 'Safety Gate',
     description: 'Verified, reviewed, experimental, blocked',

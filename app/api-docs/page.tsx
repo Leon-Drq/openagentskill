@@ -263,7 +263,7 @@ export default function APIDocsPage() {
             </div>
           </div>
 
-          <div className="border border-border mb-8 sm:mb-10">
+          <div id="agent-outcome" className="scroll-mt-24 border border-border mb-8 sm:mb-10">
             <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                 <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
@@ -286,6 +286,7 @@ export default function APIDocsPage() {
                   ['blocked_by_risk', 'The agent stopped because risk was too high'],
                   ['setup_required', 'The skill may work but required extra setup'],
                   ['GET /api/agent/outcome?skill_slug=crawl4ai', 'Read aggregate success and install-attempt stats'],
+                  ['GET /api/agent/outcome?format=text', 'Read a compact machine-friendly outcome summary'],
                 ].map(([field, detail]) => (
                   <div key={field} className="min-w-0 bg-background p-3">
                     <code className="font-mono text-xs">{field}</code>
