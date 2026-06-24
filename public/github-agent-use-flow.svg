@@ -1,0 +1,71 @@
+<svg width="1200" height="520" viewBox="0 0 1200 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">OpenAgentSkill agent use flow</title>
+  <desc id="desc">A five step flow showing how an AI agent resolves a task, checks trust signals, installs a skill, and reports an outcome.</desc>
+  <defs>
+    <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#ded8ca"/>
+    </pattern>
+    <filter id="soft-shadow" x="-12%" y="-18%" width="124%" height="136%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#151412" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0L10 5L0 10Z" fill="#006b4f"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="520" fill="#faf8f1"/>
+  <rect width="1200" height="520" fill="url(#dots)" opacity="0.9"/>
+  <g font-family="Inter, Arial, sans-serif">
+    <text x="84" y="70" fill="#c58b25" font-size="14" font-weight="800">•</text>
+    <text x="110" y="70" fill="#746f66" font-size="13" font-weight="700" letter-spacing="4">AGENT-NATIVE REGISTRY</text>
+    <text x="84" y="124" fill="#151412" font-family="Georgia, 'Times New Roman', serif" font-size="52" font-weight="700">From task to safe install plan.</text>
+    <text x="84" y="162" fill="#5f5a52" font-size="20">Let an agent resolve, compare, audit, install, and report outcomes without scraping a directory.</text>
+  </g>
+
+  <g filter="url(#soft-shadow)" font-family="Inter, Arial, sans-serif">
+    <rect x="84" y="218" width="178" height="164" rx="16" fill="#fffdf7" stroke="#d7cfbe"/>
+    <text x="110" y="252" fill="#746f66" font-size="11" font-weight="700" letter-spacing="2.6">01 TASK</text>
+    <text x="110" y="294" fill="#151412" font-size="21" font-weight="800">Stock news</text>
+    <text x="110" y="324" fill="#5f5a52" font-size="13">Start with a job, not a package.</text>
+    <rect x="110" y="344" width="104" height="24" rx="12" fill="#e9f2eb"/>
+    <text x="124" y="361" fill="#006b4f" font-size="11" font-weight="800">plain language</text>
+
+    <rect x="306" y="218" width="178" height="164" rx="16" fill="#fffdf7" stroke="#d7cfbe"/>
+    <text x="332" y="252" fill="#746f66" font-size="11" font-weight="700" letter-spacing="2.6">02 RESOLVE</text>
+    <text x="332" y="294" fill="#151412" font-size="21" font-weight="800">Rank skills</text>
+    <text x="332" y="324" fill="#5f5a52" font-size="13">Best pick plus alternatives.</text>
+    <rect x="332" y="344" width="110" height="24" rx="12" fill="#0d6b4f"/>
+    <text x="346" y="361" fill="#fffdf7" font-size="11" font-weight="800">/api/resolve</text>
+
+    <rect x="528" y="218" width="178" height="164" rx="16" fill="#fffdf7" stroke="#d7cfbe"/>
+    <text x="554" y="252" fill="#746f66" font-size="11" font-weight="700" letter-spacing="2.6">03 TRUST</text>
+    <text x="554" y="294" fill="#151412" font-size="21" font-weight="800">Audit first</text>
+    <text x="554" y="324" fill="#5f5a52" font-size="13">Check license, docs, risk.</text>
+    <rect x="554" y="344" width="86" height="24" rx="12" fill="#f7ead4"/>
+    <text x="568" y="361" fill="#9b6514" font-size="11" font-weight="800">risk gate</text>
+
+    <rect x="750" y="218" width="178" height="164" rx="16" fill="#fffdf7" stroke="#d7cfbe"/>
+    <text x="776" y="252" fill="#746f66" font-size="11" font-weight="700" letter-spacing="2.6">04 INSTALL</text>
+    <text x="776" y="294" fill="#151412" font-size="21" font-weight="800">Handoff</text>
+    <text x="776" y="324" fill="#5f5a52" font-size="13">Codex, Claude Code, Cursor.</text>
+    <rect x="776" y="344" width="76" height="24" rx="12" fill="#e9f2eb"/>
+    <text x="790" y="361" fill="#006b4f" font-size="11" font-weight="800">sandbox</text>
+
+    <rect x="972" y="218" width="178" height="164" rx="16" fill="#fffdf7" stroke="#d7cfbe"/>
+    <text x="998" y="252" fill="#746f66" font-size="11" font-weight="700" letter-spacing="2.6">05 OUTCOME</text>
+    <text x="998" y="294" fill="#151412" font-size="21" font-weight="800">Learn</text>
+    <text x="998" y="324" fill="#5f5a52" font-size="13">Report success, failure, risk.</text>
+    <rect x="998" y="344" width="86" height="24" rx="12" fill="#111111"/>
+    <text x="1012" y="361" fill="#fffdf7" font-size="11" font-weight="800">feedback</text>
+  </g>
+
+  <path d="M270 300H296" stroke="#006b4f" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M492 300H518" stroke="#006b4f" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M714 300H740" stroke="#006b4f" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M936 300H962" stroke="#006b4f" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g font-family="Inter, Arial, sans-serif">
+    <rect x="84" y="426" width="1032" height="46" rx="12" fill="#151412"/>
+    <text x="110" y="455" fill="#fffdf7" font-size="14" font-weight="700">curl</text>
+    <text x="156" y="455" fill="#d8d1c4" font-size="14">https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&amp;agent=codex&amp;max_risk=medium</text>
+  </g>
+</svg>

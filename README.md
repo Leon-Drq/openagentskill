@@ -30,6 +30,16 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 <br />
 <br />
 
+<img src="./public/github-agent-use-flow.svg" alt="OpenAgentSkill agent use flow: task, resolve, trust, install, outcome feedback" width="920" />
+
+<br />
+<br />
+
+<img src="./public/github-domain-catalog.svg" alt="OpenAgentSkill domain catalog: 10,000+ skills organized by real work" width="920" />
+
+<br />
+<br />
+
 <img src="./public/github-agent-architecture.svg" alt="OpenAgentSkill architecture diagram: agents resolve skills through trust, install, and outcome feedback" width="920" />
 
 <br />
@@ -40,6 +50,15 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 </div>
 
 ---
+
+## Start Here
+
+| I am a... | Start with | What you get |
+| --- | --- | --- |
+| Agent builder | [`/api/agent/resolve`](https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&agent=codex&max_risk=medium&format=text) | One recommended skill, alternatives, install command, trust signals, and risk notes |
+| Skill author | [Submit Skill](https://www.openagentskill.com/submit) | Canonical page, badges, audit surface, X share card, and claim path |
+| Developer exploring skills | [GitHub Skill Index](./skills/README.md) | Curated domain maps and scenario-first examples |
+| SEO/community operator | [X Growth Kit](https://www.openagentskill.com/x-kit) | Human-readable launch drafts and creator reply workflows |
 
 ## Why Star This Repo?
 
@@ -52,6 +71,29 @@ OpenAgentSkill is not another static directory. It is a registry, trust layer, a
 | Trust Score + audit pages | Agents can inspect quality, license, README/SKILL.md completeness, install safety, maintenance, and risk signals |
 | Outcome feedback loop | Resolved skills can report `success`, `failed`, `not_relevant`, `blocked_by_risk`, or `setup_required` so rankings learn from real use |
 | Agent-readable APIs | Codex, Claude Code, Cursor, and other runtimes can call stable endpoints instead of scraping a website |
+
+## Copy-Paste Agent Integration
+
+Give this to Codex, Claude Code, Cursor, or any browser-capable agent:
+
+```text
+Before installing a third-party skill, call OpenAgentSkill:
+
+GET https://www.openagentskill.com/api/agent/resolve?task={TASK}&agent={AGENT}&max_risk=medium&format=json
+
+Use the response to inspect:
+- recommended_skill
+- alternatives
+- install_command
+- trust_score
+- audit_url
+- risk_level
+- do_not_use_when
+
+Only install when the risk policy allows it. After trying the skill, report the result:
+
+POST https://www.openagentskill.com/api/agent/outcome
+```
 
 ## 30-Second Demo
 
@@ -97,16 +139,35 @@ curl "https://www.openagentskill.com/api/agent/outcome?format=text"
 
 ## What Makes OpenAgentSkill Different?
 
-| Feature | OpenAgentSkill | Static directories |
-| --- | --- | --- |
-| Task-to-skill Resolve API | Yes | No |
-| Trust Score | GitHub quality + audit + install safety + outcome evidence | Usually stars or manual labels |
-| Public audit page | Yes | Usually no |
-| Machine-readable skill metadata | Yes | Partial |
-| Install handoff | Codex, Claude Code, Cursor, CLI | Partial |
-| Real agent outcome feedback | Yes | No |
-| Creator claim loop | Community indexed, then claimable/verified | Usually manual only |
-| SEO/use-case pages with real skill lists | Yes | Often generic landing pages |
+Based on the public positioning of OpenAgentSkill, skills.sh, agentskills.io, and common GitHub skill lists:
+
+| Feature | OpenAgentSkill | skills.sh | agentskills.io | Static lists |
+| --- | --- | --- | --- | --- |
+| Primary job | Agent resolve, trust, audit, install, outcomes | CLI/package-manager style install flow | Agent Skills standard and ecosystem docs | Human browsing |
+| Task-to-skill Resolve API | Yes | Partial | No public resolve layer | No |
+| Trust Score + audit page | Yes | Partial registry signals | Specification guidance | Usually no |
+| Machine-readable skill metadata | Yes | Install-focused metadata | Format/spec metadata | Inconsistent |
+| Install handoff | Codex, Claude Code, Cursor, CLI | `npx skills add` workflow | Standard-compatible clients | Manual copy |
+| Real agent outcome feedback | Yes | No public outcome loop | No public outcome loop | No |
+| Creator claim loop | Community indexed, then claimable/verified | Community registry | Open ecosystem contribution | Manual PRs |
+| Programmatic SEO pages | Real skill lists by task, agent, domain, and comparison | Registry/search pages | Documentation pages | Usually README sections |
+
+OpenAgentSkill should sit between package-manager speed and audit-grade decision support: agents can still install quickly, but they first get a reasoned shortlist and risk profile.
+
+## Best Skills By Domain
+
+| Domain | Representative jobs | GitHub index | Live page |
+| --- | --- | --- | --- |
+| Coding agents | Plan, patch, test, review, ship | [coding.md](./skills/coding.md) | [Coding agents](https://www.openagentskill.com/ai-agent-skills/coding-agents) |
+| Web scraping | Extract tables, monitor pages, crawl docs | [web-scraping.md](./skills/web-scraping.md) | [Web scraping](https://www.openagentskill.com/ai-agent-skills/web-scraping) |
+| Research | Recent context, source-backed briefs, trend scans | [research.md](./skills/research.md) | [Research agents](https://www.openagentskill.com/use-cases/research-agents) |
+| Finance and quant | Stock news, filings, backtests, portfolio analysis | [finance.md](./skills/finance.md) | [Finance skills](https://www.openagentskill.com/ai-agent-skills/finance-quant) |
+| Documents and PDF | Parse PDFs, OCR, markdown conversion, RAG prep | [documents-pdf.md](./skills/documents-pdf.md) | [PDF parsing](https://www.openagentskill.com/best/pdf-parsing) |
+| Data analysis | CSV, SQL, notebooks, charts, dashboards | [data.md](./skills/data.md) | [Data analysis](https://www.openagentskill.com/ai-agent-skills/data-analysis) |
+| Design and creative | Figma, image, video, motion, brand assets | [design.md](./skills/design.md) | [Design pack](https://www.openagentskill.com/skill-packs/design-agent-pack) |
+| Marketing and growth | SEO pages, X drafts, CRM, content ops | [marketing.md](./skills/marketing.md) | [Growth pack](https://www.openagentskill.com/skill-packs/seo-automation-agent-pack) |
+| Security | Review install risk, secrets, shell/network surfaces | [security.md](./skills/security.md) | [Safety](https://www.openagentskill.com/safety) |
+| Football and World Cup | Match data, player analysis, tournament dashboards | [football-world-cup.md](./skills/football-world-cup.md) | [Football analytics](https://www.openagentskill.com/ai-agent-skills/world-cup-football) |
 
 ## How Agents Use It
 
@@ -169,6 +230,7 @@ Submit or fix a skill:
 | Use cases | [/use-cases](https://www.openagentskill.com/use-cases) | Scenario pages with real skill lists |
 | Skill packs | [/skill-packs](https://www.openagentskill.com/skill-packs) | Workflow bundles for common agent jobs |
 | Comparisons | [/compare](https://www.openagentskill.com/compare) | OpenAgentSkill vs other skill platforms |
+| X Growth Kit | [/x-kit](https://www.openagentskill.com/x-kit) | Curator-style X drafts, creator replies, and launch copy |
 | API Docs | [/api-docs](https://www.openagentskill.com/api-docs) | Programmatic access for agents and apps |
 | GitHub skill index | [skills/](./skills/README.md) | Curated domain lists for GitHub readers and agents |
 

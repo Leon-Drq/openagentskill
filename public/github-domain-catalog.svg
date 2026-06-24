@@ -1,0 +1,80 @@
+<svg width="1200" height="560" viewBox="0 0 1200 560" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">OpenAgentSkill domain catalog</title>
+  <desc id="desc">A visual catalog of OpenAgentSkill domains including coding, research, finance, data, design, marketing, legal, education, and sports analytics.</desc>
+  <defs>
+    <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#ded8ca"/>
+    </pattern>
+    <filter id="shadow" x="-10%" y="-16%" width="120%" height="132%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#151412" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="560" fill="#faf8f1"/>
+  <rect width="1200" height="560" fill="url(#dots)" opacity="0.9"/>
+  <g font-family="Inter, Arial, sans-serif">
+    <text x="84" y="70" fill="#c58b25" font-size="14" font-weight="800">•</text>
+    <text x="110" y="70" fill="#746f66" font-size="13" font-weight="700" letter-spacing="4">SKILL SUPPLY MAP</text>
+    <text x="84" y="124" fill="#151412" font-family="Georgia, 'Times New Roman', serif" font-size="52" font-weight="700">10,000+ skills, organized by real work.</text>
+    <text x="84" y="162" fill="#5f5a52" font-size="20">The catalog is not just volume. Each skill gets task fit, agent fit, install path, trust signals, and risk notes.</text>
+  </g>
+
+  <g filter="url(#shadow)" font-family="Inter, Arial, sans-serif">
+    <rect x="84" y="220" width="204" height="104" rx="14" fill="#fffdf7" stroke="#d7cfbe"/>
+    <text x="110" y="250" fill="#746f66" font-size="11" font-weight="700" letter-spacing="2.4">CODING</text>
+    <text x="110" y="282" fill="#151412" font-size="22" font-weight="800">Repo work</text>
+    <text x="110" y="306" fill="#5f5a52" font-size="13">PR review, CI, tests, patching</text>
+    <circle cx="260" cy="248" r="5" fill="#006b4f"/>
+
+    <rect x="316" y="220" width="204" height="104" rx="14" fill="#fffdf7" stroke="#d7cfbe"/>
+    <text x="342" y="250" fill="#746f66" font-size="11" font-weight="700" letter-spacing="2.4">RESEARCH</text>
+    <text x="342" y="282" fill="#151412" font-size="22" font-weight="800">Recent context</text>
+    <text x="342" y="306" fill="#5f5a52" font-size="13">Web, X, Reddit, HN, sources</text>
+    <circle cx="492" cy="248" r="5" fill="#006b4f"/>
+
+    <rect x="548" y="220" width="204" height="104" rx="14" fill="#fffdf7" stroke="#d7cfbe"/>
+    <text x="574" y="250" fill="#746f66" font-size="11" font-weight="700" letter-spacing="2.4">FINANCE</text>
+    <text x="574" y="282" fill="#151412" font-size="22" font-weight="800">Market analysis</text>
+    <text x="574" y="306" fill="#5f5a52" font-size="13">Stocks, filings, quant workflows</text>
+    <circle cx="724" cy="248" r="5" fill="#c58b25"/>
+
+    <rect x="780" y="220" width="204" height="104" rx="14" fill="#fffdf7" stroke="#d7cfbe"/>
+    <text x="806" y="250" fill="#746f66" font-size="11" font-weight="700" letter-spacing="2.4">DATA</text>
+    <text x="806" y="282" fill="#151412" font-size="22" font-weight="800">Tables to answers</text>
+    <text x="806" y="306" fill="#5f5a52" font-size="13">CSV, SQL, charts, notebooks</text>
+    <circle cx="956" cy="248" r="5" fill="#006b4f"/>
+
+    <rect x="84" y="352" width="204" height="104" rx="14" fill="#fffdf7" stroke="#d7cfbe"/>
+    <text x="110" y="382" fill="#746f66" font-size="11" font-weight="700" letter-spacing="2.4">DESIGN</text>
+    <text x="110" y="414" fill="#151412" font-size="22" font-weight="800">Creative ops</text>
+    <text x="110" y="438" fill="#5f5a52" font-size="13">Figma, image, video, motion</text>
+    <circle cx="260" cy="380" r="5" fill="#c58b25"/>
+
+    <rect x="316" y="352" width="204" height="104" rx="14" fill="#fffdf7" stroke="#d7cfbe"/>
+    <text x="342" y="382" fill="#746f66" font-size="11" font-weight="700" letter-spacing="2.4">MARKETING</text>
+    <text x="342" y="414" fill="#151412" font-size="22" font-weight="800">Growth loops</text>
+    <text x="342" y="438" fill="#5f5a52" font-size="13">SEO, content, CRM, X drafts</text>
+    <circle cx="492" cy="380" r="5" fill="#006b4f"/>
+
+    <rect x="548" y="352" width="204" height="104" rx="14" fill="#fffdf7" stroke="#d7cfbe"/>
+    <text x="574" y="382" fill="#746f66" font-size="11" font-weight="700" letter-spacing="2.4">LEGAL</text>
+    <text x="574" y="414" fill="#151412" font-size="22" font-weight="800">Review support</text>
+    <text x="574" y="438" fill="#5f5a52" font-size="13">Policy, contracts, compliance</text>
+    <circle cx="724" cy="380" r="5" fill="#c58b25"/>
+
+    <rect x="780" y="352" width="204" height="104" rx="14" fill="#fffdf7" stroke="#d7cfbe"/>
+    <text x="806" y="382" fill="#746f66" font-size="11" font-weight="700" letter-spacing="2.4">SPORTS</text>
+    <text x="806" y="414" fill="#151412" font-size="22" font-weight="800">World Cup</text>
+    <text x="806" y="438" fill="#5f5a52" font-size="13">Football analytics and dashboards</text>
+    <circle cx="956" cy="380" r="5" fill="#006b4f"/>
+  </g>
+
+  <g font-family="Inter, Arial, sans-serif">
+    <rect x="1014" y="220" width="102" height="236" rx="18" fill="#006b4f"/>
+    <text x="1065" y="270" text-anchor="middle" fill="#fffdf7" font-size="42" font-weight="900">API</text>
+    <text x="1065" y="304" text-anchor="middle" fill="#dbe9dc" font-size="12" font-weight="700" letter-spacing="1.6">AGENT</text>
+    <line x1="1038" y1="326" x2="1092" y2="326" stroke="#4ca77c"/>
+    <text x="1065" y="358" text-anchor="middle" fill="#fffdf7" font-size="13" font-weight="800">resolve</text>
+    <text x="1065" y="386" text-anchor="middle" fill="#fffdf7" font-size="13" font-weight="800">audit</text>
+    <text x="1065" y="414" text-anchor="middle" fill="#fffdf7" font-size="13" font-weight="800">install</text>
+  </g>
+</svg>
