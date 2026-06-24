@@ -30,12 +30,12 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 <br />
 <br />
 
-<img src="./public/github-agent-use-flow.svg" alt="OpenAgentSkill agent use flow: task, resolve, trust, install, outcome feedback" width="920" />
+<img src="./public/github-agent-use-flow.png" alt="OpenAgentSkill agent use flow: task, resolve, trust, install, outcome feedback" width="920" />
 
 <br />
 <br />
 
-<img src="./public/github-domain-catalog.svg" alt="OpenAgentSkill domain catalog: 10,000+ skills organized by real work" width="920" />
+<img src="./public/github-domain-catalog.png" alt="OpenAgentSkill domain catalog: 10,000+ skills organized by real work" width="920" />
 
 <br />
 <br />
