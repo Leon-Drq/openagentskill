@@ -55,7 +55,7 @@ export function SkillXSharePanel({
         <div className="mt-4 overflow-hidden rounded-[8px] border border-border bg-background">
           <div className="flex items-center justify-between border-b border-border bg-[#fbfaf7] px-3 py-2">
             <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
-              OpenAgentSkill Update
+              Curator note
             </span>
             <span className="h-2 w-2 rounded-full bg-[#006b4f]" />
           </div>

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'OpenAgentSkill X Growth Kit',
-    description: 'Ready-to-share OpenAgentSkill Update drafts for high-quality AI agent skills.',
+    description: 'Ready-to-share curator-style drafts for high-quality AI agent skills.',
     url: 'https://www.openagentskill.com/x-kit',
     type: 'website',
   },
@@ -35,9 +35,9 @@ export default async function XKitPage() {
   return (
     <MarketingPageShell>
       <MarketingHero
-        eyebrow="OpenAgentSkill Update"
-        title="Share useful skills with a stronger story."
-        description="Each draft turns a registry listing into a concrete agent use case, then links back to the canonical skill page for discovery and attribution."
+        eyebrow="Curator notes"
+        title="Share useful skills with a more human story."
+        description="Each draft starts with a practical observation, explains the agent use case, then links back to the canonical skill page for discovery and attribution."
         aside={
           <MarketingMetricStrip
             columns="grid-cols-3"

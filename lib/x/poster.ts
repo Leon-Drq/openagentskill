@@ -76,88 +76,146 @@ function getSkillUrl(skill: XPostSkill, source?: 'x') {
 }
 
 export function buildSkillPostText(skill: XPostSkill) {
-  const url = getSkillUrl(skill)
-  const installCommand = truncate(skill.install_command || `npx skills add ${skill.github_repo}`, 72)
-  const title = `Skill pick: ${truncate(skill.name, 72)}`
-  const stats = `${formatStars(skill.github_stars)} GitHub stars - ${truncate(skill.category, 36)}`
-  const footer = `${url}\n\n#AIAgents #AgentSkills`
-  const build = (description: string, includeInstall: boolean) => [
-    title,
-    ...(description ? ['', description] : []),
-    '',
-    stats,
-    ...(includeInstall ? [`Install: ${installCommand}`] : []),
-    '',
-    footer,
-  ].join('\n')
-
-  const withEmptyDescription = build('', true)
-  const descriptionBudget = 280 - withEmptyDescription.length - 1
-  const description = truncate(skill.description, Math.max(0, descriptionBudget))
-  const text = build(description, true)
-
-  if (text.length <= 280) return text
-
-  return build('', false).slice(0, 280)
+  return buildHumanSkillPostText(skill, { includeUrl: true, source: undefined })
 }
 
-function inferUseCase(skill: XPostSkill) {
-  const text = [
+function getSkillSearchText(skill: XPostSkill) {
+  return [
     skill.name,
     skill.description,
     skill.category,
     skill.github_repo,
     ...(skill.tags || []),
   ].join(' ').toLowerCase()
+}
 
+function getHumanObservation(skill: XPostSkill) {
+  const text = getSkillSearchText(skill)
+
+  if (/(last\s?30|recent|trend|trending|hacker news|reddit|youtube|polymarket|bluesky|social)/.test(text)) {
+    return "A lot of agents don't need a bigger prompt. They need fresher context."
+  }
   if (/(browser|web|crawl|scrap|page|site|monitor)/.test(text)) {
-    return 'you need an agent to browse, extract, or monitor web pages without building a scraper from scratch.'
+    return 'Most web agents fail in the boring part: messy pages, missing context, repeatable extraction.'
   }
-  if (/(finance|stock|investment|market|equity|quant|trading|supply-chain|bottleneck|research)/.test(text)) {
-    return 'you want an agent to turn market noise into source-backed research, ranked candidates, and risk checks.'
+  if (/(finance|stock|investment|market|equity|quant|trading|portfolio|earnings)/.test(text)) {
+    return "Finance agents don't need louder takes. They need sources, data, and a repeatable research path."
   }
-  if (/\b(code|coding|developer|dev|github|claude|cursor|terminal|repo)\b/.test(text)) {
-    return 'you want your coding agent to carry more repo context and ship repetitive changes faster.'
+  if (/\b(code|coding|developer|dev|github|claude|cursor|terminal|repo|review|test)\b/.test(text)) {
+    return "Most coding agents don't fail from lack of model power. They fail when repo context disappears."
   }
   if (/(rag|search|knowledge|memory|document|pdf|data|vector)/.test(text)) {
-    return 'your agent needs to turn docs, data, or knowledge bases into answers and actions.'
+    return 'The useful research skills are not search wrappers. They help agents keep sources attached.'
   }
-  if (/(workflow|productivity|task|calendar|email|notion|slack|ops)/.test(text)) {
-    return 'you want to move a repeatable work routine from manual steps into an agent workflow.'
+  if (/(workflow|productivity|task|calendar|email|notion|slack|ops|automation)/.test(text)) {
+    return 'A good workflow skill turns repeated manual steps into something an agent can safely replay.'
   }
-  if (/(image|video|design|figma|creative)/.test(text)) {
-    return 'you want an agent to help with creative production instead of only text chat.'
+  if (/(image|video|design|figma|creative|seedance|motion)/.test(text)) {
+    return "Creative agents need taste, but they also need a production surface they can actually operate."
   }
 
-  return 'you want a practical agent capability you can plug into real work, not just another demo.'
+  return 'The best agent skills feel small at first, then remove a task your agent used to improvise.'
+}
+
+function getCapabilityLine(skill: XPostSkill) {
+  const text = getSkillSearchText(skill)
+  const name = truncate(skill.name, 54)
+  const description = truncate(skill.description, 110)
+
+  if (/(last\s?30|recent|trend|trending|hacker news|reddit|youtube|polymarket|bluesky|social)/.test(text)) {
+    return `${name} feels like a recent-web radar for Codex, Claude Code, Cursor, and research agents.`
+  }
+  if (/(browser|web|crawl|scrap|page|site|monitor)/.test(text)) {
+    return `${name} gives agents a cleaner path to browse, extract, and monitor web pages.`
+  }
+  if (/(finance|stock|investment|market|equity|quant|trading|portfolio|earnings)/.test(text)) {
+    return `${name} helps turn market noise into source-backed analysis an agent can reuse.`
+  }
+  if (/\b(code|coding|developer|dev|github|claude|cursor|terminal|repo|review|test)\b/.test(text)) {
+    return `${name} gives coding agents a repeatable way to plan, patch, review, or ship.`
+  }
+  if (/(rag|search|knowledge|memory|document|pdf|data|vector)/.test(text)) {
+    return `${name} helps agents turn docs, data, or knowledge bases into grounded work.`
+  }
+  if (/(workflow|productivity|task|calendar|email|notion|slack|ops|automation)/.test(text)) {
+    return `${name} helps agents move a repeatable workflow out of manual copy-paste.`
+  }
+  if (/(image|video|design|figma|creative|seedance|motion)/.test(text)) {
+    return `${name} gives creative agents a more practical production workflow.`
+  }
+
+  return description ? `${name}: ${description}` : `${name} is a practical agent skill worth shortlisting.`
+}
+
+function getOneLineTake(skill: XPostSkill) {
+  const text = getSkillSearchText(skill)
+
+  if (/(last\s?30|recent|trend|trending|hacker news|reddit|youtube|polymarket|bluesky|social)/.test(text)) {
+    return 'One-line take: recent context beats stale search.'
+  }
+  if (/(browser|web|crawl|scrap|page|site|monitor)/.test(text)) {
+    return 'One-line take: less scraper glue, more usable agent context.'
+  }
+  if (/(finance|stock|investment|market|equity|quant|trading|portfolio|earnings)/.test(text)) {
+    return 'One-line take: make the research path auditable before the agent acts.'
+  }
+  if (/\b(code|coding|developer|dev|github|claude|cursor|terminal|repo|review|test)\b/.test(text)) {
+    return 'One-line take: better repo rituals beat another blank prompt.'
+  }
+  if (/(rag|search|knowledge|memory|document|pdf|data|vector)/.test(text)) {
+    return 'One-line take: grounded answers start with better retrieval.'
+  }
+  if (/(workflow|productivity|task|calendar|email|notion|slack|ops|automation)/.test(text)) {
+    return 'One-line take: repeatable work should become agent-readable.'
+  }
+  if (/(image|video|design|figma|creative|seedance|motion)/.test(text)) {
+    return 'One-line take: agents need production taste plus production handles.'
+  }
+
+  return 'One-line take: package the capability so the agent does not start from scratch.'
+}
+
+function buildHumanSkillPostText(
+  skill: XPostSkill,
+  options: {
+    includeUrl: boolean
+    source?: 'x'
+  }
+) {
+  const url = getSkillUrl(skill, options.source)
+  const stats = `${formatStars(skill.github_stars)} stars`
+  const footer = options.includeUrl ? `${url}\n#AIAgents` : '#AIAgents'
+  const build = (parts: string[]) => parts.filter(Boolean).join('\n\n')
+
+  const observation = getHumanObservation(skill)
+  const capability = getCapabilityLine(skill)
+  const take = getOneLineTake(skill)
+  const full = build([observation, capability, take, stats, footer])
+  if (full.length <= 280) return full
+
+  const withoutTake = build([observation, capability, stats, footer])
+  if (withoutTake.length <= 280) return withoutTake
+
+  const compactBase = build([observation, stats, footer])
+  const compactBudget = Math.max(0, 280 - compactBase.length - 2)
+  const compact = build([observation, truncate(capability, compactBudget), stats, footer])
+  if (compact.length <= 280) return compact
+
+  const fallbackTail = build([`${stats} - ${truncate(skill.category, 28)}`, footer])
+  const fallbackBudget = Math.max(0, 280 - fallbackTail.length - 2)
+  const fallback = build([truncate(capability, fallbackBudget), fallbackTail])
+  if (fallback.length <= 280) return fallback
+
+  return build([truncate(skill.name, Math.max(0, 280 - footer.length - 2)), footer])
 }
 
 export function buildManualXMainText(skill: XPostSkill) {
-  const title = 'OpenAgentSkill Update'
-  const pick = `Today: ${truncate(skill.name, 64)}`
-  const useCase = `Use it when ${inferUseCase(skill)}`
-  const stats = `${formatStars(skill.github_stars)} stars - ${truncate(skill.category, 32)}`
-  const link = `Link: ${getSkillUrl(skill, 'x')}`
-  const footer = '#AIAgents #OpenAgentSkill'
-
-  const build = (scenario: string) => [
-    title,
-    pick,
-    '',
-    scenario,
-    '',
-    stats,
-    link,
-    footer,
-  ].join('\n')
-
-  const fixedLength = build('').length
-  return build(truncate(useCase, 280 - fixedLength)).slice(0, 280)
+  return buildHumanSkillPostText(skill, { includeUrl: true, source: 'x' })
 }
 
 export function buildManualXReplyText(skill: XPostSkill) {
   const installCommand = truncate(skill.install_command || `npx skills add ${skill.github_repo}`, 84)
-  const title = `Link for ${truncate(skill.name, 72)}:`
+  const title = `Listing + install path for ${truncate(skill.name, 54)}:`
   const footer = `Install: ${installCommand}`
   const text = [title, getSkillUrl(skill, 'x'), '', footer].join('\n')
 
@@ -176,10 +234,10 @@ export function buildCommunityIndexedReplyText(
   const url = `${getSkillUrlBySlug(skill.slug, 'x')}&utm_source=x_reply`
 
   const intro = creatorName
-    ? `Love this. Added ${creatorName}'s ${skillName} to OpenAgentSkill as a community-indexed skill.`
-    : `Love this. Added ${skillName} to OpenAgentSkill as a community-indexed skill.`
+    ? `This is exactly the kind of practical skill agents need. Added ${creatorName}'s ${skillName} to OpenAgentSkill.`
+    : `This is exactly the kind of practical skill agents need. Added ${skillName} to OpenAgentSkill.`
 
-  const claimLine = 'Happy to update or verify the listing if you want to claim it.'
+  const claimLine = 'Happy to update details or mark it as claimed.'
   const build = (middle: string, includeClaim: boolean) => [
     intro,
     middle,
@@ -188,7 +246,7 @@ export function buildCommunityIndexedReplyText(
     ...(includeClaim ? ['', claimLine] : []),
   ].join('\n')
 
-  const middle = 'Now agents/builders can discover it, compare trust signals, and find the install path from one page.'
+  const middle = 'Now builders can discover it, compare trust signals, and find the install path from one page.'
   const full = build(middle, true)
   if (full.length <= 280) return full
 
