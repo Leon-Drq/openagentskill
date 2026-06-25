@@ -371,6 +371,66 @@ export async function enqueueXSkillPostQueue(
   }
 }
 
+async function getApprovedSkillsBySlugs(
+  supabase: SupabasePublicClient,
+  slugs: string[],
+  limit: number
+) {
+  const uniqueSlugs = Array.from(new Set(slugs.map((slug) => slug.trim()).filter(Boolean))).slice(0, 100)
+  if (!uniqueSlugs.length) return []
+
+  const { data, error } = await supabase
+    .from('skills')
+    .select('*')
+    .eq('ai_review_approved', true)
+    .in('slug', uniqueSlugs)
+    .limit(uniqueSlugs.length)
+
+  if (error) throw new Error(`Failed to load skills for X queue: ${error.message}`)
+
+  const skillsBySlug = new Map((data || []).map((skill) => [skill.slug, skill as SkillRecord]))
+  return uniqueSlugs
+    .map((slug) => skillsBySlug.get(slug))
+    .filter((skill): skill is SkillRecord => Boolean(skill))
+    .slice(0, limit)
+}
+
+export async function enqueueXSkillPostQueueForSlugs(
+  options: {
+    slugs: string[]
+    limit?: number
+    minStars?: number
+    campaign?: string
+  }
+): Promise<XQueueBuildResult> {
+  const serverSecret = getServerSecret()
+  const supabase = createPublicClient()
+  const limit = Math.min(Math.max(options.limit || 8, 1), 25)
+  const minStars = Math.max(options.minStars || 10, 10)
+  const campaign = options.campaign || 'github_hot_daily'
+  const skills = (await getApprovedSkillsBySlugs(supabase, options.slugs, limit * 3))
+    .filter((skill) => isGoodXCandidate(skill, minStars))
+    .sort((a, b) => getQueuePriority(b) - getQueuePriority(a))
+    .slice(0, limit)
+
+  const results: QueueRpcResult[] = []
+  for (const skill of skills) {
+    const result = await enqueueQueueItem(supabase, serverSecret, skill, { campaign })
+    results.push(result)
+  }
+
+  const queued = results.filter((result) => result.status === 'queued').length
+  const skipped = results.filter((result) => result.status !== 'queued').length
+
+  return {
+    status: queued > 0 ? 'ready' : 'skipped',
+    queued,
+    skipped,
+    considered: skills.length,
+    results,
+  }
+}
+
 async function claimNextQueueItem(supabase: SupabasePublicClient, serverSecret: string) {
   const { data, error } = await supabase.rpc('claim_x_content_queue_item', {
     p_server_secret: serverSecret,

@@ -29,6 +29,10 @@
       "schedule": "15 3 * * *"
     },
     {
+      "path": "/api/cron/growth-daily",
+      "schedule": "20 13 * * *"
+    },
+    {
       "path": "/api/x/post-daily",
       "schedule": "30 15,23 * * *"
     },
