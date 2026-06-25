@@ -25,11 +25,11 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 
 <br />
 
-<img src="./public/github-social-preview.png" alt="OpenAgentSkill preview: Resolve, Trust, Install, Outcome Feedback" width="920" />
+<img src="./public/github-homepage-preview.png" alt="OpenAgentSkill homepage showing the skill layer for AI agents" width="920" />
 
 <br />
 
-<sub>Resolve API · Trust Score · Install Plan · Outcome Loop</sub>
+<sub>The skill layer for AI agents · Registry API · Trust Score · Auto installs</sub>
 
 </div>
 
