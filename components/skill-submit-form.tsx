@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { parseGitHubUrl } from '@/lib/github/api'
 import { useI18n } from '@/lib/i18n/context'
+import { SKILL_SUBMISSION_MIN_STARS } from '@/lib/skills/submission-policy'
 
 interface SubmitFormProps {
   onSubmit: (data: SubmitFormData) => Promise<void>
@@ -165,7 +166,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
           )}
         </div>
         <p className="mt-1.5 text-xs text-secondary">
-          至少需要 <span className="font-semibold text-foreground">3 star</span> 才能提交
+          至少需要 <span className="font-semibold text-foreground">{SKILL_SUBMISSION_MIN_STARS} stars</span> 才能提交。提交后会自动进行静态安全扫描、AI 质量评分和发布门禁检查。
         </p>
         {validating && (
           <p className="mt-2 text-sm text-secondary">{t.submitPage.form.validating}</p>

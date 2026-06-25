@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { validateGitHubRepo, GitHubAPIError } from '@/lib/github/api'
+import { SKILL_SUBMISSION_MIN_STARS } from '@/lib/skills/submission-policy'
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,14 +18,13 @@ export async function POST(request: NextRequest) {
     const repoData = await validateGitHubRepo(repository)
 
     // Check minimum star threshold
-    const MIN_STARS = 3
-    if (repoData.stars < MIN_STARS) {
+    if (repoData.stars < SKILL_SUBMISSION_MIN_STARS) {
       return NextResponse.json(
         {
           valid: false,
-          error: `该仓库目前有 ${repoData.stars} 个 star，未达到最低 ${MIN_STARS} star 的要求。`,
+          error: `该仓库目前有 ${repoData.stars} 个 star，未达到最低 ${SKILL_SUBMISSION_MIN_STARS} star 的要求。`,
           stars: repoData.stars,
-          minStars: MIN_STARS,
+          minStars: SKILL_SUBMISSION_MIN_STARS,
         },
         { status: 400 }
       )
@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
       valid: true,
       repository: repoData,
       stars: repoData.stars,
+      minStars: SKILL_SUBMISSION_MIN_STARS,
     })
   } catch (error) {
     console.error('[v0] Validation error:', error)

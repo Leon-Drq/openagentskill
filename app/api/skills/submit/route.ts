@@ -9,6 +9,10 @@ import {
 } from '@/lib/github/api'
 import { reviewSkill } from '@/lib/ai-review/reviewer'
 import { analyzeCode } from '@/lib/security/static-analysis'
+import {
+  evaluateSkillSubmissionPolicy,
+  SKILL_SUBMISSION_MIN_STARS,
+} from '@/lib/skills/submission-policy'
 import { createPublicClient } from '@/lib/supabase/public'
 
 const SkillSubmitRequestSchema = z.object({
@@ -56,10 +60,13 @@ export async function POST(request: NextRequest) {
     const repoData = await validateGitHubRepo(repository)
 
     // Enforce minimum star threshold (also checked client-side but enforced here)
-    const MIN_STARS = 3
-    if (repoData.stars < MIN_STARS) {
+    if (repoData.stars < SKILL_SUBMISSION_MIN_STARS) {
       return NextResponse.json(
-        { error: `该仓库仅有 ${repoData.stars} 个 star，未达到最低 ${MIN_STARS} star 的要求` },
+        {
+          error: `该仓库仅有 ${repoData.stars} 个 star，未达到最低 ${SKILL_SUBMISSION_MIN_STARS} star 的要求`,
+          stars: repoData.stars,
+          minStars: SKILL_SUBMISSION_MIN_STARS,
+        },
         { status: 400 }
       )
     }
@@ -118,6 +125,33 @@ export async function POST(request: NextRequest) {
       totalScore: review.totalScore,
     })
 
+    const policy = evaluateSkillSubmissionPolicy({
+      stars: repoData.stars,
+      hasReadme: repoData.hasReadme,
+      staticAnalysis: staticResult,
+      review,
+    })
+    const reviewedResult = {
+      ...review,
+      approved: policy.approved,
+      issues: policy.issues,
+      suggestions: policy.suggestions,
+      policy,
+    }
+
+    if (!policy.approved) {
+      return NextResponse.json({
+        success: false,
+        approved: false,
+        review: reviewedResult,
+        policy,
+        error:
+          policy.status === 'manual_review'
+            ? 'Skill requires manual review before publishing'
+            : 'Skill did not pass the automatic submission gate',
+      })
+    }
+
     // Step 4: Create skill object
     const skillName = manifestData?.name || repo.replace(/-/g, ' ')
     const slug = `${owner}-${repo}`.toLowerCase()
@@ -167,7 +201,7 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       featured: false,
-      verified: review.approved && review.totalScore >= 35,
+      verified: policy.verified,
     }
 
     try {
@@ -186,6 +220,7 @@ export async function POST(request: NextRequest) {
           stars: repoData.stars,
           source: submissionSource,
           static_analysis: staticResult,
+          submission_policy: policy,
         },
       }
 
@@ -209,20 +244,20 @@ export async function POST(request: NextRequest) {
           version: manifestData?.version || '1.0.0',
           license: repoData.license || 'Unknown',
           install_command: `npx skills add ${owner}/${repo}`,
-          verified: review.approved && review.totalScore >= 35,
+          verified: policy.verified,
           submission_source: submissionSource,
           submitted_by_agent: body.submittedByAgent,
           ai_review_score: review.scores,
-          ai_review_approved: review.approved,
-          ai_review_issues: review.issues,
-          ai_review_suggestions: review.suggestions,
+          ai_review_approved: policy.approved,
+          ai_review_issues: policy.issues,
+          ai_review_suggestions: policy.suggestions,
         },
         p_submission: {
           github_repo: `${owner}/${repo}`,
           submission_source: submissionSource,
           submitted_by_agent: body.submittedByAgent,
-          ai_review_result: review,
-          status: review.approved ? 'approved' : 'rejected',
+          ai_review_result: reviewedResult,
+          status: policy.status,
         },
         p_activity: activity,
       })
@@ -240,8 +275,9 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        approved: review.approved,
-        review,
+        approved: policy.approved,
+        review: reviewedResult,
+        policy,
         skill: {
           ...newSkill,
           id: skillRecord.id,
@@ -262,8 +298,9 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: false,
-        approved: review.approved,
-        review,
+        approved: policy.approved,
+        review: reviewedResult,
+        policy,
         error: 'Skill reviewed but database save failed',
       }, { status: 500 })
     }

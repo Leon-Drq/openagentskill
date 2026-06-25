@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { MarketingHero, MarketingPageShell } from '@/components/marketing-page'
+import { SKILL_SUBMISSION_MIN_STARS } from '@/lib/skills/submission-policy'
 
 export const metadata: Metadata = {
   title: 'API Reference - Open Agent Skill',
@@ -832,7 +833,7 @@ This skill enables agents to perform comprehensive web research...`}</code>
             </div>
             <div className="p-4 sm:p-6">
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
-                {'Submit a GitHub repository as a skill. The repository must have at least 3 stars. Used by OpenClaw and other agents to auto-publish skills.'}
+                {`Submit a GitHub repository as a skill. The repository must have at least ${SKILL_SUBMISSION_MIN_STARS} stars and pass static security analysis plus AI scoring before automatic publishing. Used by OpenClaw and other agents to submit skill candidates.`}
               </p>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Request Body'}</h3>
@@ -885,8 +886,13 @@ Content-Type: application/json
   },
   "review": {
     "approved": true,
-    "totalScore": 42,
-    "summary": "High quality skill with clear documentation"
+    "totalScore": 36,
+    "summary": "High quality skill with clear documentation",
+    "policy": {
+      "status": "approved",
+      "min_stars": ${SKILL_SUBMISSION_MIN_STARS},
+      "checks": ["GitHub adoption", "Static security scan", "AI total score"]
+    }
   }
 }`}</code>
               </div>
@@ -931,7 +937,7 @@ publish:
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="font-semibold mb-2 text-sm sm:text-base">{'OpenClaw will POST automatically when the threshold is reached'}</h3>
-                <p className="text-secondary text-sm mb-3">{'Once configured, every time a monitored repo crosses 3 stars, OpenClaw will call the submit API with the repo details. You can also trigger it manually:'}</p>
+                <p className="text-secondary text-sm mb-3">{`Once configured, every time a monitored repo crosses ${SKILL_SUBMISSION_MIN_STARS} stars, OpenClaw will call the submit API with the repo details. You can also trigger it manually:`}</p>
                 <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
                   <code>{`# Manually submit a specific repo via OpenClaw
 openclaw publish --target openagentskill --repo owner/my-skill`}</code>
@@ -945,7 +951,7 @@ openclaw publish --target openagentskill --repo owner/my-skill`}</code>
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="font-semibold mb-2 text-sm sm:text-base">{'AI review runs automatically'}</h3>
-                <p className="text-secondary text-sm">{'Submitted skills go through the same AI review pipeline as manual submissions — static security analysis + quality scoring. If approved, the skill appears on the platform immediately with the activity feed noting it was "discovered by OpenClaw".'}</p>
+                <p className="text-secondary text-sm">{'Submitted skills go through the same review pipeline as manual submissions: minimum-star gate, static security analysis, AI quality scoring, and a final publish policy gate. Only approved skills appear immediately with the activity feed noting they were discovered by OpenClaw.'}</p>
               </div>
             </div>
           </div>
