@@ -78,6 +78,15 @@ function booleanFromEnv(name: string, fallback: boolean) {
   return value === 'true' || value === '1'
 }
 
+function utcDayWindow(date = new Date()) {
+  const start = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+  const end = new Date(start.getTime() + 86_400_000)
+  return {
+    start: start.toISOString(),
+    end: end.toISOString(),
+  }
+}
+
 function unique(values: Array<string | undefined>) {
   return Array.from(new Set(values.filter((value): value is string => Boolean(value))))
 }
@@ -150,6 +159,19 @@ async function generateSeoPostsForSlugs(
   }
 }
 
+async function remainingDailySeoPostQuota(dailyLimit: number) {
+  const supabase = createAdminClient()
+  const window = utcDayWindow()
+  const { count, error } = await supabase
+    .from('blog_posts')
+    .select('id', { count: 'exact', head: true })
+    .gte('published_at', window.start)
+    .lt('published_at', window.end)
+
+  if (error) throw new Error(`Failed to count today's blog posts: ${error.message}`)
+  return Math.max(0, dailyLimit - (count || 0))
+}
+
 export async function runDailyGrowthAutomation(
   options: DailyGrowthOptions = {}
 ): Promise<DailyGrowthResult> {
@@ -157,6 +179,7 @@ export async function runDailyGrowthAutomation(
   const targetNew = Math.min(Math.max(options.targetNew ?? numberFromEnv('GROWTH_DAILY_TARGET_NEW', 40), 1), 250)
   const hotLimit = Math.min(Math.max(options.hotLimit ?? numberFromEnv('GROWTH_DAILY_HOT_LIMIT', 24), 1), 80)
   const blogLimit = Math.min(Math.max(options.blogLimit ?? nonNegativeNumberFromEnv('GROWTH_DAILY_BLOG_LIMIT', 0), 0), 12)
+  const seoDailyLimit = Math.min(Math.max(numberFromEnv('SEO_DRIP_DAILY_LIMIT', 50), 1), 100)
   const xQueueLimit = Math.min(Math.max(options.xQueueLimit ?? numberFromEnv('GROWTH_DAILY_X_QUEUE_LIMIT', 8), 1), 25)
   const xMinStars = Math.max(options.xMinStars ?? numberFromEnv('GROWTH_DAILY_X_MIN_STARS', 10), 10)
   const autoPost = options.autoPost ?? booleanFromEnv('GROWTH_DAILY_AUTO_POST', true)
@@ -194,7 +217,8 @@ export async function runDailyGrowthAutomation(
   const combinedResults = [...hotResults, ...broadImport.results]
   const indexedSlugs = collectSlugsByStatus(combinedResults, ['indexed'])
   const indexedOrUpdatedSlugs = collectSlugsByStatus(combinedResults, ['indexed', 'updated'])
-  const seo = await generateSeoPostsForSlugs(indexedSlugs, blogLimit)
+  const seoRemainingToday = blogLimit > 0 ? await remainingDailySeoPostQuota(seoDailyLimit) : 0
+  const seo = await generateSeoPostsForSlugs(indexedSlugs, Math.min(blogLimit, seoRemainingToday))
 
   const indexingUrls = new Set([
     ...collectIndexNowUrlsFromIndexerResults(combinedResults),
