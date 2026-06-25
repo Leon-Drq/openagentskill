@@ -7,6 +7,7 @@ import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile, type SkillTrustEvidence } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
+import { AGENT_OUTCOMES } from '@/lib/agent-outcomes'
 
 const SITE_URL = 'https://www.openagentskill.com'
 
@@ -104,6 +105,24 @@ export interface AgentReadableSkillMetadata {
       verification_result: string
     }
   }
+  outcome_feedback: {
+    endpoint: string
+    method: 'POST'
+    requires_resolve_event_id: boolean
+    event_id_source: string
+    expected_outcomes: string[]
+    payload_template: {
+      event_id: string
+      skill_slug: string
+      task: string
+      agent: string
+      outcome: string
+      install_used: boolean
+      risk_blocked: boolean
+      setup_required: boolean
+      notes: string
+    }
+  }
   endpoints: {
     web: string
     api: string
@@ -172,6 +191,7 @@ export function buildAgentReadableSkillMetadata(
   const installPath = `/api/skills/${skill.slug}/install`
   const manifestPath = `/api/registry/manifest/${skill.slug}`
   const auditPath = `/skills/${skill.slug}/audit`
+  const outcomePath = '/api/agent/outcome'
   const evalPath = `/api/agent/evals?slug=${encodeURIComponent(skill.slug)}&task=${encodeURIComponent(task)}&max_risk=medium`
 
   const suitedTasks = uniqueStrings(
@@ -318,6 +338,24 @@ export function buildAgentReadableSkillMetadata(
         install_command: installCommand,
         risk_summary: `${auditRiskLabel(audit.risk_level)}; ${safety.safety_tier.label}; ${trust.riskSummary.label}`,
         verification_result: 'Report the smallest successful task, files touched, warnings, and any missing setup.',
+      },
+    },
+    outcome_feedback: {
+      endpoint: absoluteUrl(baseUrl, outcomePath),
+      method: 'POST',
+      requires_resolve_event_id: true,
+      event_id_source: 'Use feedback.event_id returned by /api/agent/resolve for the current task.',
+      expected_outcomes: [...AGENT_OUTCOMES],
+      payload_template: {
+        event_id: '<feedback.event_id from /api/agent/resolve>',
+        skill_slug: skill.slug,
+        task,
+        agent: 'codex',
+        outcome: 'success',
+        install_used: true,
+        risk_blocked: false,
+        setup_required: false,
+        notes: 'Report the smallest successful task, setup friction, files touched, and risk notes.',
       },
     },
     endpoints: {

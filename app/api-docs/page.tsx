@@ -197,6 +197,7 @@ export default function APIDocsPage() {
                   ['recommendation.install', 'Command, target, install API, review requirement, and auto-install policy'],
                   ['recommendation.why_recommended', 'Short explainable ranking reasons for agent logs'],
                   ['recommendation.trust_score_v4', 'Trust Score v4 evidence, outcome signals, install safety, permission surface, install policy, compatibility, and risk summary'],
+                  ['decision_packet', 'Stable agent contract with selected skill, install plan, trust dimensions, do_not_use_when, alternatives, and outcome_feedback'],
                   ['feedback', 'Outcome event id, outcome API URL, expected outcomes, and ready CLI command for reporting adoption results'],
                   ['agent_handoff', 'Platform copy prompts, API sequence, review checklist, expected output contract, and blocked actions'],
                 ].map(([field, detail]) => (

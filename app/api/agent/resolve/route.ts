@@ -52,6 +52,20 @@ Event ID: ${payload.feedback.event_id}
 Outcome API: ${payload.feedback.outcome_api}
 CLI: ${payload.feedback.cli_example}
 
+Decision Packet:
+${payload.decision_packet ? `Version: ${payload.decision_packet.version}
+Selected: ${payload.decision_packet.selected_skill.name} (${payload.decision_packet.selected_skill.slug})
+Install: ${payload.decision_packet.install.command}
+Policy: ${payload.decision_packet.install.policy}
+Trust: ${payload.decision_packet.trust.score}/100 ${payload.decision_packet.trust.label}
+Risk: ${payload.decision_packet.risk.level}; ${payload.decision_packet.risk.safety_tier}
+Outcome endpoint: ${payload.decision_packet.outcome_feedback.endpoint}
+Outcome event: ${payload.decision_packet.outcome_feedback.event_id}
+Do not use when:
+${payload.decision_packet.risk.do_not_use_when.slice(0, 4).map((item) => `- ${item}`).join('\n')}
+Alternatives:
+${payload.decision_packet.alternatives.slice(0, 3).map((item) => `- ${item.name}: ${item.install_command}`).join('\n')}` : 'No decision packet generated'}
+
 Selected:
 ${selected ? `${selected.skill.name} (${selected.skill.slug})
 Match: ${selected.match_score}

@@ -296,6 +296,7 @@ export default async function SkillDetailPage({
     agentReadableMetadata?.do_not_use_when || [
       'Do not skip repository, license, permission, and dependency review before production use.',
     ]
+  const outcomeFeedback = agentReadableMetadata?.outcome_feedback || null
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -633,13 +634,13 @@ export default async function SkillDetailPage({
                 </div>
               </div>
 
-              <div className="grid gap-3 bg-[#fbfaf7] p-3 lg:grid-cols-3">
+              <div className="grid gap-3 bg-[#fbfaf7] p-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                 <div className="rounded-[8px] border border-border bg-background p-5">
                   <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">
                     Suited tasks
                   </p>
                   <ul className="space-y-2 text-sm leading-relaxed text-secondary">
-                    {suitableTasks.slice(0, 5).map((task) => (
+                    {suitableTasks.slice(0, 4).map((task) => (
                       <li key={task} className="flex gap-2">
                         <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-[#006b4f]" />
                         <span>{task}</span>
@@ -664,13 +665,47 @@ export default async function SkillDetailPage({
                 </div>
                 <div className="rounded-[8px] border border-border bg-background p-5">
                   <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">
+                    Install decision
+                  </p>
+                  <dl className="grid gap-2 text-sm">
+                    <div className="flex items-center justify-between gap-4">
+                      <dt className="text-secondary">Command</dt>
+                      <dd className="max-w-[9rem] truncate font-mono text-xs" title={installCommand}>
+                        {installCommand}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <dt className="text-secondary">Policy</dt>
+                      <dd className="font-mono">
+                        {safetyProfile?.safety_tier.auto_install_policy ||
+                          'review'}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <dt className="text-secondary">Human review</dt>
+                      <dd className="font-mono">
+                        {safetyProfile?.human_review_required ? 'yes' : 'no'}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+                <div className="rounded-[8px] border border-border bg-background p-5">
+                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">
                     Trust and risk
                   </p>
                   <dl className="grid gap-2 text-sm">
                     <div className="flex items-center justify-between gap-4">
-                      <dt className="text-secondary">Trust score</dt>
+                      <dt className="text-secondary">Trust</dt>
                       <dd className="font-mono">
                         {trustProfile ? `${trustProfile.score}/100` : 'Unknown'}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <dt className="text-secondary">Audit</dt>
+                      <dd className="font-mono">
+                        {auditProfile
+                          ? `${auditProfile.audit_score}/100`
+                          : 'Unknown'}
                       </dd>
                     </div>
                     <div className="flex items-center justify-between gap-4">
@@ -681,11 +716,27 @@ export default async function SkillDetailPage({
                           : 'Unknown'}
                       </dd>
                     </div>
+                  </dl>
+                </div>
+                <div className="rounded-[8px] border border-border bg-background p-5">
+                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">
+                    Outcome loop
+                  </p>
+                  <dl className="grid gap-2 text-sm">
                     <div className="flex items-center justify-between gap-4">
-                      <dt className="text-secondary">Auto install</dt>
+                      <dt className="text-secondary">Endpoint</dt>
+                      <dd className="text-right font-mono text-xs [overflow-wrap:anywhere]">
+                        /api/agent/outcome
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <dt className="text-secondary">Event ID</dt>
+                      <dd className="font-mono">resolve</dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <dt className="text-secondary">Outcomes</dt>
                       <dd className="font-mono">
-                        {safetyProfile?.safety_tier.auto_install_policy ||
-                          'review'}
+                        {outcomeFeedback?.expected_outcomes.length || 5}
                       </dd>
                     </div>
                   </dl>
@@ -735,11 +786,11 @@ export default async function SkillDetailPage({
                   </p>
                   <ul className="space-y-2 text-sm leading-relaxed text-secondary">
                     {doNotUseWhen.slice(0, 5).map((warning) => (
-                        <li key={warning} className="flex gap-2">
-                          <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-amber-600" />
-                          <span>{warning}</span>
-                        </li>
-                      ))}
+                      <li key={warning} className="flex gap-2">
+                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-amber-600" />
+                        <span>{warning}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>

@@ -421,15 +421,29 @@ interface ResolverRecommendationCandidate {
   machine_metadata: AgentReadableSkillMetadata
 }
 
+type ResolveFeedbackContract = ReturnType<typeof buildResolveFeedback>
+
 function buildResolverRecommendation(
   task: string,
   agent: InstallTargetId | 'auto',
   selected: ResolverRecommendationCandidate | null,
-  alternatives: ResolverRecommendationCandidate[]
+  alternatives: ResolverRecommendationCandidate[],
+  feedback: ResolveFeedbackContract
 ) {
   if (!selected) return null
 
   const risk = summarizeRisks(selected)
+  const alternativeShortlist = alternatives.slice(0, 5).map((candidate) => ({
+    slug: candidate.skill.slug,
+    name: candidate.skill.name,
+    url: candidate.urls.web,
+    install_command: candidate.install_plan.command,
+    trust_score: candidate.trust.score,
+    audit_score: candidate.audit.audit_score,
+    safety_score: candidate.safety.score,
+    why_consider: candidate.recommendation_reasons[0] || candidate.decision.headline,
+    risk: summarizeRisks(candidate),
+  }))
 
   return {
     task,
@@ -525,17 +539,72 @@ function buildResolverRecommendation(
       github_quality: selected.supply_profile.githubQuality,
       coverage_tags: selected.supply_profile.coverageTags,
     },
-    alternatives: alternatives.slice(0, 5).map((candidate) => ({
-      slug: candidate.skill.slug,
-      name: candidate.skill.name,
-      url: candidate.urls.web,
-      install_command: candidate.install_plan.command,
-      trust_score: candidate.trust.score,
-      audit_score: candidate.audit.audit_score,
-      safety_score: candidate.safety.score,
-      why_consider: candidate.recommendation_reasons[0] || candidate.decision.headline,
-      risk: summarizeRisks(candidate),
-    })),
+    alternatives: alternativeShortlist,
+    decision_packet: {
+      version: 'openagentskill-agent-decision-packet-v1',
+      task,
+      agent,
+      selected_skill: {
+        slug: selected.skill.slug,
+        name: selected.skill.name,
+        url: selected.urls.web,
+        api_url: selected.urls.api,
+        audit_url: selected.urls.audit,
+        repository: selected.urls.repository,
+      },
+      suited_tasks: selected.machine_metadata.suited_tasks,
+      suited_agents: selected.machine_metadata.suited_agents,
+      install: {
+        command: selected.install_plan.command,
+        target: selected.install_plan.target,
+        label: selected.install_plan.label,
+        policy: selected.safety.safety_tier.auto_install_policy,
+        auto_install_allowed: selected.safety.auto_install_allowed,
+        human_review_required: selected.safety.human_review_required,
+        sandbox_first: !selected.safety.auto_install_allowed || selected.trust.autoInstall.sandboxRequired,
+      },
+      trust: {
+        score: selected.trust.score,
+        label: selected.trust.label,
+        version: selected.trust.version,
+        dimensions: selected.trust.dimensions.map((dimension) => ({
+          id: dimension.id,
+          label: dimension.label,
+          score: dimension.score,
+          status: dimension.status,
+          detail: dimension.detail,
+        })),
+      },
+      risk: {
+        level: risk.level,
+        audit_label: risk.level,
+        safety: risk.safety,
+        trust: risk.trust,
+        safety_tier: risk.safety_tier,
+        notes: risk.notes,
+        do_not_use_when: selected.machine_metadata.do_not_use_when,
+        minimum_review_before_use: selected.machine_metadata.agent_contract.minimum_review_before_use,
+      },
+      alternatives: alternativeShortlist,
+      outcome_feedback: {
+        event_id: feedback.event_id,
+        endpoint: feedback.outcome_api,
+        method: feedback.method,
+        expected_outcomes: feedback.expected_outcomes,
+        payload_template: feedback.json_example,
+        cli_example: feedback.cli_example,
+      },
+      next_agent_action: selected.safety.auto_install_allowed
+        ? 'Review audit, install in a sandbox, run one narrow task, then report outcome.'
+        : 'Ask for human approval or choose a safer alternative before installing.',
+      stable_fields: [
+        'decision_packet.selected_skill',
+        'decision_packet.install',
+        'decision_packet.risk.do_not_use_when',
+        'decision_packet.alternatives',
+        'decision_packet.outcome_feedback',
+      ],
+    },
     agent_instruction: [
       `Use ${selected.skill.name} for: ${task}`,
       `Review audit: ${selected.urls.audit}`,
@@ -885,7 +954,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         ],
       }
     : null
-  const recommendation = buildResolverRecommendation(task, agent, selected, alternatives)
+  const recommendation = buildResolverRecommendation(task, agent, selected, alternatives, feedback)
 
   return {
     task,
@@ -905,6 +974,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           summary: 'No matching skill passed the current filters.',
         },
     agent_decision: agentDecision,
+    decision_packet: recommendation?.decision_packet || null,
     benchmark: {
       endpoint: `${SITE_URL}/api/agent/evals`,
       note: 'Use the evals endpoint to regression-test recommendation quality before changing ranking logic.',
@@ -927,6 +997,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         risk: 'recommendation.risk',
         alternatives: 'recommendation.alternatives',
         agent_handoff: 'agent_handoff.platform_templates + agent_handoff.review_checklist',
+        decision_packet: 'decision_packet',
       },
     },
   }
