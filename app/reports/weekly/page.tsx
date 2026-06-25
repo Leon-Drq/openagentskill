@@ -47,7 +47,7 @@ function SkillList({ skills }: { skills: SkillRecord[] }) {
 
 export default async function WeeklyReportPage() {
   const [skills, eventStatsMap] = await Promise.all([
-    getAllSkills('quality').catch(() => []),
+    getAllSkills('quality', undefined, 1200).catch(() => []),
     getSkillEventStatsMap().catch(() => ({})),
   ])
   const report = buildWeeklySkillReport(skills, eventStatsMap)

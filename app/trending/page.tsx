@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 
 export default async function TrendingSkillsPage() {
   const [skills, eventStatsMap, dailyStatsMap] = await Promise.all([
-    getAllSkills('quality').catch(() => []),
+    getAllSkills('quality', undefined, 1200).catch(() => []),
     getSkillEventStatsMap().catch((): Record<string, SkillEventStats> => ({})),
     getSkillEventDailyStatsMap(7).catch((): Record<string, SkillEventDailyStats[]> => ({})),
   ])

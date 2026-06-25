@@ -101,7 +101,7 @@ export default async function AlternativesPage({
   const { slug } = await params
   const [target, dbSkills] = await Promise.all([
     getSkillBySlugOrFallback(slug),
-    getAllSkills('quality').catch(() => []),
+    getAllSkills('quality', undefined, 1200).catch(() => []),
   ])
   if (!target) notFound()
 

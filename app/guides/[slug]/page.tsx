@@ -204,7 +204,7 @@ export default async function GrowthGuidePage({
   const guide = getGrowthGuideBySlug(slug)
   if (!guide) notFound()
 
-  const allSkills = await getAllSkills('quality').catch(() => [])
+  const allSkills = await getAllSkills('quality', undefined, 1200).catch(() => [])
   const guideSkills = getGuideSkillModels(allSkills, guide)
   const primarySkills = guideSkills.slice(0, guide.intent === 'compare' ? 2 : 4)
   const relatedGuides = getRelatedGrowthGuides(guide)

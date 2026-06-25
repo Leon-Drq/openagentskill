@@ -55,7 +55,7 @@ export default async function TaskDetailPage({
   if (!task) notFound()
 
   const [skills, useCase] = await Promise.all([
-    getAllSkills('quality').catch(() => []),
+    getAllSkills('quality', undefined, 1200).catch(() => []),
     Promise.resolve(getUseCaseBySlug(task.useCaseSlug)),
   ])
   const ranked = selectSkillsForTask(skills, task, 12)

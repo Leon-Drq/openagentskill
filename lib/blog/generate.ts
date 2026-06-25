@@ -96,11 +96,12 @@ function toSkillPreview(row: BlogSkillRow): BlogSkillPreview {
   }
 }
 
-async function fetchApprovedSkillRows() {
+async function fetchApprovedSkillRows(maxRows = 1200) {
   const supabase = createPublicClient()
   const rows: BlogSkillRow[] = []
 
-  for (let from = 0; ; from += 1000) {
+  for (let from = 0; from < maxRows; from += 1000) {
+    const to = Math.min(from + 999, maxRows - 1)
     const { data, error } = await supabase
       .from('skills')
       .select(`
@@ -109,14 +110,25 @@ async function fetchApprovedSkillRows() {
       `)
       .eq('ai_review_approved', true)
       .order('created_at', { ascending: false })
-      .range(from, from + 999)
+      .range(from, to)
 
     if (error) throw new Error(error.message)
     rows.push(...((data || []) as BlogSkillRow[]))
-    if (!data || data.length < 1000) break
+    if (!data || data.length < to - from + 1) break
   }
 
   return rows.filter((row) => !isBlogMcpSkillRecord(row))
+}
+
+async function fetchApprovedSkillCount() {
+  const supabase = createPublicClient()
+  const { count, error } = await supabase
+    .from('skills')
+    .select('id', { count: 'exact', head: true })
+    .eq('ai_review_approved', true)
+
+  if (error) return null
+  return count
 }
 
 // ─── AI Content Generator ─────────────────────────────────────────────────────
@@ -287,7 +299,10 @@ export async function getBlogPostBySlug(slug: string) {
 }
 
 export async function getBlogHubData(): Promise<BlogHubData> {
-  const rows = await fetchApprovedSkillRows()
+  const [rows, totalCount] = await Promise.all([
+    fetchApprovedSkillRows(1200),
+    fetchApprovedSkillCount(),
+  ])
   const previews = rows.map(toSkillPreview)
   const launchWindowHours = 24
   const recentCutoff = Date.now() - launchWindowHours * 60 * 60 * 1000
@@ -300,7 +315,7 @@ export async function getBlogHubData(): Promise<BlogHubData> {
   }
 
   return {
-    totalSkills: previews.length,
+    totalSkills: totalCount ?? previews.length,
     recentLaunchCount: recentSkills.length,
     launchWindowHours,
     latestSkills: recentSkills

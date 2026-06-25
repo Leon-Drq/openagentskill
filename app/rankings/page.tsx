@@ -28,7 +28,7 @@ function formatNumber(value: number) {
 
 export default async function RankingsPage() {
   const [skills, statsMap] = await Promise.all([
-    getAllSkills('quality').catch(() => []),
+    getAllSkills('quality', undefined, 1200).catch(() => []),
     getSkillStats().catch((): Record<string, SkillAgentStats> => ({})),
   ])
   const rankingDefinitions = getRankingDefinitions()

@@ -47,7 +47,7 @@ export default async function AgentDetailPage({
   const profile = getAgentProfile(slug)
   if (!profile) notFound()
 
-  const skills = await getAllSkills('quality').catch(() => [])
+  const skills = await getAllSkills('quality', undefined, 1200).catch(() => [])
   const ranked = rankSkillsForAgent(skills, profile, 48)
   const totalStars = ranked.reduce((sum, item) => sum + Number(item.skill.github_stars || 0), 0)
   const installSteps = [

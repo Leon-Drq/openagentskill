@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 }
 
 export default async function AgentsHubPage() {
-  const skills = await getAllSkills('quality').catch(() => [])
+  const skills = await getAllSkills('quality', undefined, 1200).catch(() => [])
   const summaries = AGENT_PROFILES.map((profile) => {
     const ranked = rankSkillsForAgent(skills, profile, 6)
     const totalStars = ranked.reduce((sum, item) => sum + Number(item.skill.github_stars || 0), 0)

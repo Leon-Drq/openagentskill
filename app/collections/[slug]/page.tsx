@@ -43,7 +43,7 @@ export default async function CollectionDetailPage({
   const stack = getSkillStackBySlug(slug)
   if (!stack) notFound()
 
-  const allSkills = await getAllSkills('quality').catch(() => [])
+  const allSkills = await getAllSkills('quality', undefined, 1200).catch(() => [])
   const picks = selectSkillsForStack(allSkills, stack, 8)
   const compareUrl = `/compare?skills=${encodeURIComponent(picks.slice(0, 4).map((skill) => skill.slug).join(','))}`
 

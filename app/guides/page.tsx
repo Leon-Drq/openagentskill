@@ -30,7 +30,7 @@ const intentLabels: Record<string, string> = {
 }
 
 export default async function GuidesPage() {
-  const skills = await getAllSkills('quality').catch(() => [])
+  const skills = await getAllSkills('quality', undefined, 1200).catch(() => [])
   const totalStars = skills.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0)
   const groupedGuides = GROWTH_GUIDES.reduce<Record<string, typeof GROWTH_GUIDES>>((groups, guide) => {
     groups[guide.intent] = [...(groups[guide.intent] || []), guide]

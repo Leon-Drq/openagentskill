@@ -46,7 +46,7 @@ export default async function BlogUseCaseGuidePage({
   const useCase = getUseCaseBySlug(slug)
   if (!useCase) notFound()
 
-  const allSkills = await getAllSkills('quality').catch(() => [])
+  const allSkills = await getAllSkills('quality', undefined, 1200).catch(() => [])
   const skills = selectSkillsForUseCase(allSkills, useCase, 10)
   const stacks = SKILL_STACKS.filter((stack) => stack.useCaseSlug === useCase.slug)
 

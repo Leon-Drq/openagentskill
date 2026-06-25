@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 }
 
 export default async function CollectionsPage() {
-  const skills = await getAllSkills('quality').catch(() => [])
+  const skills = await getAllSkills('quality', undefined, 1200).catch(() => [])
 
   return (
     <MarketingPageShell>

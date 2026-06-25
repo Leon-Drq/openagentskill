@@ -106,7 +106,7 @@ function EventRows({ rows }: { rows: Array<{ skill: SkillRecord; stats: SkillEve
 
 export default async function MonthlyReportPage() {
   const [skills, eventStatsMap] = await Promise.all([
-    getAllSkills('quality').catch(() => []),
+    getAllSkills('quality', undefined, 1200).catch(() => []),
     getSkillEventStatsMap().catch(() => ({})),
   ])
 

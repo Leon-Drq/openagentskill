@@ -32,7 +32,7 @@ function formatNumber(value: number) {
 }
 
 export default async function TasksPage() {
-  const skills = await getAllSkills('quality').catch(() => [])
+  const skills = await getAllSkills('quality', undefined, 1200).catch(() => [])
   const totalStars = skills.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0)
 
   return (

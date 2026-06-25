@@ -79,7 +79,7 @@ function buildRows(
 
 export default async function AuditsPage() {
   const [skills, auditsMap, eventStatsMap] = await Promise.all([
-    getAllSkills('quality').catch(() => []),
+    getAllSkills('quality', undefined, 1200).catch(() => []),
     getSkillAuditsMap().catch((): Record<string, SkillAuditRecord> => ({})),
     getSkillEventStatsMap().catch((): Record<string, SkillEventStats> => ({})),
   ])

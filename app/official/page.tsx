@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 }
 
 export default async function OfficialSkillsPage() {
-  const skills = await getAllSkills('quality').catch(() => [])
+  const skills = await getAllSkills('quality', undefined, 1200).catch(() => [])
   const summaries = getOfficialCreatorSummaries(skills)
   const officialSkillCount = summaries.reduce((sum, summary) => sum + summary.skillCount, 0)
   const totalStars = summaries.reduce((sum, summary) => sum + summary.totalStars, 0)

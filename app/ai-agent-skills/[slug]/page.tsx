@@ -71,7 +71,7 @@ export default async function AiAgentSkillClusterPage({
   if (!cluster) notFound()
 
   const [skills, useCase] = await Promise.all([
-    getAllSkills('quality').catch(() => []),
+    getAllSkills('quality', undefined, 1200).catch(() => []),
     Promise.resolve(getUseCaseBySlug(cluster.useCaseSlug)),
   ])
 

@@ -32,7 +32,7 @@ function formatCompact(value: number) {
 }
 
 export default async function AgentSkillsRegistryPage() {
-  const skills = await getAllSkills('quality').catch(() => [])
+  const skills = await getAllSkills('quality', undefined, 1200).catch(() => [])
   const topSkills = skills.slice(0, 5)
 
   const faq = [

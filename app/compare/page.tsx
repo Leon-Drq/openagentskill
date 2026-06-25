@@ -48,7 +48,7 @@ export default async function ComparePage({
     : []
 
   const fallbackSkills = comparedSkills.length === 0
-    ? (await getAllSkills('quality').catch(() => [])).slice(0, 6)
+    ? await getAllSkills('quality', undefined, 6).catch(() => [])
     : []
   const eventStatsMap = comparedSkills.length
     ? await getSkillEventStatsMap().catch(() => ({} as Record<string, SkillEventStats>))

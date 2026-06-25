@@ -40,7 +40,7 @@ function getInstallCommand(skill: SkillRecord) {
 }
 
 export default async function AgentSkillsDirectoryPage() {
-  const skills = await getAllSkills('quality').catch(() => [])
+  const skills = await getAllSkills('quality', undefined, 1200).catch(() => [])
   const topSkills = skills.slice(0, 12)
   const categories = Array.from(new Set(skills.map((skill) => skill.category).filter(Boolean))).slice(0, 12)
 

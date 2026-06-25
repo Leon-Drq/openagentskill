@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 }
 
 export default async function XKitPage() {
-  const skills = await getAllSkills('quality').catch(() => [])
+  const skills = await getAllSkills('quality', undefined, 1200).catch(() => [])
   const candidates = skills
     .filter((skill) => Number(skill.github_stars || 0) >= 500)
     .slice(0, 8)

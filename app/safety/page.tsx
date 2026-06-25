@@ -40,7 +40,7 @@ function tierLabel(tier: SkillSafetyTier) {
 
 export default async function SafetyPage() {
   const [skills, eventStatsMap] = await Promise.all([
-    getAllSkills('quality').catch(() => []),
+    getAllSkills('quality', undefined, 1200).catch(() => []),
     getSkillEventStatsMap().catch((): Record<string, SkillEventStats> => ({})),
   ])
 

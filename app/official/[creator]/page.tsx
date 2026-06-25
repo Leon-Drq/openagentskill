@@ -51,7 +51,7 @@ export default async function OfficialCreatorPage({
   const creator = getOfficialCreator(slug)
   if (!creator) notFound()
 
-  const skills = await getAllSkills('quality').catch(() => [])
+  const skills = await getAllSkills('quality', undefined, 1200).catch(() => [])
   const ranked = getSkillsForOfficialCreator(skills, creator, 48)
   const totalStars = ranked.reduce((sum, item) => sum + Number(item.skill.github_stars || 0), 0)
 
