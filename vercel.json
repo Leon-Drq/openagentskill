@@ -29,6 +29,10 @@
       "schedule": "15 3 * * *"
     },
     {
+      "path": "/api/cron/seo-hourly",
+      "schedule": "5 * * * *"
+    },
+    {
       "path": "/api/cron/growth-daily",
       "schedule": "20 13 * * *"
     },

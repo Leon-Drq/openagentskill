@@ -156,7 +156,7 @@ export async function runDailyGrowthAutomation(
   const runKey = new Date().toISOString().slice(0, 10)
   const targetNew = Math.min(Math.max(options.targetNew ?? numberFromEnv('GROWTH_DAILY_TARGET_NEW', 40), 1), 250)
   const hotLimit = Math.min(Math.max(options.hotLimit ?? numberFromEnv('GROWTH_DAILY_HOT_LIMIT', 24), 1), 80)
-  const blogLimit = Math.min(Math.max(options.blogLimit ?? nonNegativeNumberFromEnv('GROWTH_DAILY_BLOG_LIMIT', 5), 0), 12)
+  const blogLimit = Math.min(Math.max(options.blogLimit ?? nonNegativeNumberFromEnv('GROWTH_DAILY_BLOG_LIMIT', 0), 0), 12)
   const xQueueLimit = Math.min(Math.max(options.xQueueLimit ?? numberFromEnv('GROWTH_DAILY_X_QUEUE_LIMIT', 8), 1), 25)
   const xMinStars = Math.max(options.xMinStars ?? numberFromEnv('GROWTH_DAILY_X_MIN_STARS', 10), 10)
   const autoPost = options.autoPost ?? booleanFromEnv('GROWTH_DAILY_AUTO_POST', true)
