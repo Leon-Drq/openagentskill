@@ -3,7 +3,7 @@
  *
  * For each candidate repository, runs the pipeline:
  *   1. Fetch repo metadata + README from GitHub
- *   2. AI quality review (gpt-4o-mini via AI Gateway)
+ *   2. AI quality review via Vercel AI Gateway
  *   3. Write to Supabase through a narrow INDEXER_SECRET-guarded RPC
  */
 
@@ -12,6 +12,7 @@ import { generateText } from 'ai'
 import type { CandidateRepo } from './github-search'
 import { generateBlogPostForSkill } from '@/lib/blog/generate'
 import { isMcpCandidate } from './skill-filter'
+import { INDEXER_REVIEW_MODEL } from '@/lib/ai/models'
 
 const GITHUB_HEADERS = () => ({
   Accept: 'application/vnd.github.v3+json',
@@ -88,7 +89,7 @@ Respond with JSON only, no markdown:
 
   try {
     const { text } = await generateText({
-      model: 'openai/gpt-4o-mini',
+      model: INDEXER_REVIEW_MODEL,
       prompt,
       temperature: 0.2,
     })

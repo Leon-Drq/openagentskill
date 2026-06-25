@@ -1,5 +1,6 @@
 import { generateText } from 'ai'
 import { AIReviewResult } from '../schema/skill-schema'
+import { SUBMISSION_REVIEW_MODEL } from '@/lib/ai/models'
 
 export interface SkillReviewData {
   repository: string
@@ -164,7 +165,7 @@ ${codePreview}
 
   try {
     const result = await generateText({
-      model: 'openai/gpt-4o-mini',
+      model: SUBMISSION_REVIEW_MODEL,
       prompt,
       temperature: 0.3, // Lower temperature for more consistent reviews
     })
@@ -191,7 +192,7 @@ ${codePreview}
       suggestions: reviewData.suggestions || [],
       reasoning: reviewData.reasoning || '',
       reviewedAt: new Date().toISOString(),
-      reviewModel: 'gpt-4o-mini',
+      reviewModel: SUBMISSION_REVIEW_MODEL,
     }
   } catch (error) {
     console.error('[v0] AI review error:', error)

@@ -2,13 +2,14 @@
  * Blog Post Generator
  *
  * Automatically generates Markdown blog posts for newly indexed skills
- * using AI (gpt-4o-mini via Vercel AI Gateway).
+ * using Vercel AI Gateway.
  */
 
 import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { STATIC_BLOG_POSTS, getStaticBlogPostBySlug } from '@/lib/blog/static-posts'
 import { generateText } from 'ai'
+import { BLOG_GENERATION_MODEL } from '@/lib/ai/models'
 
 export interface BlogGenerateResult {
   success: boolean
@@ -181,7 +182,7 @@ Respond with JSON only:
 {"title":"Blog post title (max 60 chars)","summary":"One sentence meta description (max 155 chars)","content":"Full markdown content"}`
 
   const { text } = await generateText({
-    model: 'openai/gpt-4o-mini',
+    model: BLOG_GENERATION_MODEL,
     prompt,
     temperature: 0.7,
   })
