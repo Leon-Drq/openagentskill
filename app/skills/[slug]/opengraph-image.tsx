@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og'
-import { convertSkillRecordToManifest, getSkillBySlug } from '@/lib/db/skills'
+import { convertSkillRecordToManifest } from '@/lib/db/skills'
 import { formatCompactNumber, getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
+import { getSkillBySlugOrFallback } from '@/lib/skill-fallbacks'
 
 export const runtime = 'edge'
 export const alt = 'OpenAgentSkill skill preview'
@@ -108,7 +109,7 @@ export default async function Image({
 
   let record = null
   try {
-    record = await getSkillBySlug(slug)
+    record = await getSkillBySlugOrFallback(slug)
   } catch {
     record = null
   }

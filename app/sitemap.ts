@@ -6,25 +6,10 @@ import { BEST_SKILL_PAGES } from '@/lib/seo/growth-pages'
 import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
 import { AGENT_PROFILES, OFFICIAL_CREATORS } from '@/lib/seo/growth-directories'
 import { SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
+import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { SKILL_PACKS } from '@/lib/skill-packs'
 import { USE_CASES } from '@/lib/use-cases'
 import { AGENT_TASKS } from '@/lib/agent-tasks'
-
-const FEATURED_SKILL_SITEMAP_ENTRIES = [
-  { slug: 'crawl4ai', updatedAt: '2026-06-01T00:00:00.000Z', stars: 66_000 },
-  { slug: 'firecrawl', updatedAt: '2026-06-01T00:00:00.000Z', stars: 34_000 },
-  { slug: 'n8n', updatedAt: '2026-06-01T00:00:00.000Z', stars: 190_000 },
-  { slug: 'markitdown', updatedAt: '2026-06-01T00:00:00.000Z', stars: 80_000 },
-  { slug: 'llamaindex', updatedAt: '2026-06-01T00:00:00.000Z', stars: 42_000 },
-  { slug: 'openbb', updatedAt: '2026-06-01T00:00:00.000Z', stars: 46_000 },
-  { slug: 'browser-use', updatedAt: '2026-06-01T00:00:00.000Z', stars: 75_000 },
-  { slug: 'playwright', updatedAt: '2026-06-01T00:00:00.000Z', stars: 76_000 },
-  { slug: 'last30days-skill', updatedAt: '2026-06-01T00:00:00.000Z', stars: 42_500 },
-  { slug: 'addyosmani-agent-skills', updatedAt: '2026-06-16T00:13:14.000Z', stars: 61_800 },
-  { slug: 'serenity-skill', updatedAt: '2026-06-01T00:00:00.000Z', stars: 12_000 },
-  { slug: 'seedance-2-0', updatedAt: '2026-06-01T00:00:00.000Z', stars: 8_000 },
-  { slug: 'vectorbt', updatedAt: '2026-06-01T00:00:00.000Z', stars: 5_400 },
-]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.openagentskill.com'
@@ -82,37 +67,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   }))
 
-  const skillPages: MetadataRoute.Sitemap = FEATURED_SKILL_SITEMAP_ENTRIES.map((skill) => ({
+  const skillPages: MetadataRoute.Sitemap = CURATED_SKILL_SNAPSHOT.map((skill) => ({
     url: `${baseUrl}/skills/${skill.slug}`,
-    lastModified: new Date(skill.updatedAt),
+    lastModified: new Date(skill.github_last_pushed_at || skill.updated_at),
     changeFrequency: 'weekly',
     priority: 0.8,
   }))
 
-  const alternativePages: MetadataRoute.Sitemap = FEATURED_SKILL_SITEMAP_ENTRIES
-    .filter((skill) => Number(skill.stars || 0) >= 500)
+  const alternativePages: MetadataRoute.Sitemap = CURATED_SKILL_SNAPSHOT
+    .filter((skill) => Number(skill.github_stars || 0) >= 500)
     .slice(0, 120)
     .map((skill) => ({
       url: `${baseUrl}/alternatives/${skill.slug}`,
-      lastModified: new Date(skill.updatedAt),
+      lastModified: new Date(skill.github_last_pushed_at || skill.updated_at),
       changeFrequency: 'weekly',
       priority: 0.78,
     }))
 
-  const auditPages: MetadataRoute.Sitemap = FEATURED_SKILL_SITEMAP_ENTRIES
+  const auditPages: MetadataRoute.Sitemap = CURATED_SKILL_SNAPSHOT
     .map((skill) => ({
       url: `${baseUrl}/skills/${skill.slug}/audit`,
-      lastModified: new Date(skill.updatedAt),
+      lastModified: new Date(skill.github_last_pushed_at || skill.updated_at),
       changeFrequency: 'weekly',
-      priority: Number(skill.stars || 0) >= 500 ? 0.76 : 0.68,
+      priority: Number(skill.github_stars || 0) >= 500 ? 0.76 : 0.68,
     }))
 
-  const evalPages: MetadataRoute.Sitemap = FEATURED_SKILL_SITEMAP_ENTRIES
+  const evalPages: MetadataRoute.Sitemap = CURATED_SKILL_SNAPSHOT
     .map((skill) => ({
       url: `${baseUrl}/skills/${skill.slug}/evals`,
-      lastModified: new Date(skill.updatedAt),
+      lastModified: new Date(skill.github_last_pushed_at || skill.updated_at),
       changeFrequency: 'weekly',
-      priority: Number(skill.stars || 0) >= 500 ? 0.78 : 0.7,
+      priority: Number(skill.github_stars || 0) >= 500 ? 0.78 : 0.7,
     }))
 
   const useCasePages: MetadataRoute.Sitemap = USE_CASES.map((useCase) => ({

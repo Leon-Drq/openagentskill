@@ -6,6 +6,9 @@ import { SKILL_SUBMISSION_MIN_STARS } from '@/lib/skills/submission-policy'
 export const metadata: Metadata = {
   title: 'API Reference - Open Agent Skill',
   description: 'Agent-friendly Resolve API for selecting, auditing, and installing AI agent skills programmatically.',
+  alternates: {
+    canonical: 'https://www.openagentskill.com/api-docs',
+  },
 }
 
 export default function APIDocsPage() {

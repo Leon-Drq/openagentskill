@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Geist_Mono, Inter } from 'next/font/google'
 import { StructuredData } from '@/components/structured-data'
 import { I18nProvider } from '@/lib/i18n/context'
-import { LOCALIZED_LANDING_PAGES, getLocalizedLanguageAlternates } from '@/lib/seo/localized-pages'
+import { LOCALIZED_LANDING_PAGES } from '@/lib/seo/localized-pages'
 import {
   HOME_SOCIAL_DESCRIPTION,
   HOME_SOCIAL_IMAGE_URL,
@@ -113,10 +113,6 @@ export const metadata: Metadata = {
         height: 630,
       },
     ],
-  },
-  alternates: {
-    canonical: SITE_URL,
-    languages: getLocalizedLanguageAlternates(),
   },
 }
 

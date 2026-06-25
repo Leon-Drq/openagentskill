@@ -4,8 +4,10 @@ import { notFound } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
-import { convertSkillRecordToManifest, getAllSkills, getSkillBySlug, type SkillRecord } from '@/lib/db/skills'
+import { convertSkillRecordToManifest, getAllSkills, type SkillRecord } from '@/lib/db/skills'
 import { formatCompactNumber, getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
+import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
+import { getSkillBySlugOrFallback } from '@/lib/skill-fallbacks'
 import { getSkillTrustProfile } from '@/lib/trust'
 
 export const dynamic = 'force-dynamic'
@@ -20,7 +22,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const skill = await getSkillBySlug(slug)
+  const skill = await getSkillBySlugOrFallback(slug)
   if (!skill) return { title: 'Alternatives Not Found' }
 
   return {
@@ -68,6 +70,20 @@ function getAlternatives(target: SkillRecord, skills: SkillRecord[], limit = 12)
     .slice(0, limit)
 }
 
+function mergeSkillCatalog(skills: SkillRecord[]) {
+  const bySlug = new Map<string, SkillRecord>()
+
+  for (const skill of CURATED_SKILL_SNAPSHOT) {
+    bySlug.set(skill.slug, skill)
+  }
+
+  for (const skill of skills) {
+    bySlug.set(skill.slug, skill)
+  }
+
+  return Array.from(bySlug.values())
+}
+
 function formatDate(value: string | null | undefined) {
   if (!value) return 'Unknown'
   return new Date(value).toLocaleDateString('en-US', {
@@ -83,12 +99,13 @@ export default async function AlternativesPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const [target, skills] = await Promise.all([
-    getSkillBySlug(slug),
+  const [target, dbSkills] = await Promise.all([
+    getSkillBySlugOrFallback(slug),
     getAllSkills('quality').catch(() => []),
   ])
   if (!target) notFound()
 
+  const skills = mergeSkillCatalog(dbSkills)
   const alternatives = getAlternatives(target, skills, 16)
   const targetQuality = getSkillQualityProfile(target)
   const targetTrust = getSkillTrustProfile(target)

@@ -5,6 +5,9 @@ import { MarketingHero, MarketingPageShell } from '@/components/marketing-page'
 export const metadata: Metadata = {
   title: 'Documentation - Open Agent Skill',
   description: 'Learn how to discover, install, and use skills with your AI agents.',
+  alternates: {
+    canonical: 'https://www.openagentskill.com/docs',
+  },
 }
 
 export default function DocsPage() {
