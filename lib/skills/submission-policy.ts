@@ -56,6 +56,7 @@ export function evaluateSkillSubmissionPolicy(input: {
   const compliance = score(input.review, 'compliance')
   const total = Number(input.review.totalScore || 0)
   const highStaticRisk = input.staticAnalysis.riskLevel === 'high' || input.staticAnalysis.riskLevel === 'critical'
+  const heuristicFallback = input.review.reviewModel.startsWith('heuristic')
 
   const checks: SubmissionGateCheck[] = [
     {
@@ -115,6 +116,16 @@ export function evaluateSkillSubmissionPolicy(input: {
       detail: `${total}/40, minimum ${SKILL_SUBMISSION_MIN_TOTAL_SCORE}`,
       score: total,
     },
+    {
+      id: 'ai_review_decision',
+      label: 'AI review decision',
+      status: input.review.approved ? 'pass' : heuristicFallback ? 'warn' : 'fail',
+      detail: input.review.approved
+        ? 'AI reviewer approved automatic publishing'
+        : heuristicFallback
+          ? 'AI model review was unavailable, so heuristic scoring requires manual review'
+          : 'AI reviewer rejected automatic publishing',
+    },
   ]
 
   const failedChecks = checks.filter((check) => check.status === 'fail')
@@ -127,7 +138,13 @@ export function evaluateSkillSubmissionPolicy(input: {
   const issues = [
     ...failedChecks.map((check) => `${check.label}: ${check.detail}`),
     ...warnChecks.map((check) => `${check.label}: ${check.detail}`),
-    ...(modelRejected ? ['AI reviewer did not approve this skill for automatic publishing'] : []),
+    ...(modelRejected
+      ? [
+          heuristicFallback
+            ? 'AI model review was unavailable; manual review is required before publishing'
+            : 'AI reviewer did not approve this skill for automatic publishing',
+        ]
+      : []),
     ...input.review.issues,
   ]
 

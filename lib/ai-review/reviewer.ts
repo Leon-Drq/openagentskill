@@ -10,6 +10,78 @@ export interface SkillReviewData {
     stars: number
     forks: number
     lastUpdated: string
+    license?: string
+    language?: string
+  }
+}
+
+function clampScore(score: number) {
+  return Math.max(0, Math.min(10, Math.round(score)))
+}
+
+function includesAny(text: string, patterns: RegExp[]) {
+  return patterns.some((pattern) => pattern.test(text))
+}
+
+function heuristicReview(data: SkillReviewData, reason: string): AIReviewResult {
+  const readme = data.readmeContent || ''
+  const combinedCode = data.codeFiles.map((file) => file.content).join('\n')
+  const allText = `${readme}\n${combinedCode}`.toLowerCase()
+  const hasCriticalPattern = includesAny(allText, [/rm\s+-rf/, /base64\.b64decode[\s\S]{0,120}exec/, /curl[\s\S]{0,80}\|\s*(bash|sh)/])
+  const hasExecutionSurface = includesAny(allText, [/child_process/, /\bexec\s*\(/, /subprocess/, /os\.system\s*\(/])
+  const hasEnvSurface = includesAny(allText, [/process\.env/, /os\.environ/, /\.env\b/, /load_dotenv/])
+  const hasInstallDocs = includesAny(readme.toLowerCase(), [/install/, /npx\s+skills\s+add/, /usage/, /quickstart/, /getting started/])
+  const hasExamples = includesAny(readme.toLowerCase(), [/example/, /demo/, /usage/, /```/])
+  const hasAgentLanguage = includesAny(readme.toLowerCase(), [/agent/, /skill/, /codex/, /claude code/, /cursor/, /workflow/, /automation/])
+  const hasOpenLicense =
+    Boolean(data.githubStats.license && data.githubStats.license !== 'NOASSERTION') ||
+    Boolean(data.manifestData?.license)
+
+  const security = clampScore(9 - (hasCriticalPattern ? 7 : 0) - (hasExecutionSurface ? 2 : 0) - (hasEnvSurface ? 1 : 0))
+  const quality = clampScore(
+    4 +
+      (readme.length > 1000 ? 2 : readme.length > 400 ? 1 : 0) +
+      (hasInstallDocs ? 1 : 0) +
+      (hasExamples ? 1 : 0) +
+      (data.manifestData ? 1 : 0) +
+      (data.codeFiles.length > 0 ? 1 : 0)
+  )
+  const usefulness = clampScore(
+    5 +
+      (data.githubStats.stars >= 10 ? 1 : 0) +
+      (data.githubStats.stars >= 50 ? 1 : 0) +
+      (hasAgentLanguage ? 2 : 0) +
+      (data.githubStats.forks > 0 ? 1 : 0)
+  )
+  const compliance = clampScore(5 + (hasOpenLicense ? 3 : 0) + (data.repository.includes('/') ? 1 : 0))
+  const totalScore = security + quality + usefulness + compliance
+  const issues = [
+    'AI model review was unavailable; heuristic scoring was used and manual review is required',
+    ...(hasCriticalPattern ? ['Critical shell or encoded execution pattern detected'] : []),
+    ...(hasExecutionSurface ? ['Command execution surface detected'] : []),
+    ...(hasEnvSurface ? ['Environment variable access detected'] : []),
+    ...(!hasInstallDocs ? ['README should include clearer install or usage instructions'] : []),
+    ...(!hasOpenLicense ? ['License metadata should be explicit'] : []),
+  ]
+
+  return {
+    approved: false,
+    scores: {
+      security,
+      quality,
+      usefulness,
+      compliance,
+    },
+    totalScore,
+    issues,
+    suggestions: [
+      'Add a clear SKILL.md or skill.json manifest',
+      'Document install, usage, inputs, outputs, and safe operating boundaries',
+      'Request manual review before automatic publishing',
+    ],
+    reasoning: `AI review failed (${reason}). A conservative heuristic review produced scores but cannot approve automatic publishing.`,
+    reviewedAt: new Date().toISOString(),
+    reviewModel: 'heuristic-static-v1',
   }
 }
 
@@ -123,22 +195,7 @@ ${codePreview}
     }
   } catch (error) {
     console.error('[v0] AI review error:', error)
-    // Fallback: reject if AI review fails
-    return {
-      approved: false,
-      scores: {
-        security: 0,
-        quality: 0,
-        usefulness: 0,
-        compliance: 0,
-      },
-      totalScore: 0,
-      issues: ['AI review failed - please try again'],
-      suggestions: [],
-      reasoning: 'Technical error during AI review',
-      reviewedAt: new Date().toISOString(),
-      reviewModel: 'gpt-4o-mini',
-    }
+    return heuristicReview(data, error instanceof Error ? error.message : 'technical error')
   }
 }
 

@@ -117,6 +117,8 @@ export async function POST(request: NextRequest) {
         stars: repoData.stars,
         forks: repoData.forks,
         lastUpdated: repoData.updatedAt,
+        license: repoData.license,
+        language: repoData.language,
       },
     })
 
