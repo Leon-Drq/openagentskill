@@ -28,24 +28,8 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 <img src="./public/github-social-preview.png" alt="OpenAgentSkill preview: Resolve, Trust, Install, Outcome Feedback" width="920" />
 
 <br />
-<br />
 
-<img src="./public/github-agent-use-flow.png" alt="OpenAgentSkill agent use flow: task, resolve, trust, install, outcome feedback" width="920" />
-
-<br />
-<br />
-
-<img src="./public/github-domain-catalog.png" alt="OpenAgentSkill domain catalog: 10,000+ skills organized by real work" width="920" />
-
-<br />
-<br />
-
-<img src="./public/github-agent-architecture.svg" alt="OpenAgentSkill architecture diagram: agents resolve skills through trust, install, and outcome feedback" width="920" />
-
-<br />
-<br />
-
-<img src="./public/github-trust-score-chart.svg" alt="OpenAgentSkill trust score and coverage chart" width="920" />
+<sub>Resolve API · Trust Score · Install Plan · Outcome Loop</sub>
 
 </div>
 
