@@ -5,7 +5,7 @@ import { getAllSkills, getSkillEventStatsMap, type SkillEventStats, type SkillRe
 import { SKILL_STACKS, type SkillStackDefinition } from '@/lib/collections'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
-import { dedupeRankedSkills, getRecommendationReasons } from '@/lib/registry'
+import { dedupeRankedSkills, getRecommendationReasons, normalizeMatchScore } from '@/lib/registry'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
@@ -86,13 +86,18 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => b.safety_adjusted_score - a.safety_adjusted_score)
 
     const recommendations = candidates.filter((item) => !item.safety.blocked).slice(0, limit)
+    const topRecommendationScore = Math.max(
+      ...recommendations.map((item) => item.score),
+      candidates[0]?.score || 0
+    )
     const blockedCandidates = candidates
       .filter((item) => item.safety.blocked)
       .slice(0, 5)
       .map((item) => ({
         slug: item.skill.slug,
         name: item.skill.name,
-        match_score: item.score,
+        match_score: normalizeMatchScore(item.score, topRecommendationScore),
+        raw_match_score: item.score,
         safety_gate: item.safety.safety_tier,
         url: `https://www.openagentskill.com/skills/${item.skill.slug}/audit`,
       }))
@@ -126,13 +131,16 @@ export async function GET(request: NextRequest) {
         const audit = r.audit
         const safety = r.safety
         const supplyProfile = getSkillSupplyProfile(r.skill, eventStats)
+        const matchScore = normalizeMatchScore(r.score, topRecommendationScore)
         return {
           rank: index + 1,
           skill: r.skill.name,
           slug: r.skill.slug,
           description: r.skill.description,
-          confidence: Math.min(r.score / 100, 1.0).toFixed(2),
-          match_label: getMatchLabel(r.score),
+          confidence: (matchScore / 100).toFixed(2),
+          match_score: matchScore,
+          raw_match_score: r.score,
+          match_label: getMatchLabel(matchScore),
           safety_adjusted_score: r.safety_adjusted_score,
           install: r.skill.install_command || `npx skills add ${r.skill.github_repo}`,
           repository: r.skill.repository,
@@ -188,8 +196,8 @@ export async function GET(request: NextRequest) {
             title: useCase.shortTitle,
             url: `https://www.openagentskill.com/use-cases/${useCase.slug}`,
           })),
-          recommendation_reasons: getRecommendationReasons(r.skill, task, r.score),
-          reasoning: generateReasoning(r.skill, r.score),
+          recommendation_reasons: getRecommendationReasons(r.skill, task, matchScore),
+          reasoning: generateReasoning(r.skill, matchScore),
         }
       }),
       blocked_candidates: blockedCandidates,

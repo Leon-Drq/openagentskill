@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { unstable_cache } from 'next/cache'
 import { withTimeout } from '@/lib/async'
 import { getAllSkills, searchSkills, type SkillRecord } from '@/lib/db/skills'
-import { dedupeRankedSkills, getRecommendationReasons, rankSkillsForQuery, toRegistrySkill } from '@/lib/registry'
+import { dedupeRankedSkills, getRecommendationReasons, normalizeMatchScore, rankSkillsForQuery, toRegistrySkill } from '@/lib/registry'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSkillSupplyProfile } from '@/lib/supply'
 
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
         : Promise.resolve([] as SkillRecord[]),
     ])
     const skills = mergeSkillPools(exactPool, candidatePool)
-    const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, query))
+    const rankedCandidates = dedupeRankedSkills(rankSkillsForQuery(skills, query))
       .filter(({ skill }) => {
         if (category && skill.category.toLowerCase() !== category.toLowerCase()) return false
         if (track && getSkillSupplyProfile(skill).track.slug !== track) return false
@@ -94,9 +94,12 @@ export async function GET(request: NextRequest) {
         return true
       })
       .slice(0, shortlistLimit)
+    const topSearchScore = rankedCandidates[0]?.score || 0
+    const ranked = rankedCandidates
       .map(({ skill, score }) => ({
         skill,
-        score,
+        score: normalizeMatchScore(score, topSearchScore),
+        rawScore: score,
         registrySkill: toRegistrySkill(skill),
       }))
       .filter(({ registrySkill }) => {
@@ -147,9 +150,10 @@ ${text}`,
           min_stars: Number.isFinite(minStars) ? minStars : 0,
         },
         total: ranked.length,
-        skills: ranked.map(({ skill, score, registrySkill }, index) => ({
+        skills: ranked.map(({ skill, score, rawScore, registrySkill }, index) => ({
           rank: index + 1,
           match_score: score,
+          raw_match_score: rawScore,
           ...registrySkill,
           recommendation_reasons: getRecommendationReasons(skill, query, score),
         })),

@@ -15,7 +15,7 @@ import {
 } from '@/lib/db/skills'
 import { getPrimaryInstallCommand, getSkillInstallTargets, type InstallTargetId } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
-import { dedupeRankedSkills, getRecommendationReasons, rankSkillsForQuery } from '@/lib/registry'
+import { dedupeRankedSkills, getRecommendationReasons, normalizeMatchScore, rankSkillsForQuery } from '@/lib/registry'
 import { getSkillSupplyProfile, type SkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile, type SkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
@@ -644,6 +644,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
   const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, task, outcomeStatsMap))
     .filter(({ skill }) => candidateAllowed(skill, constraints))
     .slice(0, Math.max(limit * 3, 10))
+  const topMatchScore = ranked[0]?.score || 0
 
   const candidates = ranked.map(({ skill, score }, index) => {
     const eventStats = eventStatsMap[skill.slug] || null
@@ -654,10 +655,12 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     const decision = getSkillDecisionProfile(skill, eventStats)
     const useCases = getUseCasesForSkill(skill, 3)
     const supplyProfile = getSkillSupplyProfile(skill, eventStats)
+    const matchScore = normalizeMatchScore(score, topMatchScore)
 
     return {
       rank: index + 1,
-      match_score: score,
+      match_score: matchScore,
+      raw_match_score: score,
       skill: {
         slug: skill.slug,
         name: skill.name,
@@ -666,7 +669,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         repository: skill.repository,
         github_repo: skill.github_repo,
       },
-      recommendation_reasons: getRecommendationReasons(skill, task, score),
+      recommendation_reasons: getRecommendationReasons(skill, task, matchScore),
       supply_profile: supplyProfile,
       quality: getSkillQualityProfile(skill),
       trust,

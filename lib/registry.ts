@@ -83,6 +83,13 @@ export function getSkillInstallCommand(skill: SkillRecord) {
 
 type SkillRankingStats = SkillAgentStats | SkillOutcomeStats
 
+export function normalizeMatchScore(score: number, topScore: number) {
+  const safeScore = Math.max(0, Number(score) || 0)
+  const denominator = Math.max(100, Number(topScore) || 0)
+  if (!safeScore) return 0
+  return Math.max(1, Math.min(99, Math.round((safeScore / denominator) * 99)))
+}
+
 function getOutcomeUsageScore(stats: SkillRankingStats | null | undefined) {
   if (!stats) return 0
   const total =
