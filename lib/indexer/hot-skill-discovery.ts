@@ -52,6 +52,10 @@ const HOT_SKILL_QUERIES: HotSkillQuery[] = [
   { q: '"AI agent skill"', sort: 'updated' },
   { q: '"Codex skill"', sort: 'updated' },
   { q: '"Claude Code" "skill"', sort: 'updated' },
+  { q: '"ppt" "agent skill"', sort: 'updated' },
+  { q: '"pptx" "Claude Code" "skill"', sort: 'updated' },
+  { q: '"presentation" "agent skill"', sort: 'updated' },
+  { q: '"slide deck" "agent"', sort: 'updated' },
   { q: '"Cursor" "agent skill"', sort: 'updated' },
   { q: 'topic:agent-skills', sort: 'updated' },
   { q: 'topic:ai-agent', sort: 'updated' },
@@ -63,6 +67,7 @@ const HOT_SKILL_QUERIES: HotSkillQuery[] = [
   { q: 'topic:algorithmic-trading', sort: 'updated' },
   { q: 'topic:seo', sort: 'updated' },
   { q: 'topic:design-automation', sort: 'updated' },
+  { q: 'topic:presentation', sort: 'updated' },
   { q: 'topic:football-analytics', sort: 'updated' },
   { q: 'topic:world-cup', sort: 'updated' },
 ]
