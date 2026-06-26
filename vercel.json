@@ -38,11 +38,11 @@
     },
     {
       "path": "/api/x/post-daily",
-      "schedule": "30 15,23 * * *"
+      "schedule": "0 */3 * * *"
     },
     {
       "path": "/api/x/growth/run",
-      "schedule": "10 16 * * *"
+      "schedule": "10 */4 * * *"
     }
   ]
 }
