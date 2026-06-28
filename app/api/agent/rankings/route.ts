@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAllSkills, getSkillStats } from '@/lib/db/skills'
+import { getAgentOutcomeStatsMap, getAllSkills, getSkillStats } from '@/lib/db/skills'
 import { getRankingDefinition, getRankingDefinitions, rankSkillsForDefinition } from '@/lib/rankings'
 
 function clampLimit(value: string | null) {
@@ -26,7 +26,10 @@ export async function GET(request: NextRequest) {
       }, { status: 404 })
     }
 
-    const [skills, statsMap] = await Promise.all([getAllSkills('quality'), getSkillStats()])
+    const [skills, statsMap] = await Promise.all([
+      getAllSkills('quality'),
+      definition.kind === 'agent-usage' ? getAgentOutcomeStatsMap() : getSkillStats(),
+    ])
     const ranked = rankSkillsForDefinition(skills, definition, statsMap, limit)
 
     if (format === 'text') {

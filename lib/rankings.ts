@@ -31,6 +31,15 @@ export interface RankedSkill {
 
 export const CORE_RANKINGS: RankingDefinition[] = [
   {
+    slug: 'agent-proven',
+    title: 'Agent-proven AI agent skills',
+    shortTitle: 'Agent proven',
+    eyebrow: 'Outcome evidence',
+    description:
+      'Skills ranked by real agent outcome reports, install attempts, success rate, risk blocks, setup friction, and Trust Score.',
+    kind: 'agent-usage',
+  },
+  {
     slug: 'highest-quality-agent-skills',
     title: 'Highest quality AI agent skills',
     shortTitle: 'Highest quality',
@@ -168,16 +177,29 @@ export function rankSkillsForDefinition(
           ? stats.total_outcomes
           : stats.total_calls
         : 0
+      const failures = stats && 'failed_outcomes' in stats ? Number(stats.failed_outcomes || 0) : 0
+      const notRelevant = stats && 'not_relevant_outcomes' in stats ? Number(stats.not_relevant_outcomes || 0) : 0
+      const riskBlocked = stats && 'risk_blocked_outcomes' in stats ? Number(stats.risk_blocked_outcomes || 0) : 0
+      const setupRequired = stats && 'setup_required_outcomes' in stats ? Number(stats.setup_required_outcomes || 0) : 0
       const uniqueAgents = stats && 'unique_agents' in stats ? stats.unique_agents : 0
       const installAttempts = stats && 'install_attempts' in stats ? stats.install_attempts : 0
       const lastPushedScore = freshnessScore(skill.github_last_pushed_at || skill.updated_at)
       const createdAt = dateValue(skill.created_at)
       const isNewThisWeek = createdAt >= weekAgo
+      const successRate =
+        stats?.success_rate === null || stats?.success_rate === undefined
+          ? null
+          : Number(stats.success_rate)
       const usageScore =
-        totalUsage * 2 +
-        uniqueAgents * 5 +
-        installAttempts * 4 +
-        Math.max(0, stats?.success_rate || 0)
+        totalUsage > 0
+          ? Math.min(30, Math.log10(totalUsage + 1) * 18) +
+            Math.max(0, successRate || 0) * 0.45 +
+            Math.min(12, Math.log10(installAttempts + 1) * 8) +
+            uniqueAgents * 4 +
+            quality.score * 0.25 +
+            Math.min(8, Math.log10(Math.max(1, skill.github_stars || 1)) * 2) -
+            Math.min(30, riskBlocked * 5 + setupRequired * 3 + failures * 2.5 + notRelevant * 4)
+          : quality.score * 0.12 + Math.min(8, Math.log10(Math.max(1, skill.github_stars || 1)) * 2)
 
       switch (definition.kind) {
         case 'most-starred':
@@ -205,10 +227,10 @@ export function rankSkillsForDefinition(
           return {
             skill,
             score: usageScore + quality.score / 10,
-            badge: totalUsage ? `${formatCompactNumber(totalUsage)} outcomes` : 'Ready for feedback',
+            badge: totalUsage ? `${formatCompactNumber(totalUsage)} outcomes` : 'Needs first outcome',
             reason: totalUsage
-              ? `${formatCompactNumber(totalUsage)} agent outcomes, ${stats?.success_rate ?? 'unknown'}% success, and ${quality.label.toLowerCase()} quality.`
-              : `No public usage yet, but ${quality.label.toLowerCase()} quality makes it a good candidate to test.`,
+              ? `${formatCompactNumber(totalUsage)} agent outcomes, ${successRate ?? 'unknown'}% success, ${formatCompactNumber(installAttempts)} install attempts, ${riskBlocked} risk blocks, and ${quality.label.toLowerCase()} quality.`
+              : `No public outcome reports yet. ${quality.label} quality and ${compactStars(skill)} make it ready for a first sandbox run.`,
           }
         case 'highest-quality':
         default:

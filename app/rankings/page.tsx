@@ -1,7 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
-import { getAllSkills, getSkillStats, type SkillAgentStats } from '@/lib/db/skills'
+import {
+  getAgentOutcomeStatsMap,
+  getAllSkills,
+  getSkillStats,
+  type SkillAgentStats,
+  type SkillOutcomeStats,
+} from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
 import { CORE_RANKINGS, getRankingDefinitions, rankSkillsForDefinition } from '@/lib/rankings'
 
@@ -27,9 +33,10 @@ function formatNumber(value: number) {
 }
 
 export default async function RankingsPage() {
-  const [skills, statsMap] = await Promise.all([
+  const [skills, statsMap, outcomeStatsMap] = await Promise.all([
     getAllSkills('quality', undefined, 1200).catch(() => []),
     getSkillStats().catch((): Record<string, SkillAgentStats> => ({})),
+    getAgentOutcomeStatsMap().catch((): Record<string, SkillOutcomeStats> => ({})),
   ])
   const rankingDefinitions = getRankingDefinitions()
   const useCaseRankings = rankingDefinitions.filter((ranking) => ranking.kind === 'use-case')
@@ -58,7 +65,12 @@ export default async function RankingsPage() {
       <div className="mx-auto max-w-6xl px-6">
         <section className="grid gap-5 border-b border-border py-10 md:grid-cols-2 lg:grid-cols-3">
           {CORE_RANKINGS.map((ranking) => {
-            const topSkills = rankSkillsForDefinition(skills, ranking, statsMap, 3)
+            const topSkills = rankSkillsForDefinition(
+              skills,
+              ranking,
+              ranking.kind === 'agent-usage' ? outcomeStatsMap : statsMap,
+              3
+            )
 
             return (
               <Link

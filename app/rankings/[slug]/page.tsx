@@ -4,7 +4,14 @@ import { notFound } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
-import { convertSkillRecordToManifest, getAllSkills, getSkillStats, type SkillAgentStats } from '@/lib/db/skills'
+import {
+  convertSkillRecordToManifest,
+  getAgentOutcomeStatsMap,
+  getAllSkills,
+  getSkillStats,
+  type SkillAgentStats,
+  type SkillOutcomeStats,
+} from '@/lib/db/skills'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import {
   getRankingCompareHref,
@@ -63,7 +70,9 @@ export default async function RankingDetailPage({
 
   const [skills, statsMap] = await Promise.all([
     getAllSkills('quality', undefined, 1200).catch(() => []),
-    getSkillStats().catch((): Record<string, SkillAgentStats> => ({})),
+    ranking.kind === 'agent-usage'
+      ? getAgentOutcomeStatsMap().catch((): Record<string, SkillOutcomeStats> => ({}))
+      : getSkillStats().catch((): Record<string, SkillAgentStats> => ({})),
   ])
   const rankedSkills = rankSkillsForDefinition(skills, ranking, statsMap, 30)
   const compareHref = getRankingCompareHref(rankedSkills)

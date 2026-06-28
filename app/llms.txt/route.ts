@@ -42,6 +42,8 @@ Important URLs:
 - Resolve API: https://www.openagentskill.com/api/agent/resolve
 - Agent outcome API: https://www.openagentskill.com/api/agent/outcome
 - Agent outcome contract: https://www.openagentskill.com/api/agent/outcome?contract=true
+- Agent-Proven rankings: https://www.openagentskill.com/rankings/agent-proven
+- Agent-Proven ranking API: https://www.openagentskill.com/api/agent/rankings?slug=agent-proven
 - Skill Eval API: https://www.openagentskill.com/api/agent/evals?slug=crawl4ai
 - Resolve eval dashboard: https://www.openagentskill.com/evals/resolve
 - Skill search API: https://www.openagentskill.com/api/skills/search
@@ -65,6 +67,7 @@ Install safety:
 - Prefer agent_handoff over ad hoc page scraping because it returns platform templates, API sequence, review checklist, and blocked actions.
 - Prefer /api/agent/evals?slug={slug} before installation because it returns the Trust + Eval contract, blockers, and validation plan.
 - Report success, failed, not_relevant, blocked_by_risk, or setup_required to /api/agent/outcome so future rankings learn from real use. Add quality fields when possible.
+- Prefer /rankings/agent-proven when an agent needs skills with real reported adoption instead of only GitHub stars.
 - Treat safety_gate.blocked as "do not auto-install".
 - Treat safety_gate.experimental as manual test only.
 - Treat safety_gate.reviewed as human-review-before-install unless auto_install_policy is allow.

@@ -19,6 +19,7 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 [Browse Skills](https://www.openagentskill.com/skills) ·
 [GitHub Skill Index](./skills/README.md) ·
 [Outcome Loop](https://www.openagentskill.com/outcomes) ·
+[Agent-Proven Rankings](https://www.openagentskill.com/rankings/agent-proven) ·
 [Audits](https://www.openagentskill.com/audits) ·
 [API Docs](https://www.openagentskill.com/api-docs) ·
 [Submit Skill](https://www.openagentskill.com/submit)
@@ -54,6 +55,7 @@ OpenAgentSkill is not another static directory. It is a registry, trust layer, a
 | GitHub domain + scenario index | Curated pages for coding, web scraping, finance, RAG, PDF parsing, browser automation, DevOps, security, support, commerce, Web3, ML/media, and real agent jobs |
 | Trust Score + audit pages | Agents can inspect quality, license, README/SKILL.md completeness, install safety, maintenance, and risk signals |
 | Outcome feedback loop | Resolved skills can report `success`, `failed`, `not_relevant`, `blocked_by_risk`, or `setup_required` so rankings learn from real use |
+| Agent-Proven rankings | Skills with real outcome reports rank above untested high-star projects when agents need safer install candidates |
 | Agent-readable APIs | Codex, Claude Code, Cursor, and other runtimes can call stable endpoints instead of scraping a website |
 
 ## Copy-Paste Agent Integration
@@ -139,6 +141,7 @@ Based on the public positioning of OpenAgentSkill, skills.sh, agentskills.io, an
 | Machine-readable skill metadata | Yes | Install-focused metadata | Format/spec metadata | Inconsistent |
 | Install handoff | Codex, Claude Code, Cursor, CLI | `npx skills add` workflow | Standard-compatible clients | Manual copy |
 | Real agent outcome feedback | Yes | No public outcome loop | No public outcome loop | No |
+| Agent-Proven leaderboard | Yes | No public outcome ranking | No public outcome ranking | No |
 | Creator claim loop | Community indexed, then claimable/verified | Community registry | Open ecosystem contribution | Manual PRs |
 | Programmatic SEO pages | Real skill lists by task, agent, domain, and comparison | Registry/search pages | Documentation pages | Usually README sections |
 
@@ -176,6 +179,7 @@ Useful endpoints:
 | `GET /.well-known/agent-manifest.json` | Machine-readable capability manifest |
 | `GET /api/agent/integration-kit?format=text` | Copy-paste setup for Codex, Claude Code, and Cursor |
 | `GET /api/agent/resolve?task=...` | Resolve a task into one selected skill plus alternatives |
+| `GET /api/agent/rankings?slug=agent-proven` | Read skills ranked by real outcome reports and install attempts |
 | `GET /api/agent/skills?q=...` | Search indexed skills |
 | `GET /api/agent/tasks` | Browse task-first routes |
 | `GET /api/agent/outcome?format=text` | Read aggregate adoption signals |
@@ -215,6 +219,7 @@ Submit or fix a skill:
 | Resolve Workbench | [/resolve](https://www.openagentskill.com/resolve) | Task-to-skill recommendation with trust and install handoff |
 | Skill directory | [/skills](https://www.openagentskill.com/skills) | Search and filter the full catalog |
 | Outcome Loop | [/outcomes](https://www.openagentskill.com/outcomes) | Real agent outcome feedback and adoption signals |
+| Agent-Proven ranking | [/rankings/agent-proven](https://www.openagentskill.com/rankings/agent-proven) | Skills ranked by success reports, install attempts, risk blocks, and setup friction |
 | Agent Integration Kit | [/agent/integration-kit](https://www.openagentskill.com/agent/integration-kit) | Codex, Claude Code, Cursor setup templates |
 | Audits | [/audits](https://www.openagentskill.com/audits) | Trust, security, quality, and install-readiness reports |
 | Rankings | [/rankings](https://www.openagentskill.com/rankings) | Ranked lists for agent workflows |

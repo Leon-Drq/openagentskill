@@ -7,6 +7,9 @@ import {
   MarketingMetricStrip,
   MarketingPageShell,
 } from '@/components/marketing-page'
+import { resolveAgentSkill } from '@/lib/agent-resolve'
+
+type ResolveResult = Awaited<ReturnType<typeof resolveAgentSkill>>
 
 export const metadata: Metadata = {
   title: 'Resolve AI Agent Tasks into Skills',
@@ -42,13 +45,152 @@ const capabilities = [
   },
 ]
 
+function normalizeRisk(value: string | undefined) {
+  return value === 'low' || value === 'medium' || value === 'high' ? value : 'medium'
+}
+
+function normalizeParam(value: string | string[] | undefined) {
+  if (Array.isArray(value)) return value[0] || ''
+  return value || ''
+}
+
+function ResolveDecisionCard({ result }: { result: ResolveResult }) {
+  const recommendation = result.recommendation
+  const selected = result.selected
+  const trust = recommendation?.trust_score_v4 || recommendation?.trust_score_v3 || recommendation?.trust_score_v2
+  if (!recommendation || !selected) return null
+
+  const outcomeSignals = recommendation.trust_score_v4?.outcomes
+  const outcomeSummary = outcomeSignals?.total
+    ? `${outcomeSignals.total} outcomes, ${outcomeSignals.successRate ?? 'unknown'}% success`
+    : 'Needs first agent outcome'
+
+  return (
+    <section className="border-b border-border bg-card/45">
+      <div className="mx-auto max-w-6xl px-6 py-8 sm:py-10">
+        <div className="overflow-hidden rounded-[10px] border border-border bg-background shadow-[0_20px_60px_rgba(22,20,16,0.05)]">
+          <div className="grid gap-px bg-border lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="bg-background p-5 sm:p-7">
+              <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Resolved decision</p>
+              <h2 className="mt-4 max-w-3xl font-display text-3xl font-normal leading-tight sm:text-4xl">
+                {recommendation.best_skill.name}
+              </h2>
+              <p className="mt-4 max-w-3xl text-sm leading-6 text-secondary">
+                {recommendation.best_skill.description}
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {[
+                  `${selected.match_score}/100 task fit`,
+                  `${trust?.score ?? '—'}/100 Trust`,
+                  `${selected.audit.audit_score}/100 audit`,
+                  outcomeSummary,
+                ].map((item) => (
+                  <span
+                    key={item}
+                    className="rounded-[999px] border border-border bg-card px-3 py-1 font-mono text-[11px] text-secondary"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                <div>
+                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Install</p>
+                  <code className="mt-3 block break-words rounded-[8px] border border-border bg-card p-3 font-mono text-xs leading-5 [overflow-wrap:anywhere]">
+                    {recommendation.install.command}
+                  </code>
+                </div>
+                <div>
+                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Safety gate</p>
+                  <div className="mt-3 rounded-[8px] border border-border bg-card p-3 text-sm leading-6 text-secondary">
+                    <strong className="text-foreground">{recommendation.safety_gate.label}</strong>
+                    <br />
+                    {recommendation.safety_gate.recommended_action}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  href={`/skills/${recommendation.best_skill.slug}`}
+                  className="rounded-[8px] bg-[#006b4f] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                >
+                  Open skill
+                </Link>
+                <Link
+                  href={`/skills/${recommendation.best_skill.slug}/audit`}
+                  className="rounded-[8px] border border-border px-4 py-2 text-sm font-semibold transition-colors hover:border-foreground/50"
+                >
+                  Audit page
+                </Link>
+                <Link
+                  href={`/api/agent/resolve?task=${encodeURIComponent(result.task)}&agent=${encodeURIComponent(result.agent)}&max_risk=${encodeURIComponent(result.constraints.max_risk || 'medium')}&format=text`}
+                  prefetch={false}
+                  className="rounded-[8px] border border-border px-4 py-2 text-sm font-semibold transition-colors hover:border-foreground/50"
+                >
+                  Text API
+                </Link>
+              </div>
+            </div>
+
+            <aside className="bg-[#fbfaf7] p-5 sm:p-7">
+              <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Why this pick</p>
+              <ul className="mt-4 space-y-3">
+                {recommendation.why_recommended.slice(0, 5).map((reason) => (
+                  <li key={reason} className="border-b border-border pb-3 text-sm leading-6 text-secondary last:border-b-0">
+                    {reason}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6 rounded-[8px] border border-border bg-background p-4">
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Outcome loop</p>
+                <p className="mt-2 text-sm leading-6 text-secondary">
+                  After one narrow run, report the result so Trust Score v4 and Agent-Proven rankings learn from real use.
+                </p>
+                {result.feedback?.cli_example ? (
+                  <code className="mt-3 block break-words font-mono text-[11px] leading-5 text-secondary [overflow-wrap:anywhere]">
+                    {result.feedback.cli_example}
+                  </code>
+                ) : null}
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default async function ResolvePage({
   searchParams,
 }: {
-  searchParams: Promise<{ task?: string }>
+  searchParams: Promise<{
+    task?: string | string[]
+    agent?: string | string[]
+    max_risk?: string | string[]
+    min_stars?: string | string[]
+    live?: string | string[]
+  }>
 }) {
   const params = await searchParams
-  const initialTask = params.task || ''
+  const initialTask = normalizeParam(params.task)
+  const initialAgent = normalizeParam(params.agent) || 'codex'
+  const maxRisk = normalizeRisk(normalizeParam(params.max_risk))
+  const minStars = Number(normalizeParam(params.min_stars) || 0)
+  const live = normalizeParam(params.live) === 'true'
+  const initialResult = initialTask
+    ? await resolveAgentSkill({
+        task: initialTask,
+        agent: initialAgent,
+        constraints: {
+          max_risk: maxRisk,
+          needs_install_command: true,
+          min_stars: Number.isFinite(minStars) ? minStars : 0,
+        },
+        live,
+      }).catch(() => null)
+    : null
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -87,6 +229,8 @@ export default async function ResolvePage({
           />
         }
       />
+
+        {initialResult ? <ResolveDecisionCard result={initialResult} /> : null}
 
         <section className="border-b border-border bg-card/35">
           <div className="mx-auto max-w-6xl px-6 py-10">

@@ -202,6 +202,7 @@ export default function APIDocsPage() {
                   ['recommendation.why_recommended', 'Short explainable ranking reasons for agent logs'],
                   ['recommendation.trust_score_v4', 'Trust Score v4 evidence, outcome signals, install safety, permission surface, install policy, compatibility, and risk summary'],
                   ['decision_packet', 'Stable agent contract with selected skill, install plan, trust dimensions, do_not_use_when, alternatives, and outcome_feedback'],
+                  ['agent_feedback_loop', 'Outcome reporting contract, quality fields, idempotency, and ranking inputs updated after a run'],
                   ['feedback', 'Outcome event id, outcome API URL, expected outcomes, and ready CLI command for reporting adoption results'],
                   ['agent_handoff', 'Platform copy prompts, API sequence, review checklist, expected output contract, and blocked actions'],
                 ].map(([field, detail]) => (
@@ -281,7 +282,7 @@ export default function APIDocsPage() {
             </div>
             <div className="p-4 sm:p-6">
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
-                {'Report what happened after an agent tried one resolved skill. These aggregate signals feed Trust Score v4, rankings, skill detail pages, and the public Resolve eval dashboard.'}
+                {'Report what happened after an agent tried one resolved skill. These aggregate signals feed Trust Score v4, Agent-Proven rankings, skill detail pages, and the public Resolve eval dashboard.'}
               </p>
               <div className="grid gap-px border border-border bg-border text-sm sm:mb-6 md:grid-cols-2">
                 {[
@@ -657,12 +658,12 @@ Total: 2 skills found
             </div>
             <div className="p-4 sm:p-6">
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
-                {'Get ranked skill shortlists by quality, stars, freshness, new arrivals, or workflow-specific use cases.'}
+                {'Get ranked skill shortlists by quality, stars, freshness, new arrivals, workflow-specific use cases, or real Agent-Proven outcome evidence.'}
               </p>
               <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 text-sm sm:text-base">
                 <div>
                   <code className="font-mono bg-muted px-2 py-1">{'slug'}</code>
-                  <span className="text-secondary ml-2">{'- Ranking slug, e.g. best-web-scraping-skills'}</span>
+                  <span className="text-secondary ml-2">{'- Ranking slug, e.g. agent-proven or best-web-scraping-skills'}</span>
                 </div>
                 <div>
                   <code className="font-mono bg-muted px-2 py-1">{'limit'}</code>
@@ -674,7 +675,7 @@ Total: 2 skills found
                 </div>
               </div>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
-                <code>{'GET /api/agent/rankings?slug=best-web-scraping-skills&limit=5&format=text'}</code>
+                <code>{'GET /api/agent/rankings?slug=agent-proven&limit=5&format=text'}</code>
               </div>
             </div>
           </div>

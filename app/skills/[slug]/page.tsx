@@ -237,6 +237,7 @@ export default async function SkillDetailPage({
   const trustProfile = dbSkill
     ? getSkillTrustProfile(dbSkill, Boolean(approvedClaim), eventStats, outcomeStats)
     : null
+  const outcomeEvidence = trustProfile?.outcomeEvidence || null
   const supplyProfile = dbSkill
     ? getSkillSupplyProfile(dbSkill, eventStats)
     : null
@@ -1877,53 +1878,103 @@ export default async function SkillDetailPage({
               <div className="overflow-hidden rounded-[8px] border border-border bg-card shadow-[0_14px_36px_rgba(22,20,16,0.04)]">
                 <div className="border-b border-border bg-[#fbfaf7] p-5">
                   <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-secondary">
-                    Agent outcome signals
+                    Agent-proven evidence
                   </p>
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h3 className="font-display text-xl font-semibold leading-tight">
-                        Real use feedback
+                        Outcome feedback
                       </h3>
                       <p className="mt-1 text-xs leading-relaxed text-secondary">
-                        Reported by agents after resolve, review, and install.
+                        Real reports after resolve, review, install, and one narrow run.
                       </p>
                     </div>
                     <div className="font-mono text-2xl font-semibold">
-                      {outcomeStats?.success_rate !== null && outcomeStats?.success_rate !== undefined
-                        ? `${Math.round(Number(outcomeStats.success_rate))}%`
+                      {outcomeEvidence?.successRate !== null && outcomeEvidence?.successRate !== undefined
+                        ? `${Math.round(Number(outcomeEvidence.successRate))}%`
                         : '—'}
                     </div>
+                  </div>
+                </div>
+                <div className="border-b border-border p-5">
+                  <div className="flex flex-wrap gap-2">
+                    <span className="rounded-[999px] border border-border bg-background px-3 py-1 font-mono text-[11px] text-secondary">
+                      {outcomeEvidence?.label || 'No agent outcome data yet'}
+                    </span>
+                    <span className="rounded-[999px] border border-border bg-background px-3 py-1 font-mono text-[11px] text-secondary">
+                      Auto-install: {trustProfile?.autoInstall.allowed ? 'candidate' : 'review first'}
+                    </span>
+                    <span className="rounded-[999px] border border-border bg-background px-3 py-1 font-mono text-[11px] text-secondary">
+                      Last: {formatDate(outcomeEvidence?.lastOutcomeAt)}
+                    </span>
                   </div>
                 </div>
                 <dl className="grid grid-cols-2 gap-px bg-border text-xs">
                   <div className="bg-background p-4">
                     <dt className="text-secondary">Outcomes</dt>
                     <dd className="mt-1 font-mono text-lg">
-                      {formatNumber(outcomeStats?.total_outcomes || 0)}
+                      {formatNumber(outcomeEvidence?.total || 0)}
+                    </dd>
+                  </div>
+                  <div className="bg-background p-4">
+                    <dt className="text-secondary">Successful</dt>
+                    <dd className="mt-1 font-mono text-lg">
+                      {formatNumber(outcomeEvidence?.successes || 0)}
+                    </dd>
+                  </div>
+                  <div className="bg-background p-4">
+                    <dt className="text-secondary">Failed</dt>
+                    <dd className="mt-1 font-mono text-lg">
+                      {formatNumber(outcomeEvidence?.failures || 0)}
+                    </dd>
+                  </div>
+                  <div className="bg-background p-4">
+                    <dt className="text-secondary">Not relevant</dt>
+                    <dd className="mt-1 font-mono text-lg">
+                      {formatNumber(outcomeEvidence?.notRelevant || 0)}
                     </dd>
                   </div>
                   <div className="bg-background p-4">
                     <dt className="text-secondary">Installs</dt>
                     <dd className="mt-1 font-mono text-lg">
-                      {formatNumber(outcomeStats?.install_attempts || 0)}
+                      {formatNumber(outcomeEvidence?.installAttempts || 0)}
                     </dd>
                   </div>
                   <div className="bg-background p-4">
                     <dt className="text-secondary">Risk blocked</dt>
                     <dd className="mt-1 font-mono text-lg">
-                      {formatNumber(outcomeStats?.risk_blocked_outcomes || 0)}
+                      {formatNumber(outcomeEvidence?.riskBlocked || 0)}
                     </dd>
                   </div>
                   <div className="bg-background p-4">
                     <dt className="text-secondary">Setup needed</dt>
                     <dd className="mt-1 font-mono text-lg">
-                      {formatNumber(outcomeStats?.setup_required_outcomes || 0)}
+                      {formatNumber(outcomeEvidence?.setupRequired || 0)}
                     </dd>
                   </div>
                 </dl>
-                <p className="p-5 text-xs leading-relaxed text-secondary">
-                  {trustProfile?.outcomeEvidence.label || 'No agent outcome data yet. The first agent run can report success, setup needs, or risk blocks through /api/agent/outcome.'}
-                </p>
+                <div className="space-y-3 p-5">
+                  <p className="text-xs leading-relaxed text-secondary">
+                    {outcomeEvidence?.total
+                      ? 'This evidence feeds Trust Score v4, Resolve rankings, and the Agent-Proven leaderboard.'
+                      : 'No agent outcome data yet. The first agent run can report success, setup needs, risk blocks, failure, or not-relevant through /api/agent/outcome.'}
+                  </p>
+                  <div className="grid gap-2">
+                    <Link
+                      href="/rankings/agent-proven"
+                      className="rounded-[8px] border border-border px-3 py-2 text-center text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                    >
+                      Agent-Proven ranking
+                    </Link>
+                    <Link
+                      href="/api/agent/outcome?contract=true"
+                      prefetch={false}
+                      className="rounded-[8px] border border-border px-3 py-2 text-center text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                    >
+                      Outcome contract
+                    </Link>
+                  </div>
+                </div>
               </div>
 
               {/* Install card */}
