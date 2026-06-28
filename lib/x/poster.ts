@@ -101,6 +101,9 @@ function getHumanObservation(skill: XPostSkill) {
   if (/(finance|stock|investment|market|equity|quant|trading|portfolio|earnings)/.test(text)) {
     return "Finance agents don't need louder takes. They need sources, data, and a repeatable research path."
   }
+  if (/(presentation|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides)/.test(text)) {
+    return 'Most agents can draft slides. The hard part is choosing the right deck workflow.'
+  }
   if (/\b(code|coding|developer|dev|github|claude|cursor|terminal|repo|review|test)\b/.test(text)) {
     return "Most coding agents don't fail from lack of model power. They fail when repo context disappears."
   }
@@ -131,6 +134,9 @@ function getCapabilityLine(skill: XPostSkill) {
   if (/(finance|stock|investment|market|equity|quant|trading|portfolio|earnings)/.test(text)) {
     return `${name} helps turn market noise into source-backed analysis an agent can reuse.`
   }
+  if (/(presentation|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides)/.test(text)) {
+    return `${name} helps agents turn briefs, docs, or research notes into editable deck workflows.`
+  }
   if (/\b(code|coding|developer|dev|github|claude|cursor|terminal|repo|review|test)\b/.test(text)) {
     return `${name} gives coding agents a repeatable way to plan, patch, review, or ship.`
   }
@@ -158,6 +164,9 @@ function getOneLineTake(skill: XPostSkill) {
   }
   if (/(finance|stock|investment|market|equity|quant|trading|portfolio|earnings)/.test(text)) {
     return 'One-line take: make the research path auditable before the agent acts.'
+  }
+  if (/(presentation|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides)/.test(text)) {
+    return 'One-line take: decks need format fit, not another blank slide.'
   }
   if (/\b(code|coding|developer|dev|github|claude|cursor|terminal|repo|review|test)\b/.test(text)) {
     return 'One-line take: better repo rituals beat another blank prompt.'

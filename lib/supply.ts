@@ -80,6 +80,15 @@ export const SUPPLY_TRACKS: SupplyTrackDefinition[] = [
     keywords: ['research', 'analysis', 'rag', 'knowledge', 'paper', 'arxiv', 'summarize', 'source', 'report'],
   },
   {
+    slug: 'presentation',
+    label: 'Presentation and deck workflows',
+    shortLabel: 'Presentation',
+    description: 'PPTX generation, HTML slides, pitch decks, speaker notes, and presentation workflow skills.',
+    categoryAliases: ['presentation', 'design', 'design-creative'],
+    useCaseSlugs: ['presentation-generation', 'design-creative', 'document-processing'],
+    keywords: ['presentation', 'presentations', 'ppt', 'pptx', 'powerpoint', 'slides', 'slide deck', 'deck', 'pitch deck', 'speaker notes', 'html slides'],
+  },
+  {
     slug: 'finance',
     label: 'Finance and quant workflows',
     shortLabel: 'Finance',

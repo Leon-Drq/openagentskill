@@ -8,6 +8,7 @@ export interface UseCaseDefinition {
   description: string
   heroPrompt: string
   keywords: string[]
+  featuredSlugs?: string[]
   workflows: string[]
   agentTasks: string[]
 }
@@ -235,6 +236,45 @@ export const USE_CASES: UseCaseDefinition[] = [
     agentTasks: ['Inspect visual requirements', 'Generate reusable assets', 'Package output for review'],
   },
   {
+    slug: 'presentation-generation',
+    shortTitle: 'Presentation generation',
+    title: 'Presentation and slide deck skills for AI agents',
+    eyebrow: 'Create decks',
+    description:
+      'Find skills for turning briefs, PDFs, URLs, research notes, and product updates into editable PPTX decks, HTML slides, visual stories, and speaker-ready presentation assets.',
+    heroPrompt:
+      'I need my agent to create a polished presentation deck from a brief, document, URL, or research notes, preferably with editable PPTX or HTML slides.',
+    keywords: [
+      'presentation',
+      'presentations',
+      'ppt',
+      'pptx',
+      'powerpoint',
+      'slides',
+      'slide deck',
+      'deck',
+      'pitch deck',
+      'html slides',
+      'speaker notes',
+      'keynote',
+      'visual story',
+      'research presentation',
+      'product update deck',
+      'notebooklm',
+    ],
+    featuredSlugs: [
+      'hugohe3-ppt-master',
+      'zarazhangrui-frontend-slides',
+      'alchaincyf-huashu-design',
+      'op7418-guizang-ppt-skill',
+      'lewislulu-html-ppt-skill',
+      'jimliu-baoyu-skills',
+      'joeseesun-qiaomu-anything-to-notebooklm',
+    ],
+    workflows: ['Create PPTX from a brief', 'Turn research into slides', 'Generate HTML decks', 'Prepare speaker notes'],
+    agentTasks: ['Choose the right deck format', 'Generate editable slide structure', 'Check visual and license risk'],
+  },
+  {
     slug: 'security-compliance',
     shortTitle: 'Security and compliance',
     title: 'Security and compliance skills for agents',
@@ -367,6 +407,8 @@ function searchableSkillText(skill: SkillRecord) {
 export function scoreSkillForUseCase(skill: SkillRecord, useCase: UseCaseDefinition) {
   const text = searchableSkillText(skill)
   let score = 0
+
+  if (useCase.featuredSlugs?.includes(skill.slug)) score += 90
 
   for (const keyword of useCase.keywords) {
     const normalized = keyword.toLowerCase()

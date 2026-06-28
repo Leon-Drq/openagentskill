@@ -11,6 +11,7 @@ export interface AgentTaskDefinition {
   description: string
   agentPrompt: string
   keywords: string[]
+  featuredSlugs?: string[]
   successCriteria: string[]
   avoidWhen: string[]
 }
@@ -184,9 +185,52 @@ export const AGENT_TASKS: AgentTaskDefinition[] = [
     successCriteria: ['Separates facts from interpretation', 'Cites source URLs', 'Highlights contradictions'],
     avoidWhen: ['Sources are not reliable', 'The task requires real-time regulated advice', 'The topic needs expert review'],
   },
+  {
+    slug: 'create-presentation-deck',
+    title: 'Create a presentation deck',
+    shortTitle: 'Create deck',
+    useCaseSlug: 'presentation-generation',
+    intent: 'Turn a brief, document, URL, or research notes into an editable presentation workflow.',
+    description:
+      'Find skills for creating PPTX decks, HTML slide decks, speaker notes, visual stories, and presentation assets that a user can edit or review.',
+    agentPrompt:
+      'Find the best skill for creating a polished presentation deck from a brief, document, URL, or research notes, with editable PPTX or HTML slides when possible.',
+    keywords: [
+      'create presentation',
+      'make ppt',
+      'generate pptx',
+      'slide deck',
+      'pitch deck',
+      'powerpoint',
+      'html slides',
+      'speaker notes',
+    ],
+    featuredSlugs: [
+      'hugohe3-ppt-master',
+      'zarazhangrui-frontend-slides',
+      'alchaincyf-huashu-design',
+      'op7418-guizang-ppt-skill',
+      'lewislulu-html-ppt-skill',
+      'jimliu-baoyu-skills',
+      'joeseesun-qiaomu-anything-to-notebooklm',
+    ],
+    successCriteria: [
+      'Produces an editable deck format or a clear export path',
+      'Preserves source claims and presentation structure',
+      'Flags design, license, and manual review requirements',
+    ],
+    avoidWhen: [
+      'The deck contains confidential investor or customer data without a private workflow',
+      'The output must be legally approved without human review',
+      'The skill cannot produce the format required by downstream users',
+    ],
+  },
 ]
 
-export const FEATURED_AGENT_TASKS = AGENT_TASKS.slice(0, 8)
+export const FEATURED_AGENT_TASKS = [
+  ...AGENT_TASKS.slice(0, 7),
+  AGENT_TASKS.find((task) => task.slug === 'create-presentation-deck'),
+].filter((task): task is AgentTaskDefinition => Boolean(task))
 
 export function getAgentTaskBySlug(slug: string) {
   return AGENT_TASKS.find((task) => task.slug === slug)
@@ -197,7 +241,10 @@ export function selectSkillsForTask(skills: SkillRecord[], task: AgentTaskDefini
   const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, `${task.agentPrompt} ${task.keywords.join(' ')}`))
     .map((item) => ({
       ...item,
-      score: item.score + (useCase ? scoreSkillForUseCase(item.skill, useCase) : 0),
+      score:
+        item.score +
+        (useCase ? scoreSkillForUseCase(item.skill, useCase) : 0) +
+        (task.featuredSlugs?.includes(item.skill.slug) ? 80 : 0),
     }))
     .sort((a, b) => b.score - a.score || Number(b.skill.github_stars || 0) - Number(a.skill.github_stars || 0))
 

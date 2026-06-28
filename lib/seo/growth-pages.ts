@@ -55,6 +55,16 @@ const BEST_PAGE_OVERRIDES: Record<string, Partial<BestSkillPageDefinition>> = {
       'Generate player scouting notes before a match',
     ],
   },
+  'presentation-generation': {
+    title: 'Best AI agent skills for PPT and presentation decks',
+    searchIntent: 'Find reusable AI agent skills for creating PPTX decks, HTML slides, pitch decks, speaker notes, and presentation workflows from source material.',
+    primaryKeyword: 'best AI agent skills for PPT generation',
+    exampleTasks: [
+      'Turn a research brief into an editable PPTX deck',
+      'Create HTML slides from product notes',
+      'Prepare speaker notes and a visual story from source documents',
+    ],
+  },
 }
 
 const CUSTOM_BEST_SKILL_PAGES: BestSkillPageDefinition[] = [
@@ -146,6 +156,42 @@ const CUSTOM_BEST_SKILL_PAGES: BestSkillPageDefinition[] = [
       'Build a football analytics dashboard',
       'Compare World Cup teams with xG and event data',
       'Generate scouting notes before a match',
+    ],
+  },
+  {
+    slug: 'ppt-generation',
+    title: 'Best AI agent skills for PPT generation',
+    shortTitle: 'PPT generation',
+    eyebrow: 'Presentation agents',
+    description:
+      'Ranked OpenAgentSkill shortlist for agents that generate PPTX decks, HTML slides, speaker notes, pitch decks, and editable presentation workflows from briefs, PDFs, URLs, and research notes.',
+    useCaseSlug: 'presentation-generation',
+    searchIntent: 'Find AI agent skills for PPT generation, slide decks, PowerPoint workflows, HTML slides, speaker notes, and pitch deck creation.',
+    audience: 'Founders, analysts, marketers, designers, and builders creating presentation agents or deck automation workflows.',
+    agentSurface: 'AI agents',
+    primaryKeyword: 'best AI agent skills for PPT generation',
+    exampleTasks: [
+      'Generate a PowerPoint deck from a product brief',
+      'Convert research notes into editable slides',
+      'Create a pitch deck outline with speaker notes and visual direction',
+    ],
+  },
+  {
+    slug: 'codex-presentation-decks',
+    title: 'Best Codex skills for presentation decks',
+    shortTitle: 'Codex presentations',
+    eyebrow: 'Codex deck workflows',
+    description:
+      'Ranked OpenAgentSkill shortlist for Codex users creating presentation decks, PPTX exports, HTML slides, and speaker-ready slide workflows from source material.',
+    useCaseSlug: 'presentation-generation',
+    searchIntent: 'Find Codex-ready skills for creating presentation decks, PPTX files, HTML slides, and pitch deck workflows.',
+    audience: 'Codex users building deck generation, research presentation, product update, and pitch deck workflows.',
+    agentSurface: 'Codex',
+    primaryKeyword: 'best Codex skills for presentation decks',
+    exampleTasks: [
+      'Turn a document into a first-pass deck',
+      'Generate HTML slides for a product update',
+      'Compare PPT skills before installing one into a workflow',
     ],
   },
   {
@@ -289,7 +335,7 @@ export const BEST_SKILL_PAGES: BestSkillPageDefinition[] = [
 ]
 
 export const FEATURED_BEST_PAGES = BEST_SKILL_PAGES.filter((page) =>
-  ['web-scraping', 'stock-analysis', 'codex-web-scraping', 'codex-finance-analysis', 'claude-code-pdf-parsing', 'sports-analytics', 'football-analytics', 'research-briefs', 'marketing-seo-automation', 'security-review', 'legal-compliance-review', 'coding-agents', 'browser-automation', 'rag-knowledge', 'data-analysis', 'github-automation']
+  ['web-scraping', 'stock-analysis', 'codex-web-scraping', 'codex-finance-analysis', 'claude-code-pdf-parsing', 'sports-analytics', 'football-analytics', 'presentation-generation', 'ppt-generation', 'codex-presentation-decks', 'research-briefs', 'marketing-seo-automation', 'security-review', 'legal-compliance-review', 'coding-agents', 'browser-automation', 'rag-knowledge', 'data-analysis', 'github-automation']
     .includes(page.slug)
 )
 

@@ -182,6 +182,9 @@ export function rankSkillsForQuery(
         const isSportsSkill = /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(text)
         const isDesignTask = /\b(design|designer|creative|motion|animation|lottie|gsap|figma|ui|ux|shadcn|component|design system|three|3d|map|dashboard|visual|svg)\b/.test(normalizedQuery)
         const isDesignSkill = /\b(design|creative|motion|animation|lottie|gsap|figma|ui|ux|shadcn|component|design system|three|3d|map|dashboard|visual|svg)\b/.test(text)
+        const isPresentationTask = /\b(presentation|presentations|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides|visual story)\b/.test(normalizedQuery)
+        const isPresentationSkill = /\b(presentation|presentations|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides|visual story|notebooklm|guizang|baoyu)\b/.test(text)
+        const isDocumentOnlySkill = /\b(pdf|document|docx|markdown|ocr|converter|convert|parser|parse)\b/.test(text) && !isPresentationSkill
 
         if (isGenericWebTask && isGenericWebSkill) score += 42
         if (isGenericWebTask && isLLMReadyWebSkill) score += 28
@@ -194,6 +197,9 @@ export function rankSkillsForQuery(
         if (isFinanceTask && isSecurityOnlySkill) score -= 90
         if (isSportsTask && skill.category === 'sports-analytics') score += 85
         if (isSportsTask && isSportsSkill) score += 58
+        if (isPresentationTask && skill.category === 'design-creative') score += 50
+        if (isPresentationTask && isPresentationSkill) score += 190
+        if (isPresentationTask && isDocumentOnlySkill) score -= 90
         if (isDesignTask && skill.category === 'design-creative') score += 78
         if (isDesignTask && isDesignSkill) score += 52
       }

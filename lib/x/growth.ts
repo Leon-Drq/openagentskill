@@ -150,6 +150,37 @@ function getSkillShareText(
     .toLowerCase()
 }
 
+function getXContentLane(skill: SkillRecord) {
+  const text = getSkillShareText(skill, {
+    includeCategory: true,
+    includeGeneratedSignals: true,
+  })
+
+  if (/\b(presentation|presentations|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides)\b/.test(text)) {
+    return 'presentation'
+  }
+  if (/\b(finance|financial|quant|trading|portfolio|markets?|stocks?|equity|earnings|filings?|sec|edgar)\b/.test(text)) {
+    return 'finance'
+  }
+  if (/\b(football|soccer|world cup|fifa|sports?|xg|match|scouting)\b/.test(text)) {
+    return 'sports'
+  }
+  if (/\b(design|creative|figma|motion|animation|video|image|seedance|slides?)\b/.test(text)) {
+    return 'creative'
+  }
+  if (/\b(code|coding|developer|github|repo|review|test|claude code|cursor|codex)\b/.test(text)) {
+    return 'coding'
+  }
+  if (/\b(research|rag|retrieval|document|pdf|knowledge|search)\b/.test(text)) {
+    return 'research'
+  }
+  if (/\b(marketing|seo|growth|content|newsletter|social)\b/.test(text)) {
+    return 'growth'
+  }
+
+  return 'general'
+}
+
 function isGenericHighStarRepo(skill: SkillRecord) {
   const repo = (skill.github_repo || '').toLowerCase()
   return [
@@ -168,11 +199,11 @@ function hasShareableAgentUseCase(skill: SkillRecord) {
   const text = getSkillShareText(skill)
   const category = (skill.category || '').toLowerCase()
 
-  if (/(^|-)agent(s|-|$)|agent-skills|coding-agents|document-processing|web-scraping|browser-automation|research|finance|quant|football|world-cup|marketing|design|data-analysis|legal/.test(category)) {
+  if (/(^|-)agent(s|-|$)|agent-skills|coding-agents|document-processing|web-scraping|browser-automation|research|finance|quant|football|world-cup|marketing|design|data-analysis|legal|presentation/.test(category)) {
     return true
   }
 
-  return /\b(agent|agents|agentic|skill|skills|codex|claude code|cursor|workflow|automation|automate|scrap(e|ing)|crawl(er|ing)?|browser|playwright|puppeteer|pdf|document|markdown|rag|retrieval|research|stock|stocks|quant|trading|portfolio|football|world cup|soccer|seo|marketing|figma|design|code review|pull request|testing|security audit)\b/.test(text)
+  return /\b(agent|agents|agentic|skill|skills|codex|claude code|cursor|workflow|automation|automate|scrap(e|ing)|crawl(er|ing)?|browser|playwright|puppeteer|pdf|document|markdown|rag|retrieval|research|stock|stocks|quant|trading|portfolio|football|world cup|soccer|seo|marketing|figma|design|presentation|ppt|pptx|powerpoint|slides?|deck|code review|pull request|testing|security audit)\b/.test(text)
 }
 
 function isGoodXCandidate(skill: SkillRecord, minStars: number) {
@@ -189,6 +220,7 @@ function isGoodXCandidate(skill: SkillRecord, minStars: number) {
 function toQueueMetadata(skill: SkillRecord) {
   const trust = getSkillTrustProfile(skill)
   const audit = buildSkillAudit(skill)
+  const contentLane = getXContentLane(skill)
 
   return {
     url: `https://www.openagentskill.com/skills/${skill.slug}?ref=x`,
@@ -201,6 +233,9 @@ function toQueueMetadata(skill: SkillRecord) {
     trust_tier: trust.tier,
     audit_score: audit.audit_score,
     audit_risk_level: audit.risk_level,
+    content_lane: contentLane,
+    scenario: contentLane === 'general' ? null : contentLane,
+    utm_campaign: contentLane === 'general' ? 'daily_skill' : `${contentLane}_skill`,
     install_command: skill.install_command || `npx skills add ${skill.github_repo}`,
     generated_by: 'x_growth_os',
   }
@@ -215,13 +250,15 @@ async function enqueueQueueItem(
     scheduledFor?: string
   }
 ) {
+  const contentLane = getXContentLane(skill)
+  const campaign = contentLane === 'general' ? options.campaign : `${contentLane}_${options.campaign}`
   const { data, error } = await supabase.rpc('enqueue_x_content_queue_item', {
     p_server_secret: serverSecret,
     p_item: {
       skill_id: skill.id,
       skill_slug: skill.slug,
       content_type: 'skill_pick',
-      campaign: options.campaign,
+      campaign,
       status: 'queued',
       priority: getQueuePriority(skill),
       scheduled_for: options.scheduledFor || new Date().toISOString(),
