@@ -31,7 +31,7 @@ Preferred agent flow:
 6. Fetch /api/agent/evals?slug={slug}&task={task}&format=text and follow the eval decision.
 7. Fetch /api/agent/skills/{slug} for the selected skill.
 8. Fetch /api/skills/{slug}/install?format=text before installing.
-9. After one narrow run, POST the result to /api/agent/outcome using feedback.event_id from resolve.
+9. After one narrow run, POST the result to /api/agent/outcome using feedback.event_id from resolve. Include output_quality, workspace, error_type, and human_review_required when known. Use dry_run=true before wiring a new integration.
 
 Important URLs:
 - Agent entry: https://www.openagentskill.com/agent
@@ -41,6 +41,7 @@ Important URLs:
 - Task API: https://www.openagentskill.com/api/agent/tasks
 - Resolve API: https://www.openagentskill.com/api/agent/resolve
 - Agent outcome API: https://www.openagentskill.com/api/agent/outcome
+- Agent outcome contract: https://www.openagentskill.com/api/agent/outcome?contract=true
 - Skill Eval API: https://www.openagentskill.com/api/agent/evals?slug=crawl4ai
 - Resolve eval dashboard: https://www.openagentskill.com/evals/resolve
 - Skill search API: https://www.openagentskill.com/api/skills/search
@@ -63,7 +64,7 @@ Install safety:
 - Prefer /api/agent/resolve over raw search because it applies the OpenAgentSkill safety gate.
 - Prefer agent_handoff over ad hoc page scraping because it returns platform templates, API sequence, review checklist, and blocked actions.
 - Prefer /api/agent/evals?slug={slug} before installation because it returns the Trust + Eval contract, blockers, and validation plan.
-- Report success, failed, not_relevant, blocked_by_risk, or setup_required to /api/agent/outcome so future rankings learn from real use.
+- Report success, failed, not_relevant, blocked_by_risk, or setup_required to /api/agent/outcome so future rankings learn from real use. Add quality fields when possible.
 - Treat safety_gate.blocked as "do not auto-install".
 - Treat safety_gate.experimental as manual test only.
 - Treat safety_gate.reviewed as human-review-before-install unless auto_install_policy is allow.

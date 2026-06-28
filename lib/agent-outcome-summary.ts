@@ -76,5 +76,7 @@ export function formatOutcomeStatsText(rows: SkillOutcomeStats[]) {
     'Report an outcome:',
     'POST /api/agent/outcome',
     'Expected outcomes: success, failed, not_relevant, blocked_by_risk, setup_required',
+    'Optional quality fields: task_success, output_quality 1-5, error_type, human_review_required, workspace, evidence_url',
+    'Validate first with dry_run=true when wiring a new agent integration.',
   ].join('\n')
 }

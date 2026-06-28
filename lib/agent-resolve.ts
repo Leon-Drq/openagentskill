@@ -1,5 +1,9 @@
 import { unstable_cache } from 'next/cache'
-import { buildResolveFeedback } from '@/lib/agent-outcomes'
+import {
+  AGENT_OUTCOME_ERROR_TYPES,
+  AGENT_OUTCOME_WORKSPACES,
+  buildResolveFeedback,
+} from '@/lib/agent-outcomes'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { buildAgentHandoffTemplates } from '@/lib/agent-integration-kit'
 import { getAgentSafetyProfile, type AgentResolveConstraints, type AgentSafetyProfile } from '@/lib/agent-safety'
@@ -784,6 +788,43 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     selectedName: selected?.skill.name || null,
     alternativeSlugs: alternatives.slice(0, 5).map((candidate) => candidate.skill.slug),
   })
+  const agentFeedbackLoop = selected
+    ? {
+        version: 'openagentskill-agent-feedback-loop-v2',
+        status: 'active',
+        purpose: 'Report the result of one resolved skill run so Trust Score v4 and future Resolve rankings learn from real use.',
+        event_id: feedback.event_id,
+        selected_skill_slug: selected.skill.slug,
+        selected_skill_name: selected.skill.name,
+        endpoint: feedback.outcome_api,
+        method: feedback.method,
+        idempotency: 'Retrying the same event_id updates the previous outcome.',
+        dry_run: {
+          supported: true,
+          instruction: 'Set dry_run=true to validate a payload before wiring a new agent integration.',
+        },
+        expected_outcomes: feedback.expected_outcomes,
+        error_types: AGENT_OUTCOME_ERROR_TYPES,
+        workspaces: AGENT_OUTCOME_WORKSPACES,
+        quality_fields: [
+          'task_success',
+          'output_quality',
+          'error_type',
+          'human_review_required',
+          'used_in_production',
+          'workspace',
+          'evidence_url',
+        ],
+        payload_template: feedback.json_example,
+        cli_example: feedback.cli_example,
+        ranking_inputs_updated: [
+          'Trust Score v4 real-agent outcome dimension',
+          'Resolve ranking outcome evidence',
+          'Skill detail outcome signal block',
+          'Outcome leaderboard',
+        ],
+      }
+    : null
   const agentDecision = selected
     ? {
         input_task: task,
@@ -824,6 +865,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           event_id: feedback.event_id,
           outcome_api: feedback.outcome_api,
           cli_example: feedback.cli_example,
+          contract: agentFeedbackLoop,
         },
         agent_next_steps: [
           'Read the audit URL before installing.',
@@ -1002,6 +1044,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     agent,
     constraints,
     feedback,
+    agent_feedback_loop: agentFeedbackLoop,
     recommendation,
     selected,
     alternatives,

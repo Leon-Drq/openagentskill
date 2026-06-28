@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { AGENT_OUTCOMES } from '@/lib/agent-outcomes'
+import {
+  AGENT_OUTCOME_ERROR_TYPES,
+  AGENT_OUTCOME_WORKSPACES,
+  AGENT_OUTCOMES,
+  buildOutcomeMetadata,
+  buildOutcomeTrustImpact,
+} from '@/lib/agent-outcomes'
 import {
   createEmptyOutcomeStats,
   formatOutcomeStatsText,
@@ -16,10 +22,76 @@ const OutcomeSchema = z.object({
   install_used: z.boolean().optional().default(false),
   risk_blocked: z.boolean().optional().default(false),
   setup_required: z.boolean().optional().default(false),
+  task_success: z.boolean().nullable().optional(),
+  output_quality: z.number().int().min(1).max(5).nullable().optional(),
+  error_type: z.enum(AGENT_OUTCOME_ERROR_TYPES).nullable().optional(),
+  human_review_required: z.boolean().optional().default(false),
+  used_in_production: z.boolean().optional().default(false),
+  workspace: z.enum(AGENT_OUTCOME_WORKSPACES).optional().default('unknown'),
+  evidence_url: z.string().url().max(500).nullable().optional(),
   time_to_useful_ms: z.number().int().nonnegative().nullable().optional(),
   notes: z.string().max(3000).nullable().optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
+  dry_run: z.boolean().optional().default(false),
 })
+
+function buildOutcomeContract() {
+  return {
+    version: 'openagentskill-agent-outcome-v2',
+    endpoint: '/api/agent/outcome',
+    method: 'POST',
+    idempotency: 'event_id is unique. Retrying the same event_id updates the previous outcome.',
+    required_fields: ['event_id', 'skill_slug', 'task'],
+    outcomes: AGENT_OUTCOMES,
+    error_types: AGENT_OUTCOME_ERROR_TYPES,
+    workspaces: AGENT_OUTCOME_WORKSPACES,
+    quality_fields: {
+      task_success: 'boolean; defaults from outcome === success when omitted',
+      output_quality: 'integer 1-5 when the agent can judge answer quality',
+      human_review_required: 'true when the run cannot be trusted without a human check',
+      used_in_production: 'true only after a production workflow used the skill',
+      evidence_url: 'optional URL to logs, PR, issue, or public artifact',
+    },
+    example: {
+      event_id: 'resolve_...',
+      skill_slug: 'crawl4ai',
+      task: 'scrape pricing pages',
+      agent: 'codex',
+      outcome: 'success',
+      install_used: true,
+      task_success: true,
+      output_quality: 4,
+      error_type: null,
+      human_review_required: false,
+      workspace: 'sandbox',
+      time_to_useful_ms: 120000,
+      notes: 'Solved one narrow sandbox task; no secrets or production data touched.',
+      dry_run: false,
+    },
+  }
+}
+
+function formatOutcomeContractText() {
+  const contract = buildOutcomeContract()
+  return [
+    'OpenAgentSkill agent outcome contract',
+    '',
+    `Version: ${contract.version}`,
+    `Endpoint: POST ${contract.endpoint}`,
+    `Idempotency: ${contract.idempotency}`,
+    `Required fields: ${contract.required_fields.join(', ')}`,
+    `Outcomes: ${contract.outcomes.join(', ')}`,
+    `Error types: ${contract.error_types.join(', ')}`,
+    `Workspaces: ${contract.workspaces.join(', ')}`,
+    '',
+    'Recommended flow:',
+    '1. Call /api/agent/resolve for one concrete task.',
+    '2. Review audit, eval, Trust Score, risk notes, and alternatives.',
+    '3. Try the selected skill in a sandbox or low-risk workspace.',
+    '4. POST the result to /api/agent/outcome using feedback.event_id.',
+    '5. Use dry_run=true before wiring a new agent integration.',
+  ].join('\n')
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,6 +111,54 @@ export async function POST(request: NextRequest) {
 
     const payload = parsed.data
     const supabase = createPublicClient()
+    const metadata = buildOutcomeMetadata({
+      outcome: payload.outcome,
+      metadata: payload.metadata,
+      task_success: payload.task_success,
+      output_quality: payload.output_quality ?? null,
+      error_type: payload.error_type ?? null,
+      human_review_required: payload.human_review_required,
+      used_in_production: payload.used_in_production,
+      workspace: payload.workspace,
+      evidence_url: payload.evidence_url ?? null,
+    })
+    const trustImpact = buildOutcomeTrustImpact({
+      outcome: payload.outcome,
+      installUsed: payload.install_used,
+      riskBlocked: payload.risk_blocked || payload.outcome === 'blocked_by_risk',
+      setupRequired: payload.setup_required || payload.outcome === 'setup_required',
+      outputQuality: payload.output_quality ?? null,
+    })
+
+    if (payload.dry_run) {
+      const { data: skill, error } = await supabase
+        .from('skills')
+        .select('slug,name,ai_review_approved')
+        .eq('slug', payload.skill_slug)
+        .eq('ai_review_approved', true)
+        .maybeSingle()
+
+      if (error) {
+        return NextResponse.json({ error: 'Failed to validate skill' }, { status: 500 })
+      }
+      if (!skill) {
+        return NextResponse.json({ error: 'Skill not found' }, { status: 404 })
+      }
+
+      return NextResponse.json({
+        ok: true,
+        success: true,
+        dry_run: true,
+        message: 'Outcome payload accepted. No database row was written.',
+        contract: buildOutcomeContract(),
+        normalized_payload: {
+          ...payload,
+          metadata,
+        },
+        trust_impact: trustImpact,
+      })
+    }
+
     const { data, error } = await supabase.rpc('record_agent_outcome', {
       p_event_id: payload.event_id,
       p_skill_slug: payload.skill_slug,
@@ -50,7 +170,7 @@ export async function POST(request: NextRequest) {
       p_setup_required: payload.setup_required || payload.outcome === 'setup_required',
       p_time_to_useful_ms: payload.time_to_useful_ms ?? null,
       p_notes: payload.notes ?? null,
-      p_metadata: payload.metadata || {},
+      p_metadata: metadata,
     })
 
     if (error) {
@@ -81,6 +201,12 @@ export async function POST(request: NextRequest) {
       outcome: payload.outcome,
       stats: stats || null,
       data,
+      contract_version: 'openagentskill-agent-outcome-v2',
+      trust_impact: trustImpact,
+      next_agent_action:
+        payload.outcome === 'success'
+          ? 'Keep the skill shortlisted for similar tasks and prefer a production review before broader rollout.'
+          : 'Review alternatives from /api/agent/resolve before retrying this task.',
     })
   } catch (error) {
     console.error('[agent-outcome] Error:', error)
@@ -91,7 +217,18 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const skillSlug = request.nextUrl.searchParams.get('skill_slug')
   const format = request.nextUrl.searchParams.get('format')
+  const contract = request.nextUrl.searchParams.get('contract')
   const supabase = createPublicClient()
+
+  if (contract === 'true' || contract === '1') {
+    if (format === 'text') {
+      return new NextResponse(formatOutcomeContractText(), {
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+      })
+    }
+
+    return NextResponse.json(buildOutcomeContract())
+  }
 
   if (skillSlug) {
     const { data, error } = await supabase

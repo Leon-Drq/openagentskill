@@ -36,8 +36,8 @@ const commands = [
   {
     label: 'Outcome',
     title: 'Report whether the skill worked',
-    command: 'openagentskill outcome resolve_... --skill crawl4ai --task "scrape pricing pages" --agent codex --outcome success --install-used',
-    copy: 'Posts the result back to /api/agent/outcome so Trust Score v4 and rankings learn from real agent runs.',
+    command: 'openagentskill outcome resolve_... --skill crawl4ai --task "scrape pricing pages" --agent codex --outcome success --install-used --output-quality 4 --workspace sandbox',
+    copy: 'Posts the result back to /api/agent/outcome so Trust Score v4 and rankings learn from real agent runs. Use --dry-run when wiring an integration.',
   },
 ]
 

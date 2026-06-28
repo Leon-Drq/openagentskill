@@ -594,7 +594,18 @@ export async function GET() {
       write_endpoint: '/api/agent/outcome',
       read_endpoint: '/api/agent/outcome?skill_slug={slug}',
       machine_summary: '/api/agent/outcome?format=text',
+      contract: '/api/agent/outcome?contract=true',
       expected_outcomes: AGENT_OUTCOMES,
+      optional_quality_fields: [
+        'task_success',
+        'output_quality',
+        'error_type',
+        'human_review_required',
+        'used_in_production',
+        'workspace',
+        'evidence_url',
+        'dry_run',
+      ],
       ranking_inputs: [
         'Trust Score v4 real-agent outcome evidence',
         'skill detail outcome signal blocks',

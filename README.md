@@ -77,6 +77,8 @@ Use the response to inspect:
 Only install when the risk policy allows it. After trying the skill, report the result:
 
 POST https://www.openagentskill.com/api/agent/outcome
+
+Use `dry_run: true` first when wiring a new agent integration.
 ```
 
 ## 30-Second Demo
@@ -111,7 +113,11 @@ curl -X POST "https://www.openagentskill.com/api/agent/outcome" \
     "task": "analyze stock news",
     "agent": "codex",
     "outcome": "success",
-    "install_used": true
+    "install_used": true,
+    "task_success": true,
+    "output_quality": 4,
+    "workspace": "sandbox",
+    "time_to_useful_ms": 120000
   }'
 ```
 
@@ -173,6 +179,7 @@ Useful endpoints:
 | `GET /api/agent/skills?q=...` | Search indexed skills |
 | `GET /api/agent/tasks` | Browse task-first routes |
 | `GET /api/agent/outcome?format=text` | Read aggregate adoption signals |
+| `GET /api/agent/outcome?contract=true` | Read the feedback contract for agent integrations |
 | `POST /api/agent/outcome` | Report whether a resolved skill worked |
 | `GET /api/audits/{slug}` | Fetch a skill audit report |
 | `GET /api/badge/{slug}` | Generate a README badge |

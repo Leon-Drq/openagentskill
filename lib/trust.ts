@@ -52,6 +52,8 @@ export interface SkillTrustRiskSummary {
 export interface SkillTrustOutcomeEvidence {
   total: number
   successes: number
+  failures: number
+  notRelevant: number
   successRate: number | null
   installAttempts: number
   riskBlocked: number
@@ -188,6 +190,8 @@ function getOutcomeEvidence(outcomeStats: TrustOutcomeStats): SkillTrustOutcomeE
     return {
       total: 0,
       successes: 0,
+      failures: 0,
+      notRelevant: 0,
       successRate: null,
       installAttempts: 0,
       riskBlocked: 0,
@@ -205,6 +209,8 @@ function getOutcomeEvidence(outcomeStats: TrustOutcomeStats): SkillTrustOutcomeE
     return {
       total: Number(outcomeStats.total_outcomes || 0),
       successes: Number(outcomeStats.successful_outcomes || 0),
+      failures: Number(outcomeStats.failed_outcomes || 0),
+      notRelevant: Number(outcomeStats.not_relevant_outcomes || 0),
       successRate,
       installAttempts: Number(outcomeStats.install_attempts || 0),
       riskBlocked: Number(outcomeStats.risk_blocked_outcomes || 0),
@@ -224,6 +230,8 @@ function getOutcomeEvidence(outcomeStats: TrustOutcomeStats): SkillTrustOutcomeE
   return {
     total: Number(outcomeStats.total_calls || 0),
     successes: Number(outcomeStats.success_calls || 0),
+    failures: Math.max(0, Number(outcomeStats.total_calls || 0) - Number(outcomeStats.success_calls || 0)),
+    notRelevant: 0,
     successRate,
     installAttempts: 0,
     riskBlocked: 0,
@@ -237,15 +245,22 @@ function getOutcomeEvidence(outcomeStats: TrustOutcomeStats): SkillTrustOutcomeE
 }
 
 function scoreAgentOutcomes(evidence: SkillTrustOutcomeEvidence) {
-  if (evidence.total <= 0) return 58
-  let score = 48 + Math.min(20, Math.log10(evidence.total + 1) * 12)
-  if (evidence.successRate !== null && Number.isFinite(evidence.successRate)) {
-    score += (evidence.successRate - 60) * 0.45
-  }
+  if (evidence.total <= 0) return 54
+  const priorSuccessRate = 70
+  const priorWeight = 4
+  const bayesianSuccessRate =
+    ((evidence.successes + (priorSuccessRate / 100) * priorWeight) /
+      Math.max(1, evidence.total + priorWeight)) * 100
+  let score = 42 + Math.min(22, Math.log10(evidence.total + 1) * 14)
+  score += (bayesianSuccessRate - 60) * 0.48
   score += Math.min(8, Math.log10(evidence.installAttempts + 1) * 5)
   score -= Math.min(18, evidence.riskBlocked * 3)
   score -= Math.min(12, evidence.setupRequired * 2)
-  return clampScore(score)
+  score -= Math.min(10, evidence.notRelevant * 2)
+  score -= Math.min(8, evidence.failures * 1.5)
+
+  const capped = evidence.total < 3 ? Math.min(score, 78) : score
+  return clampScore(capped)
 }
 
 function getBestFor(skill: SkillRecord) {
@@ -277,6 +292,9 @@ function getDoNotUseFor(skill: SkillRecord, policy: SkillTrustInstallPolicy, evi
   }
   if (evidence.riskBlocked > 0) {
     items.push('Workflows similar to prior runs blocked by risk signals')
+  }
+  if (evidence.notRelevant > 0) {
+    items.push('Tasks similar to prior runs where this skill was reported not relevant')
   }
   if (evidence.setupRequired > 0) {
     items.push('Zero-setup agent runs without checking required keys, data, or configuration')
@@ -750,6 +768,8 @@ export function getSkillTrustProfile(
     }
     if (outcomeEvidence.riskBlocked > 0) warnings.push(`${outcomeEvidence.riskBlocked} agent outcome(s) blocked by risk`)
     if (outcomeEvidence.setupRequired > 0) warnings.push(`${outcomeEvidence.setupRequired} agent outcome(s) needed setup`)
+    if (outcomeEvidence.notRelevant > 0) warnings.push(`${outcomeEvidence.notRelevant} agent outcome(s) reported not relevant`)
+    if (outcomeEvidence.failures > 0) warnings.push(`${outcomeEvidence.failures} failed agent outcome(s) reported`)
   }
 
   for (const dimension of dimensions) {
@@ -789,7 +809,14 @@ export function getSkillTrustProfile(
   const documentationDimension = dimensions.find((dimension) => dimension.id === 'documentation')
   const installCommand = getInstallCommand(skill)
   const policy = getInstallPolicy(finalScore, hasInstallPath(skill), hasRepository(skill), hasKnownLicense(skill))
-  const autoInstallAllowed = policy === 'agent_install_candidate' && outcomeEvidence.riskBlocked === 0
+  const outcomeAllowsAutoInstall =
+    outcomeEvidence.total < 3 ||
+    (
+      outcomeEvidence.riskBlocked === 0 &&
+      outcomeEvidence.notRelevant === 0 &&
+      (outcomeEvidence.successRate === null || outcomeEvidence.successRate >= 65)
+    )
+  const autoInstallAllowed = policy === 'agent_install_candidate' && outcomeAllowsAutoInstall
 
   return {
     version: 'trust-score-v4',
@@ -832,7 +859,9 @@ export function getSkillTrustProfile(
       policy,
       reason: autoInstallAllowed
         ? 'Trust Score v4 allows sandbox-first agent installation after normal workspace review.'
-        : 'Human review or sandbox validation is required before automatic installation.',
+        : outcomeAllowsAutoInstall
+          ? 'Human review or sandbox validation is required before automatic installation.'
+          : 'Recent agent outcomes require review before automatic installation.',
     },
     bestFor: getBestFor(skill),
     doNotUseFor: getDoNotUseFor(skill, policy, outcomeEvidence),

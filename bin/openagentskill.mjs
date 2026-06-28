@@ -8,7 +8,7 @@ function printHelp() {
 Usage:
   openagentskill resolve "<task>" [--agent codex] [--max-risk medium] [--min-stars 500]
   openagentskill install <slug> [--agent codex]
-  openagentskill outcome <event_id> --skill <slug> --task "<task>" [--outcome success] [--agent codex]
+  openagentskill outcome <event_id> --skill <slug> --task "<task>" [--outcome success] [--agent codex] [--dry-run] [--output-quality 4]
   openagentskill evals
 
 Environment:
@@ -117,19 +117,33 @@ async function reportOutcome(baseUrl, eventId, flags) {
       install_used: Boolean(flags.installUsed),
       risk_blocked: Boolean(flags.riskBlocked),
       setup_required: Boolean(flags.setupRequired),
+      task_success:
+        flags.taskSuccess === undefined
+          ? undefined
+          : flags.taskSuccess === true || flags.taskSuccess === 'true',
+      output_quality: flags.outputQuality ? Number(flags.outputQuality) : null,
+      error_type: flags.errorType || null,
+      human_review_required: Boolean(flags.humanReviewRequired),
+      used_in_production: Boolean(flags.usedInProduction),
+      workspace: flags.workspace || 'unknown',
+      evidence_url: flags.evidenceUrl || null,
       time_to_useful_ms: flags.timeToUsefulMs ? Number(flags.timeToUsefulMs) : null,
       notes: flags.notes || null,
       metadata: {
         source: 'openagentskill-cli',
       },
+      dry_run: Boolean(flags.dryRun),
     }),
   })
   const payload = await readJson(response)
   if (!response.ok) throw new Error(payload.error || `Request failed with ${response.status}`)
 
-  console.log(`Outcome recorded: ${payload.data?.outcome || flags.outcome || 'success'}`)
+  console.log(`${payload.dry_run ? 'Outcome dry-run accepted' : 'Outcome recorded'}: ${payload.data?.outcome || flags.outcome || 'success'}`)
   console.log(`Skill: ${payload.data?.skill_slug || flags.skill}`)
   console.log(`Event: ${payload.data?.event_id || eventId}`)
+  if (payload.trust_impact?.affects?.length) {
+    console.log(`Updates: ${payload.trust_impact.affects.join(', ')}`)
+  }
 }
 
 async function installSkill(baseUrl, slug, flags) {

@@ -290,8 +290,12 @@ export default function APIDocsPage() {
                   ['not_relevant', 'The selected skill did not fit the task'],
                   ['blocked_by_risk', 'The agent stopped because risk was too high'],
                   ['setup_required', 'The skill may work but required extra setup'],
+                  ['output_quality', 'Optional 1-5 quality signal for the run output'],
+                  ['error_type', 'Optional install_failed, runtime_error, permission_blocked, low_quality_output, timeout, or other'],
+                  ['dry_run', 'Set true to validate a payload without writing a database row'],
                   ['GET /api/agent/outcome?skill_slug=crawl4ai', 'Read aggregate success and install-attempt stats'],
                   ['GET /api/agent/outcome?format=text', 'Read a compact machine-friendly outcome summary'],
+                  ['GET /api/agent/outcome?contract=true', 'Read the v2 feedback contract'],
                 ].map(([field, detail]) => (
                   <div key={field} className="min-w-0 bg-background p-3">
                     <code className="font-mono text-xs">{field}</code>
@@ -307,7 +311,11 @@ export default function APIDocsPage() {
   "task": "scrape pricing pages",
   "agent": "codex",
   "outcome": "success",
-  "install_used": true
+  "install_used": true,
+  "task_success": true,
+  "output_quality": 4,
+  "workspace": "sandbox",
+  "time_to_useful_ms": 120000
 }`}</code>
               </div>
             </div>

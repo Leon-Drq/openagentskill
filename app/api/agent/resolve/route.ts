@@ -52,6 +52,14 @@ Event ID: ${payload.feedback.event_id}
 Outcome API: ${payload.feedback.outcome_api}
 CLI: ${payload.feedback.cli_example}
 
+Agent Feedback Loop:
+${payload.agent_feedback_loop ? `Version: ${payload.agent_feedback_loop.version}
+Dry run: ${payload.agent_feedback_loop.dry_run.supported ? 'supported' : 'not supported'}
+Expected outcomes: ${payload.agent_feedback_loop.expected_outcomes.join(', ')}
+Error types: ${payload.agent_feedback_loop.error_types.join(', ')}
+Workspaces: ${payload.agent_feedback_loop.workspaces.join(', ')}
+Updates: ${payload.agent_feedback_loop.ranking_inputs_updated.join('; ')}` : 'No feedback loop generated'}
+
 Decision Packet:
 ${payload.decision_packet ? `Version: ${payload.decision_packet.version}
 Selected: ${payload.decision_packet.selected_skill.name} (${payload.decision_packet.selected_skill.slug})

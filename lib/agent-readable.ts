@@ -44,10 +44,14 @@ export interface AgentReadableSkillMetadata {
     evidence: SkillTrustEvidence
     outcome_evidence: {
       total: number
+      successes: number
+      failures: number
+      not_relevant: number
       success_rate: number | null
       install_attempts: number
       risk_blocked: number
       setup_required: number
+      last_outcome_at: string | null
       label: string
     }
     auto_install: {
@@ -120,6 +124,12 @@ export interface AgentReadableSkillMetadata {
       install_used: boolean
       risk_blocked: boolean
       setup_required: boolean
+      task_success: boolean
+      output_quality: number
+      error_type: string | null
+      human_review_required: boolean
+      workspace: string
+      time_to_useful_ms: number
       notes: string
     }
   }
@@ -279,10 +289,14 @@ export function buildAgentReadableSkillMetadata(
       evidence: trust.evidence,
       outcome_evidence: {
         total: trust.outcomeEvidence.total,
+        successes: trust.outcomeEvidence.successes,
+        failures: trust.outcomeEvidence.failures,
+        not_relevant: trust.outcomeEvidence.notRelevant,
         success_rate: trust.outcomeEvidence.successRate,
         install_attempts: trust.outcomeEvidence.installAttempts,
         risk_blocked: trust.outcomeEvidence.riskBlocked,
         setup_required: trust.outcomeEvidence.setupRequired,
+        last_outcome_at: trust.outcomeEvidence.lastOutcomeAt,
         label: trust.outcomeEvidence.label,
       },
       auto_install: {
@@ -355,6 +369,12 @@ export function buildAgentReadableSkillMetadata(
         install_used: true,
         risk_blocked: false,
         setup_required: false,
+        task_success: true,
+        output_quality: 4,
+        error_type: null,
+        human_review_required: false,
+        workspace: 'sandbox',
+        time_to_useful_ms: 120000,
         notes: 'Report the smallest successful task, setup friction, files touched, and risk notes.',
       },
     },
