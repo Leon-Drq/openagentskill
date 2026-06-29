@@ -109,6 +109,51 @@ export async function GET() {
             },
           },
         },
+        '/api/agent/receipt': {
+          get: {
+            summary: 'Generate a stable install receipt for one resolved task',
+            parameters: [
+              { name: 'task', in: 'query', required: true, schema: { type: 'string' } },
+              { name: 'agent', in: 'query', required: false, schema: { type: 'string', enum: ['auto', 'codex', 'claude-code', 'cursor', 'openagentskill-cli'] } },
+              { name: 'max_risk', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'min_stars', in: 'query', required: false, schema: { type: 'number' } },
+              { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
+            ],
+            responses: {
+              '200': {
+                description:
+                  'Stable install receipt with selected_skill, install policy, Trust Score, risk notes, alternatives, outcome_feedback event id, and next steps.',
+              },
+            },
+          },
+          post: {
+            summary: 'Generate an install receipt with JSON constraints',
+            requestBody: {
+              required: true,
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    required: ['task'],
+                    properties: {
+                      task: { type: 'string' },
+                      agent: { type: 'string' },
+                      limit: { type: 'number' },
+                      constraints: { type: 'object' },
+                      format: { type: 'string', enum: ['json', 'text'] },
+                    },
+                  },
+                },
+              },
+            },
+            responses: {
+              '200': {
+                description:
+                  'Install receipt generated from the same resolver ranking logic used by /api/agent/resolve.',
+              },
+            },
+          },
+        },
         '/api/agent/outcome': {
           get: {
             summary: 'Read aggregate agent outcome statistics for skill adoption and success signals',

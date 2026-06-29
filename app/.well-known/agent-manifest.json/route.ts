@@ -91,12 +91,24 @@ export async function GET() {
       resolve: {
         url: '/api/agent/resolve',
         method: 'GET or POST',
-        description: 'Resolve one task into a selected skill, alternatives, safety profile, policy decision, install plan, and agent_handoff templates.',
+        description: 'Resolve one task into a selected skill, alternatives, safety profile, policy decision, install_receipt, install plan, and agent_handoff templates.',
         params: {
           task: 'Description of the task you need a skill for (required)',
           agent: 'Target agent: codex, claude-code, cursor, openagentskill-cli, or auto (optional)',
           max_risk: 'Allowed risk: low, medium, high, safe_to_try, needs_review, or risky (optional)',
           needs_install_command: 'Require install handoff, default true (optional)',
+          min_stars: 'Minimum GitHub stars (optional)',
+          format: 'Response format: json (default) or text (optional)',
+        },
+      },
+      receipt: {
+        url: '/api/agent/receipt',
+        method: 'GET or POST',
+        description: 'Generate the stable pre-install receipt for one resolved task: selected skill, install policy, Trust Score, risk notes, alternatives, outcome event id, and next steps.',
+        params: {
+          task: 'Description of the task you need a skill for (required)',
+          agent: 'Target agent: codex, claude-code, cursor, openagentskill-cli, or auto (optional)',
+          max_risk: 'Allowed risk: low, medium, high, safe_to_try, needs_review, or risky (optional)',
           min_stars: 'Minimum GitHub stars (optional)',
           format: 'Response format: json (default) or text (optional)',
         },
@@ -110,7 +122,7 @@ export async function GET() {
           format: 'Response format: json (default) or text (optional)',
         },
         body: {
-          event_id: 'feedback.event_id from /api/agent/resolve (required for POST)',
+          event_id: 'install_receipt.outcome_feedback.event_id or feedback.event_id from /api/agent/resolve (required for POST)',
           skill_slug: 'Resolved skill slug (required for POST)',
           task: 'Task attempted by the agent (required for POST)',
           agent: 'Agent surface such as codex, claude-code, cursor, or auto',
@@ -175,6 +187,7 @@ export async function GET() {
       search: '100 requests/hour',
       recommend: '50 requests/hour',
       resolve: '50 requests/hour',
+      receipt: '50 requests/hour',
       outcome: '100 requests/hour',
       tasks: '100 requests/hour',
       submit: '10 requests/hour',

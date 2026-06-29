@@ -20,6 +20,7 @@ Canonical:
 - Page: ${payload.canonical_page}
 - API: ${payload.api}
 - Resolve API: ${payload.resolve_api}
+- Receipt API: ${payload.receipt_api}
 - Manifest: ${payload.manifest}
 - llms.txt: ${payload.llms}
 
@@ -29,6 +30,7 @@ ${payload.recommended_flow.map((item, index) => `${index + 1}. ${item}`).join('\
 Supported Agents:
 ${payload.supported_agents.map((agent) => `- ${agent.name}: ${agent.surface}
   Resolve: ${agent.resolve_url}
+  Receipt: ${agent.receipt_url}
   Best for: ${agent.best_for.join(', ')}
   Setup:
 ${agent.setup_steps.map((step) => `    - ${step}`).join('\n')}

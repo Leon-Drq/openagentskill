@@ -40,7 +40,7 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 
 | I am a... | Start with | What you get |
 | --- | --- | --- |
-| Agent builder | [`/api/agent/resolve`](https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&agent=codex&max_risk=medium&format=text) | One recommended skill, alternatives, install command, trust signals, and risk notes |
+| Agent builder | [`/api/agent/resolve`](https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&agent=codex&max_risk=medium&format=text) | One recommended skill, alternatives, install receipt, trust signals, and risk notes |
 | Skill author | [Submit Skill](https://www.openagentskill.com/submit) | Canonical page, badges, audit surface, X share card, and claim path |
 | Developer exploring skills | [GitHub Skill Index](./skills/README.md) | Curated domain maps and scenario-first examples |
 | SEO/community operator | [X Growth Kit](https://www.openagentskill.com/x-kit) | Human-readable launch drafts and creator reply workflows |
@@ -66,17 +66,19 @@ Give this to Codex, Claude Code, Cursor, or any browser-capable agent:
 Before installing a third-party skill, call OpenAgentSkill:
 
 GET https://www.openagentskill.com/api/agent/resolve?task={TASK}&agent={AGENT}&max_risk=medium&format=json
+GET https://www.openagentskill.com/api/agent/receipt?task={TASK}&agent={AGENT}&max_risk=medium&format=text
 
 Use the response to inspect:
 - recommended_skill
 - alternatives
 - install_command
+- install_receipt
 - trust_score
 - audit_url
 - risk_level
 - do_not_use_when
 
-Only install when the risk policy allows it. After trying the skill, report the result:
+Only install when the receipt risk policy allows it. After trying the skill, report the result:
 
 POST https://www.openagentskill.com/api/agent/outcome
 
@@ -89,6 +91,12 @@ Ask OpenAgentSkill to resolve a task before your agent installs anything:
 
 ```bash
 curl "https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&agent=codex&max_risk=medium&format=text"
+```
+
+Fetch the stable install receipt for the same task:
+
+```bash
+curl "https://www.openagentskill.com/api/agent/receipt?task=analyze+stock+news&agent=codex&max_risk=medium&format=text"
 ```
 
 Example response shape:
@@ -166,10 +174,11 @@ OpenAgentSkill should sit between package-manager speed and audit-grade decision
 
 1. Describe a task.
 2. Call `/api/agent/resolve`.
-3. Inspect the recommended skill, alternatives, Trust Score, audit URL, install plan, and risk policy.
-4. Install in a sandboxed workflow only when the policy allows it.
-5. Report the outcome through `/api/agent/outcome`.
-6. Future rankings improve from aggregate feedback.
+3. Fetch or read `install_receipt` for the selected skill, install plan, risk policy, and outcome event id.
+4. Inspect alternatives, Trust Score, audit URL, and eval URL.
+5. Install in a sandboxed workflow only when the receipt policy allows it.
+6. Report the outcome through `/api/agent/outcome`.
+7. Future rankings improve from aggregate feedback.
 
 Useful endpoints:
 
@@ -179,6 +188,7 @@ Useful endpoints:
 | `GET /.well-known/agent-manifest.json` | Machine-readable capability manifest |
 | `GET /api/agent/integration-kit?format=text` | Copy-paste setup for Codex, Claude Code, and Cursor |
 | `GET /api/agent/resolve?task=...` | Resolve a task into one selected skill plus alternatives |
+| `GET /api/agent/receipt?task=...` | Fetch the stable install receipt for one resolved task |
 | `GET /api/agent/rankings?slug=agent-proven` | Read skills ranked by real outcome reports and install attempts |
 | `GET /api/agent/skills?q=...` | Search indexed skills |
 | `GET /api/agent/tasks` | Browse task-first routes |

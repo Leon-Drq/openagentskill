@@ -586,6 +586,7 @@ export async function GET() {
         '/use-cases/{use_case}',
         '/tasks/{task}',
         '/api/agent/resolve',
+        '/api/agent/receipt',
       ],
     },
     agent_outcome_loop: {
@@ -595,6 +596,7 @@ export async function GET() {
       read_endpoint: '/api/agent/outcome?skill_slug={slug}',
       machine_summary: '/api/agent/outcome?format=text',
       contract: '/api/agent/outcome?contract=true',
+      install_receipt: '/api/agent/receipt?task={task}&agent={agent}&format=text',
       expected_outcomes: AGENT_OUTCOMES,
       optional_quality_fields: [
         'task_success',
@@ -614,8 +616,9 @@ export async function GET() {
       ],
       recommended_agent_flow: [
         'Call /api/agent/resolve with a specific task.',
+        'Read install_receipt or fetch /api/agent/receipt before installing.',
         'Run one narrow sandboxed attempt with the selected skill.',
-        'POST success, failed, not_relevant, blocked_by_risk, or setup_required to /api/agent/outcome using feedback.event_id.',
+        'POST success, failed, not_relevant, blocked_by_risk, or setup_required to /api/agent/outcome using install_receipt.outcome_feedback.event_id or feedback.event_id.',
         'Use /api/agent/outcome?skill_slug={slug} or format=text before reusing the same skill in production.',
       ],
     },

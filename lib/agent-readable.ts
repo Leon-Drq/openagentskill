@@ -139,6 +139,7 @@ export interface AgentReadableSkillMetadata {
     audit: string
     eval: string
     resolve: string
+    receipt: string
     install: string
     manifest: string
   }
@@ -198,6 +199,7 @@ export function buildAgentReadableSkillMetadata(
   })
   const platformHints = getPlatformHints(skill)
   const resolvePath = `/api/agent/resolve?task=${encodeURIComponent(task)}&agent=codex&max_risk=medium`
+  const receiptPath = `/api/agent/receipt?task=${encodeURIComponent(task)}&agent=codex&max_risk=medium&format=text`
   const installPath = `/api/skills/${skill.slug}/install`
   const manifestPath = `/api/registry/manifest/${skill.slug}`
   const auditPath = `/skills/${skill.slug}/audit`
@@ -358,10 +360,10 @@ export function buildAgentReadableSkillMetadata(
       endpoint: absoluteUrl(baseUrl, outcomePath),
       method: 'POST',
       requires_resolve_event_id: true,
-      event_id_source: 'Use feedback.event_id returned by /api/agent/resolve for the current task.',
+      event_id_source: 'Use install_receipt.outcome_feedback.event_id or feedback.event_id returned by /api/agent/resolve for the current task.',
       expected_outcomes: [...AGENT_OUTCOMES],
       payload_template: {
-        event_id: '<feedback.event_id from /api/agent/resolve>',
+        event_id: '<install_receipt.outcome_feedback.event_id or feedback.event_id from /api/agent/resolve>',
         skill_slug: skill.slug,
         task,
         agent: 'codex',
@@ -384,6 +386,7 @@ export function buildAgentReadableSkillMetadata(
       audit: absoluteUrl(baseUrl, auditPath),
       eval: absoluteUrl(baseUrl, evalPath),
       resolve: absoluteUrl(baseUrl, resolvePath),
+      receipt: absoluteUrl(baseUrl, receiptPath),
       install: absoluteUrl(baseUrl, installPath),
       manifest: absoluteUrl(baseUrl, manifestPath),
     },

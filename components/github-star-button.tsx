@@ -13,9 +13,10 @@ interface GitHubRepoSummary {
 interface GitHubStarButtonProps {
   className?: string
   fullWidth?: boolean
+  compact?: boolean
 }
 
-export function GitHubStarButton({ className, fullWidth }: GitHubStarButtonProps) {
+export function GitHubStarButton({ className, fullWidth, compact }: GitHubStarButtonProps) {
   const [repo, setRepo] = useState<GitHubRepoSummary>({
     repo: 'Leon-Drq/openagentskill',
     url: 'https://github.com/Leon-Drq/openagentskill',
@@ -56,9 +57,9 @@ export function GitHubStarButton({ className, fullWidth }: GitHubStarButtonProps
       )}
       aria-label={`Star ${repo.repo || 'OpenAgentSkill'} on GitHub, ${repo.stars_label || '0'} stars`}
     >
-      <span className="flex items-center gap-2 px-3">
+      <span className={cn('flex items-center gap-2', compact ? 'px-2.5' : 'px-3')}>
         <Github className="h-4 w-4" aria-hidden="true" />
-        <span>Star</span>
+        <span className={compact ? 'sr-only sm:not-sr-only' : undefined}>Star</span>
       </span>
       <span className="flex min-w-8 items-center justify-center border-l border-white/15 bg-[#075f47] px-2 font-mono text-[11px]">
         {repo.stars_label || '0'}

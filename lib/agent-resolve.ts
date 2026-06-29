@@ -4,6 +4,7 @@ import {
   AGENT_OUTCOME_WORKSPACES,
   buildResolveFeedback,
 } from '@/lib/agent-outcomes'
+import { buildAgentInstallReceipt } from '@/lib/agent-install-receipt'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { buildAgentHandoffTemplates } from '@/lib/agent-integration-kit'
 import { getAgentSafetyProfile, type AgentResolveConstraints, type AgentSafetyProfile } from '@/lib/agent-safety'
@@ -1038,6 +1039,16 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
       }
     : null
   const recommendation = buildResolverRecommendation(task, agent, selected, alternatives, feedback)
+  const generatedAt = new Date().toISOString()
+  const installReceipt = buildAgentInstallReceipt({
+    task,
+    agent,
+    constraints,
+    generatedAt,
+    selected,
+    alternatives,
+    feedback,
+  })
 
   return {
     task,
@@ -1045,6 +1056,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     constraints,
     feedback,
     agent_feedback_loop: agentFeedbackLoop,
+    install_receipt: installReceipt,
     recommendation,
     selected,
     alternatives,
@@ -1066,7 +1078,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     meta: {
       endpoint: '/api/agent/resolve',
       api_version: '2.0',
-      generated_at: new Date().toISOString(),
+      generated_at: generatedAt,
       total_skills_searched: skills.length,
       total_candidates: candidates.length,
       candidate_pool: {
@@ -1082,6 +1094,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         alternatives: 'recommendation.alternatives',
         agent_handoff: 'agent_handoff.platform_templates + agent_handoff.review_checklist',
         decision_packet: 'decision_packet',
+        install_receipt: 'install_receipt',
       },
     },
   }

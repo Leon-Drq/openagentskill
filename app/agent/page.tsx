@@ -39,7 +39,13 @@ function endpointRows() {
       label: 'Resolve task',
       method: 'POST',
       href: '/api/agent/resolve',
-      description: 'Task to selected skill, alternatives, policy decision, safety profile, and install plan.',
+      description: 'Task to selected skill, alternatives, policy decision, safety profile, install plan, and install receipt.',
+    },
+    {
+      label: 'Install receipt',
+      method: 'GET',
+      href: '/api/agent/receipt?task=scrape+pricing+pages&agent=codex&format=text',
+      description: 'Stable pre-install record with selected skill, install policy, risk notes, alternatives, and outcome event id.',
     },
     {
       label: 'Integration kit',
@@ -146,7 +152,7 @@ export default async function AgentPage() {
               ['01', 'Read /llms.txt'],
               ['02', 'Load Integration Kit'],
               ['03', 'Call Resolve API'],
-              ['04', 'Fetch install handoff'],
+              ['04', 'Fetch install receipt'],
             ].map(([step, label]) => (
               <div key={step} className="bg-card p-5">
                 <p className="font-mono text-xs text-secondary">{step}</p>

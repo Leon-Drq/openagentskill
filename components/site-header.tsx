@@ -234,7 +234,7 @@ export function SiteHeader() {
           </div>
 
           <div className="xl:hidden">
-            <GitHubStarButton className="h-9" />
+            <GitHubStarButton className="h-9" compact />
           </div>
           <div className="xl:hidden">
             <LanguageSwitcher compact />

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { resolveAgentSkill, type AgentResolveInput } from '@/lib/agent-resolve'
+import { formatAgentInstallReceiptText } from '@/lib/agent-install-receipt'
 
 export const revalidate = 300
 
@@ -59,6 +60,9 @@ Expected outcomes: ${payload.agent_feedback_loop.expected_outcomes.join(', ')}
 Error types: ${payload.agent_feedback_loop.error_types.join(', ')}
 Workspaces: ${payload.agent_feedback_loop.workspaces.join(', ')}
 Updates: ${payload.agent_feedback_loop.ranking_inputs_updated.join('; ')}` : 'No feedback loop generated'}
+
+Install Receipt:
+${payload.install_receipt ? formatAgentInstallReceiptText(payload.install_receipt) : 'No install receipt generated'}
 
 Decision Packet:
 ${payload.decision_packet ? `Version: ${payload.decision_packet.version}

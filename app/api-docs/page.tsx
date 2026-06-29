@@ -84,6 +84,7 @@ export default function APIDocsPage() {
               { method: 'GET', path: '/api/agent/tasks/{slug}' },
               { method: 'GET', path: '/api/agent/integration-kit' },
               { method: 'POST', path: '/api/agent/resolve' },
+              { method: 'GET', path: '/api/agent/receipt' },
               { method: 'GET', path: '/api/agent/discovery' },
               { method: 'GET', path: '/api/agent/recommend' },
               { method: 'GET', path: '/api/agent/evals' },
@@ -201,6 +202,7 @@ export default function APIDocsPage() {
                   ['recommendation.install', 'Command, target, install API, review requirement, and auto-install policy'],
                   ['recommendation.why_recommended', 'Short explainable ranking reasons for agent logs'],
                   ['recommendation.trust_score_v4', 'Trust Score v4 evidence, outcome signals, install safety, permission surface, install policy, compatibility, and risk summary'],
+                  ['install_receipt', 'Stable install receipt with selected skill, install policy, risk notes, alternatives, outcome event id, and next steps'],
                   ['decision_packet', 'Stable agent contract with selected skill, install plan, trust dimensions, do_not_use_when, alternatives, and outcome_feedback'],
                   ['agent_feedback_loop', 'Outcome reporting contract, quality fields, idempotency, and ranking inputs updated after a run'],
                   ['feedback', 'Outcome event id, outcome API URL, expected outcomes, and ready CLI command for reporting adoption results'],
@@ -244,6 +246,42 @@ export default function APIDocsPage() {
               </div>
               <div className="mt-4 bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
                 <code>{'GET /api/agent/resolve?task=scrape+pricing+pages&agent=codex&max_risk=medium&format=text'}</code>
+              </div>
+            </div>
+          </div>
+
+          <div id="agent-receipt" className="scroll-mt-24 border border-border mb-8 sm:mb-10">
+            <div className="bg-muted px-4 sm:px-6 py-3 sm:py-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="font-mono text-xs sm:text-sm bg-foreground text-background px-2 py-1 w-fit">
+                  {'GET'}
+                </span>
+                <span className="font-mono text-sm sm:text-base lg:text-lg break-all">
+                  {'/api/agent/receipt'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6">
+              <p className="text-base sm:text-lg mb-4 sm:mb-6">
+                {'Generate the stable install receipt for one resolved task. Agents should treat this as the pre-install execution record: selected skill, install command, safety policy, risk notes, alternatives, outcome event id, and next steps.'}
+              </p>
+              <div className="grid gap-px border border-border bg-border text-sm sm:mb-6 md:grid-cols-2">
+                {[
+                  ['receipt_id', 'Durable id for the selected task-to-skill handoff'],
+                  ['selected_skill', 'Skill URL, API URL, audit URL, eval URL, and repository'],
+                  ['install', 'Command, target, policy, sandbox-first flag, and human-review requirement'],
+                  ['risk', 'Audit label, safety tier, warnings, and do_not_use_when metadata'],
+                  ['alternatives', 'Fallback skills with install commands and safety scores'],
+                  ['outcome_feedback', 'event_id, POST endpoint, payload template, dry_run payload, and CLI example'],
+                ].map(([field, detail]) => (
+                  <div key={field} className="min-w-0 bg-background p-3">
+                    <code className="font-mono text-xs">{field}</code>
+                    <p className="mt-2 text-xs leading-relaxed text-secondary">{detail}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <code>{'GET /api/agent/receipt?task=scrape+pricing+pages&agent=codex&max_risk=medium&format=text'}</code>
               </div>
             </div>
           </div>

@@ -102,6 +102,27 @@ type ResolvePayload = {
     cli_example: string
     expected_outcomes: string[]
   }
+  install_receipt?: {
+    receipt_id: string
+    urls: {
+      json: string
+      text: string
+      web: string
+    }
+    install: {
+      command: string
+      policy: string
+      auto_install_allowed: boolean
+      human_review_required: boolean
+      sandbox_first: boolean
+    }
+    outcome_feedback: {
+      event_id: string
+      endpoint: string
+      cli_example: string
+    }
+    next_steps: string[]
+  } | null
   selected?: {
     match_score: number
     supply_profile: {
@@ -173,6 +194,18 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
     })
     if (live) params.set('live', 'true')
     return `/api/agent/resolve?${params.toString()}`
+  }, [agent, live, maxRisk, minStars, task])
+
+  const receiptUrl = useMemo(() => {
+    const params = new URLSearchParams({
+      task,
+      agent,
+      max_risk: maxRisk,
+      min_stars: minStars || '0',
+      format: 'text',
+    })
+    if (live) params.set('live', 'true')
+    return `/api/agent/receipt?${params.toString()}`
   }, [agent, live, maxRisk, minStars, task])
 
   async function resolveTask(nextTask = task) {
@@ -305,6 +338,14 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
             >
               <Copy className="h-4 w-4" aria-hidden="true" />
               Copy API URL
+            </button>
+            <button
+              type="button"
+              onClick={() => copyText(receiptUrl)}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border border-border bg-background px-5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
+            >
+              <Copy className="h-4 w-4" aria-hidden="true" />
+              Copy receipt
             </button>
           </div>
         </form>
@@ -456,6 +497,47 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
                 <code className="mt-4 block break-words border border-border bg-background p-3 font-mono text-xs leading-5 [overflow-wrap:anywhere]">
                   {payload.feedback.cli_example}
                 </code>
+              </div>
+            )}
+
+            {payload.install_receipt && (
+              <div className="grid gap-px bg-border md:grid-cols-[0.92fr_1.08fr]">
+                <div className="bg-background p-4 sm:p-5">
+                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Install receipt</p>
+                  <h3 className="mt-3 font-display text-xl font-normal">Stable agent handoff</h3>
+                  <p className="mt-2 text-sm leading-6 text-secondary">
+                    Receipt ID {payload.install_receipt.receipt_id}. Use this as the durable record before install, sandbox run, and outcome reporting.
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <a
+                      href={payload.install_receipt.urls.text}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-[8px] bg-[#006b4f] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                    >
+                      Text receipt
+                    </a>
+                    <a
+                      href={payload.install_receipt.urls.json}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-[8px] border border-border px-4 py-2 text-sm font-semibold transition-colors hover:border-foreground/40"
+                    >
+                      JSON
+                    </a>
+                  </div>
+                </div>
+                <div className="bg-background p-4 sm:p-5">
+                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Agent next steps</p>
+                  <ol className="mt-3 space-y-2">
+                    {payload.install_receipt.next_steps.slice(0, 4).map((step, index) => (
+                      <li key={step} className="flex gap-3 text-sm leading-6 text-secondary">
+                        <span className="font-mono text-xs text-foreground">{String(index + 1).padStart(2, '0')}</span>
+                        <span>{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
               </div>
             )}
 

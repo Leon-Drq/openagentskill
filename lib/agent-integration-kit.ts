@@ -12,6 +12,7 @@ export interface AgentIntegration {
   setup_steps: string[]
   default_task: string
   resolve_url: string
+  receipt_url: string
   copy_prompt: string
   expected_output_contract: string[]
 }
@@ -42,18 +43,24 @@ function resolveUrl(agent: AgentIntegrationId, task = DEFAULT_TASK) {
   return `${SITE_URL}/api/agent/resolve?task=${encodeURIComponent(task)}&agent=${agent}&max_risk=${DEFAULT_MAX_RISK}`
 }
 
+function receiptUrl(agent: AgentIntegrationId, task = DEFAULT_TASK) {
+  return `${SITE_URL}/api/agent/receipt?task=${encodeURIComponent(task)}&agent=${agent}&max_risk=${DEFAULT_MAX_RISK}&format=text`
+}
+
 function setupPrompt(agent: AgentIntegrationId, agentName: string) {
   const placeholderResolveUrl = `${SITE_URL}/api/agent/resolve?task={USER_TASK}&agent=${agent}&max_risk=${DEFAULT_MAX_RISK}`
+  const placeholderReceiptUrl = `${SITE_URL}/api/agent/receipt?task={USER_TASK}&agent=${agent}&max_risk=${DEFAULT_MAX_RISK}&format=text`
 
   return [
     `You are using OpenAgentSkill as the skill resolution layer for ${agentName}.`,
     'Before building a custom workflow from scratch, call the Resolve API with the user task.',
     `Resolve endpoint: ${placeholderResolveUrl}`,
-    'Use recommendation.best_skill as the default only after checking recommendation.risk, safety_gate, and agent_handoff.review_checklist.',
+    `Install receipt endpoint: ${placeholderReceiptUrl}`,
+    'Use install_receipt as the stable pre-install record only after checking risk, safety_gate, and agent_handoff.review_checklist.',
     'If auto_install_allowed is false, ask for human approval before installing.',
     'If blocked is true or risk notes mention secrets, shell, token, or network risk, do not auto-install.',
-    'After one narrow run, POST the result to feedback.outcome_api with feedback.event_id so future rankings learn from real outcomes.',
-    'Return the selected skill, install command, alternatives, risk summary, outcome event id, and next action before changing files.',
+    'After one narrow run, POST the result to install_receipt.outcome_feedback.endpoint with install_receipt.outcome_feedback.event_id so future rankings learn from real outcomes.',
+    'Return the selected skill, install command, receipt id, alternatives, risk summary, outcome event id, and next action before changing files.',
   ].join('\n')
 }
 
@@ -71,6 +78,7 @@ export const AGENT_INTEGRATIONS: AgentIntegration[] = [
     ],
     default_task: DEFAULT_TASK,
     resolve_url: resolveUrl('codex'),
+    receipt_url: receiptUrl('codex'),
     copy_prompt: setupPrompt('codex', 'Codex'),
     expected_output_contract: [
       'selected_skill',
@@ -95,6 +103,7 @@ export const AGENT_INTEGRATIONS: AgentIntegration[] = [
     ],
     default_task: DEFAULT_TASK,
     resolve_url: resolveUrl('claude-code'),
+    receipt_url: receiptUrl('claude-code'),
     copy_prompt: setupPrompt('claude-code', 'Claude Code'),
     expected_output_contract: [
       'selected_skill',
@@ -119,6 +128,7 @@ export const AGENT_INTEGRATIONS: AgentIntegration[] = [
     ],
     default_task: DEFAULT_TASK,
     resolve_url: resolveUrl('cursor'),
+    receipt_url: receiptUrl('cursor'),
     copy_prompt: setupPrompt('cursor', 'Cursor'),
     expected_output_contract: [
       'selected_skill',
@@ -139,6 +149,7 @@ export function getAgentIntegrationKit() {
     canonical_page: `${SITE_URL}/agent/integration-kit`,
     api: `${SITE_URL}/api/agent/integration-kit`,
     resolve_api: `${SITE_URL}/api/agent/resolve`,
+    receipt_api: `${SITE_URL}/api/agent/receipt`,
     outcome_api: `${SITE_URL}/api/agent/outcome`,
     manifest: `${SITE_URL}/.well-known/agent-manifest.json`,
     llms: `${SITE_URL}/llms.txt`,
@@ -147,7 +158,8 @@ export function getAgentIntegrationKit() {
       'Read /llms.txt or /.well-known/agent-manifest.json.',
       'Choose the Codex, Claude Code, or Cursor template for the active agent surface.',
       'Call /api/agent/resolve with task, agent, max_risk, and optional min_stars.',
-      'Read recommendation.best_skill, recommendation.install, recommendation.risk, and agent_handoff.',
+      'Read install_receipt, recommendation.best_skill, recommendation.install, recommendation.risk, and agent_handoff.',
+      'Fetch /api/agent/receipt?task=...&agent=...&format=text when a compact pre-install execution record is easier for the agent runtime.',
       'If auto_install_allowed is false, ask for human approval before installing.',
       'Fetch /api/agent/evals and /api/agent/skills/{slug} before production use.',
       'Install in a sandbox or low-risk workspace first.',
@@ -157,6 +169,11 @@ export function getAgentIntegrationKit() {
       'feedback.event_id',
       'feedback.outcome_api',
       'feedback.cli_example',
+      'install_receipt.receipt_id',
+      'install_receipt.selected_skill',
+      'install_receipt.install',
+      'install_receipt.risk',
+      'install_receipt.outcome_feedback',
       'agent_feedback_loop',
       'recommendation.best_skill',
       'recommendation.install',
@@ -201,7 +218,7 @@ export function buildAgentHandoffTemplates(input: AgentHandoffTemplateInput) {
       `Install handoff: ${input.installApiUrl}`,
       `Install command: ${input.installCommand}`,
       `Install policy: ${installPolicy}`,
-      'Outcome feedback: use feedback.event_id from the Resolve API and report the result to /api/agent/outcome after one narrow run. Include outcome, install_used, task_success, output_quality, workspace, error_type, and human_review_required when known.',
+      'Outcome feedback: use install_receipt.outcome_feedback.event_id or feedback.event_id from the Resolve API and report the result to /api/agent/outcome after one narrow run. Include outcome, install_used, task_success, output_quality, workspace, error_type, and human_review_required when known.',
       '',
       'Before installing:',
       '1. Read the audit and eval result.',
