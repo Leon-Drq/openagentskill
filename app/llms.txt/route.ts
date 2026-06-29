@@ -19,6 +19,7 @@ Use this site when an agent needs to:
 - discover reusable skills for a task
 - compare skill alternatives
 - inspect trust, audit, and safety signals
+- inspect Agent Proven Score from real outcome reports before reusing a skill
 - get an install command or agent-specific install prompt
 - avoid random GitHub searching before installing third-party code
 
@@ -32,7 +33,7 @@ Preferred agent flow:
 7. Fetch /api/agent/evals?slug={slug}&task={task}&format=text and follow the eval decision.
 8. Fetch /api/agent/skills/{slug} for the selected skill.
 9. Fetch /api/skills/{slug}/install?format=text before installing.
-10. After one narrow run, POST the result to /api/agent/outcome using install_receipt.outcome_feedback.event_id or feedback.event_id from resolve. Include output_quality, workspace, error_type, and human_review_required when known. Use dry_run=true before wiring a new integration.
+10. After one narrow run, POST the result to /api/agent/outcome using install_receipt.outcome_feedback.event_id or feedback.event_id from resolve. Include output_quality, workspace, error_type, used_in_production, time_to_useful_ms, and human_review_required when known. Use dry_run=true before wiring a new integration.
 
 Important URLs:
 - Agent entry: https://www.openagentskill.com/agent
@@ -46,6 +47,8 @@ Important URLs:
 - Agent outcome contract: https://www.openagentskill.com/api/agent/outcome?contract=true
 - Agent-Proven rankings: https://www.openagentskill.com/rankings/agent-proven
 - Agent-Proven ranking API: https://www.openagentskill.com/api/agent/rankings?slug=agent-proven
+- Best-by-success ranking API: https://www.openagentskill.com/api/agent/rankings?slug=best-by-success-rate
+- Safe auto-install ranking API: https://www.openagentskill.com/api/agent/rankings?slug=safest-auto-install-skills
 - Skill Eval API: https://www.openagentskill.com/api/agent/evals?slug=crawl4ai
 - Resolve eval dashboard: https://www.openagentskill.com/evals/resolve
 - Skill search API: https://www.openagentskill.com/api/skills/search
@@ -70,7 +73,7 @@ Install safety:
 - Prefer agent_handoff over ad hoc page scraping because it returns platform templates, API sequence, review checklist, and blocked actions.
 - Prefer /api/agent/evals?slug={slug} before installation because it returns the Trust + Eval contract, blockers, and validation plan.
 - Report success, failed, not_relevant, blocked_by_risk, or setup_required to /api/agent/outcome so future rankings learn from real use. Add quality fields when possible.
-- Prefer /rankings/agent-proven when an agent needs skills with real reported adoption instead of only GitHub stars.
+- Prefer /rankings/agent-proven or /api/agent/rankings?slug=best-by-success-rate when an agent needs skills with real reported adoption instead of only GitHub stars.
 - Treat safety_gate.blocked as "do not auto-install".
 - Treat safety_gate.experimental as manual test only.
 - Treat safety_gate.reviewed as human-review-before-install unless auto_install_policy is allow.

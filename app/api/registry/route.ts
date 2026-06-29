@@ -32,6 +32,11 @@ export async function GET() {
         read: 'GET /api/agent/outcome?skill_slug={slug}',
         machine_summary: 'GET /api/agent/outcome?format=text',
         contract: 'GET /api/agent/outcome?contract=true',
+        agent_proven_rankings: [
+          'GET /api/agent/rankings?slug=agent-proven',
+          'GET /api/agent/rankings?slug=best-by-success-rate',
+          'GET /api/agent/rankings?slug=safest-auto-install-skills',
+        ],
         outcomes: ['success', 'failed', 'not_relevant', 'blocked_by_risk', 'setup_required'],
         optional_quality_fields: [
           'task_success',
@@ -39,6 +44,7 @@ export async function GET() {
           'error_type',
           'human_review_required',
           'used_in_production',
+          'time_to_useful_ms',
           'workspace',
           'evidence_url',
           'dry_run',

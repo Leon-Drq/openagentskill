@@ -190,6 +190,21 @@ export interface SkillOutcomeStats {
   setup_required_outcomes: number
   install_attempts: number
   success_rate: number | null
+  install_success_rate?: number | null
+  avg_output_quality?: number | null
+  avg_time_to_useful_ms?: number | null
+  production_outcomes?: number
+  human_review_required_outcomes?: number
+  low_quality_outcomes?: number
+  recent_outcomes_30d?: number
+  recent_successful_outcomes_30d?: number
+  recent_failed_outcomes_30d?: number
+  recent_success_rate?: number | null
+  recent_failure_rate?: number | null
+  unique_agents?: number
+  agent_proven_score?: number | null
+  last_success_at?: string | null
+  last_failure_at?: string | null
   last_outcome_at: string | null
   updated_at: string
 }
@@ -299,6 +314,21 @@ export async function getAgentOutcomeStatsMap(): Promise<Record<string, SkillOut
       setup_required_outcomes: Number(row.setup_required_outcomes || 0),
       install_attempts: Number(row.install_attempts || 0),
       success_rate: row.success_rate === null || row.success_rate === undefined ? null : Number(row.success_rate),
+      install_success_rate: row.install_success_rate === null || row.install_success_rate === undefined ? null : Number(row.install_success_rate),
+      avg_output_quality: row.avg_output_quality === null || row.avg_output_quality === undefined ? null : Number(row.avg_output_quality),
+      avg_time_to_useful_ms: row.avg_time_to_useful_ms === null || row.avg_time_to_useful_ms === undefined ? null : Number(row.avg_time_to_useful_ms),
+      production_outcomes: Number(row.production_outcomes || 0),
+      human_review_required_outcomes: Number(row.human_review_required_outcomes || 0),
+      low_quality_outcomes: Number(row.low_quality_outcomes || 0),
+      recent_outcomes_30d: Number(row.recent_outcomes_30d || 0),
+      recent_successful_outcomes_30d: Number(row.recent_successful_outcomes_30d || 0),
+      recent_failed_outcomes_30d: Number(row.recent_failed_outcomes_30d || 0),
+      recent_success_rate: row.recent_success_rate === null || row.recent_success_rate === undefined ? null : Number(row.recent_success_rate),
+      recent_failure_rate: row.recent_failure_rate === null || row.recent_failure_rate === undefined ? null : Number(row.recent_failure_rate),
+      unique_agents: Number(row.unique_agents || 0),
+      agent_proven_score: row.agent_proven_score === null || row.agent_proven_score === undefined ? null : Number(row.agent_proven_score),
+      last_success_at: row.last_success_at || null,
+      last_failure_at: row.last_failure_at || null,
       last_outcome_at: row.last_outcome_at || null,
       updated_at: row.updated_at,
     }
@@ -326,6 +356,21 @@ export async function getAgentOutcomeStats(skillSlug: string): Promise<SkillOutc
     setup_required_outcomes: Number(row.setup_required_outcomes || 0),
     install_attempts: Number(row.install_attempts || 0),
     success_rate: row.success_rate === null || row.success_rate === undefined ? null : Number(row.success_rate),
+    install_success_rate: row.install_success_rate === null || row.install_success_rate === undefined ? null : Number(row.install_success_rate),
+    avg_output_quality: row.avg_output_quality === null || row.avg_output_quality === undefined ? null : Number(row.avg_output_quality),
+    avg_time_to_useful_ms: row.avg_time_to_useful_ms === null || row.avg_time_to_useful_ms === undefined ? null : Number(row.avg_time_to_useful_ms),
+    production_outcomes: Number(row.production_outcomes || 0),
+    human_review_required_outcomes: Number(row.human_review_required_outcomes || 0),
+    low_quality_outcomes: Number(row.low_quality_outcomes || 0),
+    recent_outcomes_30d: Number(row.recent_outcomes_30d || 0),
+    recent_successful_outcomes_30d: Number(row.recent_successful_outcomes_30d || 0),
+    recent_failed_outcomes_30d: Number(row.recent_failed_outcomes_30d || 0),
+    recent_success_rate: row.recent_success_rate === null || row.recent_success_rate === undefined ? null : Number(row.recent_success_rate),
+    recent_failure_rate: row.recent_failure_rate === null || row.recent_failure_rate === undefined ? null : Number(row.recent_failure_rate),
+    unique_agents: Number(row.unique_agents || 0),
+    agent_proven_score: row.agent_proven_score === null || row.agent_proven_score === undefined ? null : Number(row.agent_proven_score),
+    last_success_at: row.last_success_at || null,
+    last_failure_at: row.last_failure_at || null,
     last_outcome_at: row.last_outcome_at || null,
     updated_at: row.updated_at,
   }

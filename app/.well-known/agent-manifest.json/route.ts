@@ -116,7 +116,7 @@ export async function GET() {
       outcome: {
         url: '/api/agent/outcome',
         method: 'GET or POST',
-        description: 'Report or read aggregate results after an agent tries one resolved skill. Outcome feedback feeds Trust Score v4, rankings, and future Resolve recommendations.',
+        description: 'Report or read aggregate results after an agent tries one resolved skill. Outcome feedback feeds Trust Score v4, Agent Proven Score, rankings, and future Resolve recommendations.',
         params: {
           skill_slug: 'Read aggregate stats for one skill (optional)',
           format: 'Response format: json (default) or text (optional)',
@@ -128,12 +128,15 @@ export async function GET() {
           agent: 'Agent surface such as codex, claude-code, cursor, or auto',
           outcome: 'success, failed, not_relevant, blocked_by_risk, or setup_required',
           install_used: 'Whether an install handoff was used',
+          output_quality: 'Optional 1-5 quality signal used by Agent Proven Score',
+          used_in_production: 'Optional production-use signal used by Agent Proven Score',
+          time_to_useful_ms: 'Optional time-to-useful signal used by Agent Proven Score',
         },
       },
       outcome_dashboard: {
         url: '/outcomes',
         method: 'GET',
-        description: 'Human and agent-readable overview of outcome feedback, success signals, install attempts, setup friction, and risk blocks.',
+        description: 'Human and agent-readable overview of Agent Proven Score, outcome feedback, success signals, install attempts, setup friction, and risk blocks.',
       },
       detail: {
         url: '/api/agent/skills/{slug}',

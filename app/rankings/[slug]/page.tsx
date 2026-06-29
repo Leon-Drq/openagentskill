@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
+import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import {
@@ -157,6 +158,10 @@ export default async function RankingDetailPage({
                 const skill = item.skill
                 const manifest = convertSkillRecordToManifest(skill)
                 const quality = getSkillQualityProfile(skill, statsMap[skill.slug] || null)
+                const outcomeStats = statsMap[skill.slug] && 'total_outcomes' in statsMap[skill.slug]
+                  ? statsMap[skill.slug] as SkillOutcomeStats
+                  : null
+                const proven = getAgentProvenProfile(outcomeStats)
 
                 return (
                   <article key={skill.slug} className="grid gap-5 py-7 lg:grid-cols-[auto_1fr_auto]">
@@ -174,6 +179,11 @@ export default async function RankingDetailPage({
                         <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
                           {quality.label} · {quality.score}
                         </span>
+                        {ranking.kind === 'agent-usage' || ranking.kind === 'success-rate' || ranking.kind === 'safe-auto-install' ? (
+                          <span className="border border-[#c8ded5] bg-[#eef7f2] px-2 py-0.5 text-xs font-mono text-[#006b4f]">
+                            {proven.score}/100 proven
+                          </span>
+                        ) : null}
                       </div>
                       <p className="max-w-3xl text-sm leading-relaxed text-secondary">{skill.description}</p>
                       <p className="mt-3 max-w-3xl text-sm leading-relaxed">{item.reason}</p>
@@ -182,6 +192,12 @@ export default async function RankingDetailPage({
                         <span>{formatCompactNumber(skill.github_forks || 0)} forks</span>
                         <span>{formatDate(skill.github_last_pushed_at || skill.updated_at)} push</span>
                         <span>{skill.category}</span>
+                        {(ranking.kind === 'agent-usage' || ranking.kind === 'success-rate' || ranking.kind === 'safe-auto-install') && (
+                          <>
+                            <span>{proven.metrics.totalOutcomes.toLocaleString()} outcomes</span>
+                            <span>{proven.metrics.successRate === null ? 'No success data' : `${Math.round(proven.metrics.successRate)}% success`}</span>
+                          </>
+                        )}
                       </div>
                     </div>
                     <div className="lg:w-72">

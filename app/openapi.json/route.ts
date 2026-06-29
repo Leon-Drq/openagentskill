@@ -67,7 +67,7 @@ export async function GET() {
         },
         '/api/agent/resolve': {
           get: {
-            summary: 'Resolve a task into a stable decision_packet, recommendation.best_skill, alternatives, Trust Score v4, safety gate, install plan, feedback contract, and agent_handoff',
+            summary: 'Resolve a task into a stable decision_packet, recommendation.best_skill, alternatives, Agent Proven Score, Trust Score v4, safety gate, install plan, feedback contract, and agent_handoff',
             parameters: [
               { name: 'task', in: 'query', required: true, schema: { type: 'string' } },
               { name: 'agent', in: 'query', required: false, schema: { type: 'string', enum: ['auto', 'codex', 'claude-code', 'cursor', 'openagentskill-cli'] } },
@@ -78,7 +78,7 @@ export async function GET() {
             responses: {
               '200': {
                 description:
-                  'Resolved skill plan. Read decision_packet first for the stable agent contract: selected_skill, install, trust dimensions, do_not_use_when, alternatives, and outcome_feedback. recommendation.agent_contract, feedback, and agent_handoff remain available for backwards-compatible workflows.',
+                  'Resolved skill plan. Read decision_packet first for the stable agent contract: selected_skill, install, agent_proven, trust dimensions, do_not_use_when, alternatives, and outcome_feedback. recommendation.agent_contract, feedback, and agent_handoff remain available for backwards-compatible workflows.',
               },
             },
           },
@@ -122,7 +122,7 @@ export async function GET() {
             responses: {
               '200': {
                 description:
-                  'Stable install receipt with selected_skill, install policy, Trust Score, risk notes, alternatives, outcome_feedback event id, and next steps.',
+                  'Stable install receipt with selected_skill, install policy, Agent Proven Score, Trust Score, risk notes, alternatives, outcome_feedback event id, and next steps.',
                 content: {
                   'application/json': {
                     schema: { $ref: '#/components/schemas/AgentReceiptResponse' },
@@ -172,7 +172,7 @@ export async function GET() {
         },
         '/api/agent/outcome': {
           get: {
-            summary: 'Read aggregate agent outcome statistics for skill adoption and success signals',
+            summary: 'Read aggregate agent outcome statistics for Agent Proven Score, adoption, and success signals',
             parameters: [
               { name: 'skill_slug', in: 'query', required: false, schema: { type: 'string' } },
               {
@@ -183,7 +183,7 @@ export async function GET() {
                 description: 'Use format=text for a compact machine-readable plain text summary.',
               },
             ],
-            responses: { '200': { description: 'Agent outcome aggregate stats' } },
+            responses: { '200': { description: 'Agent outcome aggregate stats including agent_proven_score, recent success/failure rates, install success, output quality, and production-use signals' } },
           },
           post: {
             summary: 'Report the result of an agent trying a resolved skill',
@@ -434,6 +434,27 @@ export async function GET() {
                   label: { type: 'string' },
                   dimensions: { type: 'object' },
                   outcome_signal: { type: 'string' },
+                },
+              },
+              agent_proven: {
+                type: 'object',
+                nullable: true,
+                properties: {
+                  score: { type: 'number' },
+                  label: { type: 'string' },
+                  summary: { type: 'string' },
+                  metrics: {
+                    type: 'object',
+                    properties: {
+                      totalOutcomes: { type: 'number' },
+                      successRate: { type: 'number', nullable: true },
+                      recentSuccessRate: { type: 'number', nullable: true },
+                      recentFailureRate: { type: 'number', nullable: true },
+                      installSuccessRate: { type: 'number', nullable: true },
+                      avgOutputQuality: { type: 'number', nullable: true },
+                      productionOutcomes: { type: 'number' },
+                    },
+                  },
                 },
               },
               risk: {

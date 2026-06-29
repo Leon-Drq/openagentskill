@@ -4,6 +4,7 @@ import {
   AGENT_OUTCOME_WORKSPACES,
   buildResolveFeedback,
 } from '@/lib/agent-outcomes'
+import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { buildAgentInstallReceipt } from '@/lib/agent-install-receipt'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { buildAgentHandoffTemplates } from '@/lib/agent-integration-kit'
@@ -695,6 +696,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     const audit = buildSkillAudit(skill, eventStats)
     const safety = getAgentSafetyProfile(skill, audit, constraints)
     const trust = getSkillTrustProfile(skill, false, eventStats, outcomeStats)
+    const agentProven = getAgentProvenProfile(outcomeStats)
     const decision = getSkillDecisionProfile(skill, eventStats)
     const useCases = getUseCasesForSkill(skill, 3)
     const supplyProfile = getSkillSupplyProfile(skill, eventStats)
@@ -716,6 +718,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
       supply_profile: supplyProfile,
       quality: getSkillQualityProfile(skill),
       trust,
+      agent_proven: agentProven,
       audit: {
         audit_score: audit.audit_score,
         risk_level: audit.risk_level,
@@ -852,6 +855,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           ...selected.recommendation_reasons,
           selected.decision.headline,
           `${selected.trust.score}/100 OpenAgentSkill Trust Score`,
+          `${selected.agent_proven.score}/100 Agent Proven Score`,
           `${selected.audit.audit_score}/100 audit score`,
           `${selected.safety.safety_tier.label} safety gate`,
         ].filter(Boolean).slice(0, 6),

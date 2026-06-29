@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
+import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { buildAgentReadableSkillMetadata } from '@/lib/agent-readable'
 import { withTimeout } from '@/lib/async'
@@ -71,6 +72,7 @@ export async function GET(
           ).catch(() => null),
         ])
     const trustProfile = getSkillTrustProfile(skill, Boolean(approvedClaim), eventStats, outcomeStats)
+    const agentProven = getAgentProvenProfile(outcomeStats)
     const audit = buildSkillAudit(skill, eventStats)
     const safetyProfile = getAgentSafetyProfile(skill, audit, {
       max_risk: request.nextUrl.searchParams.get('max_risk') || 'medium',
@@ -115,7 +117,10 @@ Supply Profile:
 Statistics:
 - Quality Score: ${Number(skill.quality_score || 0)}
 - Trust Score: ${trustProfile.score} (${trustProfile.label})
+- Agent Proven Score: ${agentProven.score}/100 (${agentProven.label})
 - Agent Outcomes: ${trustProfile.outcomeEvidence.label}
+- Recent Success: ${agentProven.metrics.recentSuccessRate === null ? 'No data' : `${Math.round(agentProven.metrics.recentSuccessRate)}%`}
+- Recent Failure: ${agentProven.metrics.recentFailureRate === null ? 'No data' : `${Math.round(agentProven.metrics.recentFailureRate)}%`}
 - Audit Score: ${audit.audit_score} (${auditRiskLabel(audit.risk_level)})
 - Safety Gate: ${safetyProfile.safety_tier.label} (${safetyProfile.safety_tier.auto_install_policy})
 - Agent Safety Score: ${safetyProfile.score}/100
@@ -187,6 +192,8 @@ Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
         },
         quality: getSkillQualityProfile(skill),
         trust: trustProfile,
+        agent_proven: agentProven,
+        outcome_stats: outcomeStats,
         safety: safetyProfile,
         safety_gate: {
           tier: safetyProfile.safety_tier.tier,

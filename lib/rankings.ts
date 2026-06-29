@@ -1,4 +1,5 @@
 import type { SkillAgentStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
+import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { dedupeRankedSkills } from '@/lib/registry'
 import { USE_CASES, getUseCaseBySlug, scoreSkillForUseCase } from '@/lib/use-cases'
@@ -9,6 +10,9 @@ export type RankingKind =
   | 'recently-updated'
   | 'new-this-week'
   | 'agent-usage'
+  | 'success-rate'
+  | 'safe-auto-install'
+  | 'agent-platform'
   | 'use-case'
 
 export interface RankingDefinition {
@@ -19,6 +23,7 @@ export interface RankingDefinition {
   description: string
   kind: RankingKind
   useCaseSlug?: string
+  agentPlatform?: string
 }
 
 export interface RankedSkill {
@@ -83,6 +88,54 @@ export const CORE_RANKINGS: RankingDefinition[] = [
     description:
       'Skills with reported agent calls and success signals, ranked by real usage when feedback data is available.',
     kind: 'agent-usage',
+  },
+  {
+    slug: 'best-by-success-rate',
+    title: 'Best AI agent skills by success rate',
+    shortTitle: 'Success rate',
+    eyebrow: 'Outcome quality',
+    description:
+      'Skills ranked by reported success rate, recent success, output quality, install success, and Trust Score.',
+    kind: 'success-rate',
+  },
+  {
+    slug: 'safest-auto-install-skills',
+    title: 'Safest AI agent skills for auto install',
+    shortTitle: 'Safe install',
+    eyebrow: 'Install safety',
+    description:
+      'Skills with strong Trust Score, safe install paths, low risk blocks, clear licenses, and low setup friction.',
+    kind: 'safe-auto-install',
+  },
+  {
+    slug: 'best-codex-skills',
+    title: 'Best Codex skills for AI agents',
+    shortTitle: 'Codex',
+    eyebrow: 'Agent surface',
+    description:
+      'Reusable skills and workflows that fit Codex-style coding, repository inspection, testing, automation, and install handoffs.',
+    kind: 'agent-platform',
+    agentPlatform: 'codex',
+  },
+  {
+    slug: 'best-claude-code-skills',
+    title: 'Best Claude Code skills for AI agents',
+    shortTitle: 'Claude Code',
+    eyebrow: 'Agent surface',
+    description:
+      'Reusable skills for Claude Code workflows, including coding agents, documentation, research, browser automation, and safe install review.',
+    kind: 'agent-platform',
+    agentPlatform: 'claude code',
+  },
+  {
+    slug: 'best-cursor-skills',
+    title: 'Best Cursor skills for AI agents',
+    shortTitle: 'Cursor',
+    eyebrow: 'Agent surface',
+    description:
+      'Skills that work well for Cursor-powered coding, frontend implementation, repo exploration, and developer productivity workflows.',
+    kind: 'agent-platform',
+    agentPlatform: 'cursor',
   },
 ]
 
@@ -172,6 +225,8 @@ export function rankSkillsForDefinition(
     .map((skill) => {
       const quality = getSkillQualityProfile(skill, statsMap[skill.slug] || null)
       const stats = statsMap[skill.slug]
+      const outcomeStats = stats && 'total_outcomes' in stats ? stats : null
+      const proven = getAgentProvenProfile(outcomeStats)
       const totalUsage = stats
         ? 'total_outcomes' in stats
           ? stats.total_outcomes
@@ -181,8 +236,8 @@ export function rankSkillsForDefinition(
       const notRelevant = stats && 'not_relevant_outcomes' in stats ? Number(stats.not_relevant_outcomes || 0) : 0
       const riskBlocked = stats && 'risk_blocked_outcomes' in stats ? Number(stats.risk_blocked_outcomes || 0) : 0
       const setupRequired = stats && 'setup_required_outcomes' in stats ? Number(stats.setup_required_outcomes || 0) : 0
-      const uniqueAgents = stats && 'unique_agents' in stats ? stats.unique_agents : 0
-      const installAttempts = stats && 'install_attempts' in stats ? stats.install_attempts : 0
+      const uniqueAgents = stats && 'unique_agents' in stats ? Number(stats.unique_agents || 0) : 0
+      const installAttempts = stats && 'install_attempts' in stats ? Number(stats.install_attempts || 0) : 0
       const lastPushedScore = freshnessScore(skill.github_last_pushed_at || skill.updated_at)
       const createdAt = dateValue(skill.created_at)
       const isNewThisWeek = createdAt >= weekAgo
@@ -197,9 +252,25 @@ export function rankSkillsForDefinition(
             Math.min(12, Math.log10(installAttempts + 1) * 8) +
             uniqueAgents * 4 +
             quality.score * 0.25 +
+            proven.score * 0.45 +
             Math.min(8, Math.log10(Math.max(1, skill.github_stars || 1)) * 2) -
             Math.min(30, riskBlocked * 5 + setupRequired * 3 + failures * 2.5 + notRelevant * 4)
           : quality.score * 0.12 + Math.min(8, Math.log10(Math.max(1, skill.github_stars || 1)) * 2)
+      const platformText = [
+        skill.name,
+        skill.description,
+        skill.long_description,
+        skill.category,
+        skill.install_command,
+        ...(skill.tags || []),
+        ...(skill.frameworks || []),
+      ].filter(Boolean).join(' ').toLowerCase()
+      const platformHit = definition.agentPlatform
+        ? platformText.includes(definition.agentPlatform.toLowerCase()) ||
+          (definition.agentPlatform === 'codex' && /\b(code|coding|repo|repository|github|test|review|frontend|backend)\b/.test(platformText)) ||
+          (definition.agentPlatform === 'claude code' && /\b(claude|code|coding|docs?|research|browser|analysis)\b/.test(platformText)) ||
+          (definition.agentPlatform === 'cursor' && /\b(cursor|code|coding|frontend|component|typescript|react|repo)\b/.test(platformText))
+        : false
 
       switch (definition.kind) {
         case 'most-starred':
@@ -226,11 +297,50 @@ export function rankSkillsForDefinition(
         case 'agent-usage':
           return {
             skill,
-            score: usageScore + quality.score / 10,
-            badge: totalUsage ? `${formatCompactNumber(totalUsage)} outcomes` : 'Needs first outcome',
+            score: usageScore + quality.score / 10 + proven.score * 0.32,
+            badge: totalUsage ? `${proven.score}/100 proven` : 'Needs first outcome',
             reason: totalUsage
-              ? `${formatCompactNumber(totalUsage)} agent outcomes, ${successRate ?? 'unknown'}% success, ${formatCompactNumber(installAttempts)} install attempts, ${riskBlocked} risk blocks, and ${quality.label.toLowerCase()} quality.`
+              ? `${proven.summary} ${formatCompactNumber(installAttempts)} install attempts, ${riskBlocked} risk blocks, and ${quality.label.toLowerCase()} quality.`
               : `No public outcome reports yet. ${quality.label} quality and ${compactStars(skill)} make it ready for a first sandbox run.`,
+          }
+        case 'success-rate':
+          return {
+            skill,
+            score:
+              (successRate ?? 0) +
+              proven.score * 0.65 +
+              Math.min(18, Math.log10(totalUsage + 1) * 11) +
+              quality.score * 0.16 -
+              Math.min(24, riskBlocked * 5 + setupRequired * 2 + notRelevant * 4),
+            badge: successRate === null ? 'No success data' : `${Math.round(successRate)}% success`,
+            reason: totalUsage
+              ? `${proven.summary} Recent success ${proven.metrics.recentSuccessRate === null ? 'unknown' : `${Math.round(proven.metrics.recentSuccessRate)}%`}.`
+              : `No public outcome reports yet. ${quality.label} quality and ${compactStars(skill)} make it a candidate to test.`,
+          }
+        case 'safe-auto-install':
+          return {
+            skill,
+            score:
+              quality.score * 0.46 +
+              proven.score * 0.34 +
+              Math.min(18, Math.log10(Math.max(1, skill.github_stars || 1)) * 5) -
+              Math.min(40, riskBlocked * 10 + setupRequired * 4 + failures * 3 + notRelevant * 4),
+            badge: riskBlocked > 0 ? 'Review risk' : 'Sandbox-ready',
+            reason: totalUsage
+              ? `${proven.summary} ${riskBlocked} risk blocks and ${setupRequired} setup-required reports.`
+              : `${quality.label} quality, ${compactStars(skill)}, and no reported agent risk blocks yet.`,
+          }
+        case 'agent-platform':
+          return {
+            skill,
+            score:
+              (platformHit ? 78 : 0) +
+              quality.score * 0.3 +
+              proven.score * 0.25 +
+              Math.min(18, Math.log10(Math.max(1, skill.github_stars || 1)) * 5) -
+              Math.min(24, riskBlocked * 5 + setupRequired * 2 + notRelevant * 4),
+            badge: definition.agentPlatform ? definition.agentPlatform : 'Agent fit',
+            reason: `${definition.shortTitle} fit with ${quality.label.toLowerCase()} quality, ${compactStars(skill)}, and ${proven.label.toLowerCase()}.`,
           }
         case 'highest-quality':
         default:

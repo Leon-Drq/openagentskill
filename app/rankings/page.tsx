@@ -9,7 +9,7 @@ import {
   type SkillOutcomeStats,
 } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
-import { CORE_RANKINGS, getRankingDefinitions, rankSkillsForDefinition } from '@/lib/rankings'
+import { CORE_RANKINGS, getRankingDefinitions, rankSkillsForDefinition, type RankingDefinition } from '@/lib/rankings'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,6 +32,10 @@ function formatNumber(value: number) {
   return formatCompactNumber(value || 0)
 }
 
+function usesOutcomeStats(ranking: RankingDefinition) {
+  return ranking.kind === 'agent-usage' || ranking.kind === 'success-rate' || ranking.kind === 'safe-auto-install'
+}
+
 export default async function RankingsPage() {
   const [skills, statsMap, outcomeStatsMap] = await Promise.all([
     getAllSkills('quality', undefined, 1200).catch(() => []),
@@ -49,13 +53,17 @@ export default async function RankingsPage() {
         description="Use rankings when you already know the decision lens: quality, adoption, freshness, new arrivals, or a specific agent workflow."
         aside={
           <MarketingMetricStrip
-            columns="grid-cols-3"
+            columns="grid-cols-2"
             items={[
               { value: skills.length.toLocaleString(), label: 'Skills' },
               { value: rankingDefinitions.length, label: 'Lists' },
               {
                 value: formatNumber(skills.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0)),
                 label: 'Stars',
+              },
+              {
+                value: formatNumber(Object.values(outcomeStatsMap).reduce((sum, row) => sum + Number(row.total_outcomes || 0), 0)),
+                label: 'Outcomes',
               },
             ]}
           />
@@ -68,7 +76,7 @@ export default async function RankingsPage() {
             const topSkills = rankSkillsForDefinition(
               skills,
               ranking,
-              ranking.kind === 'agent-usage' ? outcomeStatsMap : statsMap,
+              usesOutcomeStats(ranking) ? outcomeStatsMap : statsMap,
               3
             )
 

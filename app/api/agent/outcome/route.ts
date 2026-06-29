@@ -52,6 +52,19 @@ function buildOutcomeContract() {
       used_in_production: 'true only after a production workflow used the skill',
       evidence_url: 'optional URL to logs, PR, issue, or public artifact',
     },
+    aggregate_fields: {
+      agent_proven_score: '0-100 aggregate score from outcomes, success, recency, install attempts, quality, production use, and risk penalties',
+      recent_success_rate: 'success rate for outcomes reported in the last 30 days',
+      recent_failure_rate: 'failure-like outcomes reported in the last 30 days',
+      install_success_rate: 'success rate among runs that used the install path',
+      avg_output_quality: 'average reported output quality, 1-5',
+    },
+    ranking_impact: [
+      'Updates Trust Score v4 Agent Proven outcome dimension',
+      'Updates /rankings/agent-proven and /rankings/best-by-success-rate',
+      'Changes /api/agent/resolve ordering for similar tasks',
+      'Appears on skill detail pages and machine-readable skill profiles',
+    ],
     example: {
       event_id: 'resolve_...',
       skill_slug: 'crawl4ai',
@@ -259,7 +272,8 @@ export async function GET(request: NextRequest) {
   const { data, error } = await supabase
     .from('agent_outcome_stats')
     .select('*')
-    .order('total_outcomes', { ascending: false })
+      .order('agent_proven_score', { ascending: false, nullsFirst: false })
+      .order('total_outcomes', { ascending: false })
     .limit(100)
 
   if (error) {

@@ -1,4 +1,5 @@
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
+import { getAgentProvenRankingBoost } from '@/lib/agent-proven'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { buildAgentReadableSkillMetadata } from '@/lib/agent-readable'
 import type { SkillAgentStats, SkillEventStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
@@ -92,17 +93,14 @@ export function normalizeMatchScore(score: number, topScore: number) {
 
 function getOutcomeUsageScore(stats: SkillRankingStats | null | undefined) {
   if (!stats) return 0
+  if ('total_outcomes' in stats) return getAgentProvenRankingBoost(stats)
+
   const total =
-    'total_outcomes' in stats
-      ? Number(stats.total_outcomes || 0)
-      : Number(stats.total_calls || 0)
+    Number(stats.total_calls || 0)
   const successRate = stats.success_rate === null || stats.success_rate === undefined ? null : Number(stats.success_rate)
-  const riskBlocked =
-    'risk_blocked_outcomes' in stats ? Number(stats.risk_blocked_outcomes || 0) : 0
-  const setupRequired =
-    'setup_required_outcomes' in stats ? Number(stats.setup_required_outcomes || 0) : 0
-  const installAttempts =
-    'install_attempts' in stats ? Number(stats.install_attempts || 0) : 0
+  const riskBlocked = 0
+  const setupRequired = 0
+  const installAttempts = 0
 
   let score = Math.min(18, Math.log10(total + 1) * 9)
   score += Math.min(8, Math.log10(installAttempts + 1) * 5)

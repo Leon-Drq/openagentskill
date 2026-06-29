@@ -1,4 +1,5 @@
 import type { SkillAgentStats, SkillEventStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
+import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { formatCompactNumber, getFreshnessDays } from '@/lib/quality'
 
 export type SkillTrustTier = 'production' | 'strong' | 'review' | 'risk'
@@ -58,6 +59,16 @@ export interface SkillTrustOutcomeEvidence {
   installAttempts: number
   riskBlocked: number
   setupRequired: number
+  installSuccessRate: number | null
+  avgOutputQuality: number | null
+  avgTimeToUsefulMs: number | null
+  productionOutcomes: number
+  humanReviewRequired: number
+  recentSuccessRate: number | null
+  recentFailureRate: number | null
+  uniqueAgents: number
+  agentProvenScore: number
+  agentProvenLabel: string
   lastOutcomeAt: string | null
   label: string
 }
@@ -196,6 +207,16 @@ function getOutcomeEvidence(outcomeStats: TrustOutcomeStats): SkillTrustOutcomeE
       installAttempts: 0,
       riskBlocked: 0,
       setupRequired: 0,
+      installSuccessRate: null,
+      avgOutputQuality: null,
+      avgTimeToUsefulMs: null,
+      productionOutcomes: 0,
+      humanReviewRequired: 0,
+      recentSuccessRate: null,
+      recentFailureRate: null,
+      uniqueAgents: 0,
+      agentProvenScore: 0,
+      agentProvenLabel: 'Needs first agent run',
       lastOutcomeAt: null,
       label: 'No agent outcome data yet',
     }
@@ -206,6 +227,7 @@ function getOutcomeEvidence(outcomeStats: TrustOutcomeStats): SkillTrustOutcomeE
       outcomeStats.success_rate === null || outcomeStats.success_rate === undefined
         ? null
         : Number(outcomeStats.success_rate)
+    const proven = getAgentProvenProfile(outcomeStats)
     return {
       total: Number(outcomeStats.total_outcomes || 0),
       successes: Number(outcomeStats.successful_outcomes || 0),
@@ -215,10 +237,20 @@ function getOutcomeEvidence(outcomeStats: TrustOutcomeStats): SkillTrustOutcomeE
       installAttempts: Number(outcomeStats.install_attempts || 0),
       riskBlocked: Number(outcomeStats.risk_blocked_outcomes || 0),
       setupRequired: Number(outcomeStats.setup_required_outcomes || 0),
+      installSuccessRate: outcomeStats.install_success_rate === null || outcomeStats.install_success_rate === undefined ? null : Number(outcomeStats.install_success_rate),
+      avgOutputQuality: outcomeStats.avg_output_quality === null || outcomeStats.avg_output_quality === undefined ? null : Number(outcomeStats.avg_output_quality),
+      avgTimeToUsefulMs: outcomeStats.avg_time_to_useful_ms === null || outcomeStats.avg_time_to_useful_ms === undefined ? null : Number(outcomeStats.avg_time_to_useful_ms),
+      productionOutcomes: Number(outcomeStats.production_outcomes || 0),
+      humanReviewRequired: Number(outcomeStats.human_review_required_outcomes || 0),
+      recentSuccessRate: outcomeStats.recent_success_rate === null || outcomeStats.recent_success_rate === undefined ? null : Number(outcomeStats.recent_success_rate),
+      recentFailureRate: outcomeStats.recent_failure_rate === null || outcomeStats.recent_failure_rate === undefined ? null : Number(outcomeStats.recent_failure_rate),
+      uniqueAgents: Number(outcomeStats.unique_agents || 0),
+      agentProvenScore: proven.score,
+      agentProvenLabel: proven.label,
       lastOutcomeAt: outcomeStats.last_outcome_at || null,
       label:
         Number(outcomeStats.total_outcomes || 0) > 0
-          ? `${successRate ?? 'unknown'}% success from ${formatCompactNumber(outcomeStats.total_outcomes)} agent outcomes`
+          ? `${proven.label}: ${successRate ?? 'unknown'}% success from ${formatCompactNumber(outcomeStats.total_outcomes)} agent outcomes`
           : 'No agent outcome data yet',
     }
   }
@@ -236,6 +268,37 @@ function getOutcomeEvidence(outcomeStats: TrustOutcomeStats): SkillTrustOutcomeE
     installAttempts: 0,
     riskBlocked: 0,
     setupRequired: 0,
+    installSuccessRate: null,
+    avgOutputQuality: null,
+    avgTimeToUsefulMs: null,
+    productionOutcomes: 0,
+    humanReviewRequired: 0,
+    recentSuccessRate: null,
+    recentFailureRate: null,
+    uniqueAgents: Number(outcomeStats.unique_agents || 0),
+    agentProvenScore: scoreAgentOutcomes({
+      total: Number(outcomeStats.total_calls || 0),
+      successes: Number(outcomeStats.success_calls || 0),
+      failures: Math.max(0, Number(outcomeStats.total_calls || 0) - Number(outcomeStats.success_calls || 0)),
+      notRelevant: 0,
+      successRate,
+      installAttempts: 0,
+      riskBlocked: 0,
+      setupRequired: 0,
+      installSuccessRate: null,
+      avgOutputQuality: null,
+      avgTimeToUsefulMs: null,
+      productionOutcomes: 0,
+      humanReviewRequired: 0,
+      recentSuccessRate: null,
+      recentFailureRate: null,
+      uniqueAgents: Number(outcomeStats.unique_agents || 0),
+      agentProvenScore: 0,
+      agentProvenLabel: 'Legacy agent calls',
+      lastOutcomeAt: outcomeStats.last_called_at || null,
+      label: 'Legacy agent calls',
+    }),
+    agentProvenLabel: 'Legacy agent calls',
     lastOutcomeAt: outcomeStats.last_called_at || null,
     label:
       Number(outcomeStats.total_calls || 0) > 0
@@ -246,6 +309,9 @@ function getOutcomeEvidence(outcomeStats: TrustOutcomeStats): SkillTrustOutcomeE
 
 function scoreAgentOutcomes(evidence: SkillTrustOutcomeEvidence) {
   if (evidence.total <= 0) return 54
+  if (evidence.agentProvenScore > 0) {
+    return clampScore(evidence.agentProvenScore)
+  }
   const priorSuccessRate = 70
   const priorWeight = 4
   const bayesianSuccessRate =
@@ -668,9 +734,9 @@ function buildTrustDimensions(
     },
     {
       id: 'agent_outcomes',
-      label: 'Real agent outcomes',
+      label: 'Agent Proven outcomes',
       score: agentOutcomeScore,
-      weight: 0.08,
+      weight: 0.13,
       status: outcomeEvidence.total > 0 ? statusForScore(agentOutcomeScore) : 'info',
       detail: outcomeEvidence.label,
     },
@@ -760,16 +826,30 @@ export function getSkillTrustProfile(
         ? Math.min(5, Math.floor(outcomeEvidence.total / 2))
         : 0
     score += outcomeBoost
-    strengths.push(`Agent outcome feedback available: ${outcomeEvidence.label}`)
+    if (outcomeEvidence.agentProvenScore >= 82) score += 3
+    if (outcomeEvidence.agentProvenScore < 48 && outcomeEvidence.total >= 3) score -= 5
+    strengths.push(`Agent Proven evidence available: ${outcomeEvidence.label}`)
 
     if (outcomeEvidence.successRate !== null && outcomeEvidence.successRate < 55 && outcomeEvidence.total >= 3) {
       score -= 6
       warnings.push(`Low reported agent success rate: ${outcomeEvidence.successRate}%`)
     }
+    if (outcomeEvidence.recentFailureRate !== null && outcomeEvidence.recentFailureRate >= 45) {
+      score -= 5
+      warnings.push(`Recent failure rate is elevated: ${outcomeEvidence.recentFailureRate}%`)
+    }
+    if (outcomeEvidence.avgOutputQuality !== null && outcomeEvidence.avgOutputQuality <= 2.5) {
+      score -= 4
+      warnings.push(`Low reported output quality: ${outcomeEvidence.avgOutputQuality.toFixed(1)}/5`)
+    }
+    if (outcomeEvidence.productionOutcomes > 0) {
+      strengths.push(`${outcomeEvidence.productionOutcomes} production outcome(s) reported`)
+    }
     if (outcomeEvidence.riskBlocked > 0) warnings.push(`${outcomeEvidence.riskBlocked} agent outcome(s) blocked by risk`)
     if (outcomeEvidence.setupRequired > 0) warnings.push(`${outcomeEvidence.setupRequired} agent outcome(s) needed setup`)
     if (outcomeEvidence.notRelevant > 0) warnings.push(`${outcomeEvidence.notRelevant} agent outcome(s) reported not relevant`)
     if (outcomeEvidence.failures > 0) warnings.push(`${outcomeEvidence.failures} failed agent outcome(s) reported`)
+    if (outcomeEvidence.humanReviewRequired > 0) warnings.push(`${outcomeEvidence.humanReviewRequired} agent outcome(s) required human review`)
   }
 
   for (const dimension of dimensions) {
@@ -814,7 +894,9 @@ export function getSkillTrustProfile(
     (
       outcomeEvidence.riskBlocked === 0 &&
       outcomeEvidence.notRelevant === 0 &&
-      (outcomeEvidence.successRate === null || outcomeEvidence.successRate >= 65)
+      outcomeEvidence.humanReviewRequired === 0 &&
+      (outcomeEvidence.successRate === null || outcomeEvidence.successRate >= 65) &&
+      (outcomeEvidence.recentFailureRate === null || outcomeEvidence.recentFailureRate < 45)
     )
   const autoInstallAllowed = policy === 'agent_install_candidate' && outcomeAllowsAutoInstall
 
@@ -847,6 +929,7 @@ export function getSkillTrustProfile(
         hasInstallPath(skill) ? 'Install path is available' : 'Install path is missing',
         hasRepository(skill) ? 'Repository evidence is available' : 'Repository link is missing',
         hasKnownLicense(skill) ? 'License is declared' : 'License is unclear',
+        outcomeEvidence.total > 0 ? `${outcomeEvidence.agentProvenLabel} (${outcomeEvidence.agentProvenScore}/100 Agent Proven)` : 'No Agent Proven outcome evidence yet',
         getMaintenanceLabel(freshnessDays),
       ],
     },

@@ -290,6 +290,7 @@ export default async function SkillDetailPage({
         task: `Use ${skill.name} for an agent workflow`,
       })
     : null
+  const agentProvenEvidence = agentReadableMetadata?.agent_proven || null
   const suitableTasks = agentReadableMetadata?.suited_tasks || []
   const suitableAgents = agentReadableMetadata?.suited_agents || []
   const agentAlternatives = agentReadableMetadata?.alternative_skills || []
@@ -1883,23 +1884,26 @@ export default async function SkillDetailPage({
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h3 className="font-display text-xl font-semibold leading-tight">
-                        Outcome feedback
+                        Agent Proven evidence
                       </h3>
                       <p className="mt-1 text-xs leading-relaxed text-secondary">
-                        Real reports after resolve, review, install, and one narrow run.
+                        Outcome reports after resolve, review, install, and one narrow run.
                       </p>
                     </div>
-                    <div className="font-mono text-2xl font-semibold">
-                      {outcomeEvidence?.successRate !== null && outcomeEvidence?.successRate !== undefined
-                        ? `${Math.round(Number(outcomeEvidence.successRate))}%`
-                        : '—'}
+                    <div className="text-right">
+                      <div className="font-mono text-2xl font-semibold">
+                        {agentProvenEvidence ? agentProvenEvidence.score : 0}
+                      </div>
+                      <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-secondary">
+                        Proven
+                      </div>
                     </div>
                   </div>
                 </div>
                 <div className="border-b border-border p-5">
                   <div className="flex flex-wrap gap-2">
                     <span className="rounded-[999px] border border-border bg-background px-3 py-1 font-mono text-[11px] text-secondary">
-                      {outcomeEvidence?.label || 'No agent outcome data yet'}
+                      {agentProvenEvidence?.label || 'Needs first agent run'}
                     </span>
                     <span className="rounded-[999px] border border-border bg-background px-3 py-1 font-mono text-[11px] text-secondary">
                       Auto-install: {trustProfile?.autoInstall.allowed ? 'candidate' : 'review first'}
@@ -1911,15 +1915,33 @@ export default async function SkillDetailPage({
                 </div>
                 <dl className="grid grid-cols-2 gap-px bg-border text-xs">
                   <div className="bg-background p-4">
+                    <dt className="text-secondary">Success rate</dt>
+                    <dd className="mt-1 font-mono text-lg">
+                      {outcomeEvidence?.successRate !== null && outcomeEvidence?.successRate !== undefined
+                        ? `${Math.round(Number(outcomeEvidence.successRate))}%`
+                        : '—'}
+                    </dd>
+                  </div>
+                  <div className="bg-background p-4">
+                    <dt className="text-secondary">Recent failure</dt>
+                    <dd className="mt-1 font-mono text-lg">
+                      {outcomeEvidence?.recentFailureRate !== null && outcomeEvidence?.recentFailureRate !== undefined
+                        ? `${Math.round(Number(outcomeEvidence.recentFailureRate))}%`
+                        : '—'}
+                    </dd>
+                  </div>
+                  <div className="bg-background p-4">
                     <dt className="text-secondary">Outcomes</dt>
                     <dd className="mt-1 font-mono text-lg">
                       {formatNumber(outcomeEvidence?.total || 0)}
                     </dd>
                   </div>
                   <div className="bg-background p-4">
-                    <dt className="text-secondary">Successful</dt>
+                    <dt className="text-secondary">Output quality</dt>
                     <dd className="mt-1 font-mono text-lg">
-                      {formatNumber(outcomeEvidence?.successes || 0)}
+                      {outcomeEvidence?.avgOutputQuality !== null && outcomeEvidence?.avgOutputQuality !== undefined
+                        ? `${Number(outcomeEvidence.avgOutputQuality).toFixed(1)}/5`
+                        : '—'}
                     </dd>
                   </div>
                   <div className="bg-background p-4">
@@ -1952,11 +1974,17 @@ export default async function SkillDetailPage({
                       {formatNumber(outcomeEvidence?.setupRequired || 0)}
                     </dd>
                   </div>
+                  <div className="bg-background p-4">
+                    <dt className="text-secondary">Production</dt>
+                    <dd className="mt-1 font-mono text-lg">
+                      {formatNumber(outcomeEvidence?.productionOutcomes || 0)}
+                    </dd>
+                  </div>
                 </dl>
                 <div className="space-y-3 p-5">
                   <p className="text-xs leading-relaxed text-secondary">
-                    {outcomeEvidence?.total
-                      ? 'This evidence feeds Trust Score v4, Resolve rankings, and the Agent-Proven leaderboard.'
+                    {agentProvenEvidence?.metrics.totalOutcomes
+                      ? `${agentProvenEvidence.summary} This feeds Trust Score v4, Resolve rankings, and the Agent-Proven leaderboard.`
                       : 'No agent outcome data yet. The first agent run can report success, setup needs, risk blocks, failure, or not-relevant through /api/agent/outcome.'}
                   </p>
                   <div className="grid gap-2">

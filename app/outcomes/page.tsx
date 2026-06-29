@@ -10,9 +10,9 @@ import {
 import {
   createEmptyOutcomeStats,
   formatOutcomeSuccessRate,
-  getOutcomeReadinessLabel,
   summarizeOutcomeStats,
 } from '@/lib/agent-outcome-summary'
+import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { getAgentOutcomeStatsMap, getAllSkills, type SkillOutcomeStats, type SkillRecord } from '@/lib/db/skills'
 import { getSkillTrustProfile } from '@/lib/trust'
 
@@ -41,13 +41,13 @@ function formatNumber(value: number) {
 
 function scoreOutcomeRow(skill: SkillRecord, stats: SkillOutcomeStats) {
   const trust = getSkillTrustProfile(skill, false, null, stats)
-  const successRate = stats.success_rate === null || stats.success_rate === undefined ? 0 : Number(stats.success_rate)
+  const proven = getAgentProvenProfile(stats)
 
   return (
-    Number(stats.total_outcomes || 0) * 18 +
-    Number(stats.install_attempts || 0) * 6 +
-    successRate * 0.45 +
-    trust.score * 0.2 +
+    proven.score * 2.6 +
+    Number(stats.total_outcomes || 0) * 8 +
+    Number(stats.install_attempts || 0) * 3 +
+    trust.score * 0.24 +
     Math.min(Number(skill.github_stars || 0), 50_000) / 2500
   )
 }
@@ -62,6 +62,7 @@ function getRows(skills: SkillRecord[], statsMap: Record<string, SkillOutcomeSta
         skill,
         stats,
         trust,
+        proven: getAgentProvenProfile(stats),
         score: scoreOutcomeRow(skill, stats),
       }
     })
@@ -79,6 +80,10 @@ export default async function OutcomesPage() {
   const successfulOutcomes = statsRows.reduce((sum, row) => sum + Number(row.successful_outcomes || 0), 0)
   const installAttempts = statsRows.reduce((sum, row) => sum + Number(row.install_attempts || 0), 0)
   const riskBlocked = statsRows.reduce((sum, row) => sum + Number(row.risk_blocked_outcomes || 0), 0)
+  const productionOutcomes = statsRows.reduce((sum, row) => sum + Number(row.production_outcomes || 0), 0)
+  const averageProvenScore = statsRows.length
+    ? Math.round(statsRows.reduce((sum, row) => sum + getAgentProvenProfile(row).score, 0) / statsRows.length)
+    : 0
   const successRate = totalOutcomes > 0 ? Math.round((successfulOutcomes / totalOutcomes) * 100) : null
   const skillsWithOutcomes = statsRows.filter((row) => Number(row.total_outcomes || 0) > 0).length
 
@@ -116,6 +121,8 @@ export default async function OutcomesPage() {
               { value: successRate === null ? 'No data' : `${successRate}%`, label: 'Success' },
               { value: formatNumber(installAttempts), label: 'Installs' },
               { value: formatNumber(riskBlocked), label: 'Risk blocks' },
+              { value: formatNumber(productionOutcomes), label: 'Production' },
+              { value: averageProvenScore ? `${averageProvenScore}/100` : 'No data', label: 'Avg proven' },
             ]}
           />
         }
@@ -158,7 +165,7 @@ export default async function OutcomesPage() {
           </div>
 
           <div className="divide-y divide-border">
-            {rows.map(({ skill, stats, trust }, index) => (
+            {rows.map(({ skill, stats, trust, proven }, index) => (
               <Link
                 key={skill.slug}
                 href={`/skills/${skill.slug}`}
@@ -169,7 +176,7 @@ export default async function OutcomesPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="truncate font-display text-xl font-normal">{skill.name}</h3>
                     <span className="rounded-full border border-border px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-secondary">
-                      {getOutcomeReadinessLabel(stats)}
+                      {proven.label}
                     </span>
                   </div>
                   <p className="mt-2 line-clamp-2 text-sm leading-6 text-secondary">{skill.description}</p>
@@ -178,8 +185,10 @@ export default async function OutcomesPage() {
                 <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[8px] border border-border bg-border text-center text-xs">
                   {[
                     ['Success', formatOutcomeSuccessRate(stats)],
+                    ['Proven', `${proven.score}/100`],
                     ['Outcomes', formatNumber(stats.total_outcomes)],
-                    ['Installs', formatNumber(stats.install_attempts)],
+                    ['Recent fail', proven.metrics.recentFailureRate === null ? '—' : `${Math.round(proven.metrics.recentFailureRate)}%`],
+                    ['Quality', proven.metrics.avgOutputQuality === null ? '—' : `${proven.metrics.avgOutputQuality.toFixed(1)}/5`],
                     ['Trust', `${trust.score}/100`],
                   ].map(([label, value]) => (
                     <div key={label} className="bg-background p-3">

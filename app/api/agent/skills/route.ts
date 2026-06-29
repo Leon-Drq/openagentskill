@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { unstable_cache } from 'next/cache'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
+import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { withTimeout } from '@/lib/async'
-import { getAllSkills } from '@/lib/db/skills'
+import { getAgentOutcomeStatsMap, getAllSkills, type SkillOutcomeStats } from '@/lib/db/skills'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { dedupeRankedSkills, rankSkillsForQuery } from '@/lib/registry'
@@ -30,9 +31,12 @@ export async function GET(request: NextRequest) {
   const maxRisk = searchParams.get('max_risk') || 'medium'
 
   try {
-    const candidatePool = await getAgentSkillCandidatePool()
+    const [candidatePool, outcomeStatsMap] = await Promise.all([
+      getAgentSkillCandidatePool(),
+      getAgentSkillOutcomeStatsMap(),
+    ])
     let records = query
-      ? dedupeRankedSkills(rankSkillsForQuery(candidatePool, query)).map((item) => item.skill)
+      ? dedupeRankedSkills(rankSkillsForQuery(candidatePool, query, outcomeStatsMap)).map((item) => item.skill)
       : candidatePool
 
     if (category) {
@@ -44,7 +48,7 @@ export async function GET(request: NextRequest) {
       )
     }
     if (trust) {
-      records = records.filter((r) => getSkillTrustProfile(r).tier === trust)
+      records = records.filter((r) => getSkillTrustProfile(r, false, null, outcomeStatsMap[r.slug] || null).tier === trust)
     }
     if (track) {
       records = records.filter((r) => getSkillSupplyProfile(r).track.slug === track)
@@ -65,14 +69,15 @@ export async function GET(request: NextRequest) {
     if (format === 'text') {
       const text = records
         .map((r, i) => {
-          const trustProfile = getSkillTrustProfile(r)
+          const trustProfile = getSkillTrustProfile(r, false, null, outcomeStatsMap[r.slug] || null)
+          const proven = getAgentProvenProfile(outcomeStatsMap[r.slug] || null)
           const audit = buildSkillAudit(r)
           const supply = getSkillSupplyProfile(r)
           const safetyProfile = getAgentSafetyProfile(r, audit, {
             max_risk: maxRisk,
             needs_install_command: true,
           })
-          return `${i + 1}. ${r.name} (${r.slug})\n   ${r.description}\n   Supply: ${supply.track.shortLabel} | Scenario: ${supply.scenario.label} | Agents: ${supply.applicableAgents.slice(0, 3).join(', ')}\n   Safety: ${safetyProfile.safety_tier.label} | Policy: ${safetyProfile.safety_tier.auto_install_policy} | Score: ${safetyProfile.score}/100\n   Quality: ${Number(r.quality_score || 0)} | Trust: ${trustProfile.score} ${trustProfile.label} | Audit: ${audit.audit_score} ${auditRiskLabel(audit.risk_level)}\n   Maintenance: ${supply.maintenance.label} | Risk: ${supply.risk.label}\n   Stars: ${r.github_stars} | Downloads: ${r.downloads}\n   Install: ${r.install_command || `npx skills add ${r.github_repo}`}\n   URL: https://www.openagentskill.com/skills/${r.slug}\n   ---`
+          return `${i + 1}. ${r.name} (${r.slug})\n   ${r.description}\n   Supply: ${supply.track.shortLabel} | Scenario: ${supply.scenario.label} | Agents: ${supply.applicableAgents.slice(0, 3).join(', ')}\n   Safety: ${safetyProfile.safety_tier.label} | Policy: ${safetyProfile.safety_tier.auto_install_policy} | Score: ${safetyProfile.score}/100\n   Quality: ${Number(r.quality_score || 0)} | Trust: ${trustProfile.score} ${trustProfile.label} | Agent Proven: ${proven.score}/100 ${proven.label} | Audit: ${audit.audit_score} ${auditRiskLabel(audit.risk_level)}\n   Outcomes: ${proven.metrics.totalOutcomes} | Success: ${proven.metrics.successRate === null ? 'No data' : `${Math.round(proven.metrics.successRate)}%`} | Recent failure: ${proven.metrics.recentFailureRate === null ? 'No data' : `${Math.round(proven.metrics.recentFailureRate)}%`}\n   Maintenance: ${supply.maintenance.label} | Risk: ${supply.risk.label}\n   Stars: ${r.github_stars} | Downloads: ${r.downloads}\n   Install: ${r.install_command || `npx skills add ${r.github_repo}`}\n   URL: https://www.openagentskill.com/skills/${r.slug}\n   ---`
         })
         .join('\n')
 
@@ -98,6 +103,9 @@ export async function GET(request: NextRequest) {
           needs_install_command: true,
         })
         const supplyProfile = getSkillSupplyProfile(r)
+        const outcomeStats = outcomeStatsMap[r.slug] || null
+        const trustProfile = getSkillTrustProfile(r, false, null, outcomeStats)
+        const proven = getAgentProvenProfile(outcomeStats)
         return {
           slug: r.slug,
           name: r.name,
@@ -114,7 +122,9 @@ export async function GET(request: NextRequest) {
             quality_score: Number(r.quality_score || 0),
           },
           quality: getSkillQualityProfile(r),
-          trust: getSkillTrustProfile(r),
+          trust: trustProfile,
+          agent_proven: proven,
+          outcome_stats: outcomeStats,
           audit: {
             audit_score: audit.audit_score,
             risk_level: audit.risk_level,
@@ -171,6 +181,7 @@ export async function GET(request: NextRequest) {
 }
 
 const AGENT_SKILLS_QUERY_TIMEOUT_MS = 1000
+const AGENT_SKILLS_STATS_TIMEOUT_MS = 900
 const AGENT_SKILLS_CANDIDATE_LIMIT = 500
 
 const getCachedAgentSkillCandidatePool = unstable_cache(
@@ -187,5 +198,22 @@ async function getAgentSkillCandidatePool() {
   ).catch((error) => {
     console.warn('Agent skills candidate fallback:', error)
     return CURATED_SKILL_SNAPSHOT
+  })
+}
+
+const getCachedAgentSkillOutcomeStatsMap = unstable_cache(
+  async () => getAgentOutcomeStatsMap(),
+  ['agent-skills-outcome-stats-v1'],
+  { revalidate: 300 }
+)
+
+async function getAgentSkillOutcomeStatsMap(): Promise<Record<string, SkillOutcomeStats>> {
+  return withTimeout(
+    getCachedAgentSkillOutcomeStatsMap(),
+    AGENT_SKILLS_STATS_TIMEOUT_MS,
+    'agent skills outcome stats query'
+  ).catch((error) => {
+    console.warn('Agent skills outcome stats fallback:', error)
+    return {}
   })
 }

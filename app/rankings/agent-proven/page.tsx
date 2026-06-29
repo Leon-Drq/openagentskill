@@ -19,9 +19,9 @@ import {
 } from '@/lib/db/skills'
 import {
   formatOutcomeSuccessRate,
-  getOutcomeReadinessLabel,
   summarizeOutcomeStats,
 } from '@/lib/agent-outcome-summary'
+import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { getRankingCompareHref, getRankingDefinition, rankSkillsForDefinition } from '@/lib/rankings'
 import { getSkillTrustProfile } from '@/lib/trust'
@@ -89,20 +89,19 @@ function EvidencePill({ children }: { children: ReactNode }) {
 function SkillEvidenceRow({
   skill,
   rank,
-  badge,
   reason,
   stats,
   eventStats,
 }: {
   skill: SkillRecord
   rank: number
-  badge: string
   reason: string
   stats: SkillOutcomeStats | null
   eventStats: SkillEventStats | null
 }) {
   const quality = getSkillQualityProfile(skill)
   const trust = getSkillTrustProfile(skill, false, eventStats, stats)
+  const proven = getAgentProvenProfile(stats)
   const hasOutcomeReports = Number(stats?.total_outcomes || 0) > 0
 
   return (
@@ -115,7 +114,7 @@ function SkillEvidenceRow({
               {skill.name}
             </h2>
           </Link>
-          <EvidencePill>{badge}</EvidencePill>
+          <EvidencePill>{proven.score}/100 proven</EvidencePill>
           <EvidencePill>{trust.score}/100 Trust</EvidencePill>
         </div>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-secondary">{skill.description}</p>
@@ -123,16 +122,16 @@ function SkillEvidenceRow({
         <div className="mt-4 flex flex-wrap gap-2">
           <EvidencePill>{formatCompactNumber(skill.github_stars || 0)} stars</EvidencePill>
           <EvidencePill>{quality.label} · {quality.score}</EvidencePill>
-          <EvidencePill>{getOutcomeReadinessLabel(stats)}</EvidencePill>
+          <EvidencePill>{proven.label}</EvidencePill>
           <EvidencePill>Last outcome: {formatDate(stats?.last_outcome_at)}</EvidencePill>
         </div>
         <div className="mt-5 grid gap-px overflow-hidden rounded-[8px] border border-border bg-border text-sm sm:grid-cols-5">
           {[
+            ['Proven', `${proven.score}/100`],
             ['Success', formatOutcomeSuccessRate(stats)],
-            ['Outcomes', formatCompactNumber(stats?.total_outcomes || 0)],
-            ['Installs', formatCompactNumber(stats?.install_attempts || 0)],
+            ['Recent fail', proven.metrics.recentFailureRate === null ? '—' : `${Math.round(proven.metrics.recentFailureRate)}%`],
+            ['Quality', proven.metrics.avgOutputQuality === null ? '—' : `${proven.metrics.avgOutputQuality.toFixed(1)}/5`],
             ['Risk blocked', formatCompactNumber(stats?.risk_blocked_outcomes || 0)],
-            ['Setup needed', formatCompactNumber(stats?.setup_required_outcomes || 0)],
           ].map(([label, value]) => (
             <div key={label} className="bg-card p-3">
               <div className="font-mono text-lg leading-none">{value}</div>
@@ -189,6 +188,9 @@ export default async function AgentProvenRankingsPage() {
   const firstOutcomeCandidates = rankedSkills.filter((item) => Number(getStatsForSkill(item.skill, outcomeStatsMap)?.total_outcomes || 0) === 0)
   const displayedSkills = provenSkills.length > 0 ? [...provenSkills, ...firstOutcomeCandidates.slice(0, 8)] : rankedSkills.slice(0, 24)
   const compareHref = getRankingCompareHref(displayedSkills)
+  const agentProvenAverage = provenSkills.length
+    ? Math.round(provenSkills.reduce((sum, item) => sum + getAgentProvenProfile(getStatsForSkill(item.skill, outcomeStatsMap)).score, 0) / provenSkills.length)
+    : 0
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -231,7 +233,7 @@ export default async function AgentProvenRankingsPage() {
               { value: formatCompactNumber(totalOutcomeReports(outcomeStatsMap)), label: 'Outcome reports' },
               { value: aggregateSuccessRate(outcomeStatsMap), label: 'Success rate' },
               { value: formatCompactNumber(totalInstallAttempts(outcomeStatsMap)), label: 'Install attempts' },
-              { value: Object.keys(outcomeStatsMap).length.toLocaleString(), label: 'Skills with signals' },
+              { value: agentProvenAverage ? `${agentProvenAverage}/100` : 'No data', label: 'Avg proven' },
             ]}
           />
         }
@@ -270,7 +272,6 @@ export default async function AgentProvenRankingsPage() {
                 key={item.skill.slug}
                 skill={item.skill}
                 rank={index + 1}
-                badge={item.badge}
                 reason={item.reason}
                 stats={getStatsForSkill(item.skill, outcomeStatsMap)}
                 eventStats={eventStatsMap[item.skill.slug] || null}

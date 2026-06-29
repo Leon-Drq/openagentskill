@@ -202,6 +202,7 @@ export default function APIDocsPage() {
                   ['recommendation.install', 'Command, target, install API, review requirement, and auto-install policy'],
                   ['recommendation.why_recommended', 'Short explainable ranking reasons for agent logs'],
                   ['recommendation.trust_score_v4', 'Trust Score v4 evidence, outcome signals, install safety, permission surface, install policy, compatibility, and risk summary'],
+                  ['agent_proven', '0-100 outcome-backed adoption score with recent success/failure, install success, output quality, production use, and unique agent signals'],
                   ['install_receipt', 'Stable install receipt with selected skill, install policy, risk notes, alternatives, outcome event id, and next steps'],
                   ['decision_packet', 'Stable agent contract with selected skill, install plan, trust dimensions, do_not_use_when, alternatives, and outcome_feedback'],
                   ['agent_feedback_loop', 'Outcome reporting contract, quality fields, idempotency, and ranking inputs updated after a run'],
@@ -271,6 +272,7 @@ export default function APIDocsPage() {
                   ['selected_skill', 'Skill URL, API URL, audit URL, eval URL, and repository'],
                   ['install', 'Command, target, policy, sandbox-first flag, and human-review requirement'],
                   ['risk', 'Audit label, safety tier, warnings, and do_not_use_when metadata'],
+                  ['agent_proven', 'Outcome-backed score, label, summary, and metrics for whether agents have made the skill work'],
                   ['alternatives', 'Fallback skills with install commands and safety scores'],
                   ['outcome_feedback', 'event_id, POST endpoint, payload template, dry_run payload, and CLI example'],
                 ].map(([field, detail]) => (
@@ -330,6 +332,9 @@ export default function APIDocsPage() {
                   ['blocked_by_risk', 'The agent stopped because risk was too high'],
                   ['setup_required', 'The skill may work but required extra setup'],
                   ['output_quality', 'Optional 1-5 quality signal for the run output'],
+                  ['used_in_production', 'Optional signal that the skill was useful beyond a sandbox run'],
+                  ['human_review_required', 'Optional signal that the run needed human inspection before reuse'],
+                  ['Agent Proven Score', 'Derived from total outcomes, recent success/failure, install success rate, output quality, production use, unique agents, and risk/setup penalties'],
                   ['error_type', 'Optional install_failed, runtime_error, permission_blocked, low_quality_output, timeout, or other'],
                   ['dry_run', 'Set true to validate a payload without writing a database row'],
                   ['GET /api/agent/outcome?skill_slug=crawl4ai', 'Read aggregate success and install-attempt stats'],
@@ -701,7 +706,7 @@ Total: 2 skills found
               <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 text-sm sm:text-base">
                 <div>
                   <code className="font-mono bg-muted px-2 py-1">{'slug'}</code>
-                  <span className="text-secondary ml-2">{'- Ranking slug, e.g. agent-proven or best-web-scraping-skills'}</span>
+                  <span className="text-secondary ml-2">{'- Ranking slug, e.g. agent-proven, best-by-success-rate, safest-auto-install-skills, best-codex-skills, or best-web-scraping-skills'}</span>
                 </div>
                 <div>
                   <code className="font-mono bg-muted px-2 py-1">{'limit'}</code>

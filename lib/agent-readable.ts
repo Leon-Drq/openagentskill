@@ -1,4 +1,5 @@
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
+import { getAgentProvenProfile, type AgentProvenProfile } from '@/lib/agent-proven'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import type { SkillEventStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
 import { getSkillDecisionProfile } from '@/lib/decision'
@@ -48,9 +49,14 @@ export interface AgentReadableSkillMetadata {
       failures: number
       not_relevant: number
       success_rate: number | null
+      recent_success_rate: number | null
+      recent_failure_rate: number | null
       install_attempts: number
+      install_success_rate: number | null
       risk_blocked: number
       setup_required: number
+      avg_output_quality: number | null
+      production_outcomes: number
       last_outcome_at: string | null
       label: string
     }
@@ -62,6 +68,7 @@ export interface AgentReadableSkillMetadata {
     best_for: string[]
     known_risks: string[]
   }
+  agent_proven: Pick<AgentProvenProfile, 'version' | 'score' | 'tier' | 'label' | 'summary' | 'metrics' | 'signals' | 'penalties'>
   audit: {
     score: number
     risk_level: string
@@ -192,6 +199,7 @@ export function buildAgentReadableSkillMetadata(
     options.eventStats || null,
     options.outcomeStats || null
   )
+  const agentProven = getAgentProvenProfile(options.outcomeStats || null)
   const audit = buildSkillAudit(skill, options.eventStats || null)
   const safety = getAgentSafetyProfile(skill, audit, {
     max_risk: 'medium',
@@ -295,9 +303,14 @@ export function buildAgentReadableSkillMetadata(
         failures: trust.outcomeEvidence.failures,
         not_relevant: trust.outcomeEvidence.notRelevant,
         success_rate: trust.outcomeEvidence.successRate,
+        recent_success_rate: trust.outcomeEvidence.recentSuccessRate,
+        recent_failure_rate: trust.outcomeEvidence.recentFailureRate,
         install_attempts: trust.outcomeEvidence.installAttempts,
+        install_success_rate: trust.outcomeEvidence.installSuccessRate,
         risk_blocked: trust.outcomeEvidence.riskBlocked,
         setup_required: trust.outcomeEvidence.setupRequired,
+        avg_output_quality: trust.outcomeEvidence.avgOutputQuality,
+        production_outcomes: trust.outcomeEvidence.productionOutcomes,
         last_outcome_at: trust.outcomeEvidence.lastOutcomeAt,
         label: trust.outcomeEvidence.label,
       },
@@ -308,6 +321,16 @@ export function buildAgentReadableSkillMetadata(
       },
       best_for: trust.bestFor,
       known_risks: trust.knownRisks,
+    },
+    agent_proven: {
+      version: agentProven.version,
+      score: agentProven.score,
+      tier: agentProven.tier,
+      label: agentProven.label,
+      summary: agentProven.summary,
+      metrics: agentProven.metrics,
+      signals: agentProven.signals,
+      penalties: agentProven.penalties,
     },
     audit: {
       score: audit.audit_score,

@@ -47,6 +47,23 @@ type ReceiptCandidate = {
       successRate?: number | null
     }
   }
+  agent_proven?: {
+    score: number
+    label: string
+    summary: string
+    metrics: {
+      totalOutcomes: number
+      successRate: number | null
+      recentSuccessRate: number | null
+      recentFailureRate: number | null
+      installAttempts: number
+      installSuccessRate: number | null
+      riskBlocked: number
+      setupRequired: number
+      avgOutputQuality: number | null
+      productionOutcomes: number
+    }
+  } | null
   audit: {
     audit_score: number
     risk_label: string
@@ -125,6 +142,7 @@ export function buildAgentInstallReceipt(input: {
     ...selected.recommendation_reasons,
     selected.decision.headline,
     `${selected.trust.score}/100 Trust Score`,
+    selected.agent_proven ? `${selected.agent_proven.score}/100 Agent Proven Score` : null,
     `${selected.audit.audit_score}/100 audit score`,
     `${selected.safety.score}/100 safety score`,
   ].filter(Boolean).slice(0, 8)
@@ -188,6 +206,25 @@ export function buildAgentInstallReceipt(input: {
       outcome_total: selected.trust.outcomeEvidence?.total || 0,
       outcome_success_rate: selected.trust.outcomeEvidence?.successRate ?? null,
     },
+    agent_proven: selected.agent_proven
+      ? {
+          score: selected.agent_proven.score,
+          label: selected.agent_proven.label,
+          summary: selected.agent_proven.summary,
+          metrics: {
+            totalOutcomes: selected.agent_proven.metrics.totalOutcomes,
+            successRate: selected.agent_proven.metrics.successRate,
+            recentSuccessRate: selected.agent_proven.metrics.recentSuccessRate,
+            recentFailureRate: selected.agent_proven.metrics.recentFailureRate,
+            installAttempts: selected.agent_proven.metrics.installAttempts,
+            installSuccessRate: selected.agent_proven.metrics.installSuccessRate,
+            riskBlocked: selected.agent_proven.metrics.riskBlocked,
+            setupRequired: selected.agent_proven.metrics.setupRequired,
+            avgOutputQuality: selected.agent_proven.metrics.avgOutputQuality,
+            productionOutcomes: selected.agent_proven.metrics.productionOutcomes,
+          },
+        }
+      : null,
     risk: {
       level: selected.audit.risk_label,
       safety_tier: selected.safety.safety_tier.label,
@@ -272,6 +309,7 @@ export function formatAgentInstallReceiptText(receipt: AgentInstallReceipt) {
     `Sandbox first: ${receipt.install.sandbox_first ? 'yes' : 'no'}`,
     '',
     `Trust: ${receipt.trust.score}/100 ${receipt.trust.label}`,
+    `Agent Proven: ${receipt.agent_proven ? `${receipt.agent_proven.score}/100 ${receipt.agent_proven.label}` : 'No data'}`,
     `Audit: ${receipt.risk.audit_score}/100 ${receipt.risk.level}`,
     `Safety: ${receipt.risk.safety_score}/100 ${receipt.risk.safety_tier}`,
     `Outcome signal: ${receipt.trust.outcome_signal}`,

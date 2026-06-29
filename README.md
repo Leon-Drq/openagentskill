@@ -55,6 +55,7 @@ OpenAgentSkill is not another static directory. It is a registry, trust layer, a
 | GitHub domain + scenario index | Curated pages for coding, web scraping, finance, RAG, PDF parsing, browser automation, DevOps, security, support, commerce, Web3, ML/media, and real agent jobs |
 | Trust Score + audit pages | Agents can inspect quality, license, README/SKILL.md completeness, install safety, maintenance, and risk signals |
 | Outcome feedback loop | Resolved skills can report `success`, `failed`, `not_relevant`, `blocked_by_risk`, or `setup_required` so rankings learn from real use |
+| Agent Proven Score | Every outcome can update success rate, recent failure rate, install success, output quality, production use, and human-review pressure |
 | Agent-Proven rankings | Skills with real outcome reports rank above untested high-star projects when agents need safer install candidates |
 | Agent-readable APIs | Codex, Claude Code, Cursor, and other runtimes can call stable endpoints instead of scraping a website |
 
@@ -77,6 +78,7 @@ Use the response to inspect:
 - audit_url
 - risk_level
 - do_not_use_when
+- agent_proven
 
 Only install when the receipt risk policy allows it. After trying the skill, report the result:
 
@@ -106,6 +108,7 @@ OpenAgentSkill Resolve
 Task: analyze stock news
 Best skill: Serenity Skill
 Trust Score: 83/100
+Agent Proven: 76/100, Agent proven
 Install: npx skills add muxuuu/serenity-skill
 Risk: needs_review
 Alternatives: OpenBB, Last30days Skill, VectorBT
@@ -190,6 +193,8 @@ Useful endpoints:
 | `GET /api/agent/resolve?task=...` | Resolve a task into one selected skill plus alternatives |
 | `GET /api/agent/receipt?task=...` | Fetch the stable install receipt for one resolved task |
 | `GET /api/agent/rankings?slug=agent-proven` | Read skills ranked by real outcome reports and install attempts |
+| `GET /api/agent/rankings?slug=best-by-success-rate` | Read skills ranked by Agent Proven Score, recent success, install success, and low failure pressure |
+| `GET /api/agent/rankings?slug=safest-auto-install-skills` | Read safer candidates for sandbox-first auto-install workflows |
 | `GET /api/agent/skills?q=...` | Search indexed skills |
 | `GET /api/agent/tasks` | Browse task-first routes |
 | `GET /api/agent/outcome?format=text` | Read aggregate adoption signals |
@@ -355,11 +360,12 @@ Apply SQL files in `scripts/` in order. The current schema includes:
 - Hardened RLS policies.
 - Skill audits and daily event aggregates.
 - Agent outcome feedback and aggregate success signals.
+- Agent Proven Score columns for success, recent failure, install success, output quality, production use, and unique agent adoption.
 
 Latest outcome-feedback migration:
 
 ```text
-scripts/015_agent_outcomes_and_resolve_evals.sql
+scripts/017_agent_proven_score.sql
 ```
 
 ## Project Structure
