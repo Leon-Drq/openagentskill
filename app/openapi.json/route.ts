@@ -123,6 +123,14 @@ export async function GET() {
               '200': {
                 description:
                   'Stable install receipt with selected_skill, install policy, Trust Score, risk notes, alternatives, outcome_feedback event id, and next steps.',
+                content: {
+                  'application/json': {
+                    schema: { $ref: '#/components/schemas/AgentReceiptResponse' },
+                  },
+                  'text/plain': {
+                    schema: { type: 'string' },
+                  },
+                },
               },
             },
           },
@@ -150,6 +158,14 @@ export async function GET() {
               '200': {
                 description:
                   'Install receipt generated from the same resolver ranking logic used by /api/agent/resolve.',
+                content: {
+                  'application/json': {
+                    schema: { $ref: '#/components/schemas/AgentReceiptResponse' },
+                  },
+                  'text/plain': {
+                    schema: { type: 'string' },
+                  },
+                },
               },
             },
           },
@@ -322,6 +338,143 @@ export async function GET() {
           get: {
             summary: 'Public-safe GitHub auto-discovery status',
             responses: { '200': { description: 'Discovery pipeline status, health, filters, schedule, and cross-domain query coverage' } },
+          },
+        },
+      },
+      components: {
+        schemas: {
+          AgentReceiptResponse: {
+            type: 'object',
+            required: ['receipt', 'policy_decision', 'selected', 'feedback', 'meta'],
+            properties: {
+              receipt: { $ref: '#/components/schemas/AgentInstallReceipt' },
+              policy_decision: {
+                type: 'object',
+                properties: {
+                  status: { type: 'string' },
+                  summary: { type: 'string' },
+                },
+              },
+              selected: {
+                type: 'object',
+                properties: {
+                  slug: { type: 'string' },
+                  name: { type: 'string' },
+                },
+              },
+              feedback: {
+                type: 'object',
+                properties: {
+                  event_id: { type: 'string' },
+                  endpoint: { type: 'string' },
+                },
+              },
+              meta: {
+                type: 'object',
+                properties: {
+                  contract: { type: 'string' },
+                  text_url: { type: 'string' },
+                },
+              },
+            },
+          },
+          AgentInstallReceipt: {
+            type: 'object',
+            required: [
+              'version',
+              'receipt_id',
+              'resolve_event_id',
+              'generated_at',
+              'task',
+              'agent',
+              'selected_skill',
+              'install',
+              'trust',
+              'risk',
+              'alternatives',
+              'outcome_feedback',
+              'next_steps',
+            ],
+            properties: {
+              version: { type: 'string', const: 'openagentskill-install-receipt-v1' },
+              receipt_id: { type: 'string' },
+              resolve_event_id: { type: 'string' },
+              generated_at: { type: 'string', format: 'date-time' },
+              task: { type: 'string' },
+              agent: { type: 'string' },
+              selected_skill: {
+                type: 'object',
+                properties: {
+                  slug: { type: 'string' },
+                  name: { type: 'string' },
+                  url: { type: 'string' },
+                  repository: { type: 'string' },
+                  category: { type: 'string' },
+                  stars: { type: 'number' },
+                  install_command: { type: 'string' },
+                  audit_url: { type: 'string' },
+                  eval_url: { type: 'string' },
+                },
+              },
+              install: {
+                type: 'object',
+                properties: {
+                  command: { type: 'string' },
+                  policy: { type: 'string' },
+                  auto_install_allowed: { type: 'boolean' },
+                  human_review_required: { type: 'boolean' },
+                  sandbox_first: { type: 'boolean' },
+                  checklist: { type: 'array', items: { type: 'string' } },
+                },
+              },
+              trust: {
+                type: 'object',
+                properties: {
+                  score: { type: 'number' },
+                  label: { type: 'string' },
+                  dimensions: { type: 'object' },
+                  outcome_signal: { type: 'string' },
+                },
+              },
+              risk: {
+                type: 'object',
+                properties: {
+                  level: { type: 'string' },
+                  audit_score: { type: 'number' },
+                  safety_score: { type: 'number' },
+                  safety_tier: { type: 'string' },
+                  do_not_use_when: { type: 'array', items: { type: 'string' } },
+                  notes: { type: 'array', items: { type: 'string' } },
+                },
+              },
+              alternatives: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    slug: { type: 'string' },
+                    name: { type: 'string' },
+                    install_command: { type: 'string' },
+                    trust_score: { type: 'number' },
+                    risk_level: { type: 'string' },
+                  },
+                },
+              },
+              outcome_feedback: {
+                type: 'object',
+                properties: {
+                  event_id: { type: 'string' },
+                  endpoint: { type: 'string' },
+                  method: { type: 'string', enum: ['POST'] },
+                  payload_template: { type: 'object' },
+                  dry_run_payload: { type: 'object' },
+                  cli_example: { type: 'string' },
+                },
+              },
+              next_steps: { type: 'array', items: { type: 'string' } },
+              stable_fields: { type: 'array', items: { type: 'string' } },
+              freshness_policy: { type: 'string' },
+            },
           },
         },
       },
