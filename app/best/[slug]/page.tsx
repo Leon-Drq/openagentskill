@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { convertSkillRecordToManifest, getAgentOutcomeStatsMap, getAllSkills, type SkillOutcomeStats } from '@/lib/db/skills'
 import { formatCompactNumber, getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
@@ -102,6 +103,7 @@ export default async function BestSkillDetailPage({
   const rankedSkills = rankSkillsForDefinition(skills, ranking, statsMap, 30)
   const compareHref = getRankingCompareHref(rankedSkills)
   const topSkill = rankedSkills[0]?.skill
+  const topProven = topSkill ? getAgentProvenProfile(statsMap[topSkill.slug] || null) : null
   const faqEntries = [
     {
       question: `How does OpenAgentSkill rank ${page.shortTitle.toLowerCase()}?`,
@@ -209,7 +211,7 @@ export default async function BestSkillDetailPage({
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-px self-end border border-border bg-border text-center">
+          <div className="grid grid-cols-2 gap-px self-end border border-border bg-border text-center sm:grid-cols-4">
             <div className="bg-background p-4">
               <div className="font-mono text-2xl">{rankedSkills.length}</div>
               <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Ranked</div>
@@ -223,6 +225,10 @@ export default async function BestSkillDetailPage({
             <div className="bg-background p-4">
               <div className="font-mono text-2xl">{topSkill ? getSkillTrustProfile(topSkill, false, null, statsMap[topSkill.slug] || null).score : 0}</div>
               <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Top trust</div>
+            </div>
+            <div className="bg-background p-4">
+              <div className="font-mono text-2xl">{topProven && topProven.metrics.totalOutcomes > 0 ? topProven.score : '—'}</div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Agent proven</div>
             </div>
           </div>
         </section>
@@ -266,9 +272,10 @@ export default async function BestSkillDetailPage({
               {rankedSkills.map((item) => {
                 const skill = item.skill
                 const manifest = convertSkillRecordToManifest(skill)
-                const quality = getSkillQualityProfile(skill, statsMap[skill.slug] || null)
-                const trust = getSkillTrustProfile(skill, false, null, statsMap[skill.slug] || null)
-                const audit = buildSkillAudit(skill)
+	                const quality = getSkillQualityProfile(skill, statsMap[skill.slug] || null)
+	                const trust = getSkillTrustProfile(skill, false, null, statsMap[skill.slug] || null)
+	                const proven = getAgentProvenProfile(statsMap[skill.slug] || null)
+	                const audit = buildSkillAudit(skill)
                 const platforms = [...new Set([...(skill.frameworks || []), ...getPlatformHints(skill)])]
                 const skillUseCases = getUseCasesForSkill(skill, 2)
                 const scenario =
@@ -294,11 +301,14 @@ export default async function BestSkillDetailPage({
                         <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
                           Trust {trust.score}
                         </span>
-                        <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
-                          {quality.label} {quality.score}
-                        </span>
-                        <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
-                          Audit {audit.audit_score} · {auditRiskLabel(audit.risk_level)}
+	                        <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
+	                          {quality.label} {quality.score}
+	                        </span>
+	                        <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
+	                          Agent Proven {proven.metrics.totalOutcomes > 0 ? proven.score : '—'}
+	                        </span>
+	                        <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
+	                          Audit {audit.audit_score} · {auditRiskLabel(audit.risk_level)}
                         </span>
                       </div>
                       <p className="max-w-3xl text-sm leading-relaxed text-secondary">{skill.description}</p>
@@ -309,9 +319,10 @@ export default async function BestSkillDetailPage({
                       </div>
                       <div className="mt-4 flex flex-wrap gap-4 text-xs font-mono text-secondary">
                         <span>{formatCompactNumber(skill.github_stars || 0)} stars</span>
-                        <span>{formatDate(skill.github_last_pushed_at || skill.updated_at)} push</span>
-                        <span>{trust.label}</span>
-                        {platforms.slice(0, 2).map((platform) => <span key={platform}>{platform}</span>)}
+	                        <span>{formatDate(skill.github_last_pushed_at || skill.updated_at)} push</span>
+	                        <span>{trust.label}</span>
+	                        <span>{proven.label}</span>
+	                        {platforms.slice(0, 2).map((platform) => <span key={platform}>{platform}</span>)}
                       </div>
                       <div className="mt-4 flex flex-wrap gap-2">
                         <Link
@@ -354,8 +365,8 @@ export default async function BestSkillDetailPage({
               <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Selection method</p>
               <h2 className="font-display text-2xl font-semibold">How this list is ranked</h2>
               <p className="mt-3 text-sm leading-relaxed text-secondary">
-                OpenAgentSkill scores each candidate against the workflow keywords, then balances fit with GitHub stars,
-                quality signals, trust profile, maintenance freshness, and whether there is a clear install path.
+	                OpenAgentSkill scores each candidate against the workflow keywords, then balances fit with GitHub stars,
+	                quality signals, trust profile, Agent Proven outcome evidence, maintenance freshness, and whether there is a clear install path.
               </p>
             </div>
             <div className="grid gap-3">

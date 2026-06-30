@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auditRiskColor, auditRiskLabel, buildSkillAudit, normalizeAuditRecord } from '@/lib/audits'
-import { getSkillAuditBySlug, getSkillBySlug } from '@/lib/db/skills'
+import { getAgentOutcomeStats, getSkillAuditBySlug, getSkillBySlug } from '@/lib/db/skills'
+import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { getSkillTrustProfile } from '@/lib/trust'
 
 export const dynamic = 'force-dynamic'
@@ -63,9 +64,12 @@ export async function GET(
   }
 
   const url = new URL(request.url)
-  const mode = url.searchParams.get('metric') || 'trust'
+  const mode = (url.searchParams.get('metric') || 'trust').toLowerCase()
+  const wantsProven = mode === 'proven' || mode === 'agent-proven'
   const trust = getSkillTrustProfile(skill)
   const storedAudit = mode === 'audit' ? await getSkillAuditBySlug(skill.slug).catch(() => null) : null
+  const provenStats = wantsProven ? await getAgentOutcomeStats(skill.slug).catch(() => null) : null
+  const proven = wantsProven ? getAgentProvenProfile(provenStats) : null
   const audit = mode === 'audit'
     ? storedAudit
       ? normalizeAuditRecord(storedAudit)
@@ -77,18 +81,30 @@ export async function GET(
       ? `${Number(skill.github_stars || 0).toLocaleString()} stars`
       : mode === 'quality'
         ? `${Math.round(Number(skill.quality_score || 0))}/100 quality`
+        : proven
+          ? proven.metrics.totalOutcomes > 0
+            ? `${proven.score}/100 proven`
+            : 'unproven'
         : mode === 'audit' && audit
           ? `${audit.audit_score}/100 ${auditRiskLabel(audit.risk_level).toLowerCase()}`
           : `${trust.score}/100 ${trust.tier === 'production' ? 'trusted' : 'trust'}`
-  const color = mode === 'audit' && audit
-    ? auditRiskColor(audit.risk_level)
-    : trust.tier === 'production'
-      ? '#111111'
-      : trust.tier === 'strong'
-        ? '#2563eb'
-        : trust.tier === 'review'
-          ? '#b45309'
+  const color = proven
+    ? proven.metrics.totalOutcomes <= 0
+      ? '#737373'
+      : proven.score >= 75
+        ? '#006b4f'
+        : proven.score >= 50
+          ? '#b7791f'
           : '#991b1b'
+    : mode === 'audit' && audit
+      ? auditRiskColor(audit.risk_level)
+      : trust.tier === 'production'
+        ? '#111111'
+        : trust.tier === 'strong'
+          ? '#2563eb'
+          : trust.tier === 'review'
+            ? '#b45309'
+            : '#991b1b'
 
   return new NextResponse(makeBadge(label, value, color), {
     headers: {

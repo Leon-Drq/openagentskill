@@ -51,9 +51,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/guides`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/blog`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
     { url: `${baseUrl}/submit`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${baseUrl}/docs`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/cli`, lastModified: now, changeFrequency: 'weekly', priority: 0.86 },
-    { url: `${baseUrl}/x-kit`, lastModified: now, changeFrequency: 'daily', priority: 0.74 },
+	    { url: `${baseUrl}/docs`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+	    { url: `${baseUrl}/cli`, lastModified: now, changeFrequency: 'weekly', priority: 0.86 },
+	    { url: `${baseUrl}/creator-kit`, lastModified: now, changeFrequency: 'weekly', priority: 0.82 },
+	    { url: `${baseUrl}/x-kit`, lastModified: now, changeFrequency: 'daily', priority: 0.74 },
     { url: `${baseUrl}/activity`, lastModified: now, changeFrequency: 'hourly', priority: 0.6 },
   ]
 

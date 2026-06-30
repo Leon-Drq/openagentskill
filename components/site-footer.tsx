@@ -82,9 +82,10 @@ export function SiteFooter() {
                 <Link href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</Link>
                 <Link href="/llms.txt" prefetch={false} className="hover:text-foreground">llms.txt</Link>
                 <Link href="/openapi.json" prefetch={false} className="hover:text-foreground">OpenAPI</Link>
-                <Link href="/cli" className="hover:text-foreground">CLI</Link>
-                <Link href="/x-kit" className="hover:text-foreground">X Growth Kit</Link>
-                <Link href="/submit" className="hover:text-foreground">{t.nav.submit}</Link>
+	                <Link href="/cli" className="hover:text-foreground">CLI</Link>
+	                <Link href="/creator-kit" className="hover:text-foreground">Creator Kit</Link>
+	                <Link href="/x-kit" className="hover:text-foreground">X Growth Kit</Link>
+	                <Link href="/submit" className="hover:text-foreground">{t.nav.submit}</Link>
                 <Link href="/blog" className="hover:text-foreground">Blog</Link>
                 <Link href="/guides" className="hover:text-foreground">Guides</Link>
                 <Link href="/activity" className="hover:text-foreground">{t.nav.activity}</Link>

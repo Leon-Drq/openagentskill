@@ -5,7 +5,8 @@ import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { getAgentTaskBySlug } from '@/lib/agent-tasks'
-import { convertSkillRecordToManifest, getAllSkills } from '@/lib/db/skills'
+import { getAgentProvenProfile } from '@/lib/agent-proven'
+import { convertSkillRecordToManifest, getAgentOutcomeStatsMap, getAllSkills } from '@/lib/db/skills'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillCluster, SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
 import { getSkillTrustProfile } from '@/lib/trust'
@@ -57,10 +58,6 @@ function formatDate(value: string | null | undefined) {
   })
 }
 
-function formatScore(value: number | null | undefined) {
-  return Math.round(Number(value || 0))
-}
-
 export default async function AiAgentSkillClusterPage({
   params,
 }: {
@@ -70,9 +67,10 @@ export default async function AiAgentSkillClusterPage({
   const cluster = getSkillCluster(slug)
   if (!cluster) notFound()
 
-  const [skills, useCase] = await Promise.all([
+  const [skills, useCase, outcomeStatsMap] = await Promise.all([
     getAllSkills('quality', undefined, 1200).catch(() => []),
     Promise.resolve(getUseCaseBySlug(cluster.useCaseSlug)),
+    getAgentOutcomeStatsMap().catch((): Awaited<ReturnType<typeof getAgentOutcomeStatsMap>> => ({})),
   ])
 
   const rankedSkills = useCase ? selectSkillsForUseCase(skills, useCase, 16) : []
@@ -207,7 +205,7 @@ export default async function AiAgentSkillClusterPage({
                 Start from a real workflow, not a keyword.
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-secondary sm:text-base">
-                These pages are built for high-intent search and for agents that need a structured shortlist before installing third-party code.
+                These pages are built for high-intent search and for agents that need a structured shortlist with install commands, trust signals, audit links, and real outcome evidence before installing third-party code.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -294,9 +292,11 @@ export default async function AiAgentSkillClusterPage({
             ) : (
               <div className="grid gap-4 lg:grid-cols-2">
                 {topSkills.map((skill, index) => {
-                  const manifest = convertSkillRecordToManifest(skill)
-                  const quality = getSkillQualityProfile(skill)
-                  const trust = getSkillTrustProfile(skill)
+	                  const manifest = convertSkillRecordToManifest(skill)
+	                  const outcomeStats = outcomeStatsMap[skill.slug] || null
+	                  const quality = getSkillQualityProfile(skill, outcomeStats)
+	                  const trust = getSkillTrustProfile(skill, false, null, outcomeStats)
+	                  const proven = getAgentProvenProfile(outcomeStats)
 
                   return (
                     <article key={skill.slug} className="min-w-0 border border-border bg-card p-5">
@@ -316,25 +316,26 @@ export default async function AiAgentSkillClusterPage({
                       <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-secondary">
                         {skill.description}
                       </p>
-                      <div className="mt-5 grid grid-cols-3 gap-px border border-border bg-border text-center">
-                        <div className="bg-background p-3">
-                          <p className="font-mono text-lg">{quality.score}</p>
-                          <p className="mt-1 text-[10px] uppercase text-secondary">Quality</p>
-                        </div>
+	                      <div className="mt-5 grid grid-cols-3 gap-px border border-border bg-border text-center">
+	                        <div className="bg-background p-3">
+	                          <p className="font-mono text-lg">{quality.score}</p>
+	                          <p className="mt-1 text-[10px] uppercase text-secondary">Quality</p>
+	                        </div>
                         <div className="bg-background p-3">
                           <p className="font-mono text-lg">{trust.score}</p>
                           <p className="mt-1 text-[10px] uppercase text-secondary">Trust</p>
-                        </div>
-                        <div className="bg-background p-3">
-                          <p className="font-mono text-lg">{formatScore(skill.quality_score)}</p>
-                          <p className="mt-1 text-[10px] uppercase text-secondary">Fit</p>
-                        </div>
-                      </div>
-                      <div className="mt-5 flex flex-wrap gap-3 text-xs font-mono text-secondary">
-                        <span>{skill.category}</span>
-                        <span>{formatDate(skill.github_last_pushed_at || skill.updated_at)} push</span>
-                        <span>{skill.license || 'Unknown license'}</span>
-                      </div>
+	                        </div>
+	                        <div className="bg-background p-3">
+	                          <p className="font-mono text-lg">{proven.metrics.totalOutcomes > 0 ? proven.score : '—'}</p>
+	                          <p className="mt-1 text-[10px] uppercase text-secondary">Proven</p>
+	                        </div>
+	                      </div>
+	                      <div className="mt-5 flex flex-wrap gap-3 text-xs font-mono text-secondary">
+	                        <span>{skill.category}</span>
+	                        <span>{formatDate(skill.github_last_pushed_at || skill.updated_at)} push</span>
+	                        <span>{skill.license || 'Unknown license'}</span>
+	                        <span>{proven.label}</span>
+	                      </div>
                       <div className="mt-5 min-w-0">
                         <InstallCommand
                           command={manifest.technical.installCommand || `npx skills add ${skill.github_repo}`}

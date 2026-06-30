@@ -21,6 +21,7 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 [Outcome Loop](https://www.openagentskill.com/outcomes) ·
 [Agent-Proven Rankings](https://www.openagentskill.com/rankings/agent-proven) ·
 [Audits](https://www.openagentskill.com/audits) ·
+[Creator Kit](https://www.openagentskill.com/creator-kit) ·
 [API Docs](https://www.openagentskill.com/api-docs) ·
 [Submit Skill](https://www.openagentskill.com/submit)
 
@@ -41,7 +42,7 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 | I am a... | Start with | What you get |
 | --- | --- | --- |
 | Agent builder | [`/api/agent/resolve`](https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&agent=codex&max_risk=medium&format=text) | One recommended skill, alternatives, install receipt, trust signals, and risk notes |
-| Skill author | [Submit Skill](https://www.openagentskill.com/submit) | Canonical page, badges, audit surface, X share card, and claim path |
+| Skill author | [Creator Kit](https://www.openagentskill.com/creator-kit) | Canonical page, README badges, audit surface, Agent Proven badge, X share card, and claim path |
 | Developer exploring skills | [GitHub Skill Index](./skills/README.md) | Curated domain maps and scenario-first examples |
 | SEO/community operator | [X Growth Kit](https://www.openagentskill.com/x-kit) | Human-readable launch drafts and creator reply workflows |
 
@@ -201,7 +202,7 @@ Useful endpoints:
 | `GET /api/agent/outcome?contract=true` | Read the feedback contract for agent integrations |
 | `POST /api/agent/outcome` | Report whether a resolved skill worked |
 | `GET /api/audits/{slug}` | Fetch a skill audit report |
-| `GET /api/badge/{slug}` | Generate a README badge |
+| `GET /api/badge/{slug}` | Generate a README badge for trust, audit, quality, stars, or Agent Proven evidence |
 
 ## For Skill Authors
 
@@ -211,6 +212,7 @@ Get your skill indexed, audited, ranked, and shareable.
 - Trust Score and audit page.
 - Install command and agent-readable metadata.
 - README badge.
+- Agent Proven badge for real outcome evidence.
 - X share card and launch copy.
 - Claim/verified listing flow.
 - Alternatives and use-case pages that can send qualified traffic back to your project.
@@ -220,6 +222,7 @@ Add a badge to your README:
 ```md
 [![OpenAgentSkill Trust](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=trust&label=Trust)](https://www.openagentskill.com/skills/YOUR-SLUG)
 [![OpenAgentSkill Audit](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=audit&label=Audit)](https://www.openagentskill.com/skills/YOUR-SLUG/audit)
+[![Agent Proven](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=proven&label=Agent%20Proven)](https://www.openagentskill.com/skills/YOUR-SLUG)
 ```
 
 Submit or fix a skill:
@@ -237,6 +240,7 @@ Submit or fix a skill:
 | Agent-Proven ranking | [/rankings/agent-proven](https://www.openagentskill.com/rankings/agent-proven) | Skills ranked by success reports, install attempts, risk blocks, and setup friction |
 | Agent Integration Kit | [/agent/integration-kit](https://www.openagentskill.com/agent/integration-kit) | Codex, Claude Code, Cursor setup templates |
 | Audits | [/audits](https://www.openagentskill.com/audits) | Trust, security, quality, and install-readiness reports |
+| Creator Kit | [/creator-kit](https://www.openagentskill.com/creator-kit) | README badges, creator share links, claim loop, and X drafts |
 | Rankings | [/rankings](https://www.openagentskill.com/rankings) | Ranked lists for agent workflows |
 | Use cases | [/use-cases](https://www.openagentskill.com/use-cases) | Scenario pages with real skill lists |
 | Skill packs | [/skill-packs](https://www.openagentskill.com/skill-packs) | Workflow bundles for common agent jobs |

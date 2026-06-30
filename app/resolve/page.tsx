@@ -39,6 +39,11 @@ const capabilities = [
     copy: 'Combines GitHub stars, freshness, license clarity, install readiness, and OpenAgentSkill Trust Score.',
   },
   {
+    label: 'Agent Proven',
+    title: 'Uses real run outcomes when available',
+    copy: 'Surfaces reported success, recent failures, install success, output quality, and production-use signals.',
+  },
+  {
     label: 'Install',
     title: 'Returns agent-ready handoffs',
     copy: 'Provides CLI command, target agent prompt, detail page, audit page, and safer next steps.',
@@ -61,9 +66,9 @@ function ResolveDecisionCard({ result }: { result: ResolveResult }) {
   const trust = recommendation?.trust_score_v4 || recommendation?.trust_score_v3 || recommendation?.trust_score_v2
   if (!recommendation || !selected) return null
 
-  const outcomeSignals = recommendation.trust_score_v4?.outcomes
-  const outcomeSummary = outcomeSignals?.total
-    ? `${outcomeSignals.total} outcomes, ${outcomeSignals.successRate ?? 'unknown'}% success`
+  const agentProven = selected.agent_proven
+  const outcomeSummary = agentProven?.metrics.totalOutcomes
+    ? `${agentProven.score}/100 Agent Proven`
     : 'Needs first agent outcome'
 
   return (
@@ -81,11 +86,11 @@ function ResolveDecisionCard({ result }: { result: ResolveResult }) {
               </p>
               <div className="mt-5 flex flex-wrap gap-2">
                 {[
-                  `${selected.match_score}/100 task fit`,
-                  `${trust?.score ?? '—'}/100 Trust`,
-                  `${selected.audit.audit_score}/100 audit`,
-                  outcomeSummary,
-                ].map((item) => (
+	                  `${selected.match_score}/100 task fit`,
+	                  outcomeSummary,
+	                  `${trust?.score ?? '—'}/100 Trust`,
+	                  `${selected.audit.audit_score}/100 audit`,
+	                ].map((item) => (
                   <span
                     key={item}
                     className="rounded-[999px] border border-border bg-card px-3 py-1 font-mono text-[11px] text-secondary"
@@ -153,9 +158,28 @@ function ResolveDecisionCard({ result }: { result: ResolveResult }) {
                   </li>
                 ))}
               </ul>
-              <div className="mt-6 rounded-[8px] border border-border bg-background p-4">
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Receipt + outcome loop</p>
-                <p className="mt-2 text-sm leading-6 text-secondary">
+	              <div className="mt-6 rounded-[8px] border border-border bg-background p-4">
+	                <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Agent Proven</p>
+	                <div className="mt-3 grid grid-cols-3 gap-px border border-border bg-border text-center">
+	                  {[
+	                    ['Score', agentProven ? agentProven.score : '—'],
+	                    ['Runs', agentProven ? agentProven.metrics.totalOutcomes : 0],
+	                    ['Success', agentProven?.metrics.successRate === null || agentProven?.metrics.successRate === undefined ? 'No data' : `${Math.round(agentProven.metrics.successRate)}%`],
+	                  ].map(([label, value]) => (
+	                    <div key={label} className="bg-card p-2.5">
+	                      <div className="font-mono text-base text-foreground">{value}</div>
+	                      <div className="mt-1 font-mono text-[9px] uppercase tracking-[0.14em] text-secondary">{label}</div>
+	                    </div>
+	                  ))}
+	                </div>
+	                <p className="mt-3 text-sm leading-6 text-secondary">
+	                  {agentProven?.summary || 'No reported agent outcomes yet. Run in a sandbox and report the result to improve future rankings.'}
+	                </p>
+	              </div>
+
+	              <div className="mt-4 rounded-[8px] border border-border bg-background p-4">
+	                <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Receipt + outcome loop</p>
+	                <p className="mt-2 text-sm leading-6 text-secondary">
                   {receipt
                     ? `Use receipt ${receipt.receipt_id} as the stable install handoff, then report one narrow run so rankings learn from real use.`
                     : 'After one narrow run, report the result so Trust Score v4 and Agent-Proven rankings learn from real use.'}
@@ -230,23 +254,23 @@ export default async function ResolvePage({
             Trust Score, audit notes, safety policy, and target-specific handoff.
           </>
         }
-        aside={
-          <MarketingMetricStrip
-            columns="grid-cols-3"
-            items={[
-              { value: '1', label: 'Best skill' },
-              { value: '4', label: 'Alternatives' },
-              { value: 'API', label: 'Agent ready' },
-            ]}
-          />
-        }
+	        aside={
+	          <MarketingMetricStrip
+	            columns="grid-cols-3"
+	            items={[
+	              { value: '1', label: 'Best skill' },
+	              { value: 'Score', label: 'Agent Proven' },
+	              { value: 'Receipt', label: 'Install handoff' },
+	            ]}
+	          />
+	        }
       />
 
         {initialResult ? <ResolveDecisionCard result={initialResult} /> : null}
 
         <section className="border-b border-border bg-card/35">
           <div className="mx-auto max-w-6xl px-6 py-10">
-            <MarketingFeatureGrid items={capabilities} />
+	            <MarketingFeatureGrid items={capabilities} columns="md:grid-cols-2 lg:grid-cols-4" />
           </div>
         </section>
 

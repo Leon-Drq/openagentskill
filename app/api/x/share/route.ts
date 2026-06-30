@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSkillBySlug } from '@/lib/db/skills'
+import { getXCandidateDecision } from '@/lib/x/candidates'
 import {
   buildCommunityIndexedReplyText,
   buildManualXMainText,
@@ -28,6 +29,7 @@ export async function GET(request: NextRequest) {
   const mainText = buildManualXMainText(skill)
   const replyText = buildManualXReplyText(skill)
   const creatorReplyText = buildCommunityIndexedReplyText(skill)
+  const candidate = getXCandidateDecision(skill, 500)
 
   return NextResponse.json({
     success: true,
@@ -46,6 +48,10 @@ export async function GET(request: NextRequest) {
     creatorReplyIntentUrl: buildXIntentUrl(creatorReplyText),
     creatorReplyApi: `/api/x/reply-draft?skill_slug=${encodeURIComponent(skill.slug)}&format=json`,
     meta: {
+      x_share_recommended: candidate.eligible,
+      x_share_reason: candidate.reason,
+      x_content_lane: candidate.lane,
+      x_share_signals: candidate.signals,
       requires_manual_publish: true,
       x_api_credits_used: false,
       link_strategy: 'main_post_with_optional_reply',

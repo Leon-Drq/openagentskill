@@ -14,6 +14,29 @@ type ResolveSkillSummary = {
   repository?: string
 }
 
+type AgentProvenSummary = {
+  score: number
+  label: string
+  summary: string
+  metrics: {
+    totalOutcomes: number
+    successfulOutcomes?: number
+    failedOutcomes?: number
+    installAttempts?: number
+    successRate: number | null
+    recentSuccessRate: number | null
+    recentFailureRate: number | null
+    installSuccessRate: number | null
+    avgOutputQuality: number | null
+    productionOutcomes: number
+    riskBlocked?: number
+    setupRequired?: number
+    uniqueAgents?: number
+  }
+  signals?: string[]
+  penalties?: string[]
+}
+
 type ResolvePayload = {
   task: string
   agent: string
@@ -121,6 +144,7 @@ type ResolvePayload = {
       endpoint: string
       cli_example: string
     }
+    agent_proven?: AgentProvenSummary | null
     next_steps: string[]
   } | null
   selected?: {
@@ -147,6 +171,7 @@ type ResolvePayload = {
       score: number
       label: string
     }
+    agent_proven?: AgentProvenSummary | null
   } | null
   policy_decision: {
     status: string
@@ -169,6 +194,14 @@ const exampleTasks = [
 
 function compactStatus(value: string) {
   return value.replace(/_/g, ' ')
+}
+
+function formatPercent(value: number | null | undefined) {
+  return value === null || value === undefined ? 'No data' : `${Math.round(value)}%`
+}
+
+function formatQuality(value: number | null | undefined) {
+  return value === null || value === undefined ? 'No data' : `${Number(value).toFixed(1)}/5`
 }
 
 function copyText(value: string) {
@@ -240,6 +273,7 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
   const selected = payload?.selected
   const trustScore =
     recommendation?.trust_score_v4 || recommendation?.trust_score_v3 || recommendation?.trust_score_v2
+  const agentProven = selected?.agent_proven || payload?.install_receipt?.agent_proven || null
 
   return (
     <div className="grid gap-6 lg:grid-cols-[0.82fr_1.18fr]">
@@ -347,6 +381,14 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
               <Copy className="h-4 w-4" aria-hidden="true" />
               Copy receipt
             </button>
+            <button
+              type="button"
+              onClick={() => copyText(recommendation?.agent_instruction || apiUrl)}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border border-border bg-background px-5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
+            >
+              <Copy className="h-4 w-4" aria-hidden="true" />
+              Copy agent prompt
+            </button>
           </div>
         </form>
 
@@ -403,9 +445,10 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
 
         {payload && recommendation && (
           <div className="divide-y divide-border">
-            <div className="grid gap-px bg-border sm:grid-cols-4">
+            <div className="grid gap-px bg-border sm:grid-cols-5">
               {[
                 ['Match', selected?.match_score ?? '-'],
+                ['Proven', agentProven ? agentProven.score : '-'],
                 ['Trust', trustScore?.score ?? '-'],
                 ['Audit', selected?.audit.audit_score ?? '-'],
                 ['Safety', selected?.safety.score ?? '-'],
@@ -480,6 +523,42 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
                 </div>
               </div>
             </div>
+
+            {agentProven && (
+              <div className="bg-[#fbfaf7] p-4 sm:p-5">
+                <div className="grid gap-5 lg:grid-cols-[0.82fr_1.18fr]">
+                  <div>
+                    <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Agent Proven evidence</p>
+                    <h3 className="mt-3 font-display text-2xl font-normal">
+                      {agentProven.score}/100 · {agentProven.label}
+                    </h3>
+                    <p className="mt-3 text-sm leading-6 text-secondary">{agentProven.summary}</p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {(agentProven.signals?.length ? agentProven.signals : ['No real agent outcome reports yet']).slice(0, 4).map((signal) => (
+                        <span key={signal} className="rounded-[999px] border border-border bg-background px-3 py-1 font-mono text-[11px] text-secondary">
+                          {signal}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[8px] border border-border bg-border text-center sm:grid-cols-3">
+                    {[
+                      ['Outcomes', agentProven.metrics.totalOutcomes.toLocaleString()],
+                      ['Success', formatPercent(agentProven.metrics.successRate)],
+                      ['Recent fail', formatPercent(agentProven.metrics.recentFailureRate)],
+                      ['Install', formatPercent(agentProven.metrics.installSuccessRate)],
+                      ['Quality', formatQuality(agentProven.metrics.avgOutputQuality)],
+                      ['Production', agentProven.metrics.productionOutcomes.toLocaleString()],
+                    ].map(([label, value]) => (
+                      <div key={label} className="bg-background p-3">
+                        <div className="font-mono text-lg leading-none">{value}</div>
+                        <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-secondary">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {payload.feedback && (
               <div className="bg-[#fbfaf7] p-4 sm:p-5">

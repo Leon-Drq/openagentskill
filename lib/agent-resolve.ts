@@ -4,7 +4,7 @@ import {
   AGENT_OUTCOME_WORKSPACES,
   buildResolveFeedback,
 } from '@/lib/agent-outcomes'
-import { getAgentProvenProfile } from '@/lib/agent-proven'
+import { getAgentProvenProfile, type AgentProvenProfile } from '@/lib/agent-proven'
 import { buildAgentInstallReceipt } from '@/lib/agent-install-receipt'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { buildAgentHandoffTemplates } from '@/lib/agent-integration-kit'
@@ -447,8 +447,9 @@ interface ResolverRecommendationCandidate {
     risk_label: string
     warnings: string[]
   }
-  safety: AgentSafetyProfile
-  safety_gate: {
+	  safety: AgentSafetyProfile
+	  agent_proven: AgentProvenProfile
+	  safety_gate: {
     tier: string
     label: string
     badge: string

@@ -21,6 +21,37 @@ function tokenize(value: string) {
     .filter((token) => token.length > 2)
 }
 
+const QUERY_TOKEN_ALIASES: Record<string, string[]> = {
+  trade: ['trading', 'trader', 'trades', 'finance', 'financial', 'stock', 'stocks', 'market', 'markets', 'portfolio', 'quant', 'backtest'],
+  trader: ['trade', 'trading', 'finance', 'financial', 'stock', 'stocks', 'market', 'markets', 'portfolio', 'quant', 'backtest'],
+  trades: ['trade', 'trading', 'finance', 'financial', 'stock', 'stocks', 'market', 'markets', 'portfolio', 'quant', 'backtest'],
+  trading: ['trade', 'trader', 'finance', 'financial', 'stock', 'stocks', 'market', 'markets', 'portfolio', 'quant', 'backtest'],
+  invest: ['investment', 'investor', 'finance', 'financial', 'stock', 'stocks', 'market', 'portfolio'],
+  investing: ['investment', 'investor', 'finance', 'financial', 'stock', 'stocks', 'market', 'portfolio'],
+  investment: ['invest', 'investor', 'finance', 'financial', 'stock', 'stocks', 'market', 'portfolio'],
+  market: ['markets', 'finance', 'financial', 'stock', 'stocks', 'equity', 'trading'],
+  markets: ['market', 'finance', 'financial', 'stock', 'stocks', 'equity', 'trading'],
+  stock: ['stocks', 'equity', 'finance', 'financial', 'market', 'markets', 'earnings', 'trading'],
+  stocks: ['stock', 'equity', 'finance', 'financial', 'market', 'markets', 'earnings', 'trading'],
+  equity: ['equities', 'stock', 'stocks', 'finance', 'financial', 'market', 'markets'],
+  quant: ['quantitative', 'finance', 'financial', 'trading', 'backtesting', 'portfolio'],
+  backtest: ['backtesting', 'quant', 'trading', 'finance', 'financial'],
+}
+
+function expandQueryTokens(tokens: string[]) {
+  const expanded = new Set(tokens)
+  for (const token of tokens) {
+    for (const alias of QUERY_TOKEN_ALIASES[token] || []) {
+      expanded.add(alias)
+    }
+  }
+  return [...expanded]
+}
+
+function normalizeCategory(value: string) {
+  return value.toLowerCase().replace(/[_\s]+/g, '-')
+}
+
 function skillSearchText(skill: SkillRecord) {
   return [
     skill.slug,
@@ -123,12 +154,16 @@ export function rankSkillsForQuery(
   const normalizedQuery = query.trim().toLowerCase()
   const compactQuery = normalizedQuery.replace(/[^a-z0-9]+/g, '')
   const queryTokens = tokenize(query)
+  const expandedQueryTokens = expandQueryTokens(queryTokens)
+  const isFinanceQueryIntent = /\b(finance|financial|quant|quantitative|trade|trades|trader|trading|invest|investing|investment|portfolio|markets?|stocks?|equity|crypto|filings?|edgar|sec filings?|investor|earnings|10-k|10-q|alpha|factor|backtest|backtesting|risk model)\b/.test(normalizedQuery) ||
+    queryTokens.some((token) => ['trade', 'trades', 'trader', 'trading', 'invest', 'investing', 'investment', 'market', 'markets', 'stock', 'stocks', 'equity', 'quant', 'backtest'].includes(token))
 
   return skills
     .map((skill) => {
       const text = skillSearchText(skill)
       const name = skill.name.toLowerCase()
       const slug = skill.slug.toLowerCase()
+      const category = normalizeCategory(skill.category)
       const repo = (skill.github_repo || skill.repository || '').toLowerCase()
       const install = (skill.install_command || '').toLowerCase()
       const compactName = name.replace(/[^a-z0-9]+/g, '')
@@ -150,13 +185,16 @@ export function rankSkillsForQuery(
         if (skill.description.toLowerCase().includes(normalizedQuery)) score += 42
         if (text.includes(normalizedQuery)) score += 28
 
-        for (const token of queryTokens) {
-          if (name.includes(token)) score += 30
-          if (slug.includes(token) || repo.includes(token) || install.includes(token)) score += 26
-          if (tags.some((tag) => tag.includes(token))) score += 24
-          if (frameworks.some((framework) => framework.includes(token))) score += 20
-          if (skill.category.toLowerCase().includes(token)) score += 16
-          if (text.includes(token)) score += 8
+        for (const token of expandedQueryTokens) {
+          const isOriginalToken = queryTokens.includes(token)
+          const multiplier = isOriginalToken ? 1 : 0.55
+
+          if (name.includes(token)) score += 30 * multiplier
+          if (slug.includes(token) || repo.includes(token) || install.includes(token)) score += 26 * multiplier
+          if (tags.some((tag) => tag.includes(token))) score += 24 * multiplier
+          if (frameworks.some((framework) => framework.includes(token))) score += 20 * multiplier
+          if (category.includes(token)) score += 16 * multiplier
+          if (text.includes(token)) score += 8 * multiplier
         }
 
         for (const useCase of USE_CASES) {
@@ -173,8 +211,9 @@ export function rankSkillsForQuery(
         const isContentTask = /\b(content|blog|post|posts|newsletter|social|copy|copywriting|writing|publish|publishing|product updates?|launch notes?)\b/.test(normalizedQuery)
         const isContentSkill = /\b(content|copywriting|writing|blog|markdown|newsletter|social|summary|summarize|publishing|content-generation|content automation)\b/.test(text)
         const isUnrelatedContentTool = /\b(data-analysis|database|security|scanner|vulnerability|browser-automation|web-automation|testing|qa)\b/.test(text)
-        const isFinanceTask = /\b(finance|financial|quant|trading|portfolio|markets?|stocks?|equity|crypto|filings?|edgar|sec filings?|investor|earnings|10-k|10-q|alpha|factor|backtest|risk model)\b/.test(normalizedQuery)
-        const isFinanceSkill = /\b(finance|financial|quant|trading|portfolio|market-data|markets?|stocks?|equity|crypto|filings?|edgar|sec filing|investor|earnings|10-k|10-q|alpha|factor|backtest|risk model)\b/.test(text)
+        const isFinanceTask = isFinanceQueryIntent
+        const isFinanceCategory = /\b(finance|financial|quant|trading|market|stock|investment|portfolio|fintech|crypto|defi)\b/.test(category)
+        const isFinanceSkill = /\b(finance|financial|quant|quantitative|trade|trades|trader|trading|portfolio|market-data|markets?|stocks?|stock[-_\s]?analysis|equity|crypto|filings?|edgar|sec filing|investor|investment|earnings|10-k|10-q|alpha|factor|backtest|backtesting|risk model|openbb|vectorbt|freqtrade|yfinance|zipline|backtrader)\b/.test(text) || isFinanceCategory
         const isSecurityOnlySkill = /\b(security|vulnerability|scanner|nuclei|pentest|cve|sast|exploit|secret scanning)\b/.test(text) && !isFinanceSkill
         const isSportsTask = /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(normalizedQuery)
         const isSportsSkill = /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(text)
@@ -190,9 +229,10 @@ export function rankSkillsForQuery(
         if (isContentTask && skill.category === 'content-automation') score += 70
         if (isContentTask && isContentSkill) score += 42
         if (isContentTask && isUnrelatedContentTool && !isContentSkill) score -= 55
-        if (isFinanceTask && skill.category === 'finance-quant') score += 85
-        if (isFinanceTask && isFinanceSkill) score += 58
+        if (isFinanceTask && isFinanceCategory) score += 110
+        if (isFinanceTask && isFinanceSkill) score += 72
         if (isFinanceTask && isSecurityOnlySkill) score -= 90
+        if (isFinanceTask && !isFinanceSkill && (isGenericWebSkill || isPresentationSkill || isDesignSkill || isContentSkill || isDocumentOnlySkill)) score -= 70
         if (isSportsTask && skill.category === 'sports-analytics') score += 85
         if (isSportsTask && isSportsSkill) score += 58
         if (isPresentationTask && skill.category === 'design-creative') score += 50

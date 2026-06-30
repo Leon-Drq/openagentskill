@@ -17,6 +17,12 @@ import {
   saveRefreshedXToken,
   type XPostResult,
 } from '@/lib/x/poster'
+import {
+  getXCandidateDecision,
+  getXContentLane,
+  isGenericFoundationRepoName,
+  isGoodXCandidate,
+} from '@/lib/x/candidates'
 
 type SupabasePublicClient = ReturnType<typeof createPublicClient>
 
@@ -130,97 +136,11 @@ function getQueuePriority(skill: SkillRecord) {
   return Math.round(quality + Math.log10(stars + 10) * 12 + getFreshnessBoost(skill))
 }
 
-function getSkillShareText(
-  skill: SkillRecord,
-  options: { includeCategory?: boolean; includeGeneratedSignals?: boolean } = {}
-) {
-  return [
-    skill.name,
-    skill.description,
-    skill.long_description,
-    skill.tagline,
-    ...(options.includeCategory ? [skill.category] : []),
-    skill.github_repo,
-    skill.repository,
-    ...(options.includeGeneratedSignals ? skill.tags || [] : []),
-    ...(options.includeGeneratedSignals ? skill.frameworks || [] : []),
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase()
-}
-
-function getXContentLane(skill: SkillRecord) {
-  const text = getSkillShareText(skill, {
-    includeCategory: true,
-    includeGeneratedSignals: true,
-  })
-
-  if (/\b(presentation|presentations|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides)\b/.test(text)) {
-    return 'presentation'
-  }
-  if (/\b(finance|financial|quant|trading|portfolio|markets?|stocks?|equity|earnings|filings?|sec|edgar)\b/.test(text)) {
-    return 'finance'
-  }
-  if (/\b(football|soccer|world cup|fifa|sports?|xg|match|scouting)\b/.test(text)) {
-    return 'sports'
-  }
-  if (/\b(design|creative|figma|motion|animation|video|image|seedance|slides?)\b/.test(text)) {
-    return 'creative'
-  }
-  if (/\b(code|coding|developer|github|repo|review|test|claude code|cursor|codex)\b/.test(text)) {
-    return 'coding'
-  }
-  if (/\b(research|rag|retrieval|document|pdf|knowledge|search)\b/.test(text)) {
-    return 'research'
-  }
-  if (/\b(marketing|seo|growth|content|newsletter|social)\b/.test(text)) {
-    return 'growth'
-  }
-
-  return 'general'
-}
-
-function isGenericHighStarRepo(skill: SkillRecord) {
-  const repo = (skill.github_repo || '').toLowerCase()
-  return [
-    /^freecodecamp\/freecodecamp$/,
-    /^ebookfoundation\/free-programming-books$/,
-    /^thealgorithms\/python$/,
-    /^tensorflow\/tensorflow$/,
-    /^huggingface\/transformers$/,
-    /^ohmyzsh\/ohmyzsh$/,
-    /^chalarangelo\/30-seconds-of-code$/,
-    /^excalidraw\/excalidraw$/,
-  ].some((pattern) => pattern.test(repo))
-}
-
-function hasShareableAgentUseCase(skill: SkillRecord) {
-  const text = getSkillShareText(skill)
-  const category = (skill.category || '').toLowerCase()
-
-  if (/(^|-)agent(s|-|$)|agent-skills|coding-agents|document-processing|web-scraping|browser-automation|research|finance|quant|football|world-cup|marketing|design|data-analysis|legal|presentation/.test(category)) {
-    return true
-  }
-
-  return /\b(agent|agents|agentic|skill|skills|codex|claude code|cursor|workflow|automation|automate|scrap(e|ing)|crawl(er|ing)?|browser|playwright|puppeteer|pdf|document|markdown|rag|retrieval|research|stock|stocks|quant|trading|portfolio|football|world cup|soccer|seo|marketing|figma|design|presentation|ppt|pptx|powerpoint|slides?|deck|code review|pull request|testing|security audit)\b/.test(text)
-}
-
-function isGoodXCandidate(skill: SkillRecord, minStars: number) {
-  if (!skill.ai_review_approved) return false
-  if (Number(skill.github_stars || 0) < minStars) return false
-  if (Number(skill.quality_score || 0) < 45) return false
-  if (!skill.github_repo) return false
-  if (!skill.description) return false
-  if (isGenericHighStarRepo(skill)) return false
-  if (!hasShareableAgentUseCase(skill)) return false
-  return true
-}
-
-function toQueueMetadata(skill: SkillRecord) {
+function toQueueMetadata(skill: SkillRecord, minStars = 500) {
   const trust = getSkillTrustProfile(skill)
   const audit = buildSkillAudit(skill)
-  const contentLane = getXContentLane(skill)
+  const candidate = getXCandidateDecision(skill, minStars)
+  const contentLane = candidate.lane
 
   return {
     url: `https://www.openagentskill.com/skills/${skill.slug}?ref=x`,
@@ -235,6 +155,8 @@ function toQueueMetadata(skill: SkillRecord) {
     audit_risk_level: audit.risk_level,
     content_lane: contentLane,
     scenario: contentLane === 'general' ? null : contentLane,
+    x_candidate_reason: candidate.reason,
+    x_candidate_signals: candidate.signals,
     utm_campaign: contentLane === 'general' ? 'daily_skill' : `${contentLane}_skill`,
     install_command: skill.install_command || `npx skills add ${skill.github_repo}`,
     generated_by: 'x_growth_os',
@@ -248,6 +170,7 @@ async function enqueueQueueItem(
   options: {
     campaign: string
     scheduledFor?: string
+    minStars?: number
   }
 ) {
   const contentLane = getXContentLane(skill)
@@ -265,7 +188,7 @@ async function enqueueQueueItem(
       post_text: buildSkillPostText(skill),
       reply_text: buildManualXReplyText(skill),
       source: 'auto_skill_generator',
-      metadata: toQueueMetadata(skill),
+      metadata: toQueueMetadata(skill, options.minStars),
     },
   })
 
@@ -392,7 +315,7 @@ export async function enqueueXSkillPostQueue(
 
   for (const skill of candidates) {
     if (results.filter((result) => result.status === 'queued').length >= limit) break
-    const result = await enqueueQueueItem(supabase, serverSecret, skill, { campaign })
+    const result = await enqueueQueueItem(supabase, serverSecret, skill, { campaign, minStars })
     results.push(result)
   }
 
@@ -452,7 +375,7 @@ export async function enqueueXSkillPostQueueForSlugs(
 
   const results: QueueRpcResult[] = []
   for (const skill of skills) {
-    const result = await enqueueQueueItem(supabase, serverSecret, skill, { campaign })
+    const result = await enqueueQueueItem(supabase, serverSecret, skill, { campaign, minStars })
     results.push(result)
   }
 
@@ -500,6 +423,19 @@ async function completeQueueItem(
   if (error) throw new Error(`Failed to complete X queue item: ${error.message}`)
 }
 
+function getQueuedSkillSkipReason(item: XContentQueueItem) {
+  if (item.content_type !== 'skill_pick') return null
+
+  const metadata = item.metadata || {}
+  const repo = item.skill?.github_repo || (typeof metadata.github_repo === 'string' ? metadata.github_repo : null)
+  if (isGenericFoundationRepoName(repo)) return 'generic-foundation-repo'
+
+  const candidateReason = typeof metadata.x_candidate_reason === 'string' ? metadata.x_candidate_reason : null
+  if (candidateReason && candidateReason !== 'skill-or-workflow-specific') return candidateReason
+
+  return null
+}
+
 export async function postNextQueuedSkillToX(
   options: {
     autoBuildQueue?: boolean
@@ -522,7 +458,28 @@ export async function postNextQueuedSkillToX(
     })
   }
 
-  const item = await claimNextQueueItem(supabase, serverSecret)
+  let item: XContentQueueItem | null = null
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const candidateItem = await claimNextQueueItem(supabase, serverSecret)
+    if (!candidateItem) break
+
+    const skipReason = getQueuedSkillSkipReason(candidateItem)
+    if (skipReason) {
+      await completeQueueItem(supabase, serverSecret, candidateItem.id, 'skipped', {
+        error: `Skipped before posting: ${skipReason}`,
+        metadata: {
+          skipped_by: 'x_candidate_guard',
+          skip_reason: skipReason,
+          github_repo: candidateItem.skill?.github_repo || candidateItem.metadata?.github_repo || null,
+        },
+      })
+      continue
+    }
+
+    item = candidateItem
+    break
+  }
+
   if (!item) {
     return { status: 'skipped', reason: 'No queued X content is ready' }
   }

@@ -7,6 +7,7 @@ import {
 } from '@/components/marketing-page'
 import { getAllSkills } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
+import { getXCandidateDecision } from '@/lib/x/candidates'
 import { buildCommunityIndexedReplyText, buildManualXMainText, buildManualXReplyText, buildXIntentUrl } from '@/lib/x/poster'
 
 export const dynamic = 'force-dynamic'
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
 export default async function XKitPage() {
   const skills = await getAllSkills('quality', undefined, 1200).catch(() => [])
   const candidates = skills
-    .filter((skill) => Number(skill.github_stars || 0) >= 500)
+    .filter((skill) => getXCandidateDecision(skill, 500).eligible)
     .slice(0, 8)
 
   return (
@@ -85,6 +86,7 @@ POST /api/x/reply`}</code>
           ) : (
             <div className="grid gap-4 lg:grid-cols-2">
               {candidates.map((skill) => {
+                const decision = getXCandidateDecision(skill, 500)
                 const mainText = buildManualXMainText(skill)
                 const replyText = buildManualXReplyText(skill)
                 const creatorReplyText = buildCommunityIndexedReplyText(skill)
@@ -101,6 +103,16 @@ POST /api/x/reply`}</code>
                       <span className="shrink-0 border border-border px-2 py-1 font-mono text-xs text-secondary">
                         {formatCompactNumber(skill.github_stars || 0)} stars
                       </span>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="border border-border bg-background px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-secondary">
+                        {decision.lane}
+                      </span>
+                      {decision.signals.slice(0, 3).map((signal) => (
+                        <span key={signal} className="border border-emerald-700/20 bg-emerald-50 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-emerald-800">
+                          {signal}
+                        </span>
+                      ))}
                     </div>
 
                     <pre className="mt-5 whitespace-pre-wrap break-words rounded-[8px] border border-border bg-background p-4 font-mono text-xs leading-relaxed text-secondary">
