@@ -675,6 +675,22 @@ function formatCompact(value: number) {
   return value.toLocaleString()
 }
 
+function getInstallPreview(rec: ResolveCandidate) {
+  const command = rec.install_plan.command?.trim()
+  const value = rec.install_plan.value?.trim()
+  const source = command || value || 'Install instructions available from the skill page.'
+  const maxLength = 96
+
+  return source.length > maxLength ? `${source.slice(0, maxLength - 1).trim()}...` : source
+}
+
+function getInstallKind(rec: ResolveCandidate) {
+  const command = rec.install_plan.command?.trim()
+  const value = rec.install_plan.value?.trim()
+
+  return value && command && value !== command ? 'Agent prompt' : 'Install command'
+}
+
 function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <div className="min-w-0 max-w-3xl">
@@ -932,76 +948,98 @@ export function HomePageEnhanced({ initialLocale, stats }: HomePageEnhancedProps
                     <span className="inline-block animate-pulse">{'>'} {t.hero.searching}</span>
                   </div>
                 ) : resolvedCandidates.length > 0 ? (
-                  <div className="grid gap-px bg-[#e4e0d8] md:grid-cols-3">
-                    {resolvedCandidates.slice(0, 3).map((rec, i) => (
-                      <div key={rec.skill.slug} className="min-w-0 bg-[#fffdf8] p-4 sm:p-5">
-                        <div className="mb-3 flex flex-wrap items-center gap-2">
-                          <span className="rounded-full bg-[#e8f1ed] px-2 py-1 font-mono text-[11px] font-semibold text-[#006b4f]">
-                            {i === 0 ? copy.selected : `#${rec.rank}`}
-                          </span>
-                          <span className="rounded-full border border-[#d8d2c6] px-2 py-1 font-mono text-[11px] text-[#6d675e]">
-                            {Math.min(99, Math.max(1, Math.round(Number(rec.match_score || 0))))}% {copy.fit}
-                          </span>
-                          <span className="rounded-full border border-[#d8d2c6] px-2 py-1 font-mono text-[11px] text-[#6d675e]">
-                            {copy.safety} {rec.safety.score}
-                          </span>
-                        </div>
-                        <Link href={`/skills/${rec.skill.slug}`} className="text-lg font-semibold hover:text-[#006b4f]">
-                          {rec.skill.name}
-                        </Link>
-                        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[#5f5a52]">
-                          {rec.decision?.headline || rec.recommendation_reasons[0] || rec.skill.description}
-                        </p>
-                        <div className="mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-[8px] border border-[#e0dbd2] bg-[#e0dbd2] text-center">
-                          <div className="bg-[#fbfaf6] p-2">
-                            <p className="font-mono text-[11px] text-[#6d675e]">{copy.audit}</p>
-                            <p className="mt-1 font-mono text-sm font-semibold text-[#1d1b18]">{rec.audit.audit_score}/100</p>
+                  <div className="grid gap-px bg-[#e4e0d8] lg:grid-cols-2 2xl:grid-cols-3">
+                    {resolvedCandidates.slice(0, 3).map((rec, i) => {
+                      const fullInstall = rec.install_plan.value || rec.install_plan.command || getInstallPreview(rec)
+                      const installPreview = getInstallPreview(rec)
+                      const installKind = getInstallKind(rec)
+
+                      return (
+                        <div
+                          key={rec.skill.slug}
+                          className={`flex min-w-0 flex-col bg-[#fffdf8] p-4 sm:p-5 ${i === 2 ? 'lg:col-span-2 2xl:col-span-1' : ''}`}
+                        >
+                          <div className="mb-3 flex flex-wrap items-center gap-2">
+                            <span className="rounded-full bg-[#e8f1ed] px-2 py-1 font-mono text-[11px] font-semibold text-[#006b4f]">
+                              {i === 0 ? copy.selected : `#${rec.rank}`}
+                            </span>
+                            <span className="rounded-full border border-[#d8d2c6] px-2 py-1 font-mono text-[11px] text-[#6d675e]">
+                              {Math.min(99, Math.max(1, Math.round(Number(rec.match_score || 0))))}% {copy.fit}
+                            </span>
+                            <span className="rounded-full border border-[#d8d2c6] px-2 py-1 font-mono text-[11px] text-[#6d675e]">
+                              {copy.safety} {rec.safety.score}
+                            </span>
                           </div>
-                          <div className="bg-[#fbfaf6] p-2">
-                            <p className="font-mono text-[11px] text-[#6d675e]">{copy.target}</p>
-                            <p className="mt-1 truncate font-mono text-sm font-semibold text-[#1d1b18]">{rec.install_plan.label}</p>
+                          <Link href={`/skills/${rec.skill.slug}`} className="text-lg font-semibold hover:text-[#006b4f]">
+                            {rec.skill.name}
+                          </Link>
+                          <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[#5f5a52]">
+                            {rec.decision?.headline || rec.recommendation_reasons[0] || rec.skill.description}
+                          </p>
+                          <div className="mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-[8px] border border-[#e0dbd2] bg-[#e0dbd2] text-center">
+                            <div className="bg-[#fbfaf6] p-2">
+                              <p className="font-mono text-[11px] text-[#6d675e]">{copy.audit}</p>
+                              <p className="mt-1 font-mono text-sm font-semibold text-[#1d1b18]">{rec.audit.audit_score}/100</p>
+                            </div>
+                            <div className="min-w-0 bg-[#fbfaf6] p-2">
+                              <p className="font-mono text-[11px] text-[#6d675e]">{copy.target}</p>
+                              <p className="mt-1 min-w-0 truncate font-mono text-xs font-semibold text-[#1d1b18] sm:text-sm">{rec.install_plan.label}</p>
+                            </div>
                           </div>
-                        </div>
-                        <div className="mt-4 break-all rounded-[8px] border border-[#e0dbd2] bg-[#fbfaf6] p-2 font-mono text-[11px] text-[#6d675e]">
-                          {rec.install_plan.value}
-                        </div>
-                        {i === 0 && resolveResult?.agent_decision?.risk_summary && (
-                          <div className="mt-3 rounded-[8px] border border-[#e0dbd2] bg-[#fbfaf6] p-3">
-                            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6d675e]">
-                              Risk summary
-                            </p>
-                            <p className="mt-1 text-xs leading-relaxed text-[#5f5a52]">
-                              {resolveResult.agent_decision.risk_summary.safety} · {resolveResult.agent_decision.risk_summary.trust}
-                            </p>
-                            {resolveResult.agent_decision.risk_summary.notes[0] && (
-                              <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[#5f5a52]">
-                                {resolveResult.agent_decision.risk_summary.notes[0]}
+                          <div className="mt-4 rounded-[8px] border border-[#e0dbd2] bg-[#fbfaf6] p-3">
+                            <div className="mb-2 flex min-w-0 items-center justify-between gap-2">
+                              <span className="min-w-0 truncate font-mono text-[10px] uppercase tracking-[0.16em] text-[#6d675e]">
+                                {installKind}
+                              </span>
+                              <span className="shrink-0 rounded-full border border-[#d8d2c6] px-2 py-0.5 font-mono text-[10px] text-[#6d675e]">
+                                Ready
+                              </span>
+                            </div>
+                            <code
+                              className="block min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[11px] leading-5 text-[#5f5a52]"
+                              title={fullInstall}
+                            >
+                              {installPreview}
+                            </code>
+                          </div>
+                          {i === 0 && resolveResult?.agent_decision?.risk_summary && (
+                            <div className="mt-3 rounded-[8px] border border-[#e0dbd2] bg-[#fbfaf6] p-3">
+                              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6d675e]">
+                                Risk summary
                               </p>
-                            )}
+                              <p className="mt-1 text-xs leading-relaxed text-[#5f5a52]">
+                                {resolveResult.agent_decision.risk_summary.safety} · {resolveResult.agent_decision.risk_summary.trust}
+                              </p>
+                              {resolveResult.agent_decision.risk_summary.notes[0] && (
+                                <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[#5f5a52]">
+                                  {resolveResult.agent_decision.risk_summary.notes[0]}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <button
+                              onClick={() => copyToClipboard(fullInstall)}
+                              className="min-h-10 flex-1 basis-[96px] rounded-[8px] bg-[#1d1b18] px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-85"
+                            >
+                              {copiedCmd === fullInstall ? copy.copied : copy.copyInstall}
+                            </button>
+                            <Link
+                              href={rec.urls.install_api || `/api/skills/${rec.skill.slug}/install`}
+                              className="flex min-h-10 flex-1 basis-[96px] items-center justify-center rounded-[8px] border border-[#d8d2c6] px-3 py-2 text-center text-xs font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
+                            >
+                              {copy.installApi}
+                            </Link>
+                            <Link
+                              href={`/skills/${rec.skill.slug}`}
+                              className="flex min-h-10 flex-1 basis-[96px] items-center justify-center rounded-[8px] border border-[#d8d2c6] px-3 py-2 text-center text-xs font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
+                            >
+                              {copy.details}
+                            </Link>
                           </div>
-                        )}
-                        <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                          <button
-                            onClick={() => copyToClipboard(rec.install_plan.value)}
-                            className="rounded-[8px] bg-[#1d1b18] px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-85"
-                          >
-                            {copiedCmd === rec.install_plan.value ? copy.copied : copy.copyInstall}
-                          </button>
-                          <Link
-                            href={rec.urls.install_api || `/api/skills/${rec.skill.slug}/install`}
-                            className="rounded-[8px] border border-[#d8d2c6] px-3 py-2 text-center text-xs font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
-                          >
-                            {copy.installApi}
-                          </Link>
-                          <Link
-                            href={`/skills/${rec.skill.slug}`}
-                            className="rounded-[8px] border border-[#d8d2c6] px-3 py-2 text-center text-xs font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
-                          >
-                            {copy.details}
-                          </Link>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 ) : (
                   <div className="px-5 py-8 text-center text-sm text-[#5f5a52]">
