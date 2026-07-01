@@ -8,6 +8,60 @@ const RESOLVE_CACHE_HEADERS = {
   'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
 }
 
+function buildResolveLockfile(payload: Awaited<ReturnType<typeof resolveAgentSkill>>) {
+  const selected = payload.selected
+  const decisionPacket = payload.decision_packet
+  const selectedSkill = decisionPacket?.selected_skill || (selected
+    ? {
+        slug: selected.skill.slug,
+        name: selected.skill.name,
+        repository: selected.urls.repository,
+        url: selected.urls.web,
+      }
+    : null)
+  const install = decisionPacket?.install || (selected
+    ? {
+        command: selected.install_plan.value,
+        policy: selected.safety.safety_tier.auto_install_policy,
+        auto_install_allowed: selected.safety.auto_install_allowed,
+        human_review_required: selected.safety.human_review_required,
+      }
+    : null)
+
+  return {
+    version: 'openagentskill-resolve-lock-v1',
+    generated_at: new Date().toISOString(),
+    task: payload.task,
+    agent: payload.agent,
+    policy_decision: payload.policy_decision,
+    selected_skill: selectedSkill,
+    install,
+    trust: decisionPacket?.trust || null,
+    risk: decisionPacket?.risk || (selected
+      ? {
+          audit_score: selected.audit.audit_score,
+          safety_score: selected.safety.score,
+          safety_tier: selected.safety.safety_tier.label,
+          do_not_use_when: selected.machine_metadata?.do_not_use_when || selected.decision.risks || [],
+        }
+      : null),
+    alternatives: (decisionPacket?.alternatives || payload.alternatives || []).slice(0, 5),
+    outcome_feedback: decisionPacket?.outcome_feedback || (payload.feedback
+      ? {
+          endpoint: payload.feedback.outcome_api,
+          event_id: payload.feedback.event_id,
+          cli_example: payload.feedback.cli_example,
+          expected_outcomes: payload.feedback.expected_outcomes,
+        }
+      : null),
+    review_before_install: [
+      'Open the selected skill audit URL before installing.',
+      'Install in a sandbox, branch, or isolated workspace first.',
+      'Run one narrow task, then report the outcome.',
+    ],
+  }
+}
+
 function parseLimit(value: string | null) {
   const parsed = Number(value || 5)
   return Math.min(Math.max(Number.isFinite(parsed) ? parsed : 5, 1), 10)
@@ -171,6 +225,9 @@ export async function GET(request: NextRequest) {
     })
 
     if (format === 'text') return textResponse(payload)
+    if (format === 'lockfile') {
+      return NextResponse.json(buildResolveLockfile(payload), { headers: RESOLVE_CACHE_HEADERS })
+    }
     return NextResponse.json(payload, { headers: RESOLVE_CACHE_HEADERS })
   } catch (error) {
     console.error('Agent resolve API error:', error)
@@ -187,6 +244,7 @@ export async function POST(request: NextRequest) {
     const payload = await resolveAgentSkill(body)
 
     if (body.format === 'text') return textResponse(payload)
+    if (body.format === 'lockfile') return NextResponse.json(buildResolveLockfile(payload))
     return NextResponse.json(payload)
   } catch (error) {
     console.error('Agent resolve API error:', error)

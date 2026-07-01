@@ -8,7 +8,7 @@ import { getAllSkills, getSkillsBySlugs, type SkillRecord } from '@/lib/db/skill
 import { getPrimaryInstallCommand } from '@/lib/install-targets'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
-import { getSkillPackBySlug, selectSkillsForPack, SKILL_PACKS } from '@/lib/skill-packs'
+import { buildSkillPackInstallPlan, getSkillPackBySlug, selectSkillsForPack, SKILL_PACKS } from '@/lib/skill-packs'
 
 const BASE_URL = 'https://www.openagentskill.com'
 const PACK_CANDIDATE_LIMIT = 1200
@@ -65,6 +65,7 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
   ])
   const skills = mergeSkills(featuredSkills, candidateSkills)
   const picks = selectSkillsForPack(skills, pack, 10)
+  const installPlan = buildSkillPackInstallPlan(pack, picks, { limit: 4 })
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -153,6 +154,65 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
             <ul className="space-y-2 text-sm leading-relaxed text-secondary">
               {pack.avoidWhen.map((item) => <li key={item}>{item}</li>)}
             </ul>
+          </div>
+        </section>
+
+        <section className="grid gap-6 border-b border-border py-10 lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Agent install plan</p>
+            <h2 className="font-display text-2xl font-semibold">A machine-readable plan agents can execute.</h2>
+            <p className="mt-4 text-sm leading-relaxed text-secondary">
+              The pack API returns install order, audit URLs, review checklist, and the outcome feedback contract. Agents
+              can use this page as context, then call the API for the exact JSON plan.
+            </p>
+            <Link
+              href={`/api/agent/packs/${pack.slug}?limit=6&format=text`}
+              className="mt-5 inline-flex w-full justify-center border border-border px-4 py-2.5 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground sm:w-auto"
+              prefetch={false}
+            >
+              Open text plan
+            </Link>
+          </div>
+
+          <div className="grid min-w-0 gap-4 md:grid-cols-2">
+            <div className="border border-border bg-card p-5">
+              <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Install order</p>
+              <ol className="space-y-4">
+                {installPlan.selected_skills.map((skill) => (
+                  <li key={skill.slug} className="min-w-0">
+                    <div className="flex items-start gap-3">
+                      <span className="mt-1 font-mono text-xs text-secondary">0{skill.rank}</span>
+                      <div className="min-w-0">
+                        <Link href={`/skills/${skill.slug}`} className="font-semibold hover:text-secondary">
+                          {skill.name}
+                        </Link>
+                        <p className="mt-1 text-xs leading-relaxed text-secondary">
+                          Trust {skill.trust_score}/100 · Audit {skill.audit_score}/100 · {skill.risk_level}
+                        </p>
+                        <code className="mt-2 block break-words border border-border bg-background p-2 font-mono text-xs leading-relaxed text-secondary [overflow-wrap:anywhere]">
+                          {skill.install_command}
+                        </code>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            <div className="border border-border bg-card p-5">
+              <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Review checklist</p>
+              <ul className="space-y-3 text-sm leading-relaxed text-secondary">
+                {installPlan.review_checklist.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              <div className="mt-5 border border-border bg-background p-3">
+                <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Outcome endpoint</p>
+                <code className="block break-words font-mono text-xs leading-relaxed text-secondary [overflow-wrap:anywhere]">
+                  {installPlan.outcome_feedback.method} {installPlan.outcome_feedback.endpoint}
+                </code>
+              </div>
+            </div>
           </div>
         </section>
 

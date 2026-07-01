@@ -22,22 +22,40 @@ const commands = [
     copy: 'Calls /api/agent/resolve and returns the selected skill, alternatives, safety profile, and install prompt.',
   },
   {
+    label: 'Lock',
+    title: 'Generate a stable agent lockfile',
+    command: 'openagentskill lock "analyze stock news" --agent codex --json',
+    copy: 'Returns a small OpenAgentSkill lock object with selected skill, install policy, risk notes, alternatives, and outcome event id.',
+  },
+  {
+    label: 'Receipt',
+    title: 'Fetch the pre-install receipt',
+    command: 'openagentskill receipt "parse a PDF and extract tables" --agent claude-code',
+    copy: 'Gets the stable install receipt agents should read before installing a third-party skill in a workspace.',
+  },
+  {
+    label: 'Pack',
+    title: 'Pull a complete workflow pack',
+    command: 'openagentskill pack presentation-agent-pack --limit 6 --json',
+    copy: 'Fetches scenario-level install order, audit URLs, review checklist, and outcome feedback contract for a skill pack.',
+  },
+  {
     label: 'Install',
     title: 'Fetch target-specific install handoffs',
     command: 'openagentskill install crawl4ai --agent claude-code',
     copy: 'Returns Codex, Claude Code, Cursor, and CLI install handoffs from the canonical skill record.',
   },
   {
-    label: 'Evaluate',
-    title: 'Check registry recommendation quality',
-    command: 'openagentskill evals',
-    copy: 'Runs the public recommendation benchmark so ranking changes can be checked before deployment.',
-  },
-  {
     label: 'Outcome',
     title: 'Report whether the skill worked',
     command: 'openagentskill outcome resolve_... --skill crawl4ai --task "scrape pricing pages" --agent codex --outcome success --install-used --output-quality 4 --workspace sandbox',
     copy: 'Posts the result back to /api/agent/outcome so Trust Score v4 and rankings learn from real agent runs. Use --dry-run when wiring an integration.',
+  },
+  {
+    label: 'Evaluate',
+    title: 'Check recommendation quality',
+    command: 'openagentskill evals',
+    copy: 'Runs the public recommendation benchmark so ranking changes can be checked before deployment.',
   },
 ]
 
@@ -52,14 +70,19 @@ const contract = `{
 }`
 
 const lockfile = `{
-  "version": 1,
-  "skills": {
-    "crawl4ai": {
-      "source": "github.com/unclecode/crawl4ai",
-      "audit_score": 92,
-      "safety_score": 80,
-      "resolved_at": "2026-06-10T00:00:00.000Z"
-    }
+  "version": "openagentskill-resolve-lock-v1",
+  "task": "analyze stock news",
+  "selected_skill": {
+    "slug": "serenity-skill",
+    "name": "Serenity Skill"
+  },
+  "install": {
+    "command": "npx skills add muxuuu/serenity-skill",
+    "policy": "human_review"
+  },
+  "outcome_feedback": {
+    "endpoint": "/api/agent/outcome",
+    "event_id": "resolve_..."
   }
 }`
 
@@ -91,7 +114,7 @@ export default function CliPage() {
       />
 
         <section className="min-w-0 border-b border-border">
-          <div className="mx-auto grid max-w-6xl gap-4 px-6 py-12 sm:py-14 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mx-auto grid max-w-6xl gap-4 px-4 py-10 sm:px-6 sm:py-14 md:grid-cols-2 xl:grid-cols-3">
             {commands.map((item) => (
               <article key={item.label} className="min-w-0 border border-border bg-card p-5">
                 <p className="font-mono text-xs uppercase text-secondary">{item.label}</p>
@@ -126,7 +149,7 @@ export default function CliPage() {
               </pre>
             </div>
             <div className="min-w-0 border border-border bg-card p-5">
-              <p className="mb-3 font-mono text-xs uppercase text-secondary">Future lockfile</p>
+              <p className="mb-3 font-mono text-xs uppercase text-secondary">Agent lockfile</p>
               <pre className="max-w-full overflow-x-auto border border-border bg-background p-4 font-mono text-xs leading-relaxed text-secondary">
                 <code>{lockfile}</code>
               </pre>

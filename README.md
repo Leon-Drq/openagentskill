@@ -68,13 +68,17 @@ Give this to Codex, Claude Code, Cursor, or any browser-capable agent:
 Before installing a third-party skill, call OpenAgentSkill:
 
 GET https://www.openagentskill.com/api/agent/resolve?task={TASK}&agent={AGENT}&max_risk=medium&format=json
+GET https://www.openagentskill.com/api/agent/resolve?task={TASK}&agent={AGENT}&max_risk=medium&format=lockfile
 GET https://www.openagentskill.com/api/agent/receipt?task={TASK}&agent={AGENT}&max_risk=medium&format=text
+GET https://www.openagentskill.com/api/agent/packs/{PACK_SLUG}?limit=6
 
 Use the response to inspect:
 - recommended_skill
 - alternatives
 - install_command
 - install_receipt
+- resolve lockfile
+- pack install plan
 - trust_score
 - audit_url
 - risk_level
@@ -100,6 +104,12 @@ Fetch the stable install receipt for the same task:
 
 ```bash
 curl "https://www.openagentskill.com/api/agent/receipt?task=analyze+stock+news&agent=codex&max_risk=medium&format=text"
+```
+
+Generate a compact lockfile when an agent needs a stable execution object:
+
+```bash
+curl "https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&agent=codex&max_risk=medium&format=lockfile"
 ```
 
 Example response shape:
@@ -192,7 +202,10 @@ Useful endpoints:
 | `GET /.well-known/agent-manifest.json` | Machine-readable capability manifest |
 | `GET /api/agent/integration-kit?format=text` | Copy-paste setup for Codex, Claude Code, and Cursor |
 | `GET /api/agent/resolve?task=...` | Resolve a task into one selected skill plus alternatives |
+| `GET /api/agent/resolve?task=...&format=lockfile` | Generate a compact install lock for agent workflows |
 | `GET /api/agent/receipt?task=...` | Fetch the stable install receipt for one resolved task |
+| `GET /api/agent/packs` | Browse workflow packs with install-plan URLs |
+| `GET /api/agent/packs/{slug}` | Fetch an executable pack install plan with ordered skills, audit URLs, review checklist, and outcome feedback |
 | `GET /api/agent/rankings?slug=agent-proven` | Read skills ranked by real outcome reports and install attempts |
 | `GET /api/agent/rankings?slug=best-by-success-rate` | Read skills ranked by Agent Proven Score, recent success, install success, and low failure pressure |
 | `GET /api/agent/rankings?slug=safest-auto-install-skills` | Read safer candidates for sandbox-first auto-install workflows |

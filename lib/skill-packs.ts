@@ -1,5 +1,8 @@
 import type { SkillRecord } from '@/lib/db/skills'
+import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
+import { getPrimaryInstallCommand, getSkillRepoRef } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
+import { getSkillTrustProfile } from '@/lib/trust'
 
 export interface SkillPackDefinition {
   slug: string
@@ -17,6 +20,49 @@ export interface SkillPackDefinition {
   }>
   bestFor: string[]
   avoidWhen: string[]
+}
+
+export interface SkillPackInstallPlan {
+  version: 'openagentskill-pack-install-plan-v1'
+  generated_at: string
+  pack: {
+    slug: string
+    title: string
+    persona: string
+    url: string
+    api_url: string
+  }
+  selected_skills: Array<{
+    rank: number
+    slug: string
+    name: string
+    repository: string
+    stars: number
+    install_command: string
+    skill_url: string
+    audit_url: string
+    quality_score: number
+    trust_score: number
+    audit_score: number
+    risk_level: string
+    why: string
+  }>
+  workflow: Array<{
+    step: number
+    title: string
+    description: string
+    suggested_skill_slug: string | null
+    suggested_skill_name: string | null
+  }>
+  review_checklist: string[]
+  outcome_feedback: {
+    endpoint: string
+    method: 'POST'
+    required_fields: string[]
+    recommended_fields: string[]
+    expected_outcomes: string[]
+  }
+  agent_prompt: string
 }
 
 export const SKILL_PACKS: SkillPackDefinition[] = [
@@ -259,4 +305,82 @@ export function selectSkillsForPack(skills: SkillRecord[], pack: SkillPackDefini
     .sort((a, b) => b.score - a.score || b.skill.github_stars - a.skill.github_stars)
     .slice(0, limit)
     .map((item) => item.skill)
+}
+
+export function buildSkillPackInstallPlan(
+  pack: SkillPackDefinition,
+  skills: SkillRecord[],
+  options: { baseUrl?: string; limit?: number } = {}
+): SkillPackInstallPlan {
+  const baseUrl = (options.baseUrl || 'https://www.openagentskill.com').replace(/\/$/, '')
+  const selected = skills.slice(0, Math.max(1, options.limit || 5))
+  const selectedSkills = selected.map((skill, index) => {
+    const audit = buildSkillAudit(skill)
+    const quality = getSkillQualityProfile(skill)
+    const trust = getSkillTrustProfile(skill)
+    const repoRef = getSkillRepoRef(skill)
+
+    return {
+      rank: index + 1,
+      slug: skill.slug,
+      name: skill.name,
+      repository: skill.repository || `https://github.com/${repoRef}`,
+      stars: skill.github_stars || 0,
+      install_command: getPrimaryInstallCommand(skill),
+      skill_url: `${baseUrl}/skills/${skill.slug}`,
+      audit_url: `${baseUrl}/skills/${skill.slug}/audit`,
+      quality_score: quality.score,
+      trust_score: trust.score,
+      audit_score: audit.audit_score,
+      risk_level: auditRiskLabel(audit.risk_level),
+      why: `${quality.label} quality, ${trust.label.toLowerCase()} trust profile, and a clear install path for ${pack.shortTitle.toLowerCase()} workflows.`,
+    }
+  })
+
+  const workflow = pack.workflowSteps.map((step, index) => {
+    const suggested = selectedSkills[index] || selectedSkills[0] || null
+
+    return {
+      step: index + 1,
+      title: step.title,
+      description: step.description,
+      suggested_skill_slug: suggested?.slug || null,
+      suggested_skill_name: suggested?.name || null,
+    }
+  })
+
+  const reviewChecklist = [
+    'Open the audit_url for every selected skill before installation.',
+    'Install only inside a sandbox, local branch, or disposable workspace first.',
+    'Review license, recent repository activity, README/SKILL.md completeness, and dependency surface.',
+    'Run one narrow task before using the pack in production workflows.',
+    'Report success, setup friction, risk blocks, or low-quality output to the outcome endpoint.',
+  ]
+
+  return {
+    version: 'openagentskill-pack-install-plan-v1',
+    generated_at: new Date().toISOString(),
+    pack: {
+      slug: pack.slug,
+      title: pack.title,
+      persona: pack.persona,
+      url: `${baseUrl}/skill-packs/${pack.slug}`,
+      api_url: `${baseUrl}/api/agent/packs/${pack.slug}`,
+    },
+    selected_skills: selectedSkills,
+    workflow,
+    review_checklist: reviewChecklist,
+    outcome_feedback: {
+      endpoint: `${baseUrl}/api/agent/outcome`,
+      method: 'POST',
+      required_fields: ['event_id', 'skill_slug', 'task', 'outcome'],
+      recommended_fields: ['agent', 'install_used', 'output_quality', 'workspace', 'time_to_useful_ms', 'notes'],
+      expected_outcomes: ['success', 'failed', 'not_relevant', 'blocked_by_risk', 'setup_required'],
+    },
+    agent_prompt:
+      `Use the OpenAgentSkill pack "${pack.title}" for this workflow. ` +
+      `Start with the highest-ranked relevant skill, read its audit URL before installation, install in a sandbox, ` +
+      `complete one narrow task, then report the outcome to ${baseUrl}/api/agent/outcome. ` +
+      `Avoid this pack when: ${pack.avoidWhen.join('; ')}.`,
+  }
 }

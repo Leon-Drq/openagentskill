@@ -28,12 +28,14 @@ Preferred agent flow:
 2. Load /api/agent/integration-kit for platform-specific Codex, Claude Code, or Cursor setup templates.
 3. Choose a task from /tasks or /api/agent/tasks.
 4. Call /api/agent/resolve with a natural-language task.
-5. Read install_receipt, agent_handoff.platform_templates, agent_handoff.review_checklist, and policy_decision.
-6. Fetch /api/agent/receipt?task={task}&agent={agent}&format=text when you need a compact install receipt without the full resolve payload.
-7. Fetch /api/agent/evals?slug={slug}&task={task}&format=text and follow the eval decision.
-8. Fetch /api/agent/skills/{slug} for the selected skill.
-9. Fetch /api/skills/{slug}/install?format=text before installing.
-10. After one narrow run, POST the result to /api/agent/outcome using install_receipt.outcome_feedback.event_id or feedback.event_id from resolve. Include output_quality, workspace, error_type, used_in_production, time_to_useful_ms, and human_review_required when known. Use dry_run=true before wiring a new integration.
+5. Use /api/agent/resolve?task={task}&agent={agent}&format=lockfile when you need a compact stable execution object.
+6. Read install_receipt, agent_handoff.platform_templates, agent_handoff.review_checklist, and policy_decision.
+7. Fetch /api/agent/receipt?task={task}&agent={agent}&format=text when you need a compact install receipt without the full resolve payload.
+8. For complete workflows, fetch /api/agent/packs and then /api/agent/packs/{slug}?limit=6 to get install_plan.selected_skills, review_checklist, and outcome_feedback.
+9. Fetch /api/agent/evals?slug={slug}&task={task}&format=text and follow the eval decision.
+10. Fetch /api/agent/skills/{slug} for the selected skill.
+11. Fetch /api/skills/{slug}/install?format=text before installing.
+12. After one narrow run, POST the result to /api/agent/outcome using install_receipt.outcome_feedback.event_id or feedback.event_id from resolve. Include output_quality, workspace, error_type, used_in_production, time_to_useful_ms, and human_review_required when known. Use dry_run=true before wiring a new integration.
 
 Important URLs:
 - Agent entry: https://www.openagentskill.com/agent
@@ -43,6 +45,7 @@ Important URLs:
 - Task API: https://www.openagentskill.com/api/agent/tasks
 - Resolve API: https://www.openagentskill.com/api/agent/resolve
 - Install receipt API: https://www.openagentskill.com/api/agent/receipt
+- Skill packs API: https://www.openagentskill.com/api/agent/packs
 - Agent outcome API: https://www.openagentskill.com/api/agent/outcome
 - Agent outcome contract: https://www.openagentskill.com/api/agent/outcome?contract=true
 - Agent-Proven rankings: https://www.openagentskill.com/rankings/agent-proven
@@ -69,7 +72,9 @@ Coverage:
 
 Install safety:
 - Prefer /api/agent/resolve over raw search because it applies the OpenAgentSkill safety gate.
+- Prefer /api/agent/resolve?format=lockfile when an agent needs a compact stable object for tool execution.
 - Prefer /api/agent/receipt before installation because it gives a stable selected_skill, install policy, risk summary, alternatives, and outcome event id.
+- Prefer /api/agent/packs/{slug} for multi-step workflows because it returns install_plan, review_checklist, audit URLs, and outcome_feedback.
 - Prefer agent_handoff over ad hoc page scraping because it returns platform templates, API sequence, review checklist, and blocked actions.
 - Prefer /api/agent/evals?slug={slug} before installation because it returns the Trust + Eval contract, blockers, and validation plan.
 - Report success, failed, not_relevant, blocked_by_risk, or setup_required to /api/agent/outcome so future rankings learn from real use. Add quality fields when possible.

@@ -356,11 +356,11 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
             </span>
           </label>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <button
               type="submit"
               disabled={isLoading || task.trim().length === 0}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-[#006b4f] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] bg-[#006b4f] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto"
             >
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Search className="h-4 w-4" aria-hidden="true" />}
               Resolve skill
@@ -368,7 +368,7 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
             <button
               type="button"
               onClick={() => copyText(apiUrl)}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border border-border bg-background px-5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border border-border bg-background px-5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40 sm:w-auto"
             >
               <Copy className="h-4 w-4" aria-hidden="true" />
               Copy API URL
@@ -376,7 +376,7 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
             <button
               type="button"
               onClick={() => copyText(receiptUrl)}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border border-border bg-background px-5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border border-border bg-background px-5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40 sm:w-auto"
             >
               <Copy className="h-4 w-4" aria-hidden="true" />
               Copy receipt
@@ -384,7 +384,7 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
             <button
               type="button"
               onClick={() => copyText(recommendation?.agent_instruction || apiUrl)}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border border-border bg-background px-5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border border-border bg-background px-5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40 sm:w-auto"
             >
               <Copy className="h-4 w-4" aria-hidden="true" />
               Copy agent prompt
@@ -402,7 +402,7 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
                 onClick={() => void resolveTask(example)}
                 className="flex items-center justify-between gap-3 border border-border bg-background px-3 py-2 text-left text-sm text-secondary transition-colors hover:border-foreground/40 hover:text-foreground"
               >
-                <span>{example}</span>
+                <span className="min-w-0 break-words [overflow-wrap:anywhere]">{example}</span>
                 <ArrowRight className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
               </button>
             ))}
@@ -414,7 +414,7 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
         <div className="border-b border-border p-4 sm:p-5">
           <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Recommendation</p>
           <div className="mt-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-            <h2 className="font-display text-2xl font-normal">
+            <h2 className="break-words font-display text-2xl font-normal [overflow-wrap:anywhere]">
               {recommendation?.best_skill.name || 'Resolve output will appear here'}
             </h2>
             {payload?.policy_decision && (
@@ -506,19 +506,19 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
                 <div className="mt-3 grid gap-2 text-sm">
                   <div className="flex justify-between gap-3 border-b border-border pb-2">
                     <span className="text-secondary">Scenario</span>
-                    <span className="text-right">{recommendation.supply_asset.scenario.label}</span>
+                    <span className="min-w-0 break-words text-right [overflow-wrap:anywhere]">{recommendation.supply_asset.scenario.label}</span>
                   </div>
                   <div className="flex justify-between gap-3 border-b border-border pb-2">
                     <span className="text-secondary">Agent surface</span>
-                    <span className="text-right">{selected?.supply_profile.applicableAgents.slice(0, 3).join(' + ') || agent}</span>
+                    <span className="min-w-0 break-words text-right [overflow-wrap:anywhere]">{selected?.supply_profile.applicableAgents.slice(0, 3).join(' + ') || agent}</span>
                   </div>
                   <div className="flex justify-between gap-3 border-b border-border pb-2">
                     <span className="text-secondary">Maintenance</span>
-                    <span className="text-right">{recommendation.supply_asset.maintenance.label}</span>
+                    <span className="min-w-0 break-words text-right [overflow-wrap:anywhere]">{recommendation.supply_asset.maintenance.label}</span>
                   </div>
                   <div className="flex justify-between gap-3">
                     <span className="text-secondary">GitHub quality</span>
-                    <span className="text-right">{recommendation.supply_asset.github_quality.label}</span>
+                    <span className="min-w-0 break-words text-right [overflow-wrap:anywhere]">{recommendation.supply_asset.github_quality.label}</span>
                   </div>
                 </div>
               </div>
@@ -657,8 +657,8 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
                       className="border border-border bg-card p-4 transition-colors hover:border-foreground/40"
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <h3 className="font-display text-lg font-normal">{item.name}</h3>
-                        <span className="font-mono text-xs text-secondary">Trust {item.trust_score}</span>
+	                        <h3 className="min-w-0 break-words font-display text-lg font-normal [overflow-wrap:anywhere]">{item.name}</h3>
+	                        <span className="shrink-0 font-mono text-xs text-secondary">Trust {item.trust_score}</span>
                       </div>
                       <p className="mt-2 line-clamp-2 text-sm leading-6 text-secondary">{item.why_consider}</p>
                     </Link>

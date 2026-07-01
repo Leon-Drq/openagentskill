@@ -647,7 +647,7 @@ Total: 2 skills found
             </div>
             <div className="p-4 sm:p-6">
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
-                {'Get curated skill packs for complete workflows, including top skills, trust signals, and install targets.'}
+                {'Get curated skill packs for complete workflows, including top skills, trust signals, install targets, and install_plan_url for agent execution.'}
               </p>
               <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 text-sm sm:text-base">
                 <div>
@@ -657,6 +657,10 @@ Total: 2 skills found
                 <div>
                   <code className="font-mono bg-muted px-2 py-1">{'format'}</code>
                   <span className="text-secondary ml-2">{'- Response format: json or text'}</span>
+                </div>
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'install_plan_url'}</code>
+                  <span className="text-secondary ml-2">{'- Fetch this URL when an agent needs the executable pack plan'}</span>
                 </div>
               </div>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
@@ -679,8 +683,22 @@ Total: 2 skills found
             </div>
             <div className="p-4 sm:p-6">
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
-                {'Get one skill pack with ranked skills, audit scores, trust profiles, install commands, and agent-specific prompts.'}
+                {'Get one skill pack with ranked skills, audit scores, trust profiles, install commands, review checklist, outcome feedback, and an executable install_plan object.'}
               </p>
+              <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 text-sm sm:text-base">
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'install_plan.selected_skills'}</code>
+                  <span className="text-secondary ml-2">{'- Ordered skill shortlist with install command, skill URL, audit URL, and risk level'}</span>
+                </div>
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'install_plan.review_checklist'}</code>
+                  <span className="text-secondary ml-2">{'- Pre-install checks an agent should complete before using the pack'}</span>
+                </div>
+                <div>
+                  <code className="font-mono bg-muted px-2 py-1">{'install_plan.outcome_feedback'}</code>
+                  <span className="text-secondary ml-2">{'- Endpoint and required fields for reporting whether the pack worked'}</span>
+                </div>
+              </div>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
                 <code>{'GET /api/agent/packs/frontend-engineer-agent-pack?limit=8'}</code>
               </div>

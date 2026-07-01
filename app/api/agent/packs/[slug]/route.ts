@@ -4,7 +4,7 @@ import { getAllSkills, getSkillsBySlugs, type SkillRecord } from '@/lib/db/skill
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
-import { getSkillPackBySlug, selectSkillsForPack } from '@/lib/skill-packs'
+import { buildSkillPackInstallPlan, getSkillPackBySlug, selectSkillsForPack } from '@/lib/skill-packs'
 
 const PACK_CANDIDATE_LIMIT = 1200
 
@@ -48,6 +48,7 @@ export async function GET(
     ])
     const skills = mergeSkills(featuredSkills, candidateSkills)
     const picks = selectSkillsForPack(skills, pack, limit)
+    const installPlan = buildSkillPackInstallPlan(pack, picks, { limit: Math.min(limit, 6) })
     const payload = {
       pack: {
         slug: pack.slug,
@@ -92,6 +93,23 @@ export async function GET(
           },
         }
       }),
+      install_plan: installPlan,
+      machine_contract: {
+        version: installPlan.version,
+        read_first: ['pack', 'install_plan.selected_skills', 'install_plan.workflow', 'install_plan.review_checklist'],
+        required_agent_behavior: [
+          'Pick the first relevant selected skill for the concrete user task.',
+          'Open the audit_url before installation.',
+          'Install in a sandbox or isolated workspace before production use.',
+          'Report one outcome after a narrow run using install_plan.outcome_feedback.',
+        ],
+        stable_fields: [
+          'install_plan.selected_skills[].install_command',
+          'install_plan.selected_skills[].audit_url',
+          'install_plan.workflow',
+          'install_plan.outcome_feedback',
+        ],
+      },
       meta: {
         timestamp: new Date().toISOString(),
         api_version: '1.0',
@@ -109,7 +127,13 @@ export async function GET(
       )).join('\n---\n')
 
       return new NextResponse(
-        `OpenAgentSkill Pack\n${payload.pack.title}\n${payload.pack.description}\n---\n${text}`,
+        [
+          `OpenAgentSkill Pack\n${payload.pack.title}\n${payload.pack.description}`,
+          `Recommended skills:\n${text}`,
+          `Install plan:\n${payload.install_plan.selected_skills.map((skill) => `${skill.rank}. ${skill.name} - ${skill.install_command}`).join('\n')}`,
+          `Review checklist:\n${payload.install_plan.review_checklist.map((item) => `- ${item}`).join('\n')}`,
+          `Outcome endpoint: ${payload.install_plan.outcome_feedback.method} ${payload.install_plan.outcome_feedback.endpoint}`,
+        ].join('\n---\n'),
         {
           headers: {
             'Content-Type': 'text/plain; charset=utf-8',

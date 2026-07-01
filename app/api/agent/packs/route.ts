@@ -50,6 +50,12 @@ export async function GET(request: NextRequest) {
         workflow_steps: pack.workflowSteps,
         url: `https://www.openagentskill.com/skill-packs/${pack.slug}`,
         api_url: `https://www.openagentskill.com/api/agent/packs/${pack.slug}`,
+        install_plan_url: `https://www.openagentskill.com/api/agent/packs/${pack.slug}?limit=${limit}`,
+        machine_contract: {
+          version: 'openagentskill-pack-index-v1',
+          next_step: `GET /api/agent/packs/${pack.slug}?limit=${limit}`,
+          stable_fields: ['skills[].install', 'skills[].trust', 'install_plan_url'],
+        },
         skills: picks.map((skill) => ({
           slug: skill.slug,
           name: skill.name,

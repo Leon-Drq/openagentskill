@@ -73,7 +73,7 @@ export async function GET() {
               { name: 'agent', in: 'query', required: false, schema: { type: 'string', enum: ['auto', 'codex', 'claude-code', 'cursor', 'openagentskill-cli'] } },
               { name: 'max_risk', in: 'query', required: false, schema: { type: 'string' } },
               { name: 'min_stars', in: 'query', required: false, schema: { type: 'number' } },
-              { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
+              { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text', 'lockfile'] } },
             ],
             responses: {
               '200': {
@@ -96,6 +96,7 @@ export async function GET() {
                       agent: { type: 'string' },
                       limit: { type: 'number' },
                       constraints: { type: 'object' },
+                      format: { type: 'string', enum: ['json', 'text', 'lockfile'] },
                     },
                   },
                 },
@@ -273,6 +274,37 @@ export async function GET() {
               { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
             ],
             responses: { '200': { description: 'Task detail and ranked skills' } },
+          },
+        },
+        '/api/agent/packs': {
+          get: {
+            summary: 'List workflow skill packs with ranked skills and install-plan URLs',
+            parameters: [
+              { name: 'limit', in: 'query', required: false, schema: { type: 'number' } },
+              { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
+            ],
+            responses: {
+              '200': {
+                description:
+                  'Pack index with skill shortlists, install_plan_url, and machine_contract fields. Agents should fetch /api/agent/packs/{slug} for the executable install plan.',
+              },
+            },
+          },
+        },
+        '/api/agent/packs/{slug}': {
+          get: {
+            summary: 'Get one executable skill pack install plan',
+            parameters: [
+              { name: 'slug', in: 'path', required: true, schema: { type: 'string' } },
+              { name: 'limit', in: 'query', required: false, schema: { type: 'number' } },
+              { name: 'format', in: 'query', required: false, schema: { type: 'string', enum: ['json', 'text'] } },
+            ],
+            responses: {
+              '200': {
+                description:
+                  'One workflow pack with ranked skills, audit URLs, install_plan.selected_skills, review_checklist, outcome_feedback, and a stable machine_contract for agent execution.',
+              },
+            },
           },
         },
         '/api/agent/skills': {

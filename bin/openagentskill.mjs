@@ -7,6 +7,9 @@ function printHelp() {
 
 Usage:
   openagentskill resolve "<task>" [--agent codex] [--max-risk medium] [--min-stars 500]
+  openagentskill lock "<task>" [--agent codex] [--max-risk medium] [--json]
+  openagentskill receipt "<task>" [--agent codex] [--max-risk medium] [--json]
+  openagentskill pack <pack-slug> [--limit 6] [--json]
   openagentskill install <slug> [--agent codex]
   openagentskill outcome <event_id> --skill <slug> --task "<task>" [--outcome success] [--agent codex] [--dry-run] [--output-quality 4]
   openagentskill evals
@@ -50,22 +53,37 @@ async function readJson(response) {
   }
 }
 
+function printJson(value) {
+  console.log(JSON.stringify(value, null, 2))
+}
+
+function wantsJson(flags) {
+  return Boolean(flags.json || flags.format === 'json')
+}
+
 async function resolveSkill(baseUrl, task, flags) {
+  const body = {
+    task,
+    agent: flags.agent || 'auto',
+    constraints: {
+      max_risk: flags.maxRisk || 'medium',
+      needs_install_command: flags.needsInstallCommand !== 'false',
+      min_stars: Number(flags.minStars || 0),
+    },
+  }
+  if (flags.format === 'lockfile') body.format = 'lockfile'
+
   const response = await fetch(`${baseUrl}/api/agent/resolve`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      task,
-      agent: flags.agent || 'auto',
-      constraints: {
-        max_risk: flags.maxRisk || 'medium',
-        needs_install_command: flags.needsInstallCommand !== 'false',
-        min_stars: Number(flags.minStars || 0),
-      },
-    }),
+    body: JSON.stringify(body),
   })
   const payload = await readJson(response)
   if (!response.ok) throw new Error(payload.error || `Request failed with ${response.status}`)
+  if (wantsJson(flags) || flags.format === 'lockfile') {
+    printJson(payload)
+    return
+  }
 
   const selected = payload.selected
   console.log(`Task: ${payload.task}`)
@@ -98,6 +116,85 @@ async function resolveSkill(baseUrl, task, flags) {
       console.log(`- ${item.skill.name} (${item.skill.slug}) safety ${item.safety.score}/100`)
     }
   }
+}
+
+async function lockSkill(baseUrl, task, flags) {
+  const response = await fetch(`${baseUrl}/api/agent/resolve`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      task,
+      agent: flags.agent || 'auto',
+      format: 'lockfile',
+      constraints: {
+        max_risk: flags.maxRisk || 'medium',
+        needs_install_command: flags.needsInstallCommand !== 'false',
+        min_stars: Number(flags.minStars || 0),
+      },
+    }),
+  })
+  const payload = await readJson(response)
+  if (!response.ok) throw new Error(payload.error || `Request failed with ${response.status}`)
+  if (wantsJson(flags)) {
+    printJson(payload)
+    return
+  }
+
+  console.log(`Lock: ${payload.version}`)
+  console.log(`Task: ${payload.task}`)
+  console.log(`Selected: ${payload.selected_skill?.name || 'No match'} (${payload.selected_skill?.slug || 'none'})`)
+  console.log(`Install: ${payload.install?.command || 'No install command'}`)
+  console.log(`Outcome event: ${payload.outcome_feedback?.event_id || 'none'}`)
+}
+
+async function receiptSkill(baseUrl, task, flags) {
+  const params = new URLSearchParams({
+    task,
+    agent: flags.agent || 'auto',
+    max_risk: flags.maxRisk || 'medium',
+    format: wantsJson(flags) ? 'json' : 'text',
+  })
+  if (flags.minStars) params.set('min_stars', String(flags.minStars))
+
+  const response = await fetch(`${baseUrl}/api/agent/receipt?${params.toString()}`)
+  const text = await response.text()
+  if (!response.ok) {
+    try {
+      const payload = JSON.parse(text)
+      throw new Error(payload.error || `Request failed with ${response.status}`)
+    } catch (error) {
+      if (error instanceof SyntaxError) throw new Error(text || `Request failed with ${response.status}`)
+      throw error
+    }
+  }
+
+  if (wantsJson(flags)) printJson(JSON.parse(text))
+  else console.log(text)
+}
+
+async function packPlan(baseUrl, slug, flags) {
+  const params = new URLSearchParams({
+    limit: String(flags.limit || 6),
+    format: wantsJson(flags) ? 'json' : 'text',
+  })
+  const response = await fetch(`${baseUrl}/api/agent/packs/${encodeURIComponent(slug)}?${params.toString()}`)
+  const text = await response.text()
+  if (!response.ok) {
+    try {
+      const payload = JSON.parse(text)
+      throw new Error(payload.error || `Request failed with ${response.status}`)
+    } catch (error) {
+      if (error instanceof SyntaxError) throw new Error(text || `Request failed with ${response.status}`)
+      throw error
+    }
+  }
+
+  if (!wantsJson(flags)) {
+    console.log(text)
+    return
+  }
+
+  printJson(JSON.parse(text))
 }
 
 async function reportOutcome(baseUrl, eventId, flags) {
@@ -137,6 +234,10 @@ async function reportOutcome(baseUrl, eventId, flags) {
   })
   const payload = await readJson(response)
   if (!response.ok) throw new Error(payload.error || `Request failed with ${response.status}`)
+  if (wantsJson(flags)) {
+    printJson(payload)
+    return
+  }
 
   console.log(`${payload.dry_run ? 'Outcome dry-run accepted' : 'Outcome recorded'}: ${payload.data?.outcome || flags.outcome || 'success'}`)
   console.log(`Skill: ${payload.data?.skill_slug || flags.skill}`)
@@ -150,6 +251,10 @@ async function installSkill(baseUrl, slug, flags) {
   const response = await fetch(`${baseUrl}/api/skills/${encodeURIComponent(slug)}/install`)
   const payload = await readJson(response)
   if (!response.ok) throw new Error(payload.error || `Request failed with ${response.status}`)
+  if (wantsJson(flags)) {
+    printJson(payload)
+    return
+  }
 
   const targets = payload.install_targets || []
   const target = targets.find((item) => item.id === flags.agent) || targets[0]
@@ -189,6 +294,27 @@ async function main() {
     const task = rest.join(' ').trim()
     if (!task) throw new Error('Missing task. Example: openagentskill resolve "scrape pricing pages"')
     await resolveSkill(baseUrl, task, flags)
+    return
+  }
+
+  if (command === 'lock') {
+    const task = rest.join(' ').trim()
+    if (!task) throw new Error('Missing task. Example: openagentskill lock "analyze stock news"')
+    await lockSkill(baseUrl, task, flags)
+    return
+  }
+
+  if (command === 'receipt') {
+    const task = rest.join(' ').trim()
+    if (!task) throw new Error('Missing task. Example: openagentskill receipt "scrape pricing pages"')
+    await receiptSkill(baseUrl, task, flags)
+    return
+  }
+
+  if (command === 'pack') {
+    const slug = rest[0]
+    if (!slug) throw new Error('Missing pack slug. Example: openagentskill pack frontend-engineer-agent-pack')
+    await packPlan(baseUrl, slug, flags)
     return
   }
 
