@@ -445,6 +445,8 @@ export async function GET() {
     })),
     star_refresh_cron: '0 3 * * *',
     star_refresh_frequency: 'daily at 03:00 UTC',
+    skill_radar_cron: '35 * * * *',
+    skill_radar_frequency: 'hourly X/GitHub hot-skill signal scan',
     indexnow_cron: '15 3 * * *',
     indexnow_frequency: 'daily baseline submission plus automatic submission after new skill imports',
   }
@@ -568,6 +570,28 @@ export async function GET() {
       filters,
       schedule,
     },
+    skill_radar: {
+      status: 'active',
+      private_endpoint: '/api/cron/skill-radar',
+      schedule: '35 * * * *',
+      sources: ['X posts with GitHub links', 'GitHub hot skill search'],
+      strategy:
+        'Use social and GitHub freshness as candidate signals only; every repo still passes GitHub metadata checks, MCP exclusion, AI review, Trust/Audit surfaces, SEO drip, IndexNow, and X queue guards.',
+      default_limits: {
+        target_new_per_run: 8,
+        min_stars: 10,
+        seo_posts_per_run: 1,
+        x_queue_items_per_run: 3,
+        auto_post: false,
+      },
+      quality_gates: [
+        'requires a GitHub repository URL',
+        'excludes generic foundation repositories',
+        'requires skill, workflow, agent, or concrete use-case signals',
+        'requires at least 10 GitHub stars by default',
+        'falls back to existing high-quality X queue candidates when no new radar candidate is imported',
+      ],
+    },
     seo_growth: {
       status: 'active',
       strategy:
@@ -650,6 +674,7 @@ export async function GET() {
       private_import: '/api/indexer/run',
       private_refresh_stars: '/api/indexer/refresh-stars',
       private_logs: '/api/indexer/logs',
+      private_skill_radar: '/api/cron/skill-radar',
       private_indexnow_submit: '/api/indexnow/submit',
       public_agent_outcomes: '/api/agent/outcome',
       public_agent_outcomes_text: '/api/agent/outcome?format=text',

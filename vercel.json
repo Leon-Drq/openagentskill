@@ -37,6 +37,10 @@
       "schedule": "5 * * * *"
     },
     {
+      "path": "/api/cron/skill-radar",
+      "schedule": "35 * * * *"
+    },
+    {
       "path": "/api/cron/growth-daily",
       "schedule": "20 13 * * *"
     },

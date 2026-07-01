@@ -78,10 +78,22 @@ export const REGISTRY_EVAL_CASES: RegistryEvalCase[] = [
     minTopScore: 50,
   },
   {
+    id: 'short-trade-query',
+    task: 'trade',
+    expectedTerms: ['finance', 'financial', 'trading', 'stock', 'market', 'quant', 'portfolio', 'backtest', 'openbb', 'vectorbt'],
+    minTopScore: 45,
+  },
+  {
     id: 'world-cup-dashboard',
     task: 'Build a World Cup dashboard from football match data',
     expectedTerms: ['football', 'soccer', 'world cup', 'sports', 'match'],
     minTopScore: 50,
+  },
+  {
+    id: 'short-world-cup-query',
+    task: 'world cup',
+    expectedTerms: ['football', 'soccer', 'world cup', 'sports', 'match', 'fifa', 'xg'],
+    minTopScore: 45,
   },
   {
     id: 'football-xg-analysis',
@@ -100,6 +112,12 @@ export const REGISTRY_EVAL_CASES: RegistryEvalCase[] = [
     task: 'Convert Word, PowerPoint, and spreadsheet files into clean markdown',
     expectedTerms: ['markdown', 'document', 'office', 'spreadsheet', 'convert'],
     minTopScore: 50,
+  },
+  {
+    id: 'short-ppt-query',
+    task: 'ppt',
+    expectedTerms: ['presentation', 'ppt', 'pptx', 'powerpoint', 'slides', 'slide deck', 'deck'],
+    minTopScore: 45,
   },
   {
     id: 'youtube-research',
