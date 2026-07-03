@@ -48,6 +48,7 @@ export type SkillSortMode = 'quality' | 'downloads' | 'stars' | 'new' | 'trendin
 const SKILLS_PAGE_SIZE = 1000
 const ALL_SKILLS_CACHE_TTL_MS = 5 * 60 * 1000
 const SKILL_LOOKUP_TIMEOUT_MS = 2500
+const SITEMAP_SKILLS_CACHE_TTL_MS = 30 * 60 * 1000
 
 type AllSkillsCacheEntry = {
   expiresAt: number
@@ -56,6 +57,44 @@ type AllSkillsCacheEntry = {
 }
 
 const allSkillsCache = new Map<string, AllSkillsCacheEntry>()
+
+export type SkillSitemapRecord = Pick<
+  SkillRecord,
+  | 'slug'
+  | 'github_stars'
+  | 'github_last_pushed_at'
+  | 'updated_at'
+>
+
+type SkillSitemapCacheEntry = {
+  expiresAt: number
+  value?: SkillSitemapRecord[]
+  promise?: Promise<SkillSitemapRecord[]>
+}
+
+const skillSitemapCache = new Map<string, SkillSitemapCacheEntry>()
+
+type SkillSitemapCountCacheEntry = {
+  expiresAt: number
+  value?: number
+  promise?: Promise<number>
+}
+
+const skillSitemapCountCache = new Map<string, SkillSitemapCountCacheEntry>()
+
+export interface SkillSitemapQueryOptions {
+  offset?: number
+  limit?: number
+  minStars?: number
+}
+
+function createSitemapClient() {
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY) {
+    return createAdminClient()
+  }
+
+  return createPublicClient()
+}
 
 function isMcpText(value: string) {
   return /(^|[^a-z0-9])mcp([^a-z0-9]|$)/i.test(value) || /\bmodel context protocol\b/i.test(value)
@@ -169,6 +208,120 @@ async function fetchAllSkills(
   }
 
   return filterSkillOnly(rows)
+}
+
+export async function getApprovedSkillSitemapRecords(
+  options: SkillSitemapQueryOptions = {}
+): Promise<SkillSitemapRecord[]> {
+  const offset = Math.max(0, Math.floor(options.offset || 0))
+  const rowLimit = Number.isFinite(options.limit)
+    ? Math.max(1, Math.floor(options.limit || 1))
+    : Number.POSITIVE_INFINITY
+  const minStars = Math.max(0, Math.floor(options.minStars || 0))
+  const cacheKey = `approved-sitemap:${offset}:${rowLimit}:${minStars}`
+  const now = Date.now()
+  const cached = skillSitemapCache.get(cacheKey)
+
+  if (cached && cached.expiresAt > now) {
+    if (cached.value) return cached.value
+    if (cached.promise) return cached.promise
+  }
+
+  const promise = fetchApprovedSkillSitemapRecords({ offset, limit: rowLimit, minStars })
+  skillSitemapCache.set(cacheKey, {
+    expiresAt: now + SITEMAP_SKILLS_CACHE_TTL_MS,
+    promise,
+  })
+
+  try {
+    const value = await promise
+    skillSitemapCache.set(cacheKey, {
+      expiresAt: Date.now() + SITEMAP_SKILLS_CACHE_TTL_MS,
+      value,
+    })
+    return value
+  } catch (error) {
+    skillSitemapCache.delete(cacheKey)
+    throw error
+  }
+}
+
+async function fetchApprovedSkillSitemapRecords(
+  options: Required<SkillSitemapQueryOptions>
+): Promise<SkillSitemapRecord[]> {
+  const supabase = createSitemapClient()
+  const rows: SkillSitemapRecord[] = []
+
+  for (let from = options.offset; ; from += SKILLS_PAGE_SIZE) {
+    const remaining = options.limit - rows.length
+    if (remaining <= 0) break
+    const pageSize = Math.min(SKILLS_PAGE_SIZE, remaining)
+    let query = supabase
+      .from('skills')
+      .select('slug,github_stars,github_last_pushed_at,updated_at')
+      .eq('ai_review_approved', true)
+      .order('github_stars', { ascending: false })
+
+    if (options.minStars > 0) {
+      query = query.gte('github_stars', options.minStars)
+    }
+
+    const { data, error } = await query.range(from, from + pageSize - 1)
+
+    if (error) throw error
+    if (!data?.length) break
+
+    rows.push(...(data as SkillSitemapRecord[]))
+    if (data.length < pageSize) break
+  }
+
+  return rows
+}
+
+export async function getApprovedSkillSitemapCount(minStars = 0): Promise<number> {
+  const normalizedMinStars = Math.max(0, Math.floor(minStars || 0))
+  const cacheKey = `approved-sitemap-count:${normalizedMinStars}`
+  const now = Date.now()
+  const cached = skillSitemapCountCache.get(cacheKey)
+
+  if (cached && cached.expiresAt > now) {
+    if (typeof cached.value === 'number') return cached.value
+    if (cached.promise) return cached.promise
+  }
+
+  const promise = fetchApprovedSkillSitemapCount(normalizedMinStars)
+  skillSitemapCountCache.set(cacheKey, {
+    expiresAt: now + SITEMAP_SKILLS_CACHE_TTL_MS,
+    promise,
+  })
+
+  try {
+    const value = await promise
+    skillSitemapCountCache.set(cacheKey, {
+      expiresAt: Date.now() + SITEMAP_SKILLS_CACHE_TTL_MS,
+      value,
+    })
+    return value
+  } catch (error) {
+    skillSitemapCountCache.delete(cacheKey)
+    throw error
+  }
+}
+
+async function fetchApprovedSkillSitemapCount(minStars: number): Promise<number> {
+  const supabase = createSitemapClient()
+  let query = supabase
+    .from('skills')
+    .select('slug', { count: 'exact', head: true })
+    .eq('ai_review_approved', true)
+
+  if (minStars > 0) {
+    query = query.gte('github_stars', minStars)
+  }
+
+  const { count, error } = await query
+  if (error) throw error
+  return count || 0
 }
 
 export interface SkillAgentStats {
