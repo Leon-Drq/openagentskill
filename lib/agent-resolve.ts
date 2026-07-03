@@ -23,7 +23,7 @@ import { getPrimaryInstallCommand, getSkillInstallTargets, type InstallTargetId 
 import { getSkillQualityProfile } from '@/lib/quality'
 import { dedupeRankedSkills, getRecommendationReasons, normalizeMatchScore, rankSkillsForQuery } from '@/lib/registry'
 import { getSkillSupplyProfile, type SkillSupplyProfile } from '@/lib/supply'
-import { getSkillTrustProfile, type SkillTrustProfile } from '@/lib/trust'
+import { getSkillTrustProfile, getSkillTrustProfileV5, type SkillTrustProfile, type SkillTrustProfileV5 } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
 const SITE_URL = 'https://www.openagentskill.com'
@@ -478,6 +478,7 @@ interface ResolverRecommendationCandidate {
   recommendation_reasons: string[]
   supply_profile: SkillSupplyProfile
   trust: SkillTrustProfile
+  trust_v5: SkillTrustProfileV5
   audit: {
     audit_score: number
     risk_label: string
@@ -555,10 +556,31 @@ function buildResolverRecommendation(
     why_recommended: [
       ...selected.recommendation_reasons,
       selected.decision.headline,
-      `${selected.trust.score}/100 OpenAgentSkill Trust Score v4`,
+      `${selected.trust_v5.score}/100 OpenAgentSkill Trust Score v5`,
       `${selected.audit.audit_score}/100 audit score`,
       `${selected.safety.score}/100 safety score`,
     ].filter(Boolean).slice(0, 8),
+    trust_score_v5: {
+      score: selected.trust_v5.score,
+      base_score: selected.trust_v5.base_score,
+      outcome_confidence: selected.trust_v5.outcome_confidence,
+      tier: selected.trust_v5.tier,
+      label: selected.trust_v5.label,
+      version: selected.trust_v5.version,
+      install_policy: selected.trust_v5.decision.install_policy,
+      decision: selected.trust_v5.decision,
+      evidence: selected.trust_v5.evidence,
+      agent_compatibility: selected.trust_v5.agentCompatibility,
+      risk: selected.trust_v5.riskSummary,
+      outcomes: selected.trust_v5.outcomeEvidence,
+      auto_install: selected.trust_v5.autoInstall,
+      outcome_loop: selected.trust_v5.outcome_loop,
+      agent_contract: selected.trust_v5.agent_contract,
+      best_for: selected.trust_v5.bestFor,
+      do_not_use_for: selected.trust_v5.doNotUseFor,
+      known_risks: selected.trust_v5.knownRisks,
+      backward_compatible: selected.trust_v5.backward_compatible,
+    },
     trust_score_v4: {
       score: selected.trust.score,
       tier: selected.trust.tier,
@@ -598,7 +620,7 @@ function buildResolverRecommendation(
     safety_gate: selected.safety_gate,
     machine_metadata: selected.machine_metadata,
     agent_contract: {
-      version: 'openagentskill-resolve-contract-v1',
+      version: 'openagentskill-resolve-contract-v2',
       input_task: task,
       recommended_skill_slug: selected.skill.slug,
       recommended_skill_name: selected.skill.name,
@@ -645,10 +667,13 @@ function buildResolverRecommendation(
         sandbox_first: !selected.safety.auto_install_allowed || selected.trust.autoInstall.sandboxRequired,
       },
       trust: {
-        score: selected.trust.score,
-        label: selected.trust.label,
-        version: selected.trust.version,
-        dimensions: selected.trust.dimensions.map((dimension) => ({
+        score: selected.trust_v5.score,
+        label: selected.trust_v5.label,
+        version: selected.trust_v5.version,
+        base_score: selected.trust_v5.base_score,
+        outcome_confidence: selected.trust_v5.outcome_confidence,
+        decision: selected.trust_v5.decision,
+        dimensions: selected.trust_v5.dimensions.map((dimension) => ({
           id: dimension.id,
           label: dimension.label,
           score: dimension.score,
@@ -684,6 +709,7 @@ function buildResolverRecommendation(
         'decision_packet.risk.do_not_use_when',
         'decision_packet.alternatives',
         'decision_packet.outcome_feedback',
+        'decision_packet.trust.decision',
       ],
     },
     agent_instruction: [
@@ -733,6 +759,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     const audit = buildSkillAudit(skill, eventStats)
     const safety = getAgentSafetyProfile(skill, audit, constraints)
     const trust = getSkillTrustProfile(skill, false, eventStats, outcomeStats)
+    const trustV5 = getSkillTrustProfileV5(skill, false, eventStats, outcomeStats)
     const agentProven = getAgentProvenProfile(outcomeStats)
     const decision = getSkillDecisionProfile(skill, eventStats)
     const useCases = getUseCasesForSkill(skill, 3)
@@ -755,6 +782,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
       supply_profile: supplyProfile,
       quality: getSkillQualityProfile(skill),
       trust,
+      trust_v5: trustV5,
       agent_proven: agentProven,
       audit: {
         audit_score: audit.audit_score,
@@ -831,9 +859,9 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
   })
   const agentFeedbackLoop = selected
     ? {
-        version: 'openagentskill-agent-feedback-loop-v2',
+        version: 'openagentskill-agent-feedback-loop-v3',
         status: 'active',
-        purpose: 'Report the result of one resolved skill run so Trust Score v4 and future Resolve rankings learn from real use.',
+        purpose: 'Report the result of one resolved skill run so Trust Score v5 and future Resolve rankings learn from real use.',
         event_id: feedback.event_id,
         selected_skill_slug: selected.skill.slug,
         selected_skill_name: selected.skill.name,
@@ -859,7 +887,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         payload_template: feedback.json_example,
         cli_example: feedback.cli_example,
         ranking_inputs_updated: [
-          'Trust Score v4 real-agent outcome dimension',
+          'Trust Score v5 outcome confidence',
           'Resolve ranking outcome evidence',
           'Skill detail outcome signal block',
           'Outcome leaderboard',
@@ -891,7 +919,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         why_recommended: [
           ...selected.recommendation_reasons,
           selected.decision.headline,
-          `${selected.trust.score}/100 OpenAgentSkill Trust Score`,
+          `${selected.trust_v5.score}/100 OpenAgentSkill Trust Score v5`,
           `${selected.agent_proven.score}/100 Agent Proven Score`,
           `${selected.audit.audit_score}/100 audit score`,
           `${selected.safety.safety_tier.label} safety gate`,
@@ -992,7 +1020,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           `Safety tier: ${selected.safety.safety_tier.label}`,
           `Safety score: ${selected.safety.score}/100 ${selected.safety.label}`,
           `Audit score: ${selected.audit.audit_score}/100 ${selected.audit.risk_label}`,
-          `Trust score: ${selected.trust.score}/100 ${selected.trust.label}`,
+          `Trust score: ${selected.trust_v5.score}/100 ${selected.trust_v5.label}`,
           `Readiness: ${selected.decision.readiness_score}/100 ${selected.decision.readiness_label}`,
           ...selected.safety.policy_warnings.slice(0, 3),
           ...selected.audit.warnings.slice(0, 3),

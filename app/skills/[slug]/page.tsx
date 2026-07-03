@@ -33,8 +33,8 @@ import { getSkillAttribution } from '@/lib/skill-attribution'
 import { getSkillBySlugOrFallback } from '@/lib/skill-fallbacks'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import {
-  getSkillTrustProfile,
-  type SkillTrustProfile,
+  getSkillTrustProfileV5,
+  type SkillTrustProfileV5,
   type TrustCheckStatus,
 } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
@@ -175,7 +175,7 @@ function getAuditTone(level: string) {
   return 'border-red-200 bg-red-50 text-red-700'
 }
 
-function TrustBadge({ profile }: { profile: SkillTrustProfile }) {
+function TrustBadge({ profile }: { profile: SkillTrustProfileV5 }) {
   const label =
     profile.tier === 'production'
       ? 'TRUSTED'
@@ -235,7 +235,7 @@ export default async function SkillDetailPage({
     ? getSkillDecisionProfile(dbSkill, eventStats)
     : null
   const trustProfile = dbSkill
-    ? getSkillTrustProfile(dbSkill, Boolean(approvedClaim), eventStats, outcomeStats)
+    ? getSkillTrustProfileV5(dbSkill, Boolean(approvedClaim), eventStats, outcomeStats)
     : null
   const outcomeEvidence = trustProfile?.outcomeEvidence || null
   const supplyProfile = dbSkill
@@ -1984,7 +1984,7 @@ export default async function SkillDetailPage({
                 <div className="space-y-3 p-5">
                   <p className="text-xs leading-relaxed text-secondary">
                     {agentProvenEvidence?.metrics.totalOutcomes
-                      ? `${agentProvenEvidence.summary} This feeds Trust Score v4, Resolve rankings, and the Agent-Proven leaderboard.`
+                      ? `${agentProvenEvidence.summary} This feeds Trust Score v5, Resolve rankings, and the Agent-Proven leaderboard.`
                       : 'No agent outcome data yet. The first agent run can report success, setup needs, risk blocks, failure, or not-relevant through /api/agent/outcome.'}
                   </p>
                   <div className="grid gap-2">

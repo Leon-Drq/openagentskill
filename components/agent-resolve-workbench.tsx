@@ -52,6 +52,22 @@ type ResolvePayload = {
       policy: string
     }
     why_recommended: string[]
+    trust_score_v5?: {
+      score: number
+      label: string
+      version?: string
+      install_policy: string
+      outcome_confidence?: number
+      decision?: {
+        auto_install_allowed: boolean
+        human_review_required: boolean
+        sandbox_first: boolean
+        agent_action: string
+      }
+      evidence?: Record<string, string | number> | Array<{ label: string; value: string | number | boolean }>
+      agent_compatibility?: string[]
+      risk?: unknown
+    }
     trust_score_v4?: {
       score: number
       label: string
@@ -272,7 +288,7 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
   const recommendation = payload?.recommendation
   const selected = payload?.selected
   const trustScore =
-    recommendation?.trust_score_v4 || recommendation?.trust_score_v3 || recommendation?.trust_score_v2
+    recommendation?.trust_score_v5 || recommendation?.trust_score_v4 || recommendation?.trust_score_v3 || recommendation?.trust_score_v2
   const agentProven = selected?.agent_proven || payload?.install_receipt?.agent_proven || null
 
   return (

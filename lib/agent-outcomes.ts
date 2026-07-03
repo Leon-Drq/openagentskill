@@ -36,6 +36,7 @@ export const AGENT_OUTCOME_WORKSPACES = [
 ] as const
 
 export type AgentOutcomeWorkspace = (typeof AGENT_OUTCOME_WORKSPACES)[number]
+export const AGENT_OUTCOME_PROTOCOL_VERSION = 'openagentskill-agent-outcome-v3'
 
 export interface AgentOutcomeQualityFields {
   task_success?: boolean | null
@@ -97,7 +98,7 @@ export function buildOutcomeMetadata(input: AgentOutcomeQualityFields & {
 
   return {
     ...(input.metadata || {}),
-    outcome_protocol: 'openagentskill-agent-outcome-v2',
+    outcome_protocol: AGENT_OUTCOME_PROTOCOL_VERSION,
     task_success: taskSuccess,
     output_quality: input.output_quality ?? null,
     error_type: input.error_type ?? null,
@@ -129,8 +130,9 @@ export function buildOutcomeTrustImpact(input: {
   if (input.outputQuality && input.outputQuality <= 2) negative.push('adds low output-quality signal')
 
   return {
-    trust_score_version: 'trust-score-v4',
+    trust_score_version: 'trust-score-v5',
     affects: [
+      'Trust Score v5 outcome confidence',
       'Real agent outcomes dimension',
       'Resolve ranking adoption evidence',
       'Skill detail outcome signals',
@@ -160,7 +162,7 @@ export function buildResolveFeedback(input: ResolveFeedbackInput) {
       'Mark blocked_by_risk when audit, license, credentials, shell, or network risk prevents safe use.',
       'Mark setup_required when the skill looks relevant but needs missing keys, data, or manual configuration.',
       'Mark not_relevant when the selected skill does not match the task after inspection.',
-      'Include output_quality, error_type, workspace, and human_review_required when available.',
+      'Include output_quality, error_type, workspace, human_review_required, evidence_url, and time_to_useful_ms when available.',
     ],
     json_example: {
       event_id: eventId,

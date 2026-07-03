@@ -11,18 +11,37 @@ import { getUseCaseBySlug, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cas
 
 export const dynamic = 'force-dynamic'
 
+const SITE_URL = 'https://www.openagentskill.com'
+const SKILLS_PAGE_TITLE = 'AI Agent Skills Directory'
+const SKILLS_PAGE_DESCRIPTION =
+  'Browse the OpenAgentSkill AI agent skills directory: reusable skills for Codex, Claude Code, Cursor, finance, research, web scraping, PPT, football analytics, data, marketing, design, and more.'
+
 export const metadata: Metadata = {
-  title: 'Browse AI Agent Skills',
-  description: 'Discover AI agent skills for web automation, coding agents, RAG, data processing, workflow automation, and more. Filter by category, GitHub stars, popularity, or recent updates.',
-  keywords: ['AI agent skills', 'agent tools', 'Claude tools', 'GPT plugins', 'LangChain tools', 'agent marketplace'],
+  title: SKILLS_PAGE_TITLE,
+  description: SKILLS_PAGE_DESCRIPTION,
+  keywords: [
+    'AI agent skills directory',
+    'AI agent skill repository',
+    'agent skills',
+    'Codex skills',
+    'Claude Code skills',
+    'Cursor skills',
+    'AI agent tools',
+    'agent marketplace',
+    'reusable AI skills',
+  ],
   openGraph: {
-    title: 'Browse AI Agent Skills — Open Agent Skill',
-    description: 'Discover high-star AI agent skills, browser automation tools, coding agents, RAG tools, and agent frameworks.',
+    title: 'AI Agent Skills Directory — OpenAgentSkill',
+    description: SKILLS_PAGE_DESCRIPTION,
     type: 'website',
-    url: 'https://www.openagentskill.com/skills',
+    url: `${SITE_URL}/skills`,
   },
   alternates: {
-    canonical: 'https://www.openagentskill.com/skills',
+    canonical: `${SITE_URL}/skills`,
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 }
 
@@ -33,6 +52,119 @@ const SKILLS_PAGE_REVALIDATE = 300
 const MAX_SKILLS_PAGE = Math.ceil(MAX_SKILL_CANDIDATE_LIMIT / VISIBLE_SKILL_LIMIT)
 const SKILLS_PAGE_QUERY_TIMEOUT_MS = 1200
 const FALLBACK_DATE = '2026-06-01T00:00:00.000Z'
+
+const DIRECTORY_SCENARIOS = [
+  {
+    title: 'Coding agent skills',
+    eyebrow: 'Codex, Claude Code, Cursor',
+    href: '/skills?category=Coding+Agents',
+    description: 'Code review, repo inspection, testing, planning, shipping, and engineering workflows for coding agents.',
+    terms: ['agent-skills', 'coding agent', 'coding agents', 'code review', 'codex', 'claude code', 'cursor', 'gemini cli', 'repo automation', 'engineering skill'],
+  },
+  {
+    title: 'Research and RAG skills',
+    eyebrow: 'Documents and knowledge',
+    href: '/skills?category=Research',
+    description: 'Research, recent-events briefings, PDF parsing, markdown conversion, RAG ingestion, and knowledge workflows.',
+    terms: ['research', 'rag', 'pdf', 'document', 'markdown', 'knowledge', 'retrieval', 'briefing', 'recent', 'news'],
+  },
+  {
+    title: 'Finance and trading skills',
+    eyebrow: 'Markets and quant',
+    href: '/skills?category=Finance',
+    description: 'Stock analysis, market research, quant backtesting, financial data, and investment research skills.',
+    terms: ['finance', 'financial', 'stock', 'stocks', 'trading', 'trade skill', 'market research', 'quant', 'backtesting', 'investment'],
+  },
+  {
+    title: 'Web scraping skills',
+    eyebrow: 'Crawlers and extraction',
+    href: '/skills?category=Web+Scraping',
+    description: 'Crawling, scraping, extraction, browser automation, structured data capture, and website-to-markdown workflows.',
+    terms: ['web scraping', 'scraping', 'crawler', 'crawl', 'extract', 'extraction', 'browser', 'html', 'markdown', 'website'],
+  },
+  {
+    title: 'PPT and presentation skills',
+    eyebrow: 'Slides and decks',
+    href: '/skills?q=ppt',
+    description: 'Presentation generation, editable PPTX, slide decks, speaker notes, and visual storytelling workflows.',
+    terms: ['ppt', 'pptx', 'presentation', 'slide', 'slides', 'deck', 'powerpoint', 'speaker note'],
+  },
+  {
+    title: 'Design and creative skills',
+    eyebrow: 'Images, video, UI',
+    href: '/skills?category=Design',
+    description: 'Image, video, creative production, UI design, multimodal generation, and visual workflow skills.',
+    terms: ['design', 'image', 'video', 'creative', 'ui', 'ux', 'seedance', 'visual', 'multimodal', 'filmmaking'],
+  },
+  {
+    title: 'Data and analytics skills',
+    eyebrow: 'Analysis and pipelines',
+    href: '/skills?q=data',
+    description: 'Data analysis, analytics, ETL, notebooks, databases, tables, charts, and reporting workflows.',
+    terms: ['data', 'analytics', 'analysis', 'etl', 'database', 'table', 'chart', 'notebook', 'pipeline', 'reporting'],
+  },
+  {
+    title: 'Marketing and growth skills',
+    eyebrow: 'SEO and content',
+    href: '/skills?q=marketing',
+    description: 'SEO, content research, growth workflows, social listening, campaign analysis, and publishing helpers.',
+    terms: ['marketing', 'seo', 'content', 'growth', 'social', 'campaign', 'copywriting', 'newsletter', 'traffic'],
+  },
+  {
+    title: 'Legal and compliance skills',
+    eyebrow: 'Contracts and policy',
+    href: '/skills?q=legal',
+    description: 'Contract review, policy analysis, compliance research, audit support, and legal document workflows.',
+    terms: ['legal', 'contract', 'law', 'policy', 'compliance', 'audit', 'risk'],
+  },
+  {
+    title: 'Education and teaching skills',
+    eyebrow: 'Learning workflows',
+    href: '/skills?q=teach',
+    description: 'Teaching, tutoring, course creation, lesson planning, learning support, and explanation skills.',
+    terms: ['education', 'teach', 'teaching', 'tutor', 'learning', 'course', 'lesson', 'student'],
+  },
+  {
+    title: 'Football and World Cup skills',
+    eyebrow: 'Sports analytics',
+    href: '/skills?q=football',
+    description: 'Football analytics, match data, World Cup dashboards, scouting analysis, and sports research workflows.',
+    terms: ['football', 'soccer', 'world cup', 'sports', 'match', 'statsbomb', 'mplsoccer', 'scouting'],
+  },
+] as const
+
+const POPULAR_DIRECTORY_LINKS = [
+  {
+    label: 'Best AI agent skills for stock analysis',
+    href: '/best/stock-analysis',
+    description: 'Finance and market research skills with trust, install, and maintenance signals.',
+  },
+  {
+    label: 'Best Codex skills for web scraping',
+    href: '/best/codex-web-scraping',
+    description: 'Crawler and extraction skills that agents can shortlist before installing.',
+  },
+  {
+    label: 'Best Claude Code skills for PDF parsing',
+    href: '/best/claude-code-pdf-parsing',
+    description: 'Document conversion, table extraction, OCR, and markdown workflows.',
+  },
+  {
+    label: 'Best AI agent skills for football analytics',
+    href: '/best/football-analytics',
+    description: 'Match data, scouting, dashboards, and World Cup analytics workflows.',
+  },
+  {
+    label: 'OpenAgentSkill vs skills.sh',
+    href: '/compare/openagentskill-vs-skills-sh',
+    description: 'Compare task resolution, trust signals, install handoffs, and registry APIs.',
+  },
+  {
+    label: 'OpenAgentSkill vs agentskills.io',
+    href: '/compare/openagentskill-vs-agentskills-io',
+    description: 'Compare directories, agent-readable metadata, audits, and discovery workflows.',
+  },
+] as const
 
 function fallbackSkill(input: {
   slug: string
@@ -416,6 +548,212 @@ function toSkillsPageSkill({
   }
 }
 
+type SkillsPageSkill = ReturnType<typeof toSkillsPageSkill>
+
+interface DirectorySkill {
+  slug: string
+  name: string
+  tagline: string
+  category: string
+  stars: number
+  trustScore: number | null
+  qualityScore: number
+  installCommand?: string
+}
+
+interface DirectorySection {
+  title: string
+  eyebrow: string
+  href: string
+  description: string
+  skills: DirectorySkill[]
+}
+
+interface DirectoryLink {
+  label: string
+  href: string
+  description: string
+}
+
+function directoryMatchScore(
+  scenario: (typeof DIRECTORY_SCENARIOS)[number],
+  record: SkillRecord,
+  item: { platformHints: string[]; supplyProfile: ReturnType<typeof getSkillSupplyProfile> }
+) {
+  const primaryText = [
+    record.name,
+    record.slug,
+    record.github_repo,
+    record.category,
+    ...(record.tags || []),
+    ...(record.frameworks || []),
+    ...item.platformHints,
+    item.supplyProfile.track.label,
+    item.supplyProfile.track.shortLabel,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+
+  const secondaryText = [
+    record.description,
+    record.long_description,
+    record.tagline,
+    item.supplyProfile.scenario.label,
+    item.supplyProfile.scenario.description,
+    ...item.supplyProfile.applicableAgents,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+
+  let score = 0
+  for (const term of scenario.terms) {
+    if (primaryText.includes(term)) score += 4
+    else if (secondaryText.includes(term)) score += 1
+  }
+
+  if (primaryText.includes('skill')) score += 2
+  if (primaryText.includes('agent')) score += 1
+
+  return score
+}
+
+function toDirectorySkill(item: {
+  record: SkillRecord
+  trustProfile: ReturnType<typeof getSkillTrustProfile>
+  qualityProfile: ReturnType<typeof getSkillQualityProfile>
+}): DirectorySkill {
+  const { record, trustProfile, qualityProfile } = item
+  return {
+    slug: record.slug,
+    name: record.name,
+    tagline: clampText(record.tagline || record.description, 110),
+    category: record.category,
+    stars: Number(record.github_stars || 0),
+    trustScore: trustProfile.score,
+    qualityScore: qualityProfile.score,
+    installCommand: record.install_command || (record.github_repo ? `npx skills add ${record.github_repo}` : undefined),
+  }
+}
+
+function buildDirectorySections(
+  enrichedRecords: Array<{
+    record: SkillRecord
+    qualityProfile: ReturnType<typeof getSkillQualityProfile>
+    trustProfile: ReturnType<typeof getSkillTrustProfile>
+    platformHints: string[]
+    supplyProfile: ReturnType<typeof getSkillSupplyProfile>
+  }>
+): DirectorySection[] {
+  const usedSlugs = new Set<string>()
+
+  return DIRECTORY_SCENARIOS.map((scenario) => {
+    const candidates = enrichedRecords
+      .map((item) => ({
+        item,
+        score: directoryMatchScore(scenario, item.record, item),
+      }))
+      .filter(({ score }) => score >= 4)
+      .sort((a, b) => {
+        const scoreDelta = b.score - a.score
+        if (scoreDelta !== 0) return scoreDelta
+        const trustDelta = b.item.trustProfile.score - a.item.trustProfile.score
+        if (trustDelta !== 0) return trustDelta
+        const qualityDelta = b.item.qualityProfile.score - a.item.qualityProfile.score
+        if (qualityDelta !== 0) return qualityDelta
+        return Number(b.item.record.github_stars || 0) - Number(a.item.record.github_stars || 0)
+      })
+
+    const matches: DirectorySkill[] = []
+    for (const { item } of candidates) {
+      if (usedSlugs.has(item.record.slug)) continue
+      usedSlugs.add(item.record.slug)
+      matches.push(toDirectorySkill(item))
+      if (matches.length >= 3) break
+    }
+
+    return {
+      title: scenario.title,
+      eyebrow: scenario.eyebrow,
+      href: scenario.href,
+      description: scenario.description,
+      skills: matches,
+    }
+  }).filter((section) => section.skills.length > 0).slice(0, 8)
+}
+
+function buildSkillsPageJsonLd(skills: SkillsPageSkill[], directorySections: DirectorySection[]) {
+  const deduped = new Map<string, DirectorySkill>()
+  for (const section of directorySections) {
+    for (const skill of section.skills) deduped.set(skill.slug, skill)
+  }
+  for (const skill of skills) {
+    if (!deduped.has(skill.slug)) {
+      deduped.set(skill.slug, {
+        slug: skill.slug,
+        name: skill.name,
+        tagline: skill.tagline,
+        category: skill.category,
+        stars: skill.stats.stars,
+        trustScore: skill.trustProfile?.score ?? null,
+        qualityScore: skill.stats.qualityScore || 0,
+        installCommand: skill.technical.installCommand,
+      })
+    }
+  }
+
+  const itemListElement = Array.from(deduped.values()).slice(0, 24).map((skill, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    url: `${SITE_URL}/skills/${skill.slug}`,
+    name: skill.name,
+    description: skill.tagline,
+  }))
+
+  return [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: SKILLS_PAGE_TITLE,
+      url: `${SITE_URL}/skills`,
+      description: SKILLS_PAGE_DESCRIPTION,
+      about: [
+        'AI agent skills',
+        'AI agent skill repository',
+        'Codex skills',
+        'Claude Code skills',
+        'Cursor skills',
+        'reusable AI agent tools',
+      ],
+      hasPart: {
+        '@type': 'ItemList',
+        name: 'OpenAgentSkill directory shortlist',
+        numberOfItems: itemListElement.length,
+        itemListElement,
+      },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'OpenAgentSkill',
+          item: SITE_URL,
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'AI Agent Skills Directory',
+          item: `${SITE_URL}/skills`,
+        },
+      ],
+    },
+  ]
+}
+
 export default async function SkillsPage({
   searchParams,
 }: {
@@ -537,33 +875,45 @@ export default async function SkillsPage({
   const hasMoreResults = resultCount > pageOffset + visibleRecords.length
 
   const skills = visibleRecords.map(toSkillsPageSkill)
+  const directorySections = buildDirectorySections(enrichedRecords)
+  const directoryLinks: DirectoryLink[] = POPULAR_DIRECTORY_LINKS.map((link) => ({ ...link }))
+  const jsonLd = buildSkillsPageJsonLd(skills, directorySections)
 
   return (
-    <SkillsPageClient
-      skills={skills}
-      query={params.q}
-      sort={sort}
-      category={category}
-      categories={categoryOptions}
-      useCase={useCase}
-      useCases={USE_CASES.map((item) => ({
-        slug: item.slug,
-        shortTitle: item.shortTitle,
-      }))}
-      platform={platform}
-      platformOptions={platformOptions}
-      quality={quality}
-      trust={trust}
-      safety={safety}
-      supplyTrack={supplyTrack}
-      supplyTracks={supplyTracks}
-      minStars={Number.isFinite(minStars) ? minStars : 0}
-      resultCount={resultCount}
-      page={effectivePage}
-      rankOffset={pageOffset}
-      hasPreviousResults={hasPreviousResults}
-      hasMoreResults={hasMoreResults}
-      degraded={degraded}
-    />
+    <>
+      <script
+        id="skills-directory-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <SkillsPageClient
+        skills={skills}
+        query={params.q}
+        sort={sort}
+        category={category}
+        categories={categoryOptions}
+        useCase={useCase}
+        useCases={USE_CASES.map((item) => ({
+          slug: item.slug,
+          shortTitle: item.shortTitle,
+        }))}
+        platform={platform}
+        platformOptions={platformOptions}
+        quality={quality}
+        trust={trust}
+        safety={safety}
+        supplyTrack={supplyTrack}
+        supplyTracks={supplyTracks}
+        minStars={Number.isFinite(minStars) ? minStars : 0}
+        resultCount={resultCount}
+        page={effectivePage}
+        rankOffset={pageOffset}
+        hasPreviousResults={hasPreviousResults}
+        hasMoreResults={hasMoreResults}
+        degraded={degraded}
+        directorySections={directorySections}
+        directoryLinks={directoryLinks}
+      />
+    </>
   )
 }

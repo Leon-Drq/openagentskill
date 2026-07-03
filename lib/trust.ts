@@ -102,6 +102,72 @@ export interface SkillTrustProfile {
   knownRisks: string[]
 }
 
+export interface SkillTrustV5Decision {
+  install_policy: SkillTrustInstallPolicy
+  auto_install_allowed: boolean
+  human_review_required: boolean
+  sandbox_first: boolean
+  agent_action: string
+  reasoning: string[]
+  review_required_when: string[]
+}
+
+export interface SkillTrustV5OutcomeLoop {
+  version: 'openagentskill-agent-outcome-v3'
+  required_after_install: boolean
+  endpoint: '/api/agent/outcome'
+  method: 'POST'
+  event_id_source: string
+  expected_outcomes: string[]
+  required_fields: string[]
+  quality_fields: string[]
+  ranking_inputs_updated: string[]
+}
+
+export interface SkillTrustProfileV5 {
+  version: 'trust-score-v5'
+  score: number
+  base_score: number
+  outcome_confidence: number
+  tier: SkillTrustTier
+  label: string
+  summary: string
+  recommendedAction: string
+  decision: SkillTrustV5Decision
+  dimensions: SkillTrustDimension[]
+  checks: SkillTrustCheck[]
+  strengths: string[]
+  warnings: string[]
+  evidence: SkillTrustEvidence & {
+    agentProvenScore: number
+    outcomeConfidence: string
+    installPolicy: string
+  }
+  installReadiness: SkillTrustInstallReadiness
+  agentCompatibility: string[]
+  riskSummary: SkillTrustRiskSummary
+  outcomeEvidence: SkillTrustOutcomeEvidence
+  autoInstall: SkillTrustAutoInstall
+  outcome_loop: SkillTrustV5OutcomeLoop
+  agent_contract: {
+    suited_tasks: string[]
+    suited_agents: string[]
+    install_command: string | null
+    trust_score: number
+    trust_version: 'trust-score-v5'
+    risk_level: SkillTrustRiskLevel
+    do_not_use_when: string[]
+    before_install: string[]
+    after_run: string[]
+  }
+  bestFor: string[]
+  doNotUseFor: string[]
+  knownRisks: string[]
+  backward_compatible: {
+    trust_score_v4: Pick<SkillTrustProfile, 'version' | 'score' | 'tier' | 'label' | 'summary'>
+  }
+}
+
 function clampScore(score: number) {
   return Math.max(0, Math.min(100, Math.round(score)))
 }
@@ -949,5 +1015,253 @@ export function getSkillTrustProfile(
     bestFor: getBestFor(skill),
     doNotUseFor: getDoNotUseFor(skill, policy, outcomeEvidence),
     knownRisks: finalWarnings.slice(0, 8),
+  }
+}
+
+function getOutcomeConfidence(evidence: SkillTrustOutcomeEvidence) {
+  if (evidence.total <= 0) return 0
+  return Math.min(1, Number((Math.log10(evidence.total + 1) / 1.2).toFixed(2)))
+}
+
+function getV5Tier(
+  score: number,
+  base: SkillTrustProfile,
+  outcomeConfidence: number
+): Pick<SkillTrustProfileV5, 'tier' | 'label' | 'summary' | 'recommendedAction'> {
+  if (score >= 88 && base.autoInstall.allowed && outcomeConfidence >= 0.45) {
+    return {
+      tier: 'production',
+      label: 'Agent-ready candidate',
+      summary:
+        'Strong Trust Score v5 with enough repository, install, risk, and outcome-loop evidence for a sandbox-first agent handoff.',
+      recommendedAction: 'Allow sandbox-first agent installation, run one narrow task, then report the outcome.',
+    }
+  }
+
+  if (score >= 76) {
+    return {
+      tier: 'strong',
+      label: 'Review then install',
+      summary:
+        'Good shortlist signal, but the agent should review audit notes, install policy, and outcome evidence before running it.',
+      recommendedAction: 'Use as the primary candidate after human or sandbox review.',
+    }
+  }
+
+  if (score >= 60) {
+    return {
+      tier: 'review',
+      label: 'Sandbox only',
+      summary:
+        'Useful candidate with missing or mixed trust signals. Keep it in an isolated workspace until the outcome loop proves task fit.',
+      recommendedAction: 'Run only in a sandbox and compare close alternatives before using it for real work.',
+    }
+  }
+
+  return {
+    tier: 'risk',
+    label: 'Do not auto-install',
+    summary:
+      'Trust Score v5 found insufficient evidence for agent installation. Treat this as discovery material, not an executable recommendation.',
+    recommendedAction: 'Choose a stronger alternative or inspect the source manually before any install attempt.',
+  }
+}
+
+function buildV5Decision(
+  score: number,
+  base: SkillTrustProfile,
+  outcomeConfidence: number
+): SkillTrustV5Decision {
+  const outcome = base.outcomeEvidence
+  const enoughOutcomeEvidence = outcome.total >= 3 || outcomeConfidence >= 0.5
+  const healthyOutcomeEvidence =
+    outcome.total === 0 ||
+    (
+      outcome.riskBlocked === 0 &&
+      outcome.notRelevant === 0 &&
+      outcome.humanReviewRequired === 0 &&
+      (outcome.successRate === null || outcome.successRate >= 68) &&
+      (outcome.recentFailureRate === null || outcome.recentFailureRate < 38)
+    )
+  const autoInstallAllowed =
+    score >= 88 &&
+    base.autoInstall.allowed &&
+    enoughOutcomeEvidence &&
+    healthyOutcomeEvidence &&
+    base.riskSummary.level === 'low'
+  const humanReviewRequired =
+    !autoInstallAllowed ||
+    base.installReadiness.policy !== 'agent_install_candidate' ||
+    base.riskSummary.level !== 'low' ||
+    outcome.humanReviewRequired > 0
+
+  const reasoning = [
+    `${score}/100 Trust Score v5`,
+    `${base.score}/100 Trust Score v4 baseline`,
+    enoughOutcomeEvidence
+      ? `${outcome.label}; outcome confidence ${Math.round(outcomeConfidence * 100)}%`
+      : 'Needs more real agent outcomes before unattended install',
+    base.installReadiness.ready ? 'Install path is available' : 'Install path is missing',
+    base.riskSummary.label,
+  ]
+
+  return {
+    install_policy: autoInstallAllowed ? 'agent_install_candidate' : base.installReadiness.policy,
+    auto_install_allowed: autoInstallAllowed,
+    human_review_required: humanReviewRequired,
+    sandbox_first: true,
+    agent_action: autoInstallAllowed
+      ? 'Install in a sandbox, run one narrow task, then report outcome.'
+      : score >= 76
+        ? 'Ask for approval or run a sandbox-only trial before installing.'
+        : 'Compare alternatives before installing.',
+    reasoning,
+    review_required_when: [
+      'The workspace contains production secrets, payments, private customer data, or irreversible actions.',
+      'The install command requests shell, network, credential, database, or broad filesystem access.',
+      'Outcome evidence is missing, recently failed, or required human review.',
+      ...base.doNotUseFor.slice(0, 3),
+    ].filter((item, index, items) => items.indexOf(item) === index),
+  }
+}
+
+function buildV5OutcomeLoop(): SkillTrustV5OutcomeLoop {
+  return {
+    version: 'openagentskill-agent-outcome-v3',
+    required_after_install: true,
+    endpoint: '/api/agent/outcome',
+    method: 'POST',
+    event_id_source: 'feedback.event_id, install_receipt.resolve_event_id, or decision_packet.outcome_feedback.event_id',
+    expected_outcomes: ['success', 'failed', 'not_relevant', 'blocked_by_risk', 'setup_required'],
+    required_fields: ['event_id', 'skill_slug', 'task'],
+    quality_fields: [
+      'task_success',
+      'output_quality',
+      'error_type',
+      'human_review_required',
+      'used_in_production',
+      'workspace',
+      'evidence_url',
+      'time_to_useful_ms',
+    ],
+    ranking_inputs_updated: [
+      'Trust Score v5 outcome confidence',
+      'Agent Proven Score',
+      'Resolve ranking task-fit evidence',
+      'Skill detail machine-readable metadata',
+      'Outcome leaderboard',
+    ],
+  }
+}
+
+export function getSkillTrustProfileV5(
+  skill: SkillRecord,
+  hasApprovedClaim = false,
+  eventStats?: SkillEventStats | null,
+  outcomeStats?: TrustOutcomeStats
+): SkillTrustProfileV5 {
+  const base = getSkillTrustProfile(skill, hasApprovedClaim, eventStats, outcomeStats)
+  const outcomeConfidence = getOutcomeConfidence(base.outcomeEvidence)
+  const outcomeScore = scoreAgentOutcomes(base.outcomeEvidence)
+  const outcomeWeight = base.outcomeEvidence.total > 0 ? 0.18 + outcomeConfidence * 0.2 : 0.08
+  let score = base.outcomeEvidence.total > 0
+    ? base.score * (1 - outcomeWeight) + outcomeScore * outcomeWeight
+    : base.score - 3
+
+  if (base.installReadiness.policy !== 'agent_install_candidate') score -= 2
+  if (base.riskSummary.level === 'high') score -= 7
+  else if (base.riskSummary.level === 'medium') score -= 3
+  if (base.outcomeEvidence.total > 0 && base.outcomeEvidence.recentFailureRate !== null && base.outcomeEvidence.recentFailureRate >= 38) score -= 5
+  if (base.outcomeEvidence.riskBlocked > 0) score -= Math.min(8, base.outcomeEvidence.riskBlocked * 2)
+  if (base.outcomeEvidence.notRelevant > 0) score -= Math.min(6, base.outcomeEvidence.notRelevant * 2)
+  if (base.outcomeEvidence.productionOutcomes > 0 && base.outcomeEvidence.successRate !== null && base.outcomeEvidence.successRate >= 75) score += 3
+
+  const finalScore = clampScore(score)
+  const tier = getV5Tier(finalScore, base, outcomeConfidence)
+  const decision = buildV5Decision(finalScore, base, outcomeConfidence)
+  const outcomeLoop = buildV5OutcomeLoop()
+  const installCommand = base.installReadiness.command
+
+  return {
+    version: 'trust-score-v5',
+    score: finalScore,
+    base_score: base.score,
+    outcome_confidence: outcomeConfidence,
+    ...tier,
+    decision,
+    dimensions: base.dimensions,
+    checks: base.checks,
+    strengths: [
+      ...base.strengths,
+      base.outcomeEvidence.total > 0
+        ? `Outcome confidence ${Math.round(outcomeConfidence * 100)}% from ${formatCompactNumber(base.outcomeEvidence.total)} report(s)`
+        : 'Outcome loop is ready but needs first real agent run',
+    ].filter((item, index, items) => items.indexOf(item) === index).slice(0, 10),
+    warnings: [
+      ...base.warnings,
+      ...(base.outcomeEvidence.total === 0 ? ['No real agent outcome reports yet'] : []),
+      ...(decision.human_review_required ? ['Human review required before unattended installation'] : []),
+    ].filter((item, index, items) => items.indexOf(item) === index).slice(0, 12),
+    evidence: {
+      ...base.evidence,
+      agentProvenScore: base.outcomeEvidence.agentProvenScore,
+      outcomeConfidence: `${Math.round(outcomeConfidence * 100)}%`,
+      installPolicy: decision.install_policy,
+    },
+    installReadiness: {
+      ...base.installReadiness,
+      policy: decision.install_policy,
+      label: getInstallPolicyLabel(decision.install_policy),
+      notes: [
+        ...base.installReadiness.notes,
+        decision.auto_install_allowed
+          ? 'Trust Score v5 allows sandbox-first agent installation.'
+          : 'Trust Score v5 requires review or sandbox-only use before install.',
+      ].filter((item, index, items) => items.indexOf(item) === index),
+    },
+    agentCompatibility: base.agentCompatibility,
+    riskSummary: base.riskSummary,
+    outcomeEvidence: base.outcomeEvidence,
+    autoInstall: {
+      ...base.autoInstall,
+      allowed: decision.auto_install_allowed,
+      sandboxRequired: true,
+      policy: decision.install_policy,
+      reason: decision.agent_action,
+    },
+    outcome_loop: outcomeLoop,
+    agent_contract: {
+      suited_tasks: base.bestFor,
+      suited_agents: base.agentCompatibility,
+      install_command: installCommand,
+      trust_score: finalScore,
+      trust_version: 'trust-score-v5',
+      risk_level: base.riskSummary.level,
+      do_not_use_when: base.doNotUseFor,
+      before_install: [
+        'Read the audit page and machine-readable metadata.',
+        'Confirm the install command, license, and permission surface fit the workspace.',
+        decision.auto_install_allowed
+          ? 'Install in a sandbox or branch before production use.'
+          : 'Get explicit human approval or choose an alternative before installing.',
+      ],
+      after_run: [
+        'Report the outcome to /api/agent/outcome using the resolve event id.',
+        'Include output_quality, workspace, human_review_required, and evidence_url when available.',
+        'Re-resolve before broad production rollout.',
+      ],
+    },
+    bestFor: base.bestFor,
+    doNotUseFor: base.doNotUseFor,
+    knownRisks: base.knownRisks,
+    backward_compatible: {
+      trust_score_v4: {
+        version: base.version,
+        score: base.score,
+        tier: base.tier,
+        label: base.label,
+        summary: base.summary,
+      },
+    },
   }
 }

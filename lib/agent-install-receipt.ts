@@ -47,6 +47,31 @@ type ReceiptCandidate = {
       successRate?: number | null
     }
   }
+  trust_v5?: {
+    score: number
+    base_score?: number
+    outcome_confidence?: number
+    label: string
+    version: string
+    decision?: {
+      install_policy: string
+      auto_install_allowed: boolean
+      human_review_required: boolean
+      sandbox_first: boolean
+      agent_action: string
+      reasoning: string[]
+      review_required_when: string[]
+    }
+    outcome_loop?: {
+      version: string
+      endpoint: string
+      method: string
+      required_after_install: boolean
+      expected_outcomes: string[]
+      required_fields: string[]
+      quality_fields: string[]
+    }
+  }
   agent_proven?: {
     score: number
     label: string
@@ -141,7 +166,7 @@ export function buildAgentInstallReceipt(input: {
   const reasons = [
     ...selected.recommendation_reasons,
     selected.decision.headline,
-    `${selected.trust.score}/100 Trust Score`,
+    `${selected.trust_v5?.score || selected.trust.score}/100 Trust Score`,
     selected.agent_proven ? `${selected.agent_proven.score}/100 Agent Proven Score` : null,
     `${selected.audit.audit_score}/100 audit score`,
     `${selected.safety.score}/100 safety score`,
@@ -199,12 +224,16 @@ export function buildAgentInstallReceipt(input: {
       suited_agents: selected.machine_metadata.suited_agents,
     },
     trust: {
-      score: selected.trust.score,
-      label: selected.trust.label,
-      version: selected.trust.version,
+      score: selected.trust_v5?.score || selected.trust.score,
+      label: selected.trust_v5?.label || selected.trust.label,
+      version: selected.trust_v5?.version || selected.trust.version,
+      base_score: selected.trust_v5?.base_score || selected.trust.score,
+      outcome_confidence: selected.trust_v5?.outcome_confidence ?? null,
       outcome_signal: selected.trust.outcomeEvidence?.label || 'No reported agent outcomes yet',
       outcome_total: selected.trust.outcomeEvidence?.total || 0,
       outcome_success_rate: selected.trust.outcomeEvidence?.successRate ?? null,
+      decision: selected.trust_v5?.decision || null,
+      outcome_loop: selected.trust_v5?.outcome_loop || null,
     },
     agent_proven: selected.agent_proven
       ? {
@@ -258,7 +287,7 @@ export function buildAgentInstallReceipt(input: {
       },
       cli_example: input.feedback.cli_example,
       instruction:
-        'After one narrow sandbox run, report success, failed, not_relevant, blocked_by_risk, or setup_required so future agent rankings learn from real usage.',
+      'After one narrow sandbox run, report success, failed, not_relevant, blocked_by_risk, or setup_required so Trust Score v5 and future agent rankings learn from real usage.',
     },
     next_steps: [
       `Read the audit page: ${selected.urls.audit}`,

@@ -67,7 +67,7 @@ export async function GET() {
         },
         '/api/agent/resolve': {
           get: {
-            summary: 'Resolve a task into a stable decision_packet, recommendation.best_skill, alternatives, Agent Proven Score, Trust Score v4, safety gate, install plan, feedback contract, and agent_handoff',
+            summary: 'Resolve a task into a stable decision_packet, recommendation.best_skill, alternatives, Agent Proven Score, Trust Score v5, safety gate, install plan, feedback contract, and agent_handoff',
             parameters: [
               { name: 'task', in: 'query', required: true, schema: { type: 'string' } },
               { name: 'agent', in: 'query', required: false, schema: { type: 'string', enum: ['auto', 'codex', 'claude-code', 'cursor', 'openagentskill-cli'] } },
@@ -78,7 +78,7 @@ export async function GET() {
             responses: {
               '200': {
                 description:
-                  'Resolved skill plan. Read decision_packet first for the stable agent contract: selected_skill, install, agent_proven, trust dimensions, do_not_use_when, alternatives, and outcome_feedback. recommendation.agent_contract, feedback, and agent_handoff remain available for backwards-compatible workflows.',
+                  'Resolved skill plan. Read decision_packet first for the stable agent contract: selected_skill, install, agent_proven, Trust Score v5 decision, do_not_use_when, alternatives, and outcome_feedback. recommendation.agent_contract, feedback, and agent_handoff remain available for backwards-compatible workflows.',
               },
             },
           },

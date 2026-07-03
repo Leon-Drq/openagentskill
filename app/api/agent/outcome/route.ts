@@ -4,6 +4,7 @@ import {
   AGENT_OUTCOME_ERROR_TYPES,
   AGENT_OUTCOME_WORKSPACES,
   AGENT_OUTCOMES,
+  AGENT_OUTCOME_PROTOCOL_VERSION,
   buildOutcomeMetadata,
   buildOutcomeTrustImpact,
 } from '@/lib/agent-outcomes'
@@ -37,11 +38,16 @@ const OutcomeSchema = z.object({
 
 function buildOutcomeContract() {
   return {
-    version: 'openagentskill-agent-outcome-v2',
+    version: AGENT_OUTCOME_PROTOCOL_VERSION,
     endpoint: '/api/agent/outcome',
     method: 'POST',
     idempotency: 'event_id is unique. Retrying the same event_id updates the previous outcome.',
     required_fields: ['event_id', 'skill_slug', 'task'],
+    event_id_sources: [
+      'feedback.event_id from /api/agent/resolve',
+      'install_receipt.resolve_event_id from /api/agent/receipt',
+      'decision_packet.outcome_feedback.event_id from /api/agent/resolve',
+    ],
     outcomes: AGENT_OUTCOMES,
     error_types: AGENT_OUTCOME_ERROR_TYPES,
     workspaces: AGENT_OUTCOME_WORKSPACES,
@@ -60,7 +66,8 @@ function buildOutcomeContract() {
       avg_output_quality: 'average reported output quality, 1-5',
     },
     ranking_impact: [
-      'Updates Trust Score v4 Agent Proven outcome dimension',
+      'Updates Trust Score v5 outcome confidence',
+      'Updates Trust Score v4 compatibility evidence',
       'Updates /rankings/agent-proven and /rankings/best-by-success-rate',
       'Changes /api/agent/resolve ordering for similar tasks',
       'Appears on skill detail pages and machine-readable skill profiles',
@@ -76,7 +83,9 @@ function buildOutcomeContract() {
       output_quality: 4,
       error_type: null,
       human_review_required: false,
+      used_in_production: false,
       workspace: 'sandbox',
+      evidence_url: null,
       time_to_useful_ms: 120000,
       notes: 'Solved one narrow sandbox task; no secrets or production data touched.',
       dry_run: false,
@@ -93,6 +102,7 @@ function formatOutcomeContractText() {
     `Endpoint: POST ${contract.endpoint}`,
     `Idempotency: ${contract.idempotency}`,
     `Required fields: ${contract.required_fields.join(', ')}`,
+    `Event id sources: ${contract.event_id_sources.join('; ')}`,
     `Outcomes: ${contract.outcomes.join(', ')}`,
     `Error types: ${contract.error_types.join(', ')}`,
     `Workspaces: ${contract.workspaces.join(', ')}`,
@@ -214,7 +224,7 @@ export async function POST(request: NextRequest) {
       outcome: payload.outcome,
       stats: stats || null,
       data,
-      contract_version: 'openagentskill-agent-outcome-v2',
+      contract_version: AGENT_OUTCOME_PROTOCOL_VERSION,
       trust_impact: trustImpact,
       next_agent_action:
         payload.outcome === 'success'

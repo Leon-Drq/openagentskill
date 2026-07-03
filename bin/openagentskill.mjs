@@ -12,6 +12,7 @@ Usage:
   openagentskill pack <pack-slug> [--limit 6] [--json]
   openagentskill install <slug> [--agent codex]
   openagentskill outcome <event_id> --skill <slug> --task "<task>" [--outcome success] [--agent codex] [--dry-run] [--output-quality 4]
+  openagentskill outcome-contract [--json]
   openagentskill evals
 
 Environment:
@@ -247,6 +248,27 @@ async function reportOutcome(baseUrl, eventId, flags) {
   }
 }
 
+async function outcomeContract(baseUrl, flags) {
+  const params = new URLSearchParams({
+    contract: 'true',
+    format: wantsJson(flags) ? 'json' : 'text',
+  })
+  const response = await fetch(`${baseUrl}/api/agent/outcome?${params.toString()}`)
+  const text = await response.text()
+  if (!response.ok) {
+    try {
+      const payload = JSON.parse(text)
+      throw new Error(payload.error || `Request failed with ${response.status}`)
+    } catch (error) {
+      if (error instanceof SyntaxError) throw new Error(text || `Request failed with ${response.status}`)
+      throw error
+    }
+  }
+
+  if (wantsJson(flags)) printJson(JSON.parse(text))
+  else console.log(text)
+}
+
 async function installSkill(baseUrl, slug, flags) {
   const response = await fetch(`${baseUrl}/api/skills/${encodeURIComponent(slug)}/install`)
   const payload = await readJson(response)
@@ -327,6 +349,11 @@ async function main() {
 
   if (command === 'outcome') {
     await reportOutcome(baseUrl, rest[0], flags)
+    return
+  }
+
+  if (command === 'outcome-contract') {
+    await outcomeContract(baseUrl, flags)
     return
   }
 

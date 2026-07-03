@@ -63,7 +63,7 @@ function ResolveDecisionCard({ result }: { result: ResolveResult }) {
   const recommendation = result.recommendation
   const selected = result.selected
   const receipt = result.install_receipt
-  const trust = recommendation?.trust_score_v4 || recommendation?.trust_score_v3 || recommendation?.trust_score_v2
+  const trust = recommendation?.trust_score_v5 || recommendation?.trust_score_v4 || recommendation?.trust_score_v3 || recommendation?.trust_score_v2
   if (!recommendation || !selected) return null
 
   const agentProven = selected.agent_proven
@@ -182,7 +182,7 @@ function ResolveDecisionCard({ result }: { result: ResolveResult }) {
 	                <p className="mt-2 text-sm leading-6 text-secondary">
                   {receipt
                     ? `Use receipt ${receipt.receipt_id} as the stable install handoff, then report one narrow run so rankings learn from real use.`
-                    : 'After one narrow run, report the result so Trust Score v4 and Agent-Proven rankings learn from real use.'}
+                    : 'After one narrow run, report the result so Trust Score v5 and Agent-Proven rankings learn from real use.'}
                 </p>
                 {result.feedback?.cli_example ? (
                   <code className="mt-3 block break-words font-mono text-[11px] leading-5 text-secondary [overflow-wrap:anywhere]">

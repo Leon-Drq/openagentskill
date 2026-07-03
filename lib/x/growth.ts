@@ -212,7 +212,7 @@ function buildWeeklyDigestPost(skills: SkillRecord[]) {
     '',
     ...picks.map((skill, index) => `${index + 1}. ${truncate(skill.name, 38)} - ${compactNumber(Number(skill.github_stars || 0))} stars`),
     '',
-    'Resolve -> Trust Score v4 -> install handoff -> outcome feedback.',
+    'Resolve -> Trust Score v5 -> install handoff -> outcome feedback.',
     'https://www.openagentskill.com/evals/resolve',
   ]
 

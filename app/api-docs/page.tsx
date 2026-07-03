@@ -201,7 +201,7 @@ export default function APIDocsPage() {
                   ['recommendation.best_skill', 'Selected skill with web, API, audit, and repository URLs'],
                   ['recommendation.install', 'Command, target, install API, review requirement, and auto-install policy'],
                   ['recommendation.why_recommended', 'Short explainable ranking reasons for agent logs'],
-                  ['recommendation.trust_score_v4', 'Trust Score v4 evidence, outcome signals, install safety, permission surface, install policy, compatibility, and risk summary'],
+                  ['recommendation.trust_score_v5', 'Trust Score v5 decision, outcome confidence, install policy, compatibility, risk summary, and v4 compatibility data'],
                   ['agent_proven', '0-100 outcome-backed adoption score with recent success/failure, install success, output quality, production use, and unique agent signals'],
                   ['install_receipt', 'Stable install receipt with selected skill, install policy, risk notes, alternatives, outcome event id, and next steps'],
                   ['decision_packet', 'Stable agent contract with selected skill, install plan, trust dimensions, do_not_use_when, alternatives, and outcome_feedback'],
@@ -322,7 +322,7 @@ export default function APIDocsPage() {
             </div>
             <div className="p-4 sm:p-6">
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
-                {'Report what happened after an agent tried one resolved skill. These aggregate signals feed Trust Score v4, Agent-Proven rankings, skill detail pages, and the public Resolve eval dashboard.'}
+                {'Report what happened after an agent tried one resolved skill. These aggregate signals feed Trust Score v5, Agent-Proven rankings, skill detail pages, and the public Resolve eval dashboard.'}
               </p>
               <div className="grid gap-px border border-border bg-border text-sm sm:mb-6 md:grid-cols-2">
                 {[
@@ -339,7 +339,7 @@ export default function APIDocsPage() {
                   ['dry_run', 'Set true to validate a payload without writing a database row'],
                   ['GET /api/agent/outcome?skill_slug=crawl4ai', 'Read aggregate success and install-attempt stats'],
                   ['GET /api/agent/outcome?format=text', 'Read a compact machine-friendly outcome summary'],
-                  ['GET /api/agent/outcome?contract=true', 'Read the v2 feedback contract'],
+                  ['GET /api/agent/outcome?contract=true', 'Read the v3 feedback contract'],
                 ].map(([field, detail]) => (
                   <div key={field} className="min-w-0 bg-background p-3">
                     <code className="font-mono text-xs">{field}</code>

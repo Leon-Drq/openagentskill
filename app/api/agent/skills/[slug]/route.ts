@@ -12,7 +12,7 @@ import { getSkillAttribution } from '@/lib/skill-attribution'
 import { buildSkillEvalProfile } from '@/lib/skill-evals'
 import { getSkillBySlugOrFallback, getSkillSuggestionsForSlug, isCuratedSkillFallback, normalizeSkillSlug } from '@/lib/skill-fallbacks'
 import { getSkillSupplyProfile } from '@/lib/supply'
-import { getSkillTrustProfile } from '@/lib/trust'
+import { getSkillTrustProfile, getSkillTrustProfileV5 } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
 export const revalidate = 300
@@ -72,6 +72,7 @@ export async function GET(
           ).catch(() => null),
         ])
     const trustProfile = getSkillTrustProfile(skill, Boolean(approvedClaim), eventStats, outcomeStats)
+    const trustProfileV5 = getSkillTrustProfileV5(skill, Boolean(approvedClaim), eventStats, outcomeStats)
     const agentProven = getAgentProvenProfile(outcomeStats)
     const audit = buildSkillAudit(skill, eventStats)
     const safetyProfile = getAgentSafetyProfile(skill, audit, {
@@ -116,7 +117,8 @@ Supply Profile:
 
 Statistics:
 - Quality Score: ${Number(skill.quality_score || 0)}
-- Trust Score: ${trustProfile.score} (${trustProfile.label})
+- Trust Score v5: ${trustProfileV5.score} (${trustProfileV5.label})
+- Trust Score v4 baseline: ${trustProfile.score} (${trustProfile.label})
 - Agent Proven Score: ${agentProven.score}/100 (${agentProven.label})
 - Agent Outcomes: ${trustProfile.outcomeEvidence.label}
 - Recent Success: ${agentProven.metrics.recentSuccessRate === null ? 'No data' : `${Math.round(agentProven.metrics.recentSuccessRate)}%`}
@@ -147,6 +149,7 @@ Agent-readable metadata:
 - Suited tasks: ${agentReadableMetadata.suited_tasks.slice(0, 4).join('; ')}
 - Suited agents: ${agentReadableMetadata.suited_agents.slice(0, 5).join(', ')}
 - Install policy: ${agentReadableMetadata.safety_gate.auto_install_policy}
+- Trust decision: ${trustProfileV5.decision.agent_action}
 - Do not use when: ${agentReadableMetadata.do_not_use_when.slice(0, 3).join('; ')}
 
 Pre-install Eval:
@@ -191,7 +194,9 @@ Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
           quality_score: Number(skill.quality_score || 0),
         },
         quality: getSkillQualityProfile(skill),
-        trust: trustProfile,
+        trust: trustProfileV5,
+        trust_score_v5: trustProfileV5,
+        trust_score_v4: trustProfile,
         agent_proven: agentProven,
         outcome_stats: outcomeStats,
         safety: safetyProfile,

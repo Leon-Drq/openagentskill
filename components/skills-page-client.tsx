@@ -63,6 +63,31 @@ interface SkillSupplySummary {
   }
 }
 
+interface DirectorySkill {
+  slug: string
+  name: string
+  tagline: string
+  category: string
+  stars: number
+  trustScore: number | null
+  qualityScore: number
+  installCommand?: string
+}
+
+interface DirectorySection {
+  title: string
+  eyebrow: string
+  href: string
+  description: string
+  skills: DirectorySkill[]
+}
+
+interface DirectoryLink {
+  label: string
+  href: string
+  description: string
+}
+
 interface Skill {
   id: string
   slug: string
@@ -152,6 +177,8 @@ interface Props {
   hasPreviousResults: boolean
   hasMoreResults: boolean
   degraded: boolean
+  directorySections: DirectorySection[]
+  directoryLinks: DirectoryLink[]
 }
 
 export function SkillsPageClient({
@@ -176,6 +203,8 @@ export function SkillsPageClient({
   hasPreviousResults,
   hasMoreResults,
   degraded,
+  directorySections,
+  directoryLinks,
 }: Props) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -233,6 +262,12 @@ export function SkillsPageClient({
     router.push('/skills')
   }
 
+  const formatStars = (stars: number) => {
+    if (stars >= 1000000) return `${(stars / 1000000).toFixed(1)}M`
+    if (stars >= 1000) return `${(stars / 1000).toFixed(stars >= 10000 ? 0 : 1)}K`
+    return stars.toLocaleString()
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
@@ -241,13 +276,13 @@ export function SkillsPageClient({
         <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
         <div className="relative mx-auto grid max-w-6xl gap-8 px-6 py-12 md:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.24em] text-secondary">Skill Registry</p>
-            <h1 className="mt-5 max-w-3xl font-display text-4xl font-normal leading-[0.98] text-balance md:text-6xl">
-              Find the right skill for the job your agent is doing.
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-secondary md:text-lg">
-              Search by task, platform, trust profile, or GitHub adoption. OpenAgentSkill keeps the interface human-readable and the API ready for agents.
-            </p>
+	            <p className="font-mono text-xs uppercase tracking-[0.24em] text-secondary">AI Agent Skill Repository</p>
+	            <h1 className="mt-5 max-w-3xl font-display text-4xl font-normal leading-[0.98] text-balance md:text-6xl">
+	              AI Agent Skills Directory
+	            </h1>
+	            <p className="mt-6 max-w-2xl text-base leading-7 text-secondary md:text-lg">
+	              Browse reusable skills for Codex, Claude Code, Cursor, finance, research, web scraping, PPT, football analytics, data, marketing, design, and more.
+	            </p>
           </div>
 
           <div className="border border-border bg-card/85 p-4 shadow-[0_18px_60px_rgba(23,23,23,0.05)] backdrop-blur">
@@ -289,9 +324,88 @@ export function SkillsPageClient({
             </div>
           </div>
         </div>
-      </section>
+	      </section>
 
-      <section className="border-b border-border bg-card/35">
+	      {directorySections.length > 0 && (
+	        <section className="border-b border-border bg-background">
+	          <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+	            <div className="mb-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+	              <div>
+	                <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Browse by scenario</p>
+	                <h2 className="mt-2 max-w-2xl font-display text-3xl font-normal leading-tight text-balance sm:text-4xl">
+	                  Real skills, grouped by the work your agent needs to finish.
+	                </h2>
+	              </div>
+	              <p className="max-w-2xl text-sm leading-7 text-secondary lg:justify-self-end">
+	                Each directory entry links to real skill pages with GitHub adoption, trust score,
+	                install handoff, risk notes, and agent-readable metadata. Use these as starting
+	                points when you want a shortlist before asking an agent to install anything.
+	              </p>
+	            </div>
+
+	            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+	              {directorySections.map((section) => (
+	                <article key={section.title} className="flex min-w-0 flex-col border border-border bg-card/65 p-4">
+	                  <div className="min-w-0">
+	                    <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
+	                      {section.eyebrow}
+	                    </p>
+	                    <Link href={section.href} className="mt-2 block font-display text-xl font-semibold leading-tight hover:opacity-70">
+	                      {section.title}
+	                    </Link>
+	                    <p className="mt-2 text-sm leading-6 text-secondary">
+	                      {section.description}
+	                    </p>
+	                  </div>
+
+	                  <ul className="mt-4 space-y-3">
+	                    {section.skills.map((skill) => (
+	                      <li key={skill.slug} className="min-w-0 border-t border-border pt-3">
+	                        <div className="flex min-w-0 items-start justify-between gap-3">
+	                          <Link href={`/skills/${skill.slug}`} className="min-w-0 font-semibold leading-snug hover:opacity-70">
+	                            <span className="block break-words">{skill.name}</span>
+	                          </Link>
+	                          <span className="shrink-0 rounded-full border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-secondary">
+	                            {formatStars(skill.stars)} stars
+	                          </span>
+	                        </div>
+	                        <p className="mt-1 line-clamp-2 text-xs leading-5 text-secondary">
+	                          {skill.tagline}
+	                        </p>
+	                        <div className="mt-2 flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-wider text-secondary">
+	                          <span>Trust {skill.trustScore ?? 'review'}</span>
+	                          <span>Quality {skill.qualityScore}</span>
+	                          <span>{skill.category}</span>
+	                        </div>
+	                      </li>
+	                    ))}
+	                  </ul>
+	                </article>
+	              ))}
+	            </div>
+
+	            {directoryLinks.length > 0 && (
+	              <div className="mt-6 border border-border bg-background/80 p-4">
+	                <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Popular directories</p>
+	                <div className="mt-4 grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+	                  {directoryLinks.map((link) => (
+	                    <Link
+	                      key={link.href}
+	                      href={link.href}
+	                      className="min-w-0 border border-border px-3 py-3 text-sm transition-colors hover:border-foreground"
+	                    >
+	                      <span className="block font-semibold leading-snug">{link.label}</span>
+	                      <span className="mt-1 block text-xs leading-5 text-secondary">{link.description}</span>
+	                    </Link>
+	                  ))}
+	                </div>
+	              </div>
+	            )}
+	          </div>
+	        </section>
+	      )}
+
+	      <section className="border-b border-border bg-card/35">
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
           <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>

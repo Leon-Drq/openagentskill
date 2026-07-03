@@ -641,7 +641,7 @@ export async function GET() {
       ],
       ranking_inputs: [
         'Agent Proven Score from real-agent outcome evidence',
-        'Trust Score v4 real-agent outcome evidence',
+        'Trust Score v5 outcome confidence',
         'recent success and recent failure rates',
         'install success, output quality, production use, and unique agent adoption',
         'skill detail outcome signal blocks',

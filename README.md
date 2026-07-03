@@ -41,7 +41,7 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 
 | I am a... | Start with | What you get |
 | --- | --- | --- |
-| Agent builder | [`/api/agent/resolve`](https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&agent=codex&max_risk=medium&format=text) | One recommended skill, alternatives, install receipt, trust signals, and risk notes |
+| Agent builder | [`/api/agent/resolve`](https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&agent=codex&max_risk=medium&format=text) | One recommended skill, alternatives, install receipt, Trust Score v5, and risk notes |
 | Skill author | [Creator Kit](https://www.openagentskill.com/creator-kit) | Canonical page, README badges, audit surface, Agent Proven badge, X share card, and claim path |
 | Developer exploring skills | [GitHub Skill Index](./skills/README.md) | Curated domain maps and scenario-first examples |
 | SEO/community operator | [X Growth Kit](https://www.openagentskill.com/x-kit) | Human-readable launch drafts and creator reply workflows |
@@ -54,7 +54,7 @@ OpenAgentSkill is not another static directory. It is a registry, trust layer, a
 | --- | --- |
 | 10,000+ indexed skills | Broad coverage across coding, research, finance, data, design, marketing, legal, education, sports analytics, and more |
 | GitHub domain + scenario index | Curated pages for coding, web scraping, finance, RAG, PDF parsing, browser automation, DevOps, security, support, commerce, Web3, ML/media, and real agent jobs |
-| Trust Score + audit pages | Agents can inspect quality, license, README/SKILL.md completeness, install safety, maintenance, and risk signals |
+| Trust Score v5 + audit pages | Agents can inspect quality, license, README/SKILL.md completeness, install safety, maintenance, outcome confidence, and risk signals |
 | Outcome feedback loop | Resolved skills can report `success`, `failed`, `not_relevant`, `blocked_by_risk`, or `setup_required` so rankings learn from real use |
 | Agent Proven Score | Every outcome can update success rate, recent failure rate, install success, output quality, production use, and human-review pressure |
 | Agent-Proven rankings | Skills with real outcome reports rank above untested high-star projects when agents need safer install candidates |
@@ -80,6 +80,7 @@ Use the response to inspect:
 - resolve lockfile
 - pack install plan
 - trust_score
+- trust_score_v5
 - audit_url
 - risk_level
 - do_not_use_when
@@ -119,6 +120,7 @@ OpenAgentSkill Resolve
 Task: analyze stock news
 Best skill: Serenity Skill
 Trust Score: 83/100
+Trust Score v5: 79/100, Review then install
 Agent Proven: 76/100, Agent proven
 Install: npx skills add muxuuu/serenity-skill
 Risk: needs_review
@@ -149,6 +151,37 @@ Read the machine-friendly outcome summary:
 
 ```bash
 curl "https://www.openagentskill.com/api/agent/outcome?format=text"
+```
+
+Read the integration contract before wiring a new agent:
+
+```bash
+npx openagentskill outcome-contract
+curl "https://www.openagentskill.com/api/agent/outcome?contract=true"
+```
+
+## TypeScript SDK
+
+The lightweight SDK lives in [`sdk/openagentskill.ts`](./sdk/openagentskill.ts). It is dependency-free and can be copied into an agent runtime:
+
+```ts
+import { createOpenAgentSkillClient } from './sdk/openagentskill'
+
+const client = createOpenAgentSkillClient({ defaultAgent: 'codex' })
+const plan = await client.resolve('analyze stock news')
+
+// Read plan.recommendation.trust_score_v5 before installing.
+await client.reportOutcome({
+  event_id: plan.feedback.event_id,
+  skill_slug: plan.recommendation.best_skill.slug,
+  task: plan.task,
+  agent: plan.agent,
+  outcome: 'success',
+  install_used: true,
+  task_success: true,
+  output_quality: 4,
+  workspace: 'sandbox',
+})
 ```
 
 ## What Makes OpenAgentSkill Different?
@@ -262,9 +295,9 @@ Submit or fix a skill:
 | API Docs | [/api-docs](https://www.openagentskill.com/api-docs) | Programmatic access for agents and apps |
 | GitHub skill index | [skills/](./skills/README.md) | Curated domain lists for GitHub readers and agents |
 
-## Trust Score
+## Trust Score v5
 
-Trust Score is a decision signal for agents and builders. It combines:
+Trust Score v5 is a decision signal for agents and builders. It combines:
 
 - GitHub stars, forks, freshness, and maintenance.
 - README/SKILL.md completeness.
@@ -272,7 +305,8 @@ Trust Score is a decision signal for agents and builders. It combines:
 - Install command availability and safety.
 - Permission and runtime risk hints.
 - Audit score and risk level.
-- Real agent outcome feedback.
+- Real agent outcome feedback and outcome confidence.
+- A machine-readable install decision: auto-install, human review, or sandbox-only.
 
 Trust Score is not a security guarantee. It is a shortlist signal. Review source code before installing third-party skills in sensitive environments.
 

@@ -87,7 +87,8 @@ URL: ${payload.recommendation.best_skill.url}
 Repository: ${payload.recommendation.best_skill.repository}
 Install: ${payload.recommendation.install.command}
 Install policy: ${payload.recommendation.install.policy}
-Trust Score v4: ${payload.recommendation.trust_score_v4.score}/100 ${payload.recommendation.trust_score_v4.label}
+Trust Score v5: ${payload.recommendation.trust_score_v5.score}/100 ${payload.recommendation.trust_score_v5.label}
+Trust decision: ${payload.recommendation.trust_score_v5.decision.agent_action}
 Risk: ${payload.recommendation.risk.level}; ${payload.recommendation.risk.safety_tier}; ${payload.recommendation.risk.trust}
 Why:
 ${payload.recommendation.why_recommended.map((item) => `- ${item}`).join('\n')}
@@ -124,6 +125,7 @@ Selected: ${payload.decision_packet.selected_skill.name} (${payload.decision_pac
 Install: ${payload.decision_packet.install.command}
 Policy: ${payload.decision_packet.install.policy}
 Trust: ${payload.decision_packet.trust.score}/100 ${payload.decision_packet.trust.label}
+Trust decision: ${payload.decision_packet.trust.decision.agent_action}
 Risk: ${payload.decision_packet.risk.level}; ${payload.decision_packet.risk.safety_tier}
 Outcome endpoint: ${payload.decision_packet.outcome_feedback.endpoint}
 Outcome event: ${payload.decision_packet.outcome_feedback.event_id}
