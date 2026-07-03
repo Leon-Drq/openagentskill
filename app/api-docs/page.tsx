@@ -509,7 +509,7 @@ export default function APIDocsPage() {
             </div>
             <div className="p-4 sm:p-6">
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
-                {'Return an SVG README badge for a listed skill. Use metric=trust, quality, stars, audit, or proven.'}
+                {'Return an SVG README badge for a listed skill. Use metric=listed, trust, quality, stars, audit, or proven.'}
               </p>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
                 <code>{'GET /api/badge/crawl4ai?metric=audit'}</code>
@@ -864,12 +864,14 @@ This skill enables agents to perform comprehensive web research...`}</code>
             </div>
             <div className="p-4 sm:p-6">
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
-                {'Generate a README-friendly SVG badge for a skill audit score, trust score, Agent Proven Score, quality score, or GitHub stars.'}
+                {'Generate a README-friendly SVG badge for listed status, audit score, trust score, Agent Proven Score, quality score, or GitHub stars.'}
               </p>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Markdown'}</h3>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-4 sm:mb-6 whitespace-pre-wrap">
-                <code>{`[![OpenAgentSkill](https://www.openagentskill.com/api/badge/crawl4ai)](https://www.openagentskill.com/skills/crawl4ai)
+                <code>{`[![Listed](https://www.openagentskill.com/api/badge/crawl4ai?metric=listed&label=Listed)](https://www.openagentskill.com/skills/crawl4ai)
+
+[![Trust](https://www.openagentskill.com/api/badge/crawl4ai?metric=trust&label=Trust)](https://www.openagentskill.com/skills/crawl4ai)
 
 [![Audit](https://www.openagentskill.com/api/badge/crawl4ai?metric=audit&label=Audit)](https://www.openagentskill.com/skills/crawl4ai/audit)
 
@@ -884,7 +886,7 @@ This skill enables agents to perform comprehensive web research...`}</code>
               <div className="space-y-3 text-sm sm:text-base">
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
                   <code className="font-mono bg-muted px-2 py-1 w-fit shrink-0">{'metric'}</code>
-	                  <span className="text-secondary">{'trust, audit, quality, stars, proven, or agent-proven. Defaults to trust.'}</span>
+	                  <span className="text-secondary">{'listed, trust, audit, quality, stars, proven, or agent-proven. Defaults to listed.'}</span>
                 </div>
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
                   <code className="font-mono bg-muted px-2 py-1 w-fit shrink-0">{'label'}</code>

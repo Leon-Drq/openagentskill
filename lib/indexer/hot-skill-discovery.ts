@@ -167,6 +167,7 @@ export async function searchHotSkillRepos(
           topics: repo.topics || [],
           language: repo.language,
           query: query.q,
+          stars: repo.stargazers_count,
         })
         if (!evaluation.accepted) continue
         seen.add(repo.full_name)

@@ -34,7 +34,7 @@ const features = [
   {
     label: 'README badges',
     title: 'Show trust where developers decide',
-    copy: 'Add Trust, Audit, Agent Proven, and GitHub star badges to the project README with links back to the canonical listing.',
+    copy: 'Add Listed, Trust, Audit, Agent Proven, and GitHub star badges to the project README with links back to the canonical listing.',
   },
   {
     label: 'Share cards',
@@ -49,7 +49,8 @@ const features = [
 ]
 
 function badgeMarkdown(slug: string) {
-  return `[![OpenAgentSkill Trust](https://www.openagentskill.com/api/badge/${slug}?metric=trust&label=Trust)](https://www.openagentskill.com/skills/${slug})
+  return `[![Listed on OpenAgentSkill](https://www.openagentskill.com/api/badge/${slug}?metric=listed&label=Listed)](https://www.openagentskill.com/skills/${slug})
+[![OpenAgentSkill Trust](https://www.openagentskill.com/api/badge/${slug}?metric=trust&label=Trust)](https://www.openagentskill.com/skills/${slug})
 [![OpenAgentSkill Audit](https://www.openagentskill.com/api/badge/${slug}?metric=audit&label=Audit)](https://www.openagentskill.com/skills/${slug}/audit)
 [![Agent Proven](https://www.openagentskill.com/api/badge/${slug}?metric=proven&label=Agent%20Proven)](https://www.openagentskill.com/skills/${slug})`
 }
@@ -97,7 +98,7 @@ export default async function CreatorKitPage() {
           <MarketingMetricStrip
             columns="grid-cols-3"
             items={[
-              { value: '4', label: 'Badge types' },
+              { value: '5', label: 'Badge types' },
               { value: 'X', label: 'Share drafts' },
               { value: 'Audit', label: 'Trust page' },
             ]}
@@ -115,13 +116,13 @@ export default async function CreatorKitPage() {
         <div className="mx-auto grid max-w-6xl gap-8 px-6 py-10 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Copy into README</p>
-            <h2 className="mt-3 font-display text-3xl font-normal leading-tight">Trust, audit, and Agent Proven badges.</h2>
+            <h2 className="mt-3 font-display text-3xl font-normal leading-tight">Listed, trust, audit, and Agent Proven badges.</h2>
             <p className="mt-4 text-sm leading-6 text-secondary">
               Use the skill slug after the listing is live. The badges are SVG, cacheable, and link back to the canonical
               OpenAgentSkill page so developers and agents can inspect install risk before trying the skill.
             </p>
           </div>
-          <pre className="min-w-0 overflow-x-auto rounded-[8px] border border-border bg-card p-4 text-xs leading-6 text-secondary">
+          <pre className="min-w-0 overflow-x-auto whitespace-pre-wrap break-all rounded-[8px] border border-border bg-card p-4 text-xs leading-6 text-secondary">
             <code>{badgeMarkdown(sample?.slug || 'your-skill-slug')}</code>
           </pre>
         </div>
@@ -208,7 +209,7 @@ export default async function CreatorKitPage() {
               card, or move it to the first reply when the post needs to read like a native recommendation.
             </p>
           </div>
-          <pre className="min-w-0 overflow-x-auto rounded-[8px] border border-border bg-card p-4 text-sm leading-7 text-secondary whitespace-pre-wrap">
+          <pre className="min-w-0 overflow-x-auto whitespace-pre-wrap break-words rounded-[8px] border border-border bg-card p-4 text-sm leading-7 text-secondary">
             <code>{xDraft(sample?.name || 'Your Skill', sample?.slug || 'your-skill-slug', Number(sample?.github_stars || 0))}</code>
           </pre>
         </div>

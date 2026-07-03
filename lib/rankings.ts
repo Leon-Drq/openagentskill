@@ -2,6 +2,7 @@ import type { SkillAgentStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/s
 import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { dedupeRankedSkills } from '@/lib/registry'
+import { evaluateSkillLikeness } from '@/lib/skill-likeness'
 import { USE_CASES, getUseCaseBySlug, scoreSkillForUseCase } from '@/lib/use-cases'
 
 export type RankingKind =
@@ -184,6 +185,31 @@ function reasonForUseCase(skill: SkillRecord, score: number) {
   return `${quality.label} quality, ${compactStars(skill)}, and a ${Math.round(score)} use-case fit score.`
 }
 
+function getSkillLikeness(skill: SkillRecord) {
+  return evaluateSkillLikeness({
+    fullName: skill.github_repo,
+    name: skill.name,
+    description: skill.description,
+    longDescription: skill.long_description,
+    tagline: skill.tagline,
+    tags: skill.tags,
+    frameworks: skill.frameworks,
+    language: skill.github_language,
+    category: skill.category,
+    stars: skill.github_stars,
+  })
+}
+
+function rankingSkillPenalty(skill: SkillRecord) {
+  const likeness = getSkillLikeness(skill)
+
+  if (likeness.importReady && likeness.score >= 45) return 0
+  if (likeness.importReady) return 6
+  if (likeness.score >= 45 && Number(skill.github_stars || 0) < 50_000) return 8
+
+  return 45
+}
+
 function rankByUseCase(
   skills: SkillRecord[],
   definition: RankingDefinition,
@@ -193,8 +219,11 @@ function rankByUseCase(
   if (!useCase) return []
 
   const scored = skills
-    .map((skill) => ({ skill, score: scoreSkillForUseCase(skill, useCase) }))
-    .filter((item) => item.score >= 6)
+    .map((skill) => ({
+      skill,
+      score: scoreSkillForUseCase(skill, useCase) - rankingSkillPenalty(skill) / 12,
+    }))
+    .filter((item) => item.score >= 6 && rankingSkillPenalty(item.skill) < 45)
     .sort((a, b) => b.score - a.score || b.skill.github_stars - a.skill.github_stars)
 
   return dedupeRankedSkills(scored)
@@ -239,6 +268,7 @@ export function rankSkillsForDefinition(
       const uniqueAgents = stats && 'unique_agents' in stats ? Number(stats.unique_agents || 0) : 0
       const installAttempts = stats && 'install_attempts' in stats ? Number(stats.install_attempts || 0) : 0
       const lastPushedScore = freshnessScore(skill.github_last_pushed_at || skill.updated_at)
+      const skillSpecificPenalty = rankingSkillPenalty(skill)
       const createdAt = dateValue(skill.created_at)
       const isNewThisWeek = createdAt >= weekAgo
       const successRate =
@@ -276,28 +306,32 @@ export function rankSkillsForDefinition(
         case 'most-starred':
           return {
             skill,
-            score: Number(skill.github_stars || 0),
+            score: Number(skill.github_stars || 0) - skillSpecificPenalty * 10_000,
             badge: compactStars(skill),
             reason: `${compactStars(skill)} and ${quality.label.toLowerCase()} quality signals.`,
           }
         case 'recently-updated':
           return {
             skill,
-            score: lastPushedScore + quality.score / 5 + Math.log10(Math.max(1, skill.github_stars || 1)),
+            score: lastPushedScore + quality.score / 5 + Math.log10(Math.max(1, skill.github_stars || 1)) - skillSpecificPenalty,
             badge: `${Math.round(lastPushedScore)} fresh`,
             reason: `Recently pushed, ${quality.label.toLowerCase()} quality, and ${compactStars(skill)}.`,
           }
         case 'new-this-week':
           return {
             skill,
-            score: (isNewThisWeek ? 100 : 0) + dateValue(skill.created_at) / 1_000_000_000 + quality.score / 10,
+            score:
+              (isNewThisWeek ? 100 : 0) +
+              dateValue(skill.created_at) / 1_000_000_000 +
+              quality.score / 10 -
+              skillSpecificPenalty,
             badge: isNewThisWeek ? 'New this week' : 'Recently indexed',
             reason: `Indexed recently with ${quality.label.toLowerCase()} quality and ${compactStars(skill)}.`,
           }
         case 'agent-usage':
           return {
             skill,
-            score: usageScore + quality.score / 10 + proven.score * 0.32,
+            score: usageScore + quality.score / 10 + proven.score * 0.32 - skillSpecificPenalty,
             badge: totalUsage ? `${proven.score}/100 proven` : 'Needs first outcome',
             reason: totalUsage
               ? `${proven.summary} ${formatCompactNumber(installAttempts)} install attempts, ${riskBlocked} risk blocks, and ${quality.label.toLowerCase()} quality.`
@@ -311,7 +345,8 @@ export function rankSkillsForDefinition(
               proven.score * 0.65 +
               Math.min(18, Math.log10(totalUsage + 1) * 11) +
               quality.score * 0.16 -
-              Math.min(24, riskBlocked * 5 + setupRequired * 2 + notRelevant * 4),
+              Math.min(24, riskBlocked * 5 + setupRequired * 2 + notRelevant * 4) -
+              skillSpecificPenalty,
             badge: successRate === null ? 'No success data' : `${Math.round(successRate)}% success`,
             reason: totalUsage
               ? `${proven.summary} Recent success ${proven.metrics.recentSuccessRate === null ? 'unknown' : `${Math.round(proven.metrics.recentSuccessRate)}%`}.`
@@ -324,7 +359,8 @@ export function rankSkillsForDefinition(
               quality.score * 0.46 +
               proven.score * 0.34 +
               Math.min(18, Math.log10(Math.max(1, skill.github_stars || 1)) * 5) -
-              Math.min(40, riskBlocked * 10 + setupRequired * 4 + failures * 3 + notRelevant * 4),
+              Math.min(40, riskBlocked * 10 + setupRequired * 4 + failures * 3 + notRelevant * 4) -
+              skillSpecificPenalty,
             badge: riskBlocked > 0 ? 'Review risk' : 'Sandbox-ready',
             reason: totalUsage
               ? `${proven.summary} ${riskBlocked} risk blocks and ${setupRequired} setup-required reports.`
@@ -338,7 +374,8 @@ export function rankSkillsForDefinition(
               quality.score * 0.3 +
               proven.score * 0.25 +
               Math.min(18, Math.log10(Math.max(1, skill.github_stars || 1)) * 5) -
-              Math.min(24, riskBlocked * 5 + setupRequired * 2 + notRelevant * 4),
+              Math.min(24, riskBlocked * 5 + setupRequired * 2 + notRelevant * 4) -
+              skillSpecificPenalty,
             badge: definition.agentPlatform ? definition.agentPlatform : 'Agent fit',
             reason: `${definition.shortTitle} fit with ${quality.label.toLowerCase()} quality, ${compactStars(skill)}, and ${proven.label.toLowerCase()}.`,
           }
@@ -346,12 +383,13 @@ export function rankSkillsForDefinition(
         default:
           return {
             skill,
-            score: quality.score + Math.log10(Math.max(1, skill.github_stars || 1)),
+            score: quality.score + Math.log10(Math.max(1, skill.github_stars || 1)) - skillSpecificPenalty,
             badge: `${quality.label} · ${quality.score}`,
             reason: `${quality.summary} ${compactStars(skill)}.`,
           }
       }
     })
+    .filter((item) => rankingSkillPenalty(item.skill) < 45)
     .sort((a, b) => {
       if (definition.kind === 'new-this-week') {
         return b.score - a.score || dateValue(b.skill.created_at) - dateValue(a.skill.created_at)

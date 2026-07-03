@@ -1795,6 +1795,9 @@ function buildSkill(repo: GitHubSearchRepo, query: HighStarQuery, evaluation: Sk
       github_stars: repo.stargazers_count,
       relevance_score: evaluation.score,
       relevance_signals: evaluation.signals,
+      skill_likeness_score: evaluation.skillLikenessScore,
+      skill_likeness_tier: evaluation.skillLikenessTier,
+      skill_likeness_penalties: evaluation.penalties,
     },
     ai_review_approved: true,
     ai_review_issues: [],
@@ -2198,6 +2201,7 @@ export async function bulkImportHighStarSkills(
       language: repo.language,
       query: query.q,
       category: query.category,
+      stars: repo.stargazers_count,
     })
 
     const qualityGate = evaluateImportQuality(repo, evaluation, {
@@ -2234,6 +2238,9 @@ export async function bulkImportHighStarSkills(
           stars: repo.stargazers_count,
           relevance_score: evaluation.score,
           relevance_signals: evaluation.signals,
+          skill_likeness_score: evaluation.skillLikenessScore,
+          skill_likeness_tier: evaluation.skillLikenessTier,
+          skill_likeness_penalties: evaluation.penalties,
           domain: query.domain || 'core',
           query: query.q,
           page,

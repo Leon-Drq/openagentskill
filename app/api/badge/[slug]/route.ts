@@ -64,7 +64,8 @@ export async function GET(
   }
 
   const url = new URL(request.url)
-  const mode = (url.searchParams.get('metric') || 'trust').toLowerCase()
+  const mode = (url.searchParams.get('metric') || 'listed').toLowerCase()
+  const wantsListed = mode === 'listed' || mode === 'listing' || mode === 'registry'
   const wantsProven = mode === 'proven' || mode === 'agent-proven'
   const trust = getSkillTrustProfile(skill)
   const storedAudit = mode === 'audit' ? await getSkillAuditBySlug(skill.slug).catch(() => null) : null
@@ -77,7 +78,9 @@ export async function GET(
     : null
   const label = url.searchParams.get('label') || 'OpenAgentSkill'
   const value =
-    mode === 'stars'
+    wantsListed
+      ? 'listed'
+      : mode === 'stars'
       ? `${Number(skill.github_stars || 0).toLocaleString()} stars`
       : mode === 'quality'
         ? `${Math.round(Number(skill.quality_score || 0))}/100 quality`
@@ -88,7 +91,9 @@ export async function GET(
         : mode === 'audit' && audit
           ? `${audit.audit_score}/100 ${auditRiskLabel(audit.risk_level).toLowerCase()}`
           : `${trust.score}/100 ${trust.tier === 'production' ? 'trusted' : 'trust'}`
-  const color = proven
+  const color = wantsListed
+    ? '#006b4f'
+    : proven
     ? proven.metrics.totalOutcomes <= 0
       ? '#737373'
       : proven.score >= 75

@@ -69,6 +69,96 @@ const BEST_PAGE_OVERRIDES: Record<string, Partial<BestSkillPageDefinition>> = {
 
 const CUSTOM_BEST_SKILL_PAGES: BestSkillPageDefinition[] = [
   {
+    slug: 'ai-agent-skills-library',
+    title: 'AI agent skills library',
+    shortTitle: 'Skills library',
+    eyebrow: 'Agent skill registry',
+    description:
+      'A ranked OpenAgentSkill library of reusable AI agent skills with trust signals, install handoffs, GitHub quality, maintenance status, and agent-readable metadata.',
+    useCaseSlug: 'workflow-automation',
+    searchIntent: 'Find an AI agent skills library with real reusable skills, install commands, trust scores, audit notes, and agent workflow metadata.',
+    audience: 'Builders comparing reusable skills before installing them into Codex, Claude Code, Cursor, and agent workflows.',
+    agentSurface: 'AI agents',
+    primaryKeyword: 'AI agent skills library',
+    exampleTasks: [
+      'Find a reusable skill for a new agent task',
+      'Compare skills by trust, freshness, install path, and GitHub quality',
+      'Shortlist a safe install plan before an agent acts',
+    ],
+  },
+  {
+    slug: 'open-source-ai-agent-skills',
+    title: 'Open source AI agent skills',
+    shortTitle: 'Open source skills',
+    eyebrow: 'Open source registry',
+    description:
+      'A ranked shortlist of open-source AI agent skills across coding, research, finance, presentation, data, browser automation, and workflow automation use cases.',
+    useCaseSlug: 'coding-agents',
+    searchIntent: 'Find open-source AI agent skills with GitHub repositories, license signals, install commands, and audit notes.',
+    audience: 'Developers and teams looking for reusable open-source capabilities that agents can inspect, compare, and install.',
+    agentSurface: 'AI agents',
+    primaryKeyword: 'open source AI agent skills',
+    exampleTasks: [
+      'Find open-source skills for a coding or research agent',
+      'Check license and maintenance status before installing a skill',
+      'Compare alternatives instead of picking the first GitHub repo',
+    ],
+  },
+  {
+    slug: 'codex-skills',
+    title: 'Best Codex skills for agent workflows',
+    shortTitle: 'Codex skills',
+    eyebrow: 'Codex agent skills',
+    description:
+      'Ranked OpenAgentSkill shortlist for Codex workflows: repo inspection, code review, testing, web data collection, research, and safe install handoffs.',
+    useCaseSlug: 'coding-agents',
+    searchIntent: 'Find Codex-ready skills for coding agents, repository analysis, code review, tests, web data workflows, and install handoffs.',
+    audience: 'Codex users building coding agents and developer automation workflows.',
+    agentSurface: 'Codex',
+    primaryKeyword: 'Codex skills',
+    exampleTasks: [
+      'Review a pull request and generate test ideas',
+      'Inspect a repository before changing code',
+      'Install a reusable skill into a Codex workflow after audit review',
+    ],
+  },
+  {
+    slug: 'claude-code-skills',
+    title: 'Best Claude Code skills for agent workflows',
+    shortTitle: 'Claude Code skills',
+    eyebrow: 'Claude Code agent skills',
+    description:
+      'Ranked OpenAgentSkill shortlist for Claude Code workflows: coding agents, document parsing, web research, browser automation, and safe install review.',
+    useCaseSlug: 'coding-agents',
+    searchIntent: 'Find Claude Code-ready skills for coding, document parsing, research, browser automation, and reusable agent workflows.',
+    audience: 'Claude Code users choosing skills for development, research, documents, and automation workflows.',
+    agentSurface: 'Claude Code',
+    primaryKeyword: 'Claude Code skills',
+    exampleTasks: [
+      'Use Claude Code to inspect a repo and prepare implementation steps',
+      'Compare document parsing skills before installing one',
+      'Find a browser automation skill with clear maintenance signals',
+    ],
+  },
+  {
+    slug: 'openai-agent-skills',
+    title: 'OpenAI agent skills list',
+    shortTitle: 'OpenAI agent skills',
+    eyebrow: 'OpenAI-style agents',
+    description:
+      'A practical list of reusable skills for OpenAI-style agent workflows, focused on installable open-source repositories, task fit, trust signals, and audit notes.',
+    useCaseSlug: 'workflow-automation',
+    searchIntent: 'Find reusable skills for OpenAI-style agents, including install commands, trust scores, audit notes, and alternatives.',
+    audience: 'Builders creating OpenAI-style agent workflows that need reusable skills rather than one-off prompts.',
+    agentSurface: 'AI agents',
+    primaryKeyword: 'OpenAI agent skills list',
+    exampleTasks: [
+      'Find a skill for a tool-using AI agent',
+      'Compare install safety before letting an agent run a repository',
+      'Choose reusable skills for research, coding, and automation workflows',
+    ],
+  },
+  {
     slug: 'stock-analysis',
     title: 'Best AI agent skills for stock analysis',
     shortTitle: 'Stock analysis',
@@ -335,7 +425,7 @@ export const BEST_SKILL_PAGES: BestSkillPageDefinition[] = [
 ]
 
 export const FEATURED_BEST_PAGES = BEST_SKILL_PAGES.filter((page) =>
-  ['web-scraping', 'stock-analysis', 'codex-web-scraping', 'codex-finance-analysis', 'claude-code-pdf-parsing', 'sports-analytics', 'football-analytics', 'presentation-generation', 'ppt-generation', 'codex-presentation-decks', 'research-briefs', 'marketing-seo-automation', 'security-review', 'legal-compliance-review', 'coding-agents', 'browser-automation', 'rag-knowledge', 'data-analysis', 'github-automation']
+  ['ai-agent-skills-library', 'open-source-ai-agent-skills', 'codex-skills', 'claude-code-skills', 'openai-agent-skills', 'web-scraping', 'stock-analysis', 'codex-web-scraping', 'codex-finance-analysis', 'claude-code-pdf-parsing', 'sports-analytics', 'football-analytics', 'presentation-generation', 'ppt-generation', 'codex-presentation-decks', 'research-briefs', 'marketing-seo-automation', 'security-review', 'legal-compliance-review', 'coding-agents', 'browser-automation', 'rag-knowledge', 'data-analysis', 'github-automation']
     .includes(page.slug)
 )
 

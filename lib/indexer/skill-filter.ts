@@ -1,3 +1,5 @@
+import { evaluateSkillLikeness } from '@/lib/skill-likeness'
+
 export interface SkillCandidateProfile {
   fullName: string
   name?: string
@@ -6,6 +8,7 @@ export interface SkillCandidateProfile {
   language?: string | null
   query?: string
   category?: string
+  stars?: number | null
 }
 
 export interface SkillCandidateEvaluation {
@@ -13,6 +16,9 @@ export interface SkillCandidateEvaluation {
   score: number
   reason?: 'mcp' | 'low-relevance'
   signals: string[]
+  skillLikenessScore: number
+  skillLikenessTier: string
+  penalties: string[]
 }
 
 const MCP_PATTERNS = [
@@ -92,9 +98,22 @@ export function evaluateSkillCandidate(candidate: SkillCandidateProfile): SkillC
       score: 0,
       reason: 'mcp',
       signals: ['mcp'],
+      skillLikenessScore: 0,
+      skillLikenessTier: 'generic',
+      penalties: ['mcp'],
     }
   }
 
+  const likeness = evaluateSkillLikeness({
+    fullName: candidate.fullName,
+    name: candidate.name,
+    description: candidate.description,
+    topics: candidate.topics,
+    language: candidate.language,
+    category: candidate.category,
+    query: candidate.query,
+    stars: candidate.stars,
+  })
   const signals: string[] = []
   let score = 0
 
@@ -119,9 +138,12 @@ export function evaluateSkillCandidate(candidate: SkillCandidateProfile): SkillC
   }
 
   return {
-    accepted: score >= 4,
+    accepted: score >= 4 && likeness.importReady,
     score,
-    reason: score >= 4 ? undefined : 'low-relevance',
-    signals,
+    reason: score >= 4 && likeness.importReady ? undefined : 'low-relevance',
+    signals: [...new Set([...signals, ...likeness.signals])],
+    skillLikenessScore: likeness.score,
+    skillLikenessTier: likeness.tier,
+    penalties: likeness.penalties,
   }
 }

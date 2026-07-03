@@ -129,6 +129,7 @@ export async function searchSkillRepos(
         topics: r.topics || [],
         language: r.language,
         query: q,
+        stars: r.stargazers_count,
       }).accepted
     )
     .map((r) => ({

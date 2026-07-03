@@ -285,6 +285,7 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
             topics: repo.topics || [],
             language: repo.language,
             query: `${query} ${tweet.text}`,
+            stars: repo.stargazers_count,
           })
           if (!evaluation.accepted) continue
 

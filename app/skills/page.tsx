@@ -135,6 +135,21 @@ const DIRECTORY_SCENARIOS = [
 
 const POPULAR_DIRECTORY_LINKS = [
   {
+    label: 'AI agent skills library',
+    href: '/best/ai-agent-skills-library',
+    description: 'A real library of reusable skills with trust, audit, install, and agent metadata.',
+  },
+  {
+    label: 'Open source AI agent skills',
+    href: '/best/open-source-ai-agent-skills',
+    description: 'Open-source skill candidates filtered by task fit, GitHub quality, and install safety.',
+  },
+  {
+    label: 'Best Codex skills',
+    href: '/best/codex-skills',
+    description: 'Repo inspection, code review, testing, web data, and safe install workflows for Codex.',
+  },
+  {
     label: 'Best AI agent skills for stock analysis',
     href: '/best/stock-analysis',
     description: 'Finance and market research skills with trust, install, and maintenance signals.',

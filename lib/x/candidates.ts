@@ -1,4 +1,5 @@
 import type { SkillRecord } from '@/lib/db/skills'
+import { evaluateSkillLikeness } from '@/lib/skill-likeness'
 
 export interface XCandidateDecision {
   eligible: boolean
@@ -148,6 +149,18 @@ export function getXCandidateDecision(skill: SkillRecord, minStars = 500): XCand
   const directSignals = getDirectSkillSignals(text)
   const workflowSignals = getPracticalWorkflowSignals(text)
   const signals = [...directSignals, ...workflowSignals]
+  const likeness = evaluateSkillLikeness({
+    fullName: skill.github_repo,
+    name: skill.name,
+    description: skill.description,
+    longDescription: skill.long_description,
+    tagline: skill.tagline,
+    tags: skill.tags,
+    frameworks: skill.frameworks,
+    language: skill.github_language,
+    category: skill.category,
+    stars: skill.github_stars,
+  })
 
   if (!skill.ai_review_approved) {
     return { eligible: false, reason: 'not-approved', lane, signals }
@@ -165,19 +178,32 @@ export function getXCandidateDecision(skill: SkillRecord, minStars = 500): XCand
     return { eligible: false, reason: 'missing-description', lane, signals }
   }
   if (isGenericHighStarRepo(skill)) {
-    return { eligible: false, reason: 'generic-foundation-repo', lane, signals }
+    return { eligible: false, reason: 'generic-foundation-repo', lane, signals: [...signals, ...likeness.signals] }
   }
   if (hasGenericFoundationSignals(text) && directSignals.length === 0 && workflowSignals.length === 0) {
-    return { eligible: false, reason: 'generic-foundation-description', lane, signals }
+    return { eligible: false, reason: 'generic-foundation-description', lane, signals: [...signals, ...likeness.signals] }
+  }
+  if (!likeness.xShareReady) {
+    return {
+      eligible: false,
+      reason: `weak-skill-likeness-${likeness.score}`,
+      lane,
+      signals: [...new Set([...signals, ...likeness.signals, ...likeness.penalties])],
+    }
   }
   if (directSignals.length === 0 && workflowSignals.length === 0) {
-    return { eligible: false, reason: 'not-skill-or-workflow-specific', lane, signals }
+    return { eligible: false, reason: 'not-skill-or-workflow-specific', lane, signals: [...signals, ...likeness.signals] }
   }
   if (lane === 'general' && directSignals.length === 0) {
-    return { eligible: false, reason: 'generic-lane-without-skill-signal', lane, signals }
+    return { eligible: false, reason: 'generic-lane-without-skill-signal', lane, signals: [...signals, ...likeness.signals] }
   }
 
-  return { eligible: true, reason: 'skill-or-workflow-specific', lane, signals }
+  return {
+    eligible: true,
+    reason: `skill-like-${likeness.score}`,
+    lane,
+    signals: [...new Set([...signals, ...likeness.signals])],
+  }
 }
 
 export function isGoodXCandidate(skill: SkillRecord, minStars: number) {

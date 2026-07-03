@@ -248,7 +248,7 @@ Useful endpoints:
 | `GET /api/agent/outcome?contract=true` | Read the feedback contract for agent integrations |
 | `POST /api/agent/outcome` | Report whether a resolved skill worked |
 | `GET /api/audits/{slug}` | Fetch a skill audit report |
-| `GET /api/badge/{slug}` | Generate a README badge for trust, audit, quality, stars, or Agent Proven evidence |
+| `GET /api/badge/{slug}` | Generate a README badge for listed status, trust, audit, quality, stars, or Agent Proven evidence |
 
 ## For Skill Authors
 
@@ -266,6 +266,7 @@ Get your skill indexed, audited, ranked, and shareable.
 Add a badge to your README:
 
 ```md
+[![Listed on OpenAgentSkill](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=listed&label=Listed)](https://www.openagentskill.com/skills/YOUR-SLUG)
 [![OpenAgentSkill Trust](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=trust&label=Trust)](https://www.openagentskill.com/skills/YOUR-SLUG)
 [![OpenAgentSkill Audit](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=audit&label=Audit)](https://www.openagentskill.com/skills/YOUR-SLUG/audit)
 [![Agent Proven](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=proven&label=Agent%20Proven)](https://www.openagentskill.com/skills/YOUR-SLUG)
