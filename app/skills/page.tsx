@@ -2,12 +2,13 @@ import { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
 import { buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
-import { getAllSkills, getCategories, type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats } from '@/lib/db/skills'
+import { getAllSkills, getCategories, type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkills } from '@/lib/db/skills'
 import { SkillsPageClient } from '@/components/skills-page-client'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillSupplyProfile, getSupplyTrackSummaries } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCaseBySlug, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
+import { dedupeRankedSkills, rankSkillsForQuery } from '@/lib/registry'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,11 +47,13 @@ export const metadata: Metadata = {
 }
 
 const BASE_SKILL_CANDIDATE_LIMIT = 160
-const MAX_SKILL_CANDIDATE_LIMIT = 480
+const SEARCH_SKILL_CANDIDATE_LIMIT = 720
+const MAX_SKILL_CANDIDATE_LIMIT = 720
 const VISIBLE_SKILL_LIMIT = 16
 const SKILLS_PAGE_REVALIDATE = 300
 const MAX_SKILLS_PAGE = Math.ceil(MAX_SKILL_CANDIDATE_LIMIT / VISIBLE_SKILL_LIMIT)
-const SKILLS_PAGE_QUERY_TIMEOUT_MS = 1200
+const SKILLS_PAGE_QUERY_TIMEOUT_MS = 1800
+const SKILLS_PAGE_EXACT_SEARCH_LIMIT = 200
 const FALLBACK_DATE = '2026-06-01T00:00:00.000Z'
 
 const DIRECTORY_SCENARIOS = [
@@ -406,6 +409,14 @@ function getCachedSkillCandidates(sort: SkillSortMode, category: string | undefi
   )()
 }
 
+function getCachedSearchSkillCandidates(query: string, limit: number) {
+  return unstable_cache(
+    async () => searchSkills(query, limit),
+    ['skills-page-search-candidates-v1', query.trim().toLowerCase(), String(limit)],
+    { revalidate: SKILLS_PAGE_REVALIDATE }
+  )()
+}
+
 async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   let timeout: ReturnType<typeof setTimeout> | undefined
   const timeoutPromise = new Promise<T>((_, reject) => {
@@ -453,6 +464,34 @@ async function getSkillsPageRecords(sort: SkillSortMode, category: string | unde
       degraded: true,
     }
   }
+}
+
+async function getSearchAugmentRecords(query: string | undefined) {
+  const normalizedQuery = query?.trim()
+  if (!normalizedQuery) return []
+
+  return withTimeout(
+    getCachedSearchSkillCandidates(normalizedQuery, SKILLS_PAGE_EXACT_SEARCH_LIMIT),
+    SKILLS_PAGE_QUERY_TIMEOUT_MS,
+    'skills exact search query'
+  ).catch((error) => {
+    console.warn('Skills page exact search fallback:', error)
+    return []
+  })
+}
+
+function mergeSkillRecords(primary: SkillRecord[], secondary: SkillRecord[]) {
+  const seen = new Set<string>()
+  const merged: SkillRecord[] = []
+
+  for (const record of [...secondary, ...primary]) {
+    const key = record.slug || record.github_repo || record.id
+    if (!key || seen.has(key)) continue
+    seen.add(key)
+    merged.push(record)
+  }
+
+  return merged
 }
 
 function clampPage(value: string | undefined) {
@@ -798,18 +837,21 @@ export default async function SkillsPage({
   const minStars = Number(params.minStars || 0)
   const page = clampPage(params.page)
   const requestedPageOffset = (page - 1) * VISIBLE_SKILL_LIMIT
-  const candidateLimit = Math.min(BASE_SKILL_CANDIDATE_LIMIT + requestedPageOffset, MAX_SKILL_CANDIDATE_LIMIT)
+  const hasHighIntentFilter = Boolean(params.q || useCase !== 'all' || platform !== 'all' || supplyTrack !== 'all' || minStars > 0)
+  const baseLimit = hasHighIntentFilter ? SEARCH_SKILL_CANDIDATE_LIMIT : BASE_SKILL_CANDIDATE_LIMIT
+  const candidateLimit = Math.min(baseLimit + requestedPageOffset, MAX_SKILL_CANDIDATE_LIMIT)
   const queryCategory = category !== 'all' ? category : undefined
 
-  const [recordsResult, categories, statsMap] = await Promise.all([
+  const [recordsResult, searchAugmentRecords, categories, statsMap] = await Promise.all([
     getSkillsPageRecords(sort, queryCategory, candidateLimit),
+    getSearchAugmentRecords(params.q),
     withTimeout(getCachedCategories(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills categories query')
       .catch(() => [...new Set(FALLBACK_SKILLS.map((skill) => skill.category))].sort()),
     withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
   ])
-  const records = recordsResult.records
-  const degraded = recordsResult.degraded
+  const records = mergeSkillRecords(recordsResult.records, searchAugmentRecords)
+  const degraded = recordsResult.degraded && searchAugmentRecords.length === 0
   const effectivePage = degraded && records.length <= requestedPageOffset ? 1 : page
   const pageOffset = (effectivePage - 1) * VISIBLE_SKILL_LIMIT
   const categoryOptions = categories.length > 0
@@ -862,26 +904,19 @@ export default async function SkillsPage({
     return true
   })
 
-  if (params.q) {
-    const query = params.q.toLowerCase()
-    filteredRecords = filteredRecords.filter((item) => {
-      const { record } = item
-      return (
-        record.name.toLowerCase().includes(query) ||
-        record.description.toLowerCase().includes(query) ||
-        (record.long_description || '').toLowerCase().includes(query) ||
-        item.supplyProfile.scenario.label.toLowerCase().includes(query) ||
-        item.supplyProfile.scenario.description.toLowerCase().includes(query) ||
-        item.supplyProfile.track.label.toLowerCase().includes(query) ||
-        item.supplyProfile.applicableAgents.some((agent) => agent.toLowerCase().includes(query)) ||
-        item.supplyProfile.risk.notes.some((note) => note.toLowerCase().includes(query)) ||
-        item.safetyProfile.safety_tier.label.toLowerCase().includes(query) ||
-        item.safetyProfile.safety_tier.summary.toLowerCase().includes(query) ||
-        (record.tags || []).some((tag) => tag.toLowerCase().includes(query)) ||
-        (record.frameworks || []).some((framework) => framework.toLowerCase().includes(query)) ||
-        record.github_repo?.toLowerCase().includes(query)
+  if (params.q?.trim()) {
+    const enrichedBySlug = new Map(filteredRecords.map((item) => [item.record.slug, item]))
+    const ranked = dedupeRankedSkills(
+      rankSkillsForQuery(
+        filteredRecords.map((item) => item.record),
+        params.q,
+        statsMap
       )
-    })
+    )
+
+    filteredRecords = ranked
+      .map((item) => enrichedBySlug.get(item.skill.slug))
+      .filter((item): item is (typeof enrichedRecords)[number] => Boolean(item))
   }
 
   const resultCount = filteredRecords.length

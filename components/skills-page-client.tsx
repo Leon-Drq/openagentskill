@@ -155,6 +155,34 @@ const SAFETY_OPTIONS = [
   { key: 'blocked', label: 'Blocked' },
 ] as const
 
+const TASK_SHORTCUTS = [
+  { label: 'Stock analysis', href: '/skills?q=stock%20analysis', intent: 'Finance' },
+  { label: 'Trading research', href: '/skills?q=trade', intent: 'Quant' },
+  { label: 'PPT generation', href: '/skills?q=ppt', intent: 'Slides' },
+  { label: 'PDF parsing', href: '/skills?q=pdf%20parsing', intent: 'Docs' },
+  { label: 'Web scraping', href: '/skills?q=web%20scraping', intent: 'Extract' },
+  { label: 'Design workflow', href: '/skills?track=design', intent: 'Creative' },
+  { label: 'Football analytics', href: '/skills?q=football%20analytics', intent: 'Sports' },
+] as const
+
+const AGENT_ENTRY_LINKS = [
+  {
+    label: 'Resolve API',
+    href: '/api/agent/resolve?task=analyze%20stock%20news&format=text',
+    description: 'Task in, selected skill and install plan out.',
+  },
+  {
+    label: 'Skills API',
+    href: '/api/agent/skills?q=trade&limit=5&format=text',
+    description: 'Machine-readable shortlist with trust and safety signals.',
+  },
+  {
+    label: 'llms.txt',
+    href: '/llms.txt',
+    description: 'A crawler-friendly entry point for agent surfaces.',
+  },
+] as const
+
 interface Props {
   skills: Skill[]
   query?: string
@@ -308,6 +336,18 @@ export function SkillsPageClient({
                 Search
               </button>
             </form>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {TASK_SHORTCUTS.slice(0, 5).map((shortcut) => (
+                <Link
+                  key={shortcut.href}
+                  href={shortcut.href}
+                  className="rounded-full border border-border bg-background px-3 py-1.5 text-xs text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                >
+                  <span className="font-mono uppercase tracking-wider text-secondary">{shortcut.intent}</span>{' '}
+                  <span>{shortcut.label}</span>
+                </Link>
+              ))}
+            </div>
             <div className="mt-4 grid grid-cols-3 gap-px border border-border bg-border text-center">
               <div className="bg-background p-3">
                 <div className="font-mono text-lg text-foreground">{skills.length.toLocaleString()}</div>
@@ -321,6 +361,19 @@ export function SkillsPageClient({
                 <div className="font-mono text-lg text-foreground">{platformOptions.length.toLocaleString()}</div>
                 <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">Targets</div>
               </div>
+            </div>
+            <div className="mt-4 grid gap-2">
+              {AGENT_ENTRY_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  prefetch={false}
+                  className="grid min-w-0 gap-1 border border-border bg-background/75 px-3 py-2 text-sm transition-colors hover:border-foreground"
+                >
+                  <span className="font-semibold text-foreground">{link.label}</span>
+                  <span className="text-xs leading-5 text-secondary">{link.description}</span>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
@@ -459,12 +512,12 @@ export function SkillsPageClient({
       {/* Sort Tabs */}
       <div className="sticky top-14 z-40 border-b border-border bg-background/92 backdrop-blur">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex max-w-full flex-wrap gap-0">
+          <div className="flex max-w-full gap-0 overflow-x-auto">
             {SORT_TABS.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => navigate({ sort: tab.key, category })}
-                className={`px-3 py-3 text-sm whitespace-nowrap border-b-2 transition-colors sm:px-4 ${
+                className={`shrink-0 px-3 py-3 text-sm whitespace-nowrap border-b-2 transition-colors sm:px-4 ${
                   sort === tab.key
                     ? 'border-foreground text-foreground'
                     : 'border-transparent text-secondary hover:text-foreground'
@@ -484,6 +537,39 @@ export function SkillsPageClient({
             Search, resolve APIs, and detail pages will use live data again when the database is reachable.
           </div>
         )}
+
+        <section className="mb-8 border border-border bg-background/80 p-4 sm:p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">High-intent entry points</p>
+              <h2 className="mt-2 font-display text-2xl font-normal">Start from the task, not a keyword list.</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-secondary">
+                These shortcuts use the same trust, supply, and relevance signals as the registry API, so humans and agents land on a useful shortlist faster.
+              </p>
+            </div>
+            <Link
+              href="/api/agent/skills?format=text"
+              prefetch={false}
+              className="self-start border border-border px-3 py-2 text-xs font-semibold text-secondary transition-colors hover:border-foreground hover:text-foreground lg:self-auto"
+            >
+              Agent-readable index
+            </Link>
+          </div>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {TASK_SHORTCUTS.map((shortcut) => (
+              <Link
+                key={shortcut.href}
+                href={shortcut.href}
+                className="min-w-0 border border-border bg-card/70 px-3 py-3 transition-colors hover:border-foreground"
+              >
+                <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
+                  {shortcut.intent}
+                </span>
+                <span className="mt-1 block font-semibold leading-snug text-foreground">{shortcut.label}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <section className="mb-8 border border-border bg-card/80 p-4 shadow-[0_16px_48px_rgba(23,23,23,0.04)] sm:p-5">
           <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">

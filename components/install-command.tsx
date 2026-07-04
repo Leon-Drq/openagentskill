@@ -27,14 +27,14 @@ export function InstallCommand({ command, skillSlug, compact = false }: InstallC
 
   if (compact) {
     return (
-      <div className="border border-border bg-card inline-block max-w-full">
-        <div className="px-3 py-2 flex items-center gap-3">
-          <code className="font-mono text-xs sm:text-sm break-all text-foreground">
+      <div className="block max-w-full overflow-hidden border border-border bg-card">
+        <div className="flex min-w-0 flex-col gap-2 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+          <code className="min-w-0 break-all font-mono text-xs leading-5 text-foreground sm:text-sm">
             $ {fullCommand}
           </code>
           <button
             onClick={copyToClipboard}
-            className="text-xs text-secondary hover:text-foreground transition-colors shrink-0"
+            className="self-start text-xs text-secondary transition-colors hover:text-foreground sm:self-auto"
             aria-label="Copy command"
           >
             {copied ? '✓' : 'copy'}
