@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
           })
         : Promise.resolve([] as SkillRecord[]),
     ])
-    const skills = mergeSkillPools(exactPool, candidatePool)
+    const skills = mergeSkillPools(exactPool, candidatePool, CURATED_SKILL_SNAPSHOT)
     const rankedCandidates = dedupeRankedSkills(rankSkillsForQuery(skills, query))
       .filter(({ skill }) => {
         if (category && skill.category.toLowerCase() !== category.toLowerCase()) return false

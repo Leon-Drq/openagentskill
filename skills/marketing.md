@@ -4,6 +4,7 @@ Use these when an agent needs SEO, analytics, CRM, product growth, content opera
 
 | Skill | Scenario | Source | OpenAgentSkill | Install | Trust / risk |
 | --- | --- | --- | --- | --- | --- |
+| Aaron Marketing Skills | 120 agent-ready marketing skills across SEO/GEO, influencer, paid ads, email, launch, social, and brand narrative | [aaron-he-zhu/aaron-marketing-skills](https://github.com/aaron-he-zhu/aaron-marketing-skills) | [profile](https://www.openagentskill.com/skills/aaron-he-zhu-aaron-marketing-skills) | `npx skills add aaron-he-zhu/aaron-marketing-skills` | 90 / strong shortlist |
 | MarketingSkills | CRO, copywriting, SEO, analytics, and growth engineering | [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) | [profile](https://www.openagentskill.com/skills/coreyhaines31-marketingskills) | `npx skills add coreyhaines31/marketingskills` | 95 / production |
 | Claude Skills | Multi-domain agent skills including marketing and product workflows | [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) | [profile](https://www.openagentskill.com/skills/alirezarezvani-claude-skills) | `npx skills add alirezarezvani/claude-skills` | 92 / production |
 | Twenty | Open-source CRM alternative designed for AI workflows | [twentyhq/twenty](https://github.com/twentyhq/twenty) | [profile](https://www.openagentskill.com/skills/twentyhq-twenty) | `npx skills add twentyhq/twenty` | 90 / production |

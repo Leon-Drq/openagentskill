@@ -355,6 +355,18 @@ const FALLBACK_SKILLS: SkillRecord[] = [
     license: 'MIT',
   }),
   fallbackSkill({
+    slug: 'aaron-he-zhu-aaron-marketing-skills',
+    name: 'Aaron Marketing Skills',
+    description: '120 marketing skills for SEO/GEO, influencer, paid ads, email, launch, organic social, and brand narrative agents.',
+    repo: 'aaron-he-zhu/aaron-marketing-skills',
+    category: 'Marketing',
+    tags: ['marketing', 'seo', 'geo', 'influencer marketing', 'paid ads', 'email marketing', 'product launch', 'organic social', 'brand narrative', 'agent-skills'],
+    frameworks: ['Claude Code', 'Codex', 'Marketing Agents'],
+    stars: 2_313,
+    quality: 90,
+    license: 'Apache-2.0',
+  }),
+  fallbackSkill({
     slug: 'serenity-skill',
     name: 'Serenity Skill',
     description: 'Stock analysis skill for market research and financial reasoning workflows.',
@@ -480,15 +492,17 @@ async function getSearchAugmentRecords(query: string | undefined) {
   })
 }
 
-function mergeSkillRecords(primary: SkillRecord[], secondary: SkillRecord[]) {
+function mergeSkillRecords(...pools: SkillRecord[][]) {
   const seen = new Set<string>()
   const merged: SkillRecord[] = []
 
-  for (const record of [...secondary, ...primary]) {
-    const key = record.slug || record.github_repo || record.id
-    if (!key || seen.has(key)) continue
-    seen.add(key)
-    merged.push(record)
+  for (const pool of pools) {
+    for (const record of pool) {
+      const key = record.slug || record.github_repo || record.id
+      if (!key || seen.has(key)) continue
+      seen.add(key)
+      merged.push(record)
+    }
   }
 
   return merged
@@ -850,7 +864,7 @@ export default async function SkillsPage({
     withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
   ])
-  const records = mergeSkillRecords(recordsResult.records, searchAugmentRecords)
+  const records = mergeSkillRecords(searchAugmentRecords, recordsResult.records, FALLBACK_SKILLS)
   const degraded = recordsResult.degraded && searchAugmentRecords.length === 0
   const effectivePage = degraded && records.length <= requestedPageOffset ? 1 : page
   const pageOffset = (effectivePage - 1) * VISIBLE_SKILL_LIMIT

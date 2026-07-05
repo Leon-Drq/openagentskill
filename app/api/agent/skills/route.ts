@@ -191,7 +191,7 @@ const getCachedAgentSkillCandidatePool = unstable_cache(
 )
 
 async function getAgentSkillCandidatePool() {
-  return withTimeout(
+  const records = await withTimeout(
     getCachedAgentSkillCandidatePool(),
     AGENT_SKILLS_QUERY_TIMEOUT_MS,
     'agent skills candidate query'
@@ -199,6 +199,24 @@ async function getAgentSkillCandidatePool() {
     console.warn('Agent skills candidate fallback:', error)
     return CURATED_SKILL_SNAPSHOT
   })
+
+  return mergeSkillPools(records, CURATED_SKILL_SNAPSHOT)
+}
+
+function mergeSkillPools(...pools: Awaited<ReturnType<typeof getAllSkills>>[]) {
+  const seen = new Set<string>()
+  const merged: Awaited<ReturnType<typeof getAllSkills>> = []
+
+  for (const pool of pools) {
+    for (const skill of pool) {
+      const key = skill.slug || skill.github_repo || skill.id
+      if (!key || seen.has(key)) continue
+      seen.add(key)
+      merged.push(skill)
+    }
+  }
+
+  return merged
 }
 
 const getCachedAgentSkillOutcomeStatsMap = unstable_cache(

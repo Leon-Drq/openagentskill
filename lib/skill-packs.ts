@@ -142,6 +142,13 @@ export const SKILL_PACKS: SkillPackDefinition[] = [
       'A pack for agents that turn indexed skills into SEO pages, comparison pages, social drafts, and content update workflows.',
     persona: 'Growth teams, directory founders, and indie builders growing organic traffic.',
     keywords: ['seo', 'content', 'blog', 'search', 'keyword', 'marketing', 'growth', 'social', 'twitter', 'x', 'newsletter'],
+    featuredSlugs: [
+      'aaron-he-zhu-aaron-marketing-skills',
+      'coreyhaines31-marketingskills',
+      'umami-software-umami',
+      'posthog-posthog',
+      'plausible-analytics',
+    ],
     outcomes: ['Find page opportunities', 'Generate structured briefs', 'Create internal links', 'Prepare social drafts'],
     workflowSteps: [
       { title: 'Discover', description: 'Find high-intent keywords, comparison angles, and category pages.' },

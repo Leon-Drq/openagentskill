@@ -7,6 +7,7 @@ import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAllSkills, getSkillsBySlugs, type SkillRecord } from '@/lib/db/skills'
 import { getPrimaryInstallCommand } from '@/lib/install-targets'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
+import { getCuratedSkillFallback } from '@/lib/skill-fallbacks'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { buildSkillPackInstallPlan, getSkillPackBySlug, selectSkillsForPack, SKILL_PACKS } from '@/lib/skill-packs'
 
@@ -63,7 +64,10 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
     getSkillsBySlugs(pack.featuredSlugs || []).catch(() => []),
     getAllSkills('quality', undefined, PACK_CANDIDATE_LIMIT).catch(() => []),
   ])
-  const skills = mergeSkills(featuredSkills, candidateSkills)
+  const featuredFallbacks = (pack.featuredSlugs || [])
+    .map((featuredSlug) => getCuratedSkillFallback(featuredSlug))
+    .filter((skill): skill is SkillRecord => Boolean(skill))
+  const skills = mergeSkills(featuredSkills, featuredFallbacks, candidateSkills)
   const picks = selectSkillsForPack(skills, pack, 10)
   const installPlan = buildSkillPackInstallPlan(pack, picks, { limit: 4 })
 

@@ -172,6 +172,18 @@ export const CURATED_SKILL_SNAPSHOT: SkillRecord[] = [
     license: 'MIT',
   }),
   snapshotSkill({
+    slug: 'aaron-he-zhu-aaron-marketing-skills',
+    name: 'Aaron Marketing Skills',
+    description: '120 marketing skills for SEO/GEO, influencer, paid ads, email, launch, organic social, and brand narrative agents.',
+    repo: 'aaron-he-zhu/aaron-marketing-skills',
+    category: 'Marketing',
+    tags: ['marketing', 'seo', 'geo', 'influencer marketing', 'paid ads', 'email marketing', 'product launch', 'organic social', 'brand narrative', 'agent-skills'],
+    frameworks: ['Claude Code', 'Codex', 'Marketing Agents'],
+    stars: 2_313,
+    quality: 90,
+    license: 'Apache-2.0',
+  }),
+  snapshotSkill({
     slug: 'seedance-2-0',
     name: 'Seedance 2.0 Skill',
     description: 'Creative video generation workflow skill for Seedance 2.0 filmmaking agents.',

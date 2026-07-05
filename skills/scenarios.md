@@ -92,6 +92,7 @@ curl "https://www.openagentskill.com/api/agent/resolve?task=automate+a+browser+w
 
 | Recommended skill | Why it fits | Link |
 | --- | --- | --- |
+| Aaron Marketing Skills | Full-stack marketing skill library for SEO/GEO, influencer, ads, email, launch, social, and brand narrative workflows | [profile](https://www.openagentskill.com/skills/aaron-he-zhu-aaron-marketing-skills) |
 | MarketingSkills | CRO, copywriting, SEO, analytics, and growth engineering | [profile](https://www.openagentskill.com/skills/coreyhaines31-marketingskills) |
 | PostHog | Product analytics and growth experimentation | [profile](https://www.openagentskill.com/skills/posthog-posthog) |
 | Umami | Privacy-focused analytics | [profile](https://www.openagentskill.com/skills/umami-software-umami) |

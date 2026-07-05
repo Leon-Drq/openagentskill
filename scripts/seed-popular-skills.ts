@@ -297,6 +297,26 @@ const curatedRepos: CuratedSkillRepo[] = [
     tagline: 'Automate browser workflows with visual blocks',
   },
   {
+    repo: 'aaron-he-zhu/aaron-marketing-skills',
+    name: 'Aaron Marketing Skills',
+    category: 'growth-marketing',
+    tags: [
+      'marketing',
+      'seo',
+      'geo',
+      'influencer-marketing',
+      'paid-ads',
+      'email-marketing',
+      'product-launch',
+      'organic-social',
+      'brand-narrative',
+      'agent-skills',
+    ],
+    frameworks: ['Claude Code', 'Codex', 'Marketing Agents'],
+    tagline:
+      '120 marketing skills for SEO/GEO, influencer, ads, email, launch, social, and brand narrative workflows',
+  },
+  {
     repo: 'lightpanda-io/browser',
     category: 'web-automation',
     tags: ['browser', 'headless', 'automation'],
