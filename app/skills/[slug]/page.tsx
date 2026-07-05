@@ -636,83 +636,83 @@ export default async function SkillDetailPage({
                 </div>
               </div>
 
-              <div className="grid gap-3 bg-[#fbfaf7] p-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-                <div className="rounded-[8px] border border-border bg-background p-5">
-                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">
+              <div className="grid gap-3 bg-[#fbfaf7] p-3 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="min-w-0 rounded-[8px] border border-border bg-background p-4 sm:p-5">
+                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
                     Suited tasks
                   </p>
                   <ul className="space-y-2 text-sm leading-relaxed text-secondary">
                     {suitableTasks.slice(0, 4).map((task) => (
                       <li key={task} className="flex gap-2">
                         <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-[#006b4f]" />
-                        <span>{task}</span>
+                        <span className="min-w-0 break-words [overflow-wrap:anywhere]">{task}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className="rounded-[8px] border border-border bg-background p-5">
-                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">
+                <div className="min-w-0 rounded-[8px] border border-border bg-background p-4 sm:p-5">
+                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
                     Suited agents
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {suitableAgents.map((agent) => (
                       <span
                         key={agent}
-                        className="rounded-[6px] border border-border bg-card px-2 py-1 text-xs text-secondary"
+                        className="min-w-0 max-w-full rounded-[6px] border border-border bg-card px-2 py-1 text-xs leading-snug text-secondary [overflow-wrap:anywhere]"
                       >
                         {agent}
                       </span>
                     ))}
                   </div>
                 </div>
-                <div className="rounded-[8px] border border-border bg-background p-5">
-                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">
+                <div className="min-w-0 rounded-[8px] border border-border bg-background p-4 sm:p-5">
+                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
                     Install decision
                   </p>
                   <dl className="grid gap-2 text-sm">
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="min-w-0">
                       <dt className="text-secondary">Command</dt>
-                      <dd className="max-w-[9rem] truncate font-mono text-xs" title={installCommand}>
+                      <dd className="mt-1 min-w-0 rounded-[6px] border border-border bg-[#fbfaf7] px-2.5 py-2 font-mono text-xs leading-relaxed [overflow-wrap:anywhere]" title={installCommand}>
                         {installCommand}
                       </dd>
                     </div>
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] items-start gap-3">
                       <dt className="text-secondary">Policy</dt>
-                      <dd className="font-mono">
+                      <dd className="min-w-0 break-words text-right font-mono [overflow-wrap:anywhere]">
                         {safetyProfile?.safety_tier.auto_install_policy ||
                           'review'}
                       </dd>
                     </div>
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] items-start gap-3">
                       <dt className="text-secondary">Human review</dt>
-                      <dd className="font-mono">
+                      <dd className="min-w-0 text-right font-mono">
                         {safetyProfile?.human_review_required ? 'yes' : 'no'}
                       </dd>
                     </div>
                   </dl>
                 </div>
-                <div className="rounded-[8px] border border-border bg-background p-5">
-                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">
+                <div className="min-w-0 rounded-[8px] border border-border bg-background p-4 sm:p-5">
+                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
                     Trust and risk
                   </p>
                   <dl className="grid gap-2 text-sm">
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] items-start gap-3">
                       <dt className="text-secondary">Trust</dt>
-                      <dd className="font-mono">
+                      <dd className="min-w-0 text-right font-mono">
                         {trustProfile ? `${trustProfile.score}/100` : 'Unknown'}
                       </dd>
                     </div>
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] items-start gap-3">
                       <dt className="text-secondary">Audit</dt>
-                      <dd className="font-mono">
+                      <dd className="min-w-0 text-right font-mono">
                         {auditProfile
                           ? `${auditProfile.audit_score}/100`
                           : 'Unknown'}
                       </dd>
                     </div>
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] items-start gap-3">
                       <dt className="text-secondary">Risk level</dt>
-                      <dd className="font-mono">
+                      <dd className="min-w-0 break-words text-right font-mono [overflow-wrap:anywhere]">
                         {auditProfile
                           ? auditRiskLabel(auditProfile.risk_level)
                           : 'Unknown'}
@@ -720,24 +720,24 @@ export default async function SkillDetailPage({
                     </div>
                   </dl>
                 </div>
-                <div className="rounded-[8px] border border-border bg-background p-5">
-                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">
+                <div className="min-w-0 rounded-[8px] border border-border bg-background p-4 sm:p-5">
+                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
                     Outcome loop
                   </p>
                   <dl className="grid gap-2 text-sm">
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="min-w-0">
                       <dt className="text-secondary">Endpoint</dt>
-                      <dd className="text-right font-mono text-xs [overflow-wrap:anywhere]">
+                      <dd className="mt-1 min-w-0 rounded-[6px] border border-border bg-[#fbfaf7] px-2.5 py-2 font-mono text-xs leading-relaxed [overflow-wrap:anywhere]">
                         /api/agent/outcome
                       </dd>
                     </div>
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] items-start gap-3">
                       <dt className="text-secondary">Event ID</dt>
-                      <dd className="font-mono">resolve</dd>
+                      <dd className="min-w-0 text-right font-mono">resolve</dd>
                     </div>
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] items-start gap-3">
                       <dt className="text-secondary">Outcomes</dt>
-                      <dd className="font-mono">
+                      <dd className="min-w-0 text-right font-mono">
                         {outcomeFeedback?.expected_outcomes.length || 5}
                       </dd>
                     </div>
@@ -750,7 +750,7 @@ export default async function SkillDetailPage({
                   <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">
                     Install command
                   </p>
-                  <pre className="overflow-x-auto rounded-[6px] border border-border bg-[#fbfaf7] p-4 font-mono text-xs leading-relaxed text-foreground">
+                  <pre className="whitespace-pre-wrap break-all rounded-[6px] border border-border bg-[#fbfaf7] p-4 font-mono text-xs leading-relaxed text-foreground [overflow-wrap:anywhere]">
                     <code>{installCommand}</code>
                   </pre>
                   <div className="mt-3 flex flex-wrap gap-2">
