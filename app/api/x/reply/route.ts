@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { getSkillBySlug, getSkillsBySlugs, type SkillRecord } from '@/lib/db/skills'
+import { getSkillsBySlugs, type SkillRecord } from '@/lib/db/skills'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 import { createPublicClient } from '@/lib/supabase/public'
 import { getSkillPackBySlug } from '@/lib/skill-packs'
+import { getSkillBySlugOrFallback } from '@/lib/skill-fallbacks'
 import {
   createXReplyPost,
   refreshXAccessToken,
@@ -112,7 +113,7 @@ async function buildDraft(input: z.infer<typeof ReplyRequestSchema>) {
     } as const
   }
 
-  const skill = await getSkillBySlug(slug)
+  const skill = await getSkillBySlugOrFallback(slug)
   if (!skill) {
     return {
       error: 'Skill not found',

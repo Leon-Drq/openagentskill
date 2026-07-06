@@ -75,6 +75,7 @@ export const SKILL_PACKS: SkillPackDefinition[] = [
       'A practical pack for agents working on React, Next.js, design systems, component quality, browser QA, and frontend regression checks.',
     persona: 'Frontend engineers and product teams using agents to ship UI changes faster.',
     keywords: ['frontend', 'react', 'next', 'next.js', 'ui', 'component', 'css', 'browser', 'playwright', 'testing', 'design'],
+    featuredSlugs: ['addyosmani-agent-skills', 'davidondrej-skills', 'playwright'],
     outcomes: ['Map the frontend stack', 'Patch components', 'Check responsive states', 'Verify browser flows'],
     workflowSteps: [
       { title: 'Inspect', description: 'Identify framework, routes, components, styling system, and test commands.' },

@@ -13,6 +13,7 @@ function snapshotSkill(input: {
   stars: number
   quality: number
   license?: string
+  lastPushedAt?: string
 }): SkillRecord {
   return {
     id: `snapshot-${input.slug}`,
@@ -49,7 +50,7 @@ function snapshotSkill(input: {
     quality_score: input.quality,
     quality_signals: null,
     github_language: null,
-    github_last_pushed_at: SNAPSHOT_DATE,
+    github_last_pushed_at: input.lastPushedAt || SNAPSHOT_DATE,
     created_at: SNAPSHOT_DATE,
     updated_at: SNAPSHOT_DATE,
   }
@@ -170,6 +171,29 @@ export const CURATED_SKILL_SNAPSHOT: SkillRecord[] = [
     stars: 61_800,
     quality: 94,
     license: 'MIT',
+  }),
+  snapshotSkill({
+    slug: 'davidondrej-skills',
+    name: 'David Ondrej Skills',
+    description:
+      'Official Agent Skills for coding agents, research, workflow orchestration, docs, ops, and skill authoring.',
+    repo: 'davidondrej/skills',
+    category: 'Agent Skills',
+    tags: [
+      'agent-skills',
+      'coding-agents',
+      'research-agents',
+      'workflow-agents',
+      'agent-orchestration',
+      'skill-authoring',
+      'docs',
+      'ops',
+    ],
+    frameworks: ['Codex', 'Claude Code', 'Cursor', 'Agent Workflows'],
+    stars: 968,
+    quality: 92,
+    license: 'MIT',
+    lastPushedAt: '2026-07-05T21:16:23.000Z',
   }),
   snapshotSkill({
     slug: 'aaron-he-zhu-aaron-marketing-skills',

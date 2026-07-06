@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSkillBySlug } from '@/lib/db/skills'
+import { getSkillBySlugOrFallback } from '@/lib/skill-fallbacks'
 import { buildCommunityIndexedReplyText, buildXIntentUrl } from '@/lib/x/poster'
 
 function parseTweetId(request: NextRequest) {
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const skill = await getSkillBySlug(slug)
+  const skill = await getSkillBySlugOrFallback(slug)
   if (!skill) {
     return NextResponse.json({ success: false, error: 'Skill not found' }, { status: 404 })
   }

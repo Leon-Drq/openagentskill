@@ -65,6 +65,7 @@ curl "https://www.openagentskill.com/api/agent/resolve?task=build+a+RAG+knowledg
 | Recommended skill | Why it fits | Link |
 | --- | --- | --- |
 | Agent Skills | Production-grade engineering workflows for coding agents | [profile](https://www.openagentskill.com/skills/addyosmani-agent-skills) |
+| David Ondrej Skills | Agent orchestration, skill authoring, research, docs, and ops workflows for practical coding agents | [profile](https://www.openagentskill.com/skills/davidondrej-skills) |
 | Planning With Files | Durable planning for long-running code work | [profile](https://www.openagentskill.com/skills/othmanadi-planning-with-files) |
 | Agentmemory | Persistent coding-agent memory | [profile](https://www.openagentskill.com/skills/rohitg00-agentmemory) |
 | Beads | Memory and operating context for coding agents | [profile](https://www.openagentskill.com/skills/gastownhall-beads) |

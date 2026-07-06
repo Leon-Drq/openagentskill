@@ -195,6 +195,7 @@ function fallbackSkill(input: {
   stars: number
   quality: number
   license?: string
+  lastPushedAt?: string
 }): SkillRecord {
   return {
     id: `fallback-${input.slug}`,
@@ -231,7 +232,7 @@ function fallbackSkill(input: {
     quality_score: input.quality,
     quality_signals: null,
     github_language: null,
-    github_last_pushed_at: FALLBACK_DATE,
+    github_last_pushed_at: input.lastPushedAt || FALLBACK_DATE,
     created_at: FALLBACK_DATE,
     updated_at: FALLBACK_DATE,
   }
@@ -353,6 +354,29 @@ const FALLBACK_SKILLS: SkillRecord[] = [
     stars: 61_800,
     quality: 94,
     license: 'MIT',
+  }),
+  fallbackSkill({
+    slug: 'davidondrej-skills',
+    name: 'David Ondrej Skills',
+    description:
+      'Official Agent Skills for coding agents, research, workflow orchestration, docs, ops, and skill authoring.',
+    repo: 'davidondrej/skills',
+    category: 'Agent Skills',
+    tags: [
+      'agent-skills',
+      'coding-agents',
+      'research-agents',
+      'workflow-agents',
+      'agent-orchestration',
+      'skill-authoring',
+      'docs',
+      'ops',
+    ],
+    frameworks: ['Codex', 'Claude Code', 'Cursor', 'Agent Workflows'],
+    stars: 968,
+    quality: 92,
+    license: 'MIT',
+    lastPushedAt: '2026-07-05T21:16:23.000Z',
   }),
   fallbackSkill({
     slug: 'aaron-he-zhu-aaron-marketing-skills',

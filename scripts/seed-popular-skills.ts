@@ -317,6 +317,24 @@ const curatedRepos: CuratedSkillRepo[] = [
       '120 marketing skills for SEO/GEO, influencer, ads, email, launch, social, and brand narrative workflows',
   },
   {
+    repo: 'davidondrej/skills',
+    name: 'David Ondrej Skills',
+    category: 'agent-skills',
+    tags: [
+      'agent-skills',
+      'coding-agents',
+      'research-agents',
+      'workflow-agents',
+      'agent-orchestration',
+      'skill-authoring',
+      'docs',
+      'ops',
+    ],
+    frameworks: ['Codex', 'Claude Code', 'Cursor', 'Agent Workflows'],
+    tagline:
+      'Official Agent Skills for coding agents, research, workflow orchestration, docs, ops, and skill authoring',
+  },
+  {
     repo: 'lightpanda-io/browser',
     category: 'web-automation',
     tags: ['browser', 'headless', 'automation'],

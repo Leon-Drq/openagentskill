@@ -56,6 +56,7 @@ export const AGENT_TASKS: AgentTaskDefinition[] = [
     agentPrompt:
       'Find the best skill for reviewing pull requests, summarizing risky changes, and suggesting concise code review comments.',
     keywords: ['review pull request', 'pr review', 'github diff', 'code review', 'repository analysis'],
+    featuredSlugs: ['addyosmani-agent-skills', 'davidondrej-skills'],
     successCriteria: ['Reads changed files', 'Explains risky changes', 'Produces actionable comments'],
     avoidWhen: ['The repository is unavailable locally', 'Secrets or private code cannot be shared', 'The change requires domain expertise only a maintainer has'],
   },
@@ -182,6 +183,7 @@ export const AGENT_TASKS: AgentTaskDefinition[] = [
     agentPrompt:
       'Find the best skill for summarizing research sources, comparing claims, and writing a concise evidence-backed brief.',
     keywords: ['research summary', 'source comparison', 'market research', 'summarize sources', 'report'],
+    featuredSlugs: ['last30days-skill', 'davidondrej-skills'],
     successCriteria: ['Separates facts from interpretation', 'Cites source URLs', 'Highlights contradictions'],
     avoidWhen: ['Sources are not reliable', 'The task requires real-time regulated advice', 'The topic needs expert review'],
   },
