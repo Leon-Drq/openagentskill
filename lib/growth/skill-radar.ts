@@ -169,10 +169,10 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
   const xQueueSourceSlugs = indexedSlugs.length ? indexedSlugs : touchedSlugs
   const xQueue = xQueueSourceSlugs.length
     ? await enqueueXSkillPostQueueForSlugs({
-        slugs: xQueueSourceSlugs,
-        limit: xQueueLimit,
-        minStars: xMinStars,
-        campaign: `skill_radar_${runKey}`,
+      slugs: xQueueSourceSlugs,
+      limit: xQueueLimit,
+      minStars: xMinStars,
+      campaign: 'skill_radar',
       }).catch((error) => ({
         status: 'skipped' as const,
         queued: 0,
@@ -186,7 +186,7 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
     ? await enqueueXSkillPostQueue({
         limit: Math.min(xQueueLimit, 4),
         minStars: Math.max(xMinStars, 100),
-        campaign: `skill_radar_fallback_${runKey}`,
+        campaign: 'skill_radar_fallback',
       }).catch((error) => ({
         status: 'skipped' as const,
         queued: 0,

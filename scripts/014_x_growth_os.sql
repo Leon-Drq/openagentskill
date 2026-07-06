@@ -47,9 +47,11 @@ create index if not exists idx_x_content_queue_due
 create index if not exists idx_x_content_queue_skill_slug
   on public.x_content_queue (skill_slug);
 
-create unique index if not exists idx_x_content_queue_active_unique
-  on public.x_content_queue (skill_slug, content_type, campaign)
-  where status in ('queued', 'posting', 'posted');
+drop index if exists public.idx_x_content_queue_active_unique;
+
+create unique index if not exists idx_x_content_queue_active_skill_unique
+  on public.x_content_queue (skill_slug, content_type)
+  where status in ('queued', 'posting');
 
 drop trigger if exists update_x_content_queue_updated_at on public.x_content_queue;
 create trigger update_x_content_queue_updated_at
@@ -173,11 +175,23 @@ begin
 
   if exists (
     select 1
+    from public.x_post_history h
+    where h.skill_slug = v_skill_slug
+      and h.status = 'posted'
+  ) then
+    return jsonb_build_object(
+      'status', 'skipped',
+      'reason', 'duplicate_posted',
+      'skill_slug', v_skill_slug
+    );
+  end if;
+
+  if exists (
+    select 1
     from public.x_content_queue q
     where q.skill_slug = v_skill_slug
       and q.content_type = v_content_type
-      and q.campaign = v_campaign
-      and q.status in ('queued', 'posting', 'posted')
+      and q.status in ('queued', 'posting')
   ) then
     return jsonb_build_object(
       'status', 'skipped',
@@ -220,6 +234,13 @@ begin
     'skill_slug', v_item.skill_slug,
     'scheduled_for', v_item.scheduled_for
   );
+exception
+  when unique_violation then
+    return jsonb_build_object(
+      'status', 'skipped',
+      'reason', 'duplicate_active',
+      'skill_slug', v_skill_slug
+    );
 end;
 $$;
 
@@ -238,12 +259,36 @@ declare
 begin
   perform public.assert_indexer_secret(p_server_secret);
 
+  update public.x_content_queue q
+  set
+    status = 'skipped',
+    error = coalesce(q.error, 'Skipped: skill already posted to X'),
+    locked_at = null,
+    metadata = q.metadata || jsonb_build_object(
+      'skipped_by', 'claim_x_content_queue_item',
+      'skip_reason', 'already_posted'
+    ),
+    updated_at = now()
+  where q.status in ('queued', 'posting')
+    and exists (
+      select 1
+      from public.x_post_history h
+      where h.skill_slug = q.skill_slug
+        and h.status = 'posted'
+    );
+
   with picked as (
     select q.id
     from public.x_content_queue q
     where q.status = 'queued'
       and q.scheduled_for <= now()
       and q.attempts < 3
+      and not exists (
+        select 1
+        from public.x_post_history h
+        where h.skill_slug = q.skill_slug
+          and h.status = 'posted'
+      )
     order by q.priority desc, q.scheduled_for asc, q.created_at asc
     limit 1
     for update skip locked

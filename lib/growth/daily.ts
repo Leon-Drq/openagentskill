@@ -233,10 +233,10 @@ export async function runDailyGrowthAutomation(
   const xQueueSourceSlugs = indexedSlugs.length ? indexedSlugs : indexedOrUpdatedSlugs
   const xQueue = xQueueSourceSlugs.length
     ? await enqueueXSkillPostQueueForSlugs({
-        slugs: xQueueSourceSlugs,
-        limit: xQueueLimit,
-        minStars: xMinStars,
-        campaign: `github_hot_daily_${runKey}`,
+      slugs: xQueueSourceSlugs,
+      limit: xQueueLimit,
+      minStars: xMinStars,
+      campaign: 'github_hot_daily',
       })
     : { status: 'skipped' as const, queued: 0, skipped: 0, considered: 0, results: [] }
 
@@ -244,7 +244,7 @@ export async function runDailyGrowthAutomation(
     ? await enqueueXSkillPostQueue({
         limit: Math.min(xQueueLimit, 6),
         minStars: Math.max(xMinStars, 100),
-        campaign: `github_hot_daily_fallback_${runKey}`,
+        campaign: 'github_hot_daily_fallback',
       }).catch((error) => ({
         status: 'skipped' as const,
         queued: 0,
