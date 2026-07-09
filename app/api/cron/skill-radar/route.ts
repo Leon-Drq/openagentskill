@@ -14,6 +14,16 @@ function parseOptionalPositive(searchValue: string | null, bodyValue: unknown) {
   return undefined
 }
 
+function parseOptionalNonNegative(searchValue: string | null, bodyValue: unknown) {
+  const searchParsed = Number(searchValue)
+  if (Number.isFinite(searchParsed) && searchParsed >= 0) return searchParsed
+
+  const bodyParsed = Number(bodyValue)
+  if (Number.isFinite(bodyParsed) && bodyParsed >= 0) return bodyParsed
+
+  return undefined
+}
+
 function parseOptionalBoolean(searchValue: string | null, bodyValue: unknown) {
   if (searchValue === 'true' || searchValue === '1') return true
   if (searchValue === 'false' || searchValue === '0') return false
@@ -35,7 +45,7 @@ async function handleRun(request: NextRequest) {
     githubLookbackDays: parseOptionalPositive(searchParams.get('githubLookbackDays'), body.githubLookbackDays),
     githubMaxQueries: parseOptionalPositive(searchParams.get('githubMaxQueries'), body.githubMaxQueries),
     xLimit: parseOptionalPositive(searchParams.get('xLimit'), body.xLimit),
-    xMaxQueries: parseOptionalPositive(searchParams.get('xMaxQueries'), body.xMaxQueries),
+    xMaxQueries: parseOptionalNonNegative(searchParams.get('xMaxQueries'), body.xMaxQueries),
     xResultsPerQuery: parseOptionalPositive(searchParams.get('xResultsPerQuery'), body.xResultsPerQuery),
     seoPerRun: parseOptionalPositive(searchParams.get('seoPerRun'), body.seoPerRun),
     seoDailyLimit: parseOptionalPositive(searchParams.get('seoDailyLimit'), body.seoDailyLimit),

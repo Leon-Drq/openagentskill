@@ -39,6 +39,8 @@ export async function GET(request: NextRequest) {
       category: skill.category,
       stars: skill.github_stars,
       url: `https://www.openagentskill.com/skills/${skill.slug}?ref=x`,
+      claimUrl: `https://www.openagentskill.com/skills/${skill.slug}#claim-this-skill`,
+      shareImageUrl: `https://www.openagentskill.com/skills/${skill.slug}/opengraph-image?v=7`,
     },
     mainText,
     mainIntentUrl: buildXIntentUrl(mainText),
@@ -46,6 +48,12 @@ export async function GET(request: NextRequest) {
     replyIntentUrl: buildXIntentUrl(replyText),
     creatorReplyText,
     creatorReplyIntentUrl: buildXIntentUrl(creatorReplyText),
+    creatorKit: {
+      claimUrl: `https://www.openagentskill.com/skills/${skill.slug}#claim-this-skill`,
+      shareImageUrl: `https://www.openagentskill.com/skills/${skill.slug}/opengraph-image?v=7`,
+      badgeUrl: `https://www.openagentskill.com/api/badge/${skill.slug}`,
+      canonicalUrl: `https://www.openagentskill.com/skills/${skill.slug}`,
+    },
     creatorReplyApi: `/api/x/reply-draft?skill_slug=${encodeURIComponent(skill.slug)}&format=json`,
     meta: {
       x_share_recommended: candidate.eligible,

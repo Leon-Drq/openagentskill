@@ -38,7 +38,7 @@
     },
     {
       "path": "/api/cron/skill-radar",
-      "schedule": "35 * * * *"
+      "schedule": "35 */6 * * *"
     },
     {
       "path": "/api/cron/growth-daily",
@@ -46,11 +46,11 @@
     },
     {
       "path": "/api/x/post-daily",
-      "schedule": "0 */3 * * *"
+      "schedule": "0 */6 * * *"
     },
     {
       "path": "/api/x/growth/run",
-      "schedule": "10 */4 * * *"
+      "schedule": "10 */12 * * *"
     }
   ]
 }

@@ -12,7 +12,7 @@ async function handleSync(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const limit = parsePositive(request.nextUrl.searchParams.get('limit'), 50)
+  const limit = parsePositive(request.nextUrl.searchParams.get('limit'), 12)
   const result = await syncXPostMetrics({ limit })
   return NextResponse.json({ success: result.status === 'synced', ...result })
 }

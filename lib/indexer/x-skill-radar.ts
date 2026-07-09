@@ -98,6 +98,7 @@ const X_SKILL_RADAR_QUERIES = [
 ]
 
 const WORKFLOW_SIGNAL = /\b(agent[-_\s]?skill|skill\.md|skills?|codex|claude code|cursor|gemini cli|agent workflow|installable|workflow|automation|ppt|pptx|powerpoint|slides?|presentation|deck|stock|trading|finance|quant|backtest|research|last30|web scraping|crawler|browser automation|rag|pdf|document|seo|design|video|world cup|football|soccer|sports analytics)\b/i
+const DIRECT_SKILL_SIGNAL = /\b(agent[-_\s]?skill|skill\.md|codex skill|claude code skill|cursor skill|ppt skill|pptx skill|presentation skill|stock analysis skill|trading skill|quant skill|research skill|web scraping skill|browser automation skill|design skill|video skill|sports analytics skill)\b/i
 
 function xBearerToken() {
   return (
@@ -238,9 +239,9 @@ function toCandidate(repo: GitHubRepoResponse, tweet: XRecentTweet, query: strin
 export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): Promise<XSkillRadarResult> {
   const token = xBearerToken()
   const minStars = Math.max(Math.floor(options.minStars || 10), 10)
-  const limit = Math.min(Math.max(options.limit || 24, 1), 80)
-  const maxQueries = Math.min(Math.max(options.maxQueries || 4, 1), X_SKILL_RADAR_QUERIES.length)
-  const maxResultsPerQuery = Math.min(Math.max(options.maxResultsPerQuery || 20, 10), 100)
+  const limit = Math.min(Math.max(options.limit || 8, 1), 80)
+  const maxQueries = Math.min(Math.max(options.maxQueries || 1, 1), X_SKILL_RADAR_QUERIES.length)
+  const maxResultsPerQuery = Math.min(Math.max(options.maxResultsPerQuery || 10, 10), 50)
 
   if (!token) {
     return {
@@ -277,6 +278,12 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
 
           const sourceText = `${tweet.text} ${repo.full_name} ${repo.description || ''} ${(repo.topics || []).join(' ')}`
           if (!WORKFLOW_SIGNAL.test(sourceText)) continue
+          if (
+            repo.stargazers_count >= 50_000 &&
+            !DIRECT_SKILL_SIGNAL.test(sourceText)
+          ) {
+            continue
+          }
 
           const evaluation = evaluateSkillCandidate({
             fullName: repo.full_name,

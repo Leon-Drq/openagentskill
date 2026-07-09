@@ -11,7 +11,7 @@ import { createPublicClient } from '@/lib/supabase/public'
 import { generateText } from 'ai'
 import type { CandidateRepo } from './github-search'
 import { generateBlogPostForSkill } from '@/lib/blog/generate'
-import { isMcpCandidate } from './skill-filter'
+import { evaluateSkillCandidate, isMcpCandidate } from './skill-filter'
 import { INDEXER_REVIEW_MODEL } from '@/lib/ai/models'
 
 const GITHUB_HEADERS = () => ({
@@ -65,7 +65,7 @@ interface ReviewResult {
 }
 
 async function aiReview(candidate: CandidateRepo, readme: string): Promise<ReviewResult> {
-  const prompt = `You are an AI curator for Open Agent Skill, a registry of AI agent skills and agent tools. MCP servers are out of scope for this product.
+  const prompt = `You are an AI curator for OpenAgentSkill, a registry of reusable AI agent skills. MCP servers are out of scope for this product.
 
 Evaluate this GitHub repository and decide if it should be listed:
 
@@ -78,10 +78,12 @@ README (first 1500 chars):
 ${readme.slice(0, 1500)}
 
 Rules:
-- APPROVE if: it is an AI agent skill, reusable agent tool, LLM utility, or automation skill with clear documentation
-- REJECT if: it is an MCP server, Model Context Protocol integration, demo/tutorial/example repo, has no clear use case, is a fork with no changes, or has under 5 stars unless very unique
-- Score 0-100 based on quality, documentation, and usefulness
-- Pick ONE category from: data, development, productivity, media, security, utility
+- APPROVE only if: it is explicitly an installable AI agent skill, a SKILL.md repository/collection, or a domain workflow packaged for agents such as Claude Code, Codex, Cursor, Gemini CLI, or similar agent runtimes.
+- REJECT if: it is a generic framework/library/platform, MCP server, Model Context Protocol integration, demo/tutorial/example repo, broad awesome list, foundation AI project, infrastructure project, or has no clear agent installation/use path.
+- REJECT PyTorch, Kubernetes, TensorFlow, React, Next.js, LangChain-style generic frameworks unless the README clearly packages reusable agent skills.
+- REJECT if license is missing or unclear, README is thin, or it has under 10 stars.
+- Score 0-100 based on direct skill specificity, documentation, installability, maintenance, and usefulness.
+- Pick ONE category from: coding-agents, research, finance-quant, presentation, design-creative, web-scraping, data, marketing-growth, sports-analytics, security, productivity, utility.
 - Pick 1-5 relevant tags
 
 Respond with JSON only, no markdown:
@@ -97,15 +99,23 @@ Respond with JSON only, no markdown:
     if (!match) throw new Error('No JSON in response')
     return JSON.parse(match[0]) as ReviewResult
   } catch (err) {
-    // If AI fails, do a basic heuristic approval for high-star repos
-    const approved = candidate.stars >= 50
+    // If AI fails, stay conservative: approve only direct skill-like repos.
+    const evaluation = evaluateSkillCandidate({
+      fullName: candidate.fullName,
+      name: candidate.repo,
+      description: `${candidate.description || ''}\n${readme.slice(0, 1000)}`,
+      topics: candidate.topics || [],
+      language: candidate.language,
+      stars: candidate.stars,
+    })
+    const approved = candidate.stars >= 10 && evaluation.accepted && evaluation.skillLikenessScore >= 55
     return {
       approved,
-      score: approved ? 60 : 30,
+      score: approved ? Math.max(60, evaluation.skillLikenessScore) : 30,
       category: 'utility',
-      tags: [candidate.language?.toLowerCase() || 'tool'],
+      tags: [...evaluation.signals.slice(0, 4), candidate.language?.toLowerCase()].filter(Boolean) as string[],
       summary: candidate.description || candidate.repo,
-      reason: approved ? undefined : 'AI review unavailable, low star count',
+      reason: approved ? undefined : 'AI review unavailable and repo is not direct skill-like enough',
     }
   }
 }
@@ -148,6 +158,14 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
       return { repo: repoRef, status: 'skipped', reason: 'MCP projects are excluded from skill-only imports' }
     }
 
+    if (stars < 10) {
+      return { repo: repoRef, status: 'skipped', reason: 'Below 10-star quality gate' }
+    }
+
+    if (license === 'Unknown') {
+      return { repo: repoRef, status: 'skipped', reason: 'License is missing or unclear' }
+    }
+
     // 1. Check if already indexed — if so, refresh star count and return
     const { data: existing } = await supabase
       .from('skills')
@@ -179,6 +197,22 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
     const readme = await fetchReadme(owner, repo)
     if (!readme) {
       return { repo: repoRef, status: 'skipped', reason: 'No README' }
+    }
+
+    const heuristic = evaluateSkillCandidate({
+      fullName: enrichedCandidate.fullName,
+      name: enrichedCandidate.repo,
+      description: `${enrichedCandidate.description || ''}\n${readme.slice(0, 1200)}`,
+      topics: enrichedCandidate.topics || [],
+      language: enrichedCandidate.language,
+      stars,
+    })
+    if (!heuristic.accepted || heuristic.skillLikenessScore < 45) {
+      return {
+        repo: repoRef,
+        status: 'rejected',
+        reason: `Not specific enough for OpenAgentSkill import (${heuristic.skillLikenessScore}/100)`,
+      }
     }
 
     // 3. AI Review

@@ -65,6 +65,11 @@ function numberFromEnv(name: string, fallback: number) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
 }
 
+function nonNegativeNumberFromEnv(name: string, fallback: number) {
+  const parsed = Number(process.env[name])
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
+}
+
 function booleanFromEnv(name: string, fallback: boolean) {
   const value = process.env[name]
   if (value === undefined) return fallback
@@ -109,22 +114,36 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
   const runKey = new Date().toISOString().replace(/[:.]/g, '-')
   const targetNew = Math.min(Math.max(options.targetNew ?? numberFromEnv('SKILL_RADAR_TARGET_NEW', 8), 1), 40)
   const minStars = Math.max(options.minStars ?? numberFromEnv('SKILL_RADAR_MIN_STARS', 10), 10)
-  const xQueueLimit = Math.min(Math.max(options.xQueueLimit ?? numberFromEnv('SKILL_RADAR_X_QUEUE_LIMIT', 3), 1), 12)
+  const xQueueLimit = Math.min(Math.max(options.xQueueLimit ?? numberFromEnv('SKILL_RADAR_X_QUEUE_LIMIT', 2), 1), 12)
   const xMinStars = Math.max(options.xMinStars ?? numberFromEnv('SKILL_RADAR_X_MIN_STARS', 10), 10)
   const autoPost = options.autoPost ?? booleanFromEnv('SKILL_RADAR_AUTO_POST', false)
+  const xMaxQueries = Math.min(
+    Math.max(options.xMaxQueries ?? nonNegativeNumberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 1), 0),
+    8
+  )
 
   const [xRadar, githubHot] = await Promise.all([
-    searchXSkillRadarRepos({
-      limit: options.xLimit ?? numberFromEnv('SKILL_RADAR_X_LIMIT', 18),
-      minStars,
-      maxQueries: options.xMaxQueries ?? numberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 4),
-      maxResultsPerQuery: options.xResultsPerQuery ?? numberFromEnv('SKILL_RADAR_X_RESULTS_PER_QUERY', 20),
-    }),
+    xMaxQueries > 0
+      ? searchXSkillRadarRepos({
+          limit: options.xLimit ?? numberFromEnv('SKILL_RADAR_X_LIMIT', 8),
+          minStars,
+          maxQueries: xMaxQueries,
+          maxResultsPerQuery: options.xResultsPerQuery ?? numberFromEnv('SKILL_RADAR_X_RESULTS_PER_QUERY', 10),
+        })
+      : Promise.resolve({
+          status: 'skipped' as const,
+          reason: 'X radar disabled by budget',
+          candidates: [],
+          searchedQueries: 0,
+          inspectedTweets: 0,
+          extractedRepos: 0,
+          minStars,
+        }),
     searchHotSkillRepos({
-      limit: options.githubLimit ?? numberFromEnv('SKILL_RADAR_GITHUB_LIMIT', 18),
+      limit: options.githubLimit ?? numberFromEnv('SKILL_RADAR_GITHUB_LIMIT', 22),
       minStars,
       lookbackDays: options.githubLookbackDays ?? numberFromEnv('SKILL_RADAR_GITHUB_LOOKBACK_DAYS', 14),
-      maxQueries: options.githubMaxQueries ?? numberFromEnv('SKILL_RADAR_GITHUB_MAX_QUERIES', 10),
+      maxQueries: options.githubMaxQueries ?? numberFromEnv('SKILL_RADAR_GITHUB_MAX_QUERIES', 12),
     }),
   ])
 

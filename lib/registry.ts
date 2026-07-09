@@ -72,6 +72,95 @@ function skillSearchText(skill: SkillRecord) {
     .toLowerCase()
 }
 
+type QueryIntent = 'finance' | 'presentation' | 'design' | 'coding' | 'sports' | 'research' | 'web' | null
+
+function detectQueryIntent(normalizedQuery: string, queryTokens: string[]): QueryIntent {
+  const tokenSet = new Set(queryTokens)
+
+  if (
+    /\b(finance|financial|quant|quantitative|trade|trades|trader|trading|invest|investing|investment|portfolio|markets?|stocks?|equity|crypto|filings?|edgar|sec filings?|investor|earnings|10-k|10-q|alpha|factor|backtest|backtesting|risk model)\b/.test(normalizedQuery) ||
+    ['trade', 'trades', 'trader', 'trading', 'invest', 'investing', 'investment', 'market', 'markets', 'stock', 'stocks', 'equity', 'quant', 'backtest'].some((token) => tokenSet.has(token))
+  ) {
+    return 'finance'
+  }
+
+  if (/\b(presentation|presentations|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides|visual story)\b/.test(normalizedQuery)) {
+    return 'presentation'
+  }
+
+  if (/\b(design|designer|creative|motion|animation|lottie|gsap|figma|ui|ux|shadcn|component|design system|three|3d|dashboard|visual|svg|image|video|seedance)\b/.test(normalizedQuery)) {
+    return 'design'
+  }
+
+  if (/\b(code|coding|developer|dev|repo|repos|github|pull request|pr|ci|bug|test|review|ship|codex|claude code|cursor)\b/.test(normalizedQuery)) {
+    return 'coding'
+  }
+
+  if (/\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(normalizedQuery)) {
+    return 'sports'
+  }
+
+  if (/\b(research|rag|retrieval|knowledge|document|pdf|paper|papers|arxiv|search|recent|last30|last 30)\b/.test(normalizedQuery)) {
+    return 'research'
+  }
+
+  if (/\b(websites?|web pages?|pages?|html|crawl|crawler|scrape|scraper|web scraping|pricing|competitor)\b/.test(normalizedQuery)) {
+    return 'web'
+  }
+
+  return null
+}
+
+function getIntentFitScore(intent: QueryIntent, category: string, text: string) {
+  if (!intent) return 0
+
+  const profile: Record<Exclude<QueryIntent, null>, { category: RegExp; positive: RegExp; negative: RegExp }> = {
+    finance: {
+      category: /\b(finance|financial|quant|trading|market|stock|investment|portfolio|fintech|crypto|defi)\b/,
+      positive: /\b(finance|financial|quant|quantitative|trade|trades|trader|trading|portfolio|market-data|markets?|stocks?|stock[-_\s]?analysis|equity|crypto|filings?|edgar|sec filing|investor|investment|earnings|10-k|10-q|alpha|factor|backtest|backtesting|risk model|openbb|vectorbt|freqtrade|yfinance|zipline|backtrader|serenity)\b/,
+      negative: /\b(web-crawling|crawler|crawl|scraper|scrape|browser|playwright|puppeteer|presentation|ppt|pptx|slides?|figma|design|creative|security|vulnerability|pdf|document)\b/,
+    },
+    presentation: {
+      category: /\b(design|creative|presentation|media)\b/,
+      positive: /\b(presentation|presentations|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides|visual story|notebooklm|guizang|baoyu)\b/,
+      negative: /\b(finance|trading|stock|crawler|scraper|security|database|vector|backend)\b/,
+    },
+    design: {
+      category: /\b(design|creative|media|visual)\b/,
+      positive: /\b(design|creative|motion|animation|lottie|gsap|figma|ui|ux|shadcn|component|design system|three|3d|dashboard|visual|svg|image|video|seedance)\b/,
+      negative: /\b(finance|trading|stock|crawler|scraper|security|database|backend)\b/,
+    },
+    coding: {
+      category: /\b(coding|development|developer|devtools|testing)\b/,
+      positive: /\b(code|coding|developer|dev|repo|repos|github|pull request|pr|ci|bug|test|review|ship|codex|claude code|cursor|lint|patch)\b/,
+      negative: /\b(presentation|ppt|slides?|trading|stock|football|soccer|marketing)\b/,
+    },
+    sports: {
+      category: /\b(sports|football|soccer|analytics)\b/,
+      positive: /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/,
+      negative: /\b(crawler|scraper|security|presentation|ppt|stock|trading|figma)\b/,
+    },
+    research: {
+      category: /\b(research|rag|knowledge|document|data)\b/,
+      positive: /\b(research|rag|retrieval|knowledge|document|pdf|paper|papers|arxiv|search|recent|last30|last 30|grounded|sources?)\b/,
+      negative: /\b(trading|stock|presentation|ppt|figma|video|football|soccer)\b/,
+    },
+    web: {
+      category: /\b(web|scraping|crawler|automation|data)\b/,
+      positive: /\b(web-crawling|crawler|crawl|scraper|scrape|browser|playwright|puppeteer|html|markdown|extraction|llm-friendly|structured data)\b/,
+      negative: /\b(finance|trading|stock|presentation|ppt|figma|security|vulnerability)\b/,
+    },
+  }
+
+  const selected = profile[intent]
+  let score = 0
+  if (selected.category.test(category)) score += 140
+  if (selected.positive.test(text)) score += 120
+  if (selected.negative.test(text) && !selected.positive.test(text)) score -= 170
+  if (!selected.category.test(category) && !selected.positive.test(text)) score -= 220
+  return score
+}
+
 export function getCanonicalSkillKey(skill: SkillRecord) {
   const repo = (skill.github_repo || skill.repository || '')
     .toLowerCase()
@@ -155,6 +244,7 @@ export function rankSkillsForQuery(
   const compactQuery = normalizedQuery.replace(/[^a-z0-9]+/g, '')
   const queryTokens = tokenize(query)
   const expandedQueryTokens = expandQueryTokens(queryTokens)
+  const queryIntent = detectQueryIntent(normalizedQuery, queryTokens)
   const isFinanceQueryIntent = /\b(finance|financial|quant|quantitative|trade|trades|trader|trading|invest|investing|investment|portfolio|markets?|stocks?|equity|crypto|filings?|edgar|sec filings?|investor|earnings|10-k|10-q|alpha|factor|backtest|backtesting|risk model)\b/.test(normalizedQuery) ||
     queryTokens.some((token) => ['trade', 'trades', 'trader', 'trading', 'invest', 'investing', 'investment', 'market', 'markets', 'stock', 'stocks', 'equity', 'quant', 'backtest'].includes(token))
 
@@ -223,6 +313,7 @@ export function rankSkillsForQuery(
         const isPresentationSkill = /\b(presentation|presentations|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides|visual story|notebooklm|guizang|baoyu)\b/.test(text)
         const isDocumentOnlySkill = /\b(pdf|document|docx|markdown|ocr|converter|convert|parser|parse)\b/.test(text) && !isPresentationSkill
 
+        score += getIntentFitScore(queryIntent, category, text)
         if (isGenericWebTask && isGenericWebSkill) score += 42
         if (isGenericWebTask && isLLMReadyWebSkill) score += 28
         if (isGenericWebTask && isPlatformSpecificExtractor && !normalizedQuery.includes('google maps')) score -= 65

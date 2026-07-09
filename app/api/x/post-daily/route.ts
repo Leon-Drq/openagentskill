@@ -7,7 +7,7 @@ async function handlePost(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const result = await postNextQueuedSkillToX({ autoBuildQueue: true, buildLimit: 8 })
+  const result = await postNextQueuedSkillToX({ autoBuildQueue: true, buildLimit: 4 })
   return NextResponse.json({ success: result.status === 'posted', ...result })
 }
 

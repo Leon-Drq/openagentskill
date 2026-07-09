@@ -120,6 +120,11 @@ function compactNumber(value: number) {
   return String(value)
 }
 
+function numberFromEnv(name: string, fallback: number) {
+  const parsed = Number(process.env[name])
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
+}
+
 function getFreshnessBoost(skill: SkillRecord) {
   const timestamp = Date.parse(skill.github_last_pushed_at || skill.updated_at || skill.created_at)
   if (!Number.isFinite(timestamp)) return 0
@@ -598,7 +603,7 @@ export async function syncXPostMetrics(
 ): Promise<XMetricsSyncResult> {
   const serverSecret = getServerSecret()
   const supabase = createPublicClient()
-  const limit = Math.min(Math.max(options.limit || 50, 1), 100)
+  const limit = Math.min(Math.max(options.limit || numberFromEnv('X_METRICS_SYNC_LIMIT', 12), 1), 100)
   const targets = await getMetricTargets(supabase, serverSecret, limit)
   if (!targets.length) {
     return { status: 'skipped', reason: 'No posts need metric refresh', requested: 0, recorded: 0, missing: 0 }
@@ -738,7 +743,7 @@ export async function syncXReplyDrafts(
   await saveRefreshedXToken(supabase, serverSecret, token)
 
   const mentions = await getXUserMentions(token.access_token, connection.x_user_id, {
-    maxResults: Math.min(Math.max(options.limit || 20, 5), 100),
+    maxResults: Math.min(Math.max(options.limit || numberFromEnv('X_REPLY_SYNC_LIMIT', 8), 5), 100),
   })
   const data = mentions.data || []
   if (!data.length) return { status: 'skipped', reason: 'No recent mentions found', mentions: 0, drafted: 0, skipped: 0 }
@@ -774,7 +779,7 @@ export async function syncXReplyDrafts(
 }
 
 export async function runXGrowthOS(): Promise<XGrowthRunResult> {
-  const queue = await enqueueXSkillPostQueue({ limit: 12 })
+  const queue = await enqueueXSkillPostQueue({ limit: numberFromEnv('X_GROWTH_QUEUE_LIMIT', 4) })
   const digest = await enqueueXDigestPostQueue().catch((error) => ({
     status: 'skipped' as const,
     queued: 0,
@@ -782,11 +787,11 @@ export async function runXGrowthOS(): Promise<XGrowthRunResult> {
     considered: 0,
     results: [{ status: 'skipped', reason: error instanceof Error ? error.message : 'Unknown digest error' }],
   }))
-  const metrics = await syncXPostMetrics({ limit: 50 }).catch((error) => ({
+  const metrics = await syncXPostMetrics({ limit: numberFromEnv('X_METRICS_SYNC_LIMIT', 12) }).catch((error) => ({
     status: 'error' as const,
     error: error instanceof Error ? error.message : 'Unknown X metrics sync error',
   }))
-  const replies = await syncXReplyDrafts({ limit: 25 }).catch((error) => ({
+  const replies = await syncXReplyDrafts({ limit: numberFromEnv('X_REPLY_SYNC_LIMIT', 8) }).catch((error) => ({
     status: 'error' as const,
     error: error instanceof Error ? error.message : 'Unknown X replies sync error',
   }))

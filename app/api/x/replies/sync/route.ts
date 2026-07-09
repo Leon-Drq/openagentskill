@@ -12,7 +12,7 @@ async function handleSync(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const limit = parsePositive(request.nextUrl.searchParams.get('limit'), 25)
+  const limit = parsePositive(request.nextUrl.searchParams.get('limit'), 8)
   const result = await syncXReplyDrafts({ limit })
   return NextResponse.json({ success: result.status === 'drafted', ...result })
 }
