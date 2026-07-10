@@ -43,6 +43,7 @@ function fallbackSkill(input: {
   tags: string[]
   frameworks: string[]
   stars: number
+  forks?: number
   quality: number
   license?: string
   lastPushedAt?: string
@@ -62,7 +63,7 @@ function fallbackSkill(input: {
     repository: input.repository || `https://github.com/${input.repo}`,
     github_repo: input.repo,
     github_stars: input.stars,
-    github_forks: 0,
+    github_forks: input.forks || 0,
     category: input.category,
     tags: input.tags,
     frameworks: input.frameworks,
@@ -239,6 +240,91 @@ const RESOLVE_FALLBACK_SKILLS: SkillRecord[] = [
     quality: 93,
     license: 'MIT',
     lastPushedAt: '2026-07-09T15:12:54.000Z',
+  }),
+  fallbackSkill({
+    slug: 'mattpocock-grill-with-docs',
+    name: 'Grill With Docs',
+    description:
+      'Pressure-test a plan against the live codebase, domain glossary, and architectural decisions before implementation starts.',
+    repo: 'mattpocock/skills',
+    repository: 'https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs',
+    installCommand: 'npx skills add mattpocock/skills --skill grill-with-docs',
+    category: 'coding-agents',
+    tags: ['agent-skill', 'planning', 'domain-modeling', 'adr', 'context', 'coding-agents'],
+    frameworks: ['Claude Code', 'Codex', 'Cursor'],
+    stars: 164_079,
+    forks: 14_116,
+    quality: 94,
+    license: 'MIT',
+    lastPushedAt: '2026-07-10T13:15:20.000Z',
+  }),
+  fallbackSkill({
+    slug: 'mattpocock-to-spec',
+    name: 'To Spec',
+    description:
+      'Synthesize the current conversation and codebase context into a behavior-focused engineering spec.',
+    repo: 'mattpocock/skills',
+    repository: 'https://github.com/mattpocock/skills/tree/main/skills/engineering/to-spec',
+    installCommand: 'npx skills add mattpocock/skills --skill to-spec',
+    category: 'coding-agents',
+    tags: ['agent-skill', 'spec', 'prd', 'issue-tracker', 'planning', 'coding-agents'],
+    frameworks: ['Claude Code', 'Codex', 'Cursor'],
+    stars: 164_079,
+    forks: 14_116,
+    quality: 92,
+    license: 'MIT',
+    lastPushedAt: '2026-07-10T13:15:20.000Z',
+  }),
+  fallbackSkill({
+    slug: 'mattpocock-to-tickets',
+    name: 'To Tickets',
+    description:
+      'Break an approved plan or spec into independently actionable vertical-slice tickets with explicit blocking relationships.',
+    repo: 'mattpocock/skills',
+    repository: 'https://github.com/mattpocock/skills/tree/main/skills/engineering/to-tickets',
+    installCommand: 'npx skills add mattpocock/skills --skill to-tickets',
+    category: 'coding-agents',
+    tags: ['agent-skill', 'tickets', 'issues', 'vertical-slices', 'planning', 'coding-agents'],
+    frameworks: ['Claude Code', 'Codex', 'Cursor'],
+    stars: 164_079,
+    forks: 14_116,
+    quality: 91,
+    license: 'MIT',
+    lastPushedAt: '2026-07-10T13:15:20.000Z',
+  }),
+  fallbackSkill({
+    slug: 'mattpocock-implement',
+    name: 'Implement',
+    description:
+      'Implement approved engineering work with focused tests, full verification, code review, and a commit on the current branch.',
+    repo: 'mattpocock/skills',
+    repository: 'https://github.com/mattpocock/skills/tree/main/skills/engineering/implement',
+    installCommand: 'npx skills add mattpocock/skills --skill implement',
+    category: 'coding-agents',
+    tags: ['agent-skill', 'implementation', 'tdd', 'testing', 'commit', 'coding-agents'],
+    frameworks: ['Claude Code', 'Codex', 'Cursor'],
+    stars: 164_079,
+    forks: 14_116,
+    quality: 88,
+    license: 'MIT',
+    lastPushedAt: '2026-07-10T13:15:20.000Z',
+  }),
+  fallbackSkill({
+    slug: 'mattpocock-code-review',
+    name: 'Code Review',
+    description:
+      'Review a branch or diff independently against repository standards and the originating specification.',
+    repo: 'mattpocock/skills',
+    repository: 'https://github.com/mattpocock/skills/tree/main/skills/engineering/code-review',
+    installCommand: 'npx skills add mattpocock/skills --skill code-review',
+    category: 'coding-agents',
+    tags: ['agent-skill', 'code-review', 'git-diff', 'standards', 'spec', 'coding-agents'],
+    frameworks: ['Claude Code', 'Codex', 'Cursor'],
+    stars: 164_079,
+    forks: 14_116,
+    quality: 94,
+    license: 'MIT',
+    lastPushedAt: '2026-07-10T13:15:20.000Z',
   }),
   fallbackSkill({
     slug: 'llamaindex',

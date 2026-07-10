@@ -193,6 +193,59 @@ function getSpecializedDesignIntentScore(normalizedQuery: string, skill: SkillRe
   return score
 }
 
+function getSpecializedEngineeringWorkflowScore(normalizedQuery: string, skill: SkillRecord) {
+  const slug = skill.slug.toLowerCase()
+  const isMattWorkflowSkill =
+    slug.startsWith('mattpocock-') ||
+    (skill.github_repo || '').toLowerCase() === 'mattpocock/skills'
+
+  if (!isMattWorkflowSkill) return 0
+
+  let score = 0
+
+  if (
+    /\b(grill|pressure[- ]?test|challenge (?:a )?plan|domain model|domain glossary|context\.md|architectural decision|adr)\b/.test(
+      normalizedQuery
+    ) && slug.includes('grill-with-docs')
+  ) {
+    score += 320
+  }
+
+  if (
+    /\b(to[- ]?spec|turn .* into (?:a )?(?:spec|prd)|write (?:a )?(?:spec|prd)|create (?:a )?(?:spec|prd)|product requirements document)\b/.test(
+      normalizedQuery
+    ) && slug.endsWith('to-spec')
+  ) {
+    score += 330
+  }
+
+  if (
+    /\b(to[- ]?tickets|break .* into (?:tickets|issues)|ticket breakdown|vertical slices?|blocking (?:edges|relationships)|create (?:engineering )?(?:tickets|issues))\b/.test(
+      normalizedQuery
+    ) && slug.endsWith('to-tickets')
+  ) {
+    score += 330
+  }
+
+  if (
+    /\b(implement (?:the )?(?:spec|ticket|tickets|issue|issues|work)|build from (?:the )?(?:spec|tickets)|execute (?:the )?(?:spec|tickets)|tdd implementation)\b/.test(
+      normalizedQuery
+    ) && slug.endsWith('implement')
+  ) {
+    score += 320
+  }
+
+  if (
+    /\b(code review|review (?:the )?(?:branch|diff|pull request|pr)|review .* against (?:the )?(?:spec|standards)|spec compliance|standards review)\b/.test(
+      normalizedQuery
+    ) && slug.endsWith('code-review')
+  ) {
+    score += 330
+  }
+
+  return score
+}
+
 export function getCanonicalSkillKey(skill: SkillRecord) {
   const repositoryPath = (skill.repository || '').toLowerCase()
   const nestedSkillMatch = repositoryPath.match(
@@ -373,6 +426,7 @@ export function rankSkillsForQuery(
         if (isDesignTask && skill.category === 'design-creative') score += 78
         if (isDesignTask && isDesignSkill) score += 52
         score += getSpecializedDesignIntentScore(normalizedQuery, skill, text)
+        score += getSpecializedEngineeringWorkflowScore(normalizedQuery, skill)
       }
 
       score += Math.min(24, Number(skill.quality_score || 0) / 4)
