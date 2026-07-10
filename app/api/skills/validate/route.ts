@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
     if (!repository) {
       return NextResponse.json(
-        { error: '请提供 GitHub 仓库 URL' },
+        { code: 'REPOSITORY_REQUIRED', error: 'GitHub repository URL is required' },
         { status: 400 }
       )
     }
@@ -22,7 +22,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           valid: false,
-          error: `该仓库目前有 ${repoData.stars} 个 star，未达到最低 ${SKILL_SUBMISSION_MIN_STARS} star 的要求。`,
+          code: 'MINIMUM_STARS',
+          error: `This repository has ${repoData.stars} stars and does not meet the minimum requirement of ${SKILL_SUBMISSION_MIN_STARS} stars.`,
           stars: repoData.stars,
           minStars: SKILL_SUBMISSION_MIN_STARS,
         },
@@ -35,7 +36,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           valid: false,
-          error: '仓库缺少 README 文件，请添加后重试'
+          code: 'MISSING_README',
+          error: 'This repository does not have a README. Add one and try again.'
         },
         { status: 400 }
       )
@@ -58,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { valid: false, error: '验证失败，请稍后重试' },
+      { code: 'VALIDATION_FAILED', valid: false, error: 'Validation failed. Please try again later.' },
       { status: 500 }
     )
   }

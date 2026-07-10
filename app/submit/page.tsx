@@ -3,14 +3,42 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { SkillSubmitForm, SubmitFormData } from '@/components/skill-submit-form'
-import { useI18n } from '@/lib/i18n/context'
+import { interpolate, useI18n } from '@/lib/i18n/context'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { SKILL_SUBMISSION_MIN_STARS } from '@/lib/skills/submission-policy'
 
 export default function SubmitPage() {
   const { t } = useI18n()
   const [submitted, setSubmitted] = useState(false)
   const [reviewResult, setReviewResult] = useState<any>(null)
+
+  const getSubmissionError = (error: {
+    code?: string
+    error?: string
+    stars?: number
+    minStars?: number
+  }) => {
+    switch (error.code) {
+      case 'INVALID_REPOSITORY':
+        return t.submitPage.form.repoValidError
+      case 'MINIMUM_STARS':
+        return interpolate(t.submitPage.form.minimumStarsError, {
+          stars: error.stars ?? 0,
+          minStars: error.minStars ?? SKILL_SUBMISSION_MIN_STARS,
+        })
+      case 'MISSING_README':
+        return t.submitPage.form.missingReadme
+      case 'SKILL_ALREADY_EXISTS':
+        return t.submitPage.form.skillAlreadyExists
+      case 'SAVE_FAILED':
+        return t.submitPage.form.saveFailed
+      case 'SUBMISSION_FAILED':
+        return t.submitPage.form.submissionFailed
+      default:
+        return error.error || t.common.error
+    }
+  }
 
   const handleSubmit = async (data: SubmitFormData) => {
     console.log('[v0] Submitting skill:', data)
@@ -23,7 +51,7 @@ export default function SubmitPage() {
 
     if (!response.ok) {
       const error = await response.json()
-      throw new Error(error.error || t.common.error)
+      throw new Error(getSubmissionError(error))
     }
 
     const result = await response.json()
@@ -93,9 +121,11 @@ export default function SubmitPage() {
                   {t.submitPage.result.approved.viewSkill}
                 </Link>
                 <div className="mt-8 border border-border p-4 text-left sm:p-5">
-                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">README badge</p>
+                  <p className="mb-2 text-xs uppercase tracking-widest text-secondary">
+                    {t.submitPage.result.approved.badgeEyebrow}
+                  </p>
                   <p className="mb-3 text-sm leading-relaxed text-secondary">
-                    Add this badge to the repository README after the listing is live.
+                    {t.submitPage.result.approved.badgeDescription}
                   </p>
                   <pre className="overflow-x-auto border border-border bg-background p-3 font-mono text-[11px] leading-relaxed text-secondary">
                     <code>{`[![OpenAgentSkill](https://www.openagentskill.com/api/badge/${reviewResult.skill.slug})](https://www.openagentskill.com/skills/${reviewResult.skill.slug})`}</code>
@@ -157,7 +187,7 @@ export default function SubmitPage() {
         <section className="relative overflow-hidden border-b border-border">
           <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
           <div className="relative mx-auto max-w-6xl px-6 py-14 text-center sm:py-16 lg:py-20">
-            <p className="font-mono text-xs uppercase tracking-[0.24em] text-secondary">Submit a skill</p>
+            <p className="font-mono text-xs uppercase tracking-[0.24em] text-secondary">{t.submitPage.eyebrow}</p>
             <h1 className="mx-auto mt-5 max-w-4xl font-display text-4xl font-normal leading-[0.98] text-balance sm:text-5xl lg:text-6xl">
               {t.submitPage.title}
             </h1>
@@ -171,23 +201,18 @@ export default function SubmitPage() {
           <SkillSubmitForm onSubmit={handleSubmit} />
 
           <section className="mx-auto mt-8 max-w-2xl border border-border bg-card p-5 sm:mt-10 sm:p-6">
-            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">After approval</p>
-            <h2 className="font-display text-2xl font-semibold">Add the OpenAgentSkill badge to your README</h2>
+            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">{t.submitPage.afterApproval.eyebrow}</p>
+            <h2 className="font-display text-2xl font-semibold">{t.submitPage.afterApproval.title}</h2>
             <p className="mt-3 text-sm leading-relaxed text-secondary">
-              Approved skills get a public listing, install handoff API, and badge endpoint. Add the badge to your
-              GitHub README so users and agents can verify the listing from the repository.
+              {t.submitPage.afterApproval.description}
             </p>
             <pre className="mt-5 overflow-x-auto border border-border bg-background p-3 font-mono text-[11px] leading-relaxed text-secondary">
               <code>{`[![OpenAgentSkill](https://www.openagentskill.com/api/badge/YOUR-SKILL-SLUG)](https://www.openagentskill.com/skills/YOUR-SKILL-SLUG)`}</code>
             </pre>
             <div className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
-              {[
-                ['1', 'Submit a GitHub repository with clear README and install path.'],
-                ['2', 'Claim the listing after approval to show verified ownership.'],
-                ['3', 'Add the badge and link back to the OpenAgentSkill skill page.'],
-              ].map(([step, copy]) => (
-                <div key={step} className="border border-border bg-background p-4">
-                  <span className="font-mono text-xs text-secondary">{step}</span>
+              {t.submitPage.afterApproval.steps.map((copy, index) => (
+                <div key={copy} className="border border-border bg-background p-4">
+                  <span className="font-mono text-xs text-secondary">{index + 1}</span>
                   <p className="mt-2 leading-relaxed">{copy}</p>
                 </div>
               ))}

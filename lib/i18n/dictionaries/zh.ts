@@ -223,11 +223,13 @@ Agent 发布 "multilingual-research"。
   
   // 提交页面
   submitPage: {
+    eyebrow: '提交技能',
     title: '提交 Agent Skill',
     subtitle: '分享您的 Agent Skill 到开放平台。我们使用 AI 自动审核，确保质量和安全性。',
     form: {
       repository: 'GitHub 仓库',
       repositoryPlaceholder: 'https://github.com/owner/repo 或 owner/repo',
+      repositoryRequirements: '仓库至少需要 {minStars} 个 GitHub star。每次提交都会经过静态安全扫描、AI 质量审核和发布门禁检查。',
       category: '分类',
       categoryPlaceholder: '选择分类',
       tags: '标签（最多 10 个）',
@@ -240,6 +242,12 @@ Agent 发布 "multilingual-research"。
       repoValidError: '请输入有效的 GitHub 仓库 URL 或 owner/repo 格式',
       validationFailed: '仓库验证失败',
       retryLater: '验证失败，请稍后重试',
+      repositoryRequired: '请提供 GitHub 仓库 URL',
+      minimumStarsError: '该仓库目前有 {stars} 个 star，未达到最低 {minStars} 个 star 的要求。',
+      missingReadme: '仓库缺少 README 文件，请添加后重试。',
+      submissionFailed: '提交失败，请稍后重试。',
+      skillAlreadyExists: '该技能已被 OpenAgentSkill 收录。',
+      saveFailed: '技能已通过审核，但保存失败，请稍后重试。',
       pleaseValidate: '请先验证 GitHub 仓库',
       pleaseSelectCategory: '请选择分类',
       pleaseAddTags: '请至少添加一个标签',
@@ -268,6 +276,8 @@ Agent 发布 "multilingual-research"。
         totalScore: '总分:',
         suggestions: '改进建议',
         viewSkill: '查看技能详情',
+        badgeEyebrow: 'README 徽章',
+        badgeDescription: '技能详情页发布后，将此徽章添加到仓库 README。',
       },
       rejected: {
         title: '技能未通过审核',
@@ -287,6 +297,16 @@ Agent 发布 "multilingual-research"。
         '代码必须遵循开源协议（MIT、Apache 2.0 等）',
         '发布前会自动进行静态安全扫描和 AI 质量评分',
         '只有通过自动门禁的技能会立即发布，高风险提交需要复核',
+      ],
+    },
+    afterApproval: {
+      eyebrow: '审核通过后',
+      title: '将 OpenAgentSkill 徽章添加到 README',
+      description: '审核通过的技能会获得公开详情页、安装交接 API 和徽章端点。将徽章添加到 GitHub README，方便用户和 Agent 从仓库验证收录状态。',
+      steps: [
+        '提交拥有清晰 README 和安装方式的 GitHub 仓库。',
+        '审核通过后认领详情页，展示已验证的所有权。',
+        '添加徽章，并链接回 OpenAgentSkill 技能详情页。',
       ],
     },
   },

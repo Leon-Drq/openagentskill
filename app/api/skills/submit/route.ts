@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     const repoRef = parseGitHubUrl(repository)
     if (!repoRef) {
       return NextResponse.json(
-        { error: '无效的 GitHub 仓库格式' },
+        { code: 'INVALID_REPOSITORY', error: 'Invalid GitHub repository format' },
         { status: 400 }
       )
     }
@@ -63,7 +63,8 @@ export async function POST(request: NextRequest) {
     if (repoData.stars < SKILL_SUBMISSION_MIN_STARS) {
       return NextResponse.json(
         {
-          error: `该仓库仅有 ${repoData.stars} 个 star，未达到最低 ${SKILL_SUBMISSION_MIN_STARS} star 的要求`,
+          code: 'MINIMUM_STARS',
+          error: `This repository has ${repoData.stars} stars and does not meet the minimum requirement of ${SKILL_SUBMISSION_MIN_STARS} stars.`,
           stars: repoData.stars,
           minStars: SKILL_SUBMISSION_MIN_STARS,
         },
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
 
     if (!repoData.hasReadme) {
       return NextResponse.json(
-        { error: '仓库缺少 README 文件' },
+        { code: 'MISSING_README', error: 'This repository does not have a README.' },
         { status: 400 }
       )
     }
@@ -291,6 +292,7 @@ export async function POST(request: NextRequest) {
       if (dbError?.code === '23505') {
         return NextResponse.json(
           {
+            code: 'SKILL_ALREADY_EXISTS',
             error: 'Skill already exists',
             slug,
           },
@@ -299,6 +301,7 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json({
+        code: 'SAVE_FAILED',
         success: false,
         approved: policy.approved,
         review: reviewedResult,
@@ -310,7 +313,10 @@ export async function POST(request: NextRequest) {
     console.error('[v0] Submission error:', error)
 
     return NextResponse.json(
-      { error: error.message || '提交失败，请稍后重试' },
+      {
+        code: 'SUBMISSION_FAILED',
+        error: error.message || 'Submission failed. Please try again later.',
+      },
       { status: 500 }
     )
   }

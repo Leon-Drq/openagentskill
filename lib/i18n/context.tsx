@@ -93,5 +93,5 @@ export function useI18n() {
 
 // Helper function to replace placeholders in strings
 export function interpolate(str: string, vars: Record<string, string | number>): string {
-  return str.replace(/\{(\w+)\}/g, (_, key) => String(vars[key] || ''))
+  return str.replace(/\{(\w+)\}/g, (_, key) => String(vars[key] ?? ''))
 }
