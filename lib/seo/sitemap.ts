@@ -152,6 +152,7 @@ export function getCoreSitemapEntries(now = new Date()): SitemapEntry[] {
     { url: `${SITEMAP_BASE_URL}/outcomes`, lastModified: now, changeFrequency: 'daily', priority: 0.89 },
     { url: `${SITEMAP_BASE_URL}/reports/weekly`, lastModified: now, changeFrequency: 'daily', priority: 0.85 },
     { url: `${SITEMAP_BASE_URL}/reports/monthly`, lastModified: now, changeFrequency: 'weekly', priority: 0.86 },
+    { url: `${SITEMAP_BASE_URL}/reports/state-of-agent-skills-2026`, lastModified: now, changeFrequency: 'daily', priority: 0.92 },
     { url: `${SITEMAP_BASE_URL}/collections`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${SITEMAP_BASE_URL}/skill-packs`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${SITEMAP_BASE_URL}/compare`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },

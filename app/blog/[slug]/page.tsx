@@ -18,7 +18,7 @@ export async function generateMetadata({
     title: post.title,
     description: post.summary,
     openGraph: {
-      title: `${post.title} — Open Agent Skill`,
+      title: `${post.title} — OpenAgentSkill`,
       description: post.summary,
       type: 'article',
       url: `https://www.openagentskill.com/blog/${slug}`,
@@ -88,7 +88,7 @@ export default async function BlogPostPage({
     url: `https://www.openagentskill.com/blog/${slug}`,
     publisher: {
       '@type': 'Organization',
-      name: 'Open Agent Skill',
+      name: 'OpenAgentSkill',
       url: 'https://www.openagentskill.com',
     },
   }

@@ -27,13 +27,13 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://www.openagentskill.com'),
   title: {
     default: HOME_SOCIAL_TITLE,
-    template: '%s | Open Agent Skill',
+    template: '%s | OpenAgentSkill',
   },
   description: 'The skill layer for AI agents. Let your AI agent find, compare, and install the right reusable skill automatically. OpenAgentSkill is npm for AI Agent Skills.',
   keywords: ['AI agent skills registry', 'AI agent skills directory', 'agent skill', 'agent skills', 'AgentSkill', 'agent tools', 'Claude Code skills', 'Codex skills', 'Cursor skills', 'agent recommendation API', 'openagentskill'],
-  authors: [{ name: 'Open Agent Skill Team' }],
-  creator: 'Open Agent Skill',
-  publisher: 'Open Agent Skill',
+  authors: [{ name: 'OpenAgentSkill' }],
+  creator: 'OpenAgentSkill',
+  publisher: 'OpenAgentSkill',
   robots: {
     index: true,
     follow: true,
@@ -86,7 +86,7 @@ export const metadata: Metadata = {
     title: HOME_SOCIAL_TITLE,
     description: HOME_SOCIAL_DESCRIPTION,
     url: SITE_URL,
-    siteName: 'Open Agent Skill',
+    siteName: 'OpenAgentSkill',
     locale: 'en_US',
     type: 'website',
     images: [

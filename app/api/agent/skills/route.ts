@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
         .join('\n')
 
       return new NextResponse(
-        `Open Agent Skill — Search Results\nQuery: "${query}"\nFound: ${records.length} skills\nTrust filter: ${trust || 'any'}\nSafety filter: ${safety || 'any'}\n---\n${text}`,
+        `OpenAgentSkill — Search Results\nQuery: "${query}"\nFound: ${records.length} skills\nTrust filter: ${trust || 'any'}\nSafety filter: ${safety || 'any'}\n---\n${text}`,
         {
           headers: {
             'Content-Type': 'text/plain; charset=utf-8',

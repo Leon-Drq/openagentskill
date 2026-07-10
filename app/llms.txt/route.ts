@@ -38,6 +38,8 @@ Preferred agent flow:
 12. After one narrow run, POST the result to /api/agent/outcome using install_receipt.outcome_feedback.event_id or feedback.event_id from resolve. Include output_quality, workspace, error_type, used_in_production, time_to_useful_ms, and human_review_required when known. Use dry_run=true before wiring a new integration.
 
 Important URLs:
+- Official entity profile: https://www.openagentskill.com/openagentskill
+- Machine-readable identity: https://www.openagentskill.com/.well-known/openagentskill.json
 - Agent entry: https://www.openagentskill.com/agent
 - Agent Integration Kit: https://www.openagentskill.com/agent/integration-kit
 - Agent Integration Kit API: https://www.openagentskill.com/api/agent/integration-kit
@@ -59,6 +61,9 @@ Important URLs:
 - Agent manifest: https://www.openagentskill.com/.well-known/agent-manifest.json
 - OpenAPI schema: https://www.openagentskill.com/openapi.json
 - GitHub auto-discovery status: https://www.openagentskill.com/api/agent/discovery
+- State of Agent Skills 2026 report: https://www.openagentskill.com/reports/state-of-agent-skills-2026
+- State of Agent Skills JSON: https://www.openagentskill.com/reports/state-of-agent-skills-2026.json
+- State of Agent Skills CSV: https://www.openagentskill.com/reports/state-of-agent-skills-2026.csv
 
 High-intent skill cluster routes:
 ${featuredClusters}

@@ -162,7 +162,7 @@ Pre-install Eval:
 Repository: ${skill.repository}
 
 ---
-Open Agent Skill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
+OpenAgentSkill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
 
       return new NextResponse(text, {
         headers: {

@@ -267,7 +267,7 @@ Agent 发布 "multilingual-research"。
     result: {
       approved: {
         title: '技能审核通过！',
-        subtitle: '您的技能已成功发布到 Open Agent Skill 平台',
+        subtitle: '您的技能已成功发布到 OpenAgentSkill 平台',
         reviewDetails: '审核详情',
         security: '安全性:',
         quality: '质量:',

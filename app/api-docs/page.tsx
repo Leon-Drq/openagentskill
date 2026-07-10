@@ -4,7 +4,7 @@ import { MarketingHero, MarketingPageShell } from '@/components/marketing-page'
 import { SKILL_SUBMISSION_MIN_STARS } from '@/lib/skills/submission-policy'
 
 export const metadata: Metadata = {
-  title: 'API Reference - Open Agent Skill',
+  title: 'API Reference - OpenAgentSkill',
   description: 'Agent-friendly Resolve API for selecting, auditing, and installing AI agent skills programmatically.',
   alternates: {
     canonical: 'https://www.openagentskill.com/api-docs',
@@ -983,7 +983,7 @@ Content-Type: application/json
             {'OpenClaw Auto-Submit'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed text-secondary mb-8">
-            {'If you use OpenClaw, you can configure it to automatically publish your skills to Open Agent Skill whenever a repo crosses the 50-star threshold.'}
+            {'If you use OpenClaw, you can configure it to automatically publish your skills to OpenAgentSkill whenever a repo crosses the 50-star threshold.'}
           </p>
 
           <div className="space-y-8">

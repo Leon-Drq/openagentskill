@@ -1,4 +1,4 @@
-// Core type definitions for Open Agent Skill platform
+// Core type definitions for the OpenAgentSkill platform
 
 export interface Skill {
   id: string

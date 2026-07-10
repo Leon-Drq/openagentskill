@@ -21,6 +21,7 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 [Outcome Loop](https://www.openagentskill.com/outcomes) ·
 [Agent-Proven Rankings](https://www.openagentskill.com/rankings/agent-proven) ·
 [Audits](https://www.openagentskill.com/audits) ·
+[State of Agent Skills](https://www.openagentskill.com/reports/state-of-agent-skills-2026) ·
 [Creator Kit](https://www.openagentskill.com/creator-kit) ·
 [API Docs](https://www.openagentskill.com/api-docs) ·
 [Submit Skill](https://www.openagentskill.com/submit)
@@ -44,6 +45,7 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 | Agent builder | [`/api/agent/resolve`](https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&agent=codex&max_risk=medium&format=text) | One recommended skill, alternatives, install receipt, Trust Score v5, and risk notes |
 | Skill author | [Creator Kit](https://www.openagentskill.com/creator-kit) | Canonical page, README badges, audit surface, Agent Proven badge, X share card, and claim path |
 | Developer exploring skills | [GitHub Skill Index](./skills/README.md) | Curated domain maps and scenario-first examples |
+| Researcher or journalist | [State of Agent Skills 2026](https://www.openagentskill.com/reports/state-of-agent-skills-2026) | Citable methodology plus public JSON, CSV, and text datasets |
 | SEO/community operator | [X Growth Kit](https://www.openagentskill.com/x-kit) | Human-readable launch drafts and creator reply workflows |
 
 ## Why Star This Repo?
@@ -52,7 +54,7 @@ OpenAgentSkill is not another static directory. It is a registry, trust layer, a
 
 | Signal | Why it matters |
 | --- | --- |
-| 10,000+ indexed skills | Broad coverage across coding, research, finance, data, design, marketing, legal, education, sports analytics, and more |
+| 10,000+ indexed candidates | Broad coverage that remains explicitly separated from maintainer verification and Agent Proven evidence |
 | GitHub domain + scenario index | Curated pages for coding, web scraping, finance, RAG, PDF parsing, browser automation, DevOps, security, support, commerce, Web3, ML/media, and real agent jobs |
 | Trust Score v5 + audit pages | Agents can inspect quality, license, README/SKILL.md completeness, install safety, maintenance, outcome confidence, and risk signals |
 | Outcome feedback loop | Resolved skills can report `success`, `failed`, `not_relevant`, `blocked_by_risk`, or `setup_required` so rankings learn from real use |
@@ -232,6 +234,7 @@ Useful endpoints:
 | Endpoint | Purpose |
 | --- | --- |
 | `GET /llms.txt` | Plain-text instructions for browser agents and LLMs |
+| `GET /.well-known/openagentskill.json` | Canonical brand identity, official profiles, product contract, and research links |
 | `GET /.well-known/agent-manifest.json` | Machine-readable capability manifest |
 | `GET /api/agent/integration-kit?format=text` | Copy-paste setup for Codex, Claude Code, and Cursor |
 | `GET /api/agent/resolve?task=...` | Resolve a task into one selected skill plus alternatives |
@@ -249,6 +252,7 @@ Useful endpoints:
 | `POST /api/agent/outcome` | Report whether a resolved skill worked |
 | `GET /api/audits/{slug}` | Fetch a skill audit report |
 | `GET /api/badge/{slug}` | Generate a README badge for listed status, trust, audit, quality, stars, or Agent Proven evidence |
+| `GET /reports/state-of-agent-skills-2026.json` | Read the public ecosystem report and analyzed skill-level dataset |
 
 ## For Skill Authors
 
@@ -287,6 +291,7 @@ Submit or fix a skill:
 | Agent-Proven ranking | [/rankings/agent-proven](https://www.openagentskill.com/rankings/agent-proven) | Skills ranked by success reports, install attempts, risk blocks, and setup friction |
 | Agent Integration Kit | [/agent/integration-kit](https://www.openagentskill.com/agent/integration-kit) | Codex, Claude Code, Cursor setup templates |
 | Audits | [/audits](https://www.openagentskill.com/audits) | Trust, security, quality, and install-readiness reports |
+| State of Agent Skills | [/reports/state-of-agent-skills-2026](https://www.openagentskill.com/reports/state-of-agent-skills-2026) | Original ecosystem research with methodology, JSON, CSV, and agent-readable text |
 | Creator Kit | [/creator-kit](https://www.openagentskill.com/creator-kit) | README badges, creator share links, claim loop, and X drafts |
 | Rankings | [/rankings](https://www.openagentskill.com/rankings) | Ranked lists for agent workflows |
 | Use cases | [/use-cases](https://www.openagentskill.com/use-cases) | Scenario pages with real skill lists |

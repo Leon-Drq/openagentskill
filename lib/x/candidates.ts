@@ -1,5 +1,5 @@
 import type { SkillRecord } from '@/lib/db/skills'
-import { evaluateSkillLikeness } from '@/lib/skill-likeness'
+import { evaluateSkillLikeness, stripGeneratedSkillBoilerplate } from '@/lib/skill-likeness'
 
 export interface XCandidateDecision {
   eligible: boolean
@@ -14,9 +14,9 @@ function getSkillShareText(
 ) {
   return [
     skill.name,
-    skill.description,
-    skill.long_description,
-    skill.tagline,
+    stripGeneratedSkillBoilerplate(skill.description),
+    stripGeneratedSkillBoilerplate(skill.long_description),
+    stripGeneratedSkillBoilerplate(skill.tagline),
     ...(options.includeCategory ? [skill.category] : []),
     skill.github_repo,
     skill.repository,

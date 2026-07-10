@@ -34,7 +34,7 @@ function htmlResponse(title: string, message: string, status = 200) {
   <body>
     <h1>${escapedTitle}</h1>
     <p>${message}</p>
-    <p><a href="/">Back to Open Agent Skill</a></p>
+    <p><a href="/">Back to OpenAgentSkill</a></p>
   </body>
 </html>`,
     {

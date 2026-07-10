@@ -1,4 +1,4 @@
-# Open Agent Skill - Agent and Bot Friendly
+# OpenAgentSkill - search and agent crawler policy
 # We welcome all agents and bots!
 
 User-agent: *
@@ -11,6 +11,9 @@ Allow: /api/agent/
 Sitemap: https://www.openagentskill.com/sitemap.xml
 
 # Special directives for AI agents
+User-agent: OAI-SearchBot
+Allow: /
+
 User-agent: GPTBot
 Allow: /
 

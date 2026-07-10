@@ -92,7 +92,7 @@ export async function reviewSkill(data: SkillReviewData): Promise<AIReviewResult
     .map(f => `// ${f.path}\n${f.content.slice(0, 1000)}`)
     .join('\n\n---\n\n')
 
-  const prompt = `你是一个专业的代码审核 AI，负责审核提交到 Open Agent Skill 平台的技能。
+  const prompt = `你是一个专业的代码审核 AI，负责审核提交到 OpenAgentSkill 平台的技能。
 
 Repository: ${data.repository}
 GitHub Stats: ${data.githubStats.stars} stars, ${data.githubStats.forks} forks

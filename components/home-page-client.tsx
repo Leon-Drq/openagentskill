@@ -261,7 +261,7 @@ export function HomePageClient({ stats, activities, featuredSkills }: HomePageCl
       {/* Footer */}
       <footer className="border-t border-border py-12">
         <div className="max-w-7xl mx-auto px-6 text-center text-sm text-secondary">
-          <p>© 2026 Open Agent Skill. Open protocol, open data, open code.</p>
+          <p>© 2026 OpenAgentSkill. Open protocol, open data, open code.</p>
         </div>
       </footer>
     </div>

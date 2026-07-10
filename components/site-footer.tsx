@@ -69,6 +69,8 @@ export function SiteFooter() {
                 <Link href="/audits" className="hover:text-foreground">Audits</Link>
                 <Link href="/official" className="hover:text-foreground">Official</Link>
                 <Link href="/reports/weekly" className="hover:text-foreground">Weekly Reports</Link>
+                <Link href="/reports/monthly" className="hover:text-foreground">Monthly Index</Link>
+                <Link href="/reports/state-of-agent-skills-2026" className="hover:text-foreground">State of Agent Skills</Link>
                 <Link href="/compare/openagentskill-vs-skills-sh" className="hover:text-foreground">vs skills.sh</Link>
                 <Link href="/alternatives/agentskills-io" className="hover:text-foreground">AgentSkills.io Alternative</Link>
               </div>
@@ -78,7 +80,7 @@ export function SiteFooter() {
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Build</h2>
               <div className="mt-4 grid gap-2 text-secondary">
                 <Link href="/docs" className="hover:text-foreground">{t.nav.docs}</Link>
-                <Link href="/openagentskill" className="hover:text-foreground">What is OpenAgentSkill?</Link>
+                <Link href="/openagentskill" className="hover:text-foreground">About OpenAgentSkill</Link>
                 <Link href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</Link>
                 <Link href="/llms.txt" prefetch={false} className="hover:text-foreground">llms.txt</Link>
                 <Link href="/openapi.json" prefetch={false} className="hover:text-foreground">OpenAPI</Link>

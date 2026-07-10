@@ -2,7 +2,7 @@
  * GitHub Search Module for Skill Auto-Indexer
  *
  * Uses GitHub Code Search API to find repositories containing SKILL.md,
- * which signals they are designed to be Open Agent Skills.
+ * which signals they are designed to be OpenAgentSkill-compatible agent skills.
  */
 
 import { evaluateSkillCandidate } from './skill-filter'

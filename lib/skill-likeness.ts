@@ -89,13 +89,20 @@ const GENERIC_FOUNDATION_TEXT =
 const COLLECTION_TEXT =
   /\b(awesome[-_\s]|curated[-_\s]?(list|collection)|examples?|templates?|starter(s)?|free programming books|roadmap)\b/i
 
+const GENERATED_INDEXER_BOILERPLATE =
+  /\s*Imported by the skill-only GitHub discovery pipeline[\s\S]*?Protocol-server projects are excluded from automated imports\./gi
+
+export function stripGeneratedSkillBoilerplate(value: string | null | undefined) {
+  return (value || '').replace(GENERATED_INDEXER_BOILERPLATE, ' ').replace(/\s+/g, ' ').trim()
+}
+
 function textFor(input: SkillLikenessInput) {
   return [
     input.fullName,
     input.name,
-    input.description,
-    input.longDescription,
-    input.tagline,
+    stripGeneratedSkillBoilerplate(input.description),
+    stripGeneratedSkillBoilerplate(input.longDescription),
+    stripGeneratedSkillBoilerplate(input.tagline),
     input.language,
     input.category,
     input.query,

@@ -3,6 +3,7 @@ import type { SkillEventStats, SkillRecord } from '@/lib/db/skills'
 import { getPrimaryInstallCommand, getSkillInstallTargets } from '@/lib/install-targets'
 import { formatCompactNumber, getFreshnessDays, getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
+import { stripGeneratedSkillBoilerplate } from '@/lib/skill-likeness'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
 export interface SupplyTrackDefinition {
@@ -166,9 +167,9 @@ const FALLBACK_TRACK: SupplyTrackDefinition = {
 function skillSearchText(skill: SkillRecord) {
   return [
     skill.name,
-    skill.description,
-    skill.long_description,
-    skill.tagline,
+    stripGeneratedSkillBoilerplate(skill.description),
+    stripGeneratedSkillBoilerplate(skill.long_description),
+    stripGeneratedSkillBoilerplate(skill.tagline),
     skill.category,
     skill.github_repo,
     ...(skill.tags || []),

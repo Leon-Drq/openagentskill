@@ -261,7 +261,7 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
       p_skill: skillData,
       p_activity: {
         event_type: 'skill_published',
-        actor_name: 'Open Agent Skill Indexer',
+        actor_name: 'OpenAgentSkill Indexer',
         actor_type: 'agent',
         description: `Auto-indexed ${skillData.name} from GitHub (${stars} stars)`,
         metadata: { stars, source: 'auto-indexer', score: review.score },

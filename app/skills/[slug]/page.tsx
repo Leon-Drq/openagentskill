@@ -10,6 +10,7 @@ import {
   getSkillEventStats,
 } from '@/lib/db/skills'
 import { ClaimSkillPanel } from '@/components/claim-skill-panel'
+import { CreatorBadgeKit } from '@/components/creator-badge-kit'
 import { SaveSkillButton } from '@/components/save-skill-button'
 import { SkillAttributionPanel } from '@/components/skill-attribution-panel'
 import { SkillActionLink } from '@/components/skill-action-link'
@@ -130,7 +131,7 @@ export async function generateMetadata({
       skill.category,
     ],
     openGraph: {
-      title: `${skill.name} — Open Agent Skill`,
+      title: `${skill.name} — OpenAgentSkill`,
       description,
       type: 'article',
       url: pageUrl,
@@ -2090,32 +2091,7 @@ export default async function SkillDetailPage({
                 }
               />
 
-              <div className="border border-border p-5">
-                <h3 className="font-display text-lg font-semibold mb-3">
-                  README badge
-                </h3>
-                <p className="mb-4 text-xs leading-relaxed text-secondary">
-                  Add this badge to your GitHub README to show the listing,
-                  trust score, and install handoff.
-                </p>
-                <pre className="overflow-x-auto border border-border bg-background p-3 font-mono text-[11px] leading-relaxed text-secondary">
-                  <code>{`[![OpenAgentSkill](https://www.openagentskill.com/api/badge/${skill.slug})](https://www.openagentskill.com/skills/${skill.slug})`}</code>
-                </pre>
-                <div className="mt-3 grid gap-2">
-                  <Link
-                    href={`/api/badge/${skill.slug}`}
-                    className="border border-border px-3 py-2 text-center text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
-                  >
-                    Preview badge
-                  </Link>
-                  <Link
-                    href={`/api/badge/${skill.slug}?metric=audit`}
-                    className="border border-border px-3 py-2 text-center text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
-                  >
-                    Audit badge
-                  </Link>
-                </div>
-              </div>
+              <CreatorBadgeKit skillSlug={skill.slug} />
 
               {/* Author */}
               <div className="border border-border p-5">

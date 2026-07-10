@@ -6,10 +6,10 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Activity Feed - Latest Skill Updates',
-  description: 'Real-time activity from Open Agent Skill. See new skills, trending tools, and what agents are using right now.',
+  description: 'Real-time activity from OpenAgentSkill. See new skills, trending tools, and what agents are using right now.',
   openGraph: {
-    title: 'Activity Feed — Open Agent Skill',
-    description: 'Real-time activity from Open Agent Skill. New skills, trending tools, and agent usage.',
+    title: 'Activity Feed — OpenAgentSkill',
+    description: 'Real-time activity from OpenAgentSkill. New skills, trending tools, and agent usage.',
     type: 'website',
     url: 'https://www.openagentskill.com/activity',
   },

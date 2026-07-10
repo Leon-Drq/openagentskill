@@ -267,7 +267,7 @@ Built by everyone (and every Agent), for everyone.`,
     result: {
       approved: {
         title: 'Skill Approved!',
-        subtitle: 'Your skill has been successfully published to Open Agent Skill platform',
+        subtitle: 'Your skill has been successfully published to the OpenAgentSkill platform',
         reviewDetails: 'Review Details',
         security: 'Security:',
         quality: 'Quality:',

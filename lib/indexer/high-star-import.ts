@@ -2228,7 +2228,7 @@ export async function bulkImportHighStarSkills(
       p_skill: skill,
       p_activity: {
         event_type: 'skill_published',
-        actor_name: 'Open Agent Skill Bulk Indexer',
+        actor_name: 'OpenAgentSkill Bulk Indexer',
         actor_type: 'agent',
         description: `Bulk-indexed ${skill.name} from GitHub (${repo.stargazers_count} stars)`,
         metadata: {

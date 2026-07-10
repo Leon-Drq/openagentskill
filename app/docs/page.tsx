@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { MarketingHero, MarketingPageShell } from '@/components/marketing-page'
 
 export const metadata: Metadata = {
-  title: 'Documentation - Open Agent Skill',
+  title: 'Documentation - OpenAgentSkill',
   description: 'Learn how to discover, install, and use skills with your AI agents.',
   alternates: {
     canonical: 'https://www.openagentskill.com/docs',
