@@ -15,6 +15,7 @@ import {
   getAgentOutcomeStatsMap,
   getAllSkills,
   getSkillEventStatsMap,
+  searchSkills,
   type SkillEventStats,
   type SkillOutcomeStats,
   type SkillRecord,
@@ -30,6 +31,7 @@ const SITE_URL = 'https://www.openagentskill.com'
 const RESOLVE_CANDIDATE_POOL_SIZE = 750
 const RESOLVE_CACHE_REVALIDATE = 300
 const RESOLVE_QUERY_TIMEOUT_MS = 1800
+const RESOLVE_EXACT_QUERY_TIMEOUT_MS = 2200
 const FALLBACK_DATE = '2026-06-01T00:00:00.000Z'
 
 function fallbackSkill(input: {
@@ -44,6 +46,8 @@ function fallbackSkill(input: {
   quality: number
   license?: string
   lastPushedAt?: string
+  repository?: string
+  installCommand?: string
 }): SkillRecord {
   return {
     id: `fallback-${input.slug}`,
@@ -55,7 +59,7 @@ function fallbackSkill(input: {
     author_name: input.repo.split('/')[0],
     author_email: null,
     author_url: `https://github.com/${input.repo.split('/')[0]}`,
-    repository: `https://github.com/${input.repo}`,
+    repository: input.repository || `https://github.com/${input.repo}`,
     github_repo: input.repo,
     github_stars: input.stars,
     github_forks: 0,
@@ -64,7 +68,7 @@ function fallbackSkill(input: {
     frameworks: input.frameworks,
     version: '1.0.0',
     license: input.license || 'Unknown',
-    install_command: `npx skills add ${input.repo}`,
+    install_command: input.installCommand || `npx skills add ${input.repo}`,
     npm_package: null,
     verified: false,
     submission_source: 'fallback',
@@ -171,6 +175,70 @@ const RESOLVE_FALLBACK_SKILLS: SkillRecord[] = [
     stars: 23_000,
     quality: 93,
     license: 'MIT',
+  }),
+  fallbackSkill({
+    slug: 'emilkowalski-apple-design',
+    name: 'Apple Design',
+    description:
+      "Apple's interface design and fluid-motion principles translated into practical web guidance for gestures, springs, momentum, typography, and reduced motion.",
+    repo: 'emilkowalski/skills',
+    repository: 'https://github.com/emilkowalski/skills/tree/main/skills/apple-design',
+    installCommand: 'npx skills@latest add emilkowalski/skills',
+    category: 'design-creative',
+    tags: ['agent-skill', 'apple-design', 'interface-design', 'motion', 'animation', 'gestures', 'springs'],
+    frameworks: ['Claude Code', 'Codex', 'Cursor'],
+    stars: 7_906,
+    quality: 96,
+    license: 'MIT',
+    lastPushedAt: '2026-07-09T15:12:54.000Z',
+  }),
+  fallbackSkill({
+    slug: 'emilkowalski-emil-design-eng',
+    name: 'Emil Design Engineering',
+    description:
+      'Design-engineering guidance for polished UI components, animation decisions, interaction details, and interfaces that feel intentional.',
+    repo: 'emilkowalski/skills',
+    repository: 'https://github.com/emilkowalski/skills/tree/main/skills/emil-design-eng',
+    installCommand: 'npx skills@latest add emilkowalski/skills',
+    category: 'design-creative',
+    tags: ['agent-skill', 'design-engineering', 'ui', 'animation', 'frontend', 'interaction-design'],
+    frameworks: ['Claude Code', 'Codex', 'Cursor'],
+    stars: 7_906,
+    quality: 96,
+    license: 'MIT',
+    lastPushedAt: '2026-07-09T15:12:54.000Z',
+  }),
+  fallbackSkill({
+    slug: 'emilkowalski-review-animations',
+    name: 'Review Animations',
+    description:
+      'Review animation and motion code against a strict design-engineering craft bar, with focused findings for timing, easing, continuity, and interaction quality.',
+    repo: 'emilkowalski/skills',
+    repository: 'https://github.com/emilkowalski/skills/tree/main/skills/review-animations',
+    installCommand: 'npx skills@latest add emilkowalski/skills',
+    category: 'design-creative',
+    tags: ['agent-skill', 'animation-review', 'code-review', 'motion', 'frontend', 'easing'],
+    frameworks: ['Claude Code', 'Codex', 'Cursor'],
+    stars: 7_906,
+    quality: 94,
+    license: 'MIT',
+    lastPushedAt: '2026-07-09T15:12:54.000Z',
+  }),
+  fallbackSkill({
+    slug: 'emilkowalski-animation-vocabulary',
+    name: 'Animation Vocabulary',
+    description:
+      'Reverse-lookup animation glossary that turns a vague motion description into the precise design term an agent or designer can act on.',
+    repo: 'emilkowalski/skills',
+    repository: 'https://github.com/emilkowalski/skills/tree/main/skills/animation-vocabulary',
+    installCommand: 'npx skills@latest add emilkowalski/skills',
+    category: 'design-creative',
+    tags: ['agent-skill', 'animation', 'motion', 'design-language', 'prompting', 'vocabulary'],
+    frameworks: ['Claude Code', 'Codex', 'Cursor'],
+    stars: 7_906,
+    quality: 93,
+    license: 'MIT',
+    lastPushedAt: '2026-07-09T15:12:54.000Z',
   }),
   fallbackSkill({
     slug: 'llamaindex',
@@ -384,6 +452,21 @@ function normalizeLimit(limit: number | undefined) {
 function normalizeAgent(agent: AgentResolveInput['agent']): InstallTargetId | 'auto' {
   if (agent === 'codex' || agent === 'claude-code' || agent === 'cursor' || agent === 'openagentskill-cli') return agent
   return 'auto'
+}
+
+function mergeResolveSkillPools(...pools: SkillRecord[][]) {
+  const seen = new Set<string>()
+  const merged: SkillRecord[] = []
+
+  for (const pool of pools) {
+    for (const skill of pool) {
+      if (!skill.slug || seen.has(skill.slug)) continue
+      seen.add(skill.slug)
+      merged.push(skill)
+    }
+  }
+
+  return merged
 }
 
 function candidateAllowed(skill: SkillRecord, constraints: AgentResolveConstraints) {
@@ -760,19 +843,30 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     needs_install_command: input.constraints?.needs_install_command ?? true,
     min_stars: Number(input.constraints?.min_stars || 0),
   }
-  const [skills, eventStatsMap, outcomeStatsMap] = input.live
+  const [qualityPool, queryPool, eventStatsMap, outcomeStatsMap] = input.live
     ? await Promise.all([
         withTimeout(getResolveCandidatePool(), RESOLVE_QUERY_TIMEOUT_MS, 'agent resolve candidate query')
           .catch((error) => {
             console.warn('Agent resolve candidate fallback:', error)
             return RESOLVE_FALLBACK_SKILLS
           }),
+        withTimeout(searchSkills(task, 160), RESOLVE_EXACT_QUERY_TIMEOUT_MS, 'agent resolve exact query')
+          .catch((error) => {
+            console.warn('Agent resolve exact query fallback:', error)
+            return [] as SkillRecord[]
+          }),
         withTimeout(getResolveEventStatsMap(), RESOLVE_QUERY_TIMEOUT_MS, 'agent resolve stats query')
           .catch((): Record<string, SkillEventStats> => ({})),
         withTimeout(getResolveOutcomeStatsMap(), RESOLVE_QUERY_TIMEOUT_MS, 'agent resolve outcome query')
           .catch((): Record<string, SkillOutcomeStats> => ({})),
       ])
-    : [RESOLVE_FALLBACK_SKILLS, {} as Record<string, SkillEventStats>, {} as Record<string, SkillOutcomeStats>]
+    : [
+        RESOLVE_FALLBACK_SKILLS,
+        [] as SkillRecord[],
+        {} as Record<string, SkillEventStats>,
+        {} as Record<string, SkillOutcomeStats>,
+      ]
+  const skills = mergeResolveSkillPools(queryPool, qualityPool, RESOLVE_FALLBACK_SKILLS)
 
   const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, task, outcomeStatsMap))
     .filter(({ skill }) => candidateAllowed(skill, constraints))
@@ -865,7 +959,6 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     candidate.safety.safety_tier.tier === 'verified' || candidate.safety.safety_tier.tier === 'reviewed'
   )
   const selected =
-    safeCandidates.find((candidate) => candidate.safety.auto_install_allowed) ||
     safeCandidates[0] ||
     eligibleCandidates[0] ||
     candidates[0] ||

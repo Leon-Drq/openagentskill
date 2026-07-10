@@ -731,19 +731,36 @@ export async function createSubmissionRecord(submission: {
 
 export async function searchSkills(query: string, limit = 120): Promise<SkillRecord[]> {
   const supabase = createPublicClient()
-  const normalizedQuery = query.trim().replace(/[%{},()]/g, ' ')
+  const normalizedQuery = query.trim().replace(/[%_,{},()]/g, ' ')
   if (!normalizedQuery) return []
 
-  const filter = [
-    `name.ilike.%${normalizedQuery}%`,
-    `description.ilike.%${normalizedQuery}%`,
-    `long_description.ilike.%${normalizedQuery}%`,
-    `tagline.ilike.%${normalizedQuery}%`,
-    `category.ilike.%${normalizedQuery}%`,
-    `github_repo.ilike.%${normalizedQuery}%`,
-    `repository.ilike.%${normalizedQuery}%`,
-    `install_command.ilike.%${normalizedQuery}%`,
-  ].join(',')
+  const stopWords = new Set([
+    'about', 'agent', 'agents', 'and', 'for', 'from', 'into', 'need', 'right', 'skill', 'skills',
+    'that', 'the', 'this', 'use', 'using', 'want', 'what', 'when', 'with',
+  ])
+  const queryTerms = Array.from(
+    new Set(
+      normalizedQuery
+        .toLowerCase()
+        .split(/[^a-z0-9]+/)
+        .map((term) => term.trim())
+        .filter((term) => term.length >= 3 && !stopWords.has(term))
+    )
+  ).slice(0, 5)
+  const searchTerms = queryTerms.length > 0 ? queryTerms : [normalizedQuery]
+  const fields = [
+    'name',
+    'description',
+    'long_description',
+    'tagline',
+    'category',
+    'github_repo',
+    'repository',
+    'install_command',
+  ]
+  const filter = searchTerms
+    .flatMap((term) => fields.map((field) => `${field}.ilike.%${term}%`))
+    .join(',')
   const { data, error } = await supabase
     .from('skills')
     .select('*')

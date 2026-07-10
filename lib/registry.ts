@@ -161,7 +161,48 @@ function getIntentFitScore(intent: QueryIntent, category: string, text: string) 
   return score
 }
 
+function getSpecializedDesignIntentScore(normalizedQuery: string, skill: SkillRecord, text: string) {
+  const slug = skill.slug.toLowerCase()
+  const isMotionTask = /\b(animation|animate|animated|motion|transition|easing|spring|gesture|momentum|interaction)\b/.test(normalizedQuery)
+  let score = 0
+
+  if (/\b(apple|wwdc|ios|fluid interface|gesture-driven|momentum|interruptible|spring animation)\b/.test(normalizedQuery)) {
+    if (slug.includes('apple-design') || /\bapple design\b/.test(text)) score += 260
+  }
+
+  if (
+    isMotionTask &&
+    (/\b(name this|name the|what(?:'s| is) (?:this|that) called|what do you call|precise term|right term|vocabulary|glossary)\b/.test(normalizedQuery) ||
+      /\bdescribe(?:d)? (?:this|that|an?) (?:animation|motion|effect)\b/.test(normalizedQuery))
+  ) {
+    if (slug.includes('animation-vocabulary') || /\breverse-lookup (?:animation )?glossary\b/.test(text)) score += 280
+    if (slug.includes('review-animations')) score -= 90
+  }
+
+  if (
+    isMotionTask &&
+    /\b(review|audit|critique|inspect|check|evaluate)\b/.test(normalizedQuery)
+  ) {
+    if (slug.includes('review-animations') || /\banimation-review\b/.test(text)) score += 280
+  }
+
+  if (/\b(design engineering|design-engineering|ui polish|interface polish|component polish|interaction details?)\b/.test(normalizedQuery)) {
+    if (slug.includes('emil-design-eng') || /\bdesign-engineering\b/.test(text)) score += 240
+  }
+
+  return score
+}
+
 export function getCanonicalSkillKey(skill: SkillRecord) {
+  const repositoryPath = (skill.repository || '').toLowerCase()
+  const nestedSkillMatch = repositoryPath.match(
+    /github\.com\/([^/]+\/[^/]+)\/(?:tree|blob)\/[^/]+\/(.+?)(?:\/skill\.md)?\/?$/
+  )
+
+  if (nestedSkillMatch) {
+    return `${nestedSkillMatch[1]}#${nestedSkillMatch[2]}`
+  }
+
   const repo = (skill.github_repo || skill.repository || '')
     .toLowerCase()
     .replace(/^https?:\/\/github\.com\//, '')
@@ -331,6 +372,7 @@ export function rankSkillsForQuery(
         if (isPresentationTask && isDocumentOnlySkill) score -= 90
         if (isDesignTask && skill.category === 'design-creative') score += 78
         if (isDesignTask && isDesignSkill) score += 52
+        score += getSpecializedDesignIntentScore(normalizedQuery, skill, text)
       }
 
       score += Math.min(24, Number(skill.quality_score || 0) / 4)
