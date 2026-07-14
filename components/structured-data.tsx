@@ -8,7 +8,7 @@ export function StructuredData() {
     '@type': 'WebSite',
     '@id': `${BASE_URL}/#website`,
     name: 'OpenAgentSkill',
-    alternateName: ['OpenAgentSkill Registry', 'AI Agent Skills Registry', 'AgentSkill Registry'],
+    alternateName: ['Open Agent Skill', 'OpenAgentSkill Registry', 'AI Agent Skills Registry', 'AgentSkill Registry'],
     url: BASE_URL,
     description: 'The skill layer for AI agents: a registry, audit layer, and recommendation API for discovering, comparing, and installing reusable agent skills.',
     potentialAction: {
@@ -33,7 +33,7 @@ export function StructuredData() {
     '@type': 'Organization',
     '@id': `${BASE_URL}/#organization`,
     name: 'OpenAgentSkill',
-    alternateName: ['OpenAgentSkill Registry'],
+    alternateName: ['Open Agent Skill', 'OpenAgentSkill Registry'],
     url: BASE_URL,
     logo: `${BASE_URL}/icon.svg`,
     description: 'OpenAgentSkill helps AI agents and builders discover, compare, audit, and install the right reusable skill automatically.',

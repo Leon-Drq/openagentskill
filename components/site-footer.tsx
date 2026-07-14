@@ -46,6 +46,7 @@ export function SiteFooter() {
               <div className="mt-4 grid gap-2 text-secondary">
                 <Link href="/skills" className="hover:text-foreground">{t.nav.skills}</Link>
                 <Link href="/agent-skills" className="hover:text-foreground">Agent Skills</Link>
+                <Link href="/agent-skill" className="hover:text-foreground">What Is an Agent Skill?</Link>
                 <Link href="/ai-agent-skills" className="hover:text-foreground">AI Agent Skills</Link>
                 <Link href="/tasks" className="hover:text-foreground">Tasks</Link>
                 <Link href="/skill-packs" className="hover:text-foreground">Skill Packs</Link>

@@ -11,6 +11,15 @@ const nextConfig = {
   turbopack: {
     root: __dirname,
   },
+  async redirects() {
+    return [
+      {
+        source: '/agentskill',
+        destination: '/agent-skill',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 export default nextConfig

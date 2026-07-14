@@ -6,14 +6,14 @@ import { USE_CASES } from '@/lib/use-cases'
 const BASE_URL = 'https://www.openagentskill.com'
 
 export const metadata: Metadata = {
-  title: 'What Is an Agent Skill? Definition, Examples, and Registry',
+  title: 'What Is an Agent Skill (AgentSkill)? Definition and Examples',
   description:
-    'An agent skill is a reusable capability an AI agent can discover, evaluate, install, and use. Learn how agent skills work and how OpenAgentSkill helps agents find the right skill automatically.',
+    'AgentSkill is a common search spelling for agent skill: a reusable capability an AI agent can discover, evaluate, install, and use. See definitions, examples, and registry guidance.',
   alternates: {
     canonical: `${BASE_URL}/agent-skill`,
   },
   openGraph: {
-    title: 'What Is an Agent Skill? Definition, Examples, and Registry',
+    title: 'What Is an Agent Skill (AgentSkill)? Definition and Examples',
     description:
       'Learn how AI agent skills work, how agents discover and install them, and why a skill registry matters for Codex, Claude Code, Cursor, and other agent workflows.',
     url: `${BASE_URL}/agent-skill`,
@@ -22,6 +22,11 @@ export const metadata: Metadata = {
 }
 
 const faq = [
+  {
+    question: 'Is AgentSkill the same as agent skill?',
+    answer:
+      'AgentSkill is a common compact spelling used in searches and product names. In this guide, agent skill means a reusable capability package that an AI agent can discover, evaluate, install, and use for a specific task.',
+  },
   {
     question: 'What is an agent skill?',
     answer:
@@ -46,6 +51,7 @@ export default function AgentSkillPage() {
       '@context': 'https://schema.org',
       '@type': 'Article',
       headline: 'What Is an Agent Skill?',
+      alternativeHeadline: 'What Is AgentSkill?',
       description: metadata.description,
       url: `${BASE_URL}/agent-skill`,
       publisher: {
@@ -105,6 +111,9 @@ export default function AgentSkillPage() {
                 A skill can contain instructions, scripts, prompts, examples, metadata, and installation guidance. The useful part is not only the code; it is the reusable decision about how an agent should perform a task.
               </p>
               <p>
+                <strong className="font-semibold text-foreground">AgentSkill</strong> is a common compact spelling for <strong className="font-semibold text-foreground">agent skill</strong>. Both usually describe a reusable capability package, while OpenAgentSkill provides the registry and decision layer around those packages.
+              </p>
+              <p>
                 OpenAgentSkill focuses on the registry layer: helping agents and builders find the right skill, compare alternatives, inspect audit signals, and install with a clear command or repository path.
               </p>
             </div>
@@ -162,7 +171,7 @@ export default function AgentSkillPage() {
 
         <section className="px-4 py-12 sm:px-6 sm:py-16">
           <div className="mx-auto max-w-5xl">
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {faq.map((item) => (
                 <div key={item.question} className="border border-border bg-card p-5">
                   <h2 className="font-display text-lg font-semibold">{item.question}</h2>
