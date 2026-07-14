@@ -98,7 +98,10 @@ export function SiteFooter() {
 
         <div className="flex flex-col gap-3 pt-6 font-mono text-[11px] uppercase tracking-[0.18em] text-secondary sm:flex-row sm:items-center sm:justify-between">
           <span>OpenAgentSkill Registry</span>
-          <span>Built for agent-native discovery</span>
+          <div className="flex flex-wrap items-center gap-4">
+            <Link href="/privacy" className="transition-colors hover:text-foreground">Privacy</Link>
+            <span>Built for agent-native discovery</span>
+          </div>
         </div>
       </div>
     </footer>

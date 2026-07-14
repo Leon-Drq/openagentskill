@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowRight, CheckCircle2, Copy, Loader2, Search, ShieldCheck, TriangleAlert } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { trackAnalyticsEvent } from '@/lib/analytics'
 
 type ResolveSkillSummary = {
   slug: string
@@ -257,13 +258,21 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
     return `/api/agent/receipt?${params.toString()}`
   }, [agent, live, maxRisk, minStars, task])
 
-  async function resolveTask(nextTask = task) {
+  async function resolveTask(nextTask = task, source: 'manual' | 'example' = 'manual') {
     const trimmedTask = nextTask.trim()
     if (!trimmedTask) return
 
     setTask(trimmedTask)
     setIsLoading(true)
     setError(null)
+
+    trackAnalyticsEvent('resolve_request', {
+      agent,
+      max_risk: maxRisk,
+      min_stars: Number.parseInt(minStars || '0', 10) || 0,
+      live,
+      source,
+    })
 
     try {
       const params = new URLSearchParams({
@@ -275,8 +284,37 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
       if (live) params.set('live', 'true')
 
       const response = await fetch(`/api/agent/resolve?${params.toString()}`)
-      if (!response.ok) throw new Error(`Resolve failed with status ${response.status}`)
-      setPayload((await response.json()) as ResolvePayload)
+      if (!response.ok) {
+        trackAnalyticsEvent('resolve_error', {
+          agent,
+          status: response.status,
+          source,
+        })
+        throw new Error(`Resolve failed with status ${response.status}`)
+      }
+
+      const nextPayload = (await response.json()) as ResolvePayload
+      setPayload(nextPayload)
+
+      if (nextPayload.recommendation) {
+        trackAnalyticsEvent('resolve_success', {
+          agent,
+          source,
+          skill_slug: nextPayload.recommendation.best_skill.slug,
+          track: nextPayload.recommendation.supply_asset.track.shortLabel,
+          scenario: nextPayload.recommendation.supply_asset.scenario.label,
+          policy_status: nextPayload.policy_decision.status,
+          match_score: nextPayload.selected?.match_score,
+          auto_install_allowed: nextPayload.recommendation.install.auto_install_allowed,
+          candidates: nextPayload.meta?.total_candidates,
+        })
+      } else {
+        trackAnalyticsEvent('resolve_no_match', {
+          agent,
+          source,
+          candidates: nextPayload.meta?.total_candidates,
+        })
+      }
     } catch (resolveError) {
       setError(resolveError instanceof Error ? resolveError.message : 'Failed to resolve this task')
       setPayload(null)
@@ -383,7 +421,10 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
             </button>
             <button
               type="button"
-              onClick={() => copyText(apiUrl)}
+              onClick={() => {
+                copyText(apiUrl)
+                trackAnalyticsEvent('resolve_copy', { asset: 'api_url', agent })
+              }}
               className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border border-border bg-background px-5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40 sm:w-auto"
             >
               <Copy className="h-4 w-4" aria-hidden="true" />
@@ -391,7 +432,10 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
             </button>
             <button
               type="button"
-              onClick={() => copyText(receiptUrl)}
+              onClick={() => {
+                copyText(receiptUrl)
+                trackAnalyticsEvent('resolve_copy', { asset: 'receipt_url', agent })
+              }}
               className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border border-border bg-background px-5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40 sm:w-auto"
             >
               <Copy className="h-4 w-4" aria-hidden="true" />
@@ -399,7 +443,10 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
             </button>
             <button
               type="button"
-              onClick={() => copyText(recommendation?.agent_instruction || apiUrl)}
+              onClick={() => {
+                copyText(recommendation?.agent_instruction || apiUrl)
+                trackAnalyticsEvent('resolve_copy', { asset: 'agent_prompt', agent })
+              }}
               className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border border-border bg-background px-5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40 sm:w-auto"
             >
               <Copy className="h-4 w-4" aria-hidden="true" />
@@ -415,7 +462,7 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
               <button
                 key={example}
                 type="button"
-                onClick={() => void resolveTask(example)}
+                onClick={() => void resolveTask(example, 'example')}
                 className="flex items-center justify-between gap-3 border border-border bg-background px-3 py-2 text-left text-sm text-secondary transition-colors hover:border-foreground/40 hover:text-foreground"
               >
                 <span className="min-w-0 break-words [overflow-wrap:anywhere]">{example}</span>
@@ -481,12 +528,21 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
               <div className="mt-4 flex flex-wrap gap-2">
                 <Link
                   href={recommendation.best_skill.url || `/skills/${recommendation.best_skill.slug}`}
+                  onClick={() => trackAnalyticsEvent('resolve_open_skill', {
+                    skill_slug: recommendation.best_skill.slug,
+                    agent,
+                    track: recommendation.supply_asset.track.shortLabel,
+                  })}
                   className="rounded-[8px] bg-foreground px-4 py-2 text-sm font-semibold text-background transition-opacity hover:opacity-85"
                 >
                   Open skill
                 </Link>
                 <Link
                   href={recommendation.best_skill.audit_url || `/skills/${recommendation.best_skill.slug}/audit`}
+                  onClick={() => trackAnalyticsEvent('resolve_open_audit', {
+                    skill_slug: recommendation.best_skill.slug,
+                    agent,
+                  })}
                   className="rounded-[8px] border border-border px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
                 >
                   Audit page
@@ -496,6 +552,10 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
                     href={recommendation.best_skill.repository}
                     target="_blank"
                     rel="noreferrer"
+                    onClick={() => trackAnalyticsEvent('resolve_outbound_github', {
+                      skill_slug: recommendation.best_skill.slug,
+                      agent,
+                    })}
                     className="rounded-[8px] border border-border px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
                   >
                     GitHub

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { Geist_Mono, Inter } from 'next/font/google'
+import { GoogleAnalytics } from '@/components/google-analytics'
 import { StructuredData } from '@/components/structured-data'
 import { I18nProvider } from '@/lib/i18n/context'
 import { LOCALIZED_LANDING_PAGES } from '@/lib/seo/localized-pages'
@@ -129,6 +131,11 @@ export default async function RootLayout({
     locale && locale in LOCALIZED_LANDING_PAGES
       ? LOCALIZED_LANDING_PAGES[locale as keyof typeof LOCALIZED_LANDING_PAGES].lang
       : 'en'
+  const configuredMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim()
+  const measurementId =
+    configuredMeasurementId && /^G-[A-Z0-9]+$/i.test(configuredMeasurementId)
+      ? configuredMeasurementId
+      : null
 
   return (
     <html lang={lang} className={`${inter.variable} ${geistMono.variable}`}>
@@ -139,6 +146,11 @@ export default async function RootLayout({
         <I18nProvider>
           {children}
         </I18nProvider>
+        {measurementId && (
+          <Suspense fallback={null}>
+            <GoogleAnalytics measurementId={measurementId} />
+          </Suspense>
+        )}
       </body>
     </html>
   )

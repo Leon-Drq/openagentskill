@@ -7,11 +7,29 @@ import { interpolate, useI18n } from '@/lib/i18n/context'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { SKILL_SUBMISSION_MIN_STARS } from '@/lib/skills/submission-policy'
+import { trackAnalyticsEvent } from '@/lib/analytics'
+
+type SubmissionReview = {
+  scores: {
+    security: number
+    quality: number
+    usefulness: number
+    compliance: number
+  }
+  totalScore: number
+  suggestions: string[]
+  issues: string[]
+  reasoning: string
+}
+
+type SubmissionResult =
+  | { approved: true; skill: { slug: string }; review: SubmissionReview }
+  | { approved: false; skill?: { slug: string }; review: SubmissionReview }
 
 export default function SubmitPage() {
   const { t } = useI18n()
   const [submitted, setSubmitted] = useState(false)
-  const [reviewResult, setReviewResult] = useState<any>(null)
+  const [reviewResult, setReviewResult] = useState<SubmissionResult | null>(null)
 
   const getSubmissionError = (error: {
     code?: string
@@ -54,8 +72,15 @@ export default function SubmitPage() {
       throw new Error(getSubmissionError(error))
     }
 
-    const result = await response.json()
+    const result = (await response.json()) as SubmissionResult
     console.log('[v0] Submission result:', result)
+
+    trackAnalyticsEvent('skill_submission_result', {
+      approved: Boolean(result.approved),
+      category: data.category || 'unspecified',
+      skill_slug: result.skill?.slug,
+      review_score: result.review?.totalScore,
+    })
 
     setReviewResult(result)
     setSubmitted(true)
