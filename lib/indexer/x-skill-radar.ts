@@ -71,6 +71,7 @@ export interface XSkillRadarOptions {
   minStars?: number
   maxQueries?: number
   maxResultsPerQuery?: number
+  queryOffset?: number
 }
 
 export interface XSkillRadarResult {
@@ -78,6 +79,7 @@ export interface XSkillRadarResult {
   reason?: string
   candidates: XSkillRadarCandidate[]
   searchedQueries: number
+  queryOffset: number
   inspectedTweets: number
   extractedRepos: number
   minStars: number
@@ -182,6 +184,14 @@ function radarScore(repo: GitHubRepoResponse, tweet: XRecentTweet, relevanceScor
   return Math.round((engagementScore(tweet) + stars + freshness + relevanceScore * 12) * 10) / 10
 }
 
+function rotatedWindow<T>(items: readonly T[], count: number, offset: number) {
+  if (!items.length || count <= 0) return []
+
+  const start = ((offset % items.length) + items.length) % items.length
+  const size = Math.min(count, items.length)
+  return Array.from({ length: size }, (_, index) => items[(start + index) % items.length])
+}
+
 async function searchXRecent(query: string, maxResults: number, token: string) {
   const url = new URL(X_RECENT_SEARCH_URL)
   url.searchParams.set('query', query)
@@ -242,6 +252,7 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
   const limit = Math.min(Math.max(options.limit || 8, 1), 80)
   const maxQueries = Math.min(Math.max(options.maxQueries || 1, 1), X_SKILL_RADAR_QUERIES.length)
   const maxResultsPerQuery = Math.min(Math.max(options.maxResultsPerQuery || 10, 10), 50)
+  const queryOffset = Math.max(0, Math.floor(options.queryOffset ?? 0))
 
   if (!token) {
     return {
@@ -249,6 +260,7 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
       reason: 'Missing X bearer token',
       candidates: [],
       searchedQueries: 0,
+      queryOffset,
       inspectedTweets: 0,
       extractedRepos: 0,
       minStars,
@@ -260,7 +272,7 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
   let extractedRepos = 0
   let searchedQueries = 0
 
-  for (const query of X_SKILL_RADAR_QUERIES.slice(0, maxQueries)) {
+  for (const query of rotatedWindow(X_SKILL_RADAR_QUERIES, maxQueries, queryOffset)) {
     searchedQueries += 1
     try {
       const response = await searchXRecent(query, maxResultsPerQuery, token)
@@ -319,6 +331,7 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
     reason: sortedCandidates.length ? undefined : 'No X-linked skill repositories passed quality gates',
     candidates: sortedCandidates,
     searchedQueries,
+    queryOffset,
     inspectedTweets,
     extractedRepos,
     minStars,

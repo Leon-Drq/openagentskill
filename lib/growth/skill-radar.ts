@@ -9,6 +9,7 @@ import { searchHotSkillRepos, type HotSkillDiscoveryResult } from '@/lib/indexer
 import { searchXSkillRadarRepos, type XSkillRadarResult } from '@/lib/indexer/x-skill-radar'
 import { processBatch, type ProcessResult } from '@/lib/indexer/processor'
 import type { CandidateRepo } from '@/lib/indexer/github-search'
+import { createPublicClient } from '@/lib/supabase/public'
 import {
   enqueueXSkillPostQueue,
   enqueueXSkillPostQueueForSlugs,
@@ -76,6 +77,40 @@ function booleanFromEnv(name: string, fallback: boolean) {
   return value === 'true' || value === '1'
 }
 
+function skillRadarXMaxQueries(options: SkillRadarOptions) {
+  if (options.xMaxQueries !== undefined) {
+    return Math.min(Math.max(options.xMaxQueries, 0), 8)
+  }
+
+  const maxQueries = Math.min(
+    Math.max(nonNegativeNumberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 1), 0),
+    8
+  )
+  if (maxQueries === 0) return 0
+
+  // GitHub can be checked every hour without consuming X credits. Sample X
+  // periodically, then let its high-engagement posts enrich the same quality gate.
+  const intervalHours = Math.min(
+    Math.max(numberFromEnv('SKILL_RADAR_X_SCAN_INTERVAL_HOURS', 6), 1),
+    24
+  )
+  return new Date().getUTCHours() % intervalHours === 0 ? maxQueries : 0
+}
+
+async function recordSkillRadarRun(run: Record<string, unknown>) {
+  const serverSecret = process.env.INDEXER_SECRET
+  if (!serverSecret) return
+
+  const { error } = await createPublicClient().rpc('record_indexer_run', {
+    p_server_secret: serverSecret,
+    p_run: run,
+  })
+
+  if (error) {
+    console.error('[skill-radar] Failed to record run log:', error.message)
+  }
+}
+
 function unique(values: Array<string | undefined>) {
   return Array.from(new Set(values.filter((value): value is string => Boolean(value))))
 }
@@ -111,16 +146,15 @@ function mergeCandidates(
 }
 
 export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): Promise<SkillRadarResult> {
+  const startedAt = new Date().toISOString()
   const runKey = new Date().toISOString().replace(/[:.]/g, '-')
-  const targetNew = Math.min(Math.max(options.targetNew ?? numberFromEnv('SKILL_RADAR_TARGET_NEW', 8), 1), 40)
+  const targetNew = Math.min(Math.max(options.targetNew ?? numberFromEnv('SKILL_RADAR_TARGET_NEW', 2), 1), 12)
   const minStars = Math.max(options.minStars ?? numberFromEnv('SKILL_RADAR_MIN_STARS', 10), 10)
   const xQueueLimit = Math.min(Math.max(options.xQueueLimit ?? numberFromEnv('SKILL_RADAR_X_QUEUE_LIMIT', 2), 1), 12)
   const xMinStars = Math.max(options.xMinStars ?? numberFromEnv('SKILL_RADAR_X_MIN_STARS', 10), 10)
   const autoPost = options.autoPost ?? booleanFromEnv('SKILL_RADAR_AUTO_POST', false)
-  const xMaxQueries = Math.min(
-    Math.max(options.xMaxQueries ?? nonNegativeNumberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 1), 0),
-    8
-  )
+  const xMaxQueries = skillRadarXMaxQueries(options)
+  const queryOffset = Math.floor(Date.now() / 3_600_000)
 
   const [xRadar, githubHot] = await Promise.all([
     xMaxQueries > 0
@@ -129,12 +163,14 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
           minStars,
           maxQueries: xMaxQueries,
           maxResultsPerQuery: options.xResultsPerQuery ?? numberFromEnv('SKILL_RADAR_X_RESULTS_PER_QUERY', 10),
+          queryOffset,
         })
       : Promise.resolve({
           status: 'skipped' as const,
           reason: 'X radar disabled by budget',
           candidates: [],
           searchedQueries: 0,
+          queryOffset,
           inspectedTweets: 0,
           extractedRepos: 0,
           minStars,
@@ -143,7 +179,8 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
       limit: options.githubLimit ?? numberFromEnv('SKILL_RADAR_GITHUB_LIMIT', 22),
       minStars,
       lookbackDays: options.githubLookbackDays ?? numberFromEnv('SKILL_RADAR_GITHUB_LOOKBACK_DAYS', 14),
-      maxQueries: options.githubMaxQueries ?? numberFromEnv('SKILL_RADAR_GITHUB_MAX_QUERIES', 12),
+      maxQueries: options.githubMaxQueries ?? numberFromEnv('SKILL_RADAR_GITHUB_MAX_QUERIES', 4),
+      queryOffset,
     }),
   ])
 
@@ -222,7 +259,7 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
       }))
     : { status: 'skipped' as const, reason: 'Auto-post disabled for radar run' }
 
-  return {
+  const result: SkillRadarResult = {
     success: true,
     runKey,
     source: 'x_and_github',
@@ -242,4 +279,62 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
       touched: touchedSlugs,
     },
   }
+
+  await recordSkillRadarRun({
+    mode: 'skill-radar',
+    status: summary.errors > 0 ? 'completed_with_errors' : 'completed',
+    filter_mode: 'skills-only',
+    started_at: startedAt,
+    completed_at: new Date().toISOString(),
+    target_new: targetNew,
+    min_stars: minStars,
+    max_search_requests: githubHot.searchedQueries + xRadar.searchedQueries,
+    search_requests: githubHot.searchedQueries + xRadar.searchedQueries,
+    candidates_found: candidates.length,
+    skipped_existing: summary.skipped,
+    skipped_mcp: 0,
+    skipped_low_relevance: summary.rejected,
+    imported: summary.indexed,
+    updated: 0,
+    errors: summary.errors,
+    metadata: {
+      automation: 'skill-radar',
+      maintenance_mode: true,
+      run_key: runKey,
+      query_offset: queryOffset,
+      github_hot: {
+        searched_queries: githubHot.searchedQueries,
+        query_offset: githubHot.queryOffset,
+        candidates: githubHot.candidates.length,
+      },
+      x_radar: {
+        status: xRadar.status,
+        reason: xRadar.reason || null,
+        searched_queries: xRadar.searchedQueries,
+        query_offset: xRadar.queryOffset,
+        inspected_tweets: xRadar.inspectedTweets,
+        extracted_repos: xRadar.extractedRepos,
+        candidates: xRadar.candidates.length,
+      },
+      seo: {
+        status: seo.status,
+        generated: seo.generated,
+      },
+      indexnow: {
+        success: indexing.success,
+        submitted: indexing.submitted.length,
+      },
+      x_queue: {
+        status: xQueue.status,
+        queued: xQueue.queued,
+        fallback_queued: xFallbackQueue?.queued || 0,
+      },
+      x_post: {
+        status: xPost.status,
+        reason: xPost.reason || null,
+      },
+    },
+  })
+
+  return result
 }

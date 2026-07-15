@@ -176,7 +176,7 @@ export async function runDailyGrowthAutomation(
   options: DailyGrowthOptions = {}
 ): Promise<DailyGrowthResult> {
   const runKey = new Date().toISOString().slice(0, 10)
-  const targetNew = Math.min(Math.max(options.targetNew ?? numberFromEnv('GROWTH_DAILY_TARGET_NEW', 40), 1), 250)
+  const targetNew = Math.min(Math.max(options.targetNew ?? numberFromEnv('GROWTH_DAILY_TARGET_NEW', 2), 1), 250)
   const hotLimit = Math.min(Math.max(options.hotLimit ?? numberFromEnv('GROWTH_DAILY_HOT_LIMIT', 24), 1), 80)
   const blogLimit = Math.min(Math.max(options.blogLimit ?? nonNegativeNumberFromEnv('GROWTH_DAILY_BLOG_LIMIT', 0), 0), 12)
   const seoDailyLimit = Math.min(Math.max(numberFromEnv('SEO_DRIP_DAILY_LIMIT', 50), 1), 100)

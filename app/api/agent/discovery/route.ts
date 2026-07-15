@@ -16,23 +16,10 @@ import { FEATURED_SKILL_CLUSTERS, SKILL_CLUSTERS } from '@/lib/seo/skill-cluster
 export const dynamic = 'force-dynamic'
 
 const DISCOVERY_QUERY_TIMEOUT_MS = 2500
-const BASE_IMPORT_CRON_MINUTE_UTC = 0
-
-function getCronMinute(schedule: string) {
-  const [minute] = schedule.split(' ')
-  const parsed = Number(minute)
-  return Number.isInteger(parsed) && parsed >= 0 && parsed < 60 ? parsed : null
-}
+const SKILL_RADAR_CRON_MINUTE_UTC = 35
 
 function getImportCronMinutesUtc() {
-  return Array.from(
-    new Set([
-      BASE_IMPORT_CRON_MINUTE_UTC,
-      ...INDEXER_RUN_PROFILES
-        .map((profile) => getCronMinute(profile.schedule))
-        .filter((minute): minute is number => minute !== null),
-    ])
-  ).sort((a, b) => a - b)
+  return [SKILL_RADAR_CRON_MINUTE_UTC]
 }
 
 function parsePositiveNumber(value: unknown, fallback: number) {
@@ -79,6 +66,7 @@ function buildIndexerHealth({
   runs,
   generatedAt,
   targetNew,
+  maintenanceTargetNew,
   coverageTarget,
   approvedSkillCount,
   remainingToTarget,
@@ -86,6 +74,7 @@ function buildIndexerHealth({
   runs: Array<Record<string, unknown>>
   generatedAt: Date
   targetNew: number
+  maintenanceTargetNew: number
   coverageTarget: number
   approvedSkillCount: number | null
   remainingToTarget: number | null
@@ -139,8 +128,10 @@ function buildIndexerHealth({
     status = 'unknown'
     action = 'Skill count query timed out; retry the public discovery endpoint or inspect private indexer logs.'
   } else if (remainingToTarget === 0) {
-    status = 'target_reached'
-    action = 'Coverage target reached. Keep refreshing stars and audits.'
+    status = latestStatus === 'completed_with_errors'
+      ? 'maintenance_with_warnings'
+      : 'maintenance_active'
+    action = 'Coverage target reached. The hourly quality radar continues to evaluate rotating GitHub queries and periodic X signals; only relevant skills that pass the quality gates are added.'
   } else if (lastRunUsedOldLowerTarget) {
     status = 'awaiting_next_guarded_run'
     action = 'Recent runs used the old lower target and stopped early; the deployed target guard should resume imports on the next cron.'
@@ -187,9 +178,10 @@ function buildIndexerHealth({
   return {
     status,
     action,
-    target_guard_active: true,
+    target_guard_active: belowTarget,
     target_guard_minimum: coverageTarget,
-    expected_target_new_per_run: targetNew,
+    maintenance_mode: !belowTarget,
+    expected_target_new_per_run: belowTarget ? targetNew : maintenanceTargetNew,
     latest_run_status: latestStatus,
     latest_run_started_at: latestStartedAt,
     minutes_since_latest_run: minutesSinceLatestRun,
@@ -240,6 +232,7 @@ async function getRecentRuns() {
 
   if (error) return []
   return (data || []).map((run: Record<string, unknown>) => ({
+    mode: run.mode,
     profile_key: run.metadata &&
       typeof run.metadata === 'object' &&
       !Array.isArray(run.metadata) &&
@@ -335,6 +328,7 @@ async function getRecentRuns() {
       'error_samples' in run.metadata
       ? (run.metadata as Record<string, unknown>).error_samples
       : undefined,
+    maintenance_mode: metadataValue(run, 'maintenance_mode') === true,
   }))
 }
 
@@ -363,6 +357,7 @@ function buildProfileRunSummaries(runs: Array<Record<string, unknown>>) {
     return {
       profile: profile.key,
       label: profile.label,
+      scheduled: false,
       schedule: profile.schedule,
       path: profile.path,
       domains: profile.domains,
@@ -403,24 +398,30 @@ function buildProfileRunSummaries(runs: Array<Record<string, unknown>>) {
 export async function GET() {
   const generatedAt = new Date()
   const minStars = Number(process.env.INDEXER_MIN_STARS || 500)
+  const maintenanceMinStars = Math.max(parsePositiveNumber(process.env.SKILL_RADAR_MIN_STARS, 10), 10)
+  const maintenanceTargetNew = Math.min(
+    Math.max(parsePositiveNumber(process.env.SKILL_RADAR_TARGET_NEW, 2), 1),
+    12
+  )
   const defaultTargetNewPerRun = 250
   const targetNew = Math.max(
     parsePositiveNumber(process.env.INDEXER_RUN_TARGET, defaultTargetNewPerRun),
     defaultTargetNewPerRun
   )
   const maxSearchRequests = Number(process.env.INDEXER_MAX_SEARCH_REQUESTS || (process.env.GITHUB_TOKEN ? 30 : 10))
-  const profileHourlyTargetNew = INDEXER_RUN_PROFILES.reduce(
+  const manualProfileTargetNew = INDEXER_RUN_PROFILES.reduce(
     (total, profile) => total + profile.targetNew,
     0
   )
-  const scheduledHourlyTargetNew = targetNew + profileHourlyTargetNew
+  const scheduledHourlyTargetNew = maintenanceTargetNew
   const effectiveCoverageTarget = resolveHighStarCoverageTarget(
     parsePositiveNumber(process.env.INDEXER_TARGET_TOTAL, HIGH_STAR_SKILL_COVERAGE_TARGET)
   )
   const [runs, approvedSkillCount] = await Promise.all([getRecentRuns(), getApprovedSkillCount()])
   const filters = {
-    min_stars: minStars,
-    target_new_per_run: targetNew,
+    min_stars: maintenanceMinStars,
+    coverage_import_min_stars: minStars,
+    target_new_per_run: maintenanceTargetNew,
     scheduled_hourly_target_new: scheduledHourlyTargetNew,
     estimated_daily_capacity: scheduledHourlyTargetNew * 24,
     max_search_requests_per_run: maxSearchRequests,
@@ -429,12 +430,13 @@ export async function GET() {
     excludes: ['mcp-only projects', 'archived repositories', 'forks', 'low-relevance repositories'],
   }
   const schedule = {
-    import_cron: '0 * * * *',
-    import_frequency: 'hourly base import plus staggered domain profile imports on production',
+    import_cron: '35 * * * *',
+    import_frequency: 'hourly quality maintenance radar with rotating GitHub query windows; X signals are sampled every 6 hours by default.',
     profile_crons: INDEXER_RUN_PROFILES.map((profile) => ({
       profile: profile.key,
       path: profile.path,
       schedule: profile.schedule,
+      scheduled: false,
       domains: profile.domains,
       target_new: profile.targetNew,
       min_stars: profile.minStars,
@@ -464,6 +466,7 @@ export async function GET() {
       runs,
       generatedAt,
       targetNew,
+      maintenanceTargetNew,
       coverageTarget: effectiveCoverageTarget,
       approvedSkillCount,
       remainingToTarget,
@@ -479,15 +482,15 @@ export async function GET() {
       indexer_version: HIGH_STAR_INDEXER_VERSION,
       target_approved_skills: effectiveCoverageTarget,
       target_policy:
-        'The runtime target is pinned to at least the code-level 20k coverage goal, so older Vercel env values cannot stop imports early.',
+        'The registry has reached its 20k coverage goal. Scheduled work now runs as a quality maintenance radar; broad high-star backfills remain available through protected manual endpoints.',
       current_approved_skills: approvedSkillCount,
       remaining_to_target: remainingToTarget,
       scheduled_hourly_target_new: scheduledHourlyTargetNew,
-      profile_hourly_target_new: profileHourlyTargetNew,
+      manual_profile_target_new: manualProfileTargetNew,
       estimated_daily_capacity: estimatedDailyCapacity,
       estimated_days_to_target_at_current_target: estimatedDaysToTarget,
       strategy:
-        'Grow toward a 20k+ skill registry with high-star GitHub discovery, scenario-specific query groups, MCP exclusion, trust metadata, eval metadata, and hourly imports.',
+        'Maintain a 20k+ skill registry with rotating, scenario-specific GitHub discovery, periodic social signals, MCP exclusion, trust metadata, eval metadata, and small high-quality hourly imports.',
       quality_gates: [
         'GitHub stars threshold',
         'archived and fork exclusion',
@@ -515,6 +518,7 @@ export async function GET() {
           label: profile.label,
           private_endpoint: profile.path,
           schedule: profile.schedule,
+          scheduled: false,
           domains: profile.domains,
           target_new: profile.targetNew,
           min_stars: profile.minStars,
@@ -578,11 +582,15 @@ export async function GET() {
       strategy:
         'Use social and GitHub freshness as candidate signals only; every repo still passes GitHub metadata checks, MCP exclusion, AI review, Trust/Audit surfaces, SEO drip, IndexNow, and X queue guards.',
       default_limits: {
-        target_new_per_run: 8,
-        min_stars: 10,
+        target_new_per_run: maintenanceTargetNew,
+        min_stars: maintenanceMinStars,
         seo_posts_per_run: 1,
-        x_queue_items_per_run: 3,
+        x_queue_items_per_run: 2,
         auto_post: false,
+      },
+      budget: {
+        github_query_windows: 4,
+        x_signal_scan: 'one query every 6 hours by default',
       },
       quality_gates: [
         'requires a GitHub repository URL',

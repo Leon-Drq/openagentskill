@@ -35,11 +35,13 @@ export interface HotSkillDiscoveryOptions {
   lookbackDays?: number
   perPage?: number
   maxQueries?: number
+  queryOffset?: number
 }
 
 export interface HotSkillDiscoveryResult {
   candidates: CandidateRepo[]
   searchedQueries: number
+  queryOffset: number
   minStars: number
   lookbackDays: number
   since: string
@@ -88,6 +90,14 @@ function isoDateDaysAgo(days: number) {
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function rotatedWindow<T>(items: readonly T[], count: number, offset: number) {
+  if (!items.length || count <= 0) return []
+
+  const start = ((offset % items.length) + items.length) % items.length
+  const size = Math.min(count, items.length)
+  return Array.from({ length: size }, (_, index) => items[(start + index) % items.length])
 }
 
 function scoreHotRepo(repo: GitHubRepoItem) {
@@ -147,12 +157,13 @@ export async function searchHotSkillRepos(
   const lookbackDays = Math.min(Math.max(Math.floor(options.lookbackDays || 21), 1), 90)
   const perPage = Math.min(Math.max(options.perPage || 12, 5), 30)
   const maxQueries = Math.min(Math.max(options.maxQueries || 12, 1), HOT_SKILL_QUERIES.length)
+  const queryOffset = Math.max(0, Math.floor(options.queryOffset ?? 0))
   const since = isoDateDaysAgo(lookbackDays)
   const seen = new Set<string>()
   const repos: GitHubRepoItem[] = []
   let searchedQueries = 0
 
-  for (const query of HOT_SKILL_QUERIES.slice(0, maxQueries)) {
+  for (const query of rotatedWindow(HOT_SKILL_QUERIES, maxQueries, queryOffset)) {
     if (repos.length >= limit * 3) break
     searchedQueries += 1
 
@@ -188,6 +199,7 @@ export async function searchHotSkillRepos(
   return {
     candidates,
     searchedQueries,
+    queryOffset,
     minStars,
     lookbackDays,
     since,
