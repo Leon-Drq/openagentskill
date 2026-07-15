@@ -4,6 +4,7 @@ import { Geist_Mono, Inter } from 'next/font/google'
 import { GoogleAnalytics } from '@/components/google-analytics'
 import { StructuredData } from '@/components/structured-data'
 import { I18nProvider } from '@/lib/i18n/context'
+import { defaultLocale, isLocale } from '@/lib/i18n/config'
 import { LOCALIZED_LANDING_PAGES } from '@/lib/seo/localized-pages'
 import {
   HOME_SOCIAL_DESCRIPTION,
@@ -131,6 +132,7 @@ export default async function RootLayout({
     locale && locale in LOCALIZED_LANDING_PAGES
       ? LOCALIZED_LANDING_PAGES[locale as keyof typeof LOCALIZED_LANDING_PAGES].lang
       : 'en'
+  const initialLocale = isLocale(locale) ? locale : defaultLocale
   const configuredMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim()
   const measurementId =
     configuredMeasurementId && /^G-[A-Z0-9]+$/i.test(configuredMeasurementId)
@@ -143,7 +145,7 @@ export default async function RootLayout({
         <StructuredData />
       </head>
       <body className="font-sans antialiased">
-        <I18nProvider>
+        <I18nProvider initialLocale={initialLocale}>
           {children}
         </I18nProvider>
         {measurementId && (

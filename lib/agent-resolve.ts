@@ -22,7 +22,7 @@ import {
 } from '@/lib/db/skills'
 import { getPrimaryInstallCommand, getSkillInstallTargets, type InstallTargetId } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
-import { dedupeRankedSkills, getRecommendationReasons, normalizeMatchScore, rankSkillsForQuery } from '@/lib/registry'
+import { augmentQueryForIntent, dedupeRankedSkills, getRecommendationReasons, normalizeMatchScore, rankSkillsForQuery } from '@/lib/registry'
 import { getSkillSupplyProfile, type SkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile, getSkillTrustProfileV5, type SkillTrustProfile, type SkillTrustProfileV5 } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
@@ -921,6 +921,7 @@ function buildResolverRecommendation(
 export async function resolveAgentSkill(input: AgentResolveInput) {
   const task = input.task.trim()
   if (!task) throw new Error('Missing required field: task')
+  const rankingTask = augmentQueryForIntent(task)
 
   const agent = normalizeAgent(input.agent)
   const limit = normalizeLimit(input.limit)
@@ -936,7 +937,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
             console.warn('Agent resolve candidate fallback:', error)
             return RESOLVE_FALLBACK_SKILLS
           }),
-        withTimeout(searchSkills(task, 160), RESOLVE_EXACT_QUERY_TIMEOUT_MS, 'agent resolve exact query')
+        withTimeout(searchSkills(rankingTask, 160), RESOLVE_EXACT_QUERY_TIMEOUT_MS, 'agent resolve exact query')
           .catch((error) => {
             console.warn('Agent resolve exact query fallback:', error)
             return [] as SkillRecord[]
@@ -954,7 +955,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
       ]
   const skills = mergeResolveSkillPools(queryPool, qualityPool, RESOLVE_FALLBACK_SKILLS)
 
-  const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, task, outcomeStatsMap))
+  const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, rankingTask, outcomeStatsMap))
     .filter(({ skill }) => candidateAllowed(skill, constraints))
     .slice(0, Math.max(limit * 3, 10))
   const topMatchScore = ranked[0]?.score || 0

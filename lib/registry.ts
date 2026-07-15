@@ -38,6 +38,65 @@ const QUERY_TOKEN_ALIASES: Record<string, string[]> = {
   backtest: ['backtesting', 'quant', 'trading', 'finance', 'financial'],
 }
 
+type LocalizedIntentAlias = {
+  pattern: RegExp
+  terms: string[]
+}
+
+// Keep the ranking vocabulary language-agnostic. Skills are indexed mainly with
+// English GitHub metadata, so a small deterministic bridge is more reliable than
+// asking users on localized routes to formulate their task in English.
+const LOCALIZED_INTENT_ALIASES: LocalizedIntentAlias[] = [
+  {
+    pattern: /\b(aktien?|borse|finanzen?|handel|investition|anlage|portfolio|marktrisiko|acciones?|bolsa|finanzas?|inversion|cartera|mercado|saham|pasar|keuangan|investasi|perdagangan|portofolio)\b/,
+    terms: ['finance', 'stock', 'market', 'trading'],
+  },
+  {
+    pattern: /\b(prasentation|folien|vortrag|presentacion|diapositivas|laminas|presentasi|slide|dek)\b/,
+    terms: ['presentation', 'ppt', 'slides'],
+  },
+  {
+    pattern: /\b(gestalten|schnittstelle|bewegung|diseno|interfaz|animacion|imagen|desain|antarmuka|animasi|gambar)\b/,
+    terms: ['design', 'ui', 'animation'],
+  },
+  {
+    pattern: /\b(programmierung|repository|repositorio|repositori|fehler|pruefen|testen|codigo|programacion|revisar|prueba|kode|pemrograman|uji|tinjau)\b/,
+    terms: ['coding', 'code', 'repository', 'review'],
+  },
+  {
+    pattern: /\b(fussball|weltmeisterschaft|spieler|mannschaft|futbol|mundial|jugador|equipo|partido|sepak bola|piala dunia|pemain|pertandingan)\b/,
+    terms: ['football', 'soccer', 'sports', 'analytics'],
+  },
+  {
+    pattern: /\b(forschung|recherche|dokument|quellen|investigacion|documento|articulo|fuentes|penelitian|dokumen|makalah|sumber)\b/,
+    terms: ['research', 'document', 'sources'],
+  },
+  {
+    pattern: /\b(webseite|webseiten|crawlen|scrapen|wettbewerber|preise|sitio web|pagina web|rastrear|extraer|competidor|precios|situs|merayapi|ekstrak|pesaing|harga)\b/,
+    terms: ['web', 'scraping', 'crawler', 'extraction'],
+  },
+]
+
+function foldIntentText(value: string) {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+}
+
+export function augmentQueryForIntent(value: string) {
+  const normalized = foldIntentText(value)
+  const terms = new Set<string>()
+
+  for (const alias of LOCALIZED_INTENT_ALIASES) {
+    if (alias.pattern.test(normalized)) {
+      alias.terms.forEach((term) => terms.add(term))
+    }
+  }
+
+  return terms.size ? `${value} ${[...terms].join(' ')}` : value
+}
+
 function expandQueryTokens(tokens: string[]) {
   const expanded = new Set(tokens)
   for (const token of tokens) {
@@ -334,9 +393,10 @@ export function rankSkillsForQuery(
   query: string,
   statsMap: Record<string, SkillRankingStats> = {}
 ) {
-  const normalizedQuery = query.trim().toLowerCase()
+  const rankingQuery = augmentQueryForIntent(query)
+  const normalizedQuery = rankingQuery.trim().toLowerCase()
   const compactQuery = normalizedQuery.replace(/[^a-z0-9]+/g, '')
-  const queryTokens = tokenize(query)
+  const queryTokens = tokenize(rankingQuery)
   const expandedQueryTokens = expandQueryTokens(queryTokens)
   const queryIntent = detectQueryIntent(normalizedQuery, queryTokens)
   const isFinanceQueryIntent = /\b(finance|financial|quant|quantitative|trade|trades|trader|trading|invest|investing|investment|portfolio|markets?|stocks?|equity|crypto|filings?|edgar|sec filings?|investor|earnings|10-k|10-q|alpha|factor|backtest|backtesting|risk model)\b/.test(normalizedQuery) ||

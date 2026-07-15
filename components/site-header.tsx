@@ -10,6 +10,7 @@ import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
 import { useI18n } from '@/lib/i18n/context'
+import { getBasePathname, getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { cn } from '@/lib/utils'
 
 const primaryNavItems = [
@@ -109,11 +110,12 @@ const agentItems: Array<{
 
 function isActivePath(pathname: string, href: string) {
   const baseHref = href.split('#')[0]
-  return pathname === baseHref || pathname.startsWith(`${baseHref}/`)
+  const basePathname = getBasePathname(pathname)
+  return basePathname === baseHref || basePathname.startsWith(`${baseHref}/`)
 }
 
 function ForAgentsDropdown({ pathname }: { pathname: string }) {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const [open, setOpen] = useState(false)
   const active = agentItems.some((item) => isActivePath(pathname, item.href))
 
@@ -156,7 +158,7 @@ function ForAgentsDropdown({ pathname }: { pathname: string }) {
               return (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={getLocalizedNavigationHref(item.href, locale)}
                   prefetch={item.prefetch}
                   role="menuitem"
                   onClick={() => setOpen(false)}
@@ -183,13 +185,13 @@ function ForAgentsDropdown({ pathname }: { pathname: string }) {
 }
 
 export function SiteHeader() {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const pathname = usePathname()
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/92 backdrop-blur supports-[backdrop-filter]:bg-background/82">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5 transition-opacity hover:opacity-70">
+        <Link href={getLocalizedNavigationHref('/', locale)} className="flex min-w-0 shrink-0 items-center gap-2.5 transition-opacity hover:opacity-70">
           <BrandMark className="h-7 w-7 text-foreground" />
           <span className="hidden truncate font-sans text-base font-semibold sm:inline sm:text-lg">
             OpenAgentSkill
@@ -208,7 +210,7 @@ export function SiteHeader() {
               return (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={getLocalizedNavigationHref(item.href, locale)}
                   className={cn(
                     'flex h-16 items-center border-b-2 border-transparent px-2.5 text-sm transition-colors',
                     active ? 'border-[#006b4f] text-foreground' : 'text-secondary hover:text-foreground'

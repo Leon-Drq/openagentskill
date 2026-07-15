@@ -10,6 +10,7 @@ import { BrandMark } from '@/components/brand-mark'
 import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { useI18n } from '@/lib/i18n/context'
+import { getBasePathname, getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -102,11 +103,12 @@ const agentItems: Array<{
 
 function isActivePath(pathname: string, href: string) {
   const baseHref = href.split('#')[0]
-  return pathname === baseHref || pathname.startsWith(`${baseHref}/`)
+  const basePathname = getBasePathname(pathname)
+  return basePathname === baseHref || basePathname.startsWith(`${baseHref}/`)
 }
 
 export function MobileNav() {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
 
@@ -169,7 +171,7 @@ export function MobileNav() {
                   return (
                     <li key={item.href}>
                       <Link
-                        href={item.href}
+                        href={getLocalizedNavigationHref(item.href, locale)}
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           'flex items-center justify-between border-b border-border py-3 text-lg transition-colors',
@@ -196,7 +198,7 @@ export function MobileNav() {
                   return (
                     <li key={item.href}>
                       <Link
-                        href={item.href}
+                        href={getLocalizedNavigationHref(item.href, locale)}
                         prefetch={item.prefetch}
                         onClick={() => setIsOpen(false)}
                         className={cn(

@@ -1,3 +1,9 @@
+import {
+  getLocalizedCorePath,
+  MARKET_LOCALES,
+  type LocalizedCorePageSlug,
+} from '@/lib/i18n/market-routing'
+
 export const LOCALIZED_LANDING_PAGES = {
   zh: {
     lang: 'zh-CN',
@@ -58,11 +64,11 @@ export const LOCALIZED_LANDING_PAGES = {
     label: 'Español',
     title: 'OpenAgentSkill — La capa de skills para AI agents',
     description:
-      'OpenAgentSkill es npm para AI Agent Skills: ayuda a tu AI agent a encontrar, comparar e instalar automaticamente el skill reutilizable correcto.',
+      'OpenAgentSkill es npm para AI Agent Skills: ayuda a tu AI agent a encontrar, comparar e instalar automáticamente el skill reutilizable correcto.',
     eyebrow: 'AI Agent Skill Layer',
     heading: 'La capa de skills para AI agents',
     intro:
-      'Convierte repos y skills de GitHub en una capa de descubrimiento con calidad, stars, mantenimiento y senales de confianza antes de instalar.',
+      'Convierte repos y skills de GitHub en una capa de descubrimiento con calidad, stars, mantenimiento y señales de confianza antes de instalar.',
     highlights: [
       'Encuentra skills instalables por caso de uso',
       'Compara calidad, mantenimiento y adopción',
@@ -74,13 +80,13 @@ export const LOCALIZED_LANDING_PAGES = {
   de: {
     lang: 'de',
     label: 'Deutsch',
-    title: 'OpenAgentSkill — Die Skill-Schicht fur AI agents',
+    title: 'OpenAgentSkill — Die Skill-Schicht für AI agents',
     description:
-      'OpenAgentSkill ist npm fur AI Agent Skills: Lass deinen AI agent automatisch den richtigen wiederverwendbaren Skill finden, vergleichen und installieren.',
+      'OpenAgentSkill ist npm für AI Agent Skills: Lass deinen AI agent automatisch den richtigen wiederverwendbaren Skill finden, vergleichen und installieren.',
     eyebrow: 'AI Agent Skill Layer',
-    heading: 'Die Skill-Schicht fur AI agents',
+    heading: 'Die Skill-Schicht für AI agents',
     intro:
-      'OpenAgentSkill macht GitHub-Skills zu einer Discovery-Schicht mit Qualitat, Stars, Wartung und Vertrauenssignalen vor der Installation.',
+      'OpenAgentSkill macht GitHub-Skills zu einer Discovery-Schicht mit Qualität, Stars, Wartung und Vertrauenssignalen vor der Installation.',
     highlights: [
       'Installierbare Skills nach Aufgabe finden',
       'Qualität, Wartung und Adoption vergleichen',
@@ -107,6 +113,24 @@ export const LOCALIZED_LANDING_PAGES = {
     primaryCta: 'Explorer les skills',
     secondaryCta: 'Voir l’Agent API',
   },
+  id: {
+    lang: 'id',
+    label: 'Bahasa Indonesia',
+    title: 'OpenAgentSkill — Lapisan Skill untuk AI Agents',
+    description:
+      'OpenAgentSkill adalah npm untuk AI Agent Skills: membantu AI agent menemukan, membandingkan, dan memasang skill yang dapat digunakan kembali secara otomatis.',
+    eyebrow: 'AI Agent Skill Layer',
+    heading: 'Lapisan skill untuk AI agents',
+    intro:
+      'Biarkan AI agent Anda menemukan, membandingkan, dan memasang skill yang tepat sambil memeriksa kualitas, stars, pemeliharaan, dan sinyal kepercayaan sebelum dijalankan.',
+    highlights: [
+      'Temukan skill yang dapat dipasang berdasarkan tugas',
+      'Bandingkan kualitas, pemeliharaan, dan sinyal adopsi',
+      'Temukan skill secara otomatis melalui Agent API',
+    ],
+    primaryCta: 'Jelajahi semua skill',
+    secondaryCta: 'Lihat Agent API',
+  },
 } as const
 
 export type LocalizedLandingPageCode = keyof typeof LOCALIZED_LANDING_PAGES
@@ -117,6 +141,20 @@ export function getLocalizedLanguageAlternates(baseUrl = 'https://www.openagents
     'x-default': baseUrl,
     ...Object.fromEntries(
       Object.entries(LOCALIZED_LANDING_PAGES).map(([, page]) => [page.lang, `${baseUrl}/${page.lang.split('-')[0]}`])
+    ),
+  }
+}
+
+export function getLocalizedCoreLanguageAlternates(
+  page: LocalizedCorePageSlug,
+  baseUrl = 'https://www.openagentskill.com'
+) {
+  const canonicalPath = `/${page}`
+  return {
+    en: `${baseUrl}${canonicalPath}`,
+    'x-default': `${baseUrl}${canonicalPath}`,
+    ...Object.fromEntries(
+      MARKET_LOCALES.map((locale) => [locale, `${baseUrl}${getLocalizedCorePath(locale, page)}`])
     ),
   }
 }

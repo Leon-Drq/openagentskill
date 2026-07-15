@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, ReactNode } from 'react'
 import { usePathname } from 'next/navigation'
 import type { Locale } from './config'
 import { defaultLocale, isLocale } from './config'
@@ -11,6 +11,7 @@ import ko from './dictionaries/ko'
 import es from './dictionaries/es'
 import de from './dictionaries/de'
 import fr from './dictionaries/fr'
+import id from './dictionaries/id'
 
 type DeepWiden<T> =
   T extends string ? string :
@@ -30,6 +31,7 @@ const dictionaries: Record<Locale, Dictionary> = {
   es,
   de,
   fr,
+  id,
 }
 
 function getLocaleFromPath(pathname: string): Locale | null {
@@ -46,29 +48,19 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined)
 
-export function I18nProvider({ children }: { children: ReactNode }) {
+export function I18nProvider({
+  children,
+  initialLocale = defaultLocale,
+}: {
+  children: ReactNode
+  initialLocale?: Locale
+}) {
   const pathname = usePathname()
-  const [locale, setLocaleState] = useState<Locale>(defaultLocale)
-
-  // Keep locale synced with localized routes and browser preference.
-  useEffect(() => {
-    const pathLocale = getLocaleFromPath(pathname || window.location.pathname)
-    if (pathLocale) {
-      setLocaleState(pathLocale)
-      localStorage.setItem('locale', pathLocale)
-      document.documentElement.lang = pathLocale
-      return
-    }
-
-    const savedLocale = localStorage.getItem('locale')
-    if (isLocale(savedLocale)) {
-      setLocaleState(savedLocale)
-      document.documentElement.lang = savedLocale
-    }
-  }, [pathname])
+  // The route is the source of truth. Passing it from the server avoids an
+  // English header/footer flash on a fully localized page during hydration.
+  const locale = getLocaleFromPath(pathname || '') || initialLocale || defaultLocale
 
   const setLocale = (newLocale: Locale) => {
-    setLocaleState(newLocale)
     localStorage.setItem('locale', newLocale)
     // Update html lang attribute
     document.documentElement.lang = newLocale

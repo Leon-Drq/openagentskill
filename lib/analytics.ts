@@ -19,6 +19,11 @@ export type AnalyticsEventName =
   | 'resolve_open_skill'
   | 'resolve_open_audit'
   | 'resolve_outbound_github'
+  | 'localized_resolve_request'
+  | 'localized_resolve_success'
+  | 'localized_resolve_no_match'
+  | 'localized_resolve_error'
+  | 'localized_resolve_copy_install'
   | 'skill_submission_result'
 
 export type AnalyticsConsent = 'granted' | 'denied'

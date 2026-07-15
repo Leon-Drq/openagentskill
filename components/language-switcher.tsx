@@ -4,11 +4,11 @@ import { useMemo, useState } from 'react'
 import { Check, ChevronDown, Globe2 } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useI18n } from '@/lib/i18n/context'
+import { getLanguageSwitchHref } from '@/lib/i18n/market-routing'
 import {
   isLocale,
   localeNames,
   localeNativeNames,
-  localePaths,
   localeShortLabels,
   locales,
   type Locale,
@@ -19,10 +19,6 @@ function getPathLocale(pathname: string): Locale | null {
   if (pathname === '/') return 'en'
   const firstSegment = pathname.split('/').filter(Boolean)[0]
   return isLocale(firstSegment) ? firstSegment : null
-}
-
-function isLocalizedLandingPath(pathname: string) {
-  return pathname === '/' || locales.some((loc) => pathname === localePaths[loc])
 }
 
 interface LanguageSwitcherProps {
@@ -44,10 +40,11 @@ export function LanguageSwitcher({ compact = false, className }: LanguageSwitche
   const switchLanguage = (nextLocale: Locale) => {
     setLocale(nextLocale)
     setOpen(false)
+    const destination = getLanguageSwitchHref(pathname, nextLocale)
+    const query = typeof window === 'undefined' ? '' : window.location.search
+    const href = `${destination}${query}`
 
-    if (isLocalizedLandingPath(pathname)) {
-      router.push(localePaths[nextLocale])
-    }
+    if (href !== `${pathname}${query}`) router.push(href)
   }
 
   return (

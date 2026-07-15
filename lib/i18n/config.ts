@@ -1,4 +1,4 @@
-export const locales = ['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr'] as const
+export const locales = ['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr', 'id'] as const
 export type Locale = (typeof locales)[number]
 
 export const defaultLocale: Locale = 'en'
@@ -11,6 +11,7 @@ export const localeNames: Record<Locale, string> = {
   es: 'Spanish',
   de: 'German',
   fr: 'French',
+  id: 'Indonesian',
 }
 
 export const localeNativeNames: Record<Locale, string> = {
@@ -21,6 +22,7 @@ export const localeNativeNames: Record<Locale, string> = {
   es: 'Español',
   de: 'Deutsch',
   fr: 'Français',
+  id: 'Bahasa Indonesia',
 }
 
 export const localeShortLabels: Record<Locale, string> = {
@@ -31,6 +33,7 @@ export const localeShortLabels: Record<Locale, string> = {
   es: 'ES',
   de: 'DE',
   fr: 'FR',
+  id: 'ID',
 }
 
 export const localePaths: Record<Locale, string> = {
@@ -41,6 +44,7 @@ export const localePaths: Record<Locale, string> = {
   es: '/es',
   de: '/de',
   fr: '/fr',
+  id: '/id',
 }
 
 export function isLocale(value: string | null | undefined): value is Locale {

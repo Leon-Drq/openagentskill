@@ -3,9 +3,10 @@
 import Link from 'next/link'
 import { BrandMark } from '@/components/brand-mark'
 import { useI18n } from '@/lib/i18n/context'
+import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 
 export function SiteFooter() {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
 
   return (
     <footer className="relative overflow-hidden border-t border-border bg-background">
@@ -13,7 +14,7 @@ export function SiteFooter() {
       <div className="relative mx-auto max-w-6xl px-6 py-12 sm:py-14">
         <div className="grid gap-10 border-b border-border pb-10 lg:grid-cols-[1.15fr_1.85fr]">
           <div>
-            <Link href="/" className="inline-flex items-center gap-2 font-sans text-sm font-semibold tracking-tight transition-opacity hover:opacity-70">
+            <Link href={getLocalizedNavigationHref('/', locale)} className="inline-flex items-center gap-2 font-sans text-sm font-semibold tracking-tight transition-opacity hover:opacity-70">
               <BrandMark className="h-7 w-7" />
               OpenAgentSkill
             </Link>
@@ -44,9 +45,9 @@ export function SiteFooter() {
             <div>
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Explore</h2>
               <div className="mt-4 grid gap-2 text-secondary">
-                <Link href="/skills" className="hover:text-foreground">{t.nav.skills}</Link>
+                <Link href={getLocalizedNavigationHref('/skills', locale)} className="hover:text-foreground">{t.nav.skills}</Link>
                 <Link href="/agent-skills" className="hover:text-foreground">Agent Skills</Link>
-                <Link href="/agent-skill" className="hover:text-foreground">What Is an Agent Skill?</Link>
+                <Link href={getLocalizedNavigationHref('/agent-skill', locale)} className="hover:text-foreground">What Is an Agent Skill?</Link>
                 <Link href="/ai-agent-skills" className="hover:text-foreground">AI Agent Skills</Link>
                 <Link href="/tasks" className="hover:text-foreground">Tasks</Link>
                 <Link href="/skill-packs" className="hover:text-foreground">Skill Packs</Link>
@@ -64,7 +65,7 @@ export function SiteFooter() {
               <div className="mt-4 grid gap-2 text-secondary">
                 <Link href="/compare" className="hover:text-foreground">Compare</Link>
                 <Link href="/safety" className="hover:text-foreground">Safety Gate</Link>
-                <Link href="/skills-registry" className="hover:text-foreground">Skills Registry</Link>
+                <Link href={getLocalizedNavigationHref('/agent-skills-registry', locale)} className="hover:text-foreground">Skills Registry</Link>
                 <Link href="/rankings" className="hover:text-foreground">Rankings</Link>
                 <Link href="/outcomes" className="hover:text-foreground">Outcomes</Link>
                 <Link href="/audits" className="hover:text-foreground">Audits</Link>
@@ -80,7 +81,7 @@ export function SiteFooter() {
             <div>
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Build</h2>
               <div className="mt-4 grid gap-2 text-secondary">
-                <Link href="/docs" className="hover:text-foreground">{t.nav.docs}</Link>
+                <Link href={getLocalizedNavigationHref('/docs', locale)} className="hover:text-foreground">{t.nav.docs}</Link>
                 <Link href="/openagentskill" className="hover:text-foreground">About OpenAgentSkill</Link>
                 <Link href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</Link>
                 <Link href="/llms.txt" prefetch={false} className="hover:text-foreground">llms.txt</Link>

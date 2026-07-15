@@ -10,7 +10,12 @@ import { getRankingDefinitions } from '@/lib/rankings'
 import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
 import { AGENT_PROFILES, OFFICIAL_CREATORS } from '@/lib/seo/growth-directories'
 import { BEST_SKILL_PAGES } from '@/lib/seo/growth-pages'
-import { LOCALIZED_LANDING_PAGES, getLocalizedLanguageAlternates } from '@/lib/seo/localized-pages'
+import { getLocalizedCorePath, LOCALIZED_CORE_PAGE_SLUGS, MARKET_LOCALES } from '@/lib/i18n/market-routing'
+import {
+  getLocalizedCoreLanguageAlternates,
+  LOCALIZED_LANDING_PAGES,
+  getLocalizedLanguageAlternates,
+} from '@/lib/seo/localized-pages'
 import { SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { SKILL_PACKS } from '@/lib/skill-packs'
@@ -180,9 +185,22 @@ export function getCoreSitemapEntries(now = new Date()): SitemapEntry[] {
     },
   }))
 
+  const localizedCorePages: SitemapEntry[] = MARKET_LOCALES.flatMap((locale) =>
+    LOCALIZED_CORE_PAGE_SLUGS.map((page) => ({
+      url: `${SITEMAP_BASE_URL}${getLocalizedCorePath(locale, page)}`,
+      lastModified: now,
+      changeFrequency: page === 'skills' || page === 'resolve' ? 'daily' as const : 'weekly' as const,
+      priority: page === 'resolve' || page === 'skills' ? 0.86 : 0.8,
+      alternates: {
+        languages: getLocalizedCoreLanguageAlternates(page, SITEMAP_BASE_URL),
+      },
+    }))
+  )
+
   return [
     ...staticPages,
     ...localizedPages,
+    ...localizedCorePages,
     ...SKILL_CLUSTERS.map((cluster) => ({
       url: `${SITEMAP_BASE_URL}${cluster.path}`,
       lastModified: now,
