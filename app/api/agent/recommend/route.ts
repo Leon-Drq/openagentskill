@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { unstable_cache } from 'next/cache'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
-import { getAllSkills, getSkillEventStatsMap, type SkillEventStats, type SkillRecord } from '@/lib/db/skills'
+import { getAllSkills, type SkillEventStats, type SkillRecord } from '@/lib/db/skills'
 import { SKILL_STACKS, type SkillStackDefinition } from '@/lib/collections'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
@@ -10,6 +11,21 @@ import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
+
+const AGENT_RECOMMEND_CANDIDATE_LIMIT = 240
+const AGENT_RECOMMEND_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
+  'X-Agent-Friendly': 'true',
+}
+
+// This public endpoint can receive many unique task prompts from agents. Keep
+// the shared candidate set small and durable so one request does not scan the
+// entire registry or contend with the ingestion worker.
+const getAgentRecommendCandidatePool = unstable_cache(
+  async () => getAllSkills('quality', undefined, AGENT_RECOMMEND_CANDIDATE_LIMIT),
+  ['agent-recommend-candidate-pool-v2'],
+  { revalidate: 300 }
+)
 
 /**
  * Agent Recommend API — Describe a task, get the best skills.
@@ -38,10 +54,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const [allSkills, eventStatsMap] = await Promise.all([
-      getAllSkills(),
-      getSkillEventStatsMap().catch((): Record<string, SkillEventStats> => ({})),
-    ])
+    const allSkills = await getAgentRecommendCandidatePool()
+    // Aggregate event-stat views are intentionally omitted from this public
+    // hot path. Selected results still get deterministic trust and audit data,
+    // while detailed live resolve endpoints can enrich with outcome signals.
+    const eventStatsMap: Record<string, SkillEventStats> = {}
     const stackMatches = SKILL_STACKS
       .map((stack) => ({
         stack,
@@ -235,14 +252,14 @@ export async function GET(request: NextRequest) {
         `OpenAgentSkill Recommendation API\nTask: ${payload.task}\nFound: ${payload.recommendations.length}\n---\n${text}`,
         {
           headers: {
+            ...AGENT_RECOMMEND_CACHE_HEADERS,
             'Content-Type': 'text/plain; charset=utf-8',
-            'X-Agent-Friendly': 'true',
           },
         }
       )
     }
 
-    return NextResponse.json(payload)
+    return NextResponse.json(payload, { headers: AGENT_RECOMMEND_CACHE_HEADERS })
   } catch (error) {
     console.error('Agent recommend API error:', error)
     return NextResponse.json(
