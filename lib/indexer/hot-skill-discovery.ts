@@ -49,6 +49,7 @@ export interface HotSkillDiscoveryResult {
 
 const GITHUB_API_BASE = 'https://api.github.com'
 const GITHUB_SEARCH_TIMEOUT_MS = 10_000
+const GITHUB_SEARCH_RETRY_DELAYS_MS = [750, 1_750]
 
 const HOT_SKILL_QUERIES: HotSkillQuery[] = [
   { q: '"agent skill"', sort: 'updated' },
@@ -78,6 +79,8 @@ const HOT_SKILL_QUERIES: HotSkillQuery[] = [
 function githubHeaders() {
   return {
     Accept: 'application/vnd.github.v3+json',
+    'User-Agent': 'OpenAgentSkill-Radar/1.0',
+    'X-GitHub-Api-Version': '2022-11-28',
     ...(process.env.GITHUB_TOKEN
       ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
       : {}),
@@ -141,17 +144,40 @@ async function searchHotQuery(query: HotSkillQuery, options: {
     `?q=${encodeURIComponent(q)}` +
     `&sort=${query.sort}&order=desc&per_page=${options.perPage}&page=${options.page}`
 
-  const response = await fetch(url, {
-    headers: githubHeaders(),
-    signal: AbortSignal.timeout(GITHUB_SEARCH_TIMEOUT_MS),
-  })
-  if (!response.ok) {
+  for (let attempt = 0; attempt <= GITHUB_SEARCH_RETRY_DELAYS_MS.length; attempt += 1) {
+    let response: Response
+    try {
+      response = await fetch(url, {
+        headers: githubHeaders(),
+        signal: AbortSignal.timeout(GITHUB_SEARCH_TIMEOUT_MS),
+      })
+    } catch (error) {
+      if (attempt === GITHUB_SEARCH_RETRY_DELAYS_MS.length) throw error
+      await sleep(GITHUB_SEARCH_RETRY_DELAYS_MS[attempt])
+      continue
+    }
+
+    if (response.ok) {
+      const data = (await response.json()) as GitHubSearchResponse
+      return (data.items || []).filter((repo) => !repo.archived && !repo.fork)
+    }
+
+    const retryable = [429, 502, 503, 504].includes(response.status)
     const body = await response.text().catch(() => '')
-    throw new Error(`GitHub hot search failed [${q}]: ${response.status} ${body}`)
+    const detail = body.replace(/\s+/g, ' ').slice(0, 180)
+    if (!retryable || attempt === GITHUB_SEARCH_RETRY_DELAYS_MS.length) {
+      throw new Error(`GitHub hot search failed [${q}]: ${response.status} ${detail}`)
+    }
+
+    const retryAfterSeconds = Number(response.headers.get('retry-after'))
+    const fallbackDelay = GITHUB_SEARCH_RETRY_DELAYS_MS[attempt]
+    const retryDelay = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
+      ? Math.min(retryAfterSeconds * 1_000, 10_000)
+      : fallbackDelay
+    await sleep(retryDelay)
   }
 
-  const data = (await response.json()) as GitHubSearchResponse
-  return (data.items || []).filter((repo) => !repo.archived && !repo.fork)
+  return []
 }
 
 export async function searchHotSkillRepos(
