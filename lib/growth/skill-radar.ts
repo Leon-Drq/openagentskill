@@ -313,6 +313,12 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
       })
     : []
   const summary = summarizeProcessResults(importResults)
+  if (summary.errors > 0) {
+    console.warn('[skill-radar] candidate errors', importResults
+      .filter((result) => result.status === 'error')
+      .slice(0, 3)
+      .map(({ repo, reason }) => ({ repo, reason })))
+  }
   const indexedSlugs = collectSlugs(importResults, ['indexed'])
   const touchedSlugs = collectSlugs(importResults, ['indexed', 'skipped'])
 

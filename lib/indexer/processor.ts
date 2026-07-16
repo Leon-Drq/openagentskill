@@ -14,12 +14,15 @@ import { evaluateSkillCandidate, isMcpCandidate } from './skill-filter'
 import { INDEXER_REVIEW_MODEL } from '@/lib/ai/models'
 
 const GITHUB_REQUEST_TIMEOUT_MS = 12_000
+const GITHUB_RETRY_DELAYS_MS = [750, 1_750]
 const DEFAULT_AI_REVIEW_TIMEOUT_MS = 12_000
 const MAX_AI_REVIEW_TIMEOUT_MS = 20_000
 const INDEXER_DB_TIMEOUT_MS = 12_000
 
 const GITHUB_HEADERS = () => ({
   Accept: 'application/vnd.github.v3+json',
+  'User-Agent': 'OpenAgentSkill-Indexer/1.0',
+  'X-GitHub-Api-Version': '2022-11-28',
   ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
 })
 
@@ -41,21 +44,56 @@ interface GitHubRepoMetadata {
   license: { spdx_id: string | null } | null
 }
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+async function requestGitHub(url: string, headers: HeadersInit) {
+  let lastNetworkError: unknown
+
+  for (let attempt = 0; attempt <= GITHUB_RETRY_DELAYS_MS.length; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        headers,
+        signal: AbortSignal.timeout(GITHUB_REQUEST_TIMEOUT_MS),
+      })
+
+      const retryable = [429, 502, 503, 504].includes(response.status)
+      if (response.ok || !retryable || attempt === GITHUB_RETRY_DELAYS_MS.length) {
+        return response
+      }
+
+      const retryAfterSeconds = Number(response.headers.get('retry-after'))
+      const fallbackDelay = GITHUB_RETRY_DELAYS_MS[attempt]
+      const retryDelay = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
+        ? Math.min(retryAfterSeconds * 1_000, 10_000)
+        : fallbackDelay
+      await sleep(retryDelay)
+    } catch (error) {
+      lastNetworkError = error
+      if (attempt === GITHUB_RETRY_DELAYS_MS.length) throw error
+      await sleep(GITHUB_RETRY_DELAYS_MS[attempt])
+    }
+  }
+
+  throw lastNetworkError instanceof Error
+    ? lastNetworkError
+    : new Error('GitHub request failed after retries')
+}
+
 async function fetchRepoMetadata(owner: string, repo: string): Promise<GitHubRepoMetadata> {
-  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
-    headers: GITHUB_HEADERS(),
-    signal: AbortSignal.timeout(GITHUB_REQUEST_TIMEOUT_MS),
-  })
+  const res = await requestGitHub(`https://api.github.com/repos/${owner}/${repo}`, GITHUB_HEADERS())
   if (!res.ok) throw new Error(`GitHub repo fetch failed: ${res.status}`)
   return res.json() as Promise<GitHubRepoMetadata>
 }
 
 async function fetchReadme(owner: string, repo: string): Promise<string> {
-  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/readme`, {
-    headers: { ...GITHUB_HEADERS(), Accept: 'application/vnd.github.v3.raw' },
-    signal: AbortSignal.timeout(GITHUB_REQUEST_TIMEOUT_MS),
+  const res = await requestGitHub(`https://api.github.com/repos/${owner}/${repo}/readme`, {
+    ...GITHUB_HEADERS(),
+    Accept: 'application/vnd.github.v3.raw',
   })
-  if (!res.ok) return ''
+  if (res.status === 404) return ''
+  if (!res.ok) throw new Error(`GitHub README fetch failed: ${res.status}`)
   return res.text()
 }
 
