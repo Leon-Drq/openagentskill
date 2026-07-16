@@ -13,6 +13,9 @@ import { getStateOfAgentSkillsReport } from '@/lib/research/state-of-agent-skill
 const SITE_URL = 'https://www.openagentskill.com'
 const REPORT_URL = `${SITE_URL}/reports/state-of-agent-skills-2026`
 
+// The report reads a live registry snapshot. Keep it out of static generation so
+// a slow database connection cannot fail a production deployment.
+export const dynamic = 'force-dynamic'
 export const revalidate = 3_600
 
 export const metadata: Metadata = {
