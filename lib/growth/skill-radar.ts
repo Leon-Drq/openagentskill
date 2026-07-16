@@ -13,6 +13,8 @@ import { createPublicClient } from '@/lib/supabase/public'
 import type { XQueueBuildResult } from '@/lib/x/growth'
 import type { XPostResult } from '@/lib/x/poster'
 
+const RADAR_DB_TIMEOUT_MS = 12_000
+
 export interface SkillRadarOptions {
   targetNew?: number
   minStars?: number
@@ -92,7 +94,9 @@ async function recordSkillRadarRun(run: Record<string, unknown>) {
   const serverSecret = process.env.INDEXER_SECRET
   if (!serverSecret) return
 
-  const { error } = await createPublicClient().rpc('record_indexer_run', {
+  const { error } = await createPublicClient({
+    requestTimeoutMs: RADAR_DB_TIMEOUT_MS,
+  }).rpc('record_indexer_run', {
     p_server_secret: serverSecret,
     p_run: run,
   })

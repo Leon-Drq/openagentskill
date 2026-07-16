@@ -16,6 +16,7 @@ import { INDEXER_REVIEW_MODEL } from '@/lib/ai/models'
 const GITHUB_REQUEST_TIMEOUT_MS = 12_000
 const DEFAULT_AI_REVIEW_TIMEOUT_MS = 12_000
 const MAX_AI_REVIEW_TIMEOUT_MS = 20_000
+const INDEXER_DB_TIMEOUT_MS = 12_000
 
 const GITHUB_HEADERS = () => ({
   Accept: 'application/vnd.github.v3+json',
@@ -157,7 +158,7 @@ export async function processRepo(
       throw new Error('Missing INDEXER_SECRET for controlled indexer writes.')
     }
 
-    const supabase = createPublicClient()
+    const supabase = createPublicClient({ requestTimeoutMs: INDEXER_DB_TIMEOUT_MS })
     const repoMeta = await fetchRepoMetadata(owner, repo)
     const stars = repoMeta.stargazers_count ?? candidate.stars
     const forks = repoMeta.forks_count ?? 0
