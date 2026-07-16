@@ -110,6 +110,40 @@ function unique(values: Array<string | undefined>) {
   return Array.from(new Set(values.filter((value): value is string => Boolean(value))))
 }
 
+function candidateSlug(candidate: CandidateRepo) {
+  return `${candidate.owner}-${candidate.repo}`.toLowerCase().replace(/[^a-z0-9-]/g, '-')
+}
+
+async function excludeExistingCandidates(candidates: CandidateRepo[]) {
+  const slugs = unique(candidates.map(candidateSlug))
+  if (!slugs.length) return { candidates, existing: 0 }
+
+  try {
+    const { data, error } = await createPublicClient({
+      requestTimeoutMs: RADAR_DB_TIMEOUT_MS,
+    })
+      .from('skills')
+      .select('slug')
+      .in('slug', slugs)
+
+    if (error) throw new Error(error.message)
+
+    const existingSlugs = new Set(
+      (data || []).map((row: { slug?: string | null }) => row.slug).filter((slug): slug is string => Boolean(slug))
+    )
+
+    return {
+      candidates: candidates.filter((candidate) => !existingSlugs.has(candidateSlug(candidate))),
+      existing: existingSlugs.size,
+    }
+  } catch (error) {
+    // Keep discovery available when Supabase is under transient load. The
+    // per-repository processor still has its own duplicate guard.
+    console.warn('[skill-radar] Could not prefilter existing candidates:', error)
+    return { candidates, existing: 0 }
+  }
+}
+
 function summarizeProcessResults(results: ProcessResult[]) {
   return {
     found: results.length,
@@ -245,9 +279,13 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
     }),
   ])
 
+  const configuredMaxAttempts = options.maxCandidateAttempts ?? numberFromEnv(
+    'SKILL_RADAR_MAX_CANDIDATE_ATTEMPTS',
+    targetNew * 4
+  )
   const maxCandidateAttempts = Math.min(
-    Math.max(options.maxCandidateAttempts ?? numberFromEnv('SKILL_RADAR_MAX_CANDIDATE_ATTEMPTS', targetNew * 2), 2),
-    6
+    Math.max(configuredMaxAttempts, targetNew * 4, 6),
+    12
   )
   const importBudgetMs = Math.min(
     Math.max(numberFromEnv('SKILL_RADAR_IMPORT_BUDGET_MS', 120_000), 30_000),
@@ -257,10 +295,18 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
     Math.max(numberFromEnv('SKILL_RADAR_AI_REVIEW_TIMEOUT_MS', 10_000), 3_000),
     15_000
   )
-  const reviewLimit = Math.min(Math.max(maxCandidateAttempts * 2, 6), 12)
+  const reviewLimit = Math.min(Math.max(maxCandidateAttempts * 3, 18), 30)
   const candidates = mergeCandidates(xRadar.candidates, githubHot.candidates, reviewLimit)
-  const importResults = candidates.length
-    ? await importCandidatesUntilTarget(candidates, targetNew, {
+  const candidatePool = await excludeExistingCandidates(candidates)
+  console.info('[skill-radar] intake pool', {
+    discovered: candidates.length,
+    alreadyIndexed: candidatePool.existing,
+    eligible: candidatePool.candidates.length,
+    maxCandidateAttempts,
+    targetNew,
+  })
+  const importResults = candidatePool.candidates.length
+    ? await importCandidatesUntilTarget(candidatePool.candidates, targetNew, {
         maxAttempts: maxCandidateAttempts,
         budgetMs: importBudgetMs,
         aiReviewTimeoutMs,
@@ -347,6 +393,12 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
         searched_queries: githubHot.searchedQueries,
         query_offset: githubHot.queryOffset,
         candidates: githubHot.candidates.length,
+      },
+      intake_pool: {
+        discovered: candidates.length,
+        already_indexed: candidatePool.existing,
+        eligible: candidatePool.candidates.length,
+        max_candidate_attempts: maxCandidateAttempts,
       },
       x_radar: {
         status: xRadar.status,

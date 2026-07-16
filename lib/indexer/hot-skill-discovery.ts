@@ -133,12 +133,13 @@ async function searchHotQuery(query: HotSkillQuery, options: {
   minStars: number
   since: string
   perPage: number
+  page: number
 }) {
   const q = `${query.q} stars:>=${options.minStars} pushed:>=${options.since} archived:false fork:false`
   const url =
     `${GITHUB_API_BASE}/search/repositories` +
     `?q=${encodeURIComponent(q)}` +
-    `&sort=${query.sort}&order=desc&per_page=${options.perPage}&page=1`
+    `&sort=${query.sort}&order=desc&per_page=${options.perPage}&page=${options.page}`
 
   const response = await fetch(url, {
     headers: githubHeaders(),
@@ -171,8 +172,13 @@ export async function searchHotSkillRepos(
     if (repos.length >= limit * 3) break
     searchedQueries += 1
 
+    // Repeating the first GitHub result page eventually only returns skills we
+    // already know. Rotate through a small, recent result window so hourly
+    // runs keep discovering fresh candidates without increasing API traffic.
+    const page = 1 + ((queryOffset + searchedQueries - 1) % 3)
+
     try {
-      const items = await searchHotQuery(query, { minStars, since, perPage })
+      const items = await searchHotQuery(query, { minStars, since, perPage, page })
       for (const repo of items) {
         if (seen.has(repo.full_name)) continue
         const evaluation = evaluateSkillCandidate({
