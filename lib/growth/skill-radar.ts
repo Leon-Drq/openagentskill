@@ -7,7 +7,7 @@ import {
 import { runSeoDrip, type SeoDripResult } from '@/lib/growth/seo-drip'
 import { searchHotSkillRepos, type HotSkillDiscoveryResult } from '@/lib/indexer/hot-skill-discovery'
 import { searchXSkillRadarRepos, type XSkillRadarResult } from '@/lib/indexer/x-skill-radar'
-import { processBatch, type ProcessResult } from '@/lib/indexer/processor'
+import { processRepo, type ProcessResult } from '@/lib/indexer/processor'
 import type { CandidateRepo } from '@/lib/indexer/github-search'
 import { createPublicClient } from '@/lib/supabase/public'
 import {
@@ -130,6 +130,53 @@ function collectSlugs(results: ProcessResult[], statuses: ProcessResult['status'
   return unique(results.map((result) => (result.slug && statusSet.has(result.status) ? result.slug : undefined)))
 }
 
+async function importCandidatesUntilTarget(candidates: CandidateRepo[], targetNew: number) {
+  const results: ProcessResult[] = []
+  let cursor = 0
+  let indexed = 0
+
+  // Keep a small review buffer. Rejected or already-indexed repos should not make
+  // an hourly run look empty when the next candidate is a valid skill.
+  while (cursor < candidates.length && indexed < targetNew) {
+    const remaining = targetNew - indexed
+    const batch = candidates.slice(cursor, cursor + Math.min(2, remaining))
+    cursor += batch.length
+
+    const batchResults = await Promise.all(batch.map((candidate) => processRepo(candidate)))
+    results.push(...batchResults)
+    indexed += batchResults.filter((result) => result.status === 'indexed').length
+
+    if (cursor < candidates.length && indexed < targetNew) {
+      await new Promise((resolve) => setTimeout(resolve, 500))
+    }
+  }
+
+  return results
+}
+
+function skippedSeoResult(dailyLimit: number): SeoDripResult {
+  const now = new Date().toISOString()
+  return {
+    status: 'skipped',
+    reason: 'SEO generation runs in the dedicated hourly cron',
+    dailyLimit,
+    alreadyGeneratedToday: 0,
+    remainingToday: dailyLimit,
+    attempted: 0,
+    generated: 0,
+    candidatesChecked: 0,
+    results: [],
+    indexing: {
+      skipped: true,
+      success: true,
+      status: null,
+      submitted: [],
+      message: 'Skill radar does not generate SEO posts.',
+    },
+    window: { start: now, end: now },
+  }
+}
+
 function mergeCandidates(
   xCandidates: CandidateRepo[],
   githubCandidates: CandidateRepo[],
@@ -153,6 +200,11 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
   const xQueueLimit = Math.min(Math.max(options.xQueueLimit ?? numberFromEnv('SKILL_RADAR_X_QUEUE_LIMIT', 2), 1), 12)
   const xMinStars = Math.max(options.xMinStars ?? numberFromEnv('SKILL_RADAR_X_MIN_STARS', 10), 10)
   const autoPost = options.autoPost ?? booleanFromEnv('SKILL_RADAR_AUTO_POST', false)
+  const seoPerRun = Math.min(
+    Math.max(options.seoPerRun ?? nonNegativeNumberFromEnv('SKILL_RADAR_SEO_PER_RUN', 0), 0),
+    5
+  )
+  const seoDailyLimit = options.seoDailyLimit ?? numberFromEnv('SEO_DRIP_DAILY_LIMIT', 50)
   const xMaxQueries = skillRadarXMaxQueries(options)
   const queryOffset = Math.floor(Date.now() / 3_600_000)
 
@@ -179,37 +231,29 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
       limit: options.githubLimit ?? numberFromEnv('SKILL_RADAR_GITHUB_LIMIT', 22),
       minStars,
       lookbackDays: options.githubLookbackDays ?? numberFromEnv('SKILL_RADAR_GITHUB_LOOKBACK_DAYS', 14),
-      maxQueries: options.githubMaxQueries ?? numberFromEnv('SKILL_RADAR_GITHUB_MAX_QUERIES', 4),
+      maxQueries: options.githubMaxQueries ?? numberFromEnv('SKILL_RADAR_GITHUB_MAX_QUERIES', 6),
       queryOffset,
     }),
   ])
 
-  const candidates = mergeCandidates(xRadar.candidates, githubHot.candidates, targetNew)
-  const importResults = candidates.length ? await processBatch(candidates, 2) : []
+  const reviewLimit = Math.min(Math.max(targetNew * 3, 6), 12)
+  const candidates = mergeCandidates(xRadar.candidates, githubHot.candidates, reviewLimit)
+  const importResults = candidates.length ? await importCandidatesUntilTarget(candidates, targetNew) : []
   const summary = summarizeProcessResults(importResults)
   const indexedSlugs = collectSlugs(importResults, ['indexed'])
   const touchedSlugs = collectSlugs(importResults, ['indexed', 'skipped'])
 
-  const seo = await runSeoDrip({
-    perRun: options.seoPerRun ?? numberFromEnv('SKILL_RADAR_SEO_PER_RUN', 1),
-    dailyLimit: options.seoDailyLimit ?? numberFromEnv('SEO_DRIP_DAILY_LIMIT', 50),
-    candidatePool: numberFromEnv('SKILL_RADAR_SEO_CANDIDATE_POOL', 180),
-  }).catch(async (error) => ({
-    status: 'skipped' as const,
-    reason: error instanceof Error ? error.message : 'SEO drip failed',
-    dailyLimit: options.seoDailyLimit ?? numberFromEnv('SEO_DRIP_DAILY_LIMIT', 50),
-    alreadyGeneratedToday: 0,
-    remainingToday: 0,
-    attempted: 0,
-    generated: 0,
-    candidatesChecked: 0,
-    results: [],
-    indexing: await submitIndexNowUrls([]),
-    window: {
-      start: new Date().toISOString(),
-      end: new Date().toISOString(),
-    },
-  }))
+  const seo = seoPerRun > 0
+    ? await runSeoDrip({
+        perRun: seoPerRun,
+        dailyLimit: seoDailyLimit,
+        candidatePool: numberFromEnv('SKILL_RADAR_SEO_CANDIDATE_POOL', 180),
+      }).catch(async (error) => ({
+        ...skippedSeoResult(seoDailyLimit),
+        reason: error instanceof Error ? error.message : 'SEO drip failed',
+        indexing: await submitIndexNowUrls([]),
+      }))
+    : skippedSeoResult(seoDailyLimit)
 
   const indexingUrls = [
     ...collectIndexNowUrlsFromIndexerResults(importResults),

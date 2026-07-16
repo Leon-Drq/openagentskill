@@ -47,7 +47,7 @@ async function handleRun(request: NextRequest) {
     xLimit: parseOptionalPositive(searchParams.get('xLimit'), body.xLimit),
     xMaxQueries: parseOptionalNonNegative(searchParams.get('xMaxQueries'), body.xMaxQueries),
     xResultsPerQuery: parseOptionalPositive(searchParams.get('xResultsPerQuery'), body.xResultsPerQuery),
-    seoPerRun: parseOptionalPositive(searchParams.get('seoPerRun'), body.seoPerRun),
+    seoPerRun: parseOptionalNonNegative(searchParams.get('seoPerRun'), body.seoPerRun),
     seoDailyLimit: parseOptionalPositive(searchParams.get('seoDailyLimit'), body.seoDailyLimit),
     xQueueLimit: parseOptionalPositive(searchParams.get('xQueueLimit'), body.xQueueLimit),
     xMinStars: parseOptionalPositive(searchParams.get('xMinStars'), body.xMinStars),

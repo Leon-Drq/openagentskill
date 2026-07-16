@@ -14,6 +14,9 @@ import { generateBlogPostForSkill } from '@/lib/blog/generate'
 import { evaluateSkillCandidate, isMcpCandidate } from './skill-filter'
 import { INDEXER_REVIEW_MODEL } from '@/lib/ai/models'
 
+const GITHUB_REQUEST_TIMEOUT_MS = 15_000
+const AI_REVIEW_TIMEOUT_MS = 45_000
+
 const GITHUB_HEADERS = () => ({
   Accept: 'application/vnd.github.v3+json',
   ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
@@ -40,6 +43,7 @@ interface GitHubRepoMetadata {
 async function fetchRepoMetadata(owner: string, repo: string): Promise<GitHubRepoMetadata> {
   const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
     headers: GITHUB_HEADERS(),
+    signal: AbortSignal.timeout(GITHUB_REQUEST_TIMEOUT_MS),
   })
   if (!res.ok) throw new Error(`GitHub repo fetch failed: ${res.status}`)
   return res.json() as Promise<GitHubRepoMetadata>
@@ -48,6 +52,7 @@ async function fetchRepoMetadata(owner: string, repo: string): Promise<GitHubRep
 async function fetchReadme(owner: string, repo: string): Promise<string> {
   const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/readme`, {
     headers: { ...GITHUB_HEADERS(), Accept: 'application/vnd.github.v3.raw' },
+    signal: AbortSignal.timeout(GITHUB_REQUEST_TIMEOUT_MS),
   })
   if (!res.ok) return ''
   return res.text()
@@ -94,6 +99,8 @@ Respond with JSON only, no markdown:
       model: INDEXER_REVIEW_MODEL,
       prompt,
       temperature: 0.2,
+      maxRetries: 0,
+      timeout: AI_REVIEW_TIMEOUT_MS,
     })
     const match = text.match(/\{[\s\S]*\}/)
     if (!match) throw new Error('No JSON in response')
