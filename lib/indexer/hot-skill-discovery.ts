@@ -48,6 +48,7 @@ export interface HotSkillDiscoveryResult {
 }
 
 const GITHUB_API_BASE = 'https://api.github.com'
+const GITHUB_SEARCH_TIMEOUT_MS = 10_000
 
 const HOT_SKILL_QUERIES: HotSkillQuery[] = [
   { q: '"agent skill"', sort: 'updated' },
@@ -139,7 +140,10 @@ async function searchHotQuery(query: HotSkillQuery, options: {
     `?q=${encodeURIComponent(q)}` +
     `&sort=${query.sort}&order=desc&per_page=${options.perPage}&page=1`
 
-  const response = await fetch(url, { headers: githubHeaders() } as RequestInit)
+  const response = await fetch(url, {
+    headers: githubHeaders(),
+    signal: AbortSignal.timeout(GITHUB_SEARCH_TIMEOUT_MS),
+  })
   if (!response.ok) {
     const body = await response.text().catch(() => '')
     throw new Error(`GitHub hot search failed [${q}]: ${response.status} ${body}`)

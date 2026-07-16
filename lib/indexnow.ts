@@ -1,6 +1,7 @@
 const SITE_URL = 'https://www.openagentskill.com'
 const SITE_HOST = 'www.openagentskill.com'
 const INDEXNOW_ENDPOINT = 'https://api.indexnow.org/indexnow'
+const INDEXNOW_REQUEST_TIMEOUT_MS = 10_000
 
 export const INDEXNOW_KEY = process.env.INDEXNOW_KEY || '2c3f8b6e7f9a4b18ad0c9136f61d5a2e'
 export const INDEXNOW_KEY_LOCATION =
@@ -126,6 +127,7 @@ export async function submitIndexNowUrls(urls: string[]): Promise<IndexNowSubmit
         keyLocation: INDEXNOW_KEY_LOCATION,
         urlList,
       }),
+      signal: AbortSignal.timeout(INDEXNOW_REQUEST_TIMEOUT_MS),
     })
     const responseBody = await response.text().catch(() => '')
 

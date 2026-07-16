@@ -38,7 +38,7 @@ async function handleRun(request: NextRequest) {
 
   const body = request.method === 'POST' ? await request.json().catch(() => ({})) : {}
   const searchParams = request.nextUrl.searchParams
-  const result = await runSkillRadarAutomation({
+  const options = {
     targetNew: parseOptionalPositive(searchParams.get('targetNew'), body.targetNew),
     minStars: parseOptionalPositive(searchParams.get('minStars'), body.minStars),
     githubLimit: parseOptionalPositive(searchParams.get('githubLimit'), body.githubLimit),
@@ -52,6 +52,22 @@ async function handleRun(request: NextRequest) {
     xQueueLimit: parseOptionalPositive(searchParams.get('xQueueLimit'), body.xQueueLimit),
     xMinStars: parseOptionalPositive(searchParams.get('xMinStars'), body.xMinStars),
     autoPost: parseOptionalBoolean(searchParams.get('autoPost'), body.autoPost),
+  }
+
+  console.info('[skill-radar] start', {
+    targetNew: options.targetNew ?? 'default',
+    minStars: options.minStars ?? 'default',
+    githubMaxQueries: options.githubMaxQueries ?? 'default',
+    xMaxQueries: options.xMaxQueries ?? 'default',
+  })
+  const result = await runSkillRadarAutomation(options)
+  console.info('[skill-radar] complete', {
+    candidates: result.githubHot.candidates.length,
+    reviewed: result.import.summary.found,
+    indexed: result.import.summary.indexed,
+    rejected: result.import.summary.rejected,
+    skipped: result.import.summary.skipped,
+    errors: result.import.summary.errors,
   })
 
   return NextResponse.json(result)

@@ -10,12 +10,7 @@ import { searchXSkillRadarRepos, type XSkillRadarResult } from '@/lib/indexer/x-
 import { processRepo, type ProcessResult } from '@/lib/indexer/processor'
 import type { CandidateRepo } from '@/lib/indexer/github-search'
 import { createPublicClient } from '@/lib/supabase/public'
-import {
-  enqueueXSkillPostQueue,
-  enqueueXSkillPostQueueForSlugs,
-  postNextQueuedSkillToX,
-  type XQueueBuildResult,
-} from '@/lib/x/growth'
+import type { XQueueBuildResult } from '@/lib/x/growth'
 import type { XPostResult } from '@/lib/x/poster'
 
 export interface SkillRadarOptions {
@@ -32,6 +27,8 @@ export interface SkillRadarOptions {
   xQueueLimit?: number
   xMinStars?: number
   autoPost?: boolean
+  queueX?: boolean
+  maxCandidateAttempts?: number
 }
 
 export interface SkillRadarResult {
@@ -71,19 +68,13 @@ function nonNegativeNumberFromEnv(name: string, fallback: number) {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
 }
 
-function booleanFromEnv(name: string, fallback: boolean) {
-  const value = process.env[name]
-  if (value === undefined) return fallback
-  return value === 'true' || value === '1'
-}
-
 function skillRadarXMaxQueries(options: SkillRadarOptions) {
   if (options.xMaxQueries !== undefined) {
     return Math.min(Math.max(options.xMaxQueries, 0), 8)
   }
 
   const maxQueries = Math.min(
-    Math.max(nonNegativeNumberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 1), 0),
+    Math.max(nonNegativeNumberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 0), 0),
     8
   )
   if (maxQueries === 0) return 0
@@ -130,24 +121,41 @@ function collectSlugs(results: ProcessResult[], statuses: ProcessResult['status'
   return unique(results.map((result) => (result.slug && statusSet.has(result.status) ? result.slug : undefined)))
 }
 
-async function importCandidatesUntilTarget(candidates: CandidateRepo[], targetNew: number) {
+function skippedXQueueResult(): XQueueBuildResult {
+  return { status: 'skipped', queued: 0, skipped: 0, considered: 0, results: [] }
+}
+
+async function importCandidatesUntilTarget(
+  candidates: CandidateRepo[],
+  targetNew: number,
+  options: {
+    maxAttempts: number
+    budgetMs: number
+    aiReviewTimeoutMs: number
+  }
+) {
   const results: ProcessResult[] = []
   let cursor = 0
   let indexed = 0
+  const startedAt = Date.now()
+  const candidateLimit = Math.min(candidates.length, options.maxAttempts)
 
-  // Keep a small review buffer. Rejected or already-indexed repos should not make
-  // an hourly run look empty when the next candidate is a valid skill.
-  while (cursor < candidates.length && indexed < targetNew) {
+  // Bound the entire review phase. A slow GitHub or model call should make this
+  // run smaller, never make the next hourly run disappear behind a timeout.
+  while (cursor < candidateLimit && indexed < targetNew) {
+    if (Date.now() - startedAt >= options.budgetMs) break
     const remaining = targetNew - indexed
-    const batch = candidates.slice(cursor, cursor + Math.min(2, remaining))
+    const batch = candidates.slice(cursor, cursor + Math.min(2, remaining, candidateLimit - cursor))
     cursor += batch.length
 
-    const batchResults = await Promise.all(batch.map((candidate) => processRepo(candidate)))
+    const batchResults = await Promise.all(
+      batch.map((candidate) => processRepo(candidate, { aiReviewTimeoutMs: options.aiReviewTimeoutMs }))
+    )
     results.push(...batchResults)
     indexed += batchResults.filter((result) => result.status === 'indexed').length
 
-    if (cursor < candidates.length && indexed < targetNew) {
-      await new Promise((resolve) => setTimeout(resolve, 500))
+    if (cursor < candidateLimit && indexed < targetNew) {
+      await new Promise((resolve) => setTimeout(resolve, 250))
     }
   }
 
@@ -197,11 +205,8 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
   const runKey = new Date().toISOString().replace(/[:.]/g, '-')
   const targetNew = Math.min(Math.max(options.targetNew ?? numberFromEnv('SKILL_RADAR_TARGET_NEW', 2), 1), 12)
   const minStars = Math.max(options.minStars ?? numberFromEnv('SKILL_RADAR_MIN_STARS', 10), 10)
-  const xQueueLimit = Math.min(Math.max(options.xQueueLimit ?? numberFromEnv('SKILL_RADAR_X_QUEUE_LIMIT', 2), 1), 12)
-  const xMinStars = Math.max(options.xMinStars ?? numberFromEnv('SKILL_RADAR_X_MIN_STARS', 10), 10)
-  const autoPost = options.autoPost ?? booleanFromEnv('SKILL_RADAR_AUTO_POST', false)
   const seoPerRun = Math.min(
-    Math.max(options.seoPerRun ?? nonNegativeNumberFromEnv('SKILL_RADAR_SEO_PER_RUN', 0), 0),
+    Math.max(options.seoPerRun ?? 0, 0),
     5
   )
   const seoDailyLimit = options.seoDailyLimit ?? numberFromEnv('SEO_DRIP_DAILY_LIMIT', 50)
@@ -228,17 +233,35 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
           minStars,
         }),
     searchHotSkillRepos({
-      limit: options.githubLimit ?? numberFromEnv('SKILL_RADAR_GITHUB_LIMIT', 22),
+      limit: options.githubLimit ?? numberFromEnv('SKILL_RADAR_GITHUB_LIMIT', 18),
       minStars,
       lookbackDays: options.githubLookbackDays ?? numberFromEnv('SKILL_RADAR_GITHUB_LOOKBACK_DAYS', 14),
-      maxQueries: options.githubMaxQueries ?? numberFromEnv('SKILL_RADAR_GITHUB_MAX_QUERIES', 6),
+      maxQueries: options.githubMaxQueries ?? numberFromEnv('SKILL_RADAR_GITHUB_MAX_QUERIES', 5),
       queryOffset,
     }),
   ])
 
-  const reviewLimit = Math.min(Math.max(targetNew * 3, 6), 12)
+  const maxCandidateAttempts = Math.min(
+    Math.max(options.maxCandidateAttempts ?? numberFromEnv('SKILL_RADAR_MAX_CANDIDATE_ATTEMPTS', targetNew * 2), 2),
+    6
+  )
+  const importBudgetMs = Math.min(
+    Math.max(numberFromEnv('SKILL_RADAR_IMPORT_BUDGET_MS', 120_000), 30_000),
+    180_000
+  )
+  const aiReviewTimeoutMs = Math.min(
+    Math.max(numberFromEnv('SKILL_RADAR_AI_REVIEW_TIMEOUT_MS', 10_000), 3_000),
+    15_000
+  )
+  const reviewLimit = Math.min(Math.max(maxCandidateAttempts * 2, 6), 12)
   const candidates = mergeCandidates(xRadar.candidates, githubHot.candidates, reviewLimit)
-  const importResults = candidates.length ? await importCandidatesUntilTarget(candidates, targetNew) : []
+  const importResults = candidates.length
+    ? await importCandidatesUntilTarget(candidates, targetNew, {
+        maxAttempts: maxCandidateAttempts,
+        budgetMs: importBudgetMs,
+        aiReviewTimeoutMs,
+      })
+    : []
   const summary = summarizeProcessResults(importResults)
   const indexedSlugs = collectSlugs(importResults, ['indexed'])
   const touchedSlugs = collectSlugs(importResults, ['indexed', 'skipped'])
@@ -266,42 +289,13 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
   ].filter((url): url is string => Boolean(url))
   const indexing = await submitIndexNowUrls(Array.from(new Set(indexingUrls)))
 
-  const xQueueSourceSlugs = indexedSlugs.length ? indexedSlugs : touchedSlugs
-  const xQueue = xQueueSourceSlugs.length
-    ? await enqueueXSkillPostQueueForSlugs({
-      slugs: xQueueSourceSlugs,
-      limit: xQueueLimit,
-      minStars: xMinStars,
-      campaign: 'skill_radar',
-      }).catch((error) => ({
-        status: 'skipped' as const,
-        queued: 0,
-        skipped: 1,
-        considered: 0,
-        results: [{ status: 'skipped', reason: error instanceof Error ? error.message : 'Skill radar X queue failed' }],
-      }))
-    : { status: 'skipped' as const, queued: 0, skipped: 0, considered: 0, results: [] }
-
-  const xFallbackQueue = xQueue.queued === 0
-    ? await enqueueXSkillPostQueue({
-        limit: Math.min(xQueueLimit, 4),
-        minStars: Math.max(xMinStars, 100),
-        campaign: 'skill_radar_fallback',
-      }).catch((error) => ({
-        status: 'skipped' as const,
-        queued: 0,
-        skipped: 1,
-        considered: 0,
-        results: [{ status: 'skipped', reason: error instanceof Error ? error.message : 'Skill radar fallback X queue failed' }],
-      }))
-    : undefined
-
-  const xPost = autoPost
-    ? await postNextQueuedSkillToX({ autoBuildQueue: false }).catch((error) => ({
-        status: 'skipped' as const,
-        reason: error instanceof Error ? error.message : 'Skill radar X auto-post failed',
-      }))
-    : { status: 'skipped' as const, reason: 'Auto-post disabled for radar run' }
+  // X queueing and publishing have their own cron jobs. Keeping them off the
+  // ingestion path prevents transient X/API delays from blocking new skills.
+  const xQueue = skippedXQueueResult()
+  const xPost: XPostResult & { queueItemId?: string } = {
+    status: 'skipped',
+    reason: 'X publishing runs in the dedicated X cron.',
+  }
 
   const result: SkillRadarResult = {
     success: true,
@@ -316,7 +310,6 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
     seo,
     indexing,
     xQueue,
-    ...(xFallbackQueue ? { xFallbackQueue } : {}),
     xPost,
     slugs: {
       indexed: indexedSlugs,
@@ -371,7 +364,7 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
       x_queue: {
         status: xQueue.status,
         queued: xQueue.queued,
-        fallback_queued: xFallbackQueue?.queued || 0,
+        fallback_queued: 0,
       },
       x_post: {
         status: xPost.status,

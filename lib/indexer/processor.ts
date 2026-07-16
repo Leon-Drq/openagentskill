@@ -10,12 +10,12 @@
 import { createPublicClient } from '@/lib/supabase/public'
 import { generateText } from 'ai'
 import type { CandidateRepo } from './github-search'
-import { generateBlogPostForSkill } from '@/lib/blog/generate'
 import { evaluateSkillCandidate, isMcpCandidate } from './skill-filter'
 import { INDEXER_REVIEW_MODEL } from '@/lib/ai/models'
 
-const GITHUB_REQUEST_TIMEOUT_MS = 15_000
-const AI_REVIEW_TIMEOUT_MS = 45_000
+const GITHUB_REQUEST_TIMEOUT_MS = 12_000
+const DEFAULT_AI_REVIEW_TIMEOUT_MS = 12_000
+const MAX_AI_REVIEW_TIMEOUT_MS = 20_000
 
 const GITHUB_HEADERS = () => ({
   Accept: 'application/vnd.github.v3+json',
@@ -69,7 +69,21 @@ interface ReviewResult {
   reason?: string
 }
 
-async function aiReview(candidate: CandidateRepo, readme: string): Promise<ReviewResult> {
+export interface ProcessRepoOptions {
+  aiReviewTimeoutMs?: number
+}
+
+function resolveAiReviewTimeoutMs(value?: number) {
+  const configured = value ?? Number(process.env.INDEXER_AI_REVIEW_TIMEOUT_MS)
+  if (!Number.isFinite(configured)) return DEFAULT_AI_REVIEW_TIMEOUT_MS
+  return Math.min(Math.max(Math.floor(configured), 3_000), MAX_AI_REVIEW_TIMEOUT_MS)
+}
+
+async function aiReview(
+  candidate: CandidateRepo,
+  readme: string,
+  timeoutMs = DEFAULT_AI_REVIEW_TIMEOUT_MS
+): Promise<ReviewResult> {
   const prompt = `You are an AI curator for OpenAgentSkill, a registry of reusable AI agent skills. MCP servers are out of scope for this product.
 
 Evaluate this GitHub repository and decide if it should be listed:
@@ -100,12 +114,12 @@ Respond with JSON only, no markdown:
       prompt,
       temperature: 0.2,
       maxRetries: 0,
-      timeout: AI_REVIEW_TIMEOUT_MS,
+      timeout: timeoutMs,
     })
     const match = text.match(/\{[\s\S]*\}/)
     if (!match) throw new Error('No JSON in response')
     return JSON.parse(match[0]) as ReviewResult
-  } catch (err) {
+  } catch {
     // If AI fails, stay conservative: approve only direct skill-like repos.
     const evaluation = evaluateSkillCandidate({
       fullName: candidate.fullName,
@@ -129,7 +143,10 @@ Respond with JSON only, no markdown:
 
 // ─── Main processor ───────────────────────────────────────────────────────────
 
-export async function processRepo(candidate: CandidateRepo): Promise<ProcessResult> {
+export async function processRepo(
+  candidate: CandidateRepo,
+  options: ProcessRepoOptions = {}
+): Promise<ProcessResult> {
   const { owner, repo } = candidate
   const repoRef = `${owner}/${repo}`
   const slug = `${owner}-${repo}`.toLowerCase().replace(/[^a-z0-9-]/g, '-')
@@ -223,7 +240,7 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
     }
 
     // 3. AI Review
-    const review = await aiReview(enrichedCandidate, readme)
+    const review = await aiReview(enrichedCandidate, readme, resolveAiReviewTimeoutMs(options.aiReviewTimeoutMs))
 
     if (!review.approved) {
       return { repo: repoRef, status: 'rejected', reason: review.reason || 'Did not pass review' }
@@ -263,7 +280,7 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
       review_count: 0,
     }
 
-    const { data: saveResult, error: skillError } = await supabase.rpc('upsert_indexed_skill', {
+    const { error: skillError } = await supabase.rpc('upsert_indexed_skill', {
       p_server_secret: serverSecret,
       p_skill: skillData,
       p_activity: {
@@ -277,21 +294,16 @@ export async function processRepo(candidate: CandidateRepo): Promise<ProcessResu
 
     if (skillError) throw new Error(`DB insert failed: ${skillError.message}`)
 
-    // Blog generation still needs privileged DB credentials; skip it when Vercel has
-    // only the controlled INDEXER_SECRET path available.
-    const savedSkill = saveResult as { skill?: { id?: string } } | null
-    if (
-      savedSkill?.skill?.id &&
-      (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY)
-    ) {
-      generateBlogPostForSkill(savedSkill.skill.id).catch(() => {
-        // Silently ignore blog generation errors
-      })
-    }
+    // Editorial generation is intentionally handled by the dedicated SEO cron.
+    // Leaving it out of the ingestion request keeps hourly discovery bounded.
 
     return { repo: repoRef, status: 'indexed', slug }
-  } catch (error: any) {
-    return { repo: repoRef, status: 'error', reason: error.message }
+  } catch (error: unknown) {
+    return {
+      repo: repoRef,
+      status: 'error',
+      reason: error instanceof Error ? error.message : 'Unknown indexer error',
+    }
   }
 }
 
@@ -303,7 +315,7 @@ export async function processBatch(
 
   for (let i = 0; i < candidates.length; i += concurrency) {
     const chunk = candidates.slice(i, i + concurrency)
-    const chunkResults = await Promise.all(chunk.map(processRepo))
+    const chunkResults = await Promise.all(chunk.map((candidate) => processRepo(candidate)))
     results.push(...chunkResults)
 
     // Respect GitHub rate limits
