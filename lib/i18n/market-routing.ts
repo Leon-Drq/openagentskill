@@ -62,7 +62,10 @@ export function getLanguageSwitchHref(pathname: string, nextLocale: Locale) {
   if (basePath === '/') return localePaths[nextLocale]
 
   const page = basePath.slice(1)
-  if (!isLocalizedCorePageSlug(page)) return basePath
+  // A language selection must always produce a visible locale change. Deep pages
+  // without a localized equivalent use the target locale's landing page instead
+  // of silently returning the same URL and leaving the UI in its old language.
+  if (!isLocalizedCorePageSlug(page)) return localePaths[nextLocale]
   if (nextLocale === 'en') return basePath
   if (isMarketLocale(nextLocale)) return getLocalizedCorePath(nextLocale, page)
 

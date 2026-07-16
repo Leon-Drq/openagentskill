@@ -38,8 +38,11 @@ export function LanguageSwitcher({ compact = false, className }: LanguageSwitche
   const activeLabel = useMemo(() => localeShortLabels[activeLocale], [activeLocale])
 
   const switchLanguage = (nextLocale: Locale) => {
-    setLocale(nextLocale)
     setOpen(false)
+
+    if (nextLocale === activeLocale) return
+
+    setLocale(nextLocale)
     const destination = getLanguageSwitchHref(pathname, nextLocale)
     const query = typeof window === 'undefined' ? '' : window.location.search
     const href = `${destination}${query}`
