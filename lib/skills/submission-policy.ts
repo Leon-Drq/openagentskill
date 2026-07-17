@@ -1,6 +1,8 @@
 import type { AIReviewResult } from '@/lib/schema/skill-schema'
 
-export const SKILL_SUBMISSION_MIN_STARS = 10
+// Keep the public intake open to promising early projects. Publication still
+// requires the security scan and the full quality gate below.
+export const SKILL_SUBMISSION_MIN_STARS = 3
 export const SKILL_SUBMISSION_MIN_TOTAL_SCORE = 32
 export const SKILL_SUBMISSION_VERIFIED_SCORE = 35
 export const SKILL_SUBMISSION_MIN_SECURITY_SCORE = 7
