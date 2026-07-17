@@ -1,7 +1,7 @@
 import { withTimeout } from '@/lib/async'
 import { createPublicClient } from '@/lib/supabase/public'
 
-export const LAST_VERIFIED_APPROVED_SKILL_COUNT = 20_005
+export const LAST_VERIFIED_APPROVED_SKILL_COUNT = 20_545
 
 export interface RegistrySkillCount {
   count: number
