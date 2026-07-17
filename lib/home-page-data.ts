@@ -1,40 +1,56 @@
-import { withTimeout } from '@/lib/async'
-import { createPublicClient } from '@/lib/supabase/public'
+import { unstable_cache } from 'next/cache'
+import {
+  LAST_VERIFIED_APPROVED_SKILL_COUNT,
+  getApprovedRegistrySkillCount,
+} from '@/lib/registry-stats'
 
 const HOME_STATS_SNAPSHOT = {
-  totalSkills: 20_000,
+  // The last exact count observed before the registry stats cache was added.
+  // A fallback is explicitly rendered with "+" so an upstream timeout cannot
+  // look like the registry lost indexed skills.
+  totalSkills: LAST_VERIFIED_APPROVED_SKILL_COUNT,
   totalDownloads: 860_000,
   activePlatforms: 104,
   agentSubmissions: 2_635,
 }
 
-const HOME_STATS_QUERY_TIMEOUT_MS = 2500
+const HOME_STATS_QUERY_TIMEOUT_MS = 1_500
 
-async function getApprovedSkillCount() {
-  const supabase = createPublicClient()
-  const { count, error } = await withTimeout(
-    supabase
-      .from('skills')
-      .select('slug', { count: 'exact', head: true })
-      .eq('ai_review_approved', true),
-    HOME_STATS_QUERY_TIMEOUT_MS,
-    'home approved skill count query'
-  ).catch((queryError) => {
-    console.warn('Home stats skill count fallback:', queryError)
-    return { count: null, error: queryError }
-  })
-
-  if (error || typeof count !== 'number') return HOME_STATS_SNAPSHOT.totalSkills
-  return Math.max(count, HOME_STATS_SNAPSHOT.totalSkills)
+export interface HomeSkillCount {
+  value: number
+  exact: boolean
 }
 
+async function fetchApprovedSkillCount(): Promise<HomeSkillCount> {
+  const result = await getApprovedRegistrySkillCount(HOME_STATS_QUERY_TIMEOUT_MS)
+  if (result === null) {
+    return { value: HOME_STATS_SNAPSHOT.totalSkills, exact: false }
+  }
+
+  if (!result.exact) {
+    return {
+      value: Math.max(result.count, HOME_STATS_SNAPSHOT.totalSkills),
+      exact: false,
+    }
+  }
+
+  return { value: result.count, exact: true }
+}
+
+const getCachedApprovedSkillCount = unstable_cache(
+  fetchApprovedSkillCount,
+  ['home-approved-skill-count-v2'],
+  { revalidate: 300 }
+)
+
 export async function getHomePageData() {
-  const totalSkills = await getApprovedSkillCount()
+  const totalSkills = await getCachedApprovedSkillCount()
 
   return {
     stats: {
       ...HOME_STATS_SNAPSHOT,
-      totalSkills,
+      totalSkills: totalSkills.value,
+      totalSkillsExact: totalSkills.exact,
     },
     activities: [],
     featuredSkills: [],

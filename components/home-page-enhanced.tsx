@@ -13,6 +13,7 @@ interface HomePageEnhancedProps {
   initialLocale?: Locale
   stats: {
     totalSkills: number
+    totalSkillsExact: boolean
     totalDownloads: number
     activePlatforms: number
     agentSubmissions: number
@@ -772,8 +773,9 @@ export function HomePageEnhanced({ initialLocale, stats }: HomePageEnhancedProps
     ? [resolveResult.selected, ...resolveResult.alternatives].filter((item): item is ResolveCandidate => Boolean(item))
     : []
   const copy = HOME_COPY[activeLocale] || HOME_COPY.en
+  const totalSkillsLabel = `${stats.totalSkills.toLocaleString()}${stats.totalSkillsExact ? '' : '+'}`
   const statItems = [
-    [stats.totalSkills.toLocaleString(), copy.stats[0]],
+    [totalSkillsLabel, copy.stats[0]],
     [`${Math.round(stats.totalDownloads / 1000)}K+`, copy.stats[1]],
     [stats.activePlatforms.toLocaleString(), copy.stats[2]],
     ['API', copy.stats[3]],
@@ -1194,7 +1196,7 @@ export function HomePageEnhanced({ initialLocale, stats }: HomePageEnhancedProps
             <div className="min-w-0 md:col-span-5">
               <div className="grid overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8] sm:grid-cols-3">
                 {[
-                  ['Indexed', stats.totalSkills.toLocaleString()],
+                  ['Indexed', totalSkillsLabel],
                   ['Signals', 'Fit · Risk'],
                   ['Surface', 'API · UI'],
                 ].map(([label, value]) => (

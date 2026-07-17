@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { withTimeout } from '@/lib/async'
 import { INDEXNOW_KEY_LOCATION } from '@/lib/indexnow'
 import { createPublicClient } from '@/lib/supabase/public'
+import { getApprovedRegistrySkillCount } from '@/lib/registry-stats'
 import {
   HIGH_STAR_DISCOVERY_DOMAINS,
   HIGH_STAR_INDEXER_VERSION,
@@ -332,24 +333,6 @@ async function getRecentRuns() {
   }))
 }
 
-async function getApprovedSkillCount() {
-  const supabase = createPublicClient()
-  const { count, error } = await withTimeout(
-    supabase
-      .from('skills')
-      .select('slug', { count: 'exact', head: true })
-      .eq('ai_review_approved', true),
-    DISCOVERY_QUERY_TIMEOUT_MS,
-    'approved skill count query'
-  ).catch((queryError) => {
-    console.warn('Discovery skill count fallback:', queryError)
-    return { count: null, error: queryError }
-  })
-
-  if (error) return null
-  return count
-}
-
 function buildProfileRunSummaries(runs: Array<Record<string, unknown>>) {
   return INDEXER_RUN_PROFILES.map((profile) => {
     const latest = runs.find((run) => run.profile_key === profile.key)
@@ -417,7 +400,11 @@ export async function GET() {
   const effectiveCoverageTarget = resolveHighStarCoverageTarget(
     parsePositiveNumber(process.env.INDEXER_TARGET_TOTAL, HIGH_STAR_SKILL_COVERAGE_TARGET)
   )
-  const [runs, approvedSkillCount] = await Promise.all([getRecentRuns(), getApprovedSkillCount()])
+  const [runs, approvedSkillCountResult] = await Promise.all([
+    getRecentRuns(),
+    getApprovedRegistrySkillCount(DISCOVERY_QUERY_TIMEOUT_MS),
+  ])
+  const approvedSkillCount = approvedSkillCountResult?.count ?? null
   const filters = {
     min_stars: maintenanceMinStars,
     coverage_import_min_stars: minStars,
