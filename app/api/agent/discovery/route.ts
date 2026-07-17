@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server'
 import { withTimeout } from '@/lib/async'
 import { INDEXNOW_KEY_LOCATION } from '@/lib/indexnow'
 import { createPublicClient } from '@/lib/supabase/public'
-import { getApprovedRegistrySkillCount } from '@/lib/registry-stats'
+import {
+  LAST_VERIFIED_APPROVED_SKILL_COUNT,
+  getApprovedRegistrySkillCount,
+} from '@/lib/registry-stats'
 import {
   HIGH_STAR_DISCOVERY_DOMAINS,
   HIGH_STAR_INDEXER_VERSION,
@@ -404,7 +407,13 @@ export async function GET() {
     getRecentRuns(),
     getApprovedRegistrySkillCount(DISCOVERY_QUERY_TIMEOUT_MS),
   ])
-  const approvedSkillCount = approvedSkillCountResult?.count ?? null
+  const approvedSkillCount =
+    approvedSkillCountResult?.count ?? LAST_VERIFIED_APPROVED_SKILL_COUNT
+  const approvedSkillCountSource = approvedSkillCountResult?.exact
+    ? 'live_registry_counter'
+    : approvedSkillCountResult
+      ? 'planner_estimate'
+      : 'last_verified_fallback'
   const filters = {
     min_stars: maintenanceMinStars,
     coverage_import_min_stars: minStars,
@@ -458,6 +467,7 @@ export async function GET() {
       approvedSkillCount,
       remainingToTarget,
     }),
+    approved_skill_count_source: approvedSkillCountSource,
     profile_runs: buildProfileRunSummaries(runs),
   }
 
@@ -471,6 +481,7 @@ export async function GET() {
       target_policy:
         'The registry has reached its 20k coverage goal. Scheduled work now runs as a quality maintenance radar; broad high-star backfills remain available through protected manual endpoints.',
       current_approved_skills: approvedSkillCount,
+      approved_skill_count_source: approvedSkillCountSource,
       remaining_to_target: remainingToTarget,
       scheduled_hourly_target_new: scheduledHourlyTargetNew,
       manual_profile_target_new: manualProfileTargetNew,

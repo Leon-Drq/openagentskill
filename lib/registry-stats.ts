@@ -12,7 +12,7 @@ export async function getApprovedRegistrySkillCount(
   timeoutMs = 1_500
 ): Promise<RegistrySkillCount | null> {
   const supabase = createPublicClient()
-  const { data, error } = await withTimeout(
+  const statsResult = await withTimeout(
     supabase
       .from('registry_stats')
       .select('approved_skill_count')
@@ -20,12 +20,18 @@ export async function getApprovedRegistrySkillCount(
       .maybeSingle(),
     timeoutMs,
     'registry stats query'
-  ).catch((queryError) => ({ data: null, error: queryError }))
+  )
+    .then(({ data, error }) => ({ data, error, timedOut: false }))
+    .catch((queryError) => ({ data: null, error: queryError, timedOut: true }))
 
-  const cachedCount = Number(data?.approved_skill_count)
-  if (!error && Number.isFinite(cachedCount) && cachedCount >= 0) {
+  const cachedCount = Number(statsResult.data?.approved_skill_count)
+  if (!statsResult.error && Number.isFinite(cachedCount) && cachedCount >= 0) {
     return { count: Math.floor(cachedCount), exact: true }
   }
+
+  // During an upstream timeout, do not immediately start a second database
+  // request. The caller has a clearly-labelled last-known fallback instead.
+  if (statsResult.timedOut) return null
 
   // The counter is populated by migration 019. Until it is available, use the
   // PostgREST planner estimate instead of an exact COUNT(*) scan. The caller
