@@ -228,7 +228,7 @@ export function MobileNav() {
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Link
-                  href="/submit"
+                  href={getLocalizedNavigationHref('/submit', locale)}
                   onClick={() => setIsOpen(false)}
                   className="flex items-center justify-center gap-2 rounded-[8px] border border-border bg-card/70 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
                 >

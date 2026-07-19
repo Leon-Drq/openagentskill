@@ -1,7 +1,7 @@
 'use client'
 
-import { createContext, useContext, ReactNode } from 'react'
-import { usePathname } from 'next/navigation'
+import { createContext, ReactNode, Suspense, useContext, useEffect } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation'
 import type { Locale } from './config'
 import { defaultLocale, isLocale } from './config'
 import en from './dictionaries/en'
@@ -35,9 +35,12 @@ const dictionaries: Record<Locale, Dictionary> = {
 }
 
 function getLocaleFromPath(pathname: string): Locale | null {
-  if (pathname === '/') return 'en'
   const firstSegment = pathname.split('/').filter(Boolean)[0]
   return isLocale(firstSegment) ? firstSegment : null
+}
+
+function getLocaleFromSearch(value: string | null): Locale | null {
+  return isLocale(value) ? value : null
 }
 
 interface I18nContextType {
@@ -48,17 +51,24 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined)
 
-export function I18nProvider({
+function I18nStateProvider({
   children,
   initialLocale = defaultLocale,
+  searchLocale,
 }: {
   children: ReactNode
   initialLocale?: Locale
+  searchLocale?: Locale | null
 }) {
   const pathname = usePathname()
-  // The route is the source of truth. Passing it from the server avoids an
-  // English header/footer flash on a fully localized page during hydration.
-  const locale = getLocaleFromPath(pathname || '') || initialLocale || defaultLocale
+  // A locale route takes precedence. On deep pages that do not have a translated
+  // route yet, `?lang=` keeps the user on the same page without losing language
+  // state in shared navigation and controls.
+  const locale = getLocaleFromPath(pathname || '') || searchLocale || initialLocale || defaultLocale
+
+  useEffect(() => {
+    document.documentElement.lang = locale
+  }, [locale])
 
   const setLocale = (newLocale: Locale) => {
     localStorage.setItem('locale', newLocale)
@@ -72,6 +82,36 @@ export function I18nProvider({
     <I18nContext.Provider value={{ locale, setLocale, t }}>
       {children}
     </I18nContext.Provider>
+  )
+}
+
+function I18nProviderWithSearch({
+  children,
+  initialLocale,
+}: {
+  children: ReactNode
+  initialLocale?: Locale
+}) {
+  const searchParams = useSearchParams()
+
+  return (
+    <I18nStateProvider initialLocale={initialLocale} searchLocale={getLocaleFromSearch(searchParams.get('lang'))}>
+      {children}
+    </I18nStateProvider>
+  )
+}
+
+export function I18nProvider({
+  children,
+  initialLocale = defaultLocale,
+}: {
+  children: ReactNode
+  initialLocale?: Locale
+}) {
+  return (
+    <Suspense fallback={<I18nStateProvider initialLocale={initialLocale}>{children}</I18nStateProvider>}>
+      <I18nProviderWithSearch initialLocale={initialLocale}>{children}</I18nProviderWithSearch>
+    </Suspense>
   )
 }
 

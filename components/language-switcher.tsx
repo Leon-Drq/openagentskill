@@ -6,7 +6,6 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useI18n } from '@/lib/i18n/context'
 import { getLanguageSwitchHref } from '@/lib/i18n/market-routing'
 import {
-  isLocale,
   localeNames,
   localeNativeNames,
   localeShortLabels,
@@ -14,12 +13,6 @@ import {
   type Locale,
 } from '@/lib/i18n/config'
 import { cn } from '@/lib/utils'
-
-function getPathLocale(pathname: string): Locale | null {
-  if (pathname === '/') return 'en'
-  const firstSegment = pathname.split('/').filter(Boolean)[0]
-  return isLocale(firstSegment) ? firstSegment : null
-}
 
 interface LanguageSwitcherProps {
   compact?: boolean
@@ -32,8 +25,7 @@ export function LanguageSwitcher({ compact = false, className }: LanguageSwitche
   const router = useRouter()
   const [open, setOpen] = useState(false)
 
-  const pathLocale = getPathLocale(pathname)
-  const activeLocale = pathLocale || locale
+  const activeLocale = locale
 
   const activeLabel = useMemo(() => localeShortLabels[activeLocale], [activeLocale])
 
@@ -43,11 +35,11 @@ export function LanguageSwitcher({ compact = false, className }: LanguageSwitche
     if (nextLocale === activeLocale) return
 
     setLocale(nextLocale)
-    const destination = getLanguageSwitchHref(pathname, nextLocale)
     const query = typeof window === 'undefined' ? '' : window.location.search
-    const href = `${destination}${query}`
+    const hash = typeof window === 'undefined' ? '' : window.location.hash
+    const href = getLanguageSwitchHref(pathname, nextLocale, query, hash)
 
-    if (href !== `${pathname}${query}`) router.push(href)
+    if (href !== `${pathname}${query}${hash}`) router.push(href)
   }
 
   return (

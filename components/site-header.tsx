@@ -227,7 +227,7 @@ export function SiteHeader() {
           <div className="hidden items-center gap-2 xl:flex">
             <GitHubStarButton />
             <Link
-              href="/submit"
+              href={getLocalizedNavigationHref('/submit', locale)}
               className="flex h-9 shrink-0 items-center gap-2 rounded-[8px] border border-border bg-card/70 px-3 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
             >
               <Plus className="h-4 w-4" aria-hidden="true" />

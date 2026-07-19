@@ -19,6 +19,31 @@ function normalizePathname(pathname: string) {
   return normalized.length > 1 ? normalized.replace(/\/+$/, '') : normalized
 }
 
+function splitHref(href: string) {
+  const hashIndex = href.indexOf('#')
+  const hash = hashIndex >= 0 ? href.slice(hashIndex) : ''
+  const beforeHash = hashIndex >= 0 ? href.slice(0, hashIndex) : href
+  const queryIndex = beforeHash.indexOf('?')
+
+  return {
+    pathname: queryIndex >= 0 ? beforeHash.slice(0, queryIndex) : beforeHash,
+    search: queryIndex >= 0 ? beforeHash.slice(queryIndex) : '',
+    hash,
+  }
+}
+
+function withLocalePreference(pathname: string, locale: Locale, search = '', hash = '', usePathLocale = false) {
+  const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search)
+
+  // A locale prefix is authoritative. Query-state is only used for pages that
+  // do not have their own translated route yet.
+  params.delete('lang')
+  if (!usePathLocale && locale !== 'en') params.set('lang', locale)
+
+  const query = params.toString()
+  return `${pathname}${query ? `?${query}` : ''}${hash}`
+}
+
 export function isMarketLocale(locale: Locale): locale is MarketLocale {
   return MARKET_LOCALES.includes(locale as MarketLocale)
 }
@@ -44,31 +69,31 @@ export function getLocalizedCorePath(locale: MarketLocale, page: LocalizedCorePa
 }
 
 export function getLocalizedNavigationHref(href: string, locale: Locale) {
-  const basePath = getBasePathname(href)
-  if (basePath === '/') return localePaths[locale]
+  const { pathname, search, hash } = splitHref(href)
+  const basePath = getBasePathname(pathname)
+  if (basePath === '/') return withLocalePreference(localePaths[locale], locale, search, hash, true)
   const page = basePath.slice(1)
 
-  if (!isLocalizedCorePageSlug(page)) return basePath
-  if (locale === 'en') return basePath
-  if (isMarketLocale(locale)) return getLocalizedCorePath(locale, page)
+  if (locale === 'en') return withLocalePreference(basePath, locale, search, hash)
+  if (isLocalizedCorePageSlug(page) && isMarketLocale(locale)) {
+    return withLocalePreference(getLocalizedCorePath(locale, page), locale, search, hash, true)
+  }
 
-  // The localized core page is not ready in this language yet. Preserve the real destination
-  // instead of sending users to a translated homepage with no matching content.
-  return basePath
+  // Keep the user on the requested destination when a full page translation is
+  // not available. The language preference keeps shared navigation and UI copy
+  // in sync without redirecting a deep link back to the homepage.
+  return withLocalePreference(basePath, locale, search, hash)
 }
 
-export function getLanguageSwitchHref(pathname: string, nextLocale: Locale) {
+export function getLanguageSwitchHref(pathname: string, nextLocale: Locale, search = '', hash = '') {
   const basePath = getBasePathname(pathname)
-  if (basePath === '/') return localePaths[nextLocale]
+  if (basePath === '/') return withLocalePreference(localePaths[nextLocale], nextLocale, search, hash, true)
 
   const page = basePath.slice(1)
-  // A language selection must always produce a visible locale change. Deep pages
-  // without a localized equivalent use the target locale's landing page instead
-  // of silently returning the same URL and leaving the UI in its old language.
-  if (!isLocalizedCorePageSlug(page)) return localePaths[nextLocale]
-  if (nextLocale === 'en') return basePath
-  if (isMarketLocale(nextLocale)) return getLocalizedCorePath(nextLocale, page)
+  if (nextLocale === 'en') return withLocalePreference(basePath, nextLocale, search, hash)
+  if (isLocalizedCorePageSlug(page) && isMarketLocale(nextLocale)) {
+    return withLocalePreference(getLocalizedCorePath(nextLocale, page), nextLocale, search, hash, true)
+  }
 
-  // Avoid a mixed-language deep page until it has a real localized equivalent.
-  return localePaths[nextLocale]
+  return withLocalePreference(basePath, nextLocale, search, hash)
 }
