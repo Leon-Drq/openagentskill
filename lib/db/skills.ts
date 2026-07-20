@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { withTimeout } from '@/lib/async'
 import { unstable_cache } from 'next/cache'
 import type { Skill } from '@/lib/types'
+import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 
 export interface SkillRecord {
   id: string
@@ -52,9 +53,10 @@ const MAX_SKILL_QUERY_LIMIT = 4000
 const ALL_SKILLS_CACHE_TTL_MS = 30 * 1000
 const SHARED_SKILL_CACHE_REVALIDATE_SECONDS = 300
 const CATEGORY_CACHE_REVALIDATE_SECONDS = 3600
-const SKILL_DIRECTORY_REQUEST_TIMEOUT_MS = 6500
+const SKILL_DIRECTORY_REQUEST_TIMEOUT_MS = 1800
 const SKILL_STATS_REQUEST_TIMEOUT_MS = 3000
-const SKILL_LOOKUP_TIMEOUT_MS = 2500
+const SKILL_LOOKUP_TIMEOUT_MS = 1200
+const SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS = 60
 const SITEMAP_SKILLS_CACHE_TTL_MS = 30 * 60 * 1000
 
 // Public directory views do not need private submission contact data or long
@@ -171,9 +173,37 @@ function filterSkillOnly<T extends SkillOnlyScopeRecord>(records: T[]) {
   return records.filter((record) => !isMcpSkillRecord(record))
 }
 
+function getDirectoryFallback(
+  sort: SkillSortMode,
+  category: string | undefined,
+  maxRows: number
+): SkillRecord[] {
+  const rows = filterSkillOnly(CURATED_SKILL_SNAPSHOT)
+    .filter((skill) => !category || skill.category === category)
+    .slice()
+
+  rows.sort((left, right) => {
+    if (sort === 'stars') return Number(right.github_stars || 0) - Number(left.github_stars || 0)
+    if (sort === 'downloads') return Number(right.downloads || 0) - Number(left.downloads || 0)
+    if (sort === 'new' || sort === 'fresh') {
+      return Date.parse(right.github_last_pushed_at || right.updated_at) - Date.parse(left.github_last_pushed_at || left.updated_at)
+    }
+    return Number(right.quality_score || 0) - Number(left.quality_score || 0)
+  })
+
+  return rows.slice(0, maxRows)
+}
+
 const getSharedAllSkills = unstable_cache(
-  async (sort: SkillSortMode, category: string | null, maxRows: number) =>
-    fetchAllSkills(sort, category || undefined, maxRows),
+  async (sort: SkillSortMode, category: string | null, maxRows: number) => {
+    try {
+      return await fetchAllSkills(sort, category || undefined, maxRows)
+    } catch {
+      // A bounded curated directory keeps navigation and agent flows useful
+      // while the primary database is slow or temporarily unavailable.
+      return getDirectoryFallback(sort, category || undefined, maxRows)
+    }
+  },
   ['public-skill-directory-v4'],
   {
     revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS,
@@ -749,32 +779,53 @@ export async function getCategories(): Promise<string[]> {
   return getCachedCategories().catch(() => [])
 }
 
-export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> {
-  const supabase = createPublicClient()
+function normalizeSkillLookupSlug(slug: string) {
+  const normalized = slug.trim().toLowerCase()
+  return /^[a-z0-9][a-z0-9-]{0,159}$/.test(normalized) ? normalized : null
+}
 
-  const { data, error } = await withTimeout(
-    supabase
+// Detail pages, badges, manifests, and social crawlers all resolve skills by
+// slug. Cache both matches and misses so repeated stale links do not consume a
+// database connection on every request. A short TTL keeps new approvals and
+// corrections visible quickly.
+const getCachedSkillBySlug = unstable_cache(
+  async (slug: string): Promise<SkillRecord | null> => {
+    const supabase = createPublicClient({ requestTimeoutMs: SKILL_LOOKUP_TIMEOUT_MS })
+    const { data, error } = await supabase
       .from('skills')
       .select('*')
       .eq('slug', slug)
       .eq('ai_review_approved', true)
-      .maybeSingle(),
-    SKILL_LOOKUP_TIMEOUT_MS,
-    `skill lookup ${slug}`
-  ).catch((lookupError) => {
-    console.warn('Skill lookup fallback:', lookupError)
-    return { data: null, error: lookupError }
-  })
-  
-  if (error || !data || isMcpSkillRecord(data)) return null
-  return data
+      .maybeSingle()
+
+    if (error || !data || isMcpSkillRecord(data)) return null
+    return data as SkillRecord
+  },
+  ['public-skill-by-slug-v2'],
+  {
+    revalidate: SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS,
+    tags: ['public-skill-directory'],
+  }
+)
+
+export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> {
+  const normalized = normalizeSkillLookupSlug(slug)
+  if (!normalized) return null
+
+  try {
+    return await getCachedSkillBySlug(normalized)
+  } catch {
+    // A missing or temporarily unavailable detail must not slow down the
+    // registry. Curated callers can still provide their static fallback.
+    return null
+  }
 }
 
 export async function getSkillsBySlugs(slugs: string[]): Promise<SkillRecord[]> {
   const normalizedSlugs = Array.from(new Set(slugs.map((slug) => slug.trim()).filter(Boolean)))
   if (!normalizedSlugs.length) return []
 
-  const supabase = createPublicClient()
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_LOOKUP_TIMEOUT_MS })
   const { data, error } = await withTimeout(
     supabase
       .from('skills')
@@ -905,7 +956,15 @@ async function fetchSearchSkills(normalizedQuery: string, limit: number): Promis
 }
 
 const getCachedSearchSkills = unstable_cache(
-  async (normalizedQuery: string, limit: number) => fetchSearchSkills(normalizedQuery, limit),
+  async (normalizedQuery: string, limit: number) => {
+    try {
+      return await fetchSearchSkills(normalizedQuery, limit)
+    } catch {
+      // The ranked directory candidate pool still answers the request when an
+      // exact database search is unavailable.
+      return [] as SkillRecord[]
+    }
+  },
   ['public-skill-search-v3'],
   { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
