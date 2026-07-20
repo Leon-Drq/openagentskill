@@ -57,7 +57,10 @@ const SKILL_DIRECTORY_REQUEST_TIMEOUT_MS = 1800
 const SKILL_STATS_REQUEST_TIMEOUT_MS = 3000
 const SKILL_LOOKUP_TIMEOUT_MS = 1200
 const SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS = 60
-const SITEMAP_QUERY_TIMEOUT_MS = 1800
+// Sitemap refreshes run off the interactive navigation path. Give a cold
+// registry shard enough time to return the complete URL set, then let the
+// shared and edge caches keep that work away from visitors.
+const SITEMAP_QUERY_TIMEOUT_MS = 6500
 const SITEMAP_CACHE_REVALIDATE_SECONDS = 3600
 
 // Public directory views do not need private submission contact data or long
@@ -321,7 +324,7 @@ const getCachedApprovedSkillSitemapRecords = unstable_cache(
       return getSitemapFallbackRecords(offset, limit, minStars)
     }
   },
-  ['approved-sitemap-records-v2'],
+  ['approved-sitemap-records-v3'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-records'],
@@ -336,7 +339,7 @@ const getCachedApprovedSkillSitemapCount = unstable_cache(
       return getSitemapFallbackRecords(0, CURATED_SKILL_SNAPSHOT.length, minStars).length
     }
   },
-  ['approved-sitemap-count-v2'],
+  ['approved-sitemap-count-v3'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-count'],

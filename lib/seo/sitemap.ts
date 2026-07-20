@@ -22,7 +22,7 @@ import { USE_CASES } from '@/lib/use-cases'
 
 export const SITEMAP_BASE_URL = 'https://www.openagentskill.com'
 export const SITEMAP_CHUNK_SIZE = 4000
-const SITEMAP_SKILL_QUERY_TIMEOUT_MS = 2400
+const SITEMAP_SKILL_QUERY_TIMEOUT_MS = 7200
 
 export interface SitemapEntry {
   url: string
