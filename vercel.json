@@ -2,11 +2,11 @@
   "crons": [
     {
       "path": "/api/indexer/refresh-stars",
-      "schedule": "0 3 * * *"
+      "schedule": "30 2 * * *"
     },
     {
       "path": "/api/indexnow/submit",
-      "schedule": "15 3 * * *"
+      "schedule": "10 3 * * *"
     },
     {
       "path": "/api/cron/seo-hourly",

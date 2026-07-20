@@ -97,10 +97,13 @@ async function findSkillsNeedingBlog(
 }
 
 export async function runSeoDrip(options: SeoDripOptions = {}): Promise<SeoDripResult> {
-  const supabase = createAdminClient()
+  // Background generation should yield quickly during a transient database
+  // incident instead of tying up a serverless worker that competes with page
+  // traffic. The next hourly run will safely retry.
+  const supabase = createAdminClient({ requestTimeoutMs: 12_000 })
   const dailyLimit = Math.min(Math.max(options.dailyLimit ?? numberFromEnv('SEO_DRIP_DAILY_LIMIT', 50), 1), 100)
   const perRun = Math.min(Math.max(options.perRun ?? numberFromEnv('SEO_DRIP_PER_RUN', 2), 1), 5)
-  const candidatePool = Math.min(Math.max(options.candidatePool ?? numberFromEnv('SEO_DRIP_CANDIDATE_POOL', 240), 20), 1000)
+  const candidatePool = Math.min(Math.max(options.candidatePool ?? numberFromEnv('SEO_DRIP_CANDIDATE_POOL', 120), 20), 300)
   const window = utcDayWindow()
   const alreadyGeneratedToday = await countPostsToday(supabase, window)
   const remainingToday = Math.max(0, dailyLimit - alreadyGeneratedToday)

@@ -437,9 +437,28 @@ const getCachedSkillStats = unstable_cache(
   { revalidate: SKILLS_PAGE_REVALIDATE }
 )
 
+type CachedSkillCandidates = {
+  records: SkillRecord[]
+  degraded: boolean
+}
+
 function getCachedSkillCandidates(sort: SkillSortMode, category: string | undefined, limit: number) {
   return unstable_cache(
-    async () => getAllSkills(sort, category, limit),
+    async (): Promise<CachedSkillCandidates> => {
+      try {
+        return {
+          records: await getAllSkills(sort, category, limit),
+          degraded: false,
+        }
+      } catch {
+        // Cache a compact known-good fallback instead of repeatedly throwing
+        // during Supabase recovery. The next revalidation can replace it.
+        return {
+          records: getFallbackSkills(sort, category, limit),
+          degraded: true,
+        }
+      }
+    },
     ['skills-page-candidates-v3', sort, category || 'all', String(limit)],
     { revalidate: SKILLS_PAGE_REVALIDATE }
   )()
@@ -447,7 +466,7 @@ function getCachedSkillCandidates(sort: SkillSortMode, category: string | undefi
 
 function getCachedSearchSkillCandidates(query: string, limit: number) {
   return unstable_cache(
-    async () => searchSkills(query, limit),
+    async () => searchSkills(query, limit).catch(() => []),
     ['skills-page-search-candidates-v1', query.trim().toLowerCase(), String(limit)],
     { revalidate: SKILLS_PAGE_REVALIDATE }
   )()
@@ -485,14 +504,11 @@ function getFallbackSkills(sort: SkillSortMode, category: string | undefined, li
 
 async function getSkillsPageRecords(sort: SkillSortMode, category: string | undefined, limit: number) {
   try {
-    return {
-      records: await withTimeout(
-        getCachedSkillCandidates(sort, category, limit),
-        SKILLS_PAGE_QUERY_TIMEOUT_MS,
-        'skills candidate query'
-      ),
-      degraded: false,
-    }
+    return await withTimeout(
+      getCachedSkillCandidates(sort, category, limit),
+      SKILLS_PAGE_QUERY_TIMEOUT_MS,
+      'skills candidate query'
+    )
   } catch (error) {
     console.warn('Skills page database fallback:', error)
     return {
