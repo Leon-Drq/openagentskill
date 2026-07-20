@@ -325,7 +325,7 @@ const getCachedApprovedSkillSitemapRecords = unstable_cache(
       return getSitemapFallbackRecords(offset, limit, minStars)
     }
   },
-  ['approved-sitemap-records-v4'],
+  ['approved-sitemap-records-v5'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-records'],
@@ -340,7 +340,7 @@ const getCachedApprovedSkillSitemapCount = unstable_cache(
       return getSitemapFallbackRecords(0, CURATED_SKILL_SNAPSHOT.length, minStars).length
     }
   },
-  ['approved-sitemap-count-v4'],
+  ['approved-sitemap-count-v5'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-count'],

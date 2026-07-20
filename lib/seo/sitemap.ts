@@ -21,7 +21,10 @@ import { SKILL_PACKS } from '@/lib/skill-packs'
 import { USE_CASES } from '@/lib/use-cases'
 
 export const SITEMAP_BASE_URL = 'https://www.openagentskill.com'
-export const SITEMAP_CHUNK_SIZE = 4000
+// Supabase's public API pages the catalog at 1,000 rows. Matching sitemap
+// shards to that boundary keeps one crawler request to one indexed read,
+// instead of serially waiting on four reads and falling back to a tiny sitemap.
+export const SITEMAP_CHUNK_SIZE = 1000
 const SITEMAP_SKILL_QUERY_TIMEOUT_MS = 7200
 
 export interface SitemapEntry {
