@@ -4,7 +4,6 @@ import { SKILL_STACKS } from '@/lib/collections'
 import {
   getApprovedSkillSitemapCount,
   getApprovedSkillSitemapRecords,
-  type SkillSitemapRecord,
 } from '@/lib/db/skills'
 import { getRankingDefinitions } from '@/lib/rankings'
 import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
@@ -23,7 +22,7 @@ import { USE_CASES } from '@/lib/use-cases'
 
 export const SITEMAP_BASE_URL = 'https://www.openagentskill.com'
 export const SITEMAP_CHUNK_SIZE = 4000
-const SITEMAP_SKILL_QUERY_TIMEOUT_MS = 8000
+const SITEMAP_SKILL_QUERY_TIMEOUT_MS = 2400
 
 export interface SitemapEntry {
   url: string
@@ -71,8 +70,7 @@ async function getSitemapSkillCount(minStars = 0) {
     getApprovedSkillSitemapCount(minStars),
     SITEMAP_SKILL_QUERY_TIMEOUT_MS,
     `sitemap approved skills count${minStars ? ` ${minStars}+` : ''}`
-  ).catch((error) => {
-    console.warn('Sitemap skill count fallback:', error)
+  ).catch(() => {
     return fallbackSkillRecords(minStars).length
   })
 }
@@ -88,8 +86,7 @@ export async function getSitemapSkillRecords(index = 0, minStars = 0) {
     }),
     SITEMAP_SKILL_QUERY_TIMEOUT_MS,
     `sitemap approved skills page ${index}${minStars ? ` ${minStars}+` : ''}`
-  ).catch((error) => {
-    console.warn('Sitemap skill page fallback:', error)
+  ).catch(() => {
     return fallbackSkillRecords(minStars).slice(offset, offset + SITEMAP_CHUNK_SIZE)
   })
 }

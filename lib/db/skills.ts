@@ -57,7 +57,8 @@ const SKILL_DIRECTORY_REQUEST_TIMEOUT_MS = 1800
 const SKILL_STATS_REQUEST_TIMEOUT_MS = 3000
 const SKILL_LOOKUP_TIMEOUT_MS = 1200
 const SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS = 60
-const SITEMAP_SKILLS_CACHE_TTL_MS = 30 * 60 * 1000
+const SITEMAP_QUERY_TIMEOUT_MS = 1800
+const SITEMAP_CACHE_REVALIDATE_SECONDS = 3600
 
 // Public directory views do not need private submission contact data or long
 // editorial suggestions. Keeping that payload out of high-volume list reads
@@ -115,34 +116,18 @@ export type SkillSitemapRecord = Pick<
   | 'updated_at'
 >
 
-type SkillSitemapCacheEntry = {
-  expiresAt: number
-  value?: SkillSitemapRecord[]
-  promise?: Promise<SkillSitemapRecord[]>
-}
-
-const skillSitemapCache = new Map<string, SkillSitemapCacheEntry>()
-
-type SkillSitemapCountCacheEntry = {
-  expiresAt: number
-  value?: number
-  promise?: Promise<number>
-}
-
-const skillSitemapCountCache = new Map<string, SkillSitemapCountCacheEntry>()
-
 export interface SkillSitemapQueryOptions {
   offset?: number
   limit?: number
   minStars?: number
 }
 
-function createSitemapClient() {
+function createSitemapClient(requestTimeoutMs = SITEMAP_QUERY_TIMEOUT_MS) {
   if (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY) {
-    return createAdminClient()
+    return createAdminClient({ requestTimeoutMs })
   }
 
-  return createPublicClient()
+  return createPublicClient({ requestTimeoutMs })
 }
 
 function isMcpText(value: string) {
@@ -307,40 +292,67 @@ async function fetchAllSkills(
   return filterSkillOnly(rows)
 }
 
+function getSitemapFallbackRecords(
+  offset: number,
+  limit: number,
+  minStars: number
+): SkillSitemapRecord[] {
+  return CURATED_SKILL_SNAPSHOT
+    .filter((skill) => Number(skill.github_stars || 0) >= minStars)
+    .sort((left, right) => Number(right.github_stars || 0) - Number(left.github_stars || 0))
+    .slice(offset, offset + limit)
+    .map((skill) => ({
+      slug: skill.slug,
+      github_stars: skill.github_stars,
+      github_last_pushed_at: skill.github_last_pushed_at,
+      updated_at: skill.updated_at,
+    }))
+}
+
+// Sitemap traffic is bot-heavy and arrives across many server instances. A
+// shared cache prevents every crawler hit from starting its own multi-thousand
+// row database read. On a transient database failure we cache a compact,
+// valid sitemap rather than allowing retries to crowd out interactive routes.
+const getCachedApprovedSkillSitemapRecords = unstable_cache(
+  async (offset: number, limit: number, minStars: number): Promise<SkillSitemapRecord[]> => {
+    try {
+      return await fetchApprovedSkillSitemapRecords({ offset, limit, minStars })
+    } catch {
+      return getSitemapFallbackRecords(offset, limit, minStars)
+    }
+  },
+  ['approved-sitemap-records-v2'],
+  {
+    revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
+    tags: ['approved-sitemap-records'],
+  }
+)
+
+const getCachedApprovedSkillSitemapCount = unstable_cache(
+  async (minStars: number): Promise<number> => {
+    try {
+      return await fetchApprovedSkillSitemapCount(minStars)
+    } catch {
+      return getSitemapFallbackRecords(0, CURATED_SKILL_SNAPSHOT.length, minStars).length
+    }
+  },
+  ['approved-sitemap-count-v2'],
+  {
+    revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
+    tags: ['approved-sitemap-count'],
+  }
+)
+
 export async function getApprovedSkillSitemapRecords(
   options: SkillSitemapQueryOptions = {}
 ): Promise<SkillSitemapRecord[]> {
   const offset = Math.max(0, Math.floor(options.offset || 0))
   const rowLimit = Number.isFinite(options.limit)
     ? Math.max(1, Math.floor(options.limit || 1))
-    : Number.POSITIVE_INFINITY
+    : MAX_SKILL_QUERY_LIMIT
   const minStars = Math.max(0, Math.floor(options.minStars || 0))
-  const cacheKey = `approved-sitemap:${offset}:${rowLimit}:${minStars}`
-  const now = Date.now()
-  const cached = skillSitemapCache.get(cacheKey)
 
-  if (cached && cached.expiresAt > now) {
-    if (cached.value) return cached.value
-    if (cached.promise) return cached.promise
-  }
-
-  const promise = fetchApprovedSkillSitemapRecords({ offset, limit: rowLimit, minStars })
-  skillSitemapCache.set(cacheKey, {
-    expiresAt: now + SITEMAP_SKILLS_CACHE_TTL_MS,
-    promise,
-  })
-
-  try {
-    const value = await promise
-    skillSitemapCache.set(cacheKey, {
-      expiresAt: Date.now() + SITEMAP_SKILLS_CACHE_TTL_MS,
-      value,
-    })
-    return value
-  } catch (error) {
-    skillSitemapCache.delete(cacheKey)
-    throw error
-  }
+  return getCachedApprovedSkillSitemapRecords(offset, rowLimit, minStars)
 }
 
 async function fetchApprovedSkillSitemapRecords(
@@ -377,32 +389,7 @@ async function fetchApprovedSkillSitemapRecords(
 
 export async function getApprovedSkillSitemapCount(minStars = 0): Promise<number> {
   const normalizedMinStars = Math.max(0, Math.floor(minStars || 0))
-  const cacheKey = `approved-sitemap-count:${normalizedMinStars}`
-  const now = Date.now()
-  const cached = skillSitemapCountCache.get(cacheKey)
-
-  if (cached && cached.expiresAt > now) {
-    if (typeof cached.value === 'number') return cached.value
-    if (cached.promise) return cached.promise
-  }
-
-  const promise = fetchApprovedSkillSitemapCount(normalizedMinStars)
-  skillSitemapCountCache.set(cacheKey, {
-    expiresAt: now + SITEMAP_SKILLS_CACHE_TTL_MS,
-    promise,
-  })
-
-  try {
-    const value = await promise
-    skillSitemapCountCache.set(cacheKey, {
-      expiresAt: Date.now() + SITEMAP_SKILLS_CACHE_TTL_MS,
-      value,
-    })
-    return value
-  } catch (error) {
-    skillSitemapCountCache.delete(cacheKey)
-    throw error
-  }
+  return getCachedApprovedSkillSitemapCount(normalizedMinStars)
 }
 
 async function fetchApprovedSkillSitemapCount(minStars: number): Promise<number> {

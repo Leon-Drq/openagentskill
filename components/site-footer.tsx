@@ -1,9 +1,22 @@
 'use client'
 
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 import { BrandMark } from '@/components/brand-mark'
 import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
+
+function FooterLink({
+  href,
+  children,
+  className,
+}: {
+  href: string
+  children: ReactNode
+  className?: string
+}) {
+  return <Link href={href} prefetch={false} className={className}>{children}</Link>
+}
 
 export function SiteFooter() {
   const { t, locale } = useI18n()
@@ -14,10 +27,10 @@ export function SiteFooter() {
       <div className="relative mx-auto max-w-6xl px-6 py-12 sm:py-14">
         <div className="grid gap-10 border-b border-border pb-10 lg:grid-cols-[1.15fr_1.85fr]">
           <div>
-            <Link href={getLocalizedNavigationHref('/', locale)} className="inline-flex items-center gap-2 font-sans text-sm font-semibold tracking-tight transition-opacity hover:opacity-70">
+            <FooterLink href={getLocalizedNavigationHref('/', locale)} className="inline-flex items-center gap-2 font-sans text-sm font-semibold tracking-tight transition-opacity hover:opacity-70">
               <BrandMark className="h-7 w-7" />
               OpenAgentSkill
-            </Link>
+            </FooterLink>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-secondary">
               The skill layer for AI agents: discover, compare, audit, and install reusable capabilities across Codex, Claude Code, Cursor, and agent runtimes.
             </p>
@@ -45,54 +58,54 @@ export function SiteFooter() {
             <div>
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Explore</h2>
               <div className="mt-4 grid gap-2 text-secondary">
-                <Link href={getLocalizedNavigationHref('/skills', locale)} className="hover:text-foreground">{t.nav.skills}</Link>
-                <Link href="/agent-skills" className="hover:text-foreground">Agent Skills</Link>
-                <Link href={getLocalizedNavigationHref('/agent-skill', locale)} className="hover:text-foreground">What Is an Agent Skill?</Link>
-                <Link href="/ai-agent-skills" className="hover:text-foreground">AI Agent Skills</Link>
-                <Link href="/tasks" className="hover:text-foreground">Tasks</Link>
-                <Link href="/skill-packs" className="hover:text-foreground">Skill Packs</Link>
-                <Link href="/best" className="hover:text-foreground">Best Skills</Link>
-                <Link href="/trending" className="hover:text-foreground">Trending</Link>
-                <Link href="/collections" className="hover:text-foreground">Stacks</Link>
-                <Link href="/use-cases" className="hover:text-foreground">Use Cases</Link>
-                <Link href="/agents" className="hover:text-foreground">Agents</Link>
-                <Link href="/agent" className="hover:text-foreground">Agent Entry</Link>
+                <FooterLink href={getLocalizedNavigationHref('/skills', locale)} className="hover:text-foreground">{t.nav.skills}</FooterLink>
+                <FooterLink href="/agent-skills" className="hover:text-foreground">Agent Skills</FooterLink>
+                <FooterLink href={getLocalizedNavigationHref('/agent-skill', locale)} className="hover:text-foreground">What Is an Agent Skill?</FooterLink>
+                <FooterLink href="/ai-agent-skills" className="hover:text-foreground">AI Agent Skills</FooterLink>
+                <FooterLink href="/tasks" className="hover:text-foreground">Tasks</FooterLink>
+                <FooterLink href="/skill-packs" className="hover:text-foreground">Skill Packs</FooterLink>
+                <FooterLink href="/best" className="hover:text-foreground">Best Skills</FooterLink>
+                <FooterLink href="/trending" className="hover:text-foreground">Trending</FooterLink>
+                <FooterLink href="/collections" className="hover:text-foreground">Stacks</FooterLink>
+                <FooterLink href="/use-cases" className="hover:text-foreground">Use Cases</FooterLink>
+                <FooterLink href="/agents" className="hover:text-foreground">Agents</FooterLink>
+                <FooterLink href="/agent" className="hover:text-foreground">Agent Entry</FooterLink>
               </div>
             </div>
 
             <div>
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Trust</h2>
               <div className="mt-4 grid gap-2 text-secondary">
-                <Link href="/compare" className="hover:text-foreground">Compare</Link>
-                <Link href="/safety" className="hover:text-foreground">Safety Gate</Link>
-                <Link href={getLocalizedNavigationHref('/agent-skills-registry', locale)} className="hover:text-foreground">Skills Registry</Link>
-                <Link href="/rankings" className="hover:text-foreground">Rankings</Link>
-                <Link href="/outcomes" className="hover:text-foreground">Outcomes</Link>
-                <Link href="/audits" className="hover:text-foreground">Audits</Link>
-                <Link href="/official" className="hover:text-foreground">Official</Link>
-                <Link href="/reports/weekly" className="hover:text-foreground">Weekly Reports</Link>
-                <Link href="/reports/monthly" className="hover:text-foreground">Monthly Index</Link>
-                <Link href="/reports/state-of-agent-skills-2026" className="hover:text-foreground">State of Agent Skills</Link>
-                <Link href="/compare/openagentskill-vs-skills-sh" className="hover:text-foreground">vs skills.sh</Link>
-                <Link href="/alternatives/agentskills-io" className="hover:text-foreground">AgentSkills.io Alternative</Link>
+                <FooterLink href="/compare" className="hover:text-foreground">Compare</FooterLink>
+                <FooterLink href="/safety" className="hover:text-foreground">Safety Gate</FooterLink>
+                <FooterLink href={getLocalizedNavigationHref('/agent-skills-registry', locale)} className="hover:text-foreground">Skills Registry</FooterLink>
+                <FooterLink href="/rankings" className="hover:text-foreground">Rankings</FooterLink>
+                <FooterLink href="/outcomes" className="hover:text-foreground">Outcomes</FooterLink>
+                <FooterLink href="/audits" className="hover:text-foreground">Audits</FooterLink>
+                <FooterLink href="/official" className="hover:text-foreground">Official</FooterLink>
+                <FooterLink href="/reports/weekly" className="hover:text-foreground">Weekly Reports</FooterLink>
+                <FooterLink href="/reports/monthly" className="hover:text-foreground">Monthly Index</FooterLink>
+                <FooterLink href="/reports/state-of-agent-skills-2026" className="hover:text-foreground">State of Agent Skills</FooterLink>
+                <FooterLink href="/compare/openagentskill-vs-skills-sh" className="hover:text-foreground">vs skills.sh</FooterLink>
+                <FooterLink href="/alternatives/agentskills-io" className="hover:text-foreground">AgentSkills.io Alternative</FooterLink>
               </div>
             </div>
 
             <div>
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Build</h2>
               <div className="mt-4 grid gap-2 text-secondary">
-                <Link href={getLocalizedNavigationHref('/docs', locale)} className="hover:text-foreground">{t.nav.docs}</Link>
-                <Link href="/openagentskill" className="hover:text-foreground">About OpenAgentSkill</Link>
-                <Link href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</Link>
-                <Link href="/llms.txt" prefetch={false} className="hover:text-foreground">llms.txt</Link>
-                <Link href="/openapi.json" prefetch={false} className="hover:text-foreground">OpenAPI</Link>
-	                <Link href="/cli" className="hover:text-foreground">CLI</Link>
-	                <Link href="/creator-kit" className="hover:text-foreground">Creator Kit</Link>
-	                <Link href="/x-kit" className="hover:text-foreground">X Growth Kit</Link>
-	                <Link href="/submit" className="hover:text-foreground">{t.nav.submit}</Link>
-                <Link href="/blog" className="hover:text-foreground">Blog</Link>
-                <Link href="/guides" className="hover:text-foreground">Guides</Link>
-                <Link href="/activity" className="hover:text-foreground">{t.nav.activity}</Link>
+                <FooterLink href={getLocalizedNavigationHref('/docs', locale)} className="hover:text-foreground">{t.nav.docs}</FooterLink>
+                <FooterLink href="/openagentskill" className="hover:text-foreground">About OpenAgentSkill</FooterLink>
+                <FooterLink href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</FooterLink>
+                <FooterLink href="/llms.txt" className="hover:text-foreground">llms.txt</FooterLink>
+                <FooterLink href="/openapi.json" className="hover:text-foreground">OpenAPI</FooterLink>
+                <FooterLink href="/cli" className="hover:text-foreground">CLI</FooterLink>
+                <FooterLink href="/creator-kit" className="hover:text-foreground">Creator Kit</FooterLink>
+                <FooterLink href="/x-kit" className="hover:text-foreground">X Growth Kit</FooterLink>
+                <FooterLink href="/submit" className="hover:text-foreground">{t.nav.submit}</FooterLink>
+                <FooterLink href="/blog" className="hover:text-foreground">Blog</FooterLink>
+                <FooterLink href="/guides" className="hover:text-foreground">Guides</FooterLink>
+                <FooterLink href="/activity" className="hover:text-foreground">{t.nav.activity}</FooterLink>
               </div>
             </div>
           </nav>
@@ -101,7 +114,7 @@ export function SiteFooter() {
         <div className="flex flex-col gap-3 pt-6 font-mono text-[11px] uppercase tracking-[0.18em] text-secondary sm:flex-row sm:items-center sm:justify-between">
           <span>OpenAgentSkill Registry</span>
           <div className="flex flex-wrap items-center gap-4">
-            <Link href="/privacy" className="transition-colors hover:text-foreground">Privacy</Link>
+            <FooterLink href="/privacy" className="transition-colors hover:text-foreground">Privacy</FooterLink>
             <span>Built for agent-native discovery</span>
           </div>
         </div>

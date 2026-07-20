@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { Check, ChevronDown, Globe2 } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useI18n } from '@/lib/i18n/context'
@@ -24,6 +24,7 @@ export function LanguageSwitcher({ compact = false, className }: LanguageSwitche
   const pathname = usePathname()
   const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [, startTransition] = useTransition()
 
   const activeLocale = locale
 
@@ -53,7 +54,10 @@ export function LanguageSwitcher({ compact = false, className }: LanguageSwitche
       return
     }
 
-    if (href !== `${pathname}${query}${hash}`) router.replace(href)
+    if (href !== `${pathname}${query}${hash}`) {
+      // Keep the picker responsive while a translated route is streamed.
+      startTransition(() => router.replace(href, { scroll: false }))
+    }
   }
 
   return (

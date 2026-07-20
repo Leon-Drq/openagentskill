@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { unstable_cache } from 'next/cache'
 import { ArrowRight, Search } from 'lucide-react'
 import { LocalizedResolveWorkbench } from '@/components/localized-resolve-workbench'
 import { MarketingButtonLink, MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
@@ -8,13 +9,25 @@ import { getLocalizedCorePath, type LocalizedCorePageSlug, type MarketLocale } f
 import { formatCompactNumber } from '@/lib/quality'
 import { getSkillTrustProfileV5 } from '@/lib/trust'
 
+const LOCALIZED_SKILL_LIST_REVALIDATE_SECONDS = 300
+
+const getCachedLocalizedSkillList = unstable_cache(
+  async (page: 'skills' | 'agent-skills-registry') =>
+    getAllSkills('quality', undefined, page === 'skills' ? 12 : 6).catch(() => []),
+  ['localized-core-skill-list-v2'],
+  { revalidate: LOCALIZED_SKILL_LIST_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
+)
+
 function skillListForPage(page: LocalizedCorePageSlug, query?: string) {
   if (page !== 'skills' && page !== 'agent-skills-registry') return Promise.resolve([] as SkillRecord[])
 
   const normalizedQuery = query?.trim()
   if (normalizedQuery) return searchSkills(normalizedQuery, 12).catch(() => [])
 
-  return getAllSkills('quality', undefined, page === 'skills' ? 12 : 6).catch(() => [])
+  // German, Spanish, and Indonesian core pages show the same ranked skills.
+  // Sharing this cache means a language switch does not start another database
+  // request for an otherwise identical skill list.
+  return getCachedLocalizedSkillList(page)
 }
 
 function SkillCards({
