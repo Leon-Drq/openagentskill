@@ -34,12 +34,26 @@ export function LanguageSwitcher({ compact = false, className }: LanguageSwitche
 
     if (nextLocale === activeLocale) return
 
-    setLocale(nextLocale)
     const query = typeof window === 'undefined' ? '' : window.location.search
     const hash = typeof window === 'undefined' ? '' : window.location.hash
     const href = getLanguageSwitchHref(pathname, nextLocale, query, hash)
 
-    if (href !== `${pathname}${query}${hash}`) router.push(href)
+    setLocale(nextLocale)
+
+    if (typeof window === 'undefined') return
+
+    const target = new URL(href, window.location.origin)
+
+    // Most deep pages currently keep their content route and store the locale
+    // preference in ?lang=. Updating that preference locally keeps the header,
+    // menu, and next navigation responsive without waiting for a second server
+    // render of the exact same page.
+    if (target.pathname === window.location.pathname) {
+      window.history.replaceState(window.history.state, '', `${target.pathname}${target.search}${target.hash}`)
+      return
+    }
+
+    if (href !== `${pathname}${query}${hash}`) router.replace(href)
   }
 
   return (

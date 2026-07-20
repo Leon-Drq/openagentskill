@@ -1,6 +1,7 @@
 import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { withTimeout } from '@/lib/async'
+import { unstable_cache } from 'next/cache'
 import type { Skill } from '@/lib/types'
 
 export interface SkillRecord {
@@ -46,9 +47,55 @@ export interface SkillRecord {
 export type SkillSortMode = 'quality' | 'downloads' | 'stars' | 'new' | 'trending' | 'fresh'
 
 const SKILLS_PAGE_SIZE = 1000
-const ALL_SKILLS_CACHE_TTL_MS = 5 * 60 * 1000
+const DEFAULT_SKILL_QUERY_LIMIT = 1200
+const MAX_SKILL_QUERY_LIMIT = 4000
+const ALL_SKILLS_CACHE_TTL_MS = 30 * 1000
+const SHARED_SKILL_CACHE_REVALIDATE_SECONDS = 300
+const CATEGORY_CACHE_REVALIDATE_SECONDS = 3600
+const SKILL_DIRECTORY_REQUEST_TIMEOUT_MS = 6500
+const SKILL_STATS_REQUEST_TIMEOUT_MS = 3000
 const SKILL_LOOKUP_TIMEOUT_MS = 2500
 const SITEMAP_SKILLS_CACHE_TTL_MS = 30 * 60 * 1000
+
+// Public directory views do not need private submission contact data or long
+// editorial suggestions. Keeping that payload out of high-volume list reads
+// makes the same data much cheaper to cache and send to pages.
+const SKILL_DIRECTORY_SELECT = [
+  'id',
+  'slug',
+  'name',
+  'description',
+  'tagline',
+  'author_name',
+  'author_url',
+  'repository',
+  'github_repo',
+  'github_stars',
+  'github_forks',
+  'category',
+  'tags',
+  'frameworks',
+  'version',
+  'license',
+  'install_command',
+  'npm_package',
+  'verified',
+  'submission_source',
+  'submitted_by_agent',
+  'ai_review_score',
+  'ai_review_approved',
+  'ai_review_issues',
+  'downloads',
+  'used_by',
+  'rating',
+  'review_count',
+  'quality_score',
+  'quality_signals',
+  'github_language',
+  'github_last_pushed_at',
+  'created_at',
+  'updated_at',
+].join(',')
 
 type AllSkillsCacheEntry = {
   expiresAt: number
@@ -124,22 +171,42 @@ function filterSkillOnly<T extends SkillOnlyScopeRecord>(records: T[]) {
   return records.filter((record) => !isMcpSkillRecord(record))
 }
 
+const getSharedAllSkills = unstable_cache(
+  async (sort: SkillSortMode, category: string | null, maxRows: number) =>
+    fetchAllSkills(sort, category || undefined, maxRows),
+  ['public-skill-directory-v4'],
+  {
+    revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS,
+    tags: ['public-skill-directory'],
+  }
+)
+
 export async function getAllSkills(
   sort: SkillSortMode = 'quality',
   category?: string,
-  maxRows = Number.POSITIVE_INFINITY
+  maxRows = DEFAULT_SKILL_QUERY_LIMIT
 ): Promise<SkillRecord[]> {
-  const rowLimit = Number.isFinite(maxRows) ? Math.max(1, Math.floor(maxRows)) : Number.POSITIVE_INFINITY
-  const cacheKey = `${sort}:${category || 'all'}:${rowLimit}`
+  // Never let a page route load the complete registry. Listing, ranking, and
+  // resolve flows need a bounded candidate set; the sitemap has its own
+  // streaming query below for the rare whole-registry case.
+  const rowLimit = Number.isFinite(maxRows)
+    ? Math.min(MAX_SKILL_QUERY_LIMIT, Math.max(1, Math.floor(maxRows)))
+    : DEFAULT_SKILL_QUERY_LIMIT
+  const normalizedCategory = category && category !== 'all' ? category : null
+  // Most public pages ask for a small subset of the same quality-ranked
+  // directory. Back those calls with one bounded source cache and slice it in
+  // memory instead of issuing independent 180/250/1200 row queries.
+  const sourceLimit = rowLimit <= DEFAULT_SKILL_QUERY_LIMIT ? DEFAULT_SKILL_QUERY_LIMIT : rowLimit
+  const cacheKey = `${sort}:${normalizedCategory || 'all'}:${sourceLimit}`
   const now = Date.now()
   const cached = allSkillsCache.get(cacheKey)
 
   if (cached && cached.expiresAt > now) {
-    if (cached.value) return cached.value
-    if (cached.promise) return cached.promise
+    if (cached.value) return cached.value.slice(0, rowLimit)
+    if (cached.promise) return cached.promise.then((value) => value.slice(0, rowLimit))
   }
 
-  const promise = fetchAllSkills(sort, category, rowLimit)
+  const promise = getSharedAllSkills(sort, normalizedCategory, sourceLimit)
   allSkillsCache.set(cacheKey, {
     expiresAt: now + ALL_SKILLS_CACHE_TTL_MS,
     promise,
@@ -151,7 +218,7 @@ export async function getAllSkills(
       expiresAt: Date.now() + ALL_SKILLS_CACHE_TTL_MS,
       value,
     })
-    return value
+    return value.slice(0, rowLimit)
   } catch (error) {
     allSkillsCache.delete(cacheKey)
     throw error
@@ -161,9 +228,9 @@ export async function getAllSkills(
 async function fetchAllSkills(
   sort: SkillSortMode = 'quality',
   category?: string,
-  maxRows = Number.POSITIVE_INFINITY
+  maxRows = DEFAULT_SKILL_QUERY_LIMIT
 ): Promise<SkillRecord[]> {
-  const supabase = createPublicClient()
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_DIRECTORY_REQUEST_TIMEOUT_MS })
   const rows: SkillRecord[] = []
 
   for (let from = 0; ; from += SKILLS_PAGE_SIZE) {
@@ -172,7 +239,7 @@ async function fetchAllSkills(
     const pageSize = Math.min(SKILLS_PAGE_SIZE, remaining)
     let query = supabase
       .from('skills')
-      .select('*')
+      .select(SKILL_DIRECTORY_SELECT)
       .eq('ai_review_approved', true)
 
     if (category && category !== 'all') {
@@ -203,7 +270,7 @@ async function fetchAllSkills(
     if (error) throw error
     if (!data?.length) break
 
-    rows.push(...(data as SkillRecord[]))
+    rows.push(...(data as unknown as SkillRecord[]))
     if (data.length < pageSize) break
   }
 
@@ -431,11 +498,12 @@ export interface SkillClaimRecord {
  * 获取所有 skill 的 Agent 调用统计
  * 返回以 slug 为 key 的 map
  */
-export async function getSkillStats(): Promise<Record<string, SkillAgentStats>> {
-  const supabase = createPublicClient()
+const getCachedSkillStats = unstable_cache(
+  async (): Promise<Record<string, SkillAgentStats>> => {
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_STATS_REQUEST_TIMEOUT_MS })
   const { data, error } = await supabase.from('skill_stats').select('*')
   if (error || !data) return {}
-  
+
   const map: Record<string, SkillAgentStats> = {}
   for (const row of data) {
     map[row.skill_slug] = {
@@ -448,10 +516,18 @@ export async function getSkillStats(): Promise<Record<string, SkillAgentStats>> 
     }
   }
   return map
+  },
+  ['public-skill-agent-stats-v2'],
+  { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-stats'] }
+)
+
+export async function getSkillStats(): Promise<Record<string, SkillAgentStats>> {
+  return getCachedSkillStats().catch(() => ({}))
 }
 
-export async function getAgentOutcomeStatsMap(): Promise<Record<string, SkillOutcomeStats>> {
-  const supabase = createPublicClient()
+const getCachedAgentOutcomeStatsMap = unstable_cache(
+  async (): Promise<Record<string, SkillOutcomeStats>> => {
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_STATS_REQUEST_TIMEOUT_MS })
   const { data, error } = await supabase.from('agent_outcome_stats').select('*')
   if (error || !data) return {}
 
@@ -487,6 +563,13 @@ export async function getAgentOutcomeStatsMap(): Promise<Record<string, SkillOut
     }
   }
   return map
+  },
+  ['public-agent-outcome-stats-v2'],
+  { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-outcomes'] }
+)
+
+export async function getAgentOutcomeStatsMap(): Promise<Record<string, SkillOutcomeStats>> {
+  return getCachedAgentOutcomeStatsMap().catch(() => ({}))
 }
 
 export async function getAgentOutcomeStats(skillSlug: string): Promise<SkillOutcomeStats | null> {
@@ -529,8 +612,9 @@ export async function getAgentOutcomeStats(skillSlug: string): Promise<SkillOutc
   }
 }
 
-export async function getSkillEventStatsMap(): Promise<Record<string, SkillEventStats>> {
-  const supabase = createPublicClient()
+const getCachedSkillEventStatsMap = unstable_cache(
+  async (): Promise<Record<string, SkillEventStats>> => {
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_STATS_REQUEST_TIMEOUT_MS })
   const { data, error } = await supabase.from('skill_event_stats').select('*')
   if (error || !data) return {}
 
@@ -539,6 +623,13 @@ export async function getSkillEventStatsMap(): Promise<Record<string, SkillEvent
     map[row.skill_slug] = row
   }
   return map
+  },
+  ['public-skill-event-stats-v2'],
+  { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-events'] }
+)
+
+export async function getSkillEventStatsMap(): Promise<Record<string, SkillEventStats>> {
+  return getCachedSkillEventStatsMap().catch(() => ({}))
 }
 
 export async function getSkillEventStats(skillSlug: string): Promise<SkillEventStats | null> {
@@ -625,25 +716,37 @@ export async function getApprovedClaimBySkillSlug(skillSlug: string): Promise<Sk
   return data as SkillClaimRecord
 }
 
+const getCachedCategories = unstable_cache(
+  async (): Promise<string[]> => {
+    const supabase = createPublicClient({ requestTimeoutMs: SKILL_STATS_REQUEST_TIMEOUT_MS })
+    const categories = new Set<string>()
+
+    // Category values change infrequently. A capped, shared scan is much less
+    // expensive than walking every approved row for every /skills request.
+    for (let from = 0; from < MAX_SKILL_QUERY_LIMIT; from += SKILLS_PAGE_SIZE) {
+      const { data, error } = await supabase
+        .from('skills')
+        .select('category')
+        .eq('ai_review_approved', true)
+        .range(from, from + SKILLS_PAGE_SIZE - 1)
+
+      if (error || !data?.length) break
+      for (const row of data) {
+        if (row.category) categories.add(row.category)
+      }
+      if (data.length < SKILLS_PAGE_SIZE) break
+    }
+
+    return [...categories]
+      .filter((category) => !isMcpText(category))
+      .sort()
+  },
+  ['public-skill-categories-v2'],
+  { revalidate: CATEGORY_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
+)
+
 export async function getCategories(): Promise<string[]> {
-  const supabase = createPublicClient()
-  const categories: string[] = []
-
-  for (let from = 0; ; from += SKILLS_PAGE_SIZE) {
-    const { data, error } = await supabase
-      .from('skills')
-      .select('category')
-      .eq('ai_review_approved', true)
-      .range(from, from + SKILLS_PAGE_SIZE - 1)
-
-    if (error || !data?.length) break
-    categories.push(...data.map((r) => r.category).filter(Boolean))
-    if (data.length < SKILLS_PAGE_SIZE) break
-  }
-
-  const unique = [...new Set(categories)]
-    .filter((category) => !isMcpText(category))
-  return unique.sort()
+  return getCachedCategories().catch(() => [])
 }
 
 export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> {
@@ -729,16 +832,13 @@ export async function createSubmissionRecord(submission: {
   return data
 }
 
-export async function searchSkills(query: string, limit = 120): Promise<SkillRecord[]> {
-  const supabase = createPublicClient()
-  const normalizedQuery = query.trim().replace(/[%_,{},()]/g, ' ')
-  if (!normalizedQuery) return []
-
+function getSearchTerms(normalizedQuery: string) {
   const stopWords = new Set([
     'about', 'agent', 'agents', 'and', 'for', 'from', 'into', 'need', 'right', 'skill', 'skills',
     'that', 'the', 'this', 'use', 'using', 'want', 'what', 'when', 'with',
   ])
-  const queryTerms = Array.from(
+
+  const terms = Array.from(
     new Set(
       normalizedQuery
         .toLowerCase()
@@ -747,31 +847,75 @@ export async function searchSkills(query: string, limit = 120): Promise<SkillRec
         .filter((term) => term.length >= 3 && !stopWords.has(term))
     )
   ).slice(0, 5)
-  const searchTerms = queryTerms.length > 0 ? queryTerms : [normalizedQuery]
-  const fields = [
-    'name',
-    'description',
-    'long_description',
-    'tagline',
-    'category',
-    'github_repo',
-    'repository',
-    'install_command',
-  ]
+
+  return terms.length > 0 ? terms : [normalizedQuery]
+}
+
+function isMissingSearchDocumentError(error: unknown) {
+  if (!error || typeof error !== 'object') return false
+  const message = `${(error as { code?: string }).code || ''} ${(error as { message?: string }).message || ''}`
+  return /search_document|42703/i.test(message)
+}
+
+async function searchSkillsWithLegacyFilter(
+  searchTerms: string[],
+  limit: number
+): Promise<SkillRecord[]> {
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_DIRECTORY_REQUEST_TIMEOUT_MS })
+  const fields = ['name', 'description', 'long_description', 'tagline', 'category', 'github_repo', 'repository']
   const filter = searchTerms
     .flatMap((term) => fields.map((field) => `${field}.ilike.%${term}%`))
     .join(',')
   const { data, error } = await supabase
     .from('skills')
-    .select('*')
+    .select(SKILL_DIRECTORY_SELECT)
     .eq('ai_review_approved', true)
     .or(filter)
     .order('quality_score', { ascending: false })
-    .limit(Math.min(Math.max(limit, 1), 200))
+    .limit(limit)
 
   if (error) throw error
+  return filterSkillOnly((data || []) as unknown as SkillRecord[])
+}
 
-  return filterSkillOnly((data || []) as SkillRecord[])
+async function fetchSearchSkills(normalizedQuery: string, limit: number): Promise<SkillRecord[]> {
+  const searchTerms = getSearchTerms(normalizedQuery)
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_DIRECTORY_REQUEST_TIMEOUT_MS })
+  const fullTextQuery = searchTerms.map((term) => term.replace(/[^a-z0-9-]/g, '')).filter(Boolean).join(' OR ')
+
+  const { data, error } = await supabase
+    .from('skills')
+    .select(SKILL_DIRECTORY_SELECT)
+    .eq('ai_review_approved', true)
+    .textSearch('search_document', fullTextQuery || normalizedQuery, { config: 'simple', type: 'websearch' })
+    .order('quality_score', { ascending: false })
+    .limit(limit)
+
+  if (error) {
+    // Keep deploys backward compatible while a database migration is rolling
+    // out. Once the generated tsvector exists, normal searches always use the
+    // indexed path above instead of a large ILIKE OR scan.
+    if (isMissingSearchDocumentError(error)) {
+      return searchSkillsWithLegacyFilter(searchTerms, limit)
+    }
+    throw error
+  }
+
+  return filterSkillOnly((data || []) as unknown as SkillRecord[])
+}
+
+const getCachedSearchSkills = unstable_cache(
+  async (normalizedQuery: string, limit: number) => fetchSearchSkills(normalizedQuery, limit),
+  ['public-skill-search-v3'],
+  { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
+)
+
+export async function searchSkills(query: string, limit = 120): Promise<SkillRecord[]> {
+  const normalizedQuery = query.trim().replace(/[%_,{},()]/g, ' ')
+  if (!normalizedQuery) return []
+
+  const rowLimit = Math.min(Math.max(Math.floor(limit) || 1, 1), 200)
+  return getCachedSearchSkills(normalizedQuery.toLowerCase(), rowLimit)
 }
 
 export async function getRelatedSkills(

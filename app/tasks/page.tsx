@@ -7,9 +7,9 @@ import {
   MarketingPageShell,
 } from '@/components/marketing-page'
 import { AGENT_TASKS } from '@/lib/agent-tasks'
-import { getAllSkills } from '@/lib/db/skills'
+import { getApprovedRegistrySkillCount, LAST_VERIFIED_APPROVED_SKILL_COUNT } from '@/lib/registry-stats'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'AI Agent Tasks - OpenAgentSkill',
@@ -32,8 +32,8 @@ function formatNumber(value: number) {
 }
 
 export default async function TasksPage() {
-  const skills = await getAllSkills('quality', undefined, 1200).catch(() => [])
-  const totalStars = skills.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0)
+  const registryCount = await getApprovedRegistrySkillCount(700).catch(() => null)
+  const skillCount = registryCount?.count ?? LAST_VERIFIED_APPROVED_SKILL_COUNT
 
   return (
     <MarketingPageShell>
@@ -56,8 +56,8 @@ export default async function TasksPage() {
             columns="grid-cols-3"
             items={[
               { value: AGENT_TASKS.length, label: 'Tasks' },
-              { value: skills.length.toLocaleString(), label: 'Skills' },
-              { value: formatNumber(totalStars), label: 'Stars' },
+              { value: formatNumber(skillCount), label: 'Indexed skills' },
+              { value: 'API', label: 'Install handoff' },
             ]}
           />
         }

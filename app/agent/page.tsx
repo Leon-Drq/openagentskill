@@ -16,7 +16,7 @@ import {
 } from '@/lib/indexer/high-star-import'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Agent Entry - OpenAgentSkill',

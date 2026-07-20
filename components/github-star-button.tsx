@@ -16,25 +16,51 @@ interface GitHubStarButtonProps {
   compact?: boolean
 }
 
+const REPO_CACHE_KEY = 'openagentskill.github-repo-summary.v1'
+const FALLBACK_REPO: Required<GitHubRepoSummary> = {
+  repo: 'Leon-Drq/openagentskill',
+  url: 'https://github.com/Leon-Drq/openagentskill',
+  stars_label: '0',
+}
+
+function readCachedRepo(): GitHubRepoSummary | null {
+  try {
+    const value = window.sessionStorage.getItem(REPO_CACHE_KEY)
+    if (!value) return null
+    const parsed = JSON.parse(value) as GitHubRepoSummary
+    return parsed.repo && parsed.url && parsed.stars_label ? parsed : null
+  } catch {
+    return null
+  }
+}
+
+function cacheRepo(repo: GitHubRepoSummary) {
+  try {
+    window.sessionStorage.setItem(REPO_CACHE_KEY, JSON.stringify(repo))
+  } catch {
+    // Storage can be unavailable in private browsing; the live response still works.
+  }
+}
+
+function getInitialRepo(): GitHubRepoSummary {
+  if (typeof window === 'undefined') return FALLBACK_REPO
+  return { ...FALLBACK_REPO, ...readCachedRepo() }
+}
+
 export function GitHubStarButton({ className, fullWidth, compact }: GitHubStarButtonProps) {
-  const [repo, setRepo] = useState<GitHubRepoSummary>({
-    repo: 'Leon-Drq/openagentskill',
-    url: 'https://github.com/Leon-Drq/openagentskill',
-    stars_label: '0',
-  })
+  const [repo, setRepo] = useState<GitHubRepoSummary>(getInitialRepo)
 
   useEffect(() => {
     let mounted = true
+    if (readCachedRepo()) return () => { mounted = false }
 
     fetch('/api/github/repo')
       .then((response) => (response.ok ? response.json() : null))
       .then((data: GitHubRepoSummary | null) => {
         if (!mounted || !data) return
-        setRepo((current) => ({
-          repo: data.repo || current.repo,
-          url: data.url || current.url,
-          stars_label: data.stars_label || current.stars_label,
-        }))
+        const next = { ...FALLBACK_REPO, ...data }
+        cacheRepo(next)
+        setRepo(next)
       })
       .catch(() => {
         // Keep the static fallback. The button should never disappear.

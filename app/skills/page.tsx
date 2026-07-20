@@ -10,7 +10,7 @@ import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCaseBySlug, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
 import { dedupeRankedSkills, rankSkillsForQuery } from '@/lib/registry'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 const SITE_URL = 'https://www.openagentskill.com'
 const SKILLS_PAGE_TITLE = 'AI Agent Skills Directory'

@@ -9,7 +9,7 @@ import { getCompareDecisionSummary } from '@/lib/decision'
 import { formatCompactNumber, getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Compare AI Agent Skills | OpenAgentSkill',

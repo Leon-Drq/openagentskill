@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, ReactNode, Suspense, useContext, useEffect } from 'react'
+import { createContext, ReactNode, Suspense, useContext, useEffect, useState } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import type { Locale } from './config'
 import { defaultLocale, isLocale } from './config'
@@ -54,25 +54,23 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined)
 function I18nStateProvider({
   children,
   initialLocale = defaultLocale,
-  searchLocale,
 }: {
   children: ReactNode
   initialLocale?: Locale
-  searchLocale?: Locale | null
 }) {
-  const pathname = usePathname()
-  // A locale route takes precedence. On deep pages that do not have a translated
-  // route yet, `?lang=` keeps the user on the same page without losing language
-  // state in shared navigation and controls.
-  const locale = getLocaleFromPath(pathname || '') || searchLocale || initialLocale || defaultLocale
+  const [locale, setClientLocale] = useState<Locale>(initialLocale)
 
   useEffect(() => {
     document.documentElement.lang = locale
   }, [locale])
 
   const setLocale = (newLocale: Locale) => {
-    localStorage.setItem('locale', newLocale)
-    // Update html lang attribute
+    setClientLocale(newLocale)
+    try {
+      localStorage.setItem('locale', newLocale)
+    } catch {
+      // Private browsing can disable storage. The active session still works.
+    }
     document.documentElement.lang = newLocale
   }
 
@@ -92,10 +90,19 @@ function I18nProviderWithSearch({
   children: ReactNode
   initialLocale?: Locale
 }) {
+  const pathname = usePathname()
   const searchParams = useSearchParams()
+  // Remount only when navigation actually changes the resolved locale. This
+  // avoids a synchronous state update effect on every route change while the
+  // picker can still update the current page immediately in its click handler.
+  const routeLocale =
+    getLocaleFromPath(pathname || '') ||
+    getLocaleFromSearch(searchParams.get('lang')) ||
+    initialLocale ||
+    defaultLocale
 
   return (
-    <I18nStateProvider initialLocale={initialLocale} searchLocale={getLocaleFromSearch(searchParams.get('lang'))}>
+    <I18nStateProvider key={`${pathname}:${routeLocale}`} initialLocale={routeLocale}>
       {children}
     </I18nStateProvider>
   )

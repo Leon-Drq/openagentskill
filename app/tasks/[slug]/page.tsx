@@ -5,16 +5,12 @@ import { InstallCommand } from '@/components/install-command'
 import { SkillInstallTargets } from '@/components/skill-install-targets'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
-import { AGENT_TASKS, getAgentTaskBySlug, selectSkillsForTask } from '@/lib/agent-tasks'
-import { getAllSkills } from '@/lib/db/skills'
+import { getAgentTaskBySlug, selectSkillsForTask } from '@/lib/agent-tasks'
+import { getAllSkills, getSkillsBySlugs, searchSkills, type SkillRecord } from '@/lib/db/skills'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getUseCaseBySlug } from '@/lib/use-cases'
 
-export const dynamic = 'force-dynamic'
-
-export function generateStaticParams() {
-  return AGENT_TASKS.map((task) => ({ slug: task.slug }))
-}
+export const revalidate = 300
 
 export async function generateMetadata({
   params,
@@ -45,6 +41,18 @@ function formatNumber(value: number) {
   return value.toLocaleString()
 }
 
+function mergeSkillCandidates(...pools: SkillRecord[][]) {
+  const bySlug = new Map<string, SkillRecord>()
+
+  for (const pool of pools) {
+    for (const skill of pool) {
+      if (!bySlug.has(skill.slug)) bySlug.set(skill.slug, skill)
+    }
+  }
+
+  return [...bySlug.values()]
+}
+
 export default async function TaskDetailPage({
   params,
 }: {
@@ -54,10 +62,13 @@ export default async function TaskDetailPage({
   const task = getAgentTaskBySlug(slug)
   if (!task) notFound()
 
-  const [skills, useCase] = await Promise.all([
-    getAllSkills('quality', undefined, 1200).catch(() => []),
+  const [featuredSkills, matchedSkills, broadSkills, useCase] = await Promise.all([
+    task.featuredSlugs?.length ? getSkillsBySlugs(task.featuredSlugs).catch(() => []) : Promise.resolve([]),
+    searchSkills(task.keywords.join(' '), 180).catch(() => []),
+    getAllSkills('quality', undefined, 180).catch(() => []),
     Promise.resolve(getUseCaseBySlug(task.useCaseSlug)),
   ])
+  const skills = mergeSkillCandidates(featuredSkills, matchedSkills, broadSkills)
   const ranked = selectSkillsForTask(skills, task, 12)
   const top = ranked[0]?.skill || null
   const alternatives = ranked.slice(1, 7)

@@ -159,7 +159,7 @@ function ForAgentsDropdown({ pathname }: { pathname: string }) {
                 <Link
                   key={item.href}
                   href={getLocalizedNavigationHref(item.href, locale)}
-                  prefetch={item.prefetch}
+                  prefetch={false}
                   role="menuitem"
                   onClick={() => setOpen(false)}
                   className={cn(
@@ -191,7 +191,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/92 backdrop-blur supports-[backdrop-filter]:bg-background/82">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link href={getLocalizedNavigationHref('/', locale)} className="flex min-w-0 shrink-0 items-center gap-2.5 transition-opacity hover:opacity-70">
+        <Link prefetch={false} href={getLocalizedNavigationHref('/', locale)} className="flex min-w-0 shrink-0 items-center gap-2.5 transition-opacity hover:opacity-70">
           <BrandMark className="h-7 w-7 text-foreground" />
           <span className="hidden truncate font-sans text-base font-semibold sm:inline sm:text-lg">
             OpenAgentSkill
@@ -211,6 +211,7 @@ export function SiteHeader() {
                 <Link
                   key={item.href}
                   href={getLocalizedNavigationHref(item.href, locale)}
+                  prefetch={false}
                   className={cn(
                     'flex h-16 items-center border-b-2 border-transparent px-2.5 text-sm transition-colors',
                     active ? 'border-[#006b4f] text-foreground' : 'text-secondary hover:text-foreground'
@@ -228,6 +229,7 @@ export function SiteHeader() {
             <GitHubStarButton />
             <Link
               href={getLocalizedNavigationHref('/submit', locale)}
+              prefetch={false}
               className="flex h-9 shrink-0 items-center gap-2 rounded-[8px] border border-border bg-card/70 px-3 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
