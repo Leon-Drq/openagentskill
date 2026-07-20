@@ -185,7 +185,16 @@ const AGENT_SKILLS_STATS_TIMEOUT_MS = 900
 const AGENT_SKILLS_CANDIDATE_LIMIT = 500
 
 const getCachedAgentSkillCandidatePool = unstable_cache(
-  async () => getAllSkills('quality', undefined, AGENT_SKILLS_CANDIDATE_LIMIT),
+  async () => {
+    try {
+      return await getAllSkills('quality', undefined, AGENT_SKILLS_CANDIDATE_LIMIT)
+    } catch (error) {
+      // Do not let a failed background revalidation turn a recoverable data
+      // issue into an unavailable public API response.
+      console.warn('Agent skills cache fallback:', error)
+      return CURATED_SKILL_SNAPSHOT
+    }
+  },
   ['agent-skills-candidate-pool-v3'],
   { revalidate: 300 }
 )

@@ -16,7 +16,16 @@ const SEARCH_CACHE_HEADERS = {
 }
 
 const getSearchCandidatePool = unstable_cache(
-  async () => getAllSkills('quality', undefined, SEARCH_CANDIDATE_LIMIT),
+  async () => {
+    try {
+      return await getAllSkills('quality', undefined, SEARCH_CANDIDATE_LIMIT)
+    } catch (error) {
+      // Keep the cache itself healthy during a transient database outage. The
+      // caller can still merge this curated set with an exact query result.
+      console.warn('Public skill search cache fallback:', error)
+      return CURATED_SKILL_SNAPSHOT
+    }
+  },
   ['skills-search-candidate-pool-v2'],
   { revalidate: 300 }
 )

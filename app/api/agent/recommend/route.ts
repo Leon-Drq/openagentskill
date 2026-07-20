@@ -11,6 +11,7 @@ import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
+import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 
 const AGENT_RECOMMEND_CANDIDATE_LIMIT = 240
 const AGENT_RECOMMEND_CACHE_HEADERS = {
@@ -22,7 +23,16 @@ const AGENT_RECOMMEND_CACHE_HEADERS = {
 // the shared candidate set small and durable so one request does not scan the
 // entire registry or contend with the ingestion worker.
 const getAgentRecommendCandidatePool = unstable_cache(
-  async () => getAllSkills('quality', undefined, AGENT_RECOMMEND_CANDIDATE_LIMIT),
+  async () => {
+    try {
+      return await getAllSkills('quality', undefined, AGENT_RECOMMEND_CANDIDATE_LIMIT)
+    } catch (error) {
+      // Recommendations remain useful from the maintained shortlist while
+      // Supabase recovers, instead of repeatedly failing cache revalidation.
+      console.warn('Agent recommend cache fallback:', error)
+      return CURATED_SKILL_SNAPSHOT
+    }
+  },
   ['agent-recommend-candidate-pool-v2'],
   { revalidate: 300 }
 )

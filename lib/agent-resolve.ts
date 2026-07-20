@@ -505,7 +505,17 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): P
 }
 
 const getResolveCandidatePool = unstable_cache(
-  async () => getAllSkills('quality', undefined, RESOLVE_CANDIDATE_POOL_SIZE),
+  async () => {
+    try {
+      return await getAllSkills('quality', undefined, RESOLVE_CANDIDATE_POOL_SIZE)
+    } catch (error) {
+      // Resolve is the primary agent path. A curated fallback is better than
+      // failing a request or scheduling repeated cache revalidations while the
+      // registry database is temporarily unavailable.
+      console.warn('Agent resolve cache fallback:', error)
+      return RESOLVE_FALLBACK_SKILLS
+    }
+  },
   ['agent-resolve-candidate-pool-v2'],
   { revalidate: RESOLVE_CACHE_REVALIDATE }
 )
