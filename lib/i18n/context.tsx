@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, ReactNode, Suspense, useContext, useEffect, useState } from 'react'
+import { createContext, ReactNode, Suspense, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import type { Locale } from './config'
 import { defaultLocale, isLocale } from './config'
@@ -54,30 +54,38 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined)
 function I18nStateProvider({
   children,
   initialLocale = defaultLocale,
+  routeKey,
 }: {
   children: ReactNode
   initialLocale?: Locale
+  routeKey: string
 }) {
-  const [locale, setClientLocale] = useState<Locale>(initialLocale)
+  const [override, setOverride] = useState<{ locale: Locale; routeKey: string } | null>(null)
+  const locale = override?.routeKey === routeKey ? override.locale : initialLocale
 
   useEffect(() => {
     document.documentElement.lang = locale
   }, [locale])
 
-  const setLocale = (newLocale: Locale) => {
-    setClientLocale(newLocale)
+  const setLocale = useCallback((newLocale: Locale) => {
+    // Keep the picker immediate while the matching route is streamed. Once
+    // the URL changes, the route-derived locale becomes authoritative again.
+    setOverride({ locale: newLocale, routeKey })
     try {
       localStorage.setItem('locale', newLocale)
     } catch {
       // Private browsing can disable storage. The active session still works.
     }
     document.documentElement.lang = newLocale
-  }
+  }, [routeKey])
 
-  const t = dictionaries[locale]
+  const value = useMemo(
+    () => ({ locale, setLocale, t: dictionaries[locale] }),
+    [locale, setLocale]
+  )
 
   return (
-    <I18nContext.Provider value={{ locale, setLocale, t }}>
+    <I18nContext.Provider value={value}>
       {children}
     </I18nContext.Provider>
   )
@@ -92,17 +100,18 @@ function I18nProviderWithSearch({
 }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  // Remount only when navigation actually changes the resolved locale. This
-  // avoids a synchronous state update effect on every route change while the
-  // picker can still update the current page immediately in its click handler.
+  // The route is authoritative when it specifies a locale. The provider syncs
+  // this value in place so route changes preserve the already-rendered page
+  // tree instead of tearing it down and mounting it again.
   const routeLocale =
     getLocaleFromPath(pathname || '') ||
     getLocaleFromSearch(searchParams.get('lang')) ||
     initialLocale ||
     defaultLocale
+  const routeKey = `${pathname || '/'}?${searchParams.toString()}`
 
   return (
-    <I18nStateProvider key={`${pathname}:${routeLocale}`} initialLocale={routeLocale}>
+    <I18nStateProvider initialLocale={routeLocale} routeKey={routeKey}>
       {children}
     </I18nStateProvider>
   )
@@ -116,7 +125,7 @@ export function I18nProvider({
   initialLocale?: Locale
 }) {
   return (
-    <Suspense fallback={<I18nStateProvider initialLocale={initialLocale}>{children}</I18nStateProvider>}>
+    <Suspense fallback={<I18nStateProvider initialLocale={initialLocale} routeKey="initial">{children}</I18nStateProvider>}>
       <I18nProviderWithSearch initialLocale={initialLocale}>{children}</I18nProviderWithSearch>
     </Suspense>
   )

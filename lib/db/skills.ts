@@ -161,6 +161,28 @@ function filterSkillOnly<T extends SkillOnlyScopeRecord>(records: T[]) {
   return records.filter((record) => !isMcpSkillRecord(record))
 }
 
+function sortDirectorySkills(records: SkillRecord[], sort: SkillSortMode) {
+  return records.slice().sort((left, right) => {
+    if (sort === 'stars') return Number(right.github_stars || 0) - Number(left.github_stars || 0)
+    if (sort === 'downloads' || sort === 'trending') {
+      const downloadDifference = Number(right.downloads || 0) - Number(left.downloads || 0)
+      return downloadDifference || Date.parse(right.created_at) - Date.parse(left.created_at)
+    }
+    if (sort === 'new') return Date.parse(right.created_at) - Date.parse(left.created_at)
+    if (sort === 'fresh') {
+      return Date.parse(right.github_last_pushed_at || right.updated_at) - Date.parse(left.github_last_pushed_at || left.updated_at)
+    }
+
+    const qualityDifference = Number(right.quality_score || 0) - Number(left.quality_score || 0)
+    return qualityDifference || Number(right.github_stars || 0) - Number(left.github_stars || 0)
+  })
+}
+
+function selectDirectorySkills(records: SkillRecord[], category: string | null, limit: number) {
+  const scoped = category ? records.filter((record) => record.category === category) : records
+  return scoped.slice(0, limit)
+}
+
 function getDirectoryFallback(
   sort: SkillSortMode,
   category: string | undefined,
@@ -168,18 +190,8 @@ function getDirectoryFallback(
 ): SkillRecord[] {
   const rows = filterSkillOnly(CURATED_SKILL_SNAPSHOT)
     .filter((skill) => !category || skill.category === category)
-    .slice()
 
-  rows.sort((left, right) => {
-    if (sort === 'stars') return Number(right.github_stars || 0) - Number(left.github_stars || 0)
-    if (sort === 'downloads') return Number(right.downloads || 0) - Number(left.downloads || 0)
-    if (sort === 'new' || sort === 'fresh') {
-      return Date.parse(right.github_last_pushed_at || right.updated_at) - Date.parse(left.github_last_pushed_at || left.updated_at)
-    }
-    return Number(right.quality_score || 0) - Number(left.quality_score || 0)
-  })
-
-  return rows.slice(0, maxRows)
+  return sortDirectorySkills(rows, sort).slice(0, maxRows)
 }
 
 const getSharedAllSkills = unstable_cache(
@@ -192,7 +204,7 @@ const getSharedAllSkills = unstable_cache(
       return getDirectoryFallback(sort, category || undefined, maxRows)
     }
   },
-  ['public-skill-directory-v4'],
+  ['public-skill-directory-v5'],
   {
     revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS,
     tags: ['public-skill-directory'],
@@ -215,16 +227,19 @@ export async function getAllSkills(
   // directory. Back those calls with one bounded source cache and slice it in
   // memory instead of issuing independent 180/250/1200 row queries.
   const sourceLimit = rowLimit <= DEFAULT_SKILL_QUERY_LIMIT ? DEFAULT_SKILL_QUERY_LIMIT : rowLimit
-  const cacheKey = `${sort}:${normalizedCategory || 'all'}:${sourceLimit}`
+  // Category pages share the same quality-gated source list. Filtering a
+  // cached candidate set is much cheaper than starting a new database query
+  // every time a visitor moves between Finance, Design, Research, and so on.
+  const cacheKey = `${sort}:all:${sourceLimit}`
   const now = Date.now()
   const cached = allSkillsCache.get(cacheKey)
 
   if (cached && cached.expiresAt > now) {
-    if (cached.value) return cached.value.slice(0, rowLimit)
-    if (cached.promise) return cached.promise.then((value) => value.slice(0, rowLimit))
+    if (cached.value) return selectDirectorySkills(cached.value, normalizedCategory, rowLimit)
+    if (cached.promise) return cached.promise.then((value) => selectDirectorySkills(value, normalizedCategory, rowLimit))
   }
 
-  const promise = getSharedAllSkills(sort, normalizedCategory, sourceLimit)
+  const promise = getSharedAllSkills(sort, null, sourceLimit)
   allSkillsCache.set(cacheKey, {
     expiresAt: now + ALL_SKILLS_CACHE_TTL_MS,
     promise,
@@ -236,7 +251,7 @@ export async function getAllSkills(
       expiresAt: Date.now() + ALL_SKILLS_CACHE_TTL_MS,
       value,
     })
-    return value.slice(0, rowLimit)
+    return selectDirectorySkills(value, normalizedCategory, rowLimit)
   } catch (error) {
     allSkillsCache.delete(cacheKey)
     throw error
@@ -264,25 +279,11 @@ async function fetchAllSkills(
       query = query.eq('category', category)
     }
 
-    switch (sort) {
-      case 'quality':
-        query = query.order('quality_score', { ascending: false }).order('github_stars', { ascending: false })
-        break
-      case 'stars':
-        query = query.order('github_stars', { ascending: false })
-        break
-      case 'new':
-        query = query.order('created_at', { ascending: false })
-        break
-      case 'fresh':
-        query = query.order('github_last_pushed_at', { ascending: false, nullsFirst: false }).order('quality_score', { ascending: false })
-        break
-      case 'trending':
-        query = query.order('downloads', { ascending: false }).order('created_at', { ascending: false })
-        break
-      default:
-        query = query.order('downloads', { ascending: false })
-    }
+    // Always use the quality-gated directory index for public browsing. The
+    // presentation sort is applied to this bounded, high-quality candidate
+    // set below, which avoids a full-table sort whenever someone changes a
+    // list tab or navigates into a locale-specific directory page.
+    query = query.order('quality_score', { ascending: false }).order('github_stars', { ascending: false })
 
     const { data, error } = await query.range(from, from + pageSize - 1)
     if (error) throw error
@@ -292,7 +293,7 @@ async function fetchAllSkills(
     if (data.length < pageSize) break
   }
 
-  return filterSkillOnly(rows)
+  return sortDirectorySkills(filterSkillOnly(rows), sort)
 }
 
 function getSitemapFallbackRecords(
@@ -324,7 +325,7 @@ const getCachedApprovedSkillSitemapRecords = unstable_cache(
       return getSitemapFallbackRecords(offset, limit, minStars)
     }
   },
-  ['approved-sitemap-records-v3'],
+  ['approved-sitemap-records-v4'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-records'],
@@ -339,7 +340,7 @@ const getCachedApprovedSkillSitemapCount = unstable_cache(
       return getSitemapFallbackRecords(0, CURATED_SKILL_SNAPSHOT.length, minStars).length
     }
   },
-  ['approved-sitemap-count-v3'],
+  ['approved-sitemap-count-v4'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-count'],
@@ -372,6 +373,10 @@ async function fetchApprovedSkillSitemapRecords(
       .from('skills')
       .select('slug,github_stars,github_last_pushed_at,updated_at')
       .eq('ai_review_approved', true)
+      // This matches the public-directory partial index. A sitemap needs a
+      // stable complete traversal, not a star-only ranking, and must never
+      // force a full-table sort while a crawler is visiting the site.
+      .order('quality_score', { ascending: false })
       .order('github_stars', { ascending: false })
 
     if (options.minStars > 0) {
@@ -397,9 +402,25 @@ export async function getApprovedSkillSitemapCount(minStars = 0): Promise<number
 
 async function fetchApprovedSkillSitemapCount(minStars: number): Promise<number> {
   const supabase = createSitemapClient()
+
+  // The counter is maintained by the registry trigger and avoids making every
+  // sitemap index request pay for an exact COUNT(*) across the full catalog.
+  if (minStars <= 0) {
+    const { data, error } = await supabase
+      .from('registry_stats')
+      .select('approved_skill_count')
+      .eq('id', true)
+      .maybeSingle()
+
+    const count = Number(data?.approved_skill_count)
+    if (!error && Number.isFinite(count) && count >= 0) return Math.floor(count)
+  }
+
   let query = supabase
     .from('skills')
-    .select('slug', { count: 'exact', head: true })
+    // Planner counts are sufficient to determine sitemap shard capacity and
+    // remain cheap when crawlers request this endpoint concurrently.
+    .select('slug', { count: 'planned', head: true })
     .eq('ai_review_approved', true)
 
   if (minStars > 0) {

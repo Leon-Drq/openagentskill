@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Activity, Bot, Braces, ChevronDown, FileJson2, Plus, SearchCheck, ShieldCheck, Terminal } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'
@@ -187,6 +187,11 @@ function ForAgentsDropdown({ pathname }: { pathname: string }) {
 export function SiteHeader() {
   const { t, locale } = useI18n()
   const pathname = usePathname()
+  const router = useRouter()
+
+  const warmRoute = (href: string) => {
+    router.prefetch(href)
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/92 backdrop-blur supports-[backdrop-filter]:bg-background/82">
@@ -206,12 +211,15 @@ export function SiteHeader() {
             {primaryNavItems.map((item) => {
               const active = isActivePath(pathname, item.href)
               const label = t.nav[item.labelKey]
+              const href = getLocalizedNavigationHref(item.href, locale)
 
               return (
                 <Link
                   key={item.href}
-                  href={getLocalizedNavigationHref(item.href, locale)}
+                  href={href}
                   prefetch={false}
+                  onPointerEnter={() => warmRoute(href)}
+                  onFocus={() => warmRoute(href)}
                   className={cn(
                     'flex h-16 items-center border-b-2 border-transparent px-2.5 text-sm transition-colors',
                     active ? 'border-[#006b4f] text-foreground' : 'text-secondary hover:text-foreground'
