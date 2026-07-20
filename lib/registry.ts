@@ -6,20 +6,17 @@ import type { SkillAgentStats, SkillEventStats, SkillOutcomeStats, SkillRecord }
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
+import {
+  getLocalizationIntentFitScore,
+  isLocalizationQuery,
+  tokenizeQuery,
+} from '@/lib/query-ranking'
 import { getSkillAttribution } from '@/lib/skill-attribution'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
 
 const SITE_URL = 'https://www.openagentskill.com'
-
-function tokenize(value: string) {
-  return value
-    .toLowerCase()
-    .split(/[\s+,./:_-]+/)
-    .map((token) => token.trim())
-    .filter((token) => token.length > 2)
-}
 
 const QUERY_TOKEN_ALIASES: Record<string, string[]> = {
   trade: ['trading', 'trader', 'trades', 'finance', 'financial', 'stock', 'stocks', 'market', 'markets', 'portfolio', 'quant', 'backtest'],
@@ -131,7 +128,7 @@ function skillSearchText(skill: SkillRecord) {
     .toLowerCase()
 }
 
-type QueryIntent = 'finance' | 'presentation' | 'design' | 'coding' | 'sports' | 'research' | 'web' | null
+type QueryIntent = 'finance' | 'localization' | 'presentation' | 'design' | 'coding' | 'sports' | 'research' | 'web' | null
 
 function detectQueryIntent(normalizedQuery: string, queryTokens: string[]): QueryIntent {
   const tokenSet = new Set(queryTokens)
@@ -141,6 +138,10 @@ function detectQueryIntent(normalizedQuery: string, queryTokens: string[]): Quer
     ['trade', 'trades', 'trader', 'trading', 'invest', 'investing', 'investment', 'market', 'markets', 'stock', 'stocks', 'equity', 'quant', 'backtest'].some((token) => tokenSet.has(token))
   ) {
     return 'finance'
+  }
+
+  if (isLocalizationQuery(normalizedQuery, queryTokens)) {
+    return 'localization'
   }
 
   if (/\b(presentation|presentations|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides|visual story)\b/.test(normalizedQuery)) {
@@ -172,8 +173,9 @@ function detectQueryIntent(normalizedQuery: string, queryTokens: string[]): Quer
 
 function getIntentFitScore(intent: QueryIntent, category: string, text: string) {
   if (!intent) return 0
+  if (intent === 'localization') return getLocalizationIntentFitScore(category, text)
 
-  const profile: Record<Exclude<QueryIntent, null>, { category: RegExp; positive: RegExp; negative: RegExp }> = {
+  const profile: Record<Exclude<QueryIntent, null | 'localization'>, { category: RegExp; positive: RegExp; negative: RegExp }> = {
     finance: {
       category: /\b(finance|financial|quant|trading|market|stock|investment|portfolio|fintech|crypto|defi)\b/,
       positive: /\b(finance|financial|quant|quantitative|trade|trades|trader|trading|portfolio|market-data|markets?|stocks?|stock[-_\s]?analysis|equity|crypto|filings?|edgar|sec filing|investor|investment|earnings|10-k|10-q|alpha|factor|backtest|backtesting|risk model|openbb|vectorbt|freqtrade|yfinance|zipline|backtrader|serenity)\b/,
@@ -396,7 +398,7 @@ export function rankSkillsForQuery(
   const rankingQuery = augmentQueryForIntent(query)
   const normalizedQuery = rankingQuery.trim().toLowerCase()
   const compactQuery = normalizedQuery.replace(/[^a-z0-9]+/g, '')
-  const queryTokens = tokenize(rankingQuery)
+  const queryTokens = tokenizeQuery(rankingQuery)
   const expandedQueryTokens = expandQueryTokens(queryTokens)
   const queryIntent = detectQueryIntent(normalizedQuery, queryTokens)
   const isFinanceQueryIntent = /\b(finance|financial|quant|quantitative|trade|trades|trader|trading|invest|investing|investment|portfolio|markets?|stocks?|equity|crypto|filings?|edgar|sec filings?|investor|earnings|10-k|10-q|alpha|factor|backtest|backtesting|risk model)\b/.test(normalizedQuery) ||
@@ -525,7 +527,7 @@ export function getRecommendationReasons(skill: SkillRecord, query: string, scor
   const reasons: string[] = []
   const text = skillSearchText(skill)
   const normalizedQuery = query.trim().toLowerCase()
-  const queryTokens = tokenize(query)
+  const queryTokens = tokenizeQuery(query)
   const matchedTokens = queryTokens.filter((token) => text.includes(token)).slice(0, 4)
 
   if (matchedTokens.length > 0) {
