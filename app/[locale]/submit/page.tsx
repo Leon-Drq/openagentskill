@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import SubmitPage from '@/app/submit/page'
+import { I18nProvider } from '@/lib/i18n/context'
 import { MARKET_LOCALES, type MarketLocale } from '@/lib/i18n/market-routing'
 
 const SITE_URL = 'https://www.openagentskill.com'
@@ -45,7 +46,15 @@ export default async function LocalizedSubmitPage({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
-  if (!getLocale(locale)) notFound()
+  const marketLocale = getLocale(locale)
+  if (!marketLocale) notFound()
 
-  return <SubmitPage />
+  // The root layout cannot reliably infer nested dynamic segments during SSR.
+  // Seed this client page with the route locale so its first render matches the
+  // selected language instead of briefly rendering the English fallback.
+  return (
+    <I18nProvider initialLocale={marketLocale}>
+      <SubmitPage />
+    </I18nProvider>
+  )
 }
