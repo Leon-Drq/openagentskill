@@ -5,7 +5,12 @@ import { LocalizedResolveWorkbench } from '@/components/localized-resolve-workbe
 import { MarketingButtonLink, MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import { getAllSkills, searchSkills, type SkillRecord } from '@/lib/db/skills'
 import { getMarketCoreContent } from '@/lib/i18n/market-core-pages'
-import { getLocalizedCorePath, type LocalizedCorePageSlug, type MarketLocale } from '@/lib/i18n/market-routing'
+import {
+  getLocalizedCorePath,
+  getLocalizedNavigationHref,
+  type LocalizedCorePageSlug,
+  type MarketLocale,
+} from '@/lib/i18n/market-routing'
 import { formatCompactNumber } from '@/lib/quality'
 import { getSkillTrustProfileV5 } from '@/lib/trust'
 
@@ -24,18 +29,20 @@ function skillListForPage(page: LocalizedCorePageSlug, query?: string) {
   const normalizedQuery = query?.trim()
   if (normalizedQuery) return searchSkills(normalizedQuery, 12).catch(() => [])
 
-  // German, Spanish, and Indonesian core pages show the same ranked skills.
-  // Sharing this cache means a language switch does not start another database
-  // request for an otherwise identical skill list.
+  // Every localized core page shows the same ranked skills. Sharing this cache
+  // means a language switch does not start another database request for an
+  // otherwise identical skill list.
   return getCachedLocalizedSkillList(page)
 }
 
 function SkillCards({
   skills,
   labels,
+  locale,
 }: {
   skills: SkillRecord[]
   labels: ReturnType<typeof getMarketCoreContent>['labels']
+  locale: MarketLocale
 }) {
   if (!skills.length) {
     return <p className="border border-border bg-card p-5 text-sm text-secondary">{labels.noResults}</p>
@@ -48,7 +55,7 @@ function SkillCards({
         return (
           <article key={skill.slug} className="flex min-w-0 flex-col border border-border bg-card p-4">
             <div className="flex items-start justify-between gap-3">
-              <Link href={`/skills/${skill.slug}`} className="min-w-0 text-lg font-semibold leading-tight transition-colors hover:text-[#006b4f]">
+              <Link href={getLocalizedNavigationHref(`/skills/${skill.slug}`, locale)} className="min-w-0 text-lg font-semibold leading-tight transition-colors hover:text-[#006b4f]">
                 <span className="block break-words [overflow-wrap:anywhere]">{skill.name}</span>
               </Link>
               <span className="shrink-0 rounded-[999px] border border-border bg-background px-2 py-1 font-mono text-[10px] text-secondary">
@@ -68,7 +75,7 @@ function SkillCards({
             </div>
             <div className="mt-4 flex items-center justify-between gap-3 text-xs text-secondary">
               <span className="truncate">{labels.category}: {skill.category}</span>
-              <Link href={`/skills/${skill.slug}/audit`} className="shrink-0 underline underline-offset-2 hover:text-foreground">
+              <Link href={getLocalizedNavigationHref(`/skills/${skill.slug}/audit`, locale)} className="shrink-0 underline underline-offset-2 hover:text-foreground">
                 {labels.audit}
               </Link>
             </div>
@@ -133,7 +140,7 @@ function LocalizedSkillsDirectory({
             {content.labels.englishDirectory} <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
-        <SkillCards skills={skills} labels={content.labels} />
+        <SkillCards skills={skills} labels={content.labels} locale={locale} />
       </section>
     </>
   )
@@ -229,7 +236,7 @@ function LocalizedRegistryPage({ locale, skills }: { locale: MarketLocale; skill
             {content.labels.browseSkills} <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
-        <SkillCards skills={skills} labels={content.labels} />
+        <SkillCards skills={skills} labels={content.labels} locale={locale} />
       </section>
     </>
   )

@@ -41,21 +41,10 @@ export function LanguageSwitcher({ compact = false, className }: LanguageSwitche
 
     setLocale(nextLocale)
 
-    if (typeof window === 'undefined') return
-
-    const target = new URL(href, window.location.origin)
-
-    // Most deep pages currently keep their content route and store the locale
-    // preference in ?lang=. Updating that preference locally keeps the header,
-    // menu, and next navigation responsive without waiting for a second server
-    // render of the exact same page.
-    if (target.pathname === window.location.pathname) {
-      window.history.replaceState(window.history.state, '', `${target.pathname}${target.search}${target.hash}`)
-      return
-    }
-
     if (href !== `${pathname}${query}${hash}`) {
-      // Keep the picker responsive while a translated route is streamed.
+      // Route through Next even when only the query string changes. Using the
+      // History API here leaves useSearchParams stale, so page-level language
+      // state and the visible URL can disagree.
       startTransition(() => router.replace(href, { scroll: false }))
     }
   }

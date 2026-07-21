@@ -1,6 +1,9 @@
 import { isLocale, localePaths, type Locale } from '@/lib/i18n/config'
 
-export const MARKET_LOCALES = ['de', 'es', 'id'] as const
+// These languages have dedicated versions of the core discovery routes. Keep
+// this in one place so the switcher, sitemap, and static route generation all
+// agree on which page variants actually exist.
+export const MARKET_LOCALES = ['zh', 'ja', 'ko', 'es', 'de', 'fr', 'id'] as const
 export type MarketLocale = (typeof MARKET_LOCALES)[number]
 
 export const LOCALIZED_CORE_PAGE_SLUGS = [
@@ -12,6 +15,24 @@ export const LOCALIZED_CORE_PAGE_SLUGS = [
 ] as const
 
 export type LocalizedCorePageSlug = (typeof LOCALIZED_CORE_PAGE_SLUGS)[number]
+
+// Submit is a full localized experience, but its page is implemented as a
+// dedicated route because it includes a client-side review flow rather than a
+// static registry page.
+const LOCALIZED_EXPERIENCE_PAGE_SLUGS = ['submit'] as const
+
+function hasDedicatedLocalizedRoute(page: string, locale: Locale) {
+  return isMarketLocale(locale) && (
+    isLocalizedCorePageSlug(page) ||
+    LOCALIZED_EXPERIENCE_PAGE_SLUGS.includes(page as (typeof LOCALIZED_EXPERIENCE_PAGE_SLUGS)[number])
+  )
+}
+
+function getDedicatedLocalizedPath(locale: MarketLocale, page: string) {
+  return isLocalizedCorePageSlug(page)
+    ? getLocalizedCorePath(locale, page)
+    : `/${locale}/${page}`
+}
 
 function normalizePathname(pathname: string) {
   const path = pathname.split('?')[0]?.split('#')[0] || '/'
@@ -75,8 +96,8 @@ export function getLocalizedNavigationHref(href: string, locale: Locale) {
   const page = basePath.slice(1)
 
   if (locale === 'en') return withLocalePreference(basePath, locale, search, hash)
-  if (isLocalizedCorePageSlug(page) && isMarketLocale(locale)) {
-    return withLocalePreference(getLocalizedCorePath(locale, page), locale, search, hash, true)
+  if (hasDedicatedLocalizedRoute(page, locale)) {
+    return withLocalePreference(getDedicatedLocalizedPath(locale, page), locale, search, hash, true)
   }
 
   // Keep the user on the requested destination when a full page translation is
@@ -91,8 +112,8 @@ export function getLanguageSwitchHref(pathname: string, nextLocale: Locale, sear
 
   const page = basePath.slice(1)
   if (nextLocale === 'en') return withLocalePreference(basePath, nextLocale, search, hash)
-  if (isLocalizedCorePageSlug(page) && isMarketLocale(nextLocale)) {
-    return withLocalePreference(getLocalizedCorePath(nextLocale, page), nextLocale, search, hash, true)
+  if (hasDedicatedLocalizedRoute(page, nextLocale)) {
+    return withLocalePreference(getDedicatedLocalizedPath(nextLocale, page), nextLocale, search, hash, true)
   }
 
   return withLocalePreference(basePath, nextLocale, search, hash)

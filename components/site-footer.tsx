@@ -15,11 +15,12 @@ function FooterLink({
   children: ReactNode
   className?: string
 }) {
-  return <Link href={href} prefetch={false} className={className}>{children}</Link>
+  const { locale } = useI18n()
+  return <Link href={getLocalizedNavigationHref(href, locale)} prefetch={false} className={className}>{children}</Link>
 }
 
 export function SiteFooter() {
-  const { t, locale } = useI18n()
+  const { t } = useI18n()
 
   return (
     <footer className="relative overflow-hidden border-t border-border bg-background">
@@ -27,7 +28,7 @@ export function SiteFooter() {
       <div className="relative mx-auto max-w-6xl px-6 py-12 sm:py-14">
         <div className="grid gap-10 border-b border-border pb-10 lg:grid-cols-[1.15fr_1.85fr]">
           <div>
-            <FooterLink href={getLocalizedNavigationHref('/', locale)} className="inline-flex items-center gap-2 font-sans text-sm font-semibold tracking-tight transition-opacity hover:opacity-70">
+            <FooterLink href="/" className="inline-flex items-center gap-2 font-sans text-sm font-semibold tracking-tight transition-opacity hover:opacity-70">
               <BrandMark className="h-7 w-7" />
               OpenAgentSkill
             </FooterLink>
@@ -58,9 +59,9 @@ export function SiteFooter() {
             <div>
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Explore</h2>
               <div className="mt-4 grid gap-2 text-secondary">
-                <FooterLink href={getLocalizedNavigationHref('/skills', locale)} className="hover:text-foreground">{t.nav.skills}</FooterLink>
+                <FooterLink href="/skills" className="hover:text-foreground">{t.nav.skills}</FooterLink>
                 <FooterLink href="/agent-skills" className="hover:text-foreground">Agent Skills</FooterLink>
-                <FooterLink href={getLocalizedNavigationHref('/agent-skill', locale)} className="hover:text-foreground">What Is an Agent Skill?</FooterLink>
+                <FooterLink href="/agent-skill" className="hover:text-foreground">What Is an Agent Skill?</FooterLink>
                 <FooterLink href="/ai-agent-skills" className="hover:text-foreground">AI Agent Skills</FooterLink>
                 <FooterLink href="/tasks" className="hover:text-foreground">Tasks</FooterLink>
                 <FooterLink href="/skill-packs" className="hover:text-foreground">Skill Packs</FooterLink>
@@ -78,7 +79,7 @@ export function SiteFooter() {
               <div className="mt-4 grid gap-2 text-secondary">
                 <FooterLink href="/compare" className="hover:text-foreground">Compare</FooterLink>
                 <FooterLink href="/safety" className="hover:text-foreground">Safety Gate</FooterLink>
-                <FooterLink href={getLocalizedNavigationHref('/agent-skills-registry', locale)} className="hover:text-foreground">Skills Registry</FooterLink>
+                <FooterLink href="/agent-skills-registry" className="hover:text-foreground">Skills Registry</FooterLink>
                 <FooterLink href="/rankings" className="hover:text-foreground">Rankings</FooterLink>
                 <FooterLink href="/outcomes" className="hover:text-foreground">Outcomes</FooterLink>
                 <FooterLink href="/audits" className="hover:text-foreground">Audits</FooterLink>
@@ -94,7 +95,7 @@ export function SiteFooter() {
             <div>
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Build</h2>
               <div className="mt-4 grid gap-2 text-secondary">
-                <FooterLink href={getLocalizedNavigationHref('/docs', locale)} className="hover:text-foreground">{t.nav.docs}</FooterLink>
+                <FooterLink href="/docs" className="hover:text-foreground">{t.nav.docs}</FooterLink>
                 <FooterLink href="/openagentskill" className="hover:text-foreground">About OpenAgentSkill</FooterLink>
                 <FooterLink href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</FooterLink>
                 <FooterLink href="/llms.txt" className="hover:text-foreground">llms.txt</FooterLink>

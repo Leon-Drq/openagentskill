@@ -5,7 +5,7 @@ import { CheckCircle2, Copy, Loader2, Search, ShieldCheck, TriangleAlert } from 
 import { useState } from 'react'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import type { MarketCoreContent } from '@/lib/i18n/market-core-pages'
-import type { MarketLocale } from '@/lib/i18n/market-routing'
+import { getLocalizedNavigationHref, type MarketLocale } from '@/lib/i18n/market-routing'
 
 type ResolvePayload = {
   policy_decision?: {
@@ -270,13 +270,13 @@ export function LocalizedResolveWorkbench({
               </div>
               <div className="flex flex-wrap content-start gap-2">
                 <Link
-                  href={recommendation.best_skill.url || `/skills/${recommendation.best_skill.slug}`}
+                  href={getLocalizedNavigationHref(recommendation.best_skill.url || `/skills/${recommendation.best_skill.slug}`, locale)}
                   className="inline-flex min-h-10 items-center rounded-[8px] border border-border px-3.5 py-2 text-sm font-semibold transition-colors hover:border-foreground/40"
                 >
                   {labels.openSkill}
                 </Link>
                 <Link
-                  href={recommendation.best_skill.audit_url || `/skills/${recommendation.best_skill.slug}/audit`}
+                  href={getLocalizedNavigationHref(recommendation.best_skill.audit_url || `/skills/${recommendation.best_skill.slug}/audit`, locale)}
                   className="inline-flex min-h-10 items-center rounded-[8px] border border-border px-3.5 py-2 text-sm font-semibold transition-colors hover:border-foreground/40"
                 >
                   {labels.viewAudit}
@@ -299,7 +299,7 @@ export function LocalizedResolveWorkbench({
                 <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">{copy.alternativesLabel}</p>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   {recommendation.alternatives.slice(0, 2).map((alternative) => (
-                    <Link key={alternative.slug} href={alternative.url} className="border border-border bg-card p-3 transition-colors hover:border-foreground/40">
+                    <Link key={alternative.slug} href={getLocalizedNavigationHref(alternative.url, locale)} className="border border-border bg-card p-3 transition-colors hover:border-foreground/40">
                       <div className="flex items-start justify-between gap-3">
                         <h3 className="min-w-0 break-words font-semibold [overflow-wrap:anywhere]">{alternative.name}</h3>
                         <span className="shrink-0 font-mono text-xs text-secondary">{alternative.trust_score}</span>

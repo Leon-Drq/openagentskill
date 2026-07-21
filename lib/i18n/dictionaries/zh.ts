@@ -290,7 +290,7 @@ Agent 发布 "multilingual-research"。
     guidelines: {
       title: '提交须知',
       items: [
-        '仓库必须至少有 10 个 GitHub star',
+        '仓库必须至少有 3 个 GitHub star',
         '技能必须托管在 GitHub 公开仓库',
         '建议在仓库中包含 skill.json 清单文件',
         'README 应包含清晰的安装说明和使用示例',
