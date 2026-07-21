@@ -17,6 +17,10 @@
       "schedule": "35 * * * *"
     },
     {
+      "path": "/api/cron/official-frontend-skills",
+      "schedule": "15 4 * * *"
+    },
+    {
       "path": "/api/cron/growth-daily",
       "schedule": "20 13 * * *"
     },

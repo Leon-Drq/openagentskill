@@ -26,6 +26,7 @@ import { augmentQueryForIntent, dedupeRankedSkills, getRecommendationReasons, no
 import { getSkillSupplyProfile, type SkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile, getSkillTrustProfileV5, type SkillTrustProfile, type SkillTrustProfileV5 } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
+import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 
 const SITE_URL = 'https://www.openagentskill.com'
 const RESOLVE_CANDIDATE_POOL_SIZE = 750
@@ -963,7 +964,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         {} as Record<string, SkillEventStats>,
         {} as Record<string, SkillOutcomeStats>,
       ]
-  const skills = mergeResolveSkillPools(queryPool, qualityPool, RESOLVE_FALLBACK_SKILLS)
+  const skills = mergeResolveSkillPools(queryPool, qualityPool, RESOLVE_FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
 
   const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, rankingTask, outcomeStatsMap))
     .filter(({ skill }) => candidateAllowed(skill, constraints))

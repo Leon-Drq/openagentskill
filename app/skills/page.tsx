@@ -9,6 +9,7 @@ import { getSkillSupplyProfile, getSupplyTrackSummaries } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCaseBySlug, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
 import { dedupeRankedSkills, rankSkillsForQuery } from '@/lib/registry'
+import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 
 export const revalidate = 300
 
@@ -58,6 +59,13 @@ const FALLBACK_DATE = '2026-06-01T00:00:00.000Z'
 
 const DIRECTORY_SCENARIOS = [
   {
+    title: 'Frontend and UI skills',
+    eyebrow: 'Design to deployment',
+    href: '/collections/frontend-product-ui',
+    description: 'Design direction, Figma implementation, UI review, React performance, browser QA, and safe preview deployments.',
+    terms: ['frontend', 'ui', 'ux', 'figma', 'react', 'nextjs', 'accessibility', 'browser testing', 'design system', 'deployment'],
+  },
+  {
     title: 'Coding agent skills',
     eyebrow: 'Codex, Claude Code, Cursor',
     href: '/skills?category=Coding+Agents',
@@ -95,7 +103,7 @@ const DIRECTORY_SCENARIOS = [
   {
     title: 'Design and creative skills',
     eyebrow: 'Images, video, UI',
-    href: '/skills?category=Design',
+    href: '/skills?category=design-creative',
     description: 'Image, video, creative production, UI design, multimodal generation, and visual workflow skills.',
     terms: ['design', 'image', 'video', 'creative', 'ui', 'ux', 'seedance', 'visual', 'multimodal', 'filmmaking'],
   },
@@ -486,9 +494,10 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): P
 }
 
 function getFallbackSkills(sort: SkillSortMode, category: string | undefined, limit: number) {
+  const fallbackPool = mergeSkillRecords(FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
   const records = category
-    ? FALLBACK_SKILLS.filter((skill) => skill.category.toLowerCase() === category.toLowerCase())
-    : [...FALLBACK_SKILLS]
+    ? fallbackPool.filter((skill) => skill.category.toLowerCase() === category.toLowerCase())
+    : [...fallbackPool]
 
   records.sort((a, b) => {
     if (sort === 'stars') return Number(b.github_stars || 0) - Number(a.github_stars || 0)
@@ -900,11 +909,11 @@ export default async function SkillsPage({
     getSkillsPageRecords(sort, queryCategory, candidateLimit),
     getSearchAugmentRecords(params.q),
     withTimeout(getCachedCategories(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills categories query')
-      .catch(() => [...new Set(FALLBACK_SKILLS.map((skill) => skill.category))].sort()),
+      .catch(() => [...new Set(mergeSkillRecords(FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT).map((skill) => skill.category))].sort()),
     withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
   ])
-  const records = mergeSkillRecords(searchAugmentRecords, recordsResult.records, FALLBACK_SKILLS)
+  const records = mergeSkillRecords(searchAugmentRecords, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
   const degraded = recordsResult.degraded && searchAugmentRecords.length === 0
   const effectivePage = degraded && records.length <= requestedPageOffset ? 1 : page
   const pageOffset = (effectivePage - 1) * VISIBLE_SKILL_LIMIT

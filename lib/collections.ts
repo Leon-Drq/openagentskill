@@ -11,6 +11,7 @@ export interface SkillStackDefinition {
   persona: string
   useCaseSlug: string
   keywords: string[]
+  featuredSlugs?: string[]
   outcomes: string[]
   workflowSteps: Array<{
     title: string
@@ -102,6 +103,38 @@ export const SKILL_STACKS: SkillStackDefinition[] = [
     avoidWhen: ['The flow requires bypassing platform controls', 'The target site disallows automation'],
   },
   {
+    slug: 'frontend-product-ui',
+    shortTitle: 'Frontend and UI',
+    title: 'Frontend and product UI skill stack',
+    eyebrow: 'Design, build, test, and ship interfaces',
+    description:
+      'A complete stack for agents that turn product briefs or Figma designs into polished frontend code, review the result, test it in a browser, and prepare a safe deployment.',
+    persona: 'Product, design, and engineering teams shipping high-fidelity web interfaces with AI agents.',
+    useCaseSlug: 'design-creative',
+    keywords: ['frontend', 'ui', 'ux', 'figma', 'react', 'next.js', 'design', 'accessibility', 'browser', 'test', 'deploy'],
+    featuredSlugs: [
+      'design-taste-frontend',
+      'anthropic-frontend-design',
+      'figma-implement-design',
+      'vercel-web-design-guidelines',
+      'vercel-react-best-practices',
+      'openai-playwright',
+      'anthropic-webapp-testing',
+      'anthropic-canvas-design',
+      'anthropic-brand-guidelines',
+      'vercel-deploy-to-vercel',
+    ],
+    outcomes: ['Set a visual direction', 'Implement Figma faithfully', 'Review UI and performance', 'Test and deploy safely'],
+    workflowSteps: [
+      { title: 'Direct', description: 'Choose an intentional visual direction and capture the product constraints before coding.' },
+      { title: 'Implement', description: 'Translate Figma or a brief into accessible components and production-ready frontend code.' },
+      { title: 'Review', description: 'Audit interface quality, React performance, and real browser behavior before release.' },
+      { title: 'Ship', description: 'Create a preview deployment only after the target project and configuration are reviewed.' },
+    ],
+    idealFor: ['Landing pages', 'Product UI redesigns', 'Figma-to-code handoff', 'Frontend QA and preview deploys'],
+    avoidWhen: ['The brand or design source is not authorized', 'A deployment would change a production environment without review'],
+  },
+  {
     slug: 'research-report-agent',
     shortTitle: 'Research report agent',
     title: 'Research report agent stack',
@@ -172,6 +205,8 @@ export function scoreSkillForStack(skill: SkillRecord, stack: SkillStackDefiniti
     const normalized = keyword.toLowerCase()
     if (text.includes(normalized)) score += normalized.includes(' ') ? 5 : 3
   }
+
+  if (stack.featuredSlugs?.includes(skill.slug)) score += 180
 
   const quality = getSkillQualityProfile(skill)
   score += quality.score / 12
