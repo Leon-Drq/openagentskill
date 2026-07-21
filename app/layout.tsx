@@ -140,7 +140,7 @@ export default async function RootLayout({
       : null
 
   return (
-    <html lang={lang} className={`${inter.variable} ${geistMono.variable}`}>
+    <html lang={lang} suppressHydrationWarning className={`${inter.variable} ${geistMono.variable}`}>
       <head>
         <StructuredData />
       </head>

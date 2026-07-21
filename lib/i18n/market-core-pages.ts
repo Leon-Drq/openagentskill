@@ -1,4 +1,5 @@
 import type { LocalizedCorePageSlug, MarketLocale } from '@/lib/i18n/market-routing'
+import { getLocalizedNavigationPageMeta } from '@/lib/i18n/localized-navigation-pages'
 
 type PageMeta = {
   eyebrow: string
@@ -722,18 +723,21 @@ const id: MarketCoreContent = {
 
 const MARKET_CORE_CONTENT: Record<MarketLocale, MarketCoreContent> = { zh, ja, ko, es, de, fr, id }
 
-const MARKET_CORE_PAGE_KEYS: Record<LocalizedCorePageSlug, keyof Pick<MarketCoreContent, 'resolve' | 'skills' | 'agentSkill' | 'registry' | 'docs'>> = {
+const MARKET_CORE_PAGE_KEYS = {
   resolve: 'resolve',
   skills: 'skills',
   'agent-skill': 'agentSkill',
   'agent-skills-registry': 'registry',
   docs: 'docs',
-}
+} as const
 
 export function getMarketCoreContent(locale: MarketLocale) {
   return MARKET_CORE_CONTENT[locale]
 }
 
 export function getMarketCorePageMeta(locale: MarketLocale, page: LocalizedCorePageSlug) {
-  return getMarketCoreContent(locale)[MARKET_CORE_PAGE_KEYS[page]] as PageMeta
+  const coreKey = MARKET_CORE_PAGE_KEYS[page as keyof typeof MARKET_CORE_PAGE_KEYS]
+  if (coreKey) return getMarketCoreContent(locale)[coreKey] as PageMeta
+
+  return getLocalizedNavigationPageMeta(locale, page) || getMarketCoreContent(locale).resolve
 }

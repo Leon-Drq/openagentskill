@@ -128,7 +128,7 @@ export function MobileNav() {
   }, [isOpen])
 
   return (
-    <div className="xl:hidden">
+    <div className="2xl:hidden">
       <button
         onClick={() => setIsOpen(true)}
         className="-mr-2 flex h-10 w-10 items-center justify-center rounded-[8px] text-secondary transition-colors hover:bg-muted hover:text-foreground"

@@ -9,6 +9,10 @@ export type MarketLocale = (typeof MARKET_LOCALES)[number]
 export const LOCALIZED_CORE_PAGE_SLUGS = [
   'resolve',
   'skills',
+  'tasks',
+  'skill-packs',
+  'compare',
+  'api-docs',
   'agent-skill',
   'agent-skills-registry',
   'docs',

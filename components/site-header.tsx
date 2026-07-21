@@ -207,7 +207,7 @@ export function SiteHeader() {
         </Link>
 
         <div className="flex h-full items-center gap-2 sm:gap-3">
-          <nav className="hidden h-full items-center gap-0.5 xl:flex" aria-label="Primary navigation">
+          <nav className="hidden h-full shrink-0 items-center gap-0.5 2xl:flex" aria-label="Primary navigation">
             {primaryNavItems.map((item) => {
               const active = isActivePath(pathname, item.href)
               const label = t.nav[item.labelKey]
@@ -221,7 +221,7 @@ export function SiteHeader() {
                   onPointerEnter={() => warmRoute(href)}
                   onFocus={() => warmRoute(href)}
                   className={cn(
-                    'flex h-16 items-center border-b-2 border-transparent px-2.5 text-sm transition-colors',
+                    'flex h-16 shrink-0 items-center whitespace-nowrap border-b-2 border-transparent px-2.5 text-sm transition-colors',
                     active ? 'border-[#006b4f] text-foreground' : 'text-secondary hover:text-foreground'
                   )}
                   aria-current={active ? 'page' : undefined}
@@ -233,7 +233,7 @@ export function SiteHeader() {
             <ForAgentsDropdown pathname={pathname} />
           </nav>
 
-          <div className="hidden items-center gap-2 xl:flex">
+          <div className="hidden items-center gap-2 2xl:flex">
             <GitHubStarButton />
             <Link
               href={getLocalizedNavigationHref('/submit', locale)}
@@ -245,13 +245,13 @@ export function SiteHeader() {
             </Link>
           </div>
 
-          <div className="xl:hidden">
+          <div className="2xl:hidden">
             <GitHubStarButton className="h-9" compact />
           </div>
-          <div className="xl:hidden">
+          <div className="2xl:hidden">
             <LanguageSwitcher compact />
           </div>
-          <div className="hidden xl:block">
+          <div className="hidden 2xl:block">
             <LanguageSwitcher />
           </div>
           <MobileNav />

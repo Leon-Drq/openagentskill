@@ -2,9 +2,11 @@ import Link from 'next/link'
 import { unstable_cache } from 'next/cache'
 import { ArrowRight, Search } from 'lucide-react'
 import { LocalizedResolveWorkbench } from '@/components/localized-resolve-workbench'
+import { LocalizedNavigationPage } from '@/components/localized-navigation-page'
 import { MarketingButtonLink, MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import { getAllSkills, searchSkills, type SkillRecord } from '@/lib/db/skills'
 import { getMarketCoreContent } from '@/lib/i18n/market-core-pages'
+import { LOCALIZED_LANDING_PAGES } from '@/lib/seo/localized-pages'
 import {
   getLocalizedCorePath,
   getLocalizedNavigationHref,
@@ -257,7 +259,7 @@ function LocalizedDocsPage({ locale }: { locale: MarketLocale }) {
             <MarketingButtonLink href={getLocalizedCorePath(locale, 'resolve')} variant="primary">
               {content.resolve.submit}
             </MarketingButtonLink>
-            <MarketingButtonLink href="/api-docs">
+            <MarketingButtonLink href={getLocalizedCorePath(locale, 'api-docs')}>
               {content.labels.apiDocs}
             </MarketingButtonLink>
           </>
@@ -299,9 +301,15 @@ export async function LocalizedCorePage({
 }) {
   const content = getMarketCoreContent(locale)
   const skills = await skillListForPage(page, query)
+  const language = LOCALIZED_LANDING_PAGES[locale].lang
 
   return (
     <MarketingPageShell>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `document.documentElement.lang=${JSON.stringify(language)};`,
+        }}
+      />
       {page === 'resolve' ? (
         <>
           <MarketingHero
@@ -334,6 +342,9 @@ export async function LocalizedCorePage({
         </>
       ) : null}
       {page === 'skills' ? <LocalizedSkillsDirectory locale={locale} query={query} skills={skills} /> : null}
+      {page === 'tasks' || page === 'skill-packs' || page === 'compare' || page === 'api-docs' ? (
+        <LocalizedNavigationPage locale={locale} page={page} />
+      ) : null}
       {page === 'agent-skill' ? <LocalizedAgentSkillPage locale={locale} /> : null}
       {page === 'agent-skills-registry' ? <LocalizedRegistryPage locale={locale} skills={skills} /> : null}
       {page === 'docs' ? <LocalizedDocsPage locale={locale} /> : null}

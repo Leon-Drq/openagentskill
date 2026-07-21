@@ -5,6 +5,7 @@ import { getMarketCorePageMeta } from '@/lib/i18n/market-core-pages'
 import {
   getLocalizedCorePath,
   isLocalizedCorePageSlug,
+  LOCALIZED_CORE_PAGE_SLUGS,
   MARKET_LOCALES,
   type LocalizedCorePageSlug,
   type MarketLocale,
@@ -18,7 +19,7 @@ export const dynamicParams = false
 
 export function generateStaticParams() {
   return MARKET_LOCALES.flatMap((locale) =>
-    ['resolve', 'skills', 'agent-skill', 'agent-skills-registry', 'docs'].map((page) => ({ locale, page }))
+    LOCALIZED_CORE_PAGE_SLUGS.map((page) => ({ locale, page }))
   )
 }
 
