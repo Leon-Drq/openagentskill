@@ -17,16 +17,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params
   const stack = getSkillStackBySlug(slug)
-  if (!stack) return { title: 'Skill Stack Not Found' }
+  if (!stack) return { title: 'Workflow Recipe Not Found' }
 
   return {
-    title: `${stack.title} | OpenAgentSkill`,
+    title: `${stack.shortTitle} Workflow Recipe | OpenAgentSkill`,
     description: stack.description,
     alternates: {
       canonical: `https://www.openagentskill.com/collections/${slug}`,
     },
     openGraph: {
-      title: `${stack.title} — OpenAgentSkill`,
+      title: `${stack.shortTitle} Workflow Recipe — OpenAgentSkill`,
       description: stack.description,
       url: `https://www.openagentskill.com/collections/${slug}`,
       type: 'article',
@@ -53,13 +53,13 @@ export default async function CollectionDetailPage({
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
         <nav className="mb-8 flex items-center gap-2 text-sm text-secondary">
-          <Link href="/collections" className="hover:text-foreground">Collections</Link>
+          <Link href="/collections" className="hover:text-foreground">Workflow recipes</Link>
           <span>/</span>
           <span className="text-foreground">{stack.shortTitle}</span>
         </nav>
 
         <section className="border-b border-border pb-10">
-          <p className="mb-4 text-xs uppercase tracking-widest text-secondary">{stack.eyebrow}</p>
+          <p className="mb-4 font-mono text-xs uppercase tracking-widest text-secondary">Workflow recipe · {stack.eyebrow}</p>
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
             <div>
               <h1 className="font-display text-4xl font-bold leading-tight text-balance sm:text-6xl">
@@ -74,7 +74,7 @@ export default async function CollectionDetailPage({
                   href={compareUrl}
                   className="border border-foreground bg-foreground px-5 py-2 text-sm font-semibold text-background transition-opacity hover:opacity-80"
                 >
-                  Compare top picks
+                  Compare recommended skills
                 </Link>
                 <Link
                   href={`/skills?useCase=${stack.useCaseSlug}&quality=excellent`}
@@ -85,7 +85,7 @@ export default async function CollectionDetailPage({
               </div>
             </div>
             <div className="border border-border p-5">
-              <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Outcomes</p>
+              <p className="mb-4 font-mono text-xs uppercase tracking-widest text-secondary">Expected outcome</p>
               <ul className="space-y-3 text-sm text-secondary">
                 {stack.outcomes.map((outcome) => (
                   <li key={outcome} className="border-l border-border pl-3">{outcome}</li>
@@ -97,8 +97,8 @@ export default async function CollectionDetailPage({
 
         <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Workflow map</p>
-            <h2 className="font-display text-2xl font-semibold">How the stack fits together</h2>
+            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-secondary">Workflow map</p>
+            <h2 className="font-display text-2xl font-semibold">Follow this sequence</h2>
           </div>
           <div className="grid gap-px border border-border bg-border md:grid-cols-4">
             {stack.workflowSteps.map((step, index) => (
@@ -113,10 +113,10 @@ export default async function CollectionDetailPage({
 
         <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Recommended stack</p>
-            <h2 className="font-display text-2xl font-semibold">Start with these skills</h2>
+            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-secondary">Suggested capabilities</p>
+            <h2 className="font-display text-2xl font-semibold">Choose skills for each step</h2>
             <p className="mt-3 text-sm leading-relaxed text-secondary">
-              Ranked by workflow relevance, quality score, GitHub adoption, and maintenance freshness.
+              Ranked by relevance to this workflow, quality, GitHub adoption, and maintenance freshness. This is a decision guide, not a single install command.
             </p>
           </div>
           <div className="divide-y divide-border border border-border">
@@ -166,7 +166,7 @@ export default async function CollectionDetailPage({
 
         <section className="grid gap-8 py-10 lg:grid-cols-2">
           <div className="border border-border p-5">
-            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Ideal for</p>
+            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-secondary">Good fit</p>
             <ul className="space-y-2 text-sm leading-relaxed text-secondary">
               {stack.idealFor.map((item) => (
                 <li key={item}>- {item}</li>
@@ -174,12 +174,22 @@ export default async function CollectionDetailPage({
             </ul>
           </div>
           <div className="border border-border p-5">
-            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Avoid when</p>
+            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-secondary">Not the right route when</p>
             <ul className="space-y-2 text-sm leading-relaxed text-secondary">
               {stack.avoidWhen.map((item) => (
                 <li key={item}>- {item}</li>
               ))}
             </ul>
+          </div>
+        </section>
+
+        <section className="border-t border-border py-10">
+          <div className="flex flex-col justify-between gap-4 border border-border p-5 sm:flex-row sm:items-center">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-widest text-secondary">Need a runnable bundle?</p>
+              <p className="mt-2 text-sm leading-relaxed text-secondary">Skill packs include an install order, audit links, and a machine-readable Agent plan.</p>
+            </div>
+            <Link href="/skill-packs" className="shrink-0 border border-border px-4 py-2.5 text-center text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground">Browse packs</Link>
           </div>
         </section>
       </main>

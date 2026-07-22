@@ -64,10 +64,10 @@ export function SiteFooter() {
                 <FooterLink href="/agent-skill" className="hover:text-foreground">What Is an Agent Skill?</FooterLink>
                 <FooterLink href="/ai-agent-skills" className="hover:text-foreground">AI Agent Skills</FooterLink>
                 <FooterLink href="/tasks" className="hover:text-foreground">Tasks</FooterLink>
-                <FooterLink href="/skill-packs" className="hover:text-foreground">Skill Packs</FooterLink>
+                <FooterLink href="/skill-packs" className="hover:text-foreground">Installable Packs</FooterLink>
                 <FooterLink href="/best" className="hover:text-foreground">Best Skills</FooterLink>
                 <FooterLink href="/trending" className="hover:text-foreground">Trending</FooterLink>
-                <FooterLink href="/collections" className="hover:text-foreground">Stacks</FooterLink>
+                <FooterLink href="/collections" className="hover:text-foreground">Workflow Recipes</FooterLink>
                 <FooterLink href="/use-cases" className="hover:text-foreground">Use Cases</FooterLink>
                 <FooterLink href="/agents" className="hover:text-foreground">Agents</FooterLink>
                 <FooterLink href="/agent" className="hover:text-foreground">Agent Entry</FooterLink>

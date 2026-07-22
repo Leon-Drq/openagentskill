@@ -23,7 +23,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const pack = getSkillPackBySlug(slug)
-  if (!pack) return { title: 'Skill Pack Not Found' }
+  if (!pack) return { title: 'Installable Skill Pack Not Found' }
 
   return {
     title: pack.title,
@@ -98,13 +98,13 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
         <nav className="mb-8 flex flex-wrap items-center gap-2 text-sm text-secondary">
-          <Link href="/skill-packs" className="hover:text-foreground">Skill packs</Link>
+          <Link href="/skill-packs" className="hover:text-foreground">Installable skill packs</Link>
           <span>/</span>
           <span className="text-foreground">{pack.shortTitle}</span>
         </nav>
 
         <section className="border-b border-border pb-10">
-          <p className="mb-4 text-xs uppercase tracking-widest text-secondary">{pack.eyebrow}</p>
+          <p className="mb-4 font-mono text-xs uppercase tracking-widest text-secondary">Installable pack · {pack.eyebrow}</p>
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
               <h1 className="font-display text-4xl font-bold leading-tight text-balance sm:text-6xl">
@@ -116,15 +116,15 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
             <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
               <div className="bg-background p-4">
                 <div className="font-mono text-2xl">{picks.length}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Skills</div>
+                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Selected skills</div>
               </div>
               <div className="bg-background p-4">
                 <div className="font-mono text-2xl">{pack.workflowSteps.length}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Steps</div>
+                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Install order</div>
               </div>
               <div className="bg-background p-4">
                 <div className="font-mono text-2xl">{formatCompactNumber(picks[0]?.github_stars || 0)}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Top stars</div>
+                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Top adoption</div>
               </div>
             </div>
           </div>
@@ -132,8 +132,8 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
 
         <section className="grid gap-5 border-b border-border py-10 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
-            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Workflow</p>
-            <h2 className="font-display text-2xl font-semibold">How the pack gets used</h2>
+            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-secondary">Execution order</p>
+            <h2 className="font-display text-2xl font-semibold">How an agent should use this pack</h2>
           </div>
           <ol className="grid gap-3 sm:grid-cols-2">
             {pack.workflowSteps.map((step, index) => (
@@ -148,13 +148,13 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
 
         <section className="grid gap-4 border-b border-border py-10 md:grid-cols-2">
           <div className="border border-border p-5">
-            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Best for</p>
+            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-secondary">Good fit</p>
             <ul className="space-y-2 text-sm leading-relaxed text-secondary">
               {pack.bestFor.map((item) => <li key={item}>{item}</li>)}
             </ul>
           </div>
           <div className="border border-border p-5">
-            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Avoid when</p>
+            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-secondary">Review first when</p>
             <ul className="space-y-2 text-sm leading-relaxed text-secondary">
               {pack.avoidWhen.map((item) => <li key={item}>{item}</li>)}
             </ul>

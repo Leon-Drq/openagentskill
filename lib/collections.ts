@@ -25,10 +25,10 @@ export const SKILL_STACKS: SkillStackDefinition[] = [
   {
     slug: 'web-data-pipeline',
     shortTitle: 'Web data pipeline',
-    title: 'Web data pipeline stack',
+    title: 'Web data pipeline workflow',
     eyebrow: 'Scrape, clean, and reuse web data',
     description:
-      'A practical stack for agents that crawl public pages, extract clean content, normalize data, and hand it to downstream research or RAG workflows.',
+      'A practical workflow for agents that crawl public pages, extract clean content, normalize data, and hand it to downstream research or RAG workflows.',
     persona: 'Growth, research, and data teams building repeatable web collection workflows.',
     useCaseSlug: 'web-scraping',
     keywords: ['crawl', 'scrape', 'browser', 'extract', 'markdown', 'html', 'data', 'web'],
@@ -45,10 +45,10 @@ export const SKILL_STACKS: SkillStackDefinition[] = [
   {
     slug: 'coding-review-agent',
     shortTitle: 'Coding review agent',
-    title: 'Coding review agent stack',
+    title: 'Coding review agent workflow',
     eyebrow: 'Inspect, patch, and verify code',
     description:
-      'A stack for software agents that inspect repositories, review pull requests, generate tests, and turn findings into shippable patches.',
+      'A workflow for software agents that inspect repositories, review pull requests, generate tests, and turn findings into shippable patches.',
     persona: 'Engineering teams using AI agents inside active codebases.',
     useCaseSlug: 'coding-agents',
     keywords: ['code', 'github', 'review', 'pull request', 'testing', 'debug', 'repository', 'developer'],
@@ -65,10 +65,10 @@ export const SKILL_STACKS: SkillStackDefinition[] = [
   {
     slug: 'rag-knowledge-base',
     shortTitle: 'RAG knowledge base',
-    title: 'RAG knowledge-base stack',
+    title: 'RAG knowledge-base workflow',
     eyebrow: 'Ingest, retrieve, and cite',
     description:
-      'A stack for document-heavy agents that ingest files, create searchable knowledge, retrieve relevant context, and answer with grounded sources.',
+      'A workflow for document-heavy agents that ingest files, create searchable knowledge, retrieve relevant context, and answer with grounded sources.',
     persona: 'Teams building support, research, internal documentation, or compliance assistants.',
     useCaseSlug: 'rag-knowledge',
     keywords: ['rag', 'retrieval', 'embedding', 'vector', 'document', 'pdf', 'knowledge', 'search'],
@@ -85,10 +85,10 @@ export const SKILL_STACKS: SkillStackDefinition[] = [
   {
     slug: 'browser-qa-agent',
     shortTitle: 'Browser QA agent',
-    title: 'Browser QA agent stack',
+    title: 'Browser QA agent workflow',
     eyebrow: 'Operate and verify web apps',
     description:
-      'A stack for agents that navigate products, fill forms, take screenshots, and verify real user flows across web applications.',
+      'A workflow for agents that navigate products, fill forms, take screenshots, and verify real user flows across web applications.',
     persona: 'Product and QA teams that want repeatable browser checks without writing every test from scratch.',
     useCaseSlug: 'browser-automation',
     keywords: ['browser', 'playwright', 'puppeteer', 'selenium', 'test', 'screenshot', 'form', 'ui'],
@@ -105,10 +105,10 @@ export const SKILL_STACKS: SkillStackDefinition[] = [
   {
     slug: 'frontend-product-ui',
     shortTitle: 'Frontend and UI',
-    title: 'Frontend and product UI skill stack',
+    title: 'Frontend and product UI workflow',
     eyebrow: 'Design, build, test, and ship interfaces',
     description:
-      'A complete stack for agents that turn product briefs or Figma designs into polished frontend code, review the result, test it in a browser, and prepare a safe deployment.',
+      'A practical workflow for agents that turn product briefs or Figma designs into polished frontend code, review the result, test it in a browser, and prepare a safe deployment.',
     persona: 'Product, design, and engineering teams shipping high-fidelity web interfaces with AI agents.',
     useCaseSlug: 'design-creative',
     keywords: ['frontend', 'ui', 'ux', 'figma', 'react', 'next.js', 'design', 'accessibility', 'browser', 'test', 'deploy'],
@@ -137,10 +137,10 @@ export const SKILL_STACKS: SkillStackDefinition[] = [
   {
     slug: 'video-creation-studio',
     shortTitle: 'Video creation',
-    title: 'Video creation skill stack',
+    title: 'Video creation workflow',
     eyebrow: 'Brief to publish-ready creative',
     description:
-      'A practical stack for agents that shape a video brief, create strong multimodal prompts, generate supporting B-roll, and prepare a reviewable short-form or explainer video.',
+      'A practical workflow for agents that shape a video brief, create strong multimodal prompts, generate supporting B-roll, and prepare a reviewable short-form or explainer video.',
     persona: 'Creative teams, marketers, and founders turning product stories into short videos without losing control of source assets or final review.',
     useCaseSlug: 'video-creation',
     keywords: ['video', 'seedance', 'vox', 'b-roll', 'broll', 'explainer', 'collage', 'camera', 'captions', 'voice-over', 'editing'],
@@ -158,10 +158,10 @@ export const SKILL_STACKS: SkillStackDefinition[] = [
   {
     slug: 'research-report-agent',
     shortTitle: 'Research report agent',
-    title: 'Research report agent stack',
+    title: 'Research report agent workflow',
     eyebrow: 'Find, compare, and synthesize',
     description:
-      'A stack for agents that gather sources, compare claims, summarize long material, and draft useful research briefs.',
+      'A workflow for agents that gather sources, compare claims, summarize long material, and draft useful research briefs.',
     persona: 'Founders, analysts, and content teams who need sourced research without losing the evidence trail.',
     useCaseSlug: 'research-agents',
     keywords: ['research', 'analysis', 'summarize', 'report', 'search', 'source', 'market', 'news'],
@@ -178,10 +178,10 @@ export const SKILL_STACKS: SkillStackDefinition[] = [
   {
     slug: 'content-growth-agent',
     shortTitle: 'Content growth agent',
-    title: 'Content growth agent stack',
+    title: 'Content growth agent workflow',
     eyebrow: 'Turn skills into distribution',
     description:
-      'A stack for turning newly indexed skills into SEO briefs, social drafts, comparison pages, and reusable publishing workflows.',
+      'A workflow for turning newly indexed skills into SEO briefs, social drafts, comparison pages, and reusable publishing workflows.',
     persona: 'Indie builders and marketers growing an AI tool directory.',
     useCaseSlug: 'workflow-automation',
     keywords: ['content', 'blog', 'seo', 'social', 'twitter', 'x', 'workflow', 'automation', 'summary'],

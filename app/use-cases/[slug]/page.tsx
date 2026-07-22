@@ -241,7 +241,7 @@ export default async function UseCasePage({
         {relatedStacks.length > 0 && (
           <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
             <div>
-              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Recommended stack</p>
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Recommended workflow</p>
               <h2 className="font-display text-2xl font-semibold">Turn this use case into a workflow</h2>
             </div>
             <div className="grid gap-3">

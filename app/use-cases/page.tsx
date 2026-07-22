@@ -109,11 +109,11 @@ export default async function UseCasesPage() {
         <section className="border-t border-border py-10">
           <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">From use case to stack</p>
-              <h2 className="font-display text-2xl font-semibold">Ready-made workflows</h2>
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">From use case to workflow</p>
+              <h2 className="font-display text-2xl font-semibold">Workflow recipes</h2>
             </div>
             <Link href="/collections" className="text-sm text-secondary underline underline-offset-2 hover:text-foreground">
-              Browse all stacks
+              Browse workflow recipes
             </Link>
           </div>
           <div className="grid gap-3 md:grid-cols-3">

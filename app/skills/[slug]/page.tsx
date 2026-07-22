@@ -1557,7 +1557,7 @@ export default async function SkillDetailPage({
                 <div className="mb-5 flex items-end justify-between gap-4">
                   <div>
                     <p className="mb-2 text-xs uppercase text-secondary">
-                      Stack fit
+                      Workflow fit
                     </p>
                     <h2 className="font-display text-2xl font-semibold">
                       Add it to a complete workflow

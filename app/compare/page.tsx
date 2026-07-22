@@ -248,7 +248,7 @@ export default async function ComparePage({
                     ))}
                   </tr>
                   <tr>
-                    <td className="p-4 text-xs uppercase tracking-widest text-secondary">Stack fit</td>
+                    <td className="p-4 text-xs uppercase tracking-widest text-secondary">Workflow fit</td>
                     {comparedSkills.map((skill) => (
                       <td key={skill.slug} className="p-4 align-top">
                         <div className="flex flex-wrap gap-2">

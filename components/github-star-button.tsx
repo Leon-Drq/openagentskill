@@ -42,17 +42,24 @@ function cacheRepo(repo: GitHubRepoSummary) {
   }
 }
 
-function getInitialRepo(): GitHubRepoSummary {
-  if (typeof window === 'undefined') return FALLBACK_REPO
-  return { ...FALLBACK_REPO, ...readCachedRepo() }
-}
-
 export function GitHubStarButton({ className, fullWidth, compact }: GitHubStarButtonProps) {
-  const [repo, setRepo] = useState<GitHubRepoSummary>(getInitialRepo)
+  // Keep the server and initial browser render identical. Cached data is applied
+  // after hydration so the header never creates a React hydration mismatch.
+  const [repo, setRepo] = useState<GitHubRepoSummary>(FALLBACK_REPO)
 
   useEffect(() => {
     let mounted = true
-    if (readCachedRepo()) return () => { mounted = false }
+    const cached = readCachedRepo()
+    if (cached) {
+      const timer = window.setTimeout(() => {
+        if (mounted) setRepo({ ...FALLBACK_REPO, ...cached })
+      }, 0)
+
+      return () => {
+        mounted = false
+        window.clearTimeout(timer)
+      }
+    }
 
     fetch('/api/github/repo')
       .then((response) => (response.ok ? response.json() : null))
