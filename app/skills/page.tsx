@@ -101,6 +101,13 @@ const DIRECTORY_SCENARIOS = [
     terms: ['ppt', 'pptx', 'presentation', 'slide', 'slides', 'deck', 'powerpoint', 'speaker note'],
   },
   {
+    title: 'Video creation skills',
+    eyebrow: 'Prompts, B-roll, explainers',
+    href: '/collections/video-creation-studio',
+    description: 'Video-generation prompts, B-roll, Vox-style explainers, camera direction, captions, and creative-production workflows.',
+    terms: ['video', 'video generation', 'video prompt', 'seedance', 'vox', 'b-roll', 'broll', 'explainer', 'collage', 'camera movement', 'captions'],
+  },
+  {
     title: 'Design and creative skills',
     eyebrow: 'Images, video, UI',
     href: '/skills?category=design-creative',

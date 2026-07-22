@@ -239,6 +239,20 @@ export const USE_CASES: UseCaseDefinition[] = [
     agentTasks: ['Inspect visual requirements', 'Generate reusable assets', 'Package output for review'],
   },
   {
+    slug: 'video-creation',
+    shortTitle: 'Video creation',
+    title: 'Video creation and editing skills for AI agents',
+    eyebrow: 'Plan, generate, and review video',
+    description:
+      'Discover skills for AI video prompts, B-roll, short-form editing, explainers, voice-over, captions, and creative production workflows.',
+    heroPrompt:
+      'I need my agent to turn a topic or product into a short video, generate B-roll, write video prompts, and prepare a publish-ready cut.',
+    keywords: ['video', 'video generation', 'video prompt', 'b-roll', 'broll', 'vox', 'seedance', 'editing', 'filmmaking', 'camera movement', 'captions', 'motion collage'],
+    featuredSlugs: ['vox-director', 'seedance-prompt-en', 'seedance-2-0'],
+    workflows: ['Plan a short explainer', 'Generate B-roll', 'Write a video-generation prompt', 'Prepare captions and voice-over'],
+    agentTasks: ['Turn a brief into a shot plan', 'Assign references and camera motion', 'Check assets and output before publishing'],
+  },
+  {
     slug: 'presentation-generation',
     shortTitle: 'Presentation generation',
     title: 'Presentation and slide deck skills for AI agents',

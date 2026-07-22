@@ -135,6 +135,27 @@ export const SKILL_STACKS: SkillStackDefinition[] = [
     avoidWhen: ['The brand or design source is not authorized', 'A deployment would change a production environment without review'],
   },
   {
+    slug: 'video-creation-studio',
+    shortTitle: 'Video creation',
+    title: 'Video creation skill stack',
+    eyebrow: 'Brief to publish-ready creative',
+    description:
+      'A practical stack for agents that shape a video brief, create strong multimodal prompts, generate supporting B-roll, and prepare a reviewable short-form or explainer video.',
+    persona: 'Creative teams, marketers, and founders turning product stories into short videos without losing control of source assets or final review.',
+    useCaseSlug: 'video-creation',
+    keywords: ['video', 'seedance', 'vox', 'b-roll', 'broll', 'explainer', 'collage', 'camera', 'captions', 'voice-over', 'editing'],
+    featuredSlugs: ['seedance-prompt-en', 'vox-director', 'seedance-2-0'],
+    outcomes: ['Turn a brief into a shot plan', 'Write controlled generation prompts', 'Generate supporting B-roll', 'Review rights, cost, and final output'],
+    workflowSteps: [
+      { title: 'Frame', description: 'Set the audience, one message, format, duration, and the approved inputs before generation.' },
+      { title: 'Prompt', description: 'Assign reference roles, camera movement, timing, sound, and transitions in a clear production prompt.' },
+      { title: 'Produce', description: 'Generate a narrow test or B-roll pass before expanding to a full explainer or campaign cut.' },
+      { title: 'Review', description: 'Check visual continuity, captions, media rights, provider cost, and brand safety before publishing.' },
+    ],
+    idealFor: ['B-roll generation', 'Short explainers', 'Product launch clips', 'Video prompt planning'],
+    avoidWhen: ['You do not have rights to the source material', 'A generated output would be published without a human review'],
+  },
+  {
     slug: 'research-report-agent',
     shortTitle: 'Research report agent',
     title: 'Research report agent stack',

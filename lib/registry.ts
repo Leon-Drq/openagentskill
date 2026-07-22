@@ -60,6 +60,10 @@ const LOCALIZED_INTENT_ALIASES: LocalizedIntentAlias[] = [
     terms: ['design', 'ui', 'animation'],
   },
   {
+    pattern: /(视频|剪辑|短片|运镜|补充镜头|素材|电影|片段|视频生成|生成视频)/,
+    terms: ['video', 'creative', 'seedance', 'collage', 'b-roll'],
+  },
+  {
     pattern: /\b(programmierung|repository|repositorio|repositori|fehler|pruefen|testen|codigo|programacion|revisar|prueba|kode|pemrograman|uji|tinjau)\b/,
     terms: ['coding', 'code', 'repository', 'review'],
   },
@@ -247,6 +251,21 @@ function getSpecializedDesignIntentScore(normalizedQuery: string, skill: SkillRe
 
   if (/\b(design engineering|design-engineering|ui polish|interface polish|component polish|interaction details?)\b/.test(normalizedQuery)) {
     if (slug.includes('emil-design-eng') || /\bdesign-engineering\b/.test(text)) score += 240
+  }
+
+  const isVideoTask = /\b(video|videos|b[- ]?roll|broll|vox|seedance|clip|clips|film|filmmaking|explainer|motion collage|collage video|vertical video|short[- ]?form|reels?|tiktok|video edit(?:ing)?)\b/.test(normalizedQuery)
+  if (isVideoTask) {
+    if (slug === 'vox-director') {
+      score += /\b(b[- ]?roll|broll|vox|collage|paper collage|explainer|narrated|motion collage|product ad|video ad)\b/.test(normalizedQuery)
+        ? 330
+        : 90
+    }
+
+    if (slug === 'seedance-prompt-en') {
+      score += /\b(seedance|camera movement|reference video|video prompt|beat[- ]?match|multimodal video)\b/.test(normalizedQuery)
+        ? 330
+        : 80
+    }
   }
 
   return score

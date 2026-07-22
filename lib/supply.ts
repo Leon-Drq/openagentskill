@@ -113,7 +113,7 @@ export const SUPPLY_TRACKS: SupplyTrackDefinition[] = [
     shortLabel: 'Design',
     description: 'Design assets, images, video, audio, multimodal media, presentation, and creative production skills.',
     categoryAliases: ['design-creative', 'media-automation', 'multimodal-media', 'ml-automation'],
-    useCaseSlugs: ['design-creative', 'multimodal-media'],
+    useCaseSlugs: ['design-creative', 'video-creation', 'multimodal-media'],
     keywords: ['design', 'creative', 'image', 'video', 'audio', 'media', 'presentation', 'figma', 'sprite', 'visual'],
   },
   {

@@ -21,6 +21,10 @@
       "schedule": "15 4 * * *"
     },
     {
+      "path": "/api/cron/official-video-skills",
+      "schedule": "30 4 * * *"
+    },
+    {
       "path": "/api/cron/growth-daily",
       "schedule": "20 13 * * *"
     },
