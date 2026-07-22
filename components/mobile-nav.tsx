@@ -11,6 +11,7 @@ import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { useI18n } from '@/lib/i18n/context'
 import { getBasePathname, getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
+import { getShellCopy } from '@/lib/i18n/shell-content'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -109,6 +110,7 @@ function isActivePath(pathname: string, href: string) {
 
 export function MobileNav() {
   const { t, locale } = useI18n()
+  const shell = getShellCopy(locale)
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
 
@@ -132,7 +134,7 @@ export function MobileNav() {
       <button
         onClick={() => setIsOpen(true)}
         className="-mr-2 flex h-10 w-10 items-center justify-center rounded-[8px] text-secondary transition-colors hover:bg-muted hover:text-foreground"
-        aria-label="Open menu"
+        aria-label={shell.openMenu}
       >
         <Menu className="h-5 w-5" aria-hidden="true" />
       </button>
@@ -152,17 +154,17 @@ export function MobileNav() {
             <button
               onClick={() => setIsOpen(false)}
               className="-mr-2 flex h-10 w-10 items-center justify-center rounded-[8px] text-secondary transition-colors hover:bg-muted hover:text-foreground"
-              aria-label="Close menu"
+              aria-label={shell.closeMenu}
             >
               <X className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
           <nav
             className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl flex-col px-6 py-5"
-            aria-label="Mobile navigation"
+            aria-label={shell.mobileNavigation}
           >
             <div>
-              <p className="mb-2 font-mono text-xs uppercase text-secondary">Browse</p>
+              <p className="mb-2 font-mono text-xs uppercase text-secondary">{shell.mobileBrowse}</p>
               <ul className="space-y-1">
                 {navItems.map((item) => {
                   const active = isActivePath(pathname, item.href)
@@ -190,7 +192,7 @@ export function MobileNav() {
             </div>
 
             <div className="mt-5">
-              <p className="mb-2 font-mono text-xs uppercase text-secondary">For Agents</p>
+              <p className="mb-2 font-mono text-xs uppercase text-secondary">{t.nav.forAgents}</p>
               <ul className="grid gap-2">
                 {agentItems.map((item) => {
                   const active = isActivePath(pathname, item.href)
@@ -224,7 +226,7 @@ export function MobileNav() {
 
             <div className="mt-auto pt-5">
               <div className="mb-3 flex items-center justify-between gap-4 border-t border-border pt-4">
-                <span className="font-mono text-xs uppercase text-secondary">Language</span>
+                <span className="font-mono text-xs uppercase text-secondary">{shell.mobileLanguage}</span>
                 <LanguageSwitcher />
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -235,7 +237,7 @@ export function MobileNav() {
                   className="flex items-center justify-center gap-2 rounded-[8px] border border-border bg-card/70 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
                 >
                   <Plus className="h-5 w-5" aria-hidden="true" />
-                  Submit Skill
+                  {t.nav.submitSkill}
                 </Link>
                 <GitHubStarButton fullWidth className="h-10" />
               </div>

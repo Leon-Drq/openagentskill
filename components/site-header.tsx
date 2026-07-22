@@ -11,6 +11,7 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
 import { useI18n } from '@/lib/i18n/context'
 import { getBasePathname, getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
+import { getShellCopy } from '@/lib/i18n/shell-content'
 import { cn } from '@/lib/utils'
 
 const primaryNavItems = [
@@ -119,6 +120,7 @@ function isActivePath(pathname: string, href: string) {
 
 function ForAgentsDropdown({ pathname }: { pathname: string }) {
   const { t, locale } = useI18n()
+  const shell = getShellCopy(locale)
   const [open, setOpen] = useState(false)
   const active = agentItems.some((item) => isActivePath(pathname, item.href))
 
@@ -150,8 +152,8 @@ function ForAgentsDropdown({ pathname }: { pathname: string }) {
           className="absolute right-0 top-[calc(100%-1px)] z-50 w-[330px] overflow-hidden rounded-[8px] border border-border bg-background shadow-[0_18px_55px_rgba(29,27,24,0.12)]"
         >
           <div className="border-b border-border bg-muted/35 px-4 py-3">
-            <p className="text-sm font-semibold text-foreground">Agent registry surfaces</p>
-            <p className="mt-1 text-xs leading-5 text-secondary">Resolve, install, and audit skills without opening the directory UI.</p>
+            <p className="text-sm font-semibold text-foreground">{shell.agentMenuTitle}</p>
+            <p className="mt-1 text-xs leading-5 text-secondary">{shell.agentMenuDescription}</p>
           </div>
           <div className="grid p-1.5">
             {agentItems.map((item) => {

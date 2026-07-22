@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { BrandMark } from '@/components/brand-mark'
 import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
+import { getShellCopy } from '@/lib/i18n/shell-content'
 
 function FooterLink({
   href,
@@ -20,7 +21,8 @@ function FooterLink({
 }
 
 export function SiteFooter() {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
+  const shell = getShellCopy(locale)
 
   return (
     <footer className="relative overflow-hidden border-t border-border bg-background">
@@ -33,7 +35,7 @@ export function SiteFooter() {
               OpenAgentSkill
             </FooterLink>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-secondary">
-              The skill layer for AI agents: discover, compare, audit, and install reusable capabilities across Codex, Claude Code, Cursor, and agent runtimes.
+              {shell.footerDescription}
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <a
@@ -57,7 +59,7 @@ export function SiteFooter() {
 
           <nav className="grid gap-8 text-sm sm:grid-cols-3" aria-label="Footer navigation">
             <div>
-              <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Explore</h2>
+              <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">{shell.footerExplore}</h2>
               <div className="mt-4 grid gap-2 text-secondary">
                 <FooterLink href="/skills" className="hover:text-foreground">{t.nav.skills}</FooterLink>
                 <FooterLink href="/agent-skills" className="hover:text-foreground">Agent Skills</FooterLink>
@@ -75,7 +77,7 @@ export function SiteFooter() {
             </div>
 
             <div>
-              <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Trust</h2>
+              <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">{shell.footerTrust}</h2>
               <div className="mt-4 grid gap-2 text-secondary">
                 <FooterLink href="/compare" className="hover:text-foreground">Compare</FooterLink>
                 <FooterLink href="/safety" className="hover:text-foreground">Safety Gate</FooterLink>
@@ -93,7 +95,7 @@ export function SiteFooter() {
             </div>
 
             <div>
-              <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Build</h2>
+              <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">{shell.footerBuild}</h2>
               <div className="mt-4 grid gap-2 text-secondary">
                 <FooterLink href="/docs" className="hover:text-foreground">{t.nav.docs}</FooterLink>
                 <FooterLink href="/openagentskill" className="hover:text-foreground">About OpenAgentSkill</FooterLink>
@@ -113,10 +115,10 @@ export function SiteFooter() {
         </div>
 
         <div className="flex flex-col gap-3 pt-6 font-mono text-[11px] uppercase tracking-[0.18em] text-secondary sm:flex-row sm:items-center sm:justify-between">
-          <span>OpenAgentSkill Registry</span>
+          <span>{shell.footerRegistry}</span>
           <div className="flex flex-wrap items-center gap-4">
-            <FooterLink href="/privacy" className="transition-colors hover:text-foreground">Privacy</FooterLink>
-            <span>Built for agent-native discovery</span>
+            <FooterLink href="/privacy" className="transition-colors hover:text-foreground">{shell.footerPrivacy}</FooterLink>
+            <span>{shell.footerTagline}</span>
           </div>
         </div>
       </div>

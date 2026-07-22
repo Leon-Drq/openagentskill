@@ -3,8 +3,16 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
-import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
+import { buildSkillAudit } from '@/lib/audits'
 import { getAllSkills, getSkillsBySlugs, type SkillRecord } from '@/lib/db/skills'
+import { I18nProvider } from '@/lib/i18n/context'
+import {
+  getCuratedPageCopy,
+  getLocalizedAuditRiskLabel,
+  getLocalizedPackContent,
+  getLocalizedPackReviewChecklist,
+} from '@/lib/i18n/curated-content'
+import { getLocaleFromSearchParam, getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { getPrimaryInstallCommand } from '@/lib/install-targets'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { getCuratedSkillFallback } from '@/lib/skill-fallbacks'
@@ -20,20 +28,29 @@ export function generateStaticParams() {
   return SKILL_PACKS.map((pack) => ({ slug: pack.slug }))
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ lang?: string | string[] }>
+}): Promise<Metadata> {
+  const [{ slug }, { lang }] = await Promise.all([params, searchParams])
   const pack = getSkillPackBySlug(slug)
   if (!pack) return { title: 'Installable Skill Pack Not Found' }
+  const locale = getLocaleFromSearchParam(lang)
+  const localizedPack = getLocalizedPackContent(locale, pack)
 
   return {
-    title: pack.title,
-    description: pack.description,
+    title: localizedPack.title,
+    description: localizedPack.description,
+    other: { 'content-language': locale },
     alternates: {
       canonical: `${BASE_URL}/skill-packs/${pack.slug}`,
     },
     openGraph: {
-      title: `${pack.title} - OpenAgentSkill`,
-      description: pack.description,
+      title: `${localizedPack.title} - OpenAgentSkill`,
+      description: localizedPack.description,
       url: `${BASE_URL}/skill-packs/${pack.slug}`,
       type: 'website',
     },
@@ -55,10 +72,21 @@ function mergeSkills(...pools: SkillRecord[][]) {
   return merged
 }
 
-export default async function SkillPackDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+export default async function SkillPackDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ lang?: string | string[] }>
+}) {
+  const [{ slug }, { lang }] = await Promise.all([params, searchParams])
   const pack = getSkillPackBySlug(slug)
   if (!pack) notFound()
+  const locale = getLocaleFromSearchParam(lang)
+  const copy = getCuratedPageCopy(locale)
+  const localizedPack = getLocalizedPackContent(locale, pack)
+  const reviewChecklist = getLocalizedPackReviewChecklist(locale)
+  const localizedHref = (href: string) => getLocalizedNavigationHref(href, locale)
 
   const [featuredSkills, candidateSkills] = await Promise.all([
     getSkillsBySlugs(pack.featuredSlugs || []).catch(() => []),
@@ -74,8 +102,8 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: pack.title,
-    description: pack.description,
+    name: localizedPack.title,
+    description: localizedPack.description,
     url: `${BASE_URL}/skill-packs/${pack.slug}`,
     itemListElement: picks.map((skill, index) => ({
       '@type': 'ListItem',
@@ -92,39 +120,40 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <I18nProvider initialLocale={locale}>
+      <div className="min-h-screen bg-background">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <SiteHeader />
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
         <nav className="mb-8 flex flex-wrap items-center gap-2 text-sm text-secondary">
-          <Link href="/skill-packs" className="hover:text-foreground">Installable skill packs</Link>
+          <Link href={localizedHref('/skill-packs')} className="hover:text-foreground">{copy.packBreadcrumb}</Link>
           <span>/</span>
-          <span className="text-foreground">{pack.shortTitle}</span>
+          <span className="text-foreground">{localizedPack.shortTitle}</span>
         </nav>
 
         <section className="border-b border-border pb-10">
-          <p className="mb-4 font-mono text-xs uppercase tracking-widest text-secondary">Installable pack · {pack.eyebrow}</p>
+          <p className="mb-4 font-mono text-xs uppercase tracking-widest text-secondary">{copy.packEyebrow}</p>
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
               <h1 className="font-display text-4xl font-bold leading-tight text-balance sm:text-6xl">
-                {pack.title}
+                {localizedPack.title}
               </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">{pack.description}</p>
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-secondary">{pack.persona}</p>
+              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">{localizedPack.description}</p>
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-secondary">{localizedPack.persona}</p>
             </div>
             <div className="grid grid-cols-3 gap-px border border-border bg-border text-center">
               <div className="bg-background p-4">
                 <div className="font-mono text-2xl">{picks.length}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Selected skills</div>
+                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">{copy.selectedSkills}</div>
               </div>
               <div className="bg-background p-4">
                 <div className="font-mono text-2xl">{pack.workflowSteps.length}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Install order</div>
+                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">{copy.installOrder}</div>
               </div>
               <div className="bg-background p-4">
                 <div className="font-mono text-2xl">{formatCompactNumber(picks[0]?.github_stars || 0)}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Top adoption</div>
+                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">{copy.topAdoption}</div>
               </div>
             </div>
           </div>
@@ -132,11 +161,11 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
 
         <section className="grid gap-5 border-b border-border py-10 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
-            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-secondary">Execution order</p>
-            <h2 className="font-display text-2xl font-semibold">How an agent should use this pack</h2>
+            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-secondary">{copy.executionOrder}</p>
+            <h2 className="font-display text-2xl font-semibold">{copy.packWorkflowTitle}</h2>
           </div>
           <ol className="grid gap-3 sm:grid-cols-2">
-            {pack.workflowSteps.map((step, index) => (
+            {localizedPack.workflowSteps.map((step, index) => (
               <li key={step.title} className="border border-border bg-card p-4">
                 <span className="mb-3 block font-mono text-sm text-secondary">0{index + 1}</span>
                 <h3 className="font-display text-xl font-semibold">{step.title}</h3>
@@ -148,50 +177,49 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
 
         <section className="grid gap-4 border-b border-border py-10 md:grid-cols-2">
           <div className="border border-border p-5">
-            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-secondary">Good fit</p>
+            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-secondary">{copy.goodFit}</p>
             <ul className="space-y-2 text-sm leading-relaxed text-secondary">
-              {pack.bestFor.map((item) => <li key={item}>{item}</li>)}
+              {localizedPack.bestFor.map((item) => <li key={item}>{item}</li>)}
             </ul>
           </div>
           <div className="border border-border p-5">
-            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-secondary">Review first when</p>
+            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-secondary">{copy.reviewFirstWhen}</p>
             <ul className="space-y-2 text-sm leading-relaxed text-secondary">
-              {pack.avoidWhen.map((item) => <li key={item}>{item}</li>)}
+              {localizedPack.avoidWhen.map((item) => <li key={item}>{item}</li>)}
             </ul>
           </div>
         </section>
 
         <section className="grid gap-6 border-b border-border py-10 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
-            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Agent install plan</p>
-            <h2 className="font-display text-2xl font-semibold">A machine-readable plan agents can execute.</h2>
+            <p className="mb-3 text-xs uppercase tracking-widest text-secondary">{copy.agentInstallPlan}</p>
+            <h2 className="font-display text-2xl font-semibold">{copy.agentInstallTitle}</h2>
             <p className="mt-4 text-sm leading-relaxed text-secondary">
-              The pack API returns install order, audit URLs, review checklist, and the outcome feedback contract. Agents
-              can use this page as context, then call the API for the exact JSON plan.
+              {copy.agentInstallDescription}
             </p>
             <Link
               href={`/api/agent/packs/${pack.slug}?limit=6&format=text`}
               className="mt-5 inline-flex w-full justify-center border border-border px-4 py-2.5 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground sm:w-auto"
               prefetch={false}
             >
-              Open text plan
+              {copy.openTextPlan}
             </Link>
           </div>
 
           <div className="grid min-w-0 gap-4 md:grid-cols-2">
             <div className="border border-border bg-card p-5">
-              <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Install order</p>
+              <p className="mb-4 text-xs uppercase tracking-widest text-secondary">{copy.installOrder}</p>
               <ol className="space-y-4">
                 {installPlan.selected_skills.map((skill) => (
                   <li key={skill.slug} className="min-w-0">
                     <div className="flex items-start gap-3">
                       <span className="mt-1 font-mono text-xs text-secondary">0{skill.rank}</span>
                       <div className="min-w-0">
-                        <Link href={`/skills/${skill.slug}`} className="font-semibold hover:text-secondary">
+                        <Link href={localizedHref(`/skills/${skill.slug}`)} className="font-semibold hover:text-secondary">
                           {skill.name}
                         </Link>
                         <p className="mt-1 text-xs leading-relaxed text-secondary">
-                          Trust {skill.trust_score}/100 · Audit {skill.audit_score}/100 · {skill.risk_level}
+                          {copy.trust} {skill.trust_score}/100 · {copy.audit} {skill.audit_score}/100 · {getLocalizedAuditRiskLabel(locale, skill.risk_level)}
                         </p>
                         <code className="mt-2 block break-words border border-border bg-background p-2 font-mono text-xs leading-relaxed text-secondary [overflow-wrap:anywhere]">
                           {skill.install_command}
@@ -204,14 +232,14 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
             </div>
 
             <div className="border border-border bg-card p-5">
-              <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Review checklist</p>
+              <p className="mb-4 text-xs uppercase tracking-widest text-secondary">{copy.reviewChecklist}</p>
               <ul className="space-y-3 text-sm leading-relaxed text-secondary">
-                {installPlan.review_checklist.map((item) => (
+                {reviewChecklist.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
               <div className="mt-5 border border-border bg-background p-3">
-                <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Outcome endpoint</p>
+                <p className="mb-2 text-xs uppercase tracking-widest text-secondary">{copy.outcomeEndpoint}</p>
                 <code className="block break-words font-mono text-xs leading-relaxed text-secondary [overflow-wrap:anywhere]">
                   {installPlan.outcome_feedback.method} {installPlan.outcome_feedback.endpoint}
                 </code>
@@ -223,14 +251,14 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
         <section className="py-10">
           <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Recommended skills</p>
-              <h2 className="font-display text-2xl font-semibold">Installable shortlist for this pack</h2>
+              <p className="mb-3 text-xs uppercase tracking-widest text-secondary">{copy.recommendedSkills}</p>
+              <h2 className="font-display text-2xl font-semibold">{copy.recommendedTitle}</h2>
             </div>
             <Link
               href={`/api/agent/packs/${pack.slug}`}
               className="w-full border border-border px-4 py-2.5 text-center text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground sm:w-auto"
             >
-              Open pack API
+              {copy.openPackApi}
             </Link>
           </div>
 
@@ -244,47 +272,48 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
                   <div className="font-mono text-2xl text-secondary tabular-nums">#{index + 1}</div>
                   <div className="min-w-0">
                     <div className="mb-2 flex flex-wrap items-center gap-2">
-                      <Link href={`/skills/${skill.slug}`} className="min-w-0">
+                      <Link href={localizedHref(`/skills/${skill.slug}`)} className="min-w-0">
                         <h3 className="font-display text-2xl font-semibold leading-tight hover:text-secondary">
                           {skill.name}
                         </h3>
                       </Link>
                       <span className="border border-border px-2 py-0.5 font-mono text-xs text-secondary">
-                        Quality {quality.score}
+                        {copy.quality} {quality.score}
                       </span>
                       <span className="border border-border px-2 py-0.5 font-mono text-xs text-secondary">
-                        Trust {trust.score}
+                        {copy.trust} {trust.score}
                       </span>
                       <span className="border border-border px-2 py-0.5 font-mono text-xs text-secondary">
-                        Audit {audit.audit_score}
+                        {copy.audit} {audit.audit_score}
                       </span>
                     </div>
-                    <p className="max-w-3xl text-sm leading-relaxed text-secondary">{skill.description}</p>
+                    <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-secondary">{copy.sourceDescription}</p>
+                    <p className="mt-1 max-w-3xl text-sm leading-relaxed text-secondary">{skill.description}</p>
                     <div className="mt-4 flex flex-wrap gap-4 font-mono text-xs text-secondary">
-                      <span>{formatCompactNumber(skill.github_stars || 0)} stars</span>
-                      <span>{auditRiskLabel(audit.risk_level)}</span>
-                      <span>{skill.license || 'Unknown license'}</span>
+                      <span>{formatCompactNumber(skill.github_stars || 0)} {copy.stars}</span>
+                      <span>{getLocalizedAuditRiskLabel(locale, audit.risk_level)}</span>
+                      <span>{!skill.license || skill.license.toLowerCase() === 'unknown' ? copy.unknownLicense : skill.license}</span>
                     </div>
                   </div>
                   <div className="min-w-0">
                     <div className="border border-border bg-card p-3">
-                      <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Install</p>
+                      <p className="mb-2 text-xs uppercase tracking-widest text-secondary">{copy.install}</p>
                       <code className="block break-words font-mono text-xs leading-relaxed [overflow-wrap:anywhere]">
                         {getPrimaryInstallCommand(skill)}
                       </code>
                     </div>
                     <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
                       <Link
-                        href={`/skills/${skill.slug}`}
+                        href={localizedHref(`/skills/${skill.slug}`)}
                         className="border border-foreground bg-foreground px-4 py-2.5 text-center text-sm font-semibold text-background transition-opacity hover:opacity-85"
                       >
-                        Skill page
+                        {copy.skillPage}
                       </Link>
                       <Link
-                        href={`/skills/${skill.slug}/audit`}
+                        href={localizedHref(`/skills/${skill.slug}/audit`)}
                         className="border border-border px-4 py-2.5 text-center text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
                       >
-                        Audit report
+                        {copy.auditReport}
                       </Link>
                     </div>
                   </div>
@@ -296,6 +325,7 @@ export default async function SkillPackDetailPage({ params }: { params: Promise<
       </main>
 
       <SiteFooter />
-    </div>
+      </div>
+    </I18nProvider>
   )
 }

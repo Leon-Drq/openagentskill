@@ -1,4 +1,4 @@
-import { isLocale, localePaths, type Locale } from '@/lib/i18n/config'
+import { defaultLocale, isLocale, localePaths, type Locale } from '@/lib/i18n/config'
 
 // These languages have dedicated versions of the core discovery routes. Keep
 // this in one place so the switcher, sitemap, and static route generation all
@@ -24,11 +24,18 @@ export type LocalizedCorePageSlug = (typeof LOCALIZED_CORE_PAGE_SLUGS)[number]
 // dedicated route because it includes a client-side review flow rather than a
 // static registry page.
 const LOCALIZED_EXPERIENCE_PAGE_SLUGS = ['submit'] as const
+const LOCALIZED_DEEP_ROUTE_ROOTS = ['skill-packs', 'collections'] as const
+
+function isLocalizedDeepRoute(page: string) {
+  const [root, ...segments] = page.split('/').filter(Boolean)
+  return segments.length > 0 && LOCALIZED_DEEP_ROUTE_ROOTS.includes(root as (typeof LOCALIZED_DEEP_ROUTE_ROOTS)[number])
+}
 
 function hasDedicatedLocalizedRoute(page: string, locale: Locale) {
   return isMarketLocale(locale) && (
     isLocalizedCorePageSlug(page) ||
-    LOCALIZED_EXPERIENCE_PAGE_SLUGS.includes(page as (typeof LOCALIZED_EXPERIENCE_PAGE_SLUGS)[number])
+    LOCALIZED_EXPERIENCE_PAGE_SLUGS.includes(page as (typeof LOCALIZED_EXPERIENCE_PAGE_SLUGS)[number]) ||
+    isLocalizedDeepRoute(page)
   )
 }
 
@@ -71,6 +78,16 @@ function withLocalePreference(pathname: string, locale: Locale, search = '', has
 
 export function isMarketLocale(locale: Locale): locale is MarketLocale {
   return MARKET_LOCALES.includes(locale as MarketLocale)
+}
+
+/**
+ * Resolve the locale encoded in a shared deep link. Page components use this
+ * instead of each independently parsing `?lang=` so navigation, metadata, and
+ * content rendering all agree on the active language.
+ */
+export function getLocaleFromSearchParam(value: string | string[] | null | undefined): Locale {
+  const candidate = Array.isArray(value) ? value[0] : value
+  return candidate && isLocale(candidate) ? candidate : defaultLocale
 }
 
 export function isLocalizedCorePageSlug(value: string): value is LocalizedCorePageSlug {

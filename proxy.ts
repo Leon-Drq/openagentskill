@@ -15,6 +15,16 @@ const LEGACY_LOCALIZED_NAVIGATION_PATHS = new Set([
   '/docs',
   '/submit',
 ])
+const LOCALIZED_DEEP_ROUTE_ROOTS = new Set(['/skill-packs', '/collections'])
+
+function getLocalizedDeepPath(pathname: string, locale: string) {
+  const segments = pathname.split('/').filter(Boolean)
+  const [root, ...rest] = segments
+  const baseRoot = `/${root || ''}`
+
+  if (!LOCALIZED_DEEP_ROUTE_ROOTS.has(baseRoot) || rest.length === 0) return null
+  return `/${locale}/${[root, ...rest].join('/')}`
+}
 
 // Fallback to hardcoded values if env vars are not set (same as public.ts)
 const SUPABASE_URL =
@@ -29,18 +39,22 @@ const SUPABASE_ANON_KEY =
 
 export async function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl
+  const locale = searchParams.get('lang')
 
-  // Older language switches used `?lang=xx`. Canonicalize these URLs before
-  // rendering so people and crawlers land on the actual localized route.
-  if (LEGACY_LOCALIZED_NAVIGATION_PATHS.has(pathname)) {
-    const locale = searchParams.get('lang')
-    if (locale && MARKET_LOCALE_CODES.has(locale)) {
+  // Canonicalize query-based locale links before rendering. Core navigation
+  // routes and curated deep pages both have stable locale paths, so the first
+  // server render, metadata, and client navigation all share one language.
+  if (locale && MARKET_LOCALE_CODES.has(locale)) {
+    const localizedDeepPath = getLocalizedDeepPath(pathname, locale)
+    if (LEGACY_LOCALIZED_NAVIGATION_PATHS.has(pathname) || localizedDeepPath) {
       const url = request.nextUrl.clone()
-      url.pathname = pathname === '/' ? `/${locale}` : `/${locale}${pathname}`
+      url.pathname = localizedDeepPath || (pathname === '/' ? `/${locale}` : `/${locale}${pathname}`)
       url.searchParams.delete('lang')
       return NextResponse.redirect(url, 308)
     }
+  }
 
+  if (LEGACY_LOCALIZED_NAVIGATION_PATHS.has(pathname)) {
     return NextResponse.next({ request })
   }
 
@@ -84,6 +98,8 @@ export const config = {
     '/agent-skills-registry',
     '/docs',
     '/submit',
+    '/skill-packs/:path*',
+    '/collections/:path*',
     '/profile/:path*',
     '/api/claims/:path*',
     '/api/points/:path*',
