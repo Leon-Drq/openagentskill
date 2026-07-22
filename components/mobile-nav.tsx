@@ -16,9 +16,9 @@ import { cn } from '@/lib/utils'
 const navItems = [
   { href: '/resolve', labelKey: 'resolve' },
   { href: '/skills', labelKey: 'skills' },
-  { href: '/tasks', label: 'Tasks' },
-  { href: '/skill-packs', label: 'Packs' },
-  { href: '/compare', label: 'Compare' },
+  { href: '/tasks', labelKey: 'tasks' },
+  { href: '/skill-packs', labelKey: 'packs' },
+  { href: '/compare', labelKey: 'compare' },
   { href: '/api-docs', labelKey: 'apiDocs' },
   { href: '/docs', labelKey: 'docs' },
 ] as const
@@ -128,7 +128,7 @@ export function MobileNav() {
   }, [isOpen])
 
   return (
-    <div className="2xl:hidden">
+    <div className="xl:hidden">
       <button
         onClick={() => setIsOpen(true)}
         className="-mr-2 flex h-10 w-10 items-center justify-center rounded-[8px] text-secondary transition-colors hover:bg-muted hover:text-foreground"
@@ -166,7 +166,7 @@ export function MobileNav() {
               <ul className="space-y-1">
                 {navItems.map((item) => {
                   const active = isActivePath(pathname, item.href)
-                  const label = 'label' in item ? item.label : t.nav[item.labelKey]
+                  const label = t.nav[item.labelKey]
 
                   return (
                     <li key={item.href}>

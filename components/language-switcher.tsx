@@ -16,10 +16,11 @@ import { cn } from '@/lib/utils'
 
 interface LanguageSwitcherProps {
   compact?: boolean
+  showName?: boolean
   className?: string
 }
 
-export function LanguageSwitcher({ compact = false, className }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ compact = false, showName = !compact, className }: LanguageSwitcherProps) {
   const { locale, setLocale } = useI18n()
   const pathname = usePathname()
   const router = useRouter()
@@ -60,7 +61,7 @@ export function LanguageSwitcher({ compact = false, className }: LanguageSwitche
         type="button"
         onClick={() => setOpen((value) => !value)}
         className={cn(
-          'flex items-center rounded-[8px] border border-border bg-card/80 text-xs font-semibold text-foreground transition-colors hover:border-foreground/40',
+          'flex min-w-max items-center whitespace-nowrap rounded-[8px] border border-border bg-card/80 text-xs font-semibold leading-none text-foreground transition-colors hover:border-foreground/40',
           compact ? 'h-9 gap-1.5 px-2' : 'h-8 gap-2 px-2.5'
         )}
         aria-haspopup="listbox"
@@ -69,7 +70,7 @@ export function LanguageSwitcher({ compact = false, className }: LanguageSwitche
       >
         <Globe2 className="h-3.5 w-3.5 text-secondary" aria-hidden="true" />
         <span className="font-mono">{activeLabel}</span>
-        {!compact && <span className="hidden text-secondary sm:inline">{localeNativeNames[activeLocale]}</span>}
+        {showName && <span className="hidden text-secondary sm:inline">{localeNativeNames[activeLocale]}</span>}
         <ChevronDown
           className={cn('h-3.5 w-3.5 text-secondary transition-transform', open && 'rotate-180')}
           aria-hidden="true"

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Activity, Bot, Braces, ChevronDown, FileJson2, Plus, SearchCheck, ShieldCheck, Terminal } from 'lucide-react'
+import { Activity, BookOpenText, Bot, Braces, ChevronDown, FileJson2, Plus, SearchCheck, ShieldCheck, Terminal } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'
 import { GitHubStarButton } from '@/components/github-star-button'
@@ -19,8 +19,11 @@ const primaryNavItems = [
   { href: '/tasks', labelKey: 'tasks' },
   { href: '/skill-packs', labelKey: 'packs' },
   { href: '/compare', labelKey: 'compare' },
-  { href: '/api-docs', labelKey: 'apiDocs' },
-  { href: '/docs', labelKey: 'docs' },
+] as const
+
+const resourceItems = [
+  { href: '/docs', labelKey: 'docs', icon: BookOpenText },
+  { href: '/api-docs', labelKey: 'apiDocs', icon: Braces },
 ] as const
 
 const agentItems: Array<{
@@ -130,7 +133,7 @@ function ForAgentsDropdown({ pathname }: { pathname: string }) {
         type="button"
         onClick={() => setOpen((value) => !value)}
         className={cn(
-          'flex h-16 items-center gap-1.5 border-b-2 border-transparent px-2.5 text-sm text-secondary transition-colors hover:text-foreground',
+          'flex h-16 items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent px-2.5 text-sm text-secondary transition-colors hover:text-foreground',
           active && 'border-[#006b4f] text-foreground'
         )}
         aria-haspopup="menu"
@@ -184,6 +187,64 @@ function ForAgentsDropdown({ pathname }: { pathname: string }) {
   )
 }
 
+function ResourcesDropdown({ pathname }: { pathname: string }) {
+  const { t, locale } = useI18n()
+  const [open, setOpen] = useState(false)
+  const active = resourceItems.some((item) => isActivePath(pathname, item.href))
+
+  return (
+    <div
+      className="relative h-full"
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
+      }}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        className={cn(
+          'flex h-16 items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent px-2.5 text-sm text-secondary transition-colors hover:text-foreground',
+          active && 'border-[#006b4f] text-foreground'
+        )}
+        aria-haspopup="menu"
+        aria-expanded={open}
+      >
+        {t.nav.docs}
+        <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-180')} aria-hidden="true" />
+      </button>
+
+      {open && (
+        <div
+          role="menu"
+          className="absolute left-0 top-[calc(100%-1px)] z-50 w-48 overflow-hidden rounded-[8px] border border-border bg-background p-1.5 shadow-[0_18px_55px_rgba(29,27,24,0.12)]"
+        >
+          {resourceItems.map((item) => {
+            const Icon = item.icon
+            const itemActive = isActivePath(pathname, item.href)
+
+            return (
+              <Link
+                key={item.href}
+                href={getLocalizedNavigationHref(item.href, locale)}
+                prefetch={false}
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className={cn(
+                  'flex items-center gap-2.5 rounded-[6px] px-3 py-2.5 text-sm transition-colors',
+                  itemActive ? 'bg-muted text-foreground' : 'text-secondary hover:bg-muted/60 hover:text-foreground'
+                )}
+              >
+                <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span className="font-medium">{t.nav[item.labelKey]}</span>
+              </Link>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function SiteHeader() {
   const { t, locale } = useI18n()
   const pathname = usePathname()
@@ -195,7 +256,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/92 backdrop-blur supports-[backdrop-filter]:bg-background/82">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-3 px-4 sm:px-6">
         <Link prefetch={false} href={getLocalizedNavigationHref('/', locale)} className="flex min-w-0 shrink-0 items-center gap-2.5 transition-opacity hover:opacity-70">
           <BrandMark className="h-7 w-7 text-foreground" />
           <span className="hidden truncate font-sans text-base font-semibold sm:inline sm:text-lg">
@@ -206,8 +267,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <div className="flex h-full items-center gap-2 sm:gap-3">
-          <nav className="hidden h-full shrink-0 items-center gap-0.5 2xl:flex" aria-label="Primary navigation">
+        <nav className="hidden h-full min-w-0 flex-1 items-center justify-center gap-0.5 xl:flex" aria-label="Primary navigation">
             {primaryNavItems.map((item) => {
               const active = isActivePath(pathname, item.href)
               const label = t.nav[item.labelKey]
@@ -221,7 +281,7 @@ export function SiteHeader() {
                   onPointerEnter={() => warmRoute(href)}
                   onFocus={() => warmRoute(href)}
                   className={cn(
-                    'flex h-16 shrink-0 items-center whitespace-nowrap border-b-2 border-transparent px-2.5 text-sm transition-colors',
+                    'flex h-16 shrink-0 items-center whitespace-nowrap border-b-2 border-transparent px-2 text-sm transition-colors',
                     active ? 'border-[#006b4f] text-foreground' : 'text-secondary hover:text-foreground'
                   )}
                   aria-current={active ? 'page' : undefined}
@@ -230,29 +290,32 @@ export function SiteHeader() {
                 </Link>
               )
             })}
+            <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
+            <ResourcesDropdown pathname={pathname} />
             <ForAgentsDropdown pathname={pathname} />
-          </nav>
+        </nav>
 
-          <div className="hidden items-center gap-2 2xl:flex">
+        <div className="ml-auto flex h-full shrink-0 items-center gap-1.5 sm:gap-2">
+          <div className="hidden items-center gap-2 xl:flex">
             <GitHubStarButton />
             <Link
               href={getLocalizedNavigationHref('/submit', locale)}
               prefetch={false}
-              className="flex h-9 shrink-0 items-center gap-2 rounded-[8px] border border-border bg-card/70 px-3 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
+              className="flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-[8px] border border-border bg-card/70 px-3 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
               {t.nav.submitSkill}
             </Link>
           </div>
 
-          <div className="2xl:hidden">
+          <div className="xl:hidden">
             <GitHubStarButton className="h-9" compact />
           </div>
-          <div className="2xl:hidden">
+          <div className="xl:hidden">
             <LanguageSwitcher compact />
           </div>
-          <div className="hidden 2xl:block">
-            <LanguageSwitcher />
+          <div className="hidden xl:block">
+            <LanguageSwitcher showName={false} />
           </div>
           <MobileNav />
         </div>
