@@ -436,7 +436,10 @@ function getQueuedSkillSkipReason(item: XContentQueueItem) {
   if (isGenericFoundationRepoName(repo)) return 'generic-foundation-repo'
 
   const candidateReason = typeof metadata.x_candidate_reason === 'string' ? metadata.x_candidate_reason : null
-  if (candidateReason && candidateReason !== 'skill-or-workflow-specific') return candidateReason
+  // `skill-like-*` is the positive decision produced by getXCandidateDecision.
+  // It used to be treated as a skip reason, which silently retired every
+  // otherwise eligible queued post before it reached the X API.
+  if (candidateReason && !candidateReason.startsWith('skill-like-')) return candidateReason
 
   return null
 }
@@ -457,13 +460,23 @@ export async function postNextQueuedSkillToX(
   const token = await refreshXAccessToken(connection.refresh_token)
   await saveRefreshedXToken(supabase, serverSecret, token)
 
+  let queueBuild: Pick<XQueueBuildResult, 'status' | 'queued' | 'skipped' | 'considered'> | null = null
   if (options.autoBuildQueue !== false) {
-    await enqueueXSkillPostQueue({ limit: options.buildLimit || 8 }).catch((error) => {
+    try {
+      const result = await enqueueXSkillPostQueue({ limit: options.buildLimit || 8 })
+      queueBuild = {
+        status: result.status,
+        queued: result.queued,
+        skipped: result.skipped,
+        considered: result.considered,
+      }
+    } catch (error) {
       console.warn('[x-growth] queue refill failed:', error)
-    })
+    }
   }
 
   let item: XContentQueueItem | null = null
+  const skippedQueueItems: Array<{ skillSlug: string; reason: string }> = []
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const candidateItem = await claimNextQueueItem(supabase, serverSecret)
     if (!candidateItem) break
@@ -478,6 +491,7 @@ export async function postNextQueuedSkillToX(
           github_repo: candidateItem.skill?.github_repo || candidateItem.metadata?.github_repo || null,
         },
       })
+      skippedQueueItems.push({ skillSlug: candidateItem.skill_slug, reason: skipReason })
       continue
     }
 
@@ -486,6 +500,7 @@ export async function postNextQueuedSkillToX(
   }
 
   if (!item) {
+    console.info('[x-growth] no postable X queue item', { queueBuild, skippedQueueItems })
     return { status: 'skipped', reason: 'No queued X content is ready' }
   }
 

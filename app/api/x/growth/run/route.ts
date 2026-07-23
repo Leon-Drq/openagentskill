@@ -11,6 +11,24 @@ async function handleRun(request: NextRequest) {
 
   const result = await runXGrowthOS()
   const hasError = result.metrics.status === 'error' || result.replies.status === 'error'
+
+  console.info('[x-growth-run]', {
+    queue: {
+      status: result.queue.status,
+      queued: result.queue.queued,
+      skipped: result.queue.skipped,
+      considered: result.queue.considered,
+    },
+    digest: {
+      status: result.digest.status,
+      queued: result.digest.queued,
+      skipped: result.digest.skipped,
+      considered: result.digest.considered,
+    },
+    metrics: result.metrics.status,
+    replies: result.replies.status,
+  })
+
   return NextResponse.json({ success: !hasError, ...result }, { status: hasError ? 207 : 200 })
 }
 
