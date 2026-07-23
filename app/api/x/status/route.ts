@@ -44,6 +44,13 @@ export async function GET(request: NextRequest) {
   }
 
   const connection = await getConnectionStatus()
+  const skillRadarXMaxQueries = numberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 0)
+  const skillRadarXResultsPerQuery = numberFromEnv('SKILL_RADAR_X_RESULTS_PER_QUERY', 10)
+  const skillRadarXScanIntervalHours = Math.min(
+    Math.max(numberFromEnv('SKILL_RADAR_X_SCAN_INTERVAL_HOURS', 6), 1),
+    24
+  )
+  const skillRadarXQueriesPerDay = Math.ceil(24 / skillRadarXScanIntervalHours) * skillRadarXMaxQueries
 
   return NextResponse.json({
     success: true,
@@ -66,9 +73,11 @@ export async function GET(request: NextRequest) {
       growthQueueLimit: numberFromEnv('X_GROWTH_QUEUE_LIMIT', 4),
       metricsSyncLimit: numberFromEnv('X_METRICS_SYNC_LIMIT', 12),
       replySyncLimit: numberFromEnv('X_REPLY_SYNC_LIMIT', 8),
-      skillRadarXMaxQueries: numberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 1),
-      skillRadarXResultsPerQuery: numberFromEnv('SKILL_RADAR_X_RESULTS_PER_QUERY', 10),
-      skillRadarXScanIntervalHours: numberFromEnv('SKILL_RADAR_X_SCAN_INTERVAL_HOURS', 6),
+      skillRadarXMaxQueries,
+      skillRadarXResultsPerQuery,
+      skillRadarXScanIntervalHours,
+      skillRadarXQueriesPerDay,
+      skillRadarXEnabled: skillRadarXMaxQueries > 0 && hasEnv('X_BEARER_TOKEN'),
     },
     guardrails: {
       duplicateSkillPosts: 'blocked by queue and post history',

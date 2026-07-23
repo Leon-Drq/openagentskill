@@ -31,6 +31,11 @@ function parsePositiveNumber(value: unknown, fallback: number) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
 }
 
+function parseNonNegativeNumber(value: unknown, fallback: number) {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
+}
+
 function toNumber(value: unknown) {
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : null
@@ -389,6 +394,14 @@ export async function GET() {
     Math.max(parsePositiveNumber(process.env.SKILL_RADAR_TARGET_NEW, 2), 1),
     12
   )
+  const skillRadarXMaxQueries = Math.min(
+    Math.max(parseNonNegativeNumber(process.env.SKILL_RADAR_X_MAX_QUERIES, 0), 0),
+    12
+  )
+  const skillRadarXScanIntervalHours = Math.min(
+    Math.max(parsePositiveNumber(process.env.SKILL_RADAR_X_SCAN_INTERVAL_HOURS, 6), 1),
+    24
+  )
   const defaultTargetNewPerRun = 250
   const targetNew = Math.max(
     parsePositiveNumber(process.env.INDEXER_RUN_TARGET, defaultTargetNewPerRun),
@@ -427,7 +440,7 @@ export async function GET() {
   }
   const schedule = {
     import_cron: '35 * * * *',
-    import_frequency: 'hourly quality maintenance radar with rotating GitHub query windows; X signals are sampled every 6 hours by default.',
+    import_frequency: 'hourly quality maintenance radar with rotating GitHub query windows; X signals use a separately budgeted schedule.',
     profile_crons: INDEXER_RUN_PROFILES.map((profile) => ({
       profile: profile.key,
       path: profile.path,
@@ -444,7 +457,9 @@ export async function GET() {
     star_refresh_cron: '0 3 * * *',
     star_refresh_frequency: 'daily at 03:00 UTC',
     skill_radar_cron: '35 * * * *',
-    skill_radar_frequency: 'hourly X/GitHub hot-skill signal scan',
+    skill_radar_frequency: skillRadarXMaxQueries > 0
+      ? `hourly GitHub scan; X hotspot scan every ${skillRadarXScanIntervalHours} hours`
+      : 'hourly GitHub scan; X hotspot scan is disabled until an X search budget is configured',
     indexnow_cron: '15 3 * * *',
     indexnow_frequency: 'daily baseline submission plus automatic submission after new skill imports',
   }
@@ -588,7 +603,9 @@ export async function GET() {
       },
       budget: {
         github_query_windows: 4,
-        x_signal_scan: 'one query every 6 hours by default',
+        x_signal_scan: skillRadarXMaxQueries > 0
+          ? `${skillRadarXMaxQueries} X query windows every ${skillRadarXScanIntervalHours} hours`
+          : 'disabled by budget',
       },
       quality_gates: [
         'requires a GitHub repository URL',

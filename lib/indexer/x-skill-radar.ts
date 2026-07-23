@@ -97,6 +97,8 @@ const X_SKILL_RADAR_QUERIES = [
   '("web scraping skill" OR "browser automation skill" OR "crawler skill") (github.com OR "GitHub") has:links -is:retweet',
   '("World Cup" "skill" OR "football analytics" "skill" OR "sports analytics" "agent") (github.com OR "GitHub") has:links -is:retweet',
   '("design skill" OR "video skill" OR "creative agent skill") (github.com OR "GitHub") has:links -is:retweet',
+  '("marketing skill" OR "SEO skill" OR "growth skill" OR "content skill") (github.com OR "GitHub") has:links -is:retweet',
+  '("data analysis skill" OR "spreadsheet skill" OR "SQL skill" OR "legal skill" OR "education skill") (github.com OR "GitHub") has:links -is:retweet',
 ]
 
 const WORKFLOW_SIGNAL = /\b(agent[-_\s]?skill|skill\.md|skills?|codex|claude code|cursor|gemini cli|agent workflow|installable|workflow|automation|ppt|pptx|powerpoint|slides?|presentation|deck|stock|trading|finance|quant|backtest|research|last30|web scraping|crawler|browser automation|rag|pdf|document|seo|design|video|world cup|football|soccer|sports analytics)\b/i

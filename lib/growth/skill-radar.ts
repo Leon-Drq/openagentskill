@@ -37,6 +37,7 @@ export interface SkillRadarResult {
   success: boolean
   runKey: string
   source: 'x_and_github'
+  xRadarSchedule: XSkillRadarSchedule
   xRadar: XSkillRadarResult
   githubHot: HotSkillDiscoveryResult
   import: {
@@ -60,6 +61,17 @@ export interface SkillRadarResult {
   }
 }
 
+export interface XSkillRadarSchedule {
+  enabled: boolean
+  scheduled: boolean
+  configuredMaxQueries: number
+  activeMaxQueries: number
+  intervalHours: number
+  queryOffset: number
+}
+
+const MAX_X_RADAR_QUERIES_PER_RUN = 12
+
 function numberFromEnv(name: string, fallback: number) {
   const parsed = Number(process.env[name])
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
@@ -70,24 +82,36 @@ function nonNegativeNumberFromEnv(name: string, fallback: number) {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
 }
 
-function skillRadarXMaxQueries(options: SkillRadarOptions) {
-  if (options.xMaxQueries !== undefined) {
-    return Math.min(Math.max(options.xMaxQueries, 0), 8)
-  }
-
-  const maxQueries = Math.min(
-    Math.max(nonNegativeNumberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 0), 0),
-    8
+export function getSkillRadarXSchedule(
+  options: SkillRadarOptions = {},
+  now = new Date()
+): XSkillRadarSchedule {
+  const configuredMaxQueries = Math.min(
+    Math.max(
+      options.xMaxQueries ?? nonNegativeNumberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 0),
+      0
+    ),
+    MAX_X_RADAR_QUERIES_PER_RUN
   )
-  if (maxQueries === 0) return 0
-
-  // GitHub can be checked every hour without consuming X credits. Sample X
-  // periodically, then let its high-engagement posts enrich the same quality gate.
   const intervalHours = Math.min(
     Math.max(numberFromEnv('SKILL_RADAR_X_SCAN_INTERVAL_HOURS', 6), 1),
     24
   )
-  return new Date().getUTCHours() % intervalHours === 0 ? maxQueries : 0
+  const intervalMs = intervalHours * 3_600_000
+  const intervalBucket = Math.floor(now.getTime() / intervalMs)
+  const forcedRun = options.xMaxQueries !== undefined
+  const scheduled = configuredMaxQueries > 0 && (forcedRun || now.getUTCHours() % intervalHours === 0)
+
+  return {
+    enabled: configuredMaxQueries > 0,
+    scheduled,
+    configuredMaxQueries,
+    activeMaxQueries: scheduled ? configuredMaxQueries : 0,
+    intervalHours,
+    // Advance by the full query window so a daily two-query scan rotates over
+    // every theme instead of landing on the same X search each day.
+    queryOffset: intervalBucket * Math.max(configuredMaxQueries, 1),
+  }
 }
 
 async function recordSkillRadarRun(run: Record<string, unknown>) {
@@ -248,7 +272,8 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
     5
   )
   const seoDailyLimit = options.seoDailyLimit ?? numberFromEnv('SEO_DRIP_DAILY_LIMIT', 50)
-  const xMaxQueries = skillRadarXMaxQueries(options)
+  const xRadarSchedule = getSkillRadarXSchedule(options)
+  const xMaxQueries = xRadarSchedule.activeMaxQueries
   const queryOffset = Math.floor(Date.now() / 3_600_000)
 
   const [xRadar, githubHot] = await Promise.all([
@@ -258,14 +283,16 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
           minStars,
           maxQueries: xMaxQueries,
           maxResultsPerQuery: options.xResultsPerQuery ?? numberFromEnv('SKILL_RADAR_X_RESULTS_PER_QUERY', 10),
-          queryOffset,
+          queryOffset: xRadarSchedule.queryOffset,
         })
       : Promise.resolve({
           status: 'skipped' as const,
-          reason: 'X radar disabled by budget',
+          reason: xRadarSchedule.enabled
+            ? 'X radar is waiting for its next scheduled scan window'
+            : 'X radar disabled by budget',
           candidates: [],
           searchedQueries: 0,
-          queryOffset,
+          queryOffset: xRadarSchedule.queryOffset,
           inspectedTweets: 0,
           extractedRepos: 0,
           minStars,
@@ -357,6 +384,7 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
     success: true,
     runKey,
     source: 'x_and_github',
+    xRadarSchedule,
     xRadar,
     githubHot,
     import: {
@@ -409,6 +437,11 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
       x_radar: {
         status: xRadar.status,
         reason: xRadar.reason || null,
+        enabled: xRadarSchedule.enabled,
+        scheduled: xRadarSchedule.scheduled,
+        configured_max_queries: xRadarSchedule.configuredMaxQueries,
+        active_max_queries: xRadarSchedule.activeMaxQueries,
+        interval_hours: xRadarSchedule.intervalHours,
         searched_queries: xRadar.searchedQueries,
         query_offset: xRadar.queryOffset,
         inspected_tweets: xRadar.inspectedTweets,

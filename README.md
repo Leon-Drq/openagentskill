@@ -328,6 +328,12 @@ Current production strategy:
 - Cover coding, data, documents, finance, quant, research, security, DevOps, RAG, browser automation, commerce, marketing, support, legal, education, productivity, Web3, sports analytics, ML/media, science, and robotics.
 - Submit fresh skill pages to IndexNow after imports.
 
+### X Hot-Skill Radar
+
+X is used as a discovery signal, not as an automatic import source. The daily radar rotates through task-focused searches for coding, finance, research, presentations, web scraping, design, marketing, data, legal, education, and sports. It only considers posts that link to a real GitHub repository. Every candidate still needs a clear license, a non-empty README, at least 10 GitHub stars, direct skill/workflow signals, and the normal AI quality review before it is indexed.
+
+This keeps the catalog current without importing generic frameworks or low-quality trend noise.
+
 Useful protected routes:
 
 ```text
@@ -400,6 +406,11 @@ pnpm run build
 | `X_CLIENT_ID` | Optional | X OAuth client ID |
 | `X_CLIENT_SECRET` | Optional | X OAuth client secret |
 | `X_ALLOWED_USERNAME` | Optional | Allowed X username for token storage |
+| `X_BEARER_TOKEN` | Optional | Enables X hot-skill discovery; keep server-only |
+| `SKILL_RADAR_X_MAX_QUERIES` | Optional | Number of X topic searches per scan; `0` disables X discovery |
+| `SKILL_RADAR_X_SCAN_INTERVAL_HOURS` | Optional | X scan frequency; `24` is the recommended daily, bounded setting |
+| `SKILL_RADAR_X_RESULTS_PER_QUERY` | Optional | Candidate posts inspected per X topic query; default `10` |
+| `SKILL_RADAR_X_LIMIT` | Optional | Maximum X-linked repositories to pass into the review pool per scan |
 
 Never commit production secrets. Keep privileged Supabase and X credentials server-only.
 
