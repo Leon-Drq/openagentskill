@@ -43,14 +43,11 @@ export type SitemapSection =
   | 'rankings'
   | 'guides'
   | 'skills'
-  | 'skill-audits'
-  | 'skill-evals'
-  | 'alternatives'
 
 function dateFrom(value: string | null | undefined) {
-  if (!value) return new Date()
+  if (!value) return undefined
   const date = new Date(value)
-  return Number.isFinite(date.getTime()) ? date : new Date()
+  return Number.isFinite(date.getTime()) ? date : undefined
 }
 
 function chunkCount(total: number) {
@@ -95,35 +92,20 @@ export async function getSitemapSkillRecords(index = 0, minStars = 0) {
 }
 
 export async function getSitemapIndexEntries() {
-  const now = new Date()
-  const [skillCount, highSignalSkillCount] = await Promise.all([
-    getSitemapSkillCount(),
-    getSitemapSkillCount(500),
-  ])
+  const skillCount = await getSitemapSkillCount()
 
-  const fixedSections: Array<{ loc: string; lastmod: Date }> = [
-    { loc: `${SITEMAP_BASE_URL}/sitemaps/core.xml`, lastmod: now },
-    { loc: `${SITEMAP_BASE_URL}/sitemaps/best.xml`, lastmod: now },
-    { loc: `${SITEMAP_BASE_URL}/sitemaps/rankings.xml`, lastmod: now },
-    { loc: `${SITEMAP_BASE_URL}/sitemaps/guides.xml`, lastmod: now },
+  // Do not attach a request-time lastmod to sitemap index entries. Google only
+  // treats lastmod as a signal when it represents a real, verifiable update.
+  const fixedSections: Array<{ loc: string }> = [
+    { loc: `${SITEMAP_BASE_URL}/sitemaps/core.xml` },
+    { loc: `${SITEMAP_BASE_URL}/sitemaps/best.xml` },
+    { loc: `${SITEMAP_BASE_URL}/sitemaps/rankings.xml` },
+    { loc: `${SITEMAP_BASE_URL}/sitemaps/guides.xml` },
   ]
 
   const skillSections = [
     ...Array.from({ length: chunkCount(skillCount) }, (_, index) => ({
       loc: `${SITEMAP_BASE_URL}/sitemaps/skills-${index}.xml`,
-      lastmod: now,
-    })),
-    ...Array.from({ length: chunkCount(skillCount) }, (_, index) => ({
-      loc: `${SITEMAP_BASE_URL}/sitemaps/skill-audits-${index}.xml`,
-      lastmod: now,
-    })),
-    ...Array.from({ length: chunkCount(skillCount) }, (_, index) => ({
-      loc: `${SITEMAP_BASE_URL}/sitemaps/skill-evals-${index}.xml`,
-      lastmod: now,
-    })),
-    ...Array.from({ length: chunkCount(highSignalSkillCount) }, (_, index) => ({
-      loc: `${SITEMAP_BASE_URL}/sitemaps/alternatives-${index}.xml`,
-      lastmod: now,
     })),
   ]
 
@@ -286,39 +268,11 @@ export function getGuideSitemapEntries(now = new Date()): SitemapEntry[] {
 }
 
 export async function getSkillSitemapEntries(section: SitemapSection, index = 0): Promise<SitemapEntry[]> {
-  const minStars = section === 'alternatives' ? 500 : 0
-  const skills = await getSitemapSkillRecords(index, minStars)
+  const skills = await getSitemapSkillRecords(index)
 
   return skills.map((skill) => {
     const lastModified = dateFrom(skill.github_last_pushed_at || skill.updated_at)
     const highSignal = Number(skill.github_stars || 0) >= 500
-
-    if (section === 'skill-audits') {
-      return {
-        url: `${SITEMAP_BASE_URL}/skills/${skill.slug}/audit`,
-        lastModified,
-        changeFrequency: 'weekly',
-        priority: highSignal ? 0.76 : 0.68,
-      }
-    }
-
-    if (section === 'skill-evals') {
-      return {
-        url: `${SITEMAP_BASE_URL}/skills/${skill.slug}/evals`,
-        lastModified,
-        changeFrequency: 'weekly',
-        priority: highSignal ? 0.78 : 0.7,
-      }
-    }
-
-    if (section === 'alternatives') {
-      return {
-        url: `${SITEMAP_BASE_URL}/alternatives/${skill.slug}`,
-        lastModified,
-        changeFrequency: 'weekly',
-        priority: 0.78,
-      }
-    }
 
     return {
       url: `${SITEMAP_BASE_URL}/skills/${skill.slug}`,
@@ -339,29 +293,34 @@ function escapeXml(value: string) {
 }
 
 function formatDate(value: Date | string | undefined) {
-  if (!value) return new Date().toISOString()
+  if (!value) return undefined
   const date = value instanceof Date ? value : new Date(value)
-  return (Number.isFinite(date.getTime()) ? date : new Date()).toISOString()
+  return Number.isFinite(date.getTime()) ? date.toISOString() : undefined
 }
 
-export function renderSitemapIndex(entries: Array<{ loc: string; lastmod: Date | string }>) {
+export function renderSitemapIndex(entries: Array<{ loc: string; lastmod?: Date | string }>) {
   const body = entries
     .map((entry) => {
+      const lastModified = formatDate(entry.lastmod)
       return [
         '  <sitemap>',
         `    <loc>${escapeXml(entry.loc)}</loc>`,
-        `    <lastmod>${formatDate(entry.lastmod)}</lastmod>`,
+        lastModified ? `    <lastmod>${lastModified}</lastmod>` : '',
         '  </sitemap>',
-      ].join('\n')
+      ].filter(Boolean).join('\n')
     })
     .join('\n')
 
   return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</sitemapindex>\n`
 }
 
-export function renderUrlSet(entries: SitemapEntry[]) {
+export function renderUrlSet(
+  entries: SitemapEntry[],
+  { includeLastModified = true }: { includeLastModified?: boolean } = {}
+) {
   const body = entries
     .map((entry) => {
+      const lastModified = includeLastModified ? formatDate(entry.lastModified) : undefined
       const alternates = entry.alternates?.languages
         ? Object.entries(entry.alternates.languages)
             .map(([lang, href]) => `    <xhtml:link rel="alternate" hreflang="${escapeXml(lang)}" href="${escapeXml(href)}" />`)
@@ -371,7 +330,7 @@ export function renderUrlSet(entries: SitemapEntry[]) {
       return [
         '  <url>',
         `    <loc>${escapeXml(entry.url)}</loc>`,
-        `    <lastmod>${formatDate(entry.lastModified)}</lastmod>`,
+        lastModified ? `    <lastmod>${lastModified}</lastmod>` : '',
         entry.changeFrequency ? `    <changefreq>${entry.changeFrequency}</changefreq>` : '',
         typeof entry.priority === 'number' ? `    <priority>${entry.priority.toFixed(2)}</priority>` : '',
         alternates,

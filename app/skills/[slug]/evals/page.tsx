@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
@@ -25,6 +25,10 @@ export async function generateMetadata({
     description: `Pre-install Trust + Eval report for ${skill.name}: task fit, install safety, trust score, audit warnings, and validation steps.`,
     alternates: {
       canonical: pageUrl,
+    },
+    robots: {
+      index: false,
+      follow: true,
     },
     openGraph: {
       title: `${skill.name} Eval Report - OpenAgentSkill`,
@@ -64,6 +68,10 @@ export default async function SkillEvalPage({ params }: { params: Promise<{ slug
   const { slug } = await params
   const skill = await getSkillBySlugOrFallback(slug)
   if (!skill) notFound()
+
+  if (slug !== skill.slug) {
+    permanentRedirect(`/skills/${skill.slug}/evals`)
+  }
 
   const [eventStats, relatedSkills] = isCuratedSkillFallback(skill)
     ? [null, []]

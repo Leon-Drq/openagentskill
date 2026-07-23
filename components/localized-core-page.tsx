@@ -6,7 +6,6 @@ import { LocalizedNavigationPage } from '@/components/localized-navigation-page'
 import { MarketingButtonLink, MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import { getAllSkills, searchSkills, type SkillRecord } from '@/lib/db/skills'
 import { getMarketCoreContent } from '@/lib/i18n/market-core-pages'
-import { LOCALIZED_LANDING_PAGES } from '@/lib/seo/localized-pages'
 import {
   getLocalizedCorePath,
   getLocalizedNavigationHref,
@@ -301,15 +300,8 @@ export async function LocalizedCorePage({
 }) {
   const content = getMarketCoreContent(locale)
   const skills = await skillListForPage(page, query)
-  const language = LOCALIZED_LANDING_PAGES[locale].lang
-
   return (
     <MarketingPageShell>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `document.documentElement.lang=${JSON.stringify(language)};`,
-        }}
-      />
       {page === 'resolve' ? (
         <>
           <MarketingHero

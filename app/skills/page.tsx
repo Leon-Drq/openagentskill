@@ -47,14 +47,17 @@ export const metadata: Metadata = {
   },
 }
 
-const BASE_SKILL_CANDIDATE_LIMIT = 160
-const SEARCH_SKILL_CANDIDATE_LIMIT = 720
-const MAX_SKILL_CANDIDATE_LIMIT = 720
+// The directory renders 16 cards. Keep its ranking pool broad enough for good
+// recommendations without loading hundreds of unused records into every page.
+const BASE_SKILL_CANDIDATE_LIMIT = 96
+const SEARCH_SKILL_CANDIDATE_LIMIT = 320
+const MAX_SKILL_CANDIDATE_LIMIT = 480
 const VISIBLE_SKILL_LIMIT = 16
 const SKILLS_PAGE_REVALIDATE = 300
 const MAX_SKILLS_PAGE = Math.ceil(MAX_SKILL_CANDIDATE_LIMIT / VISIBLE_SKILL_LIMIT)
 const SKILLS_PAGE_QUERY_TIMEOUT_MS = 1800
-const SKILLS_PAGE_EXACT_SEARCH_LIMIT = 200
+const SKILLS_PAGE_EXACT_SEARCH_LIMIT = 120
+const DIRECTORY_SECTION_SOURCE_LIMIT = 120
 const FALLBACK_DATE = '2026-06-01T00:00:00.000Z'
 
 const DIRECTORY_SCENARIOS = [
@@ -933,7 +936,7 @@ export default async function SkillsPage({
     ...getPlatformHints(record),
   ]).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b))
-    .slice(0, 80)
+    .slice(0, 48)
 
   const selectedUseCase = useCase !== 'all' ? getUseCaseBySlug(useCase) : undefined
 
@@ -995,7 +998,9 @@ export default async function SkillsPage({
   const hasMoreResults = resultCount > pageOffset + visibleRecords.length
 
   const skills = visibleRecords.map(toSkillsPageSkill)
-  const directorySections = buildDirectorySections(enrichedRecords)
+  const directorySections = buildDirectorySections(
+    enrichedRecords.slice(0, DIRECTORY_SECTION_SOURCE_LIMIT)
+  )
   const directoryLinks: DirectoryLink[] = POPULAR_DIRECTORY_LINKS.map((link) => ({ ...link }))
   const jsonLd = buildSkillsPageJsonLd(skills, directorySections)
 

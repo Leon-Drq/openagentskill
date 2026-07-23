@@ -14,10 +14,9 @@ export const revalidate = 3600
 
 const SHARDED_SECTION_PREFIXES: Array<[RegExp, SitemapSection]> = [
   [/^skills-(\d+)\.xml$/, 'skills'],
-  [/^skill-audits-(\d+)\.xml$/, 'skill-audits'],
-  [/^skill-evals-(\d+)\.xml$/, 'skill-evals'],
-  [/^alternatives-(\d+)\.xml$/, 'alternatives'],
 ]
+
+const RETIRED_SHARDED_SITEMAPS = /^(skill-audits|skill-evals|alternatives)-(\d+)\.xml$/
 
 function staticEntriesFor(section: string) {
   const now = new Date()
@@ -44,7 +43,22 @@ export async function GET(
   const staticEntries = staticEntriesFor(section)
 
   if (staticEntries) {
-    return xmlResponse(renderUrlSet(staticEntries))
+    // Static section entries change at editorial cadence, not whenever this
+    // endpoint is requested. Omit lastmod rather than emitting a false signal.
+    return xmlResponse(renderUrlSet(staticEntries, { includeLastModified: false }))
+  }
+
+  // Audit, eval, and generic alternative pages remain available to people and
+  // agents, but they are no longer part of the public crawl budget. A 410 tells
+  // crawlers that old child sitemaps were intentionally retired.
+  if (RETIRED_SHARDED_SITEMAPS.test(section)) {
+    return new Response('', {
+      status: 410,
+      headers: {
+        'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
+        'X-Robots-Tag': 'noindex',
+      },
+    })
   }
 
   for (const [pattern, sitemapSection] of SHARDED_SECTION_PREFIXES) {

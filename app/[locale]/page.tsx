@@ -80,18 +80,11 @@ export default async function LocalizedHomePage({
   const { stats, activities, featuredSkills } = await getHomePageData()
 
   return (
-    <>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `document.documentElement.lang=${JSON.stringify(page.lang)};`,
-        }}
-      />
-      <HomePageEnhanced
-        initialLocale={locale as Locale}
-        stats={stats}
-        activities={activities}
-        featuredSkills={featuredSkills}
-      />
-    </>
+    <HomePageEnhanced
+      initialLocale={locale as Locale}
+      stats={stats}
+      activities={activities}
+      featuredSkills={featuredSkills}
+    />
   )
 }

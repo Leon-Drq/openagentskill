@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import { cache } from 'react'
 import {
   getApprovedClaimBySkillSlug,
@@ -31,7 +31,7 @@ import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillInstallApiUrl } from '@/lib/registry'
 import { getSkillAttribution } from '@/lib/skill-attribution'
-import { getSkillBySlugOrFallback } from '@/lib/skill-fallbacks'
+import { getCanonicalSkillSlug, getSkillBySlugOrFallback } from '@/lib/skill-fallbacks'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import {
   getSkillTrustProfileV5,
@@ -50,7 +50,7 @@ export const revalidate = 1800
 const SKILL_DETAIL_SUPPORT_TIMEOUT_MS = 1200
 
 const getCachedSkillBySlug = cache(async (slug: string) =>
-  getSkillBySlugOrFallback(slug)
+  getSkillBySlugOrFallback(getCanonicalSkillSlug(slug))
 )
 
 const getCachedSkillDetailSupport = cache(
@@ -95,6 +95,7 @@ export async function generateMetadata({
   const dbSkill = await getCachedSkillBySlug(slug)
   const skill = dbSkill ? convertSkillRecordToManifest(dbSkill) : null
   if (!skill) return { title: 'Skill Not Found' }
+  const canonicalSlug = skill.slug || getCanonicalSkillSlug(slug)
 
   const starsText =
     skill.stats.stars >= 1000
@@ -103,11 +104,11 @@ export async function generateMetadata({
   const installCommand =
     skill.technical.installCommand || `npx skills add ${skill.slug}`
   const description = `${skill.description} ${starsText} GitHub stars. Install with ${installCommand}.`
-  const pageUrl = `https://www.openagentskill.com/skills/${slug}`
+  const pageUrl = `https://www.openagentskill.com/skills/${canonicalSlug}`
   const imageAlt = `${skill.name} - OpenAgentSkill`
   const imageVersion = '7'
   const staticSkillImageUrl =
-    slug === 'addyosmani-agent-skills'
+    canonicalSlug === 'addyosmani-agent-skills'
       ? 'https://www.openagentskill.com/og/skills/addyosmani-agent-skills-v7.png'
       : null
   const openGraphImageUrl = staticSkillImageUrl || `${pageUrl}/opengraph-image?v=${imageVersion}`
@@ -224,6 +225,10 @@ export default async function SkillDetailPage({
   const dbSkill = await getCachedSkillBySlug(slug)
   const skill = dbSkill ? convertSkillRecordToManifest(dbSkill) : null
   if (!skill) notFound()
+
+  if (slug !== skill.slug) {
+    permanentRedirect(`/skills/${skill.slug}`)
+  }
 
   const { relatedSkills, eventStats, outcomeStats, approvedClaim } =
     await getCachedSkillDetailSupport(skill.id, skill.category, skill.slug)

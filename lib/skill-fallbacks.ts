@@ -56,9 +56,26 @@ const SLUG_ALIASES: Record<string, string> = {
   'football-analytics': 'statsbomb-open-data',
 }
 
-export function normalizeSkillSlug(slug: string) {
-  const normalized = slug.trim().toLowerCase().replace(/^\/+|\/+$/g, '')
+function normalizeRequestedSkillSlug(slug: string) {
+  return slug.trim().toLowerCase().replace(/^\/+|\/+$/g, '')
+}
+
+/**
+ * Return the one public URL slug for a skill. Aliases are accepted at the
+ * boundary so older links keep working, while pages can redirect crawlers and
+ * users to a single canonical address.
+ */
+export function getCanonicalSkillSlug(slug: string) {
+  const normalized = normalizeRequestedSkillSlug(slug)
   return SLUG_ALIASES[normalized] || normalized
+}
+
+export function isCanonicalSkillSlug(slug: string) {
+  return normalizeRequestedSkillSlug(slug) === getCanonicalSkillSlug(slug)
+}
+
+export function normalizeSkillSlug(slug: string) {
+  return getCanonicalSkillSlug(slug)
 }
 
 export function getCuratedSkillFallback(slug: string): SkillRecord | null {

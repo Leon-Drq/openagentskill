@@ -20,7 +20,7 @@ const REPO_CACHE_KEY = 'openagentskill.github-repo-summary.v1'
 const FALLBACK_REPO: Required<GitHubRepoSummary> = {
   repo: 'Leon-Drq/openagentskill',
   url: 'https://github.com/Leon-Drq/openagentskill',
-  stars_label: '0',
+  stars_label: '200+',
 }
 
 function readCachedRepo(): GitHubRepoSummary | null {

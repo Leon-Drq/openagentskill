@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
@@ -30,6 +30,10 @@ export async function generateMetadata({
     description: `Compare ${skill.name} with similar AI agent skills ranked by quality, trust, GitHub adoption, maintenance, and install readiness.`,
     alternates: {
       canonical: `https://www.openagentskill.com/alternatives/${skill.slug}`,
+    },
+    robots: {
+      index: false,
+      follow: true,
     },
     openGraph: {
       title: `${skill.name} Alternatives - OpenAgentSkill`,
@@ -104,6 +108,10 @@ export default async function AlternativesPage({
     getAllSkills('quality', undefined, 1200).catch(() => []),
   ])
   if (!target) notFound()
+
+  if (slug !== target.slug) {
+    permanentRedirect(`/alternatives/${target.slug}`)
+  }
 
   const skills = mergeSkillCatalog(dbSkills)
   const alternatives = getAlternatives(target, skills, 16)

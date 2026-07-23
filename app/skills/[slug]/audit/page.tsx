@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
@@ -37,6 +37,10 @@ export async function generateMetadata({
     description: `Audit report for ${skill.name}: quality, trust, maintenance, install readiness, and adoption risk.`,
     alternates: {
       canonical: pageUrl,
+    },
+    robots: {
+      index: false,
+      follow: true,
     },
     openGraph: {
       title: `${skill.name} Audit Report - OpenAgentSkill`,
@@ -94,6 +98,10 @@ export default async function SkillAuditPage({ params }: { params: Promise<{ slu
   const { slug } = await params
   const skill = await getSkillBySlugOrFallback(slug)
   if (!skill) notFound()
+
+  if (slug !== skill.slug) {
+    permanentRedirect(`/skills/${skill.slug}/audit`)
+  }
 
   const [storedAudit, eventStats, relatedSkills] = isCuratedSkillFallback(skill)
     ? [null, null, []]
