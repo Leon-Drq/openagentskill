@@ -114,16 +114,28 @@ export default async function Image({
     record = null
   }
 
-  const skill = record ? convertSkillRecordToManifest(record) : null
-  const name = skill?.name || titleCase(slug)
-  const description = skill?.description || 'Discover practical skills for AI agents.'
-  const category = titleCase(skill?.category || 'agent-skill')
-  const stars = formatCompactNumber(skill?.stats.stars || 0)
-  const quality = record ? getSkillQualityProfile(record) : null
-  const score = quality?.score || skill?.stats.qualityScore || 0
+  // A missing skill must not produce a plausible-looking social card. Those
+  // 200 image responses make obsolete URLs look valid to crawlers and social
+  // scrapers, which in turn contributes to soft-404 noise.
+  if (!record) {
+    return new Response('Not Found', {
+      status: 404,
+      headers: {
+        'Cache-Control': 'public, max-age=0, must-revalidate',
+      },
+    })
+  }
+
+  const skill = convertSkillRecordToManifest(record)
+  const name = skill.name
+  const description = skill.description
+  const category = titleCase(skill.category || 'agent-skill')
+  const stars = formatCompactNumber(skill.stats.stars || 0)
+  const quality = getSkillQualityProfile(record)
+  const score = quality.score || skill.stats.qualityScore || 0
   const decision = getDecisionLabel(score)
   const install = skill?.technical.installCommand || `npx skills add ${slug}`
-  const platforms = record ? getPlatformHints(record).slice(0, 3) : []
+  const platforms = getPlatformHints(record).slice(0, 3)
   const platformText = platforms.length > 0 ? platforms.join(' + ') : 'Codex + Claude Code + Cursor'
   const scenario = getScenario(skill?.category || category, skill?.tags || [], description)
   const topTags = (skill?.tags || []).slice(0, 3).map(titleCase)

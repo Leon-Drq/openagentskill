@@ -25,6 +25,11 @@ export const SITEMAP_BASE_URL = 'https://www.openagentskill.com'
 // shards to that boundary keeps one crawler request to one indexed read,
 // instead of serially waiting on four reads and falling back to a tiny sitemap.
 export const SITEMAP_CHUNK_SIZE = 1000
+// The full registry remains browseable and available through the Agent API.
+// The public sitemap is deliberately more selective: it is a crawl queue, not
+// an inventory dump. A meaningful quality floor helps Google spend its budget
+// on pages with enough repository evidence to stand on their own.
+export const SITEMAP_MIN_QUALITY_SCORE = 45
 const SITEMAP_SKILL_QUERY_TIMEOUT_MS = 7200
 
 export interface SitemapEntry {
@@ -54,28 +59,35 @@ function chunkCount(total: number) {
   return Math.max(1, Math.ceil(total / SITEMAP_CHUNK_SIZE))
 }
 
-function fallbackSkillRecords(minStars = 0) {
+function fallbackSkillRecords(minStars = 0, minQualityScore = SITEMAP_MIN_QUALITY_SCORE) {
   return CURATED_SKILL_SNAPSHOT
     .filter((skill) => Number(skill.github_stars || 0) >= minStars)
+    .filter((skill) => Number(skill.quality_score || 0) >= minQualityScore)
     .map((skill) => ({
       slug: skill.slug,
       github_stars: skill.github_stars,
       github_last_pushed_at: skill.github_last_pushed_at,
+      created_at: skill.created_at,
       updated_at: skill.updated_at,
+      quality_score: skill.quality_score,
     }))
 }
 
-async function getSitemapSkillCount(minStars = 0) {
+async function getSitemapSkillCount(minStars = 0, minQualityScore = SITEMAP_MIN_QUALITY_SCORE) {
   return withTimeout(
-    getApprovedSkillSitemapCount(minStars),
+    getApprovedSkillSitemapCount(minStars, minQualityScore),
     SITEMAP_SKILL_QUERY_TIMEOUT_MS,
-    `sitemap approved skills count${minStars ? ` ${minStars}+` : ''}`
+    `sitemap approved skills count${minStars ? ` ${minStars}+` : ''} quality ${minQualityScore}+`
   ).catch(() => {
-    return fallbackSkillRecords(minStars).length
+    return fallbackSkillRecords(minStars, minQualityScore).length
   })
 }
 
-export async function getSitemapSkillRecords(index = 0, minStars = 0) {
+export async function getSitemapSkillRecords(
+  index = 0,
+  minStars = 0,
+  minQualityScore = SITEMAP_MIN_QUALITY_SCORE
+) {
   const offset = Math.max(0, index) * SITEMAP_CHUNK_SIZE
 
   return withTimeout(
@@ -83,11 +95,12 @@ export async function getSitemapSkillRecords(index = 0, minStars = 0) {
       offset,
       limit: SITEMAP_CHUNK_SIZE,
       minStars,
+      minQualityScore,
     }),
     SITEMAP_SKILL_QUERY_TIMEOUT_MS,
-    `sitemap approved skills page ${index}${minStars ? ` ${minStars}+` : ''}`
+    `sitemap approved skills page ${index}${minStars ? ` ${minStars}+` : ''} quality ${minQualityScore}+`
   ).catch(() => {
-    return fallbackSkillRecords(minStars).slice(offset, offset + SITEMAP_CHUNK_SIZE)
+    return fallbackSkillRecords(minStars, minQualityScore).slice(offset, offset + SITEMAP_CHUNK_SIZE)
   })
 }
 
@@ -271,7 +284,10 @@ export async function getSkillSitemapEntries(section: SitemapSection, index = 0)
   const skills = await getSitemapSkillRecords(index)
 
   return skills.map((skill) => {
-    const lastModified = dateFrom(skill.github_last_pushed_at || skill.updated_at)
+    // Metadata refreshes update `updated_at`, but do not mean the public
+    // repository content changed. Use a repository push (or the listing's
+    // creation) so sitemap lastmod stays an honest crawl signal.
+    const lastModified = dateFrom(skill.github_last_pushed_at || skill.created_at)
     const highSignal = Number(skill.github_stars || 0) >= 500
 
     return {

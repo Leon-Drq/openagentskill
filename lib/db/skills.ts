@@ -116,13 +116,16 @@ export type SkillSitemapRecord = Pick<
   | 'slug'
   | 'github_stars'
   | 'github_last_pushed_at'
+  | 'created_at'
   | 'updated_at'
+  | 'quality_score'
 >
 
 export interface SkillSitemapQueryOptions {
   offset?: number
   limit?: number
   minStars?: number
+  minQualityScore?: number
 }
 
 function createSitemapClient(requestTimeoutMs = SITEMAP_QUERY_TIMEOUT_MS) {
@@ -299,17 +302,21 @@ async function fetchAllSkills(
 function getSitemapFallbackRecords(
   offset: number,
   limit: number,
-  minStars: number
+  minStars: number,
+  minQualityScore: number
 ): SkillSitemapRecord[] {
   return CURATED_SKILL_SNAPSHOT
     .filter((skill) => Number(skill.github_stars || 0) >= minStars)
+    .filter((skill) => Number(skill.quality_score || 0) >= minQualityScore)
     .sort((left, right) => Number(right.github_stars || 0) - Number(left.github_stars || 0))
     .slice(offset, offset + limit)
     .map((skill) => ({
       slug: skill.slug,
       github_stars: skill.github_stars,
       github_last_pushed_at: skill.github_last_pushed_at,
+      created_at: skill.created_at,
       updated_at: skill.updated_at,
+      quality_score: skill.quality_score,
     }))
 }
 
@@ -318,14 +325,19 @@ function getSitemapFallbackRecords(
 // row database read. On a transient database failure we cache a compact,
 // valid sitemap rather than allowing retries to crowd out interactive routes.
 const getCachedApprovedSkillSitemapRecords = unstable_cache(
-  async (offset: number, limit: number, minStars: number): Promise<SkillSitemapRecord[]> => {
+  async (
+    offset: number,
+    limit: number,
+    minStars: number,
+    minQualityScore: number
+  ): Promise<SkillSitemapRecord[]> => {
     try {
-      return await fetchApprovedSkillSitemapRecords({ offset, limit, minStars })
+      return await fetchApprovedSkillSitemapRecords({ offset, limit, minStars, minQualityScore })
     } catch {
-      return getSitemapFallbackRecords(offset, limit, minStars)
+      return getSitemapFallbackRecords(offset, limit, minStars, minQualityScore)
     }
   },
-  ['approved-sitemap-records-v5'],
+  ['approved-sitemap-records-v6'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-records'],
@@ -333,14 +345,14 @@ const getCachedApprovedSkillSitemapRecords = unstable_cache(
 )
 
 const getCachedApprovedSkillSitemapCount = unstable_cache(
-  async (minStars: number): Promise<number> => {
+  async (minStars: number, minQualityScore: number): Promise<number> => {
     try {
-      return await fetchApprovedSkillSitemapCount(minStars)
+      return await fetchApprovedSkillSitemapCount(minStars, minQualityScore)
     } catch {
-      return getSitemapFallbackRecords(0, CURATED_SKILL_SNAPSHOT.length, minStars).length
+      return getSitemapFallbackRecords(0, CURATED_SKILL_SNAPSHOT.length, minStars, minQualityScore).length
     }
   },
-  ['approved-sitemap-count-v5'],
+  ['approved-sitemap-count-v6'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-count'],
@@ -355,8 +367,9 @@ export async function getApprovedSkillSitemapRecords(
     ? Math.max(1, Math.floor(options.limit || 1))
     : MAX_SKILL_QUERY_LIMIT
   const minStars = Math.max(0, Math.floor(options.minStars || 0))
+  const minQualityScore = Math.max(0, Math.floor(options.minQualityScore || 0))
 
-  return getCachedApprovedSkillSitemapRecords(offset, rowLimit, minStars)
+  return getCachedApprovedSkillSitemapRecords(offset, rowLimit, minStars, minQualityScore)
 }
 
 async function fetchApprovedSkillSitemapRecords(
@@ -371,7 +384,7 @@ async function fetchApprovedSkillSitemapRecords(
     const pageSize = Math.min(SKILLS_PAGE_SIZE, remaining)
     let query = supabase
       .from('skills')
-      .select('slug,github_stars,github_last_pushed_at,updated_at')
+      .select('slug,github_stars,github_last_pushed_at,created_at,updated_at,quality_score')
       .eq('ai_review_approved', true)
       // This matches the public-directory partial index. A sitemap needs a
       // stable complete traversal, not a star-only ranking, and must never
@@ -381,6 +394,10 @@ async function fetchApprovedSkillSitemapRecords(
 
     if (options.minStars > 0) {
       query = query.gte('github_stars', options.minStars)
+    }
+
+    if (options.minQualityScore > 0) {
+      query = query.gte('quality_score', options.minQualityScore)
     }
 
     const { data, error } = await query.range(from, from + pageSize - 1)
@@ -395,17 +412,18 @@ async function fetchApprovedSkillSitemapRecords(
   return rows
 }
 
-export async function getApprovedSkillSitemapCount(minStars = 0): Promise<number> {
+export async function getApprovedSkillSitemapCount(minStars = 0, minQualityScore = 0): Promise<number> {
   const normalizedMinStars = Math.max(0, Math.floor(minStars || 0))
-  return getCachedApprovedSkillSitemapCount(normalizedMinStars)
+  const normalizedMinQualityScore = Math.max(0, Math.floor(minQualityScore || 0))
+  return getCachedApprovedSkillSitemapCount(normalizedMinStars, normalizedMinQualityScore)
 }
 
-async function fetchApprovedSkillSitemapCount(minStars: number): Promise<number> {
+async function fetchApprovedSkillSitemapCount(minStars: number, minQualityScore: number): Promise<number> {
   const supabase = createSitemapClient()
 
   // The counter is maintained by the registry trigger and avoids making every
   // sitemap index request pay for an exact COUNT(*) across the full catalog.
-  if (minStars <= 0) {
+  if (minStars <= 0 && minQualityScore <= 0) {
     const { data, error } = await supabase
       .from('registry_stats')
       .select('approved_skill_count')
@@ -425,6 +443,10 @@ async function fetchApprovedSkillSitemapCount(minStars: number): Promise<number>
 
   if (minStars > 0) {
     query = query.gte('github_stars', minStars)
+  }
+
+  if (minQualityScore > 0) {
+    query = query.gte('quality_score', minQualityScore)
   }
 
   const { count, error } = await query
