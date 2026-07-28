@@ -41,6 +41,8 @@ function getSourceLabel(source: string | null | undefined) {
       return 'GitHub star discovery'
     case 'auto-indexer':
       return 'OpenAgentSkill auto-indexer'
+    case 'curated-skill-path':
+      return 'Source-checked curated skill'
     case 'agent':
       return 'Agent submitted'
     case 'api':

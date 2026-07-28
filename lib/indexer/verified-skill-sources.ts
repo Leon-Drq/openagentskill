@@ -36,6 +36,8 @@ export interface VerifiedSkillSourceSyncResult {
 interface VerifiedSkillSourceSyncOptions {
   label: string
   slugs: readonly string[]
+  listingVerified?: boolean
+  listingSource?: string
 }
 
 function selectedSkills(options: VerifiedSkillSourceSyncOptions) {
@@ -128,7 +130,15 @@ async function fetchRepositoryMetadata(repository: string): Promise<GitHubReposi
   return response.json() as Promise<GitHubRepositoryMetadata>
 }
 
-function buildPayload(skill: SkillRecord, source: SourceReference, metadata: GitHubRepositoryMetadata) {
+function buildPayload(
+  skill: SkillRecord,
+  source: SourceReference,
+  metadata: GitHubRepositoryMetadata,
+  options: VerifiedSkillSourceSyncOptions
+) {
+  const listingVerified = options.listingVerified ?? true
+  const listingSource = options.listingSource || 'official-skill-path'
+
   return {
     slug: skill.slug,
     name: skill.name,
@@ -149,12 +159,12 @@ function buildPayload(skill: SkillRecord, source: SourceReference, metadata: Git
     version: skill.version || '1.0.0',
     license: skill.license,
     install_command: skill.install_command,
-    verified: true,
-    submission_source: 'official-skill-path',
+    verified: listingVerified,
+    submission_source: listingSource,
     submitted_by_agent: 'verified-skill-source-indexer',
     ai_review_score: {
       ...(skill.ai_review_score && typeof skill.ai_review_score === 'object' ? skill.ai_review_score : {}),
-      source: 'source-verified-skill-path',
+      source: listingVerified ? 'source-verified-skill-path' : 'source-checked-curated-skill-path',
       source_url: sourceUrl(source),
       skill_path: `${source.skillDirectory ? `${source.skillDirectory}/` : ''}SKILL.md`,
     },
@@ -181,6 +191,8 @@ export async function syncVerifiedSkillSources(
   if (!serverSecret) {
     throw new Error('Missing INDEXER_SECRET for controlled verified skill sync.')
   }
+  const listingVerified = options.listingVerified ?? true
+  const listingSource = options.listingSource || 'official-skill-path'
 
   const supabase = createPublicClient({ requestTimeoutMs: 20_000 })
   const metadataByRepository = new Map<string, GitHubRepositoryMetadata>()
@@ -203,14 +215,14 @@ export async function syncVerifiedSkillSources(
 
       const { data, error } = await supabase.rpc('upsert_indexed_skill', {
         p_server_secret: serverSecret,
-        p_skill: buildPayload(skill, source, metadata),
+        p_skill: buildPayload(skill, source, metadata, options),
         p_activity: {
           event_type: 'skill_published',
-          actor_name: 'OpenAgentSkill Verified Sources',
+          actor_name: listingVerified ? 'OpenAgentSkill Verified Sources' : 'OpenAgentSkill Curated Sources',
           actor_type: 'agent',
-          description: `Indexed the verified upstream skill: ${skill.name}.`,
+          description: `Indexed the ${listingVerified ? 'verified' : 'source-checked'} upstream skill: ${skill.name}.`,
           metadata: {
-            source: 'official-skill-path',
+            source: listingSource,
             source_repo: source.repository,
             source_path: `${source.skillDirectory ? `${source.skillDirectory}/` : ''}SKILL.md`,
             source_url: sourceUrl(source),

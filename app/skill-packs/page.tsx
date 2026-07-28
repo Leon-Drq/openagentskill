@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { MarketingButtonLink, MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import { getAllSkills, getSkillsBySlugs, type SkillRecord } from '@/lib/db/skills'
+import { getCuratedSkillFallback } from '@/lib/skill-fallbacks'
 import { selectSkillsForPack, SKILL_PACKS } from '@/lib/skill-packs'
 
 const BASE_URL = 'https://www.openagentskill.com'
@@ -45,7 +46,10 @@ export default async function SkillPacksPage() {
     getSkillsBySlugs(featuredSlugs).catch(() => []),
     getAllSkills('quality', undefined, PACK_CANDIDATE_LIMIT).catch(() => []),
   ])
-  const skills = mergeSkills(featuredSkills, candidateSkills)
+  const featuredFallbacks = featuredSlugs
+    .map((featuredSlug) => getCuratedSkillFallback(featuredSlug))
+    .filter((skill): skill is SkillRecord => Boolean(skill))
+  const skills = mergeSkills(featuredSkills, featuredFallbacks, candidateSkills)
 
   const structuredData = {
     '@context': 'https://schema.org',

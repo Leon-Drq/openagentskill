@@ -177,6 +177,10 @@ function hasKnownLicense(skill: SkillRecord) {
   return Boolean(license && license !== 'unknown' && license !== 'other')
 }
 
+function hasRestrictedLicense(skill: SkillRecord) {
+  return /\bcc[- ]?by[- ]?nc\b|\bnon[- ]?commercial\b/i.test(skill.license || '')
+}
+
 function hasRepository(skill: SkillRecord) {
   return Boolean(skill.repository || skill.github_repo)
 }
@@ -421,6 +425,8 @@ function getDoNotUseFor(skill: SkillRecord, policy: SkillTrustInstallPolicy, evi
   }
   if (!hasKnownLicense(skill)) {
     items.push('Commercial reuse before clarifying license terms')
+  } else if (hasRestrictedLicense(skill)) {
+    items.push('Commercial or production reuse before confirming non-commercial license terms')
   }
   if (evidence.riskBlocked > 0) {
     items.push('Workflows similar to prior runs blocked by risk signals')
@@ -536,7 +542,8 @@ function scoreMaintenance(days: number | null) {
 }
 
 function scoreLicense(skill: SkillRecord) {
-  return hasKnownLicense(skill) ? 86 : 42
+  if (!hasKnownLicense(skill)) return 42
+  return hasRestrictedLicense(skill) ? 58 : 86
 }
 
 function documentationText(skill: SkillRecord) {
@@ -736,8 +743,10 @@ function buildTrustDimensions(
       label: 'License clarity',
       score: scoreLicense(skill),
       weight: 0.09,
-      status: hasKnownLicense(skill) ? 'pass' : 'warn',
-      detail: skill.license || 'Unknown license',
+      status: hasKnownLicense(skill) && !hasRestrictedLicense(skill) ? 'pass' : 'warn',
+      detail: hasRestrictedLicense(skill)
+        ? `${skill.license} - confirm commercial-use terms`
+        : skill.license || 'Unknown license',
     },
     {
       id: 'documentation',
@@ -855,6 +864,7 @@ export function getSkillTrustProfile(
   else warnings.push('Repository link is missing')
 
   if (!hasKnownLicense(skill)) warnings.push('License is unclear')
+  else if (hasRestrictedLicense(skill)) warnings.push('License restricts commercial reuse')
 
   if (freshnessDays === null) warnings.push('Repository freshness is unknown')
   else if (freshnessDays <= 90) strengths.push('Recently maintained repository')
@@ -954,7 +964,12 @@ export function getSkillTrustProfile(
   const finalWarnings = [...new Set([...warnings, ...dimensionWarnings])].slice(0, 10)
   const documentationDimension = dimensions.find((dimension) => dimension.id === 'documentation')
   const installCommand = getInstallCommand(skill)
-  const policy = getInstallPolicy(finalScore, hasInstallPath(skill), hasRepository(skill), hasKnownLicense(skill))
+  const policy = getInstallPolicy(
+    finalScore,
+    hasInstallPath(skill),
+    hasRepository(skill),
+    hasKnownLicense(skill) && !hasRestrictedLicense(skill)
+  )
   const outcomeAllowsAutoInstall =
     outcomeEvidence.total < 3 ||
     (
@@ -994,7 +1009,11 @@ export function getSkillTrustProfile(
       notes: [
         hasInstallPath(skill) ? 'Install path is available' : 'Install path is missing',
         hasRepository(skill) ? 'Repository evidence is available' : 'Repository link is missing',
-        hasKnownLicense(skill) ? 'License is declared' : 'License is unclear',
+        !hasKnownLicense(skill)
+          ? 'License is unclear'
+          : hasRestrictedLicense(skill)
+            ? 'License has commercial-use restrictions'
+            : 'License is declared',
         outcomeEvidence.total > 0 ? `${outcomeEvidence.agentProvenLabel} (${outcomeEvidence.agentProvenScore}/100 Agent Proven)` : 'No Agent Proven outcome evidence yet',
         getMaintenanceLabel(freshnessDays),
       ],

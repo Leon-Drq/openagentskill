@@ -17,6 +17,7 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 
 [Try Resolve](https://www.openagentskill.com/resolve) ·
 [Browse Skills](https://www.openagentskill.com/skills) ·
+[AI Video Creator Pack](https://www.openagentskill.com/skill-packs/ai-video-creator-agent-pack) ·
 [GitHub Skill Index](./skills/README.md) ·
 [Outcome Loop](https://www.openagentskill.com/outcomes) ·
 [Agent-Proven Rankings](https://www.openagentskill.com/rankings/agent-proven) ·
@@ -215,6 +216,7 @@ OpenAgentSkill should sit between package-manager speed and audit-grade decision
 | Documents and PDF | Parse PDFs, OCR, markdown conversion, RAG prep | [documents-pdf.md](./skills/documents-pdf.md) | [PDF parsing](https://www.openagentskill.com/best/pdf-parsing) |
 | Data analysis | CSV, SQL, notebooks, charts, dashboards | [data.md](./skills/data.md) | [Data analysis](https://www.openagentskill.com/ai-agent-skills/data-analysis) |
 | Design and creative | Figma, image, video, motion, brand assets | [design.md](./skills/design.md) | [Design pack](https://www.openagentskill.com/skill-packs/design-agent-pack) |
+| AI video creation | Topic planning, narration, talking-head edits, captions, covers, and retrospectives | [design.md](./skills/design.md) | [AI video creator pack](https://www.openagentskill.com/skill-packs/ai-video-creator-agent-pack) |
 | Marketing and growth | SEO pages, X drafts, CRM, content ops | [marketing.md](./skills/marketing.md) | [Growth pack](https://www.openagentskill.com/skill-packs/seo-automation-agent-pack) |
 | Security | Review install risk, secrets, shell/network surfaces | [security.md](./skills/security.md) | [Safety](https://www.openagentskill.com/safety) |
 | Football and World Cup | Match data, player analysis, tournament dashboards | [football-world-cup.md](./skills/football-world-cup.md) | [Football analytics](https://www.openagentskill.com/ai-agent-skills/world-cup-football) |

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAllSkills, getSkillsBySlugs, type SkillRecord } from '@/lib/db/skills'
+import { getCuratedSkillFallback } from '@/lib/skill-fallbacks'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
@@ -46,7 +47,10 @@ export async function GET(
       getSkillsBySlugs(pack.featuredSlugs || []),
       getAllSkills('quality', undefined, PACK_CANDIDATE_LIMIT),
     ])
-    const skills = mergeSkills(featuredSkills, candidateSkills)
+    const featuredFallbacks = (pack.featuredSlugs || [])
+      .map((featuredSlug) => getCuratedSkillFallback(featuredSlug))
+      .filter((skill): skill is SkillRecord => Boolean(skill))
+    const skills = mergeSkills(featuredSkills, featuredFallbacks, candidateSkills)
     const picks = selectSkillsForPack(skills, pack, limit)
     const installPlan = buildSkillPackInstallPlan(pack, picks, { limit: Math.min(limit, 6) })
     const payload = {

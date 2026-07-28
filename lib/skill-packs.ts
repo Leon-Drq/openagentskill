@@ -13,6 +13,7 @@ export interface SkillPackDefinition {
   persona: string
   keywords: string[]
   featuredSlugs?: string[]
+  featuredOnly?: boolean
   outcomes: string[]
   workflowSteps: Array<{
     title: string
@@ -227,6 +228,56 @@ export const SKILL_PACKS: SkillPackDefinition[] = [
     ],
   },
   {
+    slug: 'ai-video-creator-agent-pack',
+    shortTitle: 'AI video creator',
+    title: 'AI video creator agent pack',
+    eyebrow: 'Plan, produce, review, and learn from video workflows',
+    description:
+      'A review-first pack for agents that turn an approved brief into a planned, narrated, edited, captioned, packaged, and measured AI video workflow.',
+    persona:
+      'Video creators and content teams using Codex, Claude Code, or compatible agents to organize a controlled production workflow.',
+    keywords: [
+      'video',
+      'video creator',
+      'video production',
+      'content creator',
+      'voiceover',
+      'talking head',
+      'digital avatar',
+      'subtitle',
+      'caption',
+      'cover',
+      'content retrospective',
+    ],
+    featuredSlugs: [
+      'pluviobyte-ra-topic',
+      'pluviobyte-ra-practical-video-planning',
+      'pluviobyte-ra-video-title',
+      'pluviobyte-tts-skill',
+      'pluviobyte-heygen-digital-avatar',
+      'pluviobyte-ra-local-talking-head-cut',
+      'pluviobyte-ra-audio-to-subtitles',
+      'pluviobyte-skill-captions',
+      'pluviobyte-rn-cover-skill',
+      'pluviobyte-ra-retrospective',
+    ],
+    featuredOnly: true,
+    outcomes: ['Choose a topic', 'Plan the production', 'Create and review media', 'Package and learn from results'],
+    workflowSteps: [
+      { title: 'Plan', description: 'Turn a topic into an approved production brief, structure, and publishing angle.' },
+      { title: 'Produce', description: 'Create narration, avatar, or talking-head assets only after rights, credentials, and paid-service approval.' },
+      { title: 'Edit and caption', description: 'Use the final audio as the source of truth for cuts, timestamps, subtitle QC, and render review.' },
+      { title: 'Package and learn', description: 'Prepare a cover and run a source-backed retrospective after publishing.' },
+    ],
+    bestFor: ['AI video explainers', 'Talking-head workflows', 'Content production systems', 'Subtitle and cover QA'],
+    avoidWhen: [
+      'You do not have rights to the source footage, voice, likeness, or source material.',
+      'The workflow requires downloading, rewriting, or republishing third-party content without clearance.',
+      'Required paid services, API keys, local models, or workspace paths are unavailable.',
+      'A human cannot review outputs, spending, or publication before the final render.',
+    ],
+  },
+  {
     slug: 'startup-founder-agent-pack',
     shortTitle: 'Startup founder',
     title: 'Startup founder agent pack',
@@ -309,7 +360,7 @@ export function scoreSkillForPack(skill: SkillRecord, pack: SkillPackDefinition)
 export function selectSkillsForPack(skills: SkillRecord[], pack: SkillPackDefinition, limit = 10) {
   return skills
     .map((skill) => ({ skill, score: scoreSkillForPack(skill, pack) }))
-    .filter((item) => item.score >= 10)
+    .filter((item) => item.score >= 10 && (!pack.featuredOnly || pack.featuredSlugs?.includes(item.skill.slug)))
     .sort((a, b) => b.score - a.score || b.skill.github_stars - a.skill.github_stars)
     .slice(0, limit)
     .map((item) => item.skill)

@@ -62,6 +62,11 @@ function licenseKnown(skill: SkillRecord) {
   return Boolean(license && license !== 'unknown' && license !== 'other')
 }
 
+function hasRestrictedLicense(skill: SkillRecord) {
+  const license = (skill.license || '').trim().toLowerCase()
+  return license.includes('cc-by-nc') || license.includes('non-commercial')
+}
+
 function hasInstallPath(skill: SkillRecord) {
   return Boolean(skill.install_command || skill.github_repo || skill.npm_package)
 }
@@ -119,7 +124,8 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
   const repoActivityScore = repoActivityDimension?.score || 50
   const installScore = hasInstallPath(skill) ? 92 : 20
   const repositoryScore = hasRepository(skill) ? 88 : 18
-  const licenseScore = licenseKnown(skill) ? 86 : 45
+  const restrictedLicense = hasRestrictedLicense(skill)
+  const licenseScore = !licenseKnown(skill) ? 45 : restrictedLicense ? 58 : 86
   const docsScore = Math.max(hasEnoughDocumentation(skill) ? 84 : 48, documentationScore)
   const aiReviewScore = skill.ai_review_approved && (skill.ai_review_issues || []).length === 0 ? 88 : 55
   const adoptionScore = (skill.github_stars || 0) >= 500
@@ -150,6 +156,7 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
   if (!hasInstallPath(skill)) warnings.add('No install path detected')
   if (!hasRepository(skill)) warnings.add('Repository link is missing')
   if (!licenseKnown(skill)) warnings.add('License is unclear')
+  if (restrictedLicense) warnings.add('License restricts commercial reuse')
   if (!hasEnoughDocumentation(skill)) warnings.add('Documentation summary is thin')
   if (dependencyScore < 62) warnings.add('Dependency or permission surface needs review')
   if (installSafetyScore < 62) warnings.add('Install command contains a high-risk pattern')
@@ -174,9 +181,11 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
     },
     {
       label: 'License',
-      status: licenseKnown(skill) ? 'pass' : 'warn',
+      status: licenseKnown(skill) && !restrictedLicense ? 'pass' : 'warn',
       score: licenseScore,
-      detail: skill.license || 'Unknown',
+      detail: restrictedLicense
+        ? `${skill.license || 'Restricted license'} - confirm commercial reuse terms before production use`
+        : skill.license || 'Unknown',
     },
     {
       label: 'Maintenance',
@@ -243,7 +252,9 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
   ]
 
   const riskLevel: AuditRiskLevel =
-    auditScore >= 82 && warnings.size <= 3
+    restrictedLicense
+      ? 'needs_review'
+      : auditScore >= 82 && warnings.size <= 3
       ? 'safe_to_try'
       : auditScore >= 60
         ? 'needs_review'
