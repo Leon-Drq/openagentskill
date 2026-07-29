@@ -4,6 +4,7 @@ import { createPublicClient } from '@/lib/supabase/public'
 import { getSkillTrustProfile } from '@/lib/trust'
 import {
   createXPost,
+  createXReplyPost,
   getXTweetsByIds,
   getXUserMentions,
   refreshXAccessToken,
@@ -23,6 +24,7 @@ import {
   isGenericFoundationRepoName,
   isGoodXCandidate,
 } from '@/lib/x/candidates'
+import { buildXShortlist, getXShortlistLaneForDate } from '@/lib/x/shortlist'
 
 type SupabasePublicClient = ReturnType<typeof createPublicClient>
 
@@ -208,31 +210,6 @@ function weekKey(date = new Date()) {
   return `${date.getUTCFullYear()}-w${String(week).padStart(2, '0')}`
 }
 
-function buildWeeklyDigestPost(skills: SkillRecord[]) {
-  const picks = skills.slice(0, 3)
-  const lines = [
-    'OpenAgentSkill Weekly Radar',
-    '',
-    '3 skills worth shortlisting before your agent starts from scratch:',
-    '',
-    ...picks.map((skill, index) => `${index + 1}. ${truncate(skill.name, 38)} - ${compactNumber(Number(skill.github_stars || 0))} stars`),
-    '',
-    'Resolve -> Trust Score v5 -> install handoff -> outcome feedback.',
-    'https://www.openagentskill.com/evals/resolve',
-  ]
-
-  const text = lines.join('\n')
-  if (text.length <= 280) return text
-  return [
-    'OpenAgentSkill Weekly Radar',
-    '',
-    ...picks.map((skill, index) => `${index + 1}. ${truncate(skill.name, 32)}`),
-    '',
-    'Resolve, trust, install, feedback.',
-    'https://www.openagentskill.com/evals/resolve',
-  ].join('\n').slice(0, 280)
-}
-
 export async function enqueueXDigestPostQueue(
   options: {
     minStars?: number
@@ -242,43 +219,54 @@ export async function enqueueXDigestPostQueue(
 ): Promise<XQueueBuildResult> {
   const serverSecret = getServerSecret()
   const supabase = createPublicClient()
-  const minStars = Math.max(options.minStars || 5000, 500)
-  const candidatePool = Math.min(Math.max(options.candidatePool || 120, 20), 500)
-  const campaign = options.campaign || `weekly_radar_${weekKey()}`
+  const minStars = Math.max(options.minStars || 100, 25)
+  const candidatePool = Math.min(Math.max(options.candidatePool || 500, 120), 1000)
+  const edition = weekKey()
   const candidates = (await getAllSkills('quality', undefined, candidatePool))
     .filter((skill) => isGoodXCandidate(skill, minStars))
     .sort((a, b) => getQueuePriority(b) - getQueuePriority(a))
-    .slice(0, 8)
 
-  if (candidates.length < 3) {
+  const lane = getXShortlistLaneForDate(candidates)
+  if (!lane) {
     return { status: 'skipped', queued: 0, skipped: 1, considered: candidates.length, results: [] }
   }
 
-  const digestSlug = `weekly-radar-${weekKey()}`
+  const shortlist = buildXShortlist(lane, candidates, { edition, limit: 5 })
+  if (shortlist.picks.length < 3) {
+    return { status: 'skipped', queued: 0, skipped: 1, considered: candidates.length, results: [] }
+  }
+
+  const campaign = options.campaign || `task_shortlist_${lane}_${edition}`
+
   const { data, error } = await supabase.rpc('enqueue_x_content_queue_item', {
     p_server_secret: serverSecret,
     p_item: {
       skill_id: null,
-      skill_slug: digestSlug,
+      skill_slug: shortlist.slug,
       content_type: 'weekly_thread',
       campaign,
       status: 'queued',
-      priority: 120,
+      // A task-first shortlist is the weekly editorial anchor. It must run
+      // ahead of the regular single-skill queue instead of waiting behind it.
+      priority: 250,
       scheduled_for: new Date().toISOString(),
-      post_text: buildWeeklyDigestPost(candidates),
-      reply_text: candidates
-        .slice(0, 5)
-        .map((skill) => `${skill.name}: https://www.openagentskill.com/skills/${skill.slug}?ref=x-weekly`)
-        .join('\n'),
-      source: 'weekly_digest_generator',
+      post_text: shortlist.mainText,
+      reply_text: shortlist.replyText,
+      source: 'task_shortlist_generator',
       metadata: {
         generated_by: 'x_growth_os',
-        digest_type: 'weekly_radar',
-        skills: candidates.map((skill) => ({
-          slug: skill.slug,
-          name: skill.name,
-          stars: skill.github_stars,
-          quality_score: Number(skill.quality_score || 0),
+        digest_type: 'task_shortlist',
+        auto_thread_reply: true,
+        lane: shortlist.lane,
+        edition: shortlist.edition,
+        shortlist_url: shortlist.url,
+        skills: shortlist.picks.map((pick) => ({
+          slug: pick.skill.slug,
+          name: pick.skill.name,
+          role: pick.role,
+          reason: pick.reason,
+          stars: pick.skill.github_stars,
+          quality_score: pick.qualityScore,
         })),
       },
     },
@@ -532,9 +520,51 @@ export async function postNextQueuedSkillToX(
       },
     })
 
+    const shouldPostThreadReply =
+      item.content_type === 'weekly_thread' &&
+      item.metadata?.auto_thread_reply === true &&
+      typeof item.reply_text === 'string' &&
+      item.reply_text.trim().length > 0
+    let threadReply: { id: string; url: string } | null = null
+    let threadReplyError: string | null = null
+
+    if (shouldPostThreadReply) {
+      try {
+        const reply = await createXReplyPost(token.access_token, item.reply_text!.trim(), postId)
+        const replyId = reply.data?.id
+        if (!replyId) throw new Error(`X thread reply did not include an id: ${JSON.stringify(reply)}`)
+
+        threadReply = {
+          id: replyId,
+          url: `https://x.com/${connection.username}/status/${replyId}`,
+        }
+        await recordXPost(supabase, serverSecret, {
+          queue_item_id: item.id,
+          skill_slug: item.skill_slug,
+          status: 'posted',
+          x_post_id: replyId,
+          post_text: item.reply_text,
+          posted_at: new Date().toISOString(),
+          metadata: {
+            username: connection.username,
+            parent_x_post_id: postId,
+            type: 'task_shortlist_reply',
+            response: reply,
+          },
+        })
+      } catch (error) {
+        threadReplyError = error instanceof Error ? error.message : 'Unknown X thread reply error'
+        console.warn('[x-growth] main post succeeded but task shortlist reply failed:', threadReplyError)
+      }
+    }
+
     await completeQueueItem(supabase, serverSecret, item.id, 'posted', {
       xPostId: postId,
-      metadata: { posted_url: `https://x.com/${connection.username}/status/${postId}` },
+      metadata: {
+        posted_url: `https://x.com/${connection.username}/status/${postId}`,
+        ...(threadReply ? { thread_reply_id: threadReply.id, thread_reply_url: threadReply.url } : {}),
+        ...(threadReplyError ? { thread_reply_error: threadReplyError } : {}),
+      },
     })
 
     return {

@@ -89,101 +89,6 @@ function getSkillSearchText(skill: XPostSkill) {
   ].join(' ').toLowerCase()
 }
 
-function getHumanObservation(skill: XPostSkill) {
-  const text = getSkillSearchText(skill)
-
-  if (/(last\s?30|recent|trend|trending|hacker news|reddit|youtube|polymarket|bluesky|social)/.test(text)) {
-    return "A lot of agents don't need a bigger prompt. They need fresher context."
-  }
-  if (/(browser|web|crawl|scrap|page|site|monitor)/.test(text)) {
-    return 'Most web agents fail in the boring part: messy pages, missing context, repeatable extraction.'
-  }
-  if (/(finance|stock|investment|market|equity|quant|trading|portfolio|earnings)/.test(text)) {
-    return "Finance agents don't need louder takes. They need sources, data, and a repeatable research path."
-  }
-  if (/(presentation|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides)/.test(text)) {
-    return 'Most agents can draft slides. The hard part is choosing the right deck workflow.'
-  }
-  if (/\b(code|coding|developer|dev|github|claude|cursor|terminal|repo|review|test)\b/.test(text)) {
-    return "Most coding agents don't fail from lack of model power. They fail when repo context disappears."
-  }
-  if (/(rag|search|knowledge|memory|document|pdf|data|vector)/.test(text)) {
-    return 'The useful research skills are not search wrappers. They help agents keep sources attached.'
-  }
-  if (/(workflow|productivity|task|calendar|email|notion|slack|ops|automation)/.test(text)) {
-    return 'A good workflow skill turns repeated manual steps into something an agent can safely replay.'
-  }
-  if (/(image|video|design|figma|creative|seedance|motion)/.test(text)) {
-    return "Creative agents need taste, but they also need a production surface they can actually operate."
-  }
-
-  return 'The best agent skills feel small at first, then remove a task your agent used to improvise.'
-}
-
-function getCapabilityLine(skill: XPostSkill) {
-  const text = getSkillSearchText(skill)
-  const name = truncate(skill.name, 54)
-  const description = truncate(skill.description, 110)
-
-  if (/(last\s?30|recent|trend|trending|hacker news|reddit|youtube|polymarket|bluesky|social)/.test(text)) {
-    return `${name} feels like a recent-web radar for Codex, Claude Code, Cursor, and research agents.`
-  }
-  if (/(browser|web|crawl|scrap|page|site|monitor)/.test(text)) {
-    return `${name} gives agents a cleaner path to browse, extract, and monitor web pages.`
-  }
-  if (/(finance|stock|investment|market|equity|quant|trading|portfolio|earnings)/.test(text)) {
-    return `${name} helps turn market noise into source-backed analysis an agent can reuse.`
-  }
-  if (/(presentation|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides)/.test(text)) {
-    return `${name} helps agents turn briefs, docs, or research notes into editable deck workflows.`
-  }
-  if (/\b(code|coding|developer|dev|github|claude|cursor|terminal|repo|review|test)\b/.test(text)) {
-    return `${name} gives coding agents a repeatable way to plan, patch, review, or ship.`
-  }
-  if (/(rag|search|knowledge|memory|document|pdf|data|vector)/.test(text)) {
-    return `${name} helps agents turn docs, data, or knowledge bases into grounded work.`
-  }
-  if (/(workflow|productivity|task|calendar|email|notion|slack|ops|automation)/.test(text)) {
-    return `${name} helps agents move a repeatable workflow out of manual copy-paste.`
-  }
-  if (/(image|video|design|figma|creative|seedance|motion)/.test(text)) {
-    return `${name} gives creative agents a more practical production workflow.`
-  }
-
-  return description ? `${name}: ${description}` : `${name} is a practical agent skill worth shortlisting.`
-}
-
-function getOneLineTake(skill: XPostSkill) {
-  const text = getSkillSearchText(skill)
-
-  if (/(last\s?30|recent|trend|trending|hacker news|reddit|youtube|polymarket|bluesky|social)/.test(text)) {
-    return 'One-line take: recent context beats stale search.'
-  }
-  if (/(browser|web|crawl|scrap|page|site|monitor)/.test(text)) {
-    return 'One-line take: less scraper glue, more usable agent context.'
-  }
-  if (/(finance|stock|investment|market|equity|quant|trading|portfolio|earnings)/.test(text)) {
-    return 'One-line take: make the research path auditable before the agent acts.'
-  }
-  if (/(presentation|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides)/.test(text)) {
-    return 'One-line take: decks need format fit, not another blank slide.'
-  }
-  if (/\b(code|coding|developer|dev|github|claude|cursor|terminal|repo|review|test)\b/.test(text)) {
-    return 'One-line take: better repo rituals beat another blank prompt.'
-  }
-  if (/(rag|search|knowledge|memory|document|pdf|data|vector)/.test(text)) {
-    return 'One-line take: grounded answers start with better retrieval.'
-  }
-  if (/(workflow|productivity|task|calendar|email|notion|slack|ops|automation)/.test(text)) {
-    return 'One-line take: repeatable work should become agent-readable.'
-  }
-  if (/(image|video|design|figma|creative|seedance|motion)/.test(text)) {
-    return 'One-line take: agents need production taste plus production handles.'
-  }
-
-  return 'One-line take: package the capability so the agent does not start from scratch.'
-}
-
 function buildHumanSkillPostText(
   skill: XPostSkill,
   options: {
@@ -193,29 +98,42 @@ function buildHumanSkillPostText(
 ) {
   const url = getSkillUrl(skill, options.source)
   const stats = `${formatStars(skill.github_stars)} stars`
-  const footer = options.includeUrl ? `${url}\n#AIAgents` : '#AIAgents'
+  const footer = options.includeUrl ? url : ''
   const build = (parts: string[]) => parts.filter(Boolean).join('\n\n')
 
-  const observation = getHumanObservation(skill)
-  const capability = getCapabilityLine(skill)
-  const take = getOneLineTake(skill)
-  const full = build([observation, capability, take, stats, footer])
+  // Keep an individual post useful on its own. The old format led with broad
+  // registry language, which made otherwise different skills read like repeats.
+  const text = getSkillSearchText(skill)
+  const scenario = /(finance|stock|investment|market|equity|quant|trading|portfolio|earnings)/.test(text)
+    ? 'market research'
+    : /(presentation|ppt|pptx|powerpoint|slides?|deck|keynote)/.test(text)
+      ? 'the next deck'
+      : /(image|video|design|figma|creative|seedance|motion)/.test(text)
+        ? 'design or creative work'
+        : /(browser|web|crawl|scrap|page|site|monitor)/.test(text)
+          ? 'a web workflow'
+          : /(rag|search|knowledge|memory|document|pdf|data|vector)/.test(text)
+            ? 'source-backed research'
+            : /(workflow|productivity|task|calendar|email|notion|slack|ops|automation)/.test(text)
+              ? 'a repeatable workflow'
+              : /(code|coding|developer|dev|github|claude|cursor|terminal|repo|review|test)/.test(text)
+                ? 'the next repo task'
+                : 'a real agent workflow'
+  const name = truncate(skill.name, 54)
+  const description = truncate(skill.description, 126)
+  const frames = [
+    `Before you hand an agent ${scenario}, give it a repeatable starting point.`,
+    `For ${scenario}, this is a skill worth shortlisting before another blank prompt.`,
+    `A practical pick for ${scenario}:`,
+  ]
+  const frame = frames[Math.abs(Array.from(skill.slug).reduce((sum, character) => sum + character.charCodeAt(0), 0)) % frames.length]
+  const full = build([frame, `${name}: ${description}`, stats, footer])
   if (full.length <= 280) return full
 
-  const withoutTake = build([observation, capability, stats, footer])
-  if (withoutTake.length <= 280) return withoutTake
-
-  const compactBase = build([observation, stats, footer])
-  const compactBudget = Math.max(0, 280 - compactBase.length - 2)
-  const compact = build([observation, truncate(capability, compactBudget), stats, footer])
+  const compact = build([`${name}: ${truncate(description, 96)}`, stats, footer])
   if (compact.length <= 280) return compact
 
-  const fallbackTail = build([`${stats} - ${truncate(skill.category, 28)}`, footer])
-  const fallbackBudget = Math.max(0, 280 - fallbackTail.length - 2)
-  const fallback = build([truncate(capability, fallbackBudget), fallbackTail])
-  if (fallback.length <= 280) return fallback
-
-  return build([truncate(skill.name, Math.max(0, 280 - footer.length - 2)), footer])
+  return build([`${name} - ${stats}`, footer]).slice(0, 280)
 }
 
 export function buildManualXMainText(skill: XPostSkill) {
