@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { Bookmark } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { trackSkillEvent } from '@/components/skill-event-tracker'
+import { useI18n } from '@/lib/i18n/context'
+import { formatSkillDetailCopy } from '@/lib/i18n/skill-detail-copy'
 import { cn } from '@/lib/utils'
 
 interface SaveSkillButtonProps {
@@ -13,6 +15,7 @@ interface SaveSkillButtonProps {
 }
 
 export function SaveSkillButton({ skillSlug, compact, className }: SaveSkillButtonProps) {
+  const { locale } = useI18n()
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(false)
   const [hasUser, setHasUser] = useState<boolean | null>(null)
@@ -91,7 +94,7 @@ export function SaveSkillButton({ skillSlug, compact, className }: SaveSkillButt
       aria-pressed={saved}
     >
       <Bookmark className={cn('h-3.5 w-3.5', saved && 'fill-current')} aria-hidden="true" />
-      {saved ? 'Saved' : 'Save'}
+      {saved ? formatSkillDetailCopy(locale, 'saved') : formatSkillDetailCopy(locale, 'save')}
     </button>
   )
 }

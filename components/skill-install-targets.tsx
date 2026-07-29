@@ -3,6 +3,9 @@
 import { Check, Clipboard, Terminal } from 'lucide-react'
 import { useState } from 'react'
 import { trackSkillEvent } from '@/components/skill-event-tracker'
+import { SkillDetailValue } from '@/components/skill-detail-text'
+import { useI18n } from '@/lib/i18n/context'
+import { formatSkillDetailCopy } from '@/lib/i18n/skill-detail-copy'
 import type { SkillInstallTarget } from '@/lib/install-targets'
 import { cn } from '@/lib/utils'
 
@@ -12,6 +15,7 @@ interface SkillInstallTargetsProps {
 }
 
 export function SkillInstallTargets({ skillSlug, targets }: SkillInstallTargetsProps) {
+  const { locale } = useI18n()
   const [activeId, setActiveId] = useState(targets[0]?.id)
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const activeTarget = targets.find((target) => target.id === activeId) || targets[0]
@@ -34,10 +38,10 @@ export function SkillInstallTargets({ skillSlug, targets }: SkillInstallTargetsP
       <div className="border-b border-border p-4 sm:p-5">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Install targets</p>
-            <h2 className="font-display text-2xl font-semibold">Install this skill in your agent workflow</h2>
+            <p className="mb-2 text-xs uppercase tracking-widest text-secondary">{formatSkillDetailCopy(locale, 'installTargets')}</p>
+            <h2 className="font-display text-2xl font-semibold">{formatSkillDetailCopy(locale, 'installWorkflow')}</h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
-              Copy the registry command or an agent-specific install prompt for Codex, Claude Code, and Cursor.
+              {formatSkillDetailCopy(locale, 'agentHandoffDescription')}
             </p>
           </div>
           <div className="flex h-9 shrink-0 items-center border border-border bg-background">
@@ -64,7 +68,9 @@ export function SkillInstallTargets({ skillSlug, targets }: SkillInstallTargetsP
             >
               <span className="block font-semibold">{target.label}</span>
               <span className="mt-1 hidden text-xs opacity-75 sm:block lg:hidden xl:block">
-                {target.kind === 'command' ? 'Command' : 'Prompt'}
+                {target.kind === 'command'
+                  ? formatSkillDetailCopy(locale, 'command')
+                  : formatSkillDetailCopy(locale, 'prompt')}
               </span>
             </button>
           ))}
@@ -73,8 +79,12 @@ export function SkillInstallTargets({ skillSlug, targets }: SkillInstallTargetsP
         <div className="min-w-0 bg-background p-4 sm:p-5">
           <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
             <div className="min-w-0">
-              <h3 className="font-display text-xl font-semibold">{activeTarget.title}</h3>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-secondary">{activeTarget.description}</p>
+              <h3 className="font-display text-xl font-semibold">
+                <SkillDetailValue value={activeTarget.title} />
+              </h3>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-secondary">
+                <SkillDetailValue value={activeTarget.description} />
+              </p>
             </div>
             <button
               type="button"
@@ -86,7 +96,9 @@ export function SkillInstallTargets({ skillSlug, targets }: SkillInstallTargetsP
               ) : (
                 <Clipboard className="h-4 w-4" aria-hidden="true" />
               )}
-              {copiedId === activeTarget.id ? 'Copied' : activeTarget.copyLabel}
+              {copiedId === activeTarget.id
+                ? formatSkillDetailCopy(locale, 'copied')
+                : <SkillDetailValue value={activeTarget.copyLabel} />}
             </button>
           </div>
 

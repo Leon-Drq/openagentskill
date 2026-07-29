@@ -50,3 +50,8 @@ export const localePaths: Record<Locale, string> = {
 export function isLocale(value: string | null | undefined): value is Locale {
   return locales.includes(value as Locale)
 }
+
+export function getLocaleFromSearchParam(value: string | string[] | null | undefined): Locale | null {
+  const candidate = Array.isArray(value) ? value[0] : value
+  return isLocale(candidate) ? candidate : null
+}

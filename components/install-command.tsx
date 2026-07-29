@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { trackSkillEvent } from '@/components/skill-event-tracker'
+import { useI18n } from '@/lib/i18n/context'
+import { formatSkillDetailCopy } from '@/lib/i18n/skill-detail-copy'
 
 interface InstallCommandProps {
   command: string
@@ -10,6 +12,7 @@ interface InstallCommandProps {
 }
 
 export function InstallCommand({ command, skillSlug, compact = false }: InstallCommandProps) {
+  const { locale } = useI18n()
   const [copied, setCopied] = useState(false)
 
   const fullCommand = command || `npx skills add ${skillSlug}`
@@ -35,9 +38,9 @@ export function InstallCommand({ command, skillSlug, compact = false }: InstallC
           <button
             onClick={copyToClipboard}
             className="self-start text-xs text-secondary transition-colors hover:text-foreground sm:self-auto"
-            aria-label="Copy command"
+            aria-label={formatSkillDetailCopy(locale, 'copy')}
           >
-            {copied ? '✓' : 'copy'}
+            {copied ? '✓' : formatSkillDetailCopy(locale, 'copy')}
           </button>
         </div>
       </div>
@@ -47,13 +50,13 @@ export function InstallCommand({ command, skillSlug, compact = false }: InstallC
   return (
     <div className="my-8 max-w-full border border-border bg-card">
       <div className="flex flex-col items-start gap-2 border-b border-border px-4 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <h3 className="text-sm font-semibold">{'Install with one command'}</h3>
+        <h3 className="text-sm font-semibold">{formatSkillDetailCopy(locale, 'installWithOneCommand')}</h3>
         <button
           onClick={copyToClipboard}
           className="shrink-0 border border-border bg-background px-3 py-1 text-xs font-mono transition-colors hover:bg-muted"
-          aria-label="Copy command"
+          aria-label={formatSkillDetailCopy(locale, 'copy')}
         >
-          {copied ? 'Copied!' : 'Copy'}
+          {copied ? formatSkillDetailCopy(locale, 'copied') : formatSkillDetailCopy(locale, 'copy')}
         </button>
       </div>
       <div className="min-w-0">

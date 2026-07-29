@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { useI18n } from '@/lib/i18n/context'
+import { formatSkillDetailCopy } from '@/lib/i18n/skill-detail-copy'
 
 interface SkillFeedbackPanelProps {
   skillSlug: string
@@ -16,6 +18,7 @@ function getAnonymousAgentId() {
 }
 
 export function SkillFeedbackPanel({ skillSlug }: SkillFeedbackPanelProps) {
+  const { locale } = useI18n()
   const [agentId] = useState<string | null>(() => {
     if (typeof window === 'undefined') return null
     return getAnonymousAgentId()
@@ -48,15 +51,15 @@ export function SkillFeedbackPanel({ skillSlug }: SkillFeedbackPanelProps) {
 
   return (
     <div className="border border-border p-5">
-      <h3 className="font-display text-lg font-semibold mb-3">Community Signal</h3>
+      <h3 className="font-display text-lg font-semibold mb-3">{formatSkillDetailCopy(locale, 'communitySignal')}</h3>
       <p className="mb-4 text-xs leading-relaxed text-secondary">
-        Share whether this skill looks useful for your agent workflow. Aggregated feedback improves rankings over time.
+        {formatSkillDetailCopy(locale, 'communitySignalDescription')}
       </p>
       <textarea
         value={message}
         onChange={(event) => setMessage(event.target.value)}
         rows={3}
-        placeholder="Optional note..."
+        placeholder={formatSkillDetailCopy(locale, 'optionalNote')}
         className="mb-3 w-full resize-none border border-border bg-transparent px-3 py-2 text-xs outline-none placeholder:text-secondary/50 focus:border-foreground"
       />
       <div className="grid grid-cols-2 gap-2">
@@ -66,7 +69,7 @@ export function SkillFeedbackPanel({ skillSlug }: SkillFeedbackPanelProps) {
           disabled={status === 'saving'}
           className="border border-foreground bg-foreground px-3 py-2 text-xs font-semibold text-background transition-opacity hover:opacity-80 disabled:opacity-50"
         >
-          Useful
+          {formatSkillDetailCopy(locale, 'useful')}
         </button>
         <button
           type="button"
@@ -74,11 +77,11 @@ export function SkillFeedbackPanel({ skillSlug }: SkillFeedbackPanelProps) {
           disabled={status === 'saving'}
           className="border border-border px-3 py-2 text-xs text-secondary transition-colors hover:border-foreground hover:text-foreground disabled:opacity-50"
         >
-          Needs review
+          {formatSkillDetailCopy(locale, 'needsReview')}
         </button>
       </div>
-      {status === 'saved' && <p className="mt-3 text-xs text-secondary">Thanks. Signal recorded.</p>}
-      {status === 'error' && <p className="mt-3 text-xs text-secondary">Could not save feedback right now.</p>}
+      {status === 'saved' && <p className="mt-3 text-xs text-secondary">{formatSkillDetailCopy(locale, 'signalRecorded')}</p>}
+      {status === 'error' && <p className="mt-3 text-xs text-secondary">{formatSkillDetailCopy(locale, 'feedbackError')}</p>}
     </div>
   )
 }

@@ -3,6 +3,12 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { trackSkillEvent } from '@/components/skill-event-tracker'
+import { useI18n } from '@/lib/i18n/context'
+import {
+  formatSkillDetailCopy,
+  type SkillDetailCopyKey,
+} from '@/lib/i18n/skill-detail-copy'
+import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 
 interface ClaimSkillPanelProps {
   skillSlug: string
@@ -22,6 +28,25 @@ interface ClaimState {
   evidence_note: string | null
 }
 
+function getSourceLabelCopyKey(value: string): SkillDetailCopyKey | null {
+  switch (value.trim().toLowerCase()) {
+    case 'verified maintainer':
+      return 'attributionVerifiedMaintainer'
+    case 'community submitted':
+      return 'attributionCommunitySubmitted'
+    case 'agent submitted':
+      return 'attributionAgentSubmitted'
+    case 'community indexed':
+    case 'community-indexed':
+      return 'attributionCommunityIndexed'
+    case 'registry indexed':
+    case 'registry-indexed':
+      return 'attributionRegistryIndexed'
+    default:
+      return null
+  }
+}
+
 export function ClaimSkillPanel({
   skillSlug,
   repository,
@@ -29,6 +54,7 @@ export function ClaimSkillPanel({
   sourceLabel = 'community-indexed',
   approvedClaim,
 }: ClaimSkillPanelProps) {
+  const { locale } = useI18n()
   const [open, setOpen] = useState(false)
   const [hasUser, setHasUser] = useState<boolean | null>(null)
   const [existingClaim, setExistingClaim] = useState<ClaimState | null>(null)
@@ -68,7 +94,8 @@ export function ClaimSkillPanel({
     trackSkillEvent(skillSlug, 'claim_start')
 
     if (!hasUser) {
-      window.location.href = `/auth/login?next=${encodeURIComponent(`/skills/${skillSlug}`)}`
+      const next = getLocalizedNavigationHref(`/skills/${skillSlug}`, locale)
+      window.location.href = `/auth/login?next=${encodeURIComponent(next)}`
       return
     }
     setOpen(true)
@@ -104,10 +131,16 @@ export function ClaimSkillPanel({
   if (approvedClaim) {
     return (
       <div id="claim-this-skill" className="scroll-mt-24 border border-border p-5">
-        <p className="mb-2 text-xs uppercase text-secondary">Owner claim</p>
-        <h3 className="font-display text-lg font-semibold">Verified maintainer</h3>
+        <p className="mb-2 text-xs uppercase text-secondary">
+          {formatSkillDetailCopy(locale, 'ownerClaim')}
+        </p>
+        <h3 className="font-display text-lg font-semibold">
+          {formatSkillDetailCopy(locale, 'verifiedMaintainer')}
+        </h3>
         <p className="mt-2 text-xs leading-relaxed text-secondary">
-          This skill has an approved maintainer claim from @{approvedClaim.github_username}.
+          {formatSkillDetailCopy(locale, 'verifiedMaintainerDescription', {
+            username: approvedClaim.github_username,
+          })}
         </p>
         {approvedClaim.evidence_url && (
           <a
@@ -116,7 +149,7 @@ export function ClaimSkillPanel({
             rel="noopener noreferrer"
             className="mt-4 inline-block text-xs text-secondary underline underline-offset-2 hover:text-foreground"
           >
-            Verification evidence
+            {formatSkillDetailCopy(locale, 'verificationEvidence')}
           </a>
         )}
       </div>
@@ -125,17 +158,25 @@ export function ClaimSkillPanel({
 
   return (
     <div id="claim-this-skill" className="scroll-mt-24 border border-border p-5">
-      <p className="mb-2 text-xs uppercase text-secondary">Owner claim</p>
-      <h3 className="font-display text-lg font-semibold">Claim this skill listing</h3>
+      <p className="mb-2 text-xs uppercase text-secondary">
+        {formatSkillDetailCopy(locale, 'ownerClaim')}
+      </p>
+      <h3 className="font-display text-lg font-semibold">
+        {formatSkillDetailCopy(locale, 'claimThisListing')}
+      </h3>
       <p className="mt-2 text-xs leading-relaxed text-secondary">
-        This {sourceLabel} listing is attributed to {creatorName || 'the public creator/source'} but is not marked
-        official yet. Claim it to add a verified owner signal and make future launch, install, and audit updates easier
-        to trust.
+        {formatSkillDetailCopy(locale, 'claimListingDescription', {
+          sourceLabel: getSourceLabelCopyKey(sourceLabel)
+            ? formatSkillDetailCopy(locale, getSourceLabelCopyKey(sourceLabel)!)
+            : sourceLabel,
+          creatorName: creatorName || formatSkillDetailCopy(locale, 'source'),
+        })}
       </p>
 
       {existingClaim && !open ? (
         <div className="mt-4 border border-border p-3 text-xs text-secondary">
-          Claim status: <span className="font-mono text-foreground">{existingClaim.status}</span>
+          {formatSkillDetailCopy(locale, 'claimStatus')}:{' '}
+          <span className="font-mono text-foreground">{existingClaim.status}</span>
         </div>
       ) : null}
 
@@ -145,12 +186,16 @@ export function ClaimSkillPanel({
           onClick={openPanel}
           className="mt-4 w-full border border-border px-3 py-2 text-sm transition-colors hover:border-foreground"
         >
-          {hasUser ? 'Verify maintainer claim' : 'Claim this skill'}
+          {hasUser
+            ? formatSkillDetailCopy(locale, 'verifyMaintainerClaim')
+            : formatSkillDetailCopy(locale, 'claimSkill')}
         </button>
       ) : (
         <div className="mt-4 space-y-3">
           <label className="block">
-            <span className="mb-1 block text-xs text-secondary">GitHub username</span>
+            <span className="mb-1 block text-xs text-secondary">
+              {formatSkillDetailCopy(locale, 'githubUsername')}
+            </span>
             <input
               value={githubUsername}
               onChange={(event) => setGithubUsername(event.target.value)}
@@ -159,21 +204,25 @@ export function ClaimSkillPanel({
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs text-secondary">Evidence URL</span>
+            <span className="mb-1 block text-xs text-secondary">
+              {formatSkillDetailCopy(locale, 'evidenceUrl')}
+            </span>
             <input
               value={evidenceUrl}
               onChange={(event) => setEvidenceUrl(event.target.value)}
-              placeholder="GitHub profile, repo, issue, or website"
+              placeholder={formatSkillDetailCopy(locale, 'evidenceUrlPlaceholder')}
               className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs text-secondary">Verification note</span>
+            <span className="mb-1 block text-xs text-secondary">
+              {formatSkillDetailCopy(locale, 'verificationNote')}
+            </span>
             <textarea
               value={evidenceNote}
               onChange={(event) => setEvidenceNote(event.target.value)}
               rows={3}
-              placeholder="How should we verify you own or maintain this skill?"
+              placeholder={formatSkillDetailCopy(locale, 'verificationNotePlaceholder')}
               className="w-full resize-none border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
             />
           </label>
@@ -183,10 +232,20 @@ export function ClaimSkillPanel({
             disabled={status === 'loading' || githubUsername.trim().length === 0}
             className="w-full border border-foreground bg-foreground px-3 py-2 text-sm font-semibold text-background transition-opacity hover:opacity-80 disabled:opacity-50"
           >
-            {status === 'loading' ? 'Submitting...' : 'Submit claim'}
+            {status === 'loading'
+              ? formatSkillDetailCopy(locale, 'submitting')
+              : formatSkillDetailCopy(locale, 'submitClaim')}
           </button>
-          {status === 'saved' && <p className="text-xs text-secondary">Claim submitted for review.</p>}
-          {status === 'error' && <p className="text-xs text-secondary">Could not submit claim. Check your sign-in state and username.</p>}
+          {status === 'saved' && (
+            <p className="text-xs text-secondary">
+              {formatSkillDetailCopy(locale, 'claimSubmitted')}
+            </p>
+          )}
+          {status === 'error' && (
+            <p className="text-xs text-secondary">
+              {formatSkillDetailCopy(locale, 'claimSubmitError')}
+            </p>
+          )}
         </div>
       )}
     </div>

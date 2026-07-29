@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { Check, Copy, ExternalLink } from 'lucide-react'
+import { SkillDetailLink as Link } from '@/components/skill-detail-link'
+import { useI18n } from '@/lib/i18n/context'
+import { formatSkillDetailCopy } from '@/lib/i18n/skill-detail-copy'
 
 interface CreatorBadgeKitProps {
   skillSlug: string
@@ -19,6 +21,7 @@ function badgeMarkdown(slug: string) {
 }
 
 export function CreatorBadgeKit({ skillSlug }: CreatorBadgeKitProps) {
+  const { locale } = useI18n()
   const [copied, setCopied] = useState(false)
   const markdown = badgeMarkdown(skillSlug)
 
@@ -36,12 +39,14 @@ export function CreatorBadgeKit({ skillSlug }: CreatorBadgeKitProps) {
     <section className="overflow-hidden rounded-[8px] border border-border bg-card" aria-labelledby="creator-badge-title">
       <div className="flex flex-col gap-4 border-b border-border p-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-secondary">Creator backlink kit</p>
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-secondary">
+            {formatSkillDetailCopy(locale, 'creatorBacklinkKit')}
+          </p>
           <h3 id="creator-badge-title" className="mt-2 font-display text-xl font-semibold">
-            Add the evidence badges to your README
+            {formatSkillDetailCopy(locale, 'addEvidenceBadges')}
           </h3>
           <p className="mt-2 max-w-md text-xs leading-5 text-secondary">
-            Show the canonical listing, current trust and audit signals, and real Agent Proven evidence where developers evaluate the repository.
+            {formatSkillDetailCopy(locale, 'creatorBadgeDescription')}
           </p>
         </div>
         <button
@@ -50,7 +55,9 @@ export function CreatorBadgeKit({ skillSlug }: CreatorBadgeKitProps) {
           className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-[8px] border border-[#006b4f] bg-[#006b4f] px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
         >
           {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
-          {copied ? 'Copied' : 'Copy all badges'}
+          {copied
+            ? formatSkillDetailCopy(locale, 'copied')
+            : formatSkillDetailCopy(locale, 'copyAllBadges')}
         </button>
       </div>
 
@@ -64,19 +71,22 @@ export function CreatorBadgeKit({ skillSlug }: CreatorBadgeKitProps) {
           prefetch={false}
           className="inline-flex min-h-10 items-center justify-center gap-1.5 bg-card px-3 text-xs font-semibold text-secondary hover:text-foreground"
         >
-          Preview badge <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+          {formatSkillDetailCopy(locale, 'previewBadge')}{' '}
+          <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
         </Link>
         <Link
           href={`/skills/${skillSlug}/audit`}
           className="inline-flex min-h-10 items-center justify-center gap-1.5 bg-card px-3 text-xs font-semibold text-secondary hover:text-foreground"
         >
-          Open audit <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+          {formatSkillDetailCopy(locale, 'openAudit')}{' '}
+          <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
         </Link>
         <Link
           href="/creator-kit"
           className="inline-flex min-h-10 items-center justify-center gap-1.5 bg-card px-3 text-xs font-semibold text-secondary hover:text-foreground"
         >
-          Creator Kit <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+          {formatSkillDetailCopy(locale, 'creatorKit')}{' '}
+          <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
         </Link>
       </div>
     </section>

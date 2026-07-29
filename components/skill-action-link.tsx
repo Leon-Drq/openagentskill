@@ -1,8 +1,8 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import Link from 'next/link'
 import { trackSkillEvent, type SkillEventType } from '@/components/skill-event-tracker'
+import { SkillDetailLink as Link } from '@/components/skill-detail-link'
 
 interface SkillActionLinkProps {
   href: string
