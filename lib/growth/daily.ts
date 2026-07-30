@@ -9,12 +9,7 @@ import {
 import { searchHotSkillRepos, type HotSkillDiscoveryResult } from '@/lib/indexer/hot-skill-discovery'
 import { bulkImportHighStarSkills, type BulkImportSummary } from '@/lib/indexer/high-star-import'
 import { processBatch, type ProcessResult } from '@/lib/indexer/processor'
-import {
-  enqueueXSkillPostQueue,
-  enqueueXSkillPostQueueForSlugs,
-  postNextQueuedSkillToX,
-  type XQueueBuildResult,
-} from '@/lib/x/growth'
+import type { XQueueBuildResult } from '@/lib/x/growth'
 import type { XPostResult } from '@/lib/x/poster'
 
 export interface DailyGrowthOptions {
@@ -26,8 +21,6 @@ export interface DailyGrowthOptions {
   bulkMinStars?: number
   bulkMaxSearchRequests?: number
   blogLimit?: number
-  xQueueLimit?: number
-  xMinStars?: number
   autoPost?: boolean
 }
 
@@ -180,8 +173,6 @@ export async function runDailyGrowthAutomation(
   const hotLimit = Math.min(Math.max(options.hotLimit ?? numberFromEnv('GROWTH_DAILY_HOT_LIMIT', 24), 1), 80)
   const blogLimit = Math.min(Math.max(options.blogLimit ?? nonNegativeNumberFromEnv('GROWTH_DAILY_BLOG_LIMIT', 0), 0), 12)
   const seoDailyLimit = Math.min(Math.max(numberFromEnv('SEO_DRIP_DAILY_LIMIT', 50), 1), 100)
-  const xQueueLimit = Math.min(Math.max(options.xQueueLimit ?? numberFromEnv('GROWTH_DAILY_X_QUEUE_LIMIT', 8), 1), 25)
-  const xMinStars = Math.max(options.xMinStars ?? numberFromEnv('GROWTH_DAILY_X_MIN_STARS', 10), 10)
   const autoPost = options.autoPost ?? booleanFromEnv('GROWTH_DAILY_AUTO_POST', true)
 
   const hotDiscovery = await searchHotSkillRepos({
@@ -230,36 +221,26 @@ export async function runDailyGrowthAutomation(
   ].filter((url): url is string => Boolean(url)))
   const indexing = await submitIndexNowUrls(Array.from(indexingUrls))
 
-  const xQueueSourceSlugs = indexedSlugs.length ? indexedSlugs : indexedOrUpdatedSlugs
-  const xQueue = xQueueSourceSlugs.length
-    ? await enqueueXSkillPostQueueForSlugs({
-      slugs: xQueueSourceSlugs,
-      limit: xQueueLimit,
-      minStars: xMinStars,
-      campaign: 'github_hot_daily',
-      })
-    : { status: 'skipped' as const, queued: 0, skipped: 0, considered: 0, results: [] }
+  // X publishing is deliberately separated from discovery. The dedicated
+  // editorial run queues three scenario shortlists a day, rather than letting
+  // a bulk importer create generic single-skill posts.
+  const xQueue: XQueueBuildResult = {
+    status: 'skipped',
+    queued: 0,
+    skipped: 0,
+    considered: 0,
+    results: [{
+      status: 'skipped',
+      reason: 'The dedicated X editorial run owns the daily scenario-shortlist queue.',
+    }],
+  }
 
-  const xFallbackQueue = xQueue.queued === 0
-    ? await enqueueXSkillPostQueue({
-        limit: Math.min(xQueueLimit, 6),
-        minStars: Math.max(xMinStars, 100),
-        campaign: 'github_hot_daily_fallback',
-      }).catch((error) => ({
-        status: 'skipped' as const,
-        queued: 0,
-        skipped: 1,
-        considered: 0,
-        results: [{ status: 'skipped', reason: error instanceof Error ? error.message : 'Fallback X queue failed' }],
-      }))
-    : undefined
-
-  const xPost = autoPost
-    ? await postNextQueuedSkillToX({ autoBuildQueue: false }).catch((error) => ({
-        status: 'skipped' as const,
-        reason: error instanceof Error ? error.message : 'X auto-post failed',
-      }))
-    : { status: 'skipped' as const, reason: 'Auto-post disabled' }
+  const xPost = {
+    status: 'skipped' as const,
+    reason: autoPost
+      ? 'Dedicated X editorial cron publishes the queued shortlist.'
+      : 'Auto-post disabled',
+  }
 
   return {
     success: true,
@@ -273,7 +254,6 @@ export async function runDailyGrowthAutomation(
     seo,
     indexing,
     xQueue,
-    ...(xFallbackQueue ? { xFallbackQueue } : {}),
     xPost,
     slugs: {
       indexed: indexedSlugs,

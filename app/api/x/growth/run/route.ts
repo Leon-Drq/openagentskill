@@ -25,6 +25,7 @@ async function handleRun(request: NextRequest) {
       skipped: result.digest.skipped,
       considered: result.digest.considered,
     },
+    retiredLegacyQueueItems: result.retiredLegacyQueueItems,
     metrics: result.metrics.status,
     replies: result.replies.status,
   })

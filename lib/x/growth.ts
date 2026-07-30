@@ -1,5 +1,6 @@
 import { buildSkillAudit } from '@/lib/audits'
 import { getAllSkills, type SkillRecord } from '@/lib/db/skills'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { createPublicClient } from '@/lib/supabase/public'
 import { getSkillTrustProfile } from '@/lib/trust'
 import {
@@ -24,7 +25,8 @@ import {
   isGenericFoundationRepoName,
   isGoodXCandidate,
 } from '@/lib/x/candidates'
-import { buildXShortlist, getXShortlistLaneForDate } from '@/lib/x/shortlist'
+import { buildXShortlist, getXShortlistEdition, getXShortlistLaneForDate } from '@/lib/x/shortlist'
+import { createXTrackingCode, X_GROWTH_EXPERIMENT_ID } from '@/lib/x/attribution'
 
 type SupabasePublicClient = ReturnType<typeof createPublicClient>
 
@@ -100,6 +102,7 @@ export interface XReplyDraftSyncResult {
 export interface XGrowthRunResult {
   queue: XQueueBuildResult
   digest: XQueueBuildResult
+  retiredLegacyQueueItems: number
   metrics: XMetricsSyncResult | { status: 'error'; error: string }
   replies: XReplyDraftSyncResult | { status: 'error'; error: string }
 }
@@ -143,14 +146,20 @@ function getQueuePriority(skill: SkillRecord) {
   return Math.round(quality + Math.log10(stars + 10) * 12 + getFreshnessBoost(skill))
 }
 
-function toQueueMetadata(skill: SkillRecord, minStars = 500) {
+function toQueueMetadata(
+  skill: SkillRecord,
+  minStars = 500,
+  tracking?: { campaign: string; content: string; experimentId?: string }
+) {
   const trust = getSkillTrustProfile(skill)
   const audit = buildSkillAudit(skill)
   const candidate = getXCandidateDecision(skill, minStars)
   const contentLane = candidate.lane
 
   return {
-    url: `https://www.openagentskill.com/skills/${skill.slug}?ref=x`,
+    url: tracking
+      ? `https://www.openagentskill.com/skills/${skill.slug}?ref=x&utm_source=x&utm_medium=organic&utm_campaign=${encodeURIComponent(tracking.campaign)}&utm_content=${encodeURIComponent(tracking.content)}&experiment=${encodeURIComponent(tracking.experimentId || X_GROWTH_EXPERIMENT_ID)}`
+      : `https://www.openagentskill.com/skills/${skill.slug}?ref=x`,
     github_repo: skill.github_repo,
     github_stars: skill.github_stars,
     category: skill.category,
@@ -167,6 +176,12 @@ function toQueueMetadata(skill: SkillRecord, minStars = 500) {
     utm_campaign: contentLane === 'general' ? 'daily_skill' : `${contentLane}_skill`,
     install_command: skill.install_command || `npx skills add ${skill.github_repo}`,
     generated_by: 'x_growth_os',
+    ...(tracking
+      ? {
+          tracking_code: tracking.content,
+          experiment_id: tracking.experimentId || X_GROWTH_EXPERIMENT_ID,
+        }
+      : {}),
   }
 }
 
@@ -182,6 +197,13 @@ async function enqueueQueueItem(
 ) {
   const contentLane = getXContentLane(skill)
   const campaign = contentLane === 'general' ? options.campaign : `${contentLane}_${options.campaign}`
+  const trackingCode = createXTrackingCode({
+    lane: contentLane,
+    edition: new Date().toISOString().slice(0, 10),
+    format: 'skill',
+  })
+  const tracking = { campaign, content: trackingCode, experimentId: X_GROWTH_EXPERIMENT_ID }
+  const url = `https://www.openagentskill.com/skills/${skill.slug}?ref=x&utm_source=x&utm_medium=organic&utm_campaign=${encodeURIComponent(campaign)}&utm_content=${encodeURIComponent(trackingCode)}&experiment=${X_GROWTH_EXPERIMENT_ID}`
   const { data, error } = await supabase.rpc('enqueue_x_content_queue_item', {
     p_server_secret: serverSecret,
     p_item: {
@@ -192,10 +214,10 @@ async function enqueueQueueItem(
       status: 'queued',
       priority: getQueuePriority(skill),
       scheduled_for: options.scheduledFor || new Date().toISOString(),
-      post_text: buildSkillPostText(skill),
+      post_text: buildSkillPostText(skill, { url }),
       reply_text: buildManualXReplyText(skill),
       source: 'auto_skill_generator',
-      metadata: toQueueMetadata(skill, options.minStars),
+      metadata: toQueueMetadata(skill, options.minStars, tracking),
     },
   })
 
@@ -203,11 +225,55 @@ async function enqueueQueueItem(
   return data as QueueRpcResult
 }
 
-function weekKey(date = new Date()) {
-  const firstDay = new Date(Date.UTC(date.getUTCFullYear(), 0, 1))
-  const dayOffset = Math.floor((date.getTime() - firstDay.getTime()) / 86_400_000)
-  const week = Math.ceil((dayOffset + firstDay.getUTCDay() + 1) / 7)
-  return `${date.getUTCFullYear()}-w${String(week).padStart(2, '0')}`
+async function getRecentlyFeaturedShortlistSkillSlugs(days = 14) {
+  try {
+    const supabase = createAdminClient({ requestTimeoutMs: 2500 })
+    const since = new Date(Date.now() - days * 86_400_000).toISOString()
+    const { data, error } = await supabase
+      .from('x_content_queue')
+      .select('metadata')
+      .eq('content_type', 'weekly_thread')
+      .in('status', ['queued', 'posting', 'posted'])
+      .gte('created_at', since)
+      .limit(80)
+    if (error) throw new Error(error.message)
+
+    const seen = new Set<string>()
+    for (const item of data || []) {
+      const metadata = item.metadata as Record<string, unknown> | null
+      const picks = Array.isArray(metadata?.skills) ? metadata.skills : []
+      for (const pick of picks) {
+        if (pick && typeof pick === 'object' && typeof (pick as { slug?: unknown }).slug === 'string') {
+          seen.add((pick as { slug: string }).slug)
+        }
+      }
+    }
+    return seen
+  } catch (error) {
+    console.warn('[x-growth] unable to load recent shortlist picks:', error)
+    return new Set<string>()
+  }
+}
+
+async function retireLegacyAutoQueueItems() {
+  try {
+    const supabase = createAdminClient({ requestTimeoutMs: 3500 })
+    const { data, error } = await supabase
+      .from('x_content_queue')
+      .update({
+        status: 'skipped',
+        error: 'Retired by editorial feedback loop: replaced by daily task shortlists',
+        locked_at: null,
+      })
+      .in('source', ['auto_skill_generator', 'weekly_digest_generator'])
+      .eq('status', 'queued')
+      .select('id')
+    if (error) throw new Error(error.message)
+    return data?.length || 0
+  } catch (error) {
+    console.warn('[x-growth] unable to retire legacy queue items:', error)
+    return 0
+  }
 }
 
 export async function enqueueXDigestPostQueue(
@@ -215,28 +281,43 @@ export async function enqueueXDigestPostQueue(
     minStars?: number
     candidatePool?: number
     campaign?: string
+    date?: Date
+    experimentId?: string
+    laneOffset?: number
   } = {}
 ): Promise<XQueueBuildResult> {
   const serverSecret = getServerSecret()
   const supabase = createPublicClient()
   const minStars = Math.max(options.minStars || 100, 25)
   const candidatePool = Math.min(Math.max(options.candidatePool || 500, 120), 1000)
-  const edition = weekKey()
+  const date = options.date || new Date()
+  const edition = getXShortlistEdition(date)
   const candidates = (await getAllSkills('quality', undefined, candidatePool))
     .filter((skill) => isGoodXCandidate(skill, minStars))
     .sort((a, b) => getQueuePriority(b) - getQueuePriority(a))
 
-  const lane = getXShortlistLaneForDate(candidates)
+  const lane = getXShortlistLaneForDate(candidates, date, options.laneOffset || 0)
   if (!lane) {
     return { status: 'skipped', queued: 0, skipped: 1, considered: candidates.length, results: [] }
   }
 
-  const shortlist = buildXShortlist(lane, candidates, { edition, limit: 5 })
+  const recentSkillSlugs = await getRecentlyFeaturedShortlistSkillSlugs(14)
+  const trackingCode = createXTrackingCode({ lane, edition, format: 'shortlist' })
+  const experimentId = options.experimentId || X_GROWTH_EXPERIMENT_ID
+  const campaign = options.campaign || `editorial_shortlist_${lane}`
+  const shortlist = buildXShortlist(lane, candidates, {
+    edition,
+    limit: 5,
+    excludeSkillSlugs: recentSkillSlugs,
+    tracking: {
+      campaign,
+      content: trackingCode,
+      experimentId,
+    },
+  })
   if (shortlist.picks.length < 3) {
     return { status: 'skipped', queued: 0, skipped: 1, considered: candidates.length, results: [] }
   }
-
-  const campaign = options.campaign || `task_shortlist_${lane}_${edition}`
 
   const { data, error } = await supabase.rpc('enqueue_x_content_queue_item', {
     p_server_secret: serverSecret,
@@ -246,20 +327,27 @@ export async function enqueueXDigestPostQueue(
       content_type: 'weekly_thread',
       campaign,
       status: 'queued',
-      // A task-first shortlist is the weekly editorial anchor. It must run
-      // ahead of the regular single-skill queue instead of waiting behind it.
-      priority: 250,
+      // One task-first shortlist is the daily editorial anchor. It runs ahead
+      // of any explicit, manually queued creator announcement.
+      priority: 300,
       scheduled_for: new Date().toISOString(),
       post_text: shortlist.mainText,
       reply_text: shortlist.replyText,
-      source: 'task_shortlist_generator',
+      source: 'editorial_shortlist_generator',
       metadata: {
         generated_by: 'x_growth_os',
         digest_type: 'task_shortlist',
+        content_format: 'scenario_shortlist',
+        experiment_id: experimentId,
+        experiment_topic: `${lane}-${edition}`,
+        tracking_code: trackingCode,
+        tracking_url: shortlist.url,
+        expected_action: 'shortlist_visit_then_skill_install',
         auto_thread_reply: true,
         lane: shortlist.lane,
         edition: shortlist.edition,
         shortlist_url: shortlist.url,
+        share_assets: shortlist.shareAssets,
         skills: shortlist.picks.map((pick) => ({
           slug: pick.skill.slug,
           name: pick.skill.name,
@@ -449,7 +537,7 @@ export async function postNextQueuedSkillToX(
   await saveRefreshedXToken(supabase, serverSecret, token)
 
   let queueBuild: Pick<XQueueBuildResult, 'status' | 'queued' | 'skipped' | 'considered'> | null = null
-  if (options.autoBuildQueue !== false) {
+  if (options.autoBuildQueue === true) {
     try {
       const result = await enqueueXSkillPostQueue({ limit: options.buildLimit || 8 })
       queueBuild = {
@@ -511,6 +599,10 @@ export async function postNextQueuedSkillToX(
       posted_at: new Date().toISOString(),
       metadata: {
         username: connection.username,
+        post_role: 'main',
+        tracking_code: item.metadata?.tracking_code || null,
+        experiment_id: item.metadata?.experiment_id || null,
+        content_format: item.metadata?.content_format || item.content_type,
         queue: {
           content_type: item.content_type,
           campaign: item.campaign,
@@ -548,6 +640,9 @@ export async function postNextQueuedSkillToX(
           metadata: {
             username: connection.username,
             parent_x_post_id: postId,
+            post_role: 'thread_follow_up',
+            tracking_code: item.metadata?.tracking_code || null,
+            experiment_id: item.metadata?.experiment_id || null,
             type: 'task_shortlist_reply',
             response: reply,
           },
@@ -776,6 +871,7 @@ async function recordReplyDraft(
 export async function syncXReplyDrafts(
   options: {
     limit?: number
+    maxDrafts?: number
   } = {}
 ): Promise<XReplyDraftSyncResult> {
   const serverSecret = getServerSecret()
@@ -795,16 +891,27 @@ export async function syncXReplyDrafts(
 
   const authors = new Map((mentions.includes?.users || []).map((user) => [user.id, user]))
   const skills = (await getAllSkills('quality', undefined, 250)).filter((skill) => isGoodXCandidate(skill, 100))
-  let drafted = 0
-  let skipped = 0
+  const maxDrafts = Math.min(Math.max(options.maxDrafts || numberFromEnv('X_CREATOR_REPLY_DRAFT_LIMIT', 1), 1), 3)
+  const candidateMentions = data
+    .filter((mention) => mention.author_id !== connection.x_user_id)
+    .map((mention) => ({ mention, selected: selectSkillForMention(mention.text, skills) }))
+    .filter((candidate) => candidate.selected?.skill && candidate.selected.score >= 15)
+    .sort((left, right) => (right.selected?.score || 0) - (left.selected?.score || 0))
 
-  for (const mention of data) {
+  let drafted = 0
+  let skipped = data.length - candidateMentions.length
+
+  for (const candidate of candidateMentions) {
+    if (drafted >= maxDrafts) {
+      skipped += 1
+      continue
+    }
+    const mention = candidate.mention
+    const selected = candidate.selected
     if (mention.author_id === connection.x_user_id) {
       skipped += 1
       continue
     }
-
-    const selected = selectSkillForMention(mention.text, skills)
     if (!selected?.skill || selected.score < 15) {
       skipped += 1
       continue
@@ -824,22 +931,46 @@ export async function syncXReplyDrafts(
 }
 
 export async function runXGrowthOS(): Promise<XGrowthRunResult> {
-  const queue = await enqueueXSkillPostQueue({ limit: numberFromEnv('X_GROWTH_QUEUE_LIMIT', 4) })
-  const digest = await enqueueXDigestPostQueue().catch((error) => ({
-    status: 'skipped' as const,
+  const retiredLegacyQueueItems = await retireLegacyAutoQueueItems()
+  const queue: XQueueBuildResult = {
+    status: 'skipped',
     queued: 0,
-    skipped: 1,
+    skipped: retiredLegacyQueueItems,
     considered: 0,
-    results: [{ status: 'skipped', reason: error instanceof Error ? error.message : 'Unknown digest error' }],
-  }))
+    results: retiredLegacyQueueItems
+      ? [{ status: 'skipped', reason: `Retired ${retiredLegacyQueueItems} legacy generic posts` }]
+      : [],
+  }
+  const dailyShortlistCount = Math.min(Math.max(numberFromEnv('X_DAILY_SCENARIO_POSTS', 3), 3), 5)
+  const digestParts = await Promise.all(
+    Array.from({ length: dailyShortlistCount }, (_, laneOffset) =>
+      enqueueXDigestPostQueue({ laneOffset }).catch((error) => ({
+        status: 'skipped' as const,
+        queued: 0,
+        skipped: 1,
+        considered: 0,
+        results: [{ status: 'skipped', reason: error instanceof Error ? error.message : 'Unknown digest error' }],
+      }))
+    )
+  )
+  const digest: XQueueBuildResult = {
+    status: digestParts.some((part) => part.status === 'ready') ? 'ready' : 'skipped',
+    queued: digestParts.reduce((sum, part) => sum + part.queued, 0),
+    skipped: digestParts.reduce((sum, part) => sum + part.skipped, 0),
+    considered: Math.max(0, ...digestParts.map((part) => part.considered)),
+    results: digestParts.flatMap((part) => part.results),
+  }
   const metrics = await syncXPostMetrics({ limit: numberFromEnv('X_METRICS_SYNC_LIMIT', 12) }).catch((error) => ({
     status: 'error' as const,
     error: error instanceof Error ? error.message : 'Unknown X metrics sync error',
   }))
-  const replies = await syncXReplyDrafts({ limit: numberFromEnv('X_REPLY_SYNC_LIMIT', 8) }).catch((error) => ({
+  const replies = await syncXReplyDrafts({
+    limit: numberFromEnv('X_REPLY_SYNC_LIMIT', 8),
+    maxDrafts: numberFromEnv('X_CREATOR_REPLY_DRAFT_LIMIT', 1),
+  }).catch((error) => ({
     status: 'error' as const,
     error: error instanceof Error ? error.message : 'Unknown X replies sync error',
   }))
 
-  return { queue, digest, metrics, replies }
+  return { queue, digest, retiredLegacyQueueItems, metrics, replies }
 }

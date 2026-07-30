@@ -1,6 +1,14 @@
 import { timingSafeEqual } from 'node:crypto'
 import type { NextRequest } from 'next/server'
 
+// Keep the supported automation secrets statically referenced. Deployment
+// bundlers can omit dynamically accessed environment variables from functions.
+const automationSecrets = {
+  INDEXER_SECRET: process.env.INDEXER_SECRET,
+  CRON_SECRET: process.env.CRON_SECRET,
+  INDEXER_TRIGGER_SECRET: process.env.INDEXER_TRIGGER_SECRET,
+} as const
+
 function isLocalDevelopment() {
   return process.env.NODE_ENV !== 'production' && !process.env.VERCEL
 }
@@ -19,10 +27,10 @@ function safeEqual(a: string, b: string): boolean {
 
 export function isAutomationAuthorized(
   request: NextRequest,
-  envNames: string[] = ['INDEXER_SECRET', 'CRON_SECRET']
+  envNames: Array<keyof typeof automationSecrets> = ['INDEXER_SECRET', 'CRON_SECRET']
 ): boolean {
   const configuredSecrets = envNames
-    .map((name) => process.env[name])
+    .map((name) => automationSecrets[name])
     .filter((value): value is string => Boolean(value))
 
   if (configuredSecrets.length === 0) {

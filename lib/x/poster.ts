@@ -75,8 +75,15 @@ function getSkillUrl(skill: XPostSkill, source?: 'x') {
   return getSkillUrlBySlug(skill.slug, source)
 }
 
-export function buildSkillPostText(skill: XPostSkill) {
-  return buildHumanSkillPostText(skill, { includeUrl: true, source: undefined })
+export function buildSkillPostText(
+  skill: XPostSkill,
+  options: { url?: string } = {}
+) {
+  return buildHumanSkillPostText(skill, {
+    includeUrl: true,
+    source: undefined,
+    url: options.url,
+  })
 }
 
 function getSkillSearchText(skill: XPostSkill) {
@@ -94,9 +101,10 @@ function buildHumanSkillPostText(
   options: {
     includeUrl: boolean
     source?: 'x'
+    url?: string
   }
 ) {
-  const url = getSkillUrl(skill, options.source)
+  const url = options.url || getSkillUrl(skill, options.source)
   const stats = `${formatStars(skill.github_stars)} stars`
   const footer = options.includeUrl ? url : ''
   const build = (parts: string[]) => parts.filter(Boolean).join('\n\n')

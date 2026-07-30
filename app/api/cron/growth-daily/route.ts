@@ -53,8 +53,6 @@ async function handleRun(request: NextRequest) {
     bulkMinStars: parseOptionalPositive(searchParams.get('bulkMinStars'), body.bulkMinStars),
     bulkMaxSearchRequests: parseOptionalPositive(searchParams.get('bulkMaxSearchRequests'), body.bulkMaxSearchRequests),
     blogLimit: parseOptionalNonNegative(searchParams.get('blogLimit'), body.blogLimit),
-    xQueueLimit: parseOptionalPositive(searchParams.get('xQueueLimit'), body.xQueueLimit),
-    xMinStars: parseOptionalPositive(searchParams.get('xMinStars'), body.xMinStars),
     autoPost: parseOptionalBoolean(searchParams.get('autoPost'), body.autoPost),
   })
 

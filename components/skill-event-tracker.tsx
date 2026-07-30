@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { trackAnalyticsEvent, type AnalyticsEventName, type AnalyticsParameterValue } from '@/lib/analytics'
+import { getActiveXAttribution } from '@/lib/x/attribution-client'
 
 export type SkillEventType =
   | 'view'
@@ -52,10 +53,28 @@ export async function trackSkillEvent(
 ) {
   if (typeof window === 'undefined') return
 
+  const attribution = getActiveXAttribution()
+  const existingAttribution =
+    metadata.attribution &&
+    typeof metadata.attribution === 'object' &&
+    !Array.isArray(metadata.attribution)
+      ? metadata.attribution as Record<string, unknown>
+      : {}
+  const eventMetadata = attribution
+    ? {
+        ...metadata,
+        attribution: {
+          ...existingAttribution,
+          ...attribution,
+        },
+      }
+    : metadata
+
   trackAnalyticsEvent(analyticsEventNames[eventType], {
     skill_slug: skillSlug,
     path: window.location.pathname,
-    ...analyticsMetadata(metadata),
+    ...analyticsMetadata(eventMetadata),
+    ...(attribution ? { source: 'x', campaign: attribution.campaign } : {}),
   })
 
   try {
@@ -68,7 +87,7 @@ export async function trackSkillEvent(
         session_id: getSessionId(),
         path: window.location.pathname,
         referrer: document.referrer || null,
-        metadata,
+        metadata: eventMetadata,
       }),
       keepalive: true,
     })

@@ -9,7 +9,7 @@ async function handlePost(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const result = await postNextQueuedSkillToX({ autoBuildQueue: true, buildLimit: 4 })
+  const result = await postNextQueuedSkillToX({ autoBuildQueue: false })
   const posted = result.status === 'posted'
 
   // Keep production cron logs actionable without exposing OAuth tokens or post text.

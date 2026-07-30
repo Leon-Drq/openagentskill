@@ -2,18 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 import { syncXPostMetrics } from '@/lib/x/growth'
 
-function parsePositive(value: string | null, fallback: number) {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
-}
+export const maxDuration = 60
 
 async function handleSync(request: NextRequest) {
   if (!isAutomationAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const limit = parsePositive(request.nextUrl.searchParams.get('limit'), 12)
-  const result = await syncXPostMetrics({ limit })
+  const result = await syncXPostMetrics()
+  console.info('[x-metrics-sync]', {
+    status: result.status,
+    requested: result.requested,
+    recorded: result.recorded,
+    missing: result.missing,
+  })
   return NextResponse.json({ success: result.status === 'synced', ...result })
 }
 

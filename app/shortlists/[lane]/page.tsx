@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { MarketingButtonLink, MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
+import { XAttributionTracker } from '@/components/x-attribution-tracker'
 import { getXShortlist, getXShortlistInstallCommand, getXShortlistStars, isXShortlistLane } from '@/lib/x/shortlist'
 
 const BASE_URL = 'https://www.openagentskill.com'
@@ -68,6 +69,7 @@ export default async function XShortlistPage({
 
   return (
     <MarketingPageShell>
+      <XAttributionTracker anchorSkillSlug={shortlist.picks[0].skill.slug} lane={shortlist.lane} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <MarketingHero
         eyebrow={shortlist.config.eyebrow}

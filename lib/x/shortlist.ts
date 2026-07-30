@@ -2,6 +2,7 @@ import { getAllSkills, type SkillRecord } from '@/lib/db/skills'
 import { getPrimaryInstallCommand } from '@/lib/install-targets'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { getXContentLane, isGoodXCandidate } from '@/lib/x/candidates'
+import { buildXTrackingUrl, getXShareAssets, type XShareAsset, type XTrackingInput } from '@/lib/x/attribution'
 
 const SITE_URL = 'https://www.openagentskill.com'
 const DEFAULT_SHORTLIST_LIMIT = 5
@@ -40,6 +41,7 @@ export interface XShortlist {
   edition: string
   slug: string
   url: string
+  shareAssets: XShareAsset[]
   picks: XShortlistPick[]
   mainText: string
   replyText: string
@@ -308,7 +310,7 @@ function buildSocialMainText(config: XShortlistConfig, picks: XShortlistPick[], 
       'Full shortlist, audit scores, and install paths:',
       url,
     ].join('\n')
-    if (text.length <= 280) return text
+    if (getXTextLength(text) <= 280) return text
   }
 
   return [
@@ -317,7 +319,7 @@ function buildSocialMainText(config: XShortlistConfig, picks: XShortlistPick[], 
     config.socialLead,
     '',
     `Full shortlist: ${url}`,
-  ].join('\n').slice(0, 280)
+  ].join('\n')
 }
 
 function buildSocialReplyText(picks: XShortlistPick[]) {
@@ -326,46 +328,57 @@ function buildSocialReplyText(picks: XShortlistPick[]) {
       .slice(0, count)
       .map((pick, index) => `${index + 1}. ${truncate(pick.skill.name, 30)} - ${truncate(pick.reason, 44)}`)
     const text = ['Why each made the list:', '', ...lines, '', 'Review the audit and install path before adding one to a workspace.'].join('\n')
-    if (text.length <= 280) return text
+    if (getXTextLength(text) <= 280) return text
   }
 
   return 'Each pick has a public audit and install path. Review the repository before adding it to a real workspace.'
 }
 
-function getWeekEdition(date = new Date()) {
-  const firstDay = new Date(Date.UTC(date.getUTCFullYear(), 0, 1))
-  const dayOffset = Math.floor((date.getTime() - firstDay.getTime()) / 86_400_000)
-  const week = Math.ceil((dayOffset + firstDay.getUTCDay() + 1) / 7)
-  return `${date.getUTCFullYear()}-w${String(week).padStart(2, '0')}`
+function getXTextLength(value: string) {
+  return value.replace(/https?:\/\/\S+/g, 'x'.repeat(23)).length
+}
+
+export function getXShortlistEdition(date = new Date()) {
+  return date.toISOString().slice(0, 10)
 }
 
 export function isXShortlistLane(value: string): value is XShortlistLane {
   return Object.hasOwn(X_SHORTLIST_CONFIGS, value)
 }
 
-export function getXShortlistLaneForDate(skills: SkillRecord[], date = new Date()): XShortlistLane | null {
+export function getXShortlistLaneForDate(
+  skills: SkillRecord[],
+  date = new Date(),
+  offset = 0
+): XShortlistLane | null {
   const eligibleLanes = SHORTLIST_LANE_ORDER.filter((lane) =>
     skills.filter((skill) => getXContentLane(skill) === lane && isGoodXCandidate(skill, MIN_SHORTLIST_STARS)).length >= 3
   )
 
   if (!eligibleLanes.length) return null
 
-  const edition = getWeekEdition(date)
-  const week = Number(edition.slice(-2)) || 1
-  return eligibleLanes[(week - 1) % eligibleLanes.length]
+  const day = Math.floor(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) / 86_400_000)
+  return eligibleLanes[Math.abs(day + offset) % eligibleLanes.length]
 }
 
 export function buildXShortlist(
   lane: XShortlistLane,
   skills: SkillRecord[],
-  options: { limit?: number; edition?: string } = {}
+  options: {
+    limit?: number
+    edition?: string
+    tracking?: XTrackingInput
+    excludeSkillSlugs?: Iterable<string>
+  } = {}
 ): XShortlist {
   const config = X_SHORTLIST_CONFIGS[lane]
   const limit = Math.min(Math.max(options.limit || DEFAULT_SHORTLIST_LIMIT, 3), 5)
-  const edition = options.edition || getWeekEdition()
+  const edition = options.edition || getXShortlistEdition()
+  const excludedSlugs = new Set(options.excludeSkillSlugs || [])
   const ranked = skills
     .filter((skill) => getXContentLane(skill) === lane)
     .filter((skill) => isGoodXCandidate(skill, MIN_SHORTLIST_STARS))
+    .filter((skill) => !excludedSlugs.has(skill.slug))
     .map((skill) => ({ skill, role: getXShortlistRole(skill, lane), score: getShortlistScore(skill) }))
     .sort((left, right) => right.score - left.score || Number(right.skill.github_stars || 0) - Number(left.skill.github_stars || 0))
 
@@ -397,13 +410,19 @@ export function buildXShortlist(
   }
 
   const slug = `task-shortlist-${lane}-${edition}`
-  const url = `${SITE_URL}/shortlists/${lane}?ref=x&edition=${edition}`
+  const defaultUrl = `${SITE_URL}/shortlists/${lane}?ref=x&edition=${edition}`
+  const url = options.tracking
+    ? buildXTrackingUrl(`/shortlists/${lane}?edition=${encodeURIComponent(edition)}`, options.tracking)
+    : defaultUrl
   return {
     lane,
     config,
     edition,
     slug,
     url,
+    shareAssets: options.tracking
+      ? getXShareAssets(lane, edition, options.tracking.content)
+      : [],
     picks: selected,
     mainText: buildSocialMainText(config, selected, url),
     replyText: buildSocialReplyText(selected),
