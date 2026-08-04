@@ -30,6 +30,13 @@ interface XRecentTweet {
 
 interface XRecentSearchResponse {
   data?: XRecentTweet[]
+  includes?: {
+    users?: Array<{
+      id: string
+      username?: string
+      name?: string
+    }>
+  }
   meta?: {
     result_count?: number
   }
@@ -57,6 +64,9 @@ export interface XSkillRadarCandidate extends CandidateRepo {
   xSignal: {
     tweetId: string
     authorId?: string
+    authorUsername?: string
+    authorName?: string
+    sourceUrl: string
     createdAt?: string
     text: string
     query: string
@@ -200,6 +210,7 @@ async function searchXRecent(query: string, maxResults: number, token: string) {
   url.searchParams.set('max_results', String(Math.min(Math.max(maxResults, 10), 100)))
   url.searchParams.set('tweet.fields', 'author_id,created_at,entities,lang,public_metrics')
   url.searchParams.set('expansions', 'author_id')
+  url.searchParams.set('user.fields', 'username,name')
 
   const response = await fetch(url, {
     headers: {
@@ -224,7 +235,29 @@ async function fetchGitHubRepo(owner: string, repo: string) {
   return (await response.json()) as GitHubRepoResponse
 }
 
-function toCandidate(repo: GitHubRepoResponse, tweet: XRecentTweet, query: string, score: number): XSkillRadarCandidate {
+function toCandidate(
+  repo: GitHubRepoResponse,
+  tweet: XRecentTweet,
+  query: string,
+  score: number,
+  author?: { id: string; username?: string; name?: string }
+): XSkillRadarCandidate {
+  const sourceUrl = author?.username
+    ? `https://x.com/${author.username}/status/${tweet.id}`
+    : `https://x.com/i/web/status/${tweet.id}`
+  const xSignal = {
+    tweetId: tweet.id,
+    authorId: tweet.author_id,
+    authorUsername: author?.username,
+    authorName: author?.name,
+    sourceUrl,
+    createdAt: tweet.created_at,
+    text: tweet.text,
+    query,
+    engagementScore: engagementScore(tweet),
+    metrics: tweet.public_metrics || {},
+  }
+
   return {
     owner: repo.owner.login,
     repo: repo.name,
@@ -235,15 +268,13 @@ function toCandidate(repo: GitHubRepoResponse, tweet: XRecentTweet, query: strin
     topics: repo.topics || [],
     updatedAt: repo.updated_at || repo.pushed_at || new Date().toISOString(),
     htmlUrl: repo.html_url,
-    xSignal: {
-      tweetId: tweet.id,
-      authorId: tweet.author_id,
-      createdAt: tweet.created_at,
-      text: tweet.text,
-      query,
-      engagementScore: engagementScore(tweet),
-      metrics: tweet.public_metrics || {},
+    discovery: {
+      source: 'x-radar',
+      x: {
+        ...xSignal,
+      },
     },
+    xSignal,
     radarScore: score,
   }
 }
@@ -278,6 +309,9 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
     searchedQueries += 1
     try {
       const response = await searchXRecent(query, maxResultsPerQuery, token)
+      const authorsById = new Map(
+        (response.includes?.users || []).map((author) => [author.id, author])
+      )
       for (const tweet of response.data || []) {
         inspectedTweets += 1
         const repos = extractGitHubRepos(tweet)
@@ -311,7 +345,10 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
           if (!evaluation.accepted) continue
 
           const score = radarScore(repo, tweet, evaluation.score)
-          candidates.set(repo.full_name.toLowerCase(), toCandidate(repo, tweet, query, score))
+          candidates.set(
+            repo.full_name.toLowerCase(),
+            toCandidate(repo, tweet, query, score, authorsById.get(tweet.author_id || ''))
+          )
           if (candidates.size >= limit * 2) break
         }
 

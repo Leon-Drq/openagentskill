@@ -41,6 +41,8 @@ function getSourceLabel(source: string | null | undefined) {
       return 'GitHub star discovery'
     case 'auto-indexer':
       return 'OpenAgentSkill auto-indexer'
+    case 'x-skill-radar':
+      return 'X skill radar'
     case 'curated-skill-path':
       return 'Source-checked curated skill'
     case 'agent':
@@ -58,7 +60,11 @@ function getAttributionStatus(skill: SkillRecord, approvedClaim?: SkillClaimReco
   if (approvedClaim) return 'verified_maintainer'
   if (skill.submission_source === 'web') return 'community_submitted'
   if (skill.submission_source === 'agent') return 'agent_submitted'
-  if (skill.submission_source === 'github-star-discovery' || skill.submission_source === 'auto-indexer') {
+  if (
+    skill.submission_source === 'github-star-discovery' ||
+    skill.submission_source === 'auto-indexer' ||
+    skill.submission_source === 'x-skill-radar'
+  ) {
     return 'community_indexed'
   }
   return 'registry_indexed'

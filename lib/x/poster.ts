@@ -166,13 +166,13 @@ export function buildCommunityIndexedReplyText(
 ) {
   const creatorName = truncate(options.creatorName || skill.author_name || skill.github_repo?.split('/')[0] || '', 32)
   const skillName = truncate(skill.name, 52)
-  const url = `${getSkillUrlBySlug(skill.slug, 'x')}&utm_source=x_reply`
+  const url = `${getSkillUrlBySlug(skill.slug, 'x')}&utm_source=creator_reply&utm_medium=organic#claim-this-skill`
 
   const intro = creatorName
-    ? `This is exactly the kind of practical skill agents need. Added ${creatorName}'s ${skillName} to OpenAgentSkill.`
-    : `This is exactly the kind of practical skill agents need. Added ${skillName} to OpenAgentSkill.`
+    ? `Loved seeing this. ${creatorName}'s ${skillName} is now indexed on OpenAgentSkill.`
+    : `Loved seeing this. ${skillName} is now indexed on OpenAgentSkill.`
 
-  const claimLine = 'Happy to update details or mark it as claimed.'
+  const claimLine = 'Claim it to update the listing or add maintainer context.'
   const build = (middle: string, includeClaim: boolean) => [
     intro,
     middle,
@@ -181,11 +181,11 @@ export function buildCommunityIndexedReplyText(
     ...(includeClaim ? ['', claimLine] : []),
   ].join('\n')
 
-  const middle = 'Now builders can discover it, compare trust signals, and find the install path from one page.'
+  const middle = 'It now has a public install path, trust signals, and an attribution-first claim link.'
   const full = build(middle, true)
   if (full.length <= 280) return full
 
-  const shorter = build('Now agents/builders can discover and compare it from one page.', true)
+  const shorter = build('It now has a public listing, install path, and claim link.', true)
   if (shorter.length <= 280) return shorter
 
   return build('', false).slice(0, 280)

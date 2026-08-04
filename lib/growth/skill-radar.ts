@@ -5,6 +5,7 @@ import {
   type IndexNowSubmitResult,
 } from '@/lib/indexnow'
 import { runSeoDrip, type SeoDripResult } from '@/lib/growth/seo-drip'
+import { enqueueCreatorOutreachDrafts, type CreatorOutreachResult } from '@/lib/growth/creator-outreach'
 import { searchHotSkillRepos, type HotSkillDiscoveryResult } from '@/lib/indexer/hot-skill-discovery'
 import { searchXSkillRadarRepos, type XSkillRadarResult } from '@/lib/indexer/x-skill-radar'
 import { processRepo, type ProcessResult } from '@/lib/indexer/processor'
@@ -55,6 +56,7 @@ export interface SkillRadarResult {
   xQueue: XQueueBuildResult
   xFallbackQueue?: XQueueBuildResult
   xPost: XPostResult & { queueItemId?: string }
+  creatorOutreach: CreatorOutreachResult
   slugs: {
     indexed: string[]
     touched: string[]
@@ -88,7 +90,7 @@ export function getSkillRadarXSchedule(
 ): XSkillRadarSchedule {
   const configuredMaxQueries = Math.min(
     Math.max(
-      options.xMaxQueries ?? nonNegativeNumberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 0),
+      options.xMaxQueries ?? nonNegativeNumberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 1),
       0
     ),
     MAX_X_RADAR_QUERIES_PER_RUN
@@ -140,7 +142,7 @@ function candidateSlug(candidate: CandidateRepo) {
 
 async function excludeExistingCandidates(candidates: CandidateRepo[]) {
   const slugs = unique(candidates.map(candidateSlug))
-  if (!slugs.length) return { candidates, existing: 0 }
+  if (!slugs.length) return { candidates, existing: 0, existingCandidates: [] as CandidateRepo[] }
 
   try {
     const { data, error } = await createPublicClient({
@@ -159,12 +161,13 @@ async function excludeExistingCandidates(candidates: CandidateRepo[]) {
     return {
       candidates: candidates.filter((candidate) => !existingSlugs.has(candidateSlug(candidate))),
       existing: existingSlugs.size,
+      existingCandidates: candidates.filter((candidate) => existingSlugs.has(candidateSlug(candidate))),
     }
   } catch (error) {
     // Keep discovery available when Supabase is under transient load. The
     // per-repository processor still has its own duplicate guard.
     console.warn('[skill-radar] Could not prefilter existing candidates:', error)
-    return { candidates, existing: 0 }
+    return { candidates, existing: 0, existingCandidates: [] as CandidateRepo[] }
   }
 }
 
@@ -349,6 +352,22 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
   const indexedSlugs = collectSlugs(importResults, ['indexed'])
   const touchedSlugs = collectSlugs(importResults, ['indexed', 'skipped'])
 
+  // Creator outreach is intentionally downstream of review. We only create
+  // reply drafts for public X launch posts when the linked repository is now
+  // an approved registry skill (or was already approved before this scan).
+  const creatorOutreach = await enqueueCreatorOutreachDrafts(xRadar.candidates).catch((error) => ({
+    status: 'error' as const,
+    eligible: 0,
+    drafted: 0,
+    skipped: 0,
+    errors: 1,
+    results: [{
+      skillSlug: 'creator-outreach',
+      status: 'error' as const,
+      reason: error instanceof Error ? error.message : 'Creator outreach draft generation failed',
+    }],
+  }))
+
   const seo = seoPerRun > 0
     ? await runSeoDrip({
         perRun: seoPerRun,
@@ -395,6 +414,7 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
     indexing,
     xQueue,
     xPost,
+    creatorOutreach,
     slugs: {
       indexed: indexedSlugs,
       touched: touchedSlugs,
@@ -447,6 +467,13 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
         inspected_tweets: xRadar.inspectedTweets,
         extracted_repos: xRadar.extractedRepos,
         candidates: xRadar.candidates.length,
+      },
+      creator_outreach: {
+        status: creatorOutreach.status,
+        eligible: creatorOutreach.eligible,
+        drafted: creatorOutreach.drafted,
+        skipped: creatorOutreach.skipped,
+        errors: creatorOutreach.errors,
       },
       seo: {
         status: seo.status,

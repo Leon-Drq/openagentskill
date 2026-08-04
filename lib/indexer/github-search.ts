@@ -18,6 +18,30 @@ function githubHeaders() {
   }
 }
 
+export interface CandidateDiscovery {
+  /** Where this repository first entered the intake queue. */
+  source: string
+  x?: {
+    tweetId: string
+    sourceUrl: string
+    authorId?: string
+    authorUsername?: string
+    authorName?: string
+    createdAt?: string
+    text: string
+    query: string
+    engagementScore: number
+    metrics: {
+      retweet_count?: number
+      reply_count?: number
+      like_count?: number
+      quote_count?: number
+      bookmark_count?: number
+      impression_count?: number
+    }
+  }
+}
+
 export interface CandidateRepo {
   owner: string
   repo: string
@@ -28,6 +52,8 @@ export interface CandidateRepo {
   topics?: string[]
   updatedAt: string
   htmlUrl: string
+  /** Optional provenance retained through review so downstream growth flows can be selective. */
+  discovery?: CandidateDiscovery
 }
 
 /**

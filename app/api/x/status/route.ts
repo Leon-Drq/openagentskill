@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createPublicClient } from '@/lib/supabase/public'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 import { getStoredXConnection } from '@/lib/x/poster'
+import { getCreatorOutreachStatus } from '@/lib/x/growth'
 
 function hasEnv(name: string) {
   return Boolean((process.env[name] || '').trim())
@@ -44,13 +45,22 @@ export async function GET(request: NextRequest) {
   }
 
   const connection = await getConnectionStatus()
-  const skillRadarXMaxQueries = numberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 0)
+  const skillRadarXMaxQueries = numberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 1)
   const skillRadarXResultsPerQuery = numberFromEnv('SKILL_RADAR_X_RESULTS_PER_QUERY', 10)
   const skillRadarXScanIntervalHours = Math.min(
     Math.max(numberFromEnv('SKILL_RADAR_X_SCAN_INTERVAL_HOURS', 6), 1),
     24
   )
   const skillRadarXQueriesPerDay = Math.ceil(24 / skillRadarXScanIntervalHours) * skillRadarXMaxQueries
+
+  const creatorOutreach = await getCreatorOutreachStatus().catch((error) => ({
+    queued: 0,
+    posting: 0,
+    postedLast24Hours: 0,
+    errorsLast24Hours: 0,
+    dailyLimit: numberFromEnv('X_CREATOR_REPLY_DAILY_LIMIT', 2),
+    error: error instanceof Error ? error.message : 'Unable to load creator outreach state',
+  }))
 
   return NextResponse.json({
     success: true,
@@ -78,9 +88,13 @@ export async function GET(request: NextRequest) {
       skillRadarXScanIntervalHours,
       skillRadarXQueriesPerDay,
       skillRadarXEnabled: skillRadarXMaxQueries > 0 && hasEnv('X_BEARER_TOKEN'),
+      creatorReplyDailyLimit: Math.min(Math.max(numberFromEnv('X_CREATOR_REPLY_DAILY_LIMIT', 2), 1), 2),
     },
+    creatorOutreach,
     guardrails: {
       duplicateSkillPosts: 'blocked by queue and post history',
+      creatorReplyDedupe: 'one reply per source launch post; maximum two per rolling 24 hours',
+      creatorEmail: 'draft-only; never sent automatically',
       genericFoundationRepos: 'blocked before X queue/posting',
       minImportStars: 10,
       requireClearLicense: true,

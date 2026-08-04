@@ -99,6 +99,46 @@ export interface XReplyDraftSyncResult {
   skipped: number
 }
 
+interface XCreatorReplyDraft {
+  id: string
+  source_tweet_id: string
+  source_url: string | null
+  source_author_username: string | null
+  source_author_name: string | null
+  source_text: string | null
+  skill_id: string | null
+  skill_slug: string
+  draft_text: string
+  score: number
+  metadata: Record<string, unknown>
+}
+
+interface XCreatorReplyClaimSkip {
+  status: 'skipped'
+  reason?: string
+}
+
+export interface XCreatorReplyPostResult {
+  status: 'posted' | 'skipped'
+  reason?: string
+  draftId?: string
+  skillSlug?: string
+  post?: {
+    id: string
+    text: string
+    url: string
+    inReplyTo: string
+  }
+}
+
+export interface XCreatorOutreachStatus {
+  queued: number
+  posting: number
+  postedLast24Hours: number
+  errorsLast24Hours: number
+  dailyLimit: number
+}
+
 export interface XGrowthRunResult {
   queue: XQueueBuildResult
   digest: XQueueBuildResult
@@ -128,6 +168,16 @@ function compactNumber(value: number) {
 function numberFromEnv(name: string, fallback: number) {
   const parsed = Number(process.env[name])
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
+}
+
+function booleanFromEnv(name: string, fallback: boolean) {
+  const value = (process.env[name] || '').trim().toLowerCase()
+  if (!value) return fallback
+  return !['0', 'false', 'no', 'off'].includes(value)
+}
+
+function creatorReplyDailyLimit() {
+  return Math.min(Math.max(numberFromEnv('X_CREATOR_REPLY_DAILY_LIMIT', 2), 1), 2)
 }
 
 function getFreshnessBoost(skill: SkillRecord) {
@@ -502,6 +552,151 @@ async function completeQueueItem(
   })
 
   if (error) throw new Error(`Failed to complete X queue item: ${error.message}`)
+}
+
+async function claimNextCreatorReplyDraft(
+  supabase: SupabasePublicClient,
+  serverSecret: string,
+  dailyLimit: number
+) {
+  const { data, error } = await supabase.rpc('claim_auto_creator_x_reply_draft', {
+    p_server_secret: serverSecret,
+    p_daily_limit: dailyLimit,
+  })
+
+  if (error) throw new Error(`Failed to claim creator reply draft: ${error.message}`)
+  return (data || null) as XCreatorReplyDraft | XCreatorReplyClaimSkip | null
+}
+
+async function completeCreatorReplyDraft(
+  supabase: SupabasePublicClient,
+  serverSecret: string,
+  draftId: string,
+  status: 'posted' | 'error' | 'skipped',
+  options: {
+    xPostId?: string | null
+    error?: string | null
+    metadata?: Record<string, unknown>
+  } = {}
+) {
+  const { error } = await supabase.rpc('complete_auto_creator_x_reply_draft', {
+    p_server_secret: serverSecret,
+    p_draft_id: draftId,
+    p_status: status,
+    p_x_post_id: options.xPostId || null,
+    p_error: options.error || null,
+    p_metadata: options.metadata || {},
+  })
+
+  if (error) throw new Error(`Failed to complete creator reply draft: ${error.message}`)
+}
+
+export async function getCreatorOutreachStatus(): Promise<XCreatorOutreachStatus> {
+  const serverSecret = getServerSecret()
+  const { data, error } = await createPublicClient().rpc('get_creator_outreach_status', {
+    p_server_secret: serverSecret,
+  })
+
+  if (error) throw new Error(`Failed to load creator outreach status: ${error.message}`)
+  const status = (data || {}) as Partial<XCreatorOutreachStatus>
+  return {
+    queued: Number(status.queued || 0),
+    posting: Number(status.posting || 0),
+    postedLast24Hours: Number(status.postedLast24Hours || 0),
+    errorsLast24Hours: Number(status.errorsLast24Hours || 0),
+    dailyLimit: Number(status.dailyLimit || creatorReplyDailyLimit()),
+  }
+}
+
+/**
+ * Post one high-signal creator reply from X Radar. This path is separate from
+ * the main editorial queue: it is only for an author's own public launch post,
+ * has a rolling 24-hour cap of two, and is locked/deduplicated in Postgres
+ * before the X API is called.
+ */
+export async function postNextCreatorReplyToX(): Promise<XCreatorReplyPostResult> {
+  if (!booleanFromEnv('X_CREATOR_REPLY_AUTOPUBLISH', true)) {
+    return { status: 'skipped', reason: 'Creator reply auto-publish is disabled' }
+  }
+
+  const serverSecret = getServerSecret()
+  const supabase = createPublicClient()
+  const connection = await getStoredXConnection(supabase, serverSecret)
+  if (!connection) return { status: 'skipped', reason: 'X account is not authorized yet' }
+
+  // Refresh before locking a draft, so a temporary OAuth issue never leaves a
+  // candidate stuck in the posting state.
+  const token = await refreshXAccessToken(connection.refresh_token)
+  await saveRefreshedXToken(supabase, serverSecret, token)
+
+  const dailyLimit = creatorReplyDailyLimit()
+  const claimed = await claimNextCreatorReplyDraft(supabase, serverSecret, dailyLimit)
+  if (!claimed) return { status: 'skipped', reason: 'No creator reply draft is ready' }
+  if ('status' in claimed && claimed.status === 'skipped') {
+    return { status: 'skipped', reason: claimed.reason || 'Creator reply daily cap reached' }
+  }
+
+  const draft = claimed as XCreatorReplyDraft
+  try {
+    const created = await createXReplyPost(token.access_token, draft.draft_text, draft.source_tweet_id)
+    const postId = created.data?.id
+    if (!postId) throw new Error(`X creator reply did not include an id: ${JSON.stringify(created)}`)
+
+    let postHistoryError: string | null = null
+    try {
+      await recordXPost(supabase, serverSecret, {
+        skill_id: draft.skill_id,
+        skill_slug: draft.skill_slug,
+        status: 'posted',
+        x_post_id: postId,
+        post_text: draft.draft_text,
+        posted_at: new Date().toISOString(),
+        metadata: {
+          type: 'creator_indexed_reply',
+          post_role: 'creator_outreach_reply',
+          username: connection.username,
+          in_reply_to: draft.source_tweet_id,
+          source_tweet_url: draft.source_url,
+          source_author_username: draft.source_author_username,
+          source_author_name: draft.source_author_name,
+          outreach_draft_id: draft.id,
+          claim_url: draft.metadata?.claim_url || null,
+          response: created,
+        },
+      })
+    } catch (error) {
+      // The X post exists at this point. Persist the reply draft as posted even
+      // when telemetry is temporarily unavailable so it can never be sent twice.
+      postHistoryError = error instanceof Error ? error.message : 'Failed to record X post history'
+      console.error('[x-growth] creator reply history write failed:', postHistoryError)
+    }
+
+    await completeCreatorReplyDraft(supabase, serverSecret, draft.id, 'posted', {
+      xPostId: postId,
+      metadata: {
+        posted_url: `https://x.com/${connection.username}/status/${postId}`,
+        ...(postHistoryError ? { post_history_error: postHistoryError } : {}),
+      },
+    })
+
+    return {
+      status: 'posted',
+      draftId: draft.id,
+      skillSlug: draft.skill_slug,
+      post: {
+        id: postId,
+        text: draft.draft_text,
+        url: `https://x.com/${connection.username}/status/${postId}`,
+        inReplyTo: draft.source_tweet_id,
+      },
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown X creator reply error'
+    await completeCreatorReplyDraft(supabase, serverSecret, draft.id, 'error', { error: message }).catch((completionError) => {
+      console.error('[x-growth] creator reply error completion failed:', completionError)
+    })
+    return { status: 'skipped', reason: `Creator reply failed: ${message}`, draftId: draft.id, skillSlug: draft.skill_slug }
+  }
 }
 
 function getQueuedSkillSkipReason(item: XContentQueueItem) {

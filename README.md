@@ -409,12 +409,21 @@ pnpm run build
 | `X_CLIENT_SECRET` | Optional | X OAuth client secret |
 | `X_ALLOWED_USERNAME` | Optional | Allowed X username for token storage |
 | `X_BEARER_TOKEN` | Optional | Enables X hot-skill discovery; keep server-only |
-| `SKILL_RADAR_X_MAX_QUERIES` | Optional | Number of X topic searches per scan; `0` disables X discovery |
-| `SKILL_RADAR_X_SCAN_INTERVAL_HOURS` | Optional | X scan frequency; `24` is the recommended daily, bounded setting |
+| `SKILL_RADAR_X_MAX_QUERIES` | Optional | Number of X topic searches per scan; defaults to `1`, while `0` disables X discovery |
+| `SKILL_RADAR_X_SCAN_INTERVAL_HOURS` | Optional | X scan frequency; defaults to a bounded six-hour rotation |
 | `SKILL_RADAR_X_RESULTS_PER_QUERY` | Optional | Candidate posts inspected per X topic query; default `10` |
 | `SKILL_RADAR_X_LIMIT` | Optional | Maximum X-linked repositories to pass into the review pool per scan |
+| `X_CREATOR_OUTREACH_DRAFT_LIMIT` | Optional | Maximum quality-gated creator-reply drafts created from one X Radar run; default `2` |
+| `X_CREATOR_REPLY_DAILY_LIMIT` | Optional | Rolling 24-hour cap for automatic replies to original creator launch posts; maximum `2` |
+| `X_CREATOR_REPLY_MIN_SIGNAL` | Optional | Minimum X Radar engagement signal before a creator reply is eligible; default `8` |
+| `X_CREATOR_REPLY_MAX_AGE_DAYS` | Optional | Maximum age of a public launch post eligible for a reply; default `10` days |
+| `X_CREATOR_REPLY_AUTOPUBLISH` | Optional | Set `false` to keep creator replies as drafts only; defaults to `true` |
 
 Never commit production secrets. Keep privileged Supabase and X credentials server-only.
+
+## Creator Outreach Guardrails
+
+OpenAgentSkill can turn a high-signal public X launch post into a creator reply only after the linked repository passes the normal skill review. Each reply links to the canonical listing and its claim flow, is deduplicated per source post, and is capped at two replies in a rolling 24-hour window. The associated email endpoint creates a private draft only; it never collects contacts, sends email, or opens promotional pull requests automatically.
 
 ## Database Setup
 

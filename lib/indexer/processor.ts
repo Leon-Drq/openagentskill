@@ -31,6 +31,7 @@ export interface ProcessResult {
   status: 'indexed' | 'rejected' | 'error' | 'skipped'
   reason?: string
   slug?: string
+  discoverySource?: string
 }
 
 // ─── GitHub helpers ───────────────────────────────────────────────────────────
@@ -189,6 +190,7 @@ export async function processRepo(
   const { owner, repo } = candidate
   const repoRef = `${owner}/${repo}`
   const slug = `${owner}-${repo}`.toLowerCase().replace(/[^a-z0-9-]/g, '-')
+  const discoverySource = candidate.discovery?.source
 
   try {
     const serverSecret = process.env.INDEXER_SECRET
@@ -218,15 +220,15 @@ export async function processRepo(
       topics: enrichedCandidate.topics || [],
       language: enrichedCandidate.language,
     })) {
-      return { repo: repoRef, status: 'skipped', reason: 'MCP projects are excluded from skill-only imports' }
+      return { repo: repoRef, slug, discoverySource, status: 'skipped', reason: 'MCP projects are excluded from skill-only imports' }
     }
 
     if (stars < 10) {
-      return { repo: repoRef, status: 'skipped', reason: 'Below 10-star quality gate' }
+      return { repo: repoRef, slug, discoverySource, status: 'skipped', reason: 'Below 10-star quality gate' }
     }
 
     if (license === 'Unknown') {
-      return { repo: repoRef, status: 'skipped', reason: 'License is missing or unclear' }
+      return { repo: repoRef, slug, discoverySource, status: 'skipped', reason: 'License is missing or unclear' }
     }
 
     // 1. Check if already indexed — if so, refresh star count and return
@@ -251,15 +253,15 @@ export async function processRepo(
       }
 
       if (existing.github_stars !== stars) {
-        return { repo: repoRef, status: 'skipped', reason: `Stars refreshed: ${existing.github_stars} → ${stars}` }
+        return { repo: repoRef, slug, discoverySource, status: 'skipped', reason: `Stars refreshed: ${existing.github_stars} → ${stars}` }
       }
-      return { repo: repoRef, status: 'skipped', reason: 'Already indexed, metadata refreshed' }
+      return { repo: repoRef, slug, discoverySource, status: 'skipped', reason: 'Already indexed, metadata refreshed' }
     }
 
     // 2. Fetch README
     const readme = await fetchReadme(owner, repo)
     if (!readme) {
-      return { repo: repoRef, status: 'skipped', reason: 'No README' }
+      return { repo: repoRef, slug, discoverySource, status: 'skipped', reason: 'No README' }
     }
 
     const heuristic = evaluateSkillCandidate({
@@ -273,6 +275,8 @@ export async function processRepo(
     if (!heuristic.accepted || heuristic.skillLikenessScore < 45) {
       return {
         repo: repoRef,
+        slug,
+        discoverySource,
         status: 'rejected',
         reason: `Not specific enough for OpenAgentSkill import (${heuristic.skillLikenessScore}/100)`,
       }
@@ -282,7 +286,7 @@ export async function processRepo(
     const review = await aiReview(enrichedCandidate, readme, resolveAiReviewTimeoutMs(options.aiReviewTimeoutMs))
 
     if (!review.approved) {
-      return { repo: repoRef, status: 'rejected', reason: review.reason || 'Did not pass review' }
+      return { repo: repoRef, slug, discoverySource, status: 'rejected', reason: review.reason || 'Did not pass review' }
     }
 
     // 4. Write to skills table
@@ -307,8 +311,8 @@ export async function processRepo(
       license,
       install_command: `npx skills add ${repoRef}`,
       verified: stars >= 100,
-      submission_source: 'auto-indexer',
-      submitted_by_agent: 'open-agent-skill-indexer',
+      submission_source: discoverySource === 'x-radar' ? 'x-skill-radar' : 'auto-indexer',
+      submitted_by_agent: discoverySource === 'x-radar' ? 'open-agent-skill-x-radar' : 'open-agent-skill-indexer',
       ai_review_score: { total: review.score },
       ai_review_approved: true,
       ai_review_issues: [],
@@ -327,7 +331,7 @@ export async function processRepo(
         actor_name: 'OpenAgentSkill Indexer',
         actor_type: 'agent',
         description: `Auto-indexed ${skillData.name} from GitHub (${stars} stars)`,
-        metadata: { stars, source: 'auto-indexer', score: review.score },
+        metadata: { stars, source: discoverySource === 'x-radar' ? 'x-skill-radar' : 'auto-indexer', score: review.score },
       },
     })
 
@@ -336,10 +340,12 @@ export async function processRepo(
     // Editorial generation is intentionally handled by the dedicated SEO cron.
     // Leaving it out of the ingestion request keeps hourly discovery bounded.
 
-    return { repo: repoRef, status: 'indexed', slug }
+    return { repo: repoRef, status: 'indexed', slug, discoverySource }
   } catch (error: unknown) {
     return {
       repo: repoRef,
+      slug,
+      discoverySource,
       status: 'error',
       reason: error instanceof Error ? error.message : 'Unknown indexer error',
     }

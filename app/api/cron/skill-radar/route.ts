@@ -68,6 +68,12 @@ async function handleRun(request: NextRequest) {
     rejected: result.import.summary.rejected,
     skipped: result.import.summary.skipped,
     errors: result.import.summary.errors,
+    creatorOutreach: {
+      status: result.creatorOutreach.status,
+      drafted: result.creatorOutreach.drafted,
+      skipped: result.creatorOutreach.skipped,
+      errors: result.creatorOutreach.errors,
+    },
   })
 
   return NextResponse.json(result)
