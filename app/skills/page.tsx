@@ -10,41 +10,83 @@ import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCaseBySlug, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
 import { dedupeRankedSkills, rankSkillsForQuery } from '@/lib/registry'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
+import { defaultLocale, getLocaleFromSearchParam, type Locale } from '@/lib/i18n/config'
+import { getLocalizedCoreLanguageAlternates } from '@/lib/seo/localized-pages'
+import { getSearchMetadataCopy } from '@/lib/seo/search-metadata'
 
 export const revalidate = 300
 
 const SITE_URL = 'https://www.openagentskill.com'
-const SKILLS_PAGE_TITLE = 'AI Agent Skills Directory'
-const SKILLS_PAGE_DESCRIPTION =
-  'Browse the OpenAgentSkill AI agent skills directory: reusable skills for Codex, Claude Code, Cursor, finance, research, web scraping, PPT, football analytics, data, marketing, design, and more.'
 
-export const metadata: Metadata = {
-  title: SKILLS_PAGE_TITLE,
-  description: SKILLS_PAGE_DESCRIPTION,
-  keywords: [
-    'AI agent skills directory',
-    'AI agent skill repository',
-    'agent skills',
-    'Codex skills',
-    'Claude Code skills',
-    'Cursor skills',
-    'AI agent tools',
-    'agent marketplace',
-    'reusable AI skills',
-  ],
-  openGraph: {
-    title: 'AI Agent Skills Directory — OpenAgentSkill',
-    description: SKILLS_PAGE_DESCRIPTION,
-    type: 'website',
-    url: `${SITE_URL}/skills`,
-  },
-  alternates: {
-    canonical: `${SITE_URL}/skills`,
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
+type SkillsSearchParams = {
+  q?: string | string[]
+  sort?: string | string[]
+  category?: string | string[]
+  useCase?: string | string[]
+  platform?: string | string[]
+  quality?: string | string[]
+  trust?: string | string[]
+  safety?: string | string[]
+  track?: string | string[]
+  minStars?: string | string[]
+  page?: string | string[]
+  lang?: string | string[]
+  [key: string]: string | string[] | undefined
+}
+
+function firstSearchValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value
+}
+
+function isDirectorySearchVariant(params: SkillsSearchParams) {
+  return Object.entries(params).some(([key, value]) => {
+    if (key === 'lang') return false
+    return Boolean(firstSearchValue(value)?.trim())
+  })
+}
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<SkillsSearchParams>
+}): Promise<Metadata> {
+  const params = await searchParams
+  const locale = getLocaleFromSearchParam(params.lang) || defaultLocale
+  const copy = getSearchMetadataCopy(locale)
+  const isVariant = isDirectorySearchVariant(params)
+  const isCanonicalEnglishDirectory = !isVariant && locale === defaultLocale
+  const canonical = `${SITE_URL}/skills`
+
+  return {
+    title: copy.directoryTitle,
+    description: copy.directoryDescription,
+    keywords: copy.directoryKeywords,
+    other: {
+      'content-language': copy.htmlLanguage,
+    },
+    openGraph: {
+      title: `${copy.directoryTitle} - OpenAgentSkill`,
+      description: copy.directoryDescription,
+      type: 'website',
+      url: canonical,
+      locale: copy.openGraphLocale,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${copy.directoryTitle} - OpenAgentSkill`,
+      description: copy.directoryDescription,
+    },
+    alternates: isCanonicalEnglishDirectory
+      ? {
+          canonical,
+          languages: getLocalizedCoreLanguageAlternates('skills'),
+        }
+      : { canonical },
+    robots: {
+      index: isCanonicalEnglishDirectory,
+      follow: true,
+    },
+  }
 }
 
 // The directory renders 16 cards. Keep its ranking pool broad enough for good
@@ -810,7 +852,12 @@ function buildDirectorySections(
   }).filter((section) => section.skills.length > 0).slice(0, 8)
 }
 
-function buildSkillsPageJsonLd(skills: SkillsPageSkill[], directorySections: DirectorySection[]) {
+function buildSkillsPageJsonLd(
+  skills: SkillsPageSkill[],
+  directorySections: DirectorySection[],
+  locale: Locale
+) {
+  const copy = getSearchMetadataCopy(locale)
   const deduped = new Map<string, DirectorySkill>()
   for (const section of directorySections) {
     for (const skill of section.skills) deduped.set(skill.slug, skill)
@@ -842,9 +889,9 @@ function buildSkillsPageJsonLd(skills: SkillsPageSkill[], directorySections: Dir
     {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
-      name: SKILLS_PAGE_TITLE,
+      name: copy.directoryCollectionName,
       url: `${SITE_URL}/skills`,
-      description: SKILLS_PAGE_DESCRIPTION,
+      description: copy.directoryDescription,
       about: [
         'AI agent skills',
         'AI agent skill repository',
@@ -855,7 +902,7 @@ function buildSkillsPageJsonLd(skills: SkillsPageSkill[], directorySections: Dir
       ],
       hasPart: {
         '@type': 'ItemList',
-        name: 'OpenAgentSkill directory shortlist',
+        name: copy.directoryCollectionName,
         numberOfItems: itemListElement.length,
         itemListElement,
       },
@@ -873,7 +920,7 @@ function buildSkillsPageJsonLd(skills: SkillsPageSkill[], directorySections: Dir
         {
           '@type': 'ListItem',
           position: 2,
-          name: 'AI Agent Skills Directory',
+          name: copy.directoryBreadcrumbName,
           item: `${SITE_URL}/skills`,
         },
       ],
@@ -884,40 +931,30 @@ function buildSkillsPageJsonLd(skills: SkillsPageSkill[], directorySections: Dir
 export default async function SkillsPage({
   searchParams,
 }: {
-  searchParams: Promise<{
-    q?: string
-    sort?: string
-    category?: string
-    useCase?: string
-    platform?: string
-    quality?: string
-    trust?: string
-    safety?: string
-    track?: string
-    minStars?: string
-    page?: string
-  }>
+  searchParams: Promise<SkillsSearchParams>
 }) {
   const params = await searchParams
-  const sort = (params.sort as SkillSortMode) || 'quality'
-  const category = params.category || 'all'
-  const useCase = params.useCase || 'all'
-  const platform = params.platform || 'all'
-  const quality = params.quality || 'all'
-  const trust = params.trust || 'all'
-  const safety = params.safety || 'all'
-  const supplyTrack = params.track || 'all'
-  const minStars = Number(params.minStars || 0)
-  const page = clampPage(params.page)
+  const locale = getLocaleFromSearchParam(params.lang) || defaultLocale
+  const sort = (firstSearchValue(params.sort) as SkillSortMode) || 'quality'
+  const category = firstSearchValue(params.category) || 'all'
+  const useCase = firstSearchValue(params.useCase) || 'all'
+  const platform = firstSearchValue(params.platform) || 'all'
+  const quality = firstSearchValue(params.quality) || 'all'
+  const trust = firstSearchValue(params.trust) || 'all'
+  const safety = firstSearchValue(params.safety) || 'all'
+  const supplyTrack = firstSearchValue(params.track) || 'all'
+  const minStars = Number(firstSearchValue(params.minStars) || 0)
+  const page = clampPage(firstSearchValue(params.page))
+  const query = firstSearchValue(params.q)
   const requestedPageOffset = (page - 1) * VISIBLE_SKILL_LIMIT
-  const hasHighIntentFilter = Boolean(params.q || useCase !== 'all' || platform !== 'all' || supplyTrack !== 'all' || minStars > 0)
+  const hasHighIntentFilter = Boolean(query || useCase !== 'all' || platform !== 'all' || supplyTrack !== 'all' || minStars > 0)
   const baseLimit = hasHighIntentFilter ? SEARCH_SKILL_CANDIDATE_LIMIT : BASE_SKILL_CANDIDATE_LIMIT
   const candidateLimit = Math.min(baseLimit + requestedPageOffset, MAX_SKILL_CANDIDATE_LIMIT)
   const queryCategory = category !== 'all' ? category : undefined
 
   const [recordsResult, searchAugmentRecords, categories, statsMap] = await Promise.all([
     getSkillsPageRecords(sort, queryCategory, candidateLimit),
-    getSearchAugmentRecords(params.q),
+    getSearchAugmentRecords(firstSearchValue(params.q)),
     withTimeout(getCachedCategories(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills categories query')
       .catch(() => [...new Set(mergeSkillRecords(FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT).map((skill) => skill.category))].sort()),
     withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
@@ -977,12 +1014,12 @@ export default async function SkillsPage({
     return true
   })
 
-  if (params.q?.trim()) {
+  if (query?.trim()) {
     const enrichedBySlug = new Map(filteredRecords.map((item) => [item.record.slug, item]))
     const ranked = dedupeRankedSkills(
       rankSkillsForQuery(
         filteredRecords.map((item) => item.record),
-        params.q,
+        query,
         statsMap
       )
     )
@@ -1002,7 +1039,7 @@ export default async function SkillsPage({
     enrichedRecords.slice(0, DIRECTORY_SECTION_SOURCE_LIMIT)
   )
   const directoryLinks: DirectoryLink[] = POPULAR_DIRECTORY_LINKS.map((link) => ({ ...link }))
-  const jsonLd = buildSkillsPageJsonLd(skills, directorySections)
+  const jsonLd = buildSkillsPageJsonLd(skills, directorySections, locale)
 
   return (
     <>
@@ -1013,7 +1050,7 @@ export default async function SkillsPage({
       />
       <SkillsPageClient
         skills={skills}
-        query={params.q}
+        query={query}
         sort={sort}
         category={category}
         categories={categoryOptions}

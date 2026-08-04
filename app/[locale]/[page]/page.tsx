@@ -11,6 +11,7 @@ import {
   type MarketLocale,
 } from '@/lib/i18n/market-routing'
 import { getLocalizedCoreLanguageAlternates } from '@/lib/seo/localized-pages'
+import { getSearchMetadataCopy } from '@/lib/seo/search-metadata'
 
 const SITE_URL = 'https://www.openagentskill.com'
 
@@ -34,47 +35,60 @@ function getRoute(locale: string, page: string) {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; page: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }): Promise<Metadata> {
-  const { locale, page } = await params
+  const [{ locale, page }, resolvedSearchParams] = await Promise.all([params, searchParams])
   const route = getRoute(locale, page)
   if (!route) return {}
 
-  const copy = getMarketCorePageMeta(route.locale, route.page)
+  const directoryCopy = route.page === 'skills' ? getSearchMetadataCopy(route.locale) : null
+  const coreCopy = getMarketCorePageMeta(route.locale, route.page)
+  const title = directoryCopy?.directoryTitle || coreCopy.title
+  const description = directoryCopy?.directoryDescription || coreCopy.description
   const canonical = `${SITE_URL}${getLocalizedCorePath(route.locale, route.page)}`
+  const hasSearchVariant = Object.values(resolvedSearchParams).some((value) => {
+    const normalized = Array.isArray(value) ? value[0] : value
+    return Boolean(normalized?.trim())
+  })
 
   return {
-    title: copy.title,
-    description: copy.description,
+    title,
+    description,
     other: {
-      'content-language': route.locale,
+      'content-language': directoryCopy?.htmlLanguage || route.locale,
     },
     alternates: {
       canonical,
-      languages: getLocalizedCoreLanguageAlternates(route.page),
+      ...(hasSearchVariant ? {} : { languages: getLocalizedCoreLanguageAlternates(route.page) }),
+    },
+    robots: {
+      index: !hasSearchVariant,
+      follow: true,
     },
     openGraph: {
-      title: copy.title,
-      description: copy.description,
+      title,
+      description,
       url: canonical,
       siteName: 'OpenAgentSkill',
-      locale: route.locale,
+      locale: directoryCopy?.openGraphLocale || route.locale,
       type: 'website',
       images: [
         {
           url: 'https://www.openagentskill.com/opengraph-image?v=3',
           width: 1200,
           height: 630,
-          alt: copy.title,
+          alt: title,
           type: 'image/png',
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: copy.title,
-      description: copy.description,
+      title,
+      description,
       images: ['https://www.openagentskill.com/opengraph-image?v=3'],
     },
   }

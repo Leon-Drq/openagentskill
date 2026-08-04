@@ -23,7 +23,7 @@ import { SkillDetailDate, SkillDetailText, SkillDetailValue } from '@/components
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { I18nProvider } from '@/lib/i18n/context'
-import { getLocaleFromSearchParam } from '@/lib/i18n/config'
+import { defaultLocale, getLocaleFromSearchParam } from '@/lib/i18n/config'
 import { withTimeout } from '@/lib/async'
 import { getStacksForSkill } from '@/lib/collections'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
@@ -42,6 +42,8 @@ import {
   type TrustCheckStatus,
 } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
+import { isSearchIndexEligible } from '@/lib/seo/search-indexability'
+import { buildSkillSearchMetadata } from '@/lib/seo/search-metadata'
 import {
   buildManualXMainText,
   buildManualXReplyText,
@@ -97,18 +99,12 @@ export async function generateMetadata({
   const { slug } = await params
   const dbSkill = await getCachedSkillBySlug(slug)
   const skill = dbSkill ? convertSkillRecordToManifest(dbSkill) : null
-  if (!skill) return { title: 'Skill Not Found' }
+  if (!dbSkill || !skill) return { title: 'Skill Not Found' }
   const canonicalSlug = skill.slug || getCanonicalSkillSlug(slug)
-
-  const starsText =
-    skill.stats.stars >= 1000
-      ? `${(skill.stats.stars / 1000).toFixed(1)}K`
-      : skill.stats.stars
-  const installCommand =
-    skill.technical.installCommand || `npx skills add ${skill.slug}`
-  const description = `${skill.description} ${starsText} GitHub stars. Install with ${installCommand}.`
+  const seo = buildSkillSearchMetadata(dbSkill, defaultLocale)
+  const indexable = isSearchIndexEligible(dbSkill)
   const pageUrl = `https://www.openagentskill.com/skills/${canonicalSlug}`
-  const imageAlt = `${skill.name} - OpenAgentSkill`
+  const imageAlt = seo.imageAlt
   const imageVersion = '7'
   const staticSkillImageUrl =
     canonicalSlug === 'addyosmani-agent-skills'
@@ -125,26 +121,24 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${skill.name} - AI Agent Skill`,
-    description,
-    keywords: [
-      skill.name,
-      ...skill.tags,
-      'AI agent skill',
-      'agent tool',
-      skill.category,
-    ],
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.keywords,
+    other: {
+      'content-language': seo.htmlLanguage,
+    },
     openGraph: {
-      title: `${skill.name} — OpenAgentSkill`,
-      description,
+      title: `${seo.openGraphTitle} - OpenAgentSkill`,
+      description: seo.description,
       type: 'article',
       url: pageUrl,
+      locale: seo.openGraphLocale,
       images: [image],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${skill.name} — AI Agent Skill`,
-      description,
+      title: `${seo.openGraphTitle} - OpenAgentSkill`,
+      description: seo.description,
       images: [
         {
           url: twitterImageUrl,
@@ -154,6 +148,10 @@ export async function generateMetadata({
     },
     alternates: {
       canonical: pageUrl,
+    },
+    robots: {
+      index: indexable,
+      follow: true,
     },
   }
 }

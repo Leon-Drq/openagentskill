@@ -19,6 +19,10 @@ import { SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { SKILL_PACKS } from '@/lib/skill-packs'
 import { USE_CASES } from '@/lib/use-cases'
+import {
+  SEARCH_INDEX_MIN_GITHUB_STARS,
+  SEARCH_INDEX_MIN_QUALITY_SCORE,
+} from '@/lib/seo/search-indexability'
 
 export const SITEMAP_BASE_URL = 'https://www.openagentskill.com'
 // Supabase's public API pages the catalog at 1,000 rows. Matching sitemap
@@ -29,7 +33,8 @@ export const SITEMAP_CHUNK_SIZE = 1000
 // The public sitemap is deliberately more selective: it is a crawl queue, not
 // an inventory dump. A meaningful quality floor helps Google spend its budget
 // on pages with enough repository evidence to stand on their own.
-export const SITEMAP_MIN_QUALITY_SCORE = 45
+export const SITEMAP_MIN_QUALITY_SCORE = SEARCH_INDEX_MIN_QUALITY_SCORE
+export const SITEMAP_MIN_GITHUB_STARS = SEARCH_INDEX_MIN_GITHUB_STARS
 const SITEMAP_SKILL_QUERY_TIMEOUT_MS = 7200
 
 export interface SitemapEntry {
@@ -59,7 +64,10 @@ function chunkCount(total: number) {
   return Math.max(1, Math.ceil(total / SITEMAP_CHUNK_SIZE))
 }
 
-function fallbackSkillRecords(minStars = 0, minQualityScore = SITEMAP_MIN_QUALITY_SCORE) {
+function fallbackSkillRecords(
+  minStars = SITEMAP_MIN_GITHUB_STARS,
+  minQualityScore = SITEMAP_MIN_QUALITY_SCORE
+) {
   return CURATED_SKILL_SNAPSHOT
     .filter((skill) => Number(skill.github_stars || 0) >= minStars)
     .filter((skill) => Number(skill.quality_score || 0) >= minQualityScore)
@@ -73,7 +81,10 @@ function fallbackSkillRecords(minStars = 0, minQualityScore = SITEMAP_MIN_QUALIT
     }))
 }
 
-async function getSitemapSkillCount(minStars = 0, minQualityScore = SITEMAP_MIN_QUALITY_SCORE) {
+async function getSitemapSkillCount(
+  minStars = SITEMAP_MIN_GITHUB_STARS,
+  minQualityScore = SITEMAP_MIN_QUALITY_SCORE
+) {
   return withTimeout(
     getApprovedSkillSitemapCount(minStars, minQualityScore),
     SITEMAP_SKILL_QUERY_TIMEOUT_MS,
@@ -85,7 +96,7 @@ async function getSitemapSkillCount(minStars = 0, minQualityScore = SITEMAP_MIN_
 
 export async function getSitemapSkillRecords(
   index = 0,
-  minStars = 0,
+  minStars = SITEMAP_MIN_GITHUB_STARS,
   minQualityScore = SITEMAP_MIN_QUALITY_SCORE
 ) {
   const offset = Math.max(0, index) * SITEMAP_CHUNK_SIZE

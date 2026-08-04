@@ -53,11 +53,16 @@ function getCanonicalSkillPath(pathname: string) {
   return `/skills/${canonicalSlug}${suffix}`
 }
 
-function createNextResponse(locale: string | null) {
+function createNextResponse(locale: string | null, noindex = false) {
   const response = NextResponse.next()
   if (locale) response.headers.set('Content-Language', DOCUMENT_LANG_BY_LOCALE[locale] || locale)
+  if (noindex) response.headers.set('X-Robots-Tag', 'noindex, follow')
 
   return response
+}
+
+function isSkillDetailVariant(pathname: string, searchParams: URLSearchParams) {
+  return /^\/skills\/[^/]+$/.test(pathname) && Array.from(searchParams.keys()).length > 0
 }
 
 function needsSessionRefresh(pathname: string) {
@@ -82,6 +87,7 @@ export async function proxy(request: NextRequest) {
   const queryLocale = searchParams.get('lang')
   const pathLocale = getLocaleFromPath(pathname)
   const locale = pathLocale || (queryLocale && MARKET_LOCALE_CODES.has(queryLocale) ? queryLocale : null)
+  const noindex = isSkillDetailVariant(pathname, searchParams)
 
   // Static skill pages can be served straight from the cache, so normalize
   // aliases here instead of relying on a page-level redirect.
@@ -105,7 +111,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  const initialResponse = createNextResponse(locale)
+  const initialResponse = createNextResponse(locale, noindex)
 
   // Public discovery pages do not need an auth lookup on every navigation.
   // Keeping this proxy lightweight makes language changes and deep links fast.
@@ -125,8 +131,7 @@ export async function proxy(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next()
-          if (locale) supabaseResponse.headers.set('Content-Language', DOCUMENT_LANG_BY_LOCALE[locale] || locale)
+          supabaseResponse = createNextResponse(locale, noindex)
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
           )
