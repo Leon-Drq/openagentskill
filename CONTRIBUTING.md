@@ -7,7 +7,7 @@ OpenAgentSkill is an open discovery, audit, and recommendation layer for AI agen
 ### Submit or Fix a Skill
 
 - Submit a skill through [openagentskill.com/submit](https://www.openagentskill.com/submit) when possible.
-- Open an issue if a listed skill has stale metadata, wrong category, broken install instructions, or missing audit context.
+- Open an issue if a listed skill has stale metadata, a wrong category, broken install instructions, or missing audit context.
 - Automated bulk imports are skill-only. MCP servers and Model Context Protocol repos are intentionally excluded.
 
 ### For Skill Authors
