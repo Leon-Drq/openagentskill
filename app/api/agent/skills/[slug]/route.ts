@@ -15,10 +15,11 @@ import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile, getSkillTrustProfileV5 } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 const AGENT_SKILL_CACHE_HEADERS = {
-  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
+  'Cache-Control': 'no-store, max-age=0',
 }
 const AGENT_SKILL_SUPPORT_TIMEOUT_MS = 1200
 
