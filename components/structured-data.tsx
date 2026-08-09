@@ -39,6 +39,14 @@ export function StructuredData() {
     description: 'OpenAgentSkill helps AI agents and builders discover, compare, audit, and install the right reusable skill automatically.',
     image: HOME_SOCIAL_IMAGE_URL,
     foundingDate: '2026',
+    email: 'qudongqi2023@gmail.com',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      email: 'qudongqi2023@gmail.com',
+      url: `${BASE_URL}/contact`,
+      availableLanguage: ['English', 'Chinese'],
+    },
     sameAs: [
       'https://github.com/Leon-Drq/openagentskill',
       'https://x.com/openagentskill',

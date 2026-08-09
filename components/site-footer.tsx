@@ -98,7 +98,8 @@ export function SiteFooter() {
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">{shell.footerBuild}</h2>
               <div className="mt-4 grid gap-2 text-secondary">
                 <FooterLink href="/docs" className="hover:text-foreground">{t.nav.docs}</FooterLink>
-                <FooterLink href="/openagentskill" className="hover:text-foreground">About OpenAgentSkill</FooterLink>
+                <FooterLink href="/about" className="hover:text-foreground">About</FooterLink>
+                <FooterLink href="/contact" className="hover:text-foreground">Contact</FooterLink>
                 <FooterLink href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</FooterLink>
                 <FooterLink href="/llms.txt" className="hover:text-foreground">llms.txt</FooterLink>
                 <FooterLink href="/openapi.json" className="hover:text-foreground">OpenAPI</FooterLink>
@@ -118,6 +119,7 @@ export function SiteFooter() {
           <span>{shell.footerRegistry}</span>
           <div className="flex flex-wrap items-center gap-4">
             <FooterLink href="/privacy" className="transition-colors hover:text-foreground">{shell.footerPrivacy}</FooterLink>
+            <FooterLink href="/contact" className="transition-colors hover:text-foreground">Contact</FooterLink>
             <span>{shell.footerTagline}</span>
           </div>
         </div>
