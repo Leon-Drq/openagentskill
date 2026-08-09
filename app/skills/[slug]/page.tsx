@@ -228,6 +228,7 @@ export default async function SkillDetailPage({
 
   const { relatedSkills, eventStats, outcomeStats, approvedClaim } =
     await getCachedSkillDetailSupport(skill.id, skill.category, skill.slug)
+  const verifiedInstalls = outcomeStats?.verified_installs || 0
   const aiScore = dbSkill?.ai_review_score?.score as number | undefined
   const matchedUseCases = dbSkill ? getUseCasesForSkill(dbSkill, 3) : []
   const matchedStacks = dbSkill ? getStacksForSkill(dbSkill, 3) : []
@@ -409,10 +410,10 @@ export default async function SkillDetailPage({
                 <div className="grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
                   <div className="rounded-[8px] border border-border bg-background/85 p-3">
                     <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
-                      <SkillDetailText id="downloads" />
+                      <SkillDetailText id="verifiedInstalls" />
                     </span>
                     <span className="mt-1 block font-mono text-base font-semibold">
-                      {formatNumber(skill.stats.downloads)}
+                      {formatNumber(verifiedInstalls)}
                     </span>
                   </div>
                   <div className="rounded-[8px] border border-border bg-background/85 p-3">

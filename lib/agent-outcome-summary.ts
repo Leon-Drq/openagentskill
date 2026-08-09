@@ -11,6 +11,7 @@ export function createEmptyOutcomeStats(skillSlug: string): SkillOutcomeStats {
     risk_blocked_outcomes: 0,
     setup_required_outcomes: 0,
     install_attempts: 0,
+    verified_installs: 0,
     success_rate: null,
     install_success_rate: null,
     avg_output_quality: null,

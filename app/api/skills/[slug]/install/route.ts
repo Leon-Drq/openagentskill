@@ -44,6 +44,11 @@ ${payload.safety_checklist.map((item) => `- ${item}`).join('\n')}
 Verification steps:
 ${payload.verification_steps.map((item) => `- ${item}`).join('\n')}
 
+Verified install receipt:
+Endpoint: ${payload.install_receipt.method} ${payload.install_receipt.endpoint}
+Count rule: ${payload.install_receipt.count_rule}
+Example: ${JSON.stringify(payload.install_receipt.example)}
+
 Do not auto-install when:
 ${payload.do_not_auto_install_when.map((item) => `- ${item}`).join('\n')}
 

@@ -669,6 +669,14 @@ export function buildInstallHandoff(skill: SkillRecord) {
   const detailUrl = getSkillUrl(skill.slug)
   const audit = buildSkillAudit(skill)
   const safety = getAgentSafetyProfile(skill, audit, { max_risk: 'medium', needs_install_command: true })
+  const installReceiptExample = {
+    event_id: 'install_<unique-id>',
+    skill_slug: skill.slug,
+    task: `Install ${skill.name}`,
+    agent: 'codex',
+    outcome: 'success',
+    install_used: true,
+  }
 
   return {
     skill: {
@@ -679,6 +687,13 @@ export function buildInstallHandoff(skill: SkillRecord) {
     },
     recommended_command: install,
     install_targets: targets,
+    install_receipt: {
+      endpoint: `${SITE_URL}/api/agent/outcome`,
+      method: 'POST',
+      idempotency: 'event_id is unique; retries update the same receipt',
+      count_rule: 'verified installs require install_used=true and outcome=success',
+      example: installReceiptExample,
+    },
     safety_gate: {
       tier: safety.safety_tier.tier,
       label: safety.safety_tier.label,
@@ -691,7 +706,7 @@ export function buildInstallHandoff(skill: SkillRecord) {
       reasons: safety.safety_tier.reasons,
     },
     agent_prompt:
-      `Install the "${skill.name}" agent skill only after reviewing the OpenAgentSkill profile and source repository. Safety gate: ${safety.safety_tier.label} (${safety.safety_tier.auto_install_policy}). Start with ${detailUrl}, inspect the trust and audit notes, then use the recommended install handoff: ${install}. After installation, summarize changed files, required setup, and a minimal verification result before using the skill for real work.`,
+      `Install the "${skill.name}" agent skill only after reviewing the OpenAgentSkill profile and source repository. Safety gate: ${safety.safety_tier.label} (${safety.safety_tier.auto_install_policy}). Start with ${detailUrl}, inspect the trust and audit notes, then use the recommended install handoff: ${install}. After installation, summarize changed files, required setup, and a minimal verification result before using the skill for real work. Report the verified result to ${SITE_URL}/api/agent/outcome using a unique event_id, skill_slug=${skill.slug}, install_used=true, and outcome=success or failed.`,
     safety_checklist: [
       `Safety gate: ${safety.safety_tier.label}. Policy: ${safety.safety_tier.auto_install_policy}.`,
       safety.safety_tier.recommended_action,

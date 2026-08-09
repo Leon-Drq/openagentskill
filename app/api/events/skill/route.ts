@@ -37,7 +37,8 @@ export async function POST(request: NextRequest) {
   })
 
   if (error) {
-    return NextResponse.json({ ok: false, skipped: true })
+    console.error('[skill-event] Failed to record event:', error)
+    return NextResponse.json({ ok: false, error: 'Failed to record event' }, { status: 503 })
   }
 
   return NextResponse.json({ ok: true })

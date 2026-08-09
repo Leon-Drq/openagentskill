@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import {
   AGENT_OUTCOME_ERROR_TYPES,
@@ -214,6 +215,9 @@ export async function POST(request: NextRequest) {
       .select('*')
       .eq('skill_slug', payload.skill_slug)
       .maybeSingle()
+
+    revalidatePath(`/skills/${payload.skill_slug}`)
+    revalidatePath(`/api/agent/skills/${payload.skill_slug}`)
 
     return NextResponse.json({
       ok: true,

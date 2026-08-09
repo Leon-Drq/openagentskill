@@ -78,7 +78,7 @@ export async function trackSkillEvent(
   })
 
   try {
-    await fetch('/api/events/skill', {
+    const response = await fetch('/api/events/skill', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -91,6 +91,9 @@ export async function trackSkillEvent(
       }),
       keepalive: true,
     })
+    if (!response.ok && process.env.NODE_ENV !== 'production') {
+      console.warn('[skill-event] Event was not recorded', response.status)
+    }
   } catch {
     // Engagement analytics should never block the product flow.
   }

@@ -189,6 +189,7 @@ OpenAgentSkill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
           stars: skill.github_stars,
           forks: skill.github_forks,
           downloads: skill.downloads,
+          verified_installs: outcomeStats?.verified_installs || 0,
           rating: skill.rating,
           review_count: skill.review_count,
           quality_score: Number(skill.quality_score || 0),

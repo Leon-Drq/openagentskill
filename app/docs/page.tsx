@@ -55,10 +55,10 @@ export default function DocsPage() {
             {'How skills are ranked'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed mb-4">
-            {'The skills leaderboard ranks skills based on anonymous telemetry data collected from the skills CLI. When users install skills, aggregated usage data helps surface the most popular and useful skills in the ecosystem.'}
+            {'Verified installs are counted only when a compatible agent or integration reports an idempotent install outcome receipt. Install-command copies and verified installs are tracked as separate signals.'}
           </p>
           <p className="text-base sm:text-lg leading-relaxed text-secondary">
-            {'This telemetry is completely anonymous and only tracks which skills are being installed—no personal information or usage patterns are collected.'}
+            {'Direct GitHub clones and third-party installer runs are not observable unless they submit a receipt. Receipts contain the skill, agent label, install result, and optional aggregate quality fields; they do not require personal identity.'}
           </p>
         </section>
 
