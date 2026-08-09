@@ -38,7 +38,9 @@ Preferred agent flow:
 12. After one narrow run, POST the result to /api/agent/outcome using install_receipt.outcome_feedback.event_id or feedback.event_id from resolve. Include output_quality, workspace, error_type, used_in_production, time_to_useful_ms, and human_review_required when known. Use dry_run=true before wiring a new integration.
 
 Important URLs:
-- Official entity profile: https://www.openagentskill.com/openagentskill
+- Official entity profile: https://www.openagentskill.com/about
+- Contact: https://www.openagentskill.com/contact
+- Contact email: qudongqi2023@gmail.com
 - Machine-readable identity: https://www.openagentskill.com/.well-known/openagentskill.json
 - Agent entry: https://www.openagentskill.com/agent
 - Agent Integration Kit: https://www.openagentskill.com/agent/integration-kit

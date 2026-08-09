@@ -27,6 +27,10 @@ export async function GET() {
         github: 'https://github.com/Leon-Drq/openagentskill',
         x: 'https://x.com/openagentskill',
       },
+      contact: {
+        page: `${SITE_URL}/contact`,
+        email: 'qudongqi2023@gmail.com',
+      },
       endpoints: {
         agent_entry: `${SITE_URL}/agent`,
         resolve: `${SITE_URL}/api/agent/resolve`,
@@ -44,7 +48,7 @@ export async function GET() {
         'OpenAgentSkill is an open registry, trust layer, and recommendation API for reusable AI agent skills.',
       safety_notice:
         'Listings and scores are decision support, not a warranty. Review third-party source code, permissions, dependencies, and licenses before production installation.',
-      updated_at: '2026-07-10',
+      updated_at: '2026-08-09',
     },
     {
       headers: {

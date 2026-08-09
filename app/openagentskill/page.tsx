@@ -15,13 +15,13 @@ export const metadata: Metadata = {
   description:
     'OpenAgentSkill is an open registry, trust layer, and recommendation API that helps AI agents discover, compare, audit, install, and evaluate reusable skills.',
   alternates: {
-    canonical: `${SITE_URL}/openagentskill`,
+    canonical: `${SITE_URL}/about`,
   },
   openGraph: {
     title: 'About OpenAgentSkill',
     description:
       'The public identity, product contract, research sources, and official links for OpenAgentSkill.',
-    url: `${SITE_URL}/openagentskill`,
+    url: `${SITE_URL}/about`,
     type: 'website',
   },
 }
@@ -41,6 +41,11 @@ const officialLinks = [
     label: 'X',
     value: '@openagentskill',
     href: 'https://x.com/openagentskill',
+  },
+  {
+    label: 'Contact',
+    value: 'qudongqi2023@gmail.com',
+    href: 'mailto:qudongqi2023@gmail.com',
   },
   {
     label: 'Machine identity',
@@ -71,8 +76,8 @@ const structuredData = [
   {
     '@context': 'https://schema.org',
     '@type': 'AboutPage',
-    '@id': `${SITE_URL}/openagentskill#about`,
-    url: `${SITE_URL}/openagentskill`,
+    '@id': `${SITE_URL}/about#about`,
+    url: `${SITE_URL}/about`,
     name: 'About OpenAgentSkill',
     description:
       'Official facts, product contract, research sources, and links for OpenAgentSkill.',
@@ -97,7 +102,7 @@ const structuredData = [
         '@type': 'ListItem',
         position: 2,
         name: 'About',
-        item: `${SITE_URL}/openagentskill`,
+        item: `${SITE_URL}/about`,
       },
     ],
   },
