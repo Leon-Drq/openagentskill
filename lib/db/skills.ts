@@ -472,6 +472,7 @@ export interface SkillOutcomeStats {
   risk_blocked_outcomes: number
   setup_required_outcomes: number
   install_attempts: number
+  verified_installs: number
   success_rate: number | null
   install_success_rate?: number | null
   avg_output_quality?: number | null
@@ -605,6 +606,7 @@ const getCachedAgentOutcomeStatsMap = unstable_cache(
       risk_blocked_outcomes: Number(row.risk_blocked_outcomes || 0),
       setup_required_outcomes: Number(row.setup_required_outcomes || 0),
       install_attempts: Number(row.install_attempts || 0),
+      verified_installs: Number(row.verified_installs || 0),
       success_rate: row.success_rate === null || row.success_rate === undefined ? null : Number(row.success_rate),
       install_success_rate: row.install_success_rate === null || row.install_success_rate === undefined ? null : Number(row.install_success_rate),
       avg_output_quality: row.avg_output_quality === null || row.avg_output_quality === undefined ? null : Number(row.avg_output_quality),
@@ -654,6 +656,7 @@ export async function getAgentOutcomeStats(skillSlug: string): Promise<SkillOutc
     risk_blocked_outcomes: Number(row.risk_blocked_outcomes || 0),
     setup_required_outcomes: Number(row.setup_required_outcomes || 0),
     install_attempts: Number(row.install_attempts || 0),
+    verified_installs: Number(row.verified_installs || 0),
     success_rate: row.success_rate === null || row.success_rate === undefined ? null : Number(row.success_rate),
     install_success_rate: row.install_success_rate === null || row.install_success_rate === undefined ? null : Number(row.install_success_rate),
     avg_output_quality: row.avg_output_quality === null || row.avg_output_quality === undefined ? null : Number(row.avg_output_quality),

@@ -24,6 +24,19 @@ export function getSkillRepoRef(skill: InstallableSkill) {
   return skill.slug
 }
 
+
+function getVerifiedInstallReceiptInstruction(skill: InstallableSkill, agent: string) {
+  const payload = JSON.stringify({
+    event_id: 'install_<unique-id>',
+    skill_slug: skill.slug,
+    task: `Install ${skill.name}`,
+    agent,
+    outcome: 'success',
+    install_used: true,
+  })
+
+  return `After the install attempt, report the result to https://www.openagentskill.com/api/agent/outcome with POST JSON ${payload}. Replace event_id with a unique value and outcome with success or failed. Report success only after the skill is installed and a minimal verification passes.`
+}
 export function getPrimaryInstallCommand(skill: InstallableSkill) {
   return skill.install_command || `npx skills add ${getSkillRepoRef(skill)}`
 }
@@ -49,7 +62,7 @@ export function getSkillInstallTargets(skill: InstallableSkill): SkillInstallTar
       label: 'Codex',
       title: 'Codex install prompt',
       kind: 'agent-prompt',
-      value: `Install the "${skill.name}" agent skill from ${source}. Read its SKILL.md or equivalent instructions first, install only the files needed for this workspace, and summarize any required setup before using it. Skill purpose: ${description}`,
+      value: `Install the "${skill.name}" agent skill from ${source}. Read its SKILL.md or equivalent instructions first, install only the files needed for this workspace, and summarize any required setup before using it. Skill purpose: ${description} ${getVerifiedInstallReceiptInstruction(skill, 'codex')}`,
       description: 'Give Codex a repo-aware install prompt when the skill is not available through a local CLI.',
       copyLabel: 'Copy prompt',
     },
@@ -58,7 +71,7 @@ export function getSkillInstallTargets(skill: InstallableSkill): SkillInstallTar
       label: 'Claude Code',
       title: 'Claude Code skill prompt',
       kind: 'agent-prompt',
-      value: `Add "${skill.name}" as a Claude Code skill from ${source}. Inspect the skill instructions, place the reusable skill files in the appropriate local skills location for this project, and report the activation steps. Skill purpose: ${description}`,
+      value: `Add "${skill.name}" as a Claude Code skill from ${source}. Inspect the skill instructions, place the reusable skill files in the appropriate local skills location for this project, and report the activation steps. Skill purpose: ${description} ${getVerifiedInstallReceiptInstruction(skill, 'claude-code')}`,
       description: 'Use this prompt to ask Claude Code to add the skill and explain the local activation steps.',
       copyLabel: 'Copy prompt',
     },
@@ -67,7 +80,7 @@ export function getSkillInstallTargets(skill: InstallableSkill): SkillInstallTar
       label: 'Cursor',
       title: 'Cursor rule prompt',
       kind: 'agent-prompt',
-      value: `Turn "${skill.name}" from ${source} into a reusable Cursor project rule or agent instruction. Preserve the core workflow, adapt paths to this repo, and keep the rule scoped to tasks where it is relevant. Skill purpose: ${description}`,
+      value: `Turn "${skill.name}" from ${source} into a reusable Cursor project rule or agent instruction. Preserve the core workflow, adapt paths to this repo, and keep the rule scoped to tasks where it is relevant. Skill purpose: ${description} ${getVerifiedInstallReceiptInstruction(skill, 'cursor')}`,
       description: 'Use this when installing as Cursor project rules or reusable agent instructions.',
       copyLabel: 'Copy prompt',
     },

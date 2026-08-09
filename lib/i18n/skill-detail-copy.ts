@@ -5,6 +5,7 @@ type CopyValues = Record<string, string | number>
 const en = {
   skills: 'Skills',
   downloads: 'Downloads',
+  verifiedInstalls: 'Verified installs',
   stars: 'Stars',
   usedBy: 'Used by',
   agents: 'agents',
