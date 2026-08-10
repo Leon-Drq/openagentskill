@@ -29,6 +29,10 @@
       "schedule": "45 4 * * *"
     },
     {
+      "path": "/api/cron/finance-research-skills",
+      "schedule": "0 5 * * *"
+    },
+    {
       "path": "/api/cron/growth-daily",
       "schedule": "20 13 * * *"
     },

@@ -80,6 +80,32 @@ function hasEnoughDocumentation(skill: SkillRecord) {
   return text.length >= 260
 }
 
+function isFinancialDomainSkill(skill: SkillRecord) {
+  const text = [
+    skill.name,
+    skill.category,
+    skill.description,
+    skill.long_description,
+    skill.install_command,
+    ...(skill.tags || []),
+  ].join(' ').toLowerCase()
+
+  return /\b(finance|financial|quant|quantitative|market|markets|stock|stocks|equity|portfolio|investment|investor|earnings|valuation|macro|economic|economy|fund|funds|options?|trading|broker|exchange|crypto|defi)\b/.test(text)
+}
+
+function hasFinancialExecutionRisk(skill: SkillRecord) {
+  const text = [
+    skill.name,
+    skill.category,
+    skill.description,
+    skill.long_description,
+    skill.install_command,
+    ...(skill.tags || []),
+  ].join(' ').toLowerCase()
+
+  return /\b(place orders?|order execution|execute trades?|trade execution|live trading|brokerage|broker account|exchange connectivity|wallet|private key|swap(?:ping)?|withdraw(?:al)?|deposit(?:ing)?|margin trading|perpetual futures?|api trading)\b/.test(text)
+}
+
 function statusForScore(score: number): AuditCheckStatus {
   if (score >= 80) return 'pass'
   if (score >= 58) return 'warn'
@@ -125,6 +151,8 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
   const installScore = hasInstallPath(skill) ? 92 : 20
   const repositoryScore = hasRepository(skill) ? 88 : 18
   const restrictedLicense = hasRestrictedLicense(skill)
+  const isFinancialSkill = isFinancialDomainSkill(skill)
+  const financialExecutionRisk = hasFinancialExecutionRisk(skill)
   const licenseScore = !licenseKnown(skill) ? 45 : restrictedLicense ? 58 : 86
   const docsScore = Math.max(hasEnoughDocumentation(skill) ? 84 : 48, documentationScore)
   const aiReviewScore = skill.ai_review_approved && (skill.ai_review_issues || []).length === 0 ? 88 : 55
@@ -162,6 +190,8 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
   if (installSafetyScore < 62) warnings.add('Install command contains a high-risk pattern')
   if (permissionSurfaceScore < 62) warnings.add('Permission surface may require sandboxing')
   if (freshnessDays !== null && freshnessDays > 365) warnings.add('Repository appears stale')
+  if (isFinancialSkill) warnings.add('Financial research output is not financial advice; require human review before any live investment decision')
+  if (financialExecutionRisk) warnings.add('Potential broker, wallet, exchange, or real-money execution surface; sandbox and explicit approval are required')
   for (const issue of skill.ai_review_issues || []) warnings.add(issue)
   for (const warning of quality.warnings) warnings.add(warning)
   for (const warning of trust.warnings) warnings.add(warning)
@@ -239,6 +269,14 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
       score: adoptionScore,
       detail: `${formatCompactNumber(skill.github_stars || 0)} GitHub stars`,
     },
+    ...(isFinancialSkill ? [{
+      label: 'Financial decision safety',
+      status: financialExecutionRisk ? 'fail' as const : 'warn' as const,
+      score: financialExecutionRisk ? 20 : 58,
+      detail: financialExecutionRisk
+        ? 'Potential execution surface detected; do not connect live broker, exchange, wallet, or payment credentials.'
+        : 'Research-only use: do not treat output as financial advice or execute a position without human approval.',
+    }] : []),
   ]
 
   const signals: SkillAuditSignal[] = [
@@ -252,7 +290,11 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
   ]
 
   const riskLevel: AuditRiskLevel =
-    restrictedLicense
+    financialExecutionRisk
+      ? 'risky'
+      : isFinancialSkill
+        ? 'needs_review'
+      : restrictedLicense
       ? 'needs_review'
       : auditScore >= 82 && warnings.size <= 3
       ? 'safe_to_try'
@@ -275,7 +317,7 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
     signals,
     warnings: [...warnings].slice(0, 12),
     metadata: {
-      algorithm: 'heuristic-v2',
+      algorithm: 'heuristic-v3',
       note: 'This is a heuristic adoption audit based on public metadata, not a full source-code security review.',
       trust_dimensions: trust.dimensions,
       trust_formula:

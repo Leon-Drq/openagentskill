@@ -343,7 +343,7 @@ function calculateRelevanceScore(skill: SkillRecord, task: string): number {
   if (isGenericWebTask && isLLMWebSkill) score += 30
   if (isGenericWebTask && isGenericWebSkill && skill.github_stars > 10_000) score += 25
   if (isGenericWebTask && isPlatformSpecificExtractor) score -= 45
-  if (isFinanceTask && category === 'finance-quant') score += 85
+  if (isFinanceTask && /\b(finance|financial|quant|trading|market|stock|investment|portfolio|crypto)\b/.test(category)) score += 85
   if (isFinanceTask && isFinanceSkill) score += 58
   if (isFinanceTask && isSecurityOnlySkill) score -= 90
   if (isSportsTask && category === 'sports-analytics') score += 85

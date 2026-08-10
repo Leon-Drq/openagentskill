@@ -228,7 +228,16 @@ function getAgentCompatibility(skill: SkillRecord) {
     .slice(0, 6)
 }
 
-function getInstallPolicy(score: number, hasInstall: boolean, hasRepo: boolean, hasLicense: boolean): SkillTrustInstallPolicy {
+function getInstallPolicy(
+  score: number,
+  hasInstall: boolean,
+  hasRepo: boolean,
+  hasLicense: boolean,
+  isFinancialSkill = false,
+  hasFinancialExecutionRisk = false
+): SkillTrustInstallPolicy {
+  if (hasFinancialExecutionRisk) return 'sandbox_only'
+  if (isFinancialSkill) return 'human_review_before_install'
   if (score >= 86 && hasInstall && hasRepo && hasLicense) return 'agent_install_candidate'
   if (score >= 60 && hasInstall && hasRepo) return 'human_review_before_install'
   return 'sandbox_only'
@@ -414,7 +423,13 @@ function getBestFor(skill: SkillRecord) {
   return ['Reusable AI agent workflow']
 }
 
-function getDoNotUseFor(skill: SkillRecord, policy: SkillTrustInstallPolicy, evidence: SkillTrustOutcomeEvidence) {
+function getDoNotUseFor(
+  skill: SkillRecord,
+  policy: SkillTrustInstallPolicy,
+  evidence: SkillTrustOutcomeEvidence,
+  isFinancialSkill = false,
+  financialExecutionRisk = false
+) {
   const items = [
     'Production credentials, payments, or irreversible account changes without explicit human review',
     'Sensitive private data before reviewing repository code, license, and permission surface',
@@ -436,6 +451,12 @@ function getDoNotUseFor(skill: SkillRecord, policy: SkillTrustInstallPolicy, evi
   }
   if (evidence.setupRequired > 0) {
     items.push('Zero-setup agent runs without checking required keys, data, or configuration')
+  }
+  if (isFinancialSkill) {
+    items.push('Autonomous investment, trading, tax, or suitability decisions without a qualified human review')
+  }
+  if (financialExecutionRisk) {
+    items.push('Live brokerage, exchange, wallet, or payment credentials outside an explicitly approved sandbox')
   }
 
   return [...new Set(items)].slice(0, 6)
@@ -529,6 +550,18 @@ function trustSignalText(skill: SkillRecord) {
     .filter(Boolean)
     .join(' ')
     .toLowerCase()
+}
+
+function isFinancialDomainSkill(skill: SkillRecord) {
+  return /\b(finance|financial|quant|quantitative|market|markets|stock|stocks|equity|portfolio|investment|investor|earnings|valuation|macro|economic|economy|fund|funds|options?|trading|broker|exchange|crypto|defi)\b/.test(
+    trustSignalText(skill)
+  )
+}
+
+function hasFinancialExecutionRisk(skill: SkillRecord) {
+  return /\b(place orders?|order execution|execute trades?|trade execution|live trading|brokerage|broker account|exchange connectivity|wallet|private key|swap(?:ping)?|withdraw(?:al)?|deposit(?:ing)?|margin trading|perpetual futures?|api trading)\b/.test(
+    trustSignalText(skill)
+  )
 }
 
 function scoreMaintenance(days: number | null) {
@@ -829,6 +862,8 @@ export function getSkillTrustProfile(
   const qualityScore = Number(skill.quality_score || skill.ai_review_score?.score || 0)
   const issues = Array.isArray(skill.ai_review_issues) ? skill.ai_review_issues : []
   const outcomeEvidence = getOutcomeEvidence(outcomeStats)
+  const isFinancialSkill = isFinancialDomainSkill(skill)
+  const financialExecutionRisk = hasFinancialExecutionRisk(skill)
   const dimensions = buildTrustDimensions(skill, freshnessDays, stars, qualityScore, outcomeEvidence)
   const checks: SkillTrustCheck[] = []
   const strengths: string[] = []
@@ -855,6 +890,13 @@ export function getSkillTrustProfile(
   if (issues.length > 0) {
     score -= Math.min(8, issues.length * 3)
     warnings.push(issues[0])
+  }
+
+  if (isFinancialSkill) {
+    warnings.push('Financial research output is not financial advice; require human review before any live investment decision.')
+  }
+  if (financialExecutionRisk) {
+    warnings.push('This skill may touch real-money trading, broker, wallet, or exchange operations; use only in a sandbox with explicit approval.')
   }
 
   if (hasInstallPath(skill)) strengths.push('Install path is available')
@@ -968,7 +1010,9 @@ export function getSkillTrustProfile(
     finalScore,
     hasInstallPath(skill),
     hasRepository(skill),
-    hasKnownLicense(skill) && !hasRestrictedLicense(skill)
+    hasKnownLicense(skill) && !hasRestrictedLicense(skill),
+    isFinancialSkill,
+    financialExecutionRisk
   )
   const outcomeAllowsAutoInstall =
     outcomeEvidence.total < 3 ||
@@ -979,7 +1023,7 @@ export function getSkillTrustProfile(
       (outcomeEvidence.successRate === null || outcomeEvidence.successRate >= 65) &&
       (outcomeEvidence.recentFailureRate === null || outcomeEvidence.recentFailureRate < 45)
     )
-  const autoInstallAllowed = policy === 'agent_install_candidate' && outcomeAllowsAutoInstall
+  const autoInstallAllowed = !isFinancialSkill && policy === 'agent_install_candidate' && outcomeAllowsAutoInstall
 
   return {
     version: 'trust-score-v4',
@@ -1016,6 +1060,7 @@ export function getSkillTrustProfile(
             : 'License is declared',
         outcomeEvidence.total > 0 ? `${outcomeEvidence.agentProvenLabel} (${outcomeEvidence.agentProvenScore}/100 Agent Proven)` : 'No Agent Proven outcome evidence yet',
         getMaintenanceLabel(freshnessDays),
+        ...(isFinancialSkill ? ['Financial domain: human review is required before use in a live investment workflow.'] : []),
       ],
     },
     agentCompatibility: getAgentCompatibility(skill),
@@ -1032,7 +1077,7 @@ export function getSkillTrustProfile(
           : 'Recent agent outcomes require review before automatic installation.',
     },
     bestFor: getBestFor(skill),
-    doNotUseFor: getDoNotUseFor(skill, policy, outcomeEvidence),
+    doNotUseFor: getDoNotUseFor(skill, policy, outcomeEvidence, isFinancialSkill, financialExecutionRisk),
     knownRisks: finalWarnings.slice(0, 8),
   }
 }
