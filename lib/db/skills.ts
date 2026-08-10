@@ -857,18 +857,22 @@ export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> 
   }
 }
 
-export async function getSkillsBySlugs(slugs: string[]): Promise<SkillRecord[]> {
+export async function getSkillsBySlugs(
+  slugs: string[],
+  requestTimeoutMs = SKILL_LOOKUP_TIMEOUT_MS
+): Promise<SkillRecord[]> {
   const normalizedSlugs = Array.from(new Set(slugs.map((slug) => slug.trim()).filter(Boolean)))
   if (!normalizedSlugs.length) return []
 
-  const supabase = createPublicClient({ requestTimeoutMs: SKILL_LOOKUP_TIMEOUT_MS })
+  const timeoutMs = Math.max(SKILL_LOOKUP_TIMEOUT_MS, requestTimeoutMs)
+  const supabase = createPublicClient({ requestTimeoutMs: timeoutMs })
   const { data, error } = await withTimeout(
     supabase
       .from('skills')
       .select('*')
       .eq('ai_review_approved', true)
       .in('slug', normalizedSlugs),
-    SKILL_LOOKUP_TIMEOUT_MS,
+    timeoutMs,
     'skill batch slug lookup'
   ).catch((lookupError) => {
     console.warn('Skill batch slug lookup fallback:', lookupError)

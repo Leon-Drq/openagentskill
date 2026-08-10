@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { unstable_cache } from 'next/cache'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
-import { getAllSkills, type SkillEventStats, type SkillRecord } from '@/lib/db/skills'
+import { getAllSkills, getSkillsBySlugs, type SkillEventStats, type SkillRecord } from '@/lib/db/skills'
+import { FINANCE_RESEARCH_SKILL_SLUGS } from '@/lib/indexer/finance-research-skills'
 import { SKILL_STACKS, type SkillStackDefinition } from '@/lib/collections'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
@@ -25,7 +26,17 @@ const AGENT_RECOMMEND_CACHE_HEADERS = {
 const getAgentRecommendCandidatePool = unstable_cache(
   async () => {
     try {
-      return await getAllSkills('quality', undefined, AGENT_RECOMMEND_CANDIDATE_LIMIT)
+      const [qualityCandidates, financeResearchSkills] = await Promise.all([
+        getAllSkills('quality', undefined, AGENT_RECOMMEND_CANDIDATE_LIMIT),
+        // The quality directory is intentionally bounded. Keep source-checked
+        // finance research skills in the agent pool even before their public
+        // quality signal has had time to accumulate.
+        getSkillsBySlugs([...FINANCE_RESEARCH_SKILL_SLUGS], 3_500),
+      ])
+
+      return dedupeRankedSkills(
+        [...qualityCandidates, ...financeResearchSkills].map((skill) => ({ skill }))
+      ).map(({ skill }) => skill)
     } catch (error) {
       // Recommendations remain useful from the maintained shortlist while
       // Supabase recovers, instead of repeatedly failing cache revalidation.
@@ -33,7 +44,7 @@ const getAgentRecommendCandidatePool = unstable_cache(
       return CURATED_SKILL_SNAPSHOT
     }
   },
-  ['agent-recommend-candidate-pool-v2'],
+  ['agent-recommend-candidate-pool-v4'],
   { revalidate: 300 }
 )
 
@@ -333,8 +344,11 @@ function calculateRelevanceScore(skill: SkillRecord, task: string): number {
   const isGenericWebSkill = /\b(web-crawling|crawler|crawl|scraper|scrape|browser|playwright|puppeteer|html|markdown)\b/.test(fullSkillText)
   const isLLMWebSkill = /\b(llm-friendly|llm friendly|web crawler|web scraper|turn.*markdown|markdown)\b/.test(fullSkillText)
   const isPlatformSpecificExtractor = /\b(streaming|youtube|google play|google maps|app store|twitter|reddit|spotify|instagram|tiktok)\b/.test(fullSkillText)
-  const isFinanceTask = /\b(finance|financial|quant|trading|portfolio|markets?|stocks?|equity|crypto|filings?|edgar|sec filings?|investor|earnings|10-k|10-q|alpha|factor|backtest|risk model)\b/.test(normalizedTask)
-  const isFinanceSkill = /\b(finance|financial|quant|trading|portfolio|market-data|markets?|stocks?|equity|crypto|filings?|edgar|sec filing|investor|earnings|10-k|10-q|alpha|factor|backtest|risk model)\b/.test(fullSkillText)
+  const isFinanceTask = /\b(finance|financial|quant|trade|trades|trader|trading|portfolio|markets?|stocks?|equity|crypto|filings?|edgar|sec filings?|investor|earnings|10-k|10-q|alpha|factor|backtest|risk model)\b/.test(normalizedTask)
+  const isFinanceSkill = /\b(finance|financial|quant|trade|trades|trader|trading|portfolio|market-data|markets?|stocks?|equity|crypto|filings?|edgar|sec filing|investor|earnings|10-k|10-q|alpha|factor|backtest|risk model)\b/.test(fullSkillText)
+  const isFinancialResearchTask = /\b(analy[sz]e|analysis|research|earnings|portfolio|valuation|fundamental|financial statements?|balance sheet|income statement|cash flow|macro|factor|backtest|risk|stock|equity|market news|investor|10-k|10-q|filings?)\b/.test(normalizedTask)
+  const isSourceCheckedFinanceResearchSkill = skill.submission_source === 'curated-finance-research-skill-path'
+  const isPaymentsOrExecutionSkill = /\b(payment|payments|checkout|gateway|merchant|billing|invoice|settlement|processor|acquirer|card issuing|transaction processing|payment orchestration|crypto exchange|broker api|order execution|wallet)\b/.test(fullSkillText)
   const isSecurityOnlySkill = /\b(security|vulnerability|scanner|nuclei|pentest|cve|sast|exploit|secret scanning)\b/.test(fullSkillText) && !isFinanceSkill
   const isSportsTask = /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(normalizedTask)
   const isSportsSkill = /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(fullSkillText)
@@ -345,6 +359,9 @@ function calculateRelevanceScore(skill: SkillRecord, task: string): number {
   if (isGenericWebTask && isPlatformSpecificExtractor) score -= 45
   if (isFinanceTask && /\b(finance|financial|quant|trading|market|stock|investment|portfolio|crypto)\b/.test(category)) score += 85
   if (isFinanceTask && isFinanceSkill) score += 58
+  if (isFinanceTask && !isFinanceSkill && !/\b(finance|financial|quant|trading|market|stock|investment|portfolio|crypto)\b/.test(category)) score -= 180
+  if (isFinancialResearchTask && isSourceCheckedFinanceResearchSkill) score += 140
+  if (isFinancialResearchTask && isPaymentsOrExecutionSkill) score -= 180
   if (isFinanceTask && isSecurityOnlySkill) score -= 90
   if (isSportsTask && category === 'sports-analytics') score += 85
   if (isSportsTask && isSportsSkill) score += 58
