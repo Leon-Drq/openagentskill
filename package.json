@@ -10,6 +10,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "node --test lib/*.test.ts",
     "seed:popular": "node scripts/seed-popular-skills.ts",
     "indexer:backfill": "node scripts/backfill-high-star-skills.mjs",
     "lint": "eslint ."
