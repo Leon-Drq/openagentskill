@@ -937,7 +937,7 @@ function getSearchTerms(normalizedQuery: string) {
         .map((term) => term.trim())
         .filter((term) => term.length >= 3 && !stopWords.has(term))
     )
-  ).slice(0, 5)
+  ).slice(0, 10)
 
   return terms.length > 0 ? terms : [normalizedQuery]
 }

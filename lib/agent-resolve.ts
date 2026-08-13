@@ -971,7 +971,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     .slice(0, Math.max(limit * 3, 10))
   const topMatchScore = ranked[0]?.score || 0
 
-  const candidates = ranked.map(({ skill, score }, index) => {
+  const candidates = ranked.map(({ skill, score, semanticRelevance }, index) => {
     const eventStats = eventStatsMap[skill.slug] || null
     const outcomeStats = outcomeStatsMap[skill.slug] || null
     const audit = buildSkillAudit(skill, eventStats)
@@ -982,12 +982,13 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     const decision = getSkillDecisionProfile(skill, eventStats)
     const useCases = getUseCasesForSkill(skill, 3)
     const supplyProfile = getSkillSupplyProfile(skill, eventStats)
-    const matchScore = normalizeMatchScore(score, topMatchScore)
+    const matchScore = normalizeMatchScore(score, topMatchScore, semanticRelevance)
 
     return {
       rank: index + 1,
       match_score: matchScore,
       raw_match_score: score,
+      semantic_relevance: semanticRelevance,
       skill: {
         slug: skill.slug,
         name: skill.name,

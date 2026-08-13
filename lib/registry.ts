@@ -14,11 +14,16 @@ import { getUseCasesForSkill, scoreSkillForUseCase, USE_CASES } from '@/lib/use-
 const SITE_URL = 'https://www.openagentskill.com'
 
 function tokenize(value: string) {
+  const stopWords = new Set([
+    'about', 'agent', 'agents', 'and', 'for', 'from', 'into', 'need', 'right', 'skill', 'skills',
+    'that', 'the', 'this', 'use', 'using', 'want', 'what', 'when', 'with', 'your',
+  ])
+
   return value
     .toLowerCase()
     .split(/[\s+,./:_-]+/)
     .map((token) => token.trim())
-    .filter((token) => token.length > 2)
+    .filter((token) => token.length > 2 && !stopWords.has(token))
 }
 
 const QUERY_TOKEN_ALIASES: Record<string, string[]> = {
@@ -48,6 +53,22 @@ type LocalizedIntentAlias = {
 // asking users on localized routes to formulate their task in English.
 const LOCALIZED_INTENT_ALIASES: LocalizedIntentAlias[] = [
   {
+    pattern: /(中国市场本地化|中国本地化|面向中国|进入中国市场|本地化|国际化|中文化|出海)|\b(locali[sz](?:e|ation)|i18n|internationali[sz]ation|china market|chinese market|market entry)\b/,
+    terms: ['localization', 'localize', 'i18n', 'internationalization', 'china', 'chinese', 'market-entry'],
+  },
+  {
+    pattern: /(股票|金融|交易|投资|量化|回测|证券)/,
+    terms: ['finance', 'stock', 'market', 'trading'],
+  },
+  {
+    pattern: /(演示文稿|幻灯片|路演|汇报|简报)/,
+    terms: ['presentation', 'ppt', 'slides'],
+  },
+  {
+    pattern: /(设计|界面|动效|动画|视觉|图片生成)/,
+    terms: ['design', 'ui', 'animation'],
+  },
+  {
     pattern: /\b(aktien?|borse|finanzen?|handel|investition|anlage|portfolio|marktrisiko|acciones?|bolsa|finanzas?|inversion|cartera|mercado|saham|pasar|keuangan|investasi|perdagangan|portofolio)\b/,
     terms: ['finance', 'stock', 'market', 'trading'],
   },
@@ -64,6 +85,10 @@ const LOCALIZED_INTENT_ALIASES: LocalizedIntentAlias[] = [
     terms: ['video', 'creative', 'seedance', 'collage', 'b-roll'],
   },
   {
+    pattern: /(代码|编程|代码仓库|拉取请求|合并请求|错误修复|代码审查|自动化测试)/,
+    terms: ['coding', 'code', 'repository', 'review'],
+  },
+  {
     pattern: /\b(programmierung|repository|repositorio|repositori|fehler|pruefen|testen|codigo|programacion|revisar|prueba|kode|pemrograman|uji|tinjau)\b/,
     terms: ['coding', 'code', 'repository', 'review'],
   },
@@ -76,7 +101,15 @@ const LOCALIZED_INTENT_ALIASES: LocalizedIntentAlias[] = [
     terms: ['research', 'document', 'sources'],
   },
   {
+    pattern: /(研究|检索|知识库|文档|论文|资料|引用)/,
+    terms: ['research', 'document', 'sources'],
+  },
+  {
     pattern: /\b(webseite|webseiten|crawlen|scrapen|wettbewerber|preise|sitio web|pagina web|rastrear|extraer|competidor|precios|situs|merayapi|ekstrak|pesaing|harga)\b/,
+    terms: ['web', 'scraping', 'crawler', 'extraction'],
+  },
+  {
+    pattern: /(网页|网站|爬虫|抓取|网页采集|竞品价格)/,
     terms: ['web', 'scraping', 'crawler', 'extraction'],
   },
 ]
@@ -135,10 +168,14 @@ function skillSearchText(skill: SkillRecord) {
     .toLowerCase()
 }
 
-type QueryIntent = 'finance' | 'presentation' | 'design' | 'coding' | 'sports' | 'research' | 'web' | null
+type QueryIntent = 'localization' | 'finance' | 'presentation' | 'design' | 'coding' | 'sports' | 'research' | 'web' | 'marketing' | null
 
 function detectQueryIntent(normalizedQuery: string, queryTokens: string[]): QueryIntent {
   const tokenSet = new Set(queryTokens)
+
+  if (/\b(locali[sz](?:e|ed|ing|ation)|i18n|internationali[sz]ation|china market|chinese market|market entry)\b/.test(normalizedQuery)) {
+    return 'localization'
+  }
 
   if (
     /\b(finance|financial|quant|quantitative|trade|trades|trader|trading|invest|investing|investment|portfolio|markets?|stocks?|equity|crypto|filings?|edgar|sec filings?|investor|earnings|10-k|10-q|alpha|factor|backtest|backtesting|risk model)\b/.test(normalizedQuery) ||
@@ -147,28 +184,32 @@ function detectQueryIntent(normalizedQuery: string, queryTokens: string[]): Quer
     return 'finance'
   }
 
+  if (/\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(normalizedQuery)) {
+    return 'sports'
+  }
+
   if (/\b(presentation|presentations|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides|visual story)\b/.test(normalizedQuery)) {
     return 'presentation'
   }
 
-  if (/\b(design|designer|creative|motion|animation|lottie|gsap|figma|ui|ux|shadcn|component|design system|three|3d|dashboard|visual|svg|image|video|seedance)\b/.test(normalizedQuery)) {
-    return 'design'
+  if (/\b(browser|browsing|playwright|puppeteer|websites?|web pages?|pages?|html|crawl|crawler|scrape|scraper|web scraping|pricing|competitor|forms?|qa flow)\b/.test(normalizedQuery)) {
+    return 'web'
+  }
+
+  if (/\b(seo|keywords?|content marketing|newsletter|social posts?|crm|growth|marketing|go-to-market)\b/.test(normalizedQuery)) {
+    return 'marketing'
   }
 
   if (/\b(code|coding|developer|dev|repo|repos|github|pull request|pr|ci|bug|test|review|ship|codex|claude code|cursor)\b/.test(normalizedQuery)) {
     return 'coding'
   }
 
-  if (/\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(normalizedQuery)) {
-    return 'sports'
+  if (/\b(design|designer|creative|motion|animation|lottie|gsap|figma|ui|ux|shadcn|component|design system|three|3d|dashboard|visual|svg|image|video|seedance)\b/.test(normalizedQuery)) {
+    return 'design'
   }
 
   if (/\b(research|rag|retrieval|knowledge|document|pdf|paper|papers|arxiv|search|recent|last30|last 30)\b/.test(normalizedQuery)) {
     return 'research'
-  }
-
-  if (/\b(websites?|web pages?|pages?|html|crawl|crawler|scrape|scraper|web scraping|pricing|competitor)\b/.test(normalizedQuery)) {
-    return 'web'
   }
 
   return null
@@ -178,6 +219,11 @@ function getIntentFitScore(intent: QueryIntent, category: string, text: string) 
   if (!intent) return 0
 
   const profile: Record<Exclude<QueryIntent, null>, { category: RegExp; positive: RegExp; negative: RegExp }> = {
+    localization: {
+      category: /\b(growth|marketing|localization|translation|development|coding|content)\b/,
+      positive: /\b(locali[sz](?:e|ed|ing|ation)|i18n|internationali[sz]ation|globalization|translation management|market entry|go-to-market|china market|chinese market)\b/,
+      negative: /\b(robotics?|slam|lidar|odometry|mapping|computer vision|facial landmarks?|gnss|imu|taiwan|taiwanese|traditional chinese)\b/,
+    },
     finance: {
       category: /\b(finance|financial|quant|trading|market|stock|investment|portfolio|fintech|crypto|defi)\b/,
       positive: /\b(finance|financial|quant|quantitative|trade|trades|trader|trading|portfolio|market-data|markets?|stocks?|stock[-_\s]?analysis|equity|crypto|filings?|edgar|sec filing|investor|investment|earnings|10-k|10-q|alpha|factor|backtest|backtesting|risk model|openbb|vectorbt|freqtrade|yfinance|zipline|backtrader|serenity)\b/,
@@ -210,8 +256,13 @@ function getIntentFitScore(intent: QueryIntent, category: string, text: string) 
     },
     web: {
       category: /\b(web|scraping|crawler|automation|data)\b/,
-      positive: /\b(web-crawling|crawler|crawl|scraper|scrape|browser|playwright|puppeteer|html|markdown|extraction|llm-friendly|structured data)\b/,
+      positive: /\b(web-crawling|crawler|crawl|scraper|scrape|browser|browsing|playwright|puppeteer|browser automation|web automation|web testing|qa|form automation|html|markdown|extraction|llm-friendly|structured data)\b/,
       negative: /\b(finance|trading|stock|presentation|ppt|figma|security|vulnerability)\b/,
+    },
+    marketing: {
+      category: /\b(growth|marketing|content|seo|sales)\b/,
+      positive: /\b(seo|search engine optimization|keywords?|content marketing|article briefs?|newsletter|social posts?|copywriting|crm|growth|marketing|go-to-market|launch campaign)\b/,
+      negative: /\b(academic research|papers?|arxiv|robotics?|security scanner|database engine|browser testing)\b/,
     },
   }
 
@@ -222,6 +273,67 @@ function getIntentFitScore(intent: QueryIntent, category: string, text: string) 
   if (selected.negative.test(text) && !selected.positive.test(text)) score -= 170
   if (!selected.category.test(category) && !selected.positive.test(text)) score -= 220
   return score
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function containsSearchTerm(text: string, term: string) {
+  if (!term) return false
+  if (/[^\x00-\x7f]/.test(term)) return text.includes(term)
+  return new RegExp(`(^|[^a-z0-9])${escapeRegExp(term)}([^a-z0-9]|$)`, 'i').test(text)
+}
+
+function hasRequiredIntentEvidence(intent: QueryIntent, normalizedQuery: string, category: string, text: string) {
+  if (!intent) return true
+  if (getIntentFitScore(intent, category, text) <= 0) return false
+
+  if (intent === 'localization' && /\b(china|chinese)\b/.test(normalizedQuery)) {
+    const hasChinaEvidence = /\b(china|chinese|mandarin|simplified chinese)\b|中国|中文|简体中文/.test(text)
+    const hasLocalizationEvidence = /\b(locali[sz](?:e|ed|ing|ation)|i18n|internationali[sz]ation|globalization|market entry|go-to-market)\b|本地化|国际化/.test(text)
+    const regionalMismatch = /\b(taiwan|taiwanese|traditional chinese)\b|台湾|繁体中文/.test(text)
+    return hasChinaEvidence && hasLocalizationEvidence && !regionalMismatch
+  }
+
+  if (intent === 'marketing' && /\b(social posts?|newsletter|copy|copywriting|article briefs?)\b/.test(normalizedQuery)) {
+    return /\b(social posts?|social media|newsletter|copywriting|content creation|content marketing|blog posts?|article briefs?|marketing copy)\b/.test(text)
+  }
+
+  return true
+}
+
+export function getSkillQueryRelevance(skill: SkillRecord, query: string) {
+  const rankingQuery = augmentQueryForIntent(query)
+  const normalizedQuery = rankingQuery.trim().toLowerCase()
+  if (!normalizedQuery) return 100
+
+  const text = skillSearchText(skill)
+  const name = skill.name.toLowerCase()
+  const slug = skill.slug.toLowerCase()
+  const repo = (skill.github_repo || skill.repository || '').toLowerCase()
+  const queryTokens = tokenize(rankingQuery)
+  const intent = detectQueryIntent(normalizedQuery, queryTokens)
+  const category = normalizeCategory(skill.category)
+
+  if (name === normalizedQuery || slug === normalizedQuery || repo === normalizedQuery || repo.endsWith(`/${normalizedQuery}`)) {
+    return 100
+  }
+  if (!hasRequiredIntentEvidence(intent, normalizedQuery, category, text)) return 0
+
+  const originalTokens = tokenize(query)
+  const expandedTokens = expandQueryTokens(queryTokens)
+  const originalMatches = originalTokens.filter((token) => containsSearchTerm(text, token)).length
+  const expandedMatches = expandedTokens.filter((token) => containsSearchTerm(text, token)).length
+  const phraseMatch = text.includes(query.trim().toLowerCase())
+
+  let relevance = phraseMatch ? 72 : 18
+  relevance += Math.min(36, originalMatches * 12)
+  relevance += Math.min(24, Math.max(0, expandedMatches - originalMatches) * 4)
+  if (intent) relevance += 22
+  if (intent === 'localization' && /\b(china|chinese)\b/.test(normalizedQuery)) relevance = Math.max(relevance, 78)
+
+  return Math.max(0, Math.min(100, Math.round(relevance)))
 }
 
 function getSpecializedDesignIntentScore(normalizedQuery: string, skill: SkillRecord, text: string) {
@@ -376,11 +488,13 @@ export function getSkillInstallCommand(skill: SkillRecord) {
 
 type SkillRankingStats = SkillAgentStats | SkillOutcomeStats
 
-export function normalizeMatchScore(score: number, topScore: number) {
+export function normalizeMatchScore(score: number, topScore: number, semanticRelevance?: number) {
   const safeScore = Math.max(0, Number(score) || 0)
   const denominator = Math.max(100, Number(topScore) || 0)
   if (!safeScore) return 0
-  return Math.max(1, Math.min(99, Math.round((safeScore / denominator) * 99)))
+  const relativeScore = Math.max(1, Math.min(99, Math.round((safeScore / denominator) * 99)))
+  if (semanticRelevance === undefined) return relativeScore
+  return Math.min(relativeScore, Math.max(0, Math.min(99, Math.round(semanticRelevance))))
 }
 
 function getOutcomeUsageScore(stats: SkillRankingStats | null | undefined) {
@@ -514,9 +628,13 @@ export function rankSkillsForQuery(
       score += getOutcomeUsageScore(statsMap[skill.slug])
       if (skill.verified) score += 6
 
-      return { skill, score: Math.round(score * 10) / 10 }
+      return {
+        skill,
+        score: Math.round(score * 10) / 10,
+        semanticRelevance: getSkillQueryRelevance(skill, query),
+      }
     })
-    .filter((item) => !query.trim() || item.score > 18)
+    .filter((item) => !query.trim() || (item.score > 18 && item.semanticRelevance >= 30))
     .sort((a, b) => b.score - a.score)
 }
 
@@ -544,8 +662,8 @@ export function getRecommendationReasons(skill: SkillRecord, query: string, scor
   const reasons: string[] = []
   const text = skillSearchText(skill)
   const normalizedQuery = query.trim().toLowerCase()
-  const queryTokens = tokenize(query)
-  const matchedTokens = queryTokens.filter((token) => text.includes(token)).slice(0, 4)
+  const queryTokens = tokenize(augmentQueryForIntent(query))
+  const matchedTokens = queryTokens.filter((token) => containsSearchTerm(text, token)).slice(0, 4)
 
   if (matchedTokens.length > 0) {
     reasons.push(`Matches task terms: ${matchedTokens.join(', ')}`)

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { unstable_cache } from 'next/cache'
 import { withTimeout } from '@/lib/async'
 import { getAllSkills, searchSkills, type SkillRecord } from '@/lib/db/skills'
-import { dedupeRankedSkills, getRecommendationReasons, normalizeMatchScore, rankSkillsForQuery, toRegistrySkill } from '@/lib/registry'
+import { augmentQueryForIntent, dedupeRankedSkills, getRecommendationReasons, normalizeMatchScore, rankSkillsForQuery, toRegistrySkill } from '@/lib/registry'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSkillSupplyProfile } from '@/lib/supply'
 
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
       }),
       query.trim()
         ? withTimeout(
-            searchSkills(query, 120),
+            searchSkills(augmentQueryForIntent(query), 120),
             SEARCH_EXACT_QUERY_TIMEOUT_MS,
             'public skill exact search query'
           ).catch((error) => {
@@ -105,10 +105,11 @@ export async function GET(request: NextRequest) {
       .slice(0, shortlistLimit)
     const topSearchScore = rankedCandidates[0]?.score || 0
     const ranked = rankedCandidates
-      .map(({ skill, score }) => ({
+      .map(({ skill, score, semanticRelevance }) => ({
         skill,
-        score: normalizeMatchScore(score, topSearchScore),
+        score: normalizeMatchScore(score, topSearchScore, semanticRelevance),
         rawScore: score,
+        semanticRelevance,
         registrySkill: toRegistrySkill(skill),
       }))
       .filter(({ registrySkill }) => {
@@ -159,10 +160,11 @@ ${text}`,
           min_stars: Number.isFinite(minStars) ? minStars : 0,
         },
         total: ranked.length,
-        skills: ranked.map(({ skill, score, rawScore, registrySkill }, index) => ({
+        skills: ranked.map(({ skill, score, rawScore, semanticRelevance, registrySkill }, index) => ({
           rank: index + 1,
           match_score: score,
           raw_match_score: rawScore,
+          semantic_relevance: semanticRelevance,
           ...registrySkill,
           recommendation_reasons: getRecommendationReasons(skill, query, score),
         })),
