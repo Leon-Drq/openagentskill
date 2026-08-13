@@ -7,7 +7,7 @@ import { FINANCE_RESEARCH_SKILL_SLUGS } from '@/lib/indexer/finance-research-ski
 import { SKILL_STACKS, type SkillStackDefinition } from '@/lib/collections'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
-import { dedupeRankedSkills, getRecommendationReasons, normalizeMatchScore } from '@/lib/registry'
+import { dedupeRankedSkills, getRecommendationReasons, getSkillQueryRelevance, normalizeMatchScore } from '@/lib/registry'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
@@ -93,10 +93,11 @@ export async function GET(request: NextRequest) {
     const scored = allSkills.map((skill) => ({
       skill,
       score: calculateRelevanceScore(skill, task),
+      semanticRelevance: getSkillQueryRelevance(skill, task),
     }))
 
     const candidates = dedupeRankedSkills(scored)
-      .filter((item) => item.score > 0)
+      .filter((item) => item.score > 0 && item.semanticRelevance >= 30)
       .map((item) => {
         const eventStats = eventStatsMap[item.skill.slug] || null
         const audit = buildSkillAudit(item.skill, eventStats)
@@ -134,7 +135,7 @@ export async function GET(request: NextRequest) {
       .map((item) => ({
         slug: item.skill.slug,
         name: item.skill.name,
-        match_score: normalizeMatchScore(item.score, topRecommendationScore),
+        match_score: normalizeMatchScore(item.score, topRecommendationScore, item.semanticRelevance),
         raw_match_score: item.score,
         safety_gate: item.safety.safety_tier,
         url: `https://www.openagentskill.com/skills/${item.skill.slug}/audit`,
@@ -169,7 +170,7 @@ export async function GET(request: NextRequest) {
         const audit = r.audit
         const safety = r.safety
         const supplyProfile = getSkillSupplyProfile(r.skill, eventStats)
-        const matchScore = normalizeMatchScore(r.score, topRecommendationScore)
+        const matchScore = normalizeMatchScore(r.score, topRecommendationScore, r.semanticRelevance)
         return {
           rank: index + 1,
           skill: r.skill.name,
@@ -178,6 +179,7 @@ export async function GET(request: NextRequest) {
           confidence: (matchScore / 100).toFixed(2),
           match_score: matchScore,
           raw_match_score: r.score,
+          semantic_relevance: r.semanticRelevance,
           match_label: getMatchLabel(matchScore),
           safety_adjusted_score: r.safety_adjusted_score,
           install: r.skill.install_command || `npx skills add ${r.skill.github_repo}`,

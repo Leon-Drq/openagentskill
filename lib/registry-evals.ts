@@ -7,9 +7,20 @@ export interface RegistryEvalCase {
   expectedSlugs?: string[]
   expectedTerms?: string[]
   minTopScore?: number
+  expectNoMatch?: boolean
 }
 
 export const REGISTRY_EVAL_CASES: RegistryEvalCase[] = [
+  {
+    id: 'china-saas-localization-no-false-positive',
+    task: 'Localize a SaaS product for launch in China',
+    expectNoMatch: true,
+  },
+  {
+    id: 'chinese-china-market-localization-no-false-positive',
+    task: '中国市场本地化',
+    expectNoMatch: true,
+  },
   {
     id: 'generic-web-scraping',
     task: 'Scrape competitor pricing pages and extract structured data',
@@ -305,7 +316,9 @@ export function runRegistryEvals(skills: SkillRecord[], cases = REGISTRY_EVAL_CA
       testCase.expectedTerms?.some((term) => topFiveText.includes(term.toLowerCase()))
     )
     const scoreHit = !testCase.minTopScore || Number(top?.score || 0) >= testCase.minTopScore
-    const passed = Boolean(ranked.length > 0 && scoreHit && (slugHit || termHit))
+    const passed = testCase.expectNoMatch
+      ? ranked.length === 0
+      : Boolean(ranked.length > 0 && scoreHit && (slugHit || termHit))
 
     return {
       id: testCase.id,
@@ -314,6 +327,7 @@ export function runRegistryEvals(skills: SkillRecord[], cases = REGISTRY_EVAL_CA
       expected_slugs: testCase.expectedSlugs || [],
       expected_terms: testCase.expectedTerms || [],
       min_top_score: testCase.minTopScore || null,
+      expect_no_match: Boolean(testCase.expectNoMatch),
       top_score: top?.score || 0,
       top_results: ranked.map((item, index) => ({
         rank: index + 1,
