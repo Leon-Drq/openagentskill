@@ -225,12 +225,18 @@ function copyText(value: string) {
   void navigator.clipboard?.writeText(value)
 }
 
-export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: string }) {
+export function AgentResolveWorkbench({
+  initialTask = '',
+  initialLive = true,
+}: {
+  initialTask?: string
+  initialLive?: boolean
+}) {
   const [task, setTask] = useState(initialTask || exampleTasks[0])
   const [agent, setAgent] = useState('codex')
   const [maxRisk, setMaxRisk] = useState('medium')
   const [minStars, setMinStars] = useState('0')
-  const [live, setLive] = useState(false)
+  const [live, setLive] = useState(initialLive)
   const [payload, setPayload] = useState<ResolvePayload | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -242,7 +248,7 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
       max_risk: maxRisk,
       min_stars: minStars || '0',
     })
-    if (live) params.set('live', 'true')
+    params.set('live', String(live))
     return `/api/agent/resolve?${params.toString()}`
   }, [agent, live, maxRisk, minStars, task])
 
@@ -254,7 +260,7 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
       min_stars: minStars || '0',
       format: 'text',
     })
-    if (live) params.set('live', 'true')
+    params.set('live', String(live))
     return `/api/agent/receipt?${params.toString()}`
   }, [agent, live, maxRisk, minStars, task])
 
@@ -281,7 +287,7 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
         max_risk: maxRisk,
         min_stars: minStars || '0',
       })
-      if (live) params.set('live', 'true')
+      params.set('live', String(live))
 
       const response = await fetch(`/api/agent/resolve?${params.toString()}`)
       if (!response.ok) {
@@ -335,7 +341,7 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Agent Resolve</p>
-            <h2 className="mt-3 font-display text-2xl font-normal">Describe the task. Get one skill plan.</h2>
+            <h2 className="mt-3 font-display text-2xl font-normal">Describe the task. Get a ranked skill plan.</h2>
           </div>
           <span className="hidden rounded-[8px] border border-border px-2.5 py-1 font-mono text-xs text-secondary sm:inline-flex">
             API ready
@@ -406,7 +412,7 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
               className="mt-1"
             />
             <span>
-              Use live registry data. Faster default mode uses the curated low-latency candidate pool for agent calls.
+              Use live registry data for the broadest shortlist. Turn this off to use the faster curated candidate pool.
             </span>
           </label>
 
@@ -480,11 +486,18 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
             <h2 className="break-words font-display text-2xl font-normal [overflow-wrap:anywhere]">
               {recommendation?.best_skill.name || 'Resolve output will appear here'}
             </h2>
-            {payload?.policy_decision && (
-              <span className="w-fit border border-border px-2.5 py-1 font-mono text-xs uppercase tracking-[0.14em] text-secondary">
-                {compactStatus(payload.policy_decision.status)}
-              </span>
-            )}
+            <div className="flex flex-wrap items-center gap-2">
+              {recommendation && (
+                <span className="w-fit border border-border bg-card px-2.5 py-1 font-mono text-xs text-secondary">
+                  1 best + {recommendation.alternatives.length} alternative{recommendation.alternatives.length === 1 ? '' : 's'}
+                </span>
+              )}
+              {payload?.policy_decision && (
+                <span className="w-fit border border-border px-2.5 py-1 font-mono text-xs uppercase tracking-[0.14em] text-secondary">
+                  {compactStatus(payload.policy_decision.status)}
+                </span>
+              )}
+            </div>
           </div>
           {error && (
             <div className="mt-4 flex gap-3 border border-red-300 bg-red-50 p-3 text-sm text-red-700">
@@ -500,7 +513,7 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
               <ShieldCheck className="mx-auto h-8 w-8 text-[#006b4f]" aria-hidden="true" />
               <h3 className="mt-4 font-display text-2xl font-normal">The registry returns a decision, not just links.</h3>
               <p className="mt-3 text-sm leading-6 text-secondary">
-                Your agent gets one recommended skill, alternatives, install command, Trust Score, audit summary, and a safety policy before it acts.
+                Your agent gets one primary recommendation plus qualified alternatives, install command, Trust Score, audit summary, and a safety policy before it acts.
               </p>
             </div>
           </div>
@@ -560,6 +573,54 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
                   >
                     GitHub
                   </a>
+                )}
+              </div>
+
+              <div className="mt-6 border-t border-border pt-5">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Ranked alternatives</p>
+                    <h3 className="mt-2 font-display text-xl font-normal">Compare before installing</h3>
+                  </div>
+                  <span className="font-mono text-xs text-secondary">
+                    {recommendation.alternatives.length > 0
+                      ? `Ranks #2–#${recommendation.alternatives.length + 1}`
+                      : '0 qualified alternatives'}
+                  </span>
+                </div>
+
+                {recommendation.alternatives.length > 0 ? (
+                  <div className="mt-4 grid gap-3 md:grid-cols-2">
+                    {recommendation.alternatives.slice(0, 4).map((item, index) => (
+                      <Link
+                        key={item.slug}
+                        href={item.url}
+                        className="group border border-border bg-card p-4 transition-colors hover:border-foreground/40"
+                      >
+                        <div className="flex items-start gap-3">
+                          <span className="font-mono text-xs text-secondary">#{index + 2}</span>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-start justify-between gap-3">
+                              <h4 className="min-w-0 break-words font-display text-lg font-normal [overflow-wrap:anywhere] group-hover:underline">
+                                {item.name}
+                              </h4>
+                              <span className="shrink-0 font-mono text-xs text-secondary">Trust {item.trust_score}</span>
+                            </div>
+                            <p className="mt-2 line-clamp-2 text-sm leading-6 text-secondary">{item.why_consider}</p>
+                            <div className="mt-3 flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-secondary">
+                              <span>Audit {item.audit_score}</span>
+                              <span aria-hidden="true">·</span>
+                              <span>Safety {item.safety_score}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-4 border border-border bg-card p-4 text-sm leading-6 text-secondary">
+                    No close alternative passed the current task-fit and safety thresholds. The list is not padded with unrelated skills.
+                  </p>
                 )}
               </div>
             </div>
@@ -722,26 +783,6 @@ export function AgentResolveWorkbench({ initialTask = '' }: { initialTask?: stri
               </div>
             </div>
 
-            {recommendation.alternatives.length > 0 && (
-              <div className="p-4 sm:p-5">
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Alternatives</p>
-                <div className="mt-3 grid gap-3 md:grid-cols-2">
-                  {recommendation.alternatives.slice(0, 4).map((item) => (
-                    <Link
-                      key={item.slug}
-                      href={item.url}
-                      className="border border-border bg-card p-4 transition-colors hover:border-foreground/40"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-	                        <h3 className="min-w-0 break-words font-display text-lg font-normal [overflow-wrap:anywhere]">{item.name}</h3>
-	                        <span className="shrink-0 font-mono text-xs text-secondary">Trust {item.trust_score}</span>
-                      </div>
-                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-secondary">{item.why_consider}</p>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         )}
       </section>
