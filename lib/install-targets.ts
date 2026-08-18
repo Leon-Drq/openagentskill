@@ -44,7 +44,6 @@ export function getPrimaryInstallCommand(skill: InstallableSkill) {
 export function getSkillInstallTargets(skill: InstallableSkill): SkillInstallTarget[] {
   const repoRef = getSkillRepoRef(skill)
   const source = skill.repository || `https://github.com/${repoRef}`
-  const primaryCommand = getPrimaryInstallCommand(skill)
   const description = skill.description.replace(/\s+/g, ' ').trim()
 
   return [
@@ -53,8 +52,8 @@ export function getSkillInstallTargets(skill: InstallableSkill): SkillInstallTar
       label: 'CLI',
       title: 'OpenAgentSkill CLI',
       kind: 'command',
-      value: primaryCommand,
-      description: 'Use the registry command when your workflow supports the OpenAgentSkill installer.',
+      value: `npx --yes github:Leon-Drq/openagentskill#main install ${skill.slug}`,
+      description: 'Resolve policy, run the source installer safely, and report a verified install receipt.',
       copyLabel: 'Copy command',
     },
     {

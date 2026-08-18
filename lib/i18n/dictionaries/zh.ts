@@ -292,7 +292,7 @@ Agent 发布 "multilingual-research"。
       items: [
         '仓库必须至少有 3 个 GitHub star',
         '技能必须托管在 GitHub 公开仓库',
-        '建议在仓库中包含 skill.json 清单文件',
+        '请在仓库中包含带有 name 和 description 的有效 SKILL.md',
         'README 应包含清晰的安装说明和使用示例',
         '代码必须遵循开源协议（MIT、Apache 2.0 等）',
         '发布前会自动进行静态安全扫描和 AI 质量评分',

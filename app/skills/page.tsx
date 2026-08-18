@@ -285,7 +285,8 @@ function fallbackSkill(input: {
     ai_review_approved: true,
     ai_review_issues: [],
     ai_review_suggestions: [],
-    downloads: Math.max(1000, Math.round(input.stars * 1.3)),
+    // Fallback listings have no verified OpenAgentSkill install telemetry.
+    downloads: 0,
     used_by: 0,
     rating: 0,
     review_count: 0,

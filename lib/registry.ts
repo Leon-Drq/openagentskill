@@ -82,7 +82,7 @@ const LOCALIZED_INTENT_ALIASES: LocalizedIntentAlias[] = [
   },
   {
     pattern: /(视频|剪辑|短片|运镜|补充镜头|素材|电影|片段|视频生成|生成视频)/,
-    terms: ['video', 'creative', 'seedance', 'collage', 'b-roll'],
+    terms: ['video', 'video-editing', 'video-generation', 'creative', 'seedance', 'b-roll'],
   },
   {
     pattern: /(代码|编程|代码仓库|拉取请求|合并请求|错误修复|代码审查|自动化测试)/,
@@ -111,6 +111,30 @@ const LOCALIZED_INTENT_ALIASES: LocalizedIntentAlias[] = [
   {
     pattern: /(网页|网站|爬虫|抓取|网页采集|竞品价格)/,
     terms: ['web', 'scraping', 'crawler', 'extraction'],
+  },
+  {
+    pattern: /(合同|法律|法务|隐私|政策|合规|条款)/,
+    terms: ['legal', 'contract', 'privacy', 'policy', 'compliance'],
+  },
+  {
+    pattern: /(数据库|结构化查询|数据表|迁移脚本|查询语句)/,
+    terms: ['database', 'sql', 'schema', 'migration', 'query'],
+  },
+  {
+    pattern: /(安全扫描|漏洞|密钥泄露|依赖风险|代码安全)/,
+    terms: ['security', 'vulnerability', 'secret', 'dependency', 'audit'],
+  },
+  {
+    pattern: /(数据分析|电子表格|表格分析|图表|可视化|趋势分析)/,
+    terms: ['data-analysis', 'spreadsheet', 'csv', 'chart', 'visualization'],
+  },
+  {
+    pattern: /(客户支持|客服|工单|消息分流|回复草稿)/,
+    terms: ['customer-support', 'ticket', 'triage', 'reply'],
+  },
+  {
+    pattern: /(工作流自动化|任务自动化|定时任务|自动执行|连接工具)/,
+    terms: ['workflow-automation', 'scheduled', 'integration', 'tools'],
   },
 ]
 
@@ -168,13 +192,51 @@ function skillSearchText(skill: SkillRecord) {
     .toLowerCase()
 }
 
-type QueryIntent = 'localization' | 'finance' | 'presentation' | 'design' | 'coding' | 'sports' | 'research' | 'web' | 'marketing' | null
+// Categories and tags are useful recall signals, but they can be stale or
+// over-broad after automated ingestion. High-risk intent gates therefore use
+// only identity and descriptive repository evidence before a skill may rank.
+function skillEvidenceText(skill: SkillRecord) {
+  return [
+    skill.slug,
+    skill.name,
+    skill.description,
+    skill.repository,
+    skill.github_repo,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+}
+
+type QueryIntent =
+  | 'localization'
+  | 'finance'
+  | 'presentation'
+  | 'design'
+  | 'video'
+  | 'coding'
+  | 'sports'
+  | 'research'
+  | 'web'
+  | 'marketing'
+  | 'data'
+  | 'database'
+  | 'security'
+  | 'legal'
+  | 'support'
+  | 'education'
+  | 'automation'
+  | null
 
 function detectQueryIntent(normalizedQuery: string, queryTokens: string[]): QueryIntent {
   const tokenSet = new Set(queryTokens)
 
   if (/\b(locali[sz](?:e|ed|ing|ation)|i18n|internationali[sz]ation|china market|chinese market|market entry)\b/.test(normalizedQuery)) {
     return 'localization'
+  }
+
+  if (/\b(youtube|reddit|hacker news)\b/.test(normalizedQuery)) {
+    return 'research'
   }
 
   if (
@@ -192,12 +254,44 @@ function detectQueryIntent(normalizedQuery: string, queryTokens: string[]): Quer
     return 'presentation'
   }
 
+  if (/\b(video|videos|video editing|video generation|short[- ]?form|clips?|b[- ]?roll|film|filmmaking|seedance|reels?|tiktok video)\b/.test(normalizedQuery)) {
+    return 'video'
+  }
+
+  if (/\b(contract|contracts|legal|law|lawyer|clauses?|privacy policy|compliance|regulation|terms of service|obligations?)\b/.test(normalizedQuery)) {
+    return 'legal'
+  }
+
+  if (/\b(database|databases|sql|postgres|postgresql|mysql|sqlite|schema|schemas|database migration|query results?)\b/.test(normalizedQuery)) {
+    return 'database'
+  }
+
+  if (/\b(security|secure|vulnerabilit(?:y|ies)|secret scanning|exposed secrets?|api keys?|dependency risks?|sast|cve|pentest)\b/.test(normalizedQuery)) {
+    return 'security'
+  }
+
+  if (/\b(customer support|helpdesk|support messages?|support tickets?|ticket triage|draft replies|customer service)\b/.test(normalizedQuery)) {
+    return 'support'
+  }
+
+  if (/\b(tutor|tutoring|education|teach|teaching|learning|lesson|course|quiz|student)\b/.test(normalizedQuery)) {
+    return 'education'
+  }
+
   if (/\b(browser|browsing|playwright|puppeteer|websites?|web pages?|pages?|html|crawl|crawler|scrape|scraper|web scraping|pricing|competitor|forms?|qa flow)\b/.test(normalizedQuery)) {
     return 'web'
   }
 
-  if (/\b(seo|keywords?|content marketing|newsletter|social posts?|crm|growth|marketing|go-to-market)\b/.test(normalizedQuery)) {
+  if (/\b(seo|keywords?|content marketing|newsletters?|social posts?|social copy|copywriting|blog posts?|crm|growth|marketing|go-to-market)\b/.test(normalizedQuery)) {
     return 'marketing'
+  }
+
+  if (/\b(spreadsheets?|csv|data analysis|analy[sz]e data|charts?|data visuali[sz]ation|analytics exports?|explain trends?)\b/.test(normalizedQuery)) {
+    return 'data'
+  }
+
+  if (/\b(workflow automation|automate workflows?|scheduled agent|schedule(?:d)? task|schedule|scheduled|cron|recurring|connect .* (?:apis?|tools)|repeated operational tasks|orchestration)\b/.test(normalizedQuery)) {
+    return 'automation'
   }
 
   if (/\b(code|coding|developer|dev|repo|repos|github|pull request|pr|ci|bug|test|review|ship|codex|claude code|cursor)\b/.test(normalizedQuery)) {
@@ -239,6 +333,11 @@ function getIntentFitScore(intent: QueryIntent, category: string, text: string) 
       positive: /\b(design|creative|motion|animation|lottie|gsap|figma|ui|ux|shadcn|component|design system|three|3d|dashboard|visual|svg|image|video|seedance)\b/,
       negative: /\b(finance|trading|stock|crawler|scraper|security|database|backend)\b/,
     },
+    video: {
+      category: /\b(video|media|creative|design)\b/,
+      positive: /\b(video|videos|video-editing|video generation|short[- ]?form|clips?|b[- ]?roll|film|filmmaking|seedance|remotion|ffmpeg|caption|subtitle|talking head)\b/,
+      negative: /\b(static image|icon set|database|finance|trading|code review|security scanner)\b/,
+    },
     coding: {
       category: /\b(coding|development|developer|devtools|testing)\b/,
       positive: /\b(code|coding|developer|dev|repo|repos|github|pull request|pr|ci|bug|test|review|ship|codex|claude code|cursor|lint|patch)\b/,
@@ -263,6 +362,41 @@ function getIntentFitScore(intent: QueryIntent, category: string, text: string) 
       category: /\b(growth|marketing|content|seo|sales)\b/,
       positive: /\b(seo|search engine optimization|keywords?|content marketing|article briefs?|newsletter|social posts?|copywriting|crm|growth|marketing|go-to-market|launch campaign)\b/,
       negative: /\b(academic research|papers?|arxiv|robotics?|security scanner|database engine|browser testing)\b/,
+    },
+    data: {
+      category: /\b(data|analytics|spreadsheet|visualization|productivity)\b/,
+      positive: /\b(data analysis|analytics|csv|spreadsheets?|excel|charts?|visuali[sz]ation|pandas|dataframe|trends?)\b/,
+      negative: /\b(code review|security scanner|contract review|video generation|browser testing)\b/,
+    },
+    database: {
+      category: /\b(database|data|backend|development|devops)\b/,
+      positive: /\b(database|databases|sql|postgres|postgresql|mysql|sqlite|schema|migration|queries|query optimization|orm)\b/,
+      negative: /\b(code review only|presentation|video|figma|marketing|football|stock trading)\b/,
+    },
+    security: {
+      category: /\b(security|development|coding|devops|testing)\b/,
+      positive: /\b(security|vulnerabilit(?:y|ies)|secret scanning|exposed secrets?|api keys?|dependency audit|sast|cve|pentest|static analysis|supply chain)\b/,
+      negative: /\b(marketing|presentation|video generation|football|stock trading|crm)\b/,
+    },
+    legal: {
+      category: /\b(legal|compliance|policy|document|privacy)\b/,
+      positive: /\b(contract|contracts|legal|law|clauses?|privacy policy|compliance|regulation|terms of service|obligations?|gdpr|ccpa)\b/,
+      negative: /\b(code review|pull request|software architecture|video|design|stock trading)\b/,
+    },
+    support: {
+      category: /\b(support|customer|operations|crm|productivity)\b/,
+      positive: /\b(customer support|helpdesk|support messages?|support tickets?|ticket triage|draft replies|customer service|inbox)\b/,
+      negative: /\b(code review|database engine|video generation|football|stock trading)\b/,
+    },
+    education: {
+      category: /\b(education|learning|research|productivity)\b/,
+      positive: /\b(tutor|tutoring|education|teach|teaching|learning|lesson|course|quiz|student|adaptive learning)\b/,
+      negative: /\b(code review|security scanner|stock trading|video editor|crm)\b/,
+    },
+    automation: {
+      category: /\b(automation|workflow|productivity|operations|integration|devops)\b/,
+      positive: /\b(workflow automation|automate workflows?|orchestration|scheduled tasks?|cron|integrations?|connectors?|repeated tasks?|agent workflow)\b/,
+      negative: /\b(static utility collection|design asset|stock trading|football analytics)\b/,
     },
   }
 
@@ -296,8 +430,84 @@ function hasRequiredIntentEvidence(intent: QueryIntent, normalizedQuery: string,
     return hasChinaEvidence && hasLocalizationEvidence && !regionalMismatch
   }
 
-  if (intent === 'marketing' && /\b(social posts?|newsletter|copy|copywriting|article briefs?)\b/.test(normalizedQuery)) {
-    return /\b(social posts?|social media|newsletter|copywriting|content creation|content marketing|blog posts?|article briefs?|marketing copy)\b/.test(text)
+  if (intent === 'marketing' && /\b(social posts?|social copy|newsletters?|copy|copywriting|article briefs?|blog posts?)\b/.test(normalizedQuery)) {
+    const requestedChannels = [
+      /\b(social posts?|social copy|social media)\b/.test(normalizedQuery)
+        ? /\b(social posts?|social copy|social media)\b/.test(text)
+        : null,
+      /\bnewsletters?\b/.test(normalizedQuery) ? /\bnewsletters?\b/.test(text) : null,
+      /\bblog posts?\b/.test(normalizedQuery) ? /\bblog posts?|blogging\b/.test(text) : null,
+      /\b(copy|copywriting)\b/.test(normalizedQuery)
+        ? /\b(copywriting|marketing copy|social copy)\b/.test(text)
+        : null,
+    ].filter((value): value is boolean => value !== null)
+    const matchedChannels = requestedChannels.filter(Boolean).length
+    return matchedChannels >= Math.min(2, requestedChannels.length)
+  }
+
+  if (intent === 'marketing' && /\b(seo|keywords?)\b/.test(normalizedQuery)) {
+    return /\b(seo|search engine optimization|keyword research|keywords?|serp|content brief)\b/.test(text)
+  }
+
+  if (intent === 'sports' && /\b(football|soccer|world cup|fifa|expected goals|xg)\b/.test(normalizedQuery)) {
+    return /\b(football|soccer|world cup|fifa|statsbomb|expected goals|xg|match data)\b/.test(text)
+  }
+
+  if (intent === 'research') {
+    for (const platform of ['youtube', 'reddit', 'hacker news']) {
+      if (normalizedQuery.includes(platform) && !text.includes(platform)) return false
+    }
+  }
+
+  if (intent === 'legal' && /\b(contract|contracts|clauses?)\b/.test(normalizedQuery)) {
+    return /\b(contract|contracts|contract review|legal clauses?|risky clauses?)\b/.test(text)
+  }
+
+  if (intent === 'legal' && /\b(privacy policy|privacy|gdpr|ccpa)\b/.test(normalizedQuery)) {
+    return /\b(privacy policy|privacy review|data protection|gdpr|ccpa)\b/.test(text)
+  }
+
+  if (intent === 'database') {
+    return /\b(database|databases|sql|postgres|postgresql|mysql|sqlite|schema|migration|orm)\b/.test(text)
+  }
+
+  if (intent === 'security') {
+    if (/\b(secrets?|api keys?|credentials?)\b/.test(normalizedQuery)) {
+      return /\b(secrets?|api keys?|credentials?)\b/.test(text) &&
+        /\b(security|scan|scanner|audit|vulnerabilit(?:y|ies)|sast|static analysis)\b/.test(text)
+    }
+    if (/\b(dependency|dependencies|supply chain)\b/.test(normalizedQuery)) {
+      return /\b(dependency|dependencies|supply chain)\b/.test(text) &&
+        /\b(security|audit|vulnerabilit(?:y|ies)|cve|scan|scanner)\b/.test(text)
+    }
+    return /\b(security|vulnerabilit(?:y|ies)|secret|api key|dependency|sast|cve|pentest|static analysis)\b/.test(text)
+  }
+
+  if (intent === 'video') {
+    return /\b(video|videos|video-editing|video generation|clips?|b[- ]?roll|film|seedance|remotion|ffmpeg|caption|subtitle)\b/.test(text)
+  }
+
+  if (intent === 'data' && /\b(csv|spreadsheets?|excel|charts?|visuali[sz]ation|analytics exports?)\b/.test(normalizedQuery)) {
+    return /\b(csv|spreadsheets?|excel|charts?|visuali[sz]ation|pandas|dataframe|analytics)\b/.test(text)
+  }
+
+  if (intent === 'support') {
+    return /\b(customer support|helpdesk|support tickets?|ticket triage|customer service|support inbox)\b/.test(text)
+  }
+
+  if (intent === 'education') {
+    return /\b(tutor|tutoring|education|teach|teaching|learning|lesson|course|quiz|student)\b/.test(text)
+  }
+
+  if (intent === 'automation') {
+    if (/\b(schedule|scheduled|cron|timer)\b/.test(normalizedQuery)) {
+      return /\b(schedule|scheduled|scheduler|cron|timer|recurring)\b/.test(text)
+    }
+    return /\b(workflow automation|automation workflow|orchestration|integration|connector|repeated tasks?)\b/.test(text)
+  }
+
+  if (intent === 'coding' && /\b(api documentation|api docs|openapi|swagger)\b/.test(normalizedQuery)) {
+    return /\b(api documentation|api docs|openapi|swagger|documentation generator|generate documentation)\b/.test(text)
   }
 
   return true
@@ -309,6 +519,7 @@ export function getSkillQueryRelevance(skill: SkillRecord, query: string) {
   if (!normalizedQuery) return 100
 
   const text = skillSearchText(skill)
+  const evidenceText = skillEvidenceText(skill)
   const name = skill.name.toLowerCase()
   const slug = skill.slug.toLowerCase()
   const repo = (skill.github_repo || skill.repository || '').toLowerCase()
@@ -319,7 +530,7 @@ export function getSkillQueryRelevance(skill: SkillRecord, query: string) {
   if (name === normalizedQuery || slug === normalizedQuery || repo === normalizedQuery || repo.endsWith(`/${normalizedQuery}`)) {
     return 100
   }
-  if (!hasRequiredIntentEvidence(intent, normalizedQuery, category, text)) return 0
+  if (!hasRequiredIntentEvidence(intent, normalizedQuery, category, evidenceText)) return 0
 
   const originalTokens = tokenize(query)
   const expandedTokens = expandQueryTokens(queryTokens)
@@ -538,6 +749,7 @@ export function rankSkillsForQuery(
   return skills
     .map((skill) => {
       const text = skillSearchText(skill)
+      const evidenceText = skillEvidenceText(skill)
       const name = skill.name.toLowerCase()
       const slug = skill.slug.toLowerCase()
       const category = normalizeCategory(skill.category)
@@ -624,14 +836,17 @@ export function rankSkillsForQuery(
 
       score += Math.min(24, Number(skill.quality_score || 0) / 4)
       score += Math.min(22, Math.log10(Number(skill.github_stars || 0) + 1) * 5)
-      score += Math.min(12, Math.log10(Number(skill.downloads || 0) + 1) * 3)
+      // Legacy download counters are not independently verifiable. Real
+      // outcome and verified-install evidence is added by getOutcomeUsageScore.
       score += getOutcomeUsageScore(statsMap[skill.slug])
       if (skill.verified) score += 6
 
       return {
         skill,
         score: Math.round(score * 10) / 10,
-        semanticRelevance: getSkillQueryRelevance(skill, query),
+        semanticRelevance: hasRequiredIntentEvidence(queryIntent, normalizedQuery, category, evidenceText)
+          ? getSkillQueryRelevance(skill, query)
+          : 0,
       }
     })
     .filter((item) => !query.trim() || (item.score > 18 && item.semanticRelevance >= 30))
@@ -689,7 +904,11 @@ export function getRecommendationReasons(skill: SkillRecord, query: string, scor
   return reasons.slice(0, 5)
 }
 
-export function toRegistrySkill(skill: SkillRecord, eventStats?: SkillEventStats | null) {
+export function toRegistrySkill(
+  skill: SkillRecord,
+  eventStats?: SkillEventStats | null,
+  outcomeStats?: SkillOutcomeStats | null
+) {
   const quality = getSkillQualityProfile(skill)
   const trust = getSkillTrustProfile(skill, false, eventStats || null)
   const audit = buildSkillAudit(skill, eventStats || null)
@@ -718,6 +937,11 @@ export function toRegistrySkill(skill: SkillRecord, eventStats?: SkillEventStats
     stats: {
       stars: Number(skill.github_stars || 0),
       forks: Number(skill.github_forks || 0),
+      verified_installs: Number(outcomeStats?.verified_installs || 0),
+      install_attempts: Number(outcomeStats?.install_attempts || 0),
+      successful_runs: Number(outcomeStats?.successful_outcomes || 0),
+      total_outcomes: Number(outcomeStats?.total_outcomes || 0),
+      // Kept for API compatibility. Do not use this legacy field as proof of adoption.
       downloads: Number(skill.downloads || 0),
       rating: Number(skill.rating || 0),
       review_count: Number(skill.review_count || 0),

@@ -14,47 +14,49 @@ export const metadata: Metadata = {
   },
 }
 
+const CLI = 'npx --yes github:Leon-Drq/openagentskill#main'
+
 const commands = [
   {
     label: 'Resolve',
     title: 'Resolve a task into one safe install plan',
-    command: 'openagentskill resolve "scrape competitor pricing pages" --agent codex --max-risk medium',
+    command: `${CLI} resolve "scrape competitor pricing pages" --agent codex --max-risk medium`,
     copy: 'Calls /api/agent/resolve and returns the selected skill, alternatives, safety profile, and install prompt.',
   },
   {
     label: 'Lock',
     title: 'Generate a stable agent lockfile',
-    command: 'openagentskill lock "analyze stock news" --agent codex --json',
+    command: `${CLI} lock "analyze stock news" --agent codex --json`,
     copy: 'Returns a small OpenAgentSkill lock object with selected skill, install policy, risk notes, alternatives, and outcome event id.',
   },
   {
     label: 'Receipt',
     title: 'Fetch the pre-install receipt',
-    command: 'openagentskill receipt "parse a PDF and extract tables" --agent claude-code',
+    command: `${CLI} receipt "parse a PDF and extract tables" --agent claude-code`,
     copy: 'Gets the stable install receipt agents should read before installing a third-party skill in a workspace.',
   },
   {
     label: 'Pack',
     title: 'Pull a complete workflow pack',
-    command: 'openagentskill pack presentation-agent-pack --limit 6 --json',
+    command: `${CLI} pack presentation-agent-pack --limit 6 --json`,
     copy: 'Fetches scenario-level install order, audit URLs, review checklist, and outcome feedback contract for a skill pack.',
   },
   {
     label: 'Install',
-    title: 'Fetch target-specific install handoffs',
-    command: 'openagentskill install crawl4ai --agent claude-code',
-    copy: 'Returns Codex, Claude Code, Cursor, and CLI install handoffs from the canonical skill record.',
+    title: 'Run an audited, receipt-backed install',
+    command: `${CLI} install crawl4ai --agent claude-code --dry-run`,
+    copy: 'Rejects blocked Skills, requires approval for reviewed Skills, invokes the standard installer without a shell, and reports success only after the installer exits cleanly.',
   },
   {
     label: 'Outcome',
     title: 'Report whether the skill worked',
-    command: 'openagentskill outcome resolve_... --skill crawl4ai --task "scrape pricing pages" --agent codex --outcome success --install-used --output-quality 4 --workspace sandbox',
+    command: `${CLI} outcome resolve_... --skill crawl4ai --task "scrape pricing pages" --agent codex --outcome success --install-used --output-quality 4 --workspace sandbox`,
     copy: 'Posts the result back to /api/agent/outcome so Trust Score v5 and rankings learn from real agent runs. Use --dry-run when wiring an integration.',
   },
   {
     label: 'Evaluate',
     title: 'Check recommendation quality',
-    command: 'openagentskill evals',
+    command: `${CLI} evals`,
     copy: 'Runs the public recommendation benchmark so ranking changes can be checked before deployment.',
   },
 ]
@@ -90,12 +92,13 @@ export default function CliPage() {
   return (
     <MarketingPageShell>
       <MarketingHero
-        eyebrow="CLI contract"
+        eyebrow="Official CLI"
         title="Resolve, audit, and install agent skills from the terminal."
         description={
           <>
-            OpenAgentSkill CLI turns a natural-language task into a selected skill, safety policy decision,
-            target-specific install handoff, and audit trail.
+            Run the dependency-free CLI directly from the official GitHub source. It turns a natural-language
+            task into a selected Skill, enforces the safety decision, executes only a standard Skill installer,
+            and records a verified receipt after success.
           </>
         }
         actions={

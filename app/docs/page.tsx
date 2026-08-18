@@ -37,15 +37,15 @@ export default function DocsPage() {
             {'Getting started'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed mb-4">
-            {'To install a skill, use the skills CLI:'}
+            {'Resolve and inspect a skill before running the source installer:'}
           </p>
           <div className="border border-border bg-card p-4 sm:p-6 mb-6">
             <pre className="font-mono text-sm sm:text-base overflow-x-auto">
-              <code>{'npx skills add owner/repo'}</code>
+              <code>{'npx --yes github:Leon-Drq/openagentskill#main install <skill-slug> --agent codex --dry-run'}</code>
             </pre>
           </div>
           <p className="text-base sm:text-lg leading-relaxed text-secondary">
-            {'This will install the skill and make it available to your AI agent.'}
+            {'After reviewing the repository and policy, rerun with --yes. Blocked skills are refused and verified install evidence is recorded only after the installer succeeds.'}
           </p>
         </section>
 

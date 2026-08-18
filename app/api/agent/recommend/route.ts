@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { unstable_cache } from 'next/cache'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
-import { getAllSkills, getSkillsBySlugs, type SkillEventStats, type SkillRecord } from '@/lib/db/skills'
+import {
+  getAgentOutcomeStatsMap,
+  getAllSkills,
+  getSkillsBySlugs,
+  type SkillEventStats,
+  type SkillOutcomeStats,
+  type SkillRecord,
+} from '@/lib/db/skills'
 import { FINANCE_RESEARCH_SKILL_SLUGS } from '@/lib/indexer/finance-research-skills'
 import { SKILL_STACKS, type SkillStackDefinition } from '@/lib/collections'
 import { getSkillInstallTargets } from '@/lib/install-targets'
@@ -75,7 +82,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const allSkills = await getAgentRecommendCandidatePool()
+    const [allSkills, outcomeStatsMap] = await Promise.all([
+      getAgentRecommendCandidatePool(),
+      getAgentOutcomeStatsMap(),
+    ])
     // Aggregate event-stat views are intentionally omitted from this public
     // hot path. Selected results still get deterministic trust and audit data,
     // while detailed live resolve endpoints can enrich with outcome signals.
@@ -116,6 +126,7 @@ export async function GET(request: NextRequest) {
 
         return {
           ...item,
+          outcomeStats: outcomeStatsMap[item.skill.slug] || null,
           eventStats,
           audit,
           safety,
@@ -186,7 +197,9 @@ export async function GET(request: NextRequest) {
           repository: r.skill.repository,
           stats: {
             stars: r.skill.github_stars,
-            downloads: r.skill.downloads,
+            verified_installs: Number(r.outcomeStats?.verified_installs || 0),
+            successful_runs: Number(r.outcomeStats?.successful_outcomes || 0),
+            total_outcomes: Number(r.outcomeStats?.total_outcomes || 0),
             rating: r.skill.rating,
             quality_score: Number(r.skill.quality_score || 0),
           },
@@ -237,7 +250,7 @@ export async function GET(request: NextRequest) {
             url: `https://www.openagentskill.com/use-cases/${useCase.slug}`,
           })),
           recommendation_reasons: getRecommendationReasons(r.skill, task, matchScore),
-          reasoning: generateReasoning(r.skill, matchScore),
+          reasoning: generateReasoning(r.skill, matchScore, r.outcomeStats),
         }
       }),
       blocked_candidates: blockedCandidates,
@@ -368,13 +381,11 @@ function calculateRelevanceScore(skill: SkillRecord, task: string): number {
   if (isSportsTask && category === 'sports-analytics') score += 85
   if (isSportsTask && isSportsSkill) score += 58
 
-  // Boost by popularity signals
+  // GitHub adoption is independently inspectable. Runtime adoption is scored
+  // only from verified outcomes in the registry pipeline, never legacy counters.
   if (skill.github_stars > 10000) score += 15
   else if (skill.github_stars > 1000) score += 10
   else if (skill.github_stars > 100) score += 5
-
-  if (skill.downloads > 10000) score += 10
-  else if (skill.downloads > 1000) score += 5
 
   if (skill.rating >= 4.8) score += 10
   else if (skill.rating >= 4.5) score += 5
@@ -393,14 +404,21 @@ function getMatchLabel(score: number): string {
   return 'Partial match'
 }
 
-function generateReasoning(skill: SkillRecord, score: number): string {
+function generateReasoning(
+  skill: SkillRecord,
+  score: number,
+  outcomeStats: SkillOutcomeStats | null
+): string {
   const parts: string[] = []
 
   if (skill.github_stars > 10000) {
     parts.push(`${(skill.github_stars / 1000).toFixed(0)}K GitHub stars`)
   }
-  if (skill.downloads > 10000) {
-    parts.push(`${(skill.downloads / 1000).toFixed(0)}K+ downloads`)
+  if (Number(outcomeStats?.verified_installs || 0) > 0) {
+    parts.push(`${Number(outcomeStats?.verified_installs || 0)} verified installs`)
+  }
+  if (Number(outcomeStats?.successful_outcomes || 0) > 0) {
+    parts.push(`${Number(outcomeStats?.successful_outcomes || 0)} successful runs`)
   }
   if (skill.rating >= 4.5) {
     parts.push(`${skill.rating}/5 rating`)

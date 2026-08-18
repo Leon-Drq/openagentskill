@@ -217,7 +217,7 @@ export default async function ComparePage({
                     {comparedSkills.map((skill) => (
                       <td key={skill.slug} className="p-4 align-top font-mono text-sm">
                         {formatCompactNumber(skill.github_stars || 0)} stars
-                        <div className="mt-1 text-xs text-secondary">{formatCompactNumber(skill.downloads || 0)} installs</div>
+                        <div className="mt-1 text-xs text-secondary">Verified outcomes are shown on each skill page</div>
                       </td>
                     ))}
                   </tr>

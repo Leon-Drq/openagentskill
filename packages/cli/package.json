@@ -1,0 +1,36 @@
+{
+  "name": "openagentskill",
+  "version": "0.2.0",
+  "description": "Official OpenAgentSkill CLI for task resolution, audited installs, and verified outcome receipts",
+  "type": "module",
+  "bin": {
+    "openagentskill": "./openagentskill.mjs"
+  },
+  "files": [
+    "openagentskill.mjs",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "agent",
+    "agent-skills",
+    "codex",
+    "claude-code",
+    "cursor",
+    "skills"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Leon-Drq/openagentskill.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://www.openagentskill.com/cli",
+  "bugs": "https://github.com/Leon-Drq/openagentskill/issues",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

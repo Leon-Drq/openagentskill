@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { unstable_cache } from 'next/cache'
 import { withTimeout } from '@/lib/async'
-import { getAllSkills, searchSkills, type SkillRecord } from '@/lib/db/skills'
+import { getAgentOutcomeStatsMap, getAllSkills, searchSkills, type SkillOutcomeStats, type SkillRecord } from '@/lib/db/skills'
 import { augmentQueryForIntent, dedupeRankedSkills, getRecommendationReasons, normalizeMatchScore, rankSkillsForQuery, toRegistrySkill } from '@/lib/registry'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSkillSupplyProfile } from '@/lib/supply'
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
   const shortlistLimit = Math.max(limit * 8, 30)
 
   try {
-    const [candidatePool, exactPool] = await Promise.all([
+    const [candidatePool, exactPool, outcomeStatsMap] = await Promise.all([
       withTimeout(
         getSearchCandidatePool(),
         SEARCH_QUERY_TIMEOUT_MS,
@@ -84,9 +84,14 @@ export async function GET(request: NextRequest) {
             return [] as SkillRecord[]
           })
         : Promise.resolve([] as SkillRecord[]),
+      withTimeout(
+        getAgentOutcomeStatsMap(),
+        SEARCH_QUERY_TIMEOUT_MS,
+        'public skill outcome stats query'
+      ).catch((): Record<string, SkillOutcomeStats> => ({})),
     ])
     const skills = mergeSkillPools(exactPool, candidatePool, CURATED_SKILL_SNAPSHOT)
-    const rankedCandidates = dedupeRankedSkills(rankSkillsForQuery(skills, query))
+    const rankedCandidates = dedupeRankedSkills(rankSkillsForQuery(skills, query, outcomeStatsMap))
       .filter(({ skill }) => {
         if (category && skill.category.toLowerCase() !== category.toLowerCase()) return false
         if (track && getSkillSupplyProfile(skill).track.slug !== track) return false
@@ -110,7 +115,7 @@ export async function GET(request: NextRequest) {
         score: normalizeMatchScore(score, topSearchScore, semanticRelevance),
         rawScore: score,
         semanticRelevance,
-        registrySkill: toRegistrySkill(skill),
+        registrySkill: toRegistrySkill(skill, null, outcomeStatsMap[skill.slug] || null),
       }))
       .filter(({ registrySkill }) => {
         if (!includeBlocked && registrySkill.safety_gate.blocked) return false

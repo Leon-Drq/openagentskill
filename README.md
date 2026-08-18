@@ -33,7 +33,7 @@ Let your AI agent find, compare, install, and report outcomes for the right reus
 
 <br />
 
-<sub>The skill layer for AI agents · Registry API · Trust Score · Auto installs</sub>
+<sub>The skill layer for AI agents · Registry API · Trust Score · Audited installs</sub>
 
 </div>
 
@@ -159,9 +159,23 @@ curl "https://www.openagentskill.com/api/agent/outcome?format=text"
 Read the integration contract before wiring a new agent:
 
 ```bash
-npx openagentskill outcome-contract
+npx --yes github:Leon-Drq/openagentskill#main outcome-contract
 curl "https://www.openagentskill.com/api/agent/outcome?contract=true"
 ```
+
+## Official CLI
+
+Run the dependency-free CLI directly from the official GitHub source:
+
+```bash
+npx --yes github:Leon-Drq/openagentskill#main search "extract tables from PDF reports"
+npx --yes github:Leon-Drq/openagentskill#main resolve "extract tables from PDF reports" --agent codex
+npx --yes github:Leon-Drq/openagentskill#main install anthropic-frontend-design --agent codex --dry-run
+```
+
+The publishable package source lives in [`packages/cli`](./packages/cli). Reviewed
+Skills require explicit approval, blocked Skills are refused, and verified install
+telemetry is recorded only after the standard installer exits successfully.
 
 ## TypeScript SDK
 
