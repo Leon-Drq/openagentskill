@@ -5,11 +5,11 @@ installing a Skill through the standard `skills` installer, and reporting a
 verified install receipt.
 
 ```bash
-npx --yes github:Leon-Drq/openagentskill#main search "extract tables from PDF reports"
-npx --yes github:Leon-Drq/openagentskill#main resolve "extract tables from PDF reports" --agent codex
-npx --yes github:Leon-Drq/openagentskill#main inspect anthropic-frontend-design
-npx --yes github:Leon-Drq/openagentskill#main install anthropic-frontend-design --agent codex --dry-run
-npx --yes github:Leon-Drq/openagentskill#main install anthropic-frontend-design --agent codex --yes
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz search "extract tables from PDF reports"
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz resolve "extract tables from PDF reports" --agent codex
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz inspect anthropic-frontend-design
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install anthropic-frontend-design --agent codex --dry-run
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install anthropic-frontend-design --agent codex --yes
 ```
 
 Reviewed Skills require `--yes`; blocked Skills are never executed. Set

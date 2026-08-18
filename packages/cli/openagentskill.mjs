@@ -4,7 +4,8 @@ import { randomUUID } from 'node:crypto'
 import { spawn } from 'node:child_process'
 
 const DEFAULT_BASE_URL = 'https://www.openagentskill.com'
-const SOURCE_COMMAND = 'npx --yes github:Leon-Drq/openagentskill#main'
+const CLI_VERSION = '0.2.1'
+const SOURCE_COMMAND = 'npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz'
 const KNOWN_AGENTS = new Set(['codex', 'claude-code', 'cursor', 'open-claw'])
 
 function help() {
@@ -195,7 +196,7 @@ async function reportInstall(baseUrl, payload, eventId, agent, outcome, notes, f
       error_type: outcome === 'success' ? null : 'install_failed',
       workspace: 'local',
       notes,
-      metadata: { source: 'openagentskill-cli', cli_version: '0.2.0' },
+      metadata: { source: 'openagentskill-cli', cli_version: CLI_VERSION },
     }),
   }).catch(() => null)
 }
@@ -280,7 +281,7 @@ async function outcome(baseUrl, eventId, flags) {
       evidence_url: flags.evidenceUrl || null,
       notes: flags.notes || null,
       dry_run: Boolean(flags.dryRun),
-      metadata: { source: 'openagentskill-cli', cli_version: '0.2.0' },
+      metadata: { source: 'openagentskill-cli', cli_version: CLI_VERSION },
     }),
   })
   if (jsonEnabled(flags)) return print(payload, flags)
