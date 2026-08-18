@@ -27,6 +27,9 @@ export interface SkillRecord {
   install_command: string | null
   npm_package: string | null
   verified: boolean
+  publisher_github?: string | null
+  publisher_x?: string | null
+  publisher_verified?: boolean
   submission_source: string
   submitted_by_agent: string | null
   ai_review_score: any

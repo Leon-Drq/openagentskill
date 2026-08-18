@@ -121,26 +121,25 @@ GET /api/agent/skills/advanced-web-research?format=text`}</code>
           </p>
           <ol className="list-decimal list-inside space-y-3 text-base sm:text-lg leading-relaxed text-secondary mb-6">
             <li>{'Create a GitHub repository with your skill code'}</li>
-            <li>{'Add a skill.json manifest file describing your skill'}</li>
+            <li>{'Add a SKILL.md file with name and description frontmatter'}</li>
             <li>{'Include clear documentation and usage examples'}</li>
             <li>{'Submit your skill to the marketplace'}</li>
           </ol>
           <p className="text-base sm:text-lg leading-relaxed">
-            {'Example skill.json structure:'}
+            {'Example SKILL.md structure:'}
           </p>
           <div className="border border-border bg-card p-4 sm:p-6 mt-4">
             <pre className="font-mono text-xs sm:text-sm overflow-x-auto">
-              <code>{`{
-  "name": "my-awesome-skill",
-  "version": "1.0.0",
-  "description": "A skill that does something amazing",
-  "category": "productivity",
-  "platforms": ["langchain", "autogpt"],
-  "author": {
-    "name": "Your Name",
-    "github": "yourusername"
-  }
-}`}</code>
+              <code>{`---
+name: my-awesome-skill
+description: A skill that does something amazing
+version: 1.0.0
+category: productivity
+---
+
+# My Awesome Skill
+
+Explain when an agent should use the skill and the steps it should follow.`}</code>
             </pre>
           </div>
         </section>

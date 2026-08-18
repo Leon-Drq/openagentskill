@@ -62,6 +62,7 @@ export function SiteFooter() {
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">{shell.footerExplore}</h2>
               <div className="mt-4 grid gap-2 text-secondary">
                 <FooterLink href="/skills" className="hover:text-foreground">{t.nav.skills}</FooterLink>
+                <FooterLink href="/skills/new" className="hover:text-foreground">New submissions</FooterLink>
                 <FooterLink href="/agent-skills" className="hover:text-foreground">Agent Skills</FooterLink>
                 <FooterLink href="/agent-skill" className="hover:text-foreground">What Is an Agent Skill?</FooterLink>
                 <FooterLink href="/ai-agent-skills" className="hover:text-foreground">AI Agent Skills</FooterLink>

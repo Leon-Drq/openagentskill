@@ -302,6 +302,10 @@ export default async function SkillDetailPage({
       'Do not skip repository, license, permission, and dependency review before production use.',
     ]
   const outcomeFeedback = agentReadableMetadata?.outcome_feedback || null
+  const publisherProfiles = [
+    dbSkill?.publisher_github ? `https://github.com/${dbSkill.publisher_github}` : null,
+    dbSkill?.publisher_x ? `https://x.com/${dbSkill.publisher_x}` : null,
+  ].filter((profile): profile is string => Boolean(profile))
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -326,6 +330,7 @@ export default async function SkillDetailPage({
       '@type': skill.author.verified ? 'Organization' : 'Person',
       name: skill.author.name,
       url: attribution?.creatorUrl || undefined,
+      sameAs: publisherProfiles.length > 0 ? publisherProfiles : undefined,
     },
     sameAs: [attribution?.sourceUrl, attribution?.creatorUrl].filter(Boolean),
     downloadUrl: skill.technical.repository,
@@ -2125,6 +2130,23 @@ export default async function SkillDetailPage({
                       <p className="text-xs text-secondary">
                         @{skill.author.username}
                       </p>
+                    )}
+                    {publisherProfiles.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-3 text-xs">
+                        {dbSkill?.publisher_github && (
+                          <a href={`https://github.com/${dbSkill.publisher_github}`} target="_blank" rel="noreferrer" className="underline underline-offset-4">
+                            GitHub @{dbSkill.publisher_github}
+                          </a>
+                        )}
+                        {dbSkill?.publisher_x && (
+                          <a href={`https://x.com/${dbSkill.publisher_x}`} target="_blank" rel="noreferrer" className="underline underline-offset-4">
+                            X @{dbSkill.publisher_x}
+                          </a>
+                        )}
+                        {!dbSkill?.publisher_verified && (
+                          <span className="font-mono text-[10px] uppercase text-secondary">Unverified</span>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>

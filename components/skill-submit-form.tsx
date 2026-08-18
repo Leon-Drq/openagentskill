@@ -1,9 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { parseGitHubUrl } from '@/lib/github/api'
-import { interpolate, useI18n } from '@/lib/i18n/context'
-import { SKILL_SUBMISSION_MIN_STARS } from '@/lib/skills/submission-policy'
+import { useEffect, useMemo, useState } from 'react'
+import { useI18n } from '@/lib/i18n/context'
 
 interface SubmitFormProps {
   onSubmit: (data: SubmitFormData) => Promise<void>
@@ -11,286 +9,333 @@ interface SubmitFormProps {
 
 export interface SubmitFormData {
   repository: string
-  category: string
+  skillPath: string
+  sourceRef?: string
+  category?: string
   tags: string[]
-  submissionSource: 'web' | 'api' | 'agent'
+  makerGithub?: string
+  makerX?: string
+  submissionSource: 'web'
 }
 
+interface SkillCandidate {
+  name: string
+  description: string
+  path: string
+  ref: string
+  sourceUrl: string
+}
+
+interface ValidationResponse {
+  valid?: boolean
+  code?: string
+  error?: string
+  stars?: number
+  repository?: { owner: string; fullName: string; stars: number }
+  skills?: SkillCandidate[]
+}
+
+const DRAFT_KEY = 'openagentskill.submitDraft.v2'
+
+const categories = [
+  ['data-analysis', 'Data Analysis'],
+  ['code-generation', 'Code Generation'],
+  ['research', 'Research'],
+  ['automation', 'Automation'],
+  ['communication', 'Communication'],
+  ['creative', 'Creative'],
+  ['business', 'Business'],
+  ['developer-tools', 'Developer Tools'],
+  ['security', 'Security'],
+  ['integration', 'Integration'],
+]
+
 export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
-  const { t } = useI18n()
+  const { locale } = useI18n()
+  const zh = locale === 'zh'
   const [repository, setRepository] = useState('')
   const [category, setCategory] = useState('')
   const [tagInput, setTagInput] = useState('')
   const [tags, setTags] = useState<string[]>([])
+  const [makerGithub, setMakerGithub] = useState('')
+  const [makerX, setMakerX] = useState('')
+  const [candidates, setCandidates] = useState<SkillCandidate[]>([])
+  const [selectedPath, setSelectedPath] = useState('')
   const [validating, setValidating] = useState(false)
   const [repoValid, setRepoValid] = useState<boolean | null>(null)
   const [repoStars, setRepoStars] = useState<number | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [draftLoaded, setDraftLoaded] = useState(false)
 
-  const getValidationError = (data: {
-    code?: string
-    error?: string
-    stars?: number
-    minStars?: number
-  }) => {
-    switch (data.code) {
-      case 'REPOSITORY_REQUIRED':
-        return t.submitPage.form.repositoryRequired
-      case 'MINIMUM_STARS':
-        return interpolate(t.submitPage.form.minimumStarsError, {
-          stars: data.stars ?? 0,
-          minStars: data.minStars ?? SKILL_SUBMISSION_MIN_STARS,
-        })
-      case 'MISSING_README':
-        return t.submitPage.form.missingReadme
-      default:
-        return data.error || t.submitPage.form.validationFailed
+  const selectedCandidate = useMemo(
+    () => candidates.find((candidate) => candidate.path === selectedPath) || null,
+    [candidates, selectedPath]
+  )
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      try {
+        const raw = window.localStorage.getItem(DRAFT_KEY)
+        if (raw) {
+          const draft = JSON.parse(raw) as Partial<SubmitFormData>
+          setRepository(draft.repository || '')
+          setCategory(draft.category || '')
+          setTags(Array.isArray(draft.tags) ? draft.tags.slice(0, 10) : [])
+          setMakerGithub(draft.makerGithub || '')
+          setMakerX(draft.makerX || '')
+        }
+      } catch {
+        // Local drafts are a convenience and must never block the form.
+      } finally {
+        setDraftLoaded(true)
+      }
+    }, 0)
+    return () => window.clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    if (!draftLoaded) return
+    try {
+      window.localStorage.setItem(DRAFT_KEY, JSON.stringify({
+        repository,
+        category: category || undefined,
+        tags,
+        makerGithub: makerGithub || undefined,
+        makerX: makerX || undefined,
+      }))
+    } catch {
+      // Private browsing may disable localStorage.
     }
+  }, [category, draftLoaded, makerGithub, makerX, repository, tags])
+
+  function validationMessage(data: ValidationResponse) {
+    if (data.code === 'MISSING_SKILL_FILE') {
+      return zh
+        ? '没有找到包含 name 和 description 的有效 SKILL.md。也可以直接粘贴 Skill 目录或 SKILL.md 链接。'
+        : 'No valid SKILL.md with name and description was found. You can paste a skill directory or SKILL.md URL.'
+    }
+    if (data.code === 'INVALID_REPOSITORY') {
+      return zh
+        ? '请输入 GitHub 仓库、Skill 目录或 SKILL.md 链接。'
+        : 'Enter a GitHub repository, skill directory, or SKILL.md URL.'
+    }
+    return data.error || (zh ? '验证失败，请稍后重试。' : 'Validation failed. Please try again.')
   }
 
-  const categories = [
-    { value: 'data-analysis', label: t.submitPage.form.categories.dataAnalysis },
-    { value: 'code-generation', label: t.submitPage.form.categories.codeGeneration },
-    { value: 'research', label: t.submitPage.form.categories.research },
-    { value: 'automation', label: t.submitPage.form.categories.automation },
-    { value: 'communication', label: t.submitPage.form.categories.communication },
-    { value: 'creative', label: t.submitPage.form.categories.creative },
-    { value: 'business', label: t.submitPage.form.categories.business },
-    { value: 'developer-tools', label: t.submitPage.form.categories.developerTools },
-    { value: 'security', label: t.submitPage.form.categories.security },
-    { value: 'integration', label: t.submitPage.form.categories.integration },
-  ]
-
-  const validateRepo = async (repoUrl: string) => {
-    if (!repoUrl) {
-      setRepoValid(null)
-      return
-    }
-
-    const parsed = parseGitHubUrl(repoUrl)
-    if (!parsed) {
-      setRepoValid(false)
-      setError(t.submitPage.form.repoValidError)
-      return
-    }
-
+  async function validateRepo() {
+    if (!repository.trim()) return
     setValidating(true)
     setError('')
-
+    setCandidates([])
+    setSelectedPath('')
     try {
       const response = await fetch('/api/skills/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ repository: repoUrl }),
+        body: JSON.stringify({ repository }),
       })
-
-      const data = await response.json()
-
-      if (response.ok && data.valid) {
-        setRepoValid(true)
-        setRepoStars(data.stars ?? null)
-        setError('')
-      } else {
+      const data = await response.json() as ValidationResponse
+      if (!response.ok || !data.valid || !data.skills?.length) {
         setRepoValid(false)
         setRepoStars(data.stars ?? null)
-        setError(getValidationError(data))
+        setError(validationMessage(data))
+        return
       }
-    } catch (err) {
+
+      setRepoValid(true)
+      setRepoStars(data.repository?.stars ?? data.stars ?? null)
+      setCandidates(data.skills)
+      setSelectedPath(data.skills[0].path)
+      if (!makerGithub && data.repository?.owner) setMakerGithub(data.repository.owner)
+    } catch {
       setRepoValid(false)
-      setError(t.submitPage.form.retryLater)
+      setError(zh ? '验证失败，请稍后重试。' : 'Validation failed. Please try again.')
     } finally {
       setValidating(false)
     }
   }
 
-  const handleRepoChange = (value: string) => {
-    setRepository(value)
-    setRepoValid(null)
-    setRepoStars(null)
-    setError('')
+  function addTag() {
+    const tag = tagInput.trim()
+    if (tag && !tags.includes(tag) && tags.length < 10) setTags([...tags, tag])
+    setTagInput('')
   }
 
-  const handleRepoBlur = () => {
-    validateRepo(repository)
-  }
-
-  const addTag = () => {
-    const trimmed = tagInput.trim()
-    if (trimmed && !tags.includes(trimmed) && tags.length < 10) {
-      setTags([...tags, trimmed])
-      setTagInput('')
-    }
-  }
-
-  const removeTag = (tag: string) => {
-    setTags(tags.filter(t => t !== tag))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!repoValid) {
-      setError(t.submitPage.form.pleaseValidate)
-      return
-    }
-
-    if (!category) {
-      setError(t.submitPage.form.pleaseSelectCategory)
-      return
-    }
-
-    if (tags.length === 0) {
-      setError(t.submitPage.form.pleaseAddTags)
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
+    if (!repoValid || !selectedCandidate) {
+      setError(zh ? '请先查找并选择一个 SKILL.md。' : 'Find and select a SKILL.md first.')
       return
     }
 
     setSubmitting(true)
     setError('')
-
     try {
       await onSubmit({
         repository,
-        category,
+        skillPath: selectedCandidate.path,
+        sourceRef: selectedCandidate.ref,
+        category: category || undefined,
         tags,
+        makerGithub: makerGithub || undefined,
+        makerX: makerX || undefined,
         submissionSource: 'web',
       })
-    } catch (err: any) {
-      setError(err.message || t.submitPage.form.retryLater)
+      try { window.localStorage.removeItem(DRAFT_KEY) } catch {}
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : (zh ? '提交失败。' : 'Submission failed.'))
     } finally {
       setSubmitting(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6 sm:space-y-8">
-      {/* GitHub Repository */}
+    <form onSubmit={handleSubmit} className="mx-auto max-w-2xl space-y-7">
       <div>
-        <label htmlFor="repository" className="block text-sm font-semibold mb-2">
-          {t.submitPage.form.repository}
+        <label htmlFor="repository" className="mb-2 block text-sm font-semibold">
+          {zh ? 'GitHub 仓库或 SKILL.md 链接' : 'GitHub repository or SKILL.md URL'}
         </label>
-        <div className="relative">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <input
             id="repository"
             type="text"
             value={repository}
-            onChange={(e) => handleRepoChange(e.target.value)}
-            onBlur={handleRepoBlur}
-            placeholder={t.submitPage.form.repositoryPlaceholder}
-            className="w-full border border-border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:border-foreground focus:outline-none pr-24"
-            required
-          />
-          {repoStars !== null && repoValid === true && (
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-secondary border border-border px-2 py-0.5 bg-background">
-              {repoStars.toLocaleString()} stars
-            </span>
-          )}
-        </div>
-        <p className="mt-1.5 text-xs text-secondary">
-          {interpolate(t.submitPage.form.repositoryRequirements, {
-            minStars: SKILL_SUBMISSION_MIN_STARS,
-          })}
-        </p>
-        {validating && (
-          <p className="mt-2 text-sm text-secondary">{t.submitPage.form.validating}</p>
-        )}
-        {repoValid === true && (
-          <p className="mt-2 text-sm text-foreground">
-            {t.submitPage.form.repoValidSuccess}
-            {repoStars !== null && (
-              <span className="ml-1 text-secondary">({repoStars.toLocaleString()} stars)</span>
-            )}
-          </p>
-        )}
-        {repoValid === false && error && (
-          <p className="mt-2 text-sm text-destructive">{error}</p>
-        )}
-      </div>
-
-      {/* Category */}
-      <div>
-        <label htmlFor="category" className="block text-sm font-semibold mb-2">
-          {t.submitPage.form.category}
-        </label>
-        <select
-          id="category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="w-full border border-border bg-background px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:border-foreground focus:outline-none"
-          required
-        >
-          <option value="">{t.submitPage.form.categoryPlaceholder}</option>
-          {categories.map((cat) => (
-            <option key={cat.value} value={cat.value}>
-              {cat.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Tags */}
-      <div>
-        <label htmlFor="tags" className="block text-sm font-semibold mb-2">
-          {t.submitPage.form.tags}
-        </label>
-        <div className="flex gap-2 mb-2">
-          <input
-            id="tags"
-            type="text"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                addTag()
-              }
+            onChange={(event) => {
+              setRepository(event.target.value)
+              setRepoValid(null)
+              setRepoStars(null)
+              setCandidates([])
+              setSelectedPath('')
+              setError('')
             }}
-            placeholder={t.submitPage.form.tagsPlaceholder}
-            className="flex-1 border border-border bg-background px-3 sm:px-4 py-2 text-xs sm:text-sm focus:border-foreground focus:outline-none"
+            placeholder="https://github.com/owner/repo/tree/main/skills/my-skill"
+            className="min-w-0 flex-1 border border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none"
+            required
           />
           <button
             type="button"
-            onClick={addTag}
-            className="px-3 sm:px-4 py-2 border border-foreground text-xs sm:text-sm hover:bg-muted transition-colors whitespace-nowrap"
+            onClick={validateRepo}
+            disabled={validating || !repository.trim()}
+            className="h-12 border border-foreground px-5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {t.submitPage.form.addTag}
+            {validating ? (zh ? '查找中…' : 'Finding…') : (zh ? '查找 Skill' : 'Find Skills')}
           </button>
         </div>
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center gap-2 px-2 sm:px-3 py-1 border border-border text-xs sm:text-sm"
-              >
-                {tag}
-                <button
-                  type="button"
-                  onClick={() => removeTag(tag)}
-                  className="hover:text-destructive"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
+        <p className="mt-2 text-xs leading-5 text-secondary">
+          {zh
+            ? '0 Star 也可以提交。只要求有效的 SKILL.md；README、分类和标签不再是硬性门槛。'
+            : 'Zero-star skills are welcome. A valid SKILL.md is required; README, category, and tags are not hard gates.'}
+        </p>
+        {repoStars !== null && (
+          <p className="mt-2 font-mono text-xs text-secondary">
+            {repoStars.toLocaleString()} GitHub stars · {zh ? '仅作为排序信号' : 'ranking signal only'}
+          </p>
         )}
+        {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
       </div>
 
-      {/* Submit Button */}
-      <div className="pt-4">
-        <button
-          type="submit"
-          disabled={!repoValid || submitting}
-          className="w-full px-4 sm:px-6 py-2 sm:py-3 border-2 border-foreground bg-foreground text-background font-semibold hover:bg-background hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
-        >
-          {submitting ? t.submitPage.form.submitting : t.submitPage.form.submit}
-        </button>
-      </div>
-
-      {error && !repoValid && (
-        <p className="text-sm text-destructive text-center">{error}</p>
+      {candidates.length > 0 && (
+        <div>
+          <label htmlFor="skill-path" className="mb-2 block text-sm font-semibold">
+            {zh ? `选择 SKILL.md（发现 ${candidates.length} 个）` : `Choose SKILL.md (${candidates.length} found)`}
+          </label>
+          <select
+            id="skill-path"
+            value={selectedPath}
+            onChange={(event) => setSelectedPath(event.target.value)}
+            className="w-full border border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none"
+          >
+            {candidates.map((candidate) => (
+              <option key={`${candidate.ref}:${candidate.path}`} value={candidate.path}>
+                {candidate.name} — {candidate.path}
+              </option>
+            ))}
+          </select>
+          {selectedCandidate && (
+            <div className="mt-3 border border-border bg-card p-4">
+              <p className="font-semibold">{selectedCandidate.name}</p>
+              <p className="mt-1 text-sm leading-6 text-secondary">{selectedCandidate.description}</p>
+              <p className="mt-2 break-all font-mono text-[11px] text-secondary">{selectedCandidate.sourceUrl}</p>
+            </div>
+          )}
+        </div>
       )}
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label htmlFor="category" className="mb-2 block text-sm font-semibold">
+            {zh ? '分类（选填）' : 'Category (optional)'}
+          </label>
+          <select id="category" value={category} onChange={(event) => setCategory(event.target.value)} className="w-full border border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none">
+            <option value="">{zh ? '自动识别' : 'Auto-detect'}</option>
+            {categories.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="tags" className="mb-2 block text-sm font-semibold">
+            {zh ? '标签（选填）' : 'Tags (optional)'}
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="tags"
+              value={tagInput}
+              onChange={(event) => setTagInput(event.target.value)}
+              onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); addTag() } }}
+              placeholder={zh ? '留空则自动补全' : 'Auto-filled when empty'}
+              className="min-w-0 flex-1 border border-border bg-background px-3 py-3 text-sm focus:border-foreground focus:outline-none"
+            />
+            <button type="button" onClick={addTag} className="border border-border px-3 text-sm">+</button>
+          </div>
+        </div>
+      </div>
+
+      {tags.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <button key={tag} type="button" onClick={() => setTags(tags.filter((item) => item !== tag))} className="border border-border px-3 py-1 text-xs">
+              {tag} ×
+            </button>
+          ))}
+        </div>
+      )}
+
+      <fieldset className="border border-border bg-card p-5">
+        <legend className="px-2 font-mono text-xs uppercase tracking-[0.18em] text-secondary">
+          {zh ? 'Maker 身份（选填）' : 'Maker identity (optional)'}
+        </legend>
+        <p className="mb-4 text-xs leading-5 text-secondary">
+          {zh
+            ? '填写账号会创建公开资料链接，但不会自动获得“已验证”标记。认证需要 OAuth 或仓库所有权证明。'
+            : 'Handles create public profile links but do not grant a verified badge. Verification requires OAuth or repository ownership proof.'}
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="maker-github" className="mb-1.5 block text-xs font-semibold">GitHub</label>
+            <div className="flex border border-border bg-background">
+              <span className="px-3 py-2.5 text-sm text-secondary">@</span>
+              <input id="maker-github" value={makerGithub} onChange={(event) => setMakerGithub(event.target.value.replace(/^@/, ''))} maxLength={39} className="min-w-0 flex-1 bg-transparent py-2.5 pr-3 text-sm focus:outline-none" placeholder="octocat" />
+            </div>
+          </div>
+          <div>
+            <label htmlFor="maker-x" className="mb-1.5 block text-xs font-semibold">X</label>
+            <div className="flex border border-border bg-background">
+              <span className="px-3 py-2.5 text-sm text-secondary">@</span>
+              <input id="maker-x" value={makerX} onChange={(event) => setMakerX(event.target.value.replace(/^@/, ''))} maxLength={15} className="min-w-0 flex-1 bg-transparent py-2.5 pr-3 text-sm focus:outline-none" placeholder="maker" />
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <div className="border border-border p-4 text-xs leading-5 text-secondary">
+        {zh
+          ? '提交会先保存到社区队列，再异步执行安全与质量审核。只有 Reviewed、Verified 或 Agent Proven Skill 才会进入默认 Agent 推荐。'
+          : 'Submissions are saved to the community queue first, then reviewed asynchronously. Only Reviewed, Verified, or Agent Proven skills enter default Agent recommendations.'}
+      </div>
+
+      <button type="submit" disabled={!repoValid || !selectedCandidate || submitting} className="w-full bg-foreground px-6 py-3 font-semibold text-background transition-opacity disabled:cursor-not-allowed disabled:opacity-40">
+        {submitting ? (zh ? '正在保存…' : 'Saving…') : (zh ? '提交到社区队列' : 'Submit to community queue')}
+      </button>
     </form>
   )
 }

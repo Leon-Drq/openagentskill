@@ -1,4 +1,5 @@
 import { GitHubRepo, SkillManifest, SkillManifestSchema } from '../schema/skill-schema'
+import { parseGitHubSkillReference } from './skill-source'
 
 export class GitHubAPIError extends Error {
   constructor(message: string, public statusCode?: number) {
@@ -9,27 +10,14 @@ export class GitHubAPIError extends Error {
 
 // Parse GitHub URL to owner/repo format
 export function parseGitHubUrl(url: string): { owner: string; repo: string } | null {
-  const patterns = [
-    /github\.com\/([^\/]+)\/([^\/]+)/,
-    /^([^\/]+)\/([^\/]+)$/,
-  ]
-  
-  for (const pattern of patterns) {
-    const match = url.match(pattern)
-    if (match) {
-      return {
-        owner: match[1],
-        repo: match[2].replace(/\.git$/, ''),
-      }
-    }
-  }
-  
-  return null
+  const reference = parseGitHubSkillReference(url)
+  return reference ? { owner: reference.owner, repo: reference.repo } : null
 }
 
 // Validate GitHub repository
 export async function validateGitHubRepo(
-  ownerRepo: string
+  ownerRepo: string,
+  options: { checkReadme?: boolean; checkSkillJson?: boolean } = {}
 ): Promise<GitHubRepo> {
   const parsed = parseGitHubUrl(ownerRepo)
   if (!parsed) {
@@ -58,31 +46,20 @@ export async function validateGitHubRepo(
 
   const data = await response.json()
 
-  // Check if README exists
-  const readmeResponse = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/readme`,
-    {
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        ...(process.env.GITHUB_TOKEN && {
-          'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
-        }),
-      },
-    }
-  )
-
-  // Check if skill.json exists
-  const skillJsonResponse = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/contents/skill.json`,
-    {
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        ...(process.env.GITHUB_TOKEN && {
-          'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
-        }),
-      },
-    }
-  )
+  const optionalHeaders = {
+    'Accept': 'application/vnd.github.v3+json',
+    ...(process.env.GITHUB_TOKEN && {
+      'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+    }),
+  }
+  const [readmeResponse, skillJsonResponse] = await Promise.all([
+    options.checkReadme === false
+      ? null
+      : fetch(`https://api.github.com/repos/${owner}/${repo}/readme`, { headers: optionalHeaders }),
+    options.checkSkillJson === false
+      ? null
+      : fetch(`https://api.github.com/repos/${owner}/${repo}/contents/skill.json`, { headers: optionalHeaders }),
+  ])
 
   return {
     owner,
@@ -95,8 +72,8 @@ export async function validateGitHubRepo(
     license: data.license?.spdx_id || undefined,
     updatedAt: data.updated_at,
     defaultBranch: data.default_branch,
-    hasReadme: readmeResponse.ok,
-    hasSkillJson: skillJsonResponse.ok,
+    hasReadme: Boolean(readmeResponse?.ok),
+    hasSkillJson: Boolean(skillJsonResponse?.ok),
   }
 }
 
