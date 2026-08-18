@@ -126,6 +126,23 @@ export default function SubmitPage() {
                 {result?.skill.name || receipt.skill.name} · <span className="font-mono">{receipt.skill.path}</span>
               </p>
 
+              {result?.skill.slug && (
+                <div className="mt-5 border border-border bg-background p-4">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
+                    {zh ? '公开 Skill 地址' : 'PUBLIC SKILL URL'}
+                  </p>
+                  <Link
+                    href={`/skills/${result.skill.slug}`}
+                    className="mt-2 block break-all font-mono text-sm font-semibold underline underline-offset-4"
+                  >
+                    https://www.openagentskill.com/skills/{result.skill.slug}
+                  </Link>
+                  <p className="mt-2 text-xs text-secondary">
+                    {zh ? '公开 slug：' : 'Public slug: '}<span className="font-mono">{result.skill.slug}</span>
+                  </p>
+                </div>
+              )}
+
               {result?.review?.issues && result.review.issues.length > 0 && (
                 <div className="mt-6 border border-border p-4">
                   <p className="font-semibold">{zh ? '发现的问题' : 'Review notes'}</p>
