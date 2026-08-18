@@ -89,7 +89,7 @@ const ko = {
       items: [
         '리포지토리에는 최소 3개의 GitHub Stars가 필요합니다',
         'Skill은 공개 GitHub 리포지토리에 있어야 합니다',
-        'skill.json 매니페스트 포함을 권장합니다',
+        'name과 description이 포함된 유효한 SKILL.md를 추가하세요',
         'README에는 명확한 설치 방법과 사용 예시가 있어야 합니다',
         '코드는 오픈 소스 라이선스를 따라야 합니다',
         '게시 전에 정적 보안 분석과 AI 점수 평가를 실행합니다',

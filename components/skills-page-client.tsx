@@ -117,8 +117,7 @@ interface Skill {
 }
 
 const SORT_TABS = [
-  { key: 'quality', label: 'Recommended', description: 'Best blend of quality, stars, freshness, and agent usage' },
-  { key: 'downloads', label: 'Hall of Fame', description: 'Most installed of all time' },
+  { key: 'quality', label: 'Recommended', description: 'Best blend of relevance, quality, freshness, and verified outcomes' },
   { key: 'trending', label: 'Trending', description: 'Growing fast right now' },
   { key: 'stars', label: 'Most Starred', description: 'Highest GitHub stars' },
   { key: 'fresh', label: 'Fresh', description: 'Recently pushed on GitHub' },
@@ -854,14 +853,6 @@ export function SkillsPageClient({
                             {skill.supplyProfile.risk.label}
                           </span>
                         </>
-                      )}
-                      {skill.stats.downloads > 0 && (
-                        <span title="Downloads">
-                          {skill.stats.downloads >= 1000
-                            ? `${(skill.stats.downloads / 1000).toFixed(1)}K`
-                            : skill.stats.downloads}{' '}
-                          installs
-                        </span>
                       )}
                     </div>
 

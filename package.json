@@ -1,5 +1,5 @@
 {
-  "name": "openagentskill",
+  "name": "openagentskill-web",
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@10.28.2",
@@ -13,6 +13,7 @@
     "seed:popular": "node scripts/seed-popular-skills.ts",
     "indexer:backfill": "node scripts/backfill-high-star-skills.mjs",
     "test:submission": "node --experimental-strip-types scripts/test-skill-source.ts",
+    "test:cli": "node packages/cli/openagentskill.mjs --help",
     "lint": "eslint ."
   },
   "dependencies": {

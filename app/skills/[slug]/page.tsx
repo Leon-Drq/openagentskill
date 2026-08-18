@@ -2301,8 +2301,7 @@ export default async function SkillDetailPage({
                           {rs.description}
                         </p>
                         <span className="text-xs font-mono text-secondary mt-1 block">
-                          {formatNumber(rs.github_stars)} <SkillDetailText id="stars" /> ·{' '}
-                          {formatNumber(rs.downloads)} <SkillDetailText id="installs" />
+                          {formatNumber(rs.github_stars)} <SkillDetailText id="stars" />
                         </span>
                       </Link>
                     ))}

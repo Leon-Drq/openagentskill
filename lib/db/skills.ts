@@ -596,7 +596,8 @@ const getCachedAgentOutcomeStatsMap = unstable_cache(
   async (): Promise<Record<string, SkillOutcomeStats>> => {
   const supabase = createPublicClient({ requestTimeoutMs: SKILL_STATS_REQUEST_TIMEOUT_MS })
   const { data, error } = await supabase.from('agent_outcome_stats').select('*')
-  if (error || !data) return {}
+  if (error) throw error
+  if (!data) return {}
 
   const map: Record<string, SkillOutcomeStats> = {}
   for (const row of data as Array<Record<string, any>>) {
@@ -638,6 +639,10 @@ const getCachedAgentOutcomeStatsMap = unstable_cache(
 
 export async function getAgentOutcomeStatsMap(): Promise<Record<string, SkillOutcomeStats>> {
   return getCachedAgentOutcomeStatsMap().catch(() => ({}))
+}
+
+export async function getAgentOutcomeStatsMapStrict(): Promise<Record<string, SkillOutcomeStats>> {
+  return getCachedAgentOutcomeStatsMap()
 }
 
 export async function getAgentOutcomeStats(skillSlug: string): Promise<SkillOutcomeStats | null> {

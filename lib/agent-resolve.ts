@@ -79,7 +79,8 @@ function fallbackSkill(input: {
     ai_review_approved: true,
     ai_review_issues: [],
     ai_review_suggestions: [],
-    downloads: Math.max(1000, Math.round(input.stars * 1.3)),
+    // Curated fallbacks provide relevance coverage, not synthetic adoption.
+    downloads: 0,
     used_by: 0,
     rating: 0,
     review_count: 0,
@@ -941,7 +942,8 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     needs_install_command: input.constraints?.needs_install_command ?? true,
     min_stars: Number(input.constraints?.min_stars || 0),
   }
-  const [qualityPool, queryPool, eventStatsMap, outcomeStatsMap] = input.live
+  const useLiveRegistry = input.live !== false
+  const [qualityPool, queryPool, eventStatsMap, outcomeStatsMap] = useLiveRegistry
     ? await Promise.all([
         withTimeout(getResolveCandidatePool(), RESOLVE_QUERY_TIMEOUT_MS, 'agent resolve candidate query')
           .catch((error) => {

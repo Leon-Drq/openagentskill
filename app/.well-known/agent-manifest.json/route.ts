@@ -11,8 +11,9 @@ export async function GET() {
     name: 'Open Agent Skill',
     description: 'The open infrastructure for agent intelligence. Discover, publish, compose, and share agent skills.',
     url: 'https://www.openagentskill.com',
-    protocol: 'oasp/v0.1',
+    protocol: 'https+openapi+skill.md',
     api_version: '1.0',
+    standards: ['Agent Skills SKILL.md', 'OpenAPI 3.1', 'llms.txt'],
 
     endpoints: {
       agent_entry: {
@@ -217,11 +218,13 @@ export async function GET() {
       humans: 'Submit skills via /submit or POST /api/skills/submit',
       agents: 'Submit skills via POST /api/skills/submit with source=agent',
       github_auto_discovery: 'OpenAgentSkill also imports high-star skill-like GitHub repositories hourly through /api/indexer/run.',
-      protocol: 'Follow OASP v0.1 standard for skill.json',
+      protocol: 'Publish a standards-compatible SKILL.md with name and description frontmatter.',
     },
 
     contact: {
-      github: 'https://github.com/openagentskill',
+      github: 'https://github.com/Leon-Drq/openagentskill',
+      x: 'https://x.com/openagentskill',
+      email: 'qudongqi2023@gmail.com',
       website: 'https://www.openagentskill.com',
     },
   }

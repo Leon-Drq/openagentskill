@@ -89,7 +89,7 @@ const fr = {
       items: [
         'Le dépôt doit avoir au moins 3 GitHub Stars',
         'Le skill doit être hébergé dans un dépôt GitHub public',
-        'Nous recommandons un manifeste skill.json',
+        'Ajoutez un SKILL.md valide avec name et description',
         'Le README doit inclure des instructions d’installation et des exemples clairs',
         'Le code doit respecter une licence open source',
         'Une analyse de sécurité statique et une notation IA sont exécutées avant publication',

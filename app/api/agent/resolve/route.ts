@@ -223,7 +223,7 @@ export async function GET(request: NextRequest) {
         needs_install_command: searchParams.get('needs_install_command') !== 'false',
         min_stars: Number(searchParams.get('min_stars') || 0),
       },
-      live: searchParams.get('live') === 'true',
+      live: searchParams.get('live') !== 'false',
     })
 
     if (format === 'text') return textResponse(payload)

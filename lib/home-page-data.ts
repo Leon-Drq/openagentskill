@@ -3,15 +3,13 @@ import {
   LAST_VERIFIED_APPROVED_SKILL_COUNT,
   getApprovedRegistrySkillCount,
 } from '@/lib/registry-stats'
+import { getAgentOutcomeStatsMapStrict } from '@/lib/db/skills'
 
 const HOME_STATS_SNAPSHOT = {
   // The last exact count observed before the registry stats cache was added.
   // A fallback is explicitly rendered with "+" so an upstream timeout cannot
   // look like the registry lost indexed skills.
   totalSkills: LAST_VERIFIED_APPROVED_SKILL_COUNT,
-  totalDownloads: 860_000,
-  activePlatforms: 104,
-  agentSubmissions: 2_635,
 }
 
 const HOME_STATS_QUERY_TIMEOUT_MS = 1_500
@@ -43,12 +41,50 @@ const getCachedApprovedSkillCount = unstable_cache(
   { revalidate: 300 }
 )
 
+async function fetchEvidenceStats() {
+  try {
+    const statsMap = await getAgentOutcomeStatsMapStrict()
+    const rows = Object.values(statsMap)
+
+    return {
+      totalVerifiedInstalls: rows.reduce(
+        (sum, row) => sum + Number(row.verified_installs || 0),
+        0
+      ),
+      totalOutcomes: rows.reduce(
+        (sum, row) => sum + Number(row.total_outcomes || 0),
+        0
+      ),
+      provenSkills: rows.filter((row) => Number(row.total_outcomes || 0) > 0).length,
+      evidenceExact: true,
+    }
+  } catch {
+    // Never replace missing first-party evidence with a marketing estimate.
+    return {
+      totalVerifiedInstalls: 0,
+      totalOutcomes: 0,
+      provenSkills: 0,
+      evidenceExact: false,
+    }
+  }
+}
+
+const getCachedEvidenceStats = unstable_cache(
+  fetchEvidenceStats,
+  ['home-evidence-stats-v1'],
+  { revalidate: 300 }
+)
+
 export async function getHomePageData() {
-  const totalSkills = await getCachedApprovedSkillCount()
+  const [totalSkills, evidence] = await Promise.all([
+    getCachedApprovedSkillCount(),
+    getCachedEvidenceStats(),
+  ])
 
   return {
     stats: {
       ...HOME_STATS_SNAPSHOT,
+      ...evidence,
       totalSkills: totalSkills.value,
       totalSkillsExact: totalSkills.exact,
     },

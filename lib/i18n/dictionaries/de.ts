@@ -89,7 +89,7 @@ const de = {
       items: [
         'Das Repository muss mindestens 3 GitHub Stars haben',
         'Der Skill muss in einem öffentlichen GitHub-Repository liegen',
-        'Eine skill.json-Manifestdatei wird empfohlen',
+        'Eine gueltige SKILL.md mit name und description hinzufuegen',
         'Die README sollte klare Installationshinweise und Nutzungsbeispiele enthalten',
         'Der Code muss eine Open-Source-Lizenz einhalten',
         'Vor der Veröffentlichung laufen statische Sicherheitsanalyse und KI-Bewertung',

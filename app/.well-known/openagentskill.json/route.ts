@@ -48,7 +48,7 @@ export async function GET() {
         'OpenAgentSkill is an open registry, trust layer, and recommendation API for reusable AI agent skills.',
       safety_notice:
         'Listings and scores are decision support, not a warranty. Review third-party source code, permissions, dependencies, and licenses before production installation.',
-      updated_at: '2026-08-09',
+      updated_at: '2026-08-18',
     },
     {
       headers: {

@@ -89,7 +89,7 @@ const es = {
       items: [
         'El repositorio debe tener al menos 3 GitHub Stars',
         'El skill debe estar en un repositorio público de GitHub',
-        'Recomendamos incluir un manifiesto skill.json',
+        'Incluye un SKILL.md valido con name y description',
         'El README debe incluir instalación clara y ejemplos de uso',
         'El código debe respetar una licencia de código abierto',
         'Antes de publicar ejecutamos análisis de seguridad estático y puntuación de IA',

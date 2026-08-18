@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
             max_risk: maxRisk,
             needs_install_command: true,
           })
-          return `${i + 1}. ${r.name} (${r.slug})\n   ${r.description}\n   Supply: ${supply.track.shortLabel} | Scenario: ${supply.scenario.label} | Agents: ${supply.applicableAgents.slice(0, 3).join(', ')}\n   Safety: ${safetyProfile.safety_tier.label} | Policy: ${safetyProfile.safety_tier.auto_install_policy} | Score: ${safetyProfile.score}/100\n   Quality: ${Number(r.quality_score || 0)} | Trust: ${trustProfile.score} ${trustProfile.label} | Agent Proven: ${proven.score}/100 ${proven.label} | Audit: ${audit.audit_score} ${auditRiskLabel(audit.risk_level)}\n   Outcomes: ${proven.metrics.totalOutcomes} | Success: ${proven.metrics.successRate === null ? 'No data' : `${Math.round(proven.metrics.successRate)}%`} | Recent failure: ${proven.metrics.recentFailureRate === null ? 'No data' : `${Math.round(proven.metrics.recentFailureRate)}%`}\n   Maintenance: ${supply.maintenance.label} | Risk: ${supply.risk.label}\n   Stars: ${r.github_stars} | Downloads: ${r.downloads}\n   Install: ${r.install_command || `npx skills add ${r.github_repo}`}\n   URL: https://www.openagentskill.com/skills/${r.slug}\n   ---`
+          return `${i + 1}. ${r.name} (${r.slug})\n   ${r.description}\n   Supply: ${supply.track.shortLabel} | Scenario: ${supply.scenario.label} | Agents: ${supply.applicableAgents.slice(0, 3).join(', ')}\n   Safety: ${safetyProfile.safety_tier.label} | Policy: ${safetyProfile.safety_tier.auto_install_policy} | Score: ${safetyProfile.score}/100\n   Quality: ${Number(r.quality_score || 0)} | Trust: ${trustProfile.score} ${trustProfile.label} | Agent Proven: ${proven.score}/100 ${proven.label} | Audit: ${audit.audit_score} ${auditRiskLabel(audit.risk_level)}\n   Outcomes: ${proven.metrics.totalOutcomes} | Success: ${proven.metrics.successRate === null ? 'No data' : `${Math.round(proven.metrics.successRate)}%`} | Recent failure: ${proven.metrics.recentFailureRate === null ? 'No data' : `${Math.round(proven.metrics.recentFailureRate)}%`}\n   Maintenance: ${supply.maintenance.label} | Risk: ${supply.risk.label}\n   Stars: ${r.github_stars} | Verified installs: ${outcomeStatsMap[r.slug]?.verified_installs || 0}\n   Install: ${r.install_command || `npx skills add ${r.github_repo}`}\n   URL: https://www.openagentskill.com/skills/${r.slug}\n   ---`
         })
         .join('\n')
 
@@ -116,7 +116,9 @@ export async function GET(request: NextRequest) {
           verified: r.verified,
           stats: {
             stars: r.github_stars,
-            downloads: r.downloads,
+            verified_installs: outcomeStats?.verified_installs || 0,
+            successful_runs: outcomeStats?.successful_outcomes || 0,
+            total_outcomes: outcomeStats?.total_outcomes || 0,
             rating: r.rating,
             forks: r.github_forks,
             quality_score: Number(r.quality_score || 0),

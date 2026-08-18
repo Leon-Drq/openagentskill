@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAllSkills, getRelatedSkills, getSkillEventStats } from '@/lib/db/skills'
+import { getRelatedSkills, getSkillEventStats } from '@/lib/db/skills'
 import { resolveAgentSkill } from '@/lib/agent-resolve'
-import { REGISTRY_EVAL_CASES, runRegistryEvals } from '@/lib/registry-evals'
+import { REGISTRY_EVAL_CASES, runLiveRegistryEvals } from '@/lib/registry-evals'
 import { buildSkillEvalProfile, formatSkillEvalText } from '@/lib/skill-evals'
 import { getSkillBySlugOrFallback, isCuratedSkillFallback, normalizeSkillSlug } from '@/lib/skill-fallbacks'
 
@@ -534,8 +534,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const skills = await getAllSkills('quality')
-    const evals = runRegistryEvals(skills, REGISTRY_EVAL_CASES)
+    const evals = await runLiveRegistryEvals(REGISTRY_EVAL_CASES)
 
     return NextResponse.json(
       {
@@ -550,7 +549,8 @@ export async function GET(request: NextRequest) {
             per_skill_text: '/api/agent/evals?slug=crawl4ai&format=text',
             task_specific: '/api/agent/evals?slug=crawl4ai&task=scrape%20pricing%20pages&max_risk=medium',
           },
-          skills_evaluated: skills.length,
+          skills_evaluated: evals.skills_evaluated,
+          evaluation_mode: evals.evaluation_mode,
           generated_at: new Date().toISOString(),
         },
       },

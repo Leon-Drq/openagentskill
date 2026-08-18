@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenAgentSkill Registry"
+  short_description: "Find, audit, and safely install Agent Skills"
+  default_prompt: "Use $openagentskill-registry to find and audit the best Skill for this task before installing it."

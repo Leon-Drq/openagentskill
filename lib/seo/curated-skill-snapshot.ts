@@ -54,7 +54,8 @@ function snapshotSkill(input: {
     ai_review_approved: true,
     ai_review_issues: input.reviewIssues || [],
     ai_review_suggestions: input.reviewSuggestions || [],
-    downloads: Math.max(1000, Math.round(input.stars * 1.2)),
+    // A fallback record must never manufacture first-party adoption evidence.
+    downloads: 0,
     used_by: 0,
     rating: 0,
     review_count: 0,

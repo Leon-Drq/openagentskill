@@ -553,7 +553,7 @@ export default function APIDocsPage() {
                 </div>
                 <div>
                   <code className="font-mono bg-muted px-2 py-1">{'sort'}</code>
-                  <span className="text-secondary ml-2">{'- Sort by: quality, downloads, stars, trending, fresh, new'}</span>
+                  <span className="text-secondary ml-2">{'- Sort by: quality, stars, trending, fresh, new'}</span>
                 </div>
                 <div>
                   <code className="font-mono bg-muted px-2 py-1">{'format'}</code>
@@ -573,22 +573,22 @@ export default function APIDocsPage() {
 Total: 2 skills found
 
 ---
-[1] Advanced Web Research
-- Slug: advanced-web-research
-- Category: Research & Analysis
-- Install: npx skills add openagentskill/web-research
+[1] Crawl4AI
+- Slug: crawl4ai
+- Category: Web Scraping
+- Install: npx --yes github:Leon-Drq/openagentskill#main install crawl4ai --dry-run
 - Trust: 91/100 Production candidate
-- Downloads: 45,230
-- Rating: 4.8/5
-- Description: Comprehensive web research with multi-source aggregation
+- Verified installs: 0
+- Outcomes: 1
+- Description: Web crawling and structured extraction for agent workflows
 
 [2] Code Review Assistant
 - Slug: code-review-assistant
 - Category: Developer Tools
-- Install: npx skills add openagentskill/code-review
+- Install: npx --yes github:Leon-Drq/openagentskill#main install code-review-assistant --dry-run
 - Trust: 77/100 Strong shortlist
-- Downloads: 38,912
-- Rating: 4.7/5
+- Verified installs: 0
+- Outcomes: 0
 - Description: Automated code review with security analysis`}</code>
               </div>
 
@@ -786,10 +786,10 @@ Total: 2 skills found
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Response (text format)'}</h3>
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
-                <code>{`=== Advanced Web Research ===
+                <code>{`=== Crawl4AI ===
 
 INSTALL:
-npx skills add openagentskill/web-research
+npx --yes github:Leon-Drq/openagentskill#main install crawl4ai --dry-run
 
 DESCRIPTION:
 Comprehensive web research with multi-source aggregation
@@ -798,15 +798,14 @@ CATEGORY: Research & Analysis
 PLATFORMS: LangChain, LlamaIndex
 
 STATS:
-- Downloads: 45,230
-- Stars: 3,421
+- Verified installs: 0
+- Outcomes: 1
 - Trust: 91/100 Production candidate
-- Rating: 4.8/5 (423 reviews)
 
 TECHNICAL:
 - Version: 2.3.1
 - Languages: Python, TypeScript
-- Repository: https://github.com/openagentskill/web-research
+- Repository: https://github.com/unclecode/crawl4ai
 - License: MIT
 
 USAGE:

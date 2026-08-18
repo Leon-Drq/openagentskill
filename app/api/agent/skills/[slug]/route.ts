@@ -128,7 +128,8 @@ Statistics:
 - Safety Gate: ${safetyProfile.safety_tier.label} (${safetyProfile.safety_tier.auto_install_policy})
 - Agent Safety Score: ${safetyProfile.score}/100
 - GitHub Stars: ${skill.github_stars}
-- Downloads: ${skill.downloads}
+- Verified Installs: ${outcomeStats?.verified_installs || 0}
+- Successful Agent Runs: ${outcomeStats?.successful_outcomes || 0}
 - Rating: ${skill.rating}/5 (${skill.review_count} reviews)
 
 Author: ${skill.author_name}${skill.verified ? ' (Verified)' : ''}
@@ -189,8 +190,9 @@ OpenAgentSkill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
         stats: {
           stars: skill.github_stars,
           forks: skill.github_forks,
-          downloads: skill.downloads,
           verified_installs: outcomeStats?.verified_installs || 0,
+          successful_runs: outcomeStats?.successful_outcomes || 0,
+          total_outcomes: outcomeStats?.total_outcomes || 0,
           rating: skill.rating,
           review_count: skill.review_count,
           quality_score: Number(skill.quality_score || 0),

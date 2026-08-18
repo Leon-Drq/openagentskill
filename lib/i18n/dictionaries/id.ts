@@ -89,7 +89,7 @@ const id = {
       items: [
         'Repositori harus memiliki minimal 3 GitHub Stars',
         'Skill harus di-host di repositori GitHub publik',
-        'Kami merekomendasikan manifest skill.json',
+        'Sertakan SKILL.md valid dengan name dan description',
         'README harus memuat instalasi yang jelas dan contoh penggunaan',
         'Kode harus mengikuti lisensi sumber terbuka',
         'Analisis keamanan statis dan penilaian AI dijalankan sebelum publikasi',
