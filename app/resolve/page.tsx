@@ -192,6 +192,52 @@ function ResolveDecisionCard({ result }: { result: ResolveResult }) {
               </div>
             </aside>
           </div>
+
+          <div className="border-t border-border bg-card/55 p-5 sm:p-7">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Ranked shortlist</p>
+                <h3 className="mt-2 font-display text-2xl font-normal">Compare the next-best qualified skills</h3>
+              </div>
+              <span className="font-mono text-xs text-secondary">
+                1 best match + {recommendation.alternatives.length} alternative{recommendation.alternatives.length === 1 ? '' : 's'}
+              </span>
+            </div>
+
+            {recommendation.alternatives.length > 0 ? (
+              <div className="mt-5 grid gap-3 md:grid-cols-2">
+                {recommendation.alternatives.slice(0, 4).map((item, index) => (
+                  <Link
+                    key={item.slug}
+                    href={item.url}
+                    className="group border border-border bg-background p-4 transition-colors hover:border-foreground/45"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="font-mono text-xs text-secondary">#{index + 2}</span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-3">
+                          <h4 className="break-words font-display text-lg font-normal [overflow-wrap:anywhere] group-hover:underline">
+                            {item.name}
+                          </h4>
+                          <span className="shrink-0 font-mono text-xs text-secondary">Trust {item.trust_score}</span>
+                        </div>
+                        <p className="mt-2 line-clamp-2 text-sm leading-6 text-secondary">{item.why_consider}</p>
+                        <div className="mt-3 flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-secondary">
+                          <span>Audit {item.audit_score}</span>
+                          <span aria-hidden="true">·</span>
+                          <span>Safety {item.safety_score}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-4 border border-border bg-background p-4 text-sm leading-6 text-secondary">
+                No close alternative passed the current task-fit and safety thresholds. The resolver is intentionally returning one qualified match instead of padding the list with unrelated skills.
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </section>
@@ -214,7 +260,7 @@ export default async function ResolvePage({
   const initialAgent = normalizeParam(params.agent) || 'codex'
   const maxRisk = normalizeRisk(normalizeParam(params.max_risk))
   const minStars = Number(normalizeParam(params.min_stars) || 0)
-  const live = normalizeParam(params.live) === 'true'
+  const live = normalizeParam(params.live) !== 'false'
   const initialResult = initialTask
     ? await resolveAgentSkill({
         task: initialTask,
@@ -258,7 +304,7 @@ export default async function ResolvePage({
 	          <MarketingMetricStrip
 	            columns="grid-cols-3"
 	            items={[
-	              { value: '1', label: 'Best skill' },
+	              { value: '1 + 4', label: 'Ranked skills' },
 	              { value: 'Score', label: 'Agent Proven' },
 	              { value: 'Receipt', label: 'Install handoff' },
 	            ]}
@@ -275,7 +321,7 @@ export default async function ResolvePage({
         </section>
 
         <section className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
-          <AgentResolveWorkbench initialTask={initialTask} />
+          <AgentResolveWorkbench initialTask={initialTask} initialLive={live} />
         </section>
 
         <section className="border-t border-border">
