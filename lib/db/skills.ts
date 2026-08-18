@@ -61,6 +61,8 @@ const SKILL_DIRECTORY_REQUEST_TIMEOUT_MS = 1800
 const SKILL_STATS_REQUEST_TIMEOUT_MS = 3000
 const SKILL_LOOKUP_TIMEOUT_MS = 1200
 const SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS = 60
+const SKILL_EXACT_SEARCH_TIMEOUT_MS = 1500
+const SKILL_BROAD_SEARCH_TIMEOUT_MS = 1500
 // Sitemap refreshes run off the interactive navigation path. Give a cold
 // registry shard enough time to return the complete URL set, then let the
 // shared and edge caches keep that work away from visitors.
@@ -1037,8 +1039,16 @@ export async function searchSkills(query: string, limit = 120): Promise<SkillRec
 
   const rowLimit = Math.min(Math.max(Math.floor(limit) || 1, 1), 200)
   const [exactMatches, broadMatches] = await Promise.all([
-    fetchExactSearchSkills(normalizedQuery).catch(() => [] as SkillRecord[]),
-    getCachedSearchSkills(normalizedQuery.toLowerCase(), rowLimit),
+    withTimeout(
+      fetchExactSearchSkills(normalizedQuery),
+      SKILL_EXACT_SEARCH_TIMEOUT_MS,
+      'exact skill search'
+    ).catch(() => [] as SkillRecord[]),
+    withTimeout(
+      getCachedSearchSkills(normalizedQuery.toLowerCase(), rowLimit),
+      SKILL_BROAD_SEARCH_TIMEOUT_MS,
+      'broad skill search'
+    ).catch(() => [] as SkillRecord[]),
   ])
   const seen = new Set<string>()
   return [...exactMatches, ...broadMatches]
