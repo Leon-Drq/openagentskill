@@ -1,6 +1,7 @@
 import { generateText } from 'ai'
 import type { AIReviewResult } from '../schema/skill-schema'
 import { SUBMISSION_REVIEW_MODEL } from '@/lib/ai/models'
+import { reconcileLicenseReviewFeedback } from '@/lib/skills/license-review'
 
 export interface SkillReviewData {
   repository: string
@@ -119,6 +120,7 @@ export async function reviewSkill(data: SkillReviewData): Promise<AIReviewResult
 Repository: ${data.repository}
 GitHub adoption: ${data.githubStats.stars} stars, ${data.githubStats.forks} forks
 Last updated: ${data.githubStats.lastUpdated}
+Repository license detected by GitHub: ${data.githubStats.license || 'Unknown'}
 
 SKILL.md and documentation excerpt:
 ${data.readmeContent.slice(0, 5000)}
@@ -186,16 +188,24 @@ Return only JSON without markdown fences:
       scores.compliance >= 6 &&
       totalScore >= 32
 
+    const issues = Array.isArray(reviewData.issues)
+      ? reviewData.issues.filter((item): item is string => typeof item === 'string').slice(0, 20)
+      : []
+    const suggestions = Array.isArray(reviewData.suggestions)
+      ? reviewData.suggestions.filter((item): item is string => typeof item === 'string').slice(0, 20)
+      : []
+    const reconciledFeedback = reconcileLicenseReviewFeedback(
+      data.githubStats.license || (typeof data.manifestData?.license === 'string' ? data.manifestData.license : null),
+      issues,
+      suggestions
+    )
+
     return {
       approved: Boolean(reviewData.approved) && meetsAutomaticGate,
       scores,
       totalScore,
-      issues: Array.isArray(reviewData.issues)
-        ? reviewData.issues.filter((item): item is string => typeof item === 'string').slice(0, 20)
-        : [],
-      suggestions: Array.isArray(reviewData.suggestions)
-        ? reviewData.suggestions.filter((item): item is string => typeof item === 'string').slice(0, 20)
-        : [],
+      issues: reconciledFeedback.issues,
+      suggestions: reconciledFeedback.suggestions,
       reasoning: typeof reviewData.reasoning === 'string' ? reviewData.reasoning.slice(0, 4000) : '',
       reviewedAt: new Date().toISOString(),
       reviewModel: SUBMISSION_REVIEW_MODEL,

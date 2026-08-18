@@ -4,6 +4,7 @@ import { withTimeout } from '@/lib/async'
 import { unstable_cache } from 'next/cache'
 import type { Skill } from '@/lib/types'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
+import { getSearchTerms, normalizeExactSearchQuery } from '@/lib/search-query'
 
 export interface SkillRecord {
   id: string
@@ -931,25 +932,6 @@ export async function createSubmissionRecord(submission: {
   return data
 }
 
-function getSearchTerms(normalizedQuery: string) {
-  const stopWords = new Set([
-    'about', 'agent', 'agents', 'and', 'for', 'from', 'into', 'need', 'right', 'skill', 'skills',
-    'that', 'the', 'this', 'use', 'using', 'want', 'what', 'when', 'with',
-  ])
-
-  const terms = Array.from(
-    new Set(
-      normalizedQuery
-        .toLowerCase()
-        .split(/[^a-z0-9]+/)
-        .map((term) => term.trim())
-        .filter((term) => term.length >= 3 && !stopWords.has(term))
-    )
-  ).slice(0, 10)
-
-  return terms.length > 0 ? terms : [normalizedQuery]
-}
-
 function isMissingSearchDocumentError(error: unknown) {
   if (!error || typeof error !== 'object') return false
   const message = `${(error as { code?: string }).code || ''} ${(error as { message?: string }).message || ''}`
@@ -961,7 +943,7 @@ async function searchSkillsWithLegacyFilter(
   limit: number
 ): Promise<SkillRecord[]> {
   const supabase = createPublicClient({ requestTimeoutMs: SKILL_DIRECTORY_REQUEST_TIMEOUT_MS })
-  const fields = ['name', 'description', 'long_description', 'tagline', 'category', 'github_repo', 'repository']
+  const fields = ['slug', 'name', 'description', 'long_description', 'tagline', 'category', 'github_repo', 'repository']
   const filter = searchTerms
     .flatMap((term) => fields.map((field) => `${field}.ilike.%${term}%`))
     .join(',')
@@ -1017,12 +999,55 @@ const getCachedSearchSkills = unstable_cache(
   { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
 
+async function fetchExactSearchSkills(query: string): Promise<SkillRecord[]> {
+  const exactQuery = normalizeExactSearchQuery(query)
+  if (!exactQuery) return []
+
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_DIRECTORY_REQUEST_TIMEOUT_MS })
+  const [slugResult, nameResult] = await Promise.all([
+    supabase
+      .from('skills')
+      .select(SKILL_DIRECTORY_SELECT)
+      .eq('ai_review_approved', true)
+      .eq('slug', exactQuery.toLowerCase())
+      .limit(4),
+    supabase
+      .from('skills')
+      .select(SKILL_DIRECTORY_SELECT)
+      .eq('ai_review_approved', true)
+      .ilike('name', exactQuery)
+      .limit(8),
+  ])
+
+  if (slugResult.error) throw slugResult.error
+  if (nameResult.error) throw nameResult.error
+
+  const seen = new Set<string>()
+  return filterSkillOnly([...(slugResult.data || []), ...(nameResult.data || [])] as unknown as SkillRecord[])
+    .filter((skill) => {
+      if (seen.has(skill.slug)) return false
+      seen.add(skill.slug)
+      return true
+    })
+}
+
 export async function searchSkills(query: string, limit = 120): Promise<SkillRecord[]> {
-  const normalizedQuery = query.trim().replace(/[%_,{},()]/g, ' ')
+  const normalizedQuery = normalizeExactSearchQuery(query)
   if (!normalizedQuery) return []
 
   const rowLimit = Math.min(Math.max(Math.floor(limit) || 1, 1), 200)
-  return getCachedSearchSkills(normalizedQuery.toLowerCase(), rowLimit)
+  const [exactMatches, broadMatches] = await Promise.all([
+    fetchExactSearchSkills(normalizedQuery).catch(() => [] as SkillRecord[]),
+    getCachedSearchSkills(normalizedQuery.toLowerCase(), rowLimit),
+  ])
+  const seen = new Set<string>()
+  return [...exactMatches, ...broadMatches]
+    .filter((skill) => {
+      if (seen.has(skill.slug)) return false
+      seen.add(skill.slug)
+      return true
+    })
+    .slice(0, rowLimit)
 }
 
 export async function getRelatedSkills(

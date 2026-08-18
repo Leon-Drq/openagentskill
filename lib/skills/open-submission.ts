@@ -1,11 +1,13 @@
 import 'server-only'
 
 import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import type { GitHubRepo } from '@/lib/schema/skill-schema'
 import type { DiscoveredGitHubSkill } from '@/lib/github/skill-source'
 import { reviewSkill } from '@/lib/ai-review/reviewer'
 import { analyzeCode } from '@/lib/security/static-analysis'
 import { evaluateSkillSubmissionPolicy } from '@/lib/skills/submission-policy'
+import { estimateSubmissionQuality } from '@/lib/skills/submission-quality'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export const SUBMISSION_RATE_LIMIT = 5
@@ -294,6 +296,13 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
     const category = normalizeCategory(input)
     const tags = normalizeTags(input)
     const authorName = input.makerGithub || input.skill.frontmatter.author || input.repository.owner
+    const quality = estimateSubmissionQuality({
+      githubStars: input.repository.stars,
+      githubRepo: input.repository.fullName,
+      githubUpdatedAt: input.repository.updatedAt,
+      reviewTotal: review.totalScore,
+      tags,
+    })
     const skillPayload = {
       slug,
       name: input.skill.frontmatter.name,
@@ -333,6 +342,8 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
       ai_review_approved: true,
       ai_review_issues: policy.issues,
       ai_review_suggestions: policy.suggestions,
+      quality_score: quality.score,
+      quality_signals: quality.signals,
     }
 
     const { data: createdSkill, error: createError } = await supabase
@@ -371,6 +382,19 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
       })
       .eq('id', submissionId)
     if (updateError) throw updateError
+
+    const { error: qualityRefreshError } = await supabase.rpc('refresh_skill_quality_scores', { p_slug: slug })
+    if (qualityRefreshError) {
+      console.warn('[submission-review] Quality refresh fallback retained:', qualityRefreshError.message)
+    }
+
+    try {
+      revalidateTag('public-skill-directory', 'max')
+      revalidatePath('/skills')
+      revalidatePath('/api/skills/search')
+    } catch (cacheError) {
+      console.warn('[submission-review] Cache invalidation deferred:', cacheError)
+    }
 
     await supabase.from('activity_feed').insert({
       event_type: input.submissionSource === 'agent' ? 'agent_submitted' : 'skill_published',
