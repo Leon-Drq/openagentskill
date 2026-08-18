@@ -77,7 +77,7 @@ export function buildOutcomeCommand(input: {
   outcome?: AgentOutcome
 }) {
   return [
-    'npx --yes github:Leon-Drq/openagentskill#main outcome',
+    'npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz outcome',
     shellQuote(input.eventId),
     '--skill',
     shellQuote(input.skillSlug),

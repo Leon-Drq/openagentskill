@@ -52,7 +52,7 @@ export function getSkillInstallTargets(skill: InstallableSkill): SkillInstallTar
       label: 'CLI',
       title: 'OpenAgentSkill CLI',
       kind: 'command',
-      value: `npx --yes github:Leon-Drq/openagentskill#main install ${skill.slug}`,
+      value: `npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install ${skill.slug}`,
       description: 'Resolve policy, run the source installer safely, and report a verified install receipt.',
       copyLabel: 'Copy command',
     },

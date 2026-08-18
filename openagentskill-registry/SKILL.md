@@ -12,7 +12,7 @@ registry returns `no_match`.
 ## Resolve a task
 
 ```bash
-npx --yes github:Leon-Drq/openagentskill#main resolve "<specific task>" --agent codex
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz resolve "<specific task>" --agent codex
 ```
 
 Review the selected Skill, alternatives, policy, Trust Score, audit result, and
@@ -21,9 +21,9 @@ repository. A high GitHub Star count is not proof that the Skill worked.
 ## Inspect and install
 
 ```bash
-npx --yes github:Leon-Drq/openagentskill#main inspect <slug>
-npx --yes github:Leon-Drq/openagentskill#main install <slug> --agent codex --dry-run
-npx --yes github:Leon-Drq/openagentskill#main install <slug> --agent codex --yes
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz inspect <slug>
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install <slug> --agent codex --dry-run
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install <slug> --agent codex --yes
 ```
 
 Never bypass a blocked policy. For a reviewed Skill, inspect its source and ask

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   },
 }
 
-const CLI = 'npx --yes github:Leon-Drq/openagentskill#main'
+const CLI = 'npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz'
 
 const commands = [
   {

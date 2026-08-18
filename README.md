@@ -159,18 +159,18 @@ curl "https://www.openagentskill.com/api/agent/outcome?format=text"
 Read the integration contract before wiring a new agent:
 
 ```bash
-npx --yes github:Leon-Drq/openagentskill#main outcome-contract
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz outcome-contract
 curl "https://www.openagentskill.com/api/agent/outcome?contract=true"
 ```
 
 ## Official CLI
 
-Run the dependency-free CLI directly from the official GitHub source:
+Run the dependency-free CLI from the pinned official GitHub Release:
 
 ```bash
-npx --yes github:Leon-Drq/openagentskill#main search "extract tables from PDF reports"
-npx --yes github:Leon-Drq/openagentskill#main resolve "extract tables from PDF reports" --agent codex
-npx --yes github:Leon-Drq/openagentskill#main install anthropic-frontend-design --agent codex --dry-run
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz search "extract tables from PDF reports"
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz resolve "extract tables from PDF reports" --agent codex
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install anthropic-frontend-design --agent codex --dry-run
 ```
 
 The publishable package source lives in [`packages/cli`](./packages/cli). Reviewed
