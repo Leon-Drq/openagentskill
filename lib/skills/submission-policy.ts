@@ -1,10 +1,9 @@
 import type { AIReviewResult } from '@/lib/schema/skill-schema'
 
-// Keep the public intake open to promising early projects. Publication still
-// requires the security scan and the full quality gate below.
-export const SKILL_SUBMISSION_MIN_STARS = 3
+// Stars are an adoption signal, never an intake requirement. A new skill can
+// be useful and standards-compliant before it has an audience.
+export const SKILL_SUBMISSION_MIN_STARS = 0
 export const SKILL_SUBMISSION_MIN_TOTAL_SCORE = 32
-export const SKILL_SUBMISSION_VERIFIED_SCORE = 35
 export const SKILL_SUBMISSION_MIN_SECURITY_SCORE = 7
 export const SKILL_SUBMISSION_MIN_DIMENSION_SCORE = 6
 
@@ -49,6 +48,7 @@ function checkStatus(pass: boolean, warn = false): SubmissionGateCheck['status']
 export function evaluateSkillSubmissionPolicy(input: {
   stars: number
   hasReadme: boolean
+  hasSkillDocument?: boolean
   staticAnalysis: SubmissionStaticAnalysis
   review: AIReviewResult
 }): SubmissionPolicyGate {
@@ -64,15 +64,19 @@ export function evaluateSkillSubmissionPolicy(input: {
     {
       id: 'github_stars',
       label: 'GitHub adoption',
-      status: checkStatus(input.stars >= SKILL_SUBMISSION_MIN_STARS),
-      detail: `${input.stars} stars, minimum ${SKILL_SUBMISSION_MIN_STARS}`,
+      status: 'pass',
+      detail: `${input.stars} stars (ranking signal only; zero-star skills are welcome)`,
       score: input.stars,
     },
     {
-      id: 'readme',
-      label: 'README presence',
-      status: checkStatus(input.hasReadme),
-      detail: input.hasReadme ? 'README detected' : 'README is required',
+      id: 'skill_document',
+      label: 'SKILL.md presence',
+      status: checkStatus(Boolean(input.hasSkillDocument)),
+      detail: input.hasSkillDocument
+        ? input.hasReadme
+          ? 'Valid SKILL.md and repository README detected'
+          : 'Valid SKILL.md detected; repository README is optional'
+        : 'A valid SKILL.md is required',
     },
     {
       id: 'static_security',
@@ -152,7 +156,9 @@ export function evaluateSkillSubmissionPolicy(input: {
 
   return {
     approved,
-    verified: approved && total >= SKILL_SUBMISSION_VERIFIED_SCORE,
+    // Automated quality review cannot prove publisher identity or ownership.
+    // Verification is awarded later through the claim/ownership flow.
+    verified: false,
     status,
     min_stars: SKILL_SUBMISSION_MIN_STARS,
     min_total_score: SKILL_SUBMISSION_MIN_TOTAL_SCORE,

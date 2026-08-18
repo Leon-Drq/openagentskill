@@ -25,6 +25,7 @@ export type AnalyticsEventName =
   | 'localized_resolve_error'
   | 'localized_resolve_copy_install'
   | 'skill_submission_result'
+  | 'skill_submission_accepted'
 
 export type AnalyticsConsent = 'granted' | 'denied'
 

@@ -1,7 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { MarketingHero, MarketingPageShell } from '@/components/marketing-page'
-import { SKILL_SUBMISSION_MIN_STARS } from '@/lib/skills/submission-policy'
 
 export const metadata: Metadata = {
   title: 'API Reference - OpenAgentSkill',
@@ -910,7 +909,7 @@ This skill enables agents to perform comprehensive web research...`}</code>
             </div>
             <div className="p-4 sm:p-6">
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
-                {`Submit a GitHub repository as a skill. The repository must have at least ${SKILL_SUBMISSION_MIN_STARS} stars and pass static security analysis plus AI scoring before automatic publishing. Used by OpenClaw and other agents to submit skill candidates.`}
+                {'Submit any valid SKILL.md from a GitHub repository, directory, or file URL. Zero-star repositories are eligible. The API returns a receipt immediately and reviews the submission asynchronously.'}
               </p>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Request Body'}</h3>
@@ -920,8 +919,12 @@ This skill enables agents to perform comprehensive web research...`}</code>
                   <span className="text-secondary">{'GitHub repository URL (required) — e.g. https://github.com/owner/repo'}</span>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                  <code className="font-mono bg-muted px-2 py-1 w-fit shrink-0">{'skillPath'}</code>
+                  <span className="text-secondary">{'Exact SKILL.md path returned by POST /api/skills/validate (required)'}</span>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
                   <code className="font-mono bg-muted px-2 py-1 w-fit shrink-0">{'category'}</code>
-                  <span className="text-secondary">{'Skill category (required)'}</span>
+                  <span className="text-secondary">{'Skill category (optional; auto-detected when omitted)'}</span>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
                   <code className="font-mono bg-muted px-2 py-1 w-fit shrink-0">{'tags'}</code>
@@ -935,6 +938,10 @@ This skill enables agents to perform comprehensive web research...`}</code>
                   <code className="font-mono bg-muted px-2 py-1 w-fit shrink-0">{'submittedByAgent'}</code>
                   <span className="text-secondary">{'Agent identifier string, e.g. "openclaw-v1.2" (optional)'}</span>
                 </div>
+                <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                  <code className="font-mono bg-muted px-2 py-1 w-fit shrink-0">{'makerGithub / makerX'}</code>
+                  <span className="text-secondary">{'Optional declared maker handles. They remain unverified until OAuth or repository ownership proof.'}</span>
+                </div>
               </div>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Request'}</h3>
@@ -944,8 +951,10 @@ Content-Type: application/json
 
 {
   "repository": "https://github.com/owner/my-skill",
-  "category": "Web Scraping",
+  "skillPath": "SKILL.md",
   "tags": ["crawler", "llm", "python"],
+  "makerGithub": "owner",
+  "makerX": "owner_on_x",
   "submissionSource": "agent",
   "submittedByAgent": "openclaw-v1.2"
 }`}</code>
@@ -955,21 +964,13 @@ Content-Type: application/json
               <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
                 <code>{`{
   "success": true,
-  "approved": true,
-  "skill": {
-    "id": "...",
-    "slug": "owner-my-skill",
-    "name": "My Skill"
-  },
-  "review": {
-    "approved": true,
-    "totalScore": 36,
-    "summary": "High quality skill with clear documentation",
-    "policy": {
-      "status": "approved",
-      "min_stars": ${SKILL_SUBMISSION_MIN_STARS},
-      "checks": ["GitHub adoption", "Static security scan", "AI total score"]
-    }
+  "accepted": true,
+  "submission": {
+    "id": "7f3f...",
+    "token": "private-status-token",
+    "status": "submitted",
+    "statusUrl": "/api/skills/submissions/7f3f...?token=...",
+    "skill": { "name": "My Skill", "path": "SKILL.md" }
   }
 }`}</code>
               </div>
@@ -983,7 +984,7 @@ Content-Type: application/json
             {'OpenClaw Auto-Submit'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed text-secondary mb-8">
-            {'If you use OpenClaw, you can configure it to automatically publish your skills to OpenAgentSkill whenever a repo crosses the 50-star threshold.'}
+            {'Agents can submit a skill as soon as a valid SKILL.md is available. GitHub stars remain a ranking signal, not a publishing gate.'}
           </p>
 
           <div className="space-y-8">
@@ -999,9 +1000,8 @@ Content-Type: application/json
 publish:
   - target: openagentskill
     url: https://openagentskill.com/api/skills/submit
-    trigger:
-      stars_threshold: 50
     payload:
+      skillPath: SKILL.md
       submissionSource: agent
       submittedByAgent: "openclaw-v1.2"`}</code>
                 </div>
@@ -1013,8 +1013,8 @@ publish:
                 {'2'}
               </div>
               <div className="min-w-0 flex-1">
-                <h3 className="font-semibold mb-2 text-sm sm:text-base">{'OpenClaw will POST automatically when the threshold is reached'}</h3>
-                <p className="text-secondary text-sm mb-3">{`Once configured, every time a monitored repo crosses ${SKILL_SUBMISSION_MIN_STARS} stars, OpenClaw will call the submit API with the repo details. You can also trigger it manually:`}</p>
+                <h3 className="font-semibold mb-2 text-sm sm:text-base">{'OpenClaw can POST when SKILL.md is created or updated'}</h3>
+                <p className="text-secondary text-sm mb-3">{'No star threshold is required. The agent can also trigger submission manually:'}</p>
                 <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
                   <code>{`# Manually submit a specific repo via OpenClaw
 openclaw publish --target openagentskill --repo owner/my-skill`}</code>
@@ -1028,7 +1028,7 @@ openclaw publish --target openagentskill --repo owner/my-skill`}</code>
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="font-semibold mb-2 text-sm sm:text-base">{'AI review runs automatically'}</h3>
-                <p className="text-secondary text-sm">{'Submitted skills go through the same review pipeline as manual submissions: minimum-star gate, static security analysis, AI quality scoring, and a final publish policy gate. Only approved skills appear immediately with the activity feed noting they were discovered by OpenClaw.'}</p>
+                <p className="text-secondary text-sm">{'Every submission is persisted before review. Critical security findings are quarantined; other submissions are reviewed and published or kept in the community review queue.'}</p>
               </div>
             </div>
           </div>
@@ -1040,7 +1040,7 @@ openclaw publish --target openagentskill --repo owner/my-skill`}</code>
   -H "Content-Type: application/json" \\
   -d '{
     "repository": "https://github.com/your-org/your-skill",
-    "category": "Web Scraping",
+    "skillPath": "SKILL.md",
     "tags": ["python", "llm"],
     "submissionSource": "agent",
     "submittedByAgent": "my-custom-agent"

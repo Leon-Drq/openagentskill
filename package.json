@@ -12,6 +12,7 @@
     "start": "next start",
     "seed:popular": "node scripts/seed-popular-skills.ts",
     "indexer:backfill": "node scripts/backfill-high-star-skills.mjs",
+    "test:submission": "node --experimental-strip-types scripts/test-skill-source.ts",
     "lint": "eslint ."
   },
   "dependencies": {
