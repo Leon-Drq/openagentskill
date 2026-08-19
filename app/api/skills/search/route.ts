@@ -15,6 +15,9 @@ const SEARCH_EXACT_QUERY_TIMEOUT_MS = 2200
 const SEARCH_CACHE_HEADERS = {
   'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
 }
+const DIRECT_LOOKUP_CACHE_HEADERS = {
+  'Cache-Control': 'no-store',
+}
 
 const getSearchCandidatePool = unstable_cache(
   async () => {
@@ -93,6 +96,7 @@ export async function GET(request: NextRequest) {
     ])
     const skills = mergeSkillPools(exactPool, candidatePool, CURATED_SKILL_SNAPSHOT)
     const lookupIntent = isDirectSkillLookup(query)
+    const responseCacheHeaders = lookupIntent ? DIRECT_LOOKUP_CACHE_HEADERS : SEARCH_CACHE_HEADERS
     const rankedCandidates = dedupeRankedSkills(rankSkillsForQuery(skills, query, outcomeStatsMap))
       .filter(({ skill }) => {
         if (category && skill.category.toLowerCase() !== category.toLowerCase()) return false
@@ -154,7 +158,7 @@ Found: ${ranked.length}
 ${text}`,
         {
           headers: {
-            ...SEARCH_CACHE_HEADERS,
+            ...responseCacheHeaders,
             'Content-Type': 'text/plain; charset=utf-8',
             'X-Agent-Friendly': 'true',
           },
@@ -201,7 +205,7 @@ ${text}`,
           generated_at: new Date().toISOString(),
         },
       },
-      { headers: SEARCH_CACHE_HEADERS }
+      { headers: responseCacheHeaders }
     )
   } catch (error) {
     console.error('Public skill search API error:', error)
