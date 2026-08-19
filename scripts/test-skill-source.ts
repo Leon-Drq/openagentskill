@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 // Node's type-stripping runner needs the explicit extension; the app compiler resolves the same module by alias.
 // @ts-expect-error TS5097 is expected for this standalone Node test entrypoint.
-import { parseGitHubSkillReference, parseSkillDocument, selectSkillDocumentPaths } from '../lib/github/skill-source.ts'
+import { detectSkillDelegationName, parseGitHubSkillReference, parseSkillDocument, selectSkillDocumentPaths } from '../lib/github/skill-source.ts'
 
 assert.deepEqual(parseGitHubSkillReference('Leon-Drq/openagentskill'), {
   owner: 'Leon-Drq',
@@ -47,6 +47,16 @@ frameworks: [Codex, Claude Code]
 )
 
 assert.equal(parseSkillDocument('# Missing frontmatter and useful description'), null)
+
+assert.equal(
+  detectSkillDelegationName('Call the Skill tool with "grilling".'),
+  'grilling'
+)
+assert.equal(
+  detectSkillDelegationName('Use the Skill tool with `taste-review` to continue.'),
+  'taste-review'
+)
+assert.equal(detectSkillDelegationName('This skill has complete standalone instructions.'), null)
 
 assert.deepEqual(
   selectSkillDocumentPaths([

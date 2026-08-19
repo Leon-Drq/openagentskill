@@ -34,6 +34,10 @@ export interface DiscoveredGitHubSkill {
   frontmatter: SkillFrontmatter
 }
 
+export interface DelegatedGitHubSkill extends DiscoveredGitHubSkill {
+  delegatedName: string
+}
+
 export interface GitHubTreeItem {
   path: string
   type: 'blob' | 'tree'
@@ -210,6 +214,20 @@ export function parseSkillDocument(source: string): SkillFrontmatter | null {
   }
 }
 
+export function detectSkillDelegationName(source: string) {
+  const patterns = [
+    /\b(?:call|use|invoke)\s+the\s+skill\s+tool\s+(?:with\s+)?["'`]([a-z0-9][a-z0-9._-]{0,119})["'`]/i,
+    /\bdelegate(?:s|d)?\s+to\s+(?:the\s+)?["'`]([a-z0-9][a-z0-9._-]{0,119})["'`]\s+skill\b/i,
+  ]
+
+  for (const pattern of patterns) {
+    const match = source.match(pattern)
+    if (match?.[1]) return match[1]
+  }
+
+  return null
+}
+
 async function fetchRepositoryTree(owner: string, repo: string, ref: string) {
   const response = await fetch(
     `${GITHUB_API}/repos/${owner}/${repo}/git/trees/${encodeURIComponent(ref)}?recursive=1`,
@@ -288,6 +306,50 @@ export async function discoverGitHubSkills(
   ).filter((skill): skill is DiscoveredGitHubSkill => Boolean(skill))
 
   return { skills, truncated }
+}
+
+export async function fetchDelegatedGitHubSkill(
+  skill: DiscoveredGitHubSkill
+): Promise<DelegatedGitHubSkill | null> {
+  const delegatedName = detectSkillDelegationName(skill.document)
+  if (!delegatedName || delegatedName.toLowerCase() === skill.frontmatter.name.toLowerCase()) return null
+
+  const { tree } = await fetchRepositoryTree(skill.owner, skill.repo, skill.ref)
+  const parentDirectory = skill.directory.includes('/')
+    ? skill.directory.slice(0, skill.directory.lastIndexOf('/'))
+    : ''
+  const candidatePaths = [
+    parentDirectory ? `${parentDirectory}/${delegatedName}/SKILL.md` : `${delegatedName}/SKILL.md`,
+    `skills/${delegatedName}/SKILL.md`,
+    `.agents/skills/${delegatedName}/SKILL.md`,
+    `.claude/skills/${delegatedName}/SKILL.md`,
+  ]
+  const availablePaths = new Map(
+    tree
+      .filter((item) => item.type === 'blob' && /(^|\/)SKILL\.md$/i.test(item.path))
+      .map((item) => [item.path.toLowerCase(), item.path])
+  )
+  const path = candidatePaths
+    .map((candidate) => availablePaths.get(candidate.toLowerCase()))
+    .find((candidate): candidate is string => Boolean(candidate))
+  if (!path) return null
+
+  const document = await fetchRepositoryFile(skill.owner, skill.repo, skill.ref, path)
+  const frontmatter = parseSkillDocument(document)
+  if (!frontmatter || frontmatter.name.toLowerCase() !== delegatedName.toLowerCase()) return null
+
+  const directory = path.includes('/') ? path.slice(0, path.lastIndexOf('/')) : ''
+  return {
+    owner: skill.owner,
+    repo: skill.repo,
+    ref: skill.ref,
+    path,
+    directory,
+    sourceUrl: sourceUrl(skill.owner, skill.repo, skill.ref, path),
+    document,
+    frontmatter,
+    delegatedName,
+  }
 }
 
 const REVIEWABLE_EXTENSIONS = new Set([
