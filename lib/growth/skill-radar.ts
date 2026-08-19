@@ -159,9 +159,11 @@ async function excludeExistingCandidates(candidates: CandidateRepo[]) {
     )
 
     return {
-      candidates: candidates.filter((candidate) => !existingSlugs.has(candidateSlug(candidate))),
-      existing: existingSlugs.size,
-      existingCandidates: candidates.filter((candidate) => existingSlugs.has(candidateSlug(candidate))),
+      // Exact tree/blob references may point to a newly added child Skill in
+      // an already indexed repository, so they must reach the recursive sync.
+      candidates: candidates.filter((candidate) => candidate.skillSourceUrl || !existingSlugs.has(candidateSlug(candidate))),
+      existing: candidates.filter((candidate) => !candidate.skillSourceUrl && existingSlugs.has(candidateSlug(candidate))).length,
+      existingCandidates: candidates.filter((candidate) => !candidate.skillSourceUrl && existingSlugs.has(candidateSlug(candidate))),
     }
   } catch (error) {
     // Keep discovery available when Supabase is under transient load. The
@@ -183,7 +185,10 @@ function summarizeProcessResults(results: ProcessResult[]) {
 
 function collectSlugs(results: ProcessResult[], statuses: ProcessResult['status'][]) {
   const statusSet = new Set(statuses)
-  return unique(results.map((result) => (result.slug && statusSet.has(result.status) ? result.slug : undefined)))
+  return unique(results.flatMap((result) => {
+    if (!statusSet.has(result.status)) return []
+    return result.slugs?.length ? result.slugs : [result.slug]
+  }))
 }
 
 function skippedXQueueResult(): XQueueBuildResult {
@@ -258,7 +263,7 @@ function mergeCandidates(
   const byRepo = new Map<string, CandidateRepo>()
 
   for (const candidate of [...xCandidates, ...githubCandidates]) {
-    const key = candidate.fullName.toLowerCase()
+    const key = (candidate.skillSourceUrl || candidate.fullName).toLowerCase()
     if (!byRepo.has(key)) byRepo.set(key, candidate)
   }
 
@@ -270,6 +275,10 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
   const runKey = new Date().toISOString().replace(/[:.]/g, '-')
   const targetNew = Math.min(Math.max(options.targetNew ?? numberFromEnv('SKILL_RADAR_TARGET_NEW', 2), 1), 12)
   const minStars = Math.max(options.minStars ?? numberFromEnv('SKILL_RADAR_MIN_STARS', 10), 10)
+  const xMinStars = Math.max(
+    options.xMinStars ?? nonNegativeNumberFromEnv('SKILL_RADAR_X_MIN_STARS', 0),
+    0
+  )
   const seoPerRun = Math.min(
     Math.max(options.seoPerRun ?? 0, 0),
     5
@@ -283,7 +292,7 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
     xMaxQueries > 0
       ? searchXSkillRadarRepos({
           limit: options.xLimit ?? numberFromEnv('SKILL_RADAR_X_LIMIT', 8),
-          minStars,
+          minStars: xMinStars,
           maxQueries: xMaxQueries,
           maxResultsPerQuery: options.xResultsPerQuery ?? numberFromEnv('SKILL_RADAR_X_RESULTS_PER_QUERY', 10),
           queryOffset: xRadarSchedule.queryOffset,

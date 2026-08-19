@@ -156,6 +156,7 @@ export function parseGitHubRepoFromUrl(raw: string) {
     owner,
     repo,
     fullName: `${owner}/${repo}`,
+    sourceUrl: normalized.replace(/[),.;]+$/, ''),
   }
 }
 
@@ -173,7 +174,7 @@ function extractGitHubRepos(tweet: XRecentTweet) {
 
   return Array.from(urls)
     .map(parseGitHubRepoFromUrl)
-    .filter((repo): repo is { owner: string; repo: string; fullName: string } => Boolean(repo))
+    .filter((repo): repo is { owner: string; repo: string; fullName: string; sourceUrl: string } => Boolean(repo))
 }
 
 function engagementScore(tweet: XRecentTweet) {
@@ -237,6 +238,7 @@ async function fetchGitHubRepo(owner: string, repo: string) {
 
 function toCandidate(
   repo: GitHubRepoResponse,
+  skillSourceUrl: string,
   tweet: XRecentTweet,
   query: string,
   score: number,
@@ -268,6 +270,7 @@ function toCandidate(
     topics: repo.topics || [],
     updatedAt: repo.updated_at || repo.pushed_at || new Date().toISOString(),
     htmlUrl: repo.html_url,
+    skillSourceUrl,
     discovery: {
       source: 'x-radar',
       x: {
@@ -281,7 +284,7 @@ function toCandidate(
 
 export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): Promise<XSkillRadarResult> {
   const token = xBearerToken()
-  const minStars = Math.max(Math.floor(options.minStars || 10), 10)
+  const minStars = Math.max(Math.floor(options.minStars ?? 0), 0)
   const limit = Math.min(Math.max(options.limit || 8, 1), 80)
   const maxQueries = Math.min(Math.max(options.maxQueries || 1, 1), X_SKILL_RADAR_QUERIES.length)
   const maxResultsPerQuery = Math.min(Math.max(options.maxResultsPerQuery || 10, 10), 50)
@@ -318,7 +321,8 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
         extractedRepos += repos.length
 
         for (const parsed of repos) {
-          if (candidates.has(parsed.fullName.toLowerCase())) continue
+          const candidateKey = parsed.sourceUrl.toLowerCase()
+          if (candidates.has(candidateKey)) continue
           if (isGenericFoundationRepoName(parsed.fullName)) continue
 
           const repo = await fetchGitHubRepo(parsed.owner, parsed.repo)
@@ -346,8 +350,8 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
 
           const score = radarScore(repo, tweet, evaluation.score)
           candidates.set(
-            repo.full_name.toLowerCase(),
-            toCandidate(repo, tweet, query, score, authorsById.get(tweet.author_id || ''))
+            candidateKey,
+            toCandidate(repo, parsed.sourceUrl, tweet, query, score, authorsById.get(tweet.author_id || ''))
           )
           if (candidates.size >= limit * 2) break
         }

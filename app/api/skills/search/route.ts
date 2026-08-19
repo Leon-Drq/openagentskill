@@ -5,6 +5,7 @@ import { getAgentOutcomeStatsMap, getAllSkills, searchSkills, type SkillOutcomeS
 import { augmentQueryForIntent, dedupeRankedSkills, getRecommendationReasons, normalizeMatchScore, rankSkillsForQuery, toRegistrySkill } from '@/lib/registry'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSkillSupplyProfile } from '@/lib/supply'
+import { classifySearchMatch, isDirectSkillLookup, type SearchMatchType } from '@/lib/search-match'
 
 export const revalidate = 300
 
@@ -91,6 +92,7 @@ export async function GET(request: NextRequest) {
       ).catch((): Record<string, SkillOutcomeStats> => ({})),
     ])
     const skills = mergeSkillPools(exactPool, candidatePool, CURATED_SKILL_SNAPSHOT)
+    const lookupIntent = isDirectSkillLookup(query)
     const rankedCandidates = dedupeRankedSkills(rankSkillsForQuery(skills, query, outcomeStatsMap))
       .filter(({ skill }) => {
         if (category && skill.category.toLowerCase() !== category.toLowerCase()) return false
@@ -107,14 +109,20 @@ export async function GET(request: NextRequest) {
         }
         return true
       })
+      .map((candidate) => ({
+        ...candidate,
+        matchType: classifySearchMatch(candidate.skill, query),
+      }))
+      .filter(({ matchType }) => !lookupIntent || matchType !== 'related')
       .slice(0, shortlistLimit)
     const topSearchScore = rankedCandidates[0]?.score || 0
     const ranked = rankedCandidates
-      .map(({ skill, score, semanticRelevance }) => ({
+      .map(({ skill, score, semanticRelevance, matchType }) => ({
         skill,
         score: normalizeMatchScore(score, topSearchScore, semanticRelevance),
         rawScore: score,
         semanticRelevance,
+        matchType,
         registrySkill: toRegistrySkill(skill, null, outcomeStatsMap[skill.slug] || null),
       }))
       .filter(({ registrySkill }) => {
@@ -125,8 +133,9 @@ export async function GET(request: NextRequest) {
       .slice(0, limit)
 
     if (format === 'text') {
-      const text = ranked.map(({ score, registrySkill: item }, index) => {
+      const text = ranked.map(({ score, matchType, registrySkill: item }, index) => {
         return `${index + 1}. ${item.name} (${item.slug})
+   Match type: ${matchType}
    Match score: ${score}
    ${item.description}
    Supply: ${item.supply_profile.track.shortLabel} | Scenario: ${item.supply_profile.scenario.label}
@@ -165,8 +174,9 @@ ${text}`,
           min_stars: Number.isFinite(minStars) ? minStars : 0,
         },
         total: ranked.length,
-        skills: ranked.map(({ skill, score, rawScore, semanticRelevance, registrySkill }, index) => ({
+        skills: ranked.map(({ skill, score, rawScore, semanticRelevance, matchType, registrySkill }, index) => ({
           rank: index + 1,
+          match_type: matchType,
           match_score: score,
           raw_match_score: rawScore,
           semantic_relevance: semanticRelevance,
@@ -176,6 +186,15 @@ ${text}`,
         meta: {
           endpoint: '/api/skills/search',
           canonical_agent_endpoint: '/api/agent/resolve',
+          lookup_intent: lookupIntent,
+          exact_match_found: ranked.some(({ matchType }) => matchType === 'exact'),
+          match_counts: ranked.reduce<Record<SearchMatchType, number>>((counts, item) => {
+            counts[item.matchType] += 1
+            return counts
+          }, { exact: 0, near: 0, related: 0 }),
+          no_match_message: lookupIntent && ranked.length === 0
+            ? 'No exact or near Skill listing was found. Related task recommendations are intentionally suppressed for direct name lookups.'
+            : null,
           safety_policy: 'Blocked candidates are excluded by default. Pass include_blocked=true only for manual audit workflows.',
           agent_friendly: true,
           api_version: '1.0',

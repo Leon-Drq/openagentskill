@@ -34,10 +34,28 @@ export interface DiscoveredGitHubSkill {
   frontmatter: SkillFrontmatter
 }
 
-interface GitHubTreeItem {
+export interface GitHubTreeItem {
   path: string
   type: 'blob' | 'tree'
   size?: number
+}
+
+export function selectSkillDocumentPaths(
+  tree: GitHubTreeItem[],
+  requestedPath?: string | null,
+  limit = MAX_DISCOVERED_SKILLS
+) {
+  const normalizedRequestedPath = normalizePath(requestedPath)
+  const prefix = normalizedRequestedPath
+    ? `${normalizedRequestedPath.replace(/\/$/, '')}/`.toLowerCase()
+    : null
+
+  return tree
+    .filter((item) => item.type === 'blob' && /(^|\/)SKILL\.md$/i.test(item.path))
+    .map((item) => item.path)
+    .filter((path) => !prefix || path.toLowerCase().startsWith(prefix))
+    .sort((left, right) => left.localeCompare(right))
+    .slice(0, Math.max(1, limit))
 }
 
 function githubHeaders() {
@@ -243,12 +261,7 @@ export async function discoverGitHubSkills(
   } else {
     const treeResult = await fetchRepositoryTree(reference.owner, reference.repo, ref)
     truncated = treeResult.truncated
-    const prefix = requestedPath ? `${requestedPath.replace(/\/$/, '')}/`.toLowerCase() : null
-    paths = treeResult.tree
-      .filter((item) => item.type === 'blob' && /(^|\/)SKILL\.md$/i.test(item.path))
-      .map((item) => item.path)
-      .filter((path) => !prefix || path.toLowerCase().startsWith(prefix))
-      .slice(0, MAX_DISCOVERED_SKILLS)
+    paths = selectSkillDocumentPaths(treeResult.tree, requestedPath, MAX_DISCOVERED_SKILLS)
   }
 
   const skills = (
