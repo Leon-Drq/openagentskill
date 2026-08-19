@@ -5,6 +5,7 @@ import { reviewSkill } from '@/lib/ai-review/reviewer'
 import { validateGitHubRepo } from '@/lib/github/api'
 import {
   discoverGitHubSkills,
+  fetchDelegatedGitHubSkill,
   fetchSkillPackageFiles,
   parseGitHubSkillReference,
   type DiscoveredGitHubSkill,
@@ -76,8 +77,8 @@ export function inferIndexedSkillCategory(skill: Pick<DiscoveredGitHubSkill, 'pa
   return 'automation'
 }
 
-function normalizeTags(skill: DiscoveredGitHubSkill) {
-  const source = [...skill.frontmatter.tags, 'agent-skill']
+function normalizeTags(skill: DiscoveredGitHubSkill, extraTags: string[] = []) {
+  const source = [...skill.frontmatter.tags, ...extraTags, 'agent-skill']
   const seen = new Set<string>()
   return source
     .map((value) => value.trim().toLowerCase().replace(/[^a-z0-9+#.-]+/g, '-').replace(/^-+|-+$/g, ''))
@@ -150,7 +151,20 @@ async function payloadForNew(
   repository: Awaited<ReturnType<typeof validateGitHubRepo>>,
   discoverySource: string
 ) {
-  const codeFiles = await fetchSkillPackageFiles(skill)
+  const delegatedSkill = await fetchDelegatedGitHubSkill(skill)
+  const packageGroups = await Promise.all([
+    fetchSkillPackageFiles(skill),
+    delegatedSkill ? fetchSkillPackageFiles(delegatedSkill) : Promise.resolve([]),
+  ])
+  const codeFiles = packageGroups.flat()
+  const reviewDocument = delegatedSkill
+    ? [
+        skill.document,
+        `## Delegated implementation: ${delegatedSkill.frontmatter.name}`,
+        `Source: ${delegatedSkill.sourceUrl}`,
+        delegatedSkill.document,
+      ].join('\n\n')
+    : skill.document
   const staticAnalysis = analyzeCode(codeFiles)
   if (!staticAnalysis.passed) {
     return {
@@ -161,7 +175,7 @@ async function payloadForNew(
 
   const review = await reviewSkill({
     repository: skill.sourceUrl,
-    readmeContent: skill.document,
+    readmeContent: reviewDocument,
     codeFiles,
     manifestData: skill.frontmatter,
     githubStats: {
@@ -187,7 +201,7 @@ async function payloadForNew(
   }
 
   const slug = buildIndexedSkillSlug(repository.owner, skill.frontmatter.name)
-  const tags = normalizeTags(skill)
+  const tags = normalizeTags(skill, delegatedSkill ? ['skill-alias', 'composed-skill'] : [])
   const quality = estimateSubmissionQuality({
     githubStars: repository.stars,
     githubRepo: repository.fullName,
@@ -202,7 +216,7 @@ async function payloadForNew(
       slug,
       name: skill.frontmatter.name,
       description: skill.frontmatter.description,
-      long_description: skill.document.slice(0, 12_000),
+      long_description: reviewDocument.slice(0, 12_000),
       tagline: skill.frontmatter.description.slice(0, 280),
       author_name: skill.frontmatter.author || repository.owner,
       author_url: `https://github.com/${repository.owner}`,
@@ -228,6 +242,13 @@ async function payloadForNew(
         source_url: skill.sourceUrl,
         source_ref: skill.ref,
         skill_path: skill.path,
+        ...(delegatedSkill
+          ? {
+              delegates_to: delegatedSkill.frontmatter.name,
+              delegated_skill_path: delegatedSkill.path,
+              delegated_source_url: delegatedSkill.sourceUrl,
+            }
+          : {}),
       },
       ai_review_approved: true,
       ai_review_issues: policy.issues,
