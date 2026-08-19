@@ -505,7 +505,7 @@ export async function GET() {
       strategy:
         'Maintain a 20k+ skill registry with rotating, scenario-specific GitHub discovery, periodic social signals, MCP exclusion, trust metadata, eval metadata, and small high-quality hourly imports.',
       quality_gates: [
-        'GitHub stars threshold',
+        'GitHub stars threshold for repository-level discovery; explicit SKILL.md paths remain zero-star eligible',
         'archived and fork exclusion',
         'skill relevance scoring',
         'MCP-only exclusion',
@@ -519,10 +519,19 @@ export async function GET() {
     github_discovery: {
       status: 'active',
       source: 'github_search',
-      strategy: 'high-star, skills-only, cross-domain rotating discovery',
+      strategy: 'high-star repository discovery plus recursive, zero-star-eligible SKILL.md source sync',
       target_approved_skills: effectiveCoverageTarget,
       domain_count: HIGH_STAR_DISCOVERY_DOMAINS.length,
       domains: HIGH_STAR_DISCOVERY_DOMAINS,
+      recursive_skill_sources: {
+        status: 'active',
+        schedule: 'every 6 hours',
+        patterns: ['SKILL.md', 'skills/**/SKILL.md', '.agents/skills/**/SKILL.md', '**/SKILL.md'],
+        exact_source_urls_preserved_from_social_radar: true,
+        existing_repository_incremental_rescan: true,
+        zero_star_intake: true,
+        review_policy: 'static security analysis plus automated quality review before public approval',
+      },
       targeted_import: {
         supported: true,
         private_endpoint: '/api/indexer/run',
@@ -706,6 +715,7 @@ export async function GET() {
       private_refresh_stars: '/api/indexer/refresh-stars',
       private_logs: '/api/indexer/logs',
       private_skill_radar: '/api/cron/skill-radar',
+      private_skill_source_sync: '/api/cron/skill-source-sync',
       private_indexnow_submit: '/api/indexnow/submit',
       public_agent_outcomes: '/api/agent/outcome',
       public_agent_outcomes_text: '/api/agent/outcome?format=text',

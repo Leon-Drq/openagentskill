@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 // Node's type-stripping runner needs the explicit extension; the app compiler resolves the same module by alias.
 // @ts-expect-error TS5097 is expected for this standalone Node test entrypoint.
-import { parseGitHubSkillReference, parseSkillDocument } from '../lib/github/skill-source.ts'
+import { parseGitHubSkillReference, parseSkillDocument, selectSkillDocumentPaths } from '../lib/github/skill-source.ts'
 
 assert.deepEqual(parseGitHubSkillReference('Leon-Drq/openagentskill'), {
   owner: 'Leon-Drq',
@@ -47,5 +47,31 @@ frameworks: [Codex, Claude Code]
 )
 
 assert.equal(parseSkillDocument('# Missing frontmatter and useful description'), null)
+
+assert.deepEqual(
+  selectSkillDocumentPaths([
+    { path: 'README.md', type: 'blob' },
+    { path: 'skills/research/SKILL.md', type: 'blob' },
+    { path: 'skills/productivity/grill-me/SKILL.md', type: 'blob' },
+    { path: '.agents/skills/test-desktop-app/SKILL.md', type: 'blob' },
+    { path: 'nested/skill.md', type: 'blob' },
+    { path: 'skills/folder/SKILL.md', type: 'tree' },
+  ]),
+  [
+    '.agents/skills/test-desktop-app/SKILL.md',
+    'nested/skill.md',
+    'skills/productivity/grill-me/SKILL.md',
+    'skills/research/SKILL.md',
+  ]
+)
+
+assert.deepEqual(
+  selectSkillDocumentPaths([
+    { path: 'skills/taste-review/SKILL.md', type: 'blob' },
+    { path: 'skills/simplify/SKILL.md', type: 'blob' },
+    { path: '.agents/skills/test-desktop-app/SKILL.md', type: 'blob' },
+  ], '.agents/skills/test-desktop-app'),
+  ['.agents/skills/test-desktop-app/SKILL.md']
+)
 
 console.log('skill source parser tests passed')

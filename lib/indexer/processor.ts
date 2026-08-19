@@ -12,6 +12,7 @@ import { generateText } from 'ai'
 import type { CandidateRepo } from './github-search'
 import { evaluateSkillCandidate, isMcpCandidate } from './skill-filter'
 import { INDEXER_REVIEW_MODEL } from '@/lib/ai/models'
+import { syncRepositorySkills } from './repository-skill-sync'
 
 const GITHUB_REQUEST_TIMEOUT_MS = 12_000
 const GITHUB_RETRY_DELAYS_MS = [750, 1_750]
@@ -31,6 +32,9 @@ export interface ProcessResult {
   status: 'indexed' | 'rejected' | 'error' | 'skipped'
   reason?: string
   slug?: string
+  slugs?: string[]
+  indexedSkills?: number
+  updatedSkills?: number
   discoverySource?: string
 }
 
@@ -196,6 +200,65 @@ export async function processRepo(
     const serverSecret = process.env.INDEXER_SECRET
     if (!serverSecret) {
       throw new Error('Missing INDEXER_SECRET for controlled indexer writes.')
+    }
+
+    if (isMcpCandidate({
+      fullName: candidate.fullName,
+      name: candidate.repo,
+      description: candidate.description,
+      topics: candidate.topics || [],
+      language: candidate.language,
+    })) {
+      return { repo: repoRef, slug, discoverySource, status: 'skipped', reason: 'MCP projects are excluded from skill-only imports' }
+    }
+
+    // Explicit SKILL.md packages are the strongest intake signal. Split them
+    // into individual listings before applying repository-level star gates or
+    // duplicate checks. This keeps zero-star skills eligible and lets an
+    // already-known repository publish newly added nested skill directories.
+    const sourceSync = await syncRepositorySkills({
+      reference: candidate.skillSourceUrl || candidate.htmlUrl || `https://github.com/${repoRef}`,
+      discoverySource: discoverySource === 'x-radar' ? 'x-skill-radar' : 'recursive-skill-source-sync',
+      maxSkills: 8,
+    })
+    if (sourceSync.discovered > 0) {
+      const successfulEntries = sourceSync.entries.filter((entry) => entry.status === 'created' || entry.status === 'updated')
+      const slugs = successfulEntries.map((entry) => entry.slug)
+      const firstSlug = slugs[0] || slug
+
+      if (sourceSync.created > 0) {
+        return {
+          repo: repoRef,
+          slug: firstSlug,
+          slugs,
+          indexedSkills: sourceSync.created,
+          updatedSkills: sourceSync.updated,
+          discoverySource,
+          status: 'indexed',
+          reason: `Indexed ${sourceSync.created} new SKILL.md package(s); refreshed ${sourceSync.updated}.`,
+        }
+      }
+      if (sourceSync.updated > 0) {
+        return {
+          repo: repoRef,
+          slug: firstSlug,
+          slugs,
+          indexedSkills: 0,
+          updatedSkills: sourceSync.updated,
+          discoverySource,
+          status: 'skipped',
+          reason: `Refreshed ${sourceSync.updated} existing SKILL.md package(s).`,
+        }
+      }
+
+      const firstFailure = sourceSync.entries.find((entry) => entry.reason)?.reason
+      return {
+        repo: repoRef,
+        slug,
+        discoverySource,
+        status: sourceSync.errors > 0 && sourceSync.rejected === 0 ? 'error' : 'rejected',
+        reason: firstFailure || 'Explicit SKILL.md packages did not pass automated review.',
+      }
     }
 
     const supabase = createPublicClient({ requestTimeoutMs: INDEXER_DB_TIMEOUT_MS })

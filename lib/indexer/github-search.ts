@@ -52,6 +52,8 @@ export interface CandidateRepo {
   topics?: string[]
   updatedAt: string
   htmlUrl: string
+  /** Exact GitHub tree/blob URL when discovery points to one SKILL.md package. */
+  skillSourceUrl?: string
   /** Optional provenance retained through review so downstream growth flows can be selective. */
   discovery?: CandidateDiscovery
 }
