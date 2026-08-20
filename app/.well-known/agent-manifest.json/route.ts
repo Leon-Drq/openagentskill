@@ -11,11 +11,16 @@ export async function GET() {
     name: 'Open Agent Skill',
     description: 'The open infrastructure for agent intelligence. Discover, publish, compose, and share agent skills.',
     url: 'https://www.openagentskill.com',
-    protocol: 'https+openapi+skill.md',
+    protocol: 'https+openapi+mcp+skill.md',
     api_version: '1.0',
-    standards: ['Agent Skills SKILL.md', 'OpenAPI 3.1', 'llms.txt'],
+    standards: ['Agent Skills SKILL.md', 'OpenAPI 3.1', 'Model Context Protocol', 'llms.txt'],
 
     endpoints: {
+      mcp: {
+        url: '/api/mcp',
+        method: 'GET or POST',
+        description: 'Remote MCP server for search, Resolve, install handoffs, rankings, and outcome feedback.',
+      },
       agent_entry: {
         url: '/agent',
         method: 'GET',
@@ -138,6 +143,16 @@ export async function GET() {
         url: '/outcomes',
         method: 'GET',
         description: 'Human and agent-readable overview of Agent Proven Score, outcome feedback, success signals, install attempts, setup friction, and risk blocks.',
+      },
+      funnel: {
+        url: '/api/agent/funnel',
+        method: 'GET',
+        description: 'Privacy-safe aggregate funnel from view and Resolve through verified installs and successful outcomes.',
+      },
+      ranking_history: {
+        url: '/api/agent/rankings/{slug}/history',
+        method: 'GET',
+        description: 'Daily ranking snapshots and skill rank movement for up to 90 days.',
       },
       detail: {
         url: '/api/agent/skills/{slug}',

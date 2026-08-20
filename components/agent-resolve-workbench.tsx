@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowRight, CheckCircle2, Copy, Loader2, Search, ShieldCheck, TriangleAlert } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { trackAnalyticsEvent } from '@/lib/analytics'
+import { trackSkillEvent } from '@/components/skill-event-tracker'
 
 type ResolveSkillSummary = {
   slug: string
@@ -136,6 +137,13 @@ type ResolvePayload = {
     }>
     agent_instruction: string
   } | null
+  recommendation_lanes?: {
+    best_match: ResolveLaneCandidate | null
+    safer_alternative: ResolveLaneCandidate | null
+    popular_alternative: ResolveLaneCandidate | null
+    new_contender: ResolveLaneCandidate | null
+    no_skill_option: { recommended: boolean; label: string; reason: string; action: string }
+  }
   feedback?: {
     event_id: string
     outcome_api: string
@@ -199,6 +207,14 @@ type ResolvePayload = {
     total_candidates: number
     generated_at: string
   }
+}
+
+type ResolveLaneCandidate = {
+  match_score: number
+  skill: { slug: string; name: string; description: string }
+  safety: { score: number }
+  trust_v5: { score: number }
+  urls: { web: string }
 }
 
 const exampleTasks = [
@@ -303,6 +319,11 @@ export function AgentResolveWorkbench({
       setPayload(nextPayload)
 
       if (nextPayload.recommendation) {
+        void trackSkillEvent(nextPayload.recommendation.best_skill.slug, 'resolve_request', {
+          agent,
+          source,
+          max_risk: maxRisk,
+        })
         trackAnalyticsEvent('resolve_success', {
           agent,
           source,
@@ -535,6 +556,34 @@ export function AgentResolveWorkbench({
                 </div>
               ))}
             </div>
+
+            {payload.recommendation_lanes ? (
+              <div className="p-4 sm:p-5">
+                <div className="flex items-end justify-between gap-4">
+                  <div><p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Decision lanes</p><h3 className="mt-2 font-display text-xl font-normal">Five useful answers, not one opaque winner</h3></div>
+                  <span className="font-mono text-xs text-secondary">Live registry</span>
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                  {([
+                    ['Best match', payload.recommendation_lanes.best_match],
+                    ['Safer', payload.recommendation_lanes.safer_alternative],
+                    ['Popular', payload.recommendation_lanes.popular_alternative],
+                    ['New contender', payload.recommendation_lanes.new_contender],
+                  ] as Array<[string, ResolveLaneCandidate | null]>).map(([label, candidate]) => candidate ? (
+                    <Link key={label} href={candidate.urls.web} className="border border-border bg-card p-3 transition-colors hover:border-foreground/40">
+                      <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-secondary">{label}</p>
+                      <p className="mt-2 line-clamp-2 font-semibold">{candidate.skill.name}</p>
+                      <p className="mt-3 font-mono text-[10px] text-secondary">Fit {candidate.match_score} · Safety {candidate.safety.score}</p>
+                    </Link>
+                  ) : <div key={label} className="border border-dashed border-border p-3 text-xs text-secondary"><span className="font-mono uppercase">{label}</span><p className="mt-2">No distinct candidate passed.</p></div>)}
+                  <div className={`border p-3 ${payload.recommendation_lanes.no_skill_option.recommended ? 'border-foreground bg-foreground text-background' : 'border-border bg-card'}`}>
+                    <p className="font-mono text-[10px] uppercase tracking-[0.14em] opacity-70">No-skill control</p>
+                    <p className="mt-2 text-sm font-semibold">{payload.recommendation_lanes.no_skill_option.label}</p>
+                    <p className="mt-2 line-clamp-3 text-xs opacity-70">{payload.recommendation_lanes.no_skill_option.reason}</p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
 
             <div className="p-4 sm:p-5">
               <p className="text-sm leading-6 text-secondary">{recommendation.best_skill.description}</p>

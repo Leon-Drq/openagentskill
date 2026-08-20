@@ -1,0 +1,10 @@
+{
+  "name": "@openagentskill/sdk",
+  "version": "0.1.0",
+  "description": "Dependency-free JavaScript SDK for OpenAgentSkill",
+  "type": "module",
+  "exports": { ".": { "types": "./index.d.ts", "import": "./openagentskill.mjs" } },
+  "files": ["openagentskill.mjs", "index.d.ts", "README.md"],
+  "license": "MIT",
+  "publishConfig": { "access": "public" }
+}

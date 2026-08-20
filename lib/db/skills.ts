@@ -512,6 +512,14 @@ export interface SkillEventStats {
   outbound_clicks: number
   claim_starts: number
   claim_submits: number
+  resolve_requests: number
+  install_starts: number
+  install_successes: number
+  install_failures: number
+  agent_calls: number
+  outcome_successes: number
+  outcome_failures: number
+  share_copies: number
   last_event_at: string | null
   updated_at: string
 }
@@ -527,6 +535,14 @@ export interface SkillEventDailyStats {
   outbound_clicks: number
   claim_starts: number
   claim_submits: number
+  resolve_requests: number
+  install_starts: number
+  install_successes: number
+  install_failures: number
+  agent_calls: number
+  outcome_successes: number
+  outcome_failures: number
+  share_copies: number
   first_event_at: string | null
   last_event_at: string | null
   updated_at: string
@@ -555,7 +571,8 @@ export interface SkillClaimRecord {
   id: string
   skill_slug: string
   user_id: string
-  github_username: string
+  github_username: string | null
+  x_username: string | null
   repo_url: string | null
   verification_method: string
   evidence_url: string | null

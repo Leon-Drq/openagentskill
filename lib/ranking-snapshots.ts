@@ -212,3 +212,16 @@ const getCachedLatestRankingSnapshot = unstable_cache(
 export async function getLatestRankingSnapshot(rankingSlug: string) {
   return getCachedLatestRankingSnapshot(rankingSlug).catch(() => null)
 }
+
+export async function getRankingSnapshotHistory(rankingSlug: string, days = 30) {
+  const supabase = createPublicClient({ requestTimeoutMs: 4_000 })
+  const since = utcDate(new Date(Date.now() - Math.min(Math.max(days, 1), 90) * 86_400_000))
+  const { data, error } = await supabase
+    .from('ranking_snapshots')
+    .select('ranking_slug,snapshot_date,generated_at,methodology_version,item_count,items,source_counts')
+    .eq('ranking_slug', rankingSlug)
+    .gte('snapshot_date', since)
+    .order('snapshot_date', { ascending: true })
+  if (error) throw new Error(`Failed to read ranking history: ${error.message}`)
+  return (data || []) as RankingSnapshot[]
+}

@@ -6,23 +6,29 @@ import { getActiveXAttribution } from '@/lib/x/attribution-client'
 
 export type SkillEventType =
   | 'view'
+  | 'resolve_request'
   | 'install_copy'
+  | 'install_start'
   | 'save'
   | 'compare'
   | 'outbound_github'
   | 'outbound_docs'
   | 'claim_start'
   | 'claim_submit'
+  | 'share_copy'
 
 const analyticsEventNames: Record<SkillEventType, AnalyticsEventName> = {
   view: 'skill_view',
+  resolve_request: 'skill_resolve_request',
   install_copy: 'skill_install_copy',
+  install_start: 'skill_install_start',
   save: 'skill_save',
   compare: 'skill_compare',
   outbound_github: 'skill_outbound_github',
   outbound_docs: 'skill_outbound_docs',
   claim_start: 'skill_claim_start',
   claim_submit: 'skill_claim_submit',
+  share_copy: 'skill_share_copy',
 }
 
 const analyticsMetadataKeys = new Set(['target', 'kind', 'placement', 'source', 'platform'])

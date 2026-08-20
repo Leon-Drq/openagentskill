@@ -201,6 +201,20 @@ async function reportInstall(baseUrl, payload, eventId, agent, outcome, notes, f
   }).catch(() => null)
 }
 
+async function reportInstallStart(baseUrl, payload, eventId, agent, flags) {
+  if (!telemetryEnabled(flags)) return null
+  return request(baseUrl, '/api/events/skill', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      skill_slug: payload.skill.slug,
+      event_type: 'install_start',
+      path: 'openagentskill-cli',
+      metadata: { source: 'openagentskill-cli', cli_version: CLI_VERSION, event_id: eventId, agent },
+    }),
+  }).catch(() => null)
+}
+
 async function install(baseUrl, slug, flags) {
   const payload = await request(baseUrl, `/api/skills/${encodeURIComponent(slug)}/install`)
   if (payload.safety_gate?.blocked) {
@@ -226,6 +240,7 @@ async function install(baseUrl, slug, flags) {
   }
 
   const eventId = `install_${randomUUID()}`
+  await reportInstallStart(baseUrl, payload, eventId, agent, flags)
   try {
     await runInstaller({ ...plan, agent })
     await reportInstall(baseUrl, payload, eventId, agent, 'success', 'Installer completed successfully.', flags)

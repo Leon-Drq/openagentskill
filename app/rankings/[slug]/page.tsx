@@ -14,7 +14,7 @@ import {
   type SkillOutcomeStats,
 } from '@/lib/db/skills'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
-import { getLatestRankingSnapshot } from '@/lib/ranking-snapshots'
+import { getLatestRankingSnapshot, getRankingSnapshotHistory } from '@/lib/ranking-snapshots'
 import {
   getRankingCompareHref,
   getRankingDefinition,
@@ -71,15 +71,21 @@ export default async function RankingDetailPage({
   if (!ranking) notFound()
 
   const usesOutcomeStats = ranking.kind === 'agent-usage' || ranking.kind === 'success-rate' || ranking.kind === 'safe-auto-install'
-  const [skills, statsMap, latestSnapshot] = await Promise.all([
+  const [skills, statsMap, latestSnapshot, snapshotHistory] = await Promise.all([
     getAllSkills('quality', undefined, 1200).catch(() => []),
     usesOutcomeStats
       ? getAgentOutcomeStatsMap().catch((): Record<string, SkillOutcomeStats> => ({}))
       : getSkillStats().catch((): Record<string, SkillAgentStats> => ({})),
     getLatestRankingSnapshot(ranking.slug),
+    getRankingSnapshotHistory(ranking.slug, 30).catch(() => []),
   ])
   const rankedSkills = rankSkillsForDefinition(skills, ranking, statsMap, 30)
   const compareHref = getRankingCompareHref(rankedSkills)
+  const oldestSnapshot = snapshotHistory[0]
+  const rankMovement = new Map((latestSnapshot?.items || []).map((item) => {
+    const previous = oldestSnapshot?.items.find((candidate) => candidate.slug === item.slug)
+    return [item.slug, previous ? previous.rank - item.rank : 0]
+  }))
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -129,6 +135,15 @@ export default async function RankingDetailPage({
               >
                 Browse excellent skills
               </Link>
+              <a
+                href={`https://x.com/intent/post?text=${encodeURIComponent(`${ranking.title} — evidence-based and updated daily`)}&url=${encodeURIComponent(`https://www.openagentskill.com/rankings/${ranking.slug}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+              >
+                Share ranking
+              </a>
+              <Link href={`/api/agent/rankings/${ranking.slug}/history?days=30`} className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground">30-day data</Link>
             </div>
           </div>
 
@@ -170,6 +185,7 @@ export default async function RankingDetailPage({
                   ? statsMap[skill.slug] as SkillOutcomeStats
                   : null
                 const proven = getAgentProvenProfile(outcomeStats)
+                const movement = rankMovement.get(skill.slug) || 0
 
                 return (
                   <article key={skill.slug} className="grid gap-5 py-7 lg:grid-cols-[auto_1fr_auto]">
@@ -183,6 +199,9 @@ export default async function RankingDetailPage({
                         </Link>
                         <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
                           {item.badge}
+                        </span>
+                        <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
+                          {snapshotHistory.length < 2 ? 'Baseline' : movement > 0 ? `↑ ${movement}` : movement < 0 ? `↓ ${Math.abs(movement)}` : '— stable'}
                         </span>
                         <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
                           {quality.label} · {quality.score}

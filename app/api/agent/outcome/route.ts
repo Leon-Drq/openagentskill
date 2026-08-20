@@ -14,6 +14,7 @@ import {
   formatOutcomeStatsText,
 } from '@/lib/agent-outcome-summary'
 import { createPublicClient } from '@/lib/supabase/public'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 const OutcomeSchema = z.object({
   event_id: z.string().min(1).max(200),
@@ -183,7 +184,8 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const { data, error } = await supabase.rpc('record_agent_outcome', {
+    const writer = createAdminClient()
+    const { data, error } = await writer.rpc('record_agent_outcome', {
       p_event_id: payload.event_id,
       p_skill_slug: payload.skill_slug,
       p_task: payload.task,
@@ -208,6 +210,26 @@ export async function POST(request: NextRequest) {
 
     if (data?.error === 'invalid_outcome') {
       return NextResponse.json({ error: 'Invalid outcome' }, { status: 400 })
+    }
+
+    try {
+      const admin = createAdminClient()
+      const isSuccess = payload.outcome === 'success'
+      const verifiedEvents = [
+        { event_type: 'agent_call', event_key: `${payload.event_id}:agent-call` },
+        { event_type: isSuccess ? 'outcome_success' : 'outcome_failure', event_key: `${payload.event_id}:outcome` },
+        ...(payload.install_used ? [{ event_type: isSuccess ? 'install_success' : 'install_failure', event_key: `${payload.event_id}:install` }] : []),
+      ].map((event) => ({
+        skill_slug: payload.skill_slug,
+        ...event,
+        source: 'agent_outcome',
+        is_verified: true,
+        path: '/api/agent/outcome',
+        metadata: { agent: payload.agent, outcome: payload.outcome, resolve_event_id: payload.event_id },
+      }))
+      await admin.from('skill_events').upsert(verifiedEvents, { onConflict: 'event_key' })
+    } catch (funnelError) {
+      console.warn('[agent-outcome] Verified funnel mirror failed:', funnelError)
     }
 
     const { data: stats } = await supabase

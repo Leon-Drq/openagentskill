@@ -4,11 +4,16 @@ import { createClient } from '@/lib/supabase/server'
 
 const ClaimSchema = z.object({
   skill_slug: z.string().min(1).max(200),
-  github_username: z.string().min(1).max(39).regex(/^[a-z0-9]([a-z0-9-]{0,37}[a-z0-9])?$/i),
+  github_username: z.string().max(39).regex(/^$|^[a-z0-9]([a-z0-9-]{0,37}[a-z0-9])?$/i).optional().default(''),
+  x_username: z.string().max(15).regex(/^$|^[a-z0-9_]{1,15}$/i).optional().default(''),
   repo_url: z.string().url().nullable().optional(),
   verification_method: z.enum(['github_profile', 'repository_issue', 'website_link', 'manual']).default('github_profile'),
   evidence_url: z.string().url().nullable().optional(),
   evidence_note: z.string().max(2000).nullable().optional(),
+}).superRefine((value, context) => {
+  if (!value.github_username && !value.x_username && !value.evidence_url) {
+    context.addIssue({ code: z.ZodIssueCode.custom, message: 'Add a GitHub handle, X handle, or evidence URL.' })
+  }
 })
 
 export async function GET(request: NextRequest) {
@@ -21,7 +26,7 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await supabase
     .from('skill_claims')
-    .select('id, skill_slug, github_username, evidence_url, evidence_note, verification_method, status, created_at, updated_at')
+    .select('id, skill_slug, github_username, x_username, evidence_url, evidence_note, verification_method, status, created_at, updated_at')
     .eq('skill_slug', skillSlug)
     .eq('user_id', user.id)
     .maybeSingle()
@@ -45,7 +50,9 @@ export async function POST(request: NextRequest) {
 
   const { error: profileError } = await supabase.from('profiles').upsert({
     id: user.id,
-    display_name: user.email?.split('@')[0] || parsed.data.github_username,
+    display_name: user.email?.split('@')[0] || parsed.data.github_username || parsed.data.x_username,
+    github_username: parsed.data.github_username.toLowerCase() || null,
+    x_username: parsed.data.x_username.toLowerCase() || null,
   })
 
   if (profileError) {
@@ -57,9 +64,10 @@ export async function POST(request: NextRequest) {
     .upsert({
       skill_slug: parsed.data.skill_slug,
       user_id: user.id,
-      github_username: parsed.data.github_username.toLowerCase(),
+      github_username: parsed.data.github_username.toLowerCase() || null,
+      x_username: parsed.data.x_username.toLowerCase() || null,
       repo_url: parsed.data.repo_url || null,
-      verification_method: parsed.data.verification_method,
+      verification_method: parsed.data.github_username ? parsed.data.verification_method : parsed.data.x_username ? 'manual' : 'website_link',
       evidence_url: parsed.data.evidence_url || null,
       evidence_note: parsed.data.evidence_note || null,
       status: 'pending',
@@ -69,7 +77,7 @@ export async function POST(request: NextRequest) {
     }, {
       onConflict: 'skill_slug,user_id',
     })
-    .select('id, skill_slug, github_username, evidence_url, evidence_note, verification_method, status, created_at, updated_at')
+    .select('id, skill_slug, github_username, x_username, evidence_url, evidence_note, verification_method, status, created_at, updated_at')
     .single()
 
   if (error) {

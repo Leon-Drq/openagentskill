@@ -23,6 +23,8 @@ Canonical:
 - Receipt API: ${payload.receipt_api}
 - Manifest: ${payload.manifest}
 - llms.txt: ${payload.llms}
+- MCP: ${payload.mcp}
+- JavaScript SDK: ${payload.sdk}
 
 Recommended Flow:
 ${payload.recommended_flow.map((item, index) => `${index + 1}. ${item}`).join('\n')}

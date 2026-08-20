@@ -252,6 +252,9 @@ Useful endpoints:
 | `GET /llms.txt` | Plain-text instructions for browser agents and LLMs |
 | `GET /.well-known/openagentskill.json` | Canonical brand identity, official profiles, product contract, and research links |
 | `GET /.well-known/agent-manifest.json` | Machine-readable capability manifest |
+| `POST /api/mcp` | Remote MCP tools for search, Resolve, install plans, rankings, and outcome feedback |
+| `GET /.well-known/mcp.json` | Remote MCP discovery metadata |
+| `@openagentskill/sdk` | Dependency-free JavaScript client (package source in `packages/sdk`) |
 | `GET /api/agent/integration-kit?format=text` | Copy-paste setup for Codex, Claude Code, and Cursor |
 | `GET /api/agent/resolve?task=...` | Resolve a task into one selected skill plus alternatives |
 | `GET /api/agent/resolve?task=...&format=lockfile` | Generate a compact install lock for agent workflows |
@@ -261,6 +264,8 @@ Useful endpoints:
 | `GET /api/agent/rankings?slug=agent-proven` | Read skills ranked by real outcome reports and install attempts |
 | `GET /api/agent/rankings?slug=best-by-success-rate` | Read skills ranked by Agent Proven Score, recent success, install success, and low failure pressure |
 | `GET /api/agent/rankings?slug=safest-auto-install-skills` | Read safer candidates for sandbox-first auto-install workflows |
+| `GET /api/agent/rankings/{slug}/history?days=30` | Read daily snapshots and rank movement |
+| `GET /api/agent/funnel?skill_slug=...` | Read aggregate views → starts → verified installs → successful outcomes |
 | `GET /api/agent/skills?q=...` | Search indexed skills |
 | `GET /api/agent/tasks` | Browse task-first routes |
 | `GET /api/agent/outcome?format=text` | Read aggregate adoption signals |
@@ -281,6 +286,7 @@ Get your skill indexed, audited, ranked, and shareable.
 - Agent Proven badge for real outcome evidence.
 - X share card and launch copy.
 - Claim/verified listing flow.
+- Creator Dashboard with optional GitHub/X identity and full-funnel skill analytics.
 - Alternatives and use-case pages that can send qualified traffic back to your project.
 
 Add a badge to your README:

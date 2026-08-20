@@ -26,7 +26,7 @@ export function NavUserMenu() {
   if (user) {
     return (
       <Link
-        href="/profile"
+        href="/creator"
         className="text-xs sm:text-sm text-secondary hover:text-foreground transition-colors font-mono border border-border px-2.5 py-1 hover:border-foreground"
       >
         {user.email?.split('@')[0]}

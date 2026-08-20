@@ -2102,6 +2102,7 @@ export default async function SkillDetailPage({
                   approvedClaim
                     ? {
                         github_username: approvedClaim.github_username,
+                        x_username: approvedClaim.x_username,
                         evidence_url: approvedClaim.evidence_url,
                       }
                     : null

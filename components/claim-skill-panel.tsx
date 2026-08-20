@@ -16,7 +16,8 @@ interface ClaimSkillPanelProps {
   creatorName?: string
   sourceLabel?: string
   approvedClaim?: {
-    github_username: string
+    github_username: string | null
+    x_username?: string | null
     evidence_url: string | null
   } | null
 }
@@ -24,6 +25,7 @@ interface ClaimSkillPanelProps {
 interface ClaimState {
   status: 'pending' | 'approved' | 'rejected'
   github_username: string
+  x_username: string | null
   evidence_url: string | null
   evidence_note: string | null
 }
@@ -59,6 +61,7 @@ export function ClaimSkillPanel({
   const [hasUser, setHasUser] = useState<boolean | null>(null)
   const [existingClaim, setExistingClaim] = useState<ClaimState | null>(null)
   const [githubUsername, setGithubUsername] = useState('')
+  const [xUsername, setXUsername] = useState('')
   const [evidenceUrl, setEvidenceUrl] = useState(repository || '')
   const [evidenceNote, setEvidenceNote] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'saved' | 'error'>('idle')
@@ -79,6 +82,7 @@ export function ClaimSkillPanel({
       if (data.claim) {
         setExistingClaim(data.claim)
         setGithubUsername(data.claim.github_username || '')
+        setXUsername(data.claim.x_username || '')
         setEvidenceUrl(data.claim.evidence_url || repository || '')
         setEvidenceNote(data.claim.evidence_note || '')
       }
@@ -111,6 +115,7 @@ export function ClaimSkillPanel({
       body: JSON.stringify({
         skill_slug: skillSlug,
         github_username: githubUsername,
+        x_username: xUsername,
         repo_url: repository || null,
         verification_method: 'github_profile',
         evidence_url: evidenceUrl || null,
@@ -139,7 +144,7 @@ export function ClaimSkillPanel({
         </h3>
         <p className="mt-2 text-xs leading-relaxed text-secondary">
           {formatSkillDetailCopy(locale, 'verifiedMaintainerDescription', {
-            username: approvedClaim.github_username,
+            username: approvedClaim.github_username || approvedClaim.x_username || 'verified creator',
           })}
         </p>
         {approvedClaim.evidence_url && (
@@ -204,6 +209,15 @@ export function ClaimSkillPanel({
             />
           </label>
           <label className="block">
+            <span className="mb-1 block text-xs text-secondary">X username (optional)</span>
+            <input
+              value={xUsername}
+              onChange={(event) => setXUsername(event.target.value.replace(/^@/, ''))}
+              placeholder="creator"
+              className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
+            />
+          </label>
+          <label className="block">
             <span className="mb-1 block text-xs text-secondary">
               {formatSkillDetailCopy(locale, 'evidenceUrl')}
             </span>
@@ -229,7 +243,7 @@ export function ClaimSkillPanel({
           <button
             type="button"
             onClick={submitClaim}
-            disabled={status === 'loading' || githubUsername.trim().length === 0}
+            disabled={status === 'loading' || (!githubUsername.trim() && !xUsername.trim() && !evidenceUrl.trim())}
             className="w-full border border-foreground bg-foreground px-3 py-2 text-sm font-semibold text-background transition-opacity hover:opacity-80 disabled:opacity-50"
           >
             {status === 'loading'

@@ -666,6 +666,9 @@ interface ResolverRecommendationCandidate {
     name: string
     description: string
     category: string
+    github_stars: number
+    created_at: string
+    updated_at: string
   }
   urls: {
     web: string
@@ -996,6 +999,9 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         name: skill.name,
         description: skill.description,
         category: skill.category,
+        github_stars: Number(skill.github_stars || 0),
+        created_at: skill.created_at,
+        updated_at: skill.github_last_pushed_at || skill.updated_at,
         repository: skill.repository,
         github_repo: skill.github_repo,
       },
@@ -1067,6 +1073,26 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
   const alternatives = eligibleCandidates
     .filter((candidate) => candidate.skill.slug !== selected?.skill.slug)
     .slice(0, Math.max(0, limit - 1))
+  const laneCandidates = eligibleCandidates.filter((candidate) => candidate.skill.slug !== selected?.skill.slug)
+  const saferAlternative = [...laneCandidates].sort((a, b) => b.safety.score - a.safety.score || b.trust_v5.score - a.trust_v5.score)[0] || null
+  const popularAlternative = [...laneCandidates].filter((candidate) => candidate.skill.slug !== saferAlternative?.skill.slug).sort((a, b) => b.skill.github_stars - a.skill.github_stars)[0] || null
+  const newContender = [...laneCandidates].filter((candidate) => ![saferAlternative?.skill.slug, popularAlternative?.skill.slug].includes(candidate.skill.slug)).sort((a, b) => Date.parse(b.skill.created_at || b.skill.updated_at) - Date.parse(a.skill.created_at || a.skill.updated_at))[0] || null
+  const recommendationLanes = {
+    best_match: selected,
+    safer_alternative: saferAlternative,
+    popular_alternative: popularAlternative,
+    new_contender: newContender,
+    no_skill_option: {
+      recommended: !selected || selected.match_score < 45 || selected.safety.human_review_required,
+      label: 'Build without a third-party skill',
+      reason: !selected
+        ? 'No candidate passed the current constraints.'
+        : selected.safety.human_review_required
+          ? 'Use a native agent workflow when the third-party permission or maintenance surface is not acceptable.'
+          : 'Keep this as the control path when a one-off native workflow is cheaper than adopting a reusable skill.',
+      action: 'Use the agent’s built-in tools for one narrow run, then reconsider a skill only if the workflow repeats.',
+    },
+  }
   const blockedCandidates = candidates
     .filter((candidate) => candidate.safety.blocked)
     .slice(0, 5)
@@ -1347,6 +1373,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     agent_feedback_loop: agentFeedbackLoop,
     install_receipt: installReceipt,
     recommendation,
+    recommendation_lanes: recommendationLanes,
     selected,
     alternatives,
     blocked_candidates: blockedCandidates,
@@ -1384,6 +1411,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         agent_handoff: 'agent_handoff.platform_templates + agent_handoff.review_checklist',
         decision_packet: 'decision_packet',
         install_receipt: 'install_receipt',
+        recommendation_lanes: 'recommendation_lanes',
       },
     },
   }

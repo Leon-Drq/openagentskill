@@ -6,13 +6,16 @@ const EventSchema = z.object({
   skill_slug: z.string().min(1).max(200),
   event_type: z.enum([
     'view',
+    'resolve_request',
     'install_copy',
+    'install_start',
     'save',
     'compare',
     'outbound_github',
     'outbound_docs',
     'claim_start',
     'claim_submit',
+    'share_copy',
   ]),
   session_id: z.string().max(200).nullable().optional(),
   path: z.string().max(500).nullable().optional(),
@@ -34,6 +37,8 @@ export async function POST(request: NextRequest) {
     path: parsed.data.path || null,
     referrer: parsed.data.referrer || null,
     metadata: parsed.data.metadata || {},
+    source: 'web',
+    is_verified: false,
   })
 
   if (error) {

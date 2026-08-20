@@ -25,7 +25,7 @@ Use this site when an agent needs to:
 
 Preferred agent flow:
 1. Read this file.
-2. Load /api/agent/integration-kit for platform-specific Codex, Claude Code, or Cursor setup templates.
+2. Connect the remote MCP server at /api/mcp, use @openagentskill/sdk, or load /api/agent/integration-kit for copy-paste templates.
 3. Choose a task from /tasks or /api/agent/tasks.
 4. Call /api/agent/resolve with a natural-language task.
 5. Use /api/agent/resolve?task={task}&agent={agent}&format=lockfile when you need a compact stable execution object.
@@ -45,6 +45,9 @@ Important URLs:
 - Agent entry: https://www.openagentskill.com/agent
 - Agent Integration Kit: https://www.openagentskill.com/agent/integration-kit
 - Agent Integration Kit API: https://www.openagentskill.com/api/agent/integration-kit
+- Remote MCP server: https://www.openagentskill.com/api/mcp
+- MCP discovery: https://www.openagentskill.com/.well-known/mcp.json
+- JavaScript SDK: @openagentskill/sdk (source: https://github.com/Leon-Drq/openagentskill/tree/codex/daily-skill-rankings/packages/sdk)
 - Tasks: https://www.openagentskill.com/tasks
 - Task API: https://www.openagentskill.com/api/agent/tasks
 - Resolve API: https://www.openagentskill.com/api/agent/resolve
@@ -56,6 +59,8 @@ Important URLs:
 - Agent-Proven ranking API: https://www.openagentskill.com/api/agent/rankings?slug=agent-proven
 - Best-by-success ranking API: https://www.openagentskill.com/api/agent/rankings?slug=best-by-success-rate
 - Safe auto-install ranking API: https://www.openagentskill.com/api/agent/rankings?slug=safest-auto-install-skills
+- Ranking history API: https://www.openagentskill.com/api/agent/rankings/agent-proven/history?days=30
+- Aggregate funnel API: https://www.openagentskill.com/api/agent/funnel
 - Skill Eval API: https://www.openagentskill.com/api/agent/evals?slug=crawl4ai
 - Resolve eval dashboard: https://www.openagentskill.com/evals/resolve
 - Skill search API: https://www.openagentskill.com/api/skills/search

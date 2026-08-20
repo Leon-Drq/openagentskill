@@ -4,13 +4,16 @@ export type AnalyticsParameterValue = string | number | boolean
 
 export type AnalyticsEventName =
   | 'skill_view'
+  | 'skill_resolve_request'
   | 'skill_install_copy'
+  | 'skill_install_start'
   | 'skill_save'
   | 'skill_compare'
   | 'skill_outbound_github'
   | 'skill_outbound_docs'
   | 'skill_claim_start'
   | 'skill_claim_submit'
+  | 'skill_share_copy'
   | 'resolve_request'
   | 'resolve_success'
   | 'resolve_no_match'

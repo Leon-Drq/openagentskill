@@ -16,6 +16,7 @@
     "test:submission-discovery": "node --experimental-strip-types scripts/test-submission-discovery.ts",
     "test:supabase-circuit": "node --experimental-strip-types scripts/test-supabase-circuit.ts",
     "test:cli": "node packages/cli/openagentskill.mjs --help",
+    "test:sdk": "node scripts/test-sdk.mjs",
     "lint": "eslint ."
   },
   "dependencies": {

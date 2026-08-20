@@ -2,6 +2,8 @@ import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 import { generateDailyRankingSnapshots } from '@/lib/ranking-snapshots'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
+import { getRankingDefinitions } from '@/lib/rankings'
+import { submitIndexNowUrls } from '@/lib/indexnow'
 
 export const maxDuration = 120
 
@@ -14,6 +16,10 @@ async function runDailyRankings(request: NextRequest) {
 
   try {
     const result = await generateDailyRankingSnapshots()
+    const distribution = await submitIndexNowUrls([
+      'https://www.openagentskill.com/rankings',
+      ...getRankingDefinitions().map((ranking) => `https://www.openagentskill.com/rankings/${ranking.slug}`),
+    ]).catch((error) => ({ success: false, error: error instanceof Error ? error.message : String(error) }))
 
     revalidateTag('ranking-snapshots', 'max')
     revalidatePath('/')
@@ -27,6 +33,7 @@ async function runDailyRankings(request: NextRequest) {
       ok: true,
       duration_ms: Date.now() - startedAt,
       ...result,
+      distribution,
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)

@@ -11,6 +11,37 @@ export async function GET() {
       },
       servers: [{ url: 'https://www.openagentskill.com' }],
       paths: {
+        '/api/mcp': {
+          get: {
+            summary: 'Discover the OpenAgentSkill remote MCP server and available tools',
+            responses: { '200': { description: 'MCP server metadata' } },
+          },
+          post: {
+            summary: 'Call OpenAgentSkill through MCP JSON-RPC 2.0',
+            requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['jsonrpc', 'method'], properties: { jsonrpc: { type: 'string', const: '2.0' }, id: {}, method: { type: 'string' }, params: { type: 'object' } } } } } },
+            responses: { '200': { description: 'MCP JSON-RPC result' } },
+          },
+        },
+        '/api/agent/rankings/{slug}/history': {
+          get: {
+            summary: 'Read up to 90 days of evidence-based ranking snapshots and rank movement',
+            parameters: [
+              { name: 'slug', in: 'path', required: true, schema: { type: 'string' } },
+              { name: 'days', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 90 } },
+            ],
+            responses: { '200': { description: 'Daily ranking history and movement' } },
+          },
+        },
+        '/api/agent/funnel': {
+          get: {
+            summary: 'Read privacy-safe aggregate discovery, install, agent call, and outcome conversion metrics',
+            parameters: [
+              { name: 'skill_slug', in: 'query', required: false, schema: { type: 'string' } },
+              { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 500 } },
+            ],
+            responses: { '200': { description: 'Aggregate funnel with explicit metric definitions' } },
+          },
+        },
         '/api/registry': {
           get: {
             summary: 'Get Registry API index and canonical endpoints',
