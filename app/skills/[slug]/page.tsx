@@ -34,7 +34,7 @@ import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillInstallApiUrl } from '@/lib/registry'
 import { getSkillAttribution } from '@/lib/skill-attribution'
-import { getCanonicalSkillSlug, getSkillBySlugOrFallback } from '@/lib/skill-fallbacks'
+import { getCanonicalSkillSlug, getSkillBySlugOrFallbackStrict } from '@/lib/skill-fallbacks'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import {
   getSkillTrustProfileV5,
@@ -50,12 +50,12 @@ import {
   buildXIntentUrl,
 } from '@/lib/x/poster'
 
-export const dynamic = 'force-static'
-export const revalidate = 1800
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 const SKILL_DETAIL_SUPPORT_TIMEOUT_MS = 1200
 
 const getCachedSkillBySlug = cache(async (slug: string) =>
-  getSkillBySlugOrFallback(getCanonicalSkillSlug(slug))
+  getSkillBySlugOrFallbackStrict(getCanonicalSkillSlug(slug))
 )
 
 const getCachedSkillDetailSupport = cache(
@@ -363,7 +363,7 @@ export default async function SkillDetailPage({
 
       <SiteHeader />
 
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+      <main className="mx-auto max-w-6xl px-4 pb-28 pt-8 sm:px-6 sm:py-12">
         {/* Breadcrumb */}
         <nav className="mb-6 flex items-center gap-2 text-xs text-secondary sm:text-sm">
           <Link href="/skills" className="hover:text-foreground">
@@ -914,10 +914,12 @@ export default async function SkillDetailPage({
               </section>
             )}
 
-            <SkillInstallTargets
-              skillSlug={skill.slug}
-              targets={installTargets}
-            />
+            <div id="install-options" className="scroll-mt-24">
+              <SkillInstallTargets
+                skillSlug={skill.slug}
+                targets={installTargets}
+              />
+            </div>
 
             <section className="mb-10 overflow-hidden rounded-[8px] border border-border bg-card shadow-[0_18px_48px_rgba(22,20,16,0.05)]">
               <div className="relative border-b border-border bg-[#fbfaf7] p-5 sm:p-6">
@@ -2309,6 +2311,36 @@ export default async function SkillDetailPage({
                 </div>
               )}
             </div>
+          </div>
+        </div>
+
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 p-3 shadow-[0_-12px_30px_rgba(22,20,16,0.08)] backdrop-blur lg:hidden">
+          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-2">
+            <a
+              href="#install-options"
+              className="inline-flex min-h-11 items-center justify-center rounded-[8px] bg-[#006b4f] px-4 text-sm font-semibold text-white"
+            >
+              <SkillDetailText id="install" />
+            </a>
+            {skill.technical.repository ? (
+              <SkillActionLink
+                href={skill.technical.repository}
+                skillSlug={skill.slug}
+                eventType="outbound_github"
+                external
+                className="inline-flex min-h-11 items-center justify-center rounded-[8px] border border-border bg-background px-4 text-sm font-semibold"
+              >
+                <SkillDetailText id="viewGitHub" />
+              </SkillActionLink>
+            ) : (
+              <Link
+                href={resolveTextHref}
+                prefetch={false}
+                className="inline-flex min-h-11 items-center justify-center rounded-[8px] border border-border bg-background px-4 text-sm font-semibold"
+              >
+                <SkillDetailText id="autoResolvePlan" />
+              </Link>
+            )}
           </div>
         </div>
       </main>

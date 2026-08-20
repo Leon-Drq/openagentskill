@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildInstallHandoff } from '@/lib/registry'
-import { getSkillBySlugOrFallback, getSkillSuggestionsForSlug } from '@/lib/skill-fallbacks'
+import { getSkillBySlugOrFallbackStrict, getSkillSuggestionsForSlug } from '@/lib/skill-fallbacks'
 
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 const INSTALL_CACHE_HEADERS = {
-  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
+  'Cache-Control': 'no-store, max-age=0',
 }
 
 export async function GET(
@@ -16,7 +17,7 @@ export async function GET(
   const format = request.nextUrl.searchParams.get('format') || 'json'
 
   try {
-    const skill = await getSkillBySlugOrFallback(slug)
+    const skill = await getSkillBySlugOrFallbackStrict(slug)
     if (!skill) {
       return NextResponse.json({
         error: `Skill not found: ${slug}`,
@@ -67,6 +68,9 @@ ${payload.urls.web}`,
     return NextResponse.json(payload, { headers: INSTALL_CACHE_HEADERS })
   } catch (error) {
     console.error('Public skill install API error:', error)
-    return NextResponse.json({ error: 'Failed to build install handoff' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Skill registry is temporarily unavailable. Retry this request.' },
+      { status: 503, headers: { ...INSTALL_CACHE_HEADERS, 'Retry-After': '15', 'X-Registry-Data-State': 'degraded' } }
+    )
   }
 }

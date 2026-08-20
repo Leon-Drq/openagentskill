@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { toRegistrySkill } from '@/lib/registry'
-import { getSkillBySlugOrFallback, getSkillSuggestionsForSlug } from '@/lib/skill-fallbacks'
+import { getSkillBySlugOrFallbackStrict, getSkillSuggestionsForSlug } from '@/lib/skill-fallbacks'
 
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 const MANIFEST_CACHE_HEADERS = {
-  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
+  'Cache-Control': 'no-store, max-age=0',
 }
 
 export async function GET(
@@ -16,7 +17,7 @@ export async function GET(
   const format = request.nextUrl.searchParams.get('format') || 'json'
 
   try {
-    const skill = await getSkillBySlugOrFallback(slug)
+    const skill = await getSkillBySlugOrFallbackStrict(slug)
 
     if (!skill) {
       return NextResponse.json({
@@ -90,6 +91,9 @@ URLs:
     )
   } catch (error) {
     console.error('Registry manifest API error:', error)
-    return NextResponse.json({ error: 'Failed to build registry manifest' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Skill registry is temporarily unavailable. Retry this request.' },
+      { status: 503, headers: { ...MANIFEST_CACHE_HEADERS, 'Retry-After': '15', 'X-Registry-Data-State': 'degraded' } }
+    )
   }
 }

@@ -10,7 +10,7 @@ import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillAttribution } from '@/lib/skill-attribution'
 import { buildSkillEvalProfile } from '@/lib/skill-evals'
-import { getSkillBySlugOrFallback, getSkillSuggestionsForSlug, isCuratedSkillFallback, normalizeSkillSlug } from '@/lib/skill-fallbacks'
+import { getSkillBySlugOrFallbackStrict, getSkillSuggestionsForSlug, isCuratedSkillFallback, normalizeSkillSlug } from '@/lib/skill-fallbacks'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile, getSkillTrustProfileV5 } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
@@ -36,7 +36,7 @@ export async function GET(
   const format = request.nextUrl.searchParams.get('format') || 'json'
 
   try {
-    const skill = await getSkillBySlugOrFallback(slug)
+    const skill = await getSkillBySlugOrFallbackStrict(slug)
 
     if (!skill) {
       return NextResponse.json(
@@ -280,8 +280,8 @@ OpenAgentSkill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
   } catch (error) {
     console.error('Agent skill detail API error:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch skill details' },
-      { status: 500 }
+      { error: 'Skill registry is temporarily unavailable. Retry this request.' },
+      { status: 503, headers: { ...AGENT_SKILL_CACHE_HEADERS, 'Retry-After': '15', 'X-Registry-Data-State': 'degraded' } }
     )
   }
 }

@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
 import { buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
-import { getAllSkills, getCategories, type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkills } from '@/lib/db/skills'
+import { getAllSkills, getCategories, type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsStrict } from '@/lib/db/skills'
 import { SkillsPageClient } from '@/components/skills-page-client'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillSupplyProfile, getSupplyTrackSummaries } from '@/lib/supply'
@@ -98,6 +98,7 @@ const VISIBLE_SKILL_LIMIT = 16
 const SKILLS_PAGE_REVALIDATE = 300
 const MAX_SKILLS_PAGE = Math.ceil(MAX_SKILL_CANDIDATE_LIMIT / VISIBLE_SKILL_LIMIT)
 const SKILLS_PAGE_QUERY_TIMEOUT_MS = 1800
+const SKILLS_PAGE_EXACT_SEARCH_TIMEOUT_MS = 8000
 const SKILLS_PAGE_EXACT_SEARCH_LIMIT = 120
 const DIRECTORY_SECTION_SOURCE_LIMIT = 120
 const FALLBACK_DATE = '2026-06-01T00:00:00.000Z'
@@ -525,14 +526,6 @@ function getCachedSkillCandidates(sort: SkillSortMode, category: string | undefi
   )()
 }
 
-function getCachedSearchSkillCandidates(query: string, limit: number) {
-  return unstable_cache(
-    async () => searchSkills(query, limit).catch(() => []),
-    ['skills-page-search-candidates-v1', query.trim().toLowerCase(), String(limit)],
-    { revalidate: SKILLS_PAGE_REVALIDATE }
-  )()
-}
-
 async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   let timeout: ReturnType<typeof setTimeout> | undefined
   const timeoutPromise = new Promise<T>((_, reject) => {
@@ -582,16 +575,19 @@ async function getSkillsPageRecords(sort: SkillSortMode, category: string | unde
 
 async function getSearchAugmentRecords(query: string | undefined) {
   const normalizedQuery = query?.trim()
-  if (!normalizedQuery) return []
+  if (!normalizedQuery) return { records: [] as SkillRecord[], degraded: false }
 
-  return withTimeout(
-    getCachedSearchSkillCandidates(normalizedQuery, SKILLS_PAGE_EXACT_SEARCH_LIMIT),
-    SKILLS_PAGE_QUERY_TIMEOUT_MS,
-    'skills exact search query'
-  ).catch((error) => {
+  try {
+    const records = await withTimeout(
+      searchSkillsStrict(normalizedQuery, SKILLS_PAGE_EXACT_SEARCH_LIMIT),
+      SKILLS_PAGE_EXACT_SEARCH_TIMEOUT_MS,
+      'skills exact search query'
+    )
+    return { records, degraded: false }
+  } catch (error) {
     console.warn('Skills page exact search fallback:', error)
-    return []
-  })
+    return { records: [] as SkillRecord[], degraded: true }
+  }
 }
 
 function mergeSkillRecords(...pools: SkillRecord[][]) {
@@ -961,8 +957,8 @@ export default async function SkillsPage({
     withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
   ])
-  const records = mergeSkillRecords(searchAugmentRecords, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
-  const degraded = recordsResult.degraded && searchAugmentRecords.length === 0
+  const records = mergeSkillRecords(searchAugmentRecords.records, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
+  const degraded = recordsResult.degraded || searchAugmentRecords.degraded
   const effectivePage = degraded && records.length <= requestedPageOffset ? 1 : page
   const pageOffset = (effectivePage - 1) * VISIBLE_SKILL_LIMIT
   const categoryOptions = categories.length > 0

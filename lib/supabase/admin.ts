@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createResilientTimeoutFetch } from '@/lib/supabase/resilient-fetch'
 
 const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -9,23 +10,6 @@ const SUPABASE_URL =
 
 export interface AdminClientOptions {
   requestTimeoutMs?: number
-}
-
-function createTimeoutFetch(timeoutMs: number): typeof fetch {
-  return async (input, init) => {
-    const controller = new AbortController()
-    const externalSignal = init?.signal
-    const signal = externalSignal
-      ? AbortSignal.any([externalSignal, controller.signal])
-      : controller.signal
-    const timeout = setTimeout(() => controller.abort(), timeoutMs)
-
-    try {
-      return await fetch(input, { ...init, signal })
-    } finally {
-      clearTimeout(timeout)
-    }
-  }
 }
 
 export function createAdminClient(options: AdminClientOptions = {}) {
@@ -47,7 +31,7 @@ export function createAdminClient(options: AdminClientOptions = {}) {
       persistSession: false,
     },
     ...(Number.isFinite(requestTimeoutMs) && requestTimeoutMs > 0
-      ? { global: { fetch: createTimeoutFetch(Math.floor(requestTimeoutMs)) } }
+      ? { global: { fetch: createResilientTimeoutFetch(Math.floor(requestTimeoutMs)) } }
       : {}),
   })
 }

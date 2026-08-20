@@ -59,9 +59,12 @@ const SHARED_SKILL_CACHE_REVALIDATE_SECONDS = 300
 const CATEGORY_CACHE_REVALIDATE_SECONDS = 3600
 const SKILL_DIRECTORY_REQUEST_TIMEOUT_MS = 1800
 const SKILL_STATS_REQUEST_TIMEOUT_MS = 3000
-const SKILL_LOOKUP_TIMEOUT_MS = 1200
+// Exact lookups are correctness-critical. A cold database request can take a
+// few seconds, so a directory-sized timeout would turn a live skill into a
+// false 404.
+const SKILL_LOOKUP_TIMEOUT_MS = 7000
 const SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS = 60
-const SKILL_EXACT_SEARCH_TIMEOUT_MS = 1500
+const SKILL_EXACT_SEARCH_TIMEOUT_MS = 7000
 const SKILL_BROAD_SEARCH_TIMEOUT_MS = 1500
 // Sitemap refreshes run off the interactive navigation path. Give a cold
 // registry shard enough time to return the complete URL set, then let the
@@ -832,9 +835,8 @@ function normalizeSkillLookupSlug(slug: string) {
 }
 
 // Detail pages, badges, manifests, and social crawlers all resolve skills by
-// slug. Cache both matches and misses so repeated stale links do not consume a
-// database connection on every request. A short TTL keeps new approvals and
-// corrections visible quickly.
+// slug. Cache matches and genuine misses, but let transient errors escape so
+// they are never stored as a false missing record.
 const getCachedSkillBySlug = unstable_cache(
   async (slug: string): Promise<SkillRecord | null> => {
     const supabase = createPublicClient({ requestTimeoutMs: SKILL_LOOKUP_TIMEOUT_MS })
@@ -845,25 +847,30 @@ const getCachedSkillBySlug = unstable_cache(
       .eq('ai_review_approved', true)
       .maybeSingle()
 
-    if (error || !data || isMcpSkillRecord(data)) return null
+    if (error) throw error
+    if (!data || isMcpSkillRecord(data)) return null
     return data as SkillRecord
   },
-  ['public-skill-by-slug-v2'],
+  ['public-skill-by-slug-v3'],
   {
     revalidate: SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS,
     tags: ['public-skill-directory'],
   }
 )
 
-export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> {
+export async function getSkillBySlugStrict(slug: string): Promise<SkillRecord | null> {
   const normalized = normalizeSkillLookupSlug(slug)
   if (!normalized) return null
 
+  return getCachedSkillBySlug(normalized)
+}
+
+export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> {
+
   try {
-    return await getCachedSkillBySlug(normalized)
-  } catch {
-    // A missing or temporarily unavailable detail must not slow down the
-    // registry. Curated callers can still provide their static fallback.
+    return await getSkillBySlugStrict(slug)
+  } catch (error) {
+    console.warn('Skill slug lookup fallback:', error)
     return null
   }
 }
@@ -988,16 +995,8 @@ async function fetchSearchSkills(normalizedQuery: string, limit: number): Promis
 }
 
 const getCachedSearchSkills = unstable_cache(
-  async (normalizedQuery: string, limit: number) => {
-    try {
-      return await fetchSearchSkills(normalizedQuery, limit)
-    } catch {
-      // The ranked directory candidate pool still answers the request when an
-      // exact database search is unavailable.
-      return [] as SkillRecord[]
-    }
-  },
-  ['public-skill-search-v3'],
+  async (normalizedQuery: string, limit: number) => fetchSearchSkills(normalizedQuery, limit),
+  ['public-skill-search-v4'],
   { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
 
@@ -1005,7 +1004,7 @@ async function fetchExactSearchSkills(query: string): Promise<SkillRecord[]> {
   const exactQuery = normalizeExactSearchQuery(query)
   if (!exactQuery) return []
 
-  const supabase = createPublicClient({ requestTimeoutMs: SKILL_DIRECTORY_REQUEST_TIMEOUT_MS })
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_EXACT_SEARCH_TIMEOUT_MS })
   const [slugResult, nameResult] = await Promise.all([
     supabase
       .from('skills')
@@ -1021,11 +1020,16 @@ async function fetchExactSearchSkills(query: string): Promise<SkillRecord[]> {
       .limit(8),
   ])
 
-  if (slugResult.error) throw slugResult.error
-  if (nameResult.error) throw nameResult.error
+  const records = [...(slugResult.data || []), ...(nameResult.data || [])] as unknown as SkillRecord[]
+  // A partial response is sufficient when it already contains a definitive
+  // match. If the healthy query returned nothing, however, do not let the
+  // failed sibling query turn an unknown result into a false empty result.
+  if (records.length === 0 && (slugResult.error || nameResult.error)) {
+    throw slugResult.error || nameResult.error
+  }
 
   const seen = new Set<string>()
-  return filterSkillOnly([...(slugResult.data || []), ...(nameResult.data || [])] as unknown as SkillRecord[])
+  return filterSkillOnly(records)
     .filter((skill) => {
       if (seen.has(skill.slug)) return false
       seen.add(skill.slug)
@@ -1033,7 +1037,18 @@ async function fetchExactSearchSkills(query: string): Promise<SkillRecord[]> {
     })
 }
 
-export async function searchSkills(query: string, limit = 120): Promise<SkillRecord[]> {
+function mergeSearchMatches(exactMatches: SkillRecord[], broadMatches: SkillRecord[], rowLimit: number) {
+  const seen = new Set<string>()
+  return [...exactMatches, ...broadMatches]
+    .filter((skill) => {
+      if (seen.has(skill.slug)) return false
+      seen.add(skill.slug)
+      return true
+    })
+    .slice(0, rowLimit)
+}
+
+export async function searchSkillsStrict(query: string, limit = 120): Promise<SkillRecord[]> {
   const normalizedQuery = normalizeExactSearchQuery(query)
   if (!normalizedQuery) return []
 
@@ -1043,21 +1058,32 @@ export async function searchSkills(query: string, limit = 120): Promise<SkillRec
       fetchExactSearchSkills(normalizedQuery),
       SKILL_EXACT_SEARCH_TIMEOUT_MS,
       'exact skill search'
-    ).catch(() => [] as SkillRecord[]),
+    ),
     withTimeout(
       getCachedSearchSkills(normalizedQuery.toLowerCase(), rowLimit),
       SKILL_BROAD_SEARCH_TIMEOUT_MS,
       'broad skill search'
     ).catch(() => [] as SkillRecord[]),
   ])
-  const seen = new Set<string>()
-  return [...exactMatches, ...broadMatches]
-    .filter((skill) => {
-      if (seen.has(skill.slug)) return false
-      seen.add(skill.slug)
-      return true
-    })
-    .slice(0, rowLimit)
+  return mergeSearchMatches(exactMatches, broadMatches, rowLimit)
+}
+
+export async function searchSkills(query: string, limit = 120): Promise<SkillRecord[]> {
+  const normalizedQuery = normalizeExactSearchQuery(query)
+  if (!normalizedQuery) return []
+  const rowLimit = Math.min(Math.max(Math.floor(limit) || 1, 1), 200)
+
+  try {
+    return await searchSkillsStrict(normalizedQuery, rowLimit)
+  } catch (error) {
+    console.warn('Exact skill search fallback:', error)
+    const broadMatches = await withTimeout(
+      getCachedSearchSkills(normalizedQuery.toLowerCase(), rowLimit),
+      SKILL_BROAD_SEARCH_TIMEOUT_MS,
+      'broad skill search fallback'
+    ).catch(() => [] as SkillRecord[])
+    return mergeSearchMatches([], broadMatches, rowLimit)
+  }
 }
 
 export async function getRelatedSkills(

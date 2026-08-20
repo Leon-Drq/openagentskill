@@ -301,7 +301,7 @@ export function SkillsPageClient({
 
       <section className="relative overflow-hidden border-b border-border">
         <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
-        <div className="relative mx-auto grid max-w-6xl gap-8 px-6 py-12 md:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+        <div className={`relative mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 ${query ? 'py-8 md:py-10' : 'py-12 md:py-16'} lg:grid-cols-[1.15fr_0.85fr] lg:items-end`}>
           <div>
 	            <p className="font-mono text-xs uppercase tracking-[0.24em] text-secondary">AI Agent Skill Repository</p>
 	            <h1 className="mt-5 max-w-3xl font-display text-4xl font-normal leading-[0.98] text-balance md:text-6xl">
@@ -349,8 +349,12 @@ export function SkillsPageClient({
             </div>
             <div className="mt-4 grid grid-cols-3 gap-px border border-border bg-border text-center">
               <div className="bg-background p-3">
-                <div className="font-mono text-lg text-foreground">{skills.length.toLocaleString()}</div>
-                <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">Shown</div>
+                <div className="font-mono text-lg text-foreground">
+                  {query && degraded ? '—' : resultCount.toLocaleString()}
+                </div>
+                <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">
+                  {query ? (degraded ? 'Live offline' : 'Matches') : 'Ranked'}
+                </div>
               </div>
               <div className="bg-background p-3">
                 <div className="font-mono text-lg text-foreground">{supplyTracks.length.toLocaleString()}</div>
@@ -378,7 +382,7 @@ export function SkillsPageClient({
         </div>
 	      </section>
 
-	      {directorySections.length > 0 && (
+	      {!query && directorySections.length > 0 && (
 	        <section className="border-b border-border bg-background">
 	          <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
 	            <div className="mb-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
@@ -457,7 +461,7 @@ export function SkillsPageClient({
 	        </section>
 	      )}
 
-	      <section className="border-b border-border bg-card/35">
+	      {!query && <section className="border-b border-border bg-card/35">
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
           <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>
@@ -506,7 +510,7 @@ export function SkillsPageClient({
             ))}
           </div>
       </div>
-      </section>
+      </section>}
 
       {/* Sort Tabs */}
       <div className="sticky top-14 z-40 border-b border-border bg-background/92 backdrop-blur">
@@ -537,7 +541,7 @@ export function SkillsPageClient({
           </div>
         )}
 
-        <section className="mb-8 border border-border bg-background/80 p-4 sm:p-5">
+        {!query && <section className="mb-8 border border-border bg-background/80 p-4 sm:p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">High-intent entry points</p>
@@ -568,7 +572,26 @@ export function SkillsPageClient({
               </Link>
             ))}
           </div>
-        </section>
+        </section>}
+
+        {query && (
+          <section className="mb-6 rounded-[8px] border border-border bg-card/80 p-4 sm:p-5">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">Live registry search</p>
+            <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div className="min-w-0">
+                <h2 className="break-words font-display text-2xl font-semibold sm:text-3xl">
+                  Results for “{query}”
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-secondary">
+                  Exact name and slug matches are checked against the live registry before ranked alternatives.
+                </p>
+              </div>
+              <Link href="/skills" className="shrink-0 text-sm font-semibold text-[#006b4f] underline underline-offset-4">
+                Clear search
+              </Link>
+            </div>
+          </section>
+        )}
 
         <section className="mb-8 border border-border bg-card/80 p-4 shadow-[0_16px_48px_rgba(23,23,23,0.04)] sm:p-5">
           <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
@@ -675,10 +698,10 @@ export function SkillsPageClient({
 
         {/* Category filters */}
         {categories.length > 0 && (
-          <div className="mb-8 flex flex-wrap gap-2">
+          <div className="-mx-4 mb-8 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
             <button
               onClick={() => navigate({ sort, category: 'all' })}
-              className={`text-xs px-3 py-1.5 border transition-colors ${
+              className={`shrink-0 whitespace-nowrap border px-3 py-1.5 text-xs transition-colors ${
                 category === 'all'
                   ? 'border-foreground bg-foreground text-background'
                   : 'border-border text-secondary hover:border-foreground hover:text-foreground'
@@ -690,7 +713,7 @@ export function SkillsPageClient({
               <button
                 key={cat}
                 onClick={() => navigate({ sort, category: cat })}
-                className={`text-xs px-3 py-1.5 border capitalize transition-colors ${
+                className={`shrink-0 whitespace-nowrap border px-3 py-1.5 text-xs capitalize transition-colors ${
                   category === cat
                     ? 'border-foreground bg-foreground text-background'
                     : 'border-border text-secondary hover:border-foreground hover:text-foreground'
@@ -718,8 +741,10 @@ export function SkillsPageClient({
 
         {/* Skills List */}
         {skills.length === 0 ? (
-          <div className="border border-border bg-card/70 p-12 text-center">
-            <p className="text-secondary mb-4">No skills found.</p>
+          <div className="border border-border bg-card/70 p-7 text-center sm:p-12">
+            <p className="mb-4 text-secondary">
+              {degraded ? 'Live search is temporarily unavailable. Retry in a moment.' : 'No exact or relevant skills found.'}
+            </p>
             <Link href="/skills" className="text-foreground underline text-sm">
               Clear filters
             </Link>
@@ -857,7 +882,7 @@ export function SkillsPageClient({
                     </div>
 
                     {(skill.qualityProfile || skill.trustProfile || skill.safetyProfile) && (
-                      <div className="mb-4 grid max-w-4xl gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      <div className="mb-4 hidden max-w-4xl gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-3">
                         {skill.qualityProfile && (
                           <div className="border-l border-border pl-3 text-xs leading-relaxed text-secondary">
                             <span className="mb-1 block font-mono text-[10px] uppercase tracking-widest text-secondary">
