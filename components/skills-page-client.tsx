@@ -349,8 +349,12 @@ export function SkillsPageClient({
             </div>
             <div className="mt-4 grid grid-cols-3 gap-px border border-border bg-border text-center">
               <div className="bg-background p-3">
-                <div className="font-mono text-lg text-foreground">{resultCount.toLocaleString()}</div>
-                <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">{query ? 'Matches' : 'Ranked'}</div>
+                <div className="font-mono text-lg text-foreground">
+                  {query && degraded ? '—' : resultCount.toLocaleString()}
+                </div>
+                <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">
+                  {query ? (degraded ? 'Live offline' : 'Matches') : 'Ranked'}
+                </div>
               </div>
               <div className="bg-background p-3">
                 <div className="font-mono text-lg text-foreground">{supplyTracks.length.toLocaleString()}</div>
