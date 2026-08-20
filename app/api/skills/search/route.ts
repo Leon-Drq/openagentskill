@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
           query,
           meta: { lookup_intent: true, retryable: true },
         },
-        { status: 503, headers: { ...DIRECT_LOOKUP_CACHE_HEADERS, 'Retry-After': '3' } }
+        { status: 503, headers: { ...DIRECT_LOOKUP_CACHE_HEADERS, 'Retry-After': '15', 'X-Registry-Data-State': 'degraded' } }
       )
     }
     const exactPool = exactResult.records

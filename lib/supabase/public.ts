@@ -1,4 +1,5 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createResilientTimeoutFetch } from '@/lib/supabase/resilient-fetch'
 
 // Supabase anon key is intentionally public — it is safe to commit.
 // RLS policies on the database enforce all access control.
@@ -20,23 +21,6 @@ export interface PublicClientOptions {
   requestTimeoutMs?: number
 }
 
-function createTimeoutFetch(timeoutMs: number): typeof fetch {
-  return async (input, init) => {
-    const controller = new AbortController()
-    const externalSignal = init?.signal
-    const signal = externalSignal
-      ? AbortSignal.any([externalSignal, controller.signal])
-      : controller.signal
-    const timeout = setTimeout(() => controller.abort(), timeoutMs)
-
-    try {
-      return await fetch(input, { ...init, signal })
-    } finally {
-      clearTimeout(timeout)
-    }
-  }
-}
-
 /**
  * A lightweight Supabase client for public read-only operations.
  * Does NOT depend on cookies() — works in any server context.
@@ -45,7 +29,7 @@ export function createPublicClient(options: PublicClientOptions = {}) {
   const requestTimeoutMs = Number(options.requestTimeoutMs)
   if (Number.isFinite(requestTimeoutMs) && requestTimeoutMs > 0) {
     return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: { fetch: createTimeoutFetch(Math.floor(requestTimeoutMs)) },
+      global: { fetch: createResilientTimeoutFetch(Math.floor(requestTimeoutMs)) },
     })
   }
 

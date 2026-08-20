@@ -70,7 +70,7 @@ ${payload.urls.web}`,
     console.error('Public skill install API error:', error)
     return NextResponse.json(
       { error: 'Skill registry is temporarily unavailable. Retry this request.' },
-      { status: 503, headers: { ...INSTALL_CACHE_HEADERS, 'Retry-After': '3' } }
+      { status: 503, headers: { ...INSTALL_CACHE_HEADERS, 'Retry-After': '15', 'X-Registry-Data-State': 'degraded' } }
     )
   }
 }

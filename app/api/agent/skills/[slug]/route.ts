@@ -281,7 +281,7 @@ OpenAgentSkill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
     console.error('Agent skill detail API error:', error)
     return NextResponse.json(
       { error: 'Skill registry is temporarily unavailable. Retry this request.' },
-      { status: 503, headers: { ...AGENT_SKILL_CACHE_HEADERS, 'Retry-After': '3' } }
+      { status: 503, headers: { ...AGENT_SKILL_CACHE_HEADERS, 'Retry-After': '15', 'X-Registry-Data-State': 'degraded' } }
     )
   }
 }

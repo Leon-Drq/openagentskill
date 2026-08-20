@@ -93,7 +93,7 @@ URLs:
     console.error('Registry manifest API error:', error)
     return NextResponse.json(
       { error: 'Skill registry is temporarily unavailable. Retry this request.' },
-      { status: 503, headers: { ...MANIFEST_CACHE_HEADERS, 'Retry-After': '3' } }
+      { status: 503, headers: { ...MANIFEST_CACHE_HEADERS, 'Retry-After': '15', 'X-Registry-Data-State': 'degraded' } }
     )
   }
 }
