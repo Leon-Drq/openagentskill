@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { ArrowRight, ArrowUpRight, Github, Search } from 'lucide-react'
 import type { Locale } from '@/lib/i18n/config'
 import { useI18n } from '@/lib/i18n/context'
@@ -729,39 +728,17 @@ const COMPARISON_LINKS = [
   { label: 'Native docs', href: 'https://developers.openai.com/codex/skills' },
 ]
 
-type DiscoveryMode = 'task' | 'skill' | 'repository'
-
 const DISCOVERY_COPY: Record<string, {
-  start: string
-  modes: Record<DiscoveryMode, string>
-  placeholders: Record<DiscoveryMode, string>
-  actions: Record<DiscoveryMode, string>
   liveApi: string
   sourceRefresh: string
   machineContract: string
 }> = {
   en: {
-    start: 'Start with one intent',
-    modes: { task: 'Describe a task', skill: 'Find a skill', repository: 'Paste GitHub' },
-    placeholders: {
-      task: 'What should your agent accomplish?',
-      skill: 'Search by skill name, topic, or capability',
-      repository: 'https://github.com/owner/repository',
-    },
-    actions: { task: 'Resolve task', skill: 'Search skills', repository: 'Review repository' },
     liveApi: 'Live agent API',
     sourceRefresh: 'Source refresh',
     machineContract: 'Machine contract',
   },
   zh: {
-    start: '从一个意图开始',
-    modes: { task: '描述任务', skill: '查找 Skill', repository: '粘贴 GitHub' },
-    placeholders: {
-      task: '你的 Agent 要完成什么任务？',
-      skill: '按 Skill 名称、主题或能力搜索',
-      repository: 'https://github.com/owner/repository',
-    },
-    actions: { task: '解析任务', skill: '搜索 Skills', repository: '审核仓库' },
     liveApi: '实时 Agent API',
     sourceRefresh: '数据刷新',
     machineContract: '机器接口',
@@ -807,11 +784,8 @@ function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) 
 
 export function HomePageEnhanced({ initialLocale, stats, featuredSkills, rankingGeneratedAt }: HomePageEnhancedProps) {
   const { t, locale } = useI18n()
-  const router = useRouter()
   const activeLocale = initialLocale || locale
   const [taskQuery, setTaskQuery] = useState('')
-  const [discoveryMode, setDiscoveryMode] = useState<DiscoveryMode>('task')
-  const [discoveryQuery, setDiscoveryQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const [resolveResult, setResolveResult] = useState<ResolveResult | null>(null)
   const [searchedCount, setSearchedCount] = useState(0)
@@ -868,24 +842,6 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
     await runRecommendation(taskQuery)
   }
 
-  const handleDiscovery = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const query = discoveryQuery.trim()
-    if (!query) return
-
-    if (discoveryMode === 'skill') {
-      router.push(`/skills?q=${encodeURIComponent(query)}`)
-      return
-    }
-    if (discoveryMode === 'repository') {
-      router.push(`/submit?repository=${encodeURIComponent(query)}`)
-      return
-    }
-
-    await runRecommendation(query)
-    requestAnimationFrame(() => searchRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
-  }
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') handleFindSkills()
   }
@@ -930,52 +886,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
             {copy.heroSubtitle}
           </p>
 
-          <form
-            onSubmit={handleDiscovery}
-            className="mt-10 max-w-4xl overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8]/95 shadow-[0_18px_55px_rgba(29,27,24,0.06)]"
-          >
-            <div className="border-b border-[#e4e0d8] px-3 pt-3 sm:px-4">
-              <p className="px-1 font-mono text-[10px] uppercase tracking-[0.2em] text-[#6d675e]">{discoveryCopy.start}</p>
-              <div className="mt-2 grid grid-cols-3 gap-1" role="tablist" aria-label={discoveryCopy.start}>
-                {(['task', 'skill', 'repository'] as DiscoveryMode[]).map((mode) => (
-                  <button
-                    key={mode}
-                    type="button"
-                    role="tab"
-                    aria-selected={discoveryMode === mode}
-                    onClick={() => setDiscoveryMode(mode)}
-                    className={`min-h-11 rounded-t-[7px] px-2 text-xs font-semibold transition-colors sm:px-4 sm:text-sm ${
-                      discoveryMode === mode
-                        ? 'bg-[#1d1b18] text-white'
-                        : 'text-[#6d675e] hover:bg-[#f2efe8] hover:text-[#1d1b18]'
-                    }`}
-                  >
-                    {discoveryCopy.modes[mode]}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex flex-col gap-2 p-3 sm:flex-row sm:p-4">
-              <input
-                type={discoveryMode === 'repository' ? 'url' : 'search'}
-                value={discoveryQuery}
-                onChange={(event) => setDiscoveryQuery(event.target.value)}
-                placeholder={discoveryCopy.placeholders[discoveryMode]}
-                aria-label={discoveryCopy.modes[discoveryMode]}
-                className="min-h-12 min-w-0 flex-1 rounded-[8px] border border-[#d8d2c6] bg-[#fbfaf6] px-4 text-sm outline-none placeholder:text-[#6d675e]/55 focus:border-[#006b4f]"
-              />
-              <button
-                type="submit"
-                disabled={!discoveryQuery.trim() || isSearching}
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[8px] bg-[#006b4f] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
-              >
-                <Search className="h-4 w-4" aria-hidden="true" />
-                {discoveryMode === 'task' && isSearching ? copy.reviewing : discoveryCopy.actions[discoveryMode]}
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-6 flex flex-wrap items-center gap-3">
+          <div className="mt-10 flex flex-wrap items-center gap-3">
             <a
               href="#task-search"
               className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] bg-[#006b4f] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:w-auto"
