@@ -7,6 +7,7 @@ const ja = {
     home: 'ホーム',
     resolve: '解決',
     skills: 'スキル',
+    rankings: 'ランキング',
     tasks: 'タスク',
     packs: 'スキルパック',
     compare: '比較',

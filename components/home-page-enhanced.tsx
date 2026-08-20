@@ -34,7 +34,12 @@ interface HomePageEnhancedProps {
     description: string
     github_stars: number
     downloads: number
+    rank: number
+    badge: string
+    reason: string
+    category: string
   }>
+  rankingGeneratedAt: string | null
 }
 
 interface ResolveCandidate {
@@ -800,7 +805,7 @@ function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) 
   )
 }
 
-export function HomePageEnhanced({ initialLocale, stats }: HomePageEnhancedProps) {
+export function HomePageEnhanced({ initialLocale, stats, featuredSkills, rankingGeneratedAt }: HomePageEnhancedProps) {
   const { t, locale } = useI18n()
   const router = useRouter()
   const activeLocale = initialLocale || locale
@@ -1010,6 +1015,93 @@ export function HomePageEnhanced({ initialLocale, stats }: HomePageEnhancedProps
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="border-b border-[#e4e0d8] bg-[#f3f1ea]/55 px-6 py-14 md:py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d675e]">Daily leaderboards</p>
+              <h2
+                className="mt-3 text-3xl font-normal leading-tight tracking-normal md:text-5xl"
+                style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+              >
+                Skills moving now, ranked with evidence.
+              </h2>
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[#5f5a52] md:text-base">
+                Daily snapshots combine capped activity signals, quality, trust, GitHub adoption, and real agent outcomes.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              {rankingGeneratedAt && (
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#6d675e]">
+                  Updated {new Date(rankingGeneratedAt).toLocaleString('en-US', {
+                    timeZone: 'UTC',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })} UTC
+                </span>
+              )}
+              <Link
+                href="/rankings"
+                className="inline-flex h-10 items-center gap-2 rounded-[8px] border border-[#d8d2c6] bg-[#fffdf8] px-4 text-sm font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
+              >
+                View all rankings
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+
+          <nav className="mt-7 flex gap-2 overflow-x-auto pb-1" aria-label="Leaderboard views">
+            {[
+              ['/trending', 'Trending'],
+              ['/rankings/agent-proven', 'Agent proven'],
+              ['/rankings/safest-auto-install-skills', 'Safe install'],
+              ['/rankings/new-agent-skills-this-week', 'New this week'],
+            ].map(([href, label], index) => (
+              <Link
+                key={href}
+                href={href}
+                className={`shrink-0 rounded-full border px-3.5 py-2 text-xs font-semibold transition-colors ${
+                  index === 0
+                    ? 'border-[#006b4f] bg-[#006b4f] text-white'
+                    : 'border-[#d8d2c6] bg-[#fffdf8] text-[#5f5a52] hover:border-[#006b4f] hover:text-[#006b4f]'
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+
+          {featuredSkills.length > 0 ? (
+            <ol className="mt-6 grid gap-px overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#d8d2c6] sm:grid-cols-2 lg:grid-cols-5">
+              {featuredSkills.map((skill) => (
+                <li key={skill.slug} className="min-w-0 bg-[#fffdf8]">
+                  <Link href={`/skills/${skill.slug}`} className="group flex h-full min-h-56 flex-col p-5 transition-colors hover:bg-[#f7f4ec]">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="grid h-8 w-8 place-items-center rounded-full bg-[#006b4f] font-mono text-xs font-semibold text-white">
+                        {skill.rank}
+                      </span>
+                      <span className="truncate font-mono text-[10px] uppercase tracking-[0.12em] text-[#6d675e]">{skill.category}</span>
+                    </div>
+                    <h3 className="mt-5 line-clamp-2 text-lg font-semibold leading-tight group-hover:text-[#006b4f]">{skill.name}</h3>
+                    <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-[#5f5a52]">{skill.reason || skill.description}</p>
+                    <div className="mt-auto flex items-end justify-between gap-3 pt-5 font-mono text-[11px] text-[#6d675e]">
+                      <span>{formatCompact(skill.github_stars)} stars</span>
+                      <span className="max-w-[9rem] truncate text-right">{skill.badge}</span>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <div className="mt-6 rounded-[10px] border border-dashed border-[#d8d2c6] bg-[#fffdf8] p-6 text-sm leading-relaxed text-[#5f5a52]">
+              The first daily leaderboard snapshot is being generated. Browse the live rankings while the scheduled snapshot is prepared.
+            </div>
+          )}
         </div>
       </section>
 

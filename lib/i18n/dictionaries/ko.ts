@@ -7,6 +7,7 @@ const ko = {
     home: '홈',
     resolve: '해결',
     skills: '스킬',
+    rankings: '랭킹',
     tasks: '작업',
     packs: '스킬 팩',
     compare: '비교',

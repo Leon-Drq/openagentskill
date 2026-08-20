@@ -4,6 +4,7 @@ export default {
     home: '首页',
     resolve: '解析',
     skills: '技能',
+    rankings: '排行榜',
     tasks: '任务',
     packs: '技能包',
     compare: '对比',

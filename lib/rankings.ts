@@ -389,7 +389,25 @@ export function rankSkillsForDefinition(
           }
       }
     })
-    .filter((item) => rankingSkillPenalty(item.skill) < 45)
+    .filter((item) => {
+      if (rankingSkillPenalty(item.skill) >= 45) return false
+
+      if (definition.kind === 'agent-usage' || definition.kind === 'success-rate') {
+        const stats = statsMap[item.skill.slug]
+        const totalUsage = stats
+          ? 'total_outcomes' in stats
+            ? Number(stats.total_outcomes || 0)
+            : Number(stats.total_calls || 0)
+          : 0
+
+        if (totalUsage <= 0) return false
+        if (definition.kind === 'success-rate' && (stats?.success_rate === null || stats?.success_rate === undefined)) {
+          return false
+        }
+      }
+
+      return true
+    })
     .sort((a, b) => {
       if (definition.kind === 'new-this-week') {
         return b.score - a.score || dateValue(b.skill.created_at) - dateValue(a.skill.created_at)

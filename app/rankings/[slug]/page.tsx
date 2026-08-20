@@ -14,6 +14,7 @@ import {
   type SkillOutcomeStats,
 } from '@/lib/db/skills'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
+import { getLatestRankingSnapshot } from '@/lib/ranking-snapshots'
 import {
   getRankingCompareHref,
   getRankingDefinition,
@@ -69,11 +70,13 @@ export default async function RankingDetailPage({
   const ranking = getRankingDefinition(slug)
   if (!ranking) notFound()
 
-  const [skills, statsMap] = await Promise.all([
+  const usesOutcomeStats = ranking.kind === 'agent-usage' || ranking.kind === 'success-rate' || ranking.kind === 'safe-auto-install'
+  const [skills, statsMap, latestSnapshot] = await Promise.all([
     getAllSkills('quality', undefined, 1200).catch(() => []),
-    ranking.kind === 'agent-usage'
+    usesOutcomeStats
       ? getAgentOutcomeStatsMap().catch((): Record<string, SkillOutcomeStats> => ({}))
       : getSkillStats().catch((): Record<string, SkillAgentStats> => ({})),
+    getLatestRankingSnapshot(ranking.slug),
   ])
   const rankedSkills = rankSkillsForDefinition(skills, ranking, statsMap, 30)
   const compareHref = getRankingCompareHref(rankedSkills)
@@ -106,6 +109,11 @@ export default async function RankingDetailPage({
             <p className="mb-4 text-xs uppercase tracking-widest text-secondary">{ranking.eyebrow}</p>
             <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">{ranking.title}</h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">{ranking.description}</p>
+            <p className="mt-4 font-mono text-xs uppercase tracking-widest text-secondary">
+              {latestSnapshot
+                ? `Daily snapshot: ${new Date(latestSnapshot.generated_at).toLocaleString('en-US', { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'short' })} UTC`
+                : 'Daily snapshot pending · live ranking shown'}
+            </p>
             <div className="mt-7 flex flex-wrap gap-3">
               {rankedSkills.length > 1 && (
                 <Link

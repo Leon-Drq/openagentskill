@@ -7,6 +7,7 @@ const de = {
     home: 'Start',
     resolve: 'Auflösen',
     skills: 'Skills',
+    rankings: 'Ranglisten',
     tasks: 'Aufgaben',
     packs: 'Skill Packs',
     compare: 'Vergleich',

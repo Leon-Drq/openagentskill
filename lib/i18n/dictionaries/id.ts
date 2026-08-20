@@ -7,6 +7,7 @@ const id = {
     home: 'Beranda',
     resolve: 'Temukan',
     skills: 'Skill',
+    rankings: 'Peringkat',
     tasks: 'Tugas',
     packs: 'Paket',
     compare: 'Bandingkan',

@@ -4,6 +4,7 @@ import {
   getApprovedRegistrySkillCount,
 } from '@/lib/registry-stats'
 import { getAgentOutcomeStatsMapStrict } from '@/lib/db/skills'
+import { getLatestRankingSnapshot } from '@/lib/ranking-snapshots'
 
 const HOME_STATS_SNAPSHOT = {
   // The last exact count observed before the registry stats cache was added.
@@ -76,9 +77,10 @@ const getCachedEvidenceStats = unstable_cache(
 )
 
 export async function getHomePageData() {
-  const [totalSkills, evidence] = await Promise.all([
+  const [totalSkills, evidence, trendingSnapshot] = await Promise.all([
     getCachedApprovedSkillCount(),
     getCachedEvidenceStats(),
+    getLatestRankingSnapshot('trending'),
   ])
 
   return {
@@ -89,6 +91,17 @@ export async function getHomePageData() {
       totalSkillsExact: totalSkills.exact,
     },
     activities: [],
-    featuredSkills: [],
+    featuredSkills: (trendingSnapshot?.items || []).slice(0, 5).map((item) => ({
+      slug: item.slug,
+      name: item.name,
+      description: item.description,
+      github_stars: item.github_stars,
+      downloads: 0,
+      rank: item.rank,
+      badge: item.badge,
+      reason: item.reason,
+      category: item.category,
+    })),
+    rankingGeneratedAt: trendingSnapshot?.generated_at || null,
   }
 }

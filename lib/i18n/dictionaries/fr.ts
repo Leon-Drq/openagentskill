@@ -7,6 +7,7 @@ const fr = {
     home: 'Accueil',
     resolve: 'Resoudre',
     skills: 'Skills',
+    rankings: 'Classements',
     tasks: 'Taches',
     packs: 'Packs',
     compare: 'Comparer',

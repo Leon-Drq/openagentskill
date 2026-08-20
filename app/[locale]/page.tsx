@@ -77,7 +77,7 @@ export default async function LocalizedHomePage({
   const page = getPage(locale)
   if (!page) notFound()
 
-  const { stats, activities, featuredSkills } = await getHomePageData()
+  const { stats, activities, featuredSkills, rankingGeneratedAt } = await getHomePageData()
 
   return (
     <HomePageEnhanced
@@ -85,6 +85,7 @@ export default async function LocalizedHomePage({
       stats={stats}
       activities={activities}
       featuredSkills={featuredSkills}
+      rankingGeneratedAt={rankingGeneratedAt}
     />
   )
 }

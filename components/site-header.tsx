@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils'
 const primaryNavItems = [
   { href: '/resolve', labelKey: 'resolve' },
   { href: '/skills', labelKey: 'skills' },
+  { href: '/rankings', labelKey: 'rankings' },
   { href: '/tasks', labelKey: 'tasks' },
   { href: '/skill-packs', labelKey: 'packs' },
   { href: '/compare', labelKey: 'compare' },

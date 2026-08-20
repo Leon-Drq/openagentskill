@@ -10,6 +10,7 @@ import {
 } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
 import { CORE_RANKINGS, getRankingDefinitions, rankSkillsForDefinition, type RankingDefinition } from '@/lib/rankings'
+import { getLatestRankingSnapshot, RANKING_METHODOLOGY_VERSION } from '@/lib/ranking-snapshots'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,10 +38,11 @@ function usesOutcomeStats(ranking: RankingDefinition) {
 }
 
 export default async function RankingsPage() {
-  const [skills, statsMap, outcomeStatsMap] = await Promise.all([
+  const [skills, statsMap, outcomeStatsMap, latestSnapshot] = await Promise.all([
     getAllSkills('quality', undefined, 1200).catch(() => []),
     getSkillStats().catch((): Record<string, SkillAgentStats> => ({})),
     getAgentOutcomeStatsMap().catch((): Record<string, SkillOutcomeStats> => ({})),
+    getLatestRankingSnapshot('trending'),
   ])
   const rankingDefinitions = getRankingDefinitions()
   const useCaseRankings = rankingDefinitions.filter((ranking) => ranking.kind === 'use-case')
@@ -71,6 +73,25 @@ export default async function RankingsPage() {
       />
 
       <div className="mx-auto max-w-6xl px-6">
+        <section className="grid gap-px border-x border-b border-border bg-border sm:grid-cols-3">
+          <div className="bg-background p-5">
+            <p className="text-xs uppercase tracking-widest text-secondary">Refresh cadence</p>
+            <p className="mt-2 font-mono text-sm">Daily at 02:55 UTC</p>
+          </div>
+          <div className="bg-background p-5">
+            <p className="text-xs uppercase tracking-widest text-secondary">Latest snapshot</p>
+            <p className="mt-2 font-mono text-sm">
+              {latestSnapshot
+                ? new Date(latestSnapshot.generated_at).toLocaleString('en-US', { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'short' }) + ' UTC'
+                : 'Pending first daily run'}
+            </p>
+          </div>
+          <div className="bg-background p-5">
+            <p className="text-xs uppercase tracking-widest text-secondary">Methodology</p>
+            <p className="mt-2 font-mono text-sm">{latestSnapshot?.methodology_version || RANKING_METHODOLOGY_VERSION}</p>
+          </div>
+        </section>
+
         <section className="grid gap-5 border-b border-border py-10 md:grid-cols-2 lg:grid-cols-3">
           {CORE_RANKINGS.map((ranking) => {
             const topSkills = rankSkillsForDefinition(
@@ -108,6 +129,19 @@ export default async function RankingsPage() {
               </Link>
             )
           })}
+        </section>
+
+        <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.65fr_1.35fr]">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-secondary">How ranking works</p>
+            <h2 className="mt-3 font-display text-2xl font-semibold">No pay-to-rank. No single-metric winners.</h2>
+          </div>
+          <div className="grid gap-4 text-sm leading-relaxed text-secondary sm:grid-cols-2">
+            <p><span className="font-semibold text-foreground">Trending</span> uses capped seven-day activity, logarithmic weighting, active-day breadth, quality, trust, adoption, and real agent outcomes.</p>
+            <p><span className="font-semibold text-foreground">Agent proven</span> requires reported outcomes. Safety lists penalize risk blocks, setup friction, unclear install paths, and weak Skill-format evidence.</p>
+            <p><span className="font-semibold text-foreground">Fresh and new</span> let recently maintained or indexed skills surface without needing years of accumulated GitHub stars.</p>
+            <p><span className="font-semibold text-foreground">Daily snapshots</span> make every published leaderboard reproducible for the day and expose when the data was generated.</p>
+          </div>
         </section>
 
         <section className="py-10">

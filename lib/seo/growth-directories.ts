@@ -1,4 +1,5 @@
-import type { SkillEventDailyStats, SkillEventStats, SkillRecord } from '@/lib/db/skills'
+import type { SkillEventDailyStats, SkillEventStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
+import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { getFreshnessDays, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
 
@@ -20,6 +21,7 @@ export interface SkillDailyEventSummary {
   claim_starts: number
   claim_submits: number
   weighted_engagement: number
+  active_days: number
   latest_event_at: string | null
 }
 
@@ -309,14 +311,17 @@ function eventRecencyScore(stats?: SkillEventStats | null) {
 }
 
 function dailyEngagement(row: SkillEventDailyStats) {
+  // Cap each signal per skill/day before weighting it. The public event API is
+  // intentionally frictionless, so unlimited raw counts must never translate
+  // into unlimited ranking influence.
   return (
-    (row.views || 0) +
-    (row.install_copies || 0) * 8 +
-    (row.compares || 0) * 5 +
-    (row.outbound_clicks || 0) * 4 +
-    (row.saves || 0) * 4 +
-    (row.claim_starts || 0) * 6 +
-    (row.claim_submits || 0) * 10
+    Math.min(30, row.views || 0) +
+    Math.min(12, row.install_copies || 0) * 8 +
+    Math.min(12, row.compares || 0) * 5 +
+    Math.min(15, row.outbound_clicks || 0) * 4 +
+    Math.min(10, row.saves || 0) * 4 +
+    Math.min(5, row.claim_starts || 0) * 6 +
+    Math.min(3, row.claim_submits || 0) * 10
   )
 }
 
@@ -332,6 +337,7 @@ export function summarizeSkillDailyStats(rows?: SkillEventDailyStats[] | null): 
     claim_starts: 0,
     claim_submits: 0,
     weighted_engagement: 0,
+    active_days: 0,
     latest_event_at: null,
   }
 
@@ -346,6 +352,7 @@ export function summarizeSkillDailyStats(rows?: SkillEventDailyStats[] | null): 
     summary.claim_starts += Number(row.claim_starts || 0)
     summary.claim_submits += Number(row.claim_submits || 0)
     summary.weighted_engagement += dailyEngagement(row) * recencyWeight
+    if (Number(row.total_events || 0) > 0) summary.active_days += 1
     if (row.last_event_at && (!summary.latest_event_at || row.last_event_at > summary.latest_event_at)) {
       summary.latest_event_at = row.last_event_at
     }
@@ -454,6 +461,7 @@ export function rankTrendingSkills(
   skills: SkillRecord[],
   eventStatsMap: Record<string, SkillEventStats>,
   dailyStatsMap: Record<string, SkillEventDailyStats[]> = {},
+  outcomeStatsMap: Record<string, SkillOutcomeStats> = {},
   limit = 48
 ): GrowthRankedSkill[] {
   return skills
@@ -462,6 +470,7 @@ export function rankTrendingSkills(
       const daily = summarizeSkillDailyStats(dailyStatsMap[skill.slug])
       const quality = getSkillQualityProfile(skill)
       const trust = getSkillTrustProfile(skill, false, stats)
+      const proven = getAgentProvenProfile(outcomeStatsMap[skill.slug] || null)
       const aggregateEngagement =
         (stats?.views || 0) +
         (stats?.install_copies || 0) * 8 +
@@ -469,24 +478,32 @@ export function rankTrendingSkills(
         (stats?.outbound_clicks || 0) * 4 +
         (stats?.saves || 0) * 4
       const hasRecentActivity = daily.total_events > 0
-      const engagement = hasRecentActivity ? daily.weighted_engagement : aggregateEngagement
+      const engagement = hasRecentActivity
+        ? Math.log1p(daily.weighted_engagement) * 16
+        : Math.log1p(aggregateEngagement) * 12
       const recency = (daily.latest_event_at ? dateScore(daily.latest_event_at, 10) : eventRecencyScore(stats)) * 22
+      const activityBreadth = Math.min(7, daily.active_days) * 4
+      const outcomeEvidence = proven.metrics.totalOutcomes > 0
+        ? proven.score * 0.18 + Math.log1p(proven.metrics.totalOutcomes) * 6
+        : 0
       const score =
-        engagement * 1.8 +
+        engagement +
         recency +
-        quality.score * 0.2 +
-        trust.score * 0.12 +
+        activityBreadth +
+        outcomeEvidence +
+        quality.score * 0.22 +
+        trust.score * 0.14 +
         Math.log10(Math.max(1, skill.github_stars || 1)) * 5
       return {
         skill,
         score,
         badge: hasRecentActivity
-          ? `${daily.total_events} events / 7d`
+          ? `${daily.total_events} events / ${daily.active_days}d`
           : stats?.total_events
             ? `${stats.total_events} events`
             : `${quality.label} · ${quality.score}`,
         reason: hasRecentActivity
-          ? `${daily.views} views, ${daily.install_copies} install copies, and ${daily.compares} compares in the last 7 days, plus ${quality.label.toLowerCase()} quality signals.`
+          ? `${daily.views} views, ${daily.install_copies} install copies, and ${daily.compares} compares across ${daily.active_days} active days, with capped anti-spam weighting${proven.metrics.totalOutcomes > 0 ? ` and ${proven.metrics.totalOutcomes} agent outcomes` : ''}.`
           : stats?.total_events
             ? `${stats.views} views, ${stats.install_copies} install copies, and ${quality.label.toLowerCase()} quality signals.`
           : `${quality.label} quality with strong adoption signals; usage events will lift it as people interact.`,

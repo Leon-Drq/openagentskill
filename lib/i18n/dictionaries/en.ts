@@ -4,6 +4,7 @@ export default {
     home: 'Home',
     resolve: 'Resolve',
     skills: 'Skills',
+    rankings: 'Rankings',
     tasks: 'Tasks',
     packs: 'Packs',
     compare: 'Compare',

@@ -7,6 +7,7 @@ const es = {
     home: 'Inicio',
     resolve: 'Resolver',
     skills: 'Skills',
+    rankings: 'Clasificaciones',
     tasks: 'Tareas',
     packs: 'Packs',
     compare: 'Comparar',

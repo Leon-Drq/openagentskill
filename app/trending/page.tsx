@@ -3,13 +3,16 @@ import Link from 'next/link'
 import { GrowthSkillList } from '@/components/growth-skill-list'
 import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import {
+  getAgentOutcomeStatsMap,
   getAllSkills,
   getSkillEventDailyStatsMap,
   getSkillEventStatsMap,
   type SkillEventDailyStats,
   type SkillEventStats,
+  type SkillOutcomeStats,
 } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
+import { getLatestRankingSnapshot, RANKING_METHODOLOGY_VERSION } from '@/lib/ranking-snapshots'
 import { rankTrendingSkills, summarizeSkillDailyStats } from '@/lib/seo/growth-directories'
 
 export const dynamic = 'force-dynamic'
@@ -30,12 +33,14 @@ export const metadata: Metadata = {
 }
 
 export default async function TrendingSkillsPage() {
-  const [skills, eventStatsMap, dailyStatsMap] = await Promise.all([
+  const [skills, eventStatsMap, dailyStatsMap, outcomeStatsMap, latestSnapshot] = await Promise.all([
     getAllSkills('quality', undefined, 1200).catch(() => []),
     getSkillEventStatsMap().catch((): Record<string, SkillEventStats> => ({})),
     getSkillEventDailyStatsMap(7).catch((): Record<string, SkillEventDailyStats[]> => ({})),
+    getAgentOutcomeStatsMap().catch((): Record<string, SkillOutcomeStats> => ({})),
+    getLatestRankingSnapshot('trending'),
   ])
-  const ranked = rankTrendingSkills(skills, eventStatsMap, dailyStatsMap, 40)
+  const ranked = rankTrendingSkills(skills, eventStatsMap, dailyStatsMap, outcomeStatsMap, 40)
   const dailySummaries = Object.values(dailyStatsMap).map((rows) => summarizeSkillDailyStats(rows))
   const hasDailyStats = dailySummaries.some((stats) => stats.total_events > 0)
   const totalEvents = hasDailyStats
@@ -83,6 +88,25 @@ export default async function TrendingSkillsPage() {
       />
 
       <div className="mx-auto max-w-6xl px-6">
+        <section className="grid gap-px border-x border-b border-border bg-border sm:grid-cols-3">
+          <div className="bg-background p-5">
+            <p className="text-xs uppercase tracking-widest text-secondary">Daily snapshot</p>
+            <p className="mt-2 font-mono text-sm">
+              {latestSnapshot
+                ? new Date(latestSnapshot.generated_at).toLocaleString('en-US', { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'short' }) + ' UTC'
+                : 'First snapshot pending'}
+            </p>
+          </div>
+          <div className="bg-background p-5">
+            <p className="text-xs uppercase tracking-widest text-secondary">Method</p>
+            <p className="mt-2 font-mono text-sm">{latestSnapshot?.methodology_version || RANKING_METHODOLOGY_VERSION}</p>
+          </div>
+          <div className="bg-background p-5">
+            <p className="text-xs uppercase tracking-widest text-secondary">Anti-gaming</p>
+            <p className="mt-2 text-sm leading-relaxed">Daily event caps, logarithmic weighting, trust, and agent outcomes.</p>
+          </div>
+        </section>
+
         <section className="grid gap-3 border-b border-border py-8 md:grid-cols-4">
           <Link href="/hot" className="border border-border p-5 transition-colors hover:border-foreground">
             <p className="mb-2 text-xs uppercase tracking-widest text-secondary">Hot list</p>
@@ -112,6 +136,17 @@ export default async function TrendingSkillsPage() {
             <h2 className="font-display text-2xl font-semibold">Skills gaining evaluation intent</h2>
           </div>
           <GrowthSkillList items={ranked} />
+        </section>
+
+        <section className="grid gap-8 border-t border-border py-10 md:grid-cols-[0.75fr_1.25fr]">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-secondary">Transparent ranking</p>
+            <h2 className="mt-3 font-display text-2xl font-semibold">Momentum, not raw popularity.</h2>
+          </div>
+          <div className="grid gap-4 text-sm leading-relaxed text-secondary sm:grid-cols-2">
+            <p>Recent views, install copies, comparisons, saves, and repository clicks are capped per skill and day, then dampened logarithmically.</p>
+            <p>Quality, Trust Score, repository adoption, activity across multiple days, and verified agent outcomes prevent one noisy signal from deciding the list.</p>
+          </div>
         </section>
       </div>
     </MarketingPageShell>

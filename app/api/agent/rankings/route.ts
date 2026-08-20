@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { getAgentOutcomeStatsMap, getAllSkills, getSkillStats } from '@/lib/db/skills'
 import { getRankingDefinition, getRankingDefinitions, rankSkillsForDefinition, type RankingDefinition } from '@/lib/rankings'
+import { getLatestRankingSnapshot, RANKING_METHODOLOGY_VERSION } from '@/lib/ranking-snapshots'
 
 function clampLimit(value: string | null) {
   const parsed = Number(value || 10)
@@ -31,9 +32,10 @@ export async function GET(request: NextRequest) {
       }, { status: 404 })
     }
 
-    const [skills, statsMap] = await Promise.all([
+    const [skills, statsMap, latestSnapshot] = await Promise.all([
       getAllSkills('quality'),
       usesOutcomeStats(definition) ? getAgentOutcomeStatsMap() : getSkillStats(),
+      getLatestRankingSnapshot(slug),
     ])
     const ranked = rankSkillsForDefinition(skills, definition, statsMap, limit)
 
@@ -54,7 +56,7 @@ export async function GET(request: NextRequest) {
       )).join('\n---\n')
 
       return new NextResponse(
-        `OpenAgentSkill Ranking\n${definition.title}\n${definition.description}\n---\n${text}`,
+        `OpenAgentSkill Ranking\n${definition.title}\n${definition.description}\nMethod: ${latestSnapshot?.methodology_version || RANKING_METHODOLOGY_VERSION}\nDaily snapshot: ${latestSnapshot?.generated_at || 'pending'}\n---\n${text}`,
         {
           headers: {
             'Content-Type': 'text/plain; charset=utf-8',
@@ -95,6 +97,12 @@ export async function GET(request: NextRequest) {
         slug: ranking.slug,
         title: ranking.title,
       })),
+      meta: {
+        live_generated_at: new Date().toISOString(),
+        daily_snapshot_at: latestSnapshot?.generated_at || null,
+        methodology_version: latestSnapshot?.methodology_version || RANKING_METHODOLOGY_VERSION,
+        update_cadence: 'daily at 02:55 UTC',
+      },
     })
   } catch (error) {
     console.error('Agent rankings API error:', error)
