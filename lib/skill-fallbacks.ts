@@ -1,4 +1,4 @@
-import { getSkillBySlug, type SkillRecord } from '@/lib/db/skills'
+import { getSkillBySlugStrict, type SkillRecord } from '@/lib/db/skills'
 import { withTimeout } from '@/lib/async'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 
@@ -110,18 +110,22 @@ export function isCuratedSkillFallback(skill: SkillRecord) {
   return skill.submission_source === 'curated_snapshot' || skill.id.startsWith('snapshot-')
 }
 
-export async function getSkillBySlugOrFallback(slug: string): Promise<SkillRecord | null> {
+export async function getSkillBySlugOrFallbackStrict(slug: string): Promise<SkillRecord | null> {
   const normalized = normalizeSkillSlug(slug)
   const fallback = getCuratedSkillFallback(normalized)
 
   if (fallback) {
     const dbSkill = await withTimeout(
-      getSkillBySlug(normalized),
-      650,
+      getSkillBySlugStrict(normalized),
+      1800,
       `curated skill lookup ${normalized}`
     ).catch(() => null)
     return dbSkill || fallback
   }
 
-  return getSkillBySlug(normalized).catch(() => null)
+  return getSkillBySlugStrict(normalized)
+}
+
+export async function getSkillBySlugOrFallback(slug: string): Promise<SkillRecord | null> {
+  return getSkillBySlugOrFallbackStrict(slug).catch(() => getCuratedSkillFallback(slug))
 }

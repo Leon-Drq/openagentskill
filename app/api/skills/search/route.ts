@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { unstable_cache } from 'next/cache'
 import { withTimeout } from '@/lib/async'
-import { getAgentOutcomeStatsMap, getAllSkills, searchSkills, type SkillOutcomeStats, type SkillRecord } from '@/lib/db/skills'
+import { getAgentOutcomeStatsMap, getAllSkills, searchSkillsStrict, type SkillOutcomeStats, type SkillRecord } from '@/lib/db/skills'
 import { augmentQueryForIntent, dedupeRankedSkills, getRecommendationReasons, normalizeMatchScore, rankSkillsForQuery, toRegistrySkill } from '@/lib/registry'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSkillSupplyProfile } from '@/lib/supply'
@@ -11,7 +11,7 @@ export const revalidate = 300
 
 const SEARCH_CANDIDATE_LIMIT = 750
 const SEARCH_QUERY_TIMEOUT_MS = 1000
-const SEARCH_EXACT_QUERY_TIMEOUT_MS = 2200
+const SEARCH_EXACT_QUERY_TIMEOUT_MS = 8000
 const SEARCH_CACHE_HEADERS = {
   'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
 }
@@ -55,6 +55,11 @@ function mergeSkillPools(...pools: SkillRecord[][]) {
   return merged
 }
 
+type ExactSearchResult = {
+  records: SkillRecord[]
+  error: unknown | null
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const query = searchParams.get('q') || searchParams.get('task') || ''
@@ -67,9 +72,11 @@ export async function GET(request: NextRequest) {
   const format = searchParams.get('format') || 'json'
   const limit = clampLimit(searchParams.get('limit'))
   const shortlistLimit = Math.max(limit * 8, 30)
+  const lookupIntent = isDirectSkillLookup(query)
+  const databaseQuery = lookupIntent ? query : augmentQueryForIntent(query)
 
   try {
-    const [candidatePool, exactPool, outcomeStatsMap] = await Promise.all([
+    const [candidatePool, exactResult, outcomeStatsMap] = await Promise.all([
       withTimeout(
         getSearchCandidatePool(),
         SEARCH_QUERY_TIMEOUT_MS,
@@ -80,22 +87,32 @@ export async function GET(request: NextRequest) {
       }),
       query.trim()
         ? withTimeout(
-            searchSkills(augmentQueryForIntent(query), 120),
+            searchSkillsStrict(databaseQuery, 120),
             SEARCH_EXACT_QUERY_TIMEOUT_MS,
             'public skill exact search query'
-          ).catch((error) => {
+          ).then((records): ExactSearchResult => ({ records, error: null })).catch((error): ExactSearchResult => {
             console.warn('Public skill exact search fallback:', error)
-            return [] as SkillRecord[]
+            return { records: [], error }
           })
-        : Promise.resolve([] as SkillRecord[]),
+        : Promise.resolve({ records: [] as SkillRecord[], error: null } as ExactSearchResult),
       withTimeout(
         getAgentOutcomeStatsMap(),
         SEARCH_QUERY_TIMEOUT_MS,
         'public skill outcome stats query'
       ).catch((): Record<string, SkillOutcomeStats> => ({})),
     ])
+    if (lookupIntent && exactResult.error) {
+      return NextResponse.json(
+        {
+          error: 'Live registry search is temporarily unavailable. Retry this request.',
+          query,
+          meta: { lookup_intent: true, retryable: true },
+        },
+        { status: 503, headers: { ...DIRECT_LOOKUP_CACHE_HEADERS, 'Retry-After': '3' } }
+      )
+    }
+    const exactPool = exactResult.records
     const skills = mergeSkillPools(exactPool, candidatePool, CURATED_SKILL_SNAPSHOT)
-    const lookupIntent = isDirectSkillLookup(query)
     const responseCacheHeaders = lookupIntent ? DIRECT_LOOKUP_CACHE_HEADERS : SEARCH_CACHE_HEADERS
     const rankedCandidates = dedupeRankedSkills(rankSkillsForQuery(skills, query, outcomeStatsMap))
       .filter(({ skill }) => {
