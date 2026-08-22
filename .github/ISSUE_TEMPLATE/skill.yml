@@ -1,0 +1,59 @@
+name: Skill submission or metadata correction
+description: Submit a public Agent Skill or correct an existing OpenAgentSkill listing.
+title: "[Skill]: "
+labels: [skill-data]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The fastest path is the [web submission flow](https://www.openagentskill.com/submit). Use this form when a submission cannot be completed there or when existing metadata needs correction.
+  - type: input
+    id: source
+    attributes:
+      label: Public repository, subdirectory, or SKILL.md URL
+      placeholder: https://github.com/owner/repository/tree/main/path/to/skill
+    validations:
+      required: true
+  - type: dropdown
+    id: request
+    attributes:
+      label: Request type
+      multiple: true
+      options:
+        - New Skill
+        - Wrong source or install command
+        - Wrong name, description, category, or tags
+        - Missing license or audit context
+        - Stale GitHub metadata
+        - Risk or malicious behavior report
+        - Creator claim or attribution
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Agent workflow
+      description: What concrete task does this Skill help an agent complete?
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: Requested metadata or safety correction
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Documentation and evidence
+      description: Add examples, expected output, install documentation, or risk evidence.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: The source is publicly accessible and contains reusable Agent Skill instructions.
+          required: true
+        - label: I understand that submission does not guarantee approval, verification, ranking, or a safety designation.
+          required: true
+        - label: I disclosed if I maintain or promote this Skill.
+          required: true

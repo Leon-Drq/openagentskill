@@ -1,0 +1,73 @@
+name: Bug report
+description: Report a reproducible website, API, indexer, CLI, SDK, or data problem.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Remove secrets, private repository data, and personal information before submitting.
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Affected surface
+      options:
+        - Website UI
+        - Resolve or recommendation API
+        - Search or registry data
+        - Skill submission or review
+        - Audit, Trust Score, or ranking
+        - CLI
+        - SDK
+        - Automation or indexer
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: URL, route, command, or Skill slug
+      placeholder: https://www.openagentskill.com/... or openagentskill resolve "..."
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Include the smallest sequence that consistently reproduces the problem.
+      placeholder: |
+        1. Open...
+        2. Enter...
+        3. Observe...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots, responses, or logs
+      description: Paste redacted evidence. Drag images directly into this field.
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: Browser/device/OS, Node version, agent target, or deployment
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing issues and did not find a duplicate.
+          required: true
+        - label: I removed secrets, private data, and personal information.
+          required: true

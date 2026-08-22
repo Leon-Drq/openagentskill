@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a usage question
+    url: https://github.com/Leon-Drq/openagentskill/discussions
+    about: Use Discussions for integration help, ideas, and general questions.
+  - name: Submit a Skill on the website
+    url: https://www.openagentskill.com/submit
+    about: Paste a repository, subdirectory, or SKILL.md URL for asynchronous review.
+  - name: Report a security vulnerability
+    url: https://github.com/Leon-Drq/openagentskill/security/advisories/new
+    about: Send exploitable security issues privately; do not open a public issue.

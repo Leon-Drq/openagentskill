@@ -14,11 +14,18 @@ What changed?
 ## Verification
 
 - [ ] `pnpm run lint`
+- [ ] `pnpm run typecheck`
+- [ ] `pnpm test`
+- [ ] `pnpm run test:links`
 - [ ] `pnpm run build`
 - [ ] Checked affected desktop pages
 - [ ] Checked affected mobile pages
 - [ ] Not applicable, docs-only change
 
-## Notes
+## Risk and rollout
 
-Call out data migrations, environment variables, or deployment requirements.
+Call out security impact, data migrations, environment variables, backward compatibility, deployment requirements, and rollback steps.
+
+## Evidence
+
+Add screenshots for UI changes and representative requests/responses for API changes. Explain expected ranking or Trust Score movement when those systems change.

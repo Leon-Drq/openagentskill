@@ -7,35 +7,71 @@ on:
     branches: [main]
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-jobs:
-  lint-and-build:
-    name: Lint and build
-    runs-on: ubuntu-latest
+permissions:
+  contents: read
 
+env:
+  CI: true
+
+jobs:
+  quality:
+    name: Lint and typecheck
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Prepare pnpm
-        run: corepack prepare pnpm@10.28.2 --activate
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Setup pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.2 --activate
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 22
           cache: pnpm
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
       - name: Lint
         run: pnpm run lint
+      - name: Typecheck
+        run: pnpm run typecheck
+      - name: Check repository links
+        run: pnpm run test:links
 
-      - name: Build
+  tests:
+    name: Regression tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Setup pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.2 --activate
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run regression and contract tests
+        run: pnpm test
+
+  build:
+    name: Production build
+    needs: [quality, tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Setup pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.2 --activate
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build production application
         run: pnpm run build

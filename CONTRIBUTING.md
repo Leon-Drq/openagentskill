@@ -1,90 +1,78 @@
 # Contributing to OpenAgentSkill
 
-OpenAgentSkill is an open discovery, audit, and recommendation layer for AI agent skills. Contributions should make the catalog more useful, more accurate, or easier for agents and builders to consume.
+Thank you for helping make Agent Skill discovery, evaluation, and installation more useful and trustworthy.
 
-## How to Contribute
+## Choose a contribution path
 
-### Submit or Fix a Skill
+- **Product or API bug:** use the [bug report form](https://github.com/Leon-Drq/openagentskill/issues/new?template=bug.yml).
+- **Product proposal:** start with the [feature request form](https://github.com/Leon-Drq/openagentskill/issues/new?template=feature.yml).
+- **New or incorrect Skill:** use the [web submission flow](https://www.openagentskill.com/submit) or [Skill data form](https://github.com/Leon-Drq/openagentskill/issues/new?template=skill.yml).
+- **Usage question:** use [GitHub Discussions](https://github.com/Leon-Drq/openagentskill/discussions).
+- **Security vulnerability:** do not open a public issue; follow [SECURITY.md](./SECURITY.md).
 
-- Submit a skill through [openagentskill.com/submit](https://www.openagentskill.com/submit) when possible.
-- Open an issue if a listed skill has stale metadata, wrong category, broken install instructions, or missing audit context.
-- Automated bulk imports are skill-only. MCP servers and Model Context Protocol repos are intentionally excluded.
+Look for [`good first issue`](https://github.com/Leon-Drq/openagentskill/labels/good%20first%20issue) and [`help wanted`](https://github.com/Leon-Drq/openagentskill/labels/help%20wanted) when choosing a first contribution.
 
-### For Skill Authors
+## Before coding
 
-- Make the install command explicit and reproducible.
-- Include a `README.md` or `SKILL.md` with the task scenario, supported agents, required secrets, risk notes, and examples.
-- Add a clear license.
-- Keep dependency and shell behavior easy to inspect.
-- Link back to the OpenAgentSkill listing when your skill is indexed.
-- Add Trust and Audit badges after the listing exists:
+1. Search open and closed issues and pull requests.
+2. For a material feature, open an issue describing the user or agent workflow first.
+3. Keep changes focused; unrelated refactors should use a separate pull request.
+4. Never include production secrets, private Skill contents, user data, or access tokens.
 
-```md
-[![OpenAgentSkill Trust](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=trust&label=Trust)](https://www.openagentskill.com/skills/YOUR-SLUG)
-[![OpenAgentSkill Audit](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=audit&label=Audit)](https://www.openagentskill.com/skills/YOUR-SLUG/audit)
-```
+## Development setup
 
-### Report Bugs
-
-- Check whether the bug is already reported.
-- Include the affected page or API route.
-- Include steps to reproduce, expected behavior, actual behavior, and screenshots when relevant.
-
-### Suggesting Features
-
-- Explain the user or agent workflow the feature improves.
-- Include example skills, queries, or pages when possible.
-- Prefer concrete changes to ranking, audit, search, submission, API, or SEO behavior.
-
-### Pull Requests
-
-1. Fork the repository
-2. Create a feature branch from `main`
-3. Make your changes with clear commit messages
-4. Ensure code follows existing patterns and style
-5. Test your changes locally
-6. Submit a pull request with a clear description
-
-## Development Setup
+Requirements: Node.js 22 and pnpm 10.28.2.
 
 ```bash
-# Install dependencies
+git clone https://github.com/Leon-Drq/openagentskill.git
+cd openagentskill
+corepack enable
 pnpm install
-
-# Run development server
+cp .env.example .env.local
 pnpm dev
+```
 
-# Run linting
+The website needs Supabase configuration for live data. Pure regression and contract tests run without production credentials.
+
+## Required checks
+
+Run these before requesting review:
+
+```bash
 pnpm run lint
-
-# Build production bundle
+pnpm run typecheck
+pnpm test
+pnpm run test:links
 pnpm run build
 ```
 
-For UI changes, also check the affected pages on desktop and mobile widths.
+For UI changes, verify the affected flow at desktop and mobile widths. For API changes, include a representative request and response. For ranking or Trust Score changes, explain expected movement and add regression evidence.
 
-## Commit Message Convention
+## Pull requests
 
-We follow [Conventional Commits](https://www.conventionalcommits.org/):
+1. Fork the repository and branch from `main`.
+2. Use a clear [Conventional Commit](https://www.conventionalcommits.org/) title.
+3. Complete the pull-request checklist and link the relevant issue.
+4. Keep generated artifacts, migrations, environment changes, and deployment requirements explicit.
+5. Address automated checks and review comments without rewriting unrelated code.
 
-- `feat:` — New features
-- `fix:` — Bug fixes
-- `docs:` — Documentation changes
-- `style:` — Code style changes (formatting, etc.)
-- `refactor:` — Code refactoring
-- `test:` — Adding or updating tests
-- `chore:` — Maintenance tasks
+Maintainers may close stale, duplicate, promotional, or insufficiently reproducible submissions. A merged contribution does not guarantee that a third-party Skill will be approved, ranked, or marked safe.
 
-## Code Style
+## Code and content standards
 
-- Use TypeScript for all new code
-- Follow existing component patterns
-- Use Tailwind CSS for styling
-- Keep components small and focused
-- Keep privileged routes protected by server-side secrets
-- Never expose service-role Supabase keys or X OAuth secrets to the browser
-- Keep SEO pages useful and specific; avoid thin copied content
+- Use TypeScript for new application code.
+- Follow existing Next.js App Router and component patterns.
+- Keep privileged operations server-side and protected by appropriate authorization.
+- Preserve the distinction between indexed, reviewed, verified, and Agent-Proven evidence.
+- Do not present GitHub stars as a security signal or approval gate.
+- Keep programmatic pages specific, useful, and backed by real Skill data.
+- Add or update tests for behavior changes.
+- Prefer primary sources for technical, security, and research claims.
 
-## Questions?
+## Skill metadata standards
 
-Feel free to open an issue or reach out to the maintainers.
+Skill authors should provide a reproducible install path, clear task scope, supported agents, required secrets, permissions, risk notes, examples, and an explicit license. Automated bulk imports are Skill-only; generic repositories and MCP-only projects are outside the registry scope.
+
+## Community
+
+Participation is governed by [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md). Project decision making is described in [GOVERNANCE.md](./GOVERNANCE.md), and support routes are listed in [SUPPORT.md](./SUPPORT.md).

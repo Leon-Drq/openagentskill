@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="64" viewBox="0 0 300 64" role="img" aria-label="OpenAgentSkill">
+  <style>
+    .mark, .wordmark { fill: #111111; }
+    @media (prefers-color-scheme: dark) {
+      .mark, .wordmark { fill: #f7f6f2; }
+    }
+  </style>
+  <g class="mark">
+    <path d="M29.3 9.8C17.6 11.3 8.8 23.9 8.8 32s8.8 20.7 20.5 22.2C21.6 53.6 17.7 42.4 17.7 32s3.9-21.6 11.6-22.2Z"/>
+    <path d="M34.7 9.8C46.4 11.3 55.2 23.9 55.2 32s-8.8 20.7-20.5 22.2C42.4 53.6 46.3 42.4 46.3 32S42.4 10.4 34.7 9.8Z"/>
+  </g>
+  <text class="wordmark" x="76" y="41" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="25" font-weight="650">OpenAgentSkill</text>
+</svg>

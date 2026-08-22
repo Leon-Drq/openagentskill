@@ -1,0 +1,11 @@
+# Default repository owner and reviewer.
+* @Leon-Drq
+
+# Security-sensitive and release surfaces.
+/.github/workflows/ @Leon-Drq
+/app/api/ @Leon-Drq
+/lib/audits.ts @Leon-Drq
+/lib/trust.ts @Leon-Drq
+/lib/indexer/ @Leon-Drq
+/packages/ @Leon-Drq
+/supabase/ @Leon-Drq

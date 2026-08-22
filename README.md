@@ -1,520 +1,244 @@
 <div align="center">
 
-<img src="./public/placeholder-logo.svg" alt="OpenAgentSkill" width="260" />
+<img src="./public/openagentskill-logo.svg" alt="OpenAgentSkill" width="300" />
 
 # OpenAgentSkill
 
 **The skill layer for AI agents.**
 
-Let your AI agent find, compare, install, and report outcomes for the right reusable skill automatically.
+Find, compare, audit, and install the right reusable Agent Skill before an agent acts.
 
-**OpenAgentSkill is npm for AI Agent Skills.**
+[![CI](https://img.shields.io/github/actions/workflow/status/Leon-Drq/openagentskill/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/Leon-Drq/openagentskill/actions/workflows/ci.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/Leon-Drq/openagentskill?display_name=tag&style=flat-square)](https://github.com/Leon-Drq/openagentskill/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/Leon-Drq/openagentskill?style=flat-square)](https://github.com/Leon-Drq/openagentskill/stargazers)
+[![License](https://img.shields.io/github/license/Leon-Drq/openagentskill?style=flat-square)](./LICENSE)
 
-[![Website](https://img.shields.io/badge/Website-openagentskill.com-black?style=for-the-badge)](https://www.openagentskill.com)
-[![CI](https://img.shields.io/github/actions/workflow/status/Leon-Drq/openagentskill/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/Leon-Drq/openagentskill/actions/workflows/ci.yml)
-[![GitHub Stars](https://img.shields.io/github/stars/Leon-Drq/openagentskill?style=for-the-badge&logo=github)](https://github.com/Leon-Drq/openagentskill)
-[![License](https://img.shields.io/badge/License-MIT-006b4f?style=for-the-badge)](./LICENSE)
-
-[Try Resolve](https://www.openagentskill.com/resolve) ·
-[Browse Skills](https://www.openagentskill.com/skills) ·
-[AI Video Creator Pack](https://www.openagentskill.com/skill-packs/ai-video-creator-agent-pack) ·
-[GitHub Skill Index](./skills/README.md) ·
-[Outcome Loop](https://www.openagentskill.com/outcomes) ·
-[Agent-Proven Rankings](https://www.openagentskill.com/rankings/agent-proven) ·
-[Audits](https://www.openagentskill.com/audits) ·
-[State of Agent Skills](https://www.openagentskill.com/reports/state-of-agent-skills-2026) ·
-[Creator Kit](https://www.openagentskill.com/creator-kit) ·
-[API Docs](https://www.openagentskill.com/api-docs) ·
-[Submit Skill](https://www.openagentskill.com/submit)
+[**Try Resolve →**](https://www.openagentskill.com/resolve) · [**Install the CLI →**](#install-the-cli)
 
 <br />
 
-<img src="./public/github-homepage-preview.png" alt="OpenAgentSkill homepage showing the skill layer for AI agents" width="920" />
-
-<br />
-
-<sub>The skill layer for AI agents · Registry API · Trust Score · Audited installs</sub>
+<img src="./public/github-homepage-preview.png" alt="OpenAgentSkill task-to-skill resolver and registry" width="920" />
 
 </div>
 
----
+## Why OpenAgentSkill?
 
-## Start Here
+Agent Skills are easy to publish and increasingly hard to evaluate. A repository can be popular, recently updated, or well documented without being the right choice for a specific agent task.
 
-| I am a... | Start with | What you get |
-| --- | --- | --- |
-| Agent builder | [`/api/agent/resolve`](https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&agent=codex&max_risk=medium&format=text) | One recommended skill, alternatives, install receipt, Trust Score v5, and risk notes |
-| Skill author | [Creator Kit](https://www.openagentskill.com/creator-kit) | Canonical page, README badges, audit surface, Agent Proven badge, X share card, and claim path |
-| Developer exploring skills | [GitHub Skill Index](./skills/README.md) | Curated domain maps and scenario-first examples |
-| Researcher or journalist | [State of Agent Skills 2026](https://www.openagentskill.com/reports/state-of-agent-skills-2026) | Citable methodology plus public JSON, CSV, and text datasets |
-| SEO/community operator | [X Growth Kit](https://www.openagentskill.com/x-kit) | Human-readable launch drafts and creator reply workflows |
+OpenAgentSkill adds the decision layer between discovery and execution:
 
-## Why Star This Repo?
-
-OpenAgentSkill is not another static directory. It is a registry, trust layer, and recommendation API designed for agents that need to choose and install reusable skills before acting.
-
-| Signal | Why it matters |
+| Capability | What an agent gets |
 | --- | --- |
-| 10,000+ indexed candidates | Broad coverage that remains explicitly separated from maintainer verification and Agent Proven evidence |
-| GitHub domain + scenario index | Curated pages for coding, web scraping, finance, RAG, PDF parsing, browser automation, DevOps, security, support, commerce, Web3, ML/media, and real agent jobs |
-| Trust Score v5 + audit pages | Agents can inspect quality, license, README/SKILL.md completeness, install safety, maintenance, outcome confidence, and risk signals |
-| Outcome feedback loop | Resolved skills can report `success`, `failed`, `not_relevant`, `blocked_by_risk`, or `setup_required` so rankings learn from real use |
-| Agent Proven Score | Every outcome can update success rate, recent failure rate, install success, output quality, production use, and human-review pressure |
-| Agent-Proven rankings | Skills with real outcome reports rank above untested high-star projects when agents need safer install candidates |
-| Agent-readable APIs | Codex, Claude Code, Cursor, and other runtimes can call stable endpoints instead of scraping a website |
+| Task-to-skill resolve | One recommended Skill plus relevant alternatives |
+| Trust and audit signals | License, maintenance, install safety, permission, and quality context |
+| Install receipt | A stable, target-specific handoff for Codex, Claude Code, Cursor, or CLI |
+| Outcome loop | Evidence from successful, failed, blocked, or setup-required agent runs |
+| Machine-readable surfaces | JSON, text, OpenAPI, manifests, rankings, and public research datasets |
 
-## Copy-Paste Agent Integration
+OpenAgentSkill is not a static list and does not claim third-party code is safe. It helps agents make a better, inspectable decision before installation.
 
-Give this to Codex, Claude Code, Cursor, or any browser-capable agent:
+## 30-second demo
 
-```text
-Before installing a third-party skill, call OpenAgentSkill:
-
-GET https://www.openagentskill.com/api/agent/resolve?task={TASK}&agent={AGENT}&max_risk=medium&format=json
-GET https://www.openagentskill.com/api/agent/resolve?task={TASK}&agent={AGENT}&max_risk=medium&format=lockfile
-GET https://www.openagentskill.com/api/agent/receipt?task={TASK}&agent={AGENT}&max_risk=medium&format=text
-GET https://www.openagentskill.com/api/agent/packs/{PACK_SLUG}?limit=6
-
-Use the response to inspect:
-- recommended_skill
-- alternatives
-- install_command
-- install_receipt
-- resolve lockfile
-- pack install plan
-- trust_score
-- trust_score_v5
-- audit_url
-- risk_level
-- do_not_use_when
-- agent_proven
-
-Only install when the receipt risk policy allows it. After trying the skill, report the result:
-
-POST https://www.openagentskill.com/api/agent/outcome
-
-Use `dry_run: true` first when wiring a new agent integration.
-```
-
-## 30-Second Demo
-
-Ask OpenAgentSkill to resolve a task before your agent installs anything:
+Resolve a real task:
 
 ```bash
-curl "https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&agent=codex&max_risk=medium&format=text"
+curl "https://www.openagentskill.com/api/agent/resolve?task=extract+tables+from+PDF+reports&agent=codex&max_risk=medium&format=text"
 ```
 
-Fetch the stable install receipt for the same task:
-
-```bash
-curl "https://www.openagentskill.com/api/agent/receipt?task=analyze+stock+news&agent=codex&max_risk=medium&format=text"
-```
-
-Generate a compact lockfile when an agent needs a stable execution object:
-
-```bash
-curl "https://www.openagentskill.com/api/agent/resolve?task=analyze+stock+news&agent=codex&max_risk=medium&format=lockfile"
-```
-
-Example response shape:
+Example response:
 
 ```text
 OpenAgentSkill Resolve
-Task: analyze stock news
-Best skill: Serenity Skill
-Trust Score: 83/100
-Trust Score v5: 79/100, Review then install
-Agent Proven: 76/100, Agent proven
-Install: npx skills add muxuuu/serenity-skill
-Risk: needs_review
-Alternatives: OpenBB, Last30days Skill, VectorBT
-Outcome API: https://www.openagentskill.com/api/agent/outcome
+Task: extract tables from PDF reports
+Best skill: <recommended skill>
+Trust Score v5: <score and decision>
+Install: <reviewed install command>
+Risk: <risk level>
+Alternatives: <ranked alternatives>
+Receipt: <stable install handoff>
 ```
 
-After one narrow run, report what happened:
+The same resolver is available as [JSON](https://www.openagentskill.com/api/agent/resolve?task=extract+tables+from+PDF+reports&agent=codex&max_risk=medium), [plain text](https://www.openagentskill.com/api/agent/resolve?task=extract+tables+from+PDF+reports&agent=codex&max_risk=medium&format=text), and a compact lockfile format.
+
+## Install the CLI
+
+Run the pinned, dependency-free GitHub Release:
 
 ```bash
-curl -X POST "https://www.openagentskill.com/api/agent/outcome" \
-  -H "content-type: application/json" \
-  -d '{
-    "event_id": "resolve_...",
-    "skill_slug": "serenity-skill",
-    "task": "analyze stock news",
-    "agent": "codex",
-    "outcome": "success",
-    "install_used": true,
-    "task_success": true,
-    "output_quality": 4,
-    "workspace": "sandbox",
-    "time_to_useful_ms": 120000
-  }'
-```
-
-Read the machine-friendly outcome summary:
-
-```bash
-curl "https://www.openagentskill.com/api/agent/outcome?format=text"
-```
-
-Read the integration contract before wiring a new agent:
-
-```bash
-npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz outcome-contract
-curl "https://www.openagentskill.com/api/agent/outcome?contract=true"
-```
-
-## Official CLI
-
-Run the dependency-free CLI from the pinned official GitHub Release:
-
-```bash
-npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz search "extract tables from PDF reports"
 npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz resolve "extract tables from PDF reports" --agent codex
-npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install anthropic-frontend-design --agent codex --dry-run
 ```
 
-The publishable package source lives in [`packages/cli`](./packages/cli). Reviewed
-Skills require explicit approval, blocked Skills are refused, and verified install
-telemetry is recorded only after the standard installer exits successfully.
+Useful commands:
+
+```bash
+# Search without installing
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz search "browser automation"
+
+# Inspect a reviewed install plan
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install <skill-slug> --agent codex --dry-run
+
+# Read the outcome reporting contract
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz outcome-contract
+```
+
+The CLI refuses blocked Skills, requires explicit confirmation before execution, and supports `--no-telemetry`. Source and usage details live in [`packages/cli`](./packages/cli/README.md).
+
+## Give this to an agent
+
+```text
+Before installing a third-party Skill, call:
+
+GET https://www.openagentskill.com/api/agent/resolve
+  ?task={TASK}
+  &agent={AGENT}
+  &max_risk=medium
+  &format=json
+
+Inspect the recommended skill, alternatives, Trust Score v5, audit URL,
+risk level, install command, and install receipt. Use a sandbox first.
+
+After one narrow run, report the outcome to:
+POST https://www.openagentskill.com/api/agent/outcome
+```
+
+Copy-ready templates for Codex, Claude Code, and Cursor are available in the [Agent Integration Kit](https://www.openagentskill.com/agent/integration-kit).
+
+## How it works
+
+```mermaid
+flowchart LR
+    A["Agent task"] --> B["Resolve API"]
+    B --> C["Candidate retrieval"]
+    C --> D["Task fit + Trust Score v5"]
+    D --> E["Best Skill + alternatives"]
+    E --> F["Audit + install receipt"]
+    F --> G["Sandboxed agent run"]
+    G --> H["Outcome feedback"]
+    H --> D
+```
+
+Ranking combines task relevance with repository evidence, install readiness, maintenance, license clarity, risk signals, and real agent outcomes. See [Resolve Evals](https://www.openagentskill.com/evals/resolve) for the public evaluation surface.
+
+## Core interfaces
+
+| Interface | Purpose |
+| --- | --- |
+| [Resolve Workbench](https://www.openagentskill.com/resolve) | Turn a task into a recommended Skill and install plan |
+| [Skill Registry](https://www.openagentskill.com/skills) | Search and filter indexed Skills |
+| [Rankings](https://www.openagentskill.com/rankings) | Compare trending, trusted, and Agent-Proven Skills |
+| [Audit Index](https://www.openagentskill.com/audits) | Inspect install, maintenance, license, and risk evidence |
+| [Skill Packs](https://www.openagentskill.com/skill-packs) | Compose reviewed Skills into reusable workflows |
+| [Creator Kit](https://www.openagentskill.com/creator-kit) | Submit, claim, badge, and share a Skill |
+| [API Docs](https://www.openagentskill.com/api-docs) | Integrate registry and agent endpoints |
+
+Machine-readable entry points:
+
+- [`llms.txt`](https://www.openagentskill.com/llms.txt)
+- [Agent manifest](https://www.openagentskill.com/.well-known/agent-manifest.json)
+- [OpenAgentSkill identity](https://www.openagentskill.com/.well-known/openagentskill.json)
+- [OpenAPI document](https://www.openagentskill.com/openapi.json)
+- [State of Agent Skills dataset](https://www.openagentskill.com/reports/state-of-agent-skills-2026.json)
 
 ## TypeScript SDK
 
-The lightweight SDK lives in [`sdk/openagentskill.ts`](./sdk/openagentskill.ts). It is dependency-free and can be copied into an agent runtime:
+The dependency-free SDK source lives in [`packages/sdk`](./packages/sdk/README.md):
 
 ```ts
-import { createOpenAgentSkillClient } from './sdk/openagentskill'
+import { OpenAgentSkill } from './packages/sdk/openagentskill.mjs'
 
-const client = createOpenAgentSkillClient({ defaultAgent: 'codex' })
-const plan = await client.resolve('analyze stock news')
+const client = new OpenAgentSkill({
+  baseUrl: 'https://www.openagentskill.com',
+})
 
-// Read plan.recommendation.trust_score_v5 before installing.
+const plan = await client.resolve('audit a repository', {
+  agent: 'codex',
+  maxRisk: 'medium',
+})
+
 await client.reportOutcome({
   event_id: plan.feedback.event_id,
   skill_slug: plan.recommendation.best_skill.slug,
   task: plan.task,
-  agent: plan.agent,
   outcome: 'success',
-  install_used: true,
-  task_success: true,
-  output_quality: 4,
-  workspace: 'sandbox',
+  dry_run: true,
 })
 ```
 
-## What Makes OpenAgentSkill Different?
+The SDK package is prepared for npm publication but is not presented here as published until the public registry release is verifiable.
 
-Based on the public positioning of OpenAgentSkill, skills.sh, agentskills.io, and common GitHub skill lists:
+## For Skill authors
 
-| Feature | OpenAgentSkill | skills.sh | agentskills.io | Static lists |
-| --- | --- | --- | --- | --- |
-| Primary job | Agent resolve, trust, audit, install, outcomes | CLI/package-manager style install flow | Agent Skills standard and ecosystem docs | Human browsing |
-| Task-to-skill Resolve API | Yes | Partial | No public resolve layer | No |
-| Trust Score + audit page | Yes | Partial registry signals | Specification guidance | Usually no |
-| Machine-readable skill metadata | Yes | Install-focused metadata | Format/spec metadata | Inconsistent |
-| Install handoff | Codex, Claude Code, Cursor, CLI | `npx skills add` workflow | Standard-compatible clients | Manual copy |
-| Real agent outcome feedback | Yes | No public outcome loop | No public outcome loop | No |
-| Agent-Proven leaderboard | Yes | No public outcome ranking | No public outcome ranking | No |
-| Creator claim loop | Community indexed, then claimable/verified | Community registry | Open ecosystem contribution | Manual PRs |
-| Programmatic SEO pages | Real skill lists by task, agent, domain, and comparison | Registry/search pages | Documentation pages | Usually README sections |
+Paste a repository, subdirectory, or `SKILL.md` URL into [Submit Skill](https://www.openagentskill.com/submit). Submissions are saved first and reviewed asynchronously; GitHub stars, a predefined category, and perfect metadata are not required.
 
-OpenAgentSkill should sit between package-manager speed and audit-grade decision support: agents can still install quickly, but they first get a reasoned shortlist and risk profile.
+After indexing, authors receive:
 
-## Best Skills By Domain
+- A canonical Skill page and machine-readable metadata.
+- Trust, audit, quality, and Agent-Proven badge endpoints.
+- Claim and verified-maintainer paths.
+- Alternatives and use-case pages that can send qualified traffic back to the source.
 
-| Domain | Representative jobs | GitHub index | Live page |
-| --- | --- | --- | --- |
-| Coding agents | Plan, patch, test, review, ship | [coding.md](./skills/coding.md) | [Coding agents](https://www.openagentskill.com/ai-agent-skills/coding-agents) |
-| Web scraping | Extract tables, monitor pages, crawl docs | [web-scraping.md](./skills/web-scraping.md) | [Web scraping](https://www.openagentskill.com/ai-agent-skills/web-scraping) |
-| Research | Recent context, source-backed briefs, trend scans | [research.md](./skills/research.md) | [Research agents](https://www.openagentskill.com/use-cases/research-agents) |
-| Finance and quant | Stock news, filings, backtests, portfolio analysis | [finance.md](./skills/finance.md) | [Finance skills](https://www.openagentskill.com/ai-agent-skills/finance-quant) |
-| Documents and PDF | Parse PDFs, OCR, markdown conversion, RAG prep | [documents-pdf.md](./skills/documents-pdf.md) | [PDF parsing](https://www.openagentskill.com/best/pdf-parsing) |
-| Data analysis | CSV, SQL, notebooks, charts, dashboards | [data.md](./skills/data.md) | [Data analysis](https://www.openagentskill.com/ai-agent-skills/data-analysis) |
-| Design and creative | Figma, image, video, motion, brand assets | [design.md](./skills/design.md) | [Design pack](https://www.openagentskill.com/skill-packs/design-agent-pack) |
-| AI video creation | Topic planning, narration, talking-head edits, captions, covers, and retrospectives | [design.md](./skills/design.md) | [AI video creator pack](https://www.openagentskill.com/skill-packs/ai-video-creator-agent-pack) |
-| Marketing and growth | SEO pages, X drafts, CRM, content ops | [marketing.md](./skills/marketing.md) | [Growth pack](https://www.openagentskill.com/skill-packs/seo-automation-agent-pack) |
-| Security | Review install risk, secrets, shell/network surfaces | [security.md](./skills/security.md) | [Safety](https://www.openagentskill.com/safety) |
-| Football and World Cup | Match data, player analysis, tournament dashboards | [football-world-cup.md](./skills/football-world-cup.md) | [Football analytics](https://www.openagentskill.com/ai-agent-skills/world-cup-football) |
+Browse the curated [GitHub Skill Index](./skills/README.md) for domain and scenario maps.
 
-## How Agents Use It
+## Trust and security
 
-1. Describe a task.
-2. Call `/api/agent/resolve`.
-3. Fetch or read `install_receipt` for the selected skill, install plan, risk policy, and outcome event id.
-4. Inspect alternatives, Trust Score, audit URL, and eval URL.
-5. Install in a sandboxed workflow only when the receipt policy allows it.
-6. Report the outcome through `/api/agent/outcome`.
-7. Future rankings improve from aggregate feedback.
+OpenAgentSkill never treats popularity as proof of safety. Trust Score and audits are decision-support signals, not certifications or guarantees.
 
-Useful endpoints:
+Before executing third-party code:
 
-| Endpoint | Purpose |
-| --- | --- |
-| `GET /llms.txt` | Plain-text instructions for browser agents and LLMs |
-| `GET /.well-known/openagentskill.json` | Canonical brand identity, official profiles, product contract, and research links |
-| `GET /.well-known/agent-manifest.json` | Machine-readable capability manifest |
-| `POST /api/mcp` | Remote MCP tools for search, Resolve, install plans, rankings, and outcome feedback |
-| `GET /.well-known/mcp.json` | Remote MCP discovery metadata |
-| `@openagentskill/sdk` | Dependency-free JavaScript client (package source in `packages/sdk`) |
-| `GET /api/agent/integration-kit?format=text` | Copy-paste setup for Codex, Claude Code, and Cursor |
-| `GET /api/agent/resolve?task=...` | Resolve a task into one selected skill plus alternatives |
-| `GET /api/agent/resolve?task=...&format=lockfile` | Generate a compact install lock for agent workflows |
-| `GET /api/agent/receipt?task=...` | Fetch the stable install receipt for one resolved task |
-| `GET /api/agent/packs` | Browse workflow packs with install-plan URLs |
-| `GET /api/agent/packs/{slug}` | Fetch an executable pack install plan with ordered skills, audit URLs, review checklist, and outcome feedback |
-| `GET /api/agent/rankings?slug=agent-proven` | Read skills ranked by real outcome reports and install attempts |
-| `GET /api/agent/rankings?slug=best-by-success-rate` | Read skills ranked by Agent Proven Score, recent success, install success, and low failure pressure |
-| `GET /api/agent/rankings?slug=safest-auto-install-skills` | Read safer candidates for sandbox-first auto-install workflows |
-| `GET /api/agent/rankings/{slug}/history?days=30` | Read daily snapshots and rank movement |
-| `GET /api/agent/funnel?skill_slug=...` | Read aggregate views → starts → verified installs → successful outcomes |
-| `GET /api/agent/skills?q=...` | Search indexed skills |
-| `GET /api/agent/tasks` | Browse task-first routes |
-| `GET /api/agent/outcome?format=text` | Read aggregate adoption signals |
-| `GET /api/agent/outcome?contract=true` | Read the feedback contract for agent integrations |
-| `POST /api/agent/outcome` | Report whether a resolved skill worked |
-| `GET /api/audits/{slug}` | Fetch a skill audit report |
-| `GET /api/badge/{slug}` | Generate a README badge for listed status, trust, audit, quality, stars, or Agent Proven evidence |
-| `GET /reports/state-of-agent-skills-2026.json` | Read the public ecosystem report and analyzed skill-level dataset |
+1. Read the source and install scripts.
+2. Review permissions, network calls, dependencies, and required secrets.
+3. Start in a sandbox or low-risk workspace.
+4. Keep production credentials and customer data out of unreviewed Skills.
 
-## For Skill Authors
+Report vulnerabilities privately through the repository's **Security** tab. Report risky or misleading third-party listings through the [Skill data issue form](https://github.com/Leon-Drq/openagentskill/issues/new/choose). See [SECURITY.md](./SECURITY.md) for scope and disclosure rules.
 
-Get your skill indexed, audited, ranked, and shareable.
+## Local development
 
-- Public skill page with canonical URL.
-- Trust Score and audit page.
-- Install command and agent-readable metadata.
-- README badge.
-- Agent Proven badge for real outcome evidence.
-- X share card and launch copy.
-- Claim/verified listing flow.
-- Creator Dashboard with optional GitHub/X identity and full-funnel skill analytics.
-- Alternatives and use-case pages that can send qualified traffic back to your project.
-
-Add a badge to your README:
-
-```md
-[![Listed on OpenAgentSkill](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=listed&label=Listed)](https://www.openagentskill.com/skills/YOUR-SLUG)
-[![OpenAgentSkill Trust](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=trust&label=Trust)](https://www.openagentskill.com/skills/YOUR-SLUG)
-[![OpenAgentSkill Audit](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=audit&label=Audit)](https://www.openagentskill.com/skills/YOUR-SLUG/audit)
-[![Agent Proven](https://www.openagentskill.com/api/badge/YOUR-SLUG?metric=proven&label=Agent%20Proven)](https://www.openagentskill.com/skills/YOUR-SLUG)
-```
-
-Submit or fix a skill:
-
-- Website: [openagentskill.com/submit](https://www.openagentskill.com/submit)
-- GitHub issue: [Skill submission](https://github.com/Leon-Drq/openagentskill/issues/new?template=skill_submission.md)
-
-## Core Product Surfaces
-
-| Surface | Link | Purpose |
-| --- | --- | --- |
-| Resolve Workbench | [/resolve](https://www.openagentskill.com/resolve) | Task-to-skill recommendation with trust and install handoff |
-| Skill directory | [/skills](https://www.openagentskill.com/skills) | Search and filter the full catalog |
-| Outcome Loop | [/outcomes](https://www.openagentskill.com/outcomes) | Real agent outcome feedback and adoption signals |
-| Agent-Proven ranking | [/rankings/agent-proven](https://www.openagentskill.com/rankings/agent-proven) | Skills ranked by success reports, install attempts, risk blocks, and setup friction |
-| Agent Integration Kit | [/agent/integration-kit](https://www.openagentskill.com/agent/integration-kit) | Codex, Claude Code, Cursor setup templates |
-| Audits | [/audits](https://www.openagentskill.com/audits) | Trust, security, quality, and install-readiness reports |
-| State of Agent Skills | [/reports/state-of-agent-skills-2026](https://www.openagentskill.com/reports/state-of-agent-skills-2026) | Original ecosystem research with methodology, JSON, CSV, and agent-readable text |
-| Creator Kit | [/creator-kit](https://www.openagentskill.com/creator-kit) | README badges, creator share links, claim loop, and X drafts |
-| Rankings | [/rankings](https://www.openagentskill.com/rankings) | Ranked lists for agent workflows |
-| Use cases | [/use-cases](https://www.openagentskill.com/use-cases) | Scenario pages with real skill lists |
-| Skill packs | [/skill-packs](https://www.openagentskill.com/skill-packs) | Workflow bundles for common agent jobs |
-| Comparisons | [/compare](https://www.openagentskill.com/compare) | OpenAgentSkill vs other skill platforms |
-| X Growth Kit | [/x-kit](https://www.openagentskill.com/x-kit) | Curator-style X drafts, creator replies, and launch copy |
-| API Docs | [/api-docs](https://www.openagentskill.com/api-docs) | Programmatic access for agents and apps |
-| GitHub skill index | [skills/](./skills/README.md) | Curated domain lists for GitHub readers and agents |
-
-## Trust Score v5
-
-Trust Score v5 is a decision signal for agents and builders. It combines:
-
-- GitHub stars, forks, freshness, and maintenance.
-- README/SKILL.md completeness.
-- License clarity.
-- Install command availability and safety.
-- Permission and runtime risk hints.
-- Audit score and risk level.
-- Real agent outcome feedback and outcome confidence.
-- A machine-readable install decision: auto-install, human review, or sandbox-only.
-
-Trust Score is not a security guarantee. It is a shortlist signal. Review source code before installing third-party skills in sensitive environments.
-
-## Auto-Discovery
-
-The indexer scans GitHub for high-signal skill repositories and imports approved matches. MCP and Model Context Protocol repositories are intentionally excluded from automated imports.
-
-Current production strategy:
-
-- Grow toward 20,000+ approved skill listings.
-- Prefer high-star, recently maintained repositories.
-- Rotate across scenario-specific query groups.
-- Cover coding, data, documents, finance, quant, research, security, DevOps, RAG, browser automation, commerce, marketing, support, legal, education, productivity, Web3, sports analytics, ML/media, science, and robotics.
-- Submit fresh skill pages to IndexNow after imports.
-
-### X Hot-Skill Radar
-
-X is used as a discovery signal, not as an automatic import source. The daily radar rotates through task-focused searches for coding, finance, research, presentations, web scraping, design, marketing, data, legal, education, and sports. It only considers posts that link to a real GitHub repository. Every candidate still needs a clear license, a non-empty README, at least 10 GitHub stars, direct skill/workflow signals, and the normal AI quality review before it is indexed.
-
-This keeps the catalog current without importing generic frameworks or low-quality trend noise.
-
-Useful protected routes:
-
-```text
-POST /api/indexer/run
-GET  /api/indexer/run/coding-data
-GET  /api/indexer/run/finance-research
-GET  /api/indexer/run/growth-ops
-GET  /api/indexer/run/frontier-expansion
-POST /api/indexer/refresh-stars
-POST /api/indexnow/submit
-```
-
-## X Growth Loop
-
-OpenAgentSkill can generate compliant X share drafts for indexed skills and creator replies.
-
-```text
-GET  /api/x/share?skill_slug=crawl4ai
-GET  /api/x/reply-draft?skill_slug=crawl4ai&tweet_url=https://x.com/user/status/123&format=json
-POST /api/x/reply
-```
-
-Public draft endpoints generate copy and Web Intent URLs. Protected OAuth posting routes require explicit server-side authorization and an authorized X connection.
-
-## Tech Stack
-
-| Layer | Technology |
-| --- | --- |
-| Framework | Next.js 16 App Router |
-| UI | React 19, Tailwind CSS v4, shadcn/ui patterns |
-| Database | Supabase Postgres |
-| Auth and privileged writes | Supabase SSR plus server-only service role routes |
-| Analytics | Vercel Analytics |
-| Deployment | Vercel |
-| Automation | Vercel Cron routes and protected API jobs |
-| AI review | Vercel AI SDK / Gateway-compatible review flow |
-
-## Local Development
+Requirements: Node.js 22 and pnpm 10.28.2.
 
 ```bash
 git clone https://github.com/Leon-Drq/openagentskill.git
 cd openagentskill
-
+corepack enable
 pnpm install
 cp .env.example .env.local
 pnpm dev
 ```
 
-Validation:
+Quality checks:
 
 ```bash
 pnpm run lint
+pnpm run typecheck
+pnpm test
 pnpm run build
 ```
 
-## Environment Variables
+The public website requires Supabase configuration. Pure parsing, resolver-contract, SDK, CLI, and circuit-breaker regression tests run without production credentials.
 
-| Variable | Required | Description |
-| --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Public Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Public Supabase anon key |
-| `SUPABASE_SECRET_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Production | Server-only Supabase key for privileged routes |
-| `GITHUB_TOKEN` | Recommended | GitHub API token for higher indexer rate limits |
-| `INDEXER_SECRET` | Production | Bearer secret for protected indexer routes |
-| `CRON_SECRET` | Production | Bearer secret for scheduled maintenance routes |
-| `INDEXER_RUN_TARGET` | Optional | Number of new skills to import per run |
-| `INDEXER_TARGET_TOTAL` | Optional | Approved-skill coverage target; runtime never allows this below 20,000 |
-| `INDEXER_MIN_STARS` | Optional | Minimum GitHub stars for bulk imports |
-| `INDEXER_MAX_SEARCH_REQUESTS` | Optional | GitHub search request budget per run |
-| `X_CLIENT_ID` | Optional | X OAuth client ID |
-| `X_CLIENT_SECRET` | Optional | X OAuth client secret |
-| `X_ALLOWED_USERNAME` | Optional | Allowed X username for token storage |
-| `X_BEARER_TOKEN` | Optional | Enables X hot-skill discovery; keep server-only |
-| `SKILL_RADAR_X_MAX_QUERIES` | Optional | Number of X topic searches per scan; defaults to `1`, while `0` disables X discovery |
-| `SKILL_RADAR_X_SCAN_INTERVAL_HOURS` | Optional | X scan frequency; defaults to a bounded six-hour rotation |
-| `SKILL_RADAR_X_RESULTS_PER_QUERY` | Optional | Candidate posts inspected per X topic query; default `10` |
-| `SKILL_RADAR_X_LIMIT` | Optional | Maximum X-linked repositories to pass into the review pool per scan |
-| `X_CREATOR_OUTREACH_DRAFT_LIMIT` | Optional | Maximum quality-gated creator-reply drafts created from one X Radar run; default `2` |
-| `X_CREATOR_REPLY_DAILY_LIMIT` | Optional | Rolling 24-hour cap for automatic replies to original creator launch posts; maximum `2` |
-| `X_CREATOR_REPLY_MIN_SIGNAL` | Optional | Minimum X Radar engagement signal before a creator reply is eligible; default `8` |
-| `X_CREATOR_REPLY_MAX_AGE_DAYS` | Optional | Maximum age of a public launch post eligible for a reply; default `10` days |
-| `X_CREATOR_REPLY_AUTOPUBLISH` | Optional | Set `false` to keep creator replies as drafts only; defaults to `true` |
-
-Never commit production secrets. Keep privileged Supabase and X credentials server-only.
-
-## Creator Outreach Guardrails
-
-OpenAgentSkill can turn a high-signal public X launch post into a creator reply only after the linked repository passes the normal skill review. Each reply links to the canonical listing and its claim flow, is deduplicated per source post, and is capped at two replies in a rolling 24-hour window. The associated email endpoint creates a private draft only; it never collects contacts, sends email, or opens promotional pull requests automatically.
-
-## Database Setup
-
-Apply SQL files in `scripts/` in order. The current schema includes:
-
-- Skills catalog.
-- Profiles and points.
-- Activity and feedback events.
-- Secure public-write RPCs.
-- Indexer run logs.
-- X OAuth token storage.
-- Claims and skill events.
-- Hardened RLS policies.
-- Skill audits and daily event aggregates.
-- Agent outcome feedback and aggregate success signals.
-- Agent Proven Score columns for success, recent failure, install success, output quality, production use, and unique agent adoption.
-
-Latest outcome-feedback migration:
+## Repository map
 
 ```text
-scripts/017_agent_proven_score.sql
+app/          Next.js pages, APIs, manifests, reports, and agent surfaces
+components/   Product UI and client interactions
+lib/          Resolve, ranking, audit, indexer, database, and growth logic
+packages/     Publishable CLI and SDK packages
+scripts/      Regression tests, migrations, importers, and maintenance jobs
+skills/       Curated GitHub Skill index by domain and scenario
+supabase/     Database functions and migrations
 ```
-
-## Project Structure
-
-```text
-app/
-  api/
-    agent/        Agent-friendly search, rankings, recommendation, feedback, outcomes
-    audits/       Skill audit API
-    badge/        SVG badge API
-    indexer/      Protected import and maintenance jobs
-    x/            X OAuth, Web Intent, and optional posting routes
-  skills/         Skill directory and detail pages
-  outcomes/       Agent outcome loop page
-  audits/         Audit index
-  best/           Best-of ranking pages
-  trending/       Trending skills
-  hot/            Hot skills
-  agents/         Agent-specific pages
-  official/       Creator pages
-  compare/        Comparison pages
-  guides/         Guides and SEO content
-
-lib/
-  audits.ts       Audit scoring and normalization
-  quality.ts      Quality profiles
-  trust.ts        Trust scoring
-  decision.ts     Adoption-readiness profile
-  rankings.ts     Ranking logic
-  indexer/        GitHub discovery and import pipeline
-  db/             Supabase data access
-  seo/            Programmatic SEO page data
-
-scripts/
-  *.sql           Supabase migrations
-  *.mjs, *.ts     Content and seed scripts
-```
-
-## Roadmap
-
-See [ROADMAP.md](./ROADMAP.md).
-
-## Security
-
-See [SECURITY.md](./SECURITY.md). OpenAgentSkill does not guarantee that third-party skills are safe. Treat Trust Score and audits as decision support, not a replacement for source review and sandboxed execution.
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md). Useful contribution types include skill submissions, metadata fixes, audit improvements, API improvements, SEO guide contributions, and UI fixes.
+Contributions are welcome across product, APIs, indexing, trust, documentation, and Skill metadata.
+
+- Read [CONTRIBUTING.md](./CONTRIBUTING.md).
+- Look for [`good first issue`](https://github.com/Leon-Drq/openagentskill/labels/good%20first%20issue) or [`help wanted`](https://github.com/Leon-Drq/openagentskill/labels/help%20wanted).
+- Ask usage questions in [GitHub Discussions](https://github.com/Leon-Drq/openagentskill/discussions).
+- Use [SUPPORT.md](./SUPPORT.md) to choose the right support channel.
+
+Project decisions and maintainer responsibilities are documented in [GOVERNANCE.md](./GOVERNANCE.md). Releases are tracked in [CHANGELOG.md](./CHANGELOG.md), and planned work lives in [ROADMAP.md](./ROADMAP.md).
 
 ## License
 
-MIT. See [LICENSE](./LICENSE).
+[MIT](./LICENSE) © OpenAgentSkill contributors.

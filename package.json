@@ -2,6 +2,7 @@
   "name": "openagentskill-web",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "packageManager": "pnpm@10.28.2",
   "bin": {
     "openagentskill": "./bin/openagentskill.mjs"
@@ -17,6 +18,10 @@
     "test:supabase-circuit": "node --experimental-strip-types scripts/test-supabase-circuit.ts",
     "test:cli": "node packages/cli/openagentskill.mjs --help",
     "test:sdk": "node scripts/test-sdk.mjs",
+    "test:links": "node scripts/check-repository-links.mjs",
+    "test:links:external": "node scripts/check-repository-links.mjs --external",
+    "test": "pnpm run test:submission && pnpm run test:submission-discovery && pnpm run test:supabase-circuit && pnpm run test:cli && pnpm run test:sdk",
+    "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint ."
   },
   "dependencies": {

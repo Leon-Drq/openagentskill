@@ -1,0 +1,35 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "03:00"
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 5
+    groups:
+      production-minor-and-patch:
+        dependency-type: production
+        update-types: [minor, patch]
+      development-minor-and-patch:
+        dependency-type: development
+        update-types: [minor, patch]
+    labels: [dependencies]
+    commit-message:
+      prefix: chore
+      include: scope
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "03:30"
+      timezone: Asia/Shanghai
+    groups:
+      github-actions:
+        patterns: ["*"]
+    labels: [dependencies]
+    commit-message:
+      prefix: chore
+      include: scope

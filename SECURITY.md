@@ -47,7 +47,7 @@ They are not:
 
 ## Reporting A Vulnerability
 
-Please open a private security report on GitHub if available, or contact the maintainer with:
+Use GitHub's **Report a vulnerability** flow in the repository Security tab. If GitHub private vulnerability reporting is unavailable, contact [qudongqi2023@gmail.com](mailto:qudongqi2023@gmail.com) with:
 
 - Affected URL, endpoint, or repository.
 - Steps to reproduce.
@@ -56,6 +56,8 @@ Please open a private security report on GitHub if available, or contact the mai
 - Whether any secret, token, private data, or user account was exposed.
 
 Do not publicly disclose exploitable issues until the maintainer has had a reasonable chance to investigate.
+
+Please do not include live credentials, personal data, or unnecessary production data in a report. Use redacted request and response samples whenever possible.
 
 ## Reporting A Risky Or Malicious Skill
 

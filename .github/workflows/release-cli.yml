@@ -1,0 +1,41 @@
+name: Release CLI
+
+on:
+  push:
+    tags:
+      - "cli-v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Package and publish GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - name: Setup pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.2 --activate
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Verify tag and package version
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./packages/cli/package.json').version")
+          test "$GITHUB_REF_NAME" = "cli-v$VERSION"
+      - name: Run CLI contract test
+        run: pnpm run test:cli
+      - name: Pack CLI artifact
+        run: mkdir -p dist && pnpm --dir packages/cli pack --pack-destination ../../dist
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/*.tgz --verify-tag --generate-notes --title "OpenAgentSkill CLI ${GITHUB_REF_NAME#cli-v}"

@@ -1,0 +1,56 @@
+name: Feature request
+description: Propose a concrete product, API, ranking, trust, or developer-experience improvement.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or workflow
+      description: Describe the user or agent job that is currently difficult.
+    validations:
+      required: true
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Primary audience
+      options:
+        - Agent builder
+        - Skill author
+        - Developer or integrator
+        - Researcher
+        - Registry maintainer
+        - End user
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Explain the smallest useful solution, including example inputs or outputs.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence or examples
+      description: Link related Skills, queries, APIs, products, research, or screenshots.
+  - type: textarea
+    id: success
+    attributes:
+      label: Success measure
+      description: How should we know this change improved the workflow?
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing issues and Discussions for this proposal.
+          required: true
+        - label: This is a product proposal, not a request for hidden ranking placement or promotion.
+          required: true

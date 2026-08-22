@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If OpenAgentSkill or its public Agent Skill datasets support your research, please cite this repository."
+title: "OpenAgentSkill"
+type: software
+authors:
+  - family-names: "Leon-Drq"
+    alias: "Leon-Drq"
+repository-code: "https://github.com/Leon-Drq/openagentskill"
+url: "https://www.openagentskill.com"
+license: MIT
+date-released: 2026-08-23
+keywords:
+  - agent skills
+  - AI agents
+  - skill registry
+  - trust scoring
+  - software supply chain
