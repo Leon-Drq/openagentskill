@@ -16,11 +16,12 @@
     "test:submission": "node --experimental-strip-types scripts/test-skill-source.ts",
     "test:submission-discovery": "node --experimental-strip-types scripts/test-submission-discovery.ts",
     "test:supabase-circuit": "node --experimental-strip-types scripts/test-supabase-circuit.ts",
+    "test:security": "node --experimental-strip-types scripts/test-security-regressions.ts",
     "test:cli": "node packages/cli/openagentskill.mjs --help",
     "test:sdk": "node scripts/test-sdk.mjs",
     "test:links": "node scripts/check-repository-links.mjs",
     "test:links:external": "node scripts/check-repository-links.mjs --external",
-    "test": "pnpm run test:submission && pnpm run test:submission-discovery && pnpm run test:supabase-circuit && pnpm run test:cli && pnpm run test:sdk",
+    "test": "pnpm run test:submission && pnpm run test:submission-discovery && pnpm run test:supabase-circuit && pnpm run test:security && pnpm run test:cli && pnpm run test:sdk",
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint ."
   },

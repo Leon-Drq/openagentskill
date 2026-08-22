@@ -17,7 +17,6 @@ function githubAnchor(value) {
   return value
     .trim()
     .toLowerCase()
-    .replace(/<[^>]+>/g, '')
     .replace(/[^\p{L}\p{N}\s_-]/gu, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')

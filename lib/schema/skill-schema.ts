@@ -1,5 +1,24 @@
 import { z } from 'zod'
 
+function isGitHubRepositoryUrl(value: string) {
+  try {
+    const url = new URL(value)
+    const hostname = url.hostname.toLowerCase()
+    const pathSegments = url.pathname.split('/').filter(Boolean)
+
+    return (
+      url.protocol === 'https:' &&
+      !url.username &&
+      !url.password &&
+      !url.port &&
+      (hostname === 'github.com' || hostname === 'www.github.com') &&
+      pathSegments.length >= 2
+    )
+  } catch {
+    return false
+  }
+}
+
 // Skill submission schema - for validating user/agent submissions
 export const SkillSubmissionSchema = z.object({
   // Basic info
@@ -10,8 +29,8 @@ export const SkillSubmissionSchema = z.object({
   
   // Repository
   repository: z.string().url().refine(
-    (url) => url.includes('github.com'),
-    { message: 'Must be a GitHub repository URL' }
+    isGitHubRepositoryUrl,
+    { message: 'Must be an HTTPS GitHub repository URL' }
   ),
   
   // Author info
