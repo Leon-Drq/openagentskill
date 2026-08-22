@@ -57,7 +57,14 @@ const SLUG_ALIASES: Record<string, string> = {
 }
 
 function normalizeRequestedSkillSlug(slug: string) {
-  return slug.trim().toLowerCase().replace(/^\/+|\/+$/g, '')
+  const normalized = slug.trim().toLowerCase()
+  let start = 0
+  let end = normalized.length
+
+  while (start < end && normalized.charCodeAt(start) === 47) start += 1
+  while (end > start && normalized.charCodeAt(end - 1) === 47) end -= 1
+
+  return normalized.slice(start, end)
 }
 
 /**
