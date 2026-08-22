@@ -55,7 +55,7 @@
     "@radix-ui/react-tooltip": "1.2.8",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.97.0",
-    "@vercel/analytics": "1.6.1",
+    "@vercel/analytics": "2.0.1",
     "ai": "^6.0.94",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
