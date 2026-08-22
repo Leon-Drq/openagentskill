@@ -10,13 +10,18 @@ interface GitHubRepoSummary {
   stars_label?: string
 }
 
+interface CachedGitHubRepoSummary extends GitHubRepoSummary {
+  cached_at: number
+}
+
 interface GitHubStarButtonProps {
   className?: string
   fullWidth?: boolean
   compact?: boolean
 }
 
-const REPO_CACHE_KEY = 'openagentskill.github-repo-summary.v1'
+const REPO_CACHE_KEY = 'openagentskill.github-repo-summary.v2'
+const REPO_CACHE_TTL_MS = 60 * 60 * 1000
 const FALLBACK_REPO: Required<GitHubRepoSummary> = {
   repo: 'Leon-Drq/openagentskill',
   url: 'https://github.com/Leon-Drq/openagentskill',
@@ -27,7 +32,14 @@ function readCachedRepo(): GitHubRepoSummary | null {
   try {
     const value = window.sessionStorage.getItem(REPO_CACHE_KEY)
     if (!value) return null
-    const parsed = JSON.parse(value) as GitHubRepoSummary
+    const parsed = JSON.parse(value) as CachedGitHubRepoSummary
+    const isFresh = Number.isFinite(parsed.cached_at) && Date.now() - parsed.cached_at < REPO_CACHE_TTL_MS
+
+    if (!isFresh) {
+      window.sessionStorage.removeItem(REPO_CACHE_KEY)
+      return null
+    }
+
     return parsed.repo && parsed.url && parsed.stars_label ? parsed : null
   } catch {
     return null
@@ -36,10 +48,25 @@ function readCachedRepo(): GitHubRepoSummary | null {
 
 function cacheRepo(repo: GitHubRepoSummary) {
   try {
-    window.sessionStorage.setItem(REPO_CACHE_KEY, JSON.stringify(repo))
+    window.sessionStorage.setItem(REPO_CACHE_KEY, JSON.stringify({ ...repo, cached_at: Date.now() }))
   } catch {
     // Storage can be unavailable in private browsing; the live response still works.
   }
+}
+
+let pendingRepoRequest: Promise<GitHubRepoSummary | null> | null = null
+
+function fetchRepoSummary() {
+  if (!pendingRepoRequest) {
+    pendingRepoRequest = fetch('/api/github/repo', { cache: 'no-store' })
+      .then((response) => (response.ok ? response.json() as Promise<GitHubRepoSummary> : null))
+      .catch(() => null)
+      .finally(() => {
+        pendingRepoRequest = null
+      })
+  }
+
+  return pendingRepoRequest
 }
 
 export function GitHubStarButton({ className, fullWidth, compact }: GitHubStarButtonProps) {
@@ -49,32 +76,25 @@ export function GitHubStarButton({ className, fullWidth, compact }: GitHubStarBu
 
   useEffect(() => {
     let mounted = true
+    let cachedUpdateTimer: number | null = null
     const cached = readCachedRepo()
     if (cached) {
-      const timer = window.setTimeout(() => {
+      cachedUpdateTimer = window.setTimeout(() => {
         if (mounted) setRepo({ ...FALLBACK_REPO, ...cached })
       }, 0)
-
-      return () => {
-        mounted = false
-        window.clearTimeout(timer)
-      }
     }
 
-    fetch('/api/github/repo')
-      .then((response) => (response.ok ? response.json() : null))
+    fetchRepoSummary()
       .then((data: GitHubRepoSummary | null) => {
         if (!mounted || !data) return
         const next = { ...FALLBACK_REPO, ...data }
         cacheRepo(next)
         setRepo(next)
       })
-      .catch(() => {
-        // Keep the static fallback. The button should never disappear.
-      })
 
     return () => {
       mounted = false
+      if (cachedUpdateTimer !== null) window.clearTimeout(cachedUpdateTimer)
     }
   }, [])
 
