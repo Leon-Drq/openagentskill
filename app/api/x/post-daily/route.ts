@@ -20,7 +20,7 @@ async function handlePost(request: NextRequest) {
     status: 'skipped' as const,
     reason: error instanceof Error ? error.message : 'Creator reply posting failed',
   }))
-  const result = await postNextQueuedSkillToX({ autoBuildQueue: false })
+  const result = await postNextQueuedSkillToX({ autoBuildQueue: true, buildLimit: 3 })
   const posted = result.status === 'posted' || creatorReply.status === 'posted'
 
   // Keep production cron logs actionable without exposing OAuth tokens or post text.
