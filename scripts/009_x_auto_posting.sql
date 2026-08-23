@@ -67,7 +67,7 @@ security definer
 set search_path = public, pg_temp
 as $$
 declare
-  v_expected_secret_hash constant text := '074705db488fc272fdd4913f06b11cf5ca05b79ceb8af005ecdb6e2479a0af01';
+  v_expected_secret_hash constant text := '54fc1b0e14aa657fd820a882974e4fc64ae055448646a1f073b6a98e5366f43e';
 begin
   if p_server_secret is null
     or encode(extensions.digest(p_server_secret, 'sha256'), 'hex') <> v_expected_secret_hash
@@ -77,7 +77,7 @@ begin
 end;
 $$;
 
-revoke all on function public.assert_indexer_secret(text) from public;
+revoke all on function public.assert_indexer_secret(text) from public, anon, authenticated;
 
 create or replace function public.upsert_x_oauth_connection(
   p_server_secret text,
