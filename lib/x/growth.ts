@@ -732,7 +732,35 @@ export async function postNextQueuedSkillToX(
   await saveRefreshedXToken(supabase, serverSecret, token)
 
   let queueBuild: Pick<XQueueBuildResult, 'status' | 'queued' | 'skipped' | 'considered'> | null = null
-  if (options.autoBuildQueue === true) {
+  let item: XContentQueueItem | null = null
+  const skippedQueueItems: Array<{ skillSlug: string; reason: string }> = []
+  const queuePasses = options.autoBuildQueue === true ? 2 : 1
+
+  for (let queuePass = 0; queuePass < queuePasses; queuePass += 1) {
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const candidateItem = await claimNextQueueItem(supabase, serverSecret)
+      if (!candidateItem) break
+
+      const skipReason = getQueuedSkillSkipReason(candidateItem)
+      if (skipReason) {
+        await completeQueueItem(supabase, serverSecret, candidateItem.id, 'skipped', {
+          error: `Skipped before posting: ${skipReason}`,
+          metadata: {
+            skipped_by: 'x_candidate_guard',
+            skip_reason: skipReason,
+            github_repo: candidateItem.skill?.github_repo || candidateItem.metadata?.github_repo || null,
+          },
+        })
+        skippedQueueItems.push({ skillSlug: candidateItem.skill_slug, reason: skipReason })
+        continue
+      }
+
+      item = candidateItem
+      break
+    }
+
+    if (item || queuePass > 0 || options.autoBuildQueue !== true) break
+
     try {
       const result = await enqueueXSkillPostQueue({ limit: options.buildLimit || 8 })
       queueBuild = {
@@ -743,31 +771,8 @@ export async function postNextQueuedSkillToX(
       }
     } catch (error) {
       console.warn('[x-growth] queue refill failed:', error)
+      break
     }
-  }
-
-  let item: XContentQueueItem | null = null
-  const skippedQueueItems: Array<{ skillSlug: string; reason: string }> = []
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    const candidateItem = await claimNextQueueItem(supabase, serverSecret)
-    if (!candidateItem) break
-
-    const skipReason = getQueuedSkillSkipReason(candidateItem)
-    if (skipReason) {
-      await completeQueueItem(supabase, serverSecret, candidateItem.id, 'skipped', {
-        error: `Skipped before posting: ${skipReason}`,
-        metadata: {
-          skipped_by: 'x_candidate_guard',
-          skip_reason: skipReason,
-          github_repo: candidateItem.skill?.github_repo || candidateItem.metadata?.github_repo || null,
-        },
-      })
-      skippedQueueItems.push({ skillSlug: candidateItem.skill_slug, reason: skipReason })
-      continue
-    }
-
-    item = candidateItem
-    break
   }
 
   if (!item) {

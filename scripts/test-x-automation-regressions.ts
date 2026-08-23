@@ -65,4 +65,19 @@ assert.equal(
   'the X daily publishing cron must remain configured'
 )
 
+const postDailyRoute = readProjectFile('app/api/x/post-daily/route.ts')
+assert.match(
+  postDailyRoute,
+  /postNextQueuedSkillToX\(\{ autoBuildQueue: true, buildLimit: 3 \}\)/,
+  'the publishing cron must recover from an empty queue'
+)
+
+const growthSource = readProjectFile('lib/x/growth.ts')
+const postNextSource = growthSource.slice(growthSource.indexOf('export async function postNextQueuedSkillToX'))
+assert.ok(
+  postNextSource.indexOf('claimNextQueueItem(supabase, serverSecret)') <
+    postNextSource.indexOf('enqueueXSkillPostQueue({ limit:'),
+  'queue refill must happen only after the existing queue is exhausted'
+)
+
 console.log('X automation regression tests passed.')
