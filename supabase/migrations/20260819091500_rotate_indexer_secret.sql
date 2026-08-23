@@ -1,6 +1,24 @@
--- Rotate the protected indexer RPC secret after the previous Vercel values
--- became unreadable sensitive placeholders. Only the SHA-256 digest is stored
--- in source control and Postgres; the secret itself remains in Vercel.
+-- Rotate the shared automation secret. All guarded RPCs must delegate to this
+-- function so one rotation cannot split the indexer and X automation again.
+
+create or replace function public.assert_indexer_secret(p_server_secret text)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_expected_secret_hash constant text := '54fc1b0e14aa657fd820a882974e4fc64ae055448646a1f073b6a98e5366f43e';
+begin
+  if p_server_secret is null
+    or encode(extensions.digest(p_server_secret, 'sha256'), 'hex') <> v_expected_secret_hash
+  then
+    raise exception 'Invalid server secret' using errcode = '28000';
+  end if;
+end;
+$$;
+
+revoke all on function public.assert_indexer_secret(text) from public, anon, authenticated;
 
 create or replace function public.upsert_indexed_skill(
   p_server_secret text,
@@ -13,15 +31,10 @@ security definer
 set search_path = public, pg_temp
 as $$
 declare
-  v_expected_secret_hash constant text := '54fc1b0e14aa657fd820a882974e4fc64ae055448646a1f073b6a98e5366f43e';
   v_skill public.skills%rowtype;
   v_existing_id uuid;
 begin
-  if p_server_secret is null
-    or encode(extensions.digest(p_server_secret, 'sha256'), 'hex') <> v_expected_secret_hash
-  then
-    raise exception 'Invalid server secret' using errcode = '28000';
-  end if;
+  perform public.assert_indexer_secret(p_server_secret);
 
   select id into v_existing_id
   from public.skills

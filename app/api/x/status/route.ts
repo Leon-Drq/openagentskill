@@ -3,6 +3,7 @@ import { createPublicClient } from '@/lib/supabase/public'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 import { getStoredXConnection } from '@/lib/x/poster'
 import { getCreatorOutreachStatus } from '@/lib/x/growth'
+import { classifyXConnectionError } from '@/lib/x/health'
 
 function hasEnv(name: string) {
   return Boolean((process.env[name] || '').trim())
@@ -18,7 +19,10 @@ async function getConnectionStatus() {
   if (!serverSecret) {
     return {
       authorized: false,
+      health: 'blocked',
       reason: 'Missing INDEXER_SECRET',
+      reauthorizationRequired: false,
+      action: 'Configure INDEXER_SECRET in the production environment.',
     }
   }
 
@@ -26,15 +30,21 @@ async function getConnectionStatus() {
     const connection = await getStoredXConnection(createPublicClient(), serverSecret)
     return {
       authorized: Boolean(connection),
+      health: connection ? 'ready' : 'disconnected',
       username: connection?.username || null,
       userIdPresent: Boolean(connection?.x_user_id),
       scopePresent: Boolean(connection?.scope),
       reason: connection ? undefined : 'No stored OAuth connection',
+      reauthorizationRequired: !connection,
+      action: connection ? undefined : 'Connect @openagentskill to enable automatic posting.',
+      actionUrl: connection ? undefined : '/api/x/auth',
     }
   } catch (error) {
+    const failure = classifyXConnectionError(error)
     return {
       authorized: false,
-      reason: error instanceof Error ? error.message : 'Failed to inspect X OAuth connection',
+      health: 'blocked',
+      ...failure,
     }
   }
 }

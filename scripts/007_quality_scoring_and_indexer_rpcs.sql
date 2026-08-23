@@ -147,15 +147,10 @@ security definer
 set search_path = public, pg_temp
 as $$
 declare
-  v_expected_secret_hash constant text := '074705db488fc272fdd4913f06b11cf5ca05b79ceb8af005ecdb6e2479a0af01';
   v_skill public.skills%rowtype;
   v_existing_id uuid;
 begin
-  if p_server_secret is null
-    or encode(extensions.digest(p_server_secret, 'sha256'), 'hex') <> v_expected_secret_hash
-  then
-    raise exception 'Invalid server secret' using errcode = '28000';
-  end if;
+  perform public.assert_indexer_secret(p_server_secret);
 
   select id into v_existing_id
   from public.skills
@@ -294,14 +289,9 @@ security definer
 set search_path = public, pg_temp
 as $$
 declare
-  v_expected_secret_hash constant text := '074705db488fc272fdd4913f06b11cf5ca05b79ceb8af005ecdb6e2479a0af01';
   v_skill public.skills%rowtype;
 begin
-  if p_server_secret is null
-    or encode(extensions.digest(p_server_secret, 'sha256'), 'hex') <> v_expected_secret_hash
-  then
-    raise exception 'Invalid server secret' using errcode = '28000';
-  end if;
+  perform public.assert_indexer_secret(p_server_secret);
 
   update public.skills
   set
