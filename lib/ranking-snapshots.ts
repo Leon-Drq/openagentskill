@@ -20,10 +20,11 @@ import {
   type RankingDefinition,
 } from '@/lib/rankings'
 import { rankHotSkills, rankTrendingSkills, type GrowthRankedSkill } from '@/lib/seo/growth-directories'
+import { getGitHubOwner } from '@/lib/github-owner'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createPublicClient } from '@/lib/supabase/public'
 
-export const RANKING_METHODOLOGY_VERSION = 'ranking-v2-daily-2026-08'
+export const RANKING_METHODOLOGY_VERSION = 'ranking-v3-daily-2026-08'
 const SNAPSHOT_ITEM_LIMIT = 30
 const SNAPSHOT_RETENTION_DAYS = 90
 
@@ -42,6 +43,8 @@ export interface RankingSnapshotItem {
   install: string
   repository: string
   updated_at: string
+  github_owner?: string
+  author_name?: string
 }
 
 export interface RankingSnapshot {
@@ -84,6 +87,8 @@ function serializeRankedSkill(item: RankedSkill | GrowthRankedSkill): RankingSna
     install: item.skill.install_command || `npx skills add ${item.skill.github_repo}`,
     repository: item.skill.repository || `https://github.com/${item.skill.github_repo}`,
     updated_at: item.skill.github_last_pushed_at || item.skill.updated_at,
+    github_owner: getGitHubOwner(item.skill),
+    author_name: item.skill.author_name,
   }
 }
 
