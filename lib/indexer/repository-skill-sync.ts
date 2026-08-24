@@ -46,6 +46,8 @@ export interface RepositorySkillSyncResult {
 export interface RepositorySkillSyncOptions {
   reference: string
   discoverySource?: string
+  discoveryMetadata?: Record<string, unknown>
+  skillNames?: string[]
   maxSkills?: number
   refreshExisting?: boolean
 }
@@ -122,7 +124,8 @@ function payloadForExisting(
   existing: SkillRecord,
   skill: DiscoveredGitHubSkill,
   repository: Awaited<ReturnType<typeof validateGitHubRepo>>,
-  discoverySource: string
+  discoverySource: string,
+  discoveryMetadata?: Record<string, unknown>
 ) {
   return {
     ...existing,
@@ -142,6 +145,7 @@ function payloadForExisting(
       source_ref: skill.ref,
       skill_path: skill.path,
       last_source_sync_at: new Date().toISOString(),
+      ...(discoveryMetadata || {}),
     },
   }
 }
@@ -149,7 +153,8 @@ function payloadForExisting(
 async function payloadForNew(
   skill: DiscoveredGitHubSkill,
   repository: Awaited<ReturnType<typeof validateGitHubRepo>>,
-  discoverySource: string
+  discoverySource: string,
+  discoveryMetadata?: Record<string, unknown>
 ) {
   const delegatedSkill = await fetchDelegatedGitHubSkill(skill)
   const packageGroups = await Promise.all([
@@ -242,6 +247,7 @@ async function payloadForNew(
         source_url: skill.sourceUrl,
         source_ref: skill.ref,
         skill_path: skill.path,
+        ...(discoveryMetadata || {}),
         ...(delegatedSkill
           ? {
               delegates_to: delegatedSkill.frontmatter.name,
@@ -285,7 +291,15 @@ export async function syncRepositorySkills(
     Math.max(Math.floor(options.maxSkills || DEFAULT_MAX_SKILLS_PER_REPOSITORY), 1),
     MAX_SKILLS_PER_REPOSITORY
   )
-  const selected = orderedSkills(discovery.skills, existing, maxSkills)
+  const requestedNames = new Set((options.skillNames || []).map(slugPart).filter(Boolean))
+  const matchedSkills = requestedNames.size
+    ? discovery.skills.filter((skill) => {
+        const name = slugPart(skill.frontmatter.name)
+        const directory = slugPart(skill.directory.split('/').filter(Boolean).at(-1) || '')
+        return requestedNames.has(name) || requestedNames.has(directory)
+      })
+    : discovery.skills
+  const selected = orderedSkills(matchedSkills, existing, maxSkills)
   const entries: RepositorySkillSyncEntry[] = []
   const discoverySource = options.discoverySource || 'recursive-skill-source-sync'
 
@@ -299,8 +313,8 @@ export async function syncRepositorySkills(
 
     try {
       const result = existingSkill
-        ? { payload: payloadForExisting(existingSkill, skill, repository, discoverySource), reason: null }
-        : await payloadForNew(skill, repository, discoverySource)
+        ? { payload: payloadForExisting(existingSkill, skill, repository, discoverySource, options.discoveryMetadata), reason: null }
+        : await payloadForNew(skill, repository, discoverySource, options.discoveryMetadata)
 
       if (!result.payload) {
         entries.push({
@@ -355,13 +369,13 @@ export async function syncRepositorySkills(
   return {
     repository: repository.fullName,
     reference: options.reference,
-    discovered: discovery.skills.length,
+    discovered: matchedSkills.length,
     processed: entries.length,
     created: entries.filter((entry) => entry.status === 'created').length,
     updated: entries.filter((entry) => entry.status === 'updated').length,
     rejected: entries.filter((entry) => entry.status === 'rejected').length,
     errors: entries.filter((entry) => entry.status === 'error').length,
-    truncated: discovery.truncated || discovery.skills.length > maxSkills,
+    truncated: discovery.truncated || matchedSkills.length > maxSkills,
     entries,
   }
 }
