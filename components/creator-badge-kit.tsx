@@ -5,6 +5,7 @@ import { Check, Copy, ExternalLink } from 'lucide-react'
 import { SkillDetailLink as Link } from '@/components/skill-detail-link'
 import { useI18n } from '@/lib/i18n/context'
 import { formatSkillDetailCopy } from '@/lib/i18n/skill-detail-copy'
+import { copyText } from '@/lib/copy-text'
 
 interface CreatorBadgeKitProps {
   skillSlug: string
@@ -27,7 +28,8 @@ export function CreatorBadgeKit({ skillSlug }: CreatorBadgeKitProps) {
 
   async function copyBadges() {
     try {
-      await navigator.clipboard.writeText(markdown)
+      const didCopy = await copyText(markdown)
+      if (!didCopy) throw new Error('Clipboard is unavailable')
       setCopied(true)
       window.setTimeout(() => setCopied(false), 1_800)
     } catch {

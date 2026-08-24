@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Check, Copy, ExternalLink } from 'lucide-react'
 import { useI18n } from '@/lib/i18n/context'
 import { formatSkillDetailCopy } from '@/lib/i18n/skill-detail-copy'
+import { copyText } from '@/lib/copy-text'
 
 interface SkillXSharePanelProps {
   skillName: string
@@ -24,7 +25,8 @@ export function SkillXSharePanel({
   const [copied, setCopied] = useState<string | null>(null)
 
   async function copy(value: string, key: string) {
-    await navigator.clipboard.writeText(value)
+    const didCopy = await copyText(value)
+    if (!didCopy) return
     setCopied(key)
     window.setTimeout(() => setCopied(null), 1800)
   }
