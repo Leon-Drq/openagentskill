@@ -36,7 +36,7 @@ export function CreatorBadgeKit({ skillSlug }: CreatorBadgeKitProps) {
   }
 
   return (
-    <section className="overflow-hidden rounded-[8px] border border-border bg-card" aria-labelledby="creator-badge-title">
+    <section id="creator-badge-kit" className="scroll-mt-24 overflow-hidden rounded-[8px] border border-border bg-card" aria-labelledby="creator-badge-title">
       <div className="flex flex-col gap-4 border-b border-border p-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-secondary">
