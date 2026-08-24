@@ -46,5 +46,6 @@ export function SkillDetailDate({ value }: { value: string | null | undefined })
     month: 'short',
     day: 'numeric',
     year: 'numeric',
+    timeZone: 'UTC',
   })}</>
 }
