@@ -10,6 +10,7 @@ import {
 } from '@/lib/db/skills'
 import { ClaimSkillPanel } from '@/components/claim-skill-panel'
 import { CreatorBadgeKit } from '@/components/creator-badge-kit'
+import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { SaveSkillButton } from '@/components/save-skill-button'
 import { SkillAttributionPanel } from '@/components/skill-attribution-panel'
 import { SkillActionLink } from '@/components/skill-action-link'
@@ -17,6 +18,7 @@ import { SkillEventTracker } from '@/components/skill-event-tracker'
 import { SkillFeedbackPanel } from '@/components/skill-feedback-panel'
 import { SkillInstallTargets } from '@/components/skill-install-targets'
 import { SkillScorePanel } from '@/components/skill-score-panel'
+import { SkillShareButton } from '@/components/skill-share-button'
 import { SkillXSharePanel } from '@/components/skill-x-share-panel'
 import { SkillDetailLink as Link } from '@/components/skill-detail-link'
 import { SkillDetailDate, SkillDetailText, SkillDetailValue } from '@/components/skill-detail-text'
@@ -30,6 +32,7 @@ import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { buildAgentReadableSkillMetadata } from '@/lib/agent-readable'
 import { getSkillDecisionProfile } from '@/lib/decision'
+import { getGitHubOwner } from '@/lib/github-owner'
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillInstallApiUrl } from '@/lib/registry'
@@ -256,6 +259,10 @@ export default async function SkillDetailPage({
         })
       : null
   const installTargets = dbSkill ? getSkillInstallTargets(dbSkill) : []
+  const heroInstallTargets = (['codex', 'claude-code', 'cursor', 'openagentskill-cli'] as const)
+    .map((id) => installTargets.find((target) => target.id === id))
+    .filter((target): target is NonNullable<typeof target> => Boolean(target))
+  const githubOwner = dbSkill ? getGitHubOwner(dbSkill) : ''
   const compareHref = `/compare?skills=${encodeURIComponent([skill.slug, ...relatedSkills.slice(0, 3).map((rs) => rs.slug)].join(','))}`
   const installApiHref = `/api/skills/${skill.slug}/install`
   const installTextHref = `${installApiHref}?format=text`
@@ -387,112 +394,134 @@ export default async function SkillDetailPage({
         <div className="grid gap-10 lg:grid-cols-3">
           {/* Main content */}
           <div className="min-w-0 lg:col-span-2">
-            {/* Title block */}
+            {/* Conversion-first hero */}
             <div className="relative mb-8 overflow-hidden rounded-[8px] border border-border bg-card p-5 shadow-[0_18px_48px_rgba(22,20,16,0.05)] sm:p-7">
               <div className="brand-grain pointer-events-none absolute inset-0 opacity-35" />
-              <div className="relative">
-                <div className="mb-4 flex flex-wrap items-start gap-3">
-                  <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
-                    {skill.name}
-                  </h1>
-                  {trustProfile && (
-                    <div className="pt-2">
-                      <TrustBadge profile={trustProfile} />
+              <div className="relative space-y-6">
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <div className="mb-4 flex items-center gap-3">
+                      <GitHubOwnerAvatar
+                        owner={githubOwner}
+                        label={skill.author.name}
+                        size="lg"
+                        showLabel
+                      />
+                      <div className="min-w-0 text-xs leading-5 text-secondary">
+                        <p>
+                          <SkillDetailText id="creator" /> · {skill.author.name}
+                        </p>
+                        <p>
+                          <SkillDetailText id="lastUpdated" /> · <SkillDetailDate value={skill.updatedAt} />
+                        </p>
+                      </div>
                     </div>
-                  )}
-                  {attribution && (
-                    <div className="pt-2">
+                    <h1 className="font-display text-3xl font-bold leading-[1.02] sm:text-4xl lg:text-5xl">
+                      {skill.name}
+                    </h1>
+                  </div>
+                  <div className="flex shrink-0 flex-wrap gap-2">
+                    {trustProfile && <TrustBadge profile={trustProfile} />}
+                    {attribution && (
                       <span className="inline-flex items-center gap-1.5 rounded-[6px] border border-border bg-background px-3 py-1 font-mono text-xs uppercase text-secondary">
                         <SkillDetailValue value={attribution.statusLabel} />
                       </span>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-                <p className="mb-5 max-w-3xl text-lg leading-relaxed text-secondary">
+
+                <p className="max-w-3xl text-lg leading-relaxed text-secondary">
                   {skill.tagline}
                 </p>
-                {/* Key stats row */}
-                <div className="grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
-                  <div className="rounded-[8px] border border-border bg-background/85 p-3">
-                    <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
-                      <SkillDetailText id="verifiedInstalls" />
-                    </span>
-                    <span className="mt-1 block font-mono text-base font-semibold">
-                      {formatNumber(verifiedInstalls)}
-                    </span>
+
+                {skill.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {skill.tags.slice(0, 5).map((tag) => (
+                      <Link
+                        key={tag}
+                        href={`/skills?q=${encodeURIComponent(tag)}`}
+                        className="rounded-full border border-border bg-background px-3 py-1 text-xs text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                      >
+                        {tag}
+                      </Link>
+                    ))}
                   </div>
-                  <div className="rounded-[8px] border border-border bg-background/85 p-3">
-                    <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
-                      <SkillDetailText id="stars" />
+                )}
+
+                <div className="grid gap-3 sm:grid-cols-[minmax(180px,0.72fr)_minmax(0,1.28fr)]">
+                  <div className="rounded-[8px] border border-[#b8d4c8] bg-[#eef7f2] p-5">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#006b4f]">
+                      <SkillDetailText id="trustScore" />
                     </span>
-                    <span className="mt-1 block font-mono text-base font-semibold">
-                      {formatNumber(skill.stats.stars)}
-                    </span>
-                  </div>
-                  {skill.stats.usedBy > 0 && (
-                    <div className="rounded-[8px] border border-border bg-background/85 p-3">
-                      <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
-                        <SkillDetailText id="usedBy" />
+                    <div className="mt-2 flex items-end gap-2 text-[#006b4f]">
+                      <span className="font-display text-5xl font-semibold leading-none">
+                        {trustProfile?.score ?? '—'}
                       </span>
-                      <span className="mt-1 block font-mono text-base font-semibold">
-                        {formatNumber(skill.stats.usedBy)} <SkillDetailText id="agents" />
-                      </span>
+                      <span className="pb-1 font-mono text-sm">/100</span>
                     </div>
-                  )}
-                  {skill.stats.rating > 0 && (
-                    <div className="rounded-[8px] border border-border bg-background/85 p-3">
-                      <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
-                        <SkillDetailText id="rating" />
-                      </span>
-                      <span className="mt-1 block font-mono text-base font-semibold">
-                        {skill.stats.rating.toFixed(1)}/5
-                      </span>
-                      {skill.stats.reviewCount > 0 && (
-                        <span className="text-secondary ml-1">
-                          ({skill.stats.reviewCount})
+                    <p className="mt-3 text-sm font-semibold text-[#006b4f]">
+                      <SkillDetailValue value={trustProfile?.label || 'Needs review'} />
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[8px] border border-border bg-border text-sm">
+                    {[
+                      { label: 'quality', value: qualityProfile ? `${qualityProfile.score}/100` : '—' },
+                      { label: 'audit', value: auditProfile ? `${auditProfile.audit_score}/100` : '—' },
+                      { label: 'stars', value: formatNumber(skill.stats.stars) },
+                      { label: 'verifiedInstalls', value: formatNumber(verifiedInstalls) },
+                    ].map((metric) => (
+                      <div key={metric.label} className="bg-background p-3 sm:p-4">
+                        <span className="block font-mono text-[9px] uppercase tracking-[0.16em] text-secondary">
+                          <SkillDetailText id={metric.label as 'quality' | 'audit' | 'stars' | 'verifiedInstalls'} />
                         </span>
-                      )}
-                    </div>
-                  )}
-                  <div className="rounded-[8px] border border-border bg-background/85 p-3">
-                    <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
-                      <SkillDetailText id="version" />
-                    </span>
-                    <span className="mt-1 block font-mono text-base font-semibold">
-                      {skill.technical.version}
-                    </span>
+                        <span className="mt-1.5 block font-mono text-base font-semibold">
+                          {metric.value}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                  {qualityProfile && (
-                    <div className="rounded-[8px] border border-border bg-background/85 p-3">
-                      <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
-                        <SkillDetailText id="quality" />
-                      </span>
-                      <span className="mt-1 block font-mono text-base font-semibold">
-                        {qualityProfile.score}/100 · <SkillDetailValue value={qualityProfile.label} />
-                      </span>
-                    </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 border-t border-border pt-5">
+                  <SaveSkillButton skillSlug={skill.slug} compact className="min-h-10 rounded-[8px] bg-background px-3" />
+                  {skill.technical.repository && (
+                    <SkillActionLink
+                      href={skill.technical.repository}
+                      skillSlug={skill.slug}
+                      eventType="outbound_github"
+                      external
+                      className="inline-flex min-h-10 items-center justify-center rounded-[8px] border border-border bg-background px-3 text-sm font-semibold text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                    >
+                      <SkillDetailText id="viewGitHub" />
+                    </SkillActionLink>
                   )}
-                  {trustProfile && (
-                    <div className="rounded-[8px] border border-border bg-background/85 p-3">
-                      <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
-                        <SkillDetailText id="trust" />
-                      </span>
-                      <span className="mt-1 block font-mono text-base font-semibold">
-                        {trustProfile.score}/100 · <SkillDetailValue value={trustProfile.label} />
-                      </span>
-                    </div>
-                  )}
-                  {auditProfile && (
-                    <div className="rounded-[8px] border border-border bg-background/85 p-3">
-                      <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
-                        <SkillDetailText id="audit" />
-                      </span>
-                      <span className="mt-1 block font-mono text-base font-semibold">
-                        {auditProfile.audit_score}/100 ·{' '}
-                        <SkillDetailValue value={auditRiskLabel(auditProfile.risk_level)} />
-                      </span>
-                    </div>
-                  )}
+                  <Link
+                    href={`/skills/${skill.slug}/audit`}
+                    className="inline-flex min-h-10 items-center justify-center rounded-[8px] border border-border bg-background px-3 text-sm font-semibold text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                  >
+                    <SkillDetailText id="openFullAudit" />
+                  </Link>
+                  <Link
+                    href="#creator-badge-kit"
+                    className="inline-flex min-h-10 items-center justify-center rounded-[8px] border border-border bg-background px-3 text-sm font-semibold text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                  >
+                    <SkillDetailValue value="README badge" />
+                  </Link>
+                  <Link
+                    href="#claim-this-skill"
+                    className="inline-flex min-h-10 items-center justify-center rounded-[8px] border border-border bg-background px-3 text-sm font-semibold text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                  >
+                    <SkillDetailText id="claimSkill" />
+                  </Link>
+                  <SkillShareButton skillSlug={skill.slug} skillName={skill.name} />
+                </div>
+
+                <div id="install-options" className="scroll-mt-24">
+                  <SkillInstallTargets
+                    skillSlug={skill.slug}
+                    targets={heroInstallTargets}
+                    compact
+                  />
                 </div>
               </div>
             </div>
@@ -630,8 +659,8 @@ export default async function SkillDetailPage({
               audit={auditProfile}
             />
 
-            <section className="mb-10 overflow-hidden rounded-[8px] border border-border bg-card shadow-[0_18px_48px_rgba(22,20,16,0.05)]">
-              <div className="relative border-b border-border bg-[#fbfaf7] p-5 sm:p-6">
+            <details className="group mb-10 overflow-hidden rounded-[8px] border border-border bg-card shadow-[0_18px_48px_rgba(22,20,16,0.05)]">
+              <summary className="relative cursor-pointer list-none border-b border-border bg-[#fbfaf7] p-5 marker:hidden sm:p-6 [&::-webkit-details-marker]:hidden">
                 <div className="brand-grain pointer-events-none absolute inset-0 opacity-40" />
                 <div className="relative flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                   <div className="min-w-0">
@@ -645,14 +674,21 @@ export default async function SkillDetailPage({
                       <SkillDetailText id="machineDecisionDescription" />
                     </p>
                   </div>
-                  <Link
-                    href={registryManifestHref}
-                    prefetch={false}
-                    className="w-full rounded-[8px] border border-foreground bg-foreground px-4 py-2.5 text-center text-sm font-semibold text-background transition-opacity hover:opacity-80 sm:w-auto"
-                  >
-                    <SkillDetailText id="openJson" />
-                  </Link>
+                  <span className="inline-flex min-h-10 w-full items-center justify-center rounded-[8px] border border-border bg-background px-4 text-sm font-semibold text-secondary transition-colors group-open:border-foreground group-open:text-foreground sm:w-auto">
+                    <SkillDetailValue value="View technical data" />
+                    <span className="ml-2 text-lg leading-none group-open:rotate-45">+</span>
+                  </span>
                 </div>
+              </summary>
+
+              <div className="flex justify-end border-b border-border bg-card p-3">
+                <Link
+                  href={registryManifestHref}
+                  prefetch={false}
+                  className="w-full rounded-[8px] border border-foreground bg-foreground px-4 py-2.5 text-center text-sm font-semibold text-background transition-opacity hover:opacity-80 sm:w-auto"
+                >
+                  <SkillDetailText id="openJson" />
+                </Link>
               </div>
 
               <div className="grid gap-3 bg-[#fbfaf7] p-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -843,7 +879,7 @@ export default async function SkillDetailPage({
                   </div>
                 )}
               </div>
-            </section>
+            </details>
 
             {safetyProfile && (
               <section className="mb-10 overflow-hidden rounded-[8px] border border-border bg-card shadow-[0_18px_48px_rgba(22,20,16,0.05)]">
@@ -913,13 +949,6 @@ export default async function SkillDetailPage({
                 )}
               </section>
             )}
-
-            <div id="install-options" className="scroll-mt-24">
-              <SkillInstallTargets
-                skillSlug={skill.slug}
-                targets={installTargets}
-              />
-            </div>
 
             <section className="mb-10 overflow-hidden rounded-[8px] border border-border bg-card shadow-[0_18px_48px_rgba(22,20,16,0.05)]">
               <div className="relative border-b border-border bg-[#fbfaf7] p-5 sm:p-6">
