@@ -54,6 +54,8 @@ export interface CandidateRepo {
   htmlUrl: string
   /** Exact GitHub tree/blob URL when discovery points to one SKILL.md package. */
   skillSourceUrl?: string
+  /** Exact skill name inferred from a marketplace URL such as skills.sh. */
+  requestedSkillName?: string
   /** Optional provenance retained through review so downstream growth flows can be selective. */
   discovery?: CandidateDiscovery
 }

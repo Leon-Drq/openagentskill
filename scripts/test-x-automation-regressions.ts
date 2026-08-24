@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url'
 // Node's type-stripping runner needs the explicit extension.
 // @ts-expect-error TS5097 is expected for this standalone Node test entrypoint.
 import { classifyXConnectionError } from '../lib/x/health.ts'
+// @ts-expect-error TS5097 is expected for this standalone Node test entrypoint.
+import { parseSkillSourceUrl } from '../lib/indexer/skill-source-url.ts'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 const readProjectFile = (path: string) => readFileSync(`${root}/${path}`, 'utf8')
@@ -24,6 +26,23 @@ assert.equal(
   classifyXConnectionError(new Error('Failed to load X OAuth connection')).code,
   'connection_check_failed'
 )
+
+assert.deepEqual(parseSkillSourceUrl('https://www.skills.sh/petergyang/no-ai-slop/no-ai-slop'), {
+  owner: 'petergyang',
+  repo: 'no-ai-slop',
+  fullName: 'petergyang/no-ai-slop',
+  sourceUrl: 'https://www.skills.sh/petergyang/no-ai-slop/no-ai-slop',
+  directoryUrl: 'https://github.com/petergyang/no-ai-slop',
+  skillName: 'no-ai-slop',
+})
+assert.deepEqual(parseSkillSourceUrl('skills.sh/cursor/plugins/unslop'), {
+  owner: 'cursor',
+  repo: 'plugins',
+  fullName: 'cursor/plugins',
+  sourceUrl: 'https://skills.sh/cursor/plugins/unslop',
+  directoryUrl: 'https://github.com/cursor/plugins',
+  skillName: 'unslop',
+})
 
 const guardedSetupScripts = [
   'scripts/006_controlled_public_write_rpcs.sql',
@@ -79,5 +98,17 @@ assert.ok(
     postNextSource.indexOf('enqueueXSkillPostQueue({ limit:'),
   'queue refill must happen only after the existing queue is exhausted'
 )
+
+const radarSource = readProjectFile('lib/indexer/x-skill-radar.ts')
+assert.match(radarSource, /github\.com OR skills\.sh OR "GitHub"/)
+assert.match(radarSource, /function extractSkillRepos/)
+assert.match(radarSource, /requestedSkillName/)
+
+const candidateSource = readProjectFile('lib/x/candidates.ts')
+assert.match(candidateSource, /x-trend-override/)
+assert.match(candidateSource, /impression_count \|\| 0\) >= 100_000/)
+
+const processorSource = readProjectFile('lib/indexer/processor.ts')
+assert.match(processorSource, /skillNames: \[candidate\.requestedSkillName\]/)
 
 console.log('X automation regression tests passed.')

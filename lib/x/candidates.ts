@@ -140,6 +140,21 @@ function hasGenericFoundationSignals(text: string) {
   return /\b(deep[-_\s]?learning framework|machine[-_\s]?learning framework|container orchestration|operating system|programming language|frontend framework|javascript framework|runtime|database engine|distributed system|web framework|ui library)\b/.test(text)
 }
 
+export function hasXTrendOverride(skill: SkillRecord) {
+  const asRecord = (value: unknown): Record<string, unknown> =>
+    value !== null && typeof value === 'object' ? value as Record<string, unknown> : {}
+  const review = skill.ai_review_score && typeof skill.ai_review_score === 'object'
+    ? skill.ai_review_score as Record<string, unknown>
+    : {}
+  const signal = asRecord(review.x_signal)
+  const metrics = asRecord(signal.metrics)
+
+  return Number(metrics.impression_count || 0) >= 100_000 ||
+    Number(metrics.bookmark_count || 0) >= 500 ||
+    Number(metrics.like_count || 0) >= 1_000 ||
+    Number(signal.engagementScore || 0) >= 100
+}
+
 export function getXCandidateDecision(skill: SkillRecord, minStars = 500): XCandidateDecision {
   const lane = getXContentLane(skill)
   const text = getSkillShareText(skill, {
@@ -161,11 +176,12 @@ export function getXCandidateDecision(skill: SkillRecord, minStars = 500): XCand
     category: skill.category,
     stars: skill.github_stars,
   })
+  const trendOverride = hasXTrendOverride(skill)
 
   if (!skill.ai_review_approved) {
     return { eligible: false, reason: 'not-approved', lane, signals }
   }
-  if (Number(skill.github_stars || 0) < minStars) {
+  if (Number(skill.github_stars || 0) < minStars && !trendOverride) {
     return { eligible: false, reason: 'below-star-threshold', lane, signals }
   }
   if (Number(skill.quality_score || 0) < 45) {
@@ -200,9 +216,9 @@ export function getXCandidateDecision(skill: SkillRecord, minStars = 500): XCand
 
   return {
     eligible: true,
-    reason: `skill-like-${likeness.score}`,
+    reason: `${trendOverride && Number(skill.github_stars || 0) < minStars ? 'trend-' : ''}skill-like-${likeness.score}`,
     lane,
-    signals: [...new Set([...signals, ...likeness.signals])],
+    signals: [...new Set([...signals, ...likeness.signals, ...(trendOverride ? ['x-trend-override'] : [])])],
   }
 }
 

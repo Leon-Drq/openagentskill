@@ -1,5 +1,6 @@
 import { isGenericFoundationRepoName } from '@/lib/x/candidates'
 import { evaluateSkillCandidate } from './skill-filter'
+import { parseSkillSourceUrl } from './skill-source-url'
 import type { CandidateRepo } from './github-search'
 
 interface XUrlEntity {
@@ -99,16 +100,16 @@ const X_RECENT_SEARCH_URL = 'https://api.x.com/2/tweets/search/recent'
 const GITHUB_API_BASE = 'https://api.github.com'
 
 const X_SKILL_RADAR_QUERIES = [
-  '("agent skill" OR "AI agent skill" OR "Codex skill" OR "Claude Code skill" OR "Cursor skill") (github.com OR "GitHub") has:links -is:retweet',
-  '("skill" "Claude Code" OR "skill" "Codex" OR "skill" "Cursor") (github.com OR "GitHub") has:links -is:retweet',
-  '("PPT skill" OR "pptx skill" OR "presentation skill" OR "slide deck skill") (github.com OR "GitHub") has:links -is:retweet',
-  '("stock analysis skill" OR "trading skill" OR "quant skill" OR "finance agent skill") (github.com OR "GitHub") has:links -is:retweet',
-  '("research skill" OR "last30days-skill" OR "deep research skill") (github.com OR "GitHub") has:links -is:retweet',
-  '("web scraping skill" OR "browser automation skill" OR "crawler skill") (github.com OR "GitHub") has:links -is:retweet',
-  '("World Cup" "skill" OR "football analytics" "skill" OR "sports analytics" "agent") (github.com OR "GitHub") has:links -is:retweet',
-  '("design skill" OR "video skill" OR "creative agent skill") (github.com OR "GitHub") has:links -is:retweet',
-  '("marketing skill" OR "SEO skill" OR "growth skill" OR "content skill") (github.com OR "GitHub") has:links -is:retweet',
-  '("data analysis skill" OR "spreadsheet skill" OR "SQL skill" OR "legal skill" OR "education skill") (github.com OR "GitHub") has:links -is:retweet',
+  '("agent skill" OR "AI agent skill" OR "Codex skill" OR "Claude Code skill" OR "Cursor skill") (github.com OR skills.sh OR "GitHub") has:links -is:retweet',
+  '("skill" "Claude Code" OR "skill" "Codex" OR "skill" "Cursor") (github.com OR skills.sh OR "GitHub") has:links -is:retweet',
+  '("PPT skill" OR "pptx skill" OR "presentation skill" OR "slide deck skill") (github.com OR skills.sh OR "GitHub") has:links -is:retweet',
+  '("stock analysis skill" OR "trading skill" OR "quant skill" OR "finance agent skill") (github.com OR skills.sh OR "GitHub") has:links -is:retweet',
+  '("research skill" OR "last30days-skill" OR "deep research skill") (github.com OR skills.sh OR "GitHub") has:links -is:retweet',
+  '("web scraping skill" OR "browser automation skill" OR "crawler skill") (github.com OR skills.sh OR "GitHub") has:links -is:retweet',
+  '("World Cup" "skill" OR "football analytics" "skill" OR "sports analytics" "agent") (github.com OR skills.sh OR "GitHub") has:links -is:retweet',
+  '("design skill" OR "video skill" OR "creative agent skill") (github.com OR skills.sh OR "GitHub") has:links -is:retweet',
+  '("marketing skill" OR "SEO skill" OR "growth skill" OR "content skill") (github.com OR skills.sh OR "GitHub") has:links -is:retweet',
+  '("data analysis skill" OR "spreadsheet skill" OR "SQL skill" OR "legal skill" OR "education skill") (github.com OR skills.sh OR "GitHub") has:links -is:retweet',
 ]
 
 const WORKFLOW_SIGNAL = /\b(agent[-_\s]?skill|skill\.md|skills?|codex|claude code|cursor|gemini cli|agent workflow|installable|workflow|automation|ppt|pptx|powerpoint|slides?|presentation|deck|stock|trading|finance|quant|backtest|research|last30|web scraping|crawler|browser automation|rag|pdf|document|seo|design|video|world cup|football|soccer|sports analytics)\b/i
@@ -142,39 +143,25 @@ function normalizeGithubUrl(raw: string) {
 }
 
 export function parseGitHubRepoFromUrl(raw: string) {
-  const normalized = normalizeGithubUrl(raw)
-  const match = normalized.match(/github\.com\/([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)/i)
-  if (!match) return null
-
-  const owner = match[1]
-  const repo = match[2].replace(/\.git$/i, '')
-  if (!owner || !repo) return null
-  if (['topics', 'features', 'marketplace', 'orgs', 'collections'].includes(owner.toLowerCase())) return null
-  if (['issues', 'pull', 'pulls', 'tree', 'blob', 'discussions', 'releases'].includes(repo.toLowerCase())) return null
-
-  return {
-    owner,
-    repo,
-    fullName: `${owner}/${repo}`,
-    sourceUrl: normalized.replace(/[),.;]+$/, ''),
-  }
+  const parsed = parseSkillSourceUrl(normalizeGithubUrl(raw))
+  return parsed && /github\.com\//i.test(parsed.sourceUrl) ? parsed : null
 }
 
-function extractGitHubRepos(tweet: XRecentTweet) {
+function extractSkillRepos(tweet: XRecentTweet) {
   const urls = new Set<string>()
-  const textUrls = tweet.text.match(/https?:\/\/(?:www\.)?github\.com\/[^\s)]+/gi) || []
+  const textUrls = tweet.text.match(/https?:\/\/(?:www\.)?(?:github\.com|skills\.sh)\/[^\s)]+/gi) || []
   for (const url of textUrls) urls.add(url)
 
   for (const entity of tweet.entities?.urls || []) {
     for (const value of [entity.unwound_url, entity.expanded_url, entity.display_url, entity.url]) {
       if (!value) continue
-      if (/github\.com\//i.test(value)) urls.add(value)
+      if (/(?:github\.com|skills\.sh)\//i.test(value)) urls.add(value)
     }
   }
 
   return Array.from(urls)
-    .map(parseGitHubRepoFromUrl)
-    .filter((repo): repo is { owner: string; repo: string; fullName: string; sourceUrl: string } => Boolean(repo))
+    .map(parseSkillSourceUrl)
+    .filter((repo): repo is NonNullable<ReturnType<typeof parseSkillSourceUrl>> => Boolean(repo))
 }
 
 function engagementScore(tweet: XRecentTweet) {
@@ -239,6 +226,7 @@ async function fetchGitHubRepo(owner: string, repo: string) {
 function toCandidate(
   repo: GitHubRepoResponse,
   skillSourceUrl: string,
+  requestedSkillName: string | undefined,
   tweet: XRecentTweet,
   query: string,
   score: number,
@@ -271,6 +259,7 @@ function toCandidate(
     updatedAt: repo.updated_at || repo.pushed_at || new Date().toISOString(),
     htmlUrl: repo.html_url,
     skillSourceUrl,
+    ...(requestedSkillName ? { requestedSkillName } : {}),
     discovery: {
       source: 'x-radar',
       x: {
@@ -317,11 +306,11 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
       )
       for (const tweet of response.data || []) {
         inspectedTweets += 1
-        const repos = extractGitHubRepos(tweet)
+        const repos = extractSkillRepos(tweet)
         extractedRepos += repos.length
 
         for (const parsed of repos) {
-          const candidateKey = parsed.sourceUrl.toLowerCase()
+          const candidateKey = `${parsed.fullName}/${parsed.skillName || ''}`.toLowerCase()
           if (candidates.has(candidateKey)) continue
           if (isGenericFoundationRepoName(parsed.fullName)) continue
 
@@ -351,7 +340,7 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
           const score = radarScore(repo, tweet, evaluation.score)
           candidates.set(
             candidateKey,
-            toCandidate(repo, parsed.sourceUrl, tweet, query, score, authorsById.get(tweet.author_id || ''))
+            toCandidate(repo, parsed.directoryUrl, parsed.skillName, tweet, query, score, authorsById.get(tweet.author_id || ''))
           )
           if (candidates.size >= limit * 2) break
         }

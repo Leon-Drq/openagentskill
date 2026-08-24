@@ -219,6 +219,8 @@ export async function processRepo(
     const sourceSync = await syncRepositorySkills({
       reference: candidate.skillSourceUrl || candidate.htmlUrl || `https://github.com/${repoRef}`,
       discoverySource: discoverySource === 'x-radar' ? 'x-skill-radar' : 'recursive-skill-source-sync',
+      ...(candidate.discovery?.x ? { discoveryMetadata: { x_signal: candidate.discovery.x } } : {}),
+      ...(candidate.requestedSkillName ? { skillNames: [candidate.requestedSkillName] } : {}),
       maxSkills: 8,
     })
     if (sourceSync.discovered > 0) {
@@ -258,6 +260,15 @@ export async function processRepo(
         discoverySource,
         status: sourceSync.errors > 0 && sourceSync.rejected === 0 ? 'error' : 'rejected',
         reason: firstFailure || 'Explicit SKILL.md packages did not pass automated review.',
+      }
+    }
+    if (candidate.requestedSkillName) {
+      return {
+        repo: repoRef,
+        slug,
+        discoverySource,
+        status: 'skipped',
+        reason: `Requested skill ${candidate.requestedSkillName} was not found in the repository.`,
       }
     }
 
