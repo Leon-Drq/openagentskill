@@ -11,6 +11,7 @@ import {
 import { formatCompactNumber } from '@/lib/quality'
 import { CORE_RANKINGS, getRankingDefinitions, rankSkillsForDefinition, type RankingDefinition } from '@/lib/rankings'
 import { getLatestRankingSnapshot, RANKING_METHODOLOGY_VERSION } from '@/lib/ranking-snapshots'
+import { GitHubPopularityList } from '@/components/github-popularity-list'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,6 +47,10 @@ export default async function RankingsPage() {
   ])
   const rankingDefinitions = getRankingDefinitions()
   const useCaseRankings = rankingDefinitions.filter((ranking) => ranking.kind === 'use-case')
+  const popularityRanking = CORE_RANKINGS.find((ranking) => ranking.kind === 'most-starred')
+  const popularSkills = popularityRanking
+    ? rankSkillsForDefinition(skills, popularityRanking, statsMap, 10)
+    : []
 
   return (
     <MarketingPageShell>
@@ -92,7 +97,67 @@ export default async function RankingsPage() {
           </div>
         </section>
 
-        <section className="grid gap-5 border-b border-border py-10 md:grid-cols-2 lg:grid-cols-3">
+        <section className="border-b border-border py-10">
+          <div className="mb-6 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-secondary">Default popularity ranking</p>
+              <h2 className="mt-3 font-display text-3xl font-semibold">Most-starred agent skill projects</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
+                GitHub stars are the clearest public popularity signal. We rank by stars here, while filtering out repositories that do not look like installable agent skills.
+              </p>
+            </div>
+            <Link
+              href="/rankings/most-starred-agent-skills"
+              className="shrink-0 text-sm text-secondary underline underline-offset-4 hover:text-foreground"
+            >
+              Open full popularity ranking
+            </Link>
+          </div>
+
+          <nav className="mb-6 flex gap-2 overflow-x-auto pb-1" aria-label="Ranking views">
+            {[
+              ['/rankings/most-starred-agent-skills', 'Most starred'],
+              ['/trending', 'Trending'],
+              ['/rankings/new-agent-skills-this-week', 'New this week'],
+              ['/rankings/highest-quality-agent-skills', 'Quality'],
+              ['/rankings/agent-proven', 'Agent proven'],
+            ].map(([href, label], index) => (
+              <Link
+                key={href}
+                href={href}
+                className={`shrink-0 rounded-full border px-3.5 py-2 text-xs font-semibold transition-colors ${
+                  index === 0
+                    ? 'border-[#006b4f] bg-[#006b4f] text-white'
+                    : 'border-border bg-background text-secondary hover:border-[#006b4f] hover:text-[#006b4f]'
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+
+          <GitHubPopularityList
+            items={popularSkills.map((item) => ({
+              rank: item.rank,
+              slug: item.skill.slug,
+              name: item.skill.name,
+              description: item.skill.description,
+              githubStars: item.skill.github_stars,
+              githubRepo: item.skill.github_repo,
+              authorName: item.skill.author_name,
+              badge: item.badge,
+              reason: item.reason,
+              category: item.skill.category,
+            }))}
+          />
+        </section>
+
+        <section className="border-b border-border py-10">
+          <div className="mb-6">
+            <p className="text-xs uppercase tracking-widest text-secondary">More ranking lenses</p>
+            <h2 className="mt-3 font-display text-2xl font-semibold">Popularity is the default, not the only decision signal.</h2>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {CORE_RANKINGS.map((ranking) => {
             const topSkills = rankSkillsForDefinition(
               skills,
@@ -129,6 +194,7 @@ export default async function RankingsPage() {
               </Link>
             )
           })}
+          </div>
         </section>
 
         <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.65fr_1.35fr]">

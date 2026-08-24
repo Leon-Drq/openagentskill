@@ -4,6 +4,8 @@ import { convertSkillRecordToManifest } from '@/lib/db/skills'
 import { formatCompactNumber, getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
 import type { GrowthRankedSkill } from '@/lib/seo/growth-directories'
 import { getSkillTrustProfile } from '@/lib/trust'
+import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
+import { getGitHubOwner } from '@/lib/github-owner'
 
 function formatDate(value: string | null | undefined) {
   if (!value) return 'Unknown'
@@ -41,6 +43,7 @@ export function GrowthSkillList({
         const manifest = convertSkillRecordToManifest(skill)
         const quality = getSkillQualityProfile(skill)
         const trust = getSkillTrustProfile(skill)
+        const githubOwner = getGitHubOwner(skill)
         const platforms = [...new Set([...(skill.frameworks || []), ...getPlatformHints(skill)])]
         const compareSlugs = [
           skill.slug,
@@ -49,7 +52,10 @@ export function GrowthSkillList({
 
         return (
           <article key={skill.slug} className="grid gap-5 py-7 lg:grid-cols-[auto_1fr_280px]">
-            <div className="font-mono text-2xl text-secondary tabular-nums">#{item.rank}</div>
+            <div className="flex items-center gap-3 lg:flex-col lg:items-start">
+              <div className="font-mono text-2xl text-secondary tabular-nums">#{item.rank}</div>
+              <GitHubOwnerAvatar owner={githubOwner} label={skill.author_name} size="lg" />
+            </div>
             <div className="min-w-0">
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <Link href={`/skills/${skill.slug}`} className="min-w-0">
@@ -66,6 +72,9 @@ export function GrowthSkillList({
                 <span className="border border-border px-2 py-0.5 font-mono text-xs text-secondary">
                   {quality.label} {quality.score}
                 </span>
+                {githubOwner ? (
+                  <span className="font-mono text-xs text-secondary">@{githubOwner}</span>
+                ) : null}
               </div>
               <p className="max-w-3xl text-sm leading-relaxed text-secondary">{skill.description}</p>
               <p className="mt-3 max-w-3xl text-sm leading-relaxed">{item.reason}</p>

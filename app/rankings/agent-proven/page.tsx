@@ -25,6 +25,8 @@ import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { getRankingCompareHref, getRankingDefinition, rankSkillsForDefinition } from '@/lib/rankings'
 import { getSkillTrustProfile } from '@/lib/trust'
+import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
+import { getGitHubOwner } from '@/lib/github-owner'
 
 export const dynamic = 'force-dynamic'
 
@@ -103,10 +105,14 @@ function SkillEvidenceRow({
   const trust = getSkillTrustProfile(skill, false, eventStats, stats)
   const proven = getAgentProvenProfile(stats)
   const hasOutcomeReports = Number(stats?.total_outcomes || 0) > 0
+  const githubOwner = getGitHubOwner(skill)
 
   return (
     <article className="grid gap-5 border-t border-border py-6 first:border-t-0 lg:grid-cols-[72px_1fr_290px]">
-      <div className="font-mono text-2xl text-secondary tabular-nums">#{rank}</div>
+      <div className="flex items-center gap-3 lg:flex-col lg:items-start">
+        <div className="font-mono text-2xl text-secondary tabular-nums">#{rank}</div>
+        <GitHubOwnerAvatar owner={githubOwner} label={skill.author_name} size="lg" />
+      </div>
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <Link href={`/skills/${skill.slug}`} className="min-w-0">
@@ -116,6 +122,7 @@ function SkillEvidenceRow({
           </Link>
           <EvidencePill>{proven.score}/100 proven</EvidencePill>
           <EvidencePill>{trust.score}/100 Trust</EvidencePill>
+          {githubOwner ? <span className="font-mono text-xs text-secondary">@{githubOwner}</span> : null}
         </div>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-secondary">{skill.description}</p>
         <p className="mt-3 max-w-3xl text-sm leading-6">{reason}</p>

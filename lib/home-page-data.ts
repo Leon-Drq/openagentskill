@@ -5,6 +5,7 @@ import {
 } from '@/lib/registry-stats'
 import { getAgentOutcomeStatsMapStrict } from '@/lib/db/skills'
 import { getLatestRankingSnapshot } from '@/lib/ranking-snapshots'
+import { getGitHubOwner } from '@/lib/github-owner'
 
 const HOME_STATS_SNAPSHOT = {
   // The last exact count observed before the registry stats cache was added.
@@ -77,11 +78,13 @@ const getCachedEvidenceStats = unstable_cache(
 )
 
 export async function getHomePageData() {
-  const [totalSkills, evidence, trendingSnapshot] = await Promise.all([
+  const [totalSkills, evidence, popularitySnapshot, trendingSnapshot] = await Promise.all([
     getCachedApprovedSkillCount(),
     getCachedEvidenceStats(),
+    getLatestRankingSnapshot('most-starred-agent-skills'),
     getLatestRankingSnapshot('trending'),
   ])
+  const leaderboardSnapshot = popularitySnapshot || trendingSnapshot
 
   return {
     stats: {
@@ -91,17 +94,23 @@ export async function getHomePageData() {
       totalSkillsExact: totalSkills.exact,
     },
     activities: [],
-    featuredSkills: (trendingSnapshot?.items || []).slice(0, 5).map((item) => ({
-      slug: item.slug,
-      name: item.name,
-      description: item.description,
-      github_stars: item.github_stars,
-      downloads: 0,
-      rank: item.rank,
-      badge: item.badge,
-      reason: item.reason,
-      category: item.category,
-    })),
-    rankingGeneratedAt: trendingSnapshot?.generated_at || null,
+    featuredSkills: [...(leaderboardSnapshot?.items || [])]
+      .sort((a, b) => Number(b.github_stars || 0) - Number(a.github_stars || 0))
+      .slice(0, 10)
+      .map((item, index) => ({
+        slug: item.slug,
+        name: item.name,
+        description: item.description,
+        github_stars: item.github_stars,
+        downloads: 0,
+        rank: index + 1,
+        badge: item.badge,
+        reason: item.reason,
+        category: item.category,
+        github_repo: item.repository,
+        github_owner: item.github_owner || getGitHubOwner({ repository: item.repository }),
+        author_name: item.author_name || null,
+      })),
+    rankingGeneratedAt: leaderboardSnapshot?.generated_at || null,
   }
 }

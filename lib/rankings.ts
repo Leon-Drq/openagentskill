@@ -60,7 +60,7 @@ export const CORE_RANKINGS: RankingDefinition[] = [
     shortTitle: 'Most starred',
     eyebrow: 'GitHub adoption',
     description:
-      'The highest-starred skill candidates in OpenAgentSkill, filtered to avoid MCP protocol-server projects.',
+      'Skill candidates ordered by public GitHub star count, after filtering repositories that do not look like installable agent skills.',
     kind: 'most-starred',
   },
   {
@@ -306,7 +306,10 @@ export function rankSkillsForDefinition(
         case 'most-starred':
           return {
             skill,
-            score: Number(skill.github_stars || 0) - skillSpecificPenalty * 10_000,
+            // Popularity is intentionally literal on this ranking. Repositories
+            // that fail the skill-likeness gate are filtered below; qualifying
+            // projects are then ordered by their public GitHub star count.
+            score: Number(skill.github_stars || 0),
             badge: compactStars(skill),
             reason: `${compactStars(skill)} and ${quality.label.toLowerCase()} quality signals.`,
           }

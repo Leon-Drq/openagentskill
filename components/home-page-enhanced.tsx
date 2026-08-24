@@ -8,6 +8,7 @@ import { useI18n } from '@/lib/i18n/context'
 import { USE_CASES } from '@/lib/use-cases'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
+import { GitHubPopularityList } from './github-popularity-list'
 
 interface HomePageEnhancedProps {
   initialLocale?: Locale
@@ -37,6 +38,9 @@ interface HomePageEnhancedProps {
     badge: string
     reason: string
     category: string
+    github_repo: string
+    github_owner: string
+    author_name: string | null
   }>
   rankingGeneratedAt: string | null
 }
@@ -933,15 +937,15 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d675e]">Daily leaderboards</p>
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d675e]">GitHub popularity leaderboard</p>
               <h2
                 className="mt-3 text-3xl font-normal leading-tight tracking-normal md:text-5xl"
                 style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
               >
-                Skills moving now, ranked with evidence.
+                The most-starred agent skill projects.
               </h2>
               <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[#5f5a52] md:text-base">
-                Daily snapshots combine capped activity signals, quality, trust, GitHub adoption, and real agent outcomes.
+                Popularity starts with GitHub stars, then OpenAgentSkill filters out weak skill matches and keeps trust signals visible before install.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
@@ -968,10 +972,11 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
 
           <nav className="mt-7 flex gap-2 overflow-x-auto pb-1" aria-label="Leaderboard views">
             {[
+              ['/rankings/most-starred-agent-skills', 'Most starred'],
               ['/trending', 'Trending'],
-              ['/rankings/agent-proven', 'Agent proven'],
-              ['/rankings/safest-auto-install-skills', 'Safe install'],
               ['/rankings/new-agent-skills-this-week', 'New this week'],
+              ['/rankings/highest-quality-agent-skills', 'Quality'],
+              ['/rankings/agent-proven', 'Agent proven'],
             ].map(([href, label], index) => (
               <Link
                 key={href}
@@ -988,26 +993,23 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
           </nav>
 
           {featuredSkills.length > 0 ? (
-            <ol className="mt-6 grid gap-px overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#d8d2c6] sm:grid-cols-2 lg:grid-cols-5">
-              {featuredSkills.map((skill) => (
-                <li key={skill.slug} className="min-w-0 bg-[#fffdf8]">
-                  <Link href={`/skills/${skill.slug}`} className="group flex h-full min-h-56 flex-col p-5 transition-colors hover:bg-[#f7f4ec]">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="grid h-8 w-8 place-items-center rounded-full bg-[#006b4f] font-mono text-xs font-semibold text-white">
-                        {skill.rank}
-                      </span>
-                      <span className="truncate font-mono text-[10px] uppercase tracking-[0.12em] text-[#6d675e]">{skill.category}</span>
-                    </div>
-                    <h3 className="mt-5 line-clamp-2 text-lg font-semibold leading-tight group-hover:text-[#006b4f]">{skill.name}</h3>
-                    <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-[#5f5a52]">{skill.reason || skill.description}</p>
-                    <div className="mt-auto flex items-end justify-between gap-3 pt-5 font-mono text-[11px] text-[#6d675e]">
-                      <span>{formatCompact(skill.github_stars)} stars</span>
-                      <span className="max-w-[9rem] truncate text-right">{skill.badge}</span>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ol>
+            <div className="mt-6">
+              <GitHubPopularityList
+                items={featuredSkills.map((skill) => ({
+                  rank: skill.rank,
+                  slug: skill.slug,
+                  name: skill.name,
+                  description: skill.description,
+                  githubStars: skill.github_stars,
+                  githubRepo: skill.github_repo,
+                  githubOwner: skill.github_owner,
+                  authorName: skill.author_name,
+                  badge: skill.badge,
+                  reason: skill.reason,
+                  category: skill.category,
+                }))}
+              />
+            </div>
           ) : (
             <div className="mt-6 rounded-[10px] border border-dashed border-[#d8d2c6] bg-[#fffdf8] p-6 text-sm leading-relaxed text-[#5f5a52]">
               The first daily leaderboard snapshot is being generated. Browse the live rankings while the scheduled snapshot is prepared.

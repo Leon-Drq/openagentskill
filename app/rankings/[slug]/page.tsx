@@ -5,6 +5,8 @@ import { InstallCommand } from '@/components/install-command'
 import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
+import { getGitHubOwner } from '@/lib/github-owner'
 import {
   convertSkillRecordToManifest,
   getAgentOutcomeStatsMap,
@@ -186,10 +188,14 @@ export default async function RankingDetailPage({
                   : null
                 const proven = getAgentProvenProfile(outcomeStats)
                 const movement = rankMovement.get(skill.slug) || 0
+                const githubOwner = getGitHubOwner(skill)
 
                 return (
                   <article key={skill.slug} className="grid gap-5 py-7 lg:grid-cols-[auto_1fr_auto]">
-                    <div className="font-mono text-2xl text-secondary tabular-nums">#{item.rank}</div>
+                    <div className="flex items-center gap-3 lg:flex-col lg:items-start">
+                      <div className="font-mono text-2xl text-secondary tabular-nums">#{item.rank}</div>
+                      <GitHubOwnerAvatar owner={githubOwner} label={skill.author_name} size="lg" />
+                    </div>
                     <div className="min-w-0">
                       <div className="mb-2 flex flex-wrap items-center gap-2">
                         <Link href={`/skills/${skill.slug}`} className="min-w-0">
@@ -206,6 +212,7 @@ export default async function RankingDetailPage({
                         <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
                           {quality.label} · {quality.score}
                         </span>
+                        {githubOwner ? <span className="font-mono text-xs text-secondary">@{githubOwner}</span> : null}
                         {ranking.kind === 'agent-usage' || ranking.kind === 'success-rate' || ranking.kind === 'safe-auto-install' ? (
                           <span className="border border-[#c8ded5] bg-[#eef7f2] px-2 py-0.5 text-xs font-mono text-[#006b4f]">
                             {proven.score}/100 proven
