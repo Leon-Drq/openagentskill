@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { trackSkillEvent } from '@/components/skill-event-tracker'
 import { useI18n } from '@/lib/i18n/context'
 import { formatSkillDetailCopy } from '@/lib/i18n/skill-detail-copy'
+import { copyText } from '@/lib/copy-text'
 
 interface InstallCommandProps {
   command: string
@@ -19,7 +20,8 @@ export function InstallCommand({ command, skillSlug, compact = false }: InstallC
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(fullCommand)
+      const copied = await copyText(fullCommand)
+      if (!copied) throw new Error('Clipboard is unavailable')
       trackSkillEvent(skillSlug, 'install_copy', { command: fullCommand })
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)

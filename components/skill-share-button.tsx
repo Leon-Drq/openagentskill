@@ -4,6 +4,7 @@ import { Check, Share2 } from 'lucide-react'
 import { useState } from 'react'
 import { trackSkillEvent } from '@/components/skill-event-tracker'
 import { SkillDetailValue } from '@/components/skill-detail-text'
+import { copyText } from '@/lib/copy-text'
 
 export function SkillShareButton({
   skillSlug,
@@ -27,7 +28,8 @@ export function SkillShareButton({
           url,
         })
       } else {
-        await navigator.clipboard.writeText(url)
+        const copied = await copyText(url)
+        if (!copied) throw new Error('Clipboard is unavailable')
       }
 
       trackSkillEvent(skillSlug, 'share_copy', { placement: 'skill_hero' })

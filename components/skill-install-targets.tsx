@@ -7,6 +7,7 @@ import { SkillDetailValue } from '@/components/skill-detail-text'
 import { useI18n } from '@/lib/i18n/context'
 import { formatSkillDetailCopy } from '@/lib/i18n/skill-detail-copy'
 import type { SkillInstallTarget } from '@/lib/install-targets'
+import { copyText } from '@/lib/copy-text'
 import { cn } from '@/lib/utils'
 
 interface SkillInstallTargetsProps {
@@ -25,7 +26,8 @@ export function SkillInstallTargets({ skillSlug, targets, compact = false }: Ski
 
   async function copyTarget(target: SkillInstallTarget) {
     try {
-      await navigator.clipboard.writeText(target.value)
+      const copied = await copyText(target.value)
+      if (!copied) throw new Error('Clipboard is unavailable')
       trackSkillEvent(skillSlug, 'install_copy', { target: target.id, kind: target.kind })
       setCopiedId(target.id)
       setTimeout(() => setCopiedId(null), 1800)
