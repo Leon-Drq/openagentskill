@@ -26,473 +26,13 @@ import { augmentQueryForIntent, dedupeRankedSkills, getRecommendationReasons, no
 import { getSkillSupplyProfile, type SkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile, getSkillTrustProfileV5, type SkillTrustProfile, type SkillTrustProfileV5 } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
-import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
+import { TRUSTED_RESOLVE_FALLBACKS } from '@/lib/resolve-fallbacks'
 
 const SITE_URL = 'https://www.openagentskill.com'
 const RESOLVE_CANDIDATE_POOL_SIZE = 750
 const RESOLVE_CACHE_REVALIDATE = 300
 const RESOLVE_QUERY_TIMEOUT_MS = 1800
 const RESOLVE_EXACT_QUERY_TIMEOUT_MS = 2200
-const FALLBACK_DATE = '2026-06-01T00:00:00.000Z'
-
-function fallbackSkill(input: {
-  slug: string
-  name: string
-  description: string
-  repo: string
-  category: string
-  tags: string[]
-  frameworks: string[]
-  stars: number
-  forks?: number
-  quality: number
-  license?: string
-  lastPushedAt?: string
-  repository?: string
-  installCommand?: string
-}): SkillRecord {
-  return {
-    id: `fallback-${input.slug}`,
-    slug: input.slug,
-    name: input.name,
-    description: input.description,
-    long_description: input.description,
-    tagline: input.description,
-    author_name: input.repo.split('/')[0],
-    author_email: null,
-    author_url: `https://github.com/${input.repo.split('/')[0]}`,
-    repository: input.repository || `https://github.com/${input.repo}`,
-    github_repo: input.repo,
-    github_stars: input.stars,
-    github_forks: input.forks || 0,
-    category: input.category,
-    tags: input.tags,
-    frameworks: input.frameworks,
-    version: '1.0.0',
-    license: input.license || 'Unknown',
-    install_command: input.installCommand || `npx skills add ${input.repo}`,
-    npm_package: null,
-    verified: false,
-    submission_source: 'fallback',
-    submitted_by_agent: null,
-    ai_review_score: null,
-    ai_review_approved: true,
-    ai_review_issues: [],
-    ai_review_suggestions: [],
-    // Curated fallbacks provide relevance coverage, not synthetic adoption.
-    downloads: 0,
-    used_by: 0,
-    rating: 0,
-    review_count: 0,
-    quality_score: input.quality,
-    quality_signals: null,
-    github_language: null,
-    github_last_pushed_at: input.lastPushedAt || FALLBACK_DATE,
-    created_at: FALLBACK_DATE,
-    updated_at: FALLBACK_DATE,
-  }
-}
-
-const RESOLVE_FALLBACK_SKILLS: SkillRecord[] = [
-  fallbackSkill({
-    slug: 'crawl4ai',
-    name: 'Crawl4AI',
-    description: 'Open-source LLM-friendly web crawler and scraper for agent workflows.',
-    repo: 'unclecode/crawl4ai',
-    category: 'Web Scraping',
-    tags: ['web scraping', 'crawler', 'research'],
-    frameworks: ['Codex', 'Claude Code', 'Cursor'],
-    stars: 66_000,
-    quality: 96,
-    license: 'Apache-2.0',
-  }),
-  fallbackSkill({
-    slug: 'firecrawl',
-    name: 'Firecrawl',
-    description: 'Turn websites into clean markdown or structured data for retrieval and agents.',
-    repo: 'mendableai/firecrawl',
-    category: 'Web Scraping',
-    tags: ['crawler', 'markdown', 'rag'],
-    frameworks: ['Codex', 'Claude Code', 'Cursor'],
-    stars: 34_000,
-    quality: 94,
-    license: 'AGPL-3.0',
-  }),
-  fallbackSkill({
-    slug: 'n8n',
-    name: 'n8n',
-    description: 'Workflow automation for connecting agents to repeated operational tasks.',
-    repo: 'n8n-io/n8n',
-    category: 'Workflow Automation',
-    tags: ['automation', 'workflow', 'integration'],
-    frameworks: ['API', 'CLI', 'Agent workflow'],
-    stars: 190_000,
-    quality: 92,
-  }),
-  fallbackSkill({
-    slug: 'markitdown',
-    name: 'MarkItDown',
-    description: 'Convert PDFs, Office documents, and web files into clean markdown for agents.',
-    repo: 'microsoft/markitdown',
-    category: 'Research',
-    tags: ['pdf', 'markdown', 'documents'],
-    frameworks: ['Codex', 'Claude Code', 'Cursor'],
-    stars: 80_000,
-    quality: 93,
-    license: 'MIT',
-  }),
-  fallbackSkill({
-    slug: 'hugohe3-ppt-master',
-    name: 'Ppt Master',
-    description:
-      'Generate real editable PowerPoint decks from documents, briefs, templates, and speaker-note workflows.',
-    repo: 'hugohe3/ppt-master',
-    category: 'Design',
-    tags: ['presentation', 'ppt', 'pptx', 'powerpoint', 'slides', 'speaker notes'],
-    frameworks: ['Codex', 'Claude Code', 'PowerPoint'],
-    stars: 31_000,
-    quality: 95,
-    license: 'MIT',
-  }),
-  fallbackSkill({
-    slug: 'op7418-guizang-ppt-skill',
-    name: 'Guizang Ppt Skill',
-    description:
-      'AI-agent skill for polished HTML slide decks with editorial layouts, visual prompts, and web presentation runtime.',
-    repo: 'op7418/guizang-ppt-skill',
-    category: 'Design',
-    tags: ['presentation', 'ppt', 'slides', 'html slides', 'deck', 'design'],
-    frameworks: ['Codex', 'Claude Code', 'HTML'],
-    stars: 15_000,
-    quality: 94,
-    license: 'MIT',
-  }),
-  fallbackSkill({
-    slug: 'zarazhangrui-frontend-slides',
-    name: 'Frontend Slides',
-    description: "Create beautiful web-based slides using a coding agent's frontend and design skills.",
-    repo: 'zarazhangrui/frontend-slides',
-    category: 'Design',
-    tags: ['presentation', 'slides', 'html slides', 'frontend', 'deck'],
-    frameworks: ['Codex', 'Claude Code', 'Cursor'],
-    stars: 23_000,
-    quality: 93,
-    license: 'MIT',
-  }),
-  fallbackSkill({
-    slug: 'emilkowalski-apple-design',
-    name: 'Apple Design',
-    description:
-      "Apple's interface design and fluid-motion principles translated into practical web guidance for gestures, springs, momentum, typography, and reduced motion.",
-    repo: 'emilkowalski/skills',
-    repository: 'https://github.com/emilkowalski/skills/tree/main/skills/apple-design',
-    installCommand: 'npx skills@latest add emilkowalski/skills',
-    category: 'design-creative',
-    tags: ['agent-skill', 'apple-design', 'interface-design', 'motion', 'animation', 'gestures', 'springs'],
-    frameworks: ['Claude Code', 'Codex', 'Cursor'],
-    stars: 7_906,
-    quality: 96,
-    license: 'MIT',
-    lastPushedAt: '2026-07-09T15:12:54.000Z',
-  }),
-  fallbackSkill({
-    slug: 'emilkowalski-emil-design-eng',
-    name: 'Emil Design Engineering',
-    description:
-      'Design-engineering guidance for polished UI components, animation decisions, interaction details, and interfaces that feel intentional.',
-    repo: 'emilkowalski/skills',
-    repository: 'https://github.com/emilkowalski/skills/tree/main/skills/emil-design-eng',
-    installCommand: 'npx skills@latest add emilkowalski/skills',
-    category: 'design-creative',
-    tags: ['agent-skill', 'design-engineering', 'ui', 'animation', 'frontend', 'interaction-design'],
-    frameworks: ['Claude Code', 'Codex', 'Cursor'],
-    stars: 7_906,
-    quality: 96,
-    license: 'MIT',
-    lastPushedAt: '2026-07-09T15:12:54.000Z',
-  }),
-  fallbackSkill({
-    slug: 'emilkowalski-review-animations',
-    name: 'Review Animations',
-    description:
-      'Review animation and motion code against a strict design-engineering craft bar, with focused findings for timing, easing, continuity, and interaction quality.',
-    repo: 'emilkowalski/skills',
-    repository: 'https://github.com/emilkowalski/skills/tree/main/skills/review-animations',
-    installCommand: 'npx skills@latest add emilkowalski/skills',
-    category: 'design-creative',
-    tags: ['agent-skill', 'animation-review', 'code-review', 'motion', 'frontend', 'easing'],
-    frameworks: ['Claude Code', 'Codex', 'Cursor'],
-    stars: 7_906,
-    quality: 94,
-    license: 'MIT',
-    lastPushedAt: '2026-07-09T15:12:54.000Z',
-  }),
-  fallbackSkill({
-    slug: 'emilkowalski-animation-vocabulary',
-    name: 'Animation Vocabulary',
-    description:
-      'Reverse-lookup animation glossary that turns a vague motion description into the precise design term an agent or designer can act on.',
-    repo: 'emilkowalski/skills',
-    repository: 'https://github.com/emilkowalski/skills/tree/main/skills/animation-vocabulary',
-    installCommand: 'npx skills@latest add emilkowalski/skills',
-    category: 'design-creative',
-    tags: ['agent-skill', 'animation', 'motion', 'design-language', 'prompting', 'vocabulary'],
-    frameworks: ['Claude Code', 'Codex', 'Cursor'],
-    stars: 7_906,
-    quality: 93,
-    license: 'MIT',
-    lastPushedAt: '2026-07-09T15:12:54.000Z',
-  }),
-  fallbackSkill({
-    slug: 'mattpocock-grill-with-docs',
-    name: 'Grill With Docs',
-    description:
-      'Pressure-test a plan against the live codebase, domain glossary, and architectural decisions before implementation starts.',
-    repo: 'mattpocock/skills',
-    repository: 'https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs',
-    installCommand: 'npx skills add mattpocock/skills --skill grill-with-docs',
-    category: 'coding-agents',
-    tags: ['agent-skill', 'planning', 'domain-modeling', 'adr', 'context', 'coding-agents'],
-    frameworks: ['Claude Code', 'Codex', 'Cursor'],
-    stars: 164_079,
-    forks: 14_116,
-    quality: 94,
-    license: 'MIT',
-    lastPushedAt: '2026-07-10T13:15:20.000Z',
-  }),
-  fallbackSkill({
-    slug: 'mattpocock-to-spec',
-    name: 'To Spec',
-    description:
-      'Synthesize the current conversation and codebase context into a behavior-focused engineering spec.',
-    repo: 'mattpocock/skills',
-    repository: 'https://github.com/mattpocock/skills/tree/main/skills/engineering/to-spec',
-    installCommand: 'npx skills add mattpocock/skills --skill to-spec',
-    category: 'coding-agents',
-    tags: ['agent-skill', 'spec', 'prd', 'issue-tracker', 'planning', 'coding-agents'],
-    frameworks: ['Claude Code', 'Codex', 'Cursor'],
-    stars: 164_079,
-    forks: 14_116,
-    quality: 92,
-    license: 'MIT',
-    lastPushedAt: '2026-07-10T13:15:20.000Z',
-  }),
-  fallbackSkill({
-    slug: 'mattpocock-to-tickets',
-    name: 'To Tickets',
-    description:
-      'Break an approved plan or spec into independently actionable vertical-slice tickets with explicit blocking relationships.',
-    repo: 'mattpocock/skills',
-    repository: 'https://github.com/mattpocock/skills/tree/main/skills/engineering/to-tickets',
-    installCommand: 'npx skills add mattpocock/skills --skill to-tickets',
-    category: 'coding-agents',
-    tags: ['agent-skill', 'tickets', 'issues', 'vertical-slices', 'planning', 'coding-agents'],
-    frameworks: ['Claude Code', 'Codex', 'Cursor'],
-    stars: 164_079,
-    forks: 14_116,
-    quality: 91,
-    license: 'MIT',
-    lastPushedAt: '2026-07-10T13:15:20.000Z',
-  }),
-  fallbackSkill({
-    slug: 'mattpocock-implement',
-    name: 'Implement',
-    description:
-      'Implement approved engineering work with focused tests, full verification, code review, and a commit on the current branch.',
-    repo: 'mattpocock/skills',
-    repository: 'https://github.com/mattpocock/skills/tree/main/skills/engineering/implement',
-    installCommand: 'npx skills add mattpocock/skills --skill implement',
-    category: 'coding-agents',
-    tags: ['agent-skill', 'implementation', 'tdd', 'testing', 'commit', 'coding-agents'],
-    frameworks: ['Claude Code', 'Codex', 'Cursor'],
-    stars: 164_079,
-    forks: 14_116,
-    quality: 88,
-    license: 'MIT',
-    lastPushedAt: '2026-07-10T13:15:20.000Z',
-  }),
-  fallbackSkill({
-    slug: 'mattpocock-code-review',
-    name: 'Code Review',
-    description:
-      'Review a branch or diff independently against repository standards and the originating specification.',
-    repo: 'mattpocock/skills',
-    repository: 'https://github.com/mattpocock/skills/tree/main/skills/engineering/code-review',
-    installCommand: 'npx skills add mattpocock/skills --skill code-review',
-    category: 'coding-agents',
-    tags: ['agent-skill', 'code-review', 'git-diff', 'standards', 'spec', 'coding-agents'],
-    frameworks: ['Claude Code', 'Codex', 'Cursor'],
-    stars: 164_079,
-    forks: 14_116,
-    quality: 94,
-    license: 'MIT',
-    lastPushedAt: '2026-07-10T13:15:20.000Z',
-  }),
-  fallbackSkill({
-    slug: 'llamaindex',
-    name: 'LlamaIndex',
-    description: 'Data framework for building RAG and knowledge workflows around agent tasks.',
-    repo: 'run-llama/llama_index',
-    category: 'RAG',
-    tags: ['rag', 'knowledge', 'retrieval'],
-    frameworks: ['Python', 'Codex', 'Claude Code'],
-    stars: 42_000,
-    quality: 91,
-    license: 'MIT',
-  }),
-  fallbackSkill({
-    slug: 'openbb',
-    name: 'OpenBB',
-    description: 'Open-source investment research platform for financial analysis agents.',
-    repo: 'OpenBB-finance/OpenBB',
-    category: 'Finance',
-    tags: ['finance', 'stocks', 'research'],
-    frameworks: ['Python', 'Codex', 'Claude Code'],
-    stars: 46_000,
-    quality: 90,
-  }),
-  fallbackSkill({
-    slug: 'browser-use',
-    name: 'Browser Use',
-    description: 'Browser automation layer for agents that need to interact with websites.',
-    repo: 'browser-use/browser-use',
-    category: 'Browser Automation',
-    tags: ['browser', 'automation', 'agent'],
-    frameworks: ['Python', 'Browser', 'Agent workflow'],
-    stars: 75_000,
-    quality: 90,
-  }),
-  fallbackSkill({
-    slug: 'playwright',
-    name: 'Playwright',
-    description: 'Reliable browser automation and testing engine for web agent tasks.',
-    repo: 'microsoft/playwright',
-    category: 'Browser Automation',
-    tags: ['browser', 'testing', 'automation'],
-    frameworks: ['Node.js', 'Python', 'Codex'],
-    stars: 76_000,
-    quality: 89,
-    license: 'Apache-2.0',
-  }),
-  fallbackSkill({
-    slug: 'last30days-skill',
-    name: 'Last30days Skill',
-    description: 'Research recent cross-source changes across Reddit, X, YouTube, Hacker News, and the web.',
-    repo: 'mvanhorn/last30days-skill',
-    category: 'Research',
-    tags: ['research', 'recent events', 'briefing'],
-    frameworks: ['Codex', 'Claude Code'],
-    stars: 42_500,
-    quality: 88,
-  }),
-  fallbackSkill({
-    slug: 'addyosmani-agent-skills',
-    name: 'Agent Skills',
-    description: 'Production-grade engineering skills for AI coding agents across spec, planning, build, test, review, and shipping workflows.',
-    repo: 'addyosmani/agent-skills',
-    category: 'Coding Agents',
-    tags: ['agent-skills', 'coding-agents', 'engineering', 'quality-gates', 'claude-code', 'cursor'],
-    frameworks: ['Claude Code', 'Cursor', 'Gemini CLI', 'Codex'],
-    stars: 61_800,
-    quality: 94,
-    license: 'MIT',
-  }),
-  fallbackSkill({
-    slug: 'davidondrej-skills',
-    name: 'David Ondrej Skills',
-    description:
-      'Reusable SKILL.md workflows for coding agents, research, docs, ops, orchestration, and skill-authoring.',
-    repo: 'davidondrej/skills',
-    category: 'Agent Skills',
-    tags: [
-      'agent-skills',
-      'coding-agents',
-      'research-agents',
-      'workflow-agents',
-      'agent-orchestration',
-      'skill-authoring',
-      'deep-research',
-      'youtube-transcript',
-      'docs',
-      'ops',
-    ],
-    frameworks: ['Codex', 'Claude Code', 'Cursor', 'Agent Workflows'],
-    stars: 968,
-    quality: 92,
-    license: 'MIT',
-    lastPushedAt: '2026-07-05T21:16:23.000Z',
-  }),
-  fallbackSkill({
-    slug: 'serenity-skill',
-    name: 'Serenity Skill',
-    description: 'Stock analysis skill for market research and financial reasoning workflows.',
-    repo: 'muxuuu/serenity-skill',
-    category: 'Finance',
-    tags: ['stocks', 'finance', 'analysis'],
-    frameworks: ['Codex', 'Claude Code'],
-    stars: 12_000,
-    quality: 86,
-  }),
-  fallbackSkill({
-    slug: 'seedance-2-0',
-    name: 'Seedance 2.0 Skill',
-    description: 'Creative video generation workflow skill for Seedance 2.0 filmmaking agents.',
-    repo: 'Emily2040/seedance-2.0',
-    category: 'Design',
-    tags: ['video', 'creative', 'seedance'],
-    frameworks: ['Codex', 'Claude Code'],
-    stars: 8_000,
-    quality: 84,
-  }),
-  fallbackSkill({
-    slug: 'vectorbt',
-    name: 'Vectorbt',
-    description: 'Fast quantitative research and backtesting workflows for financial agents.',
-    repo: 'polakowo/vectorbt',
-    category: 'Finance',
-    tags: ['quant', 'backtesting', 'finance'],
-    frameworks: ['Python', 'Codex'],
-    stars: 5_400,
-    quality: 83,
-  }),
-  fallbackSkill({
-    slug: 'openfootball-worldcup',
-    name: 'Openfootball Worldcup',
-    description: 'World Cup football match data and fixtures for sports analytics agents.',
-    repo: 'openfootball/worldcup',
-    category: 'Sports Analytics',
-    tags: ['world cup', 'football', 'soccer', 'match data', 'sports analytics'],
-    frameworks: ['Codex', 'Claude Code', 'Data workflow'],
-    stars: 634,
-    quality: 82,
-    license: 'Public Domain',
-  }),
-  fallbackSkill({
-    slug: 'estiens-world-cup-json',
-    name: 'World Cup JSON',
-    description: 'Structured World Cup JSON data for building football dashboards and match analysis workflows.',
-    repo: 'estiens/world_cup_json',
-    category: 'Sports Analytics',
-    tags: ['world cup', 'football', 'soccer', 'json', 'sports data'],
-    frameworks: ['Codex', 'Claude Code', 'Data workflow'],
-    stars: 926,
-    quality: 82,
-    license: 'MIT',
-  }),
-  fallbackSkill({
-    slug: 'cedricblondeau-world-cup-dashboard',
-    name: 'World Cup CLI Dashboard',
-    description: 'World Cup command-line dashboard and match data workflow for football analytics agents.',
-    repo: 'cedricblondeau/world-cup-2018-cli-dashboard',
-    category: 'Sports Analytics',
-    tags: ['world cup', 'football', 'soccer', 'dashboard', 'match data'],
-    frameworks: ['Codex', 'CLI', 'Data workflow'],
-    stars: 543,
-    quality: 80,
-    license: 'MIT',
-  }),
-]
-
 async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   let timeout: ReturnType<typeof setTimeout> | undefined
   const timeoutPromise = new Promise<T>((_, reject) => {
@@ -515,7 +55,7 @@ const getResolveCandidatePool = unstable_cache(
       // failing a request or scheduling repeated cache revalidations while the
       // registry database is temporarily unavailable.
       console.warn('Agent resolve cache fallback:', error)
-      return RESOLVE_FALLBACK_SKILLS
+      return TRUSTED_RESOLVE_FALLBACKS
     }
   },
   ['agent-resolve-candidate-pool-v2'],
@@ -951,7 +491,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         withTimeout(getResolveCandidatePool(), RESOLVE_QUERY_TIMEOUT_MS, 'agent resolve candidate query')
           .catch((error) => {
             console.warn('Agent resolve candidate fallback:', error)
-            return RESOLVE_FALLBACK_SKILLS
+            return TRUSTED_RESOLVE_FALLBACKS
           }),
         withTimeout(searchSkills(rankingTask, 160), RESOLVE_EXACT_QUERY_TIMEOUT_MS, 'agent resolve exact query')
           .catch((error) => {
@@ -964,12 +504,12 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
           .catch((): Record<string, SkillOutcomeStats> => ({})),
       ])
     : [
-        RESOLVE_FALLBACK_SKILLS,
+        TRUSTED_RESOLVE_FALLBACKS,
         [] as SkillRecord[],
         {} as Record<string, SkillEventStats>,
         {} as Record<string, SkillOutcomeStats>,
       ]
-  const skills = mergeResolveSkillPools(queryPool, qualityPool, RESOLVE_FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
+  const skills = mergeResolveSkillPools(queryPool, qualityPool, TRUSTED_RESOLVE_FALLBACKS)
 
   const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, rankingTask, outcomeStatsMap))
     .filter(({ skill }) => candidateAllowed(skill, constraints))
@@ -977,10 +517,31 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
   const topMatchScore = ranked[0]?.score || 0
 
   const candidates = ranked.map(({ skill, score, semanticRelevance }, index) => {
+    const isFallbackSnapshot = skill.submission_source === 'curated_snapshot'
     const eventStats = eventStatsMap[skill.slug] || null
     const outcomeStats = outcomeStatsMap[skill.slug] || null
     const audit = buildSkillAudit(skill, eventStats)
-    const safety = getAgentSafetyProfile(skill, audit, constraints)
+    const baseSafety = getAgentSafetyProfile(skill, audit, constraints)
+    const safety = isFallbackSnapshot
+      ? {
+          ...baseSafety,
+          safety_tier: {
+            ...baseSafety.safety_tier,
+            auto_install_policy: 'review' as const,
+            recommended_action: 'Verify the live repository and request human approval before installing this fallback snapshot.',
+            reasons: [
+              'Registry fallback snapshots may be stale even when their source path was previously verified.',
+              ...baseSafety.safety_tier.reasons,
+            ],
+          },
+          auto_install_allowed: false,
+          human_review_required: true,
+          policy_warnings: [
+            'Fallback snapshot: live registry metadata was unavailable or did not contain this record.',
+            ...baseSafety.policy_warnings,
+          ],
+        }
+      : baseSafety
     const trust = getSkillTrustProfile(skill, false, eventStats, outcomeStats)
     const trustV5 = getSkillTrustProfileV5(skill, false, eventStats, outcomeStats)
     const agentProven = getAgentProvenProfile(outcomeStats)
@@ -994,6 +555,14 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
       match_score: matchScore,
       raw_match_score: score,
       semantic_relevance: semanticRelevance,
+      registry_source: {
+        kind: isFallbackSnapshot ? 'verified_fallback_snapshot' : 'live_registry',
+        live: !isFallbackSnapshot,
+        auto_install_eligible: !isFallbackSnapshot,
+        warning: isFallbackSnapshot
+          ? 'This is a source-verified fallback snapshot. Re-check the repository before installation.'
+          : null,
+      },
       skill: {
         slug: skill.slug,
         name: skill.name,

@@ -21,6 +21,7 @@ import {
   getRankingCompareHref,
   getRankingDefinition,
   getRankingDefinitions,
+  normalizeRankingText,
   rankSkillsForDefinition,
 } from '@/lib/rankings'
 
@@ -72,7 +73,7 @@ export default async function RankingDetailPage({
   const ranking = getRankingDefinition(slug)
   if (!ranking) notFound()
 
-  const usesOutcomeStats = ranking.kind === 'agent-usage' || ranking.kind === 'success-rate' || ranking.kind === 'safe-auto-install'
+  const usesOutcomeStats = ['highest-quality', 'agent-usage', 'success-rate', 'safe-auto-install', 'agent-platform'].includes(ranking.kind)
   const [skills, statsMap, latestSnapshot, snapshotHistory] = await Promise.all([
     getAllSkills('quality', undefined, 1200).catch(() => []),
     usesOutcomeStats
@@ -162,7 +163,7 @@ export default async function RankingDetailPage({
             </div>
             <div className="bg-background p-4">
               <div className="font-mono text-2xl">
-                {rankedSkills[0] ? Math.round(getSkillQualityProfile(rankedSkills[0].skill).score) : 0}
+                {rankedSkills[0] ? Math.round(rankedSkills[0].score) : 0}
               </div>
               <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Top score</div>
             </div>
@@ -189,6 +190,8 @@ export default async function RankingDetailPage({
                 const proven = getAgentProvenProfile(outcomeStats)
                 const movement = rankMovement.get(skill.slug) || 0
                 const githubOwner = getGitHubOwner(skill)
+                const displayName = normalizeRankingText(skill.name)
+                const displayDescription = normalizeRankingText(skill.description)
 
                 return (
                   <article key={skill.slug} className="grid gap-5 py-7 lg:grid-cols-[auto_1fr_auto]">
@@ -200,17 +203,17 @@ export default async function RankingDetailPage({
                       <div className="mb-2 flex flex-wrap items-center gap-2">
                         <Link href={`/skills/${skill.slug}`} className="min-w-0">
                           <h2 className="font-display text-2xl font-semibold leading-tight hover:text-secondary">
-                            {skill.name}
+                            {displayName}
                           </h2>
                         </Link>
                         <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
-                          {item.badge}
+                          {normalizeRankingText(item.badge)}
                         </span>
                         <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
                           {snapshotHistory.length < 2 ? 'Baseline' : movement > 0 ? `↑ ${movement}` : movement < 0 ? `↓ ${Math.abs(movement)}` : '— stable'}
                         </span>
                         <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
-                          {quality.label} · {quality.score}
+                          {quality.label} | {quality.score}
                         </span>
                         {githubOwner ? <span className="font-mono text-xs text-secondary">@{githubOwner}</span> : null}
                         {ranking.kind === 'agent-usage' || ranking.kind === 'success-rate' || ranking.kind === 'safe-auto-install' ? (
@@ -219,13 +222,23 @@ export default async function RankingDetailPage({
                           </span>
                         ) : null}
                       </div>
-                      <p className="max-w-3xl text-sm leading-relaxed text-secondary">{skill.description}</p>
-                      <p className="mt-3 max-w-3xl text-sm leading-relaxed">{item.reason}</p>
+                      <p className="max-w-3xl text-sm leading-relaxed text-secondary">{displayDescription}</p>
+                      <p className="mt-3 max-w-3xl text-sm leading-relaxed">{normalizeRankingText(item.reason)}</p>
+                      <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-mono text-secondary">
+                        <span>ranking {Math.round(item.score)}/100</span>
+                        <span>quality {Math.round(item.dimensions.quality)}</span>
+                        <span>popularity {Math.round(item.dimensions.popularity)}</span>
+                        <span>freshness {Math.round(item.dimensions.freshness)}</span>
+                        <span>evidence {Math.round(item.dimensions.agentEvidence)}</span>
+                        <span>confidence {Math.round(item.dimensions.evidenceConfidence)}</span>
+                        <span>install {Math.round(item.dimensions.installReadiness)}</span>
+                        {item.dimensions.fit !== null ? <span>fit {Math.round(item.dimensions.fit)}</span> : null}
+                      </div>
                       <div className="mt-4 flex flex-wrap gap-4 text-xs font-mono text-secondary">
                         <span>{formatCompactNumber(skill.github_stars || 0)} stars</span>
                         <span>{formatCompactNumber(skill.github_forks || 0)} forks</span>
                         <span>{formatDate(skill.github_last_pushed_at || skill.updated_at)} push</span>
-                        <span>{skill.category}</span>
+                        <span>{normalizeRankingText(skill.category)}</span>
                         {(ranking.kind === 'agent-usage' || ranking.kind === 'success-rate' || ranking.kind === 'safe-auto-install') && (
                           <>
                             <span>{proven.metrics.totalOutcomes.toLocaleString()} outcomes</span>

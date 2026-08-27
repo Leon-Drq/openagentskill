@@ -9,7 +9,7 @@ import {
   type SkillOutcomeStats,
 } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
-import { CORE_RANKINGS, getRankingDefinitions, rankSkillsForDefinition, type RankingDefinition } from '@/lib/rankings'
+import { CORE_RANKINGS, getRankingDefinitions, normalizeRankingText, rankSkillsForDefinition, type RankingDefinition } from '@/lib/rankings'
 import { getLatestRankingSnapshot, RANKING_METHODOLOGY_VERSION } from '@/lib/ranking-snapshots'
 import { GitHubPopularityList } from '@/components/github-popularity-list'
 
@@ -35,7 +35,7 @@ function formatNumber(value: number) {
 }
 
 function usesOutcomeStats(ranking: RankingDefinition) {
-  return ranking.kind === 'agent-usage' || ranking.kind === 'success-rate' || ranking.kind === 'safe-auto-install'
+  return ['highest-quality', 'agent-usage', 'success-rate', 'safe-auto-install', 'agent-platform'].includes(ranking.kind)
 }
 
 export default async function RankingsPage() {
@@ -93,7 +93,7 @@ export default async function RankingsPage() {
           </div>
           <div className="bg-background p-5">
             <p className="text-xs uppercase tracking-widest text-secondary">Methodology</p>
-            <p className="mt-2 font-mono text-sm">{latestSnapshot?.methodology_version || RANKING_METHODOLOGY_VERSION}</p>
+            <p className="mt-2 font-mono text-sm">{RANKING_METHODOLOGY_VERSION}</p>
           </div>
         </section>
 
@@ -140,14 +140,14 @@ export default async function RankingsPage() {
             items={popularSkills.map((item) => ({
               rank: item.rank,
               slug: item.skill.slug,
-              name: item.skill.name,
-              description: item.skill.description,
+              name: normalizeRankingText(item.skill.name),
+              description: normalizeRankingText(item.skill.description),
               githubStars: item.skill.github_stars,
               githubRepo: item.skill.github_repo,
               authorName: item.skill.author_name,
-              badge: item.badge,
-              reason: item.reason,
-              category: item.skill.category,
+              badge: normalizeRankingText(item.badge),
+              reason: normalizeRankingText(item.reason),
+              category: normalizeRankingText(item.skill.category),
             }))}
           />
         </section>
@@ -185,8 +185,8 @@ export default async function RankingsPage() {
                   <div className="space-y-2">
                     {topSkills.map((item) => (
                       <div key={item.skill.slug} className="flex items-center justify-between gap-3 text-sm">
-                        <span className="truncate">{item.skill.name}</span>
-                        <span className="shrink-0 font-mono text-xs text-secondary">{item.badge}</span>
+                        <span className="truncate">{normalizeRankingText(item.skill.name)}</span>
+                        <span className="shrink-0 font-mono text-xs text-secondary">{normalizeRankingText(item.badge)}</span>
                       </div>
                     ))}
                   </div>
@@ -203,10 +203,10 @@ export default async function RankingsPage() {
             <h2 className="mt-3 font-display text-2xl font-semibold">No pay-to-rank. No single-metric winners.</h2>
           </div>
           <div className="grid gap-4 text-sm leading-relaxed text-secondary sm:grid-cols-2">
-            <p><span className="font-semibold text-foreground">Trending</span> uses capped seven-day activity, logarithmic weighting, active-day breadth, quality, trust, adoption, and real agent outcomes.</p>
-            <p><span className="font-semibold text-foreground">Agent proven</span> requires reported outcomes. Safety lists penalize risk blocks, setup friction, unclear install paths, and weak Skill-format evidence.</p>
-            <p><span className="font-semibold text-foreground">Fresh and new</span> let recently maintained or indexed skills surface without needing years of accumulated GitHub stars.</p>
-            <p><span className="font-semibold text-foreground">Daily snapshots</span> make every published leaderboard reproducible for the day and expose when the data was generated.</p>
+            <p><span className="font-semibold text-foreground">Bounded scores</span> normalize every public ranking score to 0–100. Raw stars or timestamps can order their dedicated lists but are never exposed as a score.</p>
+            <p><span className="font-semibold text-foreground">Independent dimensions</span> separate popularity, quality, freshness, agent evidence, evidence confidence, install readiness, and task fit.</p>
+            <p><span className="font-semibold text-foreground">Evidence-aware ranking</span> prevents one reported success from outranking broader multi-agent evidence and clearly marks skills that still need a first run.</p>
+            <p><span className="font-semibold text-foreground">Daily snapshots</span> use a versioned methodology so published leaderboards remain reproducible and auditable.</p>
           </div>
         </section>
 
@@ -236,7 +236,7 @@ export default async function RankingsPage() {
                   <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary">{ranking.description}</p>
                   {topSkill && (
                     <p className="mt-5 border-t border-border pt-4 text-xs text-secondary">
-                      Leading pick: <span className="text-foreground">{topSkill.skill.name}</span>
+                      Leading pick: <span className="text-foreground">{normalizeRankingText(topSkill.skill.name)}</span>
                     </p>
                   )}
                 </Link>
