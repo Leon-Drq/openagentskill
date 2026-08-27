@@ -33,6 +33,31 @@ export interface RankedSkill {
   score: number
   reason: string
   badge: string
+  dimensions: RankingDimensions
+}
+
+export interface RankingDimensions {
+  popularity: number
+  quality: number
+  freshness: number
+  agentEvidence: number
+  evidenceConfidence: number
+  installReadiness: number
+  fit: number | null
+}
+
+const MOJIBAKE_SEQUENCE = /(?:[\u00c2-\u00df][\u0080-\u00bf]|[\u00e0-\u00ef][\u0080-\u00bf]{2}|[\u00f0-\u00f4][\u0080-\u00bf]{3})+/g
+
+export function normalizeRankingText(value: string | null | undefined) {
+  const text = String(value || '')
+  const repaired = text.replace(MOJIBAKE_SEQUENCE, (segment) =>
+    Buffer.from(segment, 'latin1').toString('utf8')
+  )
+
+  return repaired
+    .replaceAll('Â·', '|')
+    .replaceAll('â', '-')
+    .replaceAll('â', '-')
 }
 
 export const CORE_RANKINGS: RankingDefinition[] = [
@@ -176,6 +201,80 @@ function freshnessScore(value: string | null | undefined) {
   return Math.max(0, 100 - Math.min(100, days * 2))
 }
 
+function clampScore(value: number) {
+  if (!Number.isFinite(value)) return 0
+  return Math.max(0, Math.min(100, Math.round(value * 10) / 10))
+}
+
+function weightedScore(
+  dimensions: RankingDimensions,
+  weights: Partial<Record<keyof RankingDimensions, number>>
+) {
+  let totalWeight = 0
+  let total = 0
+
+  for (const [key, weight] of Object.entries(weights) as Array<[
+    keyof RankingDimensions,
+    number,
+  ]>) {
+    const value = dimensions[key]
+    if (value === null || weight <= 0) continue
+    total += value * weight
+    totalWeight += weight
+  }
+
+  return clampScore(totalWeight > 0 ? total / totalWeight : 0)
+}
+
+function popularityScore(stars: number) {
+  // 100k stars is the top of the public popularity scale. Raw stars still
+  // determine ties and the literal most-starred ordering.
+  return clampScore((Math.log10(Math.max(0, stars) + 1) / 5) * 100)
+}
+
+function evidenceConfidenceScore(totalOutcomes: number, uniqueAgents: number) {
+  if (totalOutcomes <= 0) return 0
+  const sampleConfidence = Math.min(70, (Math.log10(totalOutcomes + 1) / Math.log10(21)) * 70)
+  const agentDiversity = Math.min(30, uniqueAgents * 6)
+  return clampScore(sampleConfidence + agentDiversity)
+}
+
+function installReadinessScore(skill: SkillRecord, riskPenalty = 0) {
+  const command = String(skill.install_command || '')
+  const repository = String(skill.repository || '')
+  const license = String(skill.license || '').toLowerCase()
+  let score = 25
+
+  if (/^npx(?:\s+-y)?\s+skills(?:@latest)?\s+add\s+/i.test(command)) score += 40
+  else if (command.trim()) score += 15
+  if (/^https:\/\/github\.com\//i.test(repository)) score += 12
+  if (license && license !== 'unknown') score += 13
+  if (skill.verified) score += 10
+
+  return clampScore(score - riskPenalty)
+}
+
+function buildDimensions(input: {
+  skill: SkillRecord
+  quality: number
+  freshness: number
+  evidence: number
+  totalOutcomes: number
+  uniqueAgents: number
+  riskPenalty: number
+  fit?: number | null
+}): RankingDimensions {
+  return {
+    popularity: popularityScore(Number(input.skill.github_stars || 0)),
+    quality: clampScore(input.quality),
+    freshness: clampScore(input.freshness),
+    agentEvidence: clampScore(input.evidence),
+    evidenceConfidence: evidenceConfidenceScore(input.totalOutcomes, input.uniqueAgents),
+    installReadiness: installReadinessScore(input.skill, input.riskPenalty),
+    fit: input.fit === undefined || input.fit === null ? null : clampScore(input.fit),
+  }
+}
+
 function compactStars(skill: SkillRecord) {
   return `${formatCompactNumber(skill.github_stars || 0)} stars`
 }
@@ -219,12 +318,34 @@ function rankByUseCase(
   if (!useCase) return []
 
   const scored = skills
-    .map((skill) => ({
-      skill,
-      score: scoreSkillForUseCase(skill, useCase) - rankingSkillPenalty(skill) / 12,
-    }))
-    .filter((item) => item.score >= 6 && rankingSkillPenalty(item.skill) < 45)
-    .sort((a, b) => b.score - a.score || b.skill.github_stars - a.skill.github_stars)
+    .map((skill) => {
+      const rawFit = scoreSkillForUseCase(skill, useCase) - rankingSkillPenalty(skill) / 12
+      const quality = getSkillQualityProfile(skill)
+      const dimensions = buildDimensions({
+        skill,
+        quality: quality.score,
+        freshness: freshnessScore(skill.github_last_pushed_at || skill.updated_at),
+        evidence: 0,
+        totalOutcomes: 0,
+        uniqueAgents: 0,
+        riskPenalty: 0,
+        fit: rawFit,
+      })
+      return {
+        skill,
+        rawFit,
+        dimensions,
+        score: weightedScore(dimensions, {
+          fit: 0.65,
+          quality: 0.15,
+          popularity: 0.08,
+          freshness: 0.07,
+          installReadiness: 0.05,
+        }),
+      }
+    })
+    .filter((item) => item.rawFit >= 6 && rankingSkillPenalty(item.skill) < 45)
+    .sort((a, b) => b.score - a.score || b.rawFit - a.rawFit || b.skill.github_stars - a.skill.github_stars)
 
   return dedupeRankedSkills(scored)
     .slice(0, limit)
@@ -233,7 +354,8 @@ function rankByUseCase(
       rank: index + 1,
       score: item.score,
       badge: `${Math.round(item.score)} fit`,
-      reason: reasonForUseCase(item.skill, item.score),
+      reason: reasonForUseCase(item.skill, item.dimensions.fit || 0),
+      dimensions: item.dimensions,
     }))
 }
 
@@ -275,17 +397,6 @@ export function rankSkillsForDefinition(
         stats?.success_rate === null || stats?.success_rate === undefined
           ? null
           : Number(stats.success_rate)
-      const usageScore =
-        totalUsage > 0
-          ? Math.min(30, Math.log10(totalUsage + 1) * 18) +
-            Math.max(0, successRate || 0) * 0.45 +
-            Math.min(12, Math.log10(installAttempts + 1) * 8) +
-            uniqueAgents * 4 +
-            quality.score * 0.25 +
-            proven.score * 0.45 +
-            Math.min(8, Math.log10(Math.max(1, skill.github_stars || 1)) * 2) -
-            Math.min(30, riskBlocked * 5 + setupRequired * 3 + failures * 2.5 + notRelevant * 4)
-          : quality.score * 0.12 + Math.min(8, Math.log10(Math.max(1, skill.github_stars || 1)) * 2)
       const platformText = [
         skill.name,
         skill.description,
@@ -295,46 +406,81 @@ export function rankSkillsForDefinition(
         ...(skill.tags || []),
         ...(skill.frameworks || []),
       ].filter(Boolean).join(' ').toLowerCase()
-      const platformHit = definition.agentPlatform
-        ? platformText.includes(definition.agentPlatform.toLowerCase()) ||
-          (definition.agentPlatform === 'codex' && /\b(code|coding|repo|repository|github|test|review|frontend|backend)\b/.test(platformText)) ||
+      const exactPlatformHit = definition.agentPlatform
+        ? platformText.includes(definition.agentPlatform.toLowerCase())
+        : false
+      const inferredPlatformHit = definition.agentPlatform
+        ? (definition.agentPlatform === 'codex' && /\b(code|coding|repo|repository|github|test|review|frontend|backend)\b/.test(platformText)) ||
           (definition.agentPlatform === 'claude code' && /\b(claude|code|coding|docs?|research|browser|analysis)\b/.test(platformText)) ||
           (definition.agentPlatform === 'cursor' && /\b(cursor|code|coding|frontend|component|typescript|react|repo)\b/.test(platformText))
         : false
+      const platformFit = exactPlatformHit ? 100 : inferredPlatformHit ? 68 : 0
+      const riskPenalty = Math.min(
+        100,
+        riskBlocked * 25 + setupRequired * 10 + failures * 8 + notRelevant * 12
+      )
+      const dimensions = buildDimensions({
+        skill,
+        quality: quality.score,
+        freshness: lastPushedScore,
+        evidence: proven.score,
+        totalOutcomes: Number(totalUsage || 0),
+        uniqueAgents,
+        riskPenalty,
+        fit: definition.kind === 'agent-platform' ? platformFit : null,
+      })
 
       switch (definition.kind) {
         case 'most-starred':
           return {
             skill,
-            // Popularity is intentionally literal on this ranking. Repositories
-            // that fail the skill-likeness gate are filtered below; qualifying
-            // projects are then ordered by their public GitHub star count.
-            score: Number(skill.github_stars || 0),
+            score: dimensions.popularity,
+            sortScore: Number(skill.github_stars || 0),
+            dimensions,
             badge: compactStars(skill),
             reason: `${compactStars(skill)} and ${quality.label.toLowerCase()} quality signals.`,
           }
         case 'recently-updated':
           return {
             skill,
-            score: lastPushedScore + quality.score / 5 + Math.log10(Math.max(1, skill.github_stars || 1)) - skillSpecificPenalty,
+            score: weightedScore(dimensions, {
+              freshness: 0.6,
+              quality: 0.2,
+              popularity: 0.1,
+              installReadiness: 0.1,
+            }),
+            sortScore: lastPushedScore * 10 + dateValue(skill.github_last_pushed_at || skill.updated_at) / 1_000_000_000_000,
+            dimensions,
             badge: `${Math.round(lastPushedScore)} fresh`,
             reason: `Recently pushed, ${quality.label.toLowerCase()} quality, and ${compactStars(skill)}.`,
           }
         case 'new-this-week':
           return {
             skill,
-            score:
-              (isNewThisWeek ? 100 : 0) +
-              dateValue(skill.created_at) / 1_000_000_000 +
-              quality.score / 10 -
-              skillSpecificPenalty,
+            score: weightedScore(dimensions, {
+              freshness: 0.45,
+              quality: 0.25,
+              popularity: 0.12,
+              installReadiness: 0.18,
+            }),
+            sortScore: (isNewThisWeek ? 10_000 : 0) + dateValue(skill.created_at) / 1_000_000_000_000,
+            dimensions,
             badge: isNewThisWeek ? 'New this week' : 'Recently indexed',
             reason: `Indexed recently with ${quality.label.toLowerCase()} quality and ${compactStars(skill)}.`,
           }
         case 'agent-usage':
           return {
             skill,
-            score: usageScore + quality.score / 10 + proven.score * 0.32 - skillSpecificPenalty,
+            score: weightedScore(dimensions, {
+              agentEvidence: 0.45,
+              evidenceConfidence: 0.25,
+              quality: 0.12,
+              installReadiness: 0.08,
+              popularity: 0.05,
+              freshness: 0.05,
+            }),
+            sortScore: proven.score * 2 + dimensions.evidenceConfidence + Math.log10(totalUsage + 1) * 10,
+            dimensions,
             badge: totalUsage ? `${proven.score}/100 proven` : 'Needs first outcome',
             reason: totalUsage
               ? `${proven.summary} ${formatCompactNumber(installAttempts)} install attempts, ${riskBlocked} risk blocks, and ${quality.label.toLowerCase()} quality.`
@@ -343,13 +489,15 @@ export function rankSkillsForDefinition(
         case 'success-rate':
           return {
             skill,
-            score:
-              (successRate ?? 0) +
-              proven.score * 0.65 +
-              Math.min(18, Math.log10(totalUsage + 1) * 11) +
-              quality.score * 0.16 -
-              Math.min(24, riskBlocked * 5 + setupRequired * 2 + notRelevant * 4) -
-              skillSpecificPenalty,
+            score: clampScore(
+              (successRate ?? 0) * 0.42 +
+              dimensions.agentEvidence * 0.25 +
+              dimensions.evidenceConfidence * 0.2 +
+              dimensions.quality * 0.08 +
+              dimensions.installReadiness * 0.05
+            ),
+            sortScore: (successRate ?? 0) + dimensions.evidenceConfidence * 0.65 + proven.score * 0.35,
+            dimensions,
             badge: successRate === null ? 'No success data' : `${Math.round(successRate)}% success`,
             reason: totalUsage
               ? `${proven.summary} Recent success ${proven.metrics.recentSuccessRate === null ? 'unknown' : `${Math.round(proven.metrics.recentSuccessRate)}%`}.`
@@ -358,38 +506,57 @@ export function rankSkillsForDefinition(
         case 'safe-auto-install':
           return {
             skill,
-            score:
-              quality.score * 0.46 +
-              proven.score * 0.34 +
-              Math.min(18, Math.log10(Math.max(1, skill.github_stars || 1)) * 5) -
-              Math.min(40, riskBlocked * 10 + setupRequired * 4 + failures * 3 + notRelevant * 4) -
-              skillSpecificPenalty,
-            badge: riskBlocked > 0 ? 'Review risk' : 'Sandbox-ready',
+            score: weightedScore(dimensions, {
+              installReadiness: 0.38,
+              quality: 0.2,
+              agentEvidence: 0.18,
+              evidenceConfidence: 0.12,
+              freshness: 0.07,
+              popularity: 0.05,
+            }),
+            sortScore: dimensions.installReadiness * 1.5 + dimensions.agentEvidence + dimensions.evidenceConfidence - riskPenalty,
+            dimensions,
+            badge: riskBlocked > 0 ? 'Review risk' : totalUsage > 0 ? 'Evidence-backed' : 'Needs first run',
             reason: totalUsage
               ? `${proven.summary} ${riskBlocked} risk blocks and ${setupRequired} setup-required reports.`
-              : `${quality.label} quality, ${compactStars(skill)}, and no reported agent risk blocks yet.`,
+              : `${quality.label} quality and ${compactStars(skill)}; no real agent safety evidence yet.`,
           }
         case 'agent-platform':
           return {
             skill,
-            score:
-              (platformHit ? 78 : 0) +
-              quality.score * 0.3 +
-              proven.score * 0.25 +
-              Math.min(18, Math.log10(Math.max(1, skill.github_stars || 1)) * 5) -
-              Math.min(24, riskBlocked * 5 + setupRequired * 2 + notRelevant * 4) -
-              skillSpecificPenalty,
+            score: weightedScore(dimensions, {
+              fit: 0.5,
+              quality: 0.18,
+              installReadiness: 0.1,
+              agentEvidence: 0.08,
+              evidenceConfidence: 0.06,
+              popularity: 0.04,
+              freshness: 0.04,
+            }),
+            sortScore: platformFit * 2 + quality.score + proven.score * 0.5,
+            dimensions,
             badge: definition.agentPlatform ? definition.agentPlatform : 'Agent fit',
             reason: `${definition.shortTitle} fit with ${quality.label.toLowerCase()} quality, ${compactStars(skill)}, and ${proven.label.toLowerCase()}.`,
           }
         case 'highest-quality':
-        default:
+        default: {
+          const qualityRankingScore = weightedScore(dimensions, {
+            quality: 0.5,
+            freshness: 0.18,
+            installReadiness: 0.12,
+            agentEvidence: 0.1,
+            evidenceConfidence: 0.05,
+            popularity: 0.05,
+          })
           return {
             skill,
-            score: quality.score + Math.log10(Math.max(1, skill.github_stars || 1)) - skillSpecificPenalty,
-            badge: `${quality.label} · ${quality.score}`,
-            reason: `${quality.summary} ${compactStars(skill)}.`,
+            score: qualityRankingScore,
+            sortScore: qualityRankingScore - skillSpecificPenalty,
+            dimensions,
+            badge: `${quality.label} | ${quality.score}`,
+            reason: `${quality.summary} ${compactStars(skill)}; ${Math.round(dimensions.evidenceConfidence)}/100 evidence confidence.`,
           }
+        }
       }
     })
     .filter((item) => {
@@ -411,16 +578,18 @@ export function rankSkillsForDefinition(
 
       return true
     })
-    .sort((a, b) => {
-      if (definition.kind === 'new-this-week') {
-        return b.score - a.score || dateValue(b.skill.created_at) - dateValue(a.skill.created_at)
-      }
-      return b.score - a.score || b.skill.github_stars - a.skill.github_stars
-    })
+    .sort((a, b) => b.sortScore - a.sortScore || b.score - a.score || b.skill.github_stars - a.skill.github_stars)
 
   return dedupeRankedSkills(scored)
     .slice(0, limit)
-    .map((item, index) => ({ ...item, rank: index + 1 }))
+    .map((item, index) => ({
+      skill: item.skill,
+      score: clampScore(item.score),
+      badge: item.badge,
+      reason: item.reason,
+      dimensions: item.dimensions,
+      rank: index + 1,
+    }))
 }
 
 export function getRankingCompareHref(rankedSkills: RankedSkill[]) {

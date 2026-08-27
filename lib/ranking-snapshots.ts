@@ -15,8 +15,10 @@ import {
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import {
   CORE_RANKINGS,
+  normalizeRankingText,
   rankSkillsForDefinition,
   type RankedSkill,
+  type RankingDimensions,
   type RankingDefinition,
 } from '@/lib/rankings'
 import { rankHotSkills, rankTrendingSkills, type GrowthRankedSkill } from '@/lib/seo/growth-directories'
@@ -24,7 +26,7 @@ import { getGitHubOwner } from '@/lib/github-owner'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createPublicClient } from '@/lib/supabase/public'
 
-export const RANKING_METHODOLOGY_VERSION = 'ranking-v3-daily-2026-08'
+export const RANKING_METHODOLOGY_VERSION = 'ranking-v4-dimensions-2026-08'
 const SNAPSHOT_ITEM_LIMIT = 30
 const SNAPSHOT_RETENTION_DAYS = 90
 
@@ -40,6 +42,7 @@ export interface RankingSnapshotItem {
   github_stars: number
   github_forks: number
   quality_score: number
+  dimensions?: RankingDimensions
   install: string
   repository: string
   updated_at: string
@@ -75,15 +78,16 @@ function serializeRankedSkill(item: RankedSkill | GrowthRankedSkill): RankingSna
   return {
     rank: item.rank,
     score: Math.round(Number(item.score || 0) * 100) / 100,
-    badge: item.badge,
-    reason: item.reason,
+    badge: normalizeRankingText(item.badge),
+    reason: normalizeRankingText(item.reason),
     slug: item.skill.slug,
-    name: item.skill.name,
-    description: item.skill.description,
-    category: item.skill.category,
+    name: normalizeRankingText(item.skill.name),
+    description: normalizeRankingText(item.skill.description),
+    category: normalizeRankingText(item.skill.category),
     github_stars: Number(item.skill.github_stars || 0),
     github_forks: Number(item.skill.github_forks || 0),
     quality_score: quality.score,
+    dimensions: 'dimensions' in item ? item.dimensions : undefined,
     install: item.skill.install_command || `npx skills add ${item.skill.github_repo}`,
     repository: item.skill.repository || `https://github.com/${item.skill.github_repo}`,
     updated_at: item.skill.github_last_pushed_at || item.skill.updated_at,
@@ -93,7 +97,7 @@ function serializeRankedSkill(item: RankedSkill | GrowthRankedSkill): RankingSna
 }
 
 function usesOutcomeStats(definition: RankingDefinition) {
-  return definition.kind === 'agent-usage' || definition.kind === 'success-rate' || definition.kind === 'safe-auto-install'
+  return ['highest-quality', 'agent-usage', 'success-rate', 'safe-auto-install', 'agent-platform'].includes(definition.kind)
 }
 
 function createSnapshotRow(
@@ -210,7 +214,7 @@ const getCachedLatestRankingSnapshot = unstable_cache(
     if (error) throw new Error(`Failed to read ranking snapshot: ${error.message}`)
     return data as RankingSnapshot | null
   },
-  ['latest-ranking-snapshot-v1'],
+  ['latest-ranking-snapshot-v2'],
   { revalidate: 300, tags: ['ranking-snapshots'] }
 )
 
