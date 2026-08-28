@@ -172,7 +172,7 @@ function ForAgentsDropdown({ pathname }: { pathname: string }) {
                 <Link
                   key={item.href}
                   href={getLocalizedNavigationHref(item.href, locale)}
-                  prefetch={false}
+                  prefetch={item.prefetch}
                   role="menuitem"
                   onClick={() => setOpen(false)}
                   className={cn(
@@ -236,7 +236,6 @@ function ResourcesDropdown({ pathname }: { pathname: string }) {
               <Link
                 key={item.href}
                 href={getLocalizedNavigationHref(item.href, locale)}
-                prefetch={false}
                 role="menuitem"
                 onClick={() => setOpen(false)}
                 className={cn(
@@ -267,7 +266,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/92 backdrop-blur supports-[backdrop-filter]:bg-background/82">
       <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-3 px-4 sm:px-6">
-        <Link prefetch={false} href={getLocalizedNavigationHref('/', locale)} className="flex min-w-0 shrink-0 items-center gap-2.5 transition-opacity hover:opacity-70">
+        <Link href={getLocalizedNavigationHref('/', locale)} className="flex min-w-0 shrink-0 items-center gap-2.5 transition-opacity hover:opacity-70">
           <BrandMark className="h-7 w-7 text-foreground" />
           <span className="hidden truncate font-sans text-base font-semibold sm:inline sm:text-lg">
             OpenAgentSkill
@@ -289,6 +288,7 @@ export function SiteHeader() {
                   href={href}
                   prefetch={false}
                   onPointerEnter={() => warmRoute(href)}
+                  onPointerDown={() => warmRoute(href)}
                   onFocus={() => warmRoute(href)}
                   className={cn(
                     'flex h-16 shrink-0 items-center whitespace-nowrap border-b-2 border-transparent px-2 text-sm transition-colors',
@@ -310,7 +310,6 @@ export function SiteHeader() {
             <GitHubStarButton />
             <Link
               href={getLocalizedNavigationHref('/submit', locale)}
-              prefetch={false}
               className="flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-[8px] border border-border bg-card/70 px-3 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
             >
               <Plus className="h-4 w-4" aria-hidden="true" />

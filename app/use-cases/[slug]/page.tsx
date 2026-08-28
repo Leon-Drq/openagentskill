@@ -12,7 +12,7 @@ import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { USE_CASES, getUseCaseBySlug, selectSkillsForUseCase } from '@/lib/use-cases'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export function generateStaticParams() {
   return USE_CASES.map((useCase) => ({ slug: useCase.slug }))

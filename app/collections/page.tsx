@@ -5,7 +5,7 @@ import { SubscribeCard } from '@/components/subscribe-card'
 import { getAllSkills } from '@/lib/db/skills'
 import { SKILL_STACKS, selectSkillsForStack } from '@/lib/collections'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'AI Agent Workflow Recipes | OpenAgentSkill',

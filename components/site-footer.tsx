@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { BrandMark } from '@/components/brand-mark'
 import { useI18n } from '@/lib/i18n/context'
@@ -17,7 +18,25 @@ function FooterLink({
   className?: string
 }) {
   const { locale } = useI18n()
-  return <Link href={getLocalizedNavigationHref(href, locale)} prefetch={false} className={className}>{children}</Link>
+  const router = useRouter()
+  const localizedHref = getLocalizedNavigationHref(href, locale)
+
+  const warmRoute = () => {
+    router.prefetch(localizedHref)
+  }
+
+  return (
+    <Link
+      href={localizedHref}
+      prefetch={false}
+      onPointerEnter={warmRoute}
+      onPointerDown={warmRoute}
+      onFocus={warmRoute}
+      className={className}
+    >
+      {children}
+    </Link>
+  )
 }
 
 export function SiteFooter() {

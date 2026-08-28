@@ -11,7 +11,7 @@ import { getRelatedSkills, getSkillEventStats } from '@/lib/db/skills'
 import { buildSkillEvalProfile, type SkillEvalCheckStatus, type SkillEvalStatus } from '@/lib/skill-evals'
 import { getSkillBySlugOrFallback, isCuratedSkillFallback } from '@/lib/skill-fallbacks'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export async function generateMetadata({
   params,

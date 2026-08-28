@@ -12,7 +12,7 @@ import {
 import { formatCompactNumber, getFreshnessDays } from '@/lib/quality'
 import { rankHotSkills, summarizeSkillDailyStats } from '@/lib/seo/growth-directories'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Hot AI Agent Skills | OpenAgentSkill',

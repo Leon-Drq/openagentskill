@@ -12,7 +12,7 @@ import { getSkillCluster, SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCaseBySlug, selectSkillsForUseCase } from '@/lib/use-cases'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 const BASE_URL = 'https://www.openagentskill.com'
 

@@ -6,7 +6,7 @@ import { getAllSkills } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
 import { getOfficialCreatorSummaries } from '@/lib/seo/growth-directories'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Official AI Agent Skills from Technology Makers | OpenAgentSkill',

@@ -16,7 +16,7 @@ import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { getAgentOutcomeStatsMap, getAllSkills, type SkillOutcomeStats, type SkillRecord } from '@/lib/db/skills'
 import { getSkillTrustProfile } from '@/lib/trust'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Agent Outcome Loop',

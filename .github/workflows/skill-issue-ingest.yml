@@ -1,0 +1,28 @@
+name: Import Skill Issue
+
+on:
+  issues:
+    types: [opened, reopened]
+
+concurrency:
+  group: skill-issue-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  import:
+    name: Validate, review, and publish
+    if: startsWith(github.event.issue.title, '[Skill]:')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Process Skill submission
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAGENTSKILL_API_BASE_URL: https://www.openagentskill.com
+        run: node scripts/process-skill-issue.mjs

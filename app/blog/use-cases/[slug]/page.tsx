@@ -8,7 +8,7 @@ import { SKILL_STACKS } from '@/lib/collections'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { getUseCaseBySlug, selectSkillsForUseCase } from '@/lib/use-cases'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export async function generateMetadata({
   params,

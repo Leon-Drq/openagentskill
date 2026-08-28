@@ -10,7 +10,7 @@ import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSkillBySlugOrFallback } from '@/lib/skill-fallbacks'
 import { getSkillTrustProfile } from '@/lib/trust'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export function generateStaticParams() {
   return []

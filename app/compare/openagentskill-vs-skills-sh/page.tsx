@@ -10,7 +10,7 @@ import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSkillTrustProfile } from '@/lib/trust'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'OpenAgentSkill vs skills.sh | Agent Skill Discovery Comparison',

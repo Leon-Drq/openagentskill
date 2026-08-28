@@ -18,7 +18,7 @@ import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCaseBySlug, getUseCasesForSkill } from '@/lib/use-cases'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 const BEST_PAGE_QUERY_TIMEOUT_MS = 2000
 
 export function generateStaticParams() {
