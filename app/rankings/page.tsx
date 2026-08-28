@@ -13,7 +13,7 @@ import { CORE_RANKINGS, getRankingDefinitions, normalizeRankingText, rankSkillsF
 import { getLatestRankingSnapshot, RANKING_METHODOLOGY_VERSION } from '@/lib/ranking-snapshots'
 import { GitHubPopularityList } from '@/components/github-popularity-list'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'AI Agent Skill Rankings',

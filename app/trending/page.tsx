@@ -15,7 +15,7 @@ import { formatCompactNumber } from '@/lib/quality'
 import { getLatestRankingSnapshot, RANKING_METHODOLOGY_VERSION } from '@/lib/ranking-snapshots'
 import { rankTrendingSkills, summarizeSkillDailyStats } from '@/lib/seo/growth-directories'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Trending AI Agent Skills | OpenAgentSkill',

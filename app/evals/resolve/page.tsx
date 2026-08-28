@@ -6,7 +6,7 @@ import { getAllSkills } from '@/lib/db/skills'
 import { REGISTRY_EVAL_CASES, runRegistryEvals } from '@/lib/registry-evals'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Resolve Quality Evals - OpenAgentSkill',

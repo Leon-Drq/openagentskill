@@ -10,7 +10,7 @@ import { formatCompactNumber } from '@/lib/quality'
 import { getXCandidateDecision } from '@/lib/x/candidates'
 import { buildCommunityIndexedReplyText, buildManualXMainText, buildManualXReplyText, buildXIntentUrl } from '@/lib/x/poster'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'OpenAgentSkill X Growth Kit',

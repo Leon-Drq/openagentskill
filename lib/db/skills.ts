@@ -63,8 +63,8 @@ const SKILL_STATS_REQUEST_TIMEOUT_MS = 3000
 // few seconds, so a directory-sized timeout would turn a live skill into a
 // false 404.
 const SKILL_LOOKUP_TIMEOUT_MS = 7000
-const SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS = 60
-const SKILL_EXACT_SEARCH_TIMEOUT_MS = 7000
+const SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS = 300
+const SKILL_EXACT_SEARCH_TIMEOUT_MS = 2500
 const SKILL_BROAD_SEARCH_TIMEOUT_MS = 1500
 // Sitemap refreshes run off the interactive navigation path. Give a cold
 // registry shard enough time to return the complete URL set, then let the
@@ -235,14 +235,20 @@ export async function getAllSkills(
     ? Math.min(MAX_SKILL_QUERY_LIMIT, Math.max(1, Math.floor(maxRows)))
     : DEFAULT_SKILL_QUERY_LIMIT
   const normalizedCategory = category && category !== 'all' ? category : null
-  // Most public pages ask for a small subset of the same quality-ranked
-  // directory. Back those calls with one bounded source cache and slice it in
-  // memory instead of issuing independent 180/250/1200 row queries.
-  const sourceLimit = rowLimit <= DEFAULT_SKILL_QUERY_LIMIT ? DEFAULT_SKILL_QUERY_LIMIT : rowLimit
-  // Category pages share the same quality-gated source list. Filtering a
-  // cached candidate set is much cheaper than starting a new database query
-  // every time a visitor moves between Finance, Design, Research, and so on.
-  const cacheKey = `${sort}:all:${sourceLimit}`
+  // Interactive pages usually render fewer than 100 records. Do not make
+  // those navigations wait for a 1,200-row directory read. Small, medium, and
+  // full consumers share bounded cache tiers instead.
+  const sourceLimit = rowLimit <= 160
+    ? 160
+    : rowLimit <= 480
+      ? 480
+      : rowLimit <= DEFAULT_SKILL_QUERY_LIMIT
+        ? DEFAULT_SKILL_QUERY_LIMIT
+        : rowLimit
+  // A category query is both smaller and more useful than reading a global
+  // pool and hoping it contains enough rows for the requested category.
+  const sourceCategory = normalizedCategory
+  const cacheKey = `${sort}:${sourceCategory || 'all'}:${sourceLimit}`
   const now = Date.now()
   const cached = allSkillsCache.get(cacheKey)
 
@@ -251,7 +257,7 @@ export async function getAllSkills(
     if (cached.promise) return cached.promise.then((value) => selectDirectorySkills(value, normalizedCategory, rowLimit))
   }
 
-  const promise = getSharedAllSkills(sort, null, sourceLimit)
+  const promise = getSharedAllSkills(sort, sourceCategory, sourceLimit)
   allSkillsCache.set(cacheKey, {
     expiresAt: now + ALL_SKILLS_CACHE_TTL_MS,
     promise,

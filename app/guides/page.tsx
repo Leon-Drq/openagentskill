@@ -5,7 +5,7 @@ import { getAllSkills } from '@/lib/db/skills'
 import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
 import { formatCompactNumber } from '@/lib/quality'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Agent Skills Guides',

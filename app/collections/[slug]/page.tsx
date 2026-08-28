@@ -11,7 +11,7 @@ import { getCuratedPageCopy, getLocalizedCollectionContent } from '@/lib/i18n/cu
 import { getLocaleFromSearchParam, getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { getSkillQualityProfile, formatCompactNumber } from '@/lib/quality'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export async function generateMetadata({
   params,

@@ -6,7 +6,7 @@ import { getAllSkills, getSkillEventStatsMap, type SkillRecord } from '@/lib/db/
 import { buildWeeklySkillReport } from '@/lib/reports'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Weekly AI Agent Skill Report',

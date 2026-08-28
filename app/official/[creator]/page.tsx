@@ -12,7 +12,7 @@ import {
   getSkillsForOfficialCreator,
 } from '@/lib/seo/growth-directories'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export function generateStaticParams() {
   return OFFICIAL_CREATORS.map((creator) => ({ creator: creator.slug }))

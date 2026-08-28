@@ -17,7 +17,7 @@ import {
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCaseBySlug, getUseCasesForSkill, scoreSkillForUseCase } from '@/lib/use-cases'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export function generateStaticParams() {
   return GROWTH_GUIDES.map((guide) => ({ slug: guide.slug }))

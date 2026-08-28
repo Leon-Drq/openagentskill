@@ -25,7 +25,7 @@ import {
   rankSkillsForDefinition,
 } from '@/lib/rankings'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export function generateStaticParams() {
   return getRankingDefinitions().map((ranking) => ({ slug: ranking.slug }))

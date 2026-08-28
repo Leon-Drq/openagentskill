@@ -22,7 +22,7 @@ import { buildSkillPackInstallPlan, getSkillPackBySlug, selectSkillsForPack, SKI
 const BASE_URL = 'https://www.openagentskill.com'
 const PACK_CANDIDATE_LIMIT = 1200
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export function generateStaticParams() {
   return SKILL_PACKS.map((pack) => ({ slug: pack.slug }))

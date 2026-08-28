@@ -12,7 +12,7 @@ import { SKILL_STACKS } from '@/lib/collections'
 import { CORE_RANKINGS, getRankingDefinitions } from '@/lib/rankings'
 import { USE_CASES } from '@/lib/use-cases'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'OpenAgentSkill Update - AI Agent Skill Guides & Launch Notes',

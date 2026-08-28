@@ -6,7 +6,7 @@ import { SKILL_STACKS } from '@/lib/collections'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { USE_CASES, selectSkillsForUseCase } from '@/lib/use-cases'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'AI Agent Skill Use Cases',

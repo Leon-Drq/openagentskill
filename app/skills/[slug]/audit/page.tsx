@@ -22,7 +22,7 @@ import { formatCompactNumber } from '@/lib/quality'
 import { getSkillBySlugOrFallback, isCuratedSkillFallback } from '@/lib/skill-fallbacks'
 import { getSkillTrustProfile, type TrustCheckStatus } from '@/lib/trust'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 const SKILL_AUDIT_SUPPORT_TIMEOUT_MS = 1200
 
 export async function generateMetadata({

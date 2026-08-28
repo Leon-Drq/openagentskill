@@ -12,7 +12,7 @@ import { getAgentOutcomeStatsMap, getAllSkills } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Creator Kit for AI Agent Skills',

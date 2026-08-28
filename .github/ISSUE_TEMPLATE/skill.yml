@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        The fastest path is the [web submission flow](https://www.openagentskill.com/submit). Use this form when a submission cannot be completed there or when existing metadata needs correction.
+        The fastest path is the [web submission flow](https://www.openagentskill.com/submit). New Skill issues are sent through the same automated validation and review pipeline. Use this form when a website submission cannot be completed or when existing metadata needs correction.
   - type: input
     id: source
     attributes:

@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { unstable_cache } from 'next/cache'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { cache } from 'react'
 import {
@@ -53,15 +54,14 @@ import {
   buildXIntentUrl,
 } from '@/lib/x/poster'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const revalidate = 300
 const SKILL_DETAIL_SUPPORT_TIMEOUT_MS = 1200
 
 const getCachedSkillBySlug = cache(async (slug: string) =>
   getSkillBySlugOrFallbackStrict(getCanonicalSkillSlug(slug))
 )
 
-const getCachedSkillDetailSupport = cache(
+const getSharedSkillDetailSupport = unstable_cache(
   async (skillId: string, category: string, slug: string) => {
     if (skillId.startsWith('snapshot-')) {
       return { relatedSkills: [], eventStats: null, outcomeStats: null, approvedClaim: null }
@@ -91,8 +91,15 @@ const getCachedSkillDetailSupport = cache(
     ])
 
     return { relatedSkills, eventStats, outcomeStats, approvedClaim }
+  },
+  ['skill-detail-support-v1'],
+  {
+    revalidate: 300,
+    tags: ['public-skill-directory', 'public-skill-stats', 'public-skill-outcomes'],
   }
 )
+
+const getCachedSkillDetailSupport = cache(getSharedSkillDetailSupport)
 
 export async function generateMetadata({
   params,

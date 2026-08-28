@@ -175,7 +175,6 @@ export function MobileNav() {
                     <li key={item.href}>
                       <Link
                         href={getLocalizedNavigationHref(item.href, locale)}
-                        prefetch={false}
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           'flex items-center justify-between border-b border-border py-3 text-lg transition-colors',
@@ -203,7 +202,7 @@ export function MobileNav() {
                     <li key={item.href}>
                       <Link
                         href={getLocalizedNavigationHref(item.href, locale)}
-                        prefetch={false}
+                        prefetch={item.prefetch}
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           'flex gap-3 rounded-[8px] border border-border bg-card/70 p-3 transition-colors',
@@ -233,7 +232,6 @@ export function MobileNav() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <Link
                   href={getLocalizedNavigationHref('/submit', locale)}
-                  prefetch={false}
                   onClick={() => setIsOpen(false)}
                   className="flex items-center justify-center gap-2 rounded-[8px] border border-border bg-card/70 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
                 >

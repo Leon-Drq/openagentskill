@@ -28,7 +28,7 @@ import { getSkillTrustProfile } from '@/lib/trust'
 import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { getGitHubOwner } from '@/lib/github-owner'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Agent-Proven AI Agent Skills',
