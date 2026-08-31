@@ -1,6 +1,7 @@
 import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { withTimeout } from '@/lib/async'
+import { isMcpOnlyCategory, isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
 import { unstable_cache } from 'next/cache'
 import type { Skill } from '@/lib/types'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
@@ -145,32 +146,13 @@ function createSitemapClient(requestTimeoutMs = SITEMAP_QUERY_TIMEOUT_MS) {
   return createPublicClient({ requestTimeoutMs })
 }
 
-function isMcpText(value: string) {
-  return /(^|[^a-z0-9])mcp([^a-z0-9]|$)/i.test(value) || /\bmodel context protocol\b/i.test(value)
-}
-
 type SkillOnlyScopeRecord = Pick<
   SkillRecord,
   'name' | 'description' | 'long_description' | 'tagline' | 'category' | 'tags' | 'frameworks' | 'github_repo'
 >
 
-function isMcpSkillRecord(record: SkillOnlyScopeRecord) {
-  const text = [
-    record.name,
-    record.description,
-    record.long_description,
-    record.tagline,
-    record.category,
-    record.github_repo,
-    ...(record.tags || []),
-    ...(record.frameworks || []),
-  ].join(' ')
-
-  return isMcpText(text)
-}
-
 function filterSkillOnly<T extends SkillOnlyScopeRecord>(records: T[]) {
-  return records.filter((record) => !isMcpSkillRecord(record))
+  return records.filter((record) => !isMcpOnlySkillRecord(record))
 }
 
 function sortDirectorySkills(records: SkillRecord[], sort: SkillSortMode) {
@@ -841,7 +823,7 @@ const getCachedCategories = unstable_cache(
     }
 
     return [...categories]
-      .filter((category) => !isMcpText(category))
+      .filter((category) => !isMcpOnlyCategory(category))
       .sort()
   },
   ['public-skill-categories-v2'],
@@ -871,7 +853,7 @@ const getCachedSkillBySlug = unstable_cache(
       .maybeSingle()
 
     if (error) throw error
-    if (!data || isMcpSkillRecord(data)) return null
+    if (!data || isMcpOnlySkillRecord(data)) return null
     return data as SkillRecord
   },
   ['public-skill-by-slug-v3'],

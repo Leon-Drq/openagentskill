@@ -10,6 +10,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { STATIC_BLOG_POSTS, getStaticBlogPostBySlug } from '@/lib/blog/static-posts'
 import { generateText } from 'ai'
 import { BLOG_GENERATION_MODEL } from '@/lib/ai/models'
+import { isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
 
 export interface BlogGenerateResult {
   success: boolean
@@ -51,10 +52,6 @@ function buildBlogSlug(skillSlug: string): string {
   return `introducing-${skillSlug}`
 }
 
-function isMcpText(value: string) {
-  return /(^|[^a-z0-9])mcp([^a-z0-9]|$)/i.test(value) || /\bmodel context protocol\b/i.test(value)
-}
-
 export function isBlogMcpSkillRecord(record: {
   name?: string | null
   description?: string | null
@@ -65,20 +62,7 @@ export function isBlogMcpSkillRecord(record: {
   frameworks?: string[] | null
   github_repo?: string | null
 }) {
-  const text = [
-    record.name,
-    record.description,
-    record.long_description,
-    record.tagline,
-    record.category,
-    record.github_repo,
-    ...(record.tags || []),
-    ...(record.frameworks || []),
-  ]
-    .filter(Boolean)
-    .join(' ')
-
-  return isMcpText(text)
+  return isMcpOnlySkillRecord(record)
 }
 
 function toSkillPreview(row: BlogSkillRow): BlogSkillPreview {
