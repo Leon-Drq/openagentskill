@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
+import { GitHubAuthButton } from '@/components/github-auth-button'
 
 export default function SignUpPage() {
   return (
@@ -20,6 +21,11 @@ function SignUpForm() {
   const searchParams = useSearchParams()
   const refCode = searchParams.get('ref')
   const inviterName = searchParams.get('inviter')
+  const requestedNext = searchParams.get('next')
+  const nextPath = requestedNext && requestedNext.startsWith('/') && !requestedNext.startsWith('//')
+    ? requestedNext
+    : '/creator'
+  const creatorIntent = nextPath === '/creator'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
@@ -56,16 +62,25 @@ function SignUpForm() {
 
         {inviterName && (
           <div className="border border-border px-4 py-3 mb-6 text-sm text-secondary">
-            Invited by <strong className="text-foreground">{inviterName}</strong> — you'll both earn bonus points.
+            Invited by <strong className="text-foreground">{inviterName}</strong> — you&apos;ll both earn bonus points.
           </div>
         )}
-        <h1 className="font-display text-2xl font-bold mb-1">Create an account</h1>
+        <h1 className="font-display text-2xl font-bold mb-1">
+          {creatorIntent ? 'Create your Creator Center' : 'Create an account'}
+        </h1>
+        {creatorIntent ? (
+          <p className="mb-3 text-sm leading-relaxed text-secondary">
+            Claim your skills, publish a verified creator profile, and track install performance.
+          </p>
+        ) : null}
         <p className="text-sm text-secondary mb-6">
           Already have one?{' '}
-          <Link href="/auth/login" className="underline hover:opacity-70 transition-opacity">
+          <Link href={`/auth/login?next=${encodeURIComponent(nextPath)}`} className="underline hover:opacity-70 transition-opacity">
             Sign in
           </Link>
         </p>
+
+        <GitHubAuthButton fallbackNext={nextPath} label="Create account with GitHub" />
 
         <form onSubmit={handleSignUp} className="space-y-4">
           <div>

@@ -1,12 +1,27 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { GitHubAuthButton } from '@/components/github-auth-button'
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  )
+}
+
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const requestedNext = searchParams.get('next')
+  const nextPath = requestedNext && requestedNext.startsWith('/') && !requestedNext.startsWith('//')
+    ? requestedNext
+    : '/profile'
+  const creatorIntent = nextPath === '/creator' || searchParams.get('intent') === 'creator'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -22,7 +37,6 @@ export default function LoginPage() {
       setError(error.message)
       setLoading(false)
     } else {
-      const nextPath = new URLSearchParams(window.location.search).get('next') || '/profile'
       router.push(nextPath)
       router.refresh()
     }
@@ -35,13 +49,22 @@ export default function LoginPage() {
           OpenAgentSkill
         </Link>
 
-        <h1 className="font-display text-2xl font-bold mb-1">Sign in</h1>
+        <h1 className="font-display text-2xl font-bold mb-1">
+          {creatorIntent ? 'Sign in to Creator Center' : 'Sign in'}
+        </h1>
+        <p className="mb-3 text-sm leading-relaxed text-secondary">
+          {creatorIntent
+            ? 'Claim your skills, manage your public creator profile, and view install analytics.'
+            : 'Access your OpenAgentSkill account.'}
+        </p>
         <p className="text-sm text-secondary mb-6">
           No account?{' '}
-          <Link href="/auth/sign-up" className="underline hover:opacity-70 transition-opacity">
+          <Link href={`/auth/sign-up?next=${encodeURIComponent(nextPath)}`} className="underline hover:opacity-70 transition-opacity">
             Create one
           </Link>
         </p>
+
+        <GitHubAuthButton fallbackNext={nextPath} />
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>

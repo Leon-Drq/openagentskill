@@ -26,7 +26,7 @@ const es = {
     safety: 'Control de seguridad',
     cli: 'CLI',
     forCreators: 'Para creadores',
-    creatorConsole: 'Panel de creadores',
+    creatorConsole: 'Centro de creadores',
     creators: 'Registro de creadores',
     creatorKit: 'Kit para creadores',
     learn: 'Aprender',

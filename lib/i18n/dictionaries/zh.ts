@@ -23,7 +23,7 @@ export default {
     safety: '安全审查',
     cli: '命令行工具',
     forCreators: '创作者',
-    creatorConsole: '创作者控制台',
+    creatorConsole: '创作者中心',
     creators: '创作者名录',
     creatorKit: '创作者工具包',
     learn: '学习',

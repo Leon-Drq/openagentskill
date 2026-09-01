@@ -26,7 +26,7 @@ const ko = {
     safety: '안전 검사',
     cli: 'CLI',
     forCreators: '크리에이터용',
-    creatorConsole: '크리에이터 콘솔',
+    creatorConsole: '크리에이터 센터',
     creators: '크리에이터 레지스트리',
     creatorKit: '크리에이터 키트',
     learn: '학습',

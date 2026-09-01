@@ -26,7 +26,7 @@ const ja = {
     safety: '安全チェック',
     cli: 'CLI',
     forCreators: 'クリエイター向け',
-    creatorConsole: 'クリエイターコンソール',
+    creatorConsole: 'クリエイターセンター',
     creators: 'クリエイター名簿',
     creatorKit: 'クリエイターキット',
     learn: '学ぶ',
