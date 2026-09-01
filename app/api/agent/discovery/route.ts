@@ -644,7 +644,7 @@ export async function GET() {
     skill_radar: {
       status: 'active',
       private_endpoint: '/api/cron/skill-radar',
-      schedule: '35 * * * *',
+      schedule: SKILL_RADAR_CRON_MINUTE_UTC,
       sources: ['X posts with GitHub links', 'GitHub hot skill search'],
       strategy:
         'Use social and GitHub freshness as candidate signals only; every repo still passes GitHub metadata checks, MCP exclusion, AI review, Trust/Audit surfaces, SEO drip, IndexNow, and X queue guards.',
@@ -665,7 +665,7 @@ export async function GET() {
         'requires a GitHub repository URL',
         'excludes generic foundation repositories',
         'requires skill, workflow, agent, or concrete use-case signals',
-        'requires at least 10 GitHub stars by default',
+        `requires at least ${AUTOMATIC_DISCOVERY_MIN_STARS} GitHub stars for automatic intake`,
         'falls back to existing high-quality X queue candidates when no new radar candidate is imported',
       ],
     },
