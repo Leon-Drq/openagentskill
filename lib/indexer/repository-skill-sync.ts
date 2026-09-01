@@ -18,6 +18,7 @@ import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getLicenseEvidence } from '@/lib/creator-ownership'
 import { evaluateFastTrackCandidate } from '@/lib/indexer/fast-track'
+import { shouldRetryAutomatedReview } from '@/lib/indexer/review-retry'
 
 const DEFAULT_MAX_SKILLS_PER_REPOSITORY = 8
 const MAX_SKILLS_PER_REPOSITORY = 20
@@ -32,6 +33,7 @@ export interface RepositorySkillSyncEntry {
   sourceUrl: string
   status: RepositorySkillSyncEntryStatus
   reason?: string
+  retryable?: boolean
 }
 
 export interface RepositorySkillSyncResult {
@@ -193,6 +195,7 @@ async function payloadForNew(
     return {
       payload: null,
       reason: staticAnalysis.issues.slice(0, 2).join('; ') || 'Static security analysis rejected the skill.',
+      retryable: false,
     }
   }
   const license = getLicenseEvidence(skill.frontmatter.license, repository.license)
@@ -216,6 +219,7 @@ async function payloadForNew(
       return {
         payload: null,
         reason: decision.reasons.slice(0, 3).join('; ') || 'Deterministic fast-track safety check failed.',
+        retryable: false,
       }
     }
     reviewScores = { security: 9, quality: 8, usefulness: 8, compliance: 9 }
@@ -248,6 +252,7 @@ async function payloadForNew(
       return {
         payload: null,
         reason: policy.issues.slice(0, 2).join('; ') || 'Automated review did not approve this skill.',
+        retryable: shouldRetryAutomatedReview(review.reviewModel),
       }
     }
     reviewScores = review.scores
@@ -269,6 +274,7 @@ async function payloadForNew(
 
   return {
     reason: null,
+    retryable: false,
     payload: {
       slug,
       name: skill.frontmatter.name,
@@ -431,6 +437,7 @@ export async function syncRepositorySkills(
           sourceUrl: skill.sourceUrl,
           status: 'rejected',
           reason: result.reason || 'Automated review rejected the skill.',
+          retryable: result.retryable,
         })
         continue
       }

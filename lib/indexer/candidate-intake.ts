@@ -420,8 +420,18 @@ async function publishCandidate(candidate: SkillCandidateRow) {
     })
     const successful = result.entries.find((entry) => entry.status === 'created' || entry.status === 'updated')
     if (!successful) {
-      const reason = result.entries.find((entry) => entry.reason)?.reason || 'Candidate did not pass publication review'
-      await updateCandidate(candidate.id, { status: 'rejected', last_error: reason.slice(0, 1000) })
+      const failure = result.entries.find((entry) => entry.reason)
+      const reason = failure?.reason || 'Candidate did not pass publication review'
+      const retryable = Boolean(failure?.retryable)
+      const shouldRetry = retryable && candidate.attempt_count < 4
+      await updateCandidate(candidate.id, {
+        status: shouldRetry ? 'publication_error' : 'rejected',
+        next_attempt_at: shouldRetry
+          ? new Date(Date.now() + Math.min(360, 15 * 2 ** Math.min(candidate.attempt_count, 4)) * 60_000).toISOString()
+          : new Date().toISOString(),
+        last_error: reason.slice(0, 1000),
+      })
+      if (shouldRetry) return { status: 'retry' as const, slug: null }
       return { status: 'rejected' as const, slug: null }
     }
 
@@ -480,6 +490,7 @@ export async function runCandidatePublicationBatch(options: { fastTrackLimit?: n
     timeBudgetReached,
     published: results.filter((result) => result.status === 'published').length,
     rejected: results.filter((result) => result.status === 'rejected').length,
+    retries: results.filter((result) => result.status === 'retry').length,
     errors: results.filter((result) => result.status === 'error').length,
     rateLimited: results.some((result) => 'rateLimited' in result && result.rateLimited),
     slugs: results.map((result) => result.slug).filter((slug): slug is string => Boolean(slug)),
