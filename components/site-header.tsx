@@ -3,7 +3,27 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Activity, BookOpenText, Bot, Braces, ChevronDown, FileJson2, Plus, SearchCheck, ShieldCheck, Terminal } from 'lucide-react'
+import {
+  Activity,
+  BookOpenText,
+  Bot,
+  Braces,
+  ChevronDown,
+  GitCompareArrows,
+  GraduationCap,
+  LayoutGrid,
+  ListChecks,
+  Newspaper,
+  Package,
+  Plus,
+  ShieldCheck,
+  Sparkles,
+  Terminal,
+  TrendingUp,
+  Trophy,
+  UserRound,
+  Wrench,
+} from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'
 import { GitHubStarButton } from '@/components/github-star-button'
@@ -11,106 +31,69 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
 import { useI18n } from '@/lib/i18n/context'
 import { getBasePathname, getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
-import { getShellCopy } from '@/lib/i18n/shell-content'
 import { cn } from '@/lib/utils'
 
-const primaryNavItems = [
-  { href: '/resolve', labelKey: 'resolve' },
-  { href: '/skills', labelKey: 'skills' },
-  { href: '/rankings', labelKey: 'rankings' },
-  { href: '/tasks', labelKey: 'tasks' },
-  { href: '/skill-packs', labelKey: 'packs' },
-  { href: '/compare', labelKey: 'compare' },
-] as const
+type NavLabelKey =
+  | 'skills'
+  | 'browseSkills'
+  | 'trending'
+  | 'rankings'
+  | 'tasks'
+  | 'packs'
+  | 'compare'
+  | 'aiSkillFinder'
+  | 'forAgents'
+  | 'agentEntry'
+  | 'integrationKit'
+  | 'apiDocs'
+  | 'outcomes'
+  | 'safety'
+  | 'cli'
+  | 'forCreators'
+  | 'creatorConsole'
+  | 'creatorKit'
+  | 'submitSkill'
+  | 'learn'
+  | 'guides'
+  | 'blog'
+  | 'useCases'
+  | 'docs'
 
-const resourceItems = [
-  { href: '/docs', labelKey: 'docs', icon: BookOpenText },
-  { href: '/api-docs', labelKey: 'apiDocs', icon: Braces },
-] as const
-
-const agentItems: Array<{
+type NavItem = {
   href: string
-  label: string
-  description: string
+  labelKey: NavLabelKey
   icon: LucideIcon
   prefetch?: false
-}> = [
-  {
-    href: '/resolve',
-    label: 'Resolve Workbench',
-    description: 'Task to skill plan',
-    icon: SearchCheck,
-  },
-  {
-    href: '/agent',
-    label: 'Agent Entry',
-    description: 'Start here',
-    icon: Bot,
-  },
-  {
-    href: '/agent/integration-kit',
-    label: 'Integration Kit',
-    description: 'Codex, Claude, Cursor',
-    icon: Braces,
-  },
-  {
-    href: '/api/agent/tasks',
-    label: 'Tasks API',
-    description: 'Jobs to routes',
-    icon: Braces,
-    prefetch: false,
-  },
-  {
-    href: '/api-docs#agent-resolve',
-    label: 'Resolve API',
-    description: 'Task to skill plan',
-    icon: Braces,
-  },
-  {
-    href: '/outcomes',
-    label: 'Outcome Loop',
-    description: 'Real agent success signals',
-    icon: Activity,
-  },
-  {
-    href: '/safety',
-    label: 'Safety Gate',
-    description: 'Trust policy',
-    icon: ShieldCheck,
-  },
-  {
-    href: '/cli',
-    label: 'CLI',
-    description: 'Terminal handoffs',
-    icon: Terminal,
-  },
-  {
-    href: '/.well-known/agent-manifest.json',
-    label: 'Manifest',
-    description: 'Machine-readable contract',
-    icon: FileJson2,
-    prefetch: false,
-  },
-  {
-    href: '/openapi.json',
-    label: 'OpenAPI',
-    description: 'Tool schema',
-    icon: FileJson2,
-    prefetch: false,
-  },
-  {
-    href: '/api/agent/discovery',
-    label: 'Discovery',
-    description: 'GitHub indexer status',
-    icon: Activity,
-    prefetch: false,
-  },
-  {
-    href: '/evals/resolve',
-    label: 'Evals',
-    description: 'Recommendation benchmark',
-    icon: Activity,
-  },
+}
+
+const skillsItems: NavItem[] = [
+  { href: '/skills', labelKey: 'browseSkills', icon: LayoutGrid },
+  { href: '/trending', labelKey: 'trending', icon: TrendingUp },
+  { href: '/rankings', labelKey: 'rankings', icon: Trophy },
+  { href: '/tasks', labelKey: 'tasks', icon: ListChecks },
+  { href: '/skill-packs', labelKey: 'packs', icon: Package },
+  { href: '/compare', labelKey: 'compare', icon: GitCompareArrows },
+]
+
+const agentItems: NavItem[] = [
+  { href: '/agent', labelKey: 'agentEntry', icon: Bot },
+  { href: '/agent/integration-kit', labelKey: 'integrationKit', icon: Braces },
+  { href: '/api-docs', labelKey: 'apiDocs', icon: Braces },
+  { href: '/cli', labelKey: 'cli', icon: Terminal },
+  { href: '/safety', labelKey: 'safety', icon: ShieldCheck },
+  { href: '/outcomes', labelKey: 'outcomes', icon: Activity },
+]
+
+const creatorItems: NavItem[] = [
+  { href: '/submit', labelKey: 'submitSkill', icon: Plus },
+  { href: '/creator', labelKey: 'creatorConsole', icon: UserRound },
+  { href: '/creator-kit', labelKey: 'creatorKit', icon: Wrench },
+]
+
+const learnItems: NavItem[] = [
+  { href: '/guides', labelKey: 'guides', icon: GraduationCap },
+  { href: '/blog', labelKey: 'blog', icon: Newspaper },
+  { href: '/use-cases', labelKey: 'useCases', icon: Sparkles },
 ]
 
 function isActivePath(pathname: string, href: string) {
@@ -119,11 +102,23 @@ function isActivePath(pathname: string, href: string) {
   return basePathname === baseHref || basePathname.startsWith(`${baseHref}/`)
 }
 
-function ForAgentsDropdown({ pathname }: { pathname: string }) {
+function NavDropdown({
+  pathname,
+  labelKey,
+  items,
+}: {
+  pathname: string
+  labelKey: NavLabelKey
+  items: NavItem[]
+}) {
   const { t, locale } = useI18n()
-  const shell = getShellCopy(locale)
+  const router = useRouter()
   const [open, setOpen] = useState(false)
-  const active = agentItems.some((item) => isActivePath(pathname, item.href))
+  const active = items.some((item) => isActivePath(pathname, item.href))
+
+  const warmRoute = (href: string) => {
+    router.prefetch(href)
+  }
 
   return (
     <div
@@ -142,114 +137,56 @@ function ForAgentsDropdown({ pathname }: { pathname: string }) {
         type="button"
         onClick={() => setOpen((value) => !value)}
         className={cn(
-          'flex h-16 items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent px-2.5 text-sm text-secondary transition-colors hover:text-foreground',
+          'flex h-16 items-center gap-1 whitespace-nowrap border-b-2 border-transparent px-2 text-sm text-secondary transition-colors hover:text-foreground',
           active && 'border-[#006b4f] text-foreground'
         )}
         aria-haspopup="menu"
         aria-expanded={open}
       >
-        <Bot className="h-3.5 w-3.5" aria-hidden="true" />
-        {t.nav.forAgents}
+        {t.nav[labelKey]}
         <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-180')} aria-hidden="true" />
       </button>
 
-      {open && (
-        <div
-          role="menu"
-          aria-label={shell.agentMenuTitle}
-          className="absolute right-0 top-[calc(100%-1px)] z-50 flex max-h-[calc(100dvh-4.5rem)] w-[330px] flex-col overflow-hidden rounded-[8px] border border-border bg-background shadow-[0_18px_55px_rgba(29,27,24,0.12)]"
-        >
-          <div className="shrink-0 border-b border-border bg-muted/35 px-4 py-3">
-            <p className="text-sm font-semibold text-foreground">{shell.agentMenuTitle}</p>
-            <p className="mt-1 text-xs leading-5 text-secondary">{shell.agentMenuDescription}</p>
-          </div>
-          <div className="grid min-h-0 flex-1 overflow-y-auto overscroll-contain p-1.5 [scrollbar-gutter:stable]">
-            {agentItems.map((item) => {
-              const Icon = item.icon
-              const itemActive = isActivePath(pathname, item.href)
-
-              return (
-                <Link
-                  key={item.href}
-                  href={getLocalizedNavigationHref(item.href, locale)}
-                  prefetch={item.prefetch}
-                  role="menuitem"
-                  onClick={() => setOpen(false)}
-                  className={cn(
-                    'flex gap-3 rounded-[6px] px-3 py-3 text-left transition-colors',
-                    itemActive ? 'bg-muted text-foreground' : 'text-secondary hover:bg-muted/60 hover:text-foreground'
-                  )}
-                >
-                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] border border-border bg-card text-foreground">
-                    <Icon className="h-4 w-4" aria-hidden="true" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-sm font-semibold">{item.label}</span>
-                    <span className="mt-0.5 block text-xs leading-5 text-secondary">{item.description}</span>
-                  </span>
-                </Link>
-              )
-            })}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function ResourcesDropdown({ pathname }: { pathname: string }) {
-  const { t, locale } = useI18n()
-  const [open, setOpen] = useState(false)
-  const active = resourceItems.some((item) => isActivePath(pathname, item.href))
-
-  return (
-    <div
-      className="relative h-full"
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
-      }}
-    >
-      <button
-        type="button"
-        onClick={() => setOpen((value) => !value)}
+      <div
+        role="menu"
+        aria-label={t.nav[labelKey]}
+        aria-hidden={!open}
         className={cn(
-          'flex h-16 items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent px-2.5 text-sm text-secondary transition-colors hover:text-foreground',
-          active && 'border-[#006b4f] text-foreground'
+          'absolute left-0 top-[calc(100%-1px)] z-50 w-64 overflow-hidden rounded-[8px] border border-border bg-background p-1.5 shadow-[0_18px_55px_rgba(29,27,24,0.12)] transition-[opacity,transform,visibility] duration-150',
+          open
+            ? 'visible translate-y-0 opacity-100'
+            : 'pointer-events-none invisible -translate-y-1 opacity-0'
         )}
-        aria-haspopup="menu"
-        aria-expanded={open}
       >
-        {t.nav.docs}
-        <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-180')} aria-hidden="true" />
-      </button>
+        {items.map((item) => {
+          const Icon = item.icon
+          const itemActive = isActivePath(pathname, item.href)
+          const href = getLocalizedNavigationHref(item.href, locale)
 
-      {open && (
-        <div
-          role="menu"
-          className="absolute left-0 top-[calc(100%-1px)] z-50 w-48 overflow-hidden rounded-[8px] border border-border bg-background p-1.5 shadow-[0_18px_55px_rgba(29,27,24,0.12)]"
-        >
-          {resourceItems.map((item) => {
-            const Icon = item.icon
-            const itemActive = isActivePath(pathname, item.href)
-
-            return (
-              <Link
-                key={item.href}
-                href={getLocalizedNavigationHref(item.href, locale)}
-                role="menuitem"
-                onClick={() => setOpen(false)}
-                className={cn(
-                  'flex items-center gap-2.5 rounded-[6px] px-3 py-2.5 text-sm transition-colors',
-                  itemActive ? 'bg-muted text-foreground' : 'text-secondary hover:bg-muted/60 hover:text-foreground'
-                )}
-              >
-                <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-                <span className="font-medium">{t.nav[item.labelKey]}</span>
-              </Link>
-            )
-          })}
-        </div>
-      )}
+          return (
+            <Link
+              key={item.href}
+              href={href}
+              prefetch={item.prefetch}
+              role="menuitem"
+              tabIndex={open ? 0 : -1}
+              onPointerEnter={() => warmRoute(href)}
+              onPointerDown={() => warmRoute(href)}
+              onFocus={() => warmRoute(href)}
+              onClick={() => setOpen(false)}
+              className={cn(
+                'flex items-center gap-3 rounded-[6px] px-3 py-2.5 text-sm transition-colors',
+                itemActive ? 'bg-muted text-foreground' : 'text-secondary hover:bg-muted/60 hover:text-foreground'
+              )}
+            >
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] border border-border bg-card text-foreground">
+                <Icon className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <span className="font-medium">{t.nav[item.labelKey]}</span>
+            </Link>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -263,6 +200,9 @@ export function SiteHeader() {
     router.prefetch(href)
   }
 
+  const resolveHref = getLocalizedNavigationHref('/resolve', locale)
+  const docsHref = getLocalizedNavigationHref('/docs', locale)
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/92 backdrop-blur supports-[backdrop-filter]:bg-background/82">
       <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-3 px-4 sm:px-6">
@@ -271,38 +211,48 @@ export function SiteHeader() {
           <span className="hidden truncate font-sans text-base font-semibold sm:inline sm:text-lg">
             OpenAgentSkill
           </span>
-          <span className="hidden rounded-[6px] border border-border px-2 py-0.5 font-mono text-[10px] uppercase text-secondary md:inline-flex">
+          <span className="hidden rounded-[6px] border border-border px-2 py-0.5 font-mono text-[10px] uppercase text-secondary 2xl:inline-flex">
             Registry
           </span>
         </Link>
 
         <nav className="hidden h-full min-w-0 flex-1 items-center justify-center gap-0.5 xl:flex" aria-label="Primary navigation">
-            {primaryNavItems.map((item) => {
-              const active = isActivePath(pathname, item.href)
-              const label = t.nav[item.labelKey]
-              const href = getLocalizedNavigationHref(item.href, locale)
+          <NavDropdown pathname={pathname} labelKey="skills" items={skillsItems} />
 
-              return (
-                <Link
-                  key={item.href}
-                  href={href}
-                  prefetch={false}
-                  onPointerEnter={() => warmRoute(href)}
-                  onPointerDown={() => warmRoute(href)}
-                  onFocus={() => warmRoute(href)}
-                  className={cn(
-                    'flex h-16 shrink-0 items-center whitespace-nowrap border-b-2 border-transparent px-2 text-sm transition-colors',
-                    active ? 'border-[#006b4f] text-foreground' : 'text-secondary hover:text-foreground'
-                  )}
-                  aria-current={active ? 'page' : undefined}
-                >
-                  {label}
-                </Link>
-              )
-            })}
-            <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
-            <ResourcesDropdown pathname={pathname} />
-            <ForAgentsDropdown pathname={pathname} />
+          <Link
+            href={resolveHref}
+            prefetch={false}
+            onPointerEnter={() => warmRoute(resolveHref)}
+            onPointerDown={() => warmRoute(resolveHref)}
+            onFocus={() => warmRoute(resolveHref)}
+            className={cn(
+              'flex h-16 shrink-0 items-center whitespace-nowrap border-b-2 border-transparent px-2 text-sm transition-colors',
+              isActivePath(pathname, '/resolve') ? 'border-[#006b4f] text-foreground' : 'text-secondary hover:text-foreground'
+            )}
+            aria-current={isActivePath(pathname, '/resolve') ? 'page' : undefined}
+          >
+            {t.nav.aiSkillFinder}
+          </Link>
+
+          <NavDropdown pathname={pathname} labelKey="forAgents" items={agentItems} />
+          <NavDropdown pathname={pathname} labelKey="forCreators" items={creatorItems} />
+          <NavDropdown pathname={pathname} labelKey="learn" items={learnItems} />
+
+          <Link
+            href={docsHref}
+            prefetch={false}
+            onPointerEnter={() => warmRoute(docsHref)}
+            onPointerDown={() => warmRoute(docsHref)}
+            onFocus={() => warmRoute(docsHref)}
+            className={cn(
+              'flex h-16 shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent px-2 text-sm transition-colors',
+              isActivePath(pathname, '/docs') ? 'border-[#006b4f] text-foreground' : 'text-secondary hover:text-foreground'
+            )}
+            aria-current={isActivePath(pathname, '/docs') ? 'page' : undefined}
+          >
+            <BookOpenText className="h-3.5 w-3.5" aria-hidden="true" />
+            {t.nav.docs}
+          </Link>
         </nav>
 
         <div className="ml-auto flex h-full shrink-0 items-center gap-1.5 sm:gap-2">
