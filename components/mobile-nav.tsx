@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Activity, Braces, FileJson2, Menu, Plus, SearchCheck, ShieldCheck, Terminal, X } from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
+import { ChevronDown, Menu, Plus, X } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'
 import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -14,99 +13,79 @@ import { getBasePathname, getLocalizedNavigationHref } from '@/lib/i18n/market-r
 import { getShellCopy } from '@/lib/i18n/shell-content'
 import { cn } from '@/lib/utils'
 
-const navItems = [
-  { href: '/resolve', labelKey: 'resolve' },
-  { href: '/skills', labelKey: 'skills' },
-  { href: '/rankings', labelKey: 'rankings' },
-  { href: '/tasks', labelKey: 'tasks' },
-  { href: '/skill-packs', labelKey: 'packs' },
-  { href: '/compare', labelKey: 'compare' },
-  { href: '/api-docs', labelKey: 'apiDocs' },
-  { href: '/docs', labelKey: 'docs' },
-] as const
+type NavLabelKey =
+  | 'skills'
+  | 'browseSkills'
+  | 'trending'
+  | 'rankings'
+  | 'tasks'
+  | 'packs'
+  | 'compare'
+  | 'forAgents'
+  | 'agentEntry'
+  | 'integrationKit'
+  | 'apiDocs'
+  | 'outcomes'
+  | 'safety'
+  | 'cli'
+  | 'forCreators'
+  | 'creatorConsole'
+  | 'creatorKit'
+  | 'submitSkill'
+  | 'learn'
+  | 'guides'
+  | 'blog'
+  | 'useCases'
 
-const agentItems: Array<{
+type MobileNavItem = {
   href: string
-  label: string
-  description: string
-  icon: LucideIcon
-  prefetch?: false
-}> = [
+  labelKey: NavLabelKey
+}
+
+const mobileSections: Array<{ labelKey: NavLabelKey; items: MobileNavItem[] }> = [
   {
-    href: '/resolve',
-    label: 'Resolve Workbench',
-    description: 'Task to skill plan',
-    icon: SearchCheck,
+    labelKey: 'skills',
+    items: [
+      { href: '/skills', labelKey: 'browseSkills' },
+      { href: '/trending', labelKey: 'trending' },
+      { href: '/rankings', labelKey: 'rankings' },
+      { href: '/tasks', labelKey: 'tasks' },
+      { href: '/skill-packs', labelKey: 'packs' },
+      { href: '/compare', labelKey: 'compare' },
+    ],
   },
   {
-    href: '/agent',
-    label: 'Agent Entry',
-    description: 'Low-noise registry map',
-    icon: Braces,
+    labelKey: 'forAgents',
+    items: [
+      { href: '/agent', labelKey: 'agentEntry' },
+      { href: '/agent/integration-kit', labelKey: 'integrationKit' },
+      { href: '/api-docs', labelKey: 'apiDocs' },
+      { href: '/cli', labelKey: 'cli' },
+      { href: '/safety', labelKey: 'safety' },
+      { href: '/outcomes', labelKey: 'outcomes' },
+    ],
   },
   {
-    href: '/agent/integration-kit',
-    label: 'Integration Kit',
-    description: 'Codex, Claude, Cursor templates',
-    icon: Braces,
+    labelKey: 'forCreators',
+    items: [
+      { href: '/submit', labelKey: 'submitSkill' },
+      { href: '/creator', labelKey: 'creatorConsole' },
+      { href: '/creator-kit', labelKey: 'creatorKit' },
+    ],
   },
   {
-    href: '/api/agent/tasks',
-    label: 'Tasks API',
-    description: 'Task catalog for agents',
-    icon: Braces,
-    prefetch: false,
-  },
-  {
-    href: '/api-docs#agent-resolve',
-    label: 'Resolve API',
-    description: 'Turn a task into a safe install plan',
-    icon: Braces,
-  },
-  {
-    href: '/outcomes',
-    label: 'Outcome Loop',
-    description: 'Real agent success signals',
-    icon: Activity,
-  },
-  {
-    href: '/safety',
-    label: 'Safety Gate',
-    description: 'Verified, reviewed, experimental, blocked',
-    icon: ShieldCheck,
-  },
-  {
-    href: '/cli',
-    label: 'CLI',
-    description: 'Resolve and install from terminal',
-    icon: Terminal,
-  },
-  {
-    href: '/.well-known/agent-manifest.json',
-    label: 'Agent Manifest',
-    description: 'Machine-readable registry contract',
-    icon: FileJson2,
-    prefetch: false,
-  },
-  {
-    href: '/api/agent/discovery',
-    label: 'GitHub Discovery',
-    description: 'Auto-import status',
-    icon: Activity,
-    prefetch: false,
-  },
-  {
-    href: '/evals/resolve',
-    label: 'Evals',
-    description: 'Recommendation quality benchmark',
-    icon: Activity,
+    labelKey: 'learn',
+    items: [
+      { href: '/guides', labelKey: 'guides' },
+      { href: '/blog', labelKey: 'blog' },
+      { href: '/use-cases', labelKey: 'useCases' },
+    ],
   },
 ]
 
 function isActivePath(pathname: string, href: string) {
-  const baseHref = href.split('#')[0]
   const basePathname = getBasePathname(pathname)
-  return basePathname === baseHref || basePathname.startsWith(`${baseHref}/`)
+  return basePathname === href || basePathname.startsWith(`${href}/`)
 }
 
 export function MobileNav() {
@@ -115,7 +94,6 @@ export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
 
-  // Prevent body scroll when menu is open (lock both html and body for iOS Safari)
   useEffect(() => {
     if (isOpen) {
       document.documentElement.style.overflow = 'hidden'
@@ -133,6 +111,7 @@ export function MobileNav() {
   return (
     <div className="xl:hidden">
       <button
+        type="button"
         onClick={() => setIsOpen(true)}
         className="-mr-2 flex h-10 w-10 items-center justify-center rounded-[8px] text-secondary transition-colors hover:bg-muted hover:text-foreground"
         aria-label={shell.openMenu}
@@ -140,7 +119,6 @@ export function MobileNav() {
         <Menu className="h-5 w-5" aria-hidden="true" />
       </button>
 
-      {/* Render through a portal so the overlay is not clipped by the sticky header. */}
       {isOpen && typeof document !== 'undefined' && createPortal(
         <div
           className="fixed inset-0 overflow-y-auto bg-background text-foreground"
@@ -153,6 +131,7 @@ export function MobileNav() {
               OpenAgentSkill
             </span>
             <button
+              type="button"
               onClick={() => setIsOpen(false)}
               className="-mr-2 flex h-10 w-10 items-center justify-center rounded-[8px] text-secondary transition-colors hover:bg-muted hover:text-foreground"
               aria-label={shell.closeMenu}
@@ -160,68 +139,76 @@ export function MobileNav() {
               <X className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
+
           <nav
-            className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl flex-col px-6 py-5"
+            className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl flex-col px-6 py-5"
             aria-label={shell.mobileNavigation}
           >
-            <div>
-              <p className="mb-2 font-mono text-xs uppercase text-secondary">{shell.mobileBrowse}</p>
-              <ul className="space-y-1">
-                {navItems.map((item) => {
-                  const active = isActivePath(pathname, item.href)
-                  const label = t.nav[item.labelKey]
-
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={getLocalizedNavigationHref(item.href, locale)}
-                        onClick={() => setIsOpen(false)}
-                        className={cn(
-                          'flex items-center justify-between border-b border-border py-3 text-lg transition-colors',
-                          active ? 'text-foreground' : 'text-secondary hover:text-foreground'
-                        )}
-                        aria-current={active ? 'page' : undefined}
-                      >
-                        {label}
-                        {active && <span className="h-1.5 w-1.5 rounded-full bg-[#006b4f]" aria-hidden="true" />}
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ul>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Link
+                href={getLocalizedNavigationHref('/resolve', locale)}
+                onClick={() => setIsOpen(false)}
+                className={cn(
+                  'flex items-center justify-between rounded-[8px] border px-4 py-3 text-base font-semibold transition-colors',
+                  isActivePath(pathname, '/resolve')
+                    ? 'border-[#006b4f]/50 bg-[#006b4f]/5 text-foreground'
+                    : 'border-border bg-card/70 text-foreground hover:border-foreground/40'
+                )}
+                aria-current={isActivePath(pathname, '/resolve') ? 'page' : undefined}
+              >
+                {t.nav.aiSkillFinder}
+                <span className="font-mono text-xs text-[#006b4f]">Resolve</span>
+              </Link>
+              <Link
+                href={getLocalizedNavigationHref('/docs', locale)}
+                onClick={() => setIsOpen(false)}
+                className={cn(
+                  'flex items-center justify-between rounded-[8px] border px-4 py-3 text-base font-semibold transition-colors',
+                  isActivePath(pathname, '/docs')
+                    ? 'border-[#006b4f]/50 bg-[#006b4f]/5 text-foreground'
+                    : 'border-border bg-card/70 text-foreground hover:border-foreground/40'
+                )}
+                aria-current={isActivePath(pathname, '/docs') ? 'page' : undefined}
+              >
+                {t.nav.docs}
+              </Link>
             </div>
 
-            <div className="mt-5">
-              <p className="mb-2 font-mono text-xs uppercase text-secondary">{t.nav.forAgents}</p>
-              <ul className="grid gap-2">
-                {agentItems.map((item) => {
-                  const active = isActivePath(pathname, item.href)
-                  const Icon = item.icon
+            <div className="mt-4 divide-y divide-border border-y border-border">
+              {mobileSections.map((section) => {
+                const active = section.items.some((item) => isActivePath(pathname, item.href))
 
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={getLocalizedNavigationHref(item.href, locale)}
-                        prefetch={item.prefetch}
-                        onClick={() => setIsOpen(false)}
-                        className={cn(
-                          'flex gap-3 rounded-[8px] border border-border bg-card/70 p-3 transition-colors',
-                          active ? 'border-[#006b4f]/50 text-foreground' : 'text-secondary hover:border-foreground/40 hover:text-foreground'
-                        )}
-                        aria-current={active ? 'page' : undefined}
-                      >
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] border border-border bg-background text-foreground">
-                          <Icon className="h-4 w-4" aria-hidden="true" />
-                        </span>
-                        <span className="min-w-0">
-                          <span className="block text-sm font-semibold">{item.label}</span>
-                          <span className="mt-0.5 block text-xs leading-5 text-secondary">{item.description}</span>
-                        </span>
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ul>
+                return (
+                  <details key={section.labelKey} className="group" open={active || section.labelKey === 'skills'}>
+                    <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-base font-semibold text-foreground marker:content-none">
+                      {t.nav[section.labelKey]}
+                      <ChevronDown className="h-4 w-4 text-secondary transition-transform group-open:rotate-180" aria-hidden="true" />
+                    </summary>
+                    <ul className="grid gap-x-6 pb-4 sm:grid-cols-2">
+                      {section.items.map((item) => {
+                        const itemActive = isActivePath(pathname, item.href)
+
+                        return (
+                          <li key={item.href}>
+                            <Link
+                              href={getLocalizedNavigationHref(item.href, locale)}
+                              onClick={() => setIsOpen(false)}
+                              className={cn(
+                                'flex items-center justify-between rounded-[6px] px-3 py-2.5 text-sm transition-colors',
+                                itemActive ? 'bg-muted text-foreground' : 'text-secondary hover:bg-muted/60 hover:text-foreground'
+                              )}
+                              aria-current={itemActive ? 'page' : undefined}
+                            >
+                              {t.nav[item.labelKey]}
+                              {itemActive && <span className="h-1.5 w-1.5 rounded-full bg-[#006b4f]" aria-hidden="true" />}
+                            </Link>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  </details>
+                )
+              })}
             </div>
 
             <div className="mt-auto pt-5">
