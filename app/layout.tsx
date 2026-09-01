@@ -144,6 +144,12 @@ export default async function RootLayout({
     <html lang={lang} suppressHydrationWarning className={`${inter.variable} ${geistMono.variable}`}>
       <head>
         <StructuredData />
+        <script
+          defer
+          src="https://vibecafe.ai/telemetry/v1.js"
+          data-vc-product-id="cmtiyqi7900000ajg1iue0cxu"
+          data-vc-auth-key="vc_web_uSGihNQ-Zzo01n29YSkBoxVLd739qGSGYTBszacTjoU"
+        />
       </head>
       <body className="font-sans antialiased">
         <I18nProvider initialLocale={initialLocale}>
