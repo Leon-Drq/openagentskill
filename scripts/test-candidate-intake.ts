@@ -8,6 +8,10 @@ import { evaluateFastTrackCandidate } from '../lib/indexer/fast-track.ts'
 import { buildCandidateSourceKey, canonicalGitHubSourceUrl } from '../lib/indexer/candidate-identity.ts'
 // @ts-expect-error TS5097 is expected for this standalone test entrypoint.
 import { shouldRetryAutomatedReview } from '../lib/indexer/review-retry.ts'
+// @ts-expect-error TS5097 is expected for this standalone test entrypoint.
+import { AUTOMATIC_DISCOVERY_MIN_STARS, PUBLICATION_DAILY_TARGET, automaticPublicationCapacityPerDay, meetsAutomaticDiscoveryStarFloor } from '../lib/indexer/intake-policy.ts'
+// @ts-expect-error TS5097 is expected for this standalone test entrypoint.
+import { SKILL_SUBMISSION_MIN_STARS } from '../lib/skills/submission-policy.ts'
 
 const now = new Date('2026-09-01T00:00:00.000Z')
 const safe = {
@@ -35,6 +39,12 @@ assert.equal(evaluateFastTrackCandidate({ ...safe, packageTruncated: true }).eli
 assert.equal(evaluateFastTrackCandidate({ ...safe, hasUnreviewedFiles: true }).eligible, false)
 assert.equal(shouldRetryAutomatedReview('heuristic-static-v2'), true)
 assert.equal(shouldRetryAutomatedReview('deepseek/deepseek-v4-flash'), false)
+assert.equal(AUTOMATIC_DISCOVERY_MIN_STARS, 20)
+assert.equal(meetsAutomaticDiscoveryStarFloor(19), false)
+assert.equal(meetsAutomaticDiscoveryStarFloor(20), true)
+assert.equal(SKILL_SUBMISSION_MIN_STARS, 0, 'direct user submissions must remain zero-star eligible')
+assert.equal(PUBLICATION_DAILY_TARGET, 1_000)
+assert.ok(automaticPublicationCapacityPerDay() > PUBLICATION_DAILY_TARGET)
 
 assert.equal(
   buildCandidateSourceKey(12345, 'OldOwner/OldName', '/skills\\demo/SKILL.md/'),
@@ -77,5 +87,23 @@ const skillSource = readFileSync(
 )
 assert.ok(skillSource.includes('mapGitHubReadsSerially(paths'), 'GitHub content reads must be serialized')
 assert.ok(skillSource.includes('repositoryTree?: GitHubTreeItem[] | null'), 'repository trees must be reusable')
+
+const growthMigration = readFileSync(
+  new URL('../supabase/migrations/20260901173000_daily_1000_minimum_star_gate.sql', import.meta.url),
+  'utf8'
+)
+assert.ok(growthMigration.includes('skills_approved_source_content_hash_unique'))
+assert.ok(growthMigration.includes('github_stars < 20'))
+
+const vercelConfig = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')) as {
+  crons: Array<{ path: string; schedule: string }>
+}
+assert.equal(
+  vercelConfig.crons.find((cron) => cron.path === '/api/cron/skill-candidates-publish')?.schedule,
+  '0,10,30,40 * * * *'
+)
+
+const openSubmission = readFileSync(new URL('../lib/skills/open-submission.ts', import.meta.url), 'utf8')
+assert.ok(openSubmission.includes('source_content_hash: sourceContentHash'))
 
 console.log('Candidate intake regression tests passed.')

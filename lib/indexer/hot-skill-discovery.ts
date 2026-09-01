@@ -1,5 +1,6 @@
 import { evaluateSkillCandidate } from './skill-filter'
 import type { CandidateRepo } from './github-search'
+import { AUTOMATIC_DISCOVERY_MIN_STARS } from './intake-policy'
 
 type GitHubSearchSort = 'stars' | 'updated'
 
@@ -219,7 +220,10 @@ export async function searchHotSkillRepos(
   options: HotSkillDiscoveryOptions = {}
 ): Promise<HotSkillDiscoveryResult> {
   const limit = Math.min(Math.max(options.limit || 24, 1), 2_000)
-  const minStars = Math.max(Math.floor(options.minStars || 10), 10)
+  const minStars = Math.max(
+    Math.floor(options.minStars || AUTOMATIC_DISCOVERY_MIN_STARS),
+    AUTOMATIC_DISCOVERY_MIN_STARS
+  )
   const lookbackDays = Math.min(Math.max(Math.floor(options.lookbackDays || 21), 1), 90)
   const perPage = Math.min(Math.max(options.perPage || 12, 5), 100)
   const maxQueries = Math.min(Math.max(options.maxQueries || 12, 1), Math.min(HOT_SKILL_QUERIES.length, 22))

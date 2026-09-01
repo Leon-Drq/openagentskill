@@ -7,12 +7,14 @@
  *   3. Write to Supabase through a narrow INDEXER_SECRET-guarded RPC
  */
 
+import { createHash } from 'node:crypto'
 import { createPublicClient } from '@/lib/supabase/public'
 import { generateText } from 'ai'
 import type { CandidateRepo } from './github-search'
 import { evaluateSkillCandidate, isMcpCandidate } from './skill-filter'
 import { INDEXER_REVIEW_MODEL } from '@/lib/ai/models'
 import { syncRepositorySkills } from './repository-skill-sync'
+import { AUTOMATIC_DISCOVERY_MIN_STARS } from './intake-policy'
 
 const GITHUB_REQUEST_TIMEOUT_MS = 12_000
 const GITHUB_RETRY_DELAYS_MS = [750, 1_750]
@@ -173,7 +175,7 @@ Respond with JSON only, no markdown:
       language: candidate.language,
       stars: candidate.stars,
     })
-    const approved = candidate.stars >= 10 && evaluation.accepted && evaluation.skillLikenessScore >= 55
+    const approved = candidate.stars >= AUTOMATIC_DISCOVERY_MIN_STARS && evaluation.accepted && evaluation.skillLikenessScore >= 55
     return {
       approved,
       score: approved ? Math.max(60, evaluation.skillLikenessScore) : 30,
@@ -222,6 +224,7 @@ export async function processRepo(
       ...(candidate.discovery?.x ? { discoveryMetadata: { x_signal: candidate.discovery.x } } : {}),
       ...(candidate.requestedSkillName ? { skillNames: [candidate.requestedSkillName] } : {}),
       maxSkills: 8,
+      minimumStarsForNew: AUTOMATIC_DISCOVERY_MIN_STARS,
     })
     if (sourceSync.discovered > 0) {
       const successfulEntries = sourceSync.entries.filter((entry) => entry.status === 'created' || entry.status === 'updated')
@@ -297,8 +300,14 @@ export async function processRepo(
       return { repo: repoRef, slug, discoverySource, status: 'skipped', reason: 'MCP projects are excluded from skill-only imports' }
     }
 
-    if (stars < 10) {
-      return { repo: repoRef, slug, discoverySource, status: 'skipped', reason: 'Below 10-star quality gate' }
+    if (stars < AUTOMATIC_DISCOVERY_MIN_STARS) {
+      return {
+        repo: repoRef,
+        slug,
+        discoverySource,
+        status: 'skipped',
+        reason: `Below ${AUTOMATIC_DISCOVERY_MIN_STARS}-star automatic discovery gate`,
+      }
     }
 
     if (license === 'Unknown') {
@@ -391,6 +400,7 @@ export async function processRepo(
       ai_review_approved: true,
       ai_review_issues: [],
       ai_review_suggestions: [],
+      source_content_hash: createHash('sha256').update(readme).digest('hex'),
       downloads: 0,
       used_by: 0,
       rating: 0,

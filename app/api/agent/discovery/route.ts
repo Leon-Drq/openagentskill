@@ -1,4 +1,9 @@
 import { NextResponse } from 'next/server'
+import {
+  AUTOMATIC_DISCOVERY_MIN_STARS,
+  PUBLICATION_DAILY_TARGET,
+  automaticPublicationCapacityPerDay,
+} from '@/lib/indexer/intake-policy'
 import { withTimeout } from '@/lib/async'
 import { INDEXNOW_KEY_LOCATION } from '@/lib/indexnow'
 import { createPublicClient } from '@/lib/supabase/public'
@@ -20,7 +25,7 @@ import { FEATURED_SKILL_CLUSTERS, SKILL_CLUSTERS } from '@/lib/seo/skill-cluster
 export const dynamic = 'force-dynamic'
 
 const DISCOVERY_QUERY_TIMEOUT_MS = 2500
-const SKILL_RADAR_CRON_MINUTE_UTC = 35
+const SKILL_RADAR_CRON_MINUTE_UTC = 45
 
 function getImportCronMinutesUtc() {
   return [SKILL_RADAR_CRON_MINUTE_UTC]
@@ -389,7 +394,10 @@ function buildProfileRunSummaries(runs: Array<Record<string, unknown>>) {
 export async function GET() {
   const generatedAt = new Date()
   const minStars = Number(process.env.INDEXER_MIN_STARS || 500)
-  const maintenanceMinStars = Math.max(parsePositiveNumber(process.env.SKILL_RADAR_MIN_STARS, 10), 10)
+  const maintenanceMinStars = Math.max(
+    parsePositiveNumber(process.env.SKILL_RADAR_MIN_STARS, AUTOMATIC_DISCOVERY_MIN_STARS),
+    AUTOMATIC_DISCOVERY_MIN_STARS
+  )
   const maintenanceTargetNew = Math.min(
     Math.max(parsePositiveNumber(process.env.SKILL_RADAR_TARGET_NEW, 2), 1),
     12
@@ -439,7 +447,7 @@ export async function GET() {
     excludes: ['mcp-only projects', 'archived repositories', 'forks', 'low-relevance repositories'],
   }
   const schedule = {
-    import_cron: '35 * * * *',
+    import_cron: '45 * * * *',
     import_frequency: 'hourly quality maintenance radar with rotating GitHub query windows; X signals use a separately budgeted schedule.',
     profile_crons: INDEXER_RUN_PROFILES.map((profile) => ({
       profile: profile.key,
@@ -456,15 +464,15 @@ export async function GET() {
     })),
     star_refresh_cron: '0 3 * * *',
     star_refresh_frequency: 'daily at 03:00 UTC',
-    skill_radar_cron: '35 * * * *',
+    skill_radar_cron: '45 * * * *',
     skill_radar_frequency: skillRadarXMaxQueries > 0
       ? `hourly GitHub scan; X hotspot scan every ${skillRadarXScanIntervalHours} hours`
       : 'hourly GitHub scan; X hotspot scan is disabled until an X search budget is configured',
     indexnow_cron: '15 3 * * *',
     indexnow_frequency: 'daily baseline submission plus automatic submission after new skill imports',
-    candidate_discovery_cron: '10 * * * *',
+    candidate_discovery_cron: '15 * * * *',
     candidate_validation_cron: '20,50 * * * *',
-    candidate_publication_cron: '40 * * * *',
+    candidate_publication_cron: '0,10,30,40 * * * *',
   }
   const estimatedDailyCapacity = scheduledHourlyTargetNew * 24
   const remainingToTarget =
@@ -508,7 +516,7 @@ export async function GET() {
       strategy:
         'Maintain a 20k+ skill registry with rotating, scenario-specific GitHub discovery, periodic social signals, MCP exclusion, trust metadata, eval metadata, and small high-quality hourly imports.',
       quality_gates: [
-        'GitHub stars threshold for repository-level discovery; explicit SKILL.md paths remain zero-star eligible',
+        'Automatic discovery requires at least 20 GitHub stars; direct user submissions remain zero-star eligible',
         'archived and fork exclusion',
         'skill relevance scoring',
         'MCP-only exclusion',
@@ -522,7 +530,7 @@ export async function GET() {
     github_discovery: {
       status: 'active',
       source: 'github_search',
-      strategy: 'high-star repository discovery plus recursive, zero-star-eligible SKILL.md source sync',
+      strategy: '20-star automatic discovery plus recursive SKILL.md source sync; direct submissions remain zero-star eligible',
       target_approved_skills: effectiveCoverageTarget,
       domain_count: HIGH_STAR_DISCOVERY_DOMAINS.length,
       domains: HIGH_STAR_DISCOVERY_DOMAINS,
@@ -532,7 +540,8 @@ export async function GET() {
         patterns: ['SKILL.md', 'skills/**/SKILL.md', '.agents/skills/**/SKILL.md', '**/SKILL.md'],
         exact_source_urls_preserved_from_social_radar: true,
         existing_repository_incremental_rescan: true,
-        zero_star_intake: true,
+        automatic_minimum_github_stars: AUTOMATIC_DISCOVERY_MIN_STARS,
+        user_submission_minimum_github_stars: 0,
         review_policy: 'static security analysis plus automated quality review before public approval',
       },
       targeted_import: {
@@ -605,7 +614,8 @@ export async function GET() {
       architecture: ['indexed_candidates', 'installable_skills'],
       discovery_capacity_per_day: 52_800,
       light_validation_capacity_per_day: 5_760,
-      publication_capacity_per_day: 984,
+      publication_daily_target: PUBLICATION_DAILY_TARGET,
+      publication_capacity_per_day: automaticPublicationCapacityPerDay(),
       fast_track: {
         minimum_github_stars: 100,
         requirements: [

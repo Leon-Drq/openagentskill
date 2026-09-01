@@ -7,6 +7,7 @@ import {
   type IndexNowSubmitResult,
 } from '@/lib/indexnow'
 import { searchHotSkillRepos, type HotSkillDiscoveryResult } from '@/lib/indexer/hot-skill-discovery'
+import { AUTOMATIC_DISCOVERY_MIN_STARS } from '@/lib/indexer/intake-policy'
 import { bulkImportHighStarSkills, type BulkImportSummary } from '@/lib/indexer/high-star-import'
 import { processBatch, type ProcessResult } from '@/lib/indexer/processor'
 import type { XQueueBuildResult } from '@/lib/x/growth'
@@ -177,7 +178,10 @@ export async function runDailyGrowthAutomation(
 
   const hotDiscovery = await searchHotSkillRepos({
     limit: hotLimit,
-    minStars: options.hotMinStars ?? numberFromEnv('GROWTH_DAILY_HOT_MIN_STARS', 10),
+    minStars: Math.max(
+      options.hotMinStars ?? numberFromEnv('GROWTH_DAILY_HOT_MIN_STARS', AUTOMATIC_DISCOVERY_MIN_STARS),
+      AUTOMATIC_DISCOVERY_MIN_STARS
+    ),
     lookbackDays: options.hotLookbackDays ?? numberFromEnv('GROWTH_DAILY_LOOKBACK_DAYS', 21),
     maxQueries: options.hotMaxQueries ?? numberFromEnv('GROWTH_DAILY_HOT_MAX_QUERIES', 12),
   })

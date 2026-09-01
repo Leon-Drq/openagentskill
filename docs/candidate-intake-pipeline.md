@@ -9,12 +9,13 @@ OpenAgentSkill keeps discovery scale separate from public marketplace quality:
 
 | Stage | Schedule | Default bound | Daily bound |
 | --- | --- | ---: | ---: |
-| GitHub discovery | hourly at `:10` | 22 searches × 100 results | 52,800 result slots |
+| GitHub discovery | hourly at `:15` | 22 searches × 100 results; repositories require 20+ stars | 52,800 result slots |
 | Light validation | hourly at `:20` and `:50` | 120 candidates/run | 5,760 candidates |
-| 100-star deterministic fast track | hourly at `:40` | 20 skills/run | 480 skills |
-| AI review | hourly at `:40` | 21 skills/run | 504 skills |
+| Public publication | `:00`, `:10`, `:30`, and `:40` hourly | 8 fast-track + 8 AI/retry slots per run | 1,536 capacity; 1,000 rolling-24h target |
 
 These are ceilings, not promised insert counts. Repository relevance filtering, stable identifiers, source URLs, exact content hashes, licenses, security checks, and existing registry records reduce the number of unique public skills.
+
+The 20-star floor applies only to automatic discovery and automatic source sync. A creator or user can submit a valid zero-star repository through the public submission flow; it still must pass structure, license, security, quality, and duplicate checks.
 
 ## Fast-track policy
 
@@ -33,7 +34,7 @@ The policy runs once during validation and again immediately before the public u
 - Authenticated search requests are spaced by at least 2.1 seconds (under 30 requests/minute).
 - Unauthenticated search requests are spaced by at least 6.1 seconds (under 10 requests/minute).
 - Search stops for the current window on HTTP 403 or 429 and respects reset/retry headers.
-- Validation uses two workers with pacing between chunks; publication is sequential with a 2.5-second gap.
+- Validation uses two workers with pacing between chunks; publication is sequential with a 2.5-second gap and a rolling 24-hour target guard.
 - Validation and publication do not run without `GITHUB_TOKEN`.
 - Queue claims use leases and `FOR UPDATE SKIP LOCKED`, so overlapping invocations do not process the same row.
 - Validation and publication failures have separate retry states with exponential backoff.

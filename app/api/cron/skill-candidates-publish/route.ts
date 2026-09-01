@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { buildIndexNowUrlsForSkill, submitIndexNowUrls } from '@/lib/indexnow'
 import { runCandidatePublicationBatch } from '@/lib/indexer/candidate-intake'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
+import {
+  PUBLICATION_AI_REVIEW_PER_RUN,
+  PUBLICATION_DAILY_TARGET,
+  PUBLICATION_FAST_TRACK_PER_RUN,
+} from '@/lib/indexer/intake-policy'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -26,9 +31,25 @@ async function handleRun(request: NextRequest) {
     })
   }
   const body = request.method === 'POST' ? await request.json().catch(() => ({})) : {}
-  const fastTrackLimit = boundedInt(body.fastTrackLimit ?? process.env.CANDIDATE_FAST_TRACK_LIMIT, 20, 1, 50)
-  const aiReviewLimit = boundedInt(body.aiReviewLimit ?? process.env.CANDIDATE_AI_REVIEW_LIMIT, 21, 0, 25)
-  const result = await runCandidatePublicationBatch({ fastTrackLimit, aiReviewLimit })
+  const fastTrackLimit = boundedInt(
+    body.fastTrackLimit ?? process.env.CANDIDATE_FAST_TRACK_LIMIT,
+    PUBLICATION_FAST_TRACK_PER_RUN,
+    1,
+    50
+  )
+  const aiReviewLimit = boundedInt(
+    body.aiReviewLimit ?? process.env.CANDIDATE_AI_REVIEW_LIMIT,
+    PUBLICATION_AI_REVIEW_PER_RUN,
+    0,
+    25
+  )
+  const dailyTarget = boundedInt(
+    body.dailyTarget ?? process.env.CANDIDATE_PUBLICATION_DAILY_TARGET,
+    PUBLICATION_DAILY_TARGET,
+    1,
+    10_000
+  )
+  const result = await runCandidatePublicationBatch({ fastTrackLimit, aiReviewLimit, dailyTarget })
   const indexing = await submitIndexNowUrls(result.slugs.flatMap(buildIndexNowUrlsForSkill))
 
   return NextResponse.json({
