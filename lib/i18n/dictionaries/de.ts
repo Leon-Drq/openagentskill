@@ -27,6 +27,7 @@ const de = {
     cli: 'CLI',
     forCreators: 'Für Creator',
     creatorConsole: 'Creator-Konsole',
+    creators: 'Creator-Verzeichnis',
     creatorKit: 'Creator-Kit',
     learn: 'Lernen',
     guides: 'Anleitungen',

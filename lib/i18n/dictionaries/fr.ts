@@ -27,6 +27,7 @@ const fr = {
     cli: 'CLI',
     forCreators: 'Pour les créateurs',
     creatorConsole: 'Console créateur',
+    creators: 'Registre des créateurs',
     creatorKit: 'Kit créateur',
     learn: 'Apprendre',
     guides: 'Guides',

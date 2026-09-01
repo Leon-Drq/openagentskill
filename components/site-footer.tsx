@@ -125,6 +125,7 @@ export function SiteFooter() {
                 <FooterLink href="/openapi.json" className="hover:text-foreground">OpenAPI</FooterLink>
                 <FooterLink href="/cli" className="hover:text-foreground">CLI</FooterLink>
                 <FooterLink href="/creator-kit" className="hover:text-foreground">Creator Kit</FooterLink>
+                <FooterLink href="/creators" className="hover:text-foreground">Creator Registry</FooterLink>
                 <FooterLink href="/x-kit" className="hover:text-foreground">X Growth Kit</FooterLink>
                 <FooterLink href="/submit" className="hover:text-foreground">{t.nav.submit}</FooterLink>
                 <FooterLink href="/blog" className="hover:text-foreground">Blog</FooterLink>

@@ -1,8 +1,9 @@
 import 'server-only'
 
+import { createHash } from 'node:crypto'
 import type { SkillRecord } from '@/lib/db/skills'
 import { reviewSkill } from '@/lib/ai-review/reviewer'
-import { validateGitHubRepo } from '@/lib/github/api'
+import { fetchRepositoryCommitSha, validateGitHubRepo } from '@/lib/github/api'
 import {
   discoverGitHubSkills,
   fetchDelegatedGitHubSkill,
@@ -14,6 +15,8 @@ import { analyzeCode } from '@/lib/security/static-analysis'
 import { evaluateSkillSubmissionPolicy } from '@/lib/skills/submission-policy'
 import { estimateSubmissionQuality } from '@/lib/skills/submission-quality'
 import { createPublicClient } from '@/lib/supabase/public'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { getLicenseEvidence } from '@/lib/creator-ownership'
 
 const DEFAULT_MAX_SKILLS_PER_REPOSITORY = 8
 const MAX_SKILLS_PER_REPOSITORY = 20
@@ -92,6 +95,10 @@ function normalizeVersion(value: string | undefined) {
   return value && /^\d+\.\d+\.\d+(?:[-+][\w.-]+)?$/.test(value) ? value : '1.0.0'
 }
 
+function contentHash(value: string) {
+  return createHash('sha256').update(value).digest('hex')
+}
+
 function normalizeSourceUrl(value: string | null | undefined) {
   return (value || '').trim().replace(/\/$/, '').toLowerCase()
 }
@@ -127,6 +134,7 @@ function payloadForExisting(
   discoverySource: string,
   discoveryMetadata?: Record<string, unknown>
 ) {
+  const license = getLicenseEvidence(skill.frontmatter.license, repository.license || existing.license)
   return {
     ...existing,
     repository: skill.sourceUrl,
@@ -137,7 +145,10 @@ function payloadForExisting(
     github_last_pushed_at: repository.updatedAt,
     long_description: skill.document.slice(0, 12_000),
     version: normalizeVersion(skill.frontmatter.version || existing.version),
-    license: skill.frontmatter.license || repository.license || existing.license || 'Unknown',
+    license: license.license,
+    license_source: license.source,
+    license_status: license.status,
+    source_content_hash: contentHash(skill.document),
     submission_source: existing.submission_source || discoverySource,
     ai_review_score: {
       ...(existing.ai_review_score && typeof existing.ai_review_score === 'object' ? existing.ai_review_score : {}),
@@ -214,6 +225,7 @@ async function payloadForNew(
     reviewTotal: review.totalScore,
     tags,
   })
+  const license = getLicenseEvidence(skill.frontmatter.license, repository.license)
 
   return {
     reason: null,
@@ -235,7 +247,10 @@ async function payloadForNew(
       tags,
       frameworks: skill.frontmatter.frameworks,
       version: normalizeVersion(skill.frontmatter.version),
-      license: skill.frontmatter.license || repository.license || 'Unknown',
+      license: license.license,
+      license_source: license.source,
+      license_status: license.status,
+      source_content_hash: contentHash(skill.document),
       install_command: `npx skills add ${repository.fullName} --skill ${skill.frontmatter.name}`,
       verified: false,
       submission_source: discoverySource,
@@ -278,8 +293,14 @@ export async function syncRepositorySkills(
     checkReadme: true,
     checkSkillJson: false,
   })
+  const sourceCommitSha = await fetchRepositoryCommitSha(
+    reference.owner,
+    reference.repo,
+    reference.ref || repository.defaultBranch
+  )
   const discovery = await discoverGitHubSkills(reference, repository)
   const supabase = createPublicClient({ requestTimeoutMs: DB_TIMEOUT_MS })
+  const admin = createAdminClient({ requestTimeoutMs: DB_TIMEOUT_MS })
   const { data: existingData, error: existingError } = await supabase
     .from('skills')
     .select('*')
@@ -347,12 +368,31 @@ export async function syncRepositorySkills(
       })
       if (error) throw new Error(error.message)
 
+      const sourceContentHash = String(result.payload.source_content_hash || contentHash(skill.document))
+      const { data: versionData, error: versionError } = await admin.rpc('record_skill_source_version', {
+        p_server_secret: serverSecret,
+        p_skill_slug: String(result.payload.slug || fallbackSlug),
+        p_source_commit_sha: sourceCommitSha || '',
+        p_source_content_hash: sourceContentHash,
+        p_source_ref: skill.ref,
+        p_source_path: skill.path,
+        p_version: String(result.payload.version || '1.0.0'),
+        p_license: String(result.payload.license || 'Unknown'),
+        p_license_source: String(result.payload.license_source || 'unknown'),
+        p_metadata: {
+          source_url: skill.sourceUrl,
+          discovery_source: discoverySource,
+        },
+      })
+      if (versionError) throw new Error(`Source version record failed: ${versionError.message}`)
+
       entries.push({
         slug: String(result.payload.slug || fallbackSlug),
         name: skill.frontmatter.name,
         path: skill.path,
         sourceUrl: skill.sourceUrl,
         status: data?.created ? 'created' : 'updated',
+        ...(versionData?.changed ? { reason: 'Source content changed and a new version was recorded.' } : {}),
       })
     } catch (error) {
       entries.push({

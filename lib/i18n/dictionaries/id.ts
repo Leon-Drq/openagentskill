@@ -27,6 +27,7 @@ const id = {
     cli: 'CLI',
     forCreators: 'Untuk Kreator',
     creatorConsole: 'Konsol Kreator',
+    creators: 'Registri Kreator',
     creatorKit: 'Kit Kreator',
     learn: 'Pelajari',
     guides: 'Panduan',

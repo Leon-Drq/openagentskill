@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { trackSkillEvent } from '@/components/skill-event-tracker'
 import { useI18n } from '@/lib/i18n/context'
@@ -19,15 +20,28 @@ interface ClaimSkillPanelProps {
     github_username: string | null
     x_username?: string | null
     evidence_url: string | null
+    verification_tier?: 'maintainer' | 'official'
+    verified_at?: string | null
   } | null
 }
 
 interface ClaimState {
   status: 'pending' | 'approved' | 'rejected'
-  github_username: string
+  github_username: string | null
   x_username: string | null
   evidence_url: string | null
   evidence_note: string | null
+  verification_method?: string
+  verification_tier?: 'maintainer' | 'official'
+  verified_at?: string | null
+  challenge_expires_at?: string | null
+}
+
+interface ClaimChallenge {
+  token: string
+  path: string
+  expires_at: string
+  repository: string
 }
 
 function getSourceLabelCopyKey(value: string): SkillDetailCopyKey | null {
@@ -57,6 +71,7 @@ export function ClaimSkillPanel({
   approvedClaim,
 }: ClaimSkillPanelProps) {
   const { locale } = useI18n()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [hasUser, setHasUser] = useState<boolean | null>(null)
   const [existingClaim, setExistingClaim] = useState<ClaimState | null>(null)
@@ -65,6 +80,9 @@ export function ClaimSkillPanel({
   const [evidenceUrl, setEvidenceUrl] = useState(repository || '')
   const [evidenceNote, setEvidenceNote] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'saved' | 'error'>('idle')
+  const [challenge, setChallenge] = useState<ClaimChallenge | null>(null)
+  const [verificationStatus, setVerificationStatus] = useState<'idle' | 'checking' | 'verified' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
     let active = true
@@ -99,7 +117,7 @@ export function ClaimSkillPanel({
 
     if (!hasUser) {
       const next = getLocalizedNavigationHref(`/skills/${skillSlug}`, locale)
-      window.location.href = `/auth/login?next=${encodeURIComponent(next)}`
+      router.push(`/auth/login?next=${encodeURIComponent(next)}`)
       return
     }
     setOpen(true)
@@ -123,14 +141,41 @@ export function ClaimSkillPanel({
       }),
     })
 
+    const data = await response.json().catch(() => ({}))
     if (!response.ok) {
+      setErrorMessage(data.error || 'Could not create the ownership challenge.')
       setStatus('error')
       return
     }
 
-    const data = await response.json()
     setExistingClaim(data.claim)
+    setChallenge(data.challenge || null)
     setStatus('saved')
+  }
+
+  async function verifyChallenge() {
+    if (verificationStatus === 'checking') return
+    setVerificationStatus('checking')
+    setErrorMessage('')
+    const response = await fetch('/api/claims/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ skill_slug: skillSlug }),
+    })
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok) {
+      setErrorMessage(data.error || 'Verification failed. Check the file and try again.')
+      setVerificationStatus('error')
+      return
+    }
+    setExistingClaim((current) => current ? { ...current, status: 'approved', verified_at: data.verified_at } : current)
+    setVerificationStatus('verified')
+    setChallenge(null)
+  }
+
+  async function copyChallengeToken() {
+    if (!challenge) return
+    await navigator.clipboard.writeText(challenge.token)
   }
 
   if (approvedClaim) {
@@ -140,7 +185,7 @@ export function ClaimSkillPanel({
           {formatSkillDetailCopy(locale, 'ownerClaim')}
         </p>
         <h3 className="font-display text-lg font-semibold">
-          {formatSkillDetailCopy(locale, 'verifiedMaintainer')}
+          {approvedClaim.verification_tier === 'official' ? 'Official publisher' : formatSkillDetailCopy(locale, 'verifiedMaintainer')}
         </h3>
         <p className="mt-2 text-xs leading-relaxed text-secondary">
           {formatSkillDetailCopy(locale, 'verifiedMaintainerDescription', {
@@ -181,7 +226,7 @@ export function ClaimSkillPanel({
       {existingClaim && !open ? (
         <div className="mt-4 border border-border p-3 text-xs text-secondary">
           {formatSkillDetailCopy(locale, 'claimStatus')}:{' '}
-          <span className="font-mono text-foreground">{existingClaim.status}</span>
+          <span className="font-mono text-foreground">{verificationStatus === 'verified' ? 'approved' : existingClaim.status}</span>
         </div>
       ) : null}
 
@@ -197,6 +242,9 @@ export function ClaimSkillPanel({
         </button>
       ) : (
         <div className="mt-4 space-y-3">
+          <div className="border border-border bg-muted/30 p-3 text-xs leading-relaxed text-secondary">
+            GitHub OAuth can approve a matching personal repository immediately. Otherwise, we generate a one-time file challenge that proves write access to this repository. X is optional and does not verify ownership by itself.
+          </div>
           <label className="block">
             <span className="mb-1 block text-xs text-secondary">
               {formatSkillDetailCopy(locale, 'githubUsername')}
@@ -250,14 +298,38 @@ export function ClaimSkillPanel({
               ? formatSkillDetailCopy(locale, 'submitting')
               : formatSkillDetailCopy(locale, 'submitClaim')}
           </button>
+          {challenge ? (
+            <div className="border border-emerald-700/40 bg-emerald-500/5 p-4 text-xs">
+              <p className="font-mono uppercase tracking-[0.14em] text-emerald-700">Ownership challenge</p>
+              <ol className="mt-3 list-decimal space-y-2 pl-4 leading-relaxed text-secondary">
+                <li>Create <code className="break-all text-foreground">{challenge.path}</code> on the repository default branch.</li>
+                <li>Paste the exact token below as the complete file content and commit it.</li>
+                <li>Return here and verify. The token expires in 24 hours.</li>
+              </ol>
+              <div className="mt-3 flex items-stretch border border-border bg-background">
+                <code className="min-w-0 flex-1 break-all p-3 text-foreground">{challenge.token}</code>
+                <button type="button" onClick={copyChallengeToken} className="border-l border-border px-3 font-semibold hover:bg-muted">Copy</button>
+              </div>
+              <button
+                type="button"
+                onClick={verifyChallenge}
+                disabled={verificationStatus === 'checking'}
+                className="mt-3 w-full bg-foreground px-3 py-2 font-semibold text-background disabled:opacity-50"
+              >
+                {verificationStatus === 'checking' ? 'Checking GitHub…' : 'Verify repository ownership'}
+              </button>
+            </div>
+          ) : null}
           {status === 'saved' && (
             <p className="text-xs text-secondary">
-              {formatSkillDetailCopy(locale, 'claimSubmitted')}
+              {existingClaim?.status === 'approved'
+                ? 'Ownership verified. This listing is now linked to your creator profile.'
+                : formatSkillDetailCopy(locale, 'claimSubmitted')}
             </p>
           )}
-          {status === 'error' && (
-            <p className="text-xs text-secondary">
-              {formatSkillDetailCopy(locale, 'claimSubmitError')}
+          {(status === 'error' || verificationStatus === 'error') && (
+            <p className="text-xs text-red-600" role="alert">
+              {errorMessage || formatSkillDetailCopy(locale, 'claimSubmitError')}
             </p>
           )}
         </div>

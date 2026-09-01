@@ -30,6 +30,7 @@ type NavLabelKey =
   | 'cli'
   | 'forCreators'
   | 'creatorConsole'
+  | 'creators'
   | 'creatorKit'
   | 'submitSkill'
   | 'learn'
@@ -69,6 +70,7 @@ const mobileSections: Array<{ labelKey: NavLabelKey; items: MobileNavItem[] }> =
     labelKey: 'forCreators',
     items: [
       { href: '/submit', labelKey: 'submitSkill' },
+      { href: '/creators', labelKey: 'creators' },
       { href: '/creator', labelKey: 'creatorConsole' },
       { href: '/creator-kit', labelKey: 'creatorKit' },
     ],
