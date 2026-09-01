@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { enqueueRepositoryCandidates } from '@/lib/indexer/candidate-intake'
 import { searchHotSkillRepos } from '@/lib/indexer/hot-skill-discovery'
+import { AUTOMATIC_DISCOVERY_MIN_STARS } from '@/lib/indexer/intake-policy'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 
 export const runtime = 'nodejs'
@@ -23,7 +24,12 @@ async function handleRun(request: NextRequest) {
   const limit = boundedInt(body.limit ?? process.env.CANDIDATE_DISCOVERY_LIMIT, 2_000, 1, 2_000)
   const maxQueries = boundedInt(body.maxQueries ?? process.env.CANDIDATE_DISCOVERY_MAX_QUERIES, 22, 1, 22)
   const perPage = boundedInt(body.perPage ?? process.env.CANDIDATE_DISCOVERY_PER_PAGE, 100, 5, 100)
-  const minStars = boundedInt(body.minStars ?? process.env.CANDIDATE_DISCOVERY_MIN_STARS, 10, 10, 100_000)
+  const minStars = boundedInt(
+    body.minStars ?? process.env.CANDIDATE_DISCOVERY_MIN_STARS,
+    AUTOMATIC_DISCOVERY_MIN_STARS,
+    AUTOMATIC_DISCOVERY_MIN_STARS,
+    100_000
+  )
   const lookbackDays = boundedInt(body.lookbackDays ?? process.env.CANDIDATE_DISCOVERY_LOOKBACK_DAYS, 90, 1, 90)
   const hourlyWindow = Math.floor(Date.now() / 3_600_000)
   const discovery = await searchHotSkillRepos({

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { HIGH_SIGNAL_SKILL_SOURCES } from '@/lib/indexer/discovery-seeds'
 import { syncRepositorySkills } from '@/lib/indexer/repository-skill-sync'
+import { AUTOMATIC_DISCOVERY_MIN_STARS } from '@/lib/indexer/intake-policy'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 import { createPublicClient } from '@/lib/supabase/public'
 
@@ -117,6 +118,7 @@ async function handleRun(request: NextRequest) {
       results.push(await syncRepositorySkills({
         reference: source.sourceUrl,
         discoverySource: source.discoverySource,
+        minimumStarsForNew: AUTOMATIC_DISCOVERY_MIN_STARS,
         maxSkills: source.discoverySource.includes('repository-rescan') ? 6 : 4,
       }))
     } catch (error) {

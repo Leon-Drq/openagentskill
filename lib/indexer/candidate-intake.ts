@@ -19,6 +19,11 @@ import {
 } from './candidate-identity'
 import { evaluateFastTrackCandidate } from './fast-track'
 import { syncRepositorySkills } from './repository-skill-sync'
+import {
+  AUTOMATIC_DISCOVERY_MIN_STARS,
+  PUBLICATION_DAILY_TARGET,
+  meetsAutomaticDiscoveryStarFloor,
+} from './intake-policy'
 
 const DB_TIMEOUT_MS = 20_000
 const CANDIDATE_LEASE_SECONDS = 240
@@ -85,8 +90,13 @@ export async function enqueueRepositoryCandidates(
   discoverySource = 'github-search'
 ) {
   const unique = new Map<string, Record<string, unknown>>()
+  let belowStarFloor = 0
 
   for (const candidate of candidates) {
+    if (!meetsAutomaticDiscoveryStarFloor(candidate.stars)) {
+      belowStarFloor += 1
+      continue
+    }
     const sourcePath = candidate.skillSourceUrl ? parseGitHubSkillReference(candidate.skillSourceUrl)?.path || '' : ''
     const sourceKey = buildCandidateSourceKey(candidate.githubId, candidate.fullName, sourcePath)
     unique.set(sourceKey, {
@@ -113,7 +123,9 @@ export async function enqueueRepositoryCandidates(
   }
 
   const rows = Array.from(unique.values())
-  if (!rows.length) return { attempted: 0, inserted: 0, duplicates: 0 }
+  if (!rows.length) {
+    return { attempted: candidates.length, inserted: 0, duplicates: 0, belowStarFloor }
+  }
 
   const { data, error } = await admin()
     .from('skill_candidates')
@@ -122,7 +134,12 @@ export async function enqueueRepositoryCandidates(
   if (error) throw new Error(`Candidate enqueue failed: ${error.message}`)
 
   const inserted = data?.length || 0
-  return { attempted: rows.length, inserted, duplicates: rows.length - inserted }
+  return {
+    attempted: candidates.length,
+    inserted,
+    duplicates: rows.length - inserted,
+    belowStarFloor,
+  }
 }
 
 async function claimCandidates(statuses: SkillCandidateStatus[], limit: number, workerPrefix: string) {
@@ -323,6 +340,16 @@ async function validateRepositoryCandidate(candidate: SkillCandidateRow) {
       checkReadme: true,
       checkSkillJson: false,
     })
+    if (!meetsAutomaticDiscoveryStarFloor(repository.stars)) {
+      await updateCandidate(candidate.id, {
+        status: 'rejected',
+        github_stars: repository.stars,
+        risk_reasons: [`Automatic discovery requires at least ${AUTOMATIC_DISCOVERY_MIN_STARS} GitHub stars`],
+        validated_at: new Date().toISOString(),
+        last_error: null,
+      })
+      return { expanded: 0, fastTrack: 0, reviewRequired: 0, duplicates: 0, rejected: 1, errors: 0 }
+    }
     const discovery = await discoverGitHubSkills(reference, repository)
 
     if (!discovery.skills.length) {
@@ -412,6 +439,7 @@ async function publishCandidate(candidate: SkillCandidateRow) {
       reference: candidate.canonical_source_url,
       discoverySource: candidate.fast_track_eligible ? 'github-fast-track' : 'github-candidate-review',
       maxSkills: 1,
+      minimumStarsForNew: AUTOMATIC_DISCOVERY_MIN_STARS,
       reviewMode: candidate.fast_track_eligible ? 'fast-track' : 'ai',
       discoveryMetadata: {
         candidate_id: candidate.id,
@@ -456,15 +484,61 @@ async function publishCandidate(candidate: SkillCandidateRow) {
   }
 }
 
-export async function runCandidatePublicationBatch(options: { fastTrackLimit?: number; aiReviewLimit?: number } = {}) {
+async function countRecentApprovedSkills() {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  const { count, error } = await admin()
+    .from('skills')
+    .select('id', { count: 'exact', head: true })
+    .eq('ai_review_approved', true)
+    .gte('created_at', since)
+  if (error) throw new Error(`Daily publication count failed: ${error.message}`)
+  return count || 0
+}
+
+export async function runCandidatePublicationBatch(options: {
+  fastTrackLimit?: number
+  aiReviewLimit?: number
+  dailyTarget?: number
+} = {}) {
   const startedAt = Date.now()
   const fastTrackLimit = Math.min(Math.max(options.fastTrackLimit ?? 12, 1), 50)
   const aiReviewLimit = Math.min(Math.max(options.aiReviewLimit ?? 4, 0), 25)
-  const fastTrack = await claimCandidates(['fast_track'], fastTrackLimit, 'candidate-fast-publisher')
-  const reviewed = aiReviewLimit > 0
-    ? await claimCandidates(['review_required'], aiReviewLimit, 'candidate-ai-publisher')
+  const dailyTarget = Math.min(Math.max(options.dailyTarget ?? PUBLICATION_DAILY_TARGET, 1), 10_000)
+  const publishedLast24Hours = await countRecentApprovedSkills()
+  const remainingDailyTarget = Math.max(dailyTarget - publishedLast24Hours, 0)
+  const batchBudget = Math.min(remainingDailyTarget, fastTrackLimit + aiReviewLimit)
+
+  if (batchBudget === 0) {
+    return {
+      claimed: 0,
+      processed: 0,
+      fastTrackClaimed: 0,
+      aiReviewClaimed: 0,
+      retryClaimed: 0,
+      timeBudgetReached: false,
+      published: 0,
+      rejected: 0,
+      retries: 0,
+      errors: 0,
+      rateLimited: false,
+      dailyTarget,
+      publishedLast24Hours,
+      remainingDailyTarget,
+      targetReached: true,
+      slugs: [] as string[],
+    }
+  }
+
+  const retryLimit = Math.min(4, batchBudget)
+  const retries = await claimCandidates(['publication_error', 'publishing'], retryLimit, 'candidate-publication-retry')
+  const fastTrackBudget = Math.min(fastTrackLimit, batchBudget - retries.length)
+  const fastTrack = fastTrackBudget > 0
+    ? await claimCandidates(['fast_track'], fastTrackBudget, 'candidate-fast-publisher')
     : []
-  const retries = await claimCandidates(['publication_error', 'publishing'], Math.min(10, fastTrackLimit), 'candidate-publication-retry')
+  const reviewBudget = Math.min(aiReviewLimit, batchBudget - retries.length - fastTrack.length)
+  const reviewed = reviewBudget > 0
+    ? await claimCandidates(['review_required'], reviewBudget, 'candidate-ai-publisher')
+    : []
   const claimed = [...retries, ...fastTrack, ...reviewed]
   const results = []
   let timeBudgetReached = false
@@ -483,6 +557,7 @@ export async function runCandidatePublicationBatch(options: { fastTrackLimit?: n
     if (index + 1 < claimed.length) await sleep(PUBLICATION_DELAY_MS)
   }
 
+  const published = results.filter((result) => result.status === 'published').length
   return {
     claimed: claimed.length,
     processed: results.length,
@@ -490,11 +565,15 @@ export async function runCandidatePublicationBatch(options: { fastTrackLimit?: n
     aiReviewClaimed: reviewed.length,
     retryClaimed: retries.length,
     timeBudgetReached,
-    published: results.filter((result) => result.status === 'published').length,
+    published,
     rejected: results.filter((result) => result.status === 'rejected').length,
     retries: results.filter((result) => result.status === 'retry').length,
     errors: results.filter((result) => result.status === 'error').length,
     rateLimited: results.some((result) => 'rateLimited' in result && result.rateLimited),
+    dailyTarget,
+    publishedLast24Hours,
+    remainingDailyTarget: Math.max(remainingDailyTarget - published, 0),
+    targetReached: publishedLast24Hours + published >= dailyTarget,
     slugs: results.map((result) => result.slug).filter((slug): slug is string => Boolean(slug)),
   }
 }

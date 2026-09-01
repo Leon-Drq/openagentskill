@@ -303,6 +303,7 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
       reviewTotal: review.totalScore,
       tags,
     })
+    const sourceContentHash = createHash('sha256').update(input.skill.document).digest('hex')
     const skillPayload = {
       slug,
       name: input.skill.frontmatter.name,
@@ -327,6 +328,7 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
       listing_status: 'reviewed',
       source_ref: input.skill.ref,
       source_path: input.skill.path,
+      source_content_hash: sourceContentHash,
       publisher_github: input.makerGithub || null,
       publisher_x: input.makerX || null,
       publisher_verified: false,
@@ -357,7 +359,8 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
       const { data: existing } = await supabase
         .from('skills')
         .select('id, slug')
-        .eq('slug', slug)
+        .or(`slug.eq.${slug},source_content_hash.eq.${sourceContentHash}`)
+        .limit(1)
         .maybeSingle()
       const { error: duplicateError } = await supabase
         .from('skill_submissions')

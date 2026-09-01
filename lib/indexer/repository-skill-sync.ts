@@ -59,6 +59,8 @@ export interface RepositorySkillSyncOptions {
   refreshExisting?: boolean
   /** Fast-track is deterministic and is re-checked immediately before publication. */
   reviewMode?: 'ai' | 'fast-track'
+  /** Automatic discovery may set a star floor; direct user submissions do not use this option. */
+  minimumStarsForNew?: number
 }
 
 function slugPart(value: string) {
@@ -397,6 +399,7 @@ export async function syncRepositorySkills(
   const selected = orderedSkills(matchedSkills, existing, maxSkills)
   const entries: RepositorySkillSyncEntry[] = []
   const discoverySource = options.discoverySource || 'recursive-skill-source-sync'
+  const minimumStarsForNew = Math.max(0, Math.floor(options.minimumStarsForNew || 0))
 
   for (const item of selected) {
     const { skill, existing: existingSkill } = item
@@ -407,6 +410,39 @@ export async function syncRepositorySkills(
     }
 
     try {
+      if (!existingSkill && repository.stars < minimumStarsForNew) {
+        entries.push({
+          slug: fallbackSlug,
+          name: skill.frontmatter.name,
+          path: skill.path,
+          sourceUrl: skill.sourceUrl,
+          status: 'rejected',
+          reason: `Automatic discovery requires at least ${minimumStarsForNew} GitHub stars.`,
+        })
+        continue
+      }
+      if (!existingSkill) {
+        const sourceHash = contentHash(skill.document)
+        const { data: duplicateContent, error: duplicateContentError } = await supabase
+          .from('skills')
+          .select('slug')
+          .eq('source_content_hash', sourceHash)
+          .eq('ai_review_approved', true)
+          .limit(1)
+          .maybeSingle()
+        if (duplicateContentError) throw new Error(`Published content dedupe lookup failed: ${duplicateContentError.message}`)
+        if (duplicateContent?.slug) {
+          entries.push({
+            slug: fallbackSlug,
+            name: skill.frontmatter.name,
+            path: skill.path,
+            sourceUrl: skill.sourceUrl,
+            status: 'rejected',
+            reason: `Exact content already exists as ${duplicateContent.slug}.`,
+          })
+          continue
+        }
+      }
       if (existingSkill && options.reviewMode === 'fast-track') {
         entries.push({
           slug: fallbackSlug,

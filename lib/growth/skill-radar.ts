@@ -10,6 +10,7 @@ import { searchHotSkillRepos, type HotSkillDiscoveryResult } from '@/lib/indexer
 import { searchXSkillRadarRepos, type XSkillRadarResult } from '@/lib/indexer/x-skill-radar'
 import { processRepo, type ProcessResult } from '@/lib/indexer/processor'
 import type { CandidateRepo } from '@/lib/indexer/github-search'
+import { AUTOMATIC_DISCOVERY_MIN_STARS } from '@/lib/indexer/intake-policy'
 import { createPublicClient } from '@/lib/supabase/public'
 import type { XQueueBuildResult } from '@/lib/x/growth'
 import type { XPostResult } from '@/lib/x/poster'
@@ -274,10 +275,13 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
   const startedAt = new Date().toISOString()
   const runKey = new Date().toISOString().replace(/[:.]/g, '-')
   const targetNew = Math.min(Math.max(options.targetNew ?? numberFromEnv('SKILL_RADAR_TARGET_NEW', 2), 1), 12)
-  const minStars = Math.max(options.minStars ?? numberFromEnv('SKILL_RADAR_MIN_STARS', 10), 10)
+  const minStars = Math.max(
+    options.minStars ?? numberFromEnv('SKILL_RADAR_MIN_STARS', AUTOMATIC_DISCOVERY_MIN_STARS),
+    AUTOMATIC_DISCOVERY_MIN_STARS
+  )
   const xMinStars = Math.max(
-    options.xMinStars ?? nonNegativeNumberFromEnv('SKILL_RADAR_X_MIN_STARS', 0),
-    0
+    options.xMinStars ?? nonNegativeNumberFromEnv('SKILL_RADAR_X_MIN_STARS', AUTOMATIC_DISCOVERY_MIN_STARS),
+    AUTOMATIC_DISCOVERY_MIN_STARS
   )
   const seoPerRun = Math.min(
     Math.max(options.seoPerRun ?? 0, 0),
