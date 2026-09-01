@@ -23,7 +23,7 @@ export default {
     safety: 'Safety Gate',
     cli: 'CLI',
     forCreators: 'For Creators',
-    creatorConsole: 'Creator Console',
+    creatorConsole: 'Creator Center',
     creators: 'Creator Registry',
     creatorKit: 'Creator Kit',
     learn: 'Learn',

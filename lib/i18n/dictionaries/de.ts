@@ -26,7 +26,7 @@ const de = {
     safety: 'Sicherheitsprüfung',
     cli: 'CLI',
     forCreators: 'Für Creator',
-    creatorConsole: 'Creator-Konsole',
+    creatorConsole: 'Creator-Center',
     creators: 'Creator-Verzeichnis',
     creatorKit: 'Creator-Kit',
     learn: 'Lernen',

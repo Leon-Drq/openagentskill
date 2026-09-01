@@ -26,7 +26,7 @@ const id = {
     safety: 'Pemeriksaan Keamanan',
     cli: 'CLI',
     forCreators: 'Untuk Kreator',
-    creatorConsole: 'Konsol Kreator',
+    creatorConsole: 'Pusat Kreator',
     creators: 'Registri Kreator',
     creatorKit: 'Kit Kreator',
     learn: 'Pelajari',
