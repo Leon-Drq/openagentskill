@@ -283,10 +283,18 @@ export async function getBlogPostBySlug(slug: string) {
 }
 
 export async function getBlogHubData(): Promise<BlogHubData> {
-  const [rows, totalCount] = await Promise.all([
-    fetchApprovedSkillRows(1200),
-    fetchApprovedSkillCount(),
-  ])
+  let rows: BlogSkillRow[] = []
+  let totalCount: number | null = null
+  try {
+    const snapshot = await Promise.all([
+      fetchApprovedSkillRows(1200),
+      fetchApprovedSkillCount(),
+    ])
+    rows = snapshot[0]
+    totalCount = snapshot[1]
+  } catch (error) {
+    console.warn('[blog] using an empty hub snapshot after a transient registry query failure:', error)
+  }
   const previews = rows.map(toSkillPreview)
   const launchWindowHours = 24
   const recentCutoff = Date.now() - launchWindowHours * 60 * 60 * 1000
