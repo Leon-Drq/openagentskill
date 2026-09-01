@@ -8,6 +8,7 @@ import {
   fetchSkillPackageSnapshot,
   parseGitHubSkillReference,
   type DiscoveredGitHubSkill,
+  type GitHubTreeItem,
 } from '@/lib/github/skill-source'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { CandidateRepo } from './github-search'
@@ -238,7 +239,8 @@ async function insertExpandedCandidate(row: Record<string, unknown>) {
 async function buildSkillCandidateRow(
   parent: SkillCandidateRow,
   repository: Awaited<ReturnType<typeof validateGitHubRepo>>,
-  skill: DiscoveredGitHubSkill
+  skill: DiscoveredGitHubSkill,
+  repositoryTree: GitHubTreeItem[] | null
 ) {
   const hash = contentHash(skill.document)
   const sourceKey = buildCandidateSourceKey(repository.id || parent.github_repository_id, repository.fullName, skill.path)
@@ -249,7 +251,7 @@ async function buildSkillCandidateRow(
   let hasUnreviewedFiles = false
 
   if (!duplicate && repository.stars >= 100 && license.status === 'detected') {
-    const snapshot = await fetchSkillPackageSnapshot(skill, { maxFiles: 4 })
+    const snapshot = await fetchSkillPackageSnapshot(skill, { maxFiles: 4, repositoryTree })
     files = snapshot.files
     packageTruncated = snapshot.truncated
     hasUnreviewedFiles = snapshot.hasUnreviewedFiles
@@ -335,7 +337,7 @@ async function validateRepositoryCandidate(candidate: SkillCandidateRow) {
 
     const rows = []
     for (const skill of discovery.skills.slice(0, 20)) {
-      rows.push(await buildSkillCandidateRow(candidate, repository, skill))
+      rows.push(await buildSkillCandidateRow(candidate, repository, skill, discovery.tree))
     }
     const data = (await Promise.all(rows.map(insertExpandedCandidate))).flat()
 

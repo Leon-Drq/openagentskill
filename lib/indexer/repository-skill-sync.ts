@@ -10,6 +10,7 @@ import {
   fetchSkillPackageSnapshot,
   parseGitHubSkillReference,
   type DiscoveredGitHubSkill,
+  type GitHubTreeItem,
 } from '@/lib/github/skill-source'
 import { analyzeCode } from '@/lib/security/static-analysis'
 import { evaluateSkillSubmissionPolicy } from '@/lib/skills/submission-policy'
@@ -172,13 +173,15 @@ async function payloadForNew(
   discoverySource: string,
   discoveryMetadata?: Record<string, unknown>,
   reviewMode: 'ai' | 'fast-track' = 'ai',
-  slugOverride?: string
+  slugOverride?: string,
+  repositoryTree?: GitHubTreeItem[] | null
 ) {
-  const delegatedSkill = await fetchDelegatedGitHubSkill(skill)
-  const packageSnapshots = await Promise.all([
-    fetchSkillPackageSnapshot(skill),
-    delegatedSkill ? fetchSkillPackageSnapshot(delegatedSkill) : Promise.resolve(null),
-  ])
+  const delegatedSkill = await fetchDelegatedGitHubSkill(skill, repositoryTree)
+  const primarySnapshot = await fetchSkillPackageSnapshot(skill, { repositoryTree })
+  const delegatedSnapshot = delegatedSkill
+    ? await fetchSkillPackageSnapshot(delegatedSkill, { repositoryTree })
+    : null
+  const packageSnapshots = [primarySnapshot, delegatedSnapshot]
   const codeFiles = packageSnapshots.flatMap((snapshot) => snapshot?.files || [])
   const packageTruncated = packageSnapshots.some((snapshot) => Boolean(snapshot?.truncated))
   const hasUnreviewedFiles = packageSnapshots.some((snapshot) => Boolean(snapshot?.hasUnreviewedFiles))
@@ -426,7 +429,8 @@ export async function syncRepositorySkills(
             discoverySource,
             options.discoveryMetadata,
             options.reviewMode || 'ai',
-            resolvedSlug
+            resolvedSlug,
+            discovery.tree
           )
 
       if (!result.payload) {
