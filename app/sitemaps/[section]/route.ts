@@ -3,6 +3,7 @@ import {
   getBestSitemapEntries,
   getCoreSitemapEntries,
   getGuideSitemapEntries,
+  getCreatorSitemapEntries,
   getRankingSitemapEntries,
   getSkillSitemapEntries,
   renderUrlSet,
@@ -18,7 +19,7 @@ const SHARDED_SECTION_PREFIXES: Array<[RegExp, SitemapSection]> = [
 
 const RETIRED_SHARDED_SITEMAPS = /^(skill-audits|skill-evals|alternatives)-(\d+)\.xml$/
 
-function staticEntriesFor(section: string) {
+async function staticEntriesFor(section: string) {
   const now = new Date()
 
   switch (section) {
@@ -30,6 +31,8 @@ function staticEntriesFor(section: string) {
       return getRankingSitemapEntries(now)
     case 'guides.xml':
       return getGuideSitemapEntries(now)
+    case 'creators.xml':
+      return getCreatorSitemapEntries()
     default:
       return null
   }
@@ -40,7 +43,7 @@ export async function GET(
   { params }: { params: Promise<{ section: string }> }
 ) {
   const { section } = await params
-  const staticEntries = staticEntriesFor(section)
+  const staticEntries = await staticEntriesFor(section)
 
   if (staticEntries) {
     // Static section entries change at editorial cadence, not whenever this

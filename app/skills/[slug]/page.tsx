@@ -1770,6 +1770,17 @@ export default async function SkillDetailPage({
                   ))}
               </dl>
 
+              {dbSkill?.source_sync_status && dbSkill.source_sync_status !== 'untracked' ? (
+                <div className="mt-5 border border-border bg-muted/20 p-4">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-secondary">Source provenance</p>
+                  <dl className="mt-3 grid gap-3 text-xs sm:grid-cols-3">
+                    <div><dt className="text-secondary">Commit</dt><dd className="mt-1 font-mono">{dbSkill.source_commit_sha?.slice(0, 7) || 'Tracked'}</dd></div>
+                    <div><dt className="text-secondary">Sync status</dt><dd className="mt-1 font-mono capitalize">{dbSkill.source_sync_status}</dd></div>
+                    <div><dt className="text-secondary">License evidence</dt><dd className="mt-1 font-mono capitalize">{(dbSkill.license_status || 'unknown')} · {(dbSkill.license_source || 'unknown').replaceAll('_', ' ')}</dd></div>
+                  </dl>
+                </div>
+              ) : null}
+
               {skill.technical.frameworks.length > 0 && (
                 <div className="mt-5">
                   <p className="text-xs text-secondary mb-2">
@@ -2140,6 +2151,8 @@ export default async function SkillDetailPage({
                         github_username: approvedClaim.github_username,
                         x_username: approvedClaim.x_username,
                         evidence_url: approvedClaim.evidence_url,
+                        verification_tier: approvedClaim.verification_tier,
+                        verified_at: approvedClaim.verified_at,
                       }
                     : null
                 }

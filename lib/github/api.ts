@@ -77,6 +77,25 @@ export async function validateGitHubRepo(
   }
 }
 
+export async function fetchRepositoryCommitSha(owner: string, repo: string, ref: string): Promise<string | null> {
+  const response = await fetch(
+    `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/commits/${encodeURIComponent(ref)}`,
+    {
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        ...(process.env.GITHUB_TOKEN && {
+          'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+        }),
+      },
+      signal: AbortSignal.timeout(12_000),
+    }
+  )
+
+  if (!response.ok) return null
+  const data = await response.json() as { sha?: string }
+  return typeof data.sha === 'string' && /^[a-f0-9]{40}$/i.test(data.sha) ? data.sha : null
+}
+
 // Fetch README content
 export async function fetchReadme(owner: string, repo: string): Promise<string> {
   const response = await fetch(

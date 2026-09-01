@@ -30,8 +30,18 @@ export async function updateCreatorProfile(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login?next=/creator')
 
-  const githubUsername = parsed.data.github_username.toLowerCase() || null
-  const xUsername = parsed.data.x_username.toLowerCase() || null
+  const { data: currentProfile } = await supabase
+    .from('profiles')
+    .select('github_username,github_verified_at,x_username,x_verified_at')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  const githubUsername = currentProfile?.github_verified_at
+    ? currentProfile.github_username
+    : parsed.data.github_username.toLowerCase() || null
+  const xUsername = currentProfile?.x_verified_at
+    ? currentProfile.x_username
+    : parsed.data.x_username.toLowerCase() || null
   const { error } = await supabase.from('profiles').upsert({
     id: user.id,
     username: parsed.data.username.toLowerCase(),

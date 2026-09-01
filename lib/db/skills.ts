@@ -46,6 +46,14 @@ export interface SkillRecord {
   quality_signals: Record<string, unknown> | null
   github_language: string | null
   github_last_pushed_at: string | null
+  last_synced_at?: string | null
+  source_ref?: string | null
+  source_path?: string | null
+  source_commit_sha?: string | null
+  source_content_hash?: string | null
+  source_sync_status?: 'untracked' | 'current' | 'changed' | 'error'
+  license_source?: 'skill_frontmatter' | 'github_repository' | 'manual' | 'unknown'
+  license_status?: 'detected' | 'missing' | 'unknown' | 'restricted'
   created_at: string
   updated_at: string
 }
@@ -570,6 +578,9 @@ export interface SkillClaimRecord {
   metadata: Record<string, unknown> | null
   created_at: string
   updated_at: string
+  verified_at: string | null
+  verification_tier: 'maintainer' | 'official'
+  challenge_expires_at?: string | null
 }
 
 /**
@@ -790,7 +801,7 @@ export async function getApprovedClaimBySkillSlug(skillSlug: string): Promise<Sk
   const supabase = createPublicClient()
   const { data, error } = await supabase
     .from('skill_claims')
-    .select('*')
+    .select('id,skill_slug,user_id,github_username,x_username,repo_url,verification_method,evidence_url,evidence_note,status,reviewer_note,metadata,created_at,updated_at,verified_at,verification_tier,challenge_expires_at')
     .eq('skill_slug', skillSlug)
     .eq('status', 'approved')
     .order('created_at', { ascending: true })

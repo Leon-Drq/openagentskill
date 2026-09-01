@@ -19,6 +19,7 @@ import { SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { SKILL_PACKS } from '@/lib/skill-packs'
 import { USE_CASES } from '@/lib/use-cases'
+import { createPublicClient } from '@/lib/supabase/public'
 import {
   SEARCH_INDEX_MIN_GITHUB_STARS,
   SEARCH_INDEX_MIN_QUALITY_SCORE,
@@ -125,6 +126,7 @@ export async function getSitemapIndexEntries() {
     { loc: `${SITEMAP_BASE_URL}/sitemaps/best.xml` },
     { loc: `${SITEMAP_BASE_URL}/sitemaps/rankings.xml` },
     { loc: `${SITEMAP_BASE_URL}/sitemaps/guides.xml` },
+    { loc: `${SITEMAP_BASE_URL}/sitemaps/creators.xml` },
   ]
 
   const skillSections = [
@@ -178,6 +180,7 @@ export function getCoreSitemapEntries(now = new Date()): SitemapEntry[] {
     { url: `${SITEMAP_BASE_URL}/docs`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${SITEMAP_BASE_URL}/cli`, lastModified: now, changeFrequency: 'weekly', priority: 0.86 },
     { url: `${SITEMAP_BASE_URL}/creator-kit`, lastModified: now, changeFrequency: 'weekly', priority: 0.82 },
+    { url: `${SITEMAP_BASE_URL}/creators`, lastModified: now, changeFrequency: 'daily', priority: 0.86 },
     { url: `${SITEMAP_BASE_URL}/x-kit`, lastModified: now, changeFrequency: 'daily', priority: 0.74 },
     { url: `${SITEMAP_BASE_URL}/activity`, lastModified: now, changeFrequency: 'hourly', priority: 0.6 },
   ]
@@ -289,6 +292,35 @@ export function getGuideSitemapEntries(now = new Date()): SitemapEntry[] {
     lastModified: now,
     changeFrequency: 'weekly',
     priority: guide.intent === 'compare' ? 0.86 : 0.88,
+  }))
+}
+
+export async function getCreatorSitemapEntries(): Promise<SitemapEntry[]> {
+  const supabase = createPublicClient({ requestTimeoutMs: 6_500 })
+  const { data: claims, error: claimError } = await supabase
+    .from('skill_claims')
+    .select('user_id,verified_at')
+    .eq('status', 'approved')
+    .limit(1000)
+  if (claimError || !claims?.length) return []
+
+  const latestByUser = new Map<string, string | null>()
+  for (const claim of claims) {
+    const current = latestByUser.get(claim.user_id)
+    if (!current || (claim.verified_at && claim.verified_at > current)) latestByUser.set(claim.user_id, claim.verified_at)
+  }
+  const { data: profiles, error: profileError } = await supabase
+    .from('profiles')
+    .select('id,username,updated_at')
+    .in('id', Array.from(latestByUser.keys()))
+    .not('username', 'is', null)
+  if (profileError) return []
+
+  return (profiles || []).map((profile) => ({
+    url: `${SITEMAP_BASE_URL}/creators/${profile.username}`,
+    lastModified: profile.updated_at || latestByUser.get(profile.id) || undefined,
+    changeFrequency: 'weekly' as const,
+    priority: 0.76,
   }))
 }
 

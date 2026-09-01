@@ -51,6 +51,7 @@ type NavLabelKey =
   | 'cli'
   | 'forCreators'
   | 'creatorConsole'
+  | 'creators'
   | 'creatorKit'
   | 'submitSkill'
   | 'learn'
@@ -86,6 +87,7 @@ const agentItems: NavItem[] = [
 
 const creatorItems: NavItem[] = [
   { href: '/submit', labelKey: 'submitSkill', icon: Plus },
+  { href: '/creators', labelKey: 'creators', icon: UserRound },
   { href: '/creator', labelKey: 'creatorConsole', icon: UserRound },
   { href: '/creator-kit', labelKey: 'creatorKit', icon: Wrench },
 ]
