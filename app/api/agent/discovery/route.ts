@@ -644,7 +644,7 @@ export async function GET() {
     skill_radar: {
       status: 'active',
       private_endpoint: '/api/cron/skill-radar',
-      schedule: SKILL_RADAR_CRON_MINUTE_UTC,
+      schedule: `${SKILL_RADAR_CRON_MINUTE_UTC} * * * *`,
       sources: ['X posts with GitHub links', 'GitHub hot skill search'],
       strategy:
         'Use social and GitHub freshness as candidate signals only; every repo still passes GitHub metadata checks, MCP exclusion, AI review, Trust/Audit surfaces, SEO drip, IndexNow, and X queue guards.',

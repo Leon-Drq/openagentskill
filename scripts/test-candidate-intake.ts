@@ -104,7 +104,7 @@ assert.equal(
 )
 
 const discoveryStatusRoute = readFileSync(new URL('../app/api/agent/discovery/route.ts', import.meta.url), 'utf8')
-assert.ok(discoveryStatusRoute.includes('schedule: SKILL_RADAR_CRON_MINUTE_UTC'))
+assert.ok(discoveryStatusRoute.includes('schedule: `${SKILL_RADAR_CRON_MINUTE_UTC} * * * *`'))
 assert.ok(!discoveryStatusRoute.includes('at least 10 GitHub stars'))
 
 const xStatusRoute = readFileSync(new URL('../app/api/x/status/route.ts', import.meta.url), 'utf8')
