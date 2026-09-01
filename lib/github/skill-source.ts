@@ -356,6 +356,7 @@ const REVIEWABLE_EXTENSIONS = new Set([
   '.md', '.txt', '.json', '.yaml', '.yml', '.toml', '.sh', '.bash', '.zsh',
   '.js', '.mjs', '.cjs', '.ts', '.tsx', '.py', '.go', '.rs', '.java', '.rb',
 ])
+const SAFE_ASSET_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.pdf'])
 
 function extension(path: string) {
   const file = path.slice(path.lastIndexOf('/') + 1)
@@ -363,27 +364,56 @@ function extension(path: string) {
   return dot >= 0 ? file.slice(dot).toLowerCase() : ''
 }
 
-export async function fetchSkillPackageFiles(skill: DiscoveredGitHubSkill) {
+export async function fetchSkillPackageSnapshot(
+  skill: DiscoveredGitHubSkill,
+  options: { maxFiles?: number } = {}
+) {
   const { tree } = await fetchRepositoryTree(skill.owner, skill.repo, skill.ref)
   const prefix = skill.directory ? `${skill.directory}/` : ''
-  const paths = tree
+  const packageItems = tree
     .filter((item) => item.type === 'blob')
     .filter((item) => !prefix || item.path.startsWith(prefix))
-    .filter((item) => REVIEWABLE_EXTENSIONS.has(extension(item.path)))
     .filter((item) => !/(^|\/)(node_modules|dist|build|vendor|\.git)(\/|$)/i.test(item.path))
     .filter((item) => !item.size || item.size <= MAX_FILE_BYTES)
+  const reviewablePaths = packageItems
+    .filter((item) => REVIEWABLE_EXTENSIONS.has(extension(item.path)))
     .sort((a, b) => {
       if (a.path === skill.path) return -1
       if (b.path === skill.path) return 1
       return a.path.localeCompare(b.path)
     })
-    .slice(0, MAX_PACKAGE_FILES)
     .map((item) => item.path)
+  const maxFiles = Math.min(Math.max(Math.floor(options.maxFiles || MAX_PACKAGE_FILES), 1), MAX_PACKAGE_FILES)
+  const paths = reviewablePaths.slice(0, maxFiles)
 
-  return Promise.all(paths.map(async (path) => ({
+  const files = await Promise.all(paths.map(async (path) => ({
     path,
     content: path === skill.path
       ? skill.document
       : await fetchRepositoryFile(skill.owner, skill.repo, skill.ref, path).catch(() => ''),
   })))
+  const unreviewedPaths = packageItems
+    .map((item) => item.path)
+    .filter((path) => {
+      const ext = extension(path)
+      const fileName = path.slice(path.lastIndexOf('/') + 1)
+      return !REVIEWABLE_EXTENSIONS.has(ext) &&
+        !SAFE_ASSET_EXTENSIONS.has(ext) &&
+        !/^(LICENSE|COPYING|NOTICE)(?:\.[A-Za-z0-9-]+)?$/i.test(fileName)
+    })
+
+  return {
+    files,
+    totalFiles: reviewablePaths.length,
+    truncated: reviewablePaths.length > files.length,
+    hasUnreviewedFiles: unreviewedPaths.length > 0,
+    unreviewedPaths: unreviewedPaths.slice(0, 5),
+  }
+}
+
+export async function fetchSkillPackageFiles(
+  skill: DiscoveredGitHubSkill,
+  options: { maxFiles?: number } = {}
+) {
+  return (await fetchSkillPackageSnapshot(skill, options)).files
 }

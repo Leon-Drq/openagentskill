@@ -9,6 +9,7 @@ interface HotSkillQuery {
 }
 
 interface GitHubRepoItem {
+  id: number
   name: string
   full_name: string
   description: string | null
@@ -45,11 +46,22 @@ export interface HotSkillDiscoveryResult {
   minStars: number
   lookbackDays: number
   since: string
+  rateLimited: boolean
+  retryAfterMs: number | null
 }
 
 const GITHUB_API_BASE = 'https://api.github.com'
 const GITHUB_SEARCH_TIMEOUT_MS = 10_000
 const GITHUB_SEARCH_RETRY_DELAYS_MS = [750, 1_750]
+const AUTHENTICATED_SEARCH_INTERVAL_MS = 2_100
+const UNAUTHENTICATED_SEARCH_INTERVAL_MS = 6_100
+
+class GitHubSearchRateLimitError extends Error {
+  constructor(message: string, public retryAfterMs: number | null) {
+    super(message)
+    this.name = 'GitHubSearchRateLimitError'
+  }
+}
 
 const HOT_SKILL_QUERIES: HotSkillQuery[] = [
   { q: '"agent skill"', sort: 'updated' },
@@ -96,6 +108,12 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+function searchIntervalMs() {
+  return process.env.GITHUB_TOKEN
+    ? AUTHENTICATED_SEARCH_INTERVAL_MS
+    : UNAUTHENTICATED_SEARCH_INTERVAL_MS
+}
+
 function rotatedWindow<T>(items: readonly T[], count: number, offset: number) {
   if (!items.length || count <= 0) return []
 
@@ -120,6 +138,7 @@ function scoreHotRepo(repo: GitHubRepoItem) {
 
 function toCandidate(repo: GitHubRepoItem): CandidateRepo {
   return {
+    githubId: repo.id,
     owner: repo.owner.login,
     repo: repo.name,
     fullName: repo.full_name,
@@ -128,6 +147,7 @@ function toCandidate(repo: GitHubRepoItem): CandidateRepo {
     language: repo.language ?? null,
     topics: repo.topics || [],
     updatedAt: repo.updated_at,
+    pushedAt: repo.pushed_at,
     htmlUrl: repo.html_url,
   }
 }
@@ -153,7 +173,7 @@ async function searchHotQuery(query: HotSkillQuery, options: {
       })
     } catch (error) {
       if (attempt === GITHUB_SEARCH_RETRY_DELAYS_MS.length) throw error
-      await sleep(GITHUB_SEARCH_RETRY_DELAYS_MS[attempt])
+      await sleep(Math.max(GITHUB_SEARCH_RETRY_DELAYS_MS[attempt], searchIntervalMs()))
       continue
     }
 
@@ -162,9 +182,24 @@ async function searchHotQuery(query: HotSkillQuery, options: {
       return (data.items || []).filter((repo) => !repo.archived && !repo.fork)
     }
 
-    const retryable = [429, 502, 503, 504].includes(response.status)
+    const rateLimited = response.status === 403 || response.status === 429
     const body = await response.text().catch(() => '')
     const detail = body.replace(/\s+/g, ' ').slice(0, 180)
+    if (rateLimited) {
+      const retryAfterSeconds = Number(response.headers.get('retry-after'))
+      const resetSeconds = Number(response.headers.get('x-ratelimit-reset'))
+      const retryAfterMs = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
+        ? Math.min(retryAfterSeconds * 1_000, 3_600_000)
+        : Number.isFinite(resetSeconds) && resetSeconds > 0
+          ? Math.min(Math.max(resetSeconds * 1_000 - Date.now(), 60_000), 3_600_000)
+          : 60_000
+      throw new GitHubSearchRateLimitError(
+        `GitHub search rate limit reached: ${response.status} ${detail}`,
+        retryAfterMs
+      )
+    }
+
+    const retryable = [502, 503, 504].includes(response.status)
     if (!retryable || attempt === GITHUB_SEARCH_RETRY_DELAYS_MS.length) {
       throw new Error(`GitHub hot search failed [${q}]: ${response.status} ${detail}`)
     }
@@ -174,7 +209,7 @@ async function searchHotQuery(query: HotSkillQuery, options: {
     const retryDelay = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
       ? Math.min(retryAfterSeconds * 1_000, 10_000)
       : fallbackDelay
-    await sleep(retryDelay)
+    await sleep(Math.max(retryDelay, searchIntervalMs()))
   }
 
   return []
@@ -183,16 +218,19 @@ async function searchHotQuery(query: HotSkillQuery, options: {
 export async function searchHotSkillRepos(
   options: HotSkillDiscoveryOptions = {}
 ): Promise<HotSkillDiscoveryResult> {
-  const limit = Math.min(Math.max(options.limit || 24, 1), 80)
+  const limit = Math.min(Math.max(options.limit || 24, 1), 2_000)
   const minStars = Math.max(Math.floor(options.minStars || 10), 10)
   const lookbackDays = Math.min(Math.max(Math.floor(options.lookbackDays || 21), 1), 90)
-  const perPage = Math.min(Math.max(options.perPage || 12, 5), 30)
-  const maxQueries = Math.min(Math.max(options.maxQueries || 12, 1), HOT_SKILL_QUERIES.length)
+  const perPage = Math.min(Math.max(options.perPage || 12, 5), 100)
+  const maxQueries = Math.min(Math.max(options.maxQueries || 12, 1), Math.min(HOT_SKILL_QUERIES.length, 22))
   const queryOffset = Math.max(0, Math.floor(options.queryOffset ?? 0))
   const since = isoDateDaysAgo(lookbackDays)
   const seen = new Set<string>()
   const repos: GitHubRepoItem[] = []
   let searchedQueries = 0
+  let rateLimited = false
+  let retryAfterMs: number | null = null
+  const requestIntervalMs = searchIntervalMs()
 
   for (const query of rotatedWindow(HOT_SKILL_QUERIES, maxQueries, queryOffset)) {
     if (repos.length >= limit * 3) break
@@ -201,7 +239,7 @@ export async function searchHotSkillRepos(
     // Repeating the first GitHub result page eventually only returns skills we
     // already know. Rotate through a small, recent result window so hourly
     // runs keep discovering fresh candidates without increasing API traffic.
-    const page = 1 + ((queryOffset + searchedQueries - 1) % 3)
+    const page = 1 + ((queryOffset + searchedQueries - 1) % 10)
 
     try {
       const items = await searchHotQuery(query, { minStars, since, perPage, page })
@@ -221,10 +259,16 @@ export async function searchHotSkillRepos(
         repos.push(repo)
       }
     } catch (error) {
+      if (error instanceof GitHubSearchRateLimitError) {
+        rateLimited = true
+        retryAfterMs = error.retryAfterMs
+        console.warn('[hot-skill-discovery] stopping this window after rate limit:', error.message)
+        break
+      }
       console.warn('[hot-skill-discovery] query skipped:', error)
     }
 
-    if (searchedQueries < maxQueries) await sleep(process.env.GITHUB_TOKEN ? 500 : 1200)
+    if (searchedQueries < maxQueries) await sleep(requestIntervalMs)
   }
 
   const candidates = repos
@@ -239,5 +283,7 @@ export async function searchHotSkillRepos(
     minStars,
     lookbackDays,
     since,
+    rateLimited,
+    retryAfterMs,
   }
 }

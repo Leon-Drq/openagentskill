@@ -43,6 +43,8 @@ export interface CandidateDiscovery {
 }
 
 export interface CandidateRepo {
+  /** Stable GitHub repository id; preferred over owner/name for deduplication. */
+  githubId?: number
   owner: string
   repo: string
   fullName: string
@@ -51,6 +53,7 @@ export interface CandidateRepo {
   language: string | null
   topics?: string[]
   updatedAt: string
+  pushedAt?: string | null
   htmlUrl: string
   /** Exact GitHub tree/blob URL when discovery points to one SKILL.md package. */
   skillSourceUrl?: string

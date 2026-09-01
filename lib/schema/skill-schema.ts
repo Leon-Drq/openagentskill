@@ -83,6 +83,7 @@ export type SkillSubmission = z.infer<typeof SkillSubmissionSchema>
 
 // GitHub repo validation result
 export const GitHubRepoSchema = z.object({
+  id: z.number().int().positive().optional(),
   owner: z.string(),
   repo: z.string(),
   fullName: z.string(),
@@ -92,6 +93,7 @@ export const GitHubRepoSchema = z.object({
   language: z.string().optional(),
   license: z.string().optional(),
   updatedAt: z.string(),
+  pushedAt: z.string().nullable().optional(),
   defaultBranch: z.string(),
   hasReadme: z.boolean(),
   hasSkillJson: z.boolean(),
