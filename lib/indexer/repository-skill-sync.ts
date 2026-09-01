@@ -7,7 +7,7 @@ import { fetchRepositoryCommitSha, validateGitHubRepo } from '@/lib/github/api'
 import {
   discoverGitHubSkills,
   fetchDelegatedGitHubSkill,
-  fetchSkillPackageFiles,
+  fetchSkillPackageSnapshot,
   parseGitHubSkillReference,
   type DiscoveredGitHubSkill,
 } from '@/lib/github/skill-source'
@@ -17,6 +17,7 @@ import { estimateSubmissionQuality } from '@/lib/skills/submission-quality'
 import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getLicenseEvidence } from '@/lib/creator-ownership'
+import { evaluateFastTrackCandidate } from '@/lib/indexer/fast-track'
 
 const DEFAULT_MAX_SKILLS_PER_REPOSITORY = 8
 const MAX_SKILLS_PER_REPOSITORY = 20
@@ -53,6 +54,8 @@ export interface RepositorySkillSyncOptions {
   skillNames?: string[]
   maxSkills?: number
   refreshExisting?: boolean
+  /** Fast-track is deterministic and is re-checked immediately before publication. */
+  reviewMode?: 'ai' | 'fast-track'
 }
 
 function slugPart(value: string) {
@@ -142,7 +145,7 @@ function payloadForExisting(
     github_stars: repository.stars,
     github_forks: repository.forks,
     github_language: repository.language || existing.github_language || null,
-    github_last_pushed_at: repository.updatedAt,
+    github_last_pushed_at: repository.pushedAt || repository.updatedAt,
     long_description: skill.document.slice(0, 12_000),
     version: normalizeVersion(skill.frontmatter.version || existing.version),
     license: license.license,
@@ -165,14 +168,18 @@ async function payloadForNew(
   skill: DiscoveredGitHubSkill,
   repository: Awaited<ReturnType<typeof validateGitHubRepo>>,
   discoverySource: string,
-  discoveryMetadata?: Record<string, unknown>
+  discoveryMetadata?: Record<string, unknown>,
+  reviewMode: 'ai' | 'fast-track' = 'ai',
+  slugOverride?: string
 ) {
   const delegatedSkill = await fetchDelegatedGitHubSkill(skill)
-  const packageGroups = await Promise.all([
-    fetchSkillPackageFiles(skill),
-    delegatedSkill ? fetchSkillPackageFiles(delegatedSkill) : Promise.resolve([]),
+  const packageSnapshots = await Promise.all([
+    fetchSkillPackageSnapshot(skill),
+    delegatedSkill ? fetchSkillPackageSnapshot(delegatedSkill) : Promise.resolve(null),
   ])
-  const codeFiles = packageGroups.flat()
+  const codeFiles = packageSnapshots.flatMap((snapshot) => snapshot?.files || [])
+  const packageTruncated = packageSnapshots.some((snapshot) => Boolean(snapshot?.truncated))
+  const hasUnreviewedFiles = packageSnapshots.some((snapshot) => Boolean(snapshot?.hasUnreviewedFiles))
   const reviewDocument = delegatedSkill
     ? [
         skill.document,
@@ -188,44 +195,77 @@ async function payloadForNew(
       reason: staticAnalysis.issues.slice(0, 2).join('; ') || 'Static security analysis rejected the skill.',
     }
   }
+  const license = getLicenseEvidence(skill.frontmatter.license, repository.license)
+  let reviewScores: { security: number; quality: number; usefulness: number; compliance: number }
+  let reviewTotal: number
+  let reviewSource: string
+  let reviewIssues: string[]
+  let reviewSuggestions: string[]
 
-  const review = await reviewSkill({
-    repository: skill.sourceUrl,
-    readmeContent: reviewDocument,
-    codeFiles,
-    manifestData: skill.frontmatter,
-    githubStats: {
+  if (reviewMode === 'fast-track') {
+    const decision = evaluateFastTrackCandidate({
       stars: repository.stars,
-      forks: repository.forks,
-      lastUpdated: repository.updatedAt,
-      license: skill.frontmatter.license || repository.license,
-      language: repository.language,
-    },
-  })
-  const policy = evaluateSkillSubmissionPolicy({
-    stars: repository.stars,
-    hasReadme: repository.hasReadme,
-    hasSkillDocument: true,
-    staticAnalysis,
-    review,
-  })
-  if (!policy.approved) {
-    return {
-      payload: null,
-      reason: policy.issues.slice(0, 2).join('; ') || 'Automated review did not approve this skill.',
+      licenseStatus: license.status,
+      updatedAt: repository.pushedAt || repository.updatedAt,
+      document: reviewDocument,
+      files: codeFiles,
+      packageTruncated,
+      hasUnreviewedFiles,
+    })
+    if (!decision.eligible) {
+      return {
+        payload: null,
+        reason: decision.reasons.slice(0, 3).join('; ') || 'Deterministic fast-track safety check failed.',
+      }
     }
+    reviewScores = { security: 9, quality: 8, usefulness: 8, compliance: 9 }
+    reviewTotal = 34
+    reviewSource = 'deterministic-fast-track-v1'
+    reviewIssues = []
+    reviewSuggestions = ['Creator ownership and identity remain unverified until the maintainer claims this skill.']
+  } else {
+    const review = await reviewSkill({
+      repository: skill.sourceUrl,
+      readmeContent: reviewDocument,
+      codeFiles,
+      manifestData: skill.frontmatter,
+      githubStats: {
+        stars: repository.stars,
+        forks: repository.forks,
+        lastUpdated: repository.pushedAt || repository.updatedAt,
+        license: skill.frontmatter.license || repository.license,
+        language: repository.language,
+      },
+    })
+    const policy = evaluateSkillSubmissionPolicy({
+      stars: repository.stars,
+      hasReadme: repository.hasReadme,
+      hasSkillDocument: true,
+      staticAnalysis,
+      review,
+    })
+    if (!policy.approved) {
+      return {
+        payload: null,
+        reason: policy.issues.slice(0, 2).join('; ') || 'Automated review did not approve this skill.',
+      }
+    }
+    reviewScores = review.scores
+    reviewTotal = review.totalScore
+    reviewSource = 'recursive-skill-source-sync'
+    reviewIssues = policy.issues
+    reviewSuggestions = policy.suggestions
   }
 
-  const slug = buildIndexedSkillSlug(repository.owner, skill.frontmatter.name)
+  const slug = slugOverride || buildIndexedSkillSlug(repository.owner, skill.frontmatter.name)
   const tags = normalizeTags(skill, delegatedSkill ? ['skill-alias', 'composed-skill'] : [])
   const quality = estimateSubmissionQuality({
     githubStars: repository.stars,
     githubRepo: repository.fullName,
-    githubUpdatedAt: repository.updatedAt,
-    reviewTotal: review.totalScore,
+    githubUpdatedAt: repository.pushedAt || repository.updatedAt,
+    reviewTotal,
     tags,
   })
-  const license = getLicenseEvidence(skill.frontmatter.license, repository.license)
 
   return {
     reason: null,
@@ -242,7 +282,7 @@ async function payloadForNew(
       github_stars: repository.stars,
       github_forks: repository.forks,
       github_language: repository.language || null,
-      github_last_pushed_at: repository.updatedAt,
+      github_last_pushed_at: repository.pushedAt || repository.updatedAt,
       category: inferIndexedSkillCategory(skill),
       tags,
       frameworks: skill.frontmatter.frameworks,
@@ -256,9 +296,9 @@ async function payloadForNew(
       submission_source: discoverySource,
       submitted_by_agent: 'open-agent-skill-source-sync',
       ai_review_score: {
-        ...review.scores,
-        total: review.totalScore,
-        source: 'recursive-skill-source-sync',
+        ...reviewScores,
+        total: reviewTotal,
+        source: reviewSource,
         source_url: skill.sourceUrl,
         source_ref: skill.ref,
         skill_path: skill.path,
@@ -272,12 +312,37 @@ async function payloadForNew(
           : {}),
       },
       ai_review_approved: true,
-      ai_review_issues: policy.issues,
-      ai_review_suggestions: policy.suggestions,
+      ai_review_issues: reviewIssues,
+      ai_review_suggestions: reviewSuggestions,
       quality_score: quality.score,
       quality_signals: quality.signals,
     },
   }
+}
+
+async function resolveIndexedSkillSlug(
+  client: ReturnType<typeof createPublicClient>,
+  baseSlug: string,
+  sourceUrl: string
+) {
+  const lookup = async (slug: string) => {
+    const { data, error } = await client
+      .from('skills')
+      .select('repository')
+      .eq('slug', slug)
+      .maybeSingle()
+    if (error) throw new Error(`Skill slug collision lookup failed: ${error.message}`)
+    return data as { repository?: string | null } | null
+  }
+
+  const current = await lookup(baseSlug)
+  if (!current || normalizeSourceUrl(current.repository) === normalizeSourceUrl(sourceUrl)) return baseSlug
+
+  const suffix = contentHash(sourceUrl).slice(0, 8)
+  const candidate = `${baseSlug.slice(0, 171)}-${suffix}`
+  const suffixed = await lookup(candidate)
+  if (!suffixed || normalizeSourceUrl(suffixed.repository) === normalizeSourceUrl(sourceUrl)) return candidate
+  return `${baseSlug.slice(0, 167)}-${contentHash(sourceUrl).slice(0, 12)}`
 }
 
 export async function syncRepositorySkills(
@@ -333,9 +398,30 @@ export async function syncRepositorySkills(
     }
 
     try {
+      if (existingSkill && options.reviewMode === 'fast-track') {
+        entries.push({
+          slug: fallbackSlug,
+          name: skill.frontmatter.name,
+          path: skill.path,
+          sourceUrl: skill.sourceUrl,
+          status: 'rejected',
+          reason: 'Fast-track does not update an existing listing; the version-sync pipeline owns existing skills.',
+        })
+        continue
+      }
+      const resolvedSlug = existingSkill
+        ? existingSkill.slug
+        : await resolveIndexedSkillSlug(supabase, fallbackSlug, skill.sourceUrl)
       const result = existingSkill
         ? { payload: payloadForExisting(existingSkill, skill, repository, discoverySource, options.discoveryMetadata), reason: null }
-        : await payloadForNew(skill, repository, discoverySource, options.discoveryMetadata)
+        : await payloadForNew(
+            skill,
+            repository,
+            discoverySource,
+            options.discoveryMetadata,
+            options.reviewMode || 'ai',
+            resolvedSlug
+          )
 
       if (!result.payload) {
         entries.push({

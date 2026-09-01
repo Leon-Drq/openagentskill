@@ -239,6 +239,8 @@ Contributions are welcome across product, APIs, indexing, trust, documentation, 
 
 Project decisions and maintainer responsibilities are documented in [GOVERNANCE.md](./GOVERNANCE.md). Releases are tracked in [CHANGELOG.md](./CHANGELOG.md), and planned work lives in [ROADMAP.md](./ROADMAP.md).
 
+The two-layer discovery, validation, deduplication, fast-track, and GitHub rate-safety design is documented in [docs/candidate-intake-pipeline.md](./docs/candidate-intake-pipeline.md).
+
 ## License
 
 [MIT](./LICENSE) © OpenAgentSkill contributors.

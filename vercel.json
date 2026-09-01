@@ -17,12 +17,24 @@
       "schedule": "5 * * * *"
     },
     {
+      "path": "/api/cron/skill-candidates-discover",
+      "schedule": "10 * * * *"
+    },
+    {
+      "path": "/api/cron/skill-candidates-validate",
+      "schedule": "20,50 * * * *"
+    },
+    {
       "path": "/api/cron/skill-radar",
       "schedule": "35 * * * *"
     },
     {
+      "path": "/api/cron/skill-candidates-publish",
+      "schedule": "40 * * * *"
+    },
+    {
       "path": "/api/cron/skill-source-sync",
-      "schedule": "50 */6 * * *"
+      "schedule": "0 */6 * * *"
     },
     {
       "path": "/api/cron/official-frontend-skills",

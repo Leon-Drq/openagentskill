@@ -462,6 +462,9 @@ export async function GET() {
       : 'hourly GitHub scan; X hotspot scan is disabled until an X search budget is configured',
     indexnow_cron: '15 3 * * *',
     indexnow_frequency: 'daily baseline submission plus automatic submission after new skill imports',
+    candidate_discovery_cron: '10 * * * *',
+    candidate_validation_cron: '20,50 * * * *',
+    candidate_publication_cron: '40 * * * *',
   }
   const estimatedDailyCapacity = scheduledHourlyTargetNew * 24
   const remainingToTarget =
@@ -596,6 +599,38 @@ export async function GET() {
       filters,
       schedule,
     },
+    candidate_pipeline: {
+      status: 'active',
+      kill_switch: 'CANDIDATE_PIPELINE_DISABLED=true',
+      architecture: ['indexed_candidates', 'installable_skills'],
+      discovery_capacity_per_day: 52_800,
+      light_validation_capacity_per_day: 5_760,
+      publication_capacity_per_day: 984,
+      fast_track: {
+        minimum_github_stars: 100,
+        requirements: [
+          'unrestricted detected license',
+          'repository updated within 12 months',
+          'documentation-only package',
+          'low deterministic security risk',
+        ],
+        note: 'Stars are only an adoption signal. Every fast-track skill is scanned again immediately before publication.',
+      },
+      deduplication: [
+        'stable GitHub repository id plus SKILL.md path',
+        'canonical source URL',
+        'exact source content SHA-256 across candidates and published skills',
+        'public skill slug uniqueness',
+      ],
+      github_safety: {
+        authenticated_search_interval_ms: 2100,
+        unauthenticated_search_interval_ms: 6100,
+        maximum_search_queries_per_window: 22,
+        stop_on_403_or_429: true,
+        leased_queue_claims: true,
+        exponential_retry_backoff: true,
+      },
+    },
     skill_radar: {
       status: 'active',
       private_endpoint: '/api/cron/skill-radar',
@@ -716,6 +751,9 @@ export async function GET() {
       private_logs: '/api/indexer/logs',
       private_skill_radar: '/api/cron/skill-radar',
       private_skill_source_sync: '/api/cron/skill-source-sync',
+      private_candidate_discovery: '/api/cron/skill-candidates-discover',
+      private_candidate_validation: '/api/cron/skill-candidates-validate',
+      private_candidate_publication: '/api/cron/skill-candidates-publish',
       private_indexnow_submit: '/api/indexnow/submit',
       public_agent_outcomes: '/api/agent/outcome',
       public_agent_outcomes_text: '/api/agent/outcome?format=text',

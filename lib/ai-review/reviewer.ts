@@ -163,6 +163,7 @@ Return only JSON without markdown fences:
       model: SUBMISSION_REVIEW_MODEL,
       prompt,
       temperature: 0.2,
+      abortSignal: AbortSignal.timeout(20_000),
     })
     const jsonMatch = result.text.match(/\{[\s\S]*\}/)
     if (!jsonMatch) throw new Error('Invalid AI response format')

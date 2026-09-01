@@ -35,6 +35,7 @@ export async function validateGitHubRepo(
         'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
       }),
     },
+    signal: AbortSignal.timeout(12_000),
   })
 
   if (!response.ok) {
@@ -55,13 +56,20 @@ export async function validateGitHubRepo(
   const [readmeResponse, skillJsonResponse] = await Promise.all([
     options.checkReadme === false
       ? null
-      : fetch(`https://api.github.com/repos/${owner}/${repo}/readme`, { headers: optionalHeaders }),
+      : fetch(`https://api.github.com/repos/${owner}/${repo}/readme`, {
+          headers: optionalHeaders,
+          signal: AbortSignal.timeout(12_000),
+        }),
     options.checkSkillJson === false
       ? null
-      : fetch(`https://api.github.com/repos/${owner}/${repo}/contents/skill.json`, { headers: optionalHeaders }),
+      : fetch(`https://api.github.com/repos/${owner}/${repo}/contents/skill.json`, {
+          headers: optionalHeaders,
+          signal: AbortSignal.timeout(12_000),
+        }),
   ])
 
   return {
+    id: typeof data.id === 'number' ? data.id : undefined,
     owner,
     repo,
     fullName: data.full_name,
@@ -71,6 +79,7 @@ export async function validateGitHubRepo(
     language: data.language || undefined,
     license: data.license?.spdx_id || undefined,
     updatedAt: data.updated_at,
+    pushedAt: typeof data.pushed_at === 'string' ? data.pushed_at : null,
     defaultBranch: data.default_branch,
     hasReadme: Boolean(readmeResponse?.ok),
     hasSkillJson: Boolean(skillJsonResponse?.ok),
