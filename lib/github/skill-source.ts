@@ -4,6 +4,7 @@ const GITHUB_API = 'https://api.github.com'
 const MAX_DISCOVERED_SKILLS = 50
 const MAX_PACKAGE_FILES = 30
 const MAX_FILE_BYTES = 120_000
+const GITHUB_READ_DELAY_MS = 100
 
 export interface GitHubSkillReference {
   owner: string
@@ -70,6 +71,17 @@ function githubHeaders() {
     'User-Agent': 'OpenAgentSkill-Submission/2.0',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   }
+}
+
+async function mapGitHubReadsSerially<T, R>(items: T[], mapper: (item: T) => Promise<R>) {
+  const results: R[] = []
+  for (let index = 0; index < items.length; index += 1) {
+    results.push(await mapper(items[index]))
+    if (index + 1 < items.length) {
+      await new Promise((resolve) => setTimeout(resolve, GITHUB_READ_DELAY_MS))
+    }
+  }
+  return results
 }
 
 function cleanSegment(value: string) {
@@ -265,7 +277,7 @@ function sourceUrl(owner: string, repo: string, ref: string, path: string) {
 export async function discoverGitHubSkills(
   reference: GitHubSkillReference,
   repository: GitHubRepo
-): Promise<{ skills: DiscoveredGitHubSkill[]; truncated: boolean }> {
+): Promise<{ skills: DiscoveredGitHubSkill[]; truncated: boolean; tree: GitHubTreeItem[] | null }> {
   const ref = reference.ref || repository.defaultBranch
   const requestedPath = normalizePath(reference.path)
   const exactSkillPath = requestedPath && /(^|\/)SKILL\.md$/i.test(requestedPath)
@@ -274,16 +286,18 @@ export async function discoverGitHubSkills(
 
   let paths: string[] = []
   let truncated = false
+  let tree: GitHubTreeItem[] | null = null
   if (exactSkillPath) {
     paths = [exactSkillPath]
   } else {
     const treeResult = await fetchRepositoryTree(reference.owner, reference.repo, ref)
     truncated = treeResult.truncated
+    tree = treeResult.tree
     paths = selectSkillDocumentPaths(treeResult.tree, requestedPath, MAX_DISCOVERED_SKILLS)
   }
 
   const skills = (
-    await Promise.all(paths.map(async (path) => {
+    await mapGitHubReadsSerially(paths, async (path) => {
       try {
         const document = await fetchRepositoryFile(reference.owner, reference.repo, ref, path)
         const frontmatter = parseSkillDocument(document)
@@ -302,19 +316,20 @@ export async function discoverGitHubSkills(
       } catch {
         return null
       }
-    }))
+    })
   ).filter((skill): skill is DiscoveredGitHubSkill => Boolean(skill))
 
-  return { skills, truncated }
+  return { skills, truncated, tree }
 }
 
 export async function fetchDelegatedGitHubSkill(
-  skill: DiscoveredGitHubSkill
+  skill: DiscoveredGitHubSkill,
+  repositoryTree?: GitHubTreeItem[] | null
 ): Promise<DelegatedGitHubSkill | null> {
   const delegatedName = detectSkillDelegationName(skill.document)
   if (!delegatedName || delegatedName.toLowerCase() === skill.frontmatter.name.toLowerCase()) return null
 
-  const { tree } = await fetchRepositoryTree(skill.owner, skill.repo, skill.ref)
+  const tree = repositoryTree || (await fetchRepositoryTree(skill.owner, skill.repo, skill.ref)).tree
   const parentDirectory = skill.directory.includes('/')
     ? skill.directory.slice(0, skill.directory.lastIndexOf('/'))
     : ''
@@ -366,9 +381,9 @@ function extension(path: string) {
 
 export async function fetchSkillPackageSnapshot(
   skill: DiscoveredGitHubSkill,
-  options: { maxFiles?: number } = {}
+  options: { maxFiles?: number; repositoryTree?: GitHubTreeItem[] | null } = {}
 ) {
-  const { tree } = await fetchRepositoryTree(skill.owner, skill.repo, skill.ref)
+  const tree = options.repositoryTree || (await fetchRepositoryTree(skill.owner, skill.repo, skill.ref)).tree
   const prefix = skill.directory ? `${skill.directory}/` : ''
   const packageItems = tree
     .filter((item) => item.type === 'blob')
@@ -386,12 +401,12 @@ export async function fetchSkillPackageSnapshot(
   const maxFiles = Math.min(Math.max(Math.floor(options.maxFiles || MAX_PACKAGE_FILES), 1), MAX_PACKAGE_FILES)
   const paths = reviewablePaths.slice(0, maxFiles)
 
-  const files = await Promise.all(paths.map(async (path) => ({
+  const files = await mapGitHubReadsSerially(paths, async (path) => ({
     path,
     content: path === skill.path
       ? skill.document
       : await fetchRepositoryFile(skill.owner, skill.repo, skill.ref, path).catch(() => ''),
-  })))
+  }))
   const unreviewedPaths = packageItems
     .map((item) => item.path)
     .filter((path) => {

@@ -71,4 +71,11 @@ const recoveryMigration = readFileSync(
 )
 assert.ok(recoveryMigration.includes("'publishing'"), 'interrupted publication rows must be reclaimable')
 
+const skillSource = readFileSync(
+  new URL('../lib/github/skill-source.ts', import.meta.url),
+  'utf8'
+)
+assert.ok(skillSource.includes('mapGitHubReadsSerially(paths'), 'GitHub content reads must be serialized')
+assert.ok(skillSource.includes('repositoryTree?: GitHubTreeItem[] | null'), 'repository trees must be reusable')
+
 console.log('Candidate intake regression tests passed.')
