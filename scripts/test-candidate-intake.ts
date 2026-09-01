@@ -6,6 +6,8 @@ import { readFileSync } from 'node:fs'
 import { evaluateFastTrackCandidate } from '../lib/indexer/fast-track.ts'
 // @ts-expect-error TS5097 is expected for this standalone test entrypoint.
 import { buildCandidateSourceKey, canonicalGitHubSourceUrl } from '../lib/indexer/candidate-identity.ts'
+// @ts-expect-error TS5097 is expected for this standalone test entrypoint.
+import { shouldRetryAutomatedReview } from '../lib/indexer/review-retry.ts'
 
 const now = new Date('2026-09-01T00:00:00.000Z')
 const safe = {
@@ -31,6 +33,8 @@ assert.equal(evaluateFastTrackCandidate({ ...safe, licenseStatus: 'missing' }).e
 assert.equal(evaluateFastTrackCandidate({ ...safe, updatedAt: '2024-01-01T00:00:00.000Z' }).eligible, false)
 assert.equal(evaluateFastTrackCandidate({ ...safe, packageTruncated: true }).eligible, false)
 assert.equal(evaluateFastTrackCandidate({ ...safe, hasUnreviewedFiles: true }).eligible, false)
+assert.equal(shouldRetryAutomatedReview('heuristic-static-v2'), true)
+assert.equal(shouldRetryAutomatedReview('deepseek/deepseek-v4-flash'), false)
 
 assert.equal(
   buildCandidateSourceKey(12345, 'OldOwner/OldName', '/skills\\demo/SKILL.md/'),
