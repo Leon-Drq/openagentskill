@@ -9,39 +9,45 @@ import { getGitHubOwner } from '@/lib/github-owner'
 
 const HOME_STATS_SNAPSHOT = {
   // The last exact count observed before the registry stats cache was added.
-  // A fallback is explicitly rendered with "+" so an upstream timeout cannot
-  // look like the registry lost indexed skills.
+  // Keep this deploy-time safety net close to the latest verified production
+  // value. It is used only on a cold cache when the counter is unavailable.
   totalSkills: LAST_VERIFIED_APPROVED_SKILL_COUNT,
 }
 
-const HOME_STATS_QUERY_TIMEOUT_MS = 1_500
+const HOME_STATS_QUERY_TIMEOUT_MS = 2_000
 
 export interface HomeSkillCount {
   value: number
   exact: boolean
 }
 
-async function fetchApprovedSkillCount(): Promise<HomeSkillCount> {
+async function fetchExactApprovedSkillCount(): Promise<HomeSkillCount> {
   const result = await getApprovedRegistrySkillCount(HOME_STATS_QUERY_TIMEOUT_MS)
-  if (result === null) {
-    return { value: HOME_STATS_SNAPSHOT.totalSkills, exact: false }
-  }
-
-  if (!result.exact) {
-    return {
-      value: Math.max(result.count, HOME_STATS_SNAPSHOT.totalSkills),
-      exact: false,
-    }
+  if (!result?.exact) {
+    // Do not turn a timeout or planner estimate into a five-minute cached
+    // regression. Rejecting lets Next keep serving the last successful value
+    // during stale-while-revalidate; the caller owns the cold-cache fallback.
+    throw new Error('Exact approved skill count is temporarily unavailable')
   }
 
   return { value: result.count, exact: true }
 }
 
-const getCachedApprovedSkillCount = unstable_cache(
-  fetchApprovedSkillCount,
-  ['home-approved-skill-count-v2'],
+const getCachedExactApprovedSkillCount = unstable_cache(
+  fetchExactApprovedSkillCount,
+  ['home-approved-skill-count-v3'],
   { revalidate: 300 }
 )
+
+async function getStableApprovedSkillCount(): Promise<HomeSkillCount> {
+  try {
+    return await getCachedExactApprovedSkillCount()
+  } catch {
+    // This path is intentionally outside unstable_cache. A transient database
+    // failure can never overwrite a newer cached count with this snapshot.
+    return { value: HOME_STATS_SNAPSHOT.totalSkills, exact: false }
+  }
+}
 
 async function fetchEvidenceStats() {
   try {
@@ -79,7 +85,7 @@ const getCachedEvidenceStats = unstable_cache(
 
 export async function getHomePageData() {
   const [totalSkills, evidence, popularitySnapshot, trendingSnapshot] = await Promise.all([
-    getCachedApprovedSkillCount(),
+    getStableApprovedSkillCount(),
     getCachedEvidenceStats(),
     getLatestRankingSnapshot('most-starred-agent-skills'),
     getLatestRankingSnapshot('trending'),
