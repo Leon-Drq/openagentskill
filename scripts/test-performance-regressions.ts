@@ -43,4 +43,26 @@ assert.match(rootLayout, /<SpeedInsights \/>/, 'real-user Core Web Vitals monito
 const siteHeader = read('components/site-header.tsx')
 assert.match(siteHeader, /onPointerDown=\{\(\) => warmRoute\(href\)\}/, 'touch navigation should warm primary routes before transition')
 
+const homePageData = read('lib/home-page-data.ts')
+assert.match(
+  homePageData,
+  /const getCachedExactApprovedSkillCount = unstable_cache\(\s*fetchExactApprovedSkillCount/,
+  'the homepage must cache only exact registry counts'
+)
+assert.match(
+  homePageData,
+  /throw new Error\('Exact approved skill count is temporarily unavailable'\)/,
+  'timeouts and planner estimates must reject instead of poisoning the homepage cache'
+)
+assert.match(
+  homePageData,
+  /async function getStableApprovedSkillCount[\s\S]+?getCachedExactApprovedSkillCount\(\)[\s\S]+?HOME_STATS_SNAPSHOT\.totalSkills/,
+  'the cold-cache snapshot fallback must remain outside unstable_cache'
+)
+assert.doesNotMatch(
+  homePageData,
+  /unstable_cache\(\s*fetchApprovedSkillCount/,
+  'fallback counts must never be stored in the homepage data cache'
+)
+
 console.log('Performance regression tests passed.')
