@@ -21,7 +21,8 @@ function LoginForm() {
   const nextPath = requestedNext && requestedNext.startsWith('/') && !requestedNext.startsWith('//')
     ? requestedNext
     : '/profile'
-  const creatorIntent = nextPath === '/creator' || searchParams.get('intent') === 'creator'
+  const claimIntent = searchParams.get('intent') === 'claim'
+  const creatorIntent = nextPath === '/creator' || searchParams.get('intent') === 'creator' || claimIntent
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -50,10 +51,12 @@ function LoginForm() {
         </Link>
 
         <h1 className="font-display text-2xl font-bold mb-1">
-          {creatorIntent ? 'Sign in to Creator Center' : 'Sign in'}
+          {claimIntent ? 'Verify Skill ownership' : creatorIntent ? 'Sign in to Creator Center' : 'Sign in'}
         </h1>
         <p className="mb-3 text-sm leading-relaxed text-secondary">
-          {creatorIntent
+          {claimIntent
+            ? 'Continue with GitHub to verify a matching repository instantly, or use email for repository-file verification.'
+            : creatorIntent
             ? 'Claim your skills, manage your public creator profile, and view install analytics.'
             : 'Access your OpenAgentSkill account.'}
         </p>
@@ -64,7 +67,7 @@ function LoginForm() {
           </Link>
         </p>
 
-        <GitHubAuthButton fallbackNext={nextPath} />
+        <GitHubAuthButton fallbackNext={nextPath} label={claimIntent ? 'Verify with GitHub' : 'Continue with GitHub'} />
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>

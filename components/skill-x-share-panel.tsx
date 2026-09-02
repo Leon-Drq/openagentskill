@@ -5,8 +5,11 @@ import { Check, Copy, ExternalLink } from 'lucide-react'
 import { useI18n } from '@/lib/i18n/context'
 import { formatSkillDetailCopy } from '@/lib/i18n/skill-detail-copy'
 import { copyText } from '@/lib/copy-text'
+import { trackSkillEvent } from '@/components/skill-event-tracker'
+import { trackAnalyticsEvent } from '@/lib/analytics'
 
 interface SkillXSharePanelProps {
+  skillSlug: string
   skillName: string
   mainText: string
   mainIntentUrl: string
@@ -15,6 +18,7 @@ interface SkillXSharePanelProps {
 }
 
 export function SkillXSharePanel({
+  skillSlug,
   skillName,
   mainText,
   mainIntentUrl,
@@ -27,6 +31,8 @@ export function SkillXSharePanel({
   async function copy(value: string, key: string) {
     const didCopy = await copyText(value)
     if (!didCopy) return
+    trackAnalyticsEvent('skill_share_copy', { skill_slug: skillSlug, platform: 'x', kind: key })
+    void trackSkillEvent(skillSlug, 'share_copy', { platform: 'x', kind: key })
     setCopied(key)
     window.setTimeout(() => setCopied(null), 1800)
   }
@@ -84,6 +90,7 @@ export function SkillXSharePanel({
           </button>
           <a
             href={mainIntentUrl}
+            onClick={() => trackAnalyticsEvent('creator_share_open', { skill_slug: skillSlug, platform: 'x', kind: 'main' })}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 rounded-[8px] border border-[#006b4f] bg-[#006b4f] px-3 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
@@ -120,6 +127,7 @@ export function SkillXSharePanel({
               </button>
               <a
                 href={replyIntentUrl}
+                onClick={() => trackAnalyticsEvent('creator_share_open', { skill_slug: skillSlug, platform: 'x', kind: 'reply' })}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-[8px] border border-border px-3 py-2 text-sm transition-colors hover:border-foreground"

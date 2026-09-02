@@ -104,6 +104,7 @@ const SKILL_DIRECTORY_SELECT = [
   'install_command',
   'npm_package',
   'verified',
+  'publisher_verified',
   'submission_source',
   'submitted_by_agent',
   'ai_review_score',
@@ -137,6 +138,7 @@ export type SkillSitemapRecord = Pick<
   | 'created_at'
   | 'updated_at'
   | 'quality_score'
+  | 'publisher_verified'
 >
 
 export interface SkillSitemapQueryOptions {
@@ -311,7 +313,7 @@ function getSitemapFallbackRecords(
   minQualityScore: number
 ): SkillSitemapRecord[] {
   return CURATED_SKILL_SNAPSHOT
-    .filter((skill) => Number(skill.github_stars || 0) >= minStars)
+    .filter((skill) => Number(skill.github_stars || 0) >= minStars || skill.publisher_verified === true)
     .filter((skill) => Number(skill.quality_score || 0) >= minQualityScore)
     .sort((left, right) => Number(right.github_stars || 0) - Number(left.github_stars || 0))
     .slice(offset, offset + limit)
@@ -322,6 +324,7 @@ function getSitemapFallbackRecords(
       created_at: skill.created_at,
       updated_at: skill.updated_at,
       quality_score: skill.quality_score,
+      publisher_verified: skill.publisher_verified,
     }))
 }
 
@@ -342,7 +345,7 @@ const getCachedApprovedSkillSitemapRecords = unstable_cache(
       return getSitemapFallbackRecords(offset, limit, minStars, minQualityScore)
     }
   },
-  ['approved-sitemap-records-v7'],
+  ['approved-sitemap-records-v8'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-records'],
@@ -357,7 +360,7 @@ const getCachedApprovedSkillSitemapCount = unstable_cache(
       return getSitemapFallbackRecords(0, CURATED_SKILL_SNAPSHOT.length, minStars, minQualityScore).length
     }
   },
-  ['approved-sitemap-count-v8'],
+  ['approved-sitemap-count-v9'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-count'],
@@ -389,7 +392,7 @@ async function fetchApprovedSkillSitemapRecords(
     const pageSize = Math.min(SKILLS_PAGE_SIZE, remaining)
     let query = supabase
       .from('skills')
-      .select('slug,github_stars,github_last_pushed_at,created_at,updated_at,quality_score')
+      .select('slug,github_stars,github_last_pushed_at,created_at,updated_at,quality_score,publisher_verified')
       .eq('ai_review_approved', true)
       // This matches the public-directory partial index. A sitemap needs a
       // stable complete traversal, not a star-only ranking, and must never
@@ -398,7 +401,7 @@ async function fetchApprovedSkillSitemapRecords(
       .order('github_stars', { ascending: false })
 
     if (options.minStars > 0) {
-      query = query.gte('github_stars', options.minStars)
+      query = query.or(`github_stars.gte.${options.minStars},publisher_verified.eq.true`)
     }
 
     if (options.minQualityScore > 0) {
@@ -447,7 +450,7 @@ async function fetchApprovedSkillSitemapCount(minStars: number, minQualityScore:
     .eq('ai_review_approved', true)
 
   if (minStars > 0) {
-    query = query.gte('github_stars', minStars)
+    query = query.or(`github_stars.gte.${minStars},publisher_verified.eq.true`)
   }
 
   if (minQualityScore > 0) {

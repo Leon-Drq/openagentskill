@@ -22,11 +22,12 @@
     "test:github-owner": "node --experimental-strip-types scripts/test-github-owner.ts",
     "test:performance": "node --experimental-strip-types scripts/test-performance-regressions.ts",
     "test:candidate-intake": "node --experimental-strip-types scripts/test-candidate-intake.ts",
+    "test:creator-growth": "node --experimental-strip-types scripts/test-creator-growth.ts",
     "test:cli": "node packages/cli/openagentskill.mjs --help",
     "test:sdk": "node scripts/test-sdk.mjs",
     "test:links": "node scripts/check-repository-links.mjs",
     "test:links:external": "node scripts/check-repository-links.mjs --external",
-    "test": "pnpm run test:submission && pnpm run test:submission-discovery && pnpm run test:skill-issue-ingest && pnpm run test:supabase-circuit && pnpm run test:security && pnpm run test:x-automation && pnpm run test:github-owner && pnpm run test:performance && pnpm run test:candidate-intake && pnpm run test:cli && pnpm run test:sdk",
+    "test": "pnpm run test:submission && pnpm run test:submission-discovery && pnpm run test:skill-issue-ingest && pnpm run test:supabase-circuit && pnpm run test:security && pnpm run test:x-automation && pnpm run test:github-owner && pnpm run test:performance && pnpm run test:candidate-intake && pnpm run test:creator-growth && pnpm run test:cli && pnpm run test:sdk",
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint ."
   },

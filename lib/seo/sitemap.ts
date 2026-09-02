@@ -70,7 +70,7 @@ function fallbackSkillRecords(
   minQualityScore = SITEMAP_MIN_QUALITY_SCORE
 ) {
   return CURATED_SKILL_SNAPSHOT
-    .filter((skill) => Number(skill.github_stars || 0) >= minStars)
+    .filter((skill) => Number(skill.github_stars || 0) >= minStars || skill.publisher_verified === true)
     .filter((skill) => Number(skill.quality_score || 0) >= minQualityScore)
     .map((skill) => ({
       slug: skill.slug,
@@ -79,6 +79,7 @@ function fallbackSkillRecords(
       created_at: skill.created_at,
       updated_at: skill.updated_at,
       quality_score: skill.quality_score,
+      publisher_verified: skill.publisher_verified,
     }))
 }
 

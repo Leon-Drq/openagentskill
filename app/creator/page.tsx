@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { CheckCircle2, Circle, ExternalLink, GitCommitHorizontal, ShieldCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { CreatorIdentityConnections } from '@/components/creator-identity-connections'
+import { CreatorActivationTracker } from '@/components/creator-activation-tracker'
 import { MarketingPageShell } from '@/components/marketing-page'
 import { updateCreatorProfile } from './actions'
 
@@ -96,6 +97,10 @@ export default async function CreatorDashboard({
 
   return (
     <MarketingPageShell><div className="mx-auto min-h-screen max-w-6xl px-5 py-12 sm:px-6 sm:py-16">
+      <CreatorActivationTracker
+        githubConnected={params.connected === 'github'}
+        profilePublished={params.saved === '1'}
+      />
       <header className="grid gap-8 border-b border-border pb-10 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
         <div>
           <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Creator ownership console</p>
@@ -147,6 +152,7 @@ export default async function CreatorDashboard({
             githubVerifiedAt={profile?.github_verified_at}
             xUsername={profile?.x_username}
             githubOAuthEnabled={process.env.NEXT_PUBLIC_GITHUB_OAUTH_ENABLED === 'true'}
+            githubAppInstallUrl={process.env.NEXT_PUBLIC_GITHUB_APP_INSTALL_URL || null}
           />
           <form action={updateCreatorProfile} className="border border-border p-6">
             <h2 className="font-display text-2xl">Public creator record</h2>
