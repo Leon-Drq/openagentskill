@@ -2126,6 +2126,7 @@ export default async function SkillDetailPage({
 
               {xMainText && (
                 <SkillXSharePanel
+                  skillSlug={skill.slug}
                   skillName={skill.name}
                   mainText={xMainText}
                   mainIntentUrl={buildXIntentUrl(xMainText)}

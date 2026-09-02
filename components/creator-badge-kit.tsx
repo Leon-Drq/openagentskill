@@ -6,6 +6,8 @@ import { SkillDetailLink as Link } from '@/components/skill-detail-link'
 import { useI18n } from '@/lib/i18n/context'
 import { formatSkillDetailCopy } from '@/lib/i18n/skill-detail-copy'
 import { copyText } from '@/lib/copy-text'
+import { trackSkillEvent } from '@/components/skill-event-tracker'
+import { trackAnalyticsEvent } from '@/lib/analytics'
 
 interface CreatorBadgeKitProps {
   skillSlug: string
@@ -13,11 +15,12 @@ interface CreatorBadgeKitProps {
 
 function badgeMarkdown(slug: string) {
   const base = 'https://www.openagentskill.com'
+  const listing = `${base}/skills/${slug}?ref=github&utm_source=github&utm_medium=referral&utm_campaign=creator_badge`
   return [
-    `[![Listed on OpenAgentSkill](${base}/api/badge/${slug}?metric=listed&label=Listed)](${base}/skills/${slug})`,
-    `[![OpenAgentSkill Trust](${base}/api/badge/${slug}?metric=trust&label=Trust)](${base}/skills/${slug})`,
+    `[![Listed on OpenAgentSkill](${base}/api/badge/${slug}?metric=listed&label=Listed)](${listing})`,
+    `[![OpenAgentSkill Trust](${base}/api/badge/${slug}?metric=trust&label=Trust)](${listing})`,
     `[![OpenAgentSkill Audit](${base}/api/badge/${slug}?metric=audit&label=Audit)](${base}/skills/${slug}/audit)`,
-    `[![Agent Proven](${base}/api/badge/${slug}?metric=proven&label=Agent%20Proven)](${base}/skills/${slug})`,
+    `[![Agent Proven](${base}/api/badge/${slug}?metric=proven&label=Agent%20Proven)](${listing})`,
   ].join('\n')
 }
 
@@ -30,6 +33,8 @@ export function CreatorBadgeKit({ skillSlug }: CreatorBadgeKitProps) {
     try {
       const didCopy = await copyText(markdown)
       if (!didCopy) throw new Error('Clipboard is unavailable')
+      trackAnalyticsEvent('creator_badge_copy', { skill_slug: skillSlug, placement: 'skill_detail' })
+      void trackSkillEvent(skillSlug, 'share_copy', { kind: 'creator_badge', placement: 'skill_detail' })
       setCopied(true)
       window.setTimeout(() => setCopied(false), 1_800)
     } catch {

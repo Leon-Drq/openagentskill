@@ -74,8 +74,7 @@ export default async function CreatorPage({ params }: Props) {
     profile.github_verified_at && profile.github_username ? `https://github.com/${profile.github_username}` : null,
     profile.x_verified_at && profile.x_username ? `https://x.com/${profile.x_username}` : null,
   ].filter(Boolean)
-  const jsonLd = {
-    '@context': 'https://schema.org',
+  const creatorLd = {
     '@type': 'Person',
     '@id': `${SITE_URL}/creators/${profile.username}#creator`,
     name,
@@ -84,7 +83,20 @@ export default async function CreatorPage({ params }: Props) {
     sameAs,
     description: profile.bio || undefined,
     knowsAbout: ['AI agents', 'Agent Skills', ...Array.from(new Set(skills.map((skill) => skill.category)))],
-    mainEntityOfPage: `${SITE_URL}/creators/${profile.username}`,
+  }
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    '@id': `${SITE_URL}/creators/${profile.username}#profile`,
+    url: `${SITE_URL}/creators/${profile.username}`,
+    dateModified: profile.updated_at || undefined,
+    mainEntity: creatorLd,
+    hasPart: skills.slice(0, 20).map((skill) => ({
+      '@type': 'SoftwareSourceCode',
+      name: skill.name,
+      url: `${SITE_URL}/skills/${skill.slug}`,
+      author: { '@id': creatorLd['@id'] },
+    })),
   }
   const listLd = {
     '@context': 'https://schema.org',

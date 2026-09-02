@@ -126,8 +126,9 @@ assert.ok(discoveryStatusRoute.includes('search_index_coverage:'))
 assert.ok(discoveryStatusRoute.includes("count: 'exact'"))
 
 const skillDatabase = readFileSync(new URL('../lib/db/skills.ts', import.meta.url), 'utf8')
-assert.ok(skillDatabase.includes("['approved-sitemap-count-v8']"))
+assert.ok(skillDatabase.includes("['approved-sitemap-count-v9']"))
 assert.ok(skillDatabase.includes("select('slug', { count: 'exact', head: true })"))
+assert.ok(skillDatabase.includes('publisher_verified.eq.true'), 'verified creators must bypass only the sitemap star floor')
 
 for (const [route, mode] of [
   ['../app/api/cron/skill-candidates-discover/route.ts', 'candidate-discovery'],

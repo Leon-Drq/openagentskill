@@ -10,6 +10,7 @@ import {
   type SkillDetailCopyKey,
 } from '@/lib/i18n/skill-detail-copy'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
+import { trackAnalyticsEvent } from '@/lib/analytics'
 
 interface ClaimSkillPanelProps {
   skillSlug: string
@@ -112,12 +113,34 @@ export function ClaimSkillPanel({
     }
   }, [skillSlug, repository])
 
+  useEffect(() => {
+    if (!hasUser || typeof window === 'undefined') return
+    const url = new URL(window.location.href)
+    let changed = false
+    if (url.searchParams.get('connected') === 'github') {
+      trackAnalyticsEvent('creator_github_connected', { placement: 'skill_claim', skill_slug: skillSlug })
+      url.searchParams.delete('connected')
+      changed = true
+    }
+    if (url.searchParams.get('claim') !== '1') {
+      if (changed) window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`)
+      return
+    }
+    const timeoutId = window.setTimeout(() => setOpen(true), 0)
+    url.searchParams.delete('claim')
+    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`)
+    return () => window.clearTimeout(timeoutId)
+  }, [hasUser, skillSlug])
+
   function openPanel() {
     trackSkillEvent(skillSlug, 'claim_start')
 
+    if (hasUser === null) return
     if (!hasUser) {
       const next = getLocalizedNavigationHref(`/skills/${skillSlug}`, locale)
-      router.push(`/auth/login?next=${encodeURIComponent(next)}`)
+      const separator = next.includes('?') ? '&' : '?'
+      const claimReturnPath = `${next}${separator}claim=1#claim-this-skill`
+      router.push(`/auth/login?next=${encodeURIComponent(claimReturnPath)}&intent=claim`)
       return
     }
     setOpen(true)
@@ -148,9 +171,21 @@ export function ClaimSkillPanel({
       return
     }
 
+    trackAnalyticsEvent('skill_claim_submit', {
+      skill_slug: skillSlug,
+      verification_method: data.claim?.verification_method || 'repository_file',
+    })
     setExistingClaim(data.claim)
     setChallenge(data.challenge || null)
     setStatus('saved')
+    if (data.claim?.status === 'approved') {
+      trackAnalyticsEvent('skill_claim_verified', {
+        skill_slug: skillSlug,
+        verification_method: data.claim.verification_method || 'github_oauth',
+      })
+      router.refresh()
+      window.setTimeout(() => document.getElementById('creator-badge-kit')?.scrollIntoView({ behavior: 'smooth' }), 450)
+    }
   }
 
   async function verifyChallenge() {
@@ -169,8 +204,14 @@ export function ClaimSkillPanel({
       return
     }
     setExistingClaim((current) => current ? { ...current, status: 'approved', verified_at: data.verified_at } : current)
+    trackAnalyticsEvent('skill_claim_verified', {
+      skill_slug: skillSlug,
+      verification_method: 'repository_file',
+    })
     setVerificationStatus('verified')
     setChallenge(null)
+    router.refresh()
+    window.setTimeout(() => document.getElementById('creator-badge-kit')?.scrollIntoView({ behavior: 'smooth' }), 450)
   }
 
   async function copyChallengeToken() {
@@ -234,28 +275,26 @@ export function ClaimSkillPanel({
         <button
           type="button"
           onClick={openPanel}
+          disabled={hasUser === null}
           className="mt-4 w-full border border-border px-3 py-2 text-sm transition-colors hover:border-foreground"
         >
-          {hasUser
+          {hasUser === null
+            ? 'Checking account…'
+            : hasUser
             ? formatSkillDetailCopy(locale, 'verifyMaintainerClaim')
             : formatSkillDetailCopy(locale, 'claimSkill')}
         </button>
       ) : (
         <div className="mt-4 space-y-3">
           <div className="border border-border bg-muted/30 p-3 text-xs leading-relaxed text-secondary">
-            GitHub OAuth can approve a matching personal repository immediately. Otherwise, we generate a one-time file challenge that proves write access to this repository. X is optional and does not verify ownership by itself.
+            Connect the GitHub account that owns this repository for instant verification. Organization and collaborator claims use a one-time repository file. X is optional and never proves ownership by itself.
           </div>
-          <label className="block">
-            <span className="mb-1 block text-xs text-secondary">
-              {formatSkillDetailCopy(locale, 'githubUsername')}
-            </span>
-            <input
-              value={githubUsername}
-              onChange={(event) => setGithubUsername(event.target.value)}
-              placeholder="owner"
-              className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-            />
-          </label>
+          {repository ? (
+            <div className="border border-border bg-background p-3">
+              <p className="text-[10px] uppercase tracking-[0.16em] text-secondary">Repository to verify</p>
+              <p className="mt-1 break-all font-mono text-xs text-foreground">{repository}</p>
+            </div>
+          ) : null}
           <label className="block">
             <span className="mb-1 block text-xs text-secondary">X username (optional)</span>
             <input
@@ -265,29 +304,23 @@ export function ClaimSkillPanel({
               className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
             />
           </label>
-          <label className="block">
-            <span className="mb-1 block text-xs text-secondary">
-              {formatSkillDetailCopy(locale, 'evidenceUrl')}
-            </span>
-            <input
-              value={evidenceUrl}
-              onChange={(event) => setEvidenceUrl(event.target.value)}
-              placeholder={formatSkillDetailCopy(locale, 'evidenceUrlPlaceholder')}
-              className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-            />
-          </label>
-          <label className="block">
-            <span className="mb-1 block text-xs text-secondary">
-              {formatSkillDetailCopy(locale, 'verificationNote')}
-            </span>
-            <textarea
-              value={evidenceNote}
-              onChange={(event) => setEvidenceNote(event.target.value)}
-              rows={3}
-              placeholder={formatSkillDetailCopy(locale, 'verificationNotePlaceholder')}
-              className="w-full resize-none border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-            />
-          </label>
+          <details className="border border-border bg-background p-3">
+            <summary className="cursor-pointer text-xs font-semibold text-secondary hover:text-foreground">Advanced ownership evidence</summary>
+            <div className="mt-3 space-y-3">
+              <label className="block">
+                <span className="mb-1 block text-xs text-secondary">{formatSkillDetailCopy(locale, 'githubUsername')}</span>
+                <input value={githubUsername} onChange={(event) => setGithubUsername(event.target.value)} placeholder="owner" className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground" />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs text-secondary">{formatSkillDetailCopy(locale, 'evidenceUrl')}</span>
+                <input value={evidenceUrl} onChange={(event) => setEvidenceUrl(event.target.value)} placeholder={formatSkillDetailCopy(locale, 'evidenceUrlPlaceholder')} className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground" />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs text-secondary">{formatSkillDetailCopy(locale, 'verificationNote')}</span>
+                <textarea value={evidenceNote} onChange={(event) => setEvidenceNote(event.target.value)} rows={2} placeholder={formatSkillDetailCopy(locale, 'verificationNotePlaceholder')} className="w-full resize-none border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground" />
+              </label>
+            </div>
+          </details>
           <button
             type="button"
             onClick={submitClaim}
@@ -296,7 +329,7 @@ export function ClaimSkillPanel({
           >
             {status === 'loading'
               ? formatSkillDetailCopy(locale, 'submitting')
-              : formatSkillDetailCopy(locale, 'submitClaim')}
+              : 'Verify ownership'}
           </button>
           {challenge ? (
             <div className="border border-emerald-700/40 bg-emerald-500/5 p-4 text-xs">
