@@ -11,7 +11,7 @@ OpenAgentSkill keeps discovery scale separate from public marketplace quality:
 | --- | --- | ---: | ---: |
 | GitHub discovery | hourly at `:15` | 22 searches × 100 results; repositories require 20+ stars | 52,800 result slots |
 | Light validation | hourly at `:20` and `:50` | 120 candidates/run | 5,760 candidates |
-| Public publication | `:00`, `:10`, `:30`, and `:40` hourly | 8 fast-track + 8 AI/retry slots per run | 1,536 capacity; 1,000 rolling-24h target |
+| Public publication | `:00`, `:10`, `:25`, `:30`, `:40`, and `:55` hourly | 8 fast-track + 8 AI/retry slots per run | 2,304 retry-aware capacity; 1,000 rolling-24h target |
 
 These are ceilings, not promised insert counts. Repository relevance filtering, stable identifiers, source URLs, exact content hashes, licenses, security checks, and existing registry records reduce the number of unique public skills.
 
@@ -51,6 +51,6 @@ Each scheduled stage writes a durable `indexer_runs` record using a stable mode:
 - `candidate-validation`
 - `candidate-publication`
 
-`GET /api/agent/discovery` exposes the recent stage runs plus a five-minute cached queue health snapshot. The snapshot includes per-status counts, ready backlog, retry errors, rolling 24-hour discovery/publication throughput, oldest ready age, and latest candidate/publication timestamps. Health is labelled `healthy`, `backlogged`, `degraded`, or `idle`; a theoretical daily capacity must not be treated as achieved throughput without these observed fields.
+`GET /api/agent/discovery` exposes the recent stage runs plus a five-minute cached queue health snapshot. The snapshot includes per-status counts, ready backlog, retry errors, rolling 24-hour discovery/publication throughput and target attainment, estimated drain time, oldest ready age, and latest candidate/publication timestamps. Health is labelled `healthy`, `backlogged`, `degraded`, or `idle`; a theoretical daily capacity must not be treated as achieved throughput without these observed fields.
 
 The same endpoint publishes a cached exact count of search-index-eligible Skill pages and Creator Claim activation. Search indexing remains stricter than registry inclusion: a page needs AI approval, a quality score of at least 50, and at least 3 GitHub stars. This keeps the full catalog available to people and agents while submitting only evidence-backed pages to crawlers. Sitemap shard counts use the same exact cached query so they cannot drift into empty or missing shards because of planner estimates.

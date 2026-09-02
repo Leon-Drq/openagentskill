@@ -30,7 +30,7 @@
     },
     {
       "path": "/api/cron/skill-candidates-publish",
-      "schedule": "0,10,30,40 * * * *"
+      "schedule": "0,10,25,30,40,55 * * * *"
     },
     {
       "path": "/api/cron/skill-source-sync",
