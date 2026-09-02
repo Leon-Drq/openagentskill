@@ -59,4 +59,8 @@ const outreachBatch = readFileSync(new URL('../app/api/creator-outreach/batch/ro
 assert.match(outreachBatch, /automatic_sending: false/, 'creator outreach cohorts must stay draft-only')
 assert.match(outreachBatch, /isAutomationAuthorized/, 'creator outreach cohorts must require automation authorization')
 
+const githubWebhookRoute = readFileSync(new URL('../app/api/webhooks/github/route.ts', import.meta.url), 'utf8')
+assert.match(githubWebhookRoute, /publisher_verified', true/, 'push sync must allowlist verified repositories')
+assert.match(githubWebhookRoute, /trustedRepository/, 'outbound sync must use the registry-returned repository')
+
 console.log('Creator growth regression tests passed.')
