@@ -42,3 +42,15 @@ The policy runs once during validation and again immediately before the public u
 - AI review is capped at 20 seconds per candidate so one provider timeout cannot exhaust the whole cron run.
 
 Set `CANDIDATE_PIPELINE_DISABLED=true` for an immediate pause. Cron endpoints remain authenticated by the existing automation secrets.
+
+## Growth and queue observability
+
+Each scheduled stage writes a durable `indexer_runs` record using a stable mode:
+
+- `candidate-discovery`
+- `candidate-validation`
+- `candidate-publication`
+
+`GET /api/agent/discovery` exposes the recent stage runs plus a five-minute cached queue health snapshot. The snapshot includes per-status counts, ready backlog, retry errors, rolling 24-hour discovery/publication throughput, oldest ready age, and latest candidate/publication timestamps. Health is labelled `healthy`, `backlogged`, `degraded`, or `idle`; a theoretical daily capacity must not be treated as achieved throughput without these observed fields.
+
+The same endpoint publishes a cached exact count of search-index-eligible Skill pages and Creator Claim activation. Search indexing remains stricter than registry inclusion: a page needs AI approval, a quality score of at least 50, and at least 3 GitHub stars. This keeps the full catalog available to people and agents while submitting only evidence-backed pages to crawlers. Sitemap shard counts use the same exact cached query so they cannot drift into empty or missing shards because of planner estimates.

@@ -357,7 +357,7 @@ const getCachedApprovedSkillSitemapCount = unstable_cache(
       return getSitemapFallbackRecords(0, CURATED_SKILL_SNAPSHOT.length, minStars, minQualityScore).length
     }
   },
-  ['approved-sitemap-count-v7'],
+  ['approved-sitemap-count-v8'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-count'],
@@ -441,9 +441,9 @@ async function fetchApprovedSkillSitemapCount(minStars: number, minQualityScore:
 
   let query = supabase
     .from('skills')
-    // Planner counts are sufficient to determine sitemap shard capacity and
-    // remain cheap when crawlers request this endpoint concurrently.
-    .select('slug', { count: 'planned', head: true })
+    // This result is cached for 12 hours. An exact indexed count prevents the
+    // planner estimate from creating empty sitemap shards or hiding valid ones.
+    .select('slug', { count: 'exact', head: true })
     .eq('ai_review_approved', true)
 
   if (minStars > 0) {

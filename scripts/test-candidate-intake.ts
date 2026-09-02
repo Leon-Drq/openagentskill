@@ -12,6 +12,8 @@ import { shouldRetryAutomatedReview } from '../lib/indexer/review-retry.ts'
 import { AUTOMATIC_DISCOVERY_MIN_STARS, PUBLICATION_DAILY_TARGET, automaticPublicationCapacityPerDay, meetsAutomaticDiscoveryStarFloor } from '../lib/indexer/intake-policy.ts'
 // @ts-expect-error TS5097 is expected for this standalone test entrypoint.
 import { SKILL_SUBMISSION_MIN_STARS } from '../lib/skills/submission-policy.ts'
+// @ts-expect-error TS5097 is expected for this standalone test entrypoint.
+import { SEARCH_INDEX_MIN_GITHUB_STARS, SEARCH_INDEX_MIN_QUALITY_SCORE } from '../lib/seo/search-indexability.ts'
 
 const now = new Date('2026-09-01T00:00:00.000Z')
 const safe = {
@@ -45,6 +47,8 @@ assert.equal(meetsAutomaticDiscoveryStarFloor(20), true)
 assert.equal(SKILL_SUBMISSION_MIN_STARS, 0, 'direct user submissions must remain zero-star eligible')
 assert.equal(PUBLICATION_DAILY_TARGET, 1_000)
 assert.ok(automaticPublicationCapacityPerDay() > PUBLICATION_DAILY_TARGET)
+assert.equal(SEARCH_INDEX_MIN_QUALITY_SCORE, 50)
+assert.equal(SEARCH_INDEX_MIN_GITHUB_STARS, 3)
 
 assert.equal(
   buildCandidateSourceKey(12345, 'OldOwner/OldName', '/skills\\demo/SKILL.md/'),
@@ -102,10 +106,38 @@ assert.equal(
   vercelConfig.crons.find((cron) => cron.path === '/api/cron/skill-candidates-publish')?.schedule,
   '0,10,30,40 * * * *'
 )
+assert.equal(
+  vercelConfig.crons.find((cron) => cron.path === '/api/indexer/refresh-stars')?.schedule,
+  '30 2 * * *'
+)
+assert.equal(
+  vercelConfig.crons.find((cron) => cron.path === '/api/indexnow/submit')?.schedule,
+  '10 3 * * *'
+)
 
 const discoveryStatusRoute = readFileSync(new URL('../app/api/agent/discovery/route.ts', import.meta.url), 'utf8')
 assert.ok(discoveryStatusRoute.includes('schedule: `${SKILL_RADAR_CRON_MINUTE_UTC} * * * *`'))
 assert.ok(!discoveryStatusRoute.includes('at least 10 GitHub stars'))
+assert.ok(discoveryStatusRoute.includes("star_refresh_cron: '30 2 * * *'"))
+assert.ok(discoveryStatusRoute.includes("indexnow_cron: '10 3 * * *'"))
+assert.ok(discoveryStatusRoute.includes('observed_health: candidatePipelineHealth'))
+assert.ok(discoveryStatusRoute.includes('search_index_coverage:'))
+assert.ok(discoveryStatusRoute.includes("count: 'exact'"))
+
+const skillDatabase = readFileSync(new URL('../lib/db/skills.ts', import.meta.url), 'utf8')
+assert.ok(skillDatabase.includes("['approved-sitemap-count-v8']"))
+assert.ok(skillDatabase.includes("select('slug', { count: 'exact', head: true })"))
+
+for (const [route, mode] of [
+  ['../app/api/cron/skill-candidates-discover/route.ts', 'candidate-discovery'],
+  ['../app/api/cron/skill-candidates-validate/route.ts', 'candidate-validation'],
+  ['../app/api/cron/skill-candidates-publish/route.ts', 'candidate-publication'],
+] as const) {
+  const source = readFileSync(new URL(route, import.meta.url), 'utf8')
+  assert.ok(source.includes('recordIndexerRun({'), `${mode} must emit a durable run log`)
+  assert.ok(source.includes(`mode: '${mode}'`), `${mode} must use a stable log mode`)
+  assert.ok(source.includes("status: 'failed'"), `${mode} must record uncaught failures`)
+}
 
 const xStatusRoute = readFileSync(new URL('../app/api/x/status/route.ts', import.meta.url), 'utf8')
 assert.ok(xStatusRoute.includes("skillRadarCron: '45 * * * *'"))

@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { createHash, randomUUID } from 'node:crypto'
+import { unstable_cache } from 'next/cache'
 import { getLicenseEvidence } from '@/lib/creator-ownership'
 import { validateGitHubRepo } from '@/lib/github/api'
 import {
@@ -44,6 +45,42 @@ export type SkillCandidateStatus =
   | 'duplicate'
   | 'validation_error'
   | 'publication_error'
+
+const CANDIDATE_PIPELINE_STATUSES: SkillCandidateStatus[] = [
+  'discovered',
+  'validating',
+  'expanded',
+  'fast_track',
+  'review_required',
+  'publishing',
+  'published',
+  'rejected',
+  'duplicate',
+  'validation_error',
+  'publication_error',
+]
+
+const READY_CANDIDATE_STATUSES: SkillCandidateStatus[] = [
+  'discovered',
+  'fast_track',
+  'review_required',
+  'validation_error',
+  'publication_error',
+]
+
+export interface CandidatePipelineHealth {
+  state: 'healthy' | 'backlogged' | 'degraded' | 'idle'
+  counts: Record<SkillCandidateStatus, number>
+  total_candidates: number
+  ready_backlog: number
+  errors_waiting_retry: number
+  discovered_last_24_hours: number
+  published_last_24_hours: number
+  oldest_ready_candidate_at: string | null
+  oldest_ready_age_hours: number | null
+  latest_candidate_at: string | null
+  latest_publication_at: string | null
+}
 
 export interface SkillCandidateRow {
   id: string
@@ -578,16 +615,93 @@ export async function runCandidatePublicationBatch(options: {
   }
 }
 
-export async function getCandidatePipelineStats() {
-  const client = admin()
-  const statuses: SkillCandidateStatus[] = [
-    'discovered', 'fast_track', 'review_required', 'published', 'duplicate',
-    'rejected', 'validation_error', 'publication_error',
-  ]
-  const entries = await Promise.all(statuses.map(async (status) => {
+async function fetchCandidatePipelineHealth(now = new Date()): Promise<CandidatePipelineHealth> {
+  const client = createAdminClient({ requestTimeoutMs: 6_000 })
+  const since = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString()
+  const entriesPromise = Promise.all(CANDIDATE_PIPELINE_STATUSES.map(async (status) => {
     const { count, error } = await client.from('skill_candidates').select('id', { count: 'exact', head: true }).eq('status', status)
     if (error) throw new Error(error.message)
     return [status, count || 0] as const
   }))
-  return Object.fromEntries(entries) as Record<SkillCandidateStatus, number>
+  const [
+    entries,
+    discoveredResult,
+    publishedResult,
+    oldestReadyResult,
+    latestCandidateResult,
+    latestPublicationResult,
+  ] = await Promise.all([
+    entriesPromise,
+    client.from('skill_candidates').select('id', { count: 'exact', head: true }).gte('discovered_at', since),
+    client.from('skill_candidates').select('id', { count: 'exact', head: true }).eq('status', 'published').gte('published_at', since),
+    client
+      .from('skill_candidates')
+      .select('discovered_at')
+      .in('status', READY_CANDIDATE_STATUSES)
+      .lte('next_attempt_at', now.toISOString())
+      .order('discovered_at', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+    client
+      .from('skill_candidates')
+      .select('discovered_at')
+      .order('discovered_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    client
+      .from('skill_candidates')
+      .select('published_at')
+      .eq('status', 'published')
+      .not('published_at', 'is', null)
+      .order('published_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ])
+
+  for (const result of [discoveredResult, publishedResult, oldestReadyResult, latestCandidateResult, latestPublicationResult]) {
+    if (result.error) throw new Error(result.error.message)
+  }
+
+  const counts = Object.fromEntries(entries) as Record<SkillCandidateStatus, number>
+  const readyBacklog = READY_CANDIDATE_STATUSES.reduce((sum, status) => sum + counts[status], 0)
+  const errorsWaitingRetry = counts.validation_error + counts.publication_error
+  const oldestReadyCandidateAt = oldestReadyResult.data?.discovered_at || null
+  const oldestReadyAgeHours = oldestReadyCandidateAt
+    ? Math.max(0, Math.round((now.getTime() - Date.parse(oldestReadyCandidateAt)) / 3_600_000))
+    : null
+  const discoveredLast24Hours = discoveredResult.count || 0
+  const publishedLast24Hours = publishedResult.count || 0
+  const errorShare = readyBacklog > 0 ? errorsWaitingRetry / readyBacklog : 0
+  const state: CandidatePipelineHealth['state'] =
+    errorsWaitingRetry >= 20 && errorShare >= 0.25
+      ? 'degraded'
+      : readyBacklog >= 100 && (oldestReadyAgeHours || 0) >= 24
+        ? 'backlogged'
+        : discoveredLast24Hours === 0 && publishedLast24Hours === 0
+          ? 'idle'
+          : 'healthy'
+
+  return {
+    state,
+    counts,
+    total_candidates: CANDIDATE_PIPELINE_STATUSES.reduce((sum, status) => sum + counts[status], 0),
+    ready_backlog: readyBacklog,
+    errors_waiting_retry: errorsWaitingRetry,
+    discovered_last_24_hours: discoveredLast24Hours,
+    published_last_24_hours: publishedLast24Hours,
+    oldest_ready_candidate_at: oldestReadyCandidateAt,
+    oldest_ready_age_hours: oldestReadyAgeHours,
+    latest_candidate_at: latestCandidateResult.data?.discovered_at || null,
+    latest_publication_at: latestPublicationResult.data?.published_at || null,
+  }
+}
+
+export const getCandidatePipelineHealth = unstable_cache(
+  fetchCandidatePipelineHealth,
+  ['candidate-pipeline-health-v1'],
+  { revalidate: 300, tags: ['candidate-pipeline-health'] }
+)
+
+export async function getCandidatePipelineStats() {
+  return (await getCandidatePipelineHealth()).counts
 }

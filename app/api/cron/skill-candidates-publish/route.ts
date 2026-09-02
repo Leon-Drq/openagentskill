@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { buildIndexNowUrlsForSkill, submitIndexNowUrls } from '@/lib/indexnow'
 import { runCandidatePublicationBatch } from '@/lib/indexer/candidate-intake'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
+import { recordIndexerRun } from '@/lib/indexer/run-log'
 import {
   PUBLICATION_AI_REVIEW_PER_RUN,
   PUBLICATION_DAILY_TARGET,
@@ -30,6 +31,7 @@ async function handleRun(request: NextRequest) {
       reason: 'GITHUB_TOKEN is required for candidate publication; no unauthenticated GitHub requests were sent.',
     })
   }
+  const startedAt = new Date().toISOString()
   const body = request.method === 'POST' ? await request.json().catch(() => ({})) : {}
   const fastTrackLimit = boundedInt(
     body.fastTrackLimit ?? process.env.CANDIDATE_FAST_TRACK_LIMIT,
@@ -49,15 +51,54 @@ async function handleRun(request: NextRequest) {
     1,
     10_000
   )
-  const result = await runCandidatePublicationBatch({ fastTrackLimit, aiReviewLimit, dailyTarget })
-  const indexing = await submitIndexNowUrls(result.slugs.flatMap(buildIndexNowUrlsForSkill))
+  try {
+    const result = await runCandidatePublicationBatch({ fastTrackLimit, aiReviewLimit, dailyTarget })
+    const indexing = await submitIndexNowUrls(result.slugs.flatMap(buildIndexNowUrlsForSkill))
 
-  return NextResponse.json({
-    success: !result.rateLimited && result.errors === 0,
-    mode: 'candidate-publication',
-    result,
-    indexing,
-  })
+    await recordIndexerRun({
+      mode: 'candidate-publication',
+      status: result.rateLimited ? 'rate-limited' : result.errors > 0 ? 'completed-with-errors' : 'completed',
+      started_at: startedAt,
+      target_new: dailyTarget,
+      candidates_found: result.claimed,
+      imported: result.published,
+      updated: result.processed,
+      errors: result.errors,
+      metadata: {
+        stage: 'publication',
+        fast_track_claimed: result.fastTrackClaimed,
+        ai_review_claimed: result.aiReviewClaimed,
+        retry_claimed: result.retryClaimed,
+        rejected: result.rejected,
+        retries: result.retries,
+        rate_limited: result.rateLimited,
+        time_budget_reached: result.timeBudgetReached,
+        published_last_24_hours: result.publishedLast24Hours,
+        remaining_daily_target: result.remainingDailyTarget,
+        target_reached: result.targetReached,
+        indexnow: indexing,
+      },
+    })
+
+    return NextResponse.json({
+      success: !result.rateLimited && result.errors === 0,
+      mode: 'candidate-publication',
+      result,
+      indexing,
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Candidate publication failed'
+    await recordIndexerRun({
+      mode: 'candidate-publication',
+      status: 'failed',
+      started_at: startedAt,
+      target_new: dailyTarget,
+      errors: 1,
+      metadata: { stage: 'publication', error: message.slice(0, 1000) },
+    })
+    console.error('[candidate-publication]', error)
+    return NextResponse.json({ success: false, mode: 'candidate-publication', error: message }, { status: 500 })
+  }
 }
 
 export async function GET(request: NextRequest) {

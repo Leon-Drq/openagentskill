@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { enqueueRepositoryCandidates } from '@/lib/indexer/candidate-intake'
 import { searchHotSkillRepos } from '@/lib/indexer/hot-skill-discovery'
 import { AUTOMATIC_DISCOVERY_MIN_STARS } from '@/lib/indexer/intake-policy'
+import { recordIndexerRun } from '@/lib/indexer/run-log'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 
 export const runtime = 'nodejs'
@@ -20,6 +21,7 @@ async function handleRun(request: NextRequest) {
     return NextResponse.json({ success: true, skipped: true, reason: 'Candidate pipeline is disabled by configuration.' })
   }
 
+  const startedAt = new Date().toISOString()
   const body = request.method === 'POST' ? await request.json().catch(() => ({})) : {}
   const limit = boundedInt(body.limit ?? process.env.CANDIDATE_DISCOVERY_LIMIT, 2_000, 1, 2_000)
   const maxQueries = boundedInt(body.maxQueries ?? process.env.CANDIDATE_DISCOVERY_MAX_QUERIES, 22, 1, 22)
@@ -32,29 +34,67 @@ async function handleRun(request: NextRequest) {
   )
   const lookbackDays = boundedInt(body.lookbackDays ?? process.env.CANDIDATE_DISCOVERY_LOOKBACK_DAYS, 90, 1, 90)
   const hourlyWindow = Math.floor(Date.now() / 3_600_000)
-  const discovery = await searchHotSkillRepos({
-    limit,
-    maxQueries,
-    perPage,
-    minStars,
-    lookbackDays,
-    queryOffset: hourlyWindow * maxQueries,
-  })
-  const intake = await enqueueRepositoryCandidates(discovery.candidates, 'github-candidate-discovery')
+  try {
+    const discovery = await searchHotSkillRepos({
+      limit,
+      maxQueries,
+      perPage,
+      minStars,
+      lookbackDays,
+      queryOffset: hourlyWindow * maxQueries,
+    })
+    const intake = await enqueueRepositoryCandidates(discovery.candidates, 'github-candidate-discovery')
 
-  return NextResponse.json({
-    success: true,
-    mode: 'candidate-discovery',
-    discovery: {
-      searched_queries: discovery.searchedQueries,
-      candidates: discovery.candidates.length,
-      min_stars: discovery.minStars,
-      since: discovery.since,
-      rate_limited: discovery.rateLimited,
-      retry_after_ms: discovery.retryAfterMs,
-    },
-    intake,
-  })
+    await recordIndexerRun({
+      mode: 'candidate-discovery',
+      status: discovery.rateLimited ? 'rate-limited' : 'completed',
+      started_at: startedAt,
+      target_new: limit,
+      min_stars: minStars,
+      max_search_requests: maxQueries,
+      search_requests: discovery.searchedQueries,
+      candidates_found: discovery.candidates.length,
+      skipped_existing: intake.duplicates,
+      imported: intake.inserted,
+      errors: discovery.rateLimited ? 1 : 0,
+      metadata: {
+        stage: 'discovery',
+        below_star_floor: intake.belowStarFloor,
+        lookback_days: lookbackDays,
+        per_page: perPage,
+        rate_limited: discovery.rateLimited,
+        retry_after_ms: discovery.retryAfterMs,
+      },
+    })
+
+    return NextResponse.json({
+      success: !discovery.rateLimited,
+      mode: 'candidate-discovery',
+      discovery: {
+        searched_queries: discovery.searchedQueries,
+        candidates: discovery.candidates.length,
+        min_stars: discovery.minStars,
+        since: discovery.since,
+        rate_limited: discovery.rateLimited,
+        retry_after_ms: discovery.retryAfterMs,
+      },
+      intake,
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Candidate discovery failed'
+    await recordIndexerRun({
+      mode: 'candidate-discovery',
+      status: 'failed',
+      started_at: startedAt,
+      target_new: limit,
+      min_stars: minStars,
+      max_search_requests: maxQueries,
+      errors: 1,
+      metadata: { stage: 'discovery', error: message.slice(0, 1000) },
+    })
+    console.error('[candidate-discovery]', error)
+    return NextResponse.json({ success: false, mode: 'candidate-discovery', error: message }, { status: 500 })
+  }
 }
 
 export async function GET(request: NextRequest) {
