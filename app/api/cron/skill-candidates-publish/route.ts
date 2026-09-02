@@ -57,7 +57,13 @@ async function handleRun(request: NextRequest) {
 
     await recordIndexerRun({
       mode: 'candidate-publication',
-      status: result.rateLimited ? 'rate-limited' : result.errors > 0 ? 'completed-with-errors' : 'completed',
+      status: result.rateLimited
+        ? 'rate-limited'
+        : result.errors > 0
+          ? 'completed-with-errors'
+          : result.retries > 0
+            ? 'completed-with-retries'
+            : 'completed',
       started_at: startedAt,
       target_new: dailyTarget,
       candidates_found: result.claimed,

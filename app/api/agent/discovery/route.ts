@@ -357,6 +357,10 @@ async function getRecentRuns(): Promise<Array<Record<string, unknown>>> {
     review_required: metadataValue(run, 'review_required'),
     duplicates: metadataValue(run, 'duplicates'),
     rejected: metadataValue(run, 'rejected'),
+    retries: metadataValue(run, 'retries'),
+    fast_track_claimed: metadataValue(run, 'fast_track_claimed'),
+    ai_review_claimed: metadataValue(run, 'ai_review_claimed'),
+    retry_claimed: metadataValue(run, 'retry_claimed'),
     published_last_24_hours: metadataValue(run, 'published_last_24_hours'),
     remaining_daily_target: metadataValue(run, 'remaining_daily_target'),
     target_reached: metadataValue(run, 'target_reached'),
@@ -536,7 +540,7 @@ export async function GET() {
     indexnow_frequency: 'daily baseline submission plus automatic submission after new skill imports',
     candidate_discovery_cron: '15 * * * *',
     candidate_validation_cron: '20,50 * * * *',
-    candidate_publication_cron: '0,10,30,40 * * * *',
+    candidate_publication_cron: '0,10,25,30,40,55 * * * *',
   }
   const estimatedDailyCapacity = scheduledHourlyTargetNew * 24
   const remainingToTarget =
@@ -683,7 +687,7 @@ export async function GET() {
         run_log_modes: ['candidate-discovery', 'candidate-validation', 'candidate-publication'],
         warning:
           candidatePipelineHealth?.state === 'backlogged'
-            ? 'The ready queue is more than 24 hours old and needs additional validation or publication throughput.'
+            ? 'The ready queue exceeds three daily publication targets or its oldest item is more than 24 hours old; additional validation or publication throughput is needed.'
             : candidatePipelineHealth?.state === 'degraded'
               ? 'At least 25% of the ready queue is waiting on validation or publication errors.'
               : candidatePipelineHealth?.state === 'idle'

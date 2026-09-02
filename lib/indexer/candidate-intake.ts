@@ -76,6 +76,10 @@ export interface CandidatePipelineHealth {
   errors_waiting_retry: number
   discovered_last_24_hours: number
   published_last_24_hours: number
+  publication_target_per_24_hours: number
+  publication_attainment_percent: number
+  publication_gap: number
+  estimated_days_to_clear_ready_backlog: number | null
   oldest_ready_candidate_at: string | null
   oldest_ready_age_hours: number | null
   latest_candidate_at: string | null
@@ -671,11 +675,18 @@ async function fetchCandidatePipelineHealth(now = new Date()): Promise<Candidate
     : null
   const discoveredLast24Hours = discoveredResult.count || 0
   const publishedLast24Hours = publishedResult.count || 0
+  const publicationAttainmentPercent = Number(
+    ((publishedLast24Hours / PUBLICATION_DAILY_TARGET) * 100).toFixed(1)
+  )
+  const estimatedDaysToClearReadyBacklog = publishedLast24Hours > 0
+    ? Number((readyBacklog / publishedLast24Hours).toFixed(1))
+    : null
   const errorShare = readyBacklog > 0 ? errorsWaitingRetry / readyBacklog : 0
   const state: CandidatePipelineHealth['state'] =
     errorsWaitingRetry >= 20 && errorShare >= 0.25
       ? 'degraded'
-      : readyBacklog >= 100 && (oldestReadyAgeHours || 0) >= 24
+      : readyBacklog >= PUBLICATION_DAILY_TARGET * 3 ||
+          (readyBacklog >= 100 && (oldestReadyAgeHours || 0) >= 24)
         ? 'backlogged'
         : discoveredLast24Hours === 0 && publishedLast24Hours === 0
           ? 'idle'
@@ -689,6 +700,10 @@ async function fetchCandidatePipelineHealth(now = new Date()): Promise<Candidate
     errors_waiting_retry: errorsWaitingRetry,
     discovered_last_24_hours: discoveredLast24Hours,
     published_last_24_hours: publishedLast24Hours,
+    publication_target_per_24_hours: PUBLICATION_DAILY_TARGET,
+    publication_attainment_percent: publicationAttainmentPercent,
+    publication_gap: Math.max(PUBLICATION_DAILY_TARGET - publishedLast24Hours, 0),
+    estimated_days_to_clear_ready_backlog: estimatedDaysToClearReadyBacklog,
     oldest_ready_candidate_at: oldestReadyCandidateAt,
     oldest_ready_age_hours: oldestReadyAgeHours,
     latest_candidate_at: latestCandidateResult.data?.discovered_at || null,

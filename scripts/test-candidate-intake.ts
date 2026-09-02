@@ -9,7 +9,7 @@ import { buildCandidateSourceKey, canonicalGitHubSourceUrl } from '../lib/indexe
 // @ts-expect-error TS5097 is expected for this standalone test entrypoint.
 import { shouldRetryAutomatedReview } from '../lib/indexer/review-retry.ts'
 // @ts-expect-error TS5097 is expected for this standalone test entrypoint.
-import { AUTOMATIC_DISCOVERY_MIN_STARS, PUBLICATION_DAILY_TARGET, automaticPublicationCapacityPerDay, meetsAutomaticDiscoveryStarFloor } from '../lib/indexer/intake-policy.ts'
+import { AUTOMATIC_DISCOVERY_MIN_STARS, PUBLICATION_DAILY_TARGET, PUBLICATION_RUNS_PER_DAY, automaticPublicationCapacityPerDay, meetsAutomaticDiscoveryStarFloor } from '../lib/indexer/intake-policy.ts'
 // @ts-expect-error TS5097 is expected for this standalone test entrypoint.
 import { SKILL_SUBMISSION_MIN_STARS } from '../lib/skills/submission-policy.ts'
 // @ts-expect-error TS5097 is expected for this standalone test entrypoint.
@@ -46,6 +46,7 @@ assert.equal(meetsAutomaticDiscoveryStarFloor(19), false)
 assert.equal(meetsAutomaticDiscoveryStarFloor(20), true)
 assert.equal(SKILL_SUBMISSION_MIN_STARS, 0, 'direct user submissions must remain zero-star eligible')
 assert.equal(PUBLICATION_DAILY_TARGET, 1_000)
+assert.equal(PUBLICATION_RUNS_PER_DAY, 144)
 assert.ok(automaticPublicationCapacityPerDay() > PUBLICATION_DAILY_TARGET)
 assert.equal(SEARCH_INDEX_MIN_QUALITY_SCORE, 50)
 assert.equal(SEARCH_INDEX_MIN_GITHUB_STARS, 3)
@@ -104,7 +105,7 @@ const vercelConfig = JSON.parse(readFileSync(new URL('../vercel.json', import.me
 }
 assert.equal(
   vercelConfig.crons.find((cron) => cron.path === '/api/cron/skill-candidates-publish')?.schedule,
-  '0,10,30,40 * * * *'
+  '0,10,25,30,40,55 * * * *'
 )
 assert.equal(
   vercelConfig.crons.find((cron) => cron.path === '/api/indexer/refresh-stars')?.schedule,
