@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server'
+import { unstable_cache } from 'next/cache'
 import {
   AUTOMATIC_DISCOVERY_MIN_STARS,
   PUBLICATION_DAILY_TARGET,
   automaticPublicationCapacityPerDay,
 } from '@/lib/indexer/intake-policy'
+import { getCandidatePipelineHealth } from '@/lib/indexer/candidate-intake'
 import { withTimeout } from '@/lib/async'
 import { INDEXNOW_KEY_LOCATION } from '@/lib/indexnow'
 import { createPublicClient } from '@/lib/supabase/public'
@@ -21,6 +23,10 @@ import {
 import { AGENT_OUTCOMES } from '@/lib/agent-outcomes'
 import { INDEXER_RUN_PROFILES } from '@/lib/indexer/run-profiles'
 import { FEATURED_SKILL_CLUSTERS, SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
+import {
+  SEARCH_INDEX_MIN_GITHUB_STARS,
+  SEARCH_INDEX_MIN_QUALITY_SCORE,
+} from '@/lib/seo/search-indexability'
 
 export const dynamic = 'force-dynamic'
 
@@ -227,7 +233,7 @@ function buildIndexerHealth({
   }
 }
 
-async function getRecentRuns() {
+async function getRecentRuns(): Promise<Array<Record<string, unknown>>> {
   const serverSecret = process.env.INDEXER_SECRET
   if (!serverSecret) return []
 
@@ -235,7 +241,7 @@ async function getRecentRuns() {
   const { data, error } = await withTimeout(
     supabase.rpc('list_indexer_runs', {
       p_server_secret: serverSecret,
-      p_limit: 5,
+      p_limit: 20,
     }),
     DISCOVERY_QUERY_TIMEOUT_MS,
     'indexer run status query'
@@ -343,8 +349,54 @@ async function getRecentRuns() {
       ? (run.metadata as Record<string, unknown>).error_samples
       : undefined,
     maintenance_mode: metadataValue(run, 'maintenance_mode') === true,
+    pipeline_stage: metadataValue(run, 'stage'),
+    below_star_floor: metadataValue(run, 'below_star_floor'),
+    rate_limited: metadataValue(run, 'rate_limited'),
+    time_budget_reached: metadataValue(run, 'time_budget_reached'),
+    fast_track: metadataValue(run, 'fast_track'),
+    review_required: metadataValue(run, 'review_required'),
+    duplicates: metadataValue(run, 'duplicates'),
+    rejected: metadataValue(run, 'rejected'),
+    published_last_24_hours: metadataValue(run, 'published_last_24_hours'),
+    remaining_daily_target: metadataValue(run, 'remaining_daily_target'),
+    target_reached: metadataValue(run, 'target_reached'),
   }))
 }
+
+async function fetchGrowthSignals() {
+  const supabase = createPublicClient({ requestTimeoutMs: DISCOVERY_QUERY_TIMEOUT_MS })
+  const [indexableResult, approvedClaimsResult] = await Promise.all([
+    supabase
+      .from('skills')
+      .select('slug', { count: 'exact', head: true })
+      .eq('ai_review_approved', true)
+      .gte('quality_score', SEARCH_INDEX_MIN_QUALITY_SCORE)
+      .gte('github_stars', SEARCH_INDEX_MIN_GITHUB_STARS),
+    supabase
+      .from('skill_claims')
+      .select('user_id,verified_at')
+      .eq('status', 'approved')
+      .limit(1000),
+  ])
+
+  const approvedClaims = approvedClaimsResult.error ? [] : approvedClaimsResult.data || []
+  const eligibleCount =
+    !indexableResult.error && typeof indexableResult.count === 'number'
+      ? indexableResult.count
+      : null
+  return {
+    search_index_eligible_skills: eligibleCount,
+    search_index_count_source: eligibleCount === null ? 'temporarily_unavailable' : 'cached_database_exact_count',
+    approved_creator_claims: approvedClaims.length,
+    verified_creators: new Set(approvedClaims.map((claim) => claim.user_id)).size,
+  }
+}
+
+const getGrowthSignals = unstable_cache(
+  fetchGrowthSignals,
+  ['agent-discovery-growth-signals-v1'],
+  { revalidate: 900, tags: ['agent-discovery-growth-signals'] }
+)
 
 function buildProfileRunSummaries(runs: Array<Record<string, unknown>>) {
   return INDEXER_RUN_PROFILES.map((profile) => {
@@ -424,9 +476,21 @@ export async function GET() {
   const effectiveCoverageTarget = resolveHighStarCoverageTarget(
     parsePositiveNumber(process.env.INDEXER_TARGET_TOTAL, HIGH_STAR_SKILL_COVERAGE_TARGET)
   )
-  const [runs, approvedSkillCountResult] = await Promise.all([
+  const [runs, approvedSkillCountResult, candidatePipelineHealth, growthSignals] = await Promise.all([
     getRecentRuns(),
     getApprovedRegistrySkillCount(DISCOVERY_QUERY_TIMEOUT_MS),
+    withTimeout(
+      getCandidatePipelineHealth(),
+      8_000,
+      'candidate pipeline health query'
+    ).catch((error) => {
+      console.warn('Candidate pipeline health fallback:', error)
+      return null
+    }),
+    withTimeout(getGrowthSignals(), 5_000, 'growth signals query').catch((error) => {
+      console.warn('Growth signals fallback:', error)
+      return null
+    }),
   ])
   const approvedSkillCount =
     approvedSkillCountResult?.count ?? LAST_VERIFIED_APPROVED_SKILL_COUNT
@@ -462,13 +526,13 @@ export async function GET() {
       max_search_requests: profile.maxSearchRequests,
       duplicate_recovery_search_requests: profile.duplicateRecoverySearchRequests,
     })),
-    star_refresh_cron: '0 3 * * *',
-    star_refresh_frequency: 'daily at 03:00 UTC',
+    star_refresh_cron: '30 2 * * *',
+    star_refresh_frequency: 'daily at 02:30 UTC',
     skill_radar_cron: '45 * * * *',
     skill_radar_frequency: skillRadarXMaxQueries > 0
       ? `hourly GitHub scan; X hotspot scan every ${skillRadarXScanIntervalHours} hours`
       : 'hourly GitHub scan; X hotspot scan is disabled until an X search budget is configured',
-    indexnow_cron: '15 3 * * *',
+    indexnow_cron: '10 3 * * *',
     indexnow_frequency: 'daily baseline submission plus automatic submission after new skill imports',
     candidate_discovery_cron: '15 * * * *',
     candidate_validation_cron: '20,50 * * * *',
@@ -483,9 +547,11 @@ export async function GET() {
     remainingToTarget === null
       ? null
       : Math.ceil(remainingToTarget / Math.max(estimatedDailyCapacity, 1))
+  const maintenanceRuns = runs.filter((run) => run.mode === 'skill-radar' || run.maintenance_mode === true)
+  const candidateRuns = runs.filter((run) => typeof run.mode === 'string' && run.mode.startsWith('candidate-'))
   const indexerHealth = {
     ...buildIndexerHealth({
-      runs,
+      runs: maintenanceRuns,
       generatedAt,
       targetNew,
       maintenanceTargetNew,
@@ -610,6 +676,20 @@ export async function GET() {
     },
     candidate_pipeline: {
       status: 'active',
+      observed_health: candidatePipelineHealth,
+      recent_runs: candidateRuns.slice(0, 9),
+      observability: {
+        source: candidatePipelineHealth ? 'live_private_queue_counts' : 'temporarily_unavailable',
+        run_log_modes: ['candidate-discovery', 'candidate-validation', 'candidate-publication'],
+        warning:
+          candidatePipelineHealth?.state === 'backlogged'
+            ? 'The ready queue is more than 24 hours old and needs additional validation or publication throughput.'
+            : candidatePipelineHealth?.state === 'degraded'
+              ? 'At least 25% of the ready queue is waiting on validation or publication errors.'
+              : candidatePipelineHealth?.state === 'idle'
+                ? 'No candidate discovery or publication activity was observed in the last 24 hours.'
+                : null,
+      },
       kill_switch: 'CANDIDATE_PIPELINE_DISABLED=true',
       architecture: ['indexed_candidates', 'installable_skills'],
       discovery_capacity_per_day: 52_800,
@@ -674,6 +754,27 @@ export async function GET() {
       strategy:
         'Publish high-intent, task-first skill cluster pages so Google and AI search can map OpenAgentSkill to concrete agent workflows.',
       cluster_count: SKILL_CLUSTERS.length,
+      search_index_coverage: {
+        approved_registry_skills: approvedSkillCount,
+        eligible_skill_pages: growthSignals?.search_index_eligible_skills ?? null,
+        eligible_share_percent:
+          growthSignals?.search_index_eligible_skills !== null &&
+          growthSignals?.search_index_eligible_skills !== undefined &&
+          approvedSkillCount > 0
+            ? Number(((growthSignals.search_index_eligible_skills / approvedSkillCount) * 100).toFixed(1))
+            : null,
+        excluded_until_quality_evidence:
+          growthSignals?.search_index_eligible_skills !== null &&
+          growthSignals?.search_index_eligible_skills !== undefined
+            ? Math.max(approvedSkillCount - growthSignals.search_index_eligible_skills, 0)
+            : null,
+        count_source: growthSignals?.search_index_count_source || 'temporarily_unavailable',
+        policy: {
+          minimum_quality_score: SEARCH_INDEX_MIN_QUALITY_SCORE,
+          minimum_github_stars: SEARCH_INDEX_MIN_GITHUB_STARS,
+          ai_review_approval_required: true,
+        },
+      },
       featured_clusters: FEATURED_SKILL_CLUSTERS.map((cluster) => ({
         slug: cluster.slug,
         title: cluster.title,
@@ -779,6 +880,11 @@ export async function GET() {
     },
     creator_growth_loop: {
       status: 'active',
+      observed_activation: {
+        approved_claims: growthSignals?.approved_creator_claims ?? null,
+        verified_creators: growthSignals?.verified_creators ?? null,
+        source: growthSignals ? 'live_public_claims' : 'temporarily_unavailable',
+      },
       workflow: [
         'index public skill from repository or creator source',
         'show listing as community indexed until a maintainer claim is approved',
