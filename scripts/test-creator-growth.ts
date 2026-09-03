@@ -63,4 +63,17 @@ const githubWebhookRoute = readFileSync(new URL('../app/api/webhooks/github/rout
 assert.match(githubWebhookRoute, /publisher_verified', true/, 'push sync must allowlist verified repositories')
 assert.match(githubWebhookRoute, /trustedRepository/, 'outbound sync must use the registry-returned repository')
 
+const batchClaimRoute = readFileSync(new URL('../app/api/claims/batch/route.ts', import.meta.url), 'utf8')
+assert.match(batchClaimRoute, /getGitHubIdentity\(user\)/, 'batch claims must use the authenticated GitHub identity')
+assert.match(batchClaimRoute, /repository\?\.owner\.toLowerCase\(\) === githubUsername/, 'batch claims must verify exact repository ownership')
+assert.match(batchClaimRoute, /publisher_verified: true/, 'batch claims must publish verified ownership to the listing')
+
+const batchClaimPanel = readFileSync(new URL('../components/creator-batch-claim.tsx', import.meta.url), 'utf8')
+assert.match(batchClaimPanel, /\/api\/claims\/batch/, 'creator dashboard must expose batch ownership verification')
+assert.match(batchClaimPanel, /creator_claim_all/, 'batch ownership completion must emit the growth event')
+
+const findSkillsSkill = readFileSync(new URL('../skills/find-skills/SKILL.md', import.meta.url), 'utf8')
+assert.match(findSkillsSkill, /\/api\/agent\/resolve/, 'official find-skills Skill must use the public resolver')
+assert.match(findSkillsSkill, /Never install a blocked/, 'official find-skills Skill must enforce the safety gate')
+
 console.log('Creator growth regression tests passed.')

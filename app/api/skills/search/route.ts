@@ -138,12 +138,13 @@ export async function GET(request: NextRequest) {
       .slice(0, shortlistLimit)
     const topSearchScore = rankedCandidates[0]?.score || 0
     const ranked = rankedCandidates
-      .map(({ skill, score, semanticRelevance, matchType }) => ({
+      .map(({ skill, score, semanticRelevance, rankingSignals, matchType }) => ({
         skill,
         score: normalizeMatchScore(score, topSearchScore, semanticRelevance),
         rawScore: score,
         semanticRelevance,
         matchType,
+        rankingSignals,
         registrySkill: toRegistrySkill(skill, null, outcomeStatsMap[skill.slug] || null),
       }))
       .filter(({ registrySkill }) => {
@@ -195,18 +196,21 @@ ${text}`,
           min_stars: Number.isFinite(minStars) ? minStars : 0,
         },
         total: ranked.length,
-        skills: ranked.map(({ skill, score, rawScore, semanticRelevance, matchType, registrySkill }, index) => ({
+        skills: ranked.map(({ skill, score, rawScore, semanticRelevance, rankingSignals, matchType, registrySkill }, index) => ({
           rank: index + 1,
           match_type: matchType,
           match_score: score,
           raw_match_score: rawScore,
           semantic_relevance: semanticRelevance,
+          ranking_signals: rankingSignals,
           ...registrySkill,
           recommendation_reasons: getRecommendationReasons(skill, query, score),
         })),
         meta: {
           endpoint: '/api/skills/search',
           canonical_agent_endpoint: '/api/agent/resolve',
+          ranking_model: 'hybrid-v2-task-fit-quality-outcomes',
+          shortlist_policy: 'Return one best match plus up to four distinct alternatives; suppress unrelated direct-name matches.',
           lookup_intent: lookupIntent,
           exact_match_found: ranked.some(({ matchType }) => matchType === 'exact'),
           match_counts: ranked.reduce<Record<SearchMatchType, number>>((counts, item) => {

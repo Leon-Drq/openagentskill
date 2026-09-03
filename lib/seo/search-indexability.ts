@@ -17,6 +17,14 @@ type SearchIndexCandidate = Pick<
   'ai_review_approved' | 'quality_score' | 'github_stars' | 'publisher_verified'
 >
 
+export interface SearchEvidenceProfile {
+  tier: 'verified-owner' | 'outcome-backed' | 'repository-backed' | 'thin'
+  label: string
+  score: number
+  indexEligible: boolean
+  signals: string[]
+}
+
 export function isSearchIndexEligible(skill: SearchIndexCandidate) {
   return (
     skill.ai_review_approved === true &&
@@ -26,4 +34,59 @@ export function isSearchIndexEligible(skill: SearchIndexCandidate) {
       skill.publisher_verified === true
     )
   )
+}
+
+export function getSearchEvidenceProfile(
+  skill: SearchIndexCandidate,
+  evidence: { verifiedInstalls?: number; totalOutcomes?: number } = {}
+): SearchEvidenceProfile {
+  const verifiedInstalls = Math.max(0, Number(evidence.verifiedInstalls || 0))
+  const totalOutcomes = Math.max(0, Number(evidence.totalOutcomes || 0))
+  const signals: string[] = []
+  let score = 0
+
+  if (skill.ai_review_approved) {
+    score += 25
+    signals.push('AI review approved')
+  }
+  score += Math.min(25, Number(skill.quality_score || 0) / 4)
+  if (Number(skill.quality_score || 0) >= SEARCH_INDEX_MIN_QUALITY_SCORE) signals.push('Quality-gated metadata')
+  if (Number(skill.github_stars || 0) >= SEARCH_INDEX_MIN_GITHUB_STARS) {
+    score += Math.min(15, Math.log10(Number(skill.github_stars || 0) + 1) * 5)
+    signals.push('Public repository adoption')
+  }
+  if (skill.publisher_verified) {
+    score += 20
+    signals.push('GitHub-verified publisher')
+  }
+  if (verifiedInstalls > 0) {
+    score += Math.min(8, Math.log10(verifiedInstalls + 1) * 5)
+    signals.push('Verified installs')
+  }
+  if (totalOutcomes > 0) {
+    score += Math.min(12, Math.log10(totalOutcomes + 1) * 7)
+    signals.push('Reported agent outcomes')
+  }
+
+  const tier = skill.publisher_verified
+    ? 'verified-owner'
+    : totalOutcomes > 0 || verifiedInstalls > 0
+      ? 'outcome-backed'
+      : isSearchIndexEligible(skill)
+        ? 'repository-backed'
+        : 'thin'
+
+  return {
+    tier,
+    label: tier === 'verified-owner'
+      ? 'Verified publisher evidence'
+      : tier === 'outcome-backed'
+        ? 'Real agent outcome evidence'
+        : tier === 'repository-backed'
+          ? 'Repository-backed evidence'
+          : 'Insufficient public evidence',
+    score: Math.min(100, Math.round(score)),
+    indexEligible: isSearchIndexEligible(skill),
+    signals,
+  }
 }

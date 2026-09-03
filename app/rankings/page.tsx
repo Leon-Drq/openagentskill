@@ -9,7 +9,7 @@ import {
   type SkillOutcomeStats,
 } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
-import { CORE_RANKINGS, getRankingDefinitions, normalizeRankingText, rankSkillsForDefinition, type RankingDefinition } from '@/lib/rankings'
+import { CORE_RANKINGS, getRankingDefinitions, getUniqueProjectStarTotal, normalizeRankingText, rankSkillsForDefinition, type RankingDefinition } from '@/lib/rankings'
 import { getLatestRankingSnapshot, RANKING_METHODOLOGY_VERSION } from '@/lib/ranking-snapshots'
 import { GitHubPopularityList } from '@/components/github-popularity-list'
 
@@ -65,8 +65,8 @@ export default async function RankingsPage() {
               { value: skills.length.toLocaleString(), label: 'Skills' },
               { value: rankingDefinitions.length, label: 'Lists' },
               {
-                value: formatNumber(skills.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0)),
-                label: 'Stars',
+                value: formatNumber(getUniqueProjectStarTotal(skills)),
+                label: 'Unique project stars',
               },
               {
                 value: formatNumber(Object.values(outcomeStatsMap).reduce((sum, row) => sum + Number(row.total_outcomes || 0), 0)),
@@ -103,7 +103,7 @@ export default async function RankingsPage() {
               <p className="text-xs uppercase tracking-widest text-secondary">Default popularity ranking</p>
               <h2 className="mt-3 font-display text-3xl font-semibold">Most-starred agent skill projects</h2>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-secondary">
-                GitHub stars are the clearest public popularity signal. We rank by stars here, while filtering out repositories that do not look like installable agent skills.
+                GitHub stars are a project-level popularity signal. Every repository appears once; nested Skills are evaluated separately by task fit, quality, safety, and real outcomes.
               </p>
             </div>
             <Link

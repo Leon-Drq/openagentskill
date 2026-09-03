@@ -14,6 +14,7 @@ export type AnalyticsEventName =
   | 'skill_claim_start'
   | 'skill_claim_submit'
   | 'skill_claim_verified'
+  | 'creator_claim_all'
   | 'skill_share_copy'
   | 'creator_github_connect_start'
   | 'creator_github_connected'

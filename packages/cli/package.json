@@ -1,6 +1,6 @@
 {
   "name": "openagentskill",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Official OpenAgentSkill CLI for task resolution, audited installs, and verified outcome receipts",
   "type": "module",
   "bin": {

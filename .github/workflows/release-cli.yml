@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   release:
@@ -22,7 +23,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -39,3 +40,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "$GITHUB_REF_NAME" dist/*.tgz --verify-tag --generate-notes --title "OpenAgentSkill CLI ${GITHUB_REF_NAME#cli-v}"
+
+      # Enable this repository variable only after the npm package has an npm
+      # Trusted Publisher linked to this exact workflow. No long-lived npm
+      # token is stored in GitHub.
+      - name: Publish npm package with provenance
+        if: ${{ vars.NPM_TRUSTED_PUBLISHING_ENABLED == 'true' }}
+        working-directory: packages/cli
+        run: npm publish --access public --provenance

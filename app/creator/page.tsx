@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { CheckCircle2, Circle, ExternalLink, GitCommitHorizontal, ShieldCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { CreatorIdentityConnections } from '@/components/creator-identity-connections'
+import { CreatorBatchClaim } from '@/components/creator-batch-claim'
 import { CreatorActivationTracker } from '@/components/creator-activation-tracker'
 import { MarketingPageShell } from '@/components/marketing-page'
 import { updateCreatorProfile } from './actions'
@@ -45,10 +46,21 @@ export default async function CreatorDashboard({
       .order('updated_at', { ascending: false }),
   ])
 
+  const verifiedGitHubUsername = profile?.github_verified_at && profile?.github_username
+    ? String(profile.github_username).toLowerCase()
+    : null
+  const { count: matchingGitHubSkillCount } = verifiedGitHubUsername
+    ? await supabase
+        .from('skills')
+        .select('slug', { count: 'exact', head: true })
+        .eq('ai_review_approved', true)
+        .ilike('github_repo', `${verifiedGitHubUsername}/%`)
+    : { count: 0 }
+
   const approvedSlugs = (claims || []).filter((claim) => claim.status === 'approved').map((claim) => claim.skill_slug)
   const [{ data: skills }, { data: events }, { data: outcomes }, { data: dailyEvents }, { data: versions }] = await Promise.all([
     approvedSlugs.length
-      ? supabase.from('skills').select('slug,name,category,repository,version,license,license_source,license_status,source_commit_sha,source_sync_status,last_synced_at').in('slug', approvedSlugs)
+      ? supabase.from('skills').select('slug,name,category,repository,github_repo,version,license,license_source,license_status,source_commit_sha,source_sync_status,last_synced_at').in('slug', approvedSlugs)
       : Promise.resolve({ data: [] }),
     approvedSlugs.length
       ? supabase.from('skill_event_stats').select('*').in('skill_slug', approvedSlugs)
@@ -68,6 +80,9 @@ export default async function CreatorDashboard({
   const outcomeMap = new Map((outcomes || []).map((row) => [row.skill_slug, row]))
   const versionCounts = new Map<string, number>()
   for (const row of versions || []) versionCounts.set(row.skill_slug, (versionCounts.get(row.skill_slug) || 0) + 1)
+  const approvedMatchingGitHubCount = verifiedGitHubUsername
+    ? (skills || []).filter((skill) => String(skill.github_repo || '').toLowerCase().startsWith(`${verifiedGitHubUsername}/`)).length
+    : 0
   const totals = (skills || []).reduce(
     (sum, skill) => {
       const event = eventMap.get(skill.slug)
@@ -147,6 +162,12 @@ export default async function CreatorDashboard({
 
       <section className="mt-10 grid gap-8 lg:grid-cols-[0.92fr_1.08fr]">
         <div className="space-y-8">
+          {verifiedGitHubUsername ? (
+            <CreatorBatchClaim
+              githubUsername={verifiedGitHubUsername}
+              availableCount={Math.max(0, Number(matchingGitHubSkillCount || 0) - approvedMatchingGitHubCount)}
+            />
+          ) : null}
           <CreatorIdentityConnections
             githubUsername={profile?.github_username}
             githubVerifiedAt={profile?.github_verified_at}

@@ -25,6 +25,7 @@ export interface RankingDefinition {
   kind: RankingKind
   useCaseSlug?: string
   agentPlatform?: string
+  entityScope?: 'project' | 'skill'
 }
 
 export interface RankedSkill {
@@ -85,8 +86,9 @@ export const CORE_RANKINGS: RankingDefinition[] = [
     shortTitle: 'Most starred',
     eyebrow: 'GitHub adoption',
     description:
-      'Skill candidates ordered by public GitHub star count, after filtering repositories that do not look like installable agent skills.',
+      'GitHub projects ordered by public star count. Each repository appears once, so one popular multi-skill repo cannot occupy the whole list.',
     kind: 'most-starred',
+    entityScope: 'project',
   },
   {
     slug: 'recently-updated-agent-skills',
@@ -359,6 +361,37 @@ function rankByUseCase(
     }))
 }
 
+function getGitHubProjectKey(skill: SkillRecord) {
+  const raw = (skill.github_repo || skill.repository || '')
+    .toLowerCase()
+    .replace(/^https?:\/\/github\.com\//, '')
+    .replace(/^github\.com\//, '')
+    .split(/[?#]/)[0]
+    .replace(/\/$/, '')
+  const [owner, repository] = raw.split('/')
+  return owner && repository ? `${owner}/${repository}` : ''
+}
+
+function dedupeRankedProjects<T extends { skill: SkillRecord }>(items: T[]) {
+  const projects = new Set<string>()
+  return items.filter((item) => {
+    const key = getGitHubProjectKey(item.skill)
+    if (!key || projects.has(key)) return false
+    projects.add(key)
+    return true
+  })
+}
+
+export function getUniqueProjectStarTotal(skills: SkillRecord[]) {
+  const stars = new Map<string, number>()
+  for (const skill of skills) {
+    const key = getGitHubProjectKey(skill)
+    if (!key) continue
+    stars.set(key, Math.max(stars.get(key) || 0, Number(skill.github_stars || 0)))
+  }
+  return [...stars.values()].reduce((total, value) => total + value, 0)
+}
+
 export function rankSkillsForDefinition(
   skills: SkillRecord[],
   definition: RankingDefinition,
@@ -580,7 +613,11 @@ export function rankSkillsForDefinition(
     })
     .sort((a, b) => b.sortScore - a.sortScore || b.score - a.score || b.skill.github_stars - a.skill.github_stars)
 
-  return dedupeRankedSkills(scored)
+  const deduped = definition.entityScope === 'project'
+    ? dedupeRankedProjects(scored)
+    : dedupeRankedSkills(scored)
+
+  return deduped
     .slice(0, limit)
     .map((item, index) => ({
       skill: item.skill,
