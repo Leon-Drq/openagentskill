@@ -65,20 +65,20 @@ The same resolver is available as [JSON](https://www.openagentskill.com/api/agen
 Run the pinned, dependency-free GitHub Release:
 
 ```bash
-npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz resolve "extract tables from PDF reports" --agent codex
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz resolve "extract tables from PDF reports" --agent codex
 ```
 
 Useful commands:
 
 ```bash
 # Search without installing
-npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz search "browser automation"
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz find "browser automation"
 
 # Inspect a reviewed install plan
-npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install <skill-slug> --agent codex --dry-run
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz add <skill-slug> --agent codex --dry-run
 
 # Read the outcome reporting contract
-npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz outcome-contract
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz outcome-contract
 ```
 
 The CLI refuses blocked Skills, requires explicit confirmation before execution, and supports `--no-telemetry`. Source and usage details live in [`packages/cli`](./packages/cli/README.md).

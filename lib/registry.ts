@@ -834,19 +834,34 @@ export function rankSkillsForQuery(
         score += getSpecializedEngineeringWorkflowScore(normalizedQuery, skill)
       }
 
-      score += Math.min(24, Number(skill.quality_score || 0) / 4)
-      score += Math.min(22, Math.log10(Number(skill.github_stars || 0) + 1) * 5)
+      const retrievalScore = score
+      const qualityBoost = Math.min(24, Number(skill.quality_score || 0) / 4)
+      const popularityBoost = Math.min(22, Math.log10(Number(skill.github_stars || 0) + 1) * 5)
+      const outcomeBoost = getOutcomeUsageScore(statsMap[skill.slug])
+      score += qualityBoost
+      score += popularityBoost
       // Legacy download counters are not independently verifiable. Real
       // outcome and verified-install evidence is added by getOutcomeUsageScore.
-      score += getOutcomeUsageScore(statsMap[skill.slug])
-      if (skill.verified) score += 6
+      score += outcomeBoost
+      const verifiedBoost = skill.verified ? 6 : 0
+      score += verifiedBoost
+
+      const semanticRelevance = hasRequiredIntentEvidence(queryIntent, normalizedQuery, category, evidenceText)
+        ? getSkillQueryRelevance(skill, query)
+        : 0
 
       return {
         skill,
         score: Math.round(score * 10) / 10,
-        semanticRelevance: hasRequiredIntentEvidence(queryIntent, normalizedQuery, category, evidenceText)
-          ? getSkillQueryRelevance(skill, query)
-          : 0,
+        semanticRelevance,
+        rankingSignals: {
+          retrieval: Math.round(retrievalScore * 10) / 10,
+          semantic: semanticRelevance,
+          quality: Math.round(qualityBoost * 10) / 10,
+          projectPopularity: Math.round(popularityBoost * 10) / 10,
+          verifiedOutcomes: Math.round(outcomeBoost * 10) / 10,
+          verifiedSource: verifiedBoost,
+        },
       }
     })
     .filter((item) => !query.trim() || (item.score > 18 && item.semanticRelevance >= 30))

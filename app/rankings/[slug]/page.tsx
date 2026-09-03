@@ -96,6 +96,17 @@ export default async function RankingDetailPage({
     name: ranking.title,
     description: ranking.description,
     url: `https://www.openagentskill.com/rankings/${ranking.slug}`,
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: rankedSkills.length,
+      itemListOrder: 'https://schema.org/ItemListOrderDescending',
+      itemListElement: rankedSkills.map((item) => ({
+        '@type': 'ListItem',
+        position: item.rank,
+        name: normalizeRankingText(item.skill.name),
+        url: `https://www.openagentskill.com/skills/${item.skill.slug}`,
+      })),
+    },
   }
 
   return (
@@ -153,13 +164,13 @@ export default async function RankingDetailPage({
           <div className="grid grid-cols-3 gap-px self-end border border-border bg-border text-center">
             <div className="bg-background p-4">
               <div className="font-mono text-2xl">{rankedSkills.length}</div>
-              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Ranked</div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">{ranking.entityScope === 'project' ? 'Projects' : 'Ranked skills'}</div>
             </div>
             <div className="bg-background p-4">
               <div className="font-mono text-2xl">
                 {formatCompactNumber(rankedSkills.reduce((sum, item) => sum + Number(item.skill.github_stars || 0), 0))}
               </div>
-              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Stars</div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">{ranking.entityScope === 'project' ? 'Project stars' : 'Stars'}</div>
             </div>
             <div className="bg-background p-4">
               <div className="font-mono text-2xl">

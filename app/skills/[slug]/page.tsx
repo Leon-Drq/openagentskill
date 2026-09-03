@@ -46,7 +46,7 @@ import {
   type TrustCheckStatus,
 } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
-import { isSearchIndexEligible } from '@/lib/seo/search-indexability'
+import { getSearchEvidenceProfile, isSearchIndexEligible } from '@/lib/seo/search-indexability'
 import { buildSkillSearchMetadata } from '@/lib/seo/search-metadata'
 import {
   buildManualXMainText,
@@ -321,42 +321,74 @@ export default async function SkillDetailPage({
     dbSkill?.publisher_x ? `https://x.com/${dbSkill.publisher_x}` : null,
   ].filter((profile): profile is string => Boolean(profile))
 
+  const searchEvidence = dbSkill
+    ? getSearchEvidenceProfile(dbSkill, {
+        verifiedInstalls: outcomeStats?.verified_installs,
+        totalOutcomes: outcomeStats?.total_outcomes,
+      })
+    : null
+
   const structuredData = {
     '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: skill.name,
-    description: skill.description,
-    applicationCategory: skill.category,
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    aggregateRating:
-      skill.stats.reviewCount > 0
-        ? {
-            '@type': 'AggregateRating',
-            ratingValue: skill.stats.rating,
-            reviewCount: skill.stats.reviewCount,
-          }
-        : undefined,
-    operatingSystem: skill.compatibility.map((c) => c.platform),
-    softwareVersion: skill.technical.version,
-    datePublished: skill.createdAt,
-    dateModified: skill.updatedAt,
-    author: {
-      '@type': skill.author.verified ? 'Organization' : 'Person',
-      name: skill.author.name,
-      url: attribution?.creatorUrl || undefined,
-      sameAs: publisherProfiles.length > 0 ? publisherProfiles : undefined,
-    },
-    sameAs: [attribution?.sourceUrl, attribution?.creatorUrl].filter(Boolean),
-    downloadUrl: skill.technical.repository,
-    codeRepository: skill.technical.repository,
-    potentialAction: {
-      '@type': 'InstallAction',
-      target: `https://www.openagentskill.com${installApiHref}`,
-      object: {
+    '@graph': [
+      {
         '@type': 'SoftwareApplication',
+        '@id': `https://www.openagentskill.com/skills/${skill.slug}#skill`,
         name: skill.name,
+        description: skill.description,
+        applicationCategory: skill.category,
+        isAccessibleForFree: true,
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        operatingSystem: skill.compatibility.map((c) => c.platform),
+        softwareVersion: skill.technical.version,
+        datePublished: skill.createdAt,
+        dateModified: skill.updatedAt,
+        license: skill.technical.license && skill.technical.license !== 'Unknown' ? skill.technical.license : undefined,
+        author: {
+          '@type': skill.author.verified ? 'Organization' : 'Person',
+          name: skill.author.name,
+          url: attribution?.creatorUrl || undefined,
+          sameAs: publisherProfiles.length > 0 ? publisherProfiles : undefined,
+        },
+        sameAs: [attribution?.sourceUrl, attribution?.creatorUrl].filter(Boolean),
+        downloadUrl: skill.technical.repository,
+        codeRepository: skill.technical.repository,
+        interactionStatistic: [
+          verifiedInstalls > 0 ? {
+            '@type': 'InteractionCounter',
+            interactionType: 'https://schema.org/InstallAction',
+            userInteractionCount: verifiedInstalls,
+          } : null,
+          Number(outcomeStats?.total_outcomes || 0) > 0 ? {
+            '@type': 'InteractionCounter',
+            interactionType: 'https://schema.org/UseAction',
+            userInteractionCount: Number(outcomeStats?.total_outcomes || 0),
+          } : null,
+        ].filter(Boolean),
+        additionalProperty: searchEvidence ? [
+          { '@type': 'PropertyValue', name: 'Evidence tier', value: searchEvidence.label },
+          { '@type': 'PropertyValue', name: 'Evidence score', value: searchEvidence.score },
+          { '@type': 'PropertyValue', name: 'Quality score', value: qualityProfile?.score },
+          { '@type': 'PropertyValue', name: 'Project-level GitHub stars', value: dbSkill?.github_stars || 0 },
+        ] : undefined,
+        potentialAction: {
+          '@type': 'InstallAction',
+          target: `https://www.openagentskill.com${installApiHref}`,
+          object: {
+            '@type': 'SoftwareApplication',
+            name: skill.name,
+          },
+        },
       },
-    },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Skills', item: 'https://www.openagentskill.com/skills' },
+          { '@type': 'ListItem', position: 2, name: skill.category, item: `https://www.openagentskill.com/skills?category=${encodeURIComponent(skill.category)}` },
+          { '@type': 'ListItem', position: 3, name: skill.name, item: `https://www.openagentskill.com/skills/${skill.slug}` },
+        ],
+      },
+    ],
   }
 
   return (

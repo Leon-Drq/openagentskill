@@ -4,19 +4,19 @@ import { randomUUID } from 'node:crypto'
 import { spawn } from 'node:child_process'
 
 const DEFAULT_BASE_URL = 'https://www.openagentskill.com'
-const CLI_VERSION = '0.2.1'
-const SOURCE_COMMAND = 'npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz'
+const CLI_VERSION = '0.3.0'
+const SOURCE_COMMAND = 'npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz'
 const KNOWN_AGENTS = new Set(['codex', 'claude-code', 'cursor', 'open-claw'])
 
 function help() {
   console.log(`OpenAgentSkill CLI
 
 Usage:
-  openagentskill search "<task>" [--limit 5] [--json]
+  openagentskill search|find "<task>" [--limit 5] [--json]
   openagentskill resolve "<task>" [--agent codex] [--max-risk medium] [--json]
   openagentskill lock "<task>" [--agent codex] [--json]
   openagentskill inspect <slug> [--json]
-  openagentskill install <slug> [--agent codex] [--dry-run] [--yes] [--no-telemetry]
+  openagentskill install|add <slug> [--agent codex] [--dry-run] [--yes] [--no-telemetry]
   openagentskill receipt "<task>" [--agent codex] [--json]
   openagentskill pack <pack-slug> [--limit 6] [--json]
   openagentskill outcome <event-id> --skill <slug> --task "<task>" [--outcome success]
@@ -32,6 +32,12 @@ Environment:
   OPENAGENTSKILL_API_URL   API origin (default: ${DEFAULT_BASE_URL})
   OPENAGENTSKILL_TELEMETRY Set to 0/false/off to disable outcome reporting
 `)
+}
+
+function requireValue(value, label) {
+  const normalized = String(value || '').trim()
+  if (!normalized) throw new Error(`Missing ${label}. Run openagentskill --help for examples.`)
+  return normalized
 }
 
 function parseArgs(args) {
@@ -77,6 +83,7 @@ function print(value, flags) {
 }
 
 async function search(baseUrl, task, flags) {
+  task = requireValue(task, 'task')
   const params = new URLSearchParams({ task, limit: String(flags.limit || 5) })
   const payload = await request(baseUrl, `/api/skills/search?${params}`)
   if (jsonEnabled(flags)) return print(payload, flags)
@@ -94,6 +101,7 @@ async function search(baseUrl, task, flags) {
 }
 
 async function resolve(baseUrl, task, flags) {
+  task = requireValue(task, 'task')
   const payload = await request(baseUrl, '/api/agent/resolve', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -139,6 +147,7 @@ async function lock(baseUrl, task, flags) {
 }
 
 async function inspect(baseUrl, slug, flags) {
+  slug = requireValue(slug, 'skill slug')
   const payload = await request(baseUrl, `/api/skills/${encodeURIComponent(slug)}/install`)
   if (jsonEnabled(flags)) return print(payload, flags)
   console.log(`${payload.skill.name} (${payload.skill.slug})`)
@@ -216,6 +225,7 @@ async function reportInstallStart(baseUrl, payload, eventId, agent, flags) {
 }
 
 async function install(baseUrl, slug, flags) {
+  slug = requireValue(slug, 'skill slug')
   const payload = await request(baseUrl, `/api/skills/${encodeURIComponent(slug)}/install`)
   if (payload.safety_gate?.blocked) {
     throw new Error(`Install blocked by safety policy: ${payload.safety_gate.recommended_action}`)
@@ -326,12 +336,13 @@ async function main() {
   const baseUrl = String(process.env.OPENAGENTSKILL_API_URL || DEFAULT_BASE_URL).replace(/\/$/, '')
   const { flags, rest } = parseArgs(args)
   if (!command || ['help', '--help', '-h'].includes(command)) return help()
+  if (['version', '--version', '-v'].includes(command)) return console.log(CLI_VERSION)
 
-  if (command === 'search') return search(baseUrl, rest.join(' ').trim(), flags)
+  if (command === 'search' || command === 'find') return search(baseUrl, rest.join(' ').trim(), flags)
   if (command === 'resolve') return resolve(baseUrl, rest.join(' ').trim(), flags)
   if (command === 'lock') return lock(baseUrl, rest.join(' ').trim(), flags)
   if (command === 'inspect') return inspect(baseUrl, rest[0], flags)
-  if (command === 'install') return install(baseUrl, rest[0], flags)
+  if (command === 'install' || command === 'add') return install(baseUrl, rest[0], flags)
   if (command === 'receipt') return receipt(baseUrl, rest.join(' ').trim(), flags)
   if (command === 'pack') return pack(baseUrl, rest[0], flags)
   if (command === 'outcome') return outcome(baseUrl, rest[0], flags)

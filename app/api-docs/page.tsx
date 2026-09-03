@@ -576,7 +576,7 @@ Total: 2 skills found
 [1] Crawl4AI
 - Slug: crawl4ai
 - Category: Web Scraping
-- Install: npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install crawl4ai --dry-run
+- Install: npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz add crawl4ai --dry-run
 - Trust: 91/100 Production candidate
 - Verified installs: 0
 - Outcomes: 1
@@ -585,7 +585,7 @@ Total: 2 skills found
 [2] Code Review Assistant
 - Slug: code-review-assistant
 - Category: Developer Tools
-- Install: npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install code-review-assistant --dry-run
+- Install: npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz add code-review-assistant --dry-run
 - Trust: 77/100 Strong shortlist
 - Verified installs: 0
 - Outcomes: 0
@@ -789,7 +789,7 @@ Total: 2 skills found
                 <code>{`=== Crawl4AI ===
 
 INSTALL:
-npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install crawl4ai --dry-run
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz add crawl4ai --dry-run
 
 DESCRIPTION:
 Comprehensive web research with multi-source aggregation

@@ -5,16 +5,20 @@ installing a Skill through the standard `skills` installer, and reporting a
 verified install receipt.
 
 ```bash
-npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz search "extract tables from PDF reports"
-npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz resolve "extract tables from PDF reports" --agent codex
-npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz inspect anthropic-frontend-design
-npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install anthropic-frontend-design --agent codex --dry-run
-npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install anthropic-frontend-design --agent codex --yes
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz find "extract tables from PDF reports"
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz resolve "extract tables from PDF reports" --agent codex
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz inspect anthropic-frontend-design
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz add anthropic-frontend-design --agent codex --dry-run
+npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz add anthropic-frontend-design --agent codex --yes
 ```
 
 Reviewed Skills require `--yes`; blocked Skills are never executed. Set
 `OPENAGENTSKILL_TELEMETRY=0` or pass `--no-telemetry` to disable anonymous
 install outcome reporting.
+
+The npm package manifest is ready for Trusted Publishing. Until the npm
+publisher is enabled, the immutable GitHub Release URL above remains the
+official executable source.
 
 The CLI does not execute arbitrary registry commands. It accepts only the
 standard `npx skills add owner/repo` command shape returned by the install API,

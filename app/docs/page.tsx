@@ -41,7 +41,7 @@ export default function DocsPage() {
           </p>
           <div className="border border-border bg-card p-4 sm:p-6 mb-6">
             <pre className="font-mono text-sm sm:text-base overflow-x-auto">
-              <code>{'npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.2.1/openagentskill-0.2.1.tgz install <skill-slug> --agent codex --dry-run'}</code>
+              <code>{'npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz add <skill-slug> --agent codex --dry-run'}</code>
             </pre>
           </div>
           <p className="text-base sm:text-lg leading-relaxed text-secondary">
