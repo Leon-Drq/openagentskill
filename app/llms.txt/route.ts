@@ -47,7 +47,8 @@ Important URLs:
 - Agent Integration Kit API: https://www.openagentskill.com/api/agent/integration-kit
 - Remote MCP server: https://www.openagentskill.com/api/mcp
 - MCP discovery: https://www.openagentskill.com/.well-known/mcp.json
-- JavaScript SDK: @openagentskill/sdk (source: https://github.com/Leon-Drq/openagentskill/tree/codex/daily-skill-rankings/packages/sdk)
+- JavaScript SDK: @openagentskill/sdk (source: https://github.com/Leon-Drq/openagentskill/tree/main/packages/sdk)
+- Registry coverage and tier definitions: https://www.openagentskill.com/api/registry/stats
 - Tasks: https://www.openagentskill.com/tasks
 - Task API: https://www.openagentskill.com/api/agent/tasks
 - Resolve API: https://www.openagentskill.com/api/agent/resolve
@@ -81,6 +82,7 @@ ${featuredTasks}
 Coverage:
 - Skill cluster pages: ${SKILL_CLUSTERS.length}
 - Task pages: ${AGENT_TASKS.length}
+- Public skill pages contain only installable skills. Discovered projects and validated candidates remain non-indexable until publication.
 
 Install safety:
 - Prefer /api/agent/resolve over raw search because it applies the OpenAgentSkill safety gate.

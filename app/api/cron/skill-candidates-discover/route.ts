@@ -4,6 +4,7 @@ import { searchHotSkillRepos } from '@/lib/indexer/hot-skill-discovery'
 import { AUTOMATIC_DISCOVERY_MIN_STARS } from '@/lib/indexer/intake-policy'
 import { recordIndexerRun } from '@/lib/indexer/run-log'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
+import { refreshRegistryCoverageStats } from '@/lib/registry-coverage'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -44,6 +45,7 @@ async function handleRun(request: NextRequest) {
       queryOffset: hourlyWindow * maxQueries,
     })
     const intake = await enqueueRepositoryCandidates(discovery.candidates, 'github-candidate-discovery')
+    const coverage = await refreshRegistryCoverageStats()
 
     await recordIndexerRun({
       mode: 'candidate-discovery',
@@ -64,6 +66,7 @@ async function handleRun(request: NextRequest) {
         per_page: perPage,
         rate_limited: discovery.rateLimited,
         retry_after_ms: discovery.retryAfterMs,
+        coverage_refreshed: coverage.refreshed,
       },
     })
 
@@ -79,6 +82,7 @@ async function handleRun(request: NextRequest) {
         retry_after_ms: discovery.retryAfterMs,
       },
       intake,
+      coverage,
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Candidate discovery failed'

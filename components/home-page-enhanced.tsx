@@ -19,6 +19,10 @@ interface HomePageEnhancedProps {
     totalOutcomes: number
     provenSkills: number
     evidenceExact: boolean
+    discoveredProjects: number | null
+    validatedSkills: number | null
+    coverageExact: boolean
+    coverageUpdatedAt: string | null
   }
   activities: Array<{
     id: string
@@ -308,7 +312,7 @@ const HOME_COPY: Record<Locale, {
     primaryCta: 'Find skills for my agent',
     githubCta: 'View on GitHub',
     registryApi: 'Registry API',
-    stats: ['Indexed skills', 'Verified installs', 'Agent outcomes', 'Skills with evidence'],
+    stats: ['Installable skills', 'Verified installs', 'Agent outcomes', 'Skills with evidence'],
     taskEyebrow: 'Agent resolve',
     taskTitle: 'Describe the task. Get one safe skill plan.',
     taskIntro: 'The API returns a selected skill, alternatives, policy decision, audit notes, and install plan before an agent acts.',
@@ -361,7 +365,7 @@ const HOME_COPY: Record<Locale, {
     primaryCta: '为我的 Agent 找技能',
     githubCta: '查看 GitHub',
     registryApi: '注册表 API',
-    stats: ['已收录技能', '已验证安装', 'Agent 运行结果', '有实证的技能'],
+    stats: ['可安装技能', '已验证安装', 'Agent 运行结果', '有实证的技能'],
     taskEyebrow: 'Agent 解析',
     taskTitle: '描述任务，得到一个安全的 Skill 方案。',
     taskIntro: 'Agent 执行前，API 会返回首选 Skill、备选项、策略判断、审计说明和安装计划。',
@@ -414,7 +418,7 @@ const HOME_COPY: Record<Locale, {
     primaryCta: 'Agent に合う Skill を探す',
     githubCta: 'GitHub を見る',
     registryApi: 'Registry API',
-    stats: ['登録済み Skill', '検証済みインストール', 'Agent 実行結果', '実証済み Skill'],
+    stats: ['インストール可能な Skill', '検証済みインストール', 'Agent 実行結果', '実証済み Skill'],
     taskEyebrow: 'Agent resolve',
     taskTitle: 'タスクを説明し、安全な Skill プランを得る。',
     taskIntro: 'API は Agent が動く前に、選択 Skill、代替案、ポリシー判断、監査メモ、インストール手順を返します。',
@@ -467,7 +471,7 @@ const HOME_COPY: Record<Locale, {
     primaryCta: 'Agent에 맞는 Skill 찾기',
     githubCta: 'GitHub 보기',
     registryApi: 'Registry API',
-    stats: ['등록된 Skill', '검증된 설치', 'Agent 실행 결과', '증거가 있는 Skill'],
+    stats: ['설치 가능한 Skill', '검증된 설치', 'Agent 실행 결과', '증거가 있는 Skill'],
     taskEyebrow: 'Agent resolve',
     taskTitle: '작업을 설명하면 안전한 Skill 계획을 받습니다.',
     taskIntro: 'API는 Agent가 실행하기 전에 선택 Skill, 대안, 정책 판단, 감사 메모, 설치 계획을 반환합니다.',
@@ -520,7 +524,7 @@ const HOME_COPY: Record<Locale, {
     primaryCta: 'Buscar skills para mi agent',
     githubCta: 'Ver en GitHub',
     registryApi: 'Registry API',
-    stats: ['Skills indexados', 'Instalaciones verificadas', 'Resultados agent', 'Skills con evidencia'],
+    stats: ['Skills instalables', 'Instalaciones verificadas', 'Resultados agent', 'Skills con evidencia'],
     taskEyebrow: 'Agent resolve',
     taskTitle: 'Describe la tarea. Recibe un plan de skill seguro.',
     taskIntro: 'La API devuelve un skill elegido, alternativas, decision de politica, notas de auditoria y plan de instalacion antes de que actue el agent.',
@@ -573,7 +577,7 @@ const HOME_COPY: Record<Locale, {
     primaryCta: 'Skills fur meinen Agent finden',
     githubCta: 'Auf GitHub ansehen',
     registryApi: 'Registry API',
-    stats: ['Indexierte Skills', 'Verifizierte Installationen', 'Agent-Ergebnisse', 'Skills mit Evidenz'],
+    stats: ['Installierbare Skills', 'Verifizierte Installationen', 'Agent-Ergebnisse', 'Skills mit Evidenz'],
     taskEyebrow: 'Agent resolve',
     taskTitle: 'Beschreibe die Aufgabe. Erhalte einen sicheren Skill-Plan.',
     taskIntro: 'Die API liefert ausgewahlten Skill, Alternativen, Policy-Entscheidung, Audit-Notizen und Installationsplan, bevor der Agent handelt.',
@@ -626,7 +630,7 @@ const HOME_COPY: Record<Locale, {
     primaryCta: 'Trouver des skills pour mon agent',
     githubCta: 'Voir sur GitHub',
     registryApi: 'Registry API',
-    stats: ['Skills indexes', 'Installations verifiees', 'Resultats agent', 'Skills avec preuves'],
+    stats: ['Skills installables', 'Installations verifiees', 'Resultats agent', 'Skills avec preuves'],
     taskEyebrow: 'Agent resolve',
     taskTitle: 'Decrivez la tache. Obtenez un plan de skill sur.',
     taskIntro: 'L API renvoie un skill choisi, des alternatives, une decision de politique, des notes d audit et un plan d installation avant que l agent agisse.',
@@ -679,7 +683,7 @@ const HOME_COPY: Record<Locale, {
     primaryCta: 'Cari skill untuk agent saya',
     githubCta: 'Lihat di GitHub',
     registryApi: 'Registry API',
-    stats: ['Skill terindeks', 'Instalasi terverifikasi', 'Hasil agent', 'Skill dengan bukti'],
+    stats: ['Skill siap dipasang', 'Instalasi terverifikasi', 'Hasil agent', 'Skill dengan bukti'],
     taskEyebrow: 'Agent resolve',
     taskTitle: 'Jelaskan tugasnya. Dapatkan satu rencana skill yang aman.',
     taskIntro: 'Sebelum agent berjalan, API mengembalikan skill pilihan, alternatif, keputusan kebijakan, catatan audit, dan rencana pemasangan.',
@@ -736,16 +740,25 @@ const DISCOVERY_COPY: Record<string, {
   liveApi: string
   sourceRefresh: string
   machineContract: string
+  discoveredProjects: string
+  validatedSkills: string
+  installableSkills: string
 }> = {
   en: {
     liveApi: 'Live agent API',
     sourceRefresh: 'Source refresh',
     machineContract: 'Machine contract',
+    discoveredProjects: 'Projects found',
+    validatedSkills: 'Validated skills',
+    installableSkills: 'Installable',
   },
   zh: {
     liveApi: '实时 Agent API',
     sourceRefresh: '数据刷新',
     machineContract: '机器接口',
+    discoveredProjects: '已发现项目',
+    validatedSkills: '已验证技能',
+    installableSkills: '可安装',
   },
 }
 
@@ -802,6 +815,12 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
   const copy = HOME_COPY[activeLocale] || HOME_COPY.en
   const discoveryCopy = DISCOVERY_COPY[activeLocale] || DISCOVERY_COPY.en
   const totalSkillsLabel = `${stats.totalSkills.toLocaleString()}${stats.totalSkillsExact ? '' : '+'}`
+  const discoveredProjectsLabel = stats.coverageExact && stats.discoveredProjects !== null
+    ? stats.discoveredProjects.toLocaleString()
+    : 'Live'
+  const validatedSkillsLabel = stats.coverageExact && stats.validatedSkills !== null
+    ? stats.validatedSkills.toLocaleString()
+    : 'Live'
   const statItems = [
     [totalSkillsLabel, copy.stats[0]],
     [stats.evidenceExact ? stats.totalVerifiedInstalls.toLocaleString() : 'Live', stats.evidenceExact ? copy.stats[1] : discoveryCopy.liveApi],
@@ -1309,9 +1328,9 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
             <div className="min-w-0 md:col-span-5">
               <div className="grid overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8] sm:grid-cols-3">
                 {[
-                  ['Indexed', totalSkillsLabel],
-                  ['Signals', 'Fit · Risk'],
-                  ['Surface', 'API · UI'],
+                  [discoveryCopy.discoveredProjects, discoveredProjectsLabel],
+                  [discoveryCopy.validatedSkills, validatedSkillsLabel],
+                  [discoveryCopy.installableSkills, totalSkillsLabel],
                 ].map(([label, value]) => (
                   <div key={label} className="border-b border-[#e4e0d8] px-4 py-3 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
                     <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6d675e]">{label}</p>

@@ -113,7 +113,7 @@ export interface SkillTrustV5Decision {
 }
 
 export interface SkillTrustV5OutcomeLoop {
-  version: 'openagentskill-agent-outcome-v3'
+  version: 'openagentskill-agent-outcome-v4'
   required_after_install: boolean
   endpoint: '/api/agent/outcome'
   method: 'POST'
@@ -1191,7 +1191,7 @@ function buildV5Decision(
 
 function buildV5OutcomeLoop(): SkillTrustV5OutcomeLoop {
   return {
-    version: 'openagentskill-agent-outcome-v3',
+    version: 'openagentskill-agent-outcome-v4',
     required_after_install: true,
     endpoint: '/api/agent/outcome',
     method: 'POST',
@@ -1207,6 +1207,7 @@ function buildV5OutcomeLoop(): SkillTrustV5OutcomeLoop {
       'workspace',
       'evidence_url',
       'time_to_useful_ms',
+      'source_version',
     ],
     ranking_inputs_updated: [
       'Trust Score v5 outcome confidence',

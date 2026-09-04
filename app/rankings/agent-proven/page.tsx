@@ -12,6 +12,7 @@ import {
   convertSkillRecordToManifest,
   getAgentOutcomeStatsMap,
   getAllSkills,
+  getSkillsBySlugs,
   getSkillEventStatsMap,
   type SkillEventStats,
   type SkillOutcomeStats,
@@ -182,11 +183,20 @@ function SkillEvidenceRow({
 
 export default async function AgentProvenRankingsPage() {
   const ranking = getRankingDefinition('agent-proven')
-  const [skills, outcomeStatsMap, eventStatsMap] = await Promise.all([
-    getAllSkills('quality', undefined, 1600).catch(() => []),
-    getAgentOutcomeStatsMap().catch((): Record<string, SkillOutcomeStats> => ({})),
+  const outcomeStatsMap = await getAgentOutcomeStatsMap()
+    .catch((): Record<string, SkillOutcomeStats> => ({}))
+  const provenSlugs = Object.values(outcomeStatsMap)
+    .filter((stats) => Number(stats.total_outcomes || 0) > 0)
+    .sort((left, right) => Number(right.agent_proven_score || 0) - Number(left.agent_proven_score || 0))
+    .map((stats) => stats.skill_slug)
+  const [provenRecords, qualityBaseline, eventStatsMap] = await Promise.all([
+    getSkillsBySlugs(provenSlugs.slice(0, 500)).catch(() => []),
+    getAllSkills('quality', undefined, 160).catch(() => []),
     getSkillEventStatsMap().catch((): Record<string, SkillEventStats> => ({})),
   ])
+  const skills = [...new Map(
+    [...provenRecords, ...qualityBaseline].map((skill) => [skill.slug, skill])
+  ).values()]
 
   const rankedSkills = ranking
     ? rankSkillsForDefinition(skills, ranking, outcomeStatsMap, 36)
