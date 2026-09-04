@@ -118,6 +118,11 @@ const SKILL_DIRECTORY_SELECT = [
   'quality_signals',
   'github_language',
   'github_last_pushed_at',
+  'source_ref',
+  'source_path',
+  'source_commit_sha',
+  'source_content_hash',
+  'source_sync_status',
   'created_at',
   'updated_at',
 ].join(',')
@@ -289,11 +294,20 @@ async function fetchAllSkills(
       query = query.eq('category', category)
     }
 
-    // Always use the quality-gated directory index for public browsing. The
-    // presentation sort is applied to this bounded, high-quality candidate
-    // set below, which avoids a full-table sort whenever someone changes a
-    // list tab or navigates into a locale-specific directory page.
-    query = query.order('quality_score', { ascending: false }).order('github_stars', { ascending: false })
+    // Fetch from the matching indexed order. Sorting a quality-only shortlist
+    // locally made global Stars/New/Fresh rankings incomplete even though the
+    // UI claimed registry-wide coverage.
+    if (sort === 'stars') {
+      query = query.order('github_stars', { ascending: false }).order('quality_score', { ascending: false })
+    } else if (sort === 'new') {
+      query = query.order('created_at', { ascending: false }).order('quality_score', { ascending: false })
+    } else if (sort === 'fresh') {
+      query = query.order('github_last_pushed_at', { ascending: false, nullsFirst: false }).order('quality_score', { ascending: false })
+    } else if (sort === 'downloads' || sort === 'trending') {
+      query = query.order('downloads', { ascending: false }).order('created_at', { ascending: false })
+    } else {
+      query = query.order('quality_score', { ascending: false }).order('github_stars', { ascending: false })
+    }
 
     const { data, error } = await query.range(from, from + pageSize - 1)
     if (error) throw error

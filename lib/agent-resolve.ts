@@ -209,6 +209,14 @@ interface ResolverRecommendationCandidate {
     github_stars: number
     created_at: string
     updated_at: string
+    source_version?: {
+      version: string
+      commit_sha: string | null
+      content_hash: string | null
+      ref: string | null
+      path: string | null
+      sync_status: string | null
+    }
   }
   urls: {
     web: string
@@ -290,6 +298,7 @@ function buildResolverRecommendation(
       audit_url: selected.urls.audit,
       eval_url: selected.urls.eval,
       repository: selected.urls.repository,
+      source_version: selected.skill.source_version || null,
     },
     install: {
       command: selected.install_plan.command,
@@ -404,6 +413,7 @@ function buildResolverRecommendation(
         api_url: selected.urls.api,
         audit_url: selected.urls.audit,
         repository: selected.urls.repository,
+        source_version: selected.skill.source_version || null,
       },
       suited_tasks: selected.machine_metadata.suited_tasks,
       suited_agents: selected.machine_metadata.suited_agents,
@@ -573,6 +583,14 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         updated_at: skill.github_last_pushed_at || skill.updated_at,
         repository: skill.repository,
         github_repo: skill.github_repo,
+        source_version: {
+          version: skill.version,
+          commit_sha: skill.source_commit_sha || null,
+          content_hash: skill.source_content_hash || null,
+          ref: skill.source_ref || null,
+          path: skill.source_path || null,
+          sync_status: skill.source_sync_status || null,
+        },
       },
       recommendation_reasons: getRecommendationReasons(skill, task, matchScore),
       supply_profile: supplyProfile,
@@ -671,6 +689,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     selectedSlug: selected?.skill.slug || null,
     selectedName: selected?.skill.name || null,
     alternativeSlugs: alternatives.slice(0, 5).map((candidate) => candidate.skill.slug),
+    sourceVersion: selected?.skill.source_version || null,
   })
   const agentFeedbackLoop = selected
     ? {

@@ -34,6 +34,14 @@ const OutcomeSchema = z.object({
   evidence_url: z.string().url().max(500).nullable().optional(),
   time_to_useful_ms: z.number().int().nonnegative().nullable().optional(),
   notes: z.string().max(3000).nullable().optional(),
+  source_version: z.object({
+    version: z.string().max(50).nullable().optional(),
+    commit_sha: z.string().regex(/^[a-f0-9]{7,64}$/i).nullable().optional(),
+    content_hash: z.string().regex(/^[a-f0-9]{64}$/i).nullable().optional(),
+    ref: z.string().max(255).nullable().optional(),
+    path: z.string().max(1000).nullable().optional(),
+    sync_status: z.string().max(50).nullable().optional(),
+  }).nullable().optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
   dry_run: z.boolean().optional().default(false),
 })
@@ -59,6 +67,11 @@ function buildOutcomeContract() {
       human_review_required: 'true when the run cannot be trusted without a human check',
       used_in_production: 'true only after a production workflow used the skill',
       evidence_url: 'optional URL to logs, PR, issue, or public artifact',
+    },
+    version_attribution: {
+      field: 'source_version from the resolve/install receipt',
+      verification: 'A supplied content hash must match the current skill or a recorded historical skill version.',
+      aggregate_behavior: 'Version evidence is stored privately with the outcome while public pages expose aggregates.',
     },
     aggregate_fields: {
       agent_proven_score: '0-100 aggregate score from outcomes, success, recency, install attempts, quality, production use, and risk penalties',
@@ -90,6 +103,13 @@ function buildOutcomeContract() {
       evidence_url: null,
       time_to_useful_ms: 120000,
       notes: 'Solved one narrow sandbox task; no secrets or production data touched.',
+      source_version: {
+        version: '1.0.0',
+        commit_sha: '0123456789abcdef0123456789abcdef01234567',
+        content_hash: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+        ref: 'main',
+        path: 'SKILL.md',
+      },
       dry_run: false,
     },
   }
@@ -136,9 +156,67 @@ export async function POST(request: NextRequest) {
 
     const payload = parsed.data
     const supabase = createPublicClient()
+    const { data: skill, error: skillError } = await supabase
+      .from('skills')
+      .select('slug,name,version,source_commit_sha,source_content_hash,source_ref,source_path,source_sync_status,ai_review_approved')
+      .eq('slug', payload.skill_slug)
+      .eq('ai_review_approved', true)
+      .maybeSingle()
+
+    if (skillError) {
+      return NextResponse.json({ error: 'Failed to validate skill' }, { status: 500 })
+    }
+    if (!skill) {
+      return NextResponse.json({ error: 'Skill not found' }, { status: 404 })
+    }
+
+    let sourceVersionVerified = false
+    let recordedSourceVersion: {
+      version?: string | null
+      source_commit_sha?: string | null
+      source_content_hash?: string | null
+      source_ref?: string | null
+      source_path?: string | null
+    } = skill
+    const suppliedHash = payload.source_version?.content_hash || null
+    if (suppliedHash) {
+      if (suppliedHash === skill.source_content_hash) {
+        sourceVersionVerified = true
+      } else {
+        const { data: recordedVersion, error: versionError } = await supabase
+          .from('skill_versions')
+          .select('version,source_commit_sha,source_content_hash,source_ref,source_path')
+          .eq('skill_slug', payload.skill_slug)
+          .eq('source_content_hash', suppliedHash)
+          .limit(1)
+          .maybeSingle()
+
+        if (versionError) {
+          return NextResponse.json({ error: 'Failed to validate source version' }, { status: 500 })
+        }
+        if (!recordedVersion) {
+          return NextResponse.json(
+            { error: 'Source version is not recorded for this skill' },
+            { status: 400 }
+          )
+        }
+        recordedSourceVersion = recordedVersion
+        sourceVersionVerified = true
+      }
+    }
+
+    const sourceVersion = {
+      skill_version: recordedSourceVersion.version || skill.version || null,
+      source_commit_sha: recordedSourceVersion.source_commit_sha || skill.source_commit_sha || null,
+      source_content_hash: recordedSourceVersion.source_content_hash || skill.source_content_hash || null,
+      source_ref: recordedSourceVersion.source_ref || skill.source_ref || null,
+      source_path: recordedSourceVersion.source_path || skill.source_path || null,
+      source_sync_status: skill.source_sync_status || null,
+      source_version_verified: sourceVersionVerified || Boolean(skill.source_content_hash),
+    }
     const metadata = buildOutcomeMetadata({
       outcome: payload.outcome,
-      metadata: payload.metadata,
+      metadata: { ...(payload.metadata || {}), ...sourceVersion },
       task_success: payload.task_success,
       output_quality: payload.output_quality ?? null,
       error_type: payload.error_type ?? null,
@@ -156,20 +234,6 @@ export async function POST(request: NextRequest) {
     })
 
     if (payload.dry_run) {
-      const { data: skill, error } = await supabase
-        .from('skills')
-        .select('slug,name,ai_review_approved')
-        .eq('slug', payload.skill_slug)
-        .eq('ai_review_approved', true)
-        .maybeSingle()
-
-      if (error) {
-        return NextResponse.json({ error: 'Failed to validate skill' }, { status: 500 })
-      }
-      if (!skill) {
-        return NextResponse.json({ error: 'Skill not found' }, { status: 404 })
-      }
-
       return NextResponse.json({
         ok: true,
         success: true,
@@ -181,6 +245,7 @@ export async function POST(request: NextRequest) {
           metadata,
         },
         trust_impact: trustImpact,
+        source_version: sourceVersion,
       })
     }
 
@@ -252,6 +317,7 @@ export async function POST(request: NextRequest) {
       data,
       contract_version: AGENT_OUTCOME_PROTOCOL_VERSION,
       trust_impact: trustImpact,
+      source_version: sourceVersion,
       next_agent_action:
         payload.outcome === 'success'
           ? 'Keep the skill shortlisted for similar tasks and prefer a production review before broader rollout.'

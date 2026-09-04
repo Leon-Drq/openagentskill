@@ -74,8 +74,15 @@ export default async function RankingDetailPage({
   if (!ranking) notFound()
 
   const usesOutcomeStats = ['highest-quality', 'agent-usage', 'success-rate', 'safe-auto-install', 'agent-platform'].includes(ranking.kind)
+  const sourceSort = ranking.kind === 'most-starred'
+    ? 'stars'
+    : ranking.kind === 'recently-updated'
+      ? 'fresh'
+      : ranking.kind === 'new-this-week'
+        ? 'new'
+        : 'quality'
   const [skills, statsMap, latestSnapshot, snapshotHistory] = await Promise.all([
-    getAllSkills('quality', undefined, 1200).catch(() => []),
+    getAllSkills(sourceSort, undefined, 480).catch(() => []),
     usesOutcomeStats
       ? getAgentOutcomeStatsMap().catch((): Record<string, SkillOutcomeStats> => ({}))
       : getSkillStats().catch((): Record<string, SkillAgentStats> => ({})),

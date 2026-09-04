@@ -120,21 +120,31 @@ function createSnapshotRow(
 }
 
 export async function generateDailyRankingSnapshots() {
-  const [skills, agentStats, outcomeStats, eventStats, dailyEventStats] = await Promise.all([
-    getAllSkills('quality', undefined, 1200),
+  const [qualitySkills, starredSkills, freshSkills, newSkills, agentStats, outcomeStats, eventStats, dailyEventStats] = await Promise.all([
+    getAllSkills('quality', undefined, 480),
+    getAllSkills('stars', undefined, 480),
+    getAllSkills('fresh', undefined, 480),
+    getAllSkills('new', undefined, 480),
     getSkillStats().catch((): Record<string, SkillAgentStats> => ({})),
     getAgentOutcomeStatsMap().catch((): Record<string, SkillOutcomeStats> => ({})),
     getSkillEventStatsMap().catch((): Record<string, SkillEventStats> => ({})),
     getSkillEventDailyStatsMap(7).catch((): Record<string, SkillEventDailyStats[]> => ({})),
   ])
 
-  if (!skills.length) {
+  if (!qualitySkills.length) {
     throw new Error('Ranking snapshot generation returned no approved skills.')
+  }
+
+  const skillsForDefinition = (definition: RankingDefinition) => {
+    if (definition.kind === 'most-starred') return starredSkills
+    if (definition.kind === 'recently-updated') return freshSkills
+    if (definition.kind === 'new-this-week') return newSkills
+    return qualitySkills
   }
 
   const generatedAt = new Date().toISOString()
   const sourceCounts: RankingSnapshot['source_counts'] = {
-    skills: skills.length,
+    skills: new Set([...qualitySkills, ...starredSkills, ...freshSkills, ...newSkills].map((skill) => skill.slug)).size,
     event_skills: Object.keys(eventStats).length,
     recent_event_skills: Object.keys(dailyEventStats).length,
     outcome_skills: Object.keys(outcomeStats).length,
@@ -144,7 +154,7 @@ export async function generateDailyRankingSnapshots() {
     createSnapshotRow(
       definition.slug,
       rankSkillsForDefinition(
-        skills,
+        skillsForDefinition(definition),
         definition,
         usesOutcomeStats(definition) ? outcomeStats : agentStats,
         SNAPSHOT_ITEM_LIMIT
@@ -157,13 +167,13 @@ export async function generateDailyRankingSnapshots() {
   rows.push(
     createSnapshotRow(
       'trending',
-      rankTrendingSkills(skills, eventStats, dailyEventStats, outcomeStats, SNAPSHOT_ITEM_LIMIT),
+      rankTrendingSkills(qualitySkills, eventStats, dailyEventStats, outcomeStats, SNAPSHOT_ITEM_LIMIT),
       generatedAt,
       sourceCounts
     ),
     createSnapshotRow(
       'hot',
-      rankHotSkills(skills, eventStats, dailyEventStats, SNAPSHOT_ITEM_LIMIT),
+      rankHotSkills(qualitySkills, eventStats, dailyEventStats, SNAPSHOT_ITEM_LIMIT),
       generatedAt,
       sourceCounts
     )

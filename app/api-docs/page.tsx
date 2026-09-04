@@ -338,7 +338,8 @@ export default function APIDocsPage() {
                   ['dry_run', 'Set true to validate a payload without writing a database row'],
                   ['GET /api/agent/outcome?skill_slug=crawl4ai', 'Read aggregate success and install-attempt stats'],
                   ['GET /api/agent/outcome?format=text', 'Read a compact machine-friendly outcome summary'],
-                  ['GET /api/agent/outcome?contract=true', 'Read the v3 feedback contract'],
+                  ['source_version', 'Version, commit, content hash, ref, and path copied from the resolve receipt and verified against recorded source history'],
+                  ['GET /api/agent/outcome?contract=true', 'Read the v4 version-attributed feedback contract'],
                 ].map(([field, detail]) => (
                   <div key={field} className="min-w-0 bg-background p-3">
                     <code className="font-mono text-xs">{field}</code>
@@ -358,7 +359,14 @@ export default function APIDocsPage() {
   "task_success": true,
   "output_quality": 4,
   "workspace": "sandbox",
-  "time_to_useful_ms": 120000
+  "time_to_useful_ms": 120000,
+  "source_version": {
+    "version": "1.0.0",
+    "commit_sha": "0123456789abcdef0123456789abcdef01234567",
+    "content_hash": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "ref": "main",
+    "path": "SKILL.md"
+  }
 }`}</code>
               </div>
             </div>
