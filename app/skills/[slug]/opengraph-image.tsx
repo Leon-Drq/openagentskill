@@ -4,6 +4,10 @@ import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { convertSkillRecordToManifest } from '@/lib/db/skills'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillBySlugOrFallback } from '@/lib/skill-fallbacks'
+import { getGitHubAvatarUrl } from '@/lib/github-owner'
+import { defaultLocale } from '@/lib/i18n/config'
+import { getSkillGitHubOwner, getSkillSocialProvenance } from '@/lib/seo/social-card'
+import { buildSkillSearchMetadata } from '@/lib/seo/search-metadata'
 
 export const runtime = 'nodejs'
 export const alt = 'OpenAgentSkill skill preview'
@@ -47,17 +51,28 @@ export default async function Image({
   const quality = getSkillQualityProfile(record)
   const score = quality.score || skill.stats.qualityScore || 0
   const safety = auditRiskLabel(buildSkillAudit(record).risk_level)
-  const install = skill.technical.installCommand || `npx skills add ${slug}`
+  const install = record.github_repo
+    ? `npx skills add ${record.github_repo}`
+    : skill.technical.installCommand || `npx skills add ${slug}`
+  const provenance = getSkillSocialProvenance(record)
+  const githubOwner = getSkillGitHubOwner(record)
+  const socialDescription = buildSkillSearchMetadata(record, defaultLocale).description
 
   return new ImageResponse(
     <SkillSocialCard
       name={truncate(skill.name, 46)}
       slug={slug}
-      scenario={truncate(skill.description, 82)}
+      scenario={truncate(socialDescription, 82)}
       score={score}
       safety={safety}
       stars={`${stars} stars`}
-      install={truncate(install, 42)}
+      install={truncate(install, 48)}
+      statusLabel={provenance.label}
+      statusDetail={provenance.detail}
+      statusTone={provenance.tone}
+      creator={truncate(githubOwner, 24)}
+      repository={truncate(record.github_repo || record.repository || slug, 32)}
+      avatarUrl={record.github_repo ? getGitHubAvatarUrl(githubOwner, 144) : null}
     />,
     size
   )
