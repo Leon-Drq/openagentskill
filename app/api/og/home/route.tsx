@@ -1,271 +1,161 @@
 import { ImageResponse } from 'next/og'
 
-export const runtime = 'edge'
+export const runtime = 'nodejs'
 
-const size = {
-  width: 1200,
-  height: 630,
-}
+const size = { width: 1200, height: 630 }
 
-const ink = '#171410'
-const muted = '#6f6a60'
-const border = '#ded8cc'
-const paper = '#f7f4ed'
-const card = '#fffdf8'
-const green = '#006b4f'
-const gold = '#d7a13b'
+const ink = '#171713'
+const muted = '#6D6A61'
+const border = '#D8D4C9'
+const paper = '#F7F5EF'
+const card = '#FFFEFA'
+const green = '#006B4F'
+const greenSoft = '#E5F0EB'
+const gold = '#C38B24'
 
-function BrandMark({ size = 58, color = ink }: { size?: number; color?: string }) {
+function BrandMark({ color = ink }: { color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 128 128" style={{ display: 'flex' }}>
-      <path
-        fill={color}
-        d="M58.5 12.5C35.1 15.4 17.5 40.8 17.5 64c0 23.2 17.6 48.6 41 51.5C43.2 114.3 35.5 91.7 35.5 64S43.2 13.7 58.5 12.5Z"
-      />
-      <path
-        fill={color}
-        d="M69.5 12.5c23.4 2.9 41 28.3 41 51.5 0 23.2-17.6 48.6-41 51.5C84.8 114.3 92.5 91.7 92.5 64S84.8 13.7 69.5 12.5Z"
-      />
+    <svg width="34" height="34" viewBox="0 0 128 128" style={{ display: 'flex' }}>
+      <path fill={color} d="M58.5 12.5C35.1 15.4 17.5 40.8 17.5 64c0 23.2 17.6 48.6 41 51.5C43.2 114.3 35.5 91.7 35.5 64S43.2 13.7 58.5 12.5Z" />
+      <path fill={color} d="M69.5 12.5c23.4 2.9 41 28.3 41 51.5 0 23.2-17.6 48.6-41 51.5C84.8 114.3 92.5 91.7 92.5 64S84.8 13.7 69.5 12.5Z" />
     </svg>
   )
 }
 
-function Pill({ children, active = false }: { children: string; active?: boolean }) {
+function Stage({ index, label, detail, active = false }: { index: string; label: string; detail: string; active?: boolean }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        border: `1px solid ${active ? green : border}`,
-        backgroundColor: active ? green : card,
-        color: active ? '#ffffff' : ink,
-        borderRadius: 999,
-        padding: '12px 18px',
-        fontSize: 18,
-        fontWeight: 720,
-      }}
-    >
-      {children}
+    <div style={{ width: 244, display: 'flex', alignItems: 'center', gap: 13 }}>
+      <div
+        style={{
+          width: 34,
+          height: 34,
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 99,
+          backgroundColor: active ? green : '#ECE9E1',
+          color: active ? '#FFFFFF' : ink,
+          fontFamily: 'monospace',
+          fontSize: 12,
+          fontWeight: 800,
+        }}
+      >
+        {index}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ display: 'flex', color: active ? green : ink, fontSize: 14, fontWeight: 800 }}>{label}</div>
+        <div style={{ display: 'flex', color: muted, fontFamily: 'monospace', fontSize: 10 }}>{detail}</div>
+      </div>
     </div>
   )
 }
 
 export async function GET() {
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        position: 'relative',
+        overflow: 'hidden',
+        backgroundColor: paper,
+        color: ink,
+        fontFamily: 'Arial, sans-serif',
+      }}
+    >
       <div
         style={{
-          width: '100%',
-          height: '100%',
+          position: 'absolute',
+          inset: 0,
           display: 'flex',
-          position: 'relative',
-          overflow: 'hidden',
-          backgroundColor: paper,
-          color: ink,
-          fontFamily: 'Inter, Arial, sans-serif',
-          padding: '52px 64px',
+          backgroundImage: 'linear-gradient(rgba(23,23,19,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(23,23,19,0.045) 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+          opacity: 0.65,
         }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            backgroundImage: 'radial-gradient(circle, rgba(23,20,16,0.14) 1px, transparent 1px)',
-            backgroundSize: '24px 24px',
-            opacity: 0.34,
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            inset: '34px 34px',
-            display: 'flex',
-            border: `1px solid ${border}`,
-            borderRadius: 28,
-          }}
-        />
+      />
+      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 14, display: 'flex', backgroundColor: green }} />
 
-        <div style={{ display: 'flex', width: '100%', height: '100%', flexDirection: 'column', position: 'relative' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <BrandMark size={48} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                <div style={{ display: 'flex', fontSize: 28, fontWeight: 780 }}>OpenAgentSkill</div>
-                <div style={{ display: 'flex', color: muted, fontSize: 14, letterSpacing: 2.4 }}>
-                  REGISTRY API FOR AGENTS
-                </div>
-              </div>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                border: `1px solid ${border}`,
-                borderRadius: 999,
-                backgroundColor: card,
-                padding: '10px 14px',
-                color: muted,
-                fontSize: 16,
-                fontWeight: 650,
-              }}
-            >
-              <span style={{ display: 'flex', width: 9, height: 9, borderRadius: 999, backgroundColor: green }} />
-              openagentskill.com
+      <div style={{ position: 'absolute', left: 54, right: 54, top: 36, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <BrandMark />
+          <div style={{ display: 'flex', fontSize: 25, fontWeight: 800, letterSpacing: -0.7 }}>OpenAgentSkill</div>
+          <div style={{ display: 'flex', marginLeft: 8, borderLeft: `1px solid ${border}`, paddingLeft: 18, color: muted, fontFamily: 'monospace', fontSize: 12, fontWeight: 700, letterSpacing: 1.8 }}>
+            OPEN AGENT SKILL REGISTRY
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, borderRadius: 99, backgroundColor: greenSoft, color: green, padding: '10px 14px', fontFamily: 'monospace', fontSize: 12, fontWeight: 800 }}>
+          <span style={{ display: 'flex', width: 7, height: 7, borderRadius: 99, backgroundColor: green }} />
+          API + CLI · OPEN SOURCE
+        </div>
+      </div>
+      <div style={{ position: 'absolute', left: 54, right: 54, top: 92, height: 1, display: 'flex', backgroundColor: border }} />
+
+      <div style={{ position: 'absolute', left: 54, right: 54, top: 126, height: 340, display: 'flex', justifyContent: 'space-between', gap: 54 }}>
+        <div style={{ width: 665, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: muted, fontFamily: 'monospace', fontSize: 12, fontWeight: 800, letterSpacing: 2.1 }}>
+            <span style={{ display: 'flex', width: 8, height: 8, borderRadius: 99, backgroundColor: gold }} />
+            DISCOVERY WITH PROVENANCE
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20, fontFamily: 'Georgia, serif', fontSize: 61, fontWeight: 700, lineHeight: 0.98, letterSpacing: -2.2 }}>
+            <div style={{ display: 'flex' }}>Find the skill.</div>
+            <div style={{ display: 'flex' }}>Verify the source.</div>
+            <div style={{ display: 'flex', color: green }}>Prove the outcome.</div>
+          </div>
+          <div style={{ display: 'flex', marginTop: 23, maxWidth: 625, color: '#49463F', fontSize: 21, lineHeight: 1.4 }}>
+            The open registry where AI agents discover, compare, install, and report real-world Skill results.
+          </div>
+        </div>
+
+        <div style={{ width: 390, height: 320, display: 'flex', flexDirection: 'column', border: `1px solid ${border}`, backgroundColor: card, boxShadow: '0 24px 70px rgba(23,23,19,0.09)' }}>
+          <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 18px', borderBottom: `1px solid ${border}` }}>
+            <div style={{ display: 'flex', color: muted, fontFamily: 'monospace', fontSize: 11, fontWeight: 800, letterSpacing: 1.5 }}>AGENT RESOLVE</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: green, fontFamily: 'monospace', fontSize: 10, fontWeight: 800 }}>
+              <span style={{ display: 'flex', width: 6, height: 6, borderRadius: 99, backgroundColor: green }} /> LIVE
             </div>
           </div>
-
-          <div style={{ display: 'flex', flex: 1, alignItems: 'center', gap: 48 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', width: 675 }}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  color: muted,
-                  fontSize: 15,
-                  fontWeight: 740,
-                  letterSpacing: 4,
-                }}
-              >
-                <span style={{ display: 'flex', color: gold }}>-</span>
-                SKILL LAYER - AGENT DISCOVERY
-              </div>
-
-              <div
-                style={{
-                  display: 'flex',
-                  marginTop: 26,
-                  fontSize: 74,
-                  lineHeight: 0.96,
-                  fontWeight: 790,
-                  color: ink,
-                  letterSpacing: -1.6,
-                }}
-              >
-                The skill layer for AI agents.
-              </div>
-
-              <div
-                style={{
-                  display: 'flex',
-                  marginTop: 26,
-                  maxWidth: 650,
-                  fontSize: 28,
-                  lineHeight: 1.26,
-                  color: '#4f4940',
-                }}
-              >
-                Let your AI agent find, compare, and install the right reusable skill automatically.
-              </div>
-
-              <div style={{ display: 'flex', gap: 12, marginTop: 34 }}>
-                <Pill active>Discover</Pill>
-                <Pill>Compare</Pill>
-                <Pill>Install</Pill>
-              </div>
+          <div style={{ display: 'flex', flexDirection: 'column', padding: 18 }}>
+            <div style={{ display: 'flex', color: muted, fontFamily: 'monospace', fontSize: 10, letterSpacing: 1.3 }}>TASK</div>
+            <div style={{ display: 'flex', marginTop: 8, border: `1px solid ${border}`, backgroundColor: '#F1EEE6', padding: '13px 14px', color: ink, fontSize: 17, fontWeight: 700 }}>
+              Review a pull request safely
             </div>
-
-            <div
-              style={{
-                width: 330,
-                display: 'flex',
-                flexDirection: 'column',
-                backgroundColor: card,
-                border: `1px solid ${border}`,
-                borderRadius: 24,
-                padding: 24,
-                boxShadow: '0 22px 60px rgba(23,20,16,0.08)',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', color: muted, fontSize: 14, fontWeight: 760, letterSpacing: 2 }}>
-                  AGENT REQUEST
+            <div style={{ display: 'flex', marginTop: 16, color: muted, fontFamily: 'monospace', fontSize: 10, letterSpacing: 1.3 }}>SHORTLIST</div>
+            <div style={{ display: 'flex', marginTop: 8, flexDirection: 'column', border: `1px solid ${green}`, backgroundColor: greenSoft }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 14px', borderBottom: '1px solid #C8DDD4' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ display: 'flex', width: 24, height: 24, alignItems: 'center', justifyContent: 'center', borderRadius: 99, backgroundColor: green, color: '#FFFFFF', fontFamily: 'monospace', fontSize: 10 }}>01</span>
+                  <span style={{ display: 'flex', color: ink, fontSize: 16, fontWeight: 800 }}>Best task-fit Skill</span>
                 </div>
-                <div style={{ display: 'flex', color: green, fontSize: 13, fontWeight: 780 }}>LIVE</div>
+                <span style={{ display: 'flex', color: green, fontFamily: 'monospace', fontSize: 11, fontWeight: 800 }}>92 / 100</span>
               </div>
-
-              <div
-                style={{
-                  display: 'flex',
-                  marginTop: 18,
-                  border: `1px solid ${border}`,
-                  backgroundColor: '#f1ede4',
-                  borderRadius: 16,
-                  padding: '16px 18px',
-                  color: ink,
-                  fontSize: 22,
-                  lineHeight: 1.24,
-                }}
-              >
-                Find a trustworthy skill for a real workflow.
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', marginTop: 18 }}>
-                {[
-                  ['01', 'Rank by task fit'],
-                  ['02', 'Check trust signals'],
-                  ['03', 'Return install plan'],
-                ].map(([index, label]) => (
-                  <div
-                    key={index}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      borderTop: `1px solid ${border}`,
-                      padding: '14px 0',
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: 999,
-                        backgroundColor: index === '01' ? green : '#eee8dc',
-                        color: index === '01' ? '#ffffff' : ink,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 13,
-                        fontWeight: 760,
-                      }}
-                    >
-                      {index}
-                    </div>
-                    <div style={{ display: 'flex', color: ink, fontSize: 18, fontWeight: 720 }}>{label}</div>
-                  </div>
-                ))}
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 14px', color: muted, fontFamily: 'monospace', fontSize: 11 }}>
+                <span style={{ display: 'flex' }}>+ 4 transparent alternatives</span>
+                <span style={{ display: 'flex', color: green }}>INSTALL →</span>
               </div>
             </div>
-          </div>
-
-          <div
-            style={{
-              height: 52,
-              borderTop: `1px solid ${border}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              color: muted,
-              fontSize: 16,
-            }}
-          >
-            <div style={{ display: 'flex', gap: 24 }}>
-              <span style={{ display: 'flex' }}>npm for AI Agent Skills</span>
-              <span style={{ display: 'flex' }}>Agent-ready APIs</span>
-              <span style={{ display: 'flex' }}>Open registry</span>
+            <div style={{ display: 'flex', marginTop: 14, alignItems: 'center', justifyContent: 'space-between', color: muted, fontFamily: 'monospace', fontSize: 10 }}>
+              <span style={{ display: 'flex' }}>SOURCE CHECKED</span>
+              <span style={{ display: 'flex' }}>OUTCOME RECEIPT</span>
             </div>
-            <div style={{ display: 'flex', color: green, fontWeight: 760 }}>openagentskill.com</div>
           </div>
         </div>
       </div>
-    ),
+
+      <div style={{ position: 'absolute', left: 54, right: 54, bottom: 34, height: 92, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid ${border}`, borderBottom: `1px solid ${border}`, backgroundColor: 'rgba(255,254,250,0.75)', padding: '0 20px' }}>
+        <Stage index="01" label="Discover" detail="task-fit search" active />
+        <div style={{ display: 'flex', color: border }}>→</div>
+        <Stage index="02" label="Verify" detail="source + safety" />
+        <div style={{ display: 'flex', color: border }}>→</div>
+        <Stage index="03" label="Install" detail="agent-ready handoff" />
+        <div style={{ display: 'flex', color: border }}>→</div>
+        <Stage index="04" label="Prove" detail="verified outcomes" />
+      </div>
+    </div>,
     {
       ...size,
       headers: {
-        'Cache-Control': 'public, max-age=31536000, immutable',
+        'Cache-Control': 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800',
       },
     }
   )

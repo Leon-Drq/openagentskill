@@ -40,6 +40,11 @@ export async function GET(request: NextRequest) {
       safety={safety}
       stars={starLabel}
       install="Ready from openagentskill.com"
+      statusLabel="REGISTRY PREVIEW"
+      statusDetail="OpenAgentSkill share asset"
+      statusTone="community"
+      creator="openagentskill"
+      repository="openagentskill.com"
     />,
     {
       ...size,

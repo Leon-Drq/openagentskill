@@ -115,13 +115,9 @@ export async function generateMetadata({
   const indexable = isSearchIndexEligible(dbSkill)
   const pageUrl = `https://www.openagentskill.com/skills/${canonicalSlug}`
   const imageAlt = seo.imageAlt
-  const imageVersion = '7'
-  const staticSkillImageUrl =
-    canonicalSlug === 'addyosmani-agent-skills'
-      ? 'https://www.openagentskill.com/og/skills/addyosmani-agent-skills-v7.png'
-      : null
-  const openGraphImageUrl = staticSkillImageUrl || `${pageUrl}/opengraph-image?v=${imageVersion}`
-  const twitterImageUrl = staticSkillImageUrl || `${pageUrl}/twitter-image?v=${imageVersion}`
+  const imageVersion = '8'
+  const openGraphImageUrl = `${pageUrl}/opengraph-image?v=${imageVersion}`
+  const twitterImageUrl = `${pageUrl}/twitter-image?v=${imageVersion}`
   const image = {
     url: openGraphImageUrl,
     width: 1200,
