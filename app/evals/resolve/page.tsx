@@ -31,7 +31,7 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): P
 }
 
 export default async function ResolveEvalsPage() {
-  const skills = await withTimeout(getAllSkills('quality', undefined, 1800), 2200, 'resolve eval skills query')
+  const skills = await withTimeout(getAllSkills('quality', undefined, 480), 2200, 'resolve eval skills query')
     .catch(() => CURATED_SKILL_SNAPSHOT)
   const evals = runRegistryEvals(skills, REGISTRY_EVAL_CASES)
   const failed = evals.results.filter((result) => !result.passed)

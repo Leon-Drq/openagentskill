@@ -48,6 +48,12 @@ export async function GET() {
             responses: { '200': { description: 'Registry API index' } },
           },
         },
+        '/api/registry/stats': {
+          get: {
+            summary: 'Read aggregate discovered, validated, installable, and agent-proven registry coverage',
+            responses: { '200': { description: 'Three-layer registry coverage and evidence counters' } },
+          },
+        },
         '/api/registry/search': {
           get: {
             summary: 'Search the skill registry by task, platform, category, or query',
@@ -238,6 +244,19 @@ export async function GET() {
                       install_used: { type: 'boolean' },
                       risk_blocked: { type: 'boolean' },
                       setup_required: { type: 'boolean' },
+                      source_version: {
+                        type: 'object',
+                        nullable: true,
+                        description: 'Source version copied from the resolve/install receipt. Content hashes are verified against current or historical skill versions.',
+                        properties: {
+                          version: { type: 'string', nullable: true },
+                          commit_sha: { type: 'string', nullable: true },
+                          content_hash: { type: 'string', nullable: true, pattern: '^[a-fA-F0-9]{64}$' },
+                          ref: { type: 'string', nullable: true },
+                          path: { type: 'string', nullable: true },
+                          sync_status: { type: 'string', nullable: true },
+                        },
+                      },
                       task_success: { type: 'boolean', nullable: true },
                       output_quality: { type: 'integer', minimum: 1, maximum: 5, nullable: true },
                       error_type: {
@@ -459,7 +478,7 @@ export async function GET() {
               'next_steps',
             ],
             properties: {
-              version: { type: 'string', const: 'openagentskill-install-receipt-v1' },
+              version: { type: 'string', const: 'openagentskill-install-receipt-v2' },
               receipt_id: { type: 'string' },
               resolve_event_id: { type: 'string' },
               generated_at: { type: 'string', format: 'date-time' },

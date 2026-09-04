@@ -17,6 +17,14 @@ type ReceiptCandidate = {
     category: string
     repository?: string
     github_repo?: string
+    source_version?: {
+      version: string
+      commit_sha: string | null
+      content_hash: string | null
+      ref: string | null
+      path: string | null
+      sync_status: string | null
+    }
   }
   urls: {
     web: string
@@ -178,7 +186,7 @@ export function buildAgentInstallReceipt(input: {
   ].filter(Boolean)
 
   return {
-    version: 'openagentskill-install-receipt-v1',
+    version: 'openagentskill-install-receipt-v2',
     receipt_id: receiptId,
     resolve_event_id: input.feedback.event_id,
     generated_at: input.generatedAt,
@@ -203,6 +211,7 @@ export function buildAgentInstallReceipt(input: {
       eval_url: selected.urls.eval,
       install_api_url: selected.urls.install_api,
       repository: selected.urls.repository,
+      source_version: selected.skill.source_version || null,
     },
     install: {
       command: selected.install_plan.command,
@@ -328,6 +337,9 @@ export function formatAgentInstallReceiptText(receipt: AgentInstallReceipt) {
     `Selected skill: ${receipt.selected_skill.name} (${receipt.selected_skill.slug})`,
     `URL: ${receipt.selected_skill.url}`,
     `Repository: ${receipt.selected_skill.repository}`,
+    `Source version: ${receipt.selected_skill.source_version?.version || 'unknown'}`,
+    `Source commit: ${receipt.selected_skill.source_version?.commit_sha || 'unknown'}`,
+    `Source content SHA-256: ${receipt.selected_skill.source_version?.content_hash || 'unknown'}`,
     `Audit: ${receipt.selected_skill.audit_url}`,
     `Eval: ${receipt.selected_skill.eval_url}`,
     '',

@@ -6,7 +6,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
-import { convertSkillRecordToManifest, getAllSkills } from '@/lib/db/skills'
+import { convertSkillRecordToManifest, getAllSkills, searchSkills } from '@/lib/db/skills'
 import { SKILL_STACKS } from '@/lib/collections'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
@@ -65,7 +65,13 @@ export default async function UseCasePage({
   const useCase = getUseCaseBySlug(slug)
   if (!useCase) notFound()
 
-  const allSkills = await getAllSkills('quality', undefined, 4000).catch(() => [])
+  const [taskMatches, qualityBaseline] = await Promise.all([
+    searchSkills(useCase.heroPrompt, 240).catch(() => []),
+    getAllSkills('quality', undefined, 160).catch(() => []),
+  ])
+  const allSkills = [...new Map(
+    [...taskMatches, ...qualityBaseline].map((skill) => [skill.slug, skill])
+  ).values()]
   const matchedSkills = selectSkillsForUseCase(allSkills, useCase, 18)
   const enrichedSkills = matchedSkills.map((skill) => {
     const trust = getSkillTrustProfile(skill)

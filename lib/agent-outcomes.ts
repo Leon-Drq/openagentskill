@@ -36,7 +36,15 @@ export const AGENT_OUTCOME_WORKSPACES = [
 ] as const
 
 export type AgentOutcomeWorkspace = (typeof AGENT_OUTCOME_WORKSPACES)[number]
-export const AGENT_OUTCOME_PROTOCOL_VERSION = 'openagentskill-agent-outcome-v3'
+export const AGENT_OUTCOME_PROTOCOL_VERSION = 'openagentskill-agent-outcome-v4'
+
+export interface AgentOutcomeSourceVersion {
+  version?: string | null
+  commit_sha?: string | null
+  content_hash?: string | null
+  ref?: string | null
+  path?: string | null
+}
 
 export interface AgentOutcomeQualityFields {
   task_success?: boolean | null
@@ -54,6 +62,7 @@ export interface ResolveFeedbackInput {
   selectedSlug?: string | null
   selectedName?: string | null
   alternativeSlugs?: string[]
+  sourceVersion?: AgentOutcomeSourceVersion | null
 }
 
 function shellQuote(value: string) {
@@ -180,6 +189,7 @@ export function buildResolveFeedback(input: ResolveFeedbackInput) {
       workspace: 'sandbox',
       time_to_useful_ms: 120000,
       notes: 'Solved the task in a sandbox workflow.',
+      source_version: input.sourceVersion || null,
     },
     cli_example: buildOutcomeCommand({
       eventId,

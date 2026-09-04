@@ -29,6 +29,21 @@ const dbSkills = read('lib/db/skills.ts')
 assert.match(dbSkills, /rowLimit <= 160[\s\S]+?rowLimit <= 480/, 'directory reads must keep bounded cache tiers')
 assert.match(dbSkills, /SKILL_EXACT_SEARCH_TIMEOUT_MS = 2500/, 'interactive exact search must stay bounded')
 assert.match(dbSkills, /SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS = 300/, 'detail lookups must share a useful cache window')
+assert.match(dbSkills, /if \(sort === 'stars'\)[\s\S]+?order\('github_stars'/, 'star rankings must query the star index directly')
+
+for (const [route, maximumPool] of [
+  ['app/evals/resolve/page.tsx', 480],
+  ['app/rankings/[slug]/page.tsx', 480],
+] as const) {
+  const source = read(route)
+  const requestedPools = [...source.matchAll(/getAllSkills\([^)]*?,\s*undefined,\s*(\d+)\)/g)]
+    .map((match) => Number(match[1]))
+  assert.ok(requestedPools.every((size) => size <= maximumPool), `${route} must avoid multi-megabyte skill caches`)
+}
+
+const useCasePage = read('app/use-cases/[slug]/page.tsx')
+assert.match(useCasePage, /searchSkills\(useCase\.heroPrompt, 240\)/, 'use-case pages must use an indexed task query')
+assert.doesNotMatch(useCasePage, /getAllSkills\('quality', undefined, 4000\)/, 'use-case pages must not cache the full registry')
 
 const skillsPage = read('app/skills/page.tsx')
 assert.match(skillsPage, /SKILLS_PAGE_EXACT_SEARCH_TIMEOUT_MS = 3000/, 'skills search must not block navigation for many seconds')
