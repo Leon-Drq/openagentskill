@@ -1,4 +1,5 @@
 import type { SkillEventStats, SkillRecord } from '@/lib/db/skills'
+import { needsOwnerPublicationReview, OWNER_PUBLICATION_NOTICE } from '@/lib/skills/publication'
 import { getFreshnessDays, getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 
@@ -54,6 +55,7 @@ export function getSkillDecisionProfile(
   const hasRecentPush = freshnessDays !== null && freshnessDays <= 180
   const hasEngagement = Boolean(eventStats && eventStats.total_events > 0)
   const hasInstall = Boolean(skill.install_command || skill.github_repo)
+  const ownerReviewRequired = needsOwnerPublicationReview(skill)
 
   let readinessScore = quality.score
   readinessScore += hasAdoption ? 4 : -8
@@ -78,14 +80,15 @@ export function getSkillDecisionProfile(
   ]
 
   const riskNotes = [
+    ...(ownerReviewRequired ? [OWNER_PUBLICATION_NOTICE] : []),
     ...quality.warnings.slice(0, 3),
     !hasEngagement ? 'No OpenAgentSkill engagement data yet' : null,
     freshnessDays === null ? 'Missing GitHub freshness metadata' : null,
   ].filter((note): note is string => Boolean(note))
 
-  const readinessLabel = getReadinessLabel(readinessScore)
-  const agentRole = getAgentRole(readinessScore)
-  const adoptionStage = getAdoptionStage(readinessScore)
+  const readinessLabel = ownerReviewRequired ? 'Needs manual review' : getReadinessLabel(readinessScore)
+  const agentRole = ownerReviewRequired ? 'Needs validation' : getAgentRole(readinessScore)
+  const adoptionStage = ownerReviewRequired ? 'Review' : getAdoptionStage(readinessScore)
   const primaryFit = useCases[0]?.shortTitle || skill.category
   const proofPoints = [
     hasAdoption ? `${skill.github_stars.toLocaleString()} GitHub stars` : null,
@@ -96,6 +99,7 @@ export function getSkillDecisionProfile(
   ].filter((point): point is string => Boolean(point))
 
   const implementationPlan = [
+    ...(ownerReviewRequired ? ['Review the pinned source and approve a manual sandbox test before installation.'] : []),
     `Install it in a sandbox agent and run one ${primaryFit} task end to end.`,
     'Compare output quality, latency, and failure behavior against at least one alternative.',
     'Promote it into production only after reviewing repository permissions, license, and maintenance signals.',
@@ -114,7 +118,7 @@ export function getSkillDecisionProfile(
     proofPoints: proofPoints.length > 0 ? proofPoints : ['Current metadata is limited; validate manually before adoption'],
     implementationPlan,
     recommendation:
-      readinessScore >= 84
+      ownerReviewRequired ? OWNER_PUBLICATION_NOTICE : readinessScore >= 84
         ? 'Use this as a leading candidate, then validate the README and install path in your own agent stack.'
         : readinessScore >= 72
           ? 'Shortlist this skill and compare it with close alternatives before production adoption.'

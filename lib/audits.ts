@@ -291,7 +291,7 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
   ]
 
   const riskLevel: AuditRiskLevel =
-    financialExecutionRisk || ['high', 'critical'].includes(skill.owner_publication?.static_analysis?.riskLevel || '')
+    financialExecutionRisk || (needsOwnerPublicationReview(skill) && ['high', 'critical'].includes(skill.owner_publication?.static_analysis?.riskLevel || ''))
       ? 'risky'
       : isFinancialSkill
         ? 'needs_review'

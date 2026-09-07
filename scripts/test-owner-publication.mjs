@@ -9,6 +9,7 @@ const { evaluateSkillSubmissionPolicy } = await import('../lib/skills/submission
 const { getSkillTrustProfile, getSkillTrustProfileV5 } = await import('../lib/trust.ts')
 const { buildSkillAudit } = await import('../lib/audits.ts')
 const { getAgentSafetyProfile } = await import('../lib/agent-safety.ts')
+const { getSkillDecisionProfile } = await import('../lib/decision.ts')
 const { isSearchIndexEligible } = await import('../lib/seo/search-indexability.ts')
 
 const secret = 'test-only-owner-token-'.repeat(3)
@@ -91,6 +92,8 @@ for (const getTrust of [getSkillTrustProfile, getSkillTrustProfileV5]) {
   assert.ok(['review', 'risk'].includes(trust.tier), 'popularity must not imply owner publication is reviewed')
 }
 const audit = buildSkillAudit(skill)
+assert.equal(getSkillDecisionProfile(skill).readinessLabel, 'Needs manual review')
+assert.equal(getSkillDecisionProfile(skill).adoptionStage, 'Review')
 assert.notEqual(audit.risk_level, 'safe_to_try')
 const safety = getAgentSafetyProfile(skill, audit)
 assert.equal(safety.auto_install_allowed, false)
