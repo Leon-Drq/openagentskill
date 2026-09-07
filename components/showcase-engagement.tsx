@@ -88,6 +88,7 @@ export function ShowcaseActions({ item }: { item: ShowcaseCase }) {
   const { stats, ready, failed, refresh, toggle } = useShowcaseEngagement()
   const [busy, setBusy] = useState(false)
   const [sharing, setSharing] = useState(false)
+  const [shareMenu, setShareMenu] = useState(false)
   const [message, setMessage] = useState('')
   const [copied, setCopied] = useState(false)
   const [manualUrl, setManualUrl] = useState('')
@@ -104,16 +105,16 @@ export function ShowcaseActions({ item }: { item: ShowcaseCase }) {
     finally { setBusy(false) }
   }
 
-  async function share() {
+  async function share(method: 'copy' | 'native') {
     if (sharing) return
     setSharing(true)
     setMessage('')
     setCopied(false)
     setManualUrl('')
+    setShareMenu(false)
     const url = getShowcaseShareUrl(item.slug, locale)
-    trackAnalyticsEvent('showcase_share_open', { case_slug: item.slug })
     try {
-      if (navigator.share) {
+      if (method === 'native' && navigator.share) {
         try {
           await navigator.share({ title: `${title} · Skill Gallery`, url })
           trackAnalyticsEvent('showcase_share_complete', { case_slug: item.slug, method: 'native' })
@@ -150,10 +151,14 @@ export function ShowcaseActions({ item }: { item: ShowcaseCase }) {
           <span>{label}</span><span className="font-mono tabular-nums">{ready ? (count ?? 0).toLocaleString(locale) : '—'}</span>
         </button>
       })}
-      <button type="button" onClick={share} disabled={sharing} aria-label={`${zh ? '分享' : 'Share'} · ${title}`} className={`${baseClass} border-[#e4e0d8] text-[#6d675e] hover:border-[#006b4f] hover:text-[#006b4f]`}>
+      <button type="button" onClick={() => { setShareMenu(!shareMenu); if (!shareMenu) trackAnalyticsEvent('showcase_share_open', { case_slug: item.slug }) }} disabled={sharing} aria-expanded={shareMenu} aria-label={`${zh ? '分享' : 'Share'} · ${title}`} className={`${baseClass} border-[#e4e0d8] text-[#6d675e] hover:border-[#006b4f] hover:text-[#006b4f]`}>
         {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Share2 className="h-4 w-4" aria-hidden="true" />}{copied ? (zh ? '已复制' : 'Copied') : (zh ? '分享' : 'Share')}
       </button>
     </div>
+    {shareMenu && <div role="group" aria-label={zh ? '分享选项' : 'Share options'} className="mt-2 flex flex-wrap gap-2 rounded-md border border-[#e4e0d8] p-2" onKeyDown={(event) => { if (event.key === 'Escape') setShareMenu(false) }}>
+      <button type="button" onClick={() => void share('copy')} className="min-h-11 rounded px-3 text-xs text-[#006b4f] hover:bg-[#006b4f]/5">{zh ? '复制链接' : 'Copy link'}</button>
+      {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && <button type="button" onClick={() => void share('native')} className="min-h-11 rounded px-3 text-xs text-[#006b4f] hover:bg-[#006b4f]/5">{zh ? '更多分享方式' : 'More sharing options'}</button>}
+    </div>}
     {failed && <button type="button" onClick={() => void refresh()} className="min-h-11 text-xs text-[#006b4f] underline">{zh ? '投票暂不可用，点击重试' : 'Voting unavailable. Retry'}</button>}
     <p role="status" className="mt-1 text-xs text-[#6d675e]">{message}</p>
     {manualUrl && <input readOnly value={manualUrl} aria-label={zh ? '分享链接' : 'Share link'} onFocus={(event) => event.currentTarget.select()} className="mt-2 min-h-11 w-full min-w-0 rounded border border-[#e4e0d8] bg-transparent px-2 text-base" />}
