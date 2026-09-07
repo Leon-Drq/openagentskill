@@ -79,6 +79,30 @@ mono-color 仓库原有作品有单独的限制性许可，因此本站重新制
 | `showcase_handoff_copy` | 配置与任务完整文本成功复制 |
 | `showcase_media_play` | 用户播放视频 |
 | `showcase_creator_open` | 打开署名作者主页，记录 creator_id |
+| `showcase_vote` | 投票成功；`vote` 为 1（赞）、-1（踩）、0（取消），不累计为总票数 |
+| `showcase_share_open` | 点击分享入口，可能取消 |
+| `showcase_share_copy` | 分享链接成功复制，不代表已发布 |
+| `showcase_share_complete` | 系统分享 API 完成，不保证对方收到或阅读 |
+| `showcase_share_visit` | 带 Gallery 分享来源参数访问案例；访问次数，不是独立访客 |
+
+### 赞、踩、分享与排序
+
+Gallery 列表和详情页共用一套数据库投票，每个账号、每个作品最多一票；赞、踩互斥，可切换或取消。
+`showcase_votes` 通过唯一主键和 RLS 限制写入；用户只读自己的记录，匿名账号不能投票。
+`set_showcase_vote` 以 invoker 运行，只接受作品和方向，通过 auth.uid() 确定投票人，遵守用户权限。
+服务端 `showcase_vote_counts` 同样以 invoker 运行，仅 service_role 可调用，API 只返回赞、踩总数和当前用户的选择。
+响应使用 `private, no-store`，页面每次打开、重新聚焦时刷新。失败显示重试，不伪造为零票。
+`?sort=top` 为社区好评，按净赞数（赞 − 踩）排序，同分保留精选顺序；默认仍为精选推荐，排序参数页 noindex 并 canonical 到 Gallery。
+这是一人一票的基础约束，尚不包含多账号作弊识别或时间衰减榜单。
+
+新增作品时，除静态目录外，须通过迁移将稳定 slug 写入 `showcase_entries`，之后才能投票。
+将来可由审核发布流程写入此表，前端组件无需改成另一套计数逻辑。
+数据迁移必须先于应用发布。验证权限：执行 `supabase/tests/showcase_votes.sql`，测试数据在事务内回滚。
+
+分享无需登录。优先系统分享，失败则复制链接，再失败则提供可选中的链接文本。
+链接保留作品语言并携带 `utm_source=gallery&utm_medium=share&utm_campaign=skill_gallery`，不包含用户身份。
+事件遵循现有分析授权；未同意统计的访问不会完整计入分析。分享按钮点击或复制次数不参与投票排序。
+后续增长评估结合分享来源会话中的访问、`showcase_start`、`showcase_handoff_copy`，不能把分享点击当成成功传播。
 
 案例事件含 `case_slug`、`skill_slug`，可在 GA 配置事件维度后分析
 “访问案例 → 复制任务 → 打开使用指引 → 复制完整文本”。
