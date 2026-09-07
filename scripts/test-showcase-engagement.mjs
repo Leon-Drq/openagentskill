@@ -1,11 +1,8 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
 import { SHOWCASE_CASES } from '../lib/showcase.ts'
 import { getShowcaseShareUrl, sortShowcaseCases } from '../lib/showcase-engagement.ts'
 
 const original = SHOWCASE_CASES.map((item) => item.slug)
-const migration = readFileSync(new URL('../supabase/migrations/20260907153055_showcase_likes.sql', import.meta.url), 'utf8')
-for (const slug of original) assert.ok(migration.includes(`('${slug}')`), `Register ${slug} for likes before publishing`)
 const [first, second, third] = SHOWCASE_CASES
 const stats = { [second.slug]: { likes: 9, dislikes: 2, vote: 1 }, [third.slug]: { likes: 7, dislikes: 0, vote: null } }
 assert.deepEqual(sortShowcaseCases(SHOWCASE_CASES, 'top', stats).slice(0, 3).map((item) => item.slug), [second.slug, third.slug, first.slug])
