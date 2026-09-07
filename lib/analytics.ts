@@ -3,6 +3,14 @@
 export type AnalyticsParameterValue = string | number | boolean
 
 export type AnalyticsEventName =
+  | 'showcase_view'
+  | 'showcase_creator_open'
+  | 'showcase_filter'
+  | 'showcase_open'
+  | 'showcase_task_copy'
+  | 'showcase_handoff_copy'
+  | 'showcase_start'
+  | 'showcase_media_play'
   | 'skill_view'
   | 'skill_resolve_request'
   | 'skill_install_copy'

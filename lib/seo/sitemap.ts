@@ -19,6 +19,7 @@ import { SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { SKILL_PACKS } from '@/lib/skill-packs'
 import { USE_CASES } from '@/lib/use-cases'
+import { SHOWCASE_CASES, SHOWCASE_UPDATED_AT } from '@/lib/showcase'
 import { createPublicClient } from '@/lib/supabase/public'
 import {
   SEARCH_INDEX_MIN_GITHUB_STARS,
@@ -141,6 +142,8 @@ export async function getSitemapIndexEntries() {
 
 export function getCoreSitemapEntries(now = new Date()): SitemapEntry[] {
   const staticPages: SitemapEntry[] = [
+    { url: `${SITEMAP_BASE_URL}/showcase`, lastModified: SHOWCASE_UPDATED_AT, changeFrequency: 'weekly', priority: 0.9 },
+    ...SHOWCASE_CASES.map((item): SitemapEntry => ({ url: `${SITEMAP_BASE_URL}/showcase/${item.slug}`, lastModified: item.updatedAt, changeFrequency: 'monthly', priority: 0.8 })),
     { url: SITEMAP_BASE_URL, lastModified: now, changeFrequency: 'daily', priority: 1 },
     { url: `${SITEMAP_BASE_URL}/resolve`, lastModified: now, changeFrequency: 'daily', priority: 0.95 },
     { url: `${SITEMAP_BASE_URL}/skills`, lastModified: now, changeFrequency: 'hourly', priority: 0.9 },
