@@ -110,6 +110,8 @@ const source = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf
 const route = source('app/api/admin/skills/publish/route.ts')
 assert.ok(route.indexOf('!isOwnerPublishAuthorized(request)') < route.indexOf('request.text()'))
 assert.match(route, /no-store/)
+assert.match(route, /export async function GET/)
+assert.match(route, /select\('request_id', \{ head: true \}\)/)
 const sql = source('supabase/migrations/20260907165513_owner_skill_publication.sql')
 assert.match(sql, /security invoker/)
 assert.match(sql, /current_user <> 'service_role'/)

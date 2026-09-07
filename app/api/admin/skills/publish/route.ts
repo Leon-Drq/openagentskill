@@ -3,10 +3,27 @@ import { revalidatePath, revalidateTag } from 'next/cache'
 import { isOwnerPublishAuthorized } from '@/lib/security/owner-publish-auth'
 import { OwnerPublicationSchema } from '@/lib/skills/owner-publication-schema'
 import { OwnerPublicationError, publishOwnerSkill } from '@/lib/skills/owner-publication'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
 const headers = { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' }
+
+export async function GET(request: NextRequest) {
+  if (!isOwnerPublishAuthorized(request)) {
+    return NextResponse.json({ error: 'Owner publishing credentials required.' }, { status: 401, headers })
+  }
+  try {
+    // Verify the real server credential and migration without creating a listing
+    // or returning any private publication history.
+    const { error } = await createAdminClient({ requestTimeoutMs: 8000 })
+      .from('owner_skill_publications').select('request_id', { head: true }).limit(1)
+    if (error) throw error
+    return NextResponse.json({ ready: true, publication_channel: 'owner', community_review: 'unchanged' }, { headers })
+  } catch {
+    return NextResponse.json({ ready: false, error: 'Owner publishing database connection is unavailable.' }, { status: 503, headers })
+  }
+}
 
 export async function POST(request: NextRequest) {
   if (!isOwnerPublishAuthorized(request)) {

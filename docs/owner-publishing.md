@@ -13,6 +13,9 @@ It is separate from GitHub, Supabase, cron and indexer credentials. There is no
 localhost bypass, account-name allowlist or public form switch.
 
 ```sh
+# Check the server credential and database connection without publishing.
+pnpm owner:publish --check
+
 # Optional preview: fetch metadata and advisory findings without database writes.
 pnpm owner:publish --repository owner/repo --path SKILL.md --reason "Owner requested this listing" --dry-run
 
