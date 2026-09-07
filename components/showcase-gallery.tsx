@@ -7,12 +7,18 @@ import { ArrowRight, Search, X } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { ShowcaseCard } from '@/components/showcase-card'
+import { ShowcaseEngagementProvider, useShowcaseEngagement } from '@/components/showcase-engagement'
+import { sortShowcaseCases, type ShowcaseSort } from '@/lib/showcase-engagement'
 import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { filterShowcaseCases, getShowcaseCreator, localizeShowcase, SHOWCASE_CASES, SHOWCASE_CATEGORIES, SHOWCASE_SKILLS } from '@/lib/showcase'
 
 export function ShowcaseGallery() {
+  return <ShowcaseEngagementProvider><GalleryContent /></ShowcaseEngagementProvider>
+}
+
+function GalleryContent() {
   const { locale } = useI18n()
   const zh = locale === 'zh'
   const router = useRouter()
@@ -23,7 +29,9 @@ export function ShowcaseGallery() {
   const rawCreator = params.get('creator') || ''
   const creatorId = SHOWCASE_SKILLS.some((skill) => skill.creatorId === rawCreator) ? rawCreator : ''
   const viewed = useRef(false)
-  const cases = filterShowcaseCases(category, query, creatorId)
+  const { stats, ready, failed, refresh } = useShowcaseEngagement()
+  const sort: ShowcaseSort = params.get('sort') === 'top' ? 'top' : 'curated'
+  const cases = sortShowcaseCases(filterShowcaseCases(category, query, creatorId), ready ? sort : 'curated', stats)
   const workflowCount = new Set(SHOWCASE_CASES.map((item) => item.skillSlug)).size
 
   useEffect(() => {
@@ -32,7 +40,7 @@ export function ShowcaseGallery() {
     trackAnalyticsEvent('showcase_view', { placement: 'gallery' })
   }, [])
 
-  function filter(nextCategory: string, nextQuery: string, nextCreator = creatorId) {
+  function filter(nextCategory: string, nextQuery: string, nextCreator = creatorId, nextSort = sort) {
     const next = new URLSearchParams(params.toString())
     if (nextCategory === 'all') next.delete('category')
     else next.set('category', nextCategory)
@@ -40,8 +48,10 @@ export function ShowcaseGallery() {
     else next.delete('q')
     if (nextCreator) next.set('creator', nextCreator)
     else next.delete('creator')
+    if (nextSort === 'curated') next.delete('sort')
+    else next.set('sort', nextSort)
     router.push(`/showcase${next.size ? `?${next}` : ''}`, { scroll: false })
-    trackAnalyticsEvent('showcase_filter', { category: nextCategory, has_query: Boolean(nextQuery.trim()), creator_id: nextCreator || undefined })
+    trackAnalyticsEvent('showcase_filter', { category: nextCategory, has_query: Boolean(nextQuery.trim()), creator_id: nextCreator || undefined, sort: nextSort })
   }
 
   return (
@@ -86,11 +96,18 @@ export function ShowcaseGallery() {
               <p aria-live="polite" role="status" className="text-xs text-[#6d675e]">{zh ? `展示 ${cases.length} 个案例${query ? `，搜索“${query}”` : ''}` : `${cases.length} ${cases.length === 1 ? 'example' : 'examples'}${query ? ` for “${query}”` : ''}`}</p>
               {(query || category !== 'all' || creatorId) && <button type="button" onClick={() => filter('all', '', '')} className="inline-flex min-h-11 items-center gap-1 text-xs text-[#006b4f]"><X className="h-3 w-3" aria-hidden="true" />{zh ? '清除筛选' : 'Clear filters'}</button>}
             </div>
+            <div className="flex max-w-full flex-wrap gap-2">
             <select value={creatorId} onChange={(event) => filter(category, query, event.target.value)} aria-label={zh ? '按技能作者筛选' : 'Filter by skill creator'} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
               <option value="">{zh ? '全部技能作者' : 'All skill creators'}</option>
               {[...new Set(SHOWCASE_SKILLS.map((skill) => skill.creatorId))].map((id) => <option key={id} value={id}>{getShowcaseCreator(id).name}</option>)}
             </select>
+            <select value={sort} onChange={(event) => filter(category, query, creatorId, event.target.value as ShowcaseSort)} aria-label={zh ? '作品排序' : 'Sort examples'} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
+              <option value="curated">{zh ? '精选推荐' : 'Curated'}</option>
+              <option value="top">{zh ? '社区好评' : 'Top rated'}</option>
+            </select>
+            </div>
           </div>
+          {sort === 'top' && <p role="status" className="mt-3 text-xs text-[#6d675e]">{failed ? (zh ? '投票数据暂时不可用，当前按精选顺序展示。' : 'Votes are unavailable. Showing curated order.') : !ready ? (zh ? '正在加载投票排行…' : 'Loading votes…') : (zh ? '按净赞数（赞 − 踩）排序，同分保留精选顺序。' : 'Ranked by likes minus dislikes. Ties keep the curated order.')} {failed && <button type="button" onClick={() => void refresh()} className="min-h-11 text-[#006b4f] underline">{zh ? '重试' : 'Retry'}</button>}</p>}
           {cases.length ? <div className="mt-5 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">{cases.map((item, index) => <ShowcaseCard key={item.slug} item={item} priority={index < 3} />)}</div> : <div className="py-24 text-center">
             <h2 className="font-display text-3xl">{zh ? '还没有匹配的作品' : 'No examples just yet.'}</h2>
             <p className="mt-3 text-sm text-[#6d675e]">{zh ? '试试其他关键词，或清除筛选查看全部作品。' : 'Try a different search, or clear the filters to see all work.'}</p>

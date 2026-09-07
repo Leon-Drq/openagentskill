@@ -7,6 +7,7 @@ import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { ShowcaseCreatorCredit } from '@/components/showcase-creator'
+import { ShowcaseActions } from '@/components/showcase-engagement'
 import { getShowcaseAccessLabel, getShowcaseImageSrc, getShowcaseSkill, localizeShowcase, SHOWCASE_CATEGORIES, type ShowcaseCase } from '@/lib/showcase'
 
 export function ShowcaseCard({ item, placement = 'gallery', priority = false }: {
@@ -57,6 +58,7 @@ export function ShowcaseCard({ item, placement = 'gallery', priority = false }: 
           {getShowcaseAccessLabel(skill, locale)}
         </Link>
       </div>
+      {(placement === 'gallery' || placement === 'related') && <ShowcaseActions item={item} />}
     </article>
   )
 }

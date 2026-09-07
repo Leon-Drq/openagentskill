@@ -12,7 +12,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const zh = getLocaleFromSearchParam(params.lang) === 'zh'
   const title = zh ? 'Skill Gallery — 技能作品集与作者 | OpenAgentSkill' : 'Skill Gallery — Agent Skills, Creative Work & Creators | OpenAgentSkill'
   const description = zh ? '查看技能制作的真实作品，复制任务，开始自己的创作。每个案例包含预览、使用条件与来源。' : 'See real work made with agent skills. Explore websites, presentations, images and videos with previews, copyable tasks, requirements and source credits.'
-  return { title: { absolute: title }, description, alternates: { canonical: `${BASE_URL}/showcase` }, robots: { index: !params.q && !params.category && !params.creator && !params.lang, follow: true },
+  return { title: { absolute: title }, description, alternates: { canonical: `${BASE_URL}/showcase` }, robots: { index: !params.q && !params.category && !params.creator && !params.lang && !params.sort, follow: true },
     twitter: { card: 'summary_large_image', title, description, images: [`${BASE_URL}/showcase/ppt-ppt-skill-showcase.png`] },
     openGraph: { title, description, url: `${BASE_URL}/showcase`, type: 'website', images: [{ url: `${BASE_URL}/showcase/ppt-ppt-skill-showcase.png`, width: 2400, height: 1350, alt: 'Editorial presentation examples made with Guizang PPT Skill' }] },
   }
@@ -29,7 +29,7 @@ export default async function ShowcasePage({ searchParams }: Props) {
   const cases = filterShowcaseCases(category, query, creatorId)
   const schema = {
     '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Skill Gallery', url: `${BASE_URL}/showcase`,
-    mainEntity: { '@type': 'ItemList', numberOfItems: cases.length, itemListElement: cases.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: localizeShowcase(item.title, locale), url: `${BASE_URL}/showcase/${item.slug}` })) },
+    mainEntity: { '@type': 'ItemList', numberOfItems: cases.length, itemListOrder: 'https://schema.org/ItemListUnordered', itemListElement: cases.map((item) => ({ '@type': 'ListItem', name: localizeShowcase(item.title, locale), url: `${BASE_URL}/showcase/${item.slug}` })) },
   }
   return <I18nProvider initialLocale={locale}><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} /><ShowcaseGallery /></I18nProvider>
 }

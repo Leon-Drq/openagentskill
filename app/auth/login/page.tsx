@@ -22,6 +22,7 @@ function LoginForm() {
     ? requestedNext
     : '/profile'
   const claimIntent = searchParams.get('intent') === 'claim'
+  const galleryVoteIntent = searchParams.get('intent') === 'gallery-vote'
   const creatorIntent = nextPath === '/creator' || searchParams.get('intent') === 'creator' || claimIntent
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -51,10 +52,10 @@ function LoginForm() {
         </Link>
 
         <h1 className="font-display text-2xl font-bold mb-1">
-          {claimIntent ? 'Verify Skill ownership' : creatorIntent ? 'Sign in to Creator Center' : 'Sign in'}
+          {galleryVoteIntent ? 'Sign in to rate this work' : claimIntent ? 'Verify Skill ownership' : creatorIntent ? 'Sign in to Creator Center' : 'Sign in'}
         </h1>
         <p className="mb-3 text-sm leading-relaxed text-secondary">
-          {claimIntent
+          {galleryVoteIntent ? 'Like or dislike a work. One vote per account; change or remove it anytime.' : claimIntent
             ? 'Continue with GitHub to verify a matching repository instantly, or use email for repository-file verification.'
             : creatorIntent
             ? 'Claim your skills, manage your public creator profile, and view install analytics.'
