@@ -1,0 +1,1437 @@
+[
+  {
+    "group": "infographic",
+    "slug": "baoyu-infographic-bridge",
+    "title": {
+      "en": "Bridge the gap",
+      "zh": "从问题走向解决方案"
+    },
+    "brief": {
+      "en": "Map a current problem, the obstacles and a desired outcome as a bridge. Label the actions that connect both sides.",
+      "zh": "用桥梁结构连接当前问题与目标，标出障碍及跨越它们的具体行动。"
+    },
+    "assets": [
+      "screenshots/infographic-layouts/bridge.webp"
+    ]
+  },
+  {
+    "group": "infographic",
+    "slug": "baoyu-infographic-circular-flow",
+    "title": {
+      "en": "A product cycle, drawn as a loop",
+      "zh": "画出产品迭代的闭环"
+    },
+    "brief": {
+      "en": "Explain a product development cycle from research to launch and feedback, with an unambiguous reading direction.",
+      "zh": "按研究、设计、验证、发布、反馈组织产品周期，并让阅读方向清晰。"
+    },
+    "assets": [
+      "screenshots/infographic-layouts/circular-flow.webp"
+    ]
+  },
+  {
+    "group": "infographic",
+    "slug": "baoyu-infographic-comparison-table",
+    "title": {
+      "en": "Two plans, one clear comparison",
+      "zh": "把两个方案摆在一起比较"
+    },
+    "brief": {
+      "en": "Compare two proposals against the same six criteria. Separate supplied facts from undecided trade-offs.",
+      "zh": "用相同的六项标准比较两个方案，区分已知事实和待决定的取舍。"
+    },
+    "assets": [
+      "screenshots/infographic-layouts/comparison-table.webp"
+    ]
+  },
+  {
+    "group": "infographic",
+    "slug": "baoyu-infographic-fishbone",
+    "title": {
+      "en": "Find the roots of a problem",
+      "zh": "用鱼骨图追溯问题根因"
+    },
+    "brief": {
+      "en": "Organize possible causes under people, process, tools and environment. Distinguish hypotheses from verified causes.",
+      "zh": "按人员、流程、工具和环境整理可能原因，区分假设与已验证根因。"
+    },
+    "assets": [
+      "screenshots/infographic-layouts/fishbone.webp"
+    ]
+  },
+  {
+    "group": "infographic",
+    "slug": "baoyu-infographic-funnel",
+    "title": {
+      "en": "See where a funnel narrows",
+      "zh": "看清转化漏斗的每一层"
+    },
+    "brief": {
+      "en": "Visualize awareness, interest, consideration, decision and retention with supplied counts and explicit conversion denominators.",
+      "zh": "呈现认知、兴趣、考虑、决策和留存各阶段，使用提供的人数并明确转化率分母。"
+    },
+    "assets": [
+      "screenshots/infographic-layouts/funnel.webp"
+    ]
+  },
+  {
+    "group": "infographic",
+    "slug": "baoyu-infographic-iceberg",
+    "title": {
+      "en": "What an iceberg hides",
+      "zh": "用冰山讲清看不见的投入"
+    },
+    "brief": {
+      "en": "Separate visible outcomes from supporting work, constraints and learning below the surface.",
+      "zh": "区分水面上的成果与水面下的投入、约束和学习过程。"
+    },
+    "assets": [
+      "screenshots/infographic-layouts/iceberg.webp"
+    ]
+  },
+  {
+    "group": "infographic",
+    "slug": "baoyu-infographic-journey-path",
+    "title": {
+      "en": "Follow the customer journey",
+      "zh": "把用户旅程画成路径"
+    },
+    "brief": {
+      "en": "Map customer touchpoints from discovery to advocacy, pairing each stage with a question and an opportunity.",
+      "zh": "从发现到主动推荐绘制用户触点，为每个阶段配一个问题与改进机会。"
+    },
+    "assets": [
+      "screenshots/infographic-layouts/journey-path.webp"
+    ]
+  },
+  {
+    "group": "infographic",
+    "slug": "baoyu-infographic-layers-stack",
+    "title": {
+      "en": "A technology stack in layers",
+      "zh": "把技术栈一层层讲清楚"
+    },
+    "brief": {
+      "en": "Explain an application stack from infrastructure to interface, showing responsibilities and dependencies rather than decorative jargon.",
+      "zh": "从基础设施到用户界面分层解释系统，标明职责与依赖，不堆砌术语。"
+    },
+    "assets": [
+      "screenshots/infographic-layouts/layers-stack.webp"
+    ]
+  },
+  {
+    "group": "infographic",
+    "slug": "baoyu-infographic-mind-map",
+    "title": {
+      "en": "Give an idea room to branch",
+      "zh": "让创意长成思维导图"
+    },
+    "brief": {
+      "en": "Organize a central concept into distinct branches, subtopics and useful cross-links without repeating the same idea.",
+      "zh": "围绕核心概念展开不同分支、子主题和关联，避免重复节点。"
+    },
+    "assets": [
+      "screenshots/infographic-layouts/mind-map.webp"
+    ]
+  },
+  {
+    "group": "infographic",
+    "slug": "baoyu-infographic-priority-quadrants",
+    "title": {
+      "en": "Decide what deserves attention",
+      "zh": "用四象限安排优先级"
+    },
+    "brief": {
+      "en": "Place tasks on an urgency-versus-importance matrix and label do, schedule, delegate and drop decisions.",
+      "zh": "按紧急程度与重要性整理任务，标明立即处理、安排、委派和放弃。"
+    },
+    "assets": [
+      "screenshots/infographic-layouts/priority-quadrants.webp"
+    ]
+  },
+  {
+    "group": "infographic",
+    "slug": "baoyu-infographic-timeline-horizontal",
+    "title": {
+      "en": "A company story through time",
+      "zh": "把发展历程排成时间线"
+    },
+    "brief": {
+      "en": "Turn dated milestones into a horizontal timeline. Preserve actual dates and keep unsupported achievements out.",
+      "zh": "把有日期的里程碑整理成横向时间线，保留真实日期，不编造成就。"
+    },
+    "assets": [
+      "screenshots/infographic-layouts/timeline-horizontal.webp"
+    ]
+  },
+  {
+    "group": "infographic",
+    "slug": "baoyu-infographic-tree-hierarchy",
+    "title": {
+      "en": "An organization that is easy to read",
+      "zh": "一眼读懂组织层级"
+    },
+    "brief": {
+      "en": "Draw an organization tree with supplied roles and reporting lines. Keep one level per visual tier.",
+      "zh": "根据提供的岗位与汇报关系绘制组织树，让每层视觉结构对应一个层级。"
+    },
+    "assets": [
+      "screenshots/infographic-layouts/tree-hierarchy.webp"
+    ]
+  },
+  {
+    "group": "comic",
+    "slug": "baoyu-comic-cinematic",
+    "title": {
+      "en": "A story in widescreen panels",
+      "zh": "用宽银幕分镜讲故事"
+    },
+    "brief": {
+      "en": "Storyboard an original journey in three wide cinematic panels, maintaining the protagonist and geography between shots.",
+      "zh": "把原创旅程画成三个宽银幕分镜，保持主角造型和空间关系连续。"
+    },
+    "assets": [
+      "screenshots/comic-layouts/cinematic.webp"
+    ]
+  },
+  {
+    "group": "comic",
+    "slug": "baoyu-comic-dense",
+    "title": {
+      "en": "Explain an engine with sequential art",
+      "zh": "用漫画拆解复杂原理"
+    },
+    "brief": {
+      "en": "Use a dense educational comic to explain a supplied mechanism. Have a domain expert check labels and causal steps before educational use.",
+      "zh": "用信息密集的科普漫画解释提供的原理；教学使用前请专业人士核对标注与因果步骤。"
+    },
+    "assets": [
+      "screenshots/comic-layouts/dense.webp"
+    ]
+  },
+  {
+    "group": "comic",
+    "slug": "baoyu-comic-webtoon",
+    "title": {
+      "en": "Teach through a vertical comic",
+      "zh": "把教程变成竖向条漫"
+    },
+    "brief": {
+      "en": "Create a vertical reading tutorial with clear panel rhythm, brief dialogue and consistent original characters.",
+      "zh": "制作适合竖向阅读的教程条漫，分镜节奏清晰，对话简短，原创角色保持一致。"
+    },
+    "assets": [
+      "screenshots/comic-layouts/webtoon.webp"
+    ]
+  },
+  {
+    "group": "cover",
+    "slug": "baoyu-cover-bold-editorial",
+    "title": {
+      "en": "The future, in bold type",
+      "zh": "用大字做科技封面"
+    },
+    "brief": {
+      "en": "Create a technology article cover with one forceful headline, geometric color bands and a quiet subtitle area.",
+      "zh": "为科技文章制作封面，用一个醒目的标题、几何色带和克制的副标题区域构图。"
+    },
+    "assets": [
+      "screenshots/cover-image-styles/bold-editorial.webp"
+    ]
+  },
+  {
+    "group": "cover",
+    "slug": "baoyu-cover-nature",
+    "title": {
+      "en": "A quieter kind of cover",
+      "zh": "自然生活主题封面"
+    },
+    "brief": {
+      "en": "Create a sustainable-living article cover using flowing landscape contours, organic texture and readable typography.",
+      "zh": "用流动地形线、有机纹理和清晰文字制作可持续生活文章封面。"
+    },
+    "assets": [
+      "screenshots/cover-image-styles/nature.webp"
+    ]
+  },
+  {
+    "group": "cover",
+    "slug": "baoyu-cover-watercolor",
+    "title": {
+      "en": "A watercolor journey inward",
+      "zh": "水彩感的内在旅程"
+    },
+    "brief": {
+      "en": "Illustrate an original reflective article cover with watercolor scenery and a restrained title, avoiding medical promises.",
+      "zh": "用水彩景致与克制标题绘制反思主题文章封面，不使用医疗功效承诺。"
+    },
+    "assets": [
+      "screenshots/cover-image-styles/watercolor.webp"
+    ]
+  },
+  {
+    "group": "illustration",
+    "slug": "baoyu-illustration-blueprint",
+    "title": {
+      "en": "Architecture as a blueprint",
+      "zh": "把系统架构画成蓝图"
+    },
+    "brief": {
+      "en": "Illustrate a supplied system architecture with clean connections, readable component names and a blueprint visual language.",
+      "zh": "按提供的系统结构绘制蓝图风格配图，组件名称易读，连接关系清楚。"
+    },
+    "assets": [
+      "screenshots/article-illustrator-styles/blueprint.webp"
+    ]
+  },
+  {
+    "group": "illustration",
+    "slug": "baoyu-illustration-flat-doodle",
+    "title": {
+      "en": "Make brainstorming visible",
+      "zh": "用涂鸦呈现头脑风暴"
+    },
+    "brief": {
+      "en": "Illustrate idea generation with original flat doodles, notes and arrows. Keep visual hierarchy around one central idea.",
+      "zh": "用原创扁平涂鸦、便签和箭头表现创意过程，围绕一个中心建立层级。"
+    },
+    "assets": [
+      "screenshots/article-illustrator-styles/flat-doodle.webp"
+    ]
+  },
+  {
+    "group": "illustration",
+    "slug": "baoyu-illustration-pixel-art",
+    "title": {
+      "en": "An article with an arcade spirit",
+      "zh": "给游戏文章一点像素趣味"
+    },
+    "brief": {
+      "en": "Create an original pixel-art illustration for a gaming-and-technology article, using generic devices and no copied game characters.",
+      "zh": "为游戏科技文章绘制原创像素配图，使用通用设备，不复制游戏角色。"
+    },
+    "assets": [
+      "screenshots/article-illustrator-styles/pixel-art.webp"
+    ]
+  },
+  {
+    "group": "illustration",
+    "slug": "baoyu-illustration-watercolor",
+    "title": {
+      "en": "Botanical watercolor for an article",
+      "zh": "植物水彩文章配图"
+    },
+    "brief": {
+      "en": "Create an original botanical illustration with balanced flower clusters and quiet space for adjacent editorial text.",
+      "zh": "用平衡的花卉组合制作原创植物水彩配图，为相邻正文留出视觉空间。"
+    },
+    "assets": [
+      "screenshots/article-illustrator-styles/watercolor.webp"
+    ]
+  },
+  {
+    "group": "social",
+    "slug": "baoyu-social-balanced",
+    "title": {
+      "en": "Four ideas on one learning card",
+      "zh": "一张卡片讲清四个学习要点"
+    },
+    "brief": {
+      "en": "Turn four supplied learning ideas into a mobile-friendly card with a balanced two-by-two layout.",
+      "zh": "把四个学习要点整理成适合手机阅读的四宫格卡片。"
+    },
+    "assets": [
+      "screenshots/xhs-images-layouts/balanced.webp"
+    ]
+  },
+  {
+    "group": "social",
+    "slug": "baoyu-social-dense",
+    "title": {
+      "en": "A useful knowledge cheat sheet",
+      "zh": "把知识压缩成可读的速查卡"
+    },
+    "brief": {
+      "en": "Organize a supplied knowledge summary into compact sections, keeping body text readable at phone width.",
+      "zh": "把知识总结组织成紧凑分区，同时确保手机宽度下正文可读。"
+    },
+    "assets": [
+      "screenshots/xhs-images-layouts/dense.webp"
+    ]
+  },
+  {
+    "group": "social",
+    "slug": "baoyu-social-list",
+    "title": {
+      "en": "A shortlist worth saving",
+      "zh": "一张值得收藏的清单卡"
+    },
+    "brief": {
+      "en": "Present five supplied recommendations with explicit selection criteria. Label sample products rather than inventing endorsements.",
+      "zh": "按明确标准展示五项建议，示例产品需标注，不伪造推荐背书。"
+    },
+    "assets": [
+      "screenshots/xhs-images-layouts/list.webp"
+    ]
+  },
+  {
+    "group": "social",
+    "slug": "baoyu-social-flow",
+    "title": {
+      "en": "A routine, step by step",
+      "zh": "把日常流程拆成步骤卡"
+    },
+    "brief": {
+      "en": "Turn a supplied routine into four ordered steps with one action per step. Use the preview for layout, not as health advice.",
+      "zh": "把提供的日常流程拆成四步，每步一个动作；参考示例版式，不将其当作健康建议。"
+    },
+    "assets": [
+      "screenshots/xhs-images-layouts/flow.webp"
+    ]
+  },
+  {
+    "group": "raster-slides",
+    "slug": "baoyu-raster-slides-corporate",
+    "title": {
+      "en": "Quarterly results that read clearly",
+      "zh": "清晰呈现季度结果"
+    },
+    "brief": {
+      "en": "Design a results slide using supplied revenue, user and satisfaction metrics, with units and reporting dates.",
+      "zh": "根据提供的收入、用户和满意度数据制作结果页，注明单位与统计日期。"
+    },
+    "assets": [
+      "screenshots/slide-deck-styles/corporate.webp"
+    ]
+  },
+  {
+    "group": "raster-slides",
+    "slug": "baoyu-raster-slides-editorial-infographic",
+    "title": {
+      "en": "Explain a machine-learning pipeline",
+      "zh": "用一页解释机器学习流程"
+    },
+    "brief": {
+      "en": "Explain data, training and predictions in three visual stages, separating simplified diagrams from technical specifications.",
+      "zh": "用数据、训练和预测三个视觉阶段解释流程，区分简化示意与技术规格。"
+    },
+    "assets": [
+      "screenshots/slide-deck-styles/editorial-infographic.webp"
+    ]
+  },
+  {
+    "group": "raster-slides",
+    "slug": "baoyu-raster-slides-scientific",
+    "title": {
+      "en": "A science lesson with visual structure",
+      "zh": "有视觉结构的科学课程页"
+    },
+    "brief": {
+      "en": "Turn expert-checked science notes into a clearly labeled teaching slide. Verify every scientific annotation before use.",
+      "zh": "把经专业核对的科学笔记转成标注清晰的教学页，使用前逐一核查科学文字。"
+    },
+    "assets": [
+      "screenshots/slide-deck-styles/scientific.webp"
+    ]
+  },
+  {
+    "group": "raster-slides",
+    "slug": "baoyu-raster-slides-vector-illustration",
+    "title": {
+      "en": "Welcome to an illustrated AI city",
+      "zh": "走进插画里的 AI 城市"
+    },
+    "brief": {
+      "en": "Create a slide introducing a fictional AI city with an original vector scene and one readable headline.",
+      "zh": "以原创矢量城市场景与一个清晰标题，制作虚构 AI 城市的介绍页。"
+    },
+    "assets": [
+      "screenshots/slide-deck-styles/vector-illustration.webp"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-8-bit-orbit",
+    "title": {
+      "en": "8-Bit Orbit",
+      "zh": "像素轨道"
+    },
+    "brief": {
+      "en": "A developer roadmap with pixel typography, resource charts and milestone views.",
+      "zh": "用像素标题、资源图表和里程碑展示开发路线。"
+    },
+    "assets": [
+      "screenshots/8-bit-orbit-1.png",
+      "screenshots/8-bit-orbit-5.png",
+      "screenshots/8-bit-orbit-6.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-biennale-yellow",
+    "title": {
+      "en": "Aurora programme",
+      "zh": "极光展览企划"
+    },
+    "brief": {
+      "en": "An arts programme combining a large serif cover, attendance chart and generous editorial spacing.",
+      "zh": "用大衬线封面、观众数据和留白组织艺术活动企划。"
+    },
+    "assets": [
+      "screenshots/biennale-yellow-1.png",
+      "screenshots/biennale-yellow-5.png",
+      "screenshots/biennale-yellow-8.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-block-frame",
+    "title": {
+      "en": "BlockFrame growth story",
+      "zh": "框架里的增长故事"
+    },
+    "brief": {
+      "en": "A playful business update with framed panels, grouped bars and an impact summary.",
+      "zh": "用趣味边框、分组柱状图和成果摘要讲述业务进展。"
+    },
+    "assets": [
+      "screenshots/block-frame-1.png",
+      "screenshots/block-frame-4.png",
+      "screenshots/block-frame-8.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-bold-poster",
+    "title": {
+      "en": "Apex annual review",
+      "zh": "Apex 年度回顾"
+    },
+    "brief": {
+      "en": "An annual-review deck with assertive red-and-black type, financial tiles and strategic priorities.",
+      "zh": "以红黑大字、财务信息格和战略重点组织年度回顾。"
+    },
+    "assets": [
+      "screenshots/bold-poster-1.png",
+      "screenshots/bold-poster-4.png",
+      "screenshots/bold-poster-8.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-broadside",
+    "title": {
+      "en": "A hierarchy that makes a point",
+      "zh": "用层级表达观点"
+    },
+    "brief": {
+      "en": "A strong typographic presentation with a stepped pyramid linking operations, product and mission.",
+      "zh": "用强烈文字和阶梯金字塔连接运营、产品与使命。"
+    },
+    "assets": [
+      "screenshots/broadside-1.png",
+      "screenshots/broadside-13.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-capsule",
+    "title": {
+      "en": "Systems in capsules",
+      "zh": "胶囊形的系统说明"
+    },
+    "brief": {
+      "en": "A system presentation using pill-shaped labels, a performance chart and an architecture flow.",
+      "zh": "用胶囊标签、表现图表和架构流程说明系统。"
+    },
+    "assets": [
+      "screenshots/capsule-1.png",
+      "screenshots/capsule-4.png",
+      "screenshots/capsule-8.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-cartesian",
+    "title": {
+      "en": "A restrained strategy review",
+      "zh": "克制的战略回顾"
+    },
+    "brief": {
+      "en": "A minimal strategy deck that moves from quarterly comparisons to implementation phases.",
+      "zh": "用极简版式从季度对比过渡到实施阶段。"
+    },
+    "assets": [
+      "screenshots/cartesian-1.png",
+      "screenshots/cartesian-4.png",
+      "screenshots/cartesian-8.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-cobalt-grid",
+    "title": {
+      "en": "An editorial field report",
+      "zh": "钴蓝色田野报告"
+    },
+    "brief": {
+      "en": "A field report with a six-part index, chart-led evidence and disciplined blue grid typography.",
+      "zh": "用六部分索引、图表证据和规整的钴蓝网格文字构建报告。"
+    },
+    "assets": [
+      "screenshots/cobalt-grid-1.png",
+      "screenshots/cobalt-grid-3.png",
+      "screenshots/cobalt-grid-5.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-creative-mode",
+    "title": {
+      "en": "Moving parts, made clear",
+      "zh": "讲清不断运转的系统"
+    },
+    "brief": {
+      "en": "A creative-process deck with layered architecture and a four-stage discover-to-deliver sequence.",
+      "zh": "通过分层架构与探索到交付的四步结构解释创作流程。"
+    },
+    "assets": [
+      "screenshots/creative-mode-1.png",
+      "screenshots/creative-mode-4.png",
+      "screenshots/creative-mode-6.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-daisy-days",
+    "title": {
+      "en": "A bright team welcome",
+      "zh": "明亮的团队欢迎会"
+    },
+    "brief": {
+      "en": "A cheerful team-introduction deck with a daily schedule and a friendly team roster.",
+      "zh": "以轻快的日程页和成员介绍组织团队欢迎会。"
+    },
+    "assets": [
+      "screenshots/daisy-days-1.png",
+      "screenshots/daisy-days-4.png",
+      "screenshots/daisy-days-8.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-editorial-tri-tone",
+    "title": {
+      "en": "Studio & Salon",
+      "zh": "工作室与沙龙"
+    },
+    "brief": {
+      "en": "A studio brief combining eight principles, a headline metric and warm tri-tone editorial layouts.",
+      "zh": "将八项原则、关键指标与暖色三色版式组合成工作室简报。"
+    },
+    "assets": [
+      "screenshots/editorial-tri-tone-1.png",
+      "screenshots/editorial-tri-tone-3.png",
+      "screenshots/editorial-tri-tone-4.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-studio",
+    "title": {
+      "en": "A proposal with conviction",
+      "zh": "有态度的提案"
+    },
+    "brief": {
+      "en": "A high-contrast proposal moving from positioning to a clear before-and-after value argument.",
+      "zh": "从定位到前后价值对比，用高对比版式组织提案。"
+    },
+    "assets": [
+      "screenshots/studio-1.png",
+      "screenshots/studio-4.png",
+      "screenshots/studio-8.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-long-table",
+    "title": {
+      "en": "An invitation to the long table",
+      "zh": "长桌边的邀请"
+    },
+    "brief": {
+      "en": "A community programme with past editions, a forthcoming event schedule and warm newsletter-like typography.",
+      "zh": "用往期活动、后续日程和温暖的通讯式排版介绍社群计划。"
+    },
+    "assets": [
+      "screenshots/long-table-1.png",
+      "screenshots/long-table-3.png",
+      "screenshots/long-table-7.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-editorial-forest",
+    "title": {
+      "en": "A quarterly review in forest green",
+      "zh": "森林绿季度回顾"
+    },
+    "brief": {
+      "en": "A quarterly review with a structured agenda and comparative revenue chart on an editorial canvas.",
+      "zh": "用分区议程与收入对比图表组织编辑式季度回顾。"
+    },
+    "assets": [
+      "screenshots/editorial-forest-1.png",
+      "screenshots/editorial-forest-2.png",
+      "screenshots/editorial-forest-5.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-neo-grid-bold",
+    "title": {
+      "en": "Digits: a financial product story",
+      "zh": "Digits：金融产品故事"
+    },
+    "brief": {
+      "en": "A financial-product pitch with oversized adoption figures, grid-based evidence and staged next steps.",
+      "zh": "用大号采用数据、网格证据和分阶段行动说明金融产品。"
+    },
+    "assets": [
+      "screenshots/neo-grid-bold-1.png",
+      "screenshots/neo-grid-bold-3.png",
+      "screenshots/neo-grid-bold-8.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-pin-and-paper",
+    "title": {
+      "en": "The rules we are keeping",
+      "zh": "留下值得坚持的原则"
+    },
+    "brief": {
+      "en": "A workshop summary using note cards, three agreed principles and three concrete next bets.",
+      "zh": "用便签、三项共识原则和三个后续行动总结工作坊。"
+    },
+    "assets": [
+      "screenshots/pin-and-paper-1.png",
+      "screenshots/pin-and-paper-3.png",
+      "screenshots/pin-and-paper-11.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-pink-script",
+    "title": {
+      "en": "After Hours editorial",
+      "zh": "After Hours 时尚编辑稿"
+    },
+    "brief": {
+      "en": "A fashion-editorial presentation with dramatic chapter openings, serif type and carefully spaced quotations.",
+      "zh": "用戏剧感章节页、衬线字和留白引文组织时尚编辑稿。"
+    },
+    "assets": [
+      "screenshots/pink-script-1.png",
+      "screenshots/pink-script-4.png",
+      "screenshots/pink-script-8.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-retro-windows",
+    "title": {
+      "en": "A retro desktop business review",
+      "zh": "复古桌面里的业务复盘"
+    },
+    "brief": {
+      "en": "A business-review template that uses desktop-window metaphors for revenue and organization views.",
+      "zh": "以桌面窗口隐喻展示收入和组织结构的业务复盘模板。"
+    },
+    "assets": [
+      "screenshots/retro-windows-1.png",
+      "screenshots/retro-windows-4.png",
+      "screenshots/retro-windows-8.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-retro-zine",
+    "title": {
+      "en": "Nexus venture zine",
+      "zh": "Nexus 创业手册"
+    },
+    "brief": {
+      "en": "A venture-studio introduction with a compact facts panel and tactile card-based capability sections.",
+      "zh": "用紧凑资料面板和纸卡式能力分区介绍创业工作室。"
+    },
+    "assets": [
+      "screenshots/retro-zine-1.png",
+      "screenshots/retro-zine-4.png",
+      "screenshots/retro-zine-8.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-sakura-chroma",
+    "title": {
+      "en": "A cassette-inspired product catalogue",
+      "zh": "磁带包装风的产品目录"
+    },
+    "brief": {
+      "en": "A product catalogue using diagonal color ribbons, compact specification columns and a bold statement page.",
+      "zh": "用斜向色带、紧凑规格栏和宣言页组织产品目录。"
+    },
+    "assets": [
+      "screenshots/sakura-chroma-1.png",
+      "screenshots/sakura-chroma-3.png",
+      "screenshots/sakura-chroma-4.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-scatterbrain",
+    "title": {
+      "en": "Ideas pinned into a story",
+      "zh": "把散落想法贴成故事"
+    },
+    "brief": {
+      "en": "A workshop presentation with sticky-note groupings, growth charts and a distribution overview.",
+      "zh": "用便签分组、增长图表和分布概览组织工作坊演示。"
+    },
+    "assets": [
+      "screenshots/scatterbrain-1.png",
+      "screenshots/scatterbrain-4.png",
+      "screenshots/scatterbrain-8.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-soft-editorial",
+    "title": {
+      "en": "Research insights on warm paper",
+      "zh": "暖纸上的研究洞察"
+    },
+    "brief": {
+      "en": "A research summary combining insight cards, headline figures and retention curves.",
+      "zh": "通过洞察卡、关键数字与留存曲线总结研究。"
+    },
+    "assets": [
+      "screenshots/soft-editorial-4.png",
+      "screenshots/soft-editorial-6.png",
+      "screenshots/soft-editorial-10.png"
+    ]
+  },
+  {
+    "group": "frontend",
+    "slug": "frontend-stencil-tablet",
+    "title": {
+      "en": "A design partnership proposal",
+      "zh": "设计合作提案"
+    },
+    "brief": {
+      "en": "A partnership deck pairing four design principles with a side-by-side pilot comparison table.",
+      "zh": "用四项设计原则和并列试点对比表组织合作提案。"
+    },
+    "assets": [
+      "screenshots/stencil-tablet-1.png",
+      "screenshots/stencil-tablet-3.png",
+      "screenshots/stencil-tablet-8.png"
+    ]
+  },
+  {
+    "group": "huashu",
+    "slug": "huashu-cover",
+    "title": {
+      "en": "Parallel agents, one cover",
+      "zh": "并行 Agent 技术封面"
+    },
+    "brief": {
+      "en": "Create a cover for a technical article on parallel agents, using strong hierarchy and one accent color.",
+      "zh": "为并行 Agent 技术文章制作封面，使用明确的文字层级和一种点缀色。"
+    },
+    "assets": [
+      "assets/showcases/cover/cover-pentagram.png"
+    ],
+    "category": "image"
+  },
+  {
+    "group": "huashu",
+    "slug": "huashu-infographic",
+    "title": {
+      "en": "A technical briefing with evidence",
+      "zh": "有证据结构的技术简报"
+    },
+    "brief": {
+      "en": "Turn supplied technical findings into a tall briefing with sections, comparisons and explicit data sources.",
+      "zh": "把技术发现组织成纵向简报，包含分区、比较及明确的数据来源。"
+    },
+    "assets": [
+      "assets/showcases/infographic/infographic-pentagram.png"
+    ],
+    "category": "image"
+  },
+  {
+    "group": "huashu",
+    "slug": "huashu-ppt",
+    "title": {
+      "en": "A benchmark in one slide",
+      "zh": "一页呈现基准测试"
+    },
+    "brief": {
+      "en": "Design a benchmark summary with supplied scores, methodology and date. Do not reuse the sample numbers as current findings.",
+      "zh": "根据提供的分数、方法和日期制作基准测试摘要，不把示例数字当作当前结论。"
+    },
+    "assets": [
+      "assets/showcases/ppt/ppt-pentagram.png"
+    ],
+    "category": "slides"
+  },
+  {
+    "group": "huashu",
+    "slug": "huashu-ainav",
+    "title": {
+      "en": "AI Compass tool directory",
+      "zh": "AI Compass 工具导航"
+    },
+    "brief": {
+      "en": "Design a tool directory with search, categories, concise summaries and transparent submission criteria.",
+      "zh": "设计带搜索、分类、简要说明及透明提交标准的工具导航。"
+    },
+    "assets": [
+      "assets/showcases/website-ai-nav/ainav-pentagram.png"
+    ],
+    "category": "web"
+  },
+  {
+    "group": "huashu",
+    "slug": "huashu-aiwriting",
+    "title": {
+      "en": "Inkwell writing workspace",
+      "zh": "Inkwell 写作工作台"
+    },
+    "brief": {
+      "en": "Build a writing-product landing prototype with a document preview, feature explanation and a clear starting action.",
+      "zh": "制作写作产品落地页原型，包含文稿预览、功能说明和清晰入口。"
+    },
+    "assets": [
+      "assets/showcases/website-ai-writing/aiwriting-takram.png"
+    ],
+    "category": "web"
+  },
+  {
+    "group": "huashu",
+    "slug": "huashu-devdocs",
+    "title": {
+      "en": "Nexus developer documentation",
+      "zh": "Nexus 开发者文档"
+    },
+    "brief": {
+      "en": "Create a developer-docs prototype with persistent navigation, endpoint examples and readable code blocks.",
+      "zh": "制作开发者文档原型，包含固定导航、接口示例和易读代码块。"
+    },
+    "assets": [
+      "assets/showcases/website-devdocs/devdocs-pentagram.png"
+    ],
+    "category": "web"
+  },
+  {
+    "group": "huashu",
+    "slug": "huashu-homepage",
+    "title": {
+      "en": "An independent maker portfolio",
+      "zh": "独立创作者作品主页"
+    },
+    "brief": {
+      "en": "Design a maker portfolio around selected projects and a clear introduction. Use real supplied achievements, never the example metrics.",
+      "zh": "围绕精选项目和清晰介绍设计创作者主页，使用真实资料，不复制示例成就数字。"
+    },
+    "assets": [
+      "assets/showcases/website-homepage/homepage-pentagram.png"
+    ],
+    "category": "web"
+  },
+  {
+    "group": "huashu",
+    "slug": "huashu-saas",
+    "title": {
+      "en": "Meridian analytics landing",
+      "zh": "Meridian 数据分析落地页"
+    },
+    "brief": {
+      "en": "Create an analytics landing prototype with a sample dashboard, product explanation and a focused trial invitation.",
+      "zh": "制作数据分析产品落地页原型，包含示例仪表盘、产品说明和明确试用入口。"
+    },
+    "assets": [
+      "assets/showcases/website-saas/saas-takram.png"
+    ],
+    "category": "web"
+  },
+  {
+    "group": "open",
+    "slug": "open-deck-swiss-international",
+    "title": {
+      "en": "Swiss typography, on slides",
+      "zh": "瑞士字体感的演示文稿"
+    },
+    "brief": {
+      "en": "Create a presentation using disciplined grids, oversized typography and a clear reading order.",
+      "zh": "用严谨网格、大号字体和清晰阅读顺序制作演示文稿。"
+    },
+    "assets": [
+      "docs/screenshots/skills/deck-swiss-international.png"
+    ],
+    "category": "slides"
+  },
+  {
+    "group": "open",
+    "slug": "open-digital-eguide",
+    "title": {
+      "en": "A creator’s style guide",
+      "zh": "创作者的风格指南"
+    },
+    "brief": {
+      "en": "Create an editorial guide with a cover, writing principles and concise worked examples.",
+      "zh": "制作编辑式指南，包含封面、写作原则和简明示例。"
+    },
+    "assets": [
+      "docs/screenshots/skills/digital-eguide.png"
+    ],
+    "category": "document"
+  },
+  {
+    "group": "open",
+    "slug": "open-doc-kami-parchment",
+    "title": {
+      "en": "An editorial document on warm paper",
+      "zh": "暖纸色的编辑式文档"
+    },
+    "brief": {
+      "en": "Lay out a multi-section document with readable serif headings, a calm column structure and useful summaries.",
+      "zh": "用易读衬线标题、克制的分栏和实用摘要排版多章节文档。"
+    },
+    "assets": [
+      "docs/screenshots/skills/doc-kami-parchment.png"
+    ],
+    "category": "document"
+  },
+  {
+    "group": "open",
+    "slug": "open-email-marketing",
+    "title": {
+      "en": "A product email with a point",
+      "zh": "重点清晰的产品营销邮件"
+    },
+    "brief": {
+      "en": "Design a product-launch email with a single offer, supplied product details and a clear call to action.",
+      "zh": "围绕一个主张、提供的产品信息和明确行动入口设计发布邮件。"
+    },
+    "assets": [
+      "docs/screenshots/skills/email-marketing.png"
+    ],
+    "category": "web"
+  },
+  {
+    "group": "open",
+    "slug": "open-flowai-live-dashboard-template",
+    "title": {
+      "en": "Team operations at a glance",
+      "zh": "一眼看清团队运营"
+    },
+    "brief": {
+      "en": "Prototype a team dashboard with status cards, a member table, filters and explicit loading and empty states.",
+      "zh": "制作包含状态卡、成员表、筛选、加载与空状态的团队仪表盘原型。"
+    },
+    "assets": [
+      "docs/screenshots/skills/flowai-live-dashboard-template.png"
+    ],
+    "category": "web"
+  },
+  {
+    "group": "open",
+    "slug": "open-github-dashboard",
+    "title": {
+      "en": "A repository activity dashboard",
+      "zh": "仓库动态仪表盘"
+    },
+    "brief": {
+      "en": "Prototype a repository dashboard with star history, contributors and recent activity, clearly labeled as sample data until connected.",
+      "zh": "制作仓库仪表盘，包含 Star 变化、贡献者和近期动态；接入前明确标为示例数据。"
+    },
+    "assets": [
+      "docs/screenshots/skills/github-dashboard.png"
+    ],
+    "category": "web"
+  },
+  {
+    "group": "open",
+    "slug": "open-magazine-poster",
+    "title": {
+      "en": "A manifesto, set like a magazine",
+      "zh": "像杂志一样排版的宣言"
+    },
+    "brief": {
+      "en": "Design a typographic manifesto poster with a strong headline, subhead and a carefully structured editorial grid.",
+      "zh": "以有力标题、副标题和精细编辑网格设计文字宣言海报。"
+    },
+    "assets": [
+      "docs/screenshots/skills/magazine-poster.png"
+    ],
+    "category": "image"
+  },
+  {
+    "group": "open",
+    "slug": "open-mobile-onboarding",
+    "title": {
+      "en": "A calmer first-run experience",
+      "zh": "更从容的首次使用体验"
+    },
+    "brief": {
+      "en": "Prototype a three-screen onboarding journey with one decision per screen, accessible actions and a clear completion state.",
+      "zh": "制作三屏引导原型，每屏一个决策，操作易访问，并有清晰完成状态。"
+    },
+    "assets": [
+      "docs/screenshots/skills/mobile-onboarding.png"
+    ],
+    "category": "web"
+  },
+  {
+    "group": "open",
+    "slug": "open-motion-frames",
+    "title": {
+      "en": "An orbital visual study",
+      "zh": "轨道式视觉研究"
+    },
+    "brief": {
+      "en": "Develop an original orbital visual composition with repeated circular forms and generous negative space. Start with a still before planning motion.",
+      "zh": "用重复圆形与留白构建原创轨道构图，先完成静帧，再规划动态。"
+    },
+    "assets": [
+      "docs/screenshots/skills/motion-frames.png"
+    ],
+    "category": "image"
+  },
+  {
+    "group": "open",
+    "slug": "open-social-carousel",
+    "title": {
+      "en": "Three posts, one visual rhythm",
+      "zh": "三张社交卡片，一套视觉节奏"
+    },
+    "brief": {
+      "en": "Design three linked social cards using original scenery, concise headlines and a consistent visual rhythm.",
+      "zh": "用原创景致、简短标题和一致视觉节奏设计三张关联社交卡片。"
+    },
+    "assets": [
+      "docs/screenshots/skills/social-carousel.png"
+    ],
+    "category": "image"
+  },
+  {
+    "group": "open",
+    "slug": "open-waitlist-page",
+    "title": {
+      "en": "Meridian is almost here",
+      "zh": "Meridian 即将上线"
+    },
+    "brief": {
+      "en": "Build a pre-launch waitlist page with an honest value proposition, accessible email form states and a privacy explanation.",
+      "zh": "制作预发布候补页，包含真实价值说明、易访问的邮箱表单状态和隐私说明。"
+    },
+    "assets": [
+      "docs/screenshots/skills/waitlist-page.png"
+    ],
+    "category": "web"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-bold-poster",
+    "title": {
+      "en": "A manifesto in motion",
+      "zh": "动起来的宣言海报"
+    },
+    "brief": {
+      "en": "Animate a short original manifesto with assertive editorial type and carefully paced transitions.",
+      "zh": "用有力的编辑字体与节奏分明的转场呈现简短原创宣言。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-bold-poster/preview.png"
+    ],
+    "category": "video"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-bold-signal",
+    "title": {
+      "en": "A four-beat product announcement",
+      "zh": "四个节拍的产品发布"
+    },
+    "brief": {
+      "en": "Turn four supplied product benefits into a high-contrast animated announcement, ending on one clear action.",
+      "zh": "把四项产品价值转成高对比发布动画，结尾只保留一个行动入口。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-bold-signal/preview.png"
+    ],
+    "category": "video"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-build-minimal",
+    "title": {
+      "en": "Less motion, more intention",
+      "zh": "克制而有目的的动态"
+    },
+    "brief": {
+      "en": "Create a minimal product-introduction animation with restrained type movement and meaningful pauses.",
+      "zh": "用克制的文字运动与有意义的停顿制作产品介绍动画。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-build-minimal/preview.png"
+    ],
+    "category": "video"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-creative-voltage",
+    "title": {
+      "en": "Split-screen creative energy",
+      "zh": "分屏里的创作能量"
+    },
+    "brief": {
+      "en": "Create a split-screen motion opener that contrasts handwritten emphasis with bold typography.",
+      "zh": "用手写重点与粗体字的对比制作分屏动态开场。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-creative-voltage/preview.png"
+    ],
+    "category": "video"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-data-chart-nyt",
+    "title": {
+      "en": "A line chart tells the story",
+      "zh": "让折线图讲故事"
+    },
+    "brief": {
+      "en": "Animate a time-series chart with supplied data, labeled axes and a sourced annotation at the turning point.",
+      "zh": "用提供的数据制作时间序列动画，标注坐标轴，并为转折点说明附来源。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-data-chart-nyt/preview.png"
+    ],
+    "category": "video"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-decision-tree",
+    "title": {
+      "en": "A decision tree you can follow",
+      "zh": "跟得上的决策树动画"
+    },
+    "brief": {
+      "en": "Animate a branching decision flow with distinct yes/no labels and enough time to read each outcome.",
+      "zh": "让分支决策流程逐步展开，明确是非标签，并留足结果阅读时间。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-decision-tree/preview.png"
+    ],
+    "category": "video",
+    "creatorId": "heygen-com"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-electric-studio",
+    "title": {
+      "en": "One idea across a split canvas",
+      "zh": "分屏画布上的一个想法"
+    },
+    "brief": {
+      "en": "Introduce a product on a two-tone canvas with a concise promise, supporting line and timed reveal.",
+      "zh": "用双色画布、简短主张、补充说明和节奏化揭示介绍产品。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-electric-studio/preview.png"
+    ],
+    "category": "video"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-glitch-title",
+    "title": {
+      "en": "Signal lost: a glitch title",
+      "zh": "Signal Lost 故障风片头"
+    },
+    "brief": {
+      "en": "Create an original glitch-title opening with readable text, controlled distortion and a reduced-motion alternative.",
+      "zh": "制作文字可读、扭曲受控的原创故障风片头，并提供减少动态版本。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-glitch-title/preview.png"
+    ],
+    "category": "video"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-kinetic-type",
+    "title": {
+      "en": "Typography becomes the animation",
+      "zh": "让字体成为动画主角"
+    },
+    "brief": {
+      "en": "Animate a short original message through scale, placement and timing rather than decorative footage.",
+      "zh": "依靠缩放、位置和时间节奏，让简短原创文案成为动画主体。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-kinetic-type/preview.png"
+    ],
+    "category": "video",
+    "creatorId": "heygen-com"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-light-leak-cinema",
+    "title": {
+      "en": "A quiet cinematic introduction",
+      "zh": "安静的电影感开场"
+    },
+    "brief": {
+      "en": "Create a warm cinematic title sequence with gentle light movement and a readable editorial title.",
+      "zh": "用轻柔光影移动与易读编辑式标题制作温暖的电影感开场。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-light-leak-cinema/preview.png"
+    ],
+    "category": "video"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-liquid-bg-hero",
+    "title": {
+      "en": "A flowing background with clear type",
+      "zh": "流动画面与清晰文字"
+    },
+    "brief": {
+      "en": "Create a short motion hero with a fluid abstract background and a stable, legible message.",
+      "zh": "用流动抽象背景与稳定清晰的文字制作短动态主视觉。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-liquid-bg-hero/preview.png"
+    ],
+    "category": "video"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-logo-outro",
+    "title": {
+      "en": "A considered brand sign-off",
+      "zh": "有分寸的品牌片尾"
+    },
+    "brief": {
+      "en": "Animate an approved original brand mark into a brief outro with restrained glow and a final hold.",
+      "zh": "使用获准使用的原创品牌标记，制作光效克制且有结尾停留的片尾。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-logo-outro/preview.png"
+    ],
+    "category": "video"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-nyt-graph",
+    "title": {
+      "en": "Two metrics, one animated chart",
+      "zh": "一张动态图表呈现两个指标"
+    },
+    "brief": {
+      "en": "Animate a combined bar-and-line chart with supplied data and distinct units for each series.",
+      "zh": "按提供的数据制作柱线组合动画，为两组数据明确不同单位。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-nyt-graph/preview.png"
+    ],
+    "category": "video",
+    "creatorId": "heygen-com"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-pentagram-stat",
+    "title": {
+      "en": "A number with context",
+      "zh": "让一个数字有上下文"
+    },
+    "brief": {
+      "en": "Present one verified key metric with a small supporting chart, denominator, date and source.",
+      "zh": "用小型支撑图表呈现一个已核实指标，注明分母、日期和来源。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-pentagram-stat/preview.png"
+    ],
+    "category": "video"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-play-mode",
+    "title": {
+      "en": "Data with a playful rhythm",
+      "zh": "有趣而清楚的数据节奏"
+    },
+    "brief": {
+      "en": "Create a playful data-led motion sequence with legible cards and explicit sample-data labels where needed.",
+      "zh": "制作卡片易读的数据动态演示，示例数字需明确标注。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-play-mode/preview.png"
+    ],
+    "category": "video",
+    "creatorId": "heygen-com"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-takram-organic",
+    "title": {
+      "en": "An organic product story",
+      "zh": "有机形态的产品故事"
+    },
+    "brief": {
+      "en": "Introduce a design product through warm editorial cards and an animated network of simple organic nodes.",
+      "zh": "用暖色编辑卡片与简单有机节点网络介绍设计产品。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/frame-takram-organic/preview.png"
+    ],
+    "category": "video"
+  },
+  {
+    "group": "motion",
+    "slug": "motion-text-cursor",
+    "title": {
+      "en": "A message, typed into view",
+      "zh": "逐字出现的信息"
+    },
+    "brief": {
+      "en": "Create a cursor-led text reveal for a concise original message, with readable timing and a static end frame.",
+      "zh": "为简短原创文案制作光标引导的文字揭示，节奏易读，并保留结束静帧。"
+    },
+    "assets": [
+      "plugins/_official/video-templates/vfx-text-cursor/preview.png"
+    ],
+    "category": "video"
+  },
+  {
+    "group": "mascot",
+    "slug": "ip-mascot-directions",
+    "title": {
+      "en": "Small characters, strong personalities",
+      "zh": "小角色，大辨识度"
+    },
+    "brief": {
+      "en": "Develop original animal mascot directions for a supplied product. Compare silhouettes and personality before choosing one; do not copy the preview characters.",
+      "zh": "为提供的产品发展原创动物吉祥物方向，比较轮廓与性格后再选择，不复制示例角色。"
+    },
+    "assets": [
+      "assets/ip-as-logo-wall.webp"
+    ]
+  }
+]

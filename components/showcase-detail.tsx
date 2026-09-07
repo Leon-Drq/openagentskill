@@ -13,7 +13,7 @@ import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { copyText } from '@/lib/copy-text'
 import { trackAnalyticsEvent } from '@/lib/analytics'
-import { getShowcaseAccessLabel, getShowcaseCreator, getShowcaseHandoff, getShowcaseImageSrc, getShowcaseSkill, localizeShowcase, SHOWCASE_CASES, SHOWCASE_CATEGORIES, type ShowcaseCase } from '@/lib/showcase'
+import { getShowcaseAccessLabel, getShowcaseCreator, getShowcaseEvidenceLabel, getShowcaseHandoff, getShowcaseImageSrc, getShowcaseSkill, localizeShowcase, SHOWCASE_CASES, SHOWCASE_CATEGORIES, type ShowcaseCase } from '@/lib/showcase'
 
 export function ShowcaseDetail({ item }: { item: ShowcaseCase }) {
   return <ShowcaseEngagementProvider><DetailContent key={item.slug} item={item} /></ShowcaseEngagementProvider>
@@ -83,7 +83,7 @@ function DetailContent({ item }: { item: ShowcaseCase }) {
           <Link href={getLocalizedNavigationHref('/showcase', locale)} className="inline-flex min-h-8 items-center gap-2 hover:text-[#006b4f]"><ArrowLeft className="h-3 w-3" aria-hidden="true" />{zh ? '全部作品' : 'All work'}</Link><span aria-hidden="true">/</span><span>{localizeShowcase(category.label, locale)}</span>
         </nav>
         <div className="mb-8 mt-5 md:mb-10">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#006b4f]">{skill.name} <span className="mx-2 text-[#bdb7ac]">/</span>{item.provenance === 'platform' ? (zh ? '本站制作' : 'Made at OpenAgentSkill') : (zh ? '作者公开案例' : 'From the author’s showcase')}</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#006b4f]">{skill.name} <span className="mx-2 text-[#bdb7ac]">/</span>{getShowcaseEvidenceLabel(item, locale)}</p>
           <h1 className="mt-4 max-w-4xl font-display text-4xl font-normal leading-[1.1] tracking-tight md:text-6xl">{title}</h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#6d675e]">{localizeShowcase(item.description, locale)}</p>
           <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-4">
@@ -120,7 +120,7 @@ function DetailContent({ item }: { item: ShowcaseCase }) {
                 </button>)}
               </div>}
               <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs leading-relaxed text-[#6d675e]">
-                <span>{artworkCreator.name} · {item.provenance === 'platform' ? (zh ? '原创制作' : 'Original work') : (zh ? '作者示例' : 'Author example')}</span>
+                <span>{artworkCreator.name} · {getShowcaseEvidenceLabel(item, locale)}</span>
                 <a href={item.videoUrl || media.src} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-8 items-center gap-1 hover:text-[#006b4f]">{item.videoUrl ? (zh ? '打开原视频' : 'Open original video') : (zh ? '查看原图' : 'View full image')}<ArrowUpRight className="h-3 w-3" aria-hidden="true" /></a>
               </figcaption>
             </figure>

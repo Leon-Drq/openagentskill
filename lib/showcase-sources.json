@@ -1,0 +1,37 @@
+{
+  "baoyu": {
+    "repo": "JimLiu/baoyu-skills",
+    "revision": "6b7a2e417500561a5ecdd0b168332f4142584617",
+    "license": "MIT",
+    "licensePath": "LICENSE",
+    "creatorId": "jimliu"
+  },
+  "frontend": {
+    "repo": "zarazhangrui/beautiful-html-templates",
+    "revision": "e5e204fb1f3b06290846e7dcd7aceddabeceec8c",
+    "license": "MIT",
+    "licensePath": "LICENSE",
+    "creatorId": "zarazhangrui"
+  },
+  "huashu": {
+    "repo": "alchaincyf/huashu-design",
+    "revision": "a790f704d85f277cc93d2081b0840d00036969bb",
+    "license": "MIT",
+    "licensePath": "LICENSE",
+    "creatorId": "alchaincyf"
+  },
+  "open": {
+    "repo": "nexu-io/open-design",
+    "revision": "ad09d388394f1dbe839edb4d7aaf7b62e10a2d54",
+    "license": "Apache-2.0",
+    "licensePath": "LICENSE",
+    "creatorId": "nexu-io"
+  },
+  "mascot": {
+    "repo": "s1dashu/ip-as-logo-skill",
+    "revision": "acb834c717bcd0a487c49732d08397ba280d690b",
+    "license": "MIT",
+    "licensePath": "LICENSE",
+    "creatorId": "s1dashu"
+  }
+}

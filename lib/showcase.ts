@@ -1,18 +1,24 @@
+import curatedEntries from './showcase-curation.json' with { type: 'json' }
+import curatedSources from './showcase-sources.json' with { type: 'json' }
+import curatedMedia from './showcase-media.json' with { type: 'json' }
+import curatedGroups from './showcase-groups.json' with { type: 'json' }
+
 // Exact prompt used for the platform-produced poster on 2026-09-07.
 export const MONO_POSTER_PROMPT = "Create an original portrait 3:4 editorial risograph poster using the mono-color skill's controlled two-ink method. Flat front-facing printed page, neutral white substrate #FAFAF7, botanical green #008A4B dominant ink (80% of inked area) and oxblood #8F3434 accent ink (20%). No third printing ink; tonal steps are halftone density, paper is not an ink.\n\nUse a specimen annotation composition with one oversized photographic fern frond curving from the bottom right across the center, cropped at the lower edge. Keep about 40% exposed paper, especially a quiet upper-right release zone. One focal event: oversized serif title interlocking with the stem. Fine annotation ticks form the only manual gesture family. An asymmetric art-book composition with no enclosing border or card.\n\nSubject: an observed fern leaf, tactile and botanical, rendered in coarse screened green photographic dots, intricate recognizable leaflets with white paper cutouts. The oxblood plate belongs only to the title and small annotation. Contemporary printed editorial work with generous space, no artificial sepia aging.\n\nExact text: 'ROOM TO GROW' in large oxblood editorial serif across two lines in upper-left and center-left; one small green monospace caption 'BOTANICAL STUDY / 01' at bottom left. Keep title at least 8x caption size. No other text, logos or watermarks.\n\nVisible paper fibers, subtle ink bleed and restrained print misregistration, sharply readable type, real reproduced image texture. Avoid full color, gradients, glossy mockups, 3D depth, stock-photo styling, clean vector clipart, decorative blobs, centered symmetry, additional labels and imitation of any existing artwork."
 
-export type ShowcaseCategory = 'web' | 'slides' | 'image' | 'video'
+export type ShowcaseCategory = 'web' | 'slides' | 'image' | 'video' | 'document'
 export type ShowcaseText = { en: string; zh: string }
 export const showcaseText = (en: string, zh: string): ShowcaseText => ({ en, zh })
 export const localizeShowcase = (text: ShowcaseText, locale: string) => locale === 'zh' ? text.zh : text.en
 export const getShowcaseImageSrc = (src: string, kind: 'card' | 'preview') => src.replace(/\.[^.]+$/, `.${kind}.webp`)
-export const SHOWCASE_UPDATED_AT = '2026-09-07'
+export const SHOWCASE_UPDATED_AT = '2026-09-08'
 
 export const SHOWCASE_CATEGORIES: { id: ShowcaseCategory; label: ShowcaseText }[] = [
   { id: 'web', label: showcaseText('Web & UI', '网页与界面') },
   { id: 'slides', label: showcaseText('Slides', '演示文稿') },
   { id: 'image', label: showcaseText('Images', '图像与设计') },
   { id: 'video', label: showcaseText('Video', '视频创作') },
+  { id: 'document', label: showcaseText('Documents', '文档与指南') },
 ]
 
 export interface ShowcaseCreator {
@@ -43,6 +49,11 @@ export const SHOWCASE_CREATORS: ShowcaseCreator[] = [
   { id: 'op7418', name: 'op7418', githubUsername: 'op7418', url: 'https://github.com/op7418', profile: null },
   { id: 'nexu-io', name: 'nexu-io', githubUsername: 'nexu-io', url: 'https://github.com/nexu-io', profile: null },
   { id: 'openagentskill', name: 'OpenAgentSkill', githubUsername: null, url: 'https://www.openagentskill.com', profile: null },
+  { id: 'jimliu', name: 'Jim Liu / 宝玉', githubUsername: 'JimLiu', url: 'https://github.com/JimLiu', profile: null },
+  { id: 'zarazhangrui', name: 'Zara Zhang', githubUsername: 'zarazhangrui', url: 'https://github.com/zarazhangrui', profile: null },
+  { id: 'alchaincyf', name: '花叔 / alchaincyf', githubUsername: 'alchaincyf', url: 'https://github.com/alchaincyf', profile: null },
+  { id: 's1dashu', name: 's1dashu', githubUsername: 's1dashu', url: 'https://github.com/s1dashu', profile: null },
+  { id: 'heygen-com', name: 'Hyperframes / heygen-com', githubUsername: 'heygen-com', url: 'https://github.com/heygen-com', profile: null },
 ]
 
 export const SHOWCASE_SKILLS: ShowcaseSkill[] = [
@@ -51,6 +62,12 @@ export const SHOWCASE_SKILLS: ShowcaseSkill[] = [
   { slug: 'op7418-guizang-ppt-skill', name: 'Guizang PPT Skill', creatorId: 'op7418', access: 'open-source', sourceLicense: 'AGPL-3.0', listingIds: [] },
   { slug: 'vox-director', name: 'Vox Director', creatorId: 'alisa0808', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
   { slug: 'nexu-io-open-design', name: 'Open Design', creatorId: 'nexu-io', access: 'open-source', sourceLicense: 'Apache-2.0', listingIds: [] },
+  ...['infographic', 'comic', 'cover-image', 'article-illustrator', 'xhs-images', 'slide-deck'].map((name): ShowcaseSkill => ({
+    slug: `jimliu-baoyu-skills-baoyu-${name}`, name: `baoyu-${name}`, creatorId: 'jimliu', access: 'open-source', sourceLicense: 'MIT', listingIds: [],
+  })),
+  { slug: 'zarazhangrui-frontend-slides', name: 'Frontend Slides', creatorId: 'zarazhangrui', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
+  { slug: 'alchaincyf-huashu-design-1d891f8f', name: 'Huashu Design', creatorId: 'alchaincyf', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
+  { slug: 's1dashu-ip-as-logo-skill', name: 'ip-as-logo', creatorId: 's1dashu', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
 ]
 
 export function getShowcaseCreator(id: string) {
@@ -91,6 +108,8 @@ export interface ShowcaseCase {
   prompt: ShowcaseText
   promptKind: 'original' | 'suggested'
   provenance: 'platform' | 'author'
+  /** Template and style references are not completed customer projects. */
+  evidenceKind?: 'work' | 'template' | 'style-study'
   /** Creator of this particular artwork; may differ from the skill's author. */
   creatorId: string
   sourceUrl: string
@@ -112,6 +131,51 @@ const openRevision = '46700f6e8b97c873e953392231bcf62b525c8dd3'
 const monoRevision = 'c8ff70597ddedcd65f21a0b528f6a70c35690b0a'
 const tx = showcaseText
 
+export function getShowcaseEvidenceLabel(item: ShowcaseCase, locale: string) {
+  if (item.provenance === 'platform') return locale === 'zh' ? '本站制作' : 'Made here'
+  if (item.evidenceKind === 'template') return locale === 'zh' ? '作者模板' : 'Author template'
+  if (item.evidenceKind === 'style-study') return locale === 'zh' ? '作者风格示例' : 'Author style study'
+  return locale === 'zh' ? '作者案例' : 'Author example'
+}
+
+const expandedCases: ShowcaseCase[] = curatedEntries.map((entry) => {
+  const group = curatedGroups[entry.group as keyof typeof curatedGroups]
+  const source = curatedSources[group.source as keyof typeof curatedSources]
+  const category = ('category' in entry ? entry.category : group.category) as ShowcaseCategory
+  const videoPath = entry.group === 'motion' ? entry.assets[0].replace(/preview\.png$/, 'preview.mp4') : null
+  const sourcePath = entry.group === 'frontend' ? `templates/${entry.slug.replace('frontend-', '')}` : entry.assets[0]
+  const note = tx(
+    'Selected from the author’s pinned repository on 2026-09-08. Originals are preserved; display copies are resized and compressed. We inspected the preview, not a fresh agent run. Original prompt, model, production time and cost are not verified. Sample figures and scientific labels require independent checking.',
+    '于 2026-09-08 从作者仓库的固定版本中精选。保留原图，展示副本仅缩放压缩。本站检查了预览，没有重新运行技能；未核实原始提示词、模型、制作时长与成本。示例数字及科学标注需独立核查。',
+  )
+  if (entry.group === 'motion') {
+    note.en += ' Upstream credits are preserved in Gallery attribution. Studio names describe inspiration, not endorsement.'
+    note.zh += ' 上游署名保留于 Gallery 素材记录；工作室名称仅描述风格灵感，不代表背书。'
+  }
+  return {
+    slug: entry.slug, skillSlug: group.skillSlug, category, title: entry.title, description: entry.brief,
+    input: group.input, output: group.output, requirements: group.requirements,
+    prompt: tx(
+      `Use ${getShowcaseSkill(group.skillSlug).name} for this task:\n${entry.brief.en}\n\nVisual reference: ${entry.title.en}. Do not copy its content. Ask for missing inputs and agree on a plan before generation. Use supplied or licensed assets; label sample data and never invent results or endorsements. Explain the file format and any costs. After approval, create the output and check readability, factual labels and clipping. My content: [paste your material].`,
+      `使用 ${getShowcaseSkill(group.skillSlug).name} 完成以下任务：\n${entry.brief.zh}\n\n视觉参考：${entry.title.zh}。不照搬其内容。先索取缺失资料并确认方案，再开始生成。仅使用提供或获准使用的素材，标注示例数据，不编造成果或背书。说明交付格式和可能费用。确认后制作，并检查可读性、事实标注及溢出。我的内容：[粘贴素材]。`,
+    ),
+    promptKind: 'suggested', provenance: 'author', evidenceKind: group.evidenceKind as ShowcaseCase['evidenceKind'],
+    creatorId: ('creatorId' in entry && entry.creatorId) || source.creatorId,
+    sourceUrl: `https://github.com/${source.repo}/${entry.group === 'frontend' ? 'tree' : 'blob'}/${source.revision}/${sourcePath}`,
+    sourceRevision: source.revision, license: source.license, licenseUrl: `/showcase/curated-${group.source}-LICENSE.txt`, productionNote: note,
+    media: entry.assets.map((_, index) => {
+      const meta = (curatedMedia as Record<string, { src: string; width: number; height: number }>)[`${entry.slug}:${index}`]
+      return { src: meta.src, width: meta.width, height: meta.height, alt: tx(`${entry.title.en} — author preview ${index + 1}`, `${entry.title.zh}：作者预览 ${index + 1}`) }
+    }),
+    ...(videoPath ? { videoUrl: `https://raw.githubusercontent.com/${source.repo}/${source.revision}/${videoPath}` } : {}),
+    cardFit: category === 'web' ? 'cover' : 'contain', updatedAt: '2026-09-08',
+  }
+})
+
+// Stable round-robin keeps one large template pack from occupying the first page.
+const expandedByGroup = [...new Set(curatedEntries.map((entry) => entry.group))].map((group) => expandedCases.filter((_, index) => curatedEntries[index].group === group))
+const interleavedExpanded = Array.from({ length: Math.max(...expandedByGroup.map((items) => items.length)) }, (_, index) => expandedByGroup.flatMap((items) => items[index] ? [items[index]] : [])).flat()
+
 const openDesignBase = {
   skillSlug: 'nexu-io-open-design', category: 'web' as const,
   creatorId: 'nexu-io', provenance: 'author' as const, promptKind: 'suggested' as const,
@@ -132,7 +196,7 @@ const voxBase = {
   updatedAt: SHOWCASE_UPDATED_AT,
 }
 
-export const SHOWCASE_CASES: ShowcaseCase[] = [
+const INITIAL_SHOWCASE_CASES: ShowcaseCase[] = [
   {
     slug: 'room-to-grow-poster', skillSlug: 'yanliudesign-mono-color-skill', category: 'image',
     title: tx('Room to grow', '留一点生长空间'),
@@ -236,6 +300,15 @@ export const SHOWCASE_CASES: ShowcaseCase[] = [
   },
 ]
 
+export const SHOWCASE_CASES: ShowcaseCase[] = [...INITIAL_SHOWCASE_CASES, ...interleavedExpanded]
+export const SHOWCASE_PAGE_SIZE = 24
+export function getShowcasePage<T>(items: T[], rawPage: string | null | undefined) {
+  const pageCount = Math.max(1, Math.ceil(items.length / SHOWCASE_PAGE_SIZE))
+  const requested = rawPage && /^\d{1,6}$/.test(rawPage) ? Number(rawPage) : 1
+  const page = Math.min(pageCount, Math.max(1, requested))
+  const offset = (page - 1) * SHOWCASE_PAGE_SIZE
+  return { page, pageCount, offset, items: items.slice(offset, offset + SHOWCASE_PAGE_SIZE), total: items.length }
+}
 export const getShowcaseCase = (slug: string) => SHOWCASE_CASES.find((item) => item.slug === slug)
 export const getShowcasesForSkill = (skillSlug: string) => SHOWCASE_CASES.filter((item) => item.skillSlug === skillSlug)
 export const FEATURED_SHOWCASE_SLUGS = ['floria-floral-studio', 'room-to-grow-poster', 'editorial-html-slides']
@@ -243,6 +316,7 @@ export const FEATURED_SHOWCASE_SLUGS = ['floria-floral-studio', 'room-to-grow-po
 const casePaths = new Set(SHOWCASE_CASES.map((item) => `/showcase/${item.slug}`))
 const assetPaths = new Set([
   '/showcase/ATTRIBUTION.md',
+  '/showcase/curated-motion-NOTICES.md',
   ...SHOWCASE_CASES.flatMap((item) => [
     item.licenseUrl,
     ...item.media.flatMap((media) => [media.src, getShowcaseImageSrc(media.src, 'card'), getShowcaseImageSrc(media.src, 'preview')]),

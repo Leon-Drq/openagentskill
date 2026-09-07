@@ -1,0 +1,947 @@
+{
+  "baoyu-infographic-bridge:0": {
+    "src": "/showcase/curated-baoyu-infographic-bridge-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "b76c040ee18090451f2ea21ffd18e8389449b99230c513b6d6eae82195395017",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/infographic-layouts/bridge.webp"
+  },
+  "baoyu-infographic-circular-flow:0": {
+    "src": "/showcase/curated-baoyu-infographic-circular-flow-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "5b955feb6b30a99c88d8ef35ed900f1ebabc1f50ab532e5ac4afe12d3bbb489d",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/infographic-layouts/circular-flow.webp"
+  },
+  "baoyu-infographic-comparison-table:0": {
+    "src": "/showcase/curated-baoyu-infographic-comparison-table-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "11d351076a5dc024c78935772c9f47c30e0de5e16f25768dab6b7930ef3f0289",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/infographic-layouts/comparison-table.webp"
+  },
+  "baoyu-infographic-fishbone:0": {
+    "src": "/showcase/curated-baoyu-infographic-fishbone-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "cd50627496ebcbb3b1c1c6262259999d404b06aa322e15013e884090a1572354",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/infographic-layouts/fishbone.webp"
+  },
+  "baoyu-infographic-funnel:0": {
+    "src": "/showcase/curated-baoyu-infographic-funnel-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "5ec3b4f6267905b0e578e132eea3d7799f006f6134cff282d03562773ae45794",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/infographic-layouts/funnel.webp"
+  },
+  "baoyu-infographic-iceberg:0": {
+    "src": "/showcase/curated-baoyu-infographic-iceberg-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "c841374bf14cbab0147aebe30edaa04f0b102ce5eb1d442b537fb5b52caa5633",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/infographic-layouts/iceberg.webp"
+  },
+  "baoyu-infographic-journey-path:0": {
+    "src": "/showcase/curated-baoyu-infographic-journey-path-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "f03913f9e33f25a08aab4bb355c66fd6951e603826ccf8aa0a0f485e9c61492a",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/infographic-layouts/journey-path.webp"
+  },
+  "baoyu-infographic-layers-stack:0": {
+    "src": "/showcase/curated-baoyu-infographic-layers-stack-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "d2f83915f67758291856ac024d965418b8a78cbe3df92768dfec3061ff3a41cc",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/infographic-layouts/layers-stack.webp"
+  },
+  "baoyu-infographic-mind-map:0": {
+    "src": "/showcase/curated-baoyu-infographic-mind-map-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "6fd8e2940bd88588a444c2f76b366f8a15e80be8623d62953699ad20703620ea",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/infographic-layouts/mind-map.webp"
+  },
+  "baoyu-infographic-priority-quadrants:0": {
+    "src": "/showcase/curated-baoyu-infographic-priority-quadrants-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "ec83ad2786638765f2e02b147a9bc9612b646f9fddba4a9ba42fe1ababdf842b",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/infographic-layouts/priority-quadrants.webp"
+  },
+  "baoyu-infographic-timeline-horizontal:0": {
+    "src": "/showcase/curated-baoyu-infographic-timeline-horizontal-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "2849b948c53497db86634d5c79bcaaff88fbfb3d17b30d913d9853bb79125860",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/infographic-layouts/timeline-horizontal.webp"
+  },
+  "baoyu-infographic-tree-hierarchy:0": {
+    "src": "/showcase/curated-baoyu-infographic-tree-hierarchy-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "a61eff6bd67a4fb6f8bebfd063a9db22aa7d2c5e279431ac2e7861600f9d4767",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/infographic-layouts/tree-hierarchy.webp"
+  },
+  "baoyu-comic-cinematic:0": {
+    "src": "/showcase/curated-baoyu-comic-cinematic-1.webp",
+    "width": 896,
+    "height": 1200,
+    "sha256": "36457354d24e95b9b2a956bf792365a230ebfa7e486a4aeebfd114db090e5bd8",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/comic-layouts/cinematic.webp"
+  },
+  "baoyu-comic-dense:0": {
+    "src": "/showcase/curated-baoyu-comic-dense-1.webp",
+    "width": 896,
+    "height": 1200,
+    "sha256": "52afc928b05a5f3cda55badff599b3ab0517ec239a01a0a1d5b13c18dcba41dd",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/comic-layouts/dense.webp"
+  },
+  "baoyu-comic-webtoon:0": {
+    "src": "/showcase/curated-baoyu-comic-webtoon-1.webp",
+    "width": 896,
+    "height": 1200,
+    "sha256": "ffdf4ca53cda295091ce328eef162b9c46a9507e5835b5c95d7c9169593925b7",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/comic-layouts/webtoon.webp"
+  },
+  "baoyu-cover-bold-editorial:0": {
+    "src": "/showcase/curated-baoyu-cover-bold-editorial-1.webp",
+    "width": 1584,
+    "height": 672,
+    "sha256": "8430d10a85cd95b2d7609c4f7dee9dc6b516867cd2c603113e67285e396d22c9",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/cover-image-styles/bold-editorial.webp"
+  },
+  "baoyu-cover-nature:0": {
+    "src": "/showcase/curated-baoyu-cover-nature-1.webp",
+    "width": 1584,
+    "height": 672,
+    "sha256": "5be95e760962872fc4f8c8c3e3dc71b4269c5f367eff3cd185fe6914e74705d8",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/cover-image-styles/nature.webp"
+  },
+  "baoyu-cover-watercolor:0": {
+    "src": "/showcase/curated-baoyu-cover-watercolor-1.webp",
+    "width": 1584,
+    "height": 672,
+    "sha256": "3b07dd3730aaaa38768c8707c6125c643433dff4ab26d449d9ac3d3b3d8c1f0b",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/cover-image-styles/watercolor.webp"
+  },
+  "baoyu-illustration-blueprint:0": {
+    "src": "/showcase/curated-baoyu-illustration-blueprint-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "31a95fcccbb8ad510bf05f1eccf2237c9f1985e7ee9b3915270dbc131c8fb3ff",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/article-illustrator-styles/blueprint.webp"
+  },
+  "baoyu-illustration-flat-doodle:0": {
+    "src": "/showcase/curated-baoyu-illustration-flat-doodle-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "5efe66a9d548da44f5aaf1e978ae997f0498a65d41aa15b764fddadc3199c496",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/article-illustrator-styles/flat-doodle.webp"
+  },
+  "baoyu-illustration-pixel-art:0": {
+    "src": "/showcase/curated-baoyu-illustration-pixel-art-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "69b979b93b7349bfcb767d85e59323d69ce573c50644c87c76e9570b979b9ff2",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/article-illustrator-styles/pixel-art.webp"
+  },
+  "baoyu-illustration-watercolor:0": {
+    "src": "/showcase/curated-baoyu-illustration-watercolor-1.webp",
+    "width": 1408,
+    "height": 768,
+    "sha256": "1edc0a081b47d6389566d2cdf5baf071daf7ab11881d6bf0dc8300e6acd2ebdc",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/article-illustrator-styles/watercolor.webp"
+  },
+  "baoyu-social-balanced:0": {
+    "src": "/showcase/curated-baoyu-social-balanced-1.webp",
+    "width": 896,
+    "height": 1200,
+    "sha256": "18474c748767db81d0f787d79e8486aa2ddf13471e6be2f6d6cb5aaf996f1b0c",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/xhs-images-layouts/balanced.webp"
+  },
+  "baoyu-social-dense:0": {
+    "src": "/showcase/curated-baoyu-social-dense-1.webp",
+    "width": 896,
+    "height": 1200,
+    "sha256": "d9fbd854222f24455d3ce1637db26ebc9e58fdf5d7a32f0838f5d2db4dd1d607",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/xhs-images-layouts/dense.webp"
+  },
+  "baoyu-social-list:0": {
+    "src": "/showcase/curated-baoyu-social-list-1.webp",
+    "width": 896,
+    "height": 1200,
+    "sha256": "35234c291ae05fa1a265aef023b09cd3bde1ae9d2b6f7809c62acc388da3e3a5",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/xhs-images-layouts/list.webp"
+  },
+  "baoyu-social-flow:0": {
+    "src": "/showcase/curated-baoyu-social-flow-1.webp",
+    "width": 896,
+    "height": 1200,
+    "sha256": "c8cef457b42e4a35719d4d82083324f90d4b62c59a284583d0020ea2ca9070ee",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/xhs-images-layouts/flow.webp"
+  },
+  "baoyu-raster-slides-corporate:0": {
+    "src": "/showcase/curated-baoyu-raster-slides-corporate-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "7da8d4576a1228a40fec2f2b02d915fe848cf61a52e43ed4ae0922d6d2448516",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/slide-deck-styles/corporate.webp"
+  },
+  "baoyu-raster-slides-editorial-infographic:0": {
+    "src": "/showcase/curated-baoyu-raster-slides-editorial-infographic-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "03a0f5ebd83e10e910df31372f9e1cc90ac14242dbd9f6d522c85a1574a5aba9",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/slide-deck-styles/editorial-infographic.webp"
+  },
+  "baoyu-raster-slides-scientific:0": {
+    "src": "/showcase/curated-baoyu-raster-slides-scientific-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "6f563f8c545388940ee363a2cadd336ae2d0b47254fcdd571edbb2211d43a2b0",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/slide-deck-styles/scientific.webp"
+  },
+  "baoyu-raster-slides-vector-illustration:0": {
+    "src": "/showcase/curated-baoyu-raster-slides-vector-illustration-1.webp",
+    "width": 1376,
+    "height": 768,
+    "sha256": "97856b559e9ede3ae3a2337d9110615cf35262f7933bdef2b81a6ef5d13c081c",
+    "sourceUrl": "https://raw.githubusercontent.com/JimLiu/baoyu-skills/6b7a2e417500561a5ecdd0b168332f4142584617/screenshots/slide-deck-styles/vector-illustration.webp"
+  },
+  "frontend-8-bit-orbit:0": {
+    "src": "/showcase/curated-frontend-8-bit-orbit-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "c1f0517225fbe17807d69de03a7260881738d25bc456bd4151af67fabbb15281",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/8-bit-orbit-1.png"
+  },
+  "frontend-8-bit-orbit:1": {
+    "src": "/showcase/curated-frontend-8-bit-orbit-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "169a44bcae5c5908be923b780130cbdce09d161d4d697da66d48d00bd090c1c3",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/8-bit-orbit-5.png"
+  },
+  "frontend-8-bit-orbit:2": {
+    "src": "/showcase/curated-frontend-8-bit-orbit-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "c4547ed996fe52337d73f57330807b714e88da5226a88498f699158331c01219",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/8-bit-orbit-6.png"
+  },
+  "frontend-biennale-yellow:0": {
+    "src": "/showcase/curated-frontend-biennale-yellow-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "8acd74e991ff533d6982f60fc2934ad2020d5ea8e03c5d79d00c24899d6f9e8d",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/biennale-yellow-1.png"
+  },
+  "frontend-biennale-yellow:1": {
+    "src": "/showcase/curated-frontend-biennale-yellow-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "af3134e5fdf9341f688074e9ef84e0f5904bde831c28cc1624e5c03aa4a9dd77",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/biennale-yellow-5.png"
+  },
+  "frontend-biennale-yellow:2": {
+    "src": "/showcase/curated-frontend-biennale-yellow-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "311ddec24da62fb5626d68e9befbb08d4c48c8a042983a92c7638987ae6b39a0",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/biennale-yellow-8.png"
+  },
+  "frontend-block-frame:0": {
+    "src": "/showcase/curated-frontend-block-frame-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "3fd1774d38f1bfbda05df46fc7f2b98a1780de45ced4d71f4925136bbf2460a0",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/block-frame-1.png"
+  },
+  "frontend-block-frame:1": {
+    "src": "/showcase/curated-frontend-block-frame-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "088d74cdc720481ddbc0deafd10d8dfa718516684b9a23f889c48ba051dc6ffe",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/block-frame-4.png"
+  },
+  "frontend-block-frame:2": {
+    "src": "/showcase/curated-frontend-block-frame-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "cdbf244bd61b8b36e39b65b2e34360bd1279bf2359d8700c6b8b862f637f8c1f",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/block-frame-8.png"
+  },
+  "frontend-bold-poster:0": {
+    "src": "/showcase/curated-frontend-bold-poster-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "95a9351619463053bda29bdf472702ed4bc650a4510fa6b3cfcc34d5e3ba79b1",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/bold-poster-1.png"
+  },
+  "frontend-bold-poster:1": {
+    "src": "/showcase/curated-frontend-bold-poster-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "d67e0d5b2107b2cbd2ce9b7e902e9533fc81349173c52a2533cc5934e18c37cc",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/bold-poster-4.png"
+  },
+  "frontend-bold-poster:2": {
+    "src": "/showcase/curated-frontend-bold-poster-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "d583ec8b42561dc3ba2f835a46913e7aa252fb8aa209ee5633bdbd73b379208e",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/bold-poster-8.png"
+  },
+  "frontend-broadside:0": {
+    "src": "/showcase/curated-frontend-broadside-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "96805bd67e4502f94b078b723d252717183fe8eb34f2eb529c44b772b4dcdce4",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/broadside-1.png"
+  },
+  "frontend-broadside:1": {
+    "src": "/showcase/curated-frontend-broadside-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "18a124480343b97a0c2aab335e66a0c41ab6f6d01884380c6526fef50a560601",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/broadside-13.png"
+  },
+  "frontend-capsule:0": {
+    "src": "/showcase/curated-frontend-capsule-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "468b1b618668660274e7a46a528d0a323fb926c3e47f7e5895ec03189efd35b3",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/capsule-1.png"
+  },
+  "frontend-capsule:1": {
+    "src": "/showcase/curated-frontend-capsule-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "f57e18e93e39530b7c74a0236465b65f30f2fa455668454423a971f52eb9360d",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/capsule-4.png"
+  },
+  "frontend-capsule:2": {
+    "src": "/showcase/curated-frontend-capsule-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "fc8ddf4d07a3f443556a449a9f50b90c554564d29e1df2df6e0f8e7dad4aa8ac",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/capsule-8.png"
+  },
+  "frontend-cartesian:0": {
+    "src": "/showcase/curated-frontend-cartesian-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "59af0f5ee20b85f07ada82a1d6bb8ab5e69b81bb08b5abf2a7520eca4934e93e",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/cartesian-1.png"
+  },
+  "frontend-cartesian:1": {
+    "src": "/showcase/curated-frontend-cartesian-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "7d7429f8f5a25b7cd994ffd01ad2db187f9c2ec441c48c9cc6458b67405648ae",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/cartesian-4.png"
+  },
+  "frontend-cartesian:2": {
+    "src": "/showcase/curated-frontend-cartesian-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "f6411b785ba0aeda5e79c7ef59df700a69e2f111a231a67195a9598a632310d1",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/cartesian-8.png"
+  },
+  "frontend-cobalt-grid:0": {
+    "src": "/showcase/curated-frontend-cobalt-grid-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "e85989914eb7ca3bb279e03cc792df19c5d06f8d3ba0e59515211164fca5ae2d",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/cobalt-grid-1.png"
+  },
+  "frontend-cobalt-grid:1": {
+    "src": "/showcase/curated-frontend-cobalt-grid-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "835573ec7f08c1df8734fe3511486d171c3a55e489f371becaf4d67cd4bf1dc4",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/cobalt-grid-3.png"
+  },
+  "frontend-cobalt-grid:2": {
+    "src": "/showcase/curated-frontend-cobalt-grid-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "652d10972a8c198393e1ea3d8b0f857d50b2c496c3cd0d5da0b01eb0153e8ee4",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/cobalt-grid-5.png"
+  },
+  "frontend-creative-mode:0": {
+    "src": "/showcase/curated-frontend-creative-mode-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "aaac87da4e7f0e1e294f8f3d88616b067174687f4b89dafcad0acb4b967e9633",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/creative-mode-1.png"
+  },
+  "frontend-creative-mode:1": {
+    "src": "/showcase/curated-frontend-creative-mode-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "f647916273c148a26267ce8cb15cfafffd8601f577d8edf43613b6f5d4ca9eda",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/creative-mode-4.png"
+  },
+  "frontend-creative-mode:2": {
+    "src": "/showcase/curated-frontend-creative-mode-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "31b5ce6966d3480fb7a415e69f9fedc7c903b05d1e7bcaaf50e07c21cf7a091d",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/creative-mode-6.png"
+  },
+  "frontend-daisy-days:0": {
+    "src": "/showcase/curated-frontend-daisy-days-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "65f6615ff2ec51a3d4a77573c2a53471b356724a58bd33dffdb55ed69ab2b73b",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/daisy-days-1.png"
+  },
+  "frontend-daisy-days:1": {
+    "src": "/showcase/curated-frontend-daisy-days-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "7b42341596e3a835f5c859e8009e5caffa8953a8608e6257fae82a99e29743dd",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/daisy-days-4.png"
+  },
+  "frontend-daisy-days:2": {
+    "src": "/showcase/curated-frontend-daisy-days-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "b42224ecf6da8fa3c1a4e021a2c3092cef8f856c2a0ca00b4fbe95d2e52bbbd1",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/daisy-days-8.png"
+  },
+  "frontend-editorial-tri-tone:0": {
+    "src": "/showcase/curated-frontend-editorial-tri-tone-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "0b89022af5bfcc26356b7bdb48156510ba16b643e9bc01027ae8197092ead507",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/editorial-tri-tone-1.png"
+  },
+  "frontend-editorial-tri-tone:1": {
+    "src": "/showcase/curated-frontend-editorial-tri-tone-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "1c2e874640b07260cf4134f6307be23ee3965b349b8720e3aea12a31078346e7",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/editorial-tri-tone-3.png"
+  },
+  "frontend-editorial-tri-tone:2": {
+    "src": "/showcase/curated-frontend-editorial-tri-tone-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "e3a5f244b705b652be851cf975c4a255058f6a9a65f5db8c01da834f78166cf0",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/editorial-tri-tone-4.png"
+  },
+  "frontend-studio:0": {
+    "src": "/showcase/curated-frontend-studio-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "0d7c0646a85c56b4b26e09f0cf8a0b658fe0b1cf36be38255900fd259d0c42d4",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/studio-1.png"
+  },
+  "frontend-studio:1": {
+    "src": "/showcase/curated-frontend-studio-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "2b90f08ed79584a2bc411eef4c09db8e30c6adf5af2ff299f64080ddec09952a",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/studio-4.png"
+  },
+  "frontend-studio:2": {
+    "src": "/showcase/curated-frontend-studio-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "87473d0d14ebc5bd2006c181fcd6eeb9cfcbd117da106f27a23c59cad9b9be0f",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/studio-8.png"
+  },
+  "frontend-long-table:0": {
+    "src": "/showcase/curated-frontend-long-table-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "79f7956399971a6038c6b98ba7850b8d232c593bafb1c484c7127e5d3fd60bba",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/long-table-1.png"
+  },
+  "frontend-long-table:1": {
+    "src": "/showcase/curated-frontend-long-table-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "267f7d9ca2c561cf72da54a031ba74fcb80291538926f076db1f92857e7251e9",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/long-table-3.png"
+  },
+  "frontend-long-table:2": {
+    "src": "/showcase/curated-frontend-long-table-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "e8b3d444590673ccbdc39a40fa186e3da871618e64c2bfddf7012b18e40fe817",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/long-table-7.png"
+  },
+  "frontend-editorial-forest:0": {
+    "src": "/showcase/curated-frontend-editorial-forest-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "a081f3b16a3dd72dd16d9fdfcf30aa61cf66c79c865189eb380d22bd425c2a1c",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/editorial-forest-1.png"
+  },
+  "frontend-editorial-forest:1": {
+    "src": "/showcase/curated-frontend-editorial-forest-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "0521b2e3de30c01dbdf5b3f75983a388751c6b8bf79cb32507bb58e0c057ba3d",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/editorial-forest-2.png"
+  },
+  "frontend-editorial-forest:2": {
+    "src": "/showcase/curated-frontend-editorial-forest-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "6b4fb1be20d82cb4adc39aa3040b8d145e2a522a2b1668d904f43e7305ffd425",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/editorial-forest-5.png"
+  },
+  "frontend-neo-grid-bold:0": {
+    "src": "/showcase/curated-frontend-neo-grid-bold-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "c53ba5da0f1b85b23ad1975da65edafaee84f029f06c468b2fbd036031ce15e5",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/neo-grid-bold-1.png"
+  },
+  "frontend-neo-grid-bold:1": {
+    "src": "/showcase/curated-frontend-neo-grid-bold-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "c591b469d9709f7689a22f23a34af1b2f8e1ad403b4651dfbfb98f3618ecca1a",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/neo-grid-bold-3.png"
+  },
+  "frontend-neo-grid-bold:2": {
+    "src": "/showcase/curated-frontend-neo-grid-bold-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "bfddba44fd59b4dc5f462fb226308623c2b23fce71d4deec94c1e4f8c9be329c",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/neo-grid-bold-8.png"
+  },
+  "frontend-pin-and-paper:0": {
+    "src": "/showcase/curated-frontend-pin-and-paper-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "35ff94a10d71d18318fa11e1c95fb6a32e2b1801ffff24ccc8e0f36afe187387",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/pin-and-paper-1.png"
+  },
+  "frontend-pin-and-paper:1": {
+    "src": "/showcase/curated-frontend-pin-and-paper-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "52f33f8157051935baccda101a653cfc946b69c4eb65c968e402284fd2411f80",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/pin-and-paper-3.png"
+  },
+  "frontend-pin-and-paper:2": {
+    "src": "/showcase/curated-frontend-pin-and-paper-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "0800cfca8ff446064ef7d07197aa6625320ee9ae30883a8a7f1ead5c5507dbe2",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/pin-and-paper-11.png"
+  },
+  "frontend-pink-script:0": {
+    "src": "/showcase/curated-frontend-pink-script-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "d39af58b620fe59ab0e28db0f070fd6e13214896115aa984be069369ef594ff7",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/pink-script-1.png"
+  },
+  "frontend-pink-script:1": {
+    "src": "/showcase/curated-frontend-pink-script-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "8af653667d89a7467b01f35f978d6ead5bfa70f2f03f0c7fc1bb2267699a8d0c",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/pink-script-4.png"
+  },
+  "frontend-pink-script:2": {
+    "src": "/showcase/curated-frontend-pink-script-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "98c1cd1c817aab2ef1d9efc0a60ea4cf0a5e6586ca873d95d48da6360998178d",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/pink-script-8.png"
+  },
+  "frontend-retro-windows:0": {
+    "src": "/showcase/curated-frontend-retro-windows-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "8d9fc0a05ab025310cc35f15c2d3b2de629c79a49df9fe1c7d63b2f7b8a00543",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/retro-windows-1.png"
+  },
+  "frontend-retro-windows:1": {
+    "src": "/showcase/curated-frontend-retro-windows-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "8ac9cdb2394f13d18dc19d1ec0547b7793f48750be68f16b4c670ad9d2906e44",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/retro-windows-4.png"
+  },
+  "frontend-retro-windows:2": {
+    "src": "/showcase/curated-frontend-retro-windows-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "a5309fcbbe367627280eabad6f3ee6585d1a1a4be9a460115cbc304a4c6b1b9e",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/retro-windows-8.png"
+  },
+  "frontend-retro-zine:0": {
+    "src": "/showcase/curated-frontend-retro-zine-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "bd93d862d934f00253a36df8f03f4aef74f87fb1b0f870c777002b39ae7f2af9",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/retro-zine-1.png"
+  },
+  "frontend-retro-zine:1": {
+    "src": "/showcase/curated-frontend-retro-zine-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "0a2b57ed755f8727ffa1802347b8101d3fb7dc0122660ff50fcb95495edfe74c",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/retro-zine-4.png"
+  },
+  "frontend-retro-zine:2": {
+    "src": "/showcase/curated-frontend-retro-zine-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "08f7c2266ae969ef453cfd048ce02458408a12eb0217ab76f45e29dd608eabad",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/retro-zine-8.png"
+  },
+  "frontend-sakura-chroma:0": {
+    "src": "/showcase/curated-frontend-sakura-chroma-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "92bae8fc25051d0dbbb648f931befbfb653cbc331e876ea5e5aaf76afbad0733",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/sakura-chroma-1.png"
+  },
+  "frontend-sakura-chroma:1": {
+    "src": "/showcase/curated-frontend-sakura-chroma-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "92b2ae7c310adc0b058bb66789b4723f88022200c57150e8adbb83e13f97fdc6",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/sakura-chroma-3.png"
+  },
+  "frontend-sakura-chroma:2": {
+    "src": "/showcase/curated-frontend-sakura-chroma-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "677e1be63d8119edac783bd83b2b486c845fc4c5b4e85af51bedf1e5c5c002e0",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/sakura-chroma-4.png"
+  },
+  "frontend-scatterbrain:0": {
+    "src": "/showcase/curated-frontend-scatterbrain-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "c2ed8f8d89fd124c65976fa3ece9b153afe4f4542d95880c367922bb88d910ca",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/scatterbrain-1.png"
+  },
+  "frontend-scatterbrain:1": {
+    "src": "/showcase/curated-frontend-scatterbrain-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "39194027896b173c471b8f6d1b9e586f9ab8e504f5676433d472b8d7653a871d",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/scatterbrain-4.png"
+  },
+  "frontend-scatterbrain:2": {
+    "src": "/showcase/curated-frontend-scatterbrain-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "6584ccf4edb736dd8273c69a4f8a2283e449bf49450ca3e797620591d8dd4f07",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/scatterbrain-8.png"
+  },
+  "frontend-soft-editorial:0": {
+    "src": "/showcase/curated-frontend-soft-editorial-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "3e37602cf749a0a383ef0f0a1f25db85e9633da1d74bafc2be76a91b004a866b",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/soft-editorial-4.png"
+  },
+  "frontend-soft-editorial:1": {
+    "src": "/showcase/curated-frontend-soft-editorial-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "c46b72e1ee7445beb0ccf9d35943b9f9eede81158ad1af470f4322623b132a3a",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/soft-editorial-6.png"
+  },
+  "frontend-soft-editorial:2": {
+    "src": "/showcase/curated-frontend-soft-editorial-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "e4c7e89704ac9bc5f1ad1de58b01ab939676554f3b1c5d24b722b391bf3a8041",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/soft-editorial-10.png"
+  },
+  "frontend-stencil-tablet:0": {
+    "src": "/showcase/curated-frontend-stencil-tablet-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "b8321134113e99f90a0e17e44e326ab25e64f3735150dd82269e0b2daabaaa2b",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/stencil-tablet-1.png"
+  },
+  "frontend-stencil-tablet:1": {
+    "src": "/showcase/curated-frontend-stencil-tablet-2.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "6535957dfc3f81a46d3ffee2c2212893cbef9b2b74ed741f4de0b5b30d971389",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/stencil-tablet-3.png"
+  },
+  "frontend-stencil-tablet:2": {
+    "src": "/showcase/curated-frontend-stencil-tablet-3.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "4529fab2af25ef40d370fc3ae83b9bbb15cbd969fdae2c96c3682dc590de6104",
+    "sourceUrl": "https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/e5e204fb1f3b06290846e7dcd7aceddabeceec8c/screenshots/stencil-tablet-8.png"
+  },
+  "huashu-cover:0": {
+    "src": "/showcase/curated-huashu-cover-1.png",
+    "width": 1200,
+    "height": 510,
+    "sha256": "d8482c018e4bb15957f95eb0d5f349a318fbd223d5e62d728f667351244bae92",
+    "sourceUrl": "https://raw.githubusercontent.com/alchaincyf/huashu-design/a790f704d85f277cc93d2081b0840d00036969bb/assets/showcases/cover/cover-pentagram.png"
+  },
+  "huashu-infographic:0": {
+    "src": "/showcase/curated-huashu-infographic-1.png",
+    "width": 1080,
+    "height": 1920,
+    "sha256": "15692b204e9f7ead259983441476e69a12a8f65aa81f72d9ec0619b5cbeccc17",
+    "sourceUrl": "https://raw.githubusercontent.com/alchaincyf/huashu-design/a790f704d85f277cc93d2081b0840d00036969bb/assets/showcases/infographic/infographic-pentagram.png"
+  },
+  "huashu-ppt:0": {
+    "src": "/showcase/curated-huashu-ppt-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "e426bd70703fd6557772006c8db84a6230eab154d1ec6730b9069a327547c7bf",
+    "sourceUrl": "https://raw.githubusercontent.com/alchaincyf/huashu-design/a790f704d85f277cc93d2081b0840d00036969bb/assets/showcases/ppt/ppt-pentagram.png"
+  },
+  "huashu-ainav:0": {
+    "src": "/showcase/curated-huashu-ainav-1.png",
+    "width": 1440,
+    "height": 900,
+    "sha256": "04b65a201170453d4f4261f9fed835b3e516b2ecbeb528560991c33d0a582dd0",
+    "sourceUrl": "https://raw.githubusercontent.com/alchaincyf/huashu-design/a790f704d85f277cc93d2081b0840d00036969bb/assets/showcases/website-ai-nav/ainav-pentagram.png"
+  },
+  "huashu-aiwriting:0": {
+    "src": "/showcase/curated-huashu-aiwriting-1.png",
+    "width": 1440,
+    "height": 900,
+    "sha256": "3c18cc8997f817cba5b4363edb5b7687ee564740f63511ce7d8535d49688704e",
+    "sourceUrl": "https://raw.githubusercontent.com/alchaincyf/huashu-design/a790f704d85f277cc93d2081b0840d00036969bb/assets/showcases/website-ai-writing/aiwriting-takram.png"
+  },
+  "huashu-devdocs:0": {
+    "src": "/showcase/curated-huashu-devdocs-1.png",
+    "width": 1440,
+    "height": 900,
+    "sha256": "a40c2b6b029110a79a81ccfaebcfd02f2c9dee3f0eaec333483c13bbdb2afa1b",
+    "sourceUrl": "https://raw.githubusercontent.com/alchaincyf/huashu-design/a790f704d85f277cc93d2081b0840d00036969bb/assets/showcases/website-devdocs/devdocs-pentagram.png"
+  },
+  "huashu-homepage:0": {
+    "src": "/showcase/curated-huashu-homepage-1.png",
+    "width": 1440,
+    "height": 900,
+    "sha256": "5199e4d1d26e0d333a74a2e54b793ff29dccf6c88e577f9c8efd42ad18d2e485",
+    "sourceUrl": "https://raw.githubusercontent.com/alchaincyf/huashu-design/a790f704d85f277cc93d2081b0840d00036969bb/assets/showcases/website-homepage/homepage-pentagram.png"
+  },
+  "huashu-saas:0": {
+    "src": "/showcase/curated-huashu-saas-1.png",
+    "width": 1440,
+    "height": 900,
+    "sha256": "5f877b12ca5fb876a92f8b44f1f7968de4366dd30c88479e7bf3f361dd2df455",
+    "sourceUrl": "https://raw.githubusercontent.com/alchaincyf/huashu-design/a790f704d85f277cc93d2081b0840d00036969bb/assets/showcases/website-saas/saas-takram.png"
+  },
+  "open-deck-swiss-international:0": {
+    "src": "/showcase/curated-open-deck-swiss-international-1.png",
+    "width": 2000,
+    "height": 1194,
+    "sha256": "e1ed2eb88ca01c4d339fa99157a51b9c6662fa163626e869968fea4c5b732abf",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/docs/screenshots/skills/deck-swiss-international.png"
+  },
+  "open-digital-eguide:0": {
+    "src": "/showcase/curated-open-digital-eguide-1.png",
+    "width": 1024,
+    "height": 576,
+    "sha256": "fa8b8e54ea6305c49d11feda44fbad4fc364606ffdee2b6e7dfa8d21e762531a",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/docs/screenshots/skills/digital-eguide.png"
+  },
+  "open-doc-kami-parchment:0": {
+    "src": "/showcase/curated-open-doc-kami-parchment-1.png",
+    "width": 2000,
+    "height": 1194,
+    "sha256": "53c5f74533af6cbc62ac6a454f662c9f1435d66bb05acb17811ca9dad4231798",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/docs/screenshots/skills/doc-kami-parchment.png"
+  },
+  "open-email-marketing:0": {
+    "src": "/showcase/curated-open-email-marketing-1.png",
+    "width": 1024,
+    "height": 576,
+    "sha256": "8607719c10b202454aaf2bfef1a039cd4284ec89387dd4e2e55200805eb519c8",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/docs/screenshots/skills/email-marketing.png"
+  },
+  "open-flowai-live-dashboard-template:0": {
+    "src": "/showcase/curated-open-flowai-live-dashboard-template-1.png",
+    "width": 1024,
+    "height": 554,
+    "sha256": "f74b026f9c75af3df7d8095b3db6e53d2cd761d06213dbfdb85462721ef503de",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/docs/screenshots/skills/flowai-live-dashboard-template.png"
+  },
+  "open-github-dashboard:0": {
+    "src": "/showcase/curated-open-github-dashboard-1.png",
+    "width": 1600,
+    "height": 1100,
+    "sha256": "74ed395f5a45a8ffc41f10b55a8a04bd6109043ea788013a1ac6b3cb7b894ef2",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/docs/screenshots/skills/github-dashboard.png"
+  },
+  "open-magazine-poster:0": {
+    "src": "/showcase/curated-open-magazine-poster-1.png",
+    "width": 2000,
+    "height": 1192,
+    "sha256": "2f49239eafc1c34f79dd71aa24ed02940de077445622bdbcce920777a683b3e6",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/docs/screenshots/skills/magazine-poster.png"
+  },
+  "open-mobile-onboarding:0": {
+    "src": "/showcase/curated-open-mobile-onboarding-1.png",
+    "width": 1024,
+    "height": 576,
+    "sha256": "900e663b44c76cc27b0f71cdbdccaf909618c599c613693e3c279764974a3904",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/docs/screenshots/skills/mobile-onboarding.png"
+  },
+  "open-motion-frames:0": {
+    "src": "/showcase/curated-open-motion-frames-1.png",
+    "width": 1024,
+    "height": 576,
+    "sha256": "78061f53980aa8dfe2cf2d2c78e4a2e93b21a757800d827968357d23c036e14f",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/docs/screenshots/skills/motion-frames.png"
+  },
+  "open-social-carousel:0": {
+    "src": "/showcase/curated-open-social-carousel-1.png",
+    "width": 1024,
+    "height": 576,
+    "sha256": "7de78cd42a8c39d6be930b4963be59d1948748cb6bf5e496453bcc3e56f290f4",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/docs/screenshots/skills/social-carousel.png"
+  },
+  "open-waitlist-page:0": {
+    "src": "/showcase/curated-open-waitlist-page-1.png",
+    "width": 2557,
+    "height": 1232,
+    "sha256": "02d3a614bcccd909bb53d2f3db33537a52a2355e3239bde2d1b419c709cc2023",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/docs/screenshots/skills/waitlist-page.png"
+  },
+  "motion-bold-poster:0": {
+    "src": "/showcase/curated-motion-bold-poster-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "47c33139df9e54bc064ffc2139c3dd2a6dc7f59c3443a434b91d636925ebcdcb",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-bold-poster/preview.png"
+  },
+  "motion-bold-signal:0": {
+    "src": "/showcase/curated-motion-bold-signal-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "3e8bd4634519c93e1c8c11987a8503755469b49f72f16e4db21476923ad5bf91",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-bold-signal/preview.png"
+  },
+  "motion-build-minimal:0": {
+    "src": "/showcase/curated-motion-build-minimal-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "87c3356ab23b51a446413313ec45bd1e721bea8a209a3016ad404d24511a5cf0",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-build-minimal/preview.png"
+  },
+  "motion-creative-voltage:0": {
+    "src": "/showcase/curated-motion-creative-voltage-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "6d101fdf23b39d7ff6ee8df167c68db7d913cc9f4d09f65a5d7bcbb6fb500ff1",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-creative-voltage/preview.png"
+  },
+  "motion-data-chart-nyt:0": {
+    "src": "/showcase/curated-motion-data-chart-nyt-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "f21da08bc5f3e34566338581db80466d65a5658f2cf4e36c9cbae749c5c457b6",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-data-chart-nyt/preview.png"
+  },
+  "motion-decision-tree:0": {
+    "src": "/showcase/curated-motion-decision-tree-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "0f43171d5c52bf302be5b78c4fce90699ab3e2ab6a8ea0d76443b53b2663ecb9",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-decision-tree/preview.png"
+  },
+  "motion-electric-studio:0": {
+    "src": "/showcase/curated-motion-electric-studio-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "5ed5302eeb4efe9a4debe4899728807bcf5b895c0bc0b448d9339bb8821deab3",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-electric-studio/preview.png"
+  },
+  "motion-glitch-title:0": {
+    "src": "/showcase/curated-motion-glitch-title-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "0023afce5bef88653c0bd15409372c75a7da92588a7f5fdf4509e49cdcf41575",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-glitch-title/preview.png"
+  },
+  "motion-kinetic-type:0": {
+    "src": "/showcase/curated-motion-kinetic-type-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "3614150ca0a670606733dd1f4c74a05b047a846099791e3338607ba9f3b81d34",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-kinetic-type/preview.png"
+  },
+  "motion-light-leak-cinema:0": {
+    "src": "/showcase/curated-motion-light-leak-cinema-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "d270c6284b3f8b36b92d025c480a38ede158c6c2f0f4fbdc1e098e214431ed34",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-light-leak-cinema/preview.png"
+  },
+  "motion-liquid-bg-hero:0": {
+    "src": "/showcase/curated-motion-liquid-bg-hero-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "05100b4a24c6ede237c16be3cce1a08960f65faef9c6db5e6f861f7be0d8264d",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-liquid-bg-hero/preview.png"
+  },
+  "motion-logo-outro:0": {
+    "src": "/showcase/curated-motion-logo-outro-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "b8f6691098b812cc7d02c6027ce8501e2e8ed8dba5df14002f744b4cf4c301e5",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-logo-outro/preview.png"
+  },
+  "motion-nyt-graph:0": {
+    "src": "/showcase/curated-motion-nyt-graph-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "0ecacb74c60ef538fd980c1c98ffaff2e4789afe04133de8fe4897f67d9bc364",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-nyt-graph/preview.png"
+  },
+  "motion-pentagram-stat:0": {
+    "src": "/showcase/curated-motion-pentagram-stat-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "0bacd86ad9109392c72ddbfa8d8c666eec779503fbc9d1105a0249149fa9053e",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-pentagram-stat/preview.png"
+  },
+  "motion-play-mode:0": {
+    "src": "/showcase/curated-motion-play-mode-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "eb88839051c1f14a965f3f9d3f961db563edab05c6a321d26b700c6bb378440a",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-play-mode/preview.png"
+  },
+  "motion-takram-organic:0": {
+    "src": "/showcase/curated-motion-takram-organic-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "dae95130e25d6692edbc2f3b7e95e1266e229e31a5126c986f211340f0ca241b",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/frame-takram-organic/preview.png"
+  },
+  "motion-text-cursor:0": {
+    "src": "/showcase/curated-motion-text-cursor-1.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "704736ccdef8db97428c71fb7879fa367cb5ffa0dc82cd2ffa21cce0540cc6e2",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/plugins/_official/video-templates/vfx-text-cursor/preview.png"
+  },
+  "ip-mascot-directions:0": {
+    "src": "/showcase/curated-ip-mascot-directions-1.webp",
+    "width": 2560,
+    "height": 2200,
+    "sha256": "80e4b0e1fecb4648f53be77a1ec1efc6f2ca4a7c01f19305eec28c812df78fd1",
+    "sourceUrl": "https://raw.githubusercontent.com/s1dashu/ip-as-logo-skill/acb834c717bcd0a487c49732d08397ba280d690b/assets/ip-as-logo-wall.webp"
+  }
+}

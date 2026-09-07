@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { ShowcaseGallery } from '@/components/showcase-gallery'
 import { I18nProvider } from '@/lib/i18n/context'
 import { getLocaleFromSearchParam } from '@/lib/i18n/config'
-import { filterShowcaseCases, localizeShowcase, SHOWCASE_CATEGORIES, SHOWCASE_SKILLS } from '@/lib/showcase'
+import { filterShowcaseCases, getShowcasePage, localizeShowcase, SHOWCASE_CASES, SHOWCASE_CATEGORIES, SHOWCASE_SKILLS } from '@/lib/showcase'
 
 const BASE_URL = 'https://www.openagentskill.com'
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> }
@@ -10,11 +10,16 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const params = await searchParams
   const zh = getLocaleFromSearchParam(params.lang) === 'zh'
-  const title = zh ? 'Skill Gallery — 技能作品集与作者 | OpenAgentSkill' : 'Skill Gallery — Agent Skills, Creative Work & Creators | OpenAgentSkill'
-  const description = zh ? '查看技能制作的真实作品，复制任务，开始自己的创作。每个案例包含预览、使用条件与来源。' : 'See real work made with agent skills. Explore websites, presentations, images and videos with previews, copyable tasks, requirements and source credits.'
-  return { title: { absolute: title }, description, alternates: { canonical: `${BASE_URL}/showcase` }, robots: { index: !params.q && !params.category && !params.creator && !params.lang && !params.sort, follow: true },
+  const rawPage = Array.isArray(params.page) ? params.page[0] : params.page
+  const { page } = getShowcasePage(SHOWCASE_CASES, rawPage)
+  const filtered = Boolean(params.q || params.category || params.creator || params.lang || params.sort)
+  const canonical = `${BASE_URL}/showcase${!filtered && page > 1 ? `?page=${page}` : ''}`
+  const pageLabel = page > 1 ? (zh ? ` — 第 ${page} 页` : ` — Page ${page}`) : ''
+  const title = zh ? `Skill Gallery — 技能作品集与作者${pageLabel} | OpenAgentSkill` : `Skill Gallery — Agent Skills, Creative Work & Creators${pageLabel} | OpenAgentSkill`
+  const description = zh ? '探索 100 个精选技能作品、作者模板与风格示例，覆盖网页、演示、图像、视频和文档。每个案例包含预览、使用条件与来源。' : 'Explore 100 curated skill examples, author templates and style studies across web, slides, images, video and documents, with tasks, requirements and source credits.'
+  return { title: { absolute: title }, description, alternates: { canonical }, robots: { index: !filtered && (!rawPage || rawPage === String(page)), follow: true },
     twitter: { card: 'summary_large_image', title, description, images: [`${BASE_URL}/showcase/ppt-ppt-skill-showcase.png`] },
-    openGraph: { title, description, url: `${BASE_URL}/showcase`, type: 'website', images: [{ url: `${BASE_URL}/showcase/ppt-ppt-skill-showcase.png`, width: 2400, height: 1350, alt: 'Editorial presentation examples made with Guizang PPT Skill' }] },
+    openGraph: { title, description, url: canonical, type: 'website', images: [{ url: `${BASE_URL}/showcase/ppt-ppt-skill-showcase.png`, width: 2400, height: 1350, alt: 'Editorial presentation examples made with Guizang PPT Skill' }] },
   }
 }
 
@@ -27,9 +32,10 @@ export default async function ShowcasePage({ searchParams }: Props) {
   const rawCreator = (Array.isArray(params.creator) ? params.creator[0] : params.creator) || ''
   const creatorId = SHOWCASE_SKILLS.some((skill) => skill.creatorId === rawCreator) ? rawCreator : ''
   const cases = filterShowcaseCases(category, query, creatorId)
+  const pagination = getShowcasePage(cases, Array.isArray(params.page) ? params.page[0] : params.page)
   const schema = {
     '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Skill Gallery', url: `${BASE_URL}/showcase`,
-    mainEntity: { '@type': 'ItemList', numberOfItems: cases.length, itemListOrder: 'https://schema.org/ItemListUnordered', itemListElement: cases.map((item) => ({ '@type': 'ListItem', name: localizeShowcase(item.title, locale), url: `${BASE_URL}/showcase/${item.slug}` })) },
+    mainEntity: { '@type': 'ItemList', numberOfItems: cases.length, itemListOrder: 'https://schema.org/ItemListUnordered', itemListElement: pagination.items.map((item, index) => ({ '@type': 'ListItem', position: pagination.offset + index + 1, name: localizeShowcase(item.title, locale), url: `${BASE_URL}/showcase/${item.slug}` })) },
   }
   return <I18nProvider initialLocale={locale}><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} /><ShowcaseGallery /></I18nProvider>
 }
