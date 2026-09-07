@@ -9,6 +9,7 @@ import { BrandMark } from '@/components/brand-mark'
 import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { useI18n } from '@/lib/i18n/context'
+import { getShowcaseNavLabel } from '@/lib/i18n/showcase-label'
 import { getBasePathname, getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { getShellCopy } from '@/lib/i18n/shell-content'
 import { cn } from '@/lib/utils'
@@ -147,6 +148,14 @@ export function MobileNav() {
             aria-label={shell.mobileNavigation}
           >
             <div className="grid gap-2 sm:grid-cols-2">
+              <Link
+                href={getLocalizedNavigationHref('/showcase', locale)}
+                onClick={() => setIsOpen(false)}
+                className="flex min-h-12 items-center justify-between rounded-[8px] border border-[#006b4f]/30 bg-[#006b4f]/5 px-4 py-3 text-base font-semibold text-[#006b4f] sm:col-span-2"
+                aria-current={isActivePath(pathname, '/showcase') ? 'page' : undefined}
+              >
+                {getShowcaseNavLabel(locale)}
+              </Link>
               <Link
                 href={getLocalizedNavigationHref('/resolve', locale)}
                 onClick={() => setIsOpen(false)}

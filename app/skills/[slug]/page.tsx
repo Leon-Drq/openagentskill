@@ -18,6 +18,7 @@ import { SkillActionLink } from '@/components/skill-action-link'
 import { SkillEventTracker } from '@/components/skill-event-tracker'
 import { SkillFeedbackPanel } from '@/components/skill-feedback-panel'
 import { SkillInstallTargets } from '@/components/skill-install-targets'
+import { SkillShowcase } from '@/components/showcase-sections'
 import { SkillScorePanel } from '@/components/skill-score-panel'
 import { SkillShareButton } from '@/components/skill-share-button'
 import { SkillXSharePanel } from '@/components/skill-x-share-panel'
@@ -560,6 +561,8 @@ export default async function SkillDetailPage({
                 </div>
               </div>
             </div>
+
+            <SkillShowcase skillSlug={skill.slug} />
 
             {supplyProfile && (
               <section className="mb-10 overflow-hidden rounded-[8px] border border-border bg-card shadow-[0_18px_48px_rgba(22,20,16,0.05)]">

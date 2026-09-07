@@ -8,6 +8,7 @@ import { useI18n } from '@/lib/i18n/context'
 import { USE_CASES } from '@/lib/use-cases'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
+import { HomeShowcase } from './showcase-sections'
 import { GitHubPopularityList } from './github-popularity-list'
 
 interface HomePageEnhancedProps {
@@ -951,6 +952,8 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
           </div>
         </div>
       </section>
+
+      <HomeShowcase />
 
       <section className="border-b border-[#e4e0d8] bg-[#f3f1ea]/55 px-6 py-14 md:py-20">
         <div className="mx-auto max-w-6xl">

@@ -30,6 +30,7 @@ import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
 import { useI18n } from '@/lib/i18n/context'
+import { getShowcaseNavLabel } from '@/lib/i18n/showcase-label'
 import { getBasePathname, getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { cn } from '@/lib/utils'
 
@@ -220,6 +221,14 @@ export function SiteHeader() {
 
         <nav className="hidden h-full min-w-0 flex-1 items-center justify-center gap-0.5 xl:flex" aria-label="Primary navigation">
           <NavDropdown pathname={pathname} labelKey="skills" items={skillsItems} />
+
+          <Link
+            href={getLocalizedNavigationHref('/showcase', locale)}
+            className={cn('flex h-16 items-center whitespace-nowrap border-b-2 border-transparent px-2 text-sm text-secondary transition-colors hover:text-foreground', isActivePath(pathname, '/showcase') && 'border-[#006b4f] text-foreground')}
+            aria-current={isActivePath(pathname, '/showcase') ? 'page' : undefined}
+          >
+            {getShowcaseNavLabel(locale)}
+          </Link>
 
           <Link
             href={resolveHref}
