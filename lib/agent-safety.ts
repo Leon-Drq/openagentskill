@@ -1,5 +1,6 @@
 import { auditRiskLabel, type ComputedSkillAudit } from '@/lib/audits'
 import type { SkillRecord } from '@/lib/db/skills'
+import { needsOwnerPublicationReview, OWNER_PUBLICATION_NOTICE } from '@/lib/skills/publication'
 
 export type AgentSafetyLevel = 'safe_to_install' | 'review_before_install' | 'avoid_auto_install'
 export type SkillSafetyTier = 'verified' | 'reviewed' | 'experimental' | 'blocked'
@@ -180,6 +181,18 @@ function safetyTierProfile({
     }
   }
 
+  if (needsOwnerPublicationReview(skill)) {
+    return {
+      tier: 'experimental',
+      label: 'Owner published · Review required',
+      badge: 'OWNER PUBLISHED',
+      summary: OWNER_PUBLICATION_NOTICE,
+      recommended_action: 'Inspect the pinned source and approve installation explicitly in an isolated workspace.',
+      auto_install_policy: 'review',
+      reasons: [OWNER_PUBLICATION_NOTICE, ...reasons].slice(0, 5),
+    }
+  }
+
   if (
     skill.verified &&
     audit.risk_level === 'safe_to_try' &&
@@ -261,6 +274,7 @@ export function getAgentSafetyProfile(
   const highRiskHints = permissionHints.filter((hint) => hint.severity === 'high')
   const mediumRiskHints = permissionHints.filter((hint) => hint.severity === 'medium')
   const policyWarnings = new Set<string>()
+  if (needsOwnerPublicationReview(skill)) policyWarnings.add(OWNER_PUBLICATION_NOTICE)
   const requiredRiskRank = riskRank(constraints.max_risk)
   const currentRiskRank = auditRiskRank(audit)
   const hasInstallPath = Boolean(skill.install_command || skill.github_repo || skill.repository)

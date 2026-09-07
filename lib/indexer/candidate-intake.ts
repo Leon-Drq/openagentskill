@@ -1,3 +1,4 @@
+import { PUBLIC_SKILL_FILTER } from '@/lib/skills/publication'
 import 'server-only'
 
 import { createHash, randomUUID } from 'node:crypto'
@@ -239,7 +240,7 @@ async function findDuplicateContent(sourceKey: string, hash: string, sourceUrl: 
     .from('skills')
     .select('slug')
     .eq('repository', sourceUrl)
-    .eq('ai_review_approved', true)
+    .or(PUBLIC_SKILL_FILTER)
     .limit(1)
     .maybeSingle()
   if (publishedBySourceError) throw new Error(`Published source dedupe lookup failed: ${publishedBySourceError.message}`)
@@ -251,7 +252,7 @@ async function findDuplicateContent(sourceKey: string, hash: string, sourceUrl: 
     .from('skills')
     .select('slug')
     .eq('source_content_hash', hash)
-    .eq('ai_review_approved', true)
+    .or(PUBLIC_SKILL_FILTER)
     .limit(1)
     .maybeSingle()
   if (publishedError) throw new Error(`Published content dedupe lookup failed: ${publishedError.message}`)

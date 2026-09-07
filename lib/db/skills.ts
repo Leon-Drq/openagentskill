@@ -1,3 +1,4 @@
+import { PUBLIC_SKILL_FILTER } from '@/lib/skills/publication'
 import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { withTimeout } from '@/lib/async'
@@ -36,6 +37,8 @@ export interface SkillRecord {
   submitted_by_agent: string | null
   ai_review_score: any
   ai_review_approved: boolean
+  listing_status?: string | null
+  owner_publication?: { channel: string; static_analysis?: { riskLevel?: string }; notice?: string } | null
   ai_review_issues: string[]
   ai_review_suggestions: string[]
   downloads: number
@@ -109,6 +112,8 @@ const SKILL_DIRECTORY_SELECT = [
   'submitted_by_agent',
   'ai_review_score',
   'ai_review_approved',
+  'listing_status',
+  'owner_publication',
   'ai_review_issues',
   'downloads',
   'used_by',
@@ -288,7 +293,7 @@ async function fetchAllSkills(
     let query = supabase
       .from('skills')
       .select(SKILL_DIRECTORY_SELECT)
-      .eq('ai_review_approved', true)
+      .or(PUBLIC_SKILL_FILTER)
 
     if (category && category !== 'all') {
       query = query.eq('category', category)
@@ -840,7 +845,7 @@ const getCachedCategories = unstable_cache(
       const { data, error } = await supabase
         .from('skills')
         .select('category')
-        .eq('ai_review_approved', true)
+        .or(PUBLIC_SKILL_FILTER)
         .range(from, from + SKILLS_PAGE_SIZE - 1)
 
       if (error || !data?.length) break
@@ -877,7 +882,7 @@ const getCachedSkillBySlug = unstable_cache(
       .from('skills')
       .select('*')
       .eq('slug', slug)
-      .eq('ai_review_approved', true)
+      .or(PUBLIC_SKILL_FILTER)
       .maybeSingle()
 
     if (error) throw error
@@ -921,7 +926,7 @@ export async function getSkillsBySlugs(
     supabase
       .from('skills')
       .select('*')
-      .eq('ai_review_approved', true)
+      .or(PUBLIC_SKILL_FILTER)
       .in('slug', normalizedSlugs),
     timeoutMs,
     'skill batch slug lookup'
@@ -992,7 +997,7 @@ async function searchSkillsWithLegacyFilter(
   const { data, error } = await supabase
     .from('skills')
     .select(SKILL_DIRECTORY_SELECT)
-    .eq('ai_review_approved', true)
+    .or(PUBLIC_SKILL_FILTER)
     .or(filter)
     .order('quality_score', { ascending: false })
     .limit(limit)
@@ -1009,7 +1014,7 @@ async function fetchSearchSkills(normalizedQuery: string, limit: number): Promis
   const { data, error } = await supabase
     .from('skills')
     .select(SKILL_DIRECTORY_SELECT)
-    .eq('ai_review_approved', true)
+    .or(PUBLIC_SKILL_FILTER)
     .textSearch('search_document', fullTextQuery || normalizedQuery, { config: 'simple', type: 'websearch' })
     .order('quality_score', { ascending: false })
     .limit(limit)
@@ -1042,13 +1047,13 @@ async function fetchExactSearchSkills(query: string): Promise<SkillRecord[]> {
     supabase
       .from('skills')
       .select(SKILL_DIRECTORY_SELECT)
-      .eq('ai_review_approved', true)
+      .or(PUBLIC_SKILL_FILTER)
       .eq('slug', exactQuery.toLowerCase())
       .limit(4),
     supabase
       .from('skills')
       .select(SKILL_DIRECTORY_SELECT)
-      .eq('ai_review_approved', true)
+      .or(PUBLIC_SKILL_FILTER)
       .ilike('name', exactQuery)
       .limit(8),
   ])
@@ -1130,7 +1135,7 @@ export async function getRelatedSkills(
   const { data, error } = await supabase
     .from('skills')
     .select('*')
-    .eq('ai_review_approved', true)
+    .or(PUBLIC_SKILL_FILTER)
     .eq('category', category)
     .neq('id', skillId)
     .order('quality_score', { ascending: false })

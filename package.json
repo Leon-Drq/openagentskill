@@ -8,6 +8,8 @@
     "openagentskill": "./bin/openagentskill.mjs"
   },
   "scripts": {
+    "owner:publish": "node scripts/owner-publish-skill.mjs",
+    "test:owner-publish": "node --experimental-strip-types scripts/test-owner-publication.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -31,7 +33,7 @@
     "test:sdk": "node scripts/test-sdk.mjs",
     "test:links": "node scripts/check-repository-links.mjs",
     "test:links:external": "node scripts/check-repository-links.mjs --external",
-    "test": "pnpm run test:submission && pnpm run test:submission-discovery && pnpm run test:skill-issue-ingest && pnpm run test:supabase-circuit && pnpm run test:security && pnpm run test:x-automation && pnpm run test:github-owner && pnpm run test:performance && pnpm run test:candidate-intake && pnpm run test:creator-growth && pnpm run test:marketplace-foundation && pnpm run test:registry-layers && pnpm run test:og-social-cards && pnpm run test:showcase && pnpm run test:cli && pnpm run test:sdk",
+    "test": "pnpm run test:owner-publish && pnpm run test:submission && pnpm run test:submission-discovery && pnpm run test:skill-issue-ingest && pnpm run test:supabase-circuit && pnpm run test:security && pnpm run test:x-automation && pnpm run test:github-owner && pnpm run test:performance && pnpm run test:candidate-intake && pnpm run test:creator-growth && pnpm run test:marketplace-foundation && pnpm run test:registry-layers && pnpm run test:og-social-cards && pnpm run test:showcase && pnpm run test:cli && pnpm run test:sdk",
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint ."
   },

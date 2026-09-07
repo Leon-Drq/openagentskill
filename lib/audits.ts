@@ -1,3 +1,4 @@
+import { needsOwnerPublicationReview } from '@/lib/skills/publication'
 import type { SkillAuditRecord, SkillEventStats, SkillRecord } from '@/lib/db/skills'
 import { formatCompactNumber, getFreshnessDays, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
@@ -290,13 +291,13 @@ export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats
   ]
 
   const riskLevel: AuditRiskLevel =
-    financialExecutionRisk
+    financialExecutionRisk || (needsOwnerPublicationReview(skill) && ['high', 'critical'].includes(skill.owner_publication?.static_analysis?.riskLevel || ''))
       ? 'risky'
       : isFinancialSkill
         ? 'needs_review'
       : restrictedLicense
       ? 'needs_review'
-      : auditScore >= 82 && warnings.size <= 3
+      : auditScore >= 82 && warnings.size <= 3 && !needsOwnerPublicationReview(skill)
       ? 'safe_to_try'
       : auditScore >= 60
         ? 'needs_review'
