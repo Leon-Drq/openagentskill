@@ -1,3 +1,4 @@
+import { needsOwnerPublicationReview, OWNER_PUBLICATION_NOTICE } from '@/lib/skills/publication'
 import type { SkillAgentStats, SkillEventStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
 import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { formatCompactNumber, getFreshnessDays } from '@/lib/quality'
@@ -1000,13 +1001,20 @@ export function getSkillTrustProfile(
 
   const finalScore = clampScore(score)
   const tier = getTier(finalScore)
+  if (needsOwnerPublicationReview(skill)) {
+    warnings.unshift(OWNER_PUBLICATION_NOTICE)
+    if (tier.tier !== 'risk') Object.assign(tier, {
+      tier: 'review', label: 'Owner published · Review required',
+      summary: OWNER_PUBLICATION_NOTICE, recommendedAction: 'Review the pinned source before installing.',
+    })
+  }
   const dimensionWarnings = dimensions
     .filter((dimension) => dimension.status === 'warn' || dimension.status === 'fail')
     .map((dimension) => `${dimension.label}: ${dimension.detail}`)
   const finalWarnings = [...new Set([...warnings, ...dimensionWarnings])].slice(0, 10)
   const documentationDimension = dimensions.find((dimension) => dimension.id === 'documentation')
   const installCommand = getInstallCommand(skill)
-  const policy = getInstallPolicy(
+  let policy = getInstallPolicy(
     finalScore,
     hasInstallPath(skill),
     hasRepository(skill),
@@ -1014,6 +1022,7 @@ export function getSkillTrustProfile(
     isFinancialSkill,
     financialExecutionRisk
   )
+  if (needsOwnerPublicationReview(skill) && policy === 'agent_install_candidate') policy = 'human_review_before_install'
   const outcomeAllowsAutoInstall =
     outcomeEvidence.total < 3 ||
     (
@@ -1243,6 +1252,10 @@ export function getSkillTrustProfileV5(
 
   const finalScore = clampScore(score)
   const tier = getV5Tier(finalScore, base, outcomeConfidence)
+  if (needsOwnerPublicationReview(skill) && tier.tier !== 'risk') Object.assign(tier, {
+    tier: 'review', label: 'Owner published · Review required',
+    summary: OWNER_PUBLICATION_NOTICE, recommendedAction: 'Review the pinned source before installing.',
+  })
   const decision = buildV5Decision(finalScore, base, outcomeConfidence)
   const outcomeLoop = buildV5OutcomeLoop()
   const installCommand = base.installReadiness.command

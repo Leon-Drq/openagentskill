@@ -1,3 +1,4 @@
+import { PUBLIC_SKILL_FILTER } from '@/lib/skills/publication'
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
@@ -160,7 +161,7 @@ export async function POST(request: NextRequest) {
       .from('skills')
       .select('slug,name,version,source_commit_sha,source_content_hash,source_ref,source_path,source_sync_status,ai_review_approved')
       .eq('slug', payload.skill_slug)
-      .eq('ai_review_approved', true)
+      .or(PUBLIC_SKILL_FILTER)
       .maybeSingle()
 
     if (skillError) {

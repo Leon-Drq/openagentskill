@@ -1,3 +1,4 @@
+import { PUBLIC_SKILL_FILTER } from '@/lib/skills/publication'
 import 'server-only'
 
 import { createHash } from 'node:crypto'
@@ -427,7 +428,7 @@ export async function syncRepositorySkills(
           .from('skills')
           .select('slug')
           .eq('source_content_hash', sourceHash)
-          .eq('ai_review_approved', true)
+          .or(PUBLIC_SKILL_FILTER)
           .limit(1)
           .maybeSingle()
         if (duplicateContentError) throw new Error(`Published content dedupe lookup failed: ${duplicateContentError.message}`)

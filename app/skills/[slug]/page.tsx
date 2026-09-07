@@ -10,6 +10,8 @@ import {
   getSkillEventStats,
 } from '@/lib/db/skills'
 import { ClaimSkillPanel } from '@/components/claim-skill-panel'
+import { OwnerPublicationNote } from '@/components/owner-publication-note'
+import { needsOwnerPublicationReview } from '@/lib/skills/publication'
 import { CreatorBadgeKit } from '@/components/creator-badge-kit'
 import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { SaveSkillButton } from '@/components/save-skill-button'
@@ -469,6 +471,8 @@ export default async function SkillDetailPage({
                 <p className="max-w-3xl text-lg leading-relaxed text-secondary">
                   {skill.tagline}
                 </p>
+
+                {dbSkill && needsOwnerPublicationReview(dbSkill) && <OwnerPublicationNote />}
 
                 {skill.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">

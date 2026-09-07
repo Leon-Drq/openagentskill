@@ -69,6 +69,7 @@ export async function validateGitHubRepo(
   ])
 
   return {
+    isPrivate: data.private === true,
     id: typeof data.id === 'number' ? data.id : undefined,
     owner,
     repo,
