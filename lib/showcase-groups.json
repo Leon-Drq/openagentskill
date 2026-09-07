@@ -1,0 +1,200 @@
+{
+  "infographic": {
+    "source": "baoyu",
+    "skillSlug": "jimliu-baoyu-skills-baoyu-infographic",
+    "category": "image",
+    "evidenceKind": "style-study",
+    "input": {
+      "en": "Your original content, audience, output language, dimensions and assets you have permission to use.",
+      "zh": "原创内容、受众、输出语言、尺寸和有权使用的素材。"
+    },
+    "requirements": {
+      "en": "A compatible agent, this skill and an image-generation backend. Generation uses your provider quota or billing; confirm the budget first. Image output is not editable vector source.",
+      "zh": "需兼容的 Agent、此技能与图像生成工具。生成消耗所用服务的额度或费用，请先确认预算；图像输出不是可编辑矢量源文件。"
+    },
+    "output": {
+      "en": "An author-published visual style example. The suggested task is our adaptation, not the original prompt.",
+      "zh": "作者公开的视觉风格示例。建议任务为本站整理，不是原始提示词。"
+    }
+  },
+  "comic": {
+    "source": "baoyu",
+    "skillSlug": "jimliu-baoyu-skills-baoyu-comic",
+    "category": "image",
+    "evidenceKind": "style-study",
+    "input": {
+      "en": "Your original content, audience, output language, dimensions and assets you have permission to use.",
+      "zh": "原创内容、受众、输出语言、尺寸和有权使用的素材。"
+    },
+    "requirements": {
+      "en": "A compatible agent, this skill and an image-generation backend. Generation uses your provider quota or billing; confirm the budget first. Image output is not editable vector source.",
+      "zh": "需兼容的 Agent、此技能与图像生成工具。生成消耗所用服务的额度或费用，请先确认预算；图像输出不是可编辑矢量源文件。"
+    },
+    "output": {
+      "en": "One author-published comic page demonstrating panel layout, not a full comic book.",
+      "zh": "一张展示分镜布局的作者漫画页面，不是一整本漫画。"
+    }
+  },
+  "cover": {
+    "source": "baoyu",
+    "skillSlug": "jimliu-baoyu-skills-baoyu-cover-image",
+    "category": "image",
+    "evidenceKind": "style-study",
+    "input": {
+      "en": "Your original content, audience, output language, dimensions and assets you have permission to use.",
+      "zh": "原创内容、受众、输出语言、尺寸和有权使用的素材。"
+    },
+    "requirements": {
+      "en": "A compatible agent, this skill and an image-generation backend. Generation uses your provider quota or billing; confirm the budget first. Image output is not editable vector source.",
+      "zh": "需兼容的 Agent、此技能与图像生成工具。生成消耗所用服务的额度或费用，请先确认预算；图像输出不是可编辑矢量源文件。"
+    },
+    "output": {
+      "en": "An author-published visual style example. The suggested task is our adaptation, not the original prompt.",
+      "zh": "作者公开的视觉风格示例。建议任务为本站整理，不是原始提示词。"
+    }
+  },
+  "illustration": {
+    "source": "baoyu",
+    "skillSlug": "jimliu-baoyu-skills-baoyu-article-illustrator",
+    "category": "image",
+    "evidenceKind": "style-study",
+    "input": {
+      "en": "Your original content, audience, output language, dimensions and assets you have permission to use.",
+      "zh": "原创内容、受众、输出语言、尺寸和有权使用的素材。"
+    },
+    "requirements": {
+      "en": "A compatible agent, this skill and an image-generation backend. Generation uses your provider quota or billing; confirm the budget first. Image output is not editable vector source.",
+      "zh": "需兼容的 Agent、此技能与图像生成工具。生成消耗所用服务的额度或费用，请先确认预算；图像输出不是可编辑矢量源文件。"
+    },
+    "output": {
+      "en": "An author-published visual style example. The suggested task is our adaptation, not the original prompt.",
+      "zh": "作者公开的视觉风格示例。建议任务为本站整理，不是原始提示词。"
+    }
+  },
+  "social": {
+    "source": "baoyu",
+    "skillSlug": "jimliu-baoyu-skills-baoyu-xhs-images",
+    "category": "image",
+    "evidenceKind": "style-study",
+    "input": {
+      "en": "Your original content, audience, output language, dimensions and assets you have permission to use.",
+      "zh": "原创内容、受众、输出语言、尺寸和有权使用的素材。"
+    },
+    "requirements": {
+      "en": "A compatible agent, this skill and an image-generation backend. Generation uses your provider quota or billing; confirm the budget first. Image output is not editable vector source.",
+      "zh": "需兼容的 Agent、此技能与图像生成工具。生成消耗所用服务的额度或费用，请先确认预算；图像输出不是可编辑矢量源文件。"
+    },
+    "output": {
+      "en": "One author-published social-card layout preview, not an entire campaign.",
+      "zh": "一张作者公开的社交卡片版式示例，不是完整营销活动。"
+    }
+  },
+  "raster-slides": {
+    "source": "baoyu",
+    "skillSlug": "jimliu-baoyu-skills-baoyu-slide-deck",
+    "category": "slides",
+    "evidenceKind": "style-study",
+    "input": {
+      "en": "Your original content, audience, output language, dimensions and assets you have permission to use.",
+      "zh": "原创内容、受众、输出语言、尺寸和有权使用的素材。"
+    },
+    "requirements": {
+      "en": "A compatible agent, this skill and an image-generation backend. Generation uses your provider quota or billing; confirm the budget first. Image output is not editable vector source.",
+      "zh": "需兼容的 Agent、此技能与图像生成工具。生成消耗所用服务的额度或费用，请先确认预算；图像输出不是可编辑矢量源文件。"
+    },
+    "output": {
+      "en": "One raster slide style preview, not a complete deck or a natively editable PPTX.",
+      "zh": "一张栅格幻灯片风格示例，不是完整文稿或原生可编辑 PPTX。"
+    }
+  },
+  "frontend": {
+    "source": "frontend",
+    "skillSlug": "zarazhangrui-frontend-slides",
+    "category": "slides",
+    "evidenceKind": "template",
+    "input": {
+      "en": "Your presentation outline, audience, verified figures and licensed images.",
+      "zh": "演示大纲、受众、已核实数字和获准使用的图片。"
+    },
+    "requirements": {
+      "en": "Frontend Slides, a coding agent with filesystem access and a browser. Use its bold-template pack; images and fonts may need your own licensed replacements.",
+      "zh": "需 Frontend Slides、可访问文件的编程 Agent 和浏览器；使用其 bold-template pack，图片与字体可能需要替换为有权使用的素材。"
+    },
+    "output": {
+      "en": "Selected views of one HTML template supported by Frontend Slides. Multiple screenshots count as one example. Not a completed customer project or editable PPTX.",
+      "zh": "Frontend Slides 支持的一套 HTML 模板的精选视图。多张截图只计一个案例，不是客户项目或可编辑 PPTX。"
+    }
+  },
+  "huashu": {
+    "source": "huashu",
+    "skillSlug": "alchaincyf-huashu-design-1d891f8f",
+    "category": "web",
+    "evidenceKind": "work",
+    "input": {
+      "en": "Your product brief, real copy, brand assets and desired file format.",
+      "zh": "产品需求、真实文案、品牌素材与期望文件格式。"
+    },
+    "requirements": {
+      "en": "Huashu Design with its complete references, assets and scripts, a compatible coding agent and a browser. Confirm any paid generation tools before use.",
+      "zh": "需完整安装 Huashu Design 的参考资料、素材和脚本，配合兼容编程 Agent 与浏览器；使用收费生成工具前先确认。"
+    },
+    "output": {
+      "en": "An author-published design screenshot. Backend behavior and editable exports are not verified here. Example numbers are not current benchmark evidence.",
+      "zh": "作者公开的设计截图。此处不验证后端功能或可编辑文件导出；示例数字不是当前基准测试证据。"
+    }
+  },
+  "open": {
+    "source": "open",
+    "skillSlug": "nexu-io-open-design",
+    "category": "web",
+    "evidenceKind": "work",
+    "input": {
+      "en": "A concrete brief, content, sample data and output requirements.",
+      "zh": "具体需求、内容、示例数据和交付要求。"
+    },
+    "requirements": {
+      "en": "Install Open Design locally and connect a coding agent. This is an application workflow composing skills; external AI media services may charge separately.",
+      "zh": "需本地安装 Open Design 并连接编程 Agent。这是组合技能的应用工作流；外部 AI 媒体服务可能单独收费。"
+    },
+    "output": {
+      "en": "An author-published design preview. A screenshot does not verify backend functions, email delivery, data connections or animation playback.",
+      "zh": "作者公开的设计预览。截图不验证后端功能、邮件发送、数据连接或动画播放。"
+    }
+  },
+  "motion": {
+    "source": "open",
+    "skillSlug": "nexu-io-open-design",
+    "category": "video",
+    "evidenceKind": "template",
+    "input": {
+      "en": "An original short script, aspect ratio, approved brand assets and verified data where applicable.",
+      "zh": "简短原创脚本、画幅、获准使用的品牌素材，以及需要时提供的已核实数据。"
+    },
+    "requirements": {
+      "en": "Open Design, the corresponding video-template plugin and its HTML-video/HyperFrames renderer. Confirm renderer setup and licensed brand replacements before export.",
+      "zh": "需 Open Design、对应视频模板插件及 HTML-video/HyperFrames 渲染环境。导出前确认配置，并替换为获准使用的品牌素材。"
+    },
+    "output": {
+      "en": "The author’s playable MP4 template preview plus its still frame. A reusable motion composition, not a new platform-produced campaign.",
+      "zh": "作者可播放的 MP4 模板预览及静帧。这是可复用动态模板，不是本站新制作的营销项目。"
+    }
+  },
+  "mascot": {
+    "source": "mascot",
+    "skillSlug": "s1dashu-ip-as-logo-skill",
+    "category": "image",
+    "evidenceKind": "style-study",
+    "input": {
+      "en": "Your original content, audience, output language, dimensions and assets you have permission to use.",
+      "zh": "原创内容、受众、输出语言、尺寸和有权使用的素材。"
+    },
+    "requirements": {
+      "en": "A compatible agent, this skill and an image-generation backend. Generation uses your provider quota or billing; confirm the budget first. Image output is not editable vector source.",
+      "zh": "需兼容的 Agent、此技能与图像生成工具。生成消耗所用服务的额度或费用，请先确认预算；图像输出不是可编辑矢量源文件。"
+    },
+    "output": {
+      "en": "One author-published showcase wall of character directions. Characters are not counted separately or offered as a logo pack.",
+      "zh": "作者公开的一张角色方向展示墙。不把角色拆成独立案例，也不作为图标素材包提供。"
+    }
+  }
+}

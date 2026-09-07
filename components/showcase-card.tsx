@@ -8,7 +8,7 @@ import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { ShowcaseCreatorCredit } from '@/components/showcase-creator'
 import { ShowcaseActions } from '@/components/showcase-engagement'
-import { getShowcaseAccessLabel, getShowcaseImageSrc, getShowcaseSkill, localizeShowcase, SHOWCASE_CATEGORIES, type ShowcaseCase } from '@/lib/showcase'
+import { getShowcaseAccessLabel, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, localizeShowcase, SHOWCASE_CATEGORIES, type ShowcaseCase } from '@/lib/showcase'
 
 export function ShowcaseCard({ item, placement = 'gallery', priority = false }: {
   item: ShowcaseCase
@@ -25,6 +25,7 @@ export function ShowcaseCard({ item, placement = 'gallery', priority = false }: 
     <article className="group min-w-0">
       <Link
         href={getLocalizedNavigationHref(`/showcase/${item.slug}`, locale)}
+        prefetch={false}
         onClick={() => trackAnalyticsEvent('showcase_open', { case_slug: item.slug, skill_slug: item.skillSlug, placement })}
         className="block rounded-lg outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#006b4f]"
       >
@@ -43,7 +44,7 @@ export function ShowcaseCard({ item, placement = 'gallery', priority = false }: 
         <div className="pt-4">
           <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-[#6d675e]">
             <span className="truncate">{skill.name}</span><span aria-hidden="true">/</span>
-            <span className="shrink-0">{item.provenance === 'platform' ? (locale === 'zh' ? '本站制作' : 'Made here') : (locale === 'zh' ? '作者案例' : 'Author example')}</span>
+            <span className="shrink-0">{getShowcaseEvidenceLabel(item, locale)}</span>
           </div>
           <div className="mt-2 flex items-start justify-between gap-3">
             <h3 className="text-base font-semibold leading-snug tracking-tight text-[#1d1b18] group-hover:text-[#006b4f]">{title}</h3>

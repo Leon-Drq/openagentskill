@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict'
-import { access, stat } from 'node:fs/promises'
+import { access, readFile, stat } from 'node:fs/promises'
+import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import { getShowcasePage, getShowcaseEvidenceLabel } from '../lib/showcase.ts'
 import { SHOWCASE_CASES, SHOWCASE_CATEGORIES, SHOWCASE_CREATORS, SHOWCASE_SKILLS, FEATURED_SHOWCASE_SLUGS, filterShowcaseCases, getShowcaseCase, getShowcaseCreator, getShowcaseCreatorHref, getShowcaseHandoff, getShowcaseImageSrc, getShowcaseSkill, getShowcaseAccessLabel, isMissingShowcasePath } from '../lib/showcase.ts'
 
 const require = createRequire(import.meta.url)
@@ -62,7 +64,7 @@ assert.equal(filterShowcaseCases('all', '').length, SHOWCASE_CASES.length)
 assert.deepEqual(filterShowcaseCases('image', 'mono').map((item) => item.slug), ['room-to-grow-poster'])
 assert.ok(filterShowcaseCases('all', '  花艺  ').some((item) => item.slug === 'floria-floral-studio'))
 assert.equal(filterShowcaseCases('video', 'botanical').length, 0)
-assert.equal(filterShowcaseCases('all', '', 'nexu-io').length, 4)
+assert.equal(filterShowcaseCases('all', '', 'nexu-io').length, 32)
 assert.deepEqual(filterShowcaseCases('all', 'Leonxlnx').map((item) => item.slug), ['floria-floral-studio'])
 assert.deepEqual(filterShowcaseCases('all', '', 'yanliudesign').map((item) => item.slug), ['room-to-grow-poster'])
 assert.equal(filterShowcaseCases('video', '', 'yanliudesign').length, 0)
@@ -75,4 +77,41 @@ assert.equal(isMissingShowcasePath('/showcase/missing-example'), true)
 assert.equal(isMissingShowcasePath('/showcase/unknown.png'), true)
 assert.equal(isMissingShowcasePath('/showcase'), false)
 assert.equal(isMissingShowcasePath('/skills'), false)
+assert.equal(SHOWCASE_CASES.length, 100, 'This curated release contains 100 distinct entries')
+assert.equal(SHOWCASE_SKILLS.length, 14, 'Cases must link to the 14 real skill/workflow entries')
+const seeds = JSON.parse(await readFile(new URL('../lib/showcase-curation.json', import.meta.url), 'utf8'))
+const mediaManifest = JSON.parse(await readFile(new URL('../lib/showcase-media.json', import.meta.url), 'utf8'))
+const sources = JSON.parse(await readFile(new URL('../lib/showcase-sources.json', import.meta.url), 'utf8'))
+const groups = JSON.parse(await readFile(new URL('../lib/showcase-groups.json', import.meta.url), 'utf8'))
+const hashes = new Set()
+const sourceUrls = new Set()
+for (const entry of seeds) {
+  const item = getShowcaseCase(entry.slug)
+  const group = groups[entry.group]
+  const source = sources[group.source]
+  assert.ok(item && item.provenance === 'author' && item.promptKind === 'suggested')
+  assert.equal(item.evidenceKind, group.evidenceKind)
+  for (let index = 0; index < entry.assets.length; index++) {
+    const meta = mediaManifest[`${entry.slug}:${index}`]
+    const actual = createHash('sha256').update(await readFile(file(meta.src))).digest('hex')
+    assert.equal(actual, meta.sha256, `${meta.src}: original changed`)
+    assert.equal(meta.sourceUrl, `https://raw.githubusercontent.com/${source.repo}/${source.revision}/${entry.assets[index]}`)
+    assert.ok(!hashes.has(actual), 'Do not split identical artwork into multiple cases')
+    assert.ok(!sourceUrls.has(meta.sourceUrl), 'Do not reuse a source image to pad the gallery')
+    hashes.add(actual); sourceUrls.add(meta.sourceUrl)
+  }
+}
+assert.match(getShowcaseEvidenceLabel(getShowcaseCase('frontend-capsule'), 'en'), /template/)
+assert.match(getShowcaseEvidenceLabel(getShowcaseCase('baoyu-infographic-bridge'), 'zh'), /风格/)
+assert.equal(getShowcaseCase('motion-decision-tree').creatorId, 'heygen-com', 'Preserve upstream artwork author, not just the bundler')
+const migrated = await readFile(new URL('../supabase/migrations/20260907173900_gallery_curated_hundred.sql', import.meta.url), 'utf8')
+assert.deepEqual(new Set([...migrated.matchAll(/\('([a-z0-9-]+)'\)/g)].map((match) => match[1])), new Set(seeds.map((entry) => entry.slug)), 'Every added case must be registered for voting')
+assert.match(migrated, /on conflict \(slug\) do nothing/i, 'Migration must preserve existing votes and be idempotent')
+const pages = Array.from({ length: 5 }, (_, index) => getShowcasePage(SHOWCASE_CASES, String(index + 1)))
+assert.deepEqual(pages.map((page) => page.items.length), [24, 24, 24, 24, 4])
+assert.deepEqual(pages.flatMap((page) => page.items.map((item) => item.slug)), SHOWCASE_CASES.map((item) => item.slug), 'Paging loses or duplicates cases')
+for (const invalid of [undefined, '', '0', '-2', 'NaN', '1.5', '1e2', '999999999999999']) assert.equal(getShowcasePage(SHOWCASE_CASES, invalid).page, 1)
+assert.equal(getShowcasePage(SHOWCASE_CASES, '999').page, 5)
+assert.deepEqual(getShowcasePage([], '99'), { page: 1, pageCount: 1, offset: 0, items: [], total: 0 })
+assert.equal(getShowcasePage(filterShowcaseCases('all', '', 's1dashu'), '5').items.length, 1)
 console.log(`Gallery checks passed: ${SHOWCASE_CASES.length} cases, linked creator/skill identities, media dimensions, optimized assets, creator filters and complete handoffs.`)

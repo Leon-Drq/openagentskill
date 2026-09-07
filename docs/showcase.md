@@ -1,7 +1,9 @@
 # Skill Gallery：内容维护与扩展
 
-首批上线内容：10 个案例，覆盖 5 个技能或工作流；网页与界面 5 个、
-演示文稿 1 个、图像 1 个、视频 3 个。9 个作者案例、1 个本站实际制作案例。
+当前精选内容：100 个案例，覆盖 14 个技能或工作流；网页与界面 15 个、
+演示文稿 30 个、图像 33 个、视频 20 个、文档 2 个。
+其中 29 个作品案例（含 1 个本站制作案例）、40 个作者模板、31 个作者风格示例。
+这些是 100 个精选展示条目，不代表 100 个独立技能，也不代表本站复测了 100 次。
 
 ## 产品入口
 
@@ -25,6 +27,8 @@
 - `provenance=platform`：本站实际制作；保存实际提示词、日期与制作记录。
 - `promptKind=original`：实际运行使用的完整原文。
 - `promptKind=suggested`：平台按作品整理的尝试任务，明确说明不是原始提示词。
+- `evidenceKind=template/style-study`：分别标为作者模板、作者风格示例，不冒充真实客户交付。
+- 同一作品的多个页面、响应式视图不重复计数；同一设计任务只选一套代表版本。
 - 模型、运行成本和耗时不详时明确说明，避免从视频时长推算制作耗时。
 - Guizang 的交付标为 HTML 演示文稿，不能暗示原生可编辑 PPTX。
 - Open Design 标为应用工作流，不能暗示它是无需配置的独立技能。
@@ -35,7 +39,9 @@ mono-color 仓库原有作品有单独的限制性许可，因此本站重新制
 
 ## 添加新案例
 
-编辑 `lib/showcase.ts` 中的 `SHOWCASE_CASES`，按 `ShowcaseCase` 类型补齐：
+首批案例保留在 `lib/showcase.ts` 的 `INITIAL_SHOWCASE_CASES`。
+新增精选通过 `lib/showcase-curation.json`、`showcase-groups.json` 和
+`showcase-sources.json` 维护；`SHOWCASE_CASES` 汇总两批数据。按 `ShowcaseCase` 类型补齐：
 稳定 slug、站内 canonical skillSlug、类型、中英文标题和描述、输入、
 实际交付格式、工具及费用条件、提示词性质、作品作者 `creatorId`、来源版本、许可、图片尺寸。
 同一个技能可以关联多个案例，不需要修改详情页模板或数据库表。
@@ -49,6 +55,11 @@ mono-color 仓库原有作品有单独的限制性许可，因此本站重新制
 原图保留，运行 `node scripts/prepare-showcase-images.mjs` 生成 720px 卡片图
 与 1600px 详情图。视频按需加载，默认不自动播放；原始视频链接始终可用。
 检查真实交付，不能只生成一张宣传封面代替作品。
+
+批量素材使用 `node scripts/import-showcase-curation.mjs` 获取明确挑选的原始文件，
+仅从锁定的 Git commit 下载，不执行仓库代码。生成的 `lib/showcase-media.json`
+记录每张原图的来源、尺寸和 SHA-256；随后运行图片压缩脚本。
+新增批次优先按不同输出类别交错排列；列表每页 24 个，避免一次渲染或预取 100 个详情页。
 
 运行 `node --experimental-strip-types scripts/test-showcase.mjs` 验证数据、
 素材尺寸、派生图片、来源、许可与任务交接；运行 `pnpm typecheck`、`pnpm lint`
@@ -122,7 +133,8 @@ Gallery 数据与素材检查已加入 `pnpm test`，随 GitHub CI 执行。
 OG 与 CollectionPage/Article JSON-LD；加入核心 sitemap，使用真实编辑日期。
 未收录的案例地址由 proxy 提前返回 404，避免根级 loading 流式输出造成软 404；
 原图、展示图与许可文件列入同源素材白名单，不受这条规则影响。
-筛选、搜索和语言查询参数页保留可访问性，canonical 指向主版本并 noindex，
+未筛选的分页有独立 canonical 和可抓取的上一页、页码、下一页链接；JSON-LD 只列当前页，
+保留全局位置。非法页码不索引。筛选、搜索和语言查询参数页保留可访问性，canonical 指向主版本并 noindex，
 避免产生大量重复索引页面。详情内容目前提供中英文，其他语言回退英文；
 不生成空翻译页面。
 
@@ -145,7 +157,7 @@ erDiagram
 ```
 
 当前实现到 Creator → Skill → Case，以及 Skill 的 `listingIds` 关联位置。
-首批五个技能的 `access` 都为 `open-source`，`listingIds` 都为空；没有创建收费商品。
+当前技能的 `access` 为 `open-source`，`listingIds` 为空；没有创建收费商品。
 `access` 支持 `open-source/free/paid/freemium`，不把付费类型硬写在卡片模板里。
 价格、版本授权与卖家应由 listing/offer 提供，不应写到作品案例里；同一技能可以有多个商品版本。
 
