@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync, readdirSync } from 'node:fs'
 import ts from 'typescript'
-import { locales } from '../lib/i18n/config.ts'
+import { locales, getLocaleFromRoute } from '../lib/i18n/config.ts'
 import { galleryTranslations, galleryCopy, localizeEditorialText } from '../lib/i18n/gallery-copy.ts'
 import { siteTranslations, siteCopy } from '../lib/i18n/site-copy.ts'
 import { submissionTranslations, submissionCopy } from '../lib/i18n/submission-copy.ts'
@@ -19,6 +19,9 @@ for (const [dictionary, size] of [[galleryTranslations, 6], [siteTranslations, 7
   }
 }
 for (const locale of locales) {
+  assert.equal(getLocaleFromRoute(`/${locale}/submit`, 'invalid'), locale)
+  assert.equal(getLocaleFromRoute('/showcase', locale), locale)
+  for (const key of ['Analytics preferences', 'Necessary only', 'Allow analytics', 'Privacy details']) assert.ok(siteCopy(locale, key).trim())
   assert.ok(galleryCopy(locale, 'Play preview', '播放预览'))
   assert.ok(siteCopy(locale, 'View all rankings'))
   assert.ok(submissionCopy(locale, 'Reviewed and published', '已通过审核并发布'))
@@ -30,6 +33,9 @@ for (const locale of locales) {
   assert.ok(getShowcaseAccessLabel({access:'open-source'}, locale))
   assert.ok(getShowcaseEvidenceLabel(SHOWCASE_CASES[0], locale))
 }
+assert.equal(getLocaleFromRoute('/ja/submit', 'de'), 'ja', 'Path locale must override query locale')
+assert.equal(getLocaleFromRoute('/showcase', 'invalid'), 'en')
+assert.equal(getLocaleFromRoute(null, null, 'fr'), 'fr')
 assert.equal(localizeEditorialText({ en: 'npx skills add owner/repo', zh: 'npx skills add owner/repo'}, 'ja'), 'npx skills add owner/repo')
 assert.equal(galleryCopy('invalid', 'Play preview', '播放预览'), 'Play preview')
 assert.ok(filterShowcaseCases('all', '成長する余白').some(x=>x.slug==='room-to-grow-poster'))

@@ -3,6 +3,13 @@ export type Locale = (typeof locales)[number]
 
 export const defaultLocale: Locale = 'en'
 
+/** Route language wins over a query preference, including public consent UI
+ * mounted outside a page-level provider. Never infer locale from browser state. */
+export function getLocaleFromRoute(pathname: string | null, preference?: string | null, initial: Locale = defaultLocale): Locale {
+  const prefix = pathname?.split('/').filter(Boolean)[0]
+  return isLocale(prefix) ? prefix : isLocale(preference) ? preference : initial
+}
+
 export const localeNames: Record<Locale, string> = {
   en: 'English',
   zh: 'Chinese',
