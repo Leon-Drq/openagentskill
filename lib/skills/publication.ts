@@ -1,5 +1,5 @@
 // Publication authority and automated review are independent facts.
-export const PUBLIC_SKILL_FILTER = 'ai_review_approved.eq.true,listing_status.eq.owner_published'
+export const PUBLIC_SKILL_FILTER = 'ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)'
 
 export function needsOwnerPublicationReview(skill: {
   listing_status?: string | null

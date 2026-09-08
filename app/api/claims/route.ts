@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     .from('skills')
     .select('slug,name,repository,github_repo,ai_review_approved')
     .eq('slug', parsed.data.skill_slug)
-    .eq('ai_review_approved', true)
+    .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
     .maybeSingle()
   if (skillError || !skill) return NextResponse.json({ error: 'Skill not found' }, { status: 404 })
 

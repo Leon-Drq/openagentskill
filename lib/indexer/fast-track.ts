@@ -8,6 +8,7 @@ const EXECUTABLE_EXTENSIONS = new Set([
 ])
 
 const DOCUMENT_RISKS: Array<{ pattern: RegExp; reason: string; level: 'medium' | 'high' | 'critical' }> = [
+  { pattern: /(?:ignore|override|bypass|disable)[^\n]{0,80}(?:previous instructions|system instructions|security checks|safety checks|approval gate|review gate)/i, reason: 'Instruction attempts to override security or authorization boundaries', level: 'high' },
   { pattern: /(?:curl|wget)[^\n|]{0,300}\|\s*(?:sh|bash|zsh|powershell|pwsh)/i, reason: 'Remote download is piped directly into a shell', level: 'critical' },
   { pattern: /\brm\s+-rf\b|\bRemove-Item\b[^\n]{0,120}\b-Recurse\b/i, reason: 'Destructive recursive deletion instruction detected', level: 'critical' },
   { pattern: /(?:seed phrase|private key|wallet key|browser cookies?|\.ssh\/|\.aws\/credentials)/i, reason: 'Sensitive credential or browser data access is requested', level: 'high' },
@@ -27,6 +28,7 @@ function fileExtension(path: string) {
 
 export interface FastTrackInput {
   stars: number
+  minimumStars?: number
   licenseStatus: 'unknown' | 'missing' | 'restricted' | 'detected'
   updatedAt: string | null | undefined
   document: string
@@ -56,7 +58,8 @@ export function evaluateFastTrackCandidate(input: FastTrackInput): FastTrackDeci
   const staticAnalysis = analyzeCode(input.files)
   let riskLevel: FastTrackDecision['riskLevel'] = staticAnalysis.riskLevel
 
-  if (input.stars < 100) reasons.push('Fewer than 100 GitHub stars')
+  const minimumStars = input.minimumStars ?? 100
+  if (input.stars < minimumStars) reasons.push(`Fewer than ${minimumStars} GitHub stars`)
   if (input.licenseStatus !== 'detected') reasons.push(`License status is ${input.licenseStatus}`)
   if (ageDays === null || ageDays > 365) reasons.push('Repository has not been updated within 12 months')
   if (hasExecutableFiles) reasons.push('Executable or script files require deeper review')
@@ -73,7 +76,7 @@ export function evaluateFastTrackCandidate(input: FastTrackInput): FastTrackDeci
 
   const uniqueReasons = Array.from(new Set(reasons))
   const eligible =
-    input.stars >= 100 &&
+    input.stars >= minimumStars &&
     input.licenseStatus === 'detected' &&
     ageDays !== null &&
     ageDays <= 365 &&

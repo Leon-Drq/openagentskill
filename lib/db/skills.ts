@@ -383,7 +383,7 @@ async function fetchApprovedSkillSitemapRecords(
     let query = supabase
       .from('skills')
       .select('slug,github_stars,github_last_pushed_at,created_at,updated_at,quality_score,publisher_verified')
-      .eq('ai_review_approved', true)
+      .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
       // This matches the public-directory partial index. A sitemap needs a
       // stable complete traversal, not a star-only ranking, and must never
       // force a full-table sort while a crawler is visiting the site.
@@ -437,7 +437,7 @@ async function fetchApprovedSkillSitemapCount(minStars: number, minQualityScore:
     // This result is cached for 12 hours. An exact indexed count prevents the
     // planner estimate from creating empty sitemap shards or hiding valid ones.
     .select('slug', { count: 'exact', head: true })
-    .eq('ai_review_approved', true)
+    .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
 
   if (minStars > 0) {
     query = query.or(`github_stars.gte.${minStars},publisher_verified.eq.true`)

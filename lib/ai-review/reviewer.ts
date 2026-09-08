@@ -1,4 +1,5 @@
-import { generateText } from 'ai'
+import { controlledGeneration, DeferredAnalysisError } from '@/lib/ai/controlled-generation'
+import { triageReview, REVIEW_POLICY_VERSION } from '@/lib/ai/review-policy'
 import type { AIReviewResult } from '../schema/skill-schema'
 import { SUBMISSION_REVIEW_MODEL } from '@/lib/ai/models'
 import { reconcileLicenseReviewFeedback } from '@/lib/skills/license-review'
@@ -8,6 +9,8 @@ export interface SkillReviewData {
   readmeContent: string
   codeFiles: { path: string; content: string }[]
   manifestData?: object & { license?: unknown }
+  packageComplete?: boolean
+  packageFingerprint?: string
   githubStats: {
     stars: number
     forks: number
@@ -18,7 +21,7 @@ export interface SkillReviewData {
 }
 
 function clampScore(score: number) {
-  return Math.max(0, Math.min(10, Math.round(score)))
+  return Number.isFinite(score) ? Math.max(0, Math.min(10, Math.round(score))) : 0
 }
 
 function includesAny(text: string, patterns: RegExp[]) {
@@ -110,9 +113,20 @@ function heuristicReview(data: SkillReviewData, reason: string): AIReviewResult 
 }
 
 export async function reviewSkill(data: SkillReviewData): Promise<AIReviewResult> {
+  const triage = triageReview(data)
+  const provenance = { method: triage.method, packageFingerprint: triage.fingerprint, policyVersion: REVIEW_POLICY_VERSION }
+  if (triage.method !== 'ai') {
+    return {
+      approved: triage.method === 'static',
+      scores: { security: 0, quality: 0, usefulness: 0, compliance: 0 }, totalScore: 0,
+      issues: triage.method === 'manual' ? [...triage.decision.reasons, 'Manual review required; no automatic installation approval.'] : [],
+      suggestions: ['Inspect the source and permissions before use. Static checks are not a runtime test or safety certification.'],
+      reasoning: triage.method === 'static' ? 'Complete low-risk package passed deterministic checks; no AI review was performed.' : 'Risk or incomplete evidence requires human review.',
+      reviewedAt: new Date().toISOString(), reviewModel: `${triage.method}-${REVIEW_POLICY_VERSION}`, ...provenance,
+    }
+  }
   const codePreview = data.codeFiles
-    .slice(0, 6)
-    .map((file) => `// ${file.path}\n${file.content.slice(0, 1600)}`)
+    .map((file) => `// ${file.path}\n${file.content}`)
     .join('\n\n---\n\n')
 
   const prompt = `You review Agent Skills submitted to OpenAgentSkill.
@@ -123,7 +137,7 @@ Last updated: ${data.githubStats.lastUpdated}
 Repository license detected by GitHub: ${data.githubStats.license || 'Unknown'}
 
 SKILL.md and documentation excerpt:
-${data.readmeContent.slice(0, 5000)}
+${data.readmeContent}
 
 ${data.manifestData ? `Parsed SKILL.md metadata:
 ${JSON.stringify(data.manifestData, null, 2)}` : ''}
@@ -159,13 +173,13 @@ Return only JSON without markdown fences:
 }`
 
   try {
-    const result = await generateText({
+    const text = await controlledGeneration({
       model: SUBMISSION_REVIEW_MODEL,
       prompt,
-      temperature: 0.2,
-      abortSignal: AbortSignal.timeout(20_000),
+      fingerprint: triage.fingerprint,
+      feature: 'skill-review',
     })
-    const jsonMatch = result.text.match(/\{[\s\S]*\}/)
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
     if (!jsonMatch) throw new Error('Invalid AI response format')
 
     const reviewData = JSON.parse(jsonMatch[0]) as {
@@ -210,10 +224,11 @@ Return only JSON without markdown fences:
       reasoning: typeof reviewData.reasoning === 'string' ? reviewData.reasoning.slice(0, 4000) : '',
       reviewedAt: new Date().toISOString(),
       reviewModel: SUBMISSION_REVIEW_MODEL,
+      ...provenance,
     }
   } catch (error) {
-    console.error('[submission-review] AI review error:', error)
-    return heuristicReview(data, error instanceof Error ? error.message : 'technical error')
+    console.warn('[submission-review] deferred', { reason: error instanceof Error ? error.name : 'AnalysisError' })
+    return { ...heuristicReview(data, 'analysis deferred'), ...provenance, method: 'manual', deferred: error instanceof DeferredAnalysisError }
   }
 }
 

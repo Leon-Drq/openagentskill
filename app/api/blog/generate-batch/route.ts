@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   const { data: skills, error } = await supabase
     .from('skills')
     .select('id, slug, name, description, long_description, tagline, category, tags, frameworks, github_repo')
-    .eq('ai_review_approved', true)
+    .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
     .order('created_at', { ascending: false })
     .limit(limit * 4)
 

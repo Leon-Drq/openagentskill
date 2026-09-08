@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     .from('skills')
     .select('github_repo')
     .eq('github_repo', repository)
-    .eq('ai_review_approved', true)
+    .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
     .eq('publisher_verified', true)
     .limit(1)
     .maybeSingle()

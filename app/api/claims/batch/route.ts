@@ -23,7 +23,7 @@ export async function POST() {
   const { data: skills, error: skillsError } = await admin
     .from('skills')
     .select('slug,name,repository,github_repo,author_user_id,publisher_verified')
-    .eq('ai_review_approved', true)
+    .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
     .ilike('github_repo', `${githubUsername}/%`)
     .order('github_stars', { ascending: false })
     .limit(MAX_BATCH_CLAIMS)

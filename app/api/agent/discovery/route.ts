@@ -373,7 +373,7 @@ async function fetchGrowthSignals() {
     supabase
       .from('skills')
       .select('slug', { count: 'exact', head: true })
-      .eq('ai_review_approved', true)
+      .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
       .gte('quality_score', SEARCH_INDEX_MIN_QUALITY_SCORE)
       .gte('github_stars', SEARCH_INDEX_MIN_GITHUB_STARS),
     supabase

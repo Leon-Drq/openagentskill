@@ -8,8 +8,6 @@
 import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { STATIC_BLOG_POSTS, getStaticBlogPostBySlug } from '@/lib/blog/static-posts'
-import { generateText } from 'ai'
-import { BLOG_GENERATION_MODEL } from '@/lib/ai/models'
 import { isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
 
 export interface BlogGenerateResult {
@@ -92,7 +90,7 @@ async function fetchApprovedSkillRows(maxRows = 1200) {
         slug, name, description, long_description, tagline, category, tags, frameworks,
         github_repo, github_stars, created_at, quality_score, author_name
       `)
-      .eq('ai_review_approved', true)
+      .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
       .order('created_at', { ascending: false })
       .range(from, to)
 
@@ -109,7 +107,7 @@ async function fetchApprovedSkillCount() {
   const { count, error } = await supabase
     .from('skills')
     .select('id', { count: 'exact', head: true })
-    .eq('ai_review_approved', true)
+    .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
 
   if (error) return null
   return count
@@ -129,69 +127,7 @@ async function generateBlogContent(skill: {
   author_name: string
   install_command: string | null
 }): Promise<{ title: string; summary: string; content: string }> {
-  const prompt = `You are the editorial voice for OpenAgentSkill Update, a practical dispatch for developers building AI agents.
-
-Write a scenario-driven blog post introducing this skill to developers:
-
-Skill Name: ${skill.name}
-Description: ${skill.description}
-Category: ${skill.category}
-Tags: ${skill.tags.join(', ')}
-GitHub: https://github.com/${skill.github_repo}
-Stars: ${skill.github_stars}
-Author: ${skill.author_name}
-Install: ${skill.install_command || `npx skills add ${skill.github_repo}`}
-
-README excerpt:
-${(skill.long_description || '').slice(0, 1200)}
-
-Write a blog post in Markdown with this exact structure:
-
-## Where this fits
-(2-3 sentences explaining the developer workflow or user problem this skill helps with. Start from a concrete user scenario.)
-
-## Why agents benefit
-(3-5 bullets describing concrete agent capabilities, not generic features)
-
-## Practical scenarios
-(3 real-world scenarios with brief explanations, written as subheadings)
-
-## Add it to your agent workflow
-(Installation and a small usage example using the install command)
-
-## Compare before adopting
-(Mention what to compare: quality signals, maintenance freshness, alternatives, and workflow fit)
-
-## Why it is worth tracking
-(1 paragraph on quality signals, community momentum, and when to evaluate it)
-
-Rules:
-- Write in English, clear and concise
-- Code blocks must use proper markdown fencing with language tags
-- Do NOT include a top-level H1 title (it will be added separately)
-- Keep the total length between 400-600 words
-- Be useful and specific. Avoid hype, vague claims, and feature-list padding.
-- Mention OpenAgentSkill only when it adds context.
-- Include one natural internal-link sentence using this exact URL when relevant: https://www.openagentskill.com/skills/${skill.slug}
-
-Respond with JSON only:
-{"title":"Blog post title (max 60 chars)","summary":"One sentence meta description (max 155 chars)","content":"Full markdown content"}`
-
-  const { text } = await generateText({
-    model: BLOG_GENERATION_MODEL,
-    prompt,
-    temperature: 0.7,
-  })
-
-  const match = text.match(/\{[\s\S]*\}/)
-  if (!match) throw new Error('No JSON in AI response')
-
-  const parsed = JSON.parse(match[0])
-  return {
-    title: parsed.title,
-    summary: parsed.summary,
-    content: parsed.content,
-  }
+  throw new Error('Per-skill AI blog generation is retired. Use the reviewed weekly editorial queue (20 slots/week).')
 }
 
 // ─── Main Entry Point ─────────────────────────────────────────────────────────
