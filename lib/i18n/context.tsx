@@ -45,14 +45,20 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined)
 function I18nStateProvider({
   children,
   initialLocale = defaultLocale,
-  routeKey,
 }: {
   children: ReactNode
   initialLocale?: Locale
-  routeKey: string
 }) {
+  const [route, setRoute] = useState({ locale: initialLocale, key: 'initial' })
+  const routeKey = route.key
   const [override, setOverride] = useState<{ locale: Locale; routeKey: string } | null>(null)
-  const locale = override?.routeKey === routeKey ? override.locale : initialLocale
+  const locale = override?.routeKey === routeKey ? override.locale : route.locale
+
+  const onRoute = useCallback((nextLocale: Locale, key: string) => {
+    setRoute(current => current.key === key && current.locale === nextLocale
+      ? current
+      : { locale: nextLocale, key })
+  }, [])
 
   useEffect(() => {
     document.documentElement.lang = locale
@@ -77,17 +83,22 @@ function I18nStateProvider({
 
   return (
     <I18nContext.Provider value={value}>
+      {/* Only route observation may suspend. Keep the streamed page tree single
+          and mounted; repeating children in a fallback races with hydration. */}
+      <Suspense fallback={null}>
+        <LocaleRouteObserver initialLocale={initialLocale} onRoute={onRoute} />
+      </Suspense>
       {children}
     </I18nContext.Provider>
   )
 }
 
-function I18nProviderWithSearch({
-  children,
+function LocaleRouteObserver({
   initialLocale,
+  onRoute,
 }: {
-  children: ReactNode
   initialLocale?: Locale
+  onRoute: (locale: Locale, key: string) => void
 }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -97,11 +108,8 @@ function I18nProviderWithSearch({
   const routeLocale = getLocaleFromRoute(pathname, searchParams.get('lang'), initialLocale)
   const routeKey = `${pathname || '/'}?${searchParams.toString()}`
 
-  return (
-    <I18nStateProvider initialLocale={routeLocale} routeKey={routeKey}>
-      {children}
-    </I18nStateProvider>
-  )
+  useEffect(() => onRoute(routeLocale, routeKey), [onRoute, routeLocale, routeKey])
+  return null
 }
 
 export function I18nProvider({
@@ -112,9 +120,7 @@ export function I18nProvider({
   initialLocale?: Locale
 }) {
   return (
-    <Suspense fallback={<I18nStateProvider initialLocale={initialLocale} routeKey="initial">{children}</I18nStateProvider>}>
-      <I18nProviderWithSearch initialLocale={initialLocale}>{children}</I18nProviderWithSearch>
-    </Suspense>
+    <I18nStateProvider initialLocale={initialLocale}>{children}</I18nStateProvider>
   )
 }
 
