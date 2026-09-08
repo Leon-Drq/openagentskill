@@ -1,5 +1,7 @@
 'use client'
 
+import { NativeSelect } from '@/components/ui/native-select'
+
 import Link from 'next/link'
 import { ArrowRight, CheckCircle2, Copy, Loader2, Search, ShieldCheck, TriangleAlert } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -388,30 +390,30 @@ export function AgentResolveWorkbench({
           <div className="grid gap-3 sm:grid-cols-3">
             <label className="block">
               <span className="mb-2 block font-mono text-xs uppercase tracking-[0.18em] text-secondary">Agent</span>
-              <select
+              <NativeSelect
                 value={agent}
                 onChange={(event) => setAgent(event.target.value)}
-                className="h-10 w-full border border-border bg-background px-3 text-sm outline-none focus:border-foreground"
+                className="h-11 w-full border border-border bg-background px-3 text-sm outline-none focus:border-foreground"
               >
                 <option value="codex">Codex</option>
                 <option value="claude-code">Claude Code</option>
                 <option value="cursor">Cursor</option>
                 <option value="openagentskill-cli">OpenAgentSkill CLI</option>
                 <option value="auto">Auto</option>
-              </select>
+              </NativeSelect>
             </label>
 
             <label className="block">
               <span className="mb-2 block font-mono text-xs uppercase tracking-[0.18em] text-secondary">Max risk</span>
-              <select
+              <NativeSelect
                 value={maxRisk}
                 onChange={(event) => setMaxRisk(event.target.value)}
-                className="h-10 w-full border border-border bg-background px-3 text-sm outline-none focus:border-foreground"
+                className="h-11 w-full border border-border bg-background px-3 text-sm outline-none focus:border-foreground"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
-              </select>
+              </NativeSelect>
             </label>
 
             <label className="block">
@@ -420,7 +422,7 @@ export function AgentResolveWorkbench({
                 value={minStars}
                 onChange={(event) => setMinStars(event.target.value.replace(/[^\d]/g, ''))}
                 inputMode="numeric"
-                className="h-10 w-full border border-border bg-background px-3 text-sm outline-none focus:border-foreground"
+                className="h-11 w-full border border-border bg-background px-3 text-sm outline-none focus:border-foreground"
               />
             </label>
           </div>

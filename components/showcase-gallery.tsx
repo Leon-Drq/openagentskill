@@ -1,5 +1,7 @@
 'use client'
 
+import { NativeSelect } from '@/components/ui/native-select'
+
 import { galleryCopy, formatGalleryNumber } from '@/lib/i18n/gallery-copy'
 
 import { useEffect, useRef } from 'react'
@@ -112,19 +114,19 @@ function GalleryContent() {
               <p aria-live="polite" role="status" className="text-xs text-[#6d675e]">{galleryCopy(locale, '{count} examples', '{count} 个案例', { count: formatGalleryNumber(cases.length, locale) })}{cases.length > 0 && ` · ${galleryCopy(locale, 'Showing {start}–{end}', '当前 {start}–{end}', { start: pagination.offset + 1, end: pagination.offset + pagination.items.length })}`}{query && ` · “${query}”`}</p>
               {(query || category !== 'all' || creatorId || tagId) && <button type="button" onClick={() => filter('all', '', '', sort, '')} className="inline-flex min-h-11 items-center gap-1 text-xs text-[#006b4f]"><X className="h-3 w-3" aria-hidden="true" />{galleryCopy(locale, "Clear filters", "清除筛选")}</button>}
             </div>
-            <div className="flex max-w-full flex-wrap gap-2">
-            <select value={tagId} onChange={(event) => filter(category, query, creatorId, sort, event.target.value)} aria-label={galleryCopy(locale, "Filter by use case", "按用途筛选")} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
+            <div className="grid w-full min-w-0 gap-2 sm:flex sm:w-auto sm:max-w-full sm:flex-wrap">
+            <NativeSelect value={tagId} onChange={(event) => filter(category, query, creatorId, sort, event.target.value)} aria-label={galleryCopy(locale, "Filter by use case", "按用途筛选")} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
               <option value="">{galleryCopy(locale, "All use cases", "全部用途")}</option>
               {SHOWCASE_TAGS.map((tag) => { const count = filterShowcaseCases(category, query, creatorId, tag.id).length; return <option key={tag.id} value={tag.id} disabled={!count && tagId !== tag.id}>{localizeShowcase(tag.label, locale)} · {count}</option> })}
-            </select>
-            <select value={creatorId} onChange={(event) => filter(category, query, event.target.value)} aria-label={galleryCopy(locale, "Filter by skill creator", "按技能作者筛选")} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
+            </NativeSelect>
+            <NativeSelect value={creatorId} onChange={(event) => filter(category, query, event.target.value)} aria-label={galleryCopy(locale, "Filter by skill creator", "按技能作者筛选")} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
               <option value="">{galleryCopy(locale, "All skill creators", "全部技能作者")}</option>
               {[...new Set(SHOWCASE_SKILLS.map((skill) => skill.creatorId))].map((id) => <option key={id} value={id}>{getShowcaseCreator(id).name}</option>)}
-            </select>
-            <select value={sort} onChange={(event) => filter(category, query, creatorId, event.target.value as ShowcaseSort)} aria-label={galleryCopy(locale, "Sort examples", "作品排序")} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
+            </NativeSelect>
+            <NativeSelect value={sort} onChange={(event) => filter(category, query, creatorId, event.target.value as ShowcaseSort)} aria-label={galleryCopy(locale, "Sort examples", "作品排序")} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
               <option value="curated">{galleryCopy(locale, "Curated", "精选推荐")}</option>
               <option value="top">{galleryCopy(locale, "Top rated", "社区好评")}</option>
-            </select>
+            </NativeSelect>
             </div>
           </div>
           {category === 'video' && <p className="mt-4 text-xs leading-relaxed text-[#6d675e]">{galleryCopy(locale, "Play a preview on the card; open the title for the task and workflow. Videos load only when you press play.", "点击封面播放预览，点击标题查看案例与制作方法。视频仅在点击后加载。")}</p>}

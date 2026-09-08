@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { Check, ChevronDown, Globe2 } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useI18n } from '@/lib/i18n/context'
@@ -26,7 +26,18 @@ export function LanguageSwitcher({ compact = false, showName = !compact, classNa
   const pathname = usePathname()
   const router = useRouter()
   const [open, setOpen] = useState(false)
+  const root = useRef<HTMLDivElement>(null)
+  const [panel, setPanel] = useState({ above: false, height: 480 })
   const [, startTransition] = useTransition()
+
+  useEffect(() => {
+    if (!open) return
+    const dismiss = (event: PointerEvent) => {
+      if (!root.current?.contains(event.target as Node)) setOpen(false)
+    }
+    document.addEventListener('pointerdown', dismiss)
+    return () => document.removeEventListener('pointerdown', dismiss)
+  }, [open])
 
   const activeLocale = locale
 
@@ -53,17 +64,32 @@ export function LanguageSwitcher({ compact = false, showName = !compact, classNa
 
   return (
     <div
+      ref={root}
       className={cn('relative', className)}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          event.stopPropagation()
+          setOpen(false)
+          root.current?.querySelector('button')?.focus()
+        }
+      }}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
       }}
     >
       <button
         type="button"
-        onClick={() => setOpen((value) => !value)}
+        onClick={(event) => {
+          const rect = event.currentTarget.getBoundingClientRect()
+          const below = window.innerHeight - rect.bottom - 16
+          const above = rect.top - 16
+          const openAbove = below < 360 && above > below
+          setPanel({ above: openAbove, height: Math.max(80, Math.min(480, openAbove ? above : below)) })
+          setOpen((value) => !value)
+        }}
         className={cn(
-          'flex min-w-max items-center whitespace-nowrap rounded-[8px] border border-border bg-card/80 text-xs font-semibold leading-none text-foreground transition-colors hover:border-foreground/40',
-          compact ? 'h-9 gap-1.5 px-2' : 'h-8 gap-2 px-2.5'
+          'flex min-w-max items-center whitespace-nowrap rounded-[8px] border border-border bg-card/80 text-xs font-semibold leading-none text-foreground transition-colors hover:border-foreground/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006b4f]',
+          compact ? 'h-10 gap-1.5 px-3' : 'h-9 gap-2 px-3'
         )}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -82,7 +108,8 @@ export function LanguageSwitcher({ compact = false, showName = !compact, classNa
         <div
           role="listbox"
           aria-label={siteCopy(locale, 'Select language')}
-          className="absolute right-0 top-10 z-50 w-52 overflow-hidden rounded-[8px] border border-border bg-background shadow-[0_18px_55px_rgba(29,27,24,0.12)]"
+          style={{ maxHeight: panel.height }}
+          className={cn('absolute right-0 z-50 w-52 max-w-[calc(100vw-2rem)] overflow-y-auto overscroll-contain rounded-[8px] border border-border bg-background shadow-[0_18px_55px_rgba(29,27,24,0.12)]', panel.above ? 'bottom-full mb-2' : 'top-full mt-2')}
         >
           {locales.map((loc) => {
             const active = loc === activeLocale
@@ -95,7 +122,7 @@ export function LanguageSwitcher({ compact = false, showName = !compact, classNa
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => switchLanguage(loc)}
                 className={cn(
-                  'flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm transition-colors',
+                  'flex min-h-11 w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#006b4f]',
                   active ? 'bg-muted text-foreground' : 'text-secondary hover:bg-muted/60 hover:text-foreground'
                 )}
               >

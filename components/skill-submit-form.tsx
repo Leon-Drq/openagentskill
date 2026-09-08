@@ -1,5 +1,7 @@
 'use client'
 
+import { NativeSelect } from '@/components/ui/native-select'
+
 import { submissionCopy } from '@/lib/i18n/submission-copy'
 
 import { useEffect, useMemo, useState } from 'react'
@@ -235,7 +237,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
           <label htmlFor="skill-path" className="mb-2 block text-sm font-semibold">
             {submissionCopy(locale, 'Choose SKILL.md ({count} found)', '选择 SKILL.md（发现 {count} 个）', { count: candidates.length })}
           </label>
-          <select
+          <NativeSelect
             id="skill-path"
             value={selectedPath}
             onChange={(event) => setSelectedPath(event.target.value)}
@@ -246,7 +248,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
                 {candidate.name} — {candidate.path}
               </option>
             ))}
-          </select>
+          </NativeSelect>
           {selectedCandidate && (
             <div className="mt-3 border border-border bg-card p-4">
               <p className="font-semibold">{selectedCandidate.name}</p>
@@ -262,10 +264,10 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
           <label htmlFor="category" className="mb-2 block text-sm font-semibold">
             {submissionCopy(locale, "Category (optional)", "分类（选填）")}
           </label>
-          <select id="category" value={category} onChange={(event) => setCategory(event.target.value)} className="w-full border border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none">
+          <NativeSelect id="category" value={category} onChange={(event) => setCategory(event.target.value)} className="w-full border border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none">
             <option value="">{submissionCopy(locale, "Auto-detect", "自动识别")}</option>
             {categories.map(([value, key]) => <option key={value} value={value}>{t.submitPage.form.categories[key]}</option>)}
-          </select>
+          </NativeSelect>
         </div>
         <div>
           <label htmlFor="tags" className="mb-2 block text-sm font-semibold">

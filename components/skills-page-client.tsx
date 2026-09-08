@@ -1,5 +1,7 @@
 'use client'
 
+import { NativeSelect } from '@/components/ui/native-select'
+
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -616,7 +618,7 @@ export function SkillsPageClient({
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             <label className="block">
               <span className="mb-1 block text-xs text-secondary">Use case</span>
-              <select
+              <NativeSelect
                 value={useCase}
                 onChange={(e) => navigate({ useCase: e.target.value })}
                 className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
@@ -625,12 +627,12 @@ export function SkillsPageClient({
                 {useCases.map((item) => (
                   <option key={item.slug} value={item.slug}>{item.shortTitle}</option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
 
             <label className="block">
               <span className="mb-1 block text-xs text-secondary">Platform fit</span>
-              <select
+              <NativeSelect
                 value={platform}
                 onChange={(e) => navigate({ platform: e.target.value })}
                 className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
@@ -639,12 +641,12 @@ export function SkillsPageClient({
                 {platformOptions.slice(0, 40).map((item) => (
                   <option key={item} value={item}>{item}</option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
 
             <label className="block">
               <span className="mb-1 block text-xs text-secondary">Quality tier</span>
-              <select
+              <NativeSelect
                 value={quality}
                 onChange={(e) => navigate({ quality: e.target.value })}
                 className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
@@ -652,12 +654,12 @@ export function SkillsPageClient({
                 {QUALITY_TABS.map((item) => (
                   <option key={item.key} value={item.key}>{item.label}</option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
 
             <label className="block">
               <span className="mb-1 block text-xs text-secondary">Trust profile</span>
-              <select
+              <NativeSelect
                 value={trust}
                 onChange={(e) => navigate({ trust: e.target.value })}
                 className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
@@ -665,12 +667,12 @@ export function SkillsPageClient({
                 {TRUST_OPTIONS.map((item) => (
                   <option key={item.key} value={item.key}>{item.label}</option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
 
             <label className="block">
               <span className="mb-1 block text-xs text-secondary">Safety gate</span>
-              <select
+              <NativeSelect
                 value={safety}
                 onChange={(e) => navigate({ safety: e.target.value })}
                 className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
@@ -678,12 +680,12 @@ export function SkillsPageClient({
                 {SAFETY_OPTIONS.map((item) => (
                   <option key={item.key} value={item.key}>{item.label}</option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
 
             <label className="block">
               <span className="mb-1 block text-xs text-secondary">GitHub adoption</span>
-              <select
+              <NativeSelect
                 value={String(minStars)}
                 onChange={(e) => navigate({ minStars: e.target.value === '0' ? undefined : e.target.value })}
                 className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
@@ -691,7 +693,7 @@ export function SkillsPageClient({
                 {STAR_OPTIONS.map((item) => (
                   <option key={item.value} value={item.value}>{item.label}</option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
           </div>
         </section>

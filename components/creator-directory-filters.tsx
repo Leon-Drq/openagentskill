@@ -1,4 +1,6 @@
 'use client'
+
+import { NativeSelect } from '@/components/ui/native-select'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 import { CREATOR_AREAS } from '@/lib/creator-directory'
@@ -25,7 +27,7 @@ export function CreatorDirectoryFilters({
       action="/creators"
       method="get"
       aria-busy={pending}
-      className="grid gap-4 border-y border-border py-5 sm:grid-cols-[1fr_auto_auto_auto] sm:items-end"
+      className="grid gap-4 border-y border-border py-5 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,auto)_minmax(0,auto)_auto] sm:items-end"
       onSubmit={(event) => {
         event.preventDefault()
         const data = new FormData(event.currentTarget),
@@ -50,9 +52,9 @@ export function CreatorDirectoryFilters({
           className="h-11 w-full border border-border bg-background px-3 text-sm text-foreground"
         />
       </label>
-      <label className="grid gap-2 text-xs text-secondary">
+      <label className="grid min-w-0 gap-2 text-xs text-secondary">
         {t('Field')}
-        <select
+        <NativeSelect
           name="area"
           defaultValue={area}
           className="h-11 max-w-full border border-border bg-background px-3 text-sm text-foreground"
@@ -64,11 +66,11 @@ export function CreatorDirectoryFilters({
               {t(a)}
             </option>
           ))}
-        </select>
+        </NativeSelect>
       </label>
-      <label className="grid gap-2 text-xs text-secondary">
+      <label className="grid min-w-0 gap-2 text-xs text-secondary">
         {t('Sort by')}
-        <select
+        <NativeSelect
           name="sort"
           defaultValue={sort}
           className="h-11 max-w-full border border-border bg-background px-3 text-sm text-foreground"
@@ -77,7 +79,7 @@ export function CreatorDirectoryFilters({
           <option value="stars">{t('Repository stars')}</option>
           <option value="recent">{t('Recently updated')}</option>
           <option value="editorial">{t('Editor selected')}</option>
-        </select>
+        </NativeSelect>
       </label>
       <button
         type="submit"
