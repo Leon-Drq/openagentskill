@@ -2,7 +2,9 @@ import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { getGitHubOwner } from '@/lib/github-owner'
-import { formatCompactNumber } from '@/lib/quality'
+import type { Locale } from '@/lib/i18n/config'
+import { siteCopy } from '@/lib/i18n/site-copy'
+import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 
 export interface GitHubPopularityItem {
   rank: number
@@ -21,15 +23,17 @@ export interface GitHubPopularityItem {
 export function GitHubPopularityList({
   items,
   compact = false,
+  locale = 'en',
 }: {
   items: GitHubPopularityItem[]
   compact?: boolean
+  locale?: Locale
 }) {
   return (
     <ol className="overflow-hidden rounded-[10px] border border-border bg-background">
       {items.map((item) => {
         const owner = item.githubOwner || getGitHubOwner({ github_repo: item.githubRepo })
-        const ownerLabel = owner || item.authorName || 'GitHub creator'
+        const ownerLabel = owner || item.authorName || siteCopy(locale, 'GitHub creator')
 
         return (
           <li
@@ -48,7 +52,7 @@ export function GitHubPopularityList({
 
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                <Link href={`/skills/${item.slug}`} className="min-w-0">
+                <Link href={getLocalizedNavigationHref(`/skills/${item.slug}`, locale)} className="min-w-0">
                   <h3 className="truncate text-base font-semibold leading-tight transition-colors hover:text-[#006b4f] sm:text-lg">
                     {item.name}
                   </h3>
@@ -70,13 +74,13 @@ export function GitHubPopularityList({
             <div className="col-span-2 flex items-center justify-between gap-4 pl-[60px] sm:col-span-1 sm:pl-0">
               <div className="text-right">
                 <div className="font-mono text-lg font-semibold tabular-nums">
-                  {formatCompactNumber(item.githubStars || 0)}
+                  {new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 1 }).format(item.githubStars || 0)}
                 </div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-secondary">GitHub stars</div>
               </div>
               <Link
-                href={`/skills/${item.slug}`}
-                aria-label={`Open ${item.name}`}
+                href={getLocalizedNavigationHref(`/skills/${item.slug}`, locale)}
+                aria-label={siteCopy(locale, 'Open {name}', { name: item.name })}
                 className="grid h-9 w-9 place-items-center rounded-full border border-border text-secondary transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
               >
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />

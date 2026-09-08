@@ -2,6 +2,8 @@ import curatedEntries from './showcase-curation.json' with { type: 'json' }
 import curatedSources from './showcase-sources.json' with { type: 'json' }
 import curatedMedia from './showcase-media.json' with { type: 'json' }
 import curatedGroups from './showcase-groups.json' with { type: 'json' }
+// @ts-expect-error Direct Node regression tests require the TypeScript extension.
+import { galleryCopy, localizeEditorialText, editorialSearchText } from './i18n/gallery-copy.ts'
 
 // Exact prompt used for the platform-produced poster on 2026-09-07.
 export const MONO_POSTER_PROMPT = "Create an original portrait 3:4 editorial risograph poster using the mono-color skill's controlled two-ink method. Flat front-facing printed page, neutral white substrate #FAFAF7, botanical green #008A4B dominant ink (80% of inked area) and oxblood #8F3434 accent ink (20%). No third printing ink; tonal steps are halftone density, paper is not an ink.\n\nUse a specimen annotation composition with one oversized photographic fern frond curving from the bottom right across the center, cropped at the lower edge. Keep about 40% exposed paper, especially a quiet upper-right release zone. One focal event: oversized serif title interlocking with the stem. Fine annotation ticks form the only manual gesture family. An asymmetric art-book composition with no enclosing border or card.\n\nSubject: an observed fern leaf, tactile and botanical, rendered in coarse screened green photographic dots, intricate recognizable leaflets with white paper cutouts. The oxblood plate belongs only to the title and small annotation. Contemporary printed editorial work with generous space, no artificial sepia aging.\n\nExact text: 'ROOM TO GROW' in large oxblood editorial serif across two lines in upper-left and center-left; one small green monospace caption 'BOTANICAL STUDY / 01' at bottom left. Keep title at least 8x caption size. No other text, logos or watermarks.\n\nVisible paper fibers, subtle ink bleed and restrained print misregistration, sharply readable type, real reproduced image texture. Avoid full color, gradients, glossy mockups, 3D depth, stock-photo styling, clean vector clipart, decorative blobs, centered symmetry, additional labels and imitation of any existing artwork."
@@ -9,7 +11,7 @@ export const MONO_POSTER_PROMPT = "Create an original portrait 3:4 editorial ris
 export type ShowcaseCategory = 'web' | 'slides' | 'image' | 'video' | 'document'
 export type ShowcaseText = { en: string; zh: string }
 export const showcaseText = (en: string, zh: string): ShowcaseText => ({ en, zh })
-export const localizeShowcase = (text: ShowcaseText, locale: string) => locale === 'zh' ? text.zh : text.en
+export const localizeShowcase = localizeEditorialText
 export const getShowcaseImageSrc = (src: string, kind: 'card' | 'preview') => src.replace(/\.[^.]+$/, `.${kind}.webp`)
 export const SHOWCASE_UPDATED_AT = '2026-09-08'
 
@@ -156,10 +158,10 @@ const monoRevision = 'c8ff70597ddedcd65f21a0b528f6a70c35690b0a'
 const tx = showcaseText
 
 export function getShowcaseEvidenceLabel(item: ShowcaseCase, locale: string) {
-  if (item.provenance === 'platform') return locale === 'zh' ? '本站制作' : 'Made here'
-  if (item.evidenceKind === 'template') return locale === 'zh' ? '作者模板' : 'Author template'
-  if (item.evidenceKind === 'style-study') return locale === 'zh' ? '作者风格示例' : 'Author style study'
-  return locale === 'zh' ? '作者案例' : 'Author example'
+  if (item.provenance === 'platform') return galleryCopy(locale, 'Made here', '本站制作')
+  if (item.evidenceKind === 'template') return galleryCopy(locale, 'Author template', '作者模板')
+  if (item.evidenceKind === 'style-study') return galleryCopy(locale, 'Author style study', '作者风格示例')
+  return galleryCopy(locale, 'Author example', '作者案例')
 }
 
 const expandedCases: ShowcaseCase[] = curatedEntries.map((entry) => {
@@ -354,13 +356,14 @@ export function isMissingShowcasePath(pathname: string) {
 }
 
 export function filterShowcaseCases(category: string, query: string, skillCreatorId = '', tagId = '') {
-  const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
+  const terms = query.normalize('NFKC').trim().toLowerCase().split(/\s+/).filter(Boolean)
   return SHOWCASE_CASES.filter((item) => {
     const skill = getShowcaseSkill(item.skillSlug)
     const skillCreator = getShowcaseCreator(skill.creatorId)
     const artworkCreator = getShowcaseCreator(item.creatorId)
     const tags = getShowcaseTags(item)
-    const searchable = [item.title.en, item.title.zh, item.description.en, item.description.zh, skill.name, item.category, skillCreator.name, skillCreator.githubUsername, artworkCreator.name, ...tags.map((tag) => tag.aliases)].join(' ').toLowerCase()
+    const categoryLabel = SHOWCASE_CATEGORIES.find((entry) => entry.id === item.category)!.label
+    const searchable = [editorialSearchText(item.title), editorialSearchText(item.description), editorialSearchText(categoryLabel), skill.name, item.category, skillCreator.name, skillCreator.githubUsername, artworkCreator.name, ...tags.flatMap((tag) => [tag.aliases, editorialSearchText(tag.label)])].join(' ').normalize('NFKC').toLowerCase()
     return (category === 'all' || item.category === category) && (!skillCreatorId || skill.creatorId === skillCreatorId) && (!tagId || tags.some((tag) => tag.id === tagId)) && terms.every((term) => searchable.includes(term))
   })
 }

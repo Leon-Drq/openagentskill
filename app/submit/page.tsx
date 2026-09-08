@@ -1,5 +1,8 @@
 'use client'
 
+import { submissionCopy } from '@/lib/i18n/submission-copy'
+import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
+
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { SkillSubmitForm, SubmitFormData } from '@/components/skill-submit-form'
@@ -35,7 +38,6 @@ type SubmissionState = {
 
 export default function SubmitPage() {
   const { locale } = useI18n()
-  const zh = locale === 'zh'
   const [receipt, setReceipt] = useState<SubmissionReceipt | null>(null)
   const [result, setResult] = useState<SubmissionState | null>(null)
 
@@ -70,7 +72,7 @@ export default function SubmitPage() {
       body: JSON.stringify(data),
     })
     const payload = await response.json()
-    if (!response.ok) throw new Error(payload.error || (zh ? '提交失败。' : 'Submission failed.'))
+    if (!response.ok) throw new Error(payload.error || (submissionCopy(locale, "Submission failed.", "提交失败。")))
 
     const nextReceipt = payload.submission as SubmissionReceipt
     setReceipt(nextReceipt)
@@ -94,15 +96,13 @@ export default function SubmitPage() {
           <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
           <div className="relative mx-auto max-w-6xl px-6 py-14 text-center sm:py-16 lg:py-20">
             <p className="font-mono text-xs uppercase tracking-[0.24em] text-secondary">
-              {zh ? '开放提交 · 0 STAR 可用' : 'OPEN SUBMISSION · ZERO STARS OK'}
+              {submissionCopy(locale, "OPEN SUBMISSION · ZERO STARS OK", "开放提交 · 0 STAR 可用")}
             </p>
             <h1 className="mx-auto mt-5 max-w-4xl font-display text-4xl font-normal leading-[0.98] text-balance sm:text-5xl lg:text-6xl">
-              {zh ? '粘贴一个链接，让 Skill 被发现' : 'Paste one link. Make your skill discoverable.'}
+              {submissionCopy(locale, "Paste one link. Make your skill discoverable.", "粘贴一个链接，让 Skill 被发现")}
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-secondary sm:text-lg">
-              {zh
-                ? '支持仓库、子目录和 SKILL.md 链接。先进入社区队列，再异步审核；不再要求 Star、README、分类或标签。'
-                : 'Repository, subdirectory, and SKILL.md URLs are supported. We save first and review asynchronously—no star, README, category, or tag gate.'}
+              {submissionCopy(locale, "Repository, subdirectory, and SKILL.md URLs are supported. We save first and review asynchronously—no star, README, category, or tag gate.", "支持仓库、子目录和 SKILL.md 链接。先进入社区队列，再异步审核；不再要求 Star、README、分类或标签。")}
             </p>
           </div>
         </section>
@@ -113,14 +113,14 @@ export default function SubmitPage() {
           ) : (
             <section className="mx-auto max-w-2xl border border-border bg-card p-6 sm:p-8">
               <p className="font-mono text-xs uppercase tracking-[0.2em] text-secondary">
-                {finished ? (zh ? '处理完成' : 'PROCESSING COMPLETE') : (zh ? '已保存' : 'SAVED')}
+                {finished ? (submissionCopy(locale, "PROCESSING COMPLETE", "处理完成")) : (submissionCopy(locale, "SAVED", "已保存"))}
               </p>
               <h1 className="mt-3 font-display text-3xl">
-                {status === 'reviewed' && (zh ? '已通过审核并发布' : 'Reviewed and published')}
-                {status === 'listed' && (zh ? '已进入社区待审队列' : 'Listed for community review')}
-                {status === 'duplicate' && (zh ? '这个 Skill 已经收录' : 'This skill is already listed')}
-                {status === 'quarantined' && (zh ? '已隔离，暂不公开' : 'Quarantined and not public')}
-                {(!finished || !status) && (zh ? '正在执行安全与质量审核' : 'Security and quality review in progress')}
+                {status === 'reviewed' && (submissionCopy(locale, "Reviewed and published", "已通过审核并发布"))}
+                {status === 'listed' && (submissionCopy(locale, "Listed for community review", "已进入社区待审队列"))}
+                {status === 'duplicate' && (submissionCopy(locale, "This skill is already listed", "这个 Skill 已经收录"))}
+                {status === 'quarantined' && (submissionCopy(locale, "Quarantined and not public", "已隔离，暂不公开"))}
+                {(!finished || !status) && (submissionCopy(locale, "Security and quality review in progress", "正在执行安全与质量审核"))}
               </h1>
               <p className="mt-4 text-sm leading-6 text-secondary">
                 {result?.skill.name || receipt.skill.name} · <span className="font-mono">{receipt.skill.path}</span>
@@ -129,23 +129,23 @@ export default function SubmitPage() {
               {result?.skill.slug && (
                 <div className="mt-5 border border-border bg-background p-4">
                   <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
-                    {zh ? '公开 Skill 地址' : 'PUBLIC SKILL URL'}
+                    {submissionCopy(locale, "PUBLIC SKILL URL", "公开 Skill 地址")}
                   </p>
                   <Link
-                    href={`/skills/${result.skill.slug}`}
+                    href={getLocalizedNavigationHref(`/skills/${result.skill.slug}`, locale)}
                     className="mt-2 block break-all font-mono text-sm font-semibold underline underline-offset-4"
                   >
                     https://www.openagentskill.com/skills/{result.skill.slug}
                   </Link>
                   <p className="mt-2 text-xs text-secondary">
-                    {zh ? '公开 slug：' : 'Public slug: '}<span className="font-mono">{result.skill.slug}</span>
+                    {submissionCopy(locale, "Public slug: ", "公开 slug：")}<span className="font-mono">{result.skill.slug}</span>
                   </p>
                 </div>
               )}
 
               {result?.review?.issues && result.review.issues.length > 0 && (
                 <div className="mt-6 border border-border p-4">
-                  <p className="font-semibold">{zh ? '发现的问题' : 'Review notes'}</p>
+                  <p className="font-semibold">{submissionCopy(locale, "Review notes", "发现的问题")}</p>
                   <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-secondary">
                     {result.review.issues.map((issue) => <li key={issue}>{issue}</li>)}
                   </ul>
@@ -153,7 +153,7 @@ export default function SubmitPage() {
               )}
               {result?.review?.suggestions && result.review.suggestions.length > 0 && (
                 <div className="mt-4 border border-border p-4">
-                  <p className="font-semibold">{zh ? '改进建议' : 'Suggestions'}</p>
+                  <p className="font-semibold">{submissionCopy(locale, "Suggestions", "改进建议")}</p>
                   <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-secondary">
                     {result.review.suggestions.map((suggestion) => <li key={suggestion}>{suggestion}</li>)}
                   </ul>
@@ -162,32 +162,32 @@ export default function SubmitPage() {
 
               <div className="mt-7 flex flex-wrap gap-3">
                 {result?.skill.slug && (
-                  <Link href={`/skills/${result.skill.slug}`} className="bg-foreground px-5 py-2.5 text-sm font-semibold text-background">
-                    {zh ? '查看 Skill' : 'View skill'}
+                  <Link href={getLocalizedNavigationHref(`/skills/${result.skill.slug}`, locale)} className="bg-foreground px-5 py-2.5 text-sm font-semibold text-background">
+                    {submissionCopy(locale, "View skill", "查看 Skill")}
                   </Link>
                 )}
                 {status === 'listed' && (
-                  <Link href="/skills/new" className="border border-foreground px-5 py-2.5 text-sm font-semibold">
-                    {zh ? '查看社区队列' : 'View community queue'}
+                  <Link href={getLocalizedNavigationHref('/skills/new', locale)} className="border border-foreground px-5 py-2.5 text-sm font-semibold">
+                    {submissionCopy(locale, "View community queue", "查看社区队列")}
                   </Link>
                 )}
                 <button type="button" onClick={() => { setReceipt(null); setResult(null) }} className="border border-border px-5 py-2.5 text-sm">
-                  {zh ? '再提交一个' : 'Submit another'}
+                  {submissionCopy(locale, "Submit another", "再提交一个")}
                 </button>
               </div>
               <p className="mt-6 break-all font-mono text-[11px] leading-5 text-secondary">
-                {zh ? '私密状态链接：' : 'Private status URL: '}{receipt.statusUrl}
+                {submissionCopy(locale, "Private status URL: ", "私密状态链接：")}{receipt.statusUrl}
               </p>
             </section>
           )}
 
           <section className="mx-auto mt-10 max-w-2xl border-t border-border pt-8">
-            <h2 className="font-display text-2xl">{zh ? '新的收录规则' : 'How listing now works'}</h2>
+            <h2 className="font-display text-2xl">{submissionCopy(locale, "How listing now works", "新的收录规则")}</h2>
             <div className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
               {[
-                zh ? '1. 有效 SKILL.md 即可提交' : '1. Submit any valid SKILL.md',
-                zh ? '2. 先保存，再异步审核' : '2. Save first, review async',
-                zh ? '3. 高风险内容隔离，其余进入社区队列' : '3. Quarantine critical risk; queue the rest',
+                submissionCopy(locale, "1. Submit any valid SKILL.md", "1. 有效 SKILL.md 即可提交"),
+                submissionCopy(locale, "2. Save first, review async", "2. 先保存，再异步审核"),
+                submissionCopy(locale, "3. Quarantine critical risk; queue the rest", "3. 高风险内容隔离，其余进入社区队列"),
               ].map((item) => <div key={item} className="border border-border p-4 leading-6">{item}</div>)}
             </div>
           </section>

@@ -1,5 +1,7 @@
 'use client'
 
+import { siteCopy } from '@/lib/i18n/site-copy'
+
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
@@ -77,42 +79,42 @@ export function SiteFooter() {
             </div>
           </div>
 
-          <nav className="grid gap-8 text-sm sm:grid-cols-3" aria-label="Footer navigation">
+          <nav className="grid gap-8 text-sm sm:grid-cols-3" aria-label={siteCopy(locale, "Footer navigation")}>
             <div>
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">{shell.footerExplore}</h2>
               <div className="mt-4 grid gap-2 text-secondary">
                 <FooterLink href="/skills" className="hover:text-foreground">{t.nav.skills}</FooterLink>
                 <FooterLink href="/showcase" className="hover:text-foreground">{getShowcaseNavLabel(locale)}</FooterLink>
-                <FooterLink href="/skills/new" className="hover:text-foreground">New submissions</FooterLink>
+                <FooterLink href="/skills/new" className="hover:text-foreground">{siteCopy(locale, "New submissions")}</FooterLink>
                 <FooterLink href="/agent-skills" className="hover:text-foreground">Agent Skills</FooterLink>
-                <FooterLink href="/agent-skill" className="hover:text-foreground">What Is an Agent Skill?</FooterLink>
+                <FooterLink href="/agent-skill" className="hover:text-foreground">{siteCopy(locale, "What Is an Agent Skill?")}</FooterLink>
                 <FooterLink href="/ai-agent-skills" className="hover:text-foreground">AI Agent Skills</FooterLink>
-                <FooterLink href="/tasks" className="hover:text-foreground">Tasks</FooterLink>
-                <FooterLink href="/skill-packs" className="hover:text-foreground">Installable Packs</FooterLink>
-                <FooterLink href="/best" className="hover:text-foreground">Best Skills</FooterLink>
-                <FooterLink href="/trending" className="hover:text-foreground">Trending</FooterLink>
-                <FooterLink href="/collections" className="hover:text-foreground">Workflow Recipes</FooterLink>
-                <FooterLink href="/use-cases" className="hover:text-foreground">Use Cases</FooterLink>
-                <FooterLink href="/agents" className="hover:text-foreground">Agents</FooterLink>
-                <FooterLink href="/agent" className="hover:text-foreground">Agent Entry</FooterLink>
+                <FooterLink href="/tasks" className="hover:text-foreground">{t.nav.tasks}</FooterLink>
+                <FooterLink href="/skill-packs" className="hover:text-foreground">{t.nav.packs}</FooterLink>
+                <FooterLink href="/best" className="hover:text-foreground">{siteCopy(locale, "Best Skills")}</FooterLink>
+                <FooterLink href="/trending" className="hover:text-foreground">{t.nav.trending}</FooterLink>
+                <FooterLink href="/collections" className="hover:text-foreground">{siteCopy(locale, "Workflow Recipes")}</FooterLink>
+                <FooterLink href="/use-cases" className="hover:text-foreground">{t.nav.useCases}</FooterLink>
+                <FooterLink href="/agents" className="hover:text-foreground">{siteCopy(locale, "Agents")}</FooterLink>
+                <FooterLink href="/agent" className="hover:text-foreground">{t.nav.agentEntry}</FooterLink>
               </div>
             </div>
 
             <div>
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">{shell.footerTrust}</h2>
               <div className="mt-4 grid gap-2 text-secondary">
-                <FooterLink href="/compare" className="hover:text-foreground">Compare</FooterLink>
-                <FooterLink href="/safety" className="hover:text-foreground">Safety Gate</FooterLink>
-                <FooterLink href="/agent-skills-registry" className="hover:text-foreground">Skills Registry</FooterLink>
-                <FooterLink href="/rankings" className="hover:text-foreground">Rankings</FooterLink>
-                <FooterLink href="/outcomes" className="hover:text-foreground">Outcomes</FooterLink>
-                <FooterLink href="/audits" className="hover:text-foreground">Audits</FooterLink>
-                <FooterLink href="/official" className="hover:text-foreground">Official</FooterLink>
-                <FooterLink href="/reports/weekly" className="hover:text-foreground">Weekly Reports</FooterLink>
-                <FooterLink href="/reports/monthly" className="hover:text-foreground">Monthly Index</FooterLink>
-                <FooterLink href="/reports/state-of-agent-skills-2026" className="hover:text-foreground">State of Agent Skills</FooterLink>
+                <FooterLink href="/compare" className="hover:text-foreground">{t.nav.compare}</FooterLink>
+                <FooterLink href="/safety" className="hover:text-foreground">{t.nav.safety}</FooterLink>
+                <FooterLink href="/agent-skills-registry" className="hover:text-foreground">{siteCopy(locale, "Skills Registry")}</FooterLink>
+                <FooterLink href="/rankings" className="hover:text-foreground">{t.nav.rankings}</FooterLink>
+                <FooterLink href="/outcomes" className="hover:text-foreground">{t.nav.outcomes}</FooterLink>
+                <FooterLink href="/audits" className="hover:text-foreground">{siteCopy(locale, "Audits")}</FooterLink>
+                <FooterLink href="/official" className="hover:text-foreground">{siteCopy(locale, "Official")}</FooterLink>
+                <FooterLink href="/reports/weekly" className="hover:text-foreground">{siteCopy(locale, "Weekly Reports")}</FooterLink>
+                <FooterLink href="/reports/monthly" className="hover:text-foreground">{siteCopy(locale, "Monthly Index")}</FooterLink>
+                <FooterLink href="/reports/state-of-agent-skills-2026" className="hover:text-foreground">{siteCopy(locale, "State of Agent Skills")}</FooterLink>
                 <FooterLink href="/compare/openagentskill-vs-skills-sh" className="hover:text-foreground">vs skills.sh</FooterLink>
-                <FooterLink href="/alternatives/agentskills-io" className="hover:text-foreground">AgentSkills.io Alternative</FooterLink>
+                <FooterLink href="/alternatives/agentskills-io" className="hover:text-foreground">{siteCopy(locale, "AgentSkills.io Alternative")}</FooterLink>
               </div>
             </div>
 
@@ -120,18 +122,18 @@ export function SiteFooter() {
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">{shell.footerBuild}</h2>
               <div className="mt-4 grid gap-2 text-secondary">
                 <FooterLink href="/docs" className="hover:text-foreground">{t.nav.docs}</FooterLink>
-                <FooterLink href="/about" className="hover:text-foreground">About</FooterLink>
-                <FooterLink href="/contact" className="hover:text-foreground">Contact</FooterLink>
+                <FooterLink href="/about" className="hover:text-foreground">{siteCopy(locale, "About")}</FooterLink>
+                <FooterLink href="/contact" className="hover:text-foreground">{siteCopy(locale, "Contact")}</FooterLink>
                 <FooterLink href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</FooterLink>
                 <FooterLink href="/llms.txt" className="hover:text-foreground">llms.txt</FooterLink>
                 <FooterLink href="/openapi.json" className="hover:text-foreground">OpenAPI</FooterLink>
                 <FooterLink href="/cli" className="hover:text-foreground">CLI</FooterLink>
-                <FooterLink href="/creator-kit" className="hover:text-foreground">Creator Kit</FooterLink>
-                <FooterLink href="/creators" className="hover:text-foreground">Creator Registry</FooterLink>
-                <FooterLink href="/x-kit" className="hover:text-foreground">X Growth Kit</FooterLink>
+                <FooterLink href="/creator-kit" className="hover:text-foreground">{t.nav.creatorKit}</FooterLink>
+                <FooterLink href="/creators" className="hover:text-foreground">{t.nav.creators}</FooterLink>
+                <FooterLink href="/x-kit" className="hover:text-foreground">{siteCopy(locale, "X Growth Kit")}</FooterLink>
                 <FooterLink href="/submit" className="hover:text-foreground">{t.nav.submit}</FooterLink>
-                <FooterLink href="/blog" className="hover:text-foreground">Blog</FooterLink>
-                <FooterLink href="/guides" className="hover:text-foreground">Guides</FooterLink>
+                <FooterLink href="/blog" className="hover:text-foreground">{t.nav.blog}</FooterLink>
+                <FooterLink href="/guides" className="hover:text-foreground">{t.nav.guides}</FooterLink>
                 <FooterLink href="/activity" className="hover:text-foreground">{t.nav.activity}</FooterLink>
               </div>
             </div>
@@ -142,7 +144,7 @@ export function SiteFooter() {
           <span>{shell.footerRegistry}</span>
           <div className="flex flex-wrap items-center gap-4">
             <FooterLink href="/privacy" className="transition-colors hover:text-foreground">{shell.footerPrivacy}</FooterLink>
-            <FooterLink href="/contact" className="transition-colors hover:text-foreground">Contact</FooterLink>
+            <FooterLink href="/contact" className="transition-colors hover:text-foreground">{siteCopy(locale, "Contact")}</FooterLink>
             <span>{shell.footerTagline}</span>
           </div>
         </div>

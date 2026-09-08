@@ -1,8 +1,11 @@
 'use client'
 
+import { siteCopy, localizeSiteText } from '@/lib/i18n/site-copy'
+
 import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ArrowUpRight, Github, Search } from 'lucide-react'
+import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import type { Locale } from '@/lib/i18n/config'
 import { useI18n } from '@/lib/i18n/context'
 import { USE_CASES } from '@/lib/use-cases'
@@ -929,7 +932,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
               <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
             </a>
             <Link
-              href="/api-docs"
+              href={getLocalizedNavigationHref("/api-docs", locale)}
               className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border border-transparent px-2 font-mono text-xs text-[#6d675e] transition-colors hover:text-[#1d1b18] sm:w-auto"
             >
               {copy.registryApi}
@@ -959,21 +962,16 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d675e]">GitHub popularity leaderboard</p>
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d675e]">{siteCopy(locale, "GitHub popularity leaderboard")}</p>
               <h2
                 className="mt-3 text-3xl font-normal leading-tight tracking-normal md:text-5xl"
                 style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-              >
-                The most-starred agent skill projects.
-              </h2>
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[#5f5a52] md:text-base">
-                Popularity starts with GitHub stars, then OpenAgentSkill filters out weak skill matches and keeps trust signals visible before install.
-              </p>
+              >{siteCopy(locale, "The most-starred agent skill projects.")}</h2>
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[#5f5a52] md:text-base">{siteCopy(locale, "Popularity starts with GitHub stars, then OpenAgentSkill filters out weak skill matches and keeps trust signals visible before install.")}</p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               {rankingGeneratedAt && (
-                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#6d675e]">
-                  Updated {new Date(rankingGeneratedAt).toLocaleString('en-US', {
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#6d675e]">{siteCopy(locale, "Updated")}{' '}{new Date(rankingGeneratedAt).toLocaleString(locale, {
                     timeZone: 'UTC',
                     month: 'short',
                     day: 'numeric',
@@ -983,26 +981,24 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                 </span>
               )}
               <Link
-                href="/rankings"
+                href={getLocalizedNavigationHref("/rankings", locale)}
                 className="inline-flex h-10 items-center gap-2 rounded-[8px] border border-[#d8d2c6] bg-[#fffdf8] px-4 text-sm font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
-              >
-                View all rankings
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              >{siteCopy(locale, "View all rankings")}<ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
           </div>
 
-          <nav className="mt-7 flex gap-2 overflow-x-auto pb-1" aria-label="Leaderboard views">
+          <nav className="mt-7 flex gap-2 overflow-x-auto pb-1" aria-label={siteCopy(locale, "Leaderboard views")}>
             {[
-              ['/rankings/most-starred-agent-skills', 'Most starred'],
-              ['/trending', 'Trending'],
-              ['/rankings/new-agent-skills-this-week', 'New this week'],
-              ['/rankings/highest-quality-agent-skills', 'Quality'],
-              ['/rankings/agent-proven', 'Agent proven'],
+              ['/rankings/most-starred-agent-skills', siteCopy(locale, 'Most starred')],
+              ['/trending', siteCopy(locale, 'Trending')],
+              ['/rankings/new-agent-skills-this-week', siteCopy(locale, 'New this week')],
+              ['/rankings/highest-quality-agent-skills', siteCopy(locale, 'Quality')],
+              ['/rankings/agent-proven', siteCopy(locale, 'Agent proven')],
             ].map(([href, label], index) => (
               <Link
                 key={href}
-                href={href}
+                href={getLocalizedNavigationHref(href, locale)}
                 className={`shrink-0 rounded-full border px-3.5 py-2 text-xs font-semibold transition-colors ${
                   index === 0
                     ? 'border-[#006b4f] bg-[#006b4f] text-white'
@@ -1017,6 +1013,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
           {featuredSkills.length > 0 ? (
             <div className="mt-6">
               <GitHubPopularityList
+                locale={locale}
                 items={featuredSkills.map((skill) => ({
                   rank: skill.rank,
                   slug: skill.slug,
@@ -1033,9 +1030,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
               />
             </div>
           ) : (
-            <div className="mt-6 rounded-[10px] border border-dashed border-[#d8d2c6] bg-[#fffdf8] p-6 text-sm leading-relaxed text-[#5f5a52]">
-              The first daily leaderboard snapshot is being generated. Browse the live rankings while the scheduled snapshot is prepared.
-            </div>
+            <div className="mt-6 rounded-[10px] border border-dashed border-[#d8d2c6] bg-[#fffdf8] p-6 text-sm leading-relaxed text-[#5f5a52]">{siteCopy(locale, "The first daily leaderboard snapshot is being generated. Browse the live rankings while the scheduled snapshot is prepared.")}</div>
           )}
         </div>
       </section>
@@ -1069,7 +1064,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                   onClick={() => runRecommendation(useCase.heroPrompt)}
                   className="rounded-full border border-[#d8d2c6] bg-[#fffdf8]/80 px-3 py-1.5 text-xs font-medium text-[#5f5a52] transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
                 >
-                  {useCase.shortTitle}
+                  {localizeSiteText(locale, useCase.shortTitle)}
                 </button>
               ))}
             </div>
@@ -1160,7 +1155,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                               {copy.safety} {rec.safety.score}
                             </span>
                           </div>
-                          <Link href={`/skills/${rec.skill.slug}`} className="text-lg font-semibold hover:text-[#006b4f]">
+                          <Link href={getLocalizedNavigationHref(`/skills/${rec.skill.slug}`, locale)} className="text-lg font-semibold hover:text-[#006b4f]">
                             {rec.skill.name}
                           </Link>
                           <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[#5f5a52]">
@@ -1194,9 +1189,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                           </div>
                           {i === 0 && resolveResult?.agent_decision?.risk_summary && (
                             <div className="mt-3 rounded-[8px] border border-[#e0dbd2] bg-[#fbfaf6] p-3">
-                              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6d675e]">
-                                Risk summary
-                              </p>
+                              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6d675e]">{siteCopy(locale, "Risk summary")}</p>
                               <p className="mt-1 text-xs leading-relaxed text-[#5f5a52]">
                                 {resolveResult.agent_decision.risk_summary.safety} · {resolveResult.agent_decision.risk_summary.trust}
                               </p>
@@ -1221,7 +1214,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                               {copy.installApi}
                             </Link>
                             <Link
-                              href={`/skills/${rec.skill.slug}`}
+                              href={getLocalizedNavigationHref(`/skills/${rec.skill.slug}`, locale)}
                               className="flex min-h-10 flex-1 basis-[96px] items-center justify-center rounded-[8px] border border-[#d8d2c6] px-3 py-2 text-center text-xs font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
                             >
                               {copy.details}
@@ -1371,7 +1364,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                         className="text-xl leading-tight"
                         style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
                       >
-                        {layer.label}
+                        {localizeSiteText(locale, layer.label)}
                       </h3>
                       {layer.accent && (
                         <span className="rounded-full border border-[#006b4f]/25 bg-[#fbfaf6] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-[#006b4f]">
@@ -1379,7 +1372,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                         </span>
                       )}
                     </div>
-                    <p className="mt-1.5 text-sm leading-relaxed text-[#5f5a52]">{layer.desc}</p>
+                    <p className="mt-1.5 text-sm leading-relaxed text-[#5f5a52]">{localizeSiteText(locale, layer.desc)}</p>
                   </div>
 
                   <div className="col-span-2 flex flex-wrap items-center gap-2 md:col-span-1 md:justify-end">
@@ -1397,13 +1390,11 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
             <aside className="lg:col-span-5">
               <div className="sticky top-24 overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8] shadow-[0_18px_55px_rgba(29,27,24,0.05)]">
                 <div className="border-b border-[#d8d2c6] bg-[#f2f0e9]/70 px-5 py-4">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#6d675e]">Execution loop</p>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#6d675e]">{siteCopy(locale, "Execution loop")}</p>
                   <h3
                     className="mt-1 text-2xl leading-none"
                     style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-                  >
-                    Discover → Inspect → Install
-                  </h3>
+                  >{siteCopy(locale, "Discover → Inspect → Install")}</h3>
                 </div>
                 <div className="divide-y divide-[#e4e0d8]">
                   {DEMO_RECOMMENDATIONS.map((item, index) => (
@@ -1414,7 +1405,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                       <div>
                         <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6d675e]">{item.score}/100 fit</p>
                         <h4 className="mt-1 font-medium">{item.name}</h4>
-                        <p className="mt-1.5 text-sm leading-relaxed text-[#5f5a52]">{item.fit}</p>
+                        <p className="mt-1.5 text-sm leading-relaxed text-[#5f5a52]">{localizeSiteText(locale, item.fit)}</p>
                       </div>
                     </div>
                   ))}
@@ -1428,8 +1419,8 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
       <section className="border-b border-[#e4e0d8] px-6 py-20 md:py-28">
         <div className="mx-auto max-w-6xl">
           <SectionHeading
-            eyebrow="Quickstart"
-            title="From task description to install command."
+            eyebrow={siteCopy(locale, "Quickstart")}
+            title={siteCopy(locale, "From task description to install command.")}
           />
 
           <ol className="mt-12 grid gap-6 md:grid-cols-2">
@@ -1444,9 +1435,9 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                       className="text-xl tracking-normal"
                       style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
                     >
-                      {step.title}
+                      {localizeSiteText(locale, step.title)}
                     </h3>
-                    <p className="mt-1 text-sm leading-relaxed text-[#5f5a52]">{step.desc}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-[#5f5a52]">{localizeSiteText(locale, step.desc)}</p>
                   </div>
                 </div>
                 <pre className="mt-5 overflow-x-auto border-t border-[#e4e0d8] bg-[#f2f0e9]/70 p-5 font-mono text-[12.5px] leading-relaxed text-[#3f3b35]">
@@ -1457,7 +1448,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
           </ol>
 
           <div className="mt-10 flex flex-wrap items-center gap-3 rounded-[10px] border border-dashed border-[#d8d2c6] bg-[#fffdf8] p-5 text-sm text-[#5f5a52]">
-            <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#1d1b18]">Agent surfaces</span>
+            <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#1d1b18]">{siteCopy(locale, "Agent surfaces")}</span>
             <span>Codex, Claude Code, Cursor, MCP-compatible agents, and custom internal runners.</span>
           </div>
         </div>
@@ -1478,9 +1469,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
               <table className="w-full min-w-[860px] border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-[#d8d2c6]">
-                    <th className="w-[23%] px-4 py-4 font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">
-                      Feature
-                    </th>
+                    <th className="w-[23%] px-4 py-4 font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">{siteCopy(locale, "Feature")}</th>
                     {COMPARISON_LINKS.map((item, index) => (
                       <th
                         key={item.label}
@@ -1507,11 +1496,11 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                 <tbody>
                   {COMPARISON_ROWS.map((row) => (
                     <tr key={row.feature} className="border-b border-[#e4e0d8] last:border-b-0">
-                      <td className="px-4 py-4 text-base font-medium text-[#1d1b18]">{row.feature}</td>
-                      <td className="bg-[#edf5f1] px-4 py-4 font-medium text-[#123b2f]">{row.openagentskill}</td>
-                      <td className="px-4 py-4 text-[#5f5a52]">{row.skillsSh}</td>
-                      <td className="px-4 py-4 text-[#5f5a52]">{row.agentSkills}</td>
-                      <td className="px-4 py-4 text-[#5f5a52]">{row.nativeDocs}</td>
+                      <td className="px-4 py-4 text-base font-medium text-[#1d1b18]">{localizeSiteText(locale, row.feature)}</td>
+                      <td className="bg-[#edf5f1] px-4 py-4 font-medium text-[#123b2f]">{localizeSiteText(locale, row.openagentskill)}</td>
+                      <td className="px-4 py-4 text-[#5f5a52]">{localizeSiteText(locale, row.skillsSh)}</td>
+                      <td className="px-4 py-4 text-[#5f5a52]">{localizeSiteText(locale, row.agentSkills)}</td>
+                      <td className="px-4 py-4 text-[#5f5a52]">{localizeSiteText(locale, row.nativeDocs)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1519,7 +1508,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
             </div>
           </div>
           <p className="mt-5 max-w-3xl text-sm leading-relaxed text-[#6d675e]">
-            Comparison is based on each project&apos;s public positioning and documentation. The point is not that one project replaces another; OpenAgentSkill focuses on the registry and recommendation layer agents can call.
+            {locale === 'en' ? 'Comparison is based on each project’s public positioning and documentation. The point is not that one project replaces another; OpenAgentSkill focuses on the registry and recommendation layer agents can call.' : siteCopy(locale, 'Comparison note')}
           </p>
         </div>
       </section>
@@ -1529,13 +1518,11 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <SectionHeading
-                eyebrow="Workflow starts"
-                title="Start from the job your agent needs to do."
+                eyebrow={siteCopy(locale, "Workflow starts")}
+                title={siteCopy(locale, "Start from the job your agent needs to do.")}
               />
             </div>
-            <Link href="/use-cases" className="inline-flex items-center gap-1 text-sm font-semibold text-[#5f5a52] transition-colors hover:text-[#006b4f]">
-              View all use cases
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            <Link href={getLocalizedNavigationHref("/use-cases", locale)} className="inline-flex items-center gap-1 text-sm font-semibold text-[#5f5a52] transition-colors hover:text-[#006b4f]">{siteCopy(locale, "View all use cases")}<ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
 
@@ -1543,7 +1530,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
             {SCENARIO_RECOMMENDATIONS.map(({ slug, title, task, skills }, index) => (
               <Link
                 key={slug}
-                href={`/use-cases/${slug}`}
+                href={getLocalizedNavigationHref(`/use-cases/${slug}`, locale)}
                 className="group flex min-h-64 flex-col bg-[#fffdf8] p-5 transition-colors hover:bg-[#f7f4ec]"
               >
                 <span className="font-mono text-xs text-[#6d675e]">{String(index + 1).padStart(2, '0')}</span>
@@ -1551,9 +1538,9 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                   className="mt-4 min-h-[1.75rem] text-xl leading-tight"
                   style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
                 >
-                  {title}
+                  {localizeSiteText(locale, title)}
                 </h3>
-                <p className="mt-2 min-h-[2.75rem] text-sm leading-relaxed text-[#5f5a52]">{task}</p>
+                <p className="mt-2 min-h-[2.75rem] text-sm leading-relaxed text-[#5f5a52]">{localizeSiteText(locale, task)}</p>
                 <div className="mt-5 space-y-2">
                   {skills.map((skill) => (
                     <div key={skill} className="flex min-h-9 items-center rounded-full border border-[#e0dbd2] bg-[#fbfaf6] px-3 font-mono text-[11px] text-[#5f5a52]">
@@ -1561,9 +1548,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                     </div>
                   ))}
                 </div>
-                <span className="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-semibold text-[#006b4f]">
-                  Get recommendations
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                <span className="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-semibold text-[#006b4f]">{siteCopy(locale, "Get recommendations")}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                 </span>
               </Link>
             ))}
@@ -1579,27 +1564,18 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
               <h2
                 className="max-w-4xl text-4xl font-normal leading-tight tracking-normal md:text-6xl"
                 style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-              >
-                Registry for humans. Skill layer for agents.
-              </h2>
-              <p className="mt-5 max-w-2xl text-base leading-relaxed text-[#5f5a52] md:text-lg">
-                Browse when you are exploring. Call the recommendation API when your
-                agent needs to pick, compare, and install a skill automatically.
-              </p>
+              >{siteCopy(locale, "Registry for humans. Skill layer for agents.")}</h2>
+              <p className="mt-5 max-w-2xl text-base leading-relaxed text-[#5f5a52] md:text-lg">{siteCopy(locale, "Browse when you are exploring. Call the recommendation API when your agent needs to pick, compare, and install a skill automatically.")}</p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
               <Link
-                href="/skills"
+                href={getLocalizedNavigationHref("/skills", locale)}
                 className="inline-flex h-11 items-center justify-center rounded-[8px] bg-[#006b4f] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              >
-                Browse skills
-              </Link>
+              >{siteCopy(locale, "Browse skills")}</Link>
               <Link
-                href="/api-docs"
+                href={getLocalizedNavigationHref("/api-docs", locale)}
                 className="inline-flex h-11 items-center justify-center rounded-[8px] border border-[#d8d2c6] bg-[#fffdf8] px-5 text-sm font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
-              >
-                Read API docs
-              </Link>
+              >{siteCopy(locale, "Read API docs")}</Link>
             </div>
           </div>
         </div>

@@ -36,7 +36,7 @@ export default async function ShowcaseCasePage({ params, searchParams }: Props) 
   const skill = getShowcaseSkill(item.skillSlug)
   const creator = getShowcaseCreator(skill.creatorId)
   const schema = {
-    '@context': 'https://schema.org', '@type': 'Article', headline: item.title.en, description: item.description.en,
+    '@context': 'https://schema.org', '@type': 'Article', headline: localizeShowcase(item.title, locale), description: localizeShowcase(item.description, locale), inLanguage: locale,
     url: `${BASE_URL}/showcase/${item.slug}`, mainEntityOfPage: `${BASE_URL}/showcase/${item.slug}`,
     image: `${BASE_URL}${item.media[0].src}`, author: { '@type': 'Organization', name: 'OpenAgentSkill', url: BASE_URL },
     datePublished: `${item.updatedAt}T00:00:00+08:00`, dateModified: `${item.updatedAt}T00:00:00+08:00`,
