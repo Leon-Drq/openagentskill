@@ -1,3 +1,4 @@
+import { NavigationHubLinks } from '@/components/navigation-hub-links'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { MarketingPageShell } from '@/components/marketing-page'
@@ -75,6 +76,7 @@ export default async function CreatorsPage({ searchParams }: Props) {
   return (
     <I18nProvider initialLocale={locale}>
       <MarketingPageShell>
+        <NavigationHubLinks hub="creators" />
         <div className="mx-auto max-w-6xl px-5 py-12 sm:px-6 sm:py-16">
           <script
             type="application/ld+json"

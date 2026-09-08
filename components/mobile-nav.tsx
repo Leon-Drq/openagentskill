@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -10,110 +10,55 @@ import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { useI18n } from '@/lib/i18n/context'
 import { getShowcaseNavLabel } from '@/lib/i18n/showcase-label'
-import { getBasePathname, getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
+import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { getShellCopy } from '@/lib/i18n/shell-content'
 import { cn } from '@/lib/utils'
 
-type NavLabelKey =
-  | 'skills'
-  | 'browseSkills'
-  | 'trending'
-  | 'rankings'
-  | 'tasks'
-  | 'packs'
-  | 'compare'
-  | 'forAgents'
-  | 'agentEntry'
-  | 'integrationKit'
-  | 'apiDocs'
-  | 'outcomes'
-  | 'safety'
-  | 'cli'
-  | 'forCreators'
-  | 'creatorConsole'
-  | 'creators'
-  | 'creatorKit'
-  | 'submitSkill'
-  | 'learn'
-  | 'guides'
-  | 'blog'
-  | 'useCases'
-
-type MobileNavItem = {
-  href: string
-  labelKey: NavLabelKey
-}
-
-const mobileSections: Array<{ labelKey: NavLabelKey; items: MobileNavItem[] }> = [
-  {
-    labelKey: 'skills',
-    items: [
-      { href: '/skills', labelKey: 'browseSkills' },
-      { href: '/trending', labelKey: 'trending' },
-      { href: '/rankings', labelKey: 'rankings' },
-      { href: '/tasks', labelKey: 'tasks' },
-      { href: '/skill-packs', labelKey: 'packs' },
-      { href: '/compare', labelKey: 'compare' },
-    ],
-  },
-  {
-    labelKey: 'forAgents',
-    items: [
-      { href: '/agent', labelKey: 'agentEntry' },
-      { href: '/agent/integration-kit', labelKey: 'integrationKit' },
-      { href: '/api-docs', labelKey: 'apiDocs' },
-      { href: '/cli', labelKey: 'cli' },
-      { href: '/safety', labelKey: 'safety' },
-      { href: '/outcomes', labelKey: 'outcomes' },
-    ],
-  },
-  {
-    labelKey: 'forCreators',
-    items: [
-      { href: '/submit', labelKey: 'submitSkill' },
-      { href: '/creators', labelKey: 'creators' },
-      { href: '/creator', labelKey: 'creatorConsole' },
-      { href: '/creator-kit', labelKey: 'creatorKit' },
-    ],
-  },
-  {
-    labelKey: 'learn',
-    items: [
-      { href: '/guides', labelKey: 'guides' },
-      { href: '/blog', labelKey: 'blog' },
-      { href: '/use-cases', labelKey: 'useCases' },
-    ],
-  },
-]
-
-function isActivePath(pathname: string, href: string) {
-  const basePathname = getBasePathname(pathname)
-  return basePathname === href || basePathname.startsWith(`${href}/`)
-}
+import { SITE_NAVIGATION, getNavigationCopy, navigationLabel, isNavigationPath, isNavigationSectionActive } from '@/lib/site-navigation'
 
 export function MobileNav() {
   const { t, locale } = useI18n()
   const shell = getShellCopy(locale)
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
+  const panel = useRef<HTMLDivElement>(null)
+  const trigger = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    if (isOpen) {
-      document.documentElement.style.overflow = 'hidden'
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.documentElement.style.overflow = ''
-      document.body.style.overflow = ''
+    if (!isOpen) return
+    const triggerElement = trigger.current
+    const htmlOverflow = document.documentElement.style.overflow
+    const bodyOverflow = document.body.style.overflow
+    document.documentElement.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden'
+    panel.current?.querySelector<HTMLButtonElement>('button')?.focus()
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { event.preventDefault(); setIsOpen(false) }
+      if (event.key === 'Tab') {
+        const elements = Array.from(panel.current?.querySelectorAll<HTMLElement>('a[href], button, summary, select, [tabindex="0"]') || []).filter(el => el.getClientRects().length && !el.hasAttribute('disabled'))
+        const first = elements[0], last = elements.at(-1)
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
+      }
     }
+    const breakpoint = window.matchMedia('(min-width: 1280px)')
+    const onResize = () => { if (breakpoint.matches) setIsOpen(false) }
+    document.addEventListener('keydown', onKey)
+    breakpoint.addEventListener('change', onResize)
     return () => {
-      document.documentElement.style.overflow = ''
-      document.body.style.overflow = ''
+      document.documentElement.style.overflow = htmlOverflow
+      document.body.style.overflow = bodyOverflow
+      document.removeEventListener('keydown', onKey)
+      breakpoint.removeEventListener('change', onResize)
+      triggerElement?.focus()
     }
   }, [isOpen])
 
   return (
     <div className="xl:hidden">
       <button
+        ref={trigger}
+        aria-expanded={isOpen}
         type="button"
         onClick={() => setIsOpen(true)}
         className="-mr-2 flex h-10 w-10 items-center justify-center rounded-[8px] text-secondary transition-colors hover:bg-muted hover:text-foreground"
@@ -124,7 +69,11 @@ export function MobileNav() {
 
       {isOpen && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 overflow-y-auto bg-background text-foreground"
+          ref={panel}
+          role="dialog"
+          aria-modal="true"
+          aria-label={shell.mobileNavigation}
+          className="fixed inset-0 overflow-y-auto overscroll-contain bg-background text-foreground"
           style={{ zIndex: 9999 }}
         >
           <div className="brand-grain pointer-events-none fixed inset-0 opacity-70" />
@@ -147,79 +96,31 @@ export function MobileNav() {
             className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl flex-col px-6 py-5"
             aria-label={shell.mobileNavigation}
           >
-            <div className="grid gap-2 sm:grid-cols-2">
-              <Link
-                href={getLocalizedNavigationHref('/showcase', locale)}
-                onClick={() => setIsOpen(false)}
-                className="flex min-h-12 items-center justify-between rounded-[8px] border border-[#006b4f]/30 bg-[#006b4f]/5 px-4 py-3 text-base font-semibold text-[#006b4f] sm:col-span-2"
-                aria-current={isActivePath(pathname, '/showcase') ? 'page' : undefined}
-              >
-                {getShowcaseNavLabel(locale)}
-              </Link>
-              <Link
-                href={getLocalizedNavigationHref('/resolve', locale)}
-                onClick={() => setIsOpen(false)}
-                className={cn(
-                  'flex items-center justify-between rounded-[8px] border px-4 py-3 text-base font-semibold transition-colors',
-                  isActivePath(pathname, '/resolve')
-                    ? 'border-[#006b4f]/50 bg-[#006b4f]/5 text-foreground'
-                    : 'border-border bg-card/70 text-foreground hover:border-foreground/40'
-                )}
-                aria-current={isActivePath(pathname, '/resolve') ? 'page' : undefined}
-              >
-                {t.nav.aiSkillFinder}
-                <span className="font-mono text-xs text-[#006b4f]">Resolve</span>
-              </Link>
-              <Link
-                href={getLocalizedNavigationHref('/docs', locale)}
-                onClick={() => setIsOpen(false)}
-                className={cn(
-                  'flex items-center justify-between rounded-[8px] border px-4 py-3 text-base font-semibold transition-colors',
-                  isActivePath(pathname, '/docs')
-                    ? 'border-[#006b4f]/50 bg-[#006b4f]/5 text-foreground'
-                    : 'border-border bg-card/70 text-foreground hover:border-foreground/40'
-                )}
-                aria-current={isActivePath(pathname, '/docs') ? 'page' : undefined}
-              >
-                {t.nav.docs}
-              </Link>
-            </div>
-
-            <div className="mt-4 divide-y divide-border border-y border-border">
-              {mobileSections.map((section) => {
-                const active = section.items.some((item) => isActivePath(pathname, item.href))
-
-                return (
-                  <details key={section.labelKey} className="group" open={active || section.labelKey === 'skills'}>
-                    <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-base font-semibold text-foreground marker:content-none">
-                      {t.nav[section.labelKey]}
-                      <ChevronDown className="h-4 w-4 text-secondary transition-transform group-open:rotate-180" aria-hidden="true" />
+            <div className="divide-y divide-border border-y border-border">
+              {SITE_NAVIGATION.map(section => (
+                <div key={section.id} data-mobile-section={section.id} className="py-1">
+                  <Link href={getLocalizedNavigationHref(section.href, locale)} prefetch={false} onClick={() => setIsOpen(false)}
+                    aria-current={isNavigationPath(pathname, section.href) ? 'page' : undefined}
+                    className={cn('block rounded px-3 py-3 text-base font-semibold', isNavigationSectionActive(pathname, section) && 'text-[#006b4f]')}>
+                    {navigationLabel(section, locale, t.nav, getShowcaseNavLabel(locale))}
+                  </Link>
+                  {section.items && <details className="group px-3" open={isNavigationSectionActive(pathname, section) || section.id === 'skills'}>
+                    <summary className="flex cursor-pointer list-none items-center justify-between pb-3 text-sm text-secondary">
+                      {getNavigationCopy(locale).more}
+                      <ChevronDown className="h-4 w-4 group-open:rotate-180" aria-hidden="true" />
                     </summary>
-                    <ul className="grid gap-x-6 pb-4 sm:grid-cols-2">
-                      {section.items.map((item) => {
-                        const itemActive = isActivePath(pathname, item.href)
-
-                        return (
-                          <li key={item.href}>
-                            <Link
-                              href={getLocalizedNavigationHref(item.href, locale)}
-                              onClick={() => setIsOpen(false)}
-                              className={cn(
-                                'flex items-center justify-between rounded-[6px] px-3 py-2.5 text-sm transition-colors',
-                                itemActive ? 'bg-muted text-foreground' : 'text-secondary hover:bg-muted/60 hover:text-foreground'
-                              )}
-                              aria-current={itemActive ? 'page' : undefined}
-                            >
-                              {t.nav[item.labelKey]}
-                              {itemActive && <span className="h-1.5 w-1.5 rounded-full bg-[#006b4f]" aria-hidden="true" />}
-                            </Link>
-                          </li>
-                        )
-                      })}
+                    <ul className="grid gap-x-6 pb-3 sm:grid-cols-2">
+                      {section.items.map(item => <li key={item.href}>
+                        <Link href={getLocalizedNavigationHref(item.href, locale)} prefetch={false} onClick={() => setIsOpen(false)}
+                          aria-current={isNavigationPath(pathname, item.href) ? 'page' : undefined}
+                          className={cn('block rounded px-3 py-2.5 text-sm hover:bg-muted', isNavigationPath(pathname, item.href) ? 'bg-muted text-foreground' : 'text-secondary')}>
+                          {navigationLabel(item, locale, t.nav, getShowcaseNavLabel(locale))}
+                        </Link>
+                      </li>)}
                     </ul>
-                  </details>
-                )
-              })}
+                  </details>}
+                </div>
+              ))}
             </div>
 
             <div className="mt-auto pt-5">

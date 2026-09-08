@@ -1,3 +1,4 @@
+import { NavigationHubLinks } from '@/components/navigation-hub-links'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
@@ -106,6 +107,7 @@ export default async function AgentPage() {
 
   return (
     <MarketingPageShell>
+      <NavigationHubLinks hub="developers" />
       <MarketingHero
         eyebrow="Agent entry"
         title="Let an agent find, trust, and install the right skill."

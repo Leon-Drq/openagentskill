@@ -1,3 +1,4 @@
+import { NavigationHubLinks } from '@/components/navigation-hub-links'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { MarketingHero, MarketingPageShell } from '@/components/marketing-page'
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 export default function DocsPage() {
   return (
     <MarketingPageShell>
+      <NavigationHubLinks hub="developers" />
         <MarketingHero
           eyebrow="Documentation"
           title="Build with the OpenAgentSkill registry."
