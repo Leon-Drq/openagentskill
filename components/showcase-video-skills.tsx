@@ -9,18 +9,20 @@ import type { Locale } from '@/lib/i18n/config'
 
 export function ShowcaseVideoSkills({ locale }: { locale: Locale }) {
   const zh = locale === 'zh'
-  const sectionRef = useRef<HTMLElement>(null)
+  const sectionRef = useRef<HTMLDetailsElement>(null)
   useEffect(() => {
     // The target is mounted after the query transition, so native hash scrolling
     // can run before it exists. Also covers a shared URL opened directly.
-    if (window.location.hash === '#video-skills') sectionRef.current?.scrollIntoView({ block: 'start' })
+    if (window.location.hash === '#video-skills' && sectionRef.current) {
+      sectionRef.current.open = true
+      sectionRef.current.scrollIntoView({ block: 'start' })
+    }
   }, [])
-  return <section ref={sectionRef} id="video-skills" aria-labelledby="video-skills-heading" className="mt-12 scroll-mt-24 border-t border-[#e4e0d8] pt-8">
-    <p className="font-mono text-[10px] uppercase tracking-widest text-[#006b4f]">{zh ? '技能精选 · 非作品案例' : 'Skill selection · separate from examples'}</p>
-    <h2 id="video-skills-heading" className="mt-3 font-display text-3xl">{zh ? 'AI 产品视频与剪辑' : 'AI product video & editing'}</h2>
-    <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[#6d675e]">{zh ? '按任务选择工具。以下是技能目录入口，不计入作品数量，也不代表本站运行验证；安装前请查看详情页的当前审核状态与使用条件。' : 'Choose by task. These registry links are not extra Gallery examples or runtime verification. Read the detail page for current review status and requirements before installing.'}</p>
-    <ul className="mt-6 divide-y divide-[#e4e0d8]">
-      {SHOWCASE_VIDEO_SKILLS.map((skill) => <li key={skill.slug} className="grid gap-2 py-5 first:pt-0 sm:grid-cols-[1fr_2fr] sm:gap-8">
+  return <details ref={sectionRef} id="video-skills" className="mt-12 scroll-mt-24 rounded-lg border border-[#e4e0d8] p-5 sm:p-6">
+    <summary className="min-h-11 cursor-pointer text-sm font-semibold text-[#006b4f]">{zh ? '相关视频技能 · 5 个工具' : 'Related video skills · 5 tools'}</summary>
+    <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[#6d675e]">{zh ? '想制作产品演示或剪辑视频？查看以下技能的使用条件。它们是工具推荐，不是上方案例的作者归属，也不代表本站实测；没有对应成片的技能不计入作品数量。' : 'Making a product demo or editing footage? Explore these tools and their requirements. Recommendations do not imply authorship of the examples above or platform testing; skills without a showcased output are not counted as examples.'}</p>
+    <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {SHOWCASE_VIDEO_SKILLS.map((skill) => <li key={skill.slug} className="min-w-0 rounded-lg border border-[#e4e0d8] bg-white/50 p-4">
         <div><Link prefetch={false} href={getLocalizedNavigationHref(`/skills/${skill.slug}`, locale)} className="inline-flex min-h-11 items-center text-sm font-semibold text-[#006b4f] underline-offset-4 hover:underline">{skill.name} <span aria-hidden="true" className="ml-2">→</span></Link></div>
         <div>
           <p className="text-sm leading-relaxed">{localizeShowcase(skill.purpose, locale)}</p>
@@ -29,5 +31,5 @@ export function ShowcaseVideoSkills({ locale }: { locale: Locale }) {
         </div>
       </li>)}
     </ul>
-  </section>
+  </details>
 }

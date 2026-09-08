@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { ShowcaseCard } from '@/components/showcase-card'
+import { ShowcaseVideoPlayer } from '@/components/showcase-video-player'
 import { ShowcaseCreatorCredit } from '@/components/showcase-creator'
 import { ShowcaseActions, ShowcaseEngagementProvider } from '@/components/showcase-engagement'
 import { useI18n } from '@/lib/i18n/context'
@@ -26,7 +27,6 @@ function DetailContent({ item }: { item: ShowcaseCase }) {
   const [copied, setCopied] = useState<'task' | 'handoff' | null>(null)
   const [copyError, setCopyError] = useState(false)
   const [started, setStarted] = useState(false)
-  const [videoError, setVideoError] = useState(false)
   const viewed = useRef(false)
   const handoffRef = useRef<HTMLDivElement>(null)
   const media = item.media[activeMedia]
@@ -102,14 +102,7 @@ function DetailContent({ item }: { item: ShowcaseCase }) {
           <div className="min-w-0">
             <figure>
               <div className="overflow-hidden rounded-lg border border-[#e4e0d8] bg-[#eeece5]">
-                {item.videoUrl ? <>
-                  <video controls playsInline preload="none" poster={getShowcaseImageSrc(media.src, 'preview')} className="aspect-video w-full bg-[#1d1b18]" aria-label={title}
-                    onError={() => setVideoError(true)} onPlay={() => trackAnalyticsEvent('showcase_media_play', { case_slug: item.slug, skill_slug: item.skillSlug })}>
-                    <source src={item.videoUrl} type="video/mp4" />
-                    <a href={item.videoUrl}>{zh ? '打开视频' : 'Open video'}</a>
-                  </video>
-                  {videoError && <p role="status" className="p-4 text-sm">{zh ? '视频暂时无法加载。可通过下方链接打开原视频。' : 'The video could not load. Use the link below to open the original.'}</p>}
-                </> : <div className={`${item.category === 'web' && media.height > media.width ? 'max-h-[700px] overflow-y-auto' : 'p-3 sm:p-5'}`} tabIndex={item.category === 'web' && media.height > media.width ? 0 : undefined} role={item.category === 'web' && media.height > media.width ? 'region' : undefined} aria-label={item.category === 'web' && media.height > media.width ? (zh ? '可滚动的完整网页预览' : 'Scrollable full website preview') : undefined}>
+                {item.videoUrl ? <ShowcaseVideoPlayer item={item} locale={locale} priority /> : <div className={`${item.category === 'web' && media.height > media.width ? 'max-h-[700px] overflow-y-auto' : 'p-3 sm:p-5'}`} tabIndex={item.category === 'web' && media.height > media.width ? 0 : undefined} role={item.category === 'web' && media.height > media.width ? 'region' : undefined} aria-label={item.category === 'web' && media.height > media.width ? (zh ? '可滚动的完整网页预览' : 'Scrollable full website preview') : undefined}>
                   <Image key={media.src} src={getShowcaseImageSrc(media.src, 'preview')} alt={localizeShowcase(media.alt, locale)} width={media.width} height={media.height}
                     sizes="(max-width: 1023px) 100vw, 680px" preload
                     className={`h-auto w-full ${item.cardFit === 'contain' ? 'max-h-[690px] object-contain' : ''}`} />

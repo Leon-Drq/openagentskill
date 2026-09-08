@@ -17,16 +17,31 @@ export const SHOWCASE_CATEGORIES: { id: ShowcaseCategory; label: ShowcaseText }[
   { id: 'web', label: showcaseText('Web & UI', '网页与界面') },
   { id: 'slides', label: showcaseText('Slides', '演示文稿') },
   { id: 'image', label: showcaseText('Images', '图像与设计') },
-  { id: 'video', label: showcaseText('Video', '视频创作') },
+  { id: 'video', label: showcaseText('Video', '视频与动画') },
   { id: 'document', label: showcaseText('Documents', '文档与指南') },
 ]
 
 // Uses cross media categories: a logo can be a still mascot or a motion ident.
-export const SHOWCASE_TAGS = [{ id: 'logo', label: showcaseText('Logo & identity', 'Logo 与品牌标识'), aliases: 'logo mascot brand identity 标志 标识 吉祥物 品牌' }] as const
+export const SHOWCASE_TAGS = [
+  { id: 'logo', label: showcaseText('Logo & identity', 'Logo 与品牌标识'), aliases: 'logo mascot brand identity 标志 标识 吉祥物 品牌' },
+  { id: 'product-demo', label: showcaseText('Product promotion', '产品宣传'), aliases: 'product demo launch promotion 产品 演示 发布 宣传' },
+  { id: 'explainer', label: showcaseText('Educational explainers', '知识讲解'), aliases: 'educational explainer teaching 知识 讲解 科普' },
+  { id: 'data-story', label: showcaseText('Data storytelling', '数据讲述'), aliases: 'data chart report storytelling 数据 图表 报告' },
+] as const
 export type ShowcaseTag = typeof SHOWCASE_TAGS[number]['id']
 const SHOWCASE_CASE_TAGS: Partial<Record<string, ShowcaseTag[]>> = {
   'ip-mascot-directions': ['logo'],
   'motion-logo-outro': ['logo'],
+  'motion-bold-signal': ['product-demo'],
+  'motion-takram-organic': ['product-demo'],
+  'football-collage-explainer': ['explainer'],
+  'money-collage-explainer': ['explainer'],
+  'silicon-valley-explainer': ['explainer'],
+  'motion-decision-tree': ['explainer'],
+  'motion-data-chart-nyt': ['data-story'],
+  'motion-nyt-graph': ['data-story'],
+  'motion-pentagram-stat': ['data-story'],
+  'motion-play-mode': ['data-story'],
 }
 export const getShowcaseTags = (item: { slug: string }) => SHOWCASE_TAGS.filter((tag) => SHOWCASE_CASE_TAGS[item.slug]?.includes(tag.id))
 
