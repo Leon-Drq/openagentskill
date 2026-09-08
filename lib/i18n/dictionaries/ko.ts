@@ -27,7 +27,7 @@ const ko = {
     cli: 'CLI',
     forCreators: '크리에이터용',
     creatorConsole: '크리에이터 센터',
-    creators: '크리에이터 레지스트리',
+    creators: '추천 크리에이터',
     creatorKit: '크리에이터 키트',
     learn: '학습',
     guides: '가이드',

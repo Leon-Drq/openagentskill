@@ -5,10 +5,11 @@ import { locales, getLocaleFromRoute } from '../lib/i18n/config.ts'
 import { galleryTranslations, galleryCopy, localizeEditorialText } from '../lib/i18n/gallery-copy.ts'
 import { siteTranslations, siteCopy } from '../lib/i18n/site-copy.ts'
 import { submissionTranslations, submissionCopy } from '../lib/i18n/submission-copy.ts'
+import { creatorTranslations, creatorCopy } from '../lib/i18n/creator-copy.ts'
 import { SHOWCASE_CATEGORIES, SHOWCASE_TAGS, SHOWCASE_CASES, filterShowcaseCases, getShowcaseAccessLabel, getShowcaseEvidenceLabel } from '../lib/showcase.ts'
 
 const placeholders = text => [...text.matchAll(/\{(\w+)\}/g)].map(x=>x[1]).sort()
-for (const [dictionary, size] of [[galleryTranslations, 6], [siteTranslations, 7], [submissionTranslations, 6]]) {
+for (const [dictionary, size] of [[galleryTranslations, 6], [siteTranslations, 7], [submissionTranslations, 6], [creatorTranslations, 7]]) {
   for (const [key, values] of Object.entries(dictionary)) {
     assert.equal(values.length, size, `${key}: all locales must be explicit`)
     for (const value of values) {
@@ -19,6 +20,7 @@ for (const [dictionary, size] of [[galleryTranslations, 6], [siteTranslations, 7
   }
 }
 for (const locale of locales) {
+  assert.ok(creatorCopy(locale, 'Featured creators'))
   assert.equal(getLocaleFromRoute(`/${locale}/submit`, 'invalid'), locale)
   assert.equal(getLocaleFromRoute('/showcase', locale), locale)
   for (const key of ['Analytics preferences', 'Necessary only', 'Allow analytics', 'Privacy details']) assert.ok(siteCopy(locale, key).trim())
@@ -58,4 +60,4 @@ for(const path of guarded) {
   visit(ast)
   assert.ok(!source.includes('&lang=zh'), `${path}: language-specific deep link`)
 }
-console.log(`Localization checks passed: ${locales.length} locales, ${Object.keys(galleryTranslations).length+Object.keys(siteTranslations).length+Object.keys(submissionTranslations).length} messages, placeholders, category coverage and migrated UI guards.`)
+console.log(`Localization checks passed: ${locales.length} locales, ${Object.keys(galleryTranslations).length+Object.keys(siteTranslations).length+Object.keys(submissionTranslations).length+Object.keys(creatorTranslations).length} messages, placeholders, category coverage and migrated UI guards.`)

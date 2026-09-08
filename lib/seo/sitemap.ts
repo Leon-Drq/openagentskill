@@ -21,6 +21,7 @@ import { SKILL_PACKS } from '@/lib/skill-packs'
 import { USE_CASES } from '@/lib/use-cases'
 import { SHOWCASE_CASES, SHOWCASE_UPDATED_AT } from '@/lib/showcase'
 import { createPublicClient } from '@/lib/supabase/public'
+import { FEATURED_CREATORS, creatorHref } from '@/lib/creator-directory'
 import {
   SEARCH_INDEX_MIN_GITHUB_STARS,
   SEARCH_INDEX_MIN_QUALITY_SCORE,
@@ -300,13 +301,14 @@ export function getGuideSitemapEntries(now = new Date()): SitemapEntry[] {
 }
 
 export async function getCreatorSitemapEntries(): Promise<SitemapEntry[]> {
+  const featured = FEATURED_CREATORS.map(creator => ({ url: `${SITEMAP_BASE_URL}${creatorHref(creator.owner)}`, lastModified: creator.checkedAt, changeFrequency: 'weekly' as const, priority: 0.76 }))
   const supabase = createPublicClient({ requestTimeoutMs: 6_500 })
   const { data: claims, error: claimError } = await supabase
     .from('skill_claims')
     .select('user_id,verified_at')
     .eq('status', 'approved')
     .limit(1000)
-  if (claimError || !claims?.length) return []
+  if (claimError || !claims?.length) return featured
 
   const latestByUser = new Map<string, string | null>()
   for (const claim of claims) {
@@ -318,14 +320,14 @@ export async function getCreatorSitemapEntries(): Promise<SitemapEntry[]> {
     .select('id,username,updated_at')
     .in('id', Array.from(latestByUser.keys()))
     .not('username', 'is', null)
-  if (profileError) return []
+  if (profileError) return featured
 
-  return (profiles || []).map((profile) => ({
+  return [...featured, ...(profiles || []).map((profile) => ({
     url: `${SITEMAP_BASE_URL}/creators/${profile.username}`,
     lastModified: profile.updated_at || latestByUser.get(profile.id) || undefined,
     changeFrequency: 'weekly' as const,
     priority: 0.76,
-  }))
+  }))]
 }
 
 export async function getSkillSitemapEntries(section: SitemapSection, index = 0): Promise<SitemapEntry[]> {
