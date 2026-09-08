@@ -89,7 +89,8 @@ function GalleryContent() {
         <section className="mx-auto max-w-6xl px-6 pb-20 pt-8" aria-label={zh ? '浏览作品' : 'Browse examples'}>
           <h2 className="sr-only">{zh ? '浏览作品' : 'Browse examples'}</h2>
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex flex-wrap gap-2" aria-label={zh ? '作品类型' : 'Example categories'}>
+            <div className="flex flex-wrap items-center gap-2" aria-label={zh ? '作品形式' : 'Output format'}>
+              <span className="mr-1 text-xs text-[#6d675e]">{zh ? '形式' : 'Format'}</span>
               {[{ id: 'all', label: { en: 'All work', zh: '全部作品' } }, ...SHOWCASE_CATEGORIES].map((entry) => {
                 const count = entry.id === 'all' ? SHOWCASE_CASES.length : SHOWCASE_CASES.filter((item) => item.category === entry.id).length
                 return <button key={entry.id} type="button" aria-pressed={category === entry.id} onClick={() => filter(entry.id, query)}
@@ -104,19 +105,16 @@ function GalleryContent() {
               <button type="submit" aria-label={zh ? '搜索' : 'Search'} className="flex h-11 w-11 shrink-0 items-center justify-center text-[#006b4f]"><ArrowRight className="h-4 w-4" aria-hidden="true" /></button>
             </form>
           </div>
-          <div className="mt-4 flex flex-wrap items-center gap-2" aria-label={zh ? '用途标签' : 'Use-case tags'}>
-            <span className="mr-1 text-xs text-[#6d675e]">{zh ? '用途' : 'Use case'}</span>
-            {SHOWCASE_TAGS.map((tag) => <button key={tag.id} type="button" aria-pressed={tagId === tag.id} onClick={() => filter(category, query, creatorId, sort, tagId === tag.id ? '' : tag.id)} className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-3 text-xs ${tagId === tag.id ? 'border-[#006b4f] bg-[#edf3ee] text-[#006b4f]' : 'border-[#e4e0d8] text-[#6d675e] hover:border-[#006b4f]'}`}>
-              {localizeShowcase(tag.label, locale)}<span className="font-mono text-[10px]">{filterShowcaseCases(category, query, creatorId, tag.id).length}</span>
-            </button>)}
-            <Link prefetch={false} href={`/showcase?category=video${zh ? '&lang=zh' : ''}#video-skills`} onClick={() => document.getElementById('video-skills')?.scrollIntoView({ block: 'start' })} className="inline-flex min-h-11 items-center gap-2 px-2 text-xs text-[#006b4f] underline-offset-4 hover:underline">{zh ? 'AI 产品视频与剪辑技能' : 'AI product video & editing skills'}<ArrowRight className="h-3 w-3" aria-hidden="true" /></Link>
-          </div>
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">
               <p aria-live="polite" role="status" className="text-xs text-[#6d675e]">{zh ? `${cases.length} 个案例${cases.length ? ` · 当前 ${pagination.offset + 1}–${pagination.offset + pagination.items.length}` : ''}${query ? `，搜索“${query}”` : ''}` : `${cases.length} ${cases.length === 1 ? 'example' : 'examples'}${cases.length ? ` · Showing ${pagination.offset + 1}–${pagination.offset + pagination.items.length}` : ''}${query ? ` for “${query}”` : ''}`}</p>
               {(query || category !== 'all' || creatorId || tagId) && <button type="button" onClick={() => filter('all', '', '', sort, '')} className="inline-flex min-h-11 items-center gap-1 text-xs text-[#006b4f]"><X className="h-3 w-3" aria-hidden="true" />{zh ? '清除筛选' : 'Clear filters'}</button>}
             </div>
             <div className="flex max-w-full flex-wrap gap-2">
+            <select value={tagId} onChange={(event) => filter(category, query, creatorId, sort, event.target.value)} aria-label={zh ? '按用途筛选' : 'Filter by use case'} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
+              <option value="">{zh ? '全部用途' : 'All use cases'}</option>
+              {SHOWCASE_TAGS.map((tag) => { const count = filterShowcaseCases(category, query, creatorId, tag.id).length; return <option key={tag.id} value={tag.id} disabled={!count && tagId !== tag.id}>{localizeShowcase(tag.label, locale)} · {count}</option> })}
+            </select>
             <select value={creatorId} onChange={(event) => filter(category, query, event.target.value)} aria-label={zh ? '按技能作者筛选' : 'Filter by skill creator'} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
               <option value="">{zh ? '全部技能作者' : 'All skill creators'}</option>
               {[...new Set(SHOWCASE_SKILLS.map((skill) => skill.creatorId))].map((id) => <option key={id} value={id}>{getShowcaseCreator(id).name}</option>)}
@@ -127,6 +125,7 @@ function GalleryContent() {
             </select>
             </div>
           </div>
+          {category === 'video' && <p className="mt-4 text-xs leading-relaxed text-[#6d675e]">{zh ? '点击封面播放预览，点击标题查看案例与制作方法。视频仅在点击后加载。' : 'Play a preview on the card; open the title for the task and workflow. Videos load only when you press play.'}</p>}
           {sort === 'top' && <p role="status" className="mt-3 text-xs text-[#6d675e]">{failed ? (zh ? '投票数据暂时不可用，当前按精选顺序展示。' : 'Votes are unavailable. Showing curated order.') : !ready ? (zh ? '正在加载投票排行…' : 'Loading votes…') : (zh ? '按净赞数（赞 − 踩）排序，同分保留精选顺序。' : 'Ranked by likes minus dislikes. Ties keep the curated order.')} {failed && <button type="button" onClick={() => void refresh()} className="min-h-11 text-[#006b4f] underline">{zh ? '重试' : 'Retry'}</button>}</p>}
           {cases.length ? <div className="mt-5 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">{pagination.items.map((item, index) => <ShowcaseCard key={item.slug} item={item} priority={index < 3} />)}</div> : <div className="py-24 text-center">
             <h2 className="font-display text-3xl">{zh ? '还没有匹配的作品' : 'No examples just yet.'}</h2>
@@ -138,7 +137,7 @@ function GalleryContent() {
             {Array.from({ length: pagination.pageCount }, (_, index) => index + 1).map((page) => <Link key={page} prefetch={false} href={pageHref(page)} aria-current={page === pagination.page ? 'page' : undefined} aria-label={zh ? `第 ${page} 页` : `Page ${page}`} className={`inline-flex h-11 min-w-11 items-center justify-center rounded-md border px-3 text-sm ${page === pagination.page ? 'border-[#006b4f] bg-[#006b4f] text-white' : 'border-[#e4e0d8] text-[#6d675e] hover:border-[#006b4f]'}`}>{page}</Link>)}
             {pagination.page < pagination.pageCount && <Link prefetch={false} href={pageHref(pagination.page + 1)} className="inline-flex min-h-11 items-center rounded-md border border-[#e4e0d8] px-4 text-sm">{zh ? '下一页' : 'Next'}</Link>}
           </nav>}
-          {category === 'video' && !tagId && !query && !creatorId && <ShowcaseVideoSkills locale={locale} />}
+          {category === 'video' && <ShowcaseVideoSkills locale={locale} />}
           <div className="mt-16 flex flex-col gap-4 border-t border-[#e4e0d8] pt-7 sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-xl text-sm leading-relaxed text-[#6d675e]">{zh ? '精选作者作品、可复用模板与风格示例，分别标注，另有本站实际制作。每项注明来源、使用条件和提示词性质；作者预览不代表本站复测成功，同一作品的多张截图仅计一项。' : 'Curated work, reusable templates and style studies are labeled separately, alongside work made here. Each names its source, requirements and prompt status. Author previews are not platform retests; multiple views of one work count once.'}</p>
             <Link href={getLocalizedNavigationHref('/skills', locale)} className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-[#006b4f]">{zh ? '浏览全部技能' : 'Explore the skill registry'}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>

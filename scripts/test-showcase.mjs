@@ -64,6 +64,19 @@ for (const item of SHOWCASE_CASES) {
 }
 assert.equal(filterShowcaseCases('all', '').length, SHOWCASE_CASES.length)
 assert.equal(new Set(SHOWCASE_TAGS.map((tag) => tag.id)).size, SHOWCASE_TAGS.length)
+for (const tag of SHOWCASE_TAGS) assert.ok(filterShowcaseCases('all', '', '', tag.id).length > 0, `Use case ${tag.id} needs real examples`)
+assert.equal(filterShowcaseCases('video', '', '', 'product-demo').length, 2)
+assert.equal(filterShowcaseCases('video', '', '', 'explainer').length, 4)
+assert.equal(filterShowcaseCases('video', '', '', 'data-story').length, 4)
+const playerSource = await readFile(new URL('../components/showcase-video-player.tsx', import.meta.url), 'utf8')
+assert.ok(playerSource.includes('started && !failed ? <video'), 'Do not attach video sources before user interaction')
+assert.ok(playerSource.includes('preload="none"') && playerSource.includes('video.pause()'), 'Keep video loading explicit and only one preview audible')
+for (const component of ['showcase-card', 'showcase-detail']) {
+  const source = await readFile(new URL(`../components/${component}.tsx`, import.meta.url), 'utf8')
+  assert.ok(source.includes('<ShowcaseVideoPlayer'), 'Cards and detail must share the same player')
+}
+const gallerySource = await readFile(new URL('../components/showcase-gallery.tsx', import.meta.url), 'utf8')
+assert.ok(gallerySource.includes('Filter by use case') && !gallerySource.includes('#video-skills'), 'Use-case controls must not mix in navigation to a skill directory')
 const logoSlugs = ['ip-mascot-directions', 'motion-logo-outro']
 assert.deepEqual(filterShowcaseCases('all', '', '', 'logo').map((item) => item.slug).sort(), logoSlugs)
 assert.equal(filterShowcaseCases('image', '', '', 'logo').length, 1)
