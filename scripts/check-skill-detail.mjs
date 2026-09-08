@@ -3,12 +3,16 @@ import { readFileSync } from 'node:fs'
 
 const origin = (process.argv[2] || 'http://localhost:3108').replace(/\/$/, '')
 const baseline = process.argv[3] ? JSON.parse(readFileSync(process.argv[3], 'utf8')) : []
-const slugs = ['singpenguin-ppt', 'design-taste-frontend', 'larashero3-dotcom-lieflat-charts', 'yanliudesign-mono-color-skill', 'browser-use-video-use']
+const slugs = ['singpenguin-ppt', 'design-taste-frontend', 'larashero3-dotcom-lieflat-charts', 'yanliudesign-mono-color-skill', 'browser-use-video-use', 'obra-using-superpowers']
 for (const slug of slugs) {
   const response = await fetch(`${origin}/skills/${slug}`, {signal:AbortSignal.timeout(30000)})
   assert.equal(response.status,200,slug)
   const html = await response.text()
   assert.ok(html.includes('data-skill-profile="v2"'),slug)
+  assert.ok(html.includes('data-skill-document-section'),slug)
+  if (slug === 'obra-using-superpowers') {
+    for (const marker of ['data-full-document', 'data-document-metadata', 'data-document-original', 'skill-document-scroll']) assert.ok(html.includes(marker), marker)
+  }
   assert.equal([...html.matchAll(/<h1\b[^>]*>/g)].length,1,slug)
   const canonical = html.match(/<link rel="canonical" href="([^"]+)/)?.[1]
   const robots = html.match(/<meta name="robots" content="([^"]+)/)?.[1]
@@ -49,4 +53,4 @@ for (const locale of ['en','zh','ja','ko','es','de','fr','id']) {
   const canonical = html.match(/<link rel="canonical" href="([^"]+)/i)?.[1]
   assert.equal(new URL(canonical).href, 'https://www.openagentskill.com/skills/singpenguin-ppt', locale)
 }
-console.log('Detail HTTP smoke passed: five profiles, canonical/title/index baseline, eight languages, schema and API consistency.')
+console.log('Detail HTTP smoke passed: six profiles, canonical/title/index baseline, source document controls, eight languages, schema and API consistency.')

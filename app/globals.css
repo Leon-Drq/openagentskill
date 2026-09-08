@@ -150,6 +150,37 @@
 }
 .native-select[aria-invalid='true'] { border-color: var(--destructive); }
 .native-select:disabled { cursor: not-allowed; opacity: 0.5; }
+
+/* Scope source-document typography; repository HTML cannot style the host page. */
+.skill-document { min-width: 0; color: var(--secondary); font-size: 1rem; line-height: 1.8; overflow-wrap: anywhere; }
+.skill-document > :first-child { margin-top: 0; }
+.skill-document p, .skill-document ul, .skill-document ol, .skill-document blockquote { margin-block: 1rem; }
+.skill-document h3, .skill-document h4, .skill-document h5, .skill-document h6 { margin-block: 1.75rem 0.75rem; color: var(--foreground); font-weight: 600; line-height: 1.35; scroll-margin-top: 7rem; }
+.skill-document h3 { font-size: 1.5rem; }
+.skill-document h4 { font-size: 1.25rem; }
+.skill-document h5, .skill-document h6 { font-size: 1.0625rem; }
+.skill-document ul { list-style: disc; padding-inline-start: 1.5rem; }
+.skill-document ol { list-style: decimal; padding-inline-start: 1.5rem; }
+.skill-document li { margin-block: 0.375rem; }
+.skill-document li > p, .skill-document li > ul, .skill-document li > ol { margin-block: 0.375rem; }
+.skill-document strong { color: var(--foreground); font-weight: 600; }
+.skill-document a { color: #006b4f; text-decoration: underline; text-underline-offset: 3px; }
+.skill-document blockquote { border-inline-start: 2px solid #006b4f; padding-inline-start: 1rem; }
+.skill-document hr { border: 0; border-top: 1px solid var(--border); margin-block: 1.5rem; }
+.skill-document code { border-radius: 3px; background: var(--muted); padding: 0.125rem 0.3rem; font-family: var(--font-geist-mono), monospace; font-size: 0.85em; }
+.skill-document pre, .skill-document-raw { max-width: 100%; max-height: 28rem; overflow: auto; padding: 1rem; margin-block: 1rem; border: 1px solid var(--border); border-radius: 4px; background: var(--card); font-size: 0.8125rem; line-height: 1.65; white-space: pre; overflow-wrap: normal; }
+.skill-document pre code { background: transparent; padding: 0; font-size: inherit; }
+.skill-document-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.25rem; border: 1px solid var(--border); border-radius: 4px; }
+.skill-document table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.skill-document th, .skill-document td { min-width: 8rem; max-width: 28rem; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border); text-align: start; vertical-align: top; }
+.skill-document th { background: var(--muted); color: var(--foreground); font-weight: 600; }
+.skill-document tr:last-child td { border-bottom: 0; }
+.skill-document input[type='checkbox'] { margin-inline-end: 0.5rem; }
+.skill-document-disclosure { min-width: 0; border: 1px solid var(--border); border-radius: 4px; padding-inline: 1rem; }
+.skill-document-disclosure > summary, .skill-document summary { padding-block: 0.8rem; min-height: 44px; cursor: pointer; font-size: 0.875rem; color: var(--foreground); font-weight: 600; overflow-wrap: anywhere; }
+.skill-document-disclosure[open] { padding-bottom: 1rem; }
+.skill-document-disclosure > summary:focus-visible, .skill-document :focus-visible, .skill-document-raw:focus-visible { outline: 2px solid #006b4f; outline-offset: 3px; }
+
 @media (min-width: 640px) { .native-select { font-size: 0.875rem; } }
 @media (prefers-reduced-motion: reduce) { .native-select { transition: none; } }
 @media (forced-colors: active) {
