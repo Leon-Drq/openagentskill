@@ -109,7 +109,7 @@ function GalleryContent() {
             {SHOWCASE_TAGS.map((tag) => <button key={tag.id} type="button" aria-pressed={tagId === tag.id} onClick={() => filter(category, query, creatorId, sort, tagId === tag.id ? '' : tag.id)} className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-3 text-xs ${tagId === tag.id ? 'border-[#006b4f] bg-[#edf3ee] text-[#006b4f]' : 'border-[#e4e0d8] text-[#6d675e] hover:border-[#006b4f]'}`}>
               {localizeShowcase(tag.label, locale)}<span className="font-mono text-[10px]">{filterShowcaseCases(category, query, creatorId, tag.id).length}</span>
             </button>)}
-            <Link prefetch={false} href={`/showcase?category=video${zh ? '&lang=zh' : ''}#video-skills`} className="inline-flex min-h-11 items-center gap-2 px-2 text-xs text-[#006b4f] underline-offset-4 hover:underline">{zh ? 'AI 产品视频与剪辑技能' : 'AI product video & editing skills'}<ArrowRight className="h-3 w-3" aria-hidden="true" /></Link>
+            <Link prefetch={false} href={`/showcase?category=video${zh ? '&lang=zh' : ''}#video-skills`} onClick={() => document.getElementById('video-skills')?.scrollIntoView({ block: 'start' })} className="inline-flex min-h-11 items-center gap-2 px-2 text-xs text-[#006b4f] underline-offset-4 hover:underline">{zh ? 'AI 产品视频与剪辑技能' : 'AI product video & editing skills'}<ArrowRight className="h-3 w-3" aria-hidden="true" /></Link>
           </div>
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">

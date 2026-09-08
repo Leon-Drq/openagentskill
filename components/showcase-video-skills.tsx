@@ -1,3 +1,6 @@
+'use client'
+
+import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { SHOWCASE_VIDEO_SKILLS } from '@/lib/showcase-video-skills'
 import { localizeShowcase } from '@/lib/showcase'
@@ -6,7 +9,13 @@ import type { Locale } from '@/lib/i18n/config'
 
 export function ShowcaseVideoSkills({ locale }: { locale: Locale }) {
   const zh = locale === 'zh'
-  return <section id="video-skills" aria-labelledby="video-skills-heading" className="mt-12 scroll-mt-24 border-t border-[#e4e0d8] pt-8">
+  const sectionRef = useRef<HTMLElement>(null)
+  useEffect(() => {
+    // The target is mounted after the query transition, so native hash scrolling
+    // can run before it exists. Also covers a shared URL opened directly.
+    if (window.location.hash === '#video-skills') sectionRef.current?.scrollIntoView({ block: 'start' })
+  }, [])
+  return <section ref={sectionRef} id="video-skills" aria-labelledby="video-skills-heading" className="mt-12 scroll-mt-24 border-t border-[#e4e0d8] pt-8">
     <p className="font-mono text-[10px] uppercase tracking-widest text-[#006b4f]">{zh ? '技能精选 · 非作品案例' : 'Skill selection · separate from examples'}</p>
     <h2 id="video-skills-heading" className="mt-3 font-display text-3xl">{zh ? 'AI 产品视频与剪辑' : 'AI product video & editing'}</h2>
     <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[#6d675e]">{zh ? '按任务选择工具。以下是技能目录入口，不计入作品数量，也不代表本站运行验证；安装前请查看详情页的当前审核状态与使用条件。' : 'Choose by task. These registry links are not extra Gallery examples or runtime verification. Read the detail page for current review status and requirements before installing.'}</p>
