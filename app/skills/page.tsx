@@ -13,6 +13,9 @@ import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { defaultLocale, getLocaleFromSearchParam, type Locale } from '@/lib/i18n/config'
 import { getLocalizedCoreLanguageAlternates } from '@/lib/seo/localized-pages'
 import { getSearchMetadataCopy } from '@/lib/seo/search-metadata'
+import { getGitHubOwner } from '@/lib/github-owner'
+import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
+import { directoryCategoryOptions, matchesDirectoryCategory, isDirectorySnapshot, sortDirectoryCandidates } from '@/lib/skills/directory'
 
 export const revalidate = 300
 
@@ -655,7 +658,10 @@ function toSkillsPageSkill({
     })),
     author: {
       name: record.author_name,
+      owner: getGitHubOwner(record),
     },
+    snapshot: isDirectorySnapshot(record),
+    sourceStatus: getSkillSourceEvidence(record).status,
     verified: Boolean(record.verified),
     createdAt: record.created_at,
     agentStats: agentStats
@@ -855,10 +861,8 @@ function buildSkillsPageJsonLd(
   locale: Locale
 ) {
   const copy = getSearchMetadataCopy(locale)
+  const directoryUrl = `${SITE_URL}${locale === defaultLocale ? '' : `/${locale}`}/skills`
   const deduped = new Map<string, DirectorySkill>()
-  for (const section of directorySections) {
-    for (const skill of section.skills) deduped.set(skill.slug, skill)
-  }
   for (const skill of skills) {
     if (!deduped.has(skill.slug)) {
       deduped.set(skill.slug, {
@@ -871,6 +875,11 @@ function buildSkillsPageJsonLd(
         qualityScore: skill.stats.qualityScore || 0,
         installCommand: skill.technical.installCommand,
       })
+    }
+  }
+  for (const section of directorySections) {
+    for (const skill of section.skills) {
+      if (!deduped.has(skill.slug)) deduped.set(skill.slug, skill)
     }
   }
 
@@ -887,7 +896,7 @@ function buildSkillsPageJsonLd(
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
       name: copy.directoryCollectionName,
-      url: `${SITE_URL}/skills`,
+      url: directoryUrl,
       description: copy.directoryDescription,
       about: [
         'AI agent skills',
@@ -918,7 +927,7 @@ function buildSkillsPageJsonLd(
           '@type': 'ListItem',
           position: 2,
           name: copy.directoryBreadcrumbName,
-          item: `${SITE_URL}/skills`,
+          item: directoryUrl,
         },
       ],
     },
@@ -932,7 +941,10 @@ export default async function SkillsPage({
 }) {
   const params = await searchParams
   const locale = getLocaleFromSearchParam(params.lang) || defaultLocale
-  const sort = (firstSearchValue(params.sort) as SkillSortMode) || 'quality'
+  const requestedSort = firstSearchValue(params.sort)
+  const sort: SkillSortMode = ['quality', 'stars', 'fresh', 'new', 'trending', 'downloads'].includes(requestedSort || '')
+    ? requestedSort as SkillSortMode
+    : firstSearchValue(params.q)?.trim() ? 'quality' : 'stars'
   const category = firstSearchValue(params.category) || 'all'
   const useCase = firstSearchValue(params.useCase) || 'all'
   const platform = firstSearchValue(params.platform) || 'all'
@@ -944,26 +956,31 @@ export default async function SkillsPage({
   const page = clampPage(firstSearchValue(params.page))
   const query = firstSearchValue(params.q)
   const requestedPageOffset = (page - 1) * VISIBLE_SKILL_LIMIT
-  const hasHighIntentFilter = Boolean(query || useCase !== 'all' || platform !== 'all' || supplyTrack !== 'all' || minStars > 0)
+  const hasHighIntentFilter = Boolean(query || category !== 'all' || useCase !== 'all' || platform !== 'all' || supplyTrack !== 'all' || minStars > 0)
   const baseLimit = hasHighIntentFilter ? SEARCH_SKILL_CANDIDATE_LIMIT : BASE_SKILL_CANDIDATE_LIMIT
   const candidateLimit = Math.min(baseLimit + requestedPageOffset, MAX_SKILL_CANDIDATE_LIMIT)
-  const queryCategory = category !== 'all' ? category : undefined
+  // Alias groups can span multiple legacy categories. Match after retrieval;
+  // never translate a display label into a single exact database category.
+  const queryCategory = undefined
 
-  const [recordsResult, searchAugmentRecords, categories, statsMap] = await Promise.all([
+  const [recordsResult, searchAugmentRecords, categories, statsMap, legacyCategoryResult] = await Promise.all([
     getSkillsPageRecords(sort, queryCategory, candidateLimit),
     getSearchAugmentRecords(firstSearchValue(params.q)),
     withTimeout(getCachedCategories(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills categories query')
       .catch(() => [...new Set(mergeSkillRecords(FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT).map((skill) => skill.category))].sort()),
     withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
+    category !== 'all' ? getSkillsPageRecords(sort, category, candidateLimit)
+      : Promise.resolve({ records: [] as SkillRecord[], degraded: false }),
   ])
-  const records = mergeSkillRecords(searchAugmentRecords.records, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
-  const degraded = recordsResult.degraded || searchAugmentRecords.degraded
+  const records = mergeSkillRecords(searchAugmentRecords.records, legacyCategoryResult.records, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
+  const degraded = recordsResult.degraded || searchAugmentRecords.degraded || legacyCategoryResult.degraded
   const effectivePage = degraded && records.length <= requestedPageOffset ? 1 : page
   const pageOffset = (effectivePage - 1) * VISIBLE_SKILL_LIMIT
-  const categoryOptions = categories.length > 0
+  const rawCategoryOptions = categories.length > 0
     ? categories
     : [...new Set(records.map((record) => record.category).filter(Boolean))].sort()
+  const categoryOptions = directoryCategoryOptions(rawCategoryOptions)
 
   const platformOptions = [...new Set(records.flatMap((record) => [
     ...(record.frameworks || []),
@@ -994,7 +1011,7 @@ export default async function SkillsPage({
 
   let filteredRecords = enrichedRecords.filter((item) => {
     const { record } = item
-    if (category !== 'all' && record.category !== category) return false
+    if (!matchesDirectoryCategory(record.category, category)) return false
     if (supplyTrack !== 'all' && item.supplyProfile.track.slug !== supplyTrack) return false
     if (selectedUseCase && scoreSkillForUseCase(record, selectedUseCase) < 6) return false
     if (platform !== 'all') {
@@ -1026,6 +1043,12 @@ export default async function SkillsPage({
       .filter((item): item is (typeof enrichedRecords)[number] => Boolean(item))
   }
 
+  // Merging live candidates and saved snapshots must not append high-star items
+  // out of order. Keep query relevance unless the visitor explicitly sorts.
+  if (!query?.trim() || sort !== 'quality') {
+    filteredRecords = sortDirectoryCandidates(filteredRecords, sort)
+  }
+
   const resultCount = filteredRecords.length
   const visibleRecords = filteredRecords.slice(pageOffset, pageOffset + VISIBLE_SKILL_LIMIT)
   const hasPreviousResults = effectivePage > 1
@@ -1036,7 +1059,7 @@ export default async function SkillsPage({
     enrichedRecords.slice(0, DIRECTORY_SECTION_SOURCE_LIMIT)
   )
   const directoryLinks: DirectoryLink[] = POPULAR_DIRECTORY_LINKS.map((link) => ({ ...link }))
-  const jsonLd = buildSkillsPageJsonLd(skills, directorySections, locale)
+  const jsonLd = buildSkillsPageJsonLd(skills, query ? [] : directorySections, locale)
 
   return (
     <>

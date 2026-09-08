@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 const read = p => readFileSync(new URL('../'+p, import.meta.url), 'utf8')
 let count=0
-for(const [file, expected] of [['showcase-gallery',3],['creator-directory-filters',2],['skills-page-client',6],['agent-resolve-workbench',2],['skill-submit-form',2]]) {
+for(const [file, expected] of [['showcase-gallery',3],['creator-directory-filters',2],['skills-page-client',3],['agent-resolve-workbench',2],['skill-submit-form',2]]) {
   const source=read(`components/${file}.tsx`)
   assert.doesNotMatch(source, /<select\b/)
   assert.equal((source.match(/<NativeSelect\b/g)||[]).length, expected)

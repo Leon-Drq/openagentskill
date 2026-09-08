@@ -12,6 +12,7 @@ import {
 } from '@/lib/i18n/market-routing'
 import { getLocalizedCoreLanguageAlternates } from '@/lib/seo/localized-pages'
 import { getSearchMetadataCopy } from '@/lib/seo/search-metadata'
+import SkillsPage from '@/app/skills/page'
 
 const SITE_URL = 'https://www.openagentskill.com'
 
@@ -99,11 +100,17 @@ export default async function LocalizedCoreRoutePage({
   searchParams,
 }: {
   params: Promise<{ locale: string; page: string }>
-  searchParams: Promise<{ q?: string | string[] }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const [{ locale, page }, resolvedSearchParams] = await Promise.all([params, searchParams])
   const route = getRoute(locale, page)
   if (!route) notFound()
+
+  // All directory locales share the same filters, pagination and source labels.
+  // This route retains its own existing localized metadata and canonical URL.
+  if (route.page === 'skills') {
+    return <SkillsPage searchParams={Promise.resolve({ ...resolvedSearchParams, lang: route.locale })} />
+  }
 
   const queryValue = resolvedSearchParams.q
   const query = Array.isArray(queryValue) ? queryValue[0] : queryValue
