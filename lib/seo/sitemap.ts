@@ -16,7 +16,6 @@ import {
   getLocalizedLanguageAlternates,
 } from '@/lib/seo/localized-pages'
 import { SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
-import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { SKILL_PACKS } from '@/lib/skill-packs'
 import { USE_CASES } from '@/lib/use-cases'
 import { SHOWCASE_CASES, SHOWCASE_UPDATED_AT } from '@/lib/showcase'
@@ -67,24 +66,6 @@ function chunkCount(total: number) {
   return Math.max(1, Math.ceil(total / SITEMAP_CHUNK_SIZE))
 }
 
-function fallbackSkillRecords(
-  minStars = SITEMAP_MIN_GITHUB_STARS,
-  minQualityScore = SITEMAP_MIN_QUALITY_SCORE
-) {
-  return CURATED_SKILL_SNAPSHOT
-    .filter((skill) => Number(skill.github_stars || 0) >= minStars || skill.publisher_verified === true)
-    .filter((skill) => Number(skill.quality_score || 0) >= minQualityScore)
-    .map((skill) => ({
-      slug: skill.slug,
-      github_stars: skill.github_stars,
-      github_last_pushed_at: skill.github_last_pushed_at,
-      created_at: skill.created_at,
-      updated_at: skill.updated_at,
-      quality_score: skill.quality_score,
-      publisher_verified: skill.publisher_verified,
-    }))
-}
-
 async function getSitemapSkillCount(
   minStars = SITEMAP_MIN_GITHUB_STARS,
   minQualityScore = SITEMAP_MIN_QUALITY_SCORE
@@ -93,9 +74,7 @@ async function getSitemapSkillCount(
     getApprovedSkillSitemapCount(minStars, minQualityScore),
     SITEMAP_SKILL_QUERY_TIMEOUT_MS,
     `sitemap approved skills count${minStars ? ` ${minStars}+` : ''} quality ${minQualityScore}+`
-  ).catch(() => {
-    return fallbackSkillRecords(minStars, minQualityScore).length
-  })
+  )
 }
 
 export async function getSitemapSkillRecords(
@@ -114,9 +93,7 @@ export async function getSitemapSkillRecords(
     }),
     SITEMAP_SKILL_QUERY_TIMEOUT_MS,
     `sitemap approved skills page ${index}${minStars ? ` ${minStars}+` : ''} quality ${minQualityScore}+`
-  ).catch(() => {
-    return fallbackSkillRecords(minStars, minQualityScore).slice(offset, offset + SITEMAP_CHUNK_SIZE)
-  })
+  )
 }
 
 export async function getSitemapIndexEntries() {
@@ -141,58 +118,57 @@ export async function getSitemapIndexEntries() {
   return [...fixedSections, ...skillSections]
 }
 
-export function getCoreSitemapEntries(now = new Date()): SitemapEntry[] {
+export function getCoreSitemapEntries(): SitemapEntry[] {
   const staticPages: SitemapEntry[] = [
     { url: `${SITEMAP_BASE_URL}/showcase`, lastModified: SHOWCASE_UPDATED_AT, changeFrequency: 'weekly', priority: 0.9 },
     ...SHOWCASE_CASES.map((item): SitemapEntry => ({ url: `${SITEMAP_BASE_URL}/showcase/${item.slug}`, lastModified: item.updatedAt, changeFrequency: 'monthly', priority: 0.8 })),
-    { url: SITEMAP_BASE_URL, lastModified: now, changeFrequency: 'daily', priority: 1 },
-    { url: `${SITEMAP_BASE_URL}/resolve`, lastModified: now, changeFrequency: 'daily', priority: 0.95 },
-    { url: `${SITEMAP_BASE_URL}/skills`, lastModified: now, changeFrequency: 'hourly', priority: 0.9 },
-    { url: `${SITEMAP_BASE_URL}/agent-skill`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${SITEMAP_BASE_URL}/agent-skills`, lastModified: now, changeFrequency: 'weekly', priority: 0.91 },
-    { url: `${SITEMAP_BASE_URL}/ai-agent-skills`, lastModified: now, changeFrequency: 'weekly', priority: 0.91 },
-    { url: `${SITEMAP_BASE_URL}/skills-registry`, lastModified: now, changeFrequency: 'weekly', priority: 0.91 },
-    { url: `${SITEMAP_BASE_URL}/about`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${SITEMAP_BASE_URL}/contact`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${SITEMAP_BASE_URL}/agent`, lastModified: now, changeFrequency: 'daily', priority: 0.93 },
-    { url: `${SITEMAP_BASE_URL}/agent/integration-kit`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${SITEMAP_BASE_URL}/evals/resolve`, lastModified: now, changeFrequency: 'daily', priority: 0.88 },
-    { url: `${SITEMAP_BASE_URL}/agent-skills-directory`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${SITEMAP_BASE_URL}/agent-skills-registry`, lastModified: now, changeFrequency: 'weekly', priority: 0.92 },
-    { url: `${SITEMAP_BASE_URL}/best`, lastModified: now, changeFrequency: 'daily', priority: 0.92 },
-    { url: `${SITEMAP_BASE_URL}/trending`, lastModified: now, changeFrequency: 'hourly', priority: 0.92 },
-    { url: `${SITEMAP_BASE_URL}/hot`, lastModified: now, changeFrequency: 'hourly', priority: 0.9 },
-    { url: `${SITEMAP_BASE_URL}/audits`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
-    { url: `${SITEMAP_BASE_URL}/official`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${SITEMAP_BASE_URL}/agents`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${SITEMAP_BASE_URL}/use-cases`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${SITEMAP_BASE_URL}/tasks`, lastModified: now, changeFrequency: 'daily', priority: 0.91 },
-    { url: `${SITEMAP_BASE_URL}/rankings`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
-    { url: `${SITEMAP_BASE_URL}/outcomes`, lastModified: now, changeFrequency: 'daily', priority: 0.89 },
-    { url: `${SITEMAP_BASE_URL}/reports/weekly`, lastModified: now, changeFrequency: 'daily', priority: 0.85 },
-    { url: `${SITEMAP_BASE_URL}/reports/monthly`, lastModified: now, changeFrequency: 'weekly', priority: 0.86 },
-    { url: `${SITEMAP_BASE_URL}/reports/state-of-agent-skills-2026`, lastModified: now, changeFrequency: 'daily', priority: 0.92 },
-    { url: `${SITEMAP_BASE_URL}/collections`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${SITEMAP_BASE_URL}/skill-packs`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${SITEMAP_BASE_URL}/compare`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${SITEMAP_BASE_URL}/compare/openagentskill-vs-skills-sh`, lastModified: now, changeFrequency: 'monthly', priority: 0.82 },
-    { url: `${SITEMAP_BASE_URL}/compare/openagentskill-vs-agentskills-io`, lastModified: now, changeFrequency: 'monthly', priority: 0.84 },
-    { url: `${SITEMAP_BASE_URL}/alternatives/skills-sh`, lastModified: now, changeFrequency: 'monthly', priority: 0.82 },
-    { url: `${SITEMAP_BASE_URL}/alternatives/agentskills-io`, lastModified: now, changeFrequency: 'monthly', priority: 0.82 },
-    { url: `${SITEMAP_BASE_URL}/guides`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${SITEMAP_BASE_URL}/blog`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
-    { url: `${SITEMAP_BASE_URL}/submit`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${SITEMAP_BASE_URL}/docs`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${SITEMAP_BASE_URL}/cli`, lastModified: now, changeFrequency: 'weekly', priority: 0.86 },
-    { url: `${SITEMAP_BASE_URL}/creator-kit`, lastModified: now, changeFrequency: 'weekly', priority: 0.82 },
-    { url: `${SITEMAP_BASE_URL}/creators`, lastModified: now, changeFrequency: 'daily', priority: 0.86 },
-    { url: `${SITEMAP_BASE_URL}/x-kit`, lastModified: now, changeFrequency: 'daily', priority: 0.74 },
-    { url: `${SITEMAP_BASE_URL}/activity`, lastModified: now, changeFrequency: 'hourly', priority: 0.6 },
+    { url: SITEMAP_BASE_URL, changeFrequency: 'daily', priority: 1 },
+    { url: `${SITEMAP_BASE_URL}/resolve`, changeFrequency: 'daily', priority: 0.95 },
+    { url: `${SITEMAP_BASE_URL}/skills`, changeFrequency: 'hourly', priority: 0.9 },
+    { url: `${SITEMAP_BASE_URL}/agent-skill`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITEMAP_BASE_URL}/agent-skills`, changeFrequency: 'weekly', priority: 0.91 },
+    { url: `${SITEMAP_BASE_URL}/ai-agent-skills`, changeFrequency: 'weekly', priority: 0.91 },
+    { url: `${SITEMAP_BASE_URL}/skills-registry`, changeFrequency: 'weekly', priority: 0.91 },
+    { url: `${SITEMAP_BASE_URL}/about`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITEMAP_BASE_URL}/contact`, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${SITEMAP_BASE_URL}/agent`, changeFrequency: 'daily', priority: 0.93 },
+    { url: `${SITEMAP_BASE_URL}/agent/integration-kit`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITEMAP_BASE_URL}/evals/resolve`, changeFrequency: 'daily', priority: 0.88 },
+    { url: `${SITEMAP_BASE_URL}/agent-skills-directory`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITEMAP_BASE_URL}/agent-skills-registry`, changeFrequency: 'weekly', priority: 0.92 },
+    { url: `${SITEMAP_BASE_URL}/best`, changeFrequency: 'daily', priority: 0.92 },
+    { url: `${SITEMAP_BASE_URL}/trending`, changeFrequency: 'hourly', priority: 0.92 },
+    { url: `${SITEMAP_BASE_URL}/hot`, changeFrequency: 'hourly', priority: 0.9 },
+    { url: `${SITEMAP_BASE_URL}/audits`, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${SITEMAP_BASE_URL}/official`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITEMAP_BASE_URL}/agents`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITEMAP_BASE_URL}/use-cases`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITEMAP_BASE_URL}/tasks`, changeFrequency: 'daily', priority: 0.91 },
+    { url: `${SITEMAP_BASE_URL}/rankings`, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${SITEMAP_BASE_URL}/outcomes`, changeFrequency: 'daily', priority: 0.89 },
+    { url: `${SITEMAP_BASE_URL}/reports/weekly`, changeFrequency: 'daily', priority: 0.85 },
+    { url: `${SITEMAP_BASE_URL}/reports/monthly`, changeFrequency: 'weekly', priority: 0.86 },
+    { url: `${SITEMAP_BASE_URL}/reports/state-of-agent-skills-2026`, changeFrequency: 'daily', priority: 0.92 },
+    { url: `${SITEMAP_BASE_URL}/collections`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITEMAP_BASE_URL}/skill-packs`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITEMAP_BASE_URL}/compare`, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${SITEMAP_BASE_URL}/compare/openagentskill-vs-skills-sh`, changeFrequency: 'monthly', priority: 0.82 },
+    { url: `${SITEMAP_BASE_URL}/compare/openagentskill-vs-agentskills-io`, changeFrequency: 'monthly', priority: 0.84 },
+    { url: `${SITEMAP_BASE_URL}/alternatives/skills-sh`, changeFrequency: 'monthly', priority: 0.82 },
+    { url: `${SITEMAP_BASE_URL}/alternatives/agentskills-io`, changeFrequency: 'monthly', priority: 0.82 },
+    { url: `${SITEMAP_BASE_URL}/guides`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITEMAP_BASE_URL}/blog`, changeFrequency: 'daily', priority: 0.8 },
+    { url: `${SITEMAP_BASE_URL}/submit`, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${SITEMAP_BASE_URL}/docs`, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${SITEMAP_BASE_URL}/cli`, changeFrequency: 'weekly', priority: 0.86 },
+    { url: `${SITEMAP_BASE_URL}/creator-kit`, changeFrequency: 'weekly', priority: 0.82 },
+    { url: `${SITEMAP_BASE_URL}/creators`, changeFrequency: 'daily', priority: 0.86 },
+    { url: `${SITEMAP_BASE_URL}/x-kit`, changeFrequency: 'daily', priority: 0.74 },
+    { url: `${SITEMAP_BASE_URL}/activity`, changeFrequency: 'hourly', priority: 0.6 },
   ]
 
   const localizedPages: SitemapEntry[] = Object.entries(LOCALIZED_LANDING_PAGES).map(([locale]) => ({
     url: `${SITEMAP_BASE_URL}/${locale}`,
-    lastModified: now,
     changeFrequency: 'weekly',
     priority: 0.88,
     alternates: {
@@ -203,7 +179,6 @@ export function getCoreSitemapEntries(now = new Date()): SitemapEntry[] {
   const localizedCorePages: SitemapEntry[] = MARKET_LOCALES.flatMap((locale) =>
     LOCALIZED_CORE_PAGE_SLUGS.map((page) => ({
       url: `${SITEMAP_BASE_URL}${getLocalizedCorePath(locale, page)}`,
-      lastModified: now,
       changeFrequency: page === 'skills' || page === 'resolve' ? 'daily' as const : 'weekly' as const,
       priority: page === 'resolve' || page === 'skills' ? 0.86 : 0.8,
       alternates: {
@@ -218,49 +193,41 @@ export function getCoreSitemapEntries(now = new Date()): SitemapEntry[] {
     ...localizedCorePages,
     ...SKILL_CLUSTERS.map((cluster) => ({
       url: `${SITEMAP_BASE_URL}${cluster.path}`,
-      lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: cluster.slug === 'world-cup-football' ? 0.9 : 0.88,
     })),
     ...USE_CASES.map((useCase) => ({
       url: `${SITEMAP_BASE_URL}/use-cases/${useCase.slug}`,
-      lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: 0.85,
     })),
     ...AGENT_TASKS.map((task) => ({
       url: `${SITEMAP_BASE_URL}/tasks/${task.slug}`,
-      lastModified: now,
       changeFrequency: 'daily' as const,
       priority: 0.86,
     })),
     ...OFFICIAL_CREATORS.map((creator) => ({
       url: `${SITEMAP_BASE_URL}/official/${creator.slug}`,
-      lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: 0.84,
     })),
     ...AGENT_PROFILES.map((profile) => ({
       url: `${SITEMAP_BASE_URL}/agents/${profile.slug}`,
-      lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: 0.84,
     })),
     ...SKILL_STACKS.map((stack) => ({
       url: `${SITEMAP_BASE_URL}/collections/${stack.slug}`,
-      lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: 0.85,
     })),
     ...SKILL_PACKS.map((pack) => ({
       url: `${SITEMAP_BASE_URL}/skill-packs/${pack.slug}`,
-      lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: 0.86,
     })),
     ...USE_CASES.map((useCase) => ({
       url: `${SITEMAP_BASE_URL}/blog/use-cases/${useCase.slug}`,
-      lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     })),
@@ -273,28 +240,26 @@ export function getCoreSitemapEntries(now = new Date()): SitemapEntry[] {
   ]
 }
 
-export function getBestSitemapEntries(now = new Date()): SitemapEntry[] {
+export function getBestSitemapEntries(): SitemapEntry[] {
   return BEST_SKILL_PAGES.map((page) => ({
     url: `${SITEMAP_BASE_URL}/best/${page.slug}`,
-    lastModified: now,
     changeFrequency: 'daily',
     priority: 0.88,
   }))
 }
 
-export function getRankingSitemapEntries(now = new Date()): SitemapEntry[] {
+export function getRankingSitemapEntries(): SitemapEntry[] {
   return getRankingDefinitions().map((ranking) => ({
     url: `${SITEMAP_BASE_URL}/rankings/${ranking.slug}`,
-    lastModified: now,
     changeFrequency: ranking.kind === 'new-this-week' ? 'daily' : 'weekly',
     priority: ranking.kind === 'use-case' ? 0.82 : 0.85,
   }))
 }
 
-export function getGuideSitemapEntries(now = new Date()): SitemapEntry[] {
+export function getGuideSitemapEntries(): SitemapEntry[] {
   return GROWTH_GUIDES.map((guide) => ({
     url: `${SITEMAP_BASE_URL}/guides/${guide.slug}`,
-    lastModified: now,
+    lastModified: guide.updatedAt,
     changeFrequency: 'weekly',
     priority: guide.intent === 'compare' ? 0.86 : 0.88,
   }))

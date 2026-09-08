@@ -1,10 +1,12 @@
 import { getSitemapIndexEntries, renderSitemapIndex } from '@/lib/seo/sitemap'
+import { sitemapUnavailableResponse } from '@/lib/seo/sitemap-response'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 3600
 
 export async function GET() {
-  const entries = await getSitemapIndexEntries()
+  const entries = await getSitemapIndexEntries().catch(() => null)
+  if (!entries) return sitemapUnavailableResponse()
 
   return new Response(renderSitemapIndex(entries), {
     headers: {

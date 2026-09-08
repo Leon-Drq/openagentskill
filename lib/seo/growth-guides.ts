@@ -29,14 +29,71 @@ export interface GrowthGuideDefinition {
   platformKeywords?: string[]
   skillKeywords: string[]
   primarySkillSlugs?: string[]
+  curatedOnly?: boolean
   compareTargetNames?: string[]
   sections: GrowthGuideSection[]
   steps: GrowthGuideStep[]
   faq: GrowthGuideFAQ[]
   relatedGuideSlugs: string[]
+  updatedAt?: string
+  resources?: Array<{ title: string; href: string; description: string }>
 }
 
 export const GROWTH_GUIDES: GrowthGuideDefinition[] = [
+  {
+    slug: 'agent-skills-for-product-videos',
+    shortTitle: 'Product video workflows',
+    title: 'Agent Skills for Product Demo Videos: Plan, Create and Edit',
+    eyebrow: 'Product video workflow guide',
+    description: 'Choose a workflow for a product demo, launch animation or recorded walkthrough. Prepare inputs, check costs and permissions, then verify the exported video.',
+    intent: 'best',
+    updatedAt: '2026-09-08',
+    heroPrompt: 'Help me make a short product demo video from my screenshots and product copy. Ask for missing inputs, explain dependencies and costs, and propose a storyboard before rendering. Do not invent product features or customer claims.',
+    skillKeywords: ['product demo', 'product launch', 'remotion', 'hyperframes', 'video editing'],
+    primarySkillSlugs: ['noamdorr-saas-product-demo-video-saas-product-demo-video', 'heygen-com-hyperframes-product-launch-video', 'remotion-dev-skills', 'browser-use-video-use'],
+    curatedOnly: true,
+    sections: [
+      {
+        title: 'Choose by the material you already have',
+        body: 'A screenshot-based product demo, a coded animation and an edited recording are different jobs. Start with the input rather than the most-starred repository. These are planning recommendations, not a comparative runtime benchmark.',
+        bullets: ['Screenshots and product copy: start with a product-demo or launch-video workflow.', 'A React project and a precise animation brief: inspect a Remotion-based workflow.', 'An existing screen recording: choose editing, trimming and captioning rather than generating a new film.'],
+      },
+      {
+        title: 'Prepare a production brief before installing',
+        body: 'Give the agent a small, explicit deliverable. A useful first test is one scene with one approved product claim. Expand only after checking that scene.',
+        bullets: ['Supply the real URL or screenshots, approved copy, brand assets and the audience.', 'Specify target duration, aspect ratio, export format and the final call to action.', 'State which assets may leave your computer and which paid services, if any, are approved.'],
+      },
+      {
+        title: 'Check costs, permissions and reproducibility',
+        body: 'An open-source skill does not mean every dependency or hosted service is free. Read the linked source version and the current detail-page review before running commands. Record the version you actually use.',
+        bullets: ['Check runtime dependencies and the applicable licenses for the renderer, music, fonts and images.', 'Review shell execution and file access; use a dedicated project folder without unrelated credentials.', 'Approve transcription, voice or media-provider charges before sending assets or making paid calls.'],
+      },
+      {
+        title: 'Verify the exported file, not just the preview',
+        body: 'A successful command is not proof of a usable video. Watch the exported artifact from start to finish, then record what passed and what still needs work.',
+        bullets: ['Check text clipping, readable captions, aspect ratio, transitions and the last frame.', 'Check audio levels, timing and missing media; confirm factual product claims against the supplied inputs.', 'If rendering fails, retain the error and source version. Do not report the attempt as a completed outcome.'],
+      },
+    ],
+    steps: [
+      { title: 'Choose the output and input', description: 'Decide whether you need a product demo, launch animation or edited recording. Gather only assets you own or have permission to use.' },
+      { title: 'Review one workflow', description: 'Open its registry detail and pinned source, inspect current review findings, then agree on tooling, permissions and costs.' },
+      { title: 'Approve a storyboard and test scene', description: 'Ask for an outline and one short scene first. Check brand accuracy and readability before a full render.' },
+      { title: 'Export, watch and keep a reproducibility note', description: 'Keep the input brief, source revision, agent/runtime versions, output format and any errors. Share a result only after inspecting it.' },
+    ],
+    faq: [
+      { question: 'Have these workflows all been runtime-tested by OpenAgentSkill?', answer: 'No. This is a source-based planning guide. Registry review, author examples and platform runtime tests are different signals; consult the specific listing and example for its actual evidence.' },
+      { question: 'Can I use a video skill without paid APIs?', answer: 'It depends on the selected workflow and optional features. Local rendering may still require dependencies or a commercial license; hosted transcription, voice and generation services can charge separately. Verify current terms before use.' },
+      { question: 'Should I start by generating or editing?', answer: 'Edit if you already have a recording with the correct product behavior. Use a demo or animation workflow when your starting material is screenshots, assets or a storyboard.' },
+    ],
+    resources: [
+      { title: 'SaaS Product Demo Video', href: '/skills/noamdorr-saas-product-demo-video-saas-product-demo-video', description: 'Registry listing and current review for the screenshot-based demo workflow.' },
+      { title: 'HyperFrames Product Launch Video', href: '/skills/heygen-com-hyperframes-product-launch-video', description: 'Registry listing and current findings for launch-video creation.' },
+      { title: 'Remotion Agent Skills', href: '/skills/remotion-dev-skills', description: 'Source and installation context for React-based video composition.' },
+      { title: 'Video Use', href: '/skills/browser-use-video-use', description: 'Source and dependency information for editing existing recordings.' },
+      { title: 'Video examples in Skill Gallery', href: '/showcase?category=video', description: 'Examples and source labels; author previews are not platform runtime tests.' },
+    ],
+    relatedGuideSlugs: ['install-agent-skills-in-claude-code', 'install-agent-skills-in-codex'],
+  },
   {
     slug: 'best-agent-skills-for-claude-code',
     shortTitle: 'Claude Code skills',

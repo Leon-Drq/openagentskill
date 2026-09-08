@@ -14,8 +14,11 @@ import {
   getGrowthGuideBySlug,
   getRelatedGrowthGuides,
 } from '@/lib/seo/growth-guides'
+import { scoreSkillForGuide, selectGuideSkills, selectComparisonSkills } from '@/lib/seo/guide-selection'
 import { getSkillTrustProfile } from '@/lib/trust'
-import { getUseCaseBySlug, getUseCasesForSkill, scoreSkillForUseCase } from '@/lib/use-cases'
+import { getUseCaseBySlug, getUseCasesForSkill } from '@/lib/use-cases'
+import { withTimeout } from '@/lib/async'
+import { getSkillBySlugOrFallbackStrict } from '@/lib/skill-fallbacks'
 
 export const revalidate = 300
 
@@ -61,110 +64,8 @@ export async function generateMetadata({
   }
 }
 
-function normalize(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, '')
-}
-
-function searchableSkillText(skill: SkillRecord) {
-  return [
-    skill.slug,
-    skill.name,
-    skill.description,
-    skill.long_description,
-    skill.tagline,
-    skill.category,
-    skill.repository,
-    skill.github_repo,
-    ...(skill.tags || []),
-    ...(skill.frameworks || []),
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase()
-}
-
 function getInstallCommand(skill: SkillRecord) {
-  if (skill.install_command) return skill.install_command
-  if (skill.github_repo) return `npx skills add ${skill.github_repo}`
-  return `npx skills add ${skill.slug}`
-}
-
-function findSkillByNeedle(skills: SkillRecord[], needle: string) {
-  const normalizedNeedle = normalize(needle)
-  return skills.find((skill) => {
-    const normalizedText = normalize([skill.slug, skill.name, skill.github_repo, skill.repository].filter(Boolean).join(' '))
-    return normalizedText.includes(normalizedNeedle)
-  })
-}
-
-function addUniqueSkill(target: SkillRecord[], skill: SkillRecord | undefined) {
-  if (!skill || target.some((item) => item.slug === skill.slug)) return
-  target.push(skill)
-}
-
-function scoreSkillForGuide(skill: SkillRecord, guide: GrowthGuideDefinition) {
-  const useCase = guide.useCaseSlug ? getUseCaseBySlug(guide.useCaseSlug) : null
-  const text = searchableSkillText(skill)
-  const normalizedText = normalize(text)
-  let score = 0
-
-  for (const keyword of guide.skillKeywords) {
-    const normalizedKeyword = keyword.toLowerCase()
-    if (text.includes(normalizedKeyword)) score += normalizedKeyword.includes(' ') ? 6 : 4
-    if (normalizedText.includes(normalize(keyword))) score += 2
-  }
-
-  for (const keyword of guide.platformKeywords || []) {
-    const normalizedKeyword = keyword.toLowerCase()
-    if (text.includes(normalizedKeyword)) score += normalizedKeyword.includes(' ') ? 5 : 3
-  }
-
-  for (const targetName of guide.compareTargetNames || []) {
-    if (normalizedText.includes(normalize(targetName))) score += 28
-  }
-
-  for (const slug of guide.primarySkillSlugs || []) {
-    if (skill.slug === slug || normalize(skill.name).includes(normalize(slug))) score += 35
-  }
-
-  if (useCase) score += scoreSkillForUseCase(skill, useCase)
-  if (guide.platformLabel && getPlatformHints(skill).includes(guide.platformLabel)) score += 8
-  if (skill.install_command || skill.github_repo) score += 4
-  if (skill.verified) score += 2
-
-  score += Math.min(9, Math.log10(Math.max(1, Number(skill.github_stars || 0))) * 2)
-  score += Math.min(7, Number(skill.quality_score || 0) / 18)
-
-  return score
-}
-
-function selectGuideSkills(skills: SkillRecord[], guide: GrowthGuideDefinition, limit = 12) {
-  const selected: SkillRecord[] = []
-
-  for (const slug of guide.primarySkillSlugs || []) {
-    addUniqueSkill(selected, findSkillByNeedle(skills, slug))
-  }
-
-  for (const targetName of guide.compareTargetNames || []) {
-    addUniqueSkill(selected, findSkillByNeedle(skills, targetName))
-  }
-
-  const scored = skills
-    .map((skill) => ({ skill, score: scoreSkillForGuide(skill, guide) }))
-    .filter((item) => item.score >= (guide.intent === 'standard' ? 8 : 10))
-    .sort((a, b) => b.score - a.score || Number(b.skill.github_stars || 0) - Number(a.skill.github_stars || 0))
-
-  for (const item of scored) {
-    addUniqueSkill(selected, item.skill)
-    if (selected.length >= limit) return selected
-  }
-
-  for (const skill of skills) {
-    addUniqueSkill(selected, skill)
-    if (selected.length >= limit) break
-  }
-
-  return selected
+  return skill.install_command || (skill.github_repo ? `npx skills add ${skill.github_repo}` : '')
 }
 
 function getGuideSkillModels(skills: SkillRecord[], guide: GrowthGuideDefinition) {
@@ -204,15 +105,39 @@ export default async function GrowthGuidePage({
   const guide = getGrowthGuideBySlug(slug)
   if (!guide) notFound()
 
-  const allSkills = await getAllSkills('quality', undefined, 1200).catch(() => [])
+  // Curated guides resolve their exact sources rather than hoping they occur
+  // in the first page of a popularity/quality-ranked global catalog.
+  const allSkills = guide.curatedOnly
+    ? (await Promise.all((guide.primarySkillSlugs || []).slice(0, 8).map(skillSlug =>
+        withTimeout(getSkillBySlugOrFallbackStrict(skillSlug), 2500, 'guide source lookup').catch(() => null)
+      ))).filter((skill): skill is SkillRecord => Boolean(skill))
+    : await getAllSkills('quality', undefined, 1200).catch(() => [])
   const guideSkills = getGuideSkillModels(allSkills, guide)
   const primarySkills = guideSkills.slice(0, guide.intent === 'compare' ? 2 : 4)
+  const comparisonSlugs = new Set(selectComparisonSkills(allSkills, guide).map(skill => skill.slug))
+  const comparisonSkills = guideSkills.filter(({ skill }) => comparisonSlugs.has(skill.slug))
   const relatedGuides = getRelatedGrowthGuides(guide)
   const useCase = guide.useCaseSlug ? getUseCaseBySlug(guide.useCaseSlug) : null
 
   return (
     <div className="min-h-screen bg-background">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(getFaqSchema(guide)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([
+        getFaqSchema(guide),
+        {
+          '@context': 'https://schema.org', '@type': 'Article', headline: guide.title,
+          description: guide.description, inLanguage: 'en',
+          mainEntityOfPage: `https://www.openagentskill.com/guides/${guide.slug}`,
+          author: { '@type': 'Organization', name: 'OpenAgentSkill', url: 'https://www.openagentskill.com/about' },
+          ...(guide.updatedAt ? { dateModified: guide.updatedAt } : {}),
+        },
+        {
+          '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Guides', item: 'https://www.openagentskill.com/guides' },
+            { '@type': 'ListItem', position: 2, name: guide.shortTitle, item: `https://www.openagentskill.com/guides/${guide.slug}` },
+          ],
+        },
+      ]).replace(/</g, '\\u003c') }} />
       <SiteHeader />
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
@@ -231,9 +156,14 @@ export default async function GrowthGuidePage({
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">{guide.description}</p>
 
             <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                href={`/resolve?task=${encodeURIComponent(guide.heroPrompt)}`}
+                prefetch={false}
+                className="border border-foreground bg-foreground px-5 py-2 text-sm text-background transition-colors hover:bg-background hover:text-foreground"
+              >Find skills for this task</Link>
               <a
                 href={`/api/agent/resolve?task=${encodeURIComponent(guide.heroPrompt)}&agent=${encodeURIComponent((guide.platformLabel || 'auto').toLowerCase().replace(/\s+/g, '-'))}&limit=4&format=text`}
-                className="border border-foreground bg-foreground px-5 py-2 text-sm text-background transition-colors hover:bg-background hover:text-foreground"
+                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
               >
                 Run resolve API
               </a>
@@ -272,19 +202,39 @@ export default async function GrowthGuidePage({
               {useCase && (
                 <span className="border border-border px-2 py-1 text-xs font-mono text-secondary">{useCase.shortTitle}</span>
               )}
-              <span className="border border-border px-2 py-1 text-xs font-mono text-secondary">Updated Jun 2026</span>
+              <span className="border border-border px-2 py-1 text-xs font-mono text-secondary">Source-based selection · not a runtime test</span>
             </div>
           </div>
         </section>
 
-        {guide.intent === 'compare' && primarySkills.length >= 2 && (
+        <p className="mt-5 text-sm leading-relaxed text-secondary">
+          Published by <Link href="/about" className="underline underline-offset-4">OpenAgentSkill</Link>.
+          {' '}Candidates are matched to this guide from available registry metadata. Repository stars describe popularity, not task success or safety. Check each source, license and current review before installing.
+          {guide.updatedAt && <> Editorial update: <time dateTime={guide.updatedAt}>{guide.updatedAt}</time>.</>}
+        </p>
+
+        {guide.resources && (
+          <section className="border-b border-border py-10">
+            <h2 className="font-display text-2xl font-semibold">Sources and examples</h2>
+            <div className="mt-5 divide-y divide-border">
+              {guide.resources.map(resource => (
+                <div key={resource.href} className="py-4">
+                  <Link href={resource.href} prefetch={false} className="font-medium underline underline-offset-4">{resource.title}</Link>
+                  <p className="mt-2 text-sm text-secondary">{resource.description}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {guide.intent === 'compare' && comparisonSkills.length >= 2 && (
           <section className="border-b border-border py-10">
             <div className="mb-6">
               <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Side-by-side decision</p>
               <h2 className="font-display text-2xl font-semibold">Which one should an agent builder try first?</h2>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
-              {primarySkills.map(({ skill, quality, trust, audit, decision, platforms }) => (
+              {comparisonSkills.map(({ skill, quality, trust, audit, decision, platforms }) => (
                 <article key={skill.slug} className="border border-border bg-card p-5">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
@@ -350,9 +300,14 @@ export default async function GrowthGuidePage({
                 {guide.intent === 'compare' ? 'Fallbacks and companions' : 'Start with these skills'}
               </h2>
             </div>
-            <span className="text-sm text-secondary">Ranked from current marketplace data</span>
+            <span className="text-sm text-secondary">Task-matched candidates · not exhaustive</span>
           </div>
 
+          {primarySkills.length === 0 && (
+            <p className="border border-border p-5 text-sm text-secondary">
+              No matching candidates are available in this shortlist right now. The guidance below remains available; use the Skill Finder to search your exact task. Unrelated popular skills are not substituted.
+            </p>
+          )}
           <div className="grid gap-4 lg:grid-cols-4">
             {primarySkills.map(({ skill, quality, trust, audit, decision, platforms, useCases }) => (
               <article key={skill.slug} className="flex flex-col justify-between border border-border bg-card p-5">
@@ -403,7 +358,9 @@ export default async function GrowthGuidePage({
                 </div>
 
                 <div className="mt-5">
-                  <InstallCommand command={getInstallCommand(skill)} skillSlug={skill.slug} compact />
+                  {getInstallCommand(skill) ? (
+                    <InstallCommand command={getInstallCommand(skill)} skillSlug={skill.slug} compact />
+                  ) : <Link href={`/skills/${skill.slug}`} className="text-sm underline">Check source installation instructions</Link>}
                 </div>
               </article>
             ))}
