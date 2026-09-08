@@ -173,7 +173,7 @@ Return only JSON without markdown fences:
 }`
 
   try {
-    const text = await controlledGeneration({
+    const { text, reviewedAt } = await controlledGeneration({
       model: SUBMISSION_REVIEW_MODEL,
       prompt,
       fingerprint: triage.fingerprint,
@@ -222,7 +222,7 @@ Return only JSON without markdown fences:
       issues: reconciledFeedback.issues,
       suggestions: reconciledFeedback.suggestions,
       reasoning: typeof reviewData.reasoning === 'string' ? reviewData.reasoning.slice(0, 4000) : '',
-      reviewedAt: new Date().toISOString(),
+      reviewedAt,
       reviewModel: SUBMISSION_REVIEW_MODEL,
       ...provenance,
     }

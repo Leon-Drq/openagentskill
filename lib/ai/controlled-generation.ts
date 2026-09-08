@@ -22,7 +22,11 @@ export async function controlledGeneration(input: {
     p_key: requestKey, p_feature: input.feature, p_model: input.model, p_reserved_usd: reservationUsd,
   })
   if (error) throw new DeferredAnalysisError('Analysis ledger unavailable; queued without calling model')
-  if (reservation.status === 'cached') return String(reservation.response)
+  if (reservation.status === 'cached') {
+    const cached = JSON.parse(String(reservation.response)) as { text: string; reviewedAt: string }
+    if (typeof cached.text !== 'string' || !Number.isFinite(Date.parse(cached.reviewedAt))) throw new DeferredAnalysisError('Cached review metadata unavailable')
+    return cached
+  }
   if (reservation.status !== 'reserved') throw new DeferredAnalysisError(`Analysis deferred: ${reservation.status}`)
   try {
     const result = await generateText({
@@ -30,14 +34,15 @@ export async function controlledGeneration(input: {
       maxOutputTokens, maxRetries: 0, abortSignal: AbortSignal.timeout(30_000),
       providerOptions: { gateway: { tags: [`feature:${input.feature}`, 'policy:risk-first-v1'] } },
     })
+    const completed = { text: result.text, reviewedAt: new Date().toISOString() }
     const { error: saveError } = await db.rpc('finish_skill_analysis', {
-      p_id: reservation.id, p_response: result.text,
+      p_id: reservation.id, p_response: JSON.stringify(completed),
       p_input_tokens: result.usage.inputTokens ?? null,
       p_output_tokens: result.usage.outputTokens ?? null,
       p_error: null,
     })
     if (saveError) throw new DeferredAnalysisError('Unable to persist analysis; reservation retained')
-    return result.text
+    return completed
   } catch (error) {
     await db.rpc('finish_skill_analysis', {
       p_id: reservation.id, p_response: null, p_input_tokens: null, p_output_tokens: null,
