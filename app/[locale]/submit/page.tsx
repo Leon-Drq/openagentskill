@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import SubmitPage from '@/app/submit/page'
 import { I18nProvider } from '@/lib/i18n/context'
+import { submissionCopy } from '@/lib/i18n/submission-copy'
 import { MARKET_LOCALES, type MarketLocale } from '@/lib/i18n/market-routing'
 
 const SITE_URL = 'https://www.openagentskill.com'
@@ -27,8 +28,8 @@ export async function generateMetadata({
 
   const canonical = `${SITE_URL}/${marketLocale}/submit`
   return {
-    title: 'Submit an AI Agent Skill',
-    description: 'Submit a reusable AI agent skill for review, trust scoring, and agent-readable installation discovery.',
+    title: submissionCopy(marketLocale, 'Paste one link. Make your skill discoverable.', '粘贴一个链接，让 Skill 被发现'),
+    description: submissionCopy(marketLocale, 'Repository, subdirectory, and SKILL.md URLs are supported. We save first and review asynchronously—no star, README, category, or tag gate.', '支持仓库、子目录和 SKILL.md 链接。先保存，再异步审核；不要求 Star、README、分类或标签。'),
     alternates: {
       canonical,
       languages: {

@@ -1,5 +1,7 @@
 'use client'
 
+import { submissionCopy } from '@/lib/i18n/submission-copy'
+
 import { useEffect, useMemo, useState } from 'react'
 import { useI18n } from '@/lib/i18n/context'
 
@@ -38,21 +40,20 @@ interface ValidationResponse {
 const DRAFT_KEY = 'openagentskill.submitDraft.v2'
 
 const categories = [
-  ['data-analysis', 'Data Analysis'],
-  ['code-generation', 'Code Generation'],
-  ['research', 'Research'],
-  ['automation', 'Automation'],
-  ['communication', 'Communication'],
-  ['creative', 'Creative'],
-  ['business', 'Business'],
-  ['developer-tools', 'Developer Tools'],
-  ['security', 'Security'],
-  ['integration', 'Integration'],
-]
+  ['data-analysis', 'dataAnalysis'],
+  ['code-generation', 'codeGeneration'],
+  ['research', 'research'],
+  ['automation', 'automation'],
+  ['communication', 'communication'],
+  ['creative', 'creative'],
+  ['business', 'business'],
+  ['developer-tools', 'developerTools'],
+  ['security', 'security'],
+  ['integration', 'integration'],
+] as const
 
 export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
-  const { locale } = useI18n()
-  const zh = locale === 'zh'
+  const { locale, t } = useI18n()
   const [repository, setRepository] = useState('')
   const [category, setCategory] = useState('')
   const [tagInput, setTagInput] = useState('')
@@ -111,16 +112,12 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
 
   function validationMessage(data: ValidationResponse) {
     if (data.code === 'MISSING_SKILL_FILE') {
-      return zh
-        ? '没有找到包含 name 和 description 的有效 SKILL.md。也可以直接粘贴 Skill 目录或 SKILL.md 链接。'
-        : 'No valid SKILL.md with name and description was found. You can paste a skill directory or SKILL.md URL.'
+      return submissionCopy(locale, "No valid SKILL.md with name and description was found. You can paste a skill directory or SKILL.md URL.", "没有找到包含 name 和 description 的有效 SKILL.md。也可以直接粘贴 Skill 目录或 SKILL.md 链接。")
     }
     if (data.code === 'INVALID_REPOSITORY') {
-      return zh
-        ? '请输入 GitHub 仓库、Skill 目录或 SKILL.md 链接。'
-        : 'Enter a GitHub repository, skill directory, or SKILL.md URL.'
+      return submissionCopy(locale, "Enter a GitHub repository, skill directory, or SKILL.md URL.", "请输入 GitHub 仓库、Skill 目录或 SKILL.md 链接。")
     }
-    return data.error || (zh ? '验证失败，请稍后重试。' : 'Validation failed. Please try again.')
+    return data.error || (submissionCopy(locale, "Validation failed. Please try again.", "验证失败，请稍后重试。"))
   }
 
   async function validateRepo() {
@@ -150,7 +147,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
       if (!makerGithub && data.repository?.owner) setMakerGithub(data.repository.owner)
     } catch {
       setRepoValid(false)
-      setError(zh ? '验证失败，请稍后重试。' : 'Validation failed. Please try again.')
+      setError(submissionCopy(locale, "Validation failed. Please try again.", "验证失败，请稍后重试。"))
     } finally {
       setValidating(false)
     }
@@ -165,7 +162,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
     if (!repoValid || !selectedCandidate) {
-      setError(zh ? '请先查找并选择一个 SKILL.md。' : 'Find and select a SKILL.md first.')
+      setError(submissionCopy(locale, "Find and select a SKILL.md first.", "请先查找并选择一个 SKILL.md。"))
       return
     }
 
@@ -184,7 +181,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
       })
       try { window.localStorage.removeItem(DRAFT_KEY) } catch {}
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : (zh ? '提交失败。' : 'Submission failed.'))
+      setError(submitError instanceof Error ? submitError.message : (submissionCopy(locale, "Submission failed.", "提交失败。")))
     } finally {
       setSubmitting(false)
     }
@@ -194,7 +191,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
     <form onSubmit={handleSubmit} className="mx-auto max-w-2xl space-y-7">
       <div>
         <label htmlFor="repository" className="mb-2 block text-sm font-semibold">
-          {zh ? 'GitHub 仓库或 SKILL.md 链接' : 'GitHub repository or SKILL.md URL'}
+          {submissionCopy(locale, "GitHub repository or SKILL.md URL", "GitHub 仓库或 SKILL.md 链接")}
         </label>
         <div className="flex flex-col gap-2 sm:flex-row">
           <input
@@ -219,17 +216,15 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
             disabled={validating || !repository.trim()}
             className="h-12 border border-foreground px-5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {validating ? (zh ? '查找中…' : 'Finding…') : (zh ? '查找 Skill' : 'Find Skills')}
+            {validating ? (submissionCopy(locale, "Finding…", "查找中…")) : (submissionCopy(locale, "Find Skills", "查找 Skill"))}
           </button>
         </div>
         <p className="mt-2 text-xs leading-5 text-secondary">
-          {zh
-            ? '0 Star 也可以提交。只要求有效的 SKILL.md；README、分类和标签不再是硬性门槛。'
-            : 'Zero-star skills are welcome. A valid SKILL.md is required; README, category, and tags are not hard gates.'}
+          {submissionCopy(locale, "Zero-star skills are welcome. A valid SKILL.md is required; README, category, and tags are not hard gates.", "0 Star 也可以提交。只要求有效的 SKILL.md；README、分类和标签不再是硬性门槛。")}
         </p>
         {repoStars !== null && (
           <p className="mt-2 font-mono text-xs text-secondary">
-            {repoStars.toLocaleString()} GitHub stars · {zh ? '仅作为排序信号' : 'ranking signal only'}
+            {repoStars.toLocaleString(locale)} GitHub stars · {submissionCopy(locale, "ranking signal only", "仅作为排序信号")}
           </p>
         )}
         {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
@@ -238,7 +233,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
       {candidates.length > 0 && (
         <div>
           <label htmlFor="skill-path" className="mb-2 block text-sm font-semibold">
-            {zh ? `选择 SKILL.md（发现 ${candidates.length} 个）` : `Choose SKILL.md (${candidates.length} found)`}
+            {submissionCopy(locale, 'Choose SKILL.md ({count} found)', '选择 SKILL.md（发现 {count} 个）', { count: candidates.length })}
           </label>
           <select
             id="skill-path"
@@ -265,16 +260,16 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="category" className="mb-2 block text-sm font-semibold">
-            {zh ? '分类（选填）' : 'Category (optional)'}
+            {submissionCopy(locale, "Category (optional)", "分类（选填）")}
           </label>
           <select id="category" value={category} onChange={(event) => setCategory(event.target.value)} className="w-full border border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none">
-            <option value="">{zh ? '自动识别' : 'Auto-detect'}</option>
-            {categories.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            <option value="">{submissionCopy(locale, "Auto-detect", "自动识别")}</option>
+            {categories.map(([value, key]) => <option key={value} value={value}>{t.submitPage.form.categories[key]}</option>)}
           </select>
         </div>
         <div>
           <label htmlFor="tags" className="mb-2 block text-sm font-semibold">
-            {zh ? '标签（选填）' : 'Tags (optional)'}
+            {submissionCopy(locale, "Tags (optional)", "标签（选填）")}
           </label>
           <div className="flex gap-2">
             <input
@@ -282,7 +277,7 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
               value={tagInput}
               onChange={(event) => setTagInput(event.target.value)}
               onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); addTag() } }}
-              placeholder={zh ? '留空则自动补全' : 'Auto-filled when empty'}
+              placeholder={submissionCopy(locale, "Auto-filled when empty", "留空则自动补全")}
               className="min-w-0 flex-1 border border-border bg-background px-3 py-3 text-sm focus:border-foreground focus:outline-none"
             />
             <button type="button" onClick={addTag} className="border border-border px-3 text-sm">+</button>
@@ -302,12 +297,10 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
 
       <fieldset className="border border-border bg-card p-5">
         <legend className="px-2 font-mono text-xs uppercase tracking-[0.18em] text-secondary">
-          {zh ? 'Maker 身份（选填）' : 'Maker identity (optional)'}
+          {submissionCopy(locale, "Maker identity (optional)", "Maker 身份（选填）")}
         </legend>
         <p className="mb-4 text-xs leading-5 text-secondary">
-          {zh
-            ? '填写账号会创建公开资料链接，但不会自动获得“已验证”标记。认证需要 OAuth 或仓库所有权证明。'
-            : 'Handles create public profile links but do not grant a verified badge. Verification requires OAuth or repository ownership proof.'}
+          {submissionCopy(locale, "Handles create public profile links but do not grant a verified badge. Verification requires OAuth or repository ownership proof.", "填写账号会创建公开资料链接，但不会自动获得“已验证”标记。认证需要 OAuth 或仓库所有权证明。")}
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -328,13 +321,11 @@ export function SkillSubmitForm({ onSubmit }: SubmitFormProps) {
       </fieldset>
 
       <div className="border border-border p-4 text-xs leading-5 text-secondary">
-        {zh
-          ? '提交会先保存到社区队列，再异步执行安全与质量审核。只有 Reviewed、Verified 或 Agent Proven Skill 才会进入默认 Agent 推荐。'
-          : 'Submissions are saved to the community queue first, then reviewed asynchronously. Only Reviewed, Verified, or Agent Proven skills enter default Agent recommendations.'}
+        {submissionCopy(locale, "Submissions are saved to the community queue first, then reviewed asynchronously. Only Reviewed, Verified, or Agent Proven skills enter default Agent recommendations.", "提交会先保存到社区队列，再异步执行安全与质量审核。只有 Reviewed、Verified 或 Agent Proven Skill 才会进入默认 Agent 推荐。")}
       </div>
 
       <button type="submit" disabled={!repoValid || !selectedCandidate || submitting} className="w-full bg-foreground px-6 py-3 font-semibold text-background transition-opacity disabled:cursor-not-allowed disabled:opacity-40">
-        {submitting ? (zh ? '正在保存…' : 'Saving…') : (zh ? '提交到社区队列' : 'Submit to community queue')}
+        {submitting ? (submissionCopy(locale, "Saving…", "正在保存…")) : (submissionCopy(locale, "Submit to community queue", "提交到社区队列"))}
       </button>
     </form>
   )

@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from 'react'
 import { Check, ChevronDown, Globe2 } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useI18n } from '@/lib/i18n/context'
+import { siteCopy } from '@/lib/i18n/site-copy'
 import { getLanguageSwitchHref } from '@/lib/i18n/market-routing'
 import {
   localeNames,
@@ -66,7 +67,7 @@ export function LanguageSwitcher({ compact = false, showName = !compact, classNa
         )}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label={`Current language: ${localeNativeNames[activeLocale]}`}
+        aria-label={siteCopy(locale, 'Current language: {language}', { language: localeNativeNames[activeLocale] })}
       >
         <Globe2 className="h-3.5 w-3.5 text-secondary" aria-hidden="true" />
         <span className="font-mono">{activeLabel}</span>
@@ -80,7 +81,7 @@ export function LanguageSwitcher({ compact = false, showName = !compact, classNa
       {open && (
         <div
           role="listbox"
-          aria-label="Select language"
+          aria-label={siteCopy(locale, 'Select language')}
           className="absolute right-0 top-10 z-50 w-52 overflow-hidden rounded-[8px] border border-border bg-background shadow-[0_18px_55px_rgba(29,27,24,0.12)]"
         >
           {locales.map((loc) => {
