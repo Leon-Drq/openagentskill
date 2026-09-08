@@ -25,10 +25,10 @@ export async function generateMetadata({
 }: Props): Promise<Metadata> {
   const p = await searchParams,
     locale = getLocaleFromSearchParam(p.lang) || 'en'
-  const title = creatorCopy(locale, 'Featured creators'),
+  const title = 'Skill Creators',
     description = creatorCopy(
       locale,
-      'Explore their skills, see the work, and start creating.',
+      'Discover creators, their skills, and their work.',
     )
   return {
     title,
@@ -58,7 +58,7 @@ export default async function CreatorsPage({ searchParams }: Props) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: t('Featured creators'),
+    name: 'Skill Creators',
     url: BASE,
     inLanguage: locale,
     mainEntity: {
@@ -87,11 +87,11 @@ export default async function CreatorsPage({ searchParams }: Props) {
               <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#006b4f]">
                 {t('Featured creators')}
               </p>
-              <h1 className="mt-5 max-w-3xl font-display text-4xl leading-[1.06] text-balance sm:text-6xl">
-                {t('Find the people behind your next project.')}
+              <h1 className="mt-5 whitespace-nowrap font-display text-[42px] font-normal leading-[1.1] tracking-tight sm:text-6xl xl:text-7xl">
+                Skill <em className="font-normal text-[#006b4f]">Creators</em>
               </h1>
               <p className="mt-5 text-base leading-7 text-secondary">
-                {t('Explore their skills, see the work, and start creating.')}
+                {t('Discover creators, their skills, and their work.')}
               </p>
             </div>
             <Link

@@ -32,12 +32,12 @@ export function HomeCreators() {
               id="home-creators-heading"
               className="font-display text-3xl sm:text-4xl"
             >
-              {creatorCopy(locale, 'Featured creators')}
+              Skill <em className="font-normal text-[#006b4f]">Creators</em>
             </h2>
             <p className="mt-3 text-sm text-secondary">
               {creatorCopy(
                 locale,
-                'Explore their skills, see the work, and start creating.',
+                'Discover creators, their skills, and their work.',
               )}
             </p>
           </div>

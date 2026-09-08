@@ -34,8 +34,8 @@ export async function generateMetadata({
       robots: { index: false, follow: false },
     }
   const locale = getLocaleFromSearchParam(p.lang) || 'en',
-    title = `${c.name} — ${creatorCopy(locale, 'Featured creators')}`
-  const description = `${c.repositories.map((r) => r.fullName).join(', ')}. ${creatorCopy(locale, 'Explore their skills, see the work, and start creating.')}`
+    title = `${c.name} — Skill Creators`
+  const description = `${c.repositories.map((r) => r.fullName).join(', ')}. ${creatorCopy(locale, 'Discover creators, their skills, and their work.')}`
   return {
     title,
     description,
@@ -99,7 +99,7 @@ export default async function FeaturedCreatorPage({
             }}
           />
           <Link href={href('/creators')} className="text-sm text-[#006b4f]">
-            ← {t('Featured creators')}
+            ← {t('Skill creators')}
           </Link>
           <header className="mt-8 grid gap-6 border-b border-border pb-8 sm:grid-cols-[1fr_auto] sm:items-end">
             <div>

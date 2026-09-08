@@ -143,6 +143,11 @@ assert.ok(
 )
 const sitemap = readFileSync('lib/seo/sitemap.ts', 'utf8')
 assert.ok(sitemap.includes('creatorHref(creator.owner)'))
+const directoryPage = readFileSync('app/creators/page.tsx', 'utf8')
+assert.ok(directoryPage.includes('Skill <em className="font-normal text-[#006b4f]">Creators</em>'))
+assert.ok(directoryPage.includes("const title = 'Skill Creators'"))
+assert.ok(!directoryPage.includes('Find the people behind your next project.'))
+assert.ok(directoryPage.includes("const BASE = 'https://www.openagentskill.com/creators'"))
 console.log(
   'Creator directory passed: 20 source-backed profiles, star deduplication, conservative ownership, publication gates, ranking, gallery attribution and sitemap integration.',
 )
