@@ -4,6 +4,9 @@ import Link from 'next/link'
 import Script from 'next/script'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { getLocaleFromRoute } from '@/lib/i18n/config'
+import { siteCopy } from '@/lib/i18n/site-copy'
+import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import {
   ANALYTICS_CONSENT_STORAGE_KEY,
   trackAnalyticsPageView,
@@ -14,6 +17,7 @@ import {
 export function GoogleAnalytics({ measurementId }: { measurementId: string }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const locale = getLocaleFromRoute(pathname, searchParams.get('lang'))
   const search = searchParams.toString()
   const [consent, setConsent] = useState<AnalyticsConsent | null | undefined>(undefined)
 
@@ -94,29 +98,30 @@ export function GoogleAnalytics({ measurementId }: { measurementId: string }) {
       {consent === null && (
         <aside
           className="fixed inset-x-0 bottom-0 z-[100] border-t border-border bg-background/95 px-4 py-4 shadow-[0_-12px_32px_rgba(26,24,20,0.08)] backdrop-blur sm:px-6"
-          aria-label="Analytics preferences"
+          aria-label={siteCopy(locale, 'Analytics preferences')}
+          lang={locale}
         >
           <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-3xl text-sm leading-6 text-secondary">
-              OpenAgentSkill uses privacy-conscious analytics to understand which pages and product flows are useful. No task text or private repository data is sent to Google.{' '}
-              <Link href="/privacy" className="font-medium text-foreground underline underline-offset-4">
-                Privacy details
+              {locale === 'en' ? 'OpenAgentSkill uses privacy-conscious analytics to understand which pages and product flows are useful. No task text or private repository data is sent to Google.' : siteCopy(locale, 'Analytics notice')}{' '}
+              <Link href={getLocalizedNavigationHref('/privacy', locale)} className="font-medium text-foreground underline underline-offset-4">
+                {siteCopy(locale, 'Privacy details')}
               </Link>
             </p>
             <div className="flex shrink-0 flex-col gap-2 min-[420px]:flex-row">
               <button
                 type="button"
                 onClick={() => chooseConsent('denied')}
-                className="h-10 border border-border bg-background px-4 text-sm font-semibold text-foreground transition-colors hover:border-foreground/45"
+                className="min-h-10 border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-foreground/45"
               >
-                Necessary only
+                {siteCopy(locale, 'Necessary only')}
               </button>
               <button
                 type="button"
                 onClick={() => chooseConsent('granted')}
-                className="h-10 bg-[#006b4f] px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                className="min-h-10 bg-[#006b4f] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
-                Allow analytics
+                {siteCopy(locale, 'Allow analytics')}
               </button>
             </div>
           </div>

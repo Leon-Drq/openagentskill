@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useI18n } from '@/lib/i18n/context'
+import { siteCopy } from '@/lib/i18n/site-copy'
 import {
   ANALYTICS_CONSENT_STORAGE_KEY,
   updateAnalyticsConsent,
@@ -8,6 +10,7 @@ import {
 } from '@/lib/analytics'
 
 export function AnalyticsPreferenceControls() {
+  const { locale } = useI18n()
   const [consent, setConsent] = useState<AnalyticsConsent | null>(null)
 
   useEffect(() => {
@@ -36,7 +39,7 @@ export function AnalyticsPreferenceControls() {
         onClick={() => choose('denied')}
         className="h-11 border border-border bg-background px-5 text-sm font-semibold transition-colors hover:border-foreground/45 aria-pressed:border-foreground aria-pressed:bg-card"
       >
-        Necessary only
+        {siteCopy(locale, 'Necessary only')}
       </button>
       <button
         type="button"
@@ -44,7 +47,7 @@ export function AnalyticsPreferenceControls() {
         onClick={() => choose('granted')}
         className="h-11 bg-[#006b4f] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90 aria-pressed:outline aria-pressed:outline-2 aria-pressed:outline-offset-2 aria-pressed:outline-[#006b4f]"
       >
-        Allow analytics
+        {siteCopy(locale, 'Allow analytics')}
       </button>
     </div>
   )

@@ -3,6 +3,11 @@ import type { Locale } from './config'
 // EN is the key. Tuple order follows the remaining supported locales.
 type Row = readonly [zh: string, ja: string, ko: string, es: string, de: string, fr: string, id: string]
 export const siteTranslations = {
+  'Analytics preferences': ['统计偏好设置', 'アクセス解析の設定', '분석 설정', 'Preferencias de analítica', 'Analyseeinstellungen', 'Préférences d’analyse', 'Preferensi analitik'],
+  'Necessary only': ['仅必要功能', '必要な機能のみ', '필수 기능만', 'Solo lo necesario', 'Nur notwendige Funktionen', 'Fonctions nécessaires uniquement', 'Hanya yang diperlukan'],
+  'Allow analytics': ['允许统计分析', 'アクセス解析を許可', '분석 허용', 'Permitir analítica', 'Analyse erlauben', 'Autoriser l’analyse', 'Izinkan analitik'],
+  'Privacy details': ['隐私详情', 'プライバシーの詳細', '개인정보 안내', 'Detalles de privacidad', 'Datenschutzdetails', 'Détails de confidentialité', 'Detail privasi'],
+  'Analytics notice': ['OpenAgentSkill 使用注重隐私的统计分析，了解哪些页面和产品流程更有帮助。不会向 Google 发送任务文本或私有仓库数据。', 'OpenAgentSkill はプライバシーに配慮したアクセス解析で、役立つページや機能を把握します。タスクの本文や非公開リポジトリのデータを Google に送信しません。', 'OpenAgentSkill은 개인정보를 고려한 분석으로 유용한 페이지와 기능을 파악합니다. 작업 텍스트나 비공개 저장소 데이터는 Google에 전송하지 않습니다.', 'OpenAgentSkill utiliza analítica respetuosa con la privacidad para conocer qué páginas y funciones son útiles. No enviamos a Google texto de tareas ni datos de repositorios privados.', 'OpenAgentSkill nutzt datenschutzbewusste Analysen, um hilfreiche Seiten und Abläufe zu erkennen. Aufgabentexte und private Repository-Daten werden nicht an Google gesendet.', 'OpenAgentSkill utilise des analyses respectueuses de la vie privée pour identifier les pages et fonctions utiles. Aucun texte de tâche ni donnée de dépôt privé n’est envoyé à Google.', 'OpenAgentSkill menggunakan analitik yang memperhatikan privasi untuk memahami halaman dan alur yang berguna. Teks tugas atau data repositori privat tidak dikirim ke Google.'],
   'Current language: {language}': ['当前语言：{language}', '現在の言語：{language}', '현재 언어: {language}', 'Idioma actual: {language}', 'Aktuelle Sprache: {language}', 'Langue actuelle : {language}', 'Bahasa saat ini: {language}'],
   'Select language': ['选择语言', '言語を選択', '언어 선택', 'Elegir idioma', 'Sprache wählen', 'Choisir la langue', 'Pilih bahasa'],
   'RAG and knowledge': ['RAG 与知识库', 'RAG・ナレッジ', 'RAG 및 지식', 'RAG y conocimiento', 'RAG und Wissen', 'RAG et connaissances', 'RAG dan pengetahuan'],

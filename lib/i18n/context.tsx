@@ -3,7 +3,7 @@
 import { createContext, ReactNode, Suspense, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import type { Locale } from './config'
-import { defaultLocale, isLocale } from './config'
+import { defaultLocale, getLocaleFromRoute } from './config'
 import en from './dictionaries/en'
 import zh from './dictionaries/zh'
 import ja from './dictionaries/ja'
@@ -32,15 +32,6 @@ const dictionaries: Record<Locale, Dictionary> = {
   de,
   fr,
   id,
-}
-
-function getLocaleFromPath(pathname: string): Locale | null {
-  const firstSegment = pathname.split('/').filter(Boolean)[0]
-  return isLocale(firstSegment) ? firstSegment : null
-}
-
-function getLocaleFromSearch(value: string | null): Locale | null {
-  return isLocale(value) ? value : null
 }
 
 interface I18nContextType {
@@ -103,11 +94,7 @@ function I18nProviderWithSearch({
   // The route is authoritative when it specifies a locale. The provider syncs
   // this value in place so route changes preserve the already-rendered page
   // tree instead of tearing it down and mounting it again.
-  const routeLocale =
-    getLocaleFromPath(pathname || '') ||
-    getLocaleFromSearch(searchParams.get('lang')) ||
-    initialLocale ||
-    defaultLocale
+  const routeLocale = getLocaleFromRoute(pathname, searchParams.get('lang'), initialLocale)
   const routeKey = `${pathname || '/'}?${searchParams.toString()}`
 
   return (
