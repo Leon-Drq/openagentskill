@@ -18,7 +18,8 @@ for (const slug of slugs) {
     assert.equal(robots,before.robots,`${slug}: index policy`)
     assert.equal(html.match(/<title>(.*?)<\/title>/s)?.[1],before.title,`${slug}: title`)
   }
-  const scripts = [...html.matchAll(/<script\b([^>]*)>(.*?)<\/script\b[^>]*>/gs)]
+  // Inspect script content only; never sanitize or render fetched HTML.
+  const scripts = [...html.matchAll(/<script\b([^>]*)>(.*?)<\/script\b[^>]*>/gsi)]
   const machine = JSON.parse(scripts.find(m=>m[1].includes('id="agent-skill-metadata"'))?.[2] || 'null')
   assert.ok(machine?.install?.source_evidence,slug)
   const schemas = scripts.filter(m=>m[1].includes('application/ld+json')).map(m=>JSON.parse(m[2]))
@@ -45,6 +46,7 @@ for (const locale of ['en','zh','ja','ko','es','de','fr','id']) {
   assert.equal(response.status,200,locale)
   const html=await response.text()
   assert.ok(html.includes('data-skill-profile="v2"'),locale)
-  assert.ok(html.includes('https://www.openagentskill.com/skills/singpenguin-ppt'),locale)
+  const canonical = html.match(/<link rel="canonical" href="([^"]+)/i)?.[1]
+  assert.equal(new URL(canonical).href, 'https://www.openagentskill.com/skills/singpenguin-ppt', locale)
 }
 console.log('Detail HTTP smoke passed: five profiles, canonical/title/index baseline, eight languages, schema and API consistency.')
