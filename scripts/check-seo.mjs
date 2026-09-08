@@ -27,7 +27,7 @@ for (const [path, expectedCanonical, indexable] of paths) {
   const { body, response } = await get(path)
   // Read target tags while skipping script/comment tokens. This is inspection,
   // not an HTML sanitizer; no transformed HTML is ever rendered or executed.
-  const tags = [...body.matchAll(/<!--[\s\S]*?-->|<script\b[^>]*>[\s\S]*?<\/script\s*>|<(link|meta|h1|title)\b[^>]*>/gi)]
+  const tags = [...body.matchAll(/<!--[\s\S]*?-->|<script\b[^>]*>[\s\S]*?<\/script\b[^>]*>|<(link|meta|h1|title)\b[^>]*>/gi)]
     .filter(m => m[1]).map(m => ({ name: m[1].toLowerCase(), attributes: attributes(m[0]) }))
   const links = tags.filter(t => t.name === 'link').map(t => t.attributes)
   const metas = tags.filter(t => t.name === 'meta').map(t => t.attributes)
@@ -38,7 +38,7 @@ for (const [path, expectedCanonical, indexable] of paths) {
   assert.equal(tags.filter(t => t.name === 'h1').length, 1, `${path}: one H1`)
   const robots = metas.filter(m => ['robots', 'googlebot'].includes(m.name)).map(m => m.content).join(',') + (response.headers.get('x-robots-tag') || '')
   assert.equal(/noindex/i.test(robots), !indexable, `${path}: indexability`)
-  for (const block of body.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)) JSON.parse(block[1])
+  for (const block of body.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script\b[^>]*>/gi)) JSON.parse(block[1])
   if (path === '/guides/agent-skills-for-product-videos') {
     assert.ok(body.includes('Sources and examples') && body.includes('2026-09-08'))
     assert.ok(body.includes('source-based planning guide'))
