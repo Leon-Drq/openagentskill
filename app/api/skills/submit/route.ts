@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { validateGitHubRepo, GitHubAPIError } from '@/lib/github/api'
 import {
   discoverGitHubSkills,
-  fetchSkillPackageFiles,
+  fetchSkillPackageSnapshot,
   parseGitHubSkillReference,
 } from '@/lib/github/skill-source'
 import {
@@ -74,7 +74,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const codeFiles = await fetchSkillPackageFiles(skill)
+    const snapshot = await fetchSkillPackageSnapshot(skill, { repositoryTree: discovery.tree })
+    const codeFiles = snapshot.files
     const forwardedFor = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
     const ip = forwardedFor || request.headers.get('x-real-ip') || 'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
@@ -90,6 +91,8 @@ export async function POST(request: NextRequest) {
       makerX: body.makerX,
       requestFingerprint: buildRequestFingerprint(ip, userAgent),
       codeFiles,
+      packageFingerprint: snapshot.fingerprint,
+      packageComplete: !discovery.truncated && !snapshot.truncated && !snapshot.hasUnreviewedFiles,
     }
     const receipt = await createOpenSubmission(submissionInput)
 

@@ -9,10 +9,8 @@
 
 import { createHash } from 'node:crypto'
 import { createPublicClient } from '@/lib/supabase/public'
-import { generateText } from 'ai'
 import type { CandidateRepo } from './github-search'
 import { evaluateSkillCandidate, isMcpCandidate } from './skill-filter'
-import { INDEXER_REVIEW_MODEL } from '@/lib/ai/models'
 import { syncRepositorySkills } from './repository-skill-sync'
 import { AUTOMATIC_DISCOVERY_MIN_STARS } from './intake-policy'
 
@@ -125,66 +123,9 @@ function resolveAiReviewTimeoutMs(value?: number) {
   return Math.min(Math.max(Math.floor(configured), 3_000), MAX_AI_REVIEW_TIMEOUT_MS)
 }
 
-async function aiReview(
-  candidate: CandidateRepo,
-  readme: string,
-  timeoutMs = DEFAULT_AI_REVIEW_TIMEOUT_MS
-): Promise<ReviewResult> {
-  const prompt = `You are an AI curator for OpenAgentSkill, a registry of reusable AI agent skills. MCP servers are out of scope for this product.
-
-Evaluate this GitHub repository and decide if it should be listed:
-
-Repo: ${candidate.fullName}
-Description: ${candidate.description}
-Stars: ${candidate.stars}
-Language: ${candidate.language || 'unknown'}
-
-README (first 1500 chars):
-${readme.slice(0, 1500)}
-
-Rules:
-- APPROVE only if: it is explicitly an installable AI agent skill, a SKILL.md repository/collection, or a domain workflow packaged for agents such as Claude Code, Codex, Cursor, Gemini CLI, or similar agent runtimes.
-- REJECT if: it is a generic framework/library/platform, MCP server, Model Context Protocol integration, demo/tutorial/example repo, broad awesome list, foundation AI project, infrastructure project, or has no clear agent installation/use path.
-- REJECT PyTorch, Kubernetes, TensorFlow, React, Next.js, LangChain-style generic frameworks unless the README clearly packages reusable agent skills.
-- REJECT if license is missing or unclear, README is thin, or it has under 10 stars.
-- Score 0-100 based on direct skill specificity, documentation, installability, maintenance, and usefulness.
-- Pick ONE category from: coding-agents, research, finance-quant, presentation, design-creative, web-scraping, data, marketing-growth, sports-analytics, security, productivity, utility.
-- Pick 1-5 relevant tags
-
-Respond with JSON only, no markdown:
-{"approved":boolean,"score":number,"category":"string","tags":["string"],"summary":"one sentence description","reason":"brief reason if rejected"}`
-
-  try {
-    const { text } = await generateText({
-      model: INDEXER_REVIEW_MODEL,
-      prompt,
-      temperature: 0.2,
-      maxRetries: 0,
-      timeout: timeoutMs,
-    })
-    const match = text.match(/\{[\s\S]*\}/)
-    if (!match) throw new Error('No JSON in response')
-    return JSON.parse(match[0]) as ReviewResult
-  } catch {
-    // If AI fails, stay conservative: approve only direct skill-like repos.
-    const evaluation = evaluateSkillCandidate({
-      fullName: candidate.fullName,
-      name: candidate.repo,
-      description: `${candidate.description || ''}\n${readme.slice(0, 1000)}`,
-      topics: candidate.topics || [],
-      language: candidate.language,
-      stars: candidate.stars,
-    })
-    const approved = candidate.stars >= AUTOMATIC_DISCOVERY_MIN_STARS && evaluation.accepted && evaluation.skillLikenessScore >= 55
-    return {
-      approved,
-      score: approved ? Math.max(60, evaluation.skillLikenessScore) : 30,
-      category: 'utility',
-      tags: [...evaluation.signals.slice(0, 4), candidate.language?.toLowerCase()].filter(Boolean) as string[],
-      summary: candidate.description || candidate.repo,
-      reason: approved ? undefined : 'AI review unavailable and repo is not direct skill-like enough',
-    }
-  }
+async function aiReview(_candidate: CandidateRepo, _readme: string, _timeoutMs: number): Promise<ReviewResult> {
+  // No SKILL.md was found by sourceSync. README classification cannot establish installability.
+  return { approved: false, score: 0, category: 'utility', tags: [], summary: '', reason: 'An explicit SKILL.md package is required; no paid README classification was performed.' }
 }
 
 // ─── Main processor ───────────────────────────────────────────────────────────

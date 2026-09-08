@@ -57,7 +57,7 @@ export async function getPlatformStats(): Promise<{
     supabase
       .from('skills')
       .select('id', { count: 'exact', head: true })
-      .eq('ai_review_approved', true),
+      .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)'),
   ])
 
   if (countError) throw countError
@@ -71,7 +71,7 @@ export async function getPlatformStats(): Promise<{
     const { data, error } = await supabase
       .from('skills')
       .select('downloads, frameworks')
-      .eq('ai_review_approved', true)
+      .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
       .range(from, from + 999)
 
     if (error) throw error

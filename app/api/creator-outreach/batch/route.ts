@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   const { data, error } = await createAdminClient({ requestTimeoutMs: 12_000 })
     .from('skills')
     .select('*')
-    .eq('ai_review_approved', true)
+    .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
     .eq('publisher_verified', false)
     .gte('quality_score', 60)
     .order('github_last_pushed_at', { ascending: false, nullsFirst: false })

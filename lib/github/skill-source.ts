@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import type { GitHubRepo } from '@/lib/schema/skill-schema'
 
 const GITHUB_API = 'https://api.github.com'
@@ -43,6 +44,7 @@ export interface GitHubTreeItem {
   path: string
   type: 'blob' | 'tree'
   size?: number
+  sha?: string
 }
 
 export function selectSkillDocumentPaths(
@@ -383,14 +385,14 @@ export async function fetchSkillPackageSnapshot(
   skill: DiscoveredGitHubSkill,
   options: { maxFiles?: number; repositoryTree?: GitHubTreeItem[] | null } = {}
 ) {
-  const tree = options.repositoryTree || (await fetchRepositoryTree(skill.owner, skill.repo, skill.ref)).tree
+  const fetchedTree = options.repositoryTree ? null : await fetchRepositoryTree(skill.owner, skill.repo, skill.ref)
+  const tree = options.repositoryTree || fetchedTree!.tree
   const prefix = skill.directory ? `${skill.directory}/` : ''
   const packageItems = tree
     .filter((item) => item.type === 'blob')
     .filter((item) => !prefix || item.path.startsWith(prefix))
-    .filter((item) => !/(^|\/)(node_modules|dist|build|vendor|\.git)(\/|$)/i.test(item.path))
-    .filter((item) => !item.size || item.size <= MAX_FILE_BYTES)
   const reviewablePaths = packageItems
+    .filter((item) => !item.size || item.size <= MAX_FILE_BYTES)
     .filter((item) => REVIEWABLE_EXTENSIONS.has(extension(item.path)))
     .sort((a, b) => {
       if (a.path === skill.path) return -1
@@ -419,9 +421,14 @@ export async function fetchSkillPackageSnapshot(
 
   return {
     files,
+    fingerprint: createHash('sha256').update(JSON.stringify(packageItems.map(({ path, sha, size }) => ({ path, sha, size })).sort((a,b) => a.path.localeCompare(b.path)))).digest('hex'),
     totalFiles: reviewablePaths.length,
-    truncated: reviewablePaths.length > files.length,
-    hasUnreviewedFiles: unreviewedPaths.length > 0,
+    truncated: Boolean(fetchedTree?.truncated) || reviewablePaths.length > files.length || packageItems.some((item) => (item.size || 0) > MAX_FILE_BYTES),
+    hasUnreviewedFiles: unreviewedPaths.length > 0 || files.some((file) => {
+      const sha = packageItems.find((item) => item.path === file.path)?.sha
+      const blobHash = createHash('sha1').update(`blob ${Buffer.byteLength(file.content, 'utf8')}\0`).update(file.content).digest('hex')
+      return !file.content || sha !== blobHash
+    }) || packageItems.some((item) => !item.sha),
     unreviewedPaths: unreviewedPaths.slice(0, 5),
   }
 }

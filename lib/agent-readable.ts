@@ -10,10 +10,12 @@ import { getSkillTrustProfile, type SkillTrustEvidence } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 import { AGENT_OUTCOMES } from '@/lib/agent-outcomes'
 import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
+import { getReviewEvidence } from '@/lib/skills/review-evidence'
 
 const SITE_URL = 'https://www.openagentskill.com'
 
 export interface AgentReadableSkillMetadata {
+  review_evidence: ReturnType<typeof getReviewEvidence>
   version: 'openagentskill-agent-metadata-v2'
   skill: {
     slug: string
@@ -270,6 +272,7 @@ export function buildAgentReadableSkillMetadata(
 
   return {
     version: 'openagentskill-agent-metadata-v2',
+    review_evidence: getReviewEvidence(skill),
     skill: {
       slug: skill.slug,
       name: skill.name,

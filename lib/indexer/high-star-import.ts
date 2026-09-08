@@ -1877,7 +1877,7 @@ async function fetchExistingApprovedSlugs(supabase: ReturnType<typeof createPubl
   const { count, error: countError } = await supabase
     .from('skills')
     .select('slug', { count: 'exact', head: true })
-    .eq('ai_review_approved', true)
+    .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
 
   if (countError) {
     throw new Error(`Failed to count existing skills: ${countError.message}`)
@@ -1889,7 +1889,7 @@ async function fetchExistingApprovedSlugs(supabase: ReturnType<typeof createPubl
     const { data, error } = await supabase
       .from('skills')
       .select('slug')
-      .eq('ai_review_approved', true)
+      .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
       .range(from, from + EXISTING_SLUG_PAGE_SIZE - 1)
 
     if (error) {
@@ -2222,52 +2222,19 @@ export async function bulkImportHighStarSkills(
 
     seenSlugs.add(slug)
 
-    const skill = buildSkill(repo, query, evaluation)
-    const { data, error } = await supabase.rpc('upsert_indexed_skill', {
-      p_server_secret: serverSecret,
-      p_skill: skill,
-      p_activity: {
-        event_type: 'skill_published',
-        actor_name: 'OpenAgentSkill Bulk Indexer',
-        actor_type: 'agent',
-        description: `Bulk-indexed ${skill.name} from GitHub (${repo.stargazers_count} stars)`,
-        metadata: {
-          source: 'github-star-discovery',
-          filter_mode: 'skills-only',
-          import_lane: importLane,
-          stars: repo.stargazers_count,
-          relevance_score: evaluation.score,
-          relevance_signals: evaluation.signals,
-          skill_likeness_score: evaluation.skillLikenessScore,
-          skill_likeness_tier: evaluation.skillLikenessTier,
-          skill_likeness_penalties: evaluation.penalties,
-          domain: query.domain || 'core',
-          query: query.q,
-          page,
-          search_min_stars: isAdaptiveExpansion ? adaptiveExpansionMinStars : minStars,
-          search_max_stars: isAdaptiveExpansion ? adaptiveExpansionMaxStars : null,
-        },
-      },
-    })
-
-    if (error) {
+    // Discovery never manufactures approval; use the shared validation/review queue.
+    const { enqueueRepositoryCandidates } = await import('./candidate-intake')
+    try {
+      await enqueueRepositoryCandidates([{
+        owner: repo.owner.login, repo: repo.name, fullName: repo.full_name,
+        description: repo.description || '', stars: repo.stargazers_count,
+        language: repo.language, topics: repo.topics, updatedAt: repo.updated_at || '',
+        htmlUrl: repo.html_url || `https://github.com/${repo.full_name}`,
+      }], 'bulk-github-discovery')
+      results.push({ repo: repo.full_name, status: 'queued', slug })
+    } catch (error) {
       summary.errors += 1
-      results.push({ repo: repo.full_name, status: 'error', slug, reason: error.message })
-      summary.errorSamples = results
-        .filter((result) => result.status === 'error')
-        .slice(-5)
-        .map((result) => ({ repo: result.repo, reason: result.reason }))
-      return
-    }
-
-    const rpcResult = data as IndexedSkillRpcResult | null
-    if (rpcResult?.created) {
-      summary.imported += 1
-      if (isAdaptiveExpansion) summary.adaptiveExpansionImported += 1
-      results.push({ repo: repo.full_name, status: 'indexed', slug })
-    } else {
-      summary.updated += 1
-      results.push({ repo: repo.full_name, status: 'updated', slug })
+      results.push({ repo: repo.full_name, status: 'error', reason: error instanceof Error ? error.message : 'Queue failed' })
     }
   }
 

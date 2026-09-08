@@ -494,6 +494,13 @@ async function publishCandidate(candidate: SkillCandidateRow) {
     if (!successful) {
       const failure = result.entries.find((entry) => entry.reason)
       const reason = failure?.reason || 'Candidate did not pass publication review'
+      if (failure?.deferred) {
+        await updateCandidate(candidate.id, {
+          status: 'review_required', next_attempt_at: new Date(Date.now() + 86_400_000).toISOString(),
+          last_error: 'Analysis budget, cooldown or availability: queued without approval',
+        })
+        return { status: 'retry' as const, slug: null }
+      }
       const retryable = Boolean(failure?.retryable)
       const shouldRetry = retryable && candidate.attempt_count < 4
       await updateCandidate(candidate.id, {
@@ -531,7 +538,7 @@ async function countRecentApprovedSkills() {
   const { count, error } = await admin()
     .from('skills')
     .select('id', { count: 'exact', head: true })
-    .eq('ai_review_approved', true)
+    .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
     .gte('created_at', since)
   if (error) throw new Error(`Daily publication count failed: ${error.message}`)
   return count || 0

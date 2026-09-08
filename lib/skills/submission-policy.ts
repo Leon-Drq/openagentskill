@@ -52,6 +52,17 @@ export function evaluateSkillSubmissionPolicy(input: {
   staticAnalysis: SubmissionStaticAnalysis
   review: AIReviewResult
 }): SubmissionPolicyGate {
+  if (input.review.method === 'static' || input.review.method === 'manual') {
+    const approved = input.review.method === 'static' && input.review.approved && input.hasSkillDocument === true
+      && input.staticAnalysis.passed && input.staticAnalysis.riskLevel === 'low'
+      && input.review.policyVersion === 'risk-first-v1' && Boolean(input.review.packageFingerprint)
+    return {
+      approved, verified: false, status: approved ? 'approved' : 'manual_review',
+      min_stars: 0, min_total_score: 0, min_security_score: 0, min_dimension_score: 0,
+      checks: [{ id: 'static_package', label: 'Static package checks', status: approved ? 'pass' : 'warn', detail: input.review.reasoning }],
+      issues: input.review.issues, suggestions: input.review.suggestions,
+    }
+  }
   const security = score(input.review, 'security')
   const quality = score(input.review, 'quality')
   const usefulness = score(input.review, 'usefulness')

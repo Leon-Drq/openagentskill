@@ -11,6 +11,8 @@ import { I18nProvider } from '@/lib/i18n/context'
 import { buildSkillSearchMetadata } from '@/lib/seo/search-metadata'
 import { isSearchIndexEligible } from '@/lib/seo/search-indexability'
 import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
+import { getReviewEvidence } from '@/lib/skills/review-evidence'
+import { SkillReviewEvidence } from '@/components/skill-review-evidence'
 import { buildDetailStructuredData, selectDetailAlternatives, serializeDetailJson } from '@/lib/skills/detail-profile'
 import { getSkillQualityProfile } from '@/lib/quality'
 import { getSkillTrustProfileV5 } from '@/lib/trust'
@@ -269,6 +271,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
 
               <section id="source-trust" className={sectionClass}>
                 <h2 className={headingClass}><ProfileText id="sourceTrust" /></h2>
+                <SkillReviewEvidence evidence={getReviewEvidence(dbSkill)} installable={source.canOfferInstall && !safety.blocked} />
                 <p className="mt-4 max-w-2xl text-sm leading-relaxed text-secondary"><ProfileText id="signalsNote" /></p>
                 <dl className="mt-6 grid gap-x-8 sm:grid-cols-2">
                   <div className="border-b border-border py-4"><dt className="text-xs text-secondary"><Text id="license" /></dt><dd className="mt-2 text-sm"><Value value={dbSkill.license || 'Unknown'} /></dd></div>

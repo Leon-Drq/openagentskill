@@ -53,7 +53,7 @@ export default async function CreatorDashboard({
     ? await supabase
         .from('skills')
         .select('slug', { count: 'exact', head: true })
-        .eq('ai_review_approved', true)
+        .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
         .ilike('github_repo', `${verifiedGitHubUsername}/%`)
     : { count: 0 }
 

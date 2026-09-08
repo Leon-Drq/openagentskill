@@ -11,7 +11,7 @@ export function selectDetailAlternatives(skill: SkillRecord, candidates: SkillRe
   const terms = words(skill)
   const seen = new Set([skill.slug])
   return candidates.map(candidate => ({candidate, overlap: [...words(candidate)].filter(term => terms.has(term)).length}))
-    .filter(({candidate, overlap}) => overlap >= 2 && (candidate.ai_review_approved || candidate.listing_status === 'owner_published'))
+    .filter(({candidate, overlap}) => overlap >= 2 && (candidate.ai_review_approved || ['owner_published', 'static_checked'].includes(candidate.listing_status || '')))
     .sort((a, b) => b.overlap - a.overlap || b.candidate.github_stars - a.candidate.github_stars)
     .filter(({candidate}) => { if (seen.has(candidate.slug)) return false; seen.add(candidate.slug); return true })
     .slice(0, limit).map(({candidate}) => candidate)

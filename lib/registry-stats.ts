@@ -41,7 +41,7 @@ export async function getApprovedRegistrySkillCount(
     supabase
       .from('skills')
       .select('slug', { count: 'planned', head: true })
-      .eq('ai_review_approved', true),
+      .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)'),
     timeoutMs,
     'registry planner count query'
   ).catch((queryError) => ({ count: null, error: queryError }))

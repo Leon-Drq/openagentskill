@@ -117,6 +117,10 @@ export const AIReviewResultSchema = z.object({
   reasoning: z.string(),
   reviewedAt: z.string(),
   reviewModel: z.string(),
+  method: z.enum(['static', 'ai', 'manual']).optional(),
+  packageFingerprint: z.string().optional(),
+  policyVersion: z.string().optional(),
+  deferred: z.boolean().optional(),
 })
 
 export type AIReviewResult = z.infer<typeof AIReviewResultSchema>

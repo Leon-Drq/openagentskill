@@ -19,7 +19,7 @@ import { estimateSubmissionQuality } from '@/lib/skills/submission-quality'
 import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getLicenseEvidence } from '@/lib/creator-ownership'
-import { evaluateFastTrackCandidate } from '@/lib/indexer/fast-track'
+import { REVIEW_POLICY_VERSION } from '@/lib/ai/review-policy'
 import { shouldRetryAutomatedReview } from '@/lib/indexer/review-retry'
 
 const DEFAULT_MAX_SKILLS_PER_REPOSITORY = 8
@@ -36,6 +36,7 @@ export interface RepositorySkillSyncEntry {
   status: RepositorySkillSyncEntryStatus
   reason?: string
   retryable?: boolean
+  deferred?: boolean
 }
 
 export interface RepositorySkillSyncResult {
@@ -136,48 +137,15 @@ function orderedSkills(skills: DiscoveredGitHubSkill[], existing: SkillRecord[],
     .slice(0, limit)
 }
 
-function payloadForExisting(
-  existing: SkillRecord,
-  skill: DiscoveredGitHubSkill,
-  repository: Awaited<ReturnType<typeof validateGitHubRepo>>,
-  discoverySource: string,
-  discoveryMetadata?: Record<string, unknown>
-) {
-  const license = getLicenseEvidence(skill.frontmatter.license, repository.license || existing.license)
-  return {
-    ...existing,
-    repository: skill.sourceUrl,
-    github_repo: repository.fullName,
-    github_stars: repository.stars,
-    github_forks: repository.forks,
-    github_language: repository.language || existing.github_language || null,
-    github_last_pushed_at: repository.pushedAt || repository.updatedAt,
-    long_description: skill.document.slice(0, 12_000),
-    version: normalizeVersion(skill.frontmatter.version || existing.version),
-    license: license.license,
-    license_source: license.source,
-    license_status: license.status,
-    source_content_hash: contentHash(skill.document),
-    submission_source: existing.submission_source || discoverySource,
-    ai_review_score: {
-      ...(existing.ai_review_score && typeof existing.ai_review_score === 'object' ? existing.ai_review_score : {}),
-      source_url: skill.sourceUrl,
-      source_ref: skill.ref,
-      skill_path: skill.path,
-      last_source_sync_at: new Date().toISOString(),
-      ...(discoveryMetadata || {}),
-    },
-  }
-}
 
 async function payloadForNew(
   skill: DiscoveredGitHubSkill,
   repository: Awaited<ReturnType<typeof validateGitHubRepo>>,
   discoverySource: string,
   discoveryMetadata?: Record<string, unknown>,
-  reviewMode: 'ai' | 'fast-track' = 'ai',
   slugOverride?: string,
-  repositoryTree?: GitHubTreeItem[] | null
+  repositoryTree?: GitHubTreeItem[] | null,
+  treeTruncated = false
 ) {
   const delegatedSkill = await fetchDelegatedGitHubSkill(skill, repositoryTree)
   const primarySnapshot = await fetchSkillPackageSnapshot(skill, { repositoryTree })
@@ -211,34 +179,18 @@ async function payloadForNew(
   let reviewIssues: string[]
   let reviewSuggestions: string[]
 
-  if (reviewMode === 'fast-track') {
-    const decision = evaluateFastTrackCandidate({
-      stars: repository.stars,
-      licenseStatus: license.status,
-      updatedAt: repository.pushedAt || repository.updatedAt,
-      document: reviewDocument,
-      files: codeFiles,
-      packageTruncated,
-      hasUnreviewedFiles,
-    })
-    if (!decision.eligible) {
-      return {
-        payload: null,
-        reason: decision.reasons.slice(0, 3).join('; ') || 'Deterministic fast-track safety check failed.',
-        retryable: false,
-      }
-    }
-    reviewScores = { security: 9, quality: 8, usefulness: 8, compliance: 9 }
-    reviewTotal = 34
-    reviewSource = 'deterministic-fast-track-v1'
-    reviewIssues = []
-    reviewSuggestions = ['Creator ownership and identity remain unverified until the maintainer claims this skill.']
-  } else {
+  // Queue classification is advisory. Every entry point uses the same fresh package policy.
+  let reviewMethod: 'static' | 'ai' | 'manual' = 'manual'
+  let reviewFingerprint: string | undefined
+  let reviewedAt: string | undefined
+  {
     const review = await reviewSkill({
       repository: skill.sourceUrl,
       readmeContent: reviewDocument,
       codeFiles,
       manifestData: skill.frontmatter,
+      packageComplete: !treeTruncated && !packageTruncated && !hasUnreviewedFiles,
+      packageFingerprint: packageSnapshots.map((snapshot) => snapshot?.fingerprint || '').join(':'),
       githubStats: {
         stars: repository.stars,
         forks: repository.forks,
@@ -259,6 +211,7 @@ async function payloadForNew(
         payload: null,
         reason: policy.issues.slice(0, 2).join('; ') || 'Automated review did not approve this skill.',
         retryable: shouldRetryAutomatedReview(review.reviewModel),
+        deferred: review.deferred === true,
       }
     }
     reviewScores = review.scores
@@ -266,6 +219,9 @@ async function payloadForNew(
     reviewSource = 'recursive-skill-source-sync'
     reviewIssues = policy.issues
     reviewSuggestions = policy.suggestions
+    reviewMethod = review.method || 'ai'
+    reviewFingerprint = review.packageFingerprint
+    reviewedAt = review.reviewedAt
   }
 
   const slug = slugOverride || buildIndexedSkillSlug(repository.owner, skill.frontmatter.name)
@@ -315,6 +271,11 @@ async function payloadForNew(
         source_ref: skill.ref,
         skill_path: skill.path,
         ...(discoveryMetadata || {}),
+        method: reviewMethod,
+        decision: 'approved',
+        policy_version: REVIEW_POLICY_VERSION,
+        package_fingerprint: reviewFingerprint,
+        reviewed_at: reviewedAt,
         ...(delegatedSkill
           ? {
               delegates_to: delegatedSkill.frontmatter.name,
@@ -323,7 +284,8 @@ async function payloadForNew(
             }
           : {}),
       },
-      ai_review_approved: true,
+      ai_review_approved: reviewMethod === 'ai',
+      listing_status: reviewMethod === 'static' ? 'static_checked' : 'reviewed',
       ai_review_issues: reviewIssues,
       ai_review_suggestions: reviewSuggestions,
       quality_score: quality.score,
@@ -375,7 +337,12 @@ export async function syncRepositorySkills(
     reference.repo,
     reference.ref || repository.defaultBranch
   )
-  const discovery = await discoverGitHubSkills(reference, repository)
+  if (!sourceCommitSha) throw new Error('Unable to pin repository snapshot; retry without publishing.')
+  const discovery = await discoverGitHubSkills({ ...reference, ref: sourceCommitSha }, repository)
+  // Scan immutable blobs, but keep the original source URL for dedupe and future syncs.
+  for (const skill of discovery.skills) {
+    skill.sourceUrl = skill.sourceUrl.replace(`/${sourceCommitSha}/`, `/${reference.ref || repository.defaultBranch}/`)
+  }
   const supabase = createPublicClient({ requestTimeoutMs: DB_TIMEOUT_MS })
   const admin = createAdminClient({ requestTimeoutMs: DB_TIMEOUT_MS })
   const { data: existingData, error: existingError } = await supabase
@@ -458,19 +425,17 @@ export async function syncRepositorySkills(
       const resolvedSlug = existingSkill
         ? existingSkill.slug
         : await resolveIndexedSkillSlug(supabase, fallbackSlug, skill.sourceUrl)
-      const result = existingSkill
-        ? { payload: payloadForExisting(existingSkill, skill, repository, discoverySource, options.discoveryMetadata), reason: null }
-        : await payloadForNew(
-            skill,
-            repository,
-            discoverySource,
-            options.discoveryMetadata,
-            options.reviewMode || 'ai',
-            resolvedSlug,
-            discovery.tree
-          )
+      const result = await payloadForNew(
+        skill, repository, discoverySource, options.discoveryMetadata,
+        resolvedSlug, discovery.tree, discovery.truncated
+      )
 
       if (!result.payload) {
+        // Keep the previously published snapshot, but visibly require review for the newly observed version.
+        if (existingSkill) {
+          const { createAdminClient } = await import('@/lib/supabase/admin')
+          await createAdminClient().from('skills').update({ source_sync_status: 'changed' }).eq('id', existingSkill.id)
+        }
         entries.push({
           slug: fallbackSlug,
           name: skill.frontmatter.name,
@@ -479,6 +444,7 @@ export async function syncRepositorySkills(
           status: 'rejected',
           reason: result.reason || 'Automated review rejected the skill.',
           retryable: result.retryable,
+          deferred: result.deferred,
         })
         continue
       }

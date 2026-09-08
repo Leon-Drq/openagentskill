@@ -473,7 +473,7 @@ async function getApprovedSkillsBySlugs(
   const { data, error } = await supabase
     .from('skills')
     .select('*')
-    .eq('ai_review_approved', true)
+    .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
     .in('slug', uniqueSlugs)
     .limit(uniqueSlugs.length)
 

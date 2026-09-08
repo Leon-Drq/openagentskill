@@ -34,6 +34,8 @@ export interface OpenSubmissionInput {
   makerX?: string
   requestFingerprint: string
   codeFiles: { path: string; content: string }[]
+  packageFingerprint?: string
+  packageComplete?: boolean
 }
 
 export interface OpenSubmissionReceipt {
@@ -258,6 +260,8 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
       repository: input.skill.sourceUrl,
       readmeContent: input.skill.document,
       codeFiles: input.codeFiles,
+      packageFingerprint: input.packageFingerprint,
+      packageComplete: input.packageComplete,
       manifestData: input.skill.frontmatter,
       githubStats: {
         stars: input.repository.stars,
@@ -325,7 +329,7 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
       license: input.skill.frontmatter.license || input.repository.license || 'Unknown',
       install_command: `npx skills add ${input.repository.fullName} --skill ${input.skill.frontmatter.name}`,
       verified: false,
-      listing_status: 'reviewed',
+      listing_status: review.method === 'static' ? 'static_checked' : 'reviewed',
       source_ref: input.skill.ref,
       source_path: input.skill.path,
       source_content_hash: sourceContentHash,
@@ -340,8 +344,13 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
         source: 'open-skill-submission',
         skill_path: input.skill.path,
         source_url: input.skill.sourceUrl,
+        method: review.method || 'ai',
+        decision: 'approved',
+        policy_version: review.policyVersion,
+        package_fingerprint: review.packageFingerprint,
+        reviewed_at: review.reviewedAt,
       },
-      ai_review_approved: true,
+      ai_review_approved: review.method === 'ai',
       ai_review_issues: policy.issues,
       ai_review_suggestions: policy.suggestions,
       quality_score: quality.score,

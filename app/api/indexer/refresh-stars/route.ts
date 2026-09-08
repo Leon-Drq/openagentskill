@@ -88,7 +88,7 @@ async function getRefreshBatch() {
     const { data, error } = await supabase
       .from('skills')
       .select('slug, github_repo, github_stars, github_forks, github_language, github_last_pushed_at')
-      .eq('ai_review_approved', true)
+      .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
       .not('github_repo', 'is', null)
       .order('slug', { ascending: true })
       .range(from, from + batchSize - 1)
