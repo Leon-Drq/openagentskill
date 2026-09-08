@@ -23,7 +23,7 @@ for (const skill of SHOWCASE_SKILLS) {
 }
 for (const creator of SHOWCASE_CREATORS) {
   const href = getShowcaseCreatorHref(creator)
-  if (!creator.profile) assert.equal(href, creator.url, 'Do not invent an internal seller/profile identity from attribution')
+  if (!creator.profile) assert.ok(href === creator.url || href === `/creators/github/${creator.githubUsername?.toLowerCase()}`, 'Only explicit public GitHub attribution pages may link internally without account verification')
 }
 for (const slug of FEATURED_SHOWCASE_SLUGS) assert.ok(getShowcaseCase(slug), `Broken homepage case: ${slug}`)
 

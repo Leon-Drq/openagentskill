@@ -12,6 +12,7 @@ import { USE_CASES } from '@/lib/use-cases'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
 import { HomeShowcase } from './showcase-sections'
+import { HomeCreators } from './home-creators'
 import { GitHubPopularityList } from './github-popularity-list'
 
 interface HomePageEnhancedProps {
@@ -1583,6 +1584,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
 
       </main>
 
+      <HomeCreators />
       <SiteFooter />
 
     </div>

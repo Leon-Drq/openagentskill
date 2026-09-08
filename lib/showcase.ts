@@ -2,6 +2,7 @@ import curatedEntries from './showcase-curation.json' with { type: 'json' }
 import curatedSources from './showcase-sources.json' with { type: 'json' }
 import curatedMedia from './showcase-media.json' with { type: 'json' }
 import curatedGroups from './showcase-groups.json' with { type: 'json' }
+import featuredCreators from './featured-creators.json' with { type: 'json' }
 // @ts-expect-error Direct Node regression tests require the TypeScript extension.
 import { galleryCopy, localizeEditorialText, editorialSearchText } from './i18n/gallery-copy.ts'
 
@@ -109,7 +110,10 @@ export function getShowcaseSkill(slug: string) {
 }
 
 export function getShowcaseCreatorHref(creator: ShowcaseCreator) {
-  return creator.profile ? `/creators/${encodeURIComponent(creator.profile.username)}` : creator.url
+  if (creator.profile) return `/creators/${encodeURIComponent(creator.profile.username)}`
+  // A curated GitHub attribution page is not a registered seller identity.
+  const featured = featuredCreators.find(entry => entry.owner.toLowerCase() === creator.githubUsername?.toLowerCase())
+  return featured ? `/creators/github/${featured.owner.toLowerCase()}` : creator.url
 }
 
 export function getShowcaseAccessLabel(skill: ShowcaseSkill, locale: string) {

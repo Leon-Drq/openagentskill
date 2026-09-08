@@ -1,0 +1,582 @@
+[
+  {
+    "owner": "yanliudesign",
+    "name": "Yan Liu",
+    "kind": "Person",
+    "area": "Design",
+    "githubUrl": "https://github.com/yanliudesign",
+    "checkedAt": "2026-09-08T08:12:32.355Z",
+    "repositories": [
+      {
+        "fullName": "yanliudesign/mono-color-skill",
+        "url": "https://github.com/yanliudesign/mono-color-skill",
+        "stars": 2891,
+        "observedAt": "2026-09-08T08:12:30.106Z",
+        "pushedAt": "2026-09-02T18:49:42Z",
+        "description": "One-ink editorial print image skill — warm paper, halftone photography, active negative space, and restrained typography.",
+        "revision": "c8ff70597ddedcd65f21a0b528f6a70c35690b0a",
+        "skillPath": "SKILL.md",
+        "license": "MIT"
+      },
+      {
+        "fullName": "yanliudesign/offer-toolkit-skill",
+        "url": "https://github.com/yanliudesign/offer-toolkit-skill",
+        "stars": 411,
+        "observedAt": "2026-09-08T08:12:32.355Z",
+        "pushedAt": "2026-09-07T21:54:32Z",
+        "description": "Full job-hunt Claude skill bundle — Job Description decoder + Resume builder (11 templates) + Behavioral Interview / story bank. Three self-contained sub-skills with a top-level router.",
+        "revision": "ccd369e46a7fe539fd01a671a69d2190012b67bc",
+        "skillPath": "SKILL.md",
+        "license": "MIT"
+      }
+    ],
+    "preferredSlugs": [
+      "yanliudesign-mono-color-skill",
+      "yanliudesign-resume-skill",
+      "yanliudesign-job-description-skill"
+    ]
+  },
+  {
+    "owner": "Leonxlnx",
+    "name": "Leon Lin",
+    "kind": "Person",
+    "area": "Design",
+    "githubUrl": "https://github.com/Leonxlnx",
+    "checkedAt": "2026-09-08T08:12:35.075Z",
+    "repositories": [
+      {
+        "fullName": "Leonxlnx/taste-skill",
+        "url": "https://github.com/Leonxlnx/taste-skill",
+        "stars": 85264,
+        "observedAt": "2026-09-08T08:12:35.075Z",
+        "pushedAt": "2026-08-24T15:23:56Z",
+        "description": "Taste-Skill - gives your AI good taste. stops the AI from generating boring, generic slop ",
+        "revision": "ccbc15639c97057cbfcf32ecebc38ef716e4bb37",
+        "skillPath": "skills/taste-skill/SKILL.md",
+        "license": "MIT"
+      }
+    ],
+    "preferredSlugs": [
+      "design-taste-frontend",
+      "leonxlnx-taste-skill"
+    ]
+  },
+  {
+    "owner": "Alisa0808",
+    "name": "Alisa",
+    "kind": "Person",
+    "area": "Video",
+    "githubUrl": "https://github.com/Alisa0808",
+    "checkedAt": "2026-09-08T08:12:38.894Z",
+    "repositories": [
+      {
+        "fullName": "Alisa0808/vox-director",
+        "url": "https://github.com/Alisa0808/vox-director",
+        "stars": 1801,
+        "observedAt": "2026-09-08T08:12:38.894Z",
+        "pushedAt": "2026-08-11T15:39:41Z",
+        "description": "Turn one topic into a finished Vox-style paper-collage explainer/ad video — automated end to end on Atlas Cloud + ffmpeg. An agent skill.",
+        "revision": "668ec3946fe0139bc985313b15c1a300fca42f94",
+        "skillPath": "SKILL.md",
+        "license": "MIT"
+      }
+    ],
+    "preferredSlugs": [
+      "vox-director",
+      "alisa0808-vox-director"
+    ]
+  },
+  {
+    "owner": "op7418",
+    "name": "歸藏",
+    "kind": "Person",
+    "area": "Presentations",
+    "githubUrl": "https://github.com/op7418",
+    "checkedAt": "2026-09-08T08:12:43.059Z",
+    "repositories": [
+      {
+        "fullName": "op7418/guizang-ppt-skill",
+        "url": "https://github.com/op7418/guizang-ppt-skill",
+        "stars": 25850,
+        "observedAt": "2026-09-08T08:12:41.698Z",
+        "pushedAt": "2026-08-07T03:58:08Z",
+        "description": "AI-agent Skill for generating polished HTML slide decks: editorial magazine and Swiss layouts, image prompts, social covers, and a WebGL/low-power presentation runtime.",
+        "revision": "c91369c449d34755d320a8b81d0734000d99d1ab",
+        "skillPath": "SKILL.md",
+        "license": "AGPL-3.0"
+      },
+      {
+        "fullName": "op7418/guizang-social-card-skill",
+        "url": "https://github.com/op7418/guizang-social-card-skill",
+        "stars": 6905,
+        "observedAt": "2026-09-08T08:12:43.059Z",
+        "pushedAt": "2026-07-01T16:39:11Z",
+        "description": "🪧 Claude Code / Codex skill — generate Xiaohongshu carousels & WeChat 21:9+1:1 cover pairs. Editorial × Swiss visual systems, 28 layouts, 10 themes, single-file HTML → PNG. 小红书图文 + 公众号封面对",
+        "revision": "cf4b810fac1c73fb65a2bb31d8c9278d82cbc4c5",
+        "skillPath": "SKILL.md",
+        "license": "AGPL-3.0"
+      }
+    ],
+    "preferredSlugs": [
+      "op7418-guizang-ppt-skill",
+      "op7418-guizang-social-card-skill"
+    ]
+  },
+  {
+    "owner": "nexu-io",
+    "name": "OpenDesign",
+    "kind": "Organization",
+    "area": "Design",
+    "githubUrl": "https://github.com/nexu-io",
+    "checkedAt": "2026-09-08T08:12:47.119Z",
+    "repositories": [
+      {
+        "fullName": "nexu-io/open-design",
+        "url": "https://github.com/nexu-io/open-design",
+        "stars": 94787,
+        "observedAt": "2026-09-08T08:12:47.119Z",
+        "pushedAt": "2026-09-08T08:05:27Z",
+        "description": "🎨 Best DeepSeek Harness Design Plugin. The open-source Claude Design alternative. 🖥️ Local-first desktop app. 🖼️ Your coding agent becomes the design engine: prototypes, landing pages, dashboards, slides, images & video — real files, HTML/PDF/PPTX/MP4 export. 🤖 Claude Code / Codex / Cursor / DeepSeek Harness / OpenCode & 20+ CLIs via BYOK.",
+        "revision": "6b60b567ac8bef60cbedd2f4c89cc494b4dbb361",
+        "skillPath": "design-templates/html-ppt-zhangzara-editorial-tri-tone/SKILL.md",
+        "license": "Apache-2.0"
+      }
+    ],
+    "preferredSlugs": [
+      "nexu-io-html-ppt-zhangzara-editorial-tri-tone",
+      "nexu-io-html-ppt-zhangzara-cobalt-grid",
+      "nexu-io-html-ppt-zhangzara-creative-mode"
+    ]
+  },
+  {
+    "owner": "JimLiu",
+    "name": "Jim Liu 宝玉",
+    "kind": "Person",
+    "area": "Content",
+    "githubUrl": "https://github.com/JimLiu",
+    "checkedAt": "2026-09-08T08:12:51.414Z",
+    "repositories": [
+      {
+        "fullName": "JimLiu/baoyu-skills",
+        "url": "https://github.com/JimLiu/baoyu-skills",
+        "stars": 25744,
+        "observedAt": "2026-09-08T08:12:49.664Z",
+        "pushedAt": "2026-07-04T16:25:18Z",
+        "description": "",
+        "revision": "6b7a2e417500561a5ecdd0b168332f4142584617",
+        "skillPath": "skills/baoyu-infographic/SKILL.md",
+        "license": "MIT"
+      },
+      {
+        "fullName": "JimLiu/baoyu-design",
+        "url": "https://github.com/JimLiu/baoyu-design",
+        "stars": 3974,
+        "observedAt": "2026-09-08T08:12:51.414Z",
+        "pushedAt": "2026-07-30T01:41:39Z",
+        "description": "Run Claude Design locally as an Agent Skill — Cursor, Claude Code & more. Produce polished UI mockups, prototypes, decks & wireframes as self-contained HTML, without claude.ai/design. Best with Opus 4.8.",
+        "revision": "026d4ea012bdd5cada72ac8cc13f21ba4edf2245",
+        "skillPath": "skills/baoyu-design/SKILL.md",
+        "license": "MIT"
+      }
+    ],
+    "preferredSlugs": [
+      "jimliu-baoyu-skills-baoyu-comic",
+      "jimliu-baoyu-skills-baoyu-xhs-images",
+      "jimliu-baoyu-skills-baoyu-article-illustrator"
+    ]
+  },
+  {
+    "owner": "zarazhangrui",
+    "name": "Zara Zhang",
+    "kind": "Person",
+    "area": "Presentations",
+    "githubUrl": "https://github.com/zarazhangrui",
+    "checkedAt": "2026-09-08T08:12:56.876Z",
+    "repositories": [
+      {
+        "fullName": "zarazhangrui/frontend-slides",
+        "url": "https://github.com/zarazhangrui/frontend-slides",
+        "stars": 28913,
+        "observedAt": "2026-09-08T08:12:55.276Z",
+        "pushedAt": "2026-06-23T20:08:19Z",
+        "description": "Create beautiful slides on the web using a coding agent's frontend skills",
+        "revision": "9906a34d640d2111f724544cbc50f7f130569ae1",
+        "skillPath": "SKILL.md",
+        "license": "MIT"
+      },
+      {
+        "fullName": "zarazhangrui/codebase-to-course",
+        "url": "https://github.com/zarazhangrui/codebase-to-course",
+        "stars": 5523,
+        "observedAt": "2026-09-08T08:12:56.876Z",
+        "pushedAt": "2026-03-30T18:26:09Z",
+        "description": "A Claude Code skill that turns any codebase into a beautiful, interactive single-page HTML course for non-technical vibe coders.",
+        "revision": "ff8837ecf8e9f6ce9874ffa42e42633394a52a00",
+        "skillPath": "SKILL.md",
+        "license": null
+      }
+    ],
+    "preferredSlugs": [
+      "zarazhangrui-frontend-slides",
+      "zarazhangrui-codebase-to-course"
+    ]
+  },
+  {
+    "owner": "alchaincyf",
+    "name": "花叔",
+    "kind": "Person",
+    "area": "Design",
+    "githubUrl": "https://github.com/alchaincyf",
+    "checkedAt": "2026-09-08T08:13:02.754Z",
+    "repositories": [
+      {
+        "fullName": "alchaincyf/huashu-design",
+        "url": "https://github.com/alchaincyf/huashu-design",
+        "stars": 23974,
+        "observedAt": "2026-09-08T08:13:00.638Z",
+        "pushedAt": "2026-08-25T03:05:46Z",
+        "description": "Huashu Design · HTML-native design skill for Claude Code · Claude Code 里 HTML 原生的设计 skill · 高保真原型 / 幻灯片 / 动画 + 20 设计哲学 + 5 维评审 + MP4 导出 · Agent-agnostic",
+        "revision": "a790f704d85f277cc93d2081b0840d00036969bb",
+        "skillPath": "SKILL.md",
+        "license": "MIT"
+      },
+      {
+        "fullName": "alchaincyf/nuwa-skill",
+        "url": "https://github.com/alchaincyf/nuwa-skill",
+        "stars": 32243,
+        "observedAt": "2026-09-08T08:13:02.754Z",
+        "pushedAt": "2026-08-25T03:02:26Z",
+        "description": "你想蒸馏的下一个员工，何必是同事。蒸馏任何人的思维方式——心智模型、决策启发式、表达DNA。Distill how anyone thinks.",
+        "revision": "fe0374687037c4cc51a65c1e0c145afe2981dc69",
+        "skillPath": "SKILL.md",
+        "license": "MIT"
+      }
+    ],
+    "preferredSlugs": [
+      "nuwa-skill",
+      "alchaincyf-huashu-design-1d891f8f"
+    ]
+  },
+  {
+    "owner": "s1dashu",
+    "name": "Sida",
+    "kind": "Person",
+    "area": "Design",
+    "githubUrl": "https://github.com/s1dashu",
+    "checkedAt": "2026-09-08T08:13:05.636Z",
+    "repositories": [
+      {
+        "fullName": "s1dashu/ip-as-logo-skill",
+        "url": "https://github.com/s1dashu/ip-as-logo-skill",
+        "stars": 5048,
+        "observedAt": "2026-09-08T08:13:05.636Z",
+        "pushedAt": "2026-08-22T16:48:59Z",
+        "description": "A compact Agent Skill for highly simplified, rounded, subtly neo-skeuomorphic IP mascot logos.",
+        "revision": "acb834c717bcd0a487c49732d08397ba280d690b",
+        "skillPath": "SKILL.md",
+        "license": "MIT"
+      }
+    ],
+    "preferredSlugs": [
+      "s1dashu-ip-as-logo-skill"
+    ]
+  },
+  {
+    "owner": "larashero3-dotcom",
+    "name": "lieflat",
+    "kind": "Person",
+    "area": "Data",
+    "githubUrl": "https://github.com/larashero3-dotcom",
+    "checkedAt": "2026-09-08T08:13:10.899Z",
+    "repositories": [
+      {
+        "fullName": "larashero3-dotcom/lieflat-charts",
+        "url": "https://github.com/larashero3-dotcom/lieflat-charts",
+        "stars": 4944,
+        "observedAt": "2026-09-08T08:13:08.923Z",
+        "pushedAt": "2026-09-05T02:40:41Z",
+        "description": "Data visualization Skill for AI Agents, turning data into polished, interactive HTML charts. 面向 AI Agents 的数据可视化 Skill，将数据快速生成精致、可交互的 HTML 图表。",
+        "revision": "eace082a317b696c5570c25826a53a7fa113e984",
+        "skillPath": "SKILL.md",
+        "license": "NOASSERTION"
+      },
+      {
+        "fullName": "larashero3-dotcom/writing-dna-skill",
+        "url": "https://github.com/larashero3-dotcom/writing-dna-skill",
+        "stars": 1613,
+        "observedAt": "2026-09-08T08:13:10.899Z",
+        "pushedAt": "2026-08-24T06:57:16Z",
+        "description": "写作蒸馏器.skill｜蒸馏复刻任意写作风格的 agent skill | Writing DNA Distiller - distill and recreate any writing style as an agent skill",
+        "revision": "ee3d97ee27268004b5187d97711161f44fc4aae4",
+        "skillPath": "SKILL.md",
+        "license": "MIT"
+      }
+    ],
+    "preferredSlugs": [
+      "larashero3-dotcom-lieflat-charts",
+      "larashero3-dotcom-writing-dna-skill",
+      "larashero3-dotcom-lieflat-less-ai-tone"
+    ]
+  },
+  {
+    "owner": "obra",
+    "name": "Jesse Vincent",
+    "kind": "Person",
+    "area": "Coding",
+    "githubUrl": "https://github.com/obra",
+    "checkedAt": "2026-09-08T08:13:14.027Z",
+    "repositories": [
+      {
+        "fullName": "obra/superpowers",
+        "url": "https://github.com/obra/superpowers",
+        "stars": 282974,
+        "observedAt": "2026-09-08T08:13:14.027Z",
+        "pushedAt": "2026-09-04T23:04:36Z",
+        "description": "An agentic skills framework & software development methodology that works.",
+        "revision": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
+        "skillPath": "skills/brainstorming/SKILL.md",
+        "license": "MIT"
+      }
+    ],
+    "preferredSlugs": [
+      "obra-dispatching-parallel-agents",
+      "obra-writing-plans",
+      "obra-using-git-worktrees"
+    ]
+  },
+  {
+    "owner": "anthropics",
+    "name": "Anthropic",
+    "kind": "Organization",
+    "area": "Coding",
+    "githubUrl": "https://github.com/anthropics",
+    "checkedAt": "2026-09-08T08:13:18.725Z",
+    "repositories": [
+      {
+        "fullName": "anthropics/skills",
+        "url": "https://github.com/anthropics/skills",
+        "stars": 175117,
+        "observedAt": "2026-09-08T08:13:18.725Z",
+        "pushedAt": "2026-09-03T16:37:14Z",
+        "description": "Public repository for Agent Skills",
+        "revision": "41bbe19d1a1a7eaab5e7bb9050a417e5c6cffc8f",
+        "skillPath": "skills/frontend-design/SKILL.md",
+        "license": null
+      }
+    ],
+    "preferredSlugs": [
+      "anthropic-frontend-design",
+      "anthropic-webapp-testing",
+      "anthropic-canvas-design"
+    ]
+  },
+  {
+    "owner": "vercel-labs",
+    "name": "Vercel Labs",
+    "kind": "Organization",
+    "area": "Coding",
+    "githubUrl": "https://github.com/vercel-labs",
+    "checkedAt": "2026-09-08T08:13:21.976Z",
+    "repositories": [
+      {
+        "fullName": "vercel-labs/agent-skills",
+        "url": "https://github.com/vercel-labs/agent-skills",
+        "stars": 30951,
+        "observedAt": "2026-09-08T08:13:21.976Z",
+        "pushedAt": "2026-08-28T13:36:31Z",
+        "description": "Vercel's official collection of agent skills",
+        "revision": "063bee94c3f4df8453406c830b0a7df0f2860278",
+        "skillPath": "skills/composition-patterns/SKILL.md",
+        "license": null
+      }
+    ],
+    "preferredSlugs": [
+      "vercel-react-best-practices",
+      "vercel-web-design-guidelines",
+      "vercel-deploy-to-vercel"
+    ]
+  },
+  {
+    "owner": "remotion-dev",
+    "name": "Remotion",
+    "kind": "Organization",
+    "area": "Video",
+    "githubUrl": "https://github.com/remotion-dev",
+    "checkedAt": "2026-09-08T08:13:24.756Z",
+    "repositories": [
+      {
+        "fullName": "remotion-dev/skills",
+        "url": "https://github.com/remotion-dev/skills",
+        "stars": 4507,
+        "observedAt": "2026-09-08T08:13:24.756Z",
+        "pushedAt": "2026-09-07T09:39:00Z",
+        "description": "Agent Skills",
+        "revision": "11986e44eeb672b083354e68967f2b194df73b7c",
+        "skillPath": "skills/remotion-best-practices/SKILL.md",
+        "license": null
+      }
+    ],
+    "preferredSlugs": [
+      "remotion-dev-skills"
+    ]
+  },
+  {
+    "owner": "heygen-com",
+    "name": "HeyGen",
+    "kind": "Organization",
+    "area": "Video",
+    "githubUrl": "https://github.com/heygen-com",
+    "checkedAt": "2026-09-08T08:13:34.352Z",
+    "repositories": [
+      {
+        "fullName": "heygen-com/hyperframes",
+        "url": "https://github.com/heygen-com/hyperframes",
+        "stars": 46933,
+        "observedAt": "2026-09-08T08:13:32.932Z",
+        "pushedAt": "2026-09-08T08:04:36Z",
+        "description": "Write HTML. Render video. Built for agents.",
+        "revision": "e5d89f770fbe01d8c243999dac59f3c39a62d66d",
+        "skillPath": "skills/product-launch-video/SKILL.md",
+        "license": "Apache-2.0"
+      },
+      {
+        "fullName": "heygen-com/skills",
+        "url": "https://github.com/heygen-com/skills",
+        "stars": 429,
+        "observedAt": "2026-09-08T08:13:34.352Z",
+        "pushedAt": "2026-07-14T21:33:38Z",
+        "description": "HeyGen AI agent skills — avatar creation and video production via the v3 Video Agent pipeline",
+        "revision": "1bd5e4d33a028dfed3abf504c5e3dd644fb9ea8a",
+        "skillPath": "heygen-avatar/SKILL.md",
+        "license": "MIT"
+      }
+    ],
+    "preferredSlugs": [
+      "heygen-com-hyperframes-general-video",
+      "heygen-com-hyperframes-product-launch-video",
+      "heygen-com-heygen-video"
+    ]
+  },
+  {
+    "owner": "K-Dense-AI",
+    "name": "K-Dense",
+    "kind": "Organization",
+    "area": "Research",
+    "githubUrl": "https://github.com/K-Dense-AI",
+    "checkedAt": "2026-09-08T08:13:41.960Z",
+    "repositories": [
+      {
+        "fullName": "K-Dense-AI/scientific-agent-skills",
+        "url": "https://github.com/K-Dense-AI/scientific-agent-skills",
+        "stars": 43711,
+        "observedAt": "2026-09-08T08:13:41.960Z",
+        "pushedAt": "2026-09-07T09:35:27Z",
+        "description": "Turn any AI agent into an AI Scientist. The #1 Agent Skills library for science, used by 190,000+ scientists worldwide. 165 ready-to-use validated skills plus 100+ scientific databases covering biology, chemistry, medicine, and drug discovery. Compatible with Cursor, Claude Code, Codex, Pi, Antigravity, and the open Agent Skills standard.",
+        "revision": "9cf7d9aea7d84754db4c167ab04b299d33c444bc",
+        "skillPath": "skills/scientific-writing/SKILL.md",
+        "license": "MIT"
+      }
+    ],
+    "preferredSlugs": [
+      "k-dense-ai-deepchem",
+      "k-dense-ai-clinical-decision-support",
+      "k-dense-ai-database-lookup"
+    ]
+  },
+  {
+    "owner": "Orchestra-Research",
+    "name": "Orchestra Research",
+    "kind": "Organization",
+    "area": "Research",
+    "githubUrl": "https://github.com/Orchestra-Research",
+    "checkedAt": "2026-09-08T08:13:45.175Z",
+    "repositories": [
+      {
+        "fullName": "Orchestra-Research/AI-Research-SKILLs",
+        "url": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
+        "stars": 12413,
+        "observedAt": "2026-09-08T08:13:45.175Z",
+        "pushedAt": "2026-06-16T01:36:46Z",
+        "description": "Comprehensive open-source library of AI research and engineering skills for any AI model. Package the skills and your claude code/codex/gemini agent will be an AI research agent with full horsepower. Maintained by Orchestra Research.",
+        "revision": "773a52944ba4747a18bd4ae9ade53fff041adcbc",
+        "skillPath": "0-autoresearch-skill/SKILL.md",
+        "license": "MIT"
+      }
+    ],
+    "preferredSlugs": [
+      "orchestra-research-ai-research-skills"
+    ]
+  },
+  {
+    "owner": "Jeffallan",
+    "name": "Jeffallan",
+    "kind": "Person",
+    "area": "Coding",
+    "githubUrl": "https://github.com/Jeffallan",
+    "checkedAt": "2026-09-08T08:13:47.802Z",
+    "repositories": [
+      {
+        "fullName": "Jeffallan/claude-skills",
+        "url": "https://github.com/Jeffallan/claude-skills",
+        "stars": 11364,
+        "observedAt": "2026-09-08T08:13:47.802Z",
+        "pushedAt": "2026-08-07T20:19:18Z",
+        "description": "67 Specialized Skills for Full-Stack Developers. Transform Claude Code into your expert pair programmer.",
+        "revision": "882ef55e377dbf9a4dbe496bb41ac6ccd0e555cf",
+        "skillPath": "skills/angular-architect/SKILL.md",
+        "license": "MIT"
+      }
+    ],
+    "preferredSlugs": [
+      "jeffallan-fastapi-expert",
+      "jeffallan-embedded-systems",
+      "jeffallan-django-expert"
+    ]
+  },
+  {
+    "owner": "microsoft",
+    "name": "Microsoft",
+    "kind": "Organization",
+    "area": "Coding",
+    "githubUrl": "https://github.com/microsoft",
+    "checkedAt": "2026-09-08T08:13:52.317Z",
+    "repositories": [
+      {
+        "fullName": "microsoft/skills",
+        "url": "https://github.com/microsoft/skills",
+        "stars": 2999,
+        "observedAt": "2026-09-08T08:13:52.317Z",
+        "pushedAt": "2026-09-07T11:05:11Z",
+        "description": "Skills, MCP servers, Custom Agents, Agents.md for SDKs to ground Coding Agents",
+        "revision": "02e0b2f852b39ea00c43283f999b83fc12079273",
+        "skillPath": ".github/plugins/azure-kusto-graph-skills/skills/azure-kusto-graph/SKILL.md",
+        "license": "MIT"
+      }
+    ],
+    "preferredSlugs": [
+      "microsoft-skills"
+    ]
+  },
+  {
+    "owner": "Pluviobyte",
+    "name": "Rain",
+    "kind": "Person",
+    "area": "Video",
+    "githubUrl": "https://github.com/Pluviobyte",
+    "checkedAt": "2026-09-08T08:13:54.864Z",
+    "repositories": [
+      {
+        "fullName": "Pluviobyte/rnskill",
+        "url": "https://github.com/Pluviobyte/rnskill",
+        "stars": 1537,
+        "observedAt": "2026-09-08T08:13:54.864Z",
+        "pushedAt": "2026-08-30T05:34:18Z",
+        "description": "雪踏乌云的 AI Agent Skills 集合",
+        "revision": "7cbf47b57cbae0596d46c10c4a1445cbb27904b3",
+        "skillPath": "skills/ai-jian-koubo/SKILL.md",
+        "license": "NOASSERTION"
+      }
+    ],
+    "preferredSlugs": []
+  }
+]

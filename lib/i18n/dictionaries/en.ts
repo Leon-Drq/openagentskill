@@ -24,7 +24,7 @@ export default {
     cli: 'CLI',
     forCreators: 'For Creators',
     creatorConsole: 'Creator Center',
-    creators: 'Creator Registry',
+    creators: 'Featured Creators',
     creatorKit: 'Creator Kit',
     learn: 'Learn',
     guides: 'Guides',
