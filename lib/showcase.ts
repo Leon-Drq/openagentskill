@@ -21,6 +21,15 @@ export const SHOWCASE_CATEGORIES: { id: ShowcaseCategory; label: ShowcaseText }[
   { id: 'document', label: showcaseText('Documents', '文档与指南') },
 ]
 
+// Uses cross media categories: a logo can be a still mascot or a motion ident.
+export const SHOWCASE_TAGS = [{ id: 'logo', label: showcaseText('Logo & identity', 'Logo 与品牌标识'), aliases: 'logo mascot brand identity 标志 标识 吉祥物 品牌' }] as const
+export type ShowcaseTag = typeof SHOWCASE_TAGS[number]['id']
+const SHOWCASE_CASE_TAGS: Partial<Record<string, ShowcaseTag[]>> = {
+  'ip-mascot-directions': ['logo'],
+  'motion-logo-outro': ['logo'],
+}
+export const getShowcaseTags = (item: { slug: string }) => SHOWCASE_TAGS.filter((tag) => SHOWCASE_CASE_TAGS[item.slug]?.includes(tag.id))
+
 export interface ShowcaseCreator {
   /** Stable curation identity; never infer a seller account from a display name. */
   id: string
@@ -329,14 +338,15 @@ export function isMissingShowcasePath(pathname: string) {
   return pathname.startsWith('/showcase/') && !casePaths.has(pathname) && !assetPaths.has(pathname)
 }
 
-export function filterShowcaseCases(category: string, query: string, skillCreatorId = '') {
+export function filterShowcaseCases(category: string, query: string, skillCreatorId = '', tagId = '') {
   const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
   return SHOWCASE_CASES.filter((item) => {
     const skill = getShowcaseSkill(item.skillSlug)
     const skillCreator = getShowcaseCreator(skill.creatorId)
     const artworkCreator = getShowcaseCreator(item.creatorId)
-    const searchable = [item.title.en, item.title.zh, item.description.en, item.description.zh, skill.name, item.category, skillCreator.name, skillCreator.githubUsername, artworkCreator.name].join(' ').toLowerCase()
-    return (category === 'all' || item.category === category) && (!skillCreatorId || skill.creatorId === skillCreatorId) && terms.every((term) => searchable.includes(term))
+    const tags = getShowcaseTags(item)
+    const searchable = [item.title.en, item.title.zh, item.description.en, item.description.zh, skill.name, item.category, skillCreator.name, skillCreator.githubUsername, artworkCreator.name, ...tags.map((tag) => tag.aliases)].join(' ').toLowerCase()
+    return (category === 'all' || item.category === category) && (!skillCreatorId || skill.creatorId === skillCreatorId) && (!tagId || tags.some((tag) => tag.id === tagId)) && terms.every((term) => searchable.includes(term))
   })
 }
 

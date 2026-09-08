@@ -8,7 +8,7 @@ import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { ShowcaseCreatorCredit } from '@/components/showcase-creator'
 import { ShowcaseActions } from '@/components/showcase-engagement'
-import { getShowcaseAccessLabel, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, localizeShowcase, SHOWCASE_CATEGORIES, type ShowcaseCase } from '@/lib/showcase'
+import { getShowcaseAccessLabel, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, getShowcaseTags, localizeShowcase, SHOWCASE_CATEGORIES, type ShowcaseCase } from '@/lib/showcase'
 
 export function ShowcaseCard({ item, placement = 'gallery', priority = false }: {
   item: ShowcaseCase
@@ -53,6 +53,7 @@ export function ShowcaseCard({ item, placement = 'gallery', priority = false }: 
           <p className="mt-2 line-clamp-2 min-h-[2.875rem] text-sm leading-relaxed text-[#6d675e]">{localizeShowcase(item.description, locale)}</p>
         </div>
       </Link>
+      {getShowcaseTags(item).map((tag) => <Link key={tag.id} prefetch={false} href={`/showcase?tag=${tag.id}${locale === 'zh' ? '&lang=zh' : ''}`} className="mt-3 inline-flex min-h-9 items-center rounded-full border border-[#e4e0d8] px-3 text-xs text-[#006b4f] hover:border-[#006b4f]">{localizeShowcase(tag.label, locale)}</Link>)}
       <div className="mt-4 flex min-w-0 items-center justify-between gap-3 border-t border-[#e4e0d8] pt-3">
         <ShowcaseCreatorCredit creatorId={skill.creatorId} label={locale === 'zh' ? '技能作者' : 'Skill by'} />
         <Link href={getLocalizedNavigationHref(`/skills/${item.skillSlug}`, locale)} className="shrink-0 rounded border border-[#e4e0d8] px-2 py-1 text-[10px] text-[#6d675e] hover:border-[#006b4f] hover:text-[#006b4f]" title={`${skill.name} · ${skill.sourceLicense}`}>

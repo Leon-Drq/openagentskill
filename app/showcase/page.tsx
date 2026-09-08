@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { ShowcaseGallery } from '@/components/showcase-gallery'
 import { I18nProvider } from '@/lib/i18n/context'
 import { getLocaleFromSearchParam } from '@/lib/i18n/config'
-import { filterShowcaseCases, getShowcasePage, localizeShowcase, SHOWCASE_CASES, SHOWCASE_CATEGORIES, SHOWCASE_SKILLS } from '@/lib/showcase'
+import { filterShowcaseCases, getShowcasePage, localizeShowcase, SHOWCASE_CASES, SHOWCASE_CATEGORIES, SHOWCASE_SKILLS, SHOWCASE_TAGS } from '@/lib/showcase'
 
 const BASE_URL = 'https://www.openagentskill.com'
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> }
@@ -12,7 +12,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const zh = getLocaleFromSearchParam(params.lang) === 'zh'
   const rawPage = Array.isArray(params.page) ? params.page[0] : params.page
   const { page } = getShowcasePage(SHOWCASE_CASES, rawPage)
-  const filtered = Boolean(params.q || params.category || params.creator || params.lang || params.sort)
+  const filtered = Boolean(params.q || params.category || params.creator || params.lang || params.sort || params.tag)
   const canonical = `${BASE_URL}/showcase${!filtered && page > 1 ? `?page=${page}` : ''}`
   const pageLabel = page > 1 ? (zh ? ` — 第 ${page} 页` : ` — Page ${page}`) : ''
   const title = zh ? `Skill Gallery — 技能作品集与作者${pageLabel} | OpenAgentSkill` : `Skill Gallery — Agent Skills, Creative Work & Creators${pageLabel} | OpenAgentSkill`
@@ -31,7 +31,9 @@ export default async function ShowcasePage({ searchParams }: Props) {
   const query = (Array.isArray(params.q) ? params.q[0] : params.q) || ''
   const rawCreator = (Array.isArray(params.creator) ? params.creator[0] : params.creator) || ''
   const creatorId = SHOWCASE_SKILLS.some((skill) => skill.creatorId === rawCreator) ? rawCreator : ''
-  const cases = filterShowcaseCases(category, query, creatorId)
+  const rawTag = Array.isArray(params.tag) ? params.tag[0] : params.tag
+  const tagId = SHOWCASE_TAGS.find((tag) => tag.id === rawTag)?.id || ''
+  const cases = filterShowcaseCases(category, query, creatorId, tagId)
   const pagination = getShowcasePage(cases, Array.isArray(params.page) ? params.page[0] : params.page)
   const schema = {
     '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Skill Gallery', url: `${BASE_URL}/showcase`,
