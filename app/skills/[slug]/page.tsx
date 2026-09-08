@@ -28,6 +28,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { SkillDetailLink as Link } from '@/components/skill-detail-link'
 import { SkillDetailText as Text, SkillDetailDate as DateText, SkillDetailValue as Value } from '@/components/skill-detail-text'
 import { SkillProfileText as ProfileText } from '@/components/skill-profile-text'
+import { SkillDocument } from '@/components/skill-document'
 import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { SkillActionLink } from '@/components/skill-action-link'
 import { SkillEventTracker } from '@/components/skill-event-tracker'
@@ -245,9 +246,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
               {hasShowcase && <SkillShowcase skillSlug={skill.slug} profile />}
               <section id="overview" className={sectionClass}>
                 <h2 className={headingClass}><Text id="overview" /></h2>
-                <div className="mt-6 space-y-4 break-words text-base leading-8 text-secondary [overflow-wrap:anywhere]">
-                  {skill.longDescription.split('\n\n').filter(Boolean).map((paragraph, index) => <p key={index} className="whitespace-pre-line">{paragraph}</p>)}
-                </div>
+                <SkillDocument source={skill.longDescription} summary={skill.description} sourceUrl={sourceHref || ''} locale={initialLocale} />
               </section>
 
               <section id="install-options" className={sectionClass}>
@@ -329,8 +328,8 @@ export default async function SkillDetailPage({ params, searchParams }: {
               </section>
             </div>
 
-            <aside className="hidden min-w-0 lg:block">
-              <nav className="sticky top-24 border-t-2 border-[#006b4f] pt-5" aria-label={skill.name}>
+            <aside className="hidden min-w-0 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100dvh-8rem)] lg:overflow-y-auto">
+              <nav className="border-t-2 border-[#006b4f] pt-5" aria-label={skill.name}>
                 <p className="mb-4 break-words font-display text-2xl">{skill.name}</p>
                 <div className="space-y-1 text-sm">
                   {hasShowcase && <Link href="#showcase" className="block py-2 text-secondary hover:text-[#006b4f]">Gallery</Link>}

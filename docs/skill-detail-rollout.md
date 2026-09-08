@@ -31,3 +31,11 @@ One detail entity plus breadcrumbs: SoftwareSourceCode for recorded instructions
 5. GitHub PR checks, merge to main via the existing Vercel integration, then repeat production smoke and browser checks.
 
 No claim of zero SEO volatility: there is no first-party Search Console baseline in this task. Keep URL/index policy unchanged; observe 28-day non-brand clicks, impressions and affected-page cohorts before further title changes. HTML size reductions are not a measured Core Web Vitals improvement. Persistent source-data backfill and GSC measurement are follow-up work, not a claim of completed runtime verification.
+
+## Source-document rendering follow-up
+
+- The shared detail template previously split every source document into plain paragraphs. This exposed frontmatter, Markdown delimiters and source-only XML tags, and lost tables/code/list formatting.
+- `SkillDocument` now separates bounded frontmatter without evaluating YAML. Short prose stays expanded; source bodies over 1,800 characters or 40 lines use a native disclosure. Full formatted text remains server-rendered, and the exact original text is available as escaped text. No source records, review states, URLs or metadata/index rules are changed.
+- The server-only renderer uses react-markdown/GFM, HTML parsing followed by a strict sanitization step, then namespaced heading/anchor normalization. Source XML wrappers become quotes. Script/style/embed/form content is stripped from the formatted view, event attributes are not allowed, and external images become opt-in source links, not automatic requests. It does not compile MDX or execute repository instructions.
+- Code and tables scroll within keyboard-focusable containers. The desktop section directory sticks in the page grid rather than inside a short parent, with bounded viewport height. Eight-language control labels follow the current language preference.
+- `test:skill-detail` includes deterministic rendering tests for frontmatter, Markdown, nested lists, tables, quotes, code, links, footnotes, heading levels, script/event/URL injection and localization. The HTTP smoke now includes `obra-using-superpowers` alongside the five existing profiles. Browser checks additionally cover hostile/very long synthetic content and four viewport widths.
