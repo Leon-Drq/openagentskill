@@ -284,7 +284,7 @@ export function getSkillSupplyProfile(skill: SkillRecord, eventStats?: SkillEven
       5
     ),
     install: {
-      ready: Boolean(skill.install_command || skill.github_repo || skill.repository),
+      ready: Boolean(command),
       command,
       primaryTarget: installTargets[0]?.label || 'CLI',
       targetCount: installTargets.length,

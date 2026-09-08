@@ -28,12 +28,12 @@ export function HomeShowcase() {
   )
 }
 
-export function SkillShowcase({ skillSlug }: { skillSlug: string }) {
+export function SkillShowcase({ skillSlug, profile = false }: { skillSlug: string; profile?: boolean }) {
   const { locale } = useI18n()
   const cases = getShowcasesForSkill(skillSlug)
   if (!cases.length) return null
   return (
-    <section id="showcase" className="mb-10 scroll-mt-24 rounded-lg border border-[#e4e0d8] bg-[#fbfaf6] p-5 sm:p-6" aria-labelledby="skill-showcase-title">
+    <section id="showcase" className={profile ? 'scroll-mt-28 border-t border-border py-9 sm:py-12' : 'mb-10 scroll-mt-24 rounded-lg border border-[#e4e0d8] bg-[#fbfaf6] p-5 sm:p-6'} aria-labelledby="skill-showcase-title">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#006b4f]">{galleryCopy(locale, "See what it makes", "先看效果")}</p>
@@ -41,7 +41,7 @@ export function SkillShowcase({ skillSlug }: { skillSlug: string }) {
         </div>
         <Link href={getLocalizedNavigationHref(`/showcase?q=${encodeURIComponent(getShowcaseSkill(skillSlug).name)}`, locale)} className="inline-flex items-center gap-1 text-xs font-semibold text-[#006b4f]">{galleryCopy(locale, "View all", "查看全部")}<ArrowRight className="h-3 w-3" aria-hidden="true" /></Link>
       </div>
-      <div className={`mt-6 grid gap-6 ${cases.length > 1 ? 'sm:grid-cols-2' : 'max-w-md'}`}>{cases.slice(0, 2).map((item) => <ShowcaseCard key={item.slug} item={item} placement="skill" />)}</div>
+      <div className={`mt-6 grid gap-6 ${cases.length > 1 ? 'sm:grid-cols-2' : profile ? '' : 'max-w-md'}`}>{cases.slice(0, 2).map((item, index) => <ShowcaseCard key={item.slug} item={item} placement="skill" priority={profile && index === 0} />)}</div>
     </section>
   )
 }

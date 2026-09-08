@@ -39,7 +39,7 @@ export function ShowcaseCard({ item, placement = 'gallery', priority = false }: 
         {!item.videoUrl && <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-[#e4e0d8] bg-[#eeece5] transition-colors group-hover:border-[#006b4f]/50">
           <Image
             src={getShowcaseImageSrc(media.src, 'card')} alt={localizeShowcase(media.alt, locale)} fill
-            sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 380px"
+            sizes={placement === 'skill' ? '(max-width: 1023px) 100vw, 768px' : '(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 380px'}
             preload={priority}
             className={`${item.cardFit === 'contain' ? 'object-contain p-4' : 'object-cover object-top'} motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-[1.025]`}
           />

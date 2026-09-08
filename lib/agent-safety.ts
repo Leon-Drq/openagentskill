@@ -1,6 +1,7 @@
 import { auditRiskLabel, type ComputedSkillAudit } from '@/lib/audits'
 import type { SkillRecord } from '@/lib/db/skills'
 import { needsOwnerPublicationReview, OWNER_PUBLICATION_NOTICE } from '@/lib/skills/publication'
+import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
 
 export type AgentSafetyLevel = 'safe_to_install' | 'review_before_install' | 'avoid_auto_install'
 export type SkillSafetyTier = 'verified' | 'reviewed' | 'experimental' | 'blocked'
@@ -324,10 +325,19 @@ export function getAgentSafetyProfile(
     policyWarnings,
   })
 
+  // Source eligibility is a separate gate; do not rewrite the existing audit score.
+  const sourceEvidence = getSkillSourceEvidence(skill)
+  if (!sourceEvidence.canOfferInstall && safetyTier.auto_install_policy !== 'block') {
+    safetyTier.auto_install_policy = 'review'
+    safetyTier.recommended_action = sourceEvidence.notice
+    safetyTier.reasons = [sourceEvidence.notice, ...safetyTier.reasons].slice(0, 5)
+    policyWarnings.add(sourceEvidence.notice)
+  }
+
   return {
     score,
-    level,
-    label: safetyLabel(level),
+    level: !sourceEvidence.canOfferInstall ? 'avoid_auto_install' : level,
+    label: safetyLabel(!sourceEvidence.canOfferInstall ? 'avoid_auto_install' : level),
     safety_tier: safetyTier,
     auto_install_allowed: safetyTier.auto_install_policy === 'allow' && level === 'safe_to_install',
     human_review_required: safetyTier.auto_install_policy !== 'allow',

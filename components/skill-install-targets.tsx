@@ -9,6 +9,7 @@ import { formatSkillDetailCopy } from '@/lib/i18n/skill-detail-copy'
 import type { SkillInstallTarget } from '@/lib/install-targets'
 import { copyText } from '@/lib/copy-text'
 import { cn } from '@/lib/utils'
+import { SkillProfileText } from '@/components/skill-profile-text'
 
 interface SkillInstallTargetsProps {
   skillSlug: string
@@ -28,7 +29,10 @@ export function SkillInstallTargets({ skillSlug, targets, compact = false }: Ski
     try {
       const copied = await copyText(target.value)
       if (!copied) throw new Error('Clipboard is unavailable')
-      trackSkillEvent(skillSlug, 'install_copy', { target: target.id, kind: target.kind })
+      // A read-only source-review prompt is not an install-intent event.
+      if (target.title !== 'Source review prompt') {
+        trackSkillEvent(skillSlug, 'install_copy', { target: target.id, kind: target.kind })
+      }
       setCopiedId(target.id)
       setTimeout(() => setCopiedId(null), 1800)
     } catch (error) {
@@ -48,7 +52,7 @@ export function SkillInstallTargets({ skillSlug, targets, compact = false }: Ski
               {formatSkillDetailCopy(locale, 'installTargets')}
             </p>
             <p className="mt-1 text-sm font-semibold">
-              <SkillDetailValue value={activeTarget.title} />
+              {activeTarget.title === 'Source review prompt' ? <SkillProfileText id="reviewSource" /> : <SkillDetailValue value={activeTarget.title} />}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-1 rounded-[8px] border border-border bg-card p-1 sm:grid-cols-4">
@@ -143,10 +147,10 @@ export function SkillInstallTargets({ skillSlug, targets, compact = false }: Ski
           <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
             <div className="min-w-0">
               <h3 className="font-display text-xl font-semibold">
-                <SkillDetailValue value={activeTarget.title} />
+                {activeTarget.title === 'Source review prompt' ? <SkillProfileText id="reviewSource" /> : <SkillDetailValue value={activeTarget.title} />}
               </h3>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-secondary">
-                <SkillDetailValue value={activeTarget.description} />
+                {activeTarget.title === 'Source review prompt' ? <SkillProfileText id="unverifiedNote" /> : <SkillDetailValue value={activeTarget.description} />}
               </p>
             </div>
             <button

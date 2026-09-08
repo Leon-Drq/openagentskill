@@ -1,4 +1,5 @@
 import { needsOwnerPublicationReview, OWNER_PUBLICATION_NOTICE } from '@/lib/skills/publication'
+import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
 import type { SkillAgentStats, SkillEventStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
 import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { formatCompactNumber, getFreshnessDays } from '@/lib/quality'
@@ -1013,7 +1014,8 @@ export function getSkillTrustProfile(
     .map((dimension) => `${dimension.label}: ${dimension.detail}`)
   const finalWarnings = [...new Set([...warnings, ...dimensionWarnings])].slice(0, 10)
   const documentationDimension = dimensions.find((dimension) => dimension.id === 'documentation')
-  const installCommand = getInstallCommand(skill)
+  const sourceEvidence = getSkillSourceEvidence(skill)
+  const installCommand = sourceEvidence.canOfferInstall ? getInstallCommand(skill) : null
   let policy = getInstallPolicy(
     finalScore,
     hasInstallPath(skill),
@@ -1023,6 +1025,7 @@ export function getSkillTrustProfile(
     financialExecutionRisk
   )
   if (needsOwnerPublicationReview(skill) && policy === 'agent_install_candidate') policy = 'human_review_before_install'
+  if (!sourceEvidence.canOfferInstall && policy === 'agent_install_candidate') policy = 'human_review_before_install'
   const outcomeAllowsAutoInstall =
     outcomeEvidence.total < 3 ||
     (
@@ -1032,7 +1035,7 @@ export function getSkillTrustProfile(
       (outcomeEvidence.successRate === null || outcomeEvidence.successRate >= 65) &&
       (outcomeEvidence.recentFailureRate === null || outcomeEvidence.recentFailureRate < 45)
     )
-  const autoInstallAllowed = !isFinancialSkill && policy === 'agent_install_candidate' && outcomeAllowsAutoInstall
+  const autoInstallAllowed = sourceEvidence.canOfferInstall && !isFinancialSkill && policy === 'agent_install_candidate' && outcomeAllowsAutoInstall
 
   return {
     version: 'trust-score-v4',
@@ -1048,19 +1051,19 @@ export function getSkillTrustProfile(
       lastPushed: getMaintenanceLabel(freshnessDays),
       license: skill.license || 'Unknown license',
       repository: skill.repository || skill.github_repo || 'Missing repository link',
-      install: installCommand || 'Missing install command',
+      install: installCommand || sourceEvidence.notice,
       installSafety: dimensions.find((dimension) => dimension.id === 'install_safety')?.detail || 'Install command safety unavailable',
       permissionSurface: dimensions.find((dimension) => dimension.id === 'permission_surface')?.detail || 'Permission surface unavailable',
       documentation: getDocumentationLabel(documentationDimension?.score || 0),
       agentOutcomes: outcomeEvidence.label,
     },
     installReadiness: {
-      ready: hasInstallPath(skill),
+      ready: sourceEvidence.canOfferInstall,
       command: installCommand,
       policy,
       label: getInstallPolicyLabel(policy),
       notes: [
-        hasInstallPath(skill) ? 'Install path is available' : 'Install path is missing',
+        sourceEvidence.canOfferInstall ? 'Install path is available' : sourceEvidence.notice,
         hasRepository(skill) ? 'Repository evidence is available' : 'Repository link is missing',
         !hasKnownLicense(skill)
           ? 'License is unclear'

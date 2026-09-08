@@ -9,6 +9,7 @@ import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile, type SkillTrustEvidence } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 import { AGENT_OUTCOMES } from '@/lib/agent-outcomes'
+import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
 
 const SITE_URL = 'https://www.openagentskill.com'
 
@@ -26,6 +27,7 @@ export interface AgentReadableSkillMetadata {
   suited_tasks: string[]
   suited_agents: string[]
   install: {
+    source_evidence: ReturnType<typeof getSkillSourceEvidence>
     command: string
     ready: boolean
     targets: Array<{
@@ -280,8 +282,9 @@ export function buildAgentReadableSkillMetadata(
     suited_tasks: suitedTasks,
     suited_agents: suitedAgents,
     install: {
+      source_evidence: getSkillSourceEvidence(skill),
       command: installCommand,
-      ready: Boolean(skill.install_command || skill.github_repo || skill.repository),
+      ready: Boolean(installCommand),
       targets: installTargets.map((target) => ({
         id: target.id,
         label: target.label,
@@ -295,8 +298,8 @@ export function buildAgentReadableSkillMetadata(
       score: trust.score,
       label: trust.label,
       version: trust.version,
-      install_policy: trust.installReadiness.policy,
-      evidence: trust.evidence,
+      install_policy: safety.safety_tier.auto_install_policy,
+      evidence: { ...trust.evidence, install: installCommand || getSkillSourceEvidence(skill).notice },
       outcome_evidence: {
         total: trust.outcomeEvidence.total,
         successes: trust.outcomeEvidence.successes,
@@ -315,9 +318,9 @@ export function buildAgentReadableSkillMetadata(
         label: trust.outcomeEvidence.label,
       },
       auto_install: {
-        allowed: trust.autoInstall.allowed,
+        allowed: trust.autoInstall.allowed && safety.auto_install_allowed,
         sandbox_required: trust.autoInstall.sandboxRequired,
-        reason: trust.autoInstall.reason,
+        reason: safety.auto_install_allowed ? trust.autoInstall.reason : safety.safety_tier.recommended_action,
       },
       best_for: trust.bestFor,
       known_risks: trust.knownRisks,
