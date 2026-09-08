@@ -216,7 +216,7 @@ Return only JSON without markdown fences:
     )
 
     return {
-      approved: Boolean(reviewData.approved) && meetsAutomaticGate,
+      approved: reviewData.approved === true && meetsAutomaticGate,
       scores,
       totalScore,
       issues: reconciledFeedback.issues,
