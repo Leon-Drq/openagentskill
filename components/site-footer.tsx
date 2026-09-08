@@ -1,5 +1,6 @@
 'use client'
 
+import { getNavigationCopy } from '@/lib/site-navigation'
 import { siteCopy } from '@/lib/i18n/site-copy'
 
 import Link from 'next/link'
@@ -83,10 +84,13 @@ export function SiteFooter() {
             <div>
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">{shell.footerExplore}</h2>
               <div className="mt-4 grid gap-2 text-secondary">
-                <FooterLink href="/skills" className="hover:text-foreground">{t.nav.skills}</FooterLink>
+<FooterLink href="/skills" className="hover:text-foreground">{t.nav.skills}</FooterLink>
                 <FooterLink href="/showcase" className="hover:text-foreground">{getShowcaseNavLabel(locale)}</FooterLink>
                 <FooterLink href="/skills/new" className="hover:text-foreground">{siteCopy(locale, "New submissions")}</FooterLink>
                 <FooterLink href="/agent-skills" className="hover:text-foreground">Agent Skills</FooterLink>
+                <details className="group">
+                  <summary className="cursor-pointer py-1 text-sm hover:text-foreground">{getNavigationCopy(locale).more}</summary>
+                  <div className="mt-2 grid gap-2">
                 <FooterLink href="/agent-skill" className="hover:text-foreground">{siteCopy(locale, "What Is an Agent Skill?")}</FooterLink>
                 <FooterLink href="/ai-agent-skills" className="hover:text-foreground">AI Agent Skills</FooterLink>
                 <FooterLink href="/tasks" className="hover:text-foreground">{t.nav.tasks}</FooterLink>
@@ -97,16 +101,21 @@ export function SiteFooter() {
                 <FooterLink href="/use-cases" className="hover:text-foreground">{t.nav.useCases}</FooterLink>
                 <FooterLink href="/agents" className="hover:text-foreground">{siteCopy(locale, "Agents")}</FooterLink>
                 <FooterLink href="/agent" className="hover:text-foreground">{t.nav.agentEntry}</FooterLink>
+                  </div>
+                </details>
               </div>
             </div>
 
             <div>
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">{shell.footerTrust}</h2>
               <div className="mt-4 grid gap-2 text-secondary">
-                <FooterLink href="/compare" className="hover:text-foreground">{t.nav.compare}</FooterLink>
+<FooterLink href="/compare" className="hover:text-foreground">{t.nav.compare}</FooterLink>
                 <FooterLink href="/safety" className="hover:text-foreground">{t.nav.safety}</FooterLink>
                 <FooterLink href="/agent-skills-registry" className="hover:text-foreground">{siteCopy(locale, "Skills Registry")}</FooterLink>
                 <FooterLink href="/rankings" className="hover:text-foreground">{t.nav.rankings}</FooterLink>
+                <details className="group">
+                  <summary className="cursor-pointer py-1 text-sm hover:text-foreground">{getNavigationCopy(locale).more}</summary>
+                  <div className="mt-2 grid gap-2">
                 <FooterLink href="/outcomes" className="hover:text-foreground">{t.nav.outcomes}</FooterLink>
                 <FooterLink href="/audits" className="hover:text-foreground">{siteCopy(locale, "Audits")}</FooterLink>
                 <FooterLink href="/official" className="hover:text-foreground">{siteCopy(locale, "Official")}</FooterLink>
@@ -115,16 +124,21 @@ export function SiteFooter() {
                 <FooterLink href="/reports/state-of-agent-skills-2026" className="hover:text-foreground">{siteCopy(locale, "State of Agent Skills")}</FooterLink>
                 <FooterLink href="/compare/openagentskill-vs-skills-sh" className="hover:text-foreground">vs skills.sh</FooterLink>
                 <FooterLink href="/alternatives/agentskills-io" className="hover:text-foreground">{siteCopy(locale, "AgentSkills.io Alternative")}</FooterLink>
+                  </div>
+                </details>
               </div>
             </div>
 
             <div>
               <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">{shell.footerBuild}</h2>
               <div className="mt-4 grid gap-2 text-secondary">
-                <FooterLink href="/docs" className="hover:text-foreground">{t.nav.docs}</FooterLink>
+<FooterLink href="/docs" className="hover:text-foreground">{t.nav.docs}</FooterLink>
                 <FooterLink href="/about" className="hover:text-foreground">{siteCopy(locale, "About")}</FooterLink>
                 <FooterLink href="/contact" className="hover:text-foreground">{siteCopy(locale, "Contact")}</FooterLink>
                 <FooterLink href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</FooterLink>
+                <details className="group">
+                  <summary className="cursor-pointer py-1 text-sm hover:text-foreground">{getNavigationCopy(locale).more}</summary>
+                  <div className="mt-2 grid gap-2">
                 <FooterLink href="/llms.txt" className="hover:text-foreground">llms.txt</FooterLink>
                 <FooterLink href="/openapi.json" className="hover:text-foreground">OpenAPI</FooterLink>
                 <FooterLink href="/cli" className="hover:text-foreground">CLI</FooterLink>
@@ -135,6 +149,8 @@ export function SiteFooter() {
                 <FooterLink href="/blog" className="hover:text-foreground">{t.nav.blog}</FooterLink>
                 <FooterLink href="/guides" className="hover:text-foreground">{t.nav.guides}</FooterLink>
                 <FooterLink href="/activity" className="hover:text-foreground">{t.nav.activity}</FooterLink>
+                  </div>
+                </details>
               </div>
             </div>
           </nav>

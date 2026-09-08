@@ -1,3 +1,4 @@
+import { NavigationHubLinks } from '@/components/navigation-hub-links'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
@@ -54,6 +55,7 @@ export default async function RankingsPage() {
 
   return (
     <MarketingPageShell>
+      <NavigationHubLinks hub="rankings" />
       <MarketingHero
         eyebrow="Rankings"
         title="Ranked shortlists for choosing agent skills faster."

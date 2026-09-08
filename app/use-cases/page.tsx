@@ -1,3 +1,4 @@
+import { NavigationHubLinks } from '@/components/navigation-hub-links'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
@@ -33,6 +34,7 @@ export default async function UseCasesPage() {
 
   return (
     <MarketingPageShell>
+      <NavigationHubLinks hub="useCases" />
       <MarketingHero
         eyebrow="Use cases"
         title="Find agent skills by the work you need done."
