@@ -13,7 +13,7 @@ import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { copyText } from '@/lib/copy-text'
 import { trackAnalyticsEvent } from '@/lib/analytics'
-import { getShowcaseAccessLabel, getShowcaseCreator, getShowcaseEvidenceLabel, getShowcaseHandoff, getShowcaseImageSrc, getShowcaseSkill, localizeShowcase, SHOWCASE_CASES, SHOWCASE_CATEGORIES, type ShowcaseCase } from '@/lib/showcase'
+import { getShowcaseAccessLabel, getShowcaseCreator, getShowcaseEvidenceLabel, getShowcaseHandoff, getShowcaseImageSrc, getShowcaseSkill, getShowcaseTags, localizeShowcase, SHOWCASE_CASES, SHOWCASE_CATEGORIES, type ShowcaseCase } from '@/lib/showcase'
 
 export function ShowcaseDetail({ item }: { item: ShowcaseCase }) {
   return <ShowcaseEngagementProvider><DetailContent key={item.slug} item={item} /></ShowcaseEngagementProvider>
@@ -92,6 +92,7 @@ function DetailContent({ item }: { item: ShowcaseCase }) {
             <Link href={getLocalizedNavigationHref(`/skills/${item.skillSlug}`, locale)} className="inline-flex items-center gap-1.5 rounded border border-[#e4e0d8] px-3 py-2 text-xs text-[#006b4f]">{getShowcaseAccessLabel(skill, locale)} · {skill.sourceLicense}<ArrowUpRight className="h-3 w-3" aria-hidden="true" /></Link>
           </div>
           <ShowcaseActions item={item} />
+          {getShowcaseTags(item).map((tag) => <Link key={tag.id} prefetch={false} href={`/showcase?tag=${tag.id}${zh ? '&lang=zh' : ''}`} className="mt-3 inline-flex min-h-11 items-center rounded-full border border-[#e4e0d8] px-3 text-xs text-[#006b4f] hover:border-[#006b4f]">{localizeShowcase(tag.label, locale)}</Link>)}
           <a href="#make-your-own" className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md bg-[#006b4f] px-4 text-sm font-semibold text-white hover:bg-[#005640] lg:hidden">
             {zh ? '复制任务并开始使用' : 'Copy task & get started'}<ArrowRight className="h-4 w-4" aria-hidden="true" />
           </a>

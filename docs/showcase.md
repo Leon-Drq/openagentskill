@@ -9,6 +9,8 @@
 
 - `/showcase`：Skill Gallery，分类、作者筛选、搜索与案例列表；`?lang=zh` 为中文。
 - `/showcase/[slug]`：成品、任务、条件、来源和使用指引。
+- `/showcase?tag=logo`：Logo 与品牌标识用途标签，可与媒体分类、作者和搜索组合；当前包含静态吉祥物与 Logo 动画各 1 项。筛选页 noindex 并 canonical 到 Gallery 根页，不变更已有案例 URL。
+- `/showcase?category=video#video-skills`：5 个产品视频生成/剪辑技能入口；3 个新站长收录、2 个复用已有记录。它们与 100 个作品案例分开计数，不暗示实际运行成功。当前审核状态以技能详情为准。
 - 首页主视觉之后：三个精选作品，连接完整作品页。
 - 桌面导航、手机菜单、页脚：作品展示入口。
 - mono-color、Taste Skill、Vox Director、Guizang PPT Skill、Open Design
@@ -45,6 +47,8 @@ mono-color 仓库原有作品有单独的限制性许可，因此本站重新制
 稳定 slug、站内 canonical skillSlug、类型、中英文标题和描述、输入、
 实际交付格式、工具及费用条件、提示词性质、作品作者 `creatorId`、来源版本、许可、图片尺寸。
 同一个技能可以关联多个案例，不需要修改详情页模板或数据库表。
+
+用途标签在 `SHOWCASE_TAGS` / `SHOWCASE_CASE_TAGS` 维护，只标注真实相关案例。产品视频目录在 `lib/showcase-video-skills.ts` 维护，每项注明用途、依赖/费用和固定版本来源，不在前端复制或伪造审核评分。
 
 作者资料集中在 `SHOWCASE_CREATORS`，技能展示资料集中在 `SHOWCASE_SKILLS`；
 案例通过 `creatorId` 和 `skillSlug` 引用它们。不要把作者姓名和技能名称复制到每个案例。

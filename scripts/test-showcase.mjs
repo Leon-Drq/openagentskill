@@ -5,6 +5,8 @@ import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { getShowcasePage, getShowcaseEvidenceLabel } from '../lib/showcase.ts'
+import { SHOWCASE_TAGS, getShowcaseTags } from '../lib/showcase.ts'
+import { SHOWCASE_VIDEO_SKILLS } from '../lib/showcase-video-skills.ts'
 import { SHOWCASE_CASES, SHOWCASE_CATEGORIES, SHOWCASE_CREATORS, SHOWCASE_SKILLS, FEATURED_SHOWCASE_SLUGS, filterShowcaseCases, getShowcaseCase, getShowcaseCreator, getShowcaseCreatorHref, getShowcaseHandoff, getShowcaseImageSrc, getShowcaseSkill, getShowcaseAccessLabel, isMissingShowcasePath } from '../lib/showcase.ts'
 
 const require = createRequire(import.meta.url)
@@ -61,6 +63,27 @@ for (const item of SHOWCASE_CASES) {
   if (item.videoUrl) assert.ok(item.videoUrl.startsWith('https://raw.githubusercontent.com/') && item.videoUrl.includes(item.sourceRevision))
 }
 assert.equal(filterShowcaseCases('all', '').length, SHOWCASE_CASES.length)
+assert.equal(new Set(SHOWCASE_TAGS.map((tag) => tag.id)).size, SHOWCASE_TAGS.length)
+const logoSlugs = ['ip-mascot-directions', 'motion-logo-outro']
+assert.deepEqual(filterShowcaseCases('all', '', '', 'logo').map((item) => item.slug).sort(), logoSlugs)
+assert.equal(filterShowcaseCases('image', '', '', 'logo').length, 1)
+assert.equal(filterShowcaseCases('video', '', '', 'logo').length, 1)
+assert.equal(filterShowcaseCases('slides', '', '', 'logo').length, 0)
+assert.equal(filterShowcaseCases('all', '', 'yanliudesign', 'logo').length, 0)
+assert.equal(getShowcasePage(filterShowcaseCases('all', '', '', 'logo'), '5').page, 1)
+for (const slug of logoSlugs) {
+  assert.ok(getShowcaseCase(slug))
+  assert.equal(getShowcaseTags({ slug })[0].id, 'logo')
+  for (const query of ['logo', '标识', '吉祥物']) assert.ok(filterShowcaseCases('all', query).some((item) => item.slug === slug))
+}
+assert.equal(getShowcaseTags({ slug: 'room-to-grow-poster' }).length, 0, 'Do not label all image work as a logo')
+assert.equal(SHOWCASE_VIDEO_SKILLS.length, 5)
+assert.equal(new Set(SHOWCASE_VIDEO_SKILLS.map((skill) => skill.slug)).size, 5)
+for (const skill of SHOWCASE_VIDEO_SKILLS) {
+  assert.match(skill.slug, /^[a-z0-9-]+$/)
+  assert.match(skill.source, /^https:\/\/github\.com\/[^/]+\/[^/]+\/blob\/[a-f0-9]{40}\//)
+  for (const locale of ['en', 'zh']) assert.ok(skill.purpose[locale] && skill.requirements[locale])
+}
 assert.deepEqual(filterShowcaseCases('image', 'mono').map((item) => item.slug), ['room-to-grow-poster'])
 assert.ok(filterShowcaseCases('all', '  花艺  ').some((item) => item.slug === 'floria-floral-studio'))
 assert.equal(filterShowcaseCases('video', 'botanical').length, 0)
