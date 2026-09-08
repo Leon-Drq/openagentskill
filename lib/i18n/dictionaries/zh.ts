@@ -24,7 +24,7 @@ export default {
     cli: '命令行工具',
     forCreators: '创作者',
     creatorConsole: '创作者中心',
-    creators: '精选创作者',
+    creators: '技能创作者',
     creatorKit: '创作者工具包',
     learn: '学习',
     guides: '指南',
