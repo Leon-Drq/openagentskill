@@ -33,8 +33,11 @@ export async function GET(
 Skill: ${payload.skill.name}
 Repository: ${payload.skill.repository}
 
+Source status: ${payload.source_evidence.status}
+Source notice: ${payload.source_evidence.notice}
+
 Recommended command:
-${payload.recommended_command}
+${payload.recommended_command || 'Not available until source review is complete.'}
 
 Agent prompt:
 ${payload.agent_prompt}

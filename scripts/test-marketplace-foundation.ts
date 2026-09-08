@@ -24,8 +24,10 @@ assert.match(search, /hybrid-v2-task-fit-quality-outcomes/, 'search must disclos
 assert.match(search, /one best match plus up to four distinct alternatives/, 'search must expose the shortlist policy')
 
 const detailPage = readFileSync(new URL('../app/skills/[slug]/page.tsx', import.meta.url), 'utf8')
-assert.match(detailPage, /'@type': 'BreadcrumbList'/, 'skill detail pages must publish breadcrumb structured data')
-assert.match(detailPage, /Project-level GitHub stars/, 'skill pages must label repository popularity accurately')
+const detailSchema = readFileSync(new URL('../lib/skills/detail-profile.ts', import.meta.url), 'utf8')
+assert.match(detailPage, /serializeDetailJson\(buildDetailStructuredData\(dbSkill\)\)/, 'skill detail pages must render the structured-data builder')
+assert.match(detailSchema, /'@type': 'BreadcrumbList'/, 'skill detail schema must publish breadcrumbs')
+assert.match(detailPage, /id="githubStars"/, 'skill pages must label repository popularity accurately')
 assert.doesNotMatch(detailPage, /'@type': 'AggregateRating'/, 'unverified legacy ratings must not be emitted as rich-result evidence')
 assert.match(detailPage, /permanentRedirect\(`\/skills\/\$\{skill\.slug\}`\)/, 'legacy skill aliases must retain permanent redirects')
 

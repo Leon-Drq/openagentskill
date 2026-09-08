@@ -5,6 +5,7 @@ import { buildAgentReadableSkillMetadata } from '@/lib/agent-readable'
 import type { SkillAgentStats, SkillEventStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
 import { getSkillDecisionProfile } from '@/lib/decision'
 import { getSkillInstallTargets } from '@/lib/install-targets'
+import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
 import { getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillAttribution } from '@/lib/skill-attribution'
 import { getSkillSupplyProfile } from '@/lib/supply'
@@ -694,7 +695,7 @@ export function getSkillInstallApiUrl(slug: string) {
 }
 
 export function getSkillInstallCommand(skill: SkillRecord) {
-  return skill.install_command || `npx skills add ${skill.github_repo}`
+  return getSkillSourceEvidence(skill).canOfferInstall ? skill.install_command || '' : ''
 }
 
 type SkillRankingStats = SkillAgentStats | SkillOutcomeStats
@@ -949,6 +950,7 @@ export function toRegistrySkill(
       url: skill.author_url,
     },
     attribution,
+    source_evidence: getSkillSourceEvidence(skill),
     stats: {
       stars: Number(skill.github_stars || 0),
       forks: Number(skill.github_forks || 0),
@@ -1021,6 +1023,7 @@ export function toRegistrySkill(
 }
 
 export function buildInstallHandoff(skill: SkillRecord) {
+  const sourceEvidence = getSkillSourceEvidence(skill)
   const install = getSkillInstallCommand(skill)
   const targets = getSkillInstallTargets(skill)
   const detailUrl = getSkillUrl(skill.slug)
@@ -1043,6 +1046,7 @@ export function buildInstallHandoff(skill: SkillRecord) {
       repository: skill.repository,
     },
     recommended_command: install,
+    source_evidence: sourceEvidence,
     install_targets: targets,
     install_receipt: {
       endpoint: `${SITE_URL}/api/agent/outcome`,
@@ -1062,14 +1066,14 @@ export function buildInstallHandoff(skill: SkillRecord) {
       recommended_action: safety.safety_tier.recommended_action,
       reasons: safety.safety_tier.reasons,
     },
-    agent_prompt:
+    agent_prompt: !sourceEvidence.canOfferInstall ? targets[0]?.value || sourceEvidence.notice :
       `Install the "${skill.name}" agent skill only after reviewing the OpenAgentSkill profile and source repository. Safety gate: ${safety.safety_tier.label} (${safety.safety_tier.auto_install_policy}). Start with ${detailUrl}, inspect the trust and audit notes, then use the recommended install handoff: ${install}. After installation, summarize changed files, required setup, and a minimal verification result before using the skill for real work. Report the verified result to ${SITE_URL}/api/agent/outcome using a unique event_id, skill_slug=${skill.slug}, install_used=true, and outcome=success or failed.`,
     safety_checklist: [
       `Safety gate: ${safety.safety_tier.label}. Policy: ${safety.safety_tier.auto_install_policy}.`,
       safety.safety_tier.recommended_action,
       'Review the repository and license before running third-party code.',
       'Prefer a sandbox or isolated project when testing a new skill.',
-      'Start with the recommended command, then inspect generated files before committing changes.',
+      sourceEvidence.canOfferInstall ? 'Start with the recommended command, then inspect generated files before committing changes.' : sourceEvidence.notice,
       'Do not execute external side effects, payments, account changes, or credentialed actions without explicit user approval.',
     ],
     verification_steps: [

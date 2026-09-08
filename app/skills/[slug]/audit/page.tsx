@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
+import { SkillProfileText } from '@/components/skill-profile-text'
+import { getPrimaryInstallCommand } from '@/lib/install-targets'
 import { SkillDetailLink as Link } from '@/components/skill-detail-link'
 import { SkillDetailDate, SkillDetailText, SkillDetailValue } from '@/components/skill-detail-text'
 import { SiteFooter } from '@/components/site-footer'
@@ -115,7 +117,7 @@ export default async function SkillAuditPage({
   const audit = storedAudit ? normalizeAuditRecord(storedAudit) : buildSkillAudit(skill, eventStats)
   const trust = getSkillTrustProfile(skill, false, eventStats)
   const safety = getAgentSafetyProfile(skill, audit, { max_risk: 'medium', needs_install_command: true })
-  const installCommand = skill.install_command || `npx skills add ${skill.github_repo || skill.slug}`
+  const installCommand = getPrimaryInstallCommand(skill)
   const agentReadableMetadata = buildAgentReadableSkillMetadata(skill, {
     eventStats,
     alternatives: relatedSkills,
@@ -310,7 +312,13 @@ export default async function SkillAuditPage({
             <div className="border border-border p-5">
               <h2 className="font-display text-lg font-semibold"><SkillDetailText id="installPath" /></h2>
               <p className="mb-4 mt-1 text-xs text-secondary"><SkillDetailText id="reviewBeforeProduction" /></p>
-              <InstallCommand command={installCommand} skillSlug={skill.slug} compact />
+              {installCommand ? (
+                <InstallCommand command={installCommand} skillSlug={skill.slug} compact />
+              ) : (
+                <Link href={`/skills/${skill.slug}#install-options`} className="text-sm text-primary underline">
+                  <SkillProfileText id="reviewSource" />
+                </Link>
+              )}
             </div>
 
             <div className="border border-border p-5">
