@@ -325,32 +325,11 @@ async function fetchAllSkills(
   return sortDirectorySkills(filterSkillOnly(rows), sort)
 }
 
-function getSitemapFallbackRecords(
-  offset: number,
-  limit: number,
-  minStars: number,
-  minQualityScore: number
-): SkillSitemapRecord[] {
-  return CURATED_SKILL_SNAPSHOT
-    .filter((skill) => Number(skill.github_stars || 0) >= minStars || skill.publisher_verified === true)
-    .filter((skill) => Number(skill.quality_score || 0) >= minQualityScore)
-    .sort((left, right) => Number(right.github_stars || 0) - Number(left.github_stars || 0))
-    .slice(offset, offset + limit)
-    .map((skill) => ({
-      slug: skill.slug,
-      github_stars: skill.github_stars,
-      github_last_pushed_at: skill.github_last_pushed_at,
-      created_at: skill.created_at,
-      updated_at: skill.updated_at,
-      quality_score: skill.quality_score,
-      publisher_verified: skill.publisher_verified,
-    }))
-}
-
 // Sitemap traffic is bot-heavy and arrives across many server instances. A
 // shared cache prevents every crawler hit from starting its own multi-thousand
-// row database read. On a transient database failure we cache a compact,
-// valid sitemap rather than allowing retries to crowd out interactive routes.
+// row database read. Revalidation failures must throw so Next's Data Cache
+// retains its last successful value, never a smaller fallback presented as live.
+// Cold-cache failures are handled as retryable 503s by the sitemap endpoints.
 const getCachedApprovedSkillSitemapRecords = unstable_cache(
   async (
     offset: number,
@@ -358,13 +337,9 @@ const getCachedApprovedSkillSitemapRecords = unstable_cache(
     minStars: number,
     minQualityScore: number
   ): Promise<SkillSitemapRecord[]> => {
-    try {
-      return await fetchApprovedSkillSitemapRecords({ offset, limit, minStars, minQualityScore })
-    } catch {
-      return getSitemapFallbackRecords(offset, limit, minStars, minQualityScore)
-    }
+    return fetchApprovedSkillSitemapRecords({ offset, limit, minStars, minQualityScore })
   },
-  ['approved-sitemap-records-v8'],
+  ['approved-sitemap-records-v10'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-records'],
@@ -373,13 +348,9 @@ const getCachedApprovedSkillSitemapRecords = unstable_cache(
 
 const getCachedApprovedSkillSitemapCount = unstable_cache(
   async (minStars: number, minQualityScore: number): Promise<number> => {
-    try {
-      return await fetchApprovedSkillSitemapCount(minStars, minQualityScore)
-    } catch {
-      return getSitemapFallbackRecords(0, CURATED_SKILL_SNAPSHOT.length, minStars, minQualityScore).length
-    }
+    return fetchApprovedSkillSitemapCount(minStars, minQualityScore)
   },
-  ['approved-sitemap-count-v9'],
+  ['approved-sitemap-count-v10'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-count'],

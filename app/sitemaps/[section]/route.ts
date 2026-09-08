@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { sitemapUnavailableResponse } from '@/lib/seo/sitemap-response'
 import {
   getBestSitemapEntries,
   getCoreSitemapEntries,
@@ -20,17 +21,15 @@ const SHARDED_SECTION_PREFIXES: Array<[RegExp, SitemapSection]> = [
 const RETIRED_SHARDED_SITEMAPS = /^(skill-audits|skill-evals|alternatives)-(\d+)\.xml$/
 
 async function staticEntriesFor(section: string) {
-  const now = new Date()
-
   switch (section) {
     case 'core.xml':
-      return getCoreSitemapEntries(now)
+      return getCoreSitemapEntries()
     case 'best.xml':
-      return getBestSitemapEntries(now)
+      return getBestSitemapEntries()
     case 'rankings.xml':
-      return getRankingSitemapEntries(now)
+      return getRankingSitemapEntries()
     case 'guides.xml':
-      return getGuideSitemapEntries(now)
+      return getGuideSitemapEntries()
     case 'creators.xml':
       return getCreatorSitemapEntries()
     default:
@@ -43,12 +42,12 @@ export async function GET(
   { params }: { params: Promise<{ section: string }> }
 ) {
   const { section } = await params
-  const staticEntries = await staticEntriesFor(section)
+  const staticEntries = await staticEntriesFor(section).catch(() => undefined)
+  if (staticEntries === undefined) return sitemapUnavailableResponse()
 
   if (staticEntries) {
-    // Static section entries change at editorial cadence, not whenever this
-    // endpoint is requested. Omit lastmod rather than emitting a false signal.
-    return xmlResponse(renderUrlSet(staticEntries, { includeLastModified: false }))
+    // Only entries with a source-backed content date emit lastmod.
+    return xmlResponse(renderUrlSet(staticEntries))
   }
 
   // Audit, eval, and generic alternative pages remain available to people and
@@ -69,9 +68,10 @@ export async function GET(
     if (!match) continue
 
     const index = Number(match[1])
-    if (!Number.isInteger(index) || index < 0) notFound()
+    if (!Number.isSafeInteger(index) || index < 0 || String(index) !== match[1]) notFound()
 
-    const entries = await getSkillSitemapEntries(sitemapSection, index)
+    const entries = await getSkillSitemapEntries(sitemapSection, index).catch(() => null)
+    if (!entries) return sitemapUnavailableResponse()
     if (entries.length === 0) notFound()
 
     return xmlResponse(renderUrlSet(entries))
