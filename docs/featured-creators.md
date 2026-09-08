@@ -63,3 +63,8 @@ typecheck, lint and production build. Browser checks cover 20 profiles, sorting,
 search, empty results, ownership notices, source/Gallery links, eight languages,
 mobile widths, navigation without login and the authenticated claim boundary.
 Do not execute listed Skills as part of these website checks.
+
+The locale provider suspends only its null-rendering route observer. Page children
+must not appear in a Suspense fallback: nested providers otherwise stream repeated
+page trees and can race with React hydration on real networks. Browser runtime
+errors are a release failure even when the visual/interaction assertions pass.

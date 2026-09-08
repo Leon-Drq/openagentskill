@@ -47,6 +47,14 @@ const guarded = [
   ...readdirSync('components').filter(x=>/^showcase-.*\.tsx$/.test(x)).map(x=>`components/${x}`),
   'components/skill-submit-form.tsx', 'app/submit/page.tsx',
 ]
+// The route observer may suspend, but the page tree must never be duplicated in
+// a Suspense fallback. Duplicated streamed trees can race with hydration ($RS).
+const providerSource = readFileSync('lib/i18n/context.tsx', 'utf8')
+assert.ok(providerSource.includes('<Suspense fallback={null}>'))
+assert.ok(providerSource.includes('<LocaleRouteObserver'))
+assert.equal((providerSource.match(/\{children\}/g) || []).length, 2,
+  'Render page children once in the state provider and pass them once from the public wrapper')
+assert.ok(!providerSource.includes('fallback={<I18nStateProvider'))
 for(const path of guarded) {
   const source=readFileSync(path,'utf8'), ast=ts.createSourceFile(path,source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX)
   function visit(n) {
