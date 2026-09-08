@@ -3,9 +3,8 @@
 import { NativeSelect } from '@/components/ui/native-select'
 
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { InstallCommand } from './install-command'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useSyncExternalStore, useTransition } from 'react'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
 import type { SupplyTrackSummary } from '@/lib/supply'
@@ -107,7 +106,9 @@ interface Skill {
     installCommand?: string
   }
   compatibility: Array<{ platform: string }>
-  author: { name: string }
+  author: { name: string; owner?: string }
+  snapshot?: boolean
+  sourceStatus?: string
   verified: boolean
   createdAt: string
   agentStats?: AgentStats | null
@@ -118,71 +119,36 @@ interface Skill {
   supplyProfile?: SkillSupplySummary
 }
 
-const SORT_TABS = [
-  { key: 'quality', label: 'Recommended', description: 'Best blend of relevance, quality, freshness, and verified outcomes' },
-  { key: 'trending', label: 'Trending', description: 'Growing fast right now' },
-  { key: 'stars', label: 'Most Starred', description: 'Highest GitHub stars' },
-  { key: 'fresh', label: 'Fresh', description: 'Recently pushed on GitHub' },
-  { key: 'new', label: 'New Arrivals', description: 'Recently published' },
-] as const
 
-const QUALITY_TABS = [
-  { key: 'all', label: 'Any quality' },
-  { key: 'excellent', label: 'Excellent' },
-  { key: 'strong', label: 'Strong' },
-  { key: 'promising', label: 'Promising' },
-] as const
 
-const STAR_OPTIONS = [
-  { value: '0', label: 'Any stars' },
-  { value: '500', label: '500+ stars' },
-  { value: '1000', label: '1K+ stars' },
-  { value: '5000', label: '5K+ stars' },
-] as const
+import { GitHubOwnerAvatar } from './github-owner-avatar'
+import { useI18n } from '@/lib/i18n/context'
+import { directoryCopy, directoryLabel } from '@/lib/i18n/directory-copy'
+import { directoryCategories, directoryCategoryOptions, directoryHref } from '@/lib/skills/directory'
+import { Search, ArrowRight, SlidersHorizontal, Star, X } from 'lucide-react'
 
-const TRUST_OPTIONS = [
-  { key: 'all', label: 'Any trust' },
-  { key: 'production', label: 'Production candidate' },
-  { key: 'strong', label: 'Strong shortlist' },
-  { key: 'review', label: 'Manual review' },
-  { key: 'risk', label: 'High review required' },
-] as const
-
-const SAFETY_OPTIONS = [
-  { key: 'all', label: 'Any safety' },
-  { key: 'verified', label: 'Verified' },
-  { key: 'reviewed', label: 'Reviewed' },
-  { key: 'experimental', label: 'Experimental' },
-  { key: 'blocked', label: 'Blocked' },
-] as const
-
-const TASK_SHORTCUTS = [
-  { label: 'Stock analysis', href: '/skills?q=stock%20analysis', intent: 'Finance' },
-  { label: 'Trading research', href: '/skills?q=trade', intent: 'Quant' },
-  { label: 'PPT generation', href: '/skills?q=ppt', intent: 'Slides' },
-  { label: 'PDF parsing', href: '/skills?q=pdf%20parsing', intent: 'Docs' },
-  { label: 'Web scraping', href: '/skills?q=web%20scraping', intent: 'Extract' },
-  { label: 'Design workflow', href: '/skills?track=design', intent: 'Creative' },
-  { label: 'Football analytics', href: '/skills?q=football%20analytics', intent: 'Sports' },
-] as const
-
-const AGENT_ENTRY_LINKS = [
-  {
-    label: 'Resolve API',
-    href: '/api/agent/resolve?task=analyze%20stock%20news&format=text',
-    description: 'Task in, selected skill and install plan out.',
-  },
-  {
-    label: 'Skills API',
-    href: '/api/agent/skills?q=trade&limit=5&format=text',
-    description: 'Machine-readable shortlist with trust and safety signals.',
-  },
-  {
-    label: 'llms.txt',
-    href: '/llms.txt',
-    description: 'A crawler-friendly entry point for agent surfaces.',
-  },
-] as const
+// A stable server snapshot avoids localStorage hydration mismatches. Selection
+// still works in memory when private browsing disables persistence.
+const compareKey = 'openagentskill.compare'
+let memorySelection: string | null = null
+function readSelection() {
+  if (memorySelection !== null) return memorySelection
+  try { return localStorage.getItem(compareKey) || '[]' } catch { return '[]' }
+}
+function subscribeSelection(notify: () => void) {
+  const onStorage = () => { memorySelection = null; notify() }
+  window.addEventListener('storage', onStorage)
+  window.addEventListener('oas-compare-change', notify)
+  return () => {
+    window.removeEventListener('storage', onStorage)
+    window.removeEventListener('oas-compare-change', notify)
+  }
+}
+function writeSelection(slugs: string[]) {
+  memorySelection = JSON.stringify(slugs)
+  try { localStorage.setItem(compareKey, memorySelection) } catch { /* Optional persistence. */ }
+  window.dispatchEvent(new Event('oas-compare-change'))
+}
 
 interface Props {
   skills: Skill[]
@@ -210,858 +176,204 @@ interface Props {
   directoryLinks: DirectoryLink[]
 }
 
-export function SkillsPageClient({
-  skills,
-  query,
-  sort,
-  category,
-  categories,
-  useCase,
-  useCases,
-  platform,
-  platformOptions,
-  quality,
-  trust,
-  safety,
-  supplyTrack,
-  supplyTracks,
-  minStars,
-  resultCount,
-  page,
-  rankOffset,
-  hasPreviousResults,
-  hasMoreResults,
-  degraded,
-  directorySections,
-  directoryLinks,
-}: Props) {
+
+export function SkillsPageClient(props: Props) {
+  const { skills, query, sort, category, categories, useCase, useCases, platform, platformOptions,
+    quality, trust, safety, supplyTrack, supplyTracks, minStars, resultCount, page, rankOffset,
+    hasPreviousResults, hasMoreResults, degraded, directorySections, directoryLinks } = props
+  const { locale } = useI18n()
+  const c = directoryCopy(locale)
+  const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [compareSlugs, setCompareSlugs] = useState<string[]>(() => {
-    if (typeof window === 'undefined') return []
-    try {
-      const stored = JSON.parse(window.localStorage.getItem('openagentskill.compare') || '[]')
-      if (Array.isArray(stored)) return stored.filter((item) => typeof item === 'string').slice(0, 4)
-    } catch {
-      return []
-    }
-    return []
-  })
-
-  useEffect(() => {
-    window.localStorage.setItem('openagentskill.compare', JSON.stringify(compareSlugs))
-  }, [compareSlugs])
-
-  const navigate = useCallback(
-    (updates: Record<string, string | undefined>) => {
-      const params = new URLSearchParams(searchParams.toString())
-      const updatesPage = Object.prototype.hasOwnProperty.call(updates, 'page')
-      for (const [key, value] of Object.entries(updates)) {
-        if (value && value !== 'all') {
-          params.set(key, value)
-        } else {
-          params.delete(key)
-        }
-      }
-      if (!updatesPage) params.delete('page')
-      router.push(`/skills?${params.toString()}`)
-    },
-    [router, searchParams]
-  )
-
-  const activeSort = SORT_TABS.find((t) => t.key === sort) || SORT_TABS[0]
-  const activeTrack = supplyTracks.find((track) => track.slug === supplyTrack)
-  const resultStart = skills.length > 0 ? rankOffset + 1 : 0
-  const resultEnd = rankOffset + skills.length
-  const compareSkills = useMemo(
-    () => compareSlugs
-      .map((slug) => skills.find((skill) => skill.slug === slug) || { slug, name: slug })
-      .filter(Boolean),
-    [compareSlugs, skills]
-  )
-
-  const toggleCompare = (slug: string) => {
-    setCompareSlugs((current) => {
-      if (current.includes(slug)) return current.filter((item) => item !== slug)
-      return [...current, slug].slice(-4)
-    })
-  }
-
-  const clearFilters = () => {
-    router.push('/skills')
-  }
-
-  const formatStars = (stars: number) => {
-    if (stars >= 1000000) return `${(stars / 1000000).toFixed(1)}M`
-    if (stars >= 1000) return `${(stars / 1000).toFixed(stars >= 10000 ? 0 : 1)}K`
-    return stars.toLocaleString()
-  }
+  const [pending, startTransition] = useTransition()
+  const storedSelection = useSyncExternalStore(subscribeSelection, readSelection, () => '[]')
+  let compareSlugs: string[] = []
+  try {
+    const stored: unknown = JSON.parse(storedSelection)
+    if (Array.isArray(stored)) compareSlugs = [...new Set(stored.filter((v): v is string => typeof v === 'string'))].slice(0, 4)
+  } catch { /* Invalid saved data must not break the directory. */ }
+  const href = (updates: Record<string, string | undefined>) => directoryHref(pathname, searchParams.toString(), updates)
+  const navigate = (updates: Record<string, string | undefined>) => startTransition(() => router.push(href(updates), { scroll: false }))
+  const resetHref = directoryHref(pathname, searchParams.toString(), Object.fromEntries(
+    ['q','sort','category','useCase','platform','quality','trust','safety','track','minStars','page'].map(key => [key, undefined])
+  ))
+  const toggleCompare = (slug: string) => writeSelection(compareSlugs.includes(slug) ? compareSlugs.filter(v => v !== slug) : [...compareSlugs, slug].slice(-4))
+  const label = (key: string) => directoryLabel(locale, key)
+  const primaryCategories = ['coding-agents','design-creative','video-creation','research','presentation','finance']
+  const categoryOptions = directoryCategoryOptions([...categories, ...primaryCategories, category === 'all' ? '' : category])
+  const selectedCategory = category === 'all' ? 'all' : directoryCategories(category)[0]
+  const activeFilters = Object.entries({ category, useCase, platform, quality, trust, safety, track: supplyTrack, minStars: minStars ? String(minStars) : 'all' })
+    .filter(([, value]) => value && value !== 'all')
+  const sortOptions = [
+    ['stars', c.stars], ['quality', query ? c.relevance : c.recommended],
+    ['fresh', c.fresh], ['new', c.new], ['trending', c.trending],
+    ...(sort === 'downloads' ? [['downloads', c.trending]] : []),
+  ]
+  const advanced = [
+    { key: 'useCase', title: c.useCase, value: useCase, options: useCases.map(v => [v.slug, v.shortTitle]) },
+    { key: 'platform', title: c.platform, value: platform, options: [...new Set([...platformOptions, ...(platform !== 'all' ? [platform] : [])])].map(v => [v, v]) },
+    { key: 'quality', title: c.quality, value: quality, options: ['excellent','strong','promising'].map(v => [v, label(v)]) },
+    { key: 'trust', title: c.trust, value: trust, options: ['production','strong','review','risk'].map(v => [v, label(v)]) },
+    { key: 'safety', title: c.safety, value: safety, options: ['verified','reviewed','experimental','blocked'].map(v => [v, label(v)]) },
+    { key: 'minStars', title: c.minimum, value: String(minStars || 'all'), options: ['20','100','500','1000','5000'].map(v => [v, v + '+']) },
+    { key: 'track', title: c.useCase, value: supplyTrack, options: supplyTracks.map(v => [v.slug, v.shortLabel]) },
+  ]
+  const stars = (value: number) => new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 1 }).format(value)
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+      <main className="skills-directory mx-auto max-w-6xl px-4 pb-16 sm:px-6" aria-busy={pending}>
+        <header className="border-b border-border pb-7 pt-10 sm:pb-9 sm:pt-14" data-directory-hero>
+          <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#006b4f]">OPENAGENTSKILL / DIRECTORY</p>
+          <h1 className="mt-4 font-display text-4xl font-normal tracking-tight sm:text-6xl">AI Agent <em className="font-normal text-[#006b4f]">Skills</em></h1>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-secondary sm:text-base">{c.intro}</p>
+          <form role="search" onSubmit={event => {
+            event.preventDefault()
+            const q = String(new FormData(event.currentTarget).get('q') || '').trim()
+            navigate({ q: q || undefined, sort: undefined })
+          }} className="mt-6 flex max-w-3xl items-center gap-2 border border-border bg-card p-2 focus-within:border-[#006b4f]">
+            <Search size={18} className="ml-2 hidden shrink-0 text-secondary sm:block" aria-hidden="true" />
+            <input key={query || ''} type="search" name="q" defaultValue={query} aria-label={c.search}
+              placeholder={c.placeholder} className="min-w-0 flex-1 bg-transparent px-2 py-2.5 text-sm outline-none" />
+            <button type="submit" disabled={pending} className="shrink-0 bg-[#006b4f] px-4 py-3 text-sm font-semibold text-white hover:bg-[#00533d] disabled:opacity-50 sm:px-6">{c.search}</button>
+          </form>
+        </header>
 
-      <section className="relative overflow-hidden border-b border-border">
-        <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
-        <div className={`relative mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 ${query ? 'py-8 md:py-10' : 'py-12 md:py-16'} lg:grid-cols-[1.15fr_0.85fr] lg:items-end`}>
-          <div>
-	            <p className="font-mono text-xs uppercase tracking-[0.24em] text-secondary">AI Agent Skill Repository</p>
-	            <h1 className="mt-5 max-w-3xl font-display text-4xl font-normal leading-[0.98] text-balance md:text-6xl">
-	              AI Agent Skills Directory
-	            </h1>
-	            <p className="mt-6 max-w-2xl text-base leading-7 text-secondary md:text-lg">
-	              Browse reusable skills for Codex, Claude Code, Cursor, finance, research, web scraping, PPT, football analytics, data, marketing, design, and more.
-	            </p>
-          </div>
+        <nav aria-label={c.category} className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-border py-4 text-sm" data-directory-categories>
+          {['all', ...primaryCategories].map(key => (
+            <Link key={key} prefetch={false} href={href({ category: key, track: undefined, useCase: undefined })}
+              aria-current={selectedCategory === key ? 'page' : undefined}
+              className={`border-b-2 py-2 transition-colors ${selectedCategory === key ? 'border-[#006b4f] font-semibold text-[#006b4f]' : 'border-transparent text-secondary hover:text-foreground'}`}>
+              {key === 'all' ? c.all : label(key)}
+            </Link>
+          ))}
+        </nav>
 
-          <div className="border border-border bg-card/85 p-4 shadow-[0_18px_60px_rgba(23,23,23,0.05)] backdrop-blur">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                const q = (e.currentTarget.elements.namedItem('q') as HTMLInputElement).value
-                navigate({ q: q || undefined })
-              }}
-              className="relative"
-            >
-              <input
-                type="text"
-                name="q"
-                defaultValue={query}
-                placeholder="Describe a task or skill name..."
-                className="w-full border border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none sm:pr-24"
-              />
-              <button
-                type="submit"
-                className="mt-2 w-full rounded-[8px] bg-[#006b4f] px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 sm:absolute sm:right-2 sm:top-1/2 sm:mt-0 sm:w-auto sm:-translate-y-1/2 sm:py-2"
-              >
-                Search
-              </button>
-            </form>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {TASK_SHORTCUTS.slice(0, 5).map((shortcut) => (
-                <Link
-                  key={shortcut.href}
-                  href={shortcut.href}
-                  className="rounded-full border border-border bg-background px-3 py-1.5 text-xs text-secondary transition-colors hover:border-foreground hover:text-foreground"
-                >
-                  <span className="font-mono uppercase tracking-wider text-secondary">{shortcut.intent}</span>{' '}
-                  <span>{shortcut.label}</span>
-                </Link>
-              ))}
-            </div>
-            <div className="mt-4 grid grid-cols-3 gap-px border border-border bg-border text-center">
-              <div className="bg-background p-3">
-                <div className="font-mono text-lg text-foreground">
-                  {query && degraded ? '—' : resultCount.toLocaleString()}
-                </div>
-                <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">
-                  {query ? (degraded ? 'Live offline' : 'Matches') : 'Ranked'}
-                </div>
-              </div>
-              <div className="bg-background p-3">
-                <div className="font-mono text-lg text-foreground">{supplyTracks.length.toLocaleString()}</div>
-                <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">Tracks</div>
-              </div>
-              <div className="bg-background p-3">
-                <div className="font-mono text-lg text-foreground">{platformOptions.length.toLocaleString()}</div>
-                <div className="mt-1 text-[10px] uppercase tracking-widest text-secondary">Targets</div>
-              </div>
-            </div>
-            <div className="mt-4 grid gap-2">
-              {AGENT_ENTRY_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  prefetch={false}
-                  className="grid min-w-0 gap-1 border border-border bg-background/75 px-3 py-2 text-sm transition-colors hover:border-foreground"
-                >
-                  <span className="font-semibold text-foreground">{link.label}</span>
-                  <span className="text-xs leading-5 text-secondary">{link.description}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-	      </section>
-
-	      {!query && directorySections.length > 0 && (
-	        <section className="border-b border-border bg-background">
-	          <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-	            <div className="mb-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
-	              <div>
-	                <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Browse by scenario</p>
-	                <h2 className="mt-2 max-w-2xl font-display text-3xl font-normal leading-tight text-balance sm:text-4xl">
-	                  Real skills, grouped by the work your agent needs to finish.
-	                </h2>
-	              </div>
-	              <p className="max-w-2xl text-sm leading-7 text-secondary lg:justify-self-end">
-	                Each directory entry links to real skill pages with GitHub adoption, trust score,
-	                install handoff, risk notes, and agent-readable metadata. Use these as starting
-	                points when you want a shortlist before asking an agent to install anything.
-	              </p>
-	            </div>
-
-	            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-	              {directorySections.map((section) => (
-	                <article key={section.title} className="flex min-w-0 flex-col border border-border bg-card/65 p-4">
-	                  <div className="min-w-0">
-	                    <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
-	                      {section.eyebrow}
-	                    </p>
-	                    <Link href={section.href} className="mt-2 block font-display text-xl font-semibold leading-tight hover:opacity-70">
-	                      {section.title}
-	                    </Link>
-	                    <p className="mt-2 text-sm leading-6 text-secondary">
-	                      {section.description}
-	                    </p>
-	                  </div>
-
-	                  <ul className="mt-4 space-y-3">
-	                    {section.skills.map((skill) => (
-	                      <li key={skill.slug} className="min-w-0 border-t border-border pt-3">
-	                        <div className="flex min-w-0 items-start justify-between gap-3">
-	                          <Link href={`/skills/${skill.slug}`} className="min-w-0 font-semibold leading-snug hover:opacity-70">
-	                            <span className="block break-words">{skill.name}</span>
-	                          </Link>
-	                          <span className="shrink-0 rounded-full border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-secondary">
-	                            {formatStars(skill.stars)} stars
-	                          </span>
-	                        </div>
-	                        <p className="mt-1 line-clamp-2 text-xs leading-5 text-secondary">
-	                          {skill.tagline}
-	                        </p>
-	                        <div className="mt-2 flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-wider text-secondary">
-	                          <span>Trust {skill.trustScore ?? 'review'}</span>
-	                          <span>Quality {skill.qualityScore}</span>
-	                          <span>{skill.category}</span>
-	                        </div>
-	                      </li>
-	                    ))}
-	                  </ul>
-	                </article>
-	              ))}
-	            </div>
-
-	            {directoryLinks.length > 0 && (
-	              <div className="mt-6 border border-border bg-background/80 p-4">
-	                <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Popular directories</p>
-	                <div className="mt-4 grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-	                  {directoryLinks.map((link) => (
-	                    <Link
-	                      key={link.href}
-	                      href={link.href}
-	                      className="min-w-0 border border-border px-3 py-3 text-sm transition-colors hover:border-foreground"
-	                    >
-	                      <span className="block font-semibold leading-snug">{link.label}</span>
-	                      <span className="mt-1 block text-xs leading-5 text-secondary">{link.description}</span>
-	                    </Link>
-	                  ))}
-	                </div>
-	              </div>
-	            )}
-	          </div>
-	        </section>
-	      )}
-
-	      {!query && <section className="border-b border-border bg-card/35">
-        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-          <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Supply tracks</p>
-              <h2 className="mt-2 font-display text-2xl font-normal">Build the registry by domain, not just by count.</h2>
-            </div>
-            {supplyTrack !== 'all' && (
-              <Link
-                href="/skills"
-                className="self-start border border-border px-3 py-1.5 text-xs text-secondary transition-colors hover:border-foreground hover:text-foreground sm:self-auto"
-              >
-                Clear track
-              </Link>
-            )}
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {supplyTracks.map((track) => (
-              <Link
-                key={track.slug}
-                href={track.href}
-                className={`min-w-0 border p-4 transition-colors ${
-                  supplyTrack === track.slug
-                    ? 'border-foreground bg-foreground text-background'
-                    : 'border-border bg-background/80 hover:border-foreground'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <p className={`font-mono text-[10px] uppercase tracking-[0.18em] ${supplyTrack === track.slug ? 'text-background/70' : 'text-secondary'}`}>
-                      {track.shortLabel}
-                    </p>
-                    <h3 className="mt-2 font-display text-xl font-semibold">{track.label}</h3>
-                  </div>
-                  <span className={`shrink-0 font-mono text-sm ${supplyTrack === track.slug ? 'text-background' : 'text-secondary'}`}>
-                    {track.count.toLocaleString()}
-                  </span>
-                </div>
-                <p className={`mt-3 line-clamp-2 text-sm leading-relaxed ${supplyTrack === track.slug ? 'text-background/75' : 'text-secondary'}`}>
-                  {track.description}
-                </p>
-                <div className={`mt-4 flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-wider ${supplyTrack === track.slug ? 'text-background/70' : 'text-secondary'}`}>
-                  <span>{track.highQualityCount.toLocaleString()} quality</span>
-                  <span>{track.maintainedCount.toLocaleString()} maintained</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-      </div>
-      </section>}
-
-      {/* Sort Tabs */}
-      <div className="sticky top-14 z-40 border-b border-border bg-background/92 backdrop-blur">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex max-w-full gap-0 overflow-x-auto">
-            {SORT_TABS.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => navigate({ sort: tab.key, category })}
-                className={`shrink-0 px-3 py-3 text-sm whitespace-nowrap border-b-2 transition-colors sm:px-4 ${
-                  sort === tab.key
-                    ? 'border-foreground text-foreground'
-                    : 'border-transparent text-secondary hover:text-foreground'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        {degraded && (
-          <div className="mb-6 border border-amber-300 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-900">
-            Live registry data is temporarily unavailable, so this page is showing a curated OpenAgentSkill snapshot.
-            Search, resolve APIs, and detail pages will use live data again when the database is reachable.
-          </div>
-        )}
-
-        {!query && <section className="mb-8 border border-border bg-background/80 p-4 sm:p-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">High-intent entry points</p>
-              <h2 className="mt-2 font-display text-2xl font-normal">Start from the task, not a keyword list.</h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-secondary">
-                These shortcuts use the same trust, supply, and relevance signals as the registry API, so humans and agents land on a useful shortlist faster.
+        <section aria-labelledby="directory-results-heading" className="pt-5" data-directory-results>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
+              <h2 id="directory-results-heading" className="break-words text-base font-semibold">
+                {query ? `${c.results} · “${query}”` : c.all}
+              </h2>
+              <p className="mt-1 font-mono text-xs text-secondary" data-directory-count>
+                {skills.length ? rankOffset + 1 : 0}–{rankOffset + skills.length} / {resultCount.toLocaleString(locale)}
               </p>
             </div>
-            <Link
-              href="/api/agent/skills?format=text"
-              prefetch={false}
-              className="self-start border border-border px-3 py-2 text-xs font-semibold text-secondary transition-colors hover:border-foreground hover:text-foreground lg:self-auto"
-            >
-              Agent-readable index
-            </Link>
+            <label className="flex min-w-0 max-w-full items-center gap-3 text-xs text-secondary">
+              <span className="shrink-0">{c.sort}</span>
+              <NativeSelect value={sort} onChange={e => navigate({ sort: e.target.value })} className="w-48 max-w-full bg-transparent text-sm">
+                {sortOptions.map(([value, title]) => <option key={value} value={value}>{title}</option>)}
+              </NativeSelect>
+            </label>
           </div>
-          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            {TASK_SHORTCUTS.map((shortcut) => (
-              <Link
-                key={shortcut.href}
-                href={shortcut.href}
-                className="min-w-0 border border-border bg-card/70 px-3 py-3 transition-colors hover:border-foreground"
-              >
-                <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
-                  {shortcut.intent}
-                </span>
-                <span className="mt-1 block font-semibold leading-snug text-foreground">{shortcut.label}</span>
-              </Link>
-            ))}
-          </div>
-        </section>}
 
-        {query && (
-          <section className="mb-6 rounded-[8px] border border-border bg-card/80 p-4 sm:p-5">
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">Live registry search</p>
-            <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div className="min-w-0">
-                <h2 className="break-words font-display text-2xl font-semibold sm:text-3xl">
-                  Results for “{query}”
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-secondary">
-                  Exact name and slug matches are checked against the live registry before ranked alternatives.
-                </p>
-              </div>
-              <Link href="/skills" className="shrink-0 text-sm font-semibold text-[#006b4f] underline underline-offset-4">
-                Clear search
-              </Link>
+          <details className="mt-4 border-b border-border pb-4" data-directory-filters>
+            <summary className="flex w-fit cursor-pointer list-none items-center gap-2 text-sm text-secondary hover:text-foreground">
+              <SlidersHorizontal size={15} aria-hidden="true" />{c.filters}{activeFilters.length ? ` · ${activeFilters.length}` : ''}
+            </summary>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <label className="grid gap-2 text-xs text-secondary">{c.category}
+                <NativeSelect value={selectedCategory} onChange={e => navigate({ category: e.target.value })} className="w-full bg-transparent text-sm">
+                  <option value="all">{c.all}</option>
+                  {categoryOptions.map(key => <option key={key} value={key}>{label(key)}</option>)}
+                </NativeSelect>
+              </label>
+              {advanced.map(filter => (
+                <label key={filter.key} className="grid gap-2 text-xs text-secondary">{filter.title}
+                  <NativeSelect value={filter.value} onChange={e => navigate({ [filter.key]: e.target.value })} className="w-full bg-transparent text-sm">
+                    <option value="all">{c.any}</option>
+                    {filter.options.map(([value, title]) => <option key={value} value={value}>{title}</option>)}
+                  </NativeSelect>
+                </label>
+              ))}
             </div>
-          </section>
-        )}
-
-        <section className="mb-8 border border-border bg-card/80 p-4 shadow-[0_16px_48px_rgba(23,23,23,0.04)] sm:p-5">
-          <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Decision filters</p>
-              <h2 className="mt-2 font-display text-2xl font-normal">Choose by scenario, quality, and trust signals.</h2>
-              {activeTrack && (
-                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-secondary">
-                  Active supply track: <span className="text-foreground">{activeTrack.label}</span>. {activeTrack.description}
-                </p>
-              )}
+          </details>
+          {activeFilters.length > 0 && (
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs" aria-label={c.active}>
+              {activeFilters.map(([key,value]) => <Link key={key} prefetch={false} href={href({ [key]: undefined })}
+                className="inline-flex max-w-full items-center gap-2 rounded-full border border-border px-3 py-2" aria-label={`${c.remove}: ${value}`}>
+                <span className="break-all">{label(value)}</span><X size={12} className="shrink-0" aria-hidden="true" />
+              </Link>)}
+              <Link href={resetHref} prefetch={false} className="p-2 text-[#006b4f] underline underline-offset-4">{c.reset}</Link>
             </div>
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="self-start border border-border px-3 py-1.5 text-xs text-secondary transition-colors hover:border-foreground hover:text-foreground sm:self-auto"
-            >
-              Reset
-            </button>
-          </div>
+          )}
+          <p className="my-4 max-w-3xl text-xs leading-5 text-secondary">{c.pool}</p>
+          <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${resultCount}`}</p>
+          {degraded && <p role="status" className="mb-5 border-l-2 border-amber-600 bg-amber-50 p-4 text-sm text-amber-950">{c.offline}</p>}
 
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-            <label className="block">
-              <span className="mb-1 block text-xs text-secondary">Use case</span>
-              <NativeSelect
-                value={useCase}
-                onChange={(e) => navigate({ useCase: e.target.value })}
-                className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-              >
-                <option value="all">Any use case</option>
-                {useCases.map((item) => (
-                  <option key={item.slug} value={item.slug}>{item.shortTitle}</option>
-                ))}
-              </NativeSelect>
-            </label>
-
-            <label className="block">
-              <span className="mb-1 block text-xs text-secondary">Platform fit</span>
-              <NativeSelect
-                value={platform}
-                onChange={(e) => navigate({ platform: e.target.value })}
-                className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-              >
-                <option value="all">Any platform</option>
-                {platformOptions.slice(0, 40).map((item) => (
-                  <option key={item} value={item}>{item}</option>
-                ))}
-              </NativeSelect>
-            </label>
-
-            <label className="block">
-              <span className="mb-1 block text-xs text-secondary">Quality tier</span>
-              <NativeSelect
-                value={quality}
-                onChange={(e) => navigate({ quality: e.target.value })}
-                className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-              >
-                {QUALITY_TABS.map((item) => (
-                  <option key={item.key} value={item.key}>{item.label}</option>
-                ))}
-              </NativeSelect>
-            </label>
-
-            <label className="block">
-              <span className="mb-1 block text-xs text-secondary">Trust profile</span>
-              <NativeSelect
-                value={trust}
-                onChange={(e) => navigate({ trust: e.target.value })}
-                className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-              >
-                {TRUST_OPTIONS.map((item) => (
-                  <option key={item.key} value={item.key}>{item.label}</option>
-                ))}
-              </NativeSelect>
-            </label>
-
-            <label className="block">
-              <span className="mb-1 block text-xs text-secondary">Safety gate</span>
-              <NativeSelect
-                value={safety}
-                onChange={(e) => navigate({ safety: e.target.value })}
-                className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-              >
-                {SAFETY_OPTIONS.map((item) => (
-                  <option key={item.key} value={item.key}>{item.label}</option>
-                ))}
-              </NativeSelect>
-            </label>
-
-            <label className="block">
-              <span className="mb-1 block text-xs text-secondary">GitHub adoption</span>
-              <NativeSelect
-                value={String(minStars)}
-                onChange={(e) => navigate({ minStars: e.target.value === '0' ? undefined : e.target.value })}
-                className="w-full border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-              >
-                {STAR_OPTIONS.map((item) => (
-                  <option key={item.value} value={item.value}>{item.label}</option>
-                ))}
-              </NativeSelect>
-            </label>
-          </div>
-        </section>
-
-        {/* Category filters */}
-        {categories.length > 0 && (
-          <div className="-mx-4 mb-8 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
-            <button
-              onClick={() => navigate({ sort, category: 'all' })}
-              className={`shrink-0 whitespace-nowrap border px-3 py-1.5 text-xs transition-colors ${
-                category === 'all'
-                  ? 'border-foreground bg-foreground text-background'
-                  : 'border-border text-secondary hover:border-foreground hover:text-foreground'
-              }`}
-            >
-              All
-            </button>
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => navigate({ sort, category: cat })}
-                className={`shrink-0 whitespace-nowrap border px-3 py-1.5 text-xs capitalize transition-colors ${
-                  category === cat
-                    ? 'border-foreground bg-foreground text-background'
-                    : 'border-border text-secondary hover:border-foreground hover:text-foreground'
-                }`}
-              >
-                {cat === 'chinese' ? '中文 Chinese' : cat}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Context line */}
-        <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
-          <p className="text-sm text-secondary">
-            Showing {resultStart.toLocaleString()}-{resultEnd.toLocaleString()} of {resultCount.toLocaleString()} ranked candidates
-            {query && <> matching <em>&quot;{query}&quot;</em></>}
-            {category !== 'all' && <> in <em>{category}</em></>}
-            {supplyTrack !== 'all' && <> inside <em>{activeTrack?.shortLabel || supplyTrack}</em></>}
-            {useCase !== 'all' && <> for <em>{useCases.find((item) => item.slug === useCase)?.shortTitle || useCase}</em></>}
-            {trust !== 'all' && <> with <em>{TRUST_OPTIONS.find((item) => item.key === trust)?.label || trust}</em></>}
-            {safety !== 'all' && <> gated as <em>{SAFETY_OPTIONS.find((item) => item.key === safety)?.label || safety}</em></>}
-          </p>
-          <p className="text-xs text-secondary italic">{activeSort.description}</p>
-        </div>
-
-        {/* Skills List */}
-        {skills.length === 0 ? (
-          <div className="border border-border bg-card/70 p-7 text-center sm:p-12">
-            <p className="mb-4 text-secondary">
-              {degraded ? 'Live search is temporarily unavailable. Retry in a moment.' : 'No exact or relevant skills found.'}
-            </p>
-            <Link href="/skills" className="text-foreground underline text-sm">
-              Clear filters
-            </Link>
-          </div>
-        ) : (
-          <div className="grid min-w-0 gap-4">
-            {skills.map((skill, index) => (
-              <article
-                key={skill.id}
-                className="min-w-0 overflow-hidden border border-border bg-card/75 p-5 transition-colors hover:border-foreground/50 sm:p-6"
-              >
-                <div className="flex min-w-0 items-start gap-3 sm:gap-6">
-                  {/* Rank */}
-                  <div className="w-6 shrink-0 pt-1 text-right font-mono text-base tabular-nums text-secondary sm:w-8 sm:text-lg">
-                    {rankOffset + index + 1}
+          {skills.length === 0 ? (
+            <div className="border-y border-border py-14 text-center">
+              <p className="text-secondary">{c.empty}</p>
+              <Link href={resetHref} className="mt-5 inline-block text-[#006b4f] underline">{c.reset}</Link>
+            </div>
+          ) : <div className="border-t border-border" data-skill-list>
+            {skills.map(skill => (
+              <article key={skill.id} className="grid min-w-0 grid-cols-[40px_minmax(0,1fr)] gap-x-4 border-b border-border py-6 sm:grid-cols-[48px_minmax(0,1fr)_150px] sm:gap-x-5 sm:py-7" data-directory-skill>
+                <div className="pt-1"><GitHubOwnerAvatar owner={skill.author.owner} label={skill.author.name} size="md" /></div>
+                <div className="min-w-0">
+                  <h3 className="break-words text-lg font-semibold leading-snug [overflow-wrap:anywhere] sm:text-xl">
+                    <Link prefetch={false} href={`/skills/${skill.slug}${locale === 'en' ? '' : '?lang=' + locale}`} className="hover:text-[#006b4f]">{skill.name}</Link>
+                  </h3>
+                  <p className="mt-1 truncate font-mono text-[11px] text-secondary">{skill.author.owner || skill.author.name}</p>
+                  <p className="mt-3 max-w-2xl break-words text-sm leading-6 text-secondary">{skill.tagline}</p>
+                  <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-secondary">
+                    <Link href={href({ category: directoryCategories(skill.category)[0] })} prefetch={false} className="underline decoration-border underline-offset-4">{directoryCategories(skill.category).map(label).join(' · ')}</Link>
+                    {[...new Set(skill.platformHints || skill.compatibility.map(v => v.platform))].slice(0, 2).map(value => <span key={value}>{value}</span>)}
+                    <span className={skill.safetyProfile?.blocked ? 'text-red-700' : ''}>{skill.snapshot ? c.snapshot : skill.safetyProfile?.blocked ? c.blocked : label(skill.sourceStatus || 'unverified')}</span>
                   </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="mb-3">
-                      <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <Link href={`/skills/${skill.slug}`} className="min-w-0 max-w-full">
-                          <h2 className="max-w-full font-display text-2xl sm:text-3xl font-semibold break-words [overflow-wrap:anywhere] hover:opacity-60 transition-opacity">
-                            {skill.name}
-                          </h2>
-                        </Link>
-                        {skill.verified && (
-                          <span className="text-xs font-mono border border-border px-2 py-0.5 shrink-0">
-                            VERIFIED
-                          </span>
-                        )}
-                        {sort === 'new' && (
-                          <span className="text-xs font-mono border border-border px-2 py-0.5 text-secondary shrink-0">
-                            NEW
-                          </span>
-                        )}
-                        {skill.qualityProfile && (
-                          <span className="text-xs font-mono border border-border px-2 py-0.5 text-secondary shrink-0">
-                            {skill.qualityProfile.label.toUpperCase()} · {skill.qualityProfile.score}
-                          </span>
-                        )}
-                        {skill.trustProfile && (
-                          <span className="text-xs font-mono border border-border px-2 py-0.5 text-secondary shrink-0">
-                            TRUST · {skill.trustProfile.score}
-                          </span>
-                        )}
-                        {skill.safetyProfile && (
-                          <span className={`shrink-0 border px-2 py-0.5 font-mono text-xs ${
-                            skill.safetyProfile.blocked
-                              ? 'border-red-300 text-red-700'
-                              : skill.safetyProfile.safety_tier.tier === 'verified'
-                                ? 'border-[#006b4f] text-[#006b4f]'
-                                : 'border-border text-secondary'
-                          }`}>
-                            SAFE · {skill.safetyProfile.safety_tier.badge}
-                          </span>
-                        )}
-                        {skill.supplyProfile && (
-                          <span className="text-xs font-mono border border-border px-2 py-0.5 text-secondary shrink-0">
-                            {skill.supplyProfile.track.shortLabel.toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-base text-secondary italic leading-relaxed">
-                        {skill.tagline}
-                      </p>
-                    </div>
-
-                    {/* Install Command */}
-                    {skill.technical.installCommand && (
-                      <div className="mb-4">
-                        <InstallCommand
-                          command={skill.technical.installCommand}
-                          skillSlug={skill.slug}
-                          compact
-                        />
-                      </div>
-                    )}
-
-                    {/* Stats */}
-                    <div className="flex flex-wrap gap-4 text-sm text-secondary font-mono mb-4">
-                      {/* Agent Calls - 核心指标 */}
-                      {skill.agentStats && skill.agentStats.total_calls > 0 && (
-                        <>
-                          <span title="Agent Calls" className="text-foreground font-semibold">
-                            {skill.agentStats.total_calls >= 1000
-                              ? `${(skill.agentStats.total_calls / 1000).toFixed(1)}K`
-                              : skill.agentStats.total_calls}{' '}
-                            agent calls
-                          </span>
-                          {skill.agentStats.success_rate !== null && (
-                            <span 
-                              title="Success Rate"
-                              className={skill.agentStats.success_rate >= 90 ? 'text-foreground' : skill.agentStats.success_rate >= 70 ? 'text-secondary' : 'text-red-600'}
-                            >
-                              {skill.agentStats.success_rate}% success
-                            </span>
-                          )}
-                        </>
-                      )}
-                      <span title="GitHub Stars">
-                        {skill.stats.stars >= 1000
-                          ? `${(skill.stats.stars / 1000).toFixed(1)}K`
-                          : skill.stats.stars} stars
-                      </span>
-                      {typeof skill.stats.qualityScore === 'number' && skill.stats.qualityScore > 0 && (
-                        <span title="Quality Score">
-                          {Math.round(skill.stats.qualityScore)} quality
-                        </span>
-                      )}
-                      {skill.trustProfile && (
-                        <span title="Trust Score">
-                          {skill.trustProfile.score} trust
-                        </span>
-                      )}
-                      {skill.safetyProfile && (
-                        <span title="Safety gate">
-                          {skill.safetyProfile.safety_tier.label}
-                        </span>
-                      )}
-                      {skill.platformHints && skill.platformHints.length > 0 && (
-                        <span title="Platform fit">
-                          {skill.platformHints.slice(0, 2).join(' + ')}
-                        </span>
-                      )}
-                      {skill.supplyProfile && (
-                        <>
-                          <span title="Maintenance">
-                            {skill.supplyProfile.maintenance.label}
-                          </span>
-                          <span title="Risk">
-                            {skill.supplyProfile.risk.label}
-                          </span>
-                        </>
-                      )}
-                    </div>
-
-                    {(skill.qualityProfile || skill.trustProfile || skill.safetyProfile) && (
-                      <div className="mb-4 hidden max-w-4xl gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-3">
-                        {skill.qualityProfile && (
-                          <div className="border-l border-border pl-3 text-xs leading-relaxed text-secondary">
-                            <span className="mb-1 block font-mono text-[10px] uppercase tracking-widest text-secondary">
-                              Quality
-                            </span>
-                            {skill.qualityProfile.summary}
-                            {skill.qualityProfile.warnings.length > 0 && (
-                              <span className="mt-1 block">
-                                Check: {skill.qualityProfile.warnings.slice(0, 2).join(' · ')}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                        {skill.trustProfile && (
-                          <div className="border-l border-border pl-3 text-xs leading-relaxed text-secondary">
-                            <span className="mb-1 block font-mono text-[10px] uppercase tracking-widest text-secondary">
-                              Trust
-                            </span>
-                            {skill.trustProfile.summary}
-                            {skill.trustProfile.warnings.length > 0 && (
-                              <span className="mt-1 block">
-                                Review: {skill.trustProfile.warnings.slice(0, 2).join(' · ')}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                        {skill.safetyProfile && (
-                          <div className="border-l border-border pl-3 text-xs leading-relaxed text-secondary">
-                            <span className="mb-1 block font-mono text-[10px] uppercase tracking-widest text-secondary">
-                              Safety gate
-                            </span>
-                            {skill.safetyProfile.safety_tier.summary}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {skill.supplyProfile && (
-                      <div className="mb-4 flex max-w-4xl flex-col gap-2 border border-border bg-background/70 px-3 py-2 text-xs leading-relaxed text-secondary sm:flex-row sm:items-center sm:justify-between">
-                        <p className="min-w-0">
-                          <span className="font-mono uppercase tracking-widest text-secondary">Scenario</span>{' '}
-                          <span className="font-semibold text-foreground">{skill.supplyProfile.scenario.label}</span>
-                          <span className="hidden sm:inline"> · {skill.supplyProfile.scenario.description}</span>
-                        </p>
-                        <p className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-secondary">
-                          {skill.supplyProfile.applicableAgents.slice(0, 2).join(' + ')} · {skill.supplyProfile.install.targetCount} targets
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Platforms + Category */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      {skill.category && (
-                        <button
-                          onClick={() => navigate({ sort, category: skill.category })}
-                          className="text-xs border border-border px-2 py-1 text-secondary capitalize hover:border-foreground hover:text-foreground transition-colors"
-                        >
-                          {skill.category === 'chinese' ? '中文' : skill.category}
-                        </button>
-                      )}
-                      {skill.compatibility.slice(0, 5).map((c) => (
-                        <span
-                          key={c.platform}
-                          className="text-xs border border-border px-2 py-1 text-secondary"
-                        >
-                          {c.platform}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-secondary">
-                      <span>by {skill.author.name}</span>
-                      <Link
-                        href={`/skills/${skill.slug}`}
-                        className="border border-border px-2.5 py-1 text-secondary transition-colors hover:border-foreground hover:text-foreground"
-                      >
-                        Details
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={() => toggleCompare(skill.slug)}
-                        className={`border px-2.5 py-1 transition-colors ${
-                          compareSlugs.includes(skill.slug)
-                            ? 'border-foreground text-foreground'
-                            : 'border-border text-secondary hover:border-foreground hover:text-foreground'
-                        }`}
-                      >
-                        {compareSlugs.includes(skill.slug) ? 'In compare' : 'Compare'}
-                      </button>
-                      <Link
-                        href={`/compare?skills=${encodeURIComponent(skill.slug)}`}
-                        className="border border-border px-2.5 py-1 text-secondary transition-colors hover:border-foreground hover:text-foreground"
-                      >
-                        Quick view
-                      </Link>
-                    </div>
+                </div>
+                <div className="col-start-2 mt-4 flex flex-wrap items-center justify-between gap-4 sm:col-start-3 sm:row-start-1 sm:mt-0 sm:flex-col sm:items-end sm:justify-start sm:gap-5">
+                  <span title={c.repoStars} className="inline-flex items-center gap-1.5 font-mono text-sm"><Star size={14} aria-hidden="true" />{stars(skill.stats.stars)}<span className="text-[10px] text-secondary">GitHub</span></span>
+                  <div className="flex items-center gap-4 text-xs">
+                    <button type="button" aria-pressed={compareSlugs.includes(skill.slug)} onClick={() => toggleCompare(skill.slug)}
+                      className="min-h-10 text-secondary hover:text-[#006b4f]">{compareSlugs.includes(skill.slug) ? c.selected : c.compare}</button>
+                    <Link prefetch={false} href={`/skills/${skill.slug}${locale === 'en' ? '' : '?lang=' + locale}`}
+                      aria-label={`${c.details}: ${skill.name}`} className="inline-flex min-h-10 items-center gap-1 text-[#006b4f]">{c.details}<ArrowRight size={14} aria-hidden="true" /></Link>
                   </div>
                 </div>
               </article>
             ))}
-          </div>
-        )}
-        {(hasPreviousResults || hasMoreResults) && (
-          <div className="mt-6 flex flex-col gap-3 border border-border bg-card/70 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">
-              Page {page}
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                disabled={!hasPreviousResults}
-                onClick={() => navigate({ page: page > 2 ? String(page - 1) : undefined })}
-                className="border border-border px-4 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                disabled={!hasMoreResults}
-                onClick={() => navigate({ page: String(page + 1) })}
-                className="border border-foreground bg-foreground px-4 py-2 text-sm font-semibold text-background transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Next
-              </button>
+          </div>}
+          {(hasPreviousResults || hasMoreResults) && <nav aria-label={c.page} className="mt-6 flex flex-wrap items-center justify-between gap-4 text-sm">
+            <span className="font-mono text-xs text-secondary">{c.page} {page}</span>
+            <div className="flex gap-3">
+              {hasPreviousResults && <Link prefetch={false} rel="prev" href={href({ page: page > 2 ? String(page - 1) : undefined })} className="border border-border px-4 py-3">{c.previous}</Link>}
+              {hasMoreResults && <Link prefetch={false} rel="next" href={href({ page: String(page + 1) })} className="bg-foreground px-5 py-3 text-background">{c.next} →</Link>}
             </div>
+          </nav>}
+        </section>
+
+        {!query && directorySections.length > 0 && <section className="mt-16 border-t border-border pt-8" aria-labelledby="directory-collections">
+          <h2 id="directory-collections" className="font-display text-3xl">{c.collections}</h2>
+          <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2">
+            {directorySections.map(section => <div key={section.href} className="min-w-0 border-b border-border pb-5">
+              <Link href={section.href} prefetch={false} className="font-semibold hover:text-[#006b4f]">{section.title} →</Link>
+              <p className="mt-2 text-xs leading-6 text-secondary">{section.description}</p>
+              <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-2 text-xs text-[#006b4f]">
+                {section.skills.map(skill => <li key={skill.slug}><Link prefetch={false} href={`/skills/${skill.slug}`} className="underline underline-offset-4">{skill.name}</Link></li>)}
+              </ul>
+            </div>)}
           </div>
-        )}
-        {skills.length > 0 && hasMoreResults && (
-          <div className="mt-6 border border-border bg-card/70 p-5 text-sm leading-relaxed text-secondary">
-            <p>
-              Showing the strongest {skills.length} results to keep the registry fast for humans and agents.
-              Refine by use case, platform, stars, or search query for a narrower shortlist.
-            </p>
-            <Link href="/api/agent/resolve?task=find%20the%20right%20skill&format=text" prefetch={false} className="mt-3 inline-flex text-foreground underline">
-              Try the agent resolve API
-            </Link>
-          </div>
-        )}
+        </section>}
+        <section className="mt-10 grid gap-8 border-t border-border pt-8 sm:grid-cols-[2fr_1fr]">
+          <div><h2 className="font-display text-2xl">{c.guides}</h2><ul className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+            {directoryLinks.map(link => <li key={link.href}><Link prefetch={false} href={link.href} className="text-secondary hover:text-[#006b4f]">{link.label} ↗</Link></li>)}
+          </ul></div>
+          <div><h2 className="font-display text-2xl">{c.developers}</h2><ul className="mt-4 space-y-3 text-sm text-secondary">
+            {[['Resolve API','/api/agent/resolve?task=find%20the%20right%20skill&format=text'],['Skills API','/api/agent/skills?format=text'],['llms.txt','/llms.txt']].map(([name,url]) =>
+              <li key={url}><Link href={url} prefetch={false} className="hover:text-[#006b4f]">{name} ↗</Link></li>)}
+          </ul></div>
+        </section>
       </main>
-
-      {compareSlugs.length > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 px-4 py-3 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0 text-sm">
-              <span className="font-mono text-xs uppercase tracking-widest text-secondary">Compare</span>
-              <div className="mt-1 flex flex-wrap gap-2">
-                {compareSkills.map((skill) => (
-                  <button
-                    key={skill.slug}
-                    type="button"
-                    onClick={() => toggleCompare(skill.slug)}
-                    className="border border-border px-2 py-1 text-xs text-secondary hover:border-foreground hover:text-foreground"
-                  >
-                    {skill.name} x
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setCompareSlugs([])}
-                className="border border-border px-4 py-2 text-xs text-secondary hover:border-foreground hover:text-foreground"
-              >
-                Clear
-              </button>
-              <Link
-                href={`/compare?skills=${encodeURIComponent(compareSlugs.join(','))}`}
-                className="border border-foreground bg-foreground px-4 py-2 text-xs font-semibold text-background hover:opacity-80"
-              >
-                Compare {compareSlugs.length}
-              </Link>
-            </div>
-          </div>
+      {compareSlugs.length > 0 && <div className="sticky bottom-0 z-40 border-t border-border bg-background p-4" data-directory-compare>
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3">
+          <span className="text-sm">{c.compare} · {compareSlugs.length}</span>
+          <button type="button" onClick={() => writeSelection([])} className="min-h-10 px-2 text-xs text-secondary">{c.clear}</button>
+          <Link href={`/compare?skills=${encodeURIComponent(compareSlugs.join(','))}`} className="ml-auto bg-[#006b4f] px-4 py-3 text-sm text-white">{c.compareNow} →</Link>
         </div>
-      )}
-
+      </div>}
       <SiteFooter />
     </div>
   )
