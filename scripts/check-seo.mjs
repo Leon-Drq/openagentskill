@@ -3,7 +3,8 @@ import assert from 'node:assert/strict'
 // Read-only, bounded release smoke test. No private keys or search submissions.
 const origin = new URL(process.argv[2] || 'https://www.openagentskill.com').origin
 const canonicalOrigin = 'https://www.openagentskill.com'
-const decode = s => s.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#x27;/g, "'")
+const entities = { amp: '&', quot: '"', '#x27': "'" }
+const decode = s => s.replace(/&(amp|quot|#x27);/g, (_, name) => entities[name])
 function attributes(tag) {
   return Object.fromEntries([...tag.matchAll(/([\w:-]+)=["']([^"']*)["']/g)].map(m => [m[1].toLowerCase(), decode(m[2])]))
 }
@@ -24,20 +25,23 @@ const paths = [
 ]
 for (const [path, expectedCanonical, indexable] of paths) {
   const { body, response } = await get(path)
-  const html = body.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
-  const links = [...html.matchAll(/<link\b[^>]*>/gi)].map(m => attributes(m[0]))
-  const metas = [...html.matchAll(/<meta\b[^>]*>/gi)].map(m => attributes(m[0]))
+  // Read target tags while skipping script/comment tokens. This is inspection,
+  // not an HTML sanitizer; no transformed HTML is ever rendered or executed.
+  const tags = [...body.matchAll(/<!--[\s\S]*?-->|<script\b[^>]*>[\s\S]*?<\/script\s*>|<(link|meta|h1|title)\b[^>]*>/gi)]
+    .filter(m => m[1]).map(m => ({ name: m[1].toLowerCase(), attributes: attributes(m[0]) }))
+  const links = tags.filter(t => t.name === 'link').map(t => t.attributes)
+  const metas = tags.filter(t => t.name === 'meta').map(t => t.attributes)
   assert.equal(links.filter(l => l.rel === 'canonical').length, 1, `${path}: one canonical`)
   assert.equal(new URL(links.find(l => l.rel === 'canonical')?.href).href, new URL(canonicalOrigin + expectedCanonical).href, `${path}: canonical`)
   assert.ok(metas.some(m => m.name === 'description' && m.content?.trim()), `${path}: description`)
-  assert.ok(/<title>[^<]+<\/title>/i.test(html), `${path}: title`)
-  assert.equal((html.match(/<h1\b/gi) || []).length, 1, `${path}: one H1`)
+  assert.ok(tags.some(t => t.name === 'title') && /<title>[^<]+<\/title>/i.test(body), `${path}: title`)
+  assert.equal(tags.filter(t => t.name === 'h1').length, 1, `${path}: one H1`)
   const robots = metas.filter(m => ['robots', 'googlebot'].includes(m.name)).map(m => m.content).join(',') + (response.headers.get('x-robots-tag') || '')
   assert.equal(/noindex/i.test(robots), !indexable, `${path}: indexability`)
   for (const block of body.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)) JSON.parse(block[1])
   if (path === '/guides/agent-skills-for-product-videos') {
-    assert.ok(html.includes('Sources and examples') && html.includes('2026-09-08'))
-    assert.ok(html.includes('source-based planning guide'))
+    assert.ok(body.includes('Sources and examples') && body.includes('2026-09-08'))
+    assert.ok(body.includes('source-based planning guide'))
   }
   if (path === '/zh/skills' || path === '/ja/skills') {
     assert.ok(links.some(l => l.hreflang && l.href === canonicalOrigin + path), `${path}: self alternate`)
