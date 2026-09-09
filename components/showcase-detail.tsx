@@ -15,8 +15,10 @@ import { ShowcaseActions, ShowcaseEngagementProvider } from '@/components/showca
 import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { copyText } from '@/lib/copy-text'
+import { NativeSelect } from '@/components/ui/native-select'
+import { renderShowcaseTaskMarkdown, type ShowcaseAgentTarget } from '@/lib/showcase-task'
 import { trackAnalyticsEvent } from '@/lib/analytics'
-import { getShowcaseAccessLabel, getShowcaseCreator, getShowcaseEvidenceLabel, getShowcaseHandoff, getShowcaseImageSrc, getShowcaseSkill, getShowcaseTags, localizeShowcase, SHOWCASE_CASES, SHOWCASE_CATEGORIES, type ShowcaseCase } from '@/lib/showcase'
+import { getShowcaseAccessLabel, getShowcaseCreator, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, getShowcaseTags, localizeShowcase, SHOWCASE_CASES, SHOWCASE_CATEGORIES, type ShowcaseCase } from '@/lib/showcase'
 
 export function ShowcaseDetail({ item }: { item: ShowcaseCase }) {
   return <ShowcaseEngagementProvider><DetailContent key={item.slug} item={item} /></ShowcaseEngagementProvider>
@@ -28,6 +30,7 @@ function DetailContent({ item }: { item: ShowcaseCase }) {
   const [copied, setCopied] = useState<'task' | 'handoff' | null>(null)
   const [copyError, setCopyError] = useState(false)
   const [started, setStarted] = useState(false)
+  const [targetAgent, setTargetAgent] = useState<ShowcaseAgentTarget>('auto')
   const viewed = useRef(false)
   const handoffRef = useRef<HTMLDivElement>(null)
   const media = item.media[activeMedia]
@@ -36,7 +39,7 @@ function DetailContent({ item }: { item: ShowcaseCase }) {
   const title = localizeShowcase(item.title, locale)
   const category = SHOWCASE_CATEGORIES.find((entry) => entry.id === item.category)!
   const task = localizeShowcase(item.prompt, locale)
-  const handoff = getShowcaseHandoff(item, locale)
+  const handoff = renderShowcaseTaskMarkdown(item, locale, targetAgent)
   const related = [...SHOWCASE_CASES].filter((entry) => entry.slug !== item.slug).sort((a, b) => Number(b.category === item.category) - Number(a.category === item.category)).slice(0, 3)
 
   useEffect(() => {
@@ -64,7 +67,7 @@ function DetailContent({ item }: { item: ShowcaseCase }) {
       if (!success) throw new Error('Copy unavailable')
       setCopied(kind)
       setCopyError(false)
-      trackAnalyticsEvent(kind === 'task' ? 'showcase_task_copy' : 'showcase_handoff_copy', { case_slug: item.slug, skill_slug: item.skillSlug, prompt_kind: item.promptKind })
+      trackAnalyticsEvent(kind === 'task' ? 'showcase_task_copy' : 'showcase_handoff_copy', { case_slug: item.slug, skill_slug: item.skillSlug, prompt_kind: item.promptKind, target_agent: targetAgent })
     } catch {
       setCopied(null)
       setCopyError(true)
@@ -163,11 +166,20 @@ function DetailContent({ item }: { item: ShowcaseCase }) {
               <div role="status" aria-live="polite" className="mt-2 text-xs leading-relaxed text-[#006b4f]">{copyError ? (galleryCopy(locale, "Automatic copy failed. Select the text above and copy it manually.", "自动复制失败，请选中上方文本手动复制。")) : copied ? (galleryCopy(locale, "Copied to clipboard.", "已复制到剪贴板。")) : ''}</div>
             </div>
             {started && <div id="showcase-handoff" ref={handoffRef} tabIndex={-1} className="mt-4 scroll-mt-24 rounded-lg border border-[#006b4f]/30 bg-[#edf3ee] p-5 outline-offset-2 focus-visible:outline-[#006b4f]">
+              <label htmlFor="showcase-target-agent" className="mb-2 block text-xs font-semibold">{galleryCopy(locale, 'Target agent', '目标 Agent')}</label>
+              <NativeSelect id="showcase-target-agent" value={targetAgent} onChange={event => { setTargetAgent(event.target.value as ShowcaseAgentTarget); setCopied(null) }} className="mb-4 min-h-11 w-full rounded-md border border-[#ccd8ce] bg-white px-3 text-sm">
+                <option value="auto">{galleryCopy(locale, 'Any agent', '通用 Agent')}</option>
+                <option value="codex">Codex</option><option value="claude-code">Claude Code</option><option value="cursor">Cursor</option>
+              </NativeSelect>
               <h3 className="text-sm font-semibold">{galleryCopy(locale, "Hand it to your agent", "交给你的 Agent")}</h3>
               <p className="mt-2 text-xs leading-relaxed text-[#6d675e]">{galleryCopy(locale, "Open your agent and paste the complete text below into a new conversation. It includes the skill source, setup requirements and your task.", "打开你使用的 Agent，将下面的完整文本粘贴到新对话。它包含技能来源、配置要求和任务。")}</p>
               <textarea readOnly value={handoff} aria-label={galleryCopy(locale, "Complete setup and task", "配置与任务完整文本")} className="mt-3 min-h-36 w-full resize-y rounded-md border border-[#ccd8ce] bg-white p-3 font-mono text-[11px] leading-relaxed" />
               <button type="button" onClick={() => copy('handoff')} className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-[#006b4f] px-3 text-sm font-semibold text-white hover:bg-[#005640]">{copied === 'handoff' ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}{copied === 'handoff' ? (galleryCopy(locale, "Setup & task copied", "完整文本已复制")) : (galleryCopy(locale, "Copy setup + task", "复制配置与任务"))}</button>
               <Link href={getLocalizedNavigationHref(`/skills/${item.skillSlug}#install-options`, locale)} className="mt-4 inline-flex items-center gap-1 text-xs text-[#006b4f] underline underline-offset-4">{galleryCopy(locale, "View skill & installation options", "查看技能与安装选项")}<ArrowUpRight className="h-3 w-3" aria-hidden="true" /></Link>
+              <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-[#006b4f]">
+                <a className="inline-flex min-h-11 items-center underline underline-offset-4" href={`/api/agent/showcase/${item.slug}?format=markdown&download=1&agent=${targetAgent}&lang=${locale}`}>{galleryCopy(locale, 'Download task (.md)', '下载任务包（.md）')}</a>
+                <a className="inline-flex min-h-11 items-center underline underline-offset-4" href={`/api/agent/showcase/${item.slug}?agent=${targetAgent}&lang=${locale}`}>{galleryCopy(locale, 'Agent task API', 'Agent 任务 API')}</a>
+              </div>
             </div>}
           </aside>
         </div>

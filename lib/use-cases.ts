@@ -429,9 +429,16 @@ export function scoreSkillForUseCase(skill: SkillRecord, useCase: UseCaseDefinit
 
   for (const keyword of useCase.keywords) {
     const normalized = keyword.toLowerCase()
-    if (text.includes(normalized)) score += normalized.includes(' ') ? 5 : 3
+    const escaped = normalized.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    // Avoid short-token matches such as "rag" inside "storage".
+    const matches = /^[\x00-\x7f]+$/.test(normalized)
+      ? new RegExp(`(^|[^a-z0-9])${escaped}($|[^a-z0-9])`, 'i').test(text)
+      : text.includes(normalized)
+    if (matches) score += normalized.includes(' ') ? 5 : 3
   }
 
+  // Popularity and quality can break ties, but cannot create task relevance.
+  if (score === 0) return 0
   if (skill.verified) score += 2
   score += Math.min(10, Math.log10(Math.max(1, skill.github_stars)) * 2)
   score += Math.min(6, Number(skill.quality_score || 0) / 20)

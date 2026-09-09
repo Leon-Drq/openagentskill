@@ -7,6 +7,8 @@ import { unstable_cache } from 'next/cache'
 import type { Skill } from '@/lib/types'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSearchTerms, normalizeExactSearchQuery } from '@/lib/search-query'
+import { packCacheJson, unpackCacheJson } from '@/lib/cache/packed-json'
+import { SEARCH_INDEX_PUBLICATION_FILTER } from '@/lib/seo/search-indexability'
 
 export interface SkillRecord {
   id: string
@@ -132,10 +134,17 @@ const SKILL_DIRECTORY_SELECT = [
   'updated_at',
 ].join(',')
 
+export type SkillDirectoryResult = {
+  records: SkillRecord[]
+  degraded: boolean
+  source: 'registry-cache' | 'last-good' | 'curated-snapshot'
+}
+
 type AllSkillsCacheEntry = {
   expiresAt: number
-  value?: SkillRecord[]
-  promise?: Promise<SkillRecord[]>
+  lastSuccessAt?: number
+  value?: SkillDirectoryResult
+  promise?: Promise<SkillDirectoryResult>
 }
 
 const allSkillsCache = new Map<string, AllSkillsCacheEntry>()
@@ -210,15 +219,11 @@ function getDirectoryFallback(
 
 const getSharedAllSkills = unstable_cache(
   async (sort: SkillSortMode, category: string | null, maxRows: number) => {
-    try {
-      return await fetchAllSkills(sort, category || undefined, maxRows)
-    } catch {
-      // A bounded curated directory keeps navigation and agent flows useful
-      // while the primary database is slow or temporarily unavailable.
-      return getDirectoryFallback(sort, category || undefined, maxRows)
-    }
+    // Only successful reads enter the shared cache. A failed refresh must
+    // throw so Next retains its last good entry, not a smaller fallback.
+    return packCacheJson(await fetchAllSkills(sort, category || undefined, maxRows))
   },
-  ['public-skill-directory-v5'],
+  ['public-skill-directory-v6-packed'],
   {
     revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS,
     tags: ['public-skill-directory'],
@@ -230,6 +235,14 @@ export async function getAllSkills(
   category?: string,
   maxRows = DEFAULT_SKILL_QUERY_LIMIT
 ): Promise<SkillRecord[]> {
+  return (await getSkillDirectory(sort, category, maxRows)).records
+}
+
+export async function getSkillDirectory(
+  sort: SkillSortMode = 'quality',
+  category?: string,
+  maxRows = DEFAULT_SKILL_QUERY_LIMIT
+): Promise<SkillDirectoryResult> {
   // Never let a page route load the complete registry. Listing, ranking, and
   // resolve flows need a bounded candidate set; the sitemap has its own
   // streaming query below for the rare whole-registry case.
@@ -255,12 +268,22 @@ export async function getAllSkills(
   const cached = allSkillsCache.get(cacheKey)
 
   if (cached && cached.expiresAt > now) {
-    if (cached.value) return selectDirectorySkills(cached.value, normalizedCategory, rowLimit)
-    if (cached.promise) return cached.promise.then((value) => selectDirectorySkills(value, normalizedCategory, rowLimit))
+    if (cached.promise) return cached.promise.then((value) => ({ ...value, records: selectDirectorySkills(value.records, normalizedCategory, rowLimit) }))
+    if (cached.value) return { ...cached.value, records: selectDirectorySkills(cached.value.records, normalizedCategory, rowLimit) }
   }
 
-  const promise = getSharedAllSkills(sort, sourceCategory, sourceLimit)
+  // Bound warm-instance memory even when many categories are requested.
+  if (allSkillsCache.size >= 64 && !allSkillsCache.has(cacheKey)) allSkillsCache.delete(allSkillsCache.keys().next().value!)
+  const promise: Promise<SkillDirectoryResult> = getSharedAllSkills(sort, sourceCategory, sourceLimit)
+    .then(async (packed) => ({ records: await unpackCacheJson<SkillRecord[]>(packed), degraded: false, source: 'registry-cache' as const }))
+    .catch(() => {
+      if (cached?.value && cached.value.source !== 'curated-snapshot' && now - (cached.lastSuccessAt || 0) < 15 * 60 * 1000) {
+        return { ...cached.value, degraded: true, source: 'last-good' as const }
+      }
+      return { records: getDirectoryFallback(sort, normalizedCategory || undefined, sourceLimit), degraded: true, source: 'curated-snapshot' as const }
+    })
   allSkillsCache.set(cacheKey, {
+    ...cached,
     expiresAt: now + ALL_SKILLS_CACHE_TTL_MS,
     promise,
   })
@@ -269,9 +292,10 @@ export async function getAllSkills(
     const value = await promise
     allSkillsCache.set(cacheKey, {
       expiresAt: Date.now() + ALL_SKILLS_CACHE_TTL_MS,
+      lastSuccessAt: value.degraded ? cached?.lastSuccessAt : Date.now(),
       value,
     })
-    return selectDirectorySkills(value, normalizedCategory, rowLimit)
+    return { ...value, records: selectDirectorySkills(value.records, normalizedCategory, rowLimit) }
   } catch (error) {
     allSkillsCache.delete(cacheKey)
     throw error
@@ -339,7 +363,7 @@ const getCachedApprovedSkillSitemapRecords = unstable_cache(
   ): Promise<SkillSitemapRecord[]> => {
     return fetchApprovedSkillSitemapRecords({ offset, limit, minStars, minQualityScore })
   },
-  ['approved-sitemap-records-v10'],
+  ['approved-sitemap-records-v11-index-policy'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-records'],
@@ -350,7 +374,7 @@ const getCachedApprovedSkillSitemapCount = unstable_cache(
   async (minStars: number, minQualityScore: number): Promise<number> => {
     return fetchApprovedSkillSitemapCount(minStars, minQualityScore)
   },
-  ['approved-sitemap-count-v10'],
+  ['approved-sitemap-count-v11-index-policy'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-count'],
@@ -383,7 +407,7 @@ async function fetchApprovedSkillSitemapRecords(
     let query = supabase
       .from('skills')
       .select('slug,github_stars,github_last_pushed_at,created_at,updated_at,quality_score,publisher_verified')
-      .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
+      .or(SEARCH_INDEX_PUBLICATION_FILTER)
       // This matches the public-directory partial index. A sitemap needs a
       // stable complete traversal, not a star-only ranking, and must never
       // force a full-table sort while a crawler is visiting the site.
@@ -419,25 +443,14 @@ export async function getApprovedSkillSitemapCount(minStars = 0, minQualityScore
 async function fetchApprovedSkillSitemapCount(minStars: number, minQualityScore: number): Promise<number> {
   const supabase = createSitemapClient()
 
-  // The counter is maintained by the registry trigger and avoids making every
-  // sitemap index request pay for an exact COUNT(*) across the full catalog.
-  if (minStars <= 0 && minQualityScore <= 0) {
-    const { data, error } = await supabase
-      .from('registry_stats')
-      .select('approved_skill_count')
-      .eq('id', true)
-      .maybeSingle()
-
-    const count = Number(data?.approved_skill_count)
-    if (!error && Number.isFinite(count) && count >= 0) return Math.floor(count)
-  }
-
+  // The general registry counter also includes owner/static publications. It
+  // cannot count this narrower SEO set, even when no numeric floors are used.
   let query = supabase
     .from('skills')
     // This result is cached for 12 hours. An exact indexed count prevents the
     // planner estimate from creating empty sitemap shards or hiding valid ones.
     .select('slug', { count: 'exact', head: true })
-    .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
+    .or(SEARCH_INDEX_PUBLICATION_FILTER)
 
   if (minStars > 0) {
     query = query.or(`github_stars.gte.${minStars},publisher_verified.eq.true`)

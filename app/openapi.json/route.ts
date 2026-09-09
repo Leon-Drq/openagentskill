@@ -11,6 +11,35 @@ export async function GET() {
       },
       servers: [{ url: 'https://www.openagentskill.com' }],
       paths: {
+        '/api/agent/showcase': {
+          get: {
+            operationId: 'findWorkflowExamples',
+            summary: 'Find source-linked Gallery examples without running a model or installing a skill',
+            parameters: [
+              { name: 'q', in: 'query', schema: { type: 'string', maxLength: 200 } },
+              { name: 'category', in: 'query', schema: { type: 'string', enum: ['all', 'web', 'slides', 'image', 'video', 'document'], default: 'all' } },
+              { name: 'lang', in: 'query', schema: { type: 'string', enum: ['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr', 'id'], default: 'en' } },
+              { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 20, default: 8 } },
+              { name: 'offset', in: 'query', schema: { type: 'integer', minimum: 0, maximum: 1000, default: 0 } },
+            ],
+            responses: { '200': { description: 'Bounded list with total, items and next_offset (null at the end). References are not runtime evidence.' }, '400': { description: 'Invalid filters' } },
+          },
+        },
+        '/api/agent/showcase/{slug}': {
+          get: {
+            operationId: 'getWorkflowTaskPackage',
+            summary: 'Read a reusable task brief, source evidence, requirements and pre-execution checklist',
+            description: 'Read-only. A preview revision pins artwork evidence, not the skill version to install. Read current skill metadata and obtain task-scoped permission before execution.',
+            parameters: [
+              { name: 'slug', in: 'path', required: true, schema: { type: 'string' } },
+              { name: 'agent', in: 'query', schema: { type: 'string', enum: ['auto', 'codex', 'claude-code', 'cursor'], default: 'auto' } },
+              { name: 'lang', in: 'query', schema: { type: 'string', enum: ['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr', 'id'], default: 'en' } },
+              { name: 'format', in: 'query', schema: { type: 'string', enum: ['json', 'text', 'markdown'], default: 'json' } },
+              { name: 'download', in: 'query', schema: { type: 'string', enum: ['1'] }, description: 'Download text/markdown as a .md file.' },
+            ],
+            responses: { '200': { description: 'Reference-only task package; permissions.auto_execute and auto_install are false.' }, '400': { description: 'Invalid options' }, '404': { description: 'Unknown workflow' } },
+          },
+        },
         '/api/mcp': {
           get: {
             summary: 'Discover the OpenAgentSkill remote MCP server and available tools',

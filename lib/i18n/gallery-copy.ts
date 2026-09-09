@@ -6,6 +6,10 @@ import { isLocale, type Locale } from './config.ts'
 // repository names, commands, licenses, or the text inside an author's artwork.
 type Translations = readonly [ja: string, ko: string, es: string, de: string, fr: string, id: string]
 export const galleryTranslations = {
+  'Target agent': ['対象 Agent', '대상 Agent', 'Agente de destino', 'Ziel-Agent', 'Agent cible', 'Agent tujuan'],
+  'Any agent': ['任意の Agent', '모든 Agent', 'Cualquier agente', 'Beliebiger Agent', 'Tout agent', 'Agent apa pun'],
+  'Download task (.md)': ['タスクをダウンロード (.md)', '작업 다운로드 (.md)', 'Descargar tarea (.md)', 'Aufgabe herunterladen (.md)', 'Télécharger la tâche (.md)', 'Unduh tugas (.md)'],
+  'Agent task API': ['Agent タスク API', 'Agent 작업 API', 'API de tareas para agentes', 'Agent-Aufgaben-API', 'API de tâches pour agents', 'API tugas agent'],
   'A floral studio, in full bloom': ['花咲くフローラルスタジオ', '꽃으로 가득한 플로럴 스튜디오', 'Un estudio floral en plena floración', 'Ein Blumenstudio in voller Blüte', 'Un atelier floral en pleine floraison', 'Studio bunga yang bermekaran'],
   'A dark botanical storefront with editorial typography and a complete scrolling layout.': ['植物をテーマにしたダークな店舗サイト。編集的なタイポグラフィと縦長レイアウトが特徴です。', '식물 테마의 어두운 쇼핑 페이지에 편집형 타이포그래피와 긴 스크롤 레이아웃을 적용했습니다.', 'Una tienda botánica oscura con tipografía editorial y un diseño completo de desplazamiento.', 'Ein dunkler botanischer Shop mit redaktioneller Typografie und vollständigem Scroll-Layout.', 'Une boutique botanique sombre, avec typographie éditoriale et mise en page défilante complète.', 'Etalase botani gelap dengan tipografi editorial dan tata letak gulir lengkap.'],
   'Room to grow': ['成長する余白', '성장할 여백', 'Espacio para crecer', 'Raum zum Wachsen', 'De la place pour grandir', 'Ruang untuk tumbuh'],

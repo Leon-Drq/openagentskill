@@ -31,7 +31,7 @@
     "test:registry-layers": "node --experimental-strip-types scripts/test-registry-layers.ts",
     "test:showcase": "node --experimental-strip-types scripts/test-showcase.mjs && node --experimental-strip-types scripts/test-showcase-engagement.mjs",
     "test:form-controls": "node scripts/test-form-controls.mjs",
-    "test:seo": "node --experimental-strip-types scripts/test-seo-foundation.mjs",
+    "test:seo": "node --experimental-strip-types scripts/test-seo-foundation.mjs && node scripts/test-growth-discovery.mjs",
     "test:skill-detail": "node scripts/test-skill-detail.mjs && node scripts/test-skill-document.mjs && node scripts/test-skills-directory.mjs",
     "check:skill-detail": "node scripts/check-skill-detail.mjs",
     "check:seo": "node scripts/check-seo.mjs",

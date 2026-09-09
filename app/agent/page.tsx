@@ -37,6 +37,14 @@ export const metadata: Metadata = {
 function endpointRows() {
   return [
     {
+      label: 'Workflow examples', method: 'GET', href: '/api/agent/showcase?category=video&limit=5',
+      description: 'Find source-linked Gallery references by task or format. No model call, installation or execution.',
+    },
+    {
+      label: 'Workflow task package', method: 'GET', href: '/api/agent/showcase/silicon-valley-explainer?format=markdown',
+      description: 'Inputs, expected output, setup requirements, provenance, licenses and a pre-execution checklist.',
+    },
+    {
       label: 'Resolve task',
       method: 'POST',
       href: '/api/agent/resolve',

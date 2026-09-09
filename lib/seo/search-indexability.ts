@@ -11,6 +11,10 @@ import type { SkillRecord } from '@/lib/db/skills'
 // but it never bypasses AI review or the quality floor.
 export const SEARCH_INDEX_MIN_QUALITY_SCORE = 50
 export const SEARCH_INDEX_MIN_GITHUB_STARS = 3
+// Keep the existing robots eligibility stable during this rollout. Publication
+// is broader than search indexing; never turn a static/owner listing into an
+// AI approval just to enter a sitemap. SQL list AND count use this same gate.
+export const SEARCH_INDEX_PUBLICATION_FILTER = 'ai_review_approved.eq.true'
 
 type SearchIndexCandidate = Pick<
   SkillRecord,
