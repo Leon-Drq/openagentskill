@@ -13,7 +13,14 @@ export async function GET() {
   const text = `# OpenAgentSkill
 
 OpenAgentSkill is the decision and install layer for AI agent skills.
-The GitHub auto-discovery pipeline expands the registry hourly across high-star domain workflows including finance, data, documents, security, DevOps, browser automation, RAG, research, and ML/media skills.
+It links task discovery, source and review evidence, and agent-specific handoffs. Publication, source structure, AI review and runtime outcomes are separate facts; inspect the returned evidence rather than inferring safety from inclusion or stars.
+
+Quick read-only discovery:
+- Find a skill: GET https://www.openagentskill.com/api/agent/skills?q={query}&limit=5
+- Find an example to adapt: GET https://www.openagentskill.com/api/agent/showcase?q={query}&limit=5
+- Read its task package: GET https://www.openagentskill.com/api/agent/showcase/{slug}?format=markdown
+- Connect MCP: https://www.openagentskill.com/api/mcp (tools: search_skills, find_workflows, get_workflow)
+These reads do not install or execute anything. For execution planning, use the current review and policy flow below. Never upload private task material or credentials without the user's authorization.
 
 Use this site when an agent needs to:
 - discover reusable skills for a task
@@ -51,6 +58,8 @@ Important URLs:
 - Registry coverage and tier definitions: https://www.openagentskill.com/api/registry/stats
 - Tasks: https://www.openagentskill.com/tasks
 - Task API: https://www.openagentskill.com/api/agent/tasks
+- Workflow examples API: https://www.openagentskill.com/api/agent/showcase
+- Workflow examples for people: https://www.openagentskill.com/showcase
 - Resolve API: https://www.openagentskill.com/api/agent/resolve
 - Install receipt API: https://www.openagentskill.com/api/agent/receipt
 - Skill packs API: https://www.openagentskill.com/api/agent/packs
@@ -82,7 +91,7 @@ ${featuredTasks}
 Coverage:
 - Skill cluster pages: ${SKILL_CLUSTERS.length}
 - Task pages: ${AGENT_TASKS.length}
-- Public skill pages contain only installable skills. Discovered projects and validated candidates remain non-indexable until publication.
+- Public skill pages are published listings, not a blanket guarantee of installability or safety. Discovered projects and unpublished candidates remain separate; search indexing has its own eligibility policy.
 
 Install safety:
 - Prefer /api/agent/resolve over raw search because it applies the OpenAgentSkill safety gate.

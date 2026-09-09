@@ -11,6 +11,8 @@ Allow: /api/agent/
 Sitemap: https://www.openagentskill.com/sitemap.xml
 
 # Special directives for AI agents
+# Search access is independent of training access. Existing training policy is
+# unchanged. These directives permit crawling; they do not guarantee ranking.
 User-agent: OAI-SearchBot
 Allow: /
 
@@ -21,6 +23,12 @@ User-agent: ChatGPT-User
 Allow: /
 
 User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
 Allow: /
 
 User-agent: Anthropic-AI

@@ -16,6 +16,14 @@ export async function GET() {
     standards: ['Agent Skills SKILL.md', 'OpenAPI 3.1', 'Model Context Protocol', 'llms.txt'],
 
     endpoints: {
+      workflows: {
+        url: '/api/agent/showcase', method: 'GET',
+        description: 'Search curated examples by q and category. Bounded pagination with limit (1–20) and offset; source references are not execution evidence.',
+      },
+      workflow_task: {
+        url: '/api/agent/showcase/{slug}', method: 'GET',
+        description: 'Read inputs, expected outputs, requirements, licenses, provenance and a pre-execution checklist. Formats: json, text, markdown. Agent targets: auto, codex, claude-code, cursor.',
+      },
       mcp: {
         url: '/api/mcp',
         method: 'GET or POST',

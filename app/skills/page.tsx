@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
 import { buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
-import { getAllSkills, getCategories, type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsStrict } from '@/lib/db/skills'
+import { getSkillDirectory, getCategories, type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsStrict } from '@/lib/db/skills'
 import { SkillsPageClient } from '@/components/skills-page-client'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillSupplyProfile, getSupplyTrackSummaries } from '@/lib/supply'
@@ -508,25 +508,9 @@ type CachedSkillCandidates = {
 }
 
 function getCachedSkillCandidates(sort: SkillSortMode, category: string | undefined, limit: number) {
-  return unstable_cache(
-    async (): Promise<CachedSkillCandidates> => {
-      try {
-        return {
-          records: await getAllSkills(sort, category, limit),
-          degraded: false,
-        }
-      } catch {
-        // Cache a compact known-good fallback instead of repeatedly throwing
-        // during Supabase recovery. The next revalidation can replace it.
-        return {
-          records: getFallbackSkills(sort, category, limit),
-          degraded: true,
-        }
-      }
-    },
-    ['skills-page-candidates-v3', sort, category || 'all', String(limit)],
-    { revalidate: SKILLS_PAGE_REVALIDATE }
-  )()
+  // The data layer owns the one shared cache and carries degradation evidence.
+  // A second cache here would both exceed 2 MB and store fallback as success.
+  return getSkillDirectory(sort, category, limit) satisfies Promise<CachedSkillCandidates>
 }
 
 async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
