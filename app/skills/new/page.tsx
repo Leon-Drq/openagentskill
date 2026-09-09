@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.openagentskill.com/skills/new' },
 }
 
+interface PublicSkillLink { slug: string; ai_review_approved: boolean; listing_status: string }
 interface CommunitySubmission {
   id: string
   status: string
@@ -23,7 +24,7 @@ interface CommunitySubmission {
   submitter_x: string | null
   identity_verified: boolean
   created_at: string
-  skills: { slug: string }[] | { slug: string } | null
+  skills: PublicSkillLink[] | PublicSkillLink | null
 }
 
 async function getCommunitySubmissions() {
@@ -42,7 +43,7 @@ async function getCommunitySubmissions() {
         submitter_x,
         identity_verified,
         created_at,
-        skills ( slug )
+        skills ( slug, ai_review_approved, listing_status )
       `)
       .in('status', ['submitted', 'processing', 'listed', 'reviewed', 'duplicate'])
       .order('created_at', { ascending: false })
@@ -57,7 +58,7 @@ async function getCommunitySubmissions() {
 
 function statusCopy(status: string) {
   if (status === 'reviewed') return 'Reviewed'
-  if (status === 'listed') return 'Community listed'
+  if (status === 'listed') return 'Needs review · not in directory'
   if (status === 'duplicate') return 'Already listed'
   if (status === 'processing') return 'Reviewing'
   return 'Submitted'
@@ -97,7 +98,8 @@ export default async function NewSkillsPage() {
             <div className="grid gap-4 md:grid-cols-2">
               {submissions.map((submission) => {
                 const relatedSkill = Array.isArray(submission.skills) ? submission.skills[0] : submission.skills
-                const destination = relatedSkill?.slug
+                const isPublic = relatedSkill && (relatedSkill.ai_review_approved || ['owner_published', 'static_checked'].includes(relatedSkill.listing_status))
+                const destination = isPublic && relatedSkill?.slug
                   ? `/skills/${relatedSkill.slug}`
                   : submission.repository_url || '#'
                 return (

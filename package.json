@@ -17,6 +17,7 @@
     "indexer:backfill": "node scripts/backfill-high-star-skills.mjs",
     "test:submission": "node --experimental-strip-types scripts/test-skill-source.ts",
     "test:submission-discovery": "node --experimental-strip-types scripts/test-submission-discovery.ts",
+    "test:submission-flow": "node scripts/test-submission-flow.mjs && node scripts/test-submission-pagination.mjs",
     "test:skill-issue-ingest": "node scripts/test-skill-issue-ingest.mjs",
     "test:supabase-circuit": "node --experimental-strip-types scripts/test-supabase-circuit.ts",
     "test:security": "node --experimental-strip-types scripts/test-security-regressions.ts",
@@ -42,7 +43,7 @@
     "test:links": "node scripts/check-repository-links.mjs",
     "test:links:external": "node scripts/check-repository-links.mjs --external",
     "test:review-cost-controls": "node scripts/test-review-cost-controls.mjs",
-    "test": "pnpm run test:review-cost-controls && pnpm run test:owner-publish && pnpm run test:submission && pnpm run test:submission-discovery && pnpm run test:skill-issue-ingest && pnpm run test:supabase-circuit && pnpm run test:security && pnpm run test:x-automation && pnpm run test:github-owner && pnpm run test:performance && pnpm run test:candidate-intake && pnpm run test:creator-growth && pnpm run test:creator-directory && pnpm run test:marketplace-foundation && pnpm run test:registry-layers && pnpm run test:og-social-cards && pnpm run test:showcase && pnpm run test:localization && pnpm run test:navigation && pnpm run test:form-controls && pnpm run test:seo && pnpm run test:skill-detail && pnpm run test:cli && pnpm run test:sdk",
+    "test": "pnpm run test:review-cost-controls && pnpm run test:owner-publish && pnpm run test:submission && pnpm run test:submission-discovery && pnpm run test:submission-flow && pnpm run test:skill-issue-ingest && pnpm run test:supabase-circuit && pnpm run test:security && pnpm run test:x-automation && pnpm run test:github-owner && pnpm run test:performance && pnpm run test:candidate-intake && pnpm run test:creator-growth && pnpm run test:creator-directory && pnpm run test:marketplace-foundation && pnpm run test:registry-layers && pnpm run test:og-social-cards && pnpm run test:showcase && pnpm run test:localization && pnpm run test:navigation && pnpm run test:form-controls && pnpm run test:seo && pnpm run test:skill-detail && pnpm run test:cli && pnpm run test:sdk",
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint ."
   },

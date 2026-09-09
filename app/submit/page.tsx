@@ -1,199 +1,131 @@
 'use client'
 
-import { submissionCopy } from '@/lib/i18n/submission-copy'
-import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
-
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { SkillSubmitForm, SubmitFormData } from '@/components/skill-submit-form'
+import { useEffect, useRef, useState } from 'react'
+import { SkillSubmitForm, type SubmitFormData } from '@/components/skill-submit-form'
+import { SubmissionReceiptPanel } from '@/components/submission-receipt'
 import { useI18n } from '@/lib/i18n/context'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { trackAnalyticsEvent } from '@/lib/analytics'
+import { submissionCopy } from '@/lib/i18n/submission-copy'
+import { submissionFlowCopy } from '@/lib/i18n/submission-flow-copy'
+import { ACTIVE_RECEIPT_KEY, PENDING_STORAGE_KEY, RECEIPT_STORAGE_KEY, receiptFromFragment, validReceipt, type SubmissionReceipt } from '@/lib/skills/submission-contract'
 
-type SubmissionStatus = 'submitted' | 'processing' | 'listed' | 'reviewed' | 'duplicate' | 'quarantined'
-
-type Review = {
-  totalScore?: number
-  scores?: { security?: number; quality?: number; usefulness?: number; compliance?: number }
-  issues?: string[]
-  suggestions?: string[]
-  reasoning?: string
-}
-
-type SubmissionReceipt = {
-  id: string
-  token: string
-  status: SubmissionStatus
-  statusUrl: string
-  skill: { name: string; description: string; path: string; sourceUrl: string }
-}
-
-type SubmissionState = {
-  id: string
-  status: SubmissionStatus
-  skill: { name: string; slug?: string | null; sourceUrl?: string }
-  review?: Review | null
+function loadReceipts(): SubmissionReceipt[] {
+  try {
+    const value: unknown = JSON.parse(localStorage.getItem(RECEIPT_STORAGE_KEY) || '[]')
+    return Array.isArray(value) ? value.filter(validReceipt).slice(0, 20) : []
+  } catch { return [] }
 }
 
 export default function SubmitPage() {
   const { locale } = useI18n()
-  const [receipt, setReceipt] = useState<SubmissionReceipt | null>(null)
-  const [result, setResult] = useState<SubmissionState | null>(null)
+  const c = (key: Parameters<typeof submissionFlowCopy>[1]) => submissionFlowCopy(locale, key)
+  const [receipts, setReceipts] = useState<SubmissionReceipt[]>([])
+  const [activeId, setActiveId] = useState<string | null>(null)
+  const [showForm, setShowForm] = useState(true)
+  const [celebrate, setCelebrate] = useState(false)
+  const [batchErrors, setBatchErrors] = useState<string[]>([])
+  const pending = useRef<Record<string, string>>({})
+  const receipt = receipts.find(item => item.id === activeId) || null
 
   useEffect(() => {
-    if (!receipt || !['submitted', 'processing'].includes(result?.status || receipt.status)) return
-    let cancelled = false
-    let attempts = 0
-
-    async function poll() {
-      attempts += 1
-      try {
-        const response = await fetch(receipt!.statusUrl, { cache: 'no-store' })
-        if (response.ok && !cancelled) {
-          const data = await response.json() as { submission: SubmissionState }
-          setResult(data.submission)
-          if (!['submitted', 'processing'].includes(data.submission.status)) return
+    const timer = setTimeout(() => {
+      const saved = loadReceipts()
+      const browserWindow = window as Window & { __oasReceiptFragment?: string }
+      const tracked = receiptFromFragment(browserWindow.__oasReceiptFragment || window.location.hash)
+      delete browserWindow.__oasReceiptFragment
+      if (tracked) {
+        // Remove capability-bearing fragments before any application analytics event.
+        history.replaceState(null, '', `${location.pathname}${location.search}`)
+        const restored = saved.find(item => item.id === tracked.id && item.token === tracked.token) || {
+          ...tracked, status: 'submitted' as const, statusUrl: '', skill: { name: 'Skill', path: '', sourceUrl: '' },
         }
-      } catch {
-        // Keep the receipt on screen; the user can return to the private status URL.
+        const merged = [restored, ...saved.filter(item => item.id !== restored.id)].slice(0, 20)
+        setReceipts(merged)
+        try { localStorage.setItem(RECEIPT_STORAGE_KEY, JSON.stringify(merged)); sessionStorage.setItem(ACTIVE_RECEIPT_KEY, restored.id) } catch { /* Optional storage. */ }
+        setActiveId(restored.id); setShowForm(false)
+      } else {
+        setReceipts(saved)
+        try {
+          const active = sessionStorage.getItem(ACTIVE_RECEIPT_KEY)
+          if (saved.some(item => item.id === active)) { setActiveId(active); setShowForm(false) }
+        } catch { /* Saved history is still available. */ }
       }
-      if (!cancelled && attempts < 30) window.setTimeout(poll, 2000)
+      try {
+        const value = JSON.parse(localStorage.getItem(PENDING_STORAGE_KEY) || '{}')
+        if (value && typeof value === 'object' && !Array.isArray(value)) pending.current = Object.fromEntries(Object.entries(value).filter((entry): entry is [string, string] => typeof entry[1] === 'string' && /^[a-f0-9]{48}$/.test(entry[1])).slice(-50))
+      } catch { /* In-memory retry still works. */ }
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [])
+
+  function tokenFor(data: SubmitFormData) {
+    const key = JSON.stringify(data)
+    if (!pending.current[key]) {
+      pending.current[key] = Array.from(crypto.getRandomValues(new Uint8Array(24)), byte => byte.toString(16).padStart(2, '0')).join('')
+      pending.current = Object.fromEntries(Object.entries(pending.current).slice(-50))
+      try { localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(pending.current)) } catch { /* Private browsing. */ }
     }
-
-    const timer = window.setTimeout(poll, 1200)
-    return () => { cancelled = true; window.clearTimeout(timer) }
-  }, [receipt, result?.status])
-
-  async function handleSubmit(data: SubmitFormData) {
-    const response = await fetch('/api/skills/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    })
-    const payload = await response.json()
-    if (!response.ok) throw new Error(payload.error || (submissionCopy(locale, "Submission failed.", "提交失败。")))
-
-    const nextReceipt = payload.submission as SubmissionReceipt
-    setReceipt(nextReceipt)
-    setResult({ id: nextReceipt.id, status: nextReceipt.status, skill: nextReceipt.skill })
-    trackAnalyticsEvent('skill_submission_accepted', {
-      category: data.category || 'auto',
-      status: nextReceipt.status,
-      has_github_identity: Boolean(data.makerGithub),
-      has_x_identity: Boolean(data.makerX),
-    })
+    return pending.current[key]
   }
 
-  const status = result?.status || receipt?.status
-  const finished = status && !['submitted', 'processing'].includes(status)
+  function selectReceipt(id: string | null) {
+    setActiveId(id)
+    try { if (id) sessionStorage.setItem(ACTIVE_RECEIPT_KEY, id); else sessionStorage.removeItem(ACTIVE_RECEIPT_KEY) } catch { /* Optional storage. */ }
+  }
 
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
-      <main>
-        <section className="relative overflow-hidden border-b border-border">
-          <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
-          <div className="relative mx-auto max-w-6xl px-6 py-14 text-center sm:py-16 lg:py-20">
-            <p className="font-mono text-xs uppercase tracking-[0.24em] text-secondary">
-              {submissionCopy(locale, "OPEN SUBMISSION · ZERO STARS OK", "开放提交 · 0 STAR 可用")}
-            </p>
-            <h1 className="mx-auto mt-5 max-w-4xl font-display text-4xl font-normal leading-[0.98] text-balance sm:text-5xl lg:text-6xl">
-              {submissionCopy(locale, "Paste one link. Make your skill discoverable.", "粘贴一个链接，让 Skill 被发现")}
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-secondary sm:text-lg">
-              {submissionCopy(locale, "Repository, subdirectory, and SKILL.md URLs are supported. We save first and review asynchronously—no star, README, category, or tag gate.", "支持仓库、子目录和 SKILL.md 链接。先进入社区队列，再异步审核；不再要求 Star、README、分类或标签。")}
-            </p>
-          </div>
-        </section>
+  async function handleSubmit(batch: SubmitFormData[]) {
+    const accepted: SubmissionReceipt[] = []
+    const failures: string[] = []
+    setBatchErrors([])
+    for (const data of batch) {
+      try {
+        const response = await fetch('/api/skills/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...data, receiptToken: tokenFor(data) }), signal: AbortSignal.timeout(60_000) })
+        const payload = await response.json()
+        if (!response.ok) {
+          const fieldIssues = Array.isArray(payload.issues) ? payload.issues.map((issue: { path: string }) => issue.path === 'makerGithub' ? c('githubError') : issue.path === 'makerX' ? c('xError') : issue.path.startsWith('tags') ? c('tagsError') : c('failed')) : []
+          throw new Error(response.status === 429 ? c('rate') : fieldIssues.length ? [...new Set(fieldIssues)].join(' ') : c('failed'), { cause: 'submission-feedback' })
+        }
+        if (!validReceipt(payload.submission)) throw new Error(c('failed'))
+        accepted.push(payload.submission)
+        // Persist every item immediately, including a partial batch or a closed tab.
+        const merged = [payload.submission, ...loadReceipts().filter(item => item.id !== payload.submission.id)].slice(0, 20)
+        try { localStorage.setItem(RECEIPT_STORAGE_KEY, JSON.stringify(merged)) } catch { /* Private link remains available. */ }
+        trackAnalyticsEvent('skill_submission_accepted', { status: payload.submission.status, category: data.category || 'auto', has_github_identity: Boolean(data.makerGithub), has_x_identity: Boolean(data.makerX) })
+      } catch (error) {
+        failures.push(`${data.skillPath}: ${error instanceof Error && error.cause === 'submission-feedback' ? error.message : c('failed')}`)
+      }
+    }
+    if (accepted.length) {
+      setReceipts(previous => [...accepted, ...previous.filter(item => !accepted.some(next => next.id === item.id))].slice(0, 20))
+      selectReceipt(accepted[0].id)
+      setCelebrate(accepted[0].status !== 'quarantined')
+      setShowForm(failures.length > 0)
+    }
+    setBatchErrors(failures)
+    if (failures.length) throw new Error(c('failed'))
+  }
 
-        <div className="mx-auto max-w-4xl px-6 py-10 sm:py-12">
-          {!receipt ? (
-            <SkillSubmitForm onSubmit={handleSubmit} />
-          ) : (
-            <section className="mx-auto max-w-2xl border border-border bg-card p-6 sm:p-8">
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-secondary">
-                {finished ? (submissionCopy(locale, "PROCESSING COMPLETE", "处理完成")) : (submissionCopy(locale, "SAVED", "已保存"))}
-              </p>
-              <h1 className="mt-3 font-display text-3xl">
-                {status === 'reviewed' && (submissionCopy(locale, "Reviewed and published", "已通过审核并发布"))}
-                {status === 'listed' && (submissionCopy(locale, "Listed for community review", "已进入社区待审队列"))}
-                {status === 'duplicate' && (submissionCopy(locale, "This skill is already listed", "这个 Skill 已经收录"))}
-                {status === 'quarantined' && (submissionCopy(locale, "Quarantined and not public", "已隔离，暂不公开"))}
-                {(!finished || !status) && (submissionCopy(locale, "Security and quality review in progress", "正在执行安全与质量审核"))}
-              </h1>
-              <p className="mt-4 text-sm leading-6 text-secondary">
-                {result?.skill.name || receipt.skill.name} · <span className="font-mono">{receipt.skill.path}</span>
-              </p>
-
-              {result?.skill.slug && (
-                <div className="mt-5 border border-border bg-background p-4">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-secondary">
-                    {submissionCopy(locale, "PUBLIC SKILL URL", "公开 Skill 地址")}
-                  </p>
-                  <Link
-                    href={getLocalizedNavigationHref(`/skills/${result.skill.slug}`, locale)}
-                    className="mt-2 block break-all font-mono text-sm font-semibold underline underline-offset-4"
-                  >
-                    https://www.openagentskill.com/skills/{result.skill.slug}
-                  </Link>
-                  <p className="mt-2 text-xs text-secondary">
-                    {submissionCopy(locale, "Public slug: ", "公开 slug：")}<span className="font-mono">{result.skill.slug}</span>
-                  </p>
-                </div>
-              )}
-
-              {result?.review?.issues && result.review.issues.length > 0 && (
-                <div className="mt-6 border border-border p-4">
-                  <p className="font-semibold">{submissionCopy(locale, "Review notes", "发现的问题")}</p>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-secondary">
-                    {result.review.issues.map((issue) => <li key={issue}>{issue}</li>)}
-                  </ul>
-                </div>
-              )}
-              {result?.review?.suggestions && result.review.suggestions.length > 0 && (
-                <div className="mt-4 border border-border p-4">
-                  <p className="font-semibold">{submissionCopy(locale, "Suggestions", "改进建议")}</p>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-secondary">
-                    {result.review.suggestions.map((suggestion) => <li key={suggestion}>{suggestion}</li>)}
-                  </ul>
-                </div>
-              )}
-
-              <div className="mt-7 flex flex-wrap gap-3">
-                {result?.skill.slug && (
-                  <Link href={getLocalizedNavigationHref(`/skills/${result.skill.slug}`, locale)} className="bg-foreground px-5 py-2.5 text-sm font-semibold text-background">
-                    {submissionCopy(locale, "View skill", "查看 Skill")}
-                  </Link>
-                )}
-                {status === 'listed' && (
-                  <Link href={getLocalizedNavigationHref('/skills/new', locale)} className="border border-foreground px-5 py-2.5 text-sm font-semibold">
-                    {submissionCopy(locale, "View community queue", "查看社区队列")}
-                  </Link>
-                )}
-                <button type="button" onClick={() => { setReceipt(null); setResult(null) }} className="border border-border px-5 py-2.5 text-sm">
-                  {submissionCopy(locale, "Submit another", "再提交一个")}
-                </button>
-              </div>
-              <p className="mt-6 break-all font-mono text-[11px] leading-5 text-secondary">
-                {submissionCopy(locale, "Private status URL: ", "私密状态链接：")}{receipt.statusUrl}
-              </p>
-            </section>
-          )}
-
-          <section className="mx-auto mt-10 max-w-2xl border-t border-border pt-8">
-            <h2 className="font-display text-2xl">{submissionCopy(locale, "How listing now works", "新的收录规则")}</h2>
-            <div className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
-              {[
-                submissionCopy(locale, "1. Submit any valid SKILL.md", "1. 有效 SKILL.md 即可提交"),
-                submissionCopy(locale, "2. Save first, review async", "2. 先保存，再异步审核"),
-                submissionCopy(locale, "3. Quarantine critical risk; queue the rest", "3. 高风险内容隔离，其余进入社区队列"),
-              ].map((item) => <div key={item} className="border border-border p-4 leading-6">{item}</div>)}
-            </div>
-          </section>
+  return <div className="min-h-screen bg-background text-foreground">
+    <SiteHeader />
+    <main>
+      <section className="relative overflow-hidden border-b border-border">
+        <div className="brand-grain pointer-events-none absolute inset-0 opacity-60" />
+        <div className="relative mx-auto max-w-6xl px-6 py-12 text-center sm:py-16">
+          <p className="font-mono text-xs uppercase tracking-[.24em] text-secondary">{submissionCopy(locale, 'OPEN SUBMISSION · ZERO STARS OK', '开放提交 · 0 STAR 可用')}</p>
+          <h1 className="mx-auto mt-5 max-w-4xl font-display text-4xl font-normal leading-tight text-balance sm:text-5xl">{submissionCopy(locale, 'Paste one link. Make your skill discoverable.', '粘贴一个链接，让 Skill 被发现')}</h1>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-secondary">{submissionCopy(locale, 'Repository, subdirectory, and SKILL.md URLs are supported. We save first and review asynchronously—no star, README, category, or tag gate.', '支持仓库、子目录和 SKILL.md 链接。先进入社区队列，再异步审核；不再要求 Star、README、分类或标签。')}</p>
         </div>
-      </main>
-      <SiteFooter />
-    </div>
-  )
+      </section>
+      <div className="mx-auto max-w-4xl space-y-8 px-6 py-10 sm:py-12">
+        {receipt && <SubmissionReceiptPanel key={receipt.id} receipt={receipt} celebrate={celebrate} onClose={() => setCelebrate(false)} />}
+        {!!batchErrors.length && <div role="alert" className="mx-auto max-w-2xl border border-destructive/30 p-4 text-sm text-destructive"><ul className="space-y-2">{batchErrors.map((error, i) => <li key={i}>{error}</li>)}</ul></div>}
+        {showForm ? <SkillSubmitForm onSubmit={handleSubmit} /> : <div className="text-center"><button type="button" onClick={() => { setShowForm(true); selectReceipt(null); setCelebrate(false); setBatchErrors([]) }} className="border border-border px-5 py-3 text-sm">{submissionCopy(locale, 'Submit another', '再提交一个')}</button></div>}
+        {!!receipts.length && <section className="mx-auto max-w-2xl border-t border-border pt-6"><h2 className="text-sm font-semibold">{c('recent')}</h2><div className="mt-3 divide-y divide-border">{receipts.map(item => <button key={item.id} type="button" onClick={() => { selectReceipt(item.id); setShowForm(false); setCelebrate(false) }} className="flex w-full items-center justify-between gap-3 py-3 text-left text-sm hover:text-primary"><span className="min-w-0 truncate">{item.skill.name}</span><span className="shrink-0 font-mono text-xs text-secondary">#{item.id.slice(0, 8)}</span></button>)}</div></section>}
+      </div>
+    </main>
+    <SiteFooter />
+  </div>
 }

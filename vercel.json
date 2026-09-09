@@ -1,6 +1,10 @@
 {
   "crons": [
     {
+      "path": "/api/cron/skill-submissions",
+      "schedule": "*/5 * * * *"
+    },
+    {
       "path": "/api/indexer/refresh-stars",
       "schedule": "30 2 * * *"
     },

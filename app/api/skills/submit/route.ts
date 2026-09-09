@@ -3,20 +3,23 @@ import { z } from 'zod'
 import { validateGitHubRepo, fetchRepositoryCommitSha, GitHubAPIError } from '@/lib/github/api'
 import {
   discoverGitHubSkills,
-  fetchSkillPackageSnapshot,
   parseGitHubSkillReference,
 } from '@/lib/github/skill-source'
 import {
   buildRequestFingerprint,
   createOpenSubmission,
-  reviewOpenSubmission,
+  findSubmissionReceipt,
+  enforceSubmissionRateLimit,
 } from '@/lib/skills/open-submission'
+import { processSubmissionJob } from '@/lib/skills/submission-worker'
+import { normalizeSocialHandle, validSocialHandle } from '@/lib/skills/submission-contract'
+import { createClient } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
-export const maxDuration = 60
+export const maxDuration = 300
 
-const githubHandle = z.string().trim().max(39).regex(/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/)
-const xHandle = z.string().trim().max(15).regex(/^[A-Za-z0-9_]{1,15}$/)
+const githubHandle = z.string().max(200).transform(value => normalizeSocialHandle(value, 'github')).refine(value => validSocialHandle(value, 'github'), 'Enter a GitHub username or profile URL.')
+const xHandle = z.string().max(200).transform(value => normalizeSocialHandle(value, 'x')).refine(value => validSocialHandle(value, 'x'), 'Enter an X username or profile URL.')
 
 const SkillSubmitRequestSchema = z.object({
   repository: z.string().trim().min(1).max(500),
@@ -28,11 +31,19 @@ const SkillSubmitRequestSchema = z.object({
   makerX: xHandle.optional().or(z.literal('')).transform((value) => value || undefined),
   submissionSource: z.enum(['web', 'api', 'agent']).default('web'),
   submittedByAgent: z.string().trim().min(1).max(200).optional(),
+  receiptToken: z.string().regex(/^[a-f0-9]{48}$/).optional(),
 })
+
+function accepted(receipt: Awaited<ReturnType<typeof createOpenSubmission>>) {
+  return NextResponse.json({ success: true, accepted: true, submission: {
+    // Retain the legacy API receipt URL for existing CLI clients. New UI uses an Authorization header.
+    ...receipt, statusUrl: `/api/skills/submissions/${receipt.id}?token=${receipt.token}`,
+  } }, { status: 202, headers: { 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' } })
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const parsed = SkillSubmitRequestSchema.safeParse(await request.json())
+    const parsed = SkillSubmitRequestSchema.safeParse(await request.json().catch(() => null))
     if (!parsed.success) {
       return NextResponse.json(
         {
@@ -56,6 +67,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (body.receiptToken) {
+      const previous = await findSubmissionReceipt(body.receiptToken, `${reference.owner}/${reference.repo}`, body.skillPath)
+      if (previous) return accepted(previous)
+    }
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || 'unknown'
+    const fingerprint = buildRequestFingerprint(ip, request.headers.get('user-agent') || 'unknown')
+    // Reject excess submissions before performing expensive upstream reads.
+    await enforceSubmissionRateLimit(fingerprint)
+
     const selectedReference = {
       ...reference,
       ref: body.sourceRef || reference.ref,
@@ -77,11 +97,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const snapshot = await fetchSkillPackageSnapshot(skill, { repositoryTree: discovery.tree })
-    const codeFiles = snapshot.files
-    const forwardedFor = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    const ip = forwardedFor || request.headers.get('x-real-ip') || 'unknown'
-    const userAgent = request.headers.get('user-agent') || 'unknown'
+    let authenticatedUserId: string | null = null
+    // Optional sign-in helps attribution; it is never required or treated as ownership.
+    if (request.cookies.getAll().some(cookie => cookie.name.startsWith('sb-') && cookie.name.includes('auth-token'))) {
+      try { const { data } = await (await createClient()).auth.getUser(); authenticatedUserId = data.user?.id || null } catch { /* anonymous intake still works */ }
+    }
 
     const submissionInput = {
       repository,
@@ -92,36 +112,20 @@ export async function POST(request: NextRequest) {
       submittedByAgent: body.submittedByAgent,
       makerGithub: body.makerGithub,
       makerX: body.makerX,
-      requestFingerprint: buildRequestFingerprint(ip, userAgent),
-      codeFiles,
-      packageFingerprint: snapshot.fingerprint,
-      packageComplete: !discovery.truncated && !snapshot.truncated && !snapshot.hasUnreviewedFiles,
+      requestFingerprint: fingerprint,
+      codeFiles: [{ path: skill.path, content: skill.document }],
+      receiptToken: body.receiptToken,
+      authenticatedUserId,
     }
     const receipt = await createOpenSubmission(submissionInput)
 
     if (receipt.status === 'submitted') {
-      after(() => reviewOpenSubmission(submissionInput, receipt.id))
+      after(() => processSubmissionJob(receipt.id).catch(() => console.warn('[submission-queue] Immediate worker unavailable; cron will retry')))
     }
 
-    return NextResponse.json(
-      {
-        success: true,
-        accepted: true,
-        message: receipt.status === 'quarantined'
-          ? 'Submission saved but quarantined by the critical-risk scanner.'
-          : 'Submission saved. Automated review continues in the background.',
-        submission: {
-          id: receipt.id,
-          token: receipt.token,
-          status: receipt.status,
-          skill: receipt.skill,
-          statusUrl: `/api/skills/submissions/${receipt.id}?token=${receipt.token}`,
-        },
-      },
-      { status: 202 }
-    )
+    return accepted(receipt)
   } catch (error) {
-    console.error('[skill-submission] error:', error)
+    console.error('[skill-submission] failed', { kind: error instanceof Error ? error.name : 'SubmissionError' })
     if (error instanceof GitHubAPIError) {
       return NextResponse.json(
         { code: 'GITHUB_ERROR', error: error.message },
@@ -131,11 +135,11 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error && error.name === 'SubmissionRateLimitError') {
       return NextResponse.json(
         { code: 'RATE_LIMITED', error: error.message },
-        { status: 429, headers: { 'Retry-After': '3600' } }
+        { status: 429, headers: { 'Retry-After': '86400' } }
       )
     }
     return NextResponse.json(
-      { code: 'SUBMISSION_FAILED', error: error instanceof Error ? error.message : 'Submission failed.' },
+      { code: 'SUBMISSION_FAILED', error: 'Unable to save this submission. Retry with the same receipt; it will not create a duplicate.' },
       { status: 500 }
     )
   }

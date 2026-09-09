@@ -288,8 +288,9 @@ function sourceUrl(owner: string, repo: string, ref: string, path: string) {
 
 export async function discoverGitHubSkills(
   reference: GitHubSkillReference,
-  repository: GitHubRepo
-): Promise<{ skills: DiscoveredGitHubSkill[]; truncated: boolean; tree: GitHubTreeItem[] | null }> {
+  repository: GitHubRepo,
+  options: { offset?: number; limit?: number; query?: string } = {}
+): Promise<{ skills: DiscoveredGitHubSkill[]; truncated: boolean; tree: GitHubTreeItem[] | null; hasMore: boolean; nextOffset: number; totalPaths: number }> {
   const ref = reference.ref || repository.defaultBranch
   const requestedPath = normalizePath(reference.path)
   const exactSkillPath = requestedPath && /(^|\/)SKILL\.md$/i.test(requestedPath)
@@ -299,13 +300,23 @@ export async function discoverGitHubSkills(
   let paths: string[] = []
   let truncated = false
   let tree: GitHubTreeItem[] | null = null
+  let totalPaths = 1
+  let hasMore = false
+  let nextOffset = 0
   if (exactSkillPath) {
     paths = [exactSkillPath]
   } else {
     const treeResult = await fetchRepositoryTree(reference.owner, reference.repo, ref)
     truncated = treeResult.truncated
     tree = treeResult.tree
-    paths = selectSkillDocumentPaths(treeResult.tree, requestedPath, MAX_DISCOVERED_SKILLS)
+    const allPaths = selectSkillDocumentPaths(treeResult.tree, requestedPath, Number.MAX_SAFE_INTEGER)
+      .filter(path => !options.query || path.toLowerCase().includes(options.query.toLowerCase()))
+    const offset = Math.max(0, Math.floor(options.offset || 0))
+    const limit = Math.min(MAX_DISCOVERED_SKILLS, Math.max(1, Math.floor(options.limit || MAX_DISCOVERED_SKILLS)))
+    totalPaths = allPaths.length
+    paths = allPaths.slice(offset, offset + limit)
+    nextOffset = offset + paths.length
+    hasMore = nextOffset < totalPaths
   }
 
   const skills = (
@@ -331,7 +342,7 @@ export async function discoverGitHubSkills(
     })
   ).filter((skill): skill is DiscoveredGitHubSkill => Boolean(skill))
 
-  return { skills, truncated, tree }
+  return { skills, truncated, tree, hasMore, nextOffset, totalPaths }
 }
 
 export async function fetchDelegatedGitHubSkill(
