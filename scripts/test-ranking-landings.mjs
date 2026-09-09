@@ -61,6 +61,7 @@ for(const locale of ['en','zh','ja','ko','es','de','fr','id']) {
 assert.match(localizedRanking(getRankingDefinition('best-local-desktop-skills'),'zh').title,/本地桌面/)
 assert.match(localizedRanking(getRankingDefinition('best-security-compliance-skills'),'de').title,/Sicherheit/)
 const page=readFileSync('app/rankings/[slug]/page.tsx','utf8')
+assert.match(page,/export const dynamicParams = false/,'Unknown ranking slugs must return a real 404 before streaming')
 assert.equal((page.match(/<h1\b/g)||[]).length,1)
 assert.match(page,/title: \{ absolute: title \}/)
 assert.match(page,/alternates: \{ canonical: url \}/)

@@ -13,3 +13,5 @@ The Star ranking displays repository stars rather than adding duplicate reposito
 SEO: one H1, real anchor links, an ordered list, CollectionPage + ItemList/ListItem + BreadcrumbList, escaped JSON-LD, Open Graph and Twitter metadata. General ranking share images read the same cached list instead of mixing historical snapshot leaders with current results. Preference/query variants use noindex/follow and canonicalize to the original English URL. No new model calls or duplicate landing routes are introduced. Rankings and traffic can still fluctuate after a redesign.
 
 Verification: `node scripts/test-ranking-landings.mjs`, full regressions, typecheck, production build, desktop/mobile ranking picker, representative ranking kinds, all locale variants and unknown-route 404.
+
+Ranking slugs are a finite build-time set (`generateStaticParams` + `dynamicParams = false`). Unknown slugs return a real HTTP 404 rather than a streamed soft-404 page with status 200.

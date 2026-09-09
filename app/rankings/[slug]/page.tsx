@@ -14,6 +14,8 @@ import { trendingCopy } from '@/lib/i18n/trending-copy'
 import { getLocaleFromSearchParam, getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 
 export const revalidate = 300
+// Definitions are a finite, versioned set. Reject unknown slugs before streaming.
+export const dynamicParams = false
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }
 
 export function generateStaticParams() {
