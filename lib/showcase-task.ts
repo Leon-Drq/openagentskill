@@ -6,6 +6,25 @@ export type ShowcaseAgentTarget = typeof SHOWCASE_AGENT_TARGETS[number]
 const TARGET_NAMES: Record<ShowcaseAgentTarget, string> = { auto: 'Any agent', codex: 'Codex', 'claude-code': 'Claude Code', cursor: 'Cursor' }
 const SITE = 'https://www.openagentskill.com'
 
+export function normalizeShowcaseAgentTarget(value: string): ShowcaseAgentTarget {
+  switch (value) {
+    case 'codex': return 'codex'
+    case 'claude-code': return 'claude-code'
+    case 'cursor': return 'cursor'
+    default: return 'auto'
+  }
+}
+
+/** Encode each URL component even when the UI currently supplies fixed options. */
+export function getShowcaseTaskUrl(slug: string, locale: string, agent: ShowcaseAgentTarget, download = false) {
+  const params = new URLSearchParams({ agent: normalizeShowcaseAgentTarget(agent), lang: locale })
+  if (download) {
+    params.set('format', 'markdown')
+    params.set('download', '1')
+  }
+  return `/api/agent/showcase/${encodeURIComponent(slug)}?${params.toString()}`
+}
+
 /** A reproducible starting brief, not an installation approval or an execution. */
 export function buildShowcaseTaskPackage(item: ShowcaseCase, locale = 'en', agent: ShowcaseAgentTarget = 'auto') {
   const skill = getShowcaseSkill(item.skillSlug)

@@ -24,6 +24,25 @@ function compile(path, dependencies, clock = Date) {
 }
 const forbidden = () => { throw new Error('Unexpected network, execution or database access') }
 
+for (const agent of tasks.SHOWCASE_AGENT_TARGETS) {
+  assert.equal(tasks.normalizeShowcaseAgentTarget(agent), agent)
+  const url = new URL(tasks.getShowcaseTaskUrl('example', 'zh', agent, true), 'https://www.openagentskill.com')
+  assert.equal(url.searchParams.get('agent'), agent)
+  assert.equal(url.searchParams.get('format'), 'markdown')
+  assert.equal(url.searchParams.get('download'), '1')
+}
+const untrusted = '<img src=x onerror=alert(1)>&download=1#fragment'
+assert.equal(tasks.normalizeShowcaseAgentTarget(untrusted), 'auto')
+const encodedTaskUrl = tasks.getShowcaseTaskUrl('example/with?query', untrusted, untrusted)
+assert.ok(!encodedTaskUrl.includes('<'))
+assert.ok(!encodedTaskUrl.includes('>'))
+const parsedTaskUrl = new URL(encodedTaskUrl, 'https://www.openagentskill.com')
+assert.equal(parsedTaskUrl.pathname, '/api/agent/showcase/example%2Fwith%3Fquery')
+assert.equal(parsedTaskUrl.searchParams.get('lang'), untrusted)
+assert.equal(parsedTaskUrl.searchParams.get('agent'), 'auto')
+assert.equal(parsedTaskUrl.searchParams.has('download'), false)
+assert.equal(parsedTaskUrl.hash, '')
+
 // Wide cached records retain all evidence; no field truncation to fit Next's limit.
 const wide = Array.from({ length: 2200 }, (_, i) => ({ slug: `skill-${i}`, source_path: 'skills/演示/SKILL.md', ai_review_approved: false, risk: 'Requires manual review. '.repeat(60) }))
 assert.ok(Buffer.byteLength(JSON.stringify(wide)) > 2_000_000)

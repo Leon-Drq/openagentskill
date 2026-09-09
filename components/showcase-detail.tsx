@@ -16,7 +16,7 @@ import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { copyText } from '@/lib/copy-text'
 import { NativeSelect } from '@/components/ui/native-select'
-import { renderShowcaseTaskMarkdown, type ShowcaseAgentTarget } from '@/lib/showcase-task'
+import { getShowcaseTaskUrl, normalizeShowcaseAgentTarget, renderShowcaseTaskMarkdown, type ShowcaseAgentTarget } from '@/lib/showcase-task'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { getShowcaseAccessLabel, getShowcaseCreator, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, getShowcaseTags, localizeShowcase, SHOWCASE_CASES, SHOWCASE_CATEGORIES, type ShowcaseCase } from '@/lib/showcase'
 
@@ -167,7 +167,7 @@ function DetailContent({ item }: { item: ShowcaseCase }) {
             </div>
             {started && <div id="showcase-handoff" ref={handoffRef} tabIndex={-1} className="mt-4 scroll-mt-24 rounded-lg border border-[#006b4f]/30 bg-[#edf3ee] p-5 outline-offset-2 focus-visible:outline-[#006b4f]">
               <label htmlFor="showcase-target-agent" className="mb-2 block text-xs font-semibold">{galleryCopy(locale, 'Target agent', '目标 Agent')}</label>
-              <NativeSelect id="showcase-target-agent" value={targetAgent} onChange={event => { setTargetAgent(event.target.value as ShowcaseAgentTarget); setCopied(null) }} className="mb-4 min-h-11 w-full rounded-md border border-[#ccd8ce] bg-white px-3 text-sm">
+              <NativeSelect id="showcase-target-agent" value={targetAgent} onChange={event => { setTargetAgent(normalizeShowcaseAgentTarget(event.target.value)); setCopied(null) }} className="mb-4 min-h-11 w-full rounded-md border border-[#ccd8ce] bg-white px-3 text-sm">
                 <option value="auto">{galleryCopy(locale, 'Any agent', '通用 Agent')}</option>
                 <option value="codex">Codex</option><option value="claude-code">Claude Code</option><option value="cursor">Cursor</option>
               </NativeSelect>
@@ -177,8 +177,8 @@ function DetailContent({ item }: { item: ShowcaseCase }) {
               <button type="button" onClick={() => copy('handoff')} className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-[#006b4f] px-3 text-sm font-semibold text-white hover:bg-[#005640]">{copied === 'handoff' ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}{copied === 'handoff' ? (galleryCopy(locale, "Setup & task copied", "完整文本已复制")) : (galleryCopy(locale, "Copy setup + task", "复制配置与任务"))}</button>
               <Link href={getLocalizedNavigationHref(`/skills/${item.skillSlug}#install-options`, locale)} className="mt-4 inline-flex items-center gap-1 text-xs text-[#006b4f] underline underline-offset-4">{galleryCopy(locale, "View skill & installation options", "查看技能与安装选项")}<ArrowUpRight className="h-3 w-3" aria-hidden="true" /></Link>
               <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-[#006b4f]">
-                <a className="inline-flex min-h-11 items-center underline underline-offset-4" href={`/api/agent/showcase/${item.slug}?format=markdown&download=1&agent=${targetAgent}&lang=${locale}`}>{galleryCopy(locale, 'Download task (.md)', '下载任务包（.md）')}</a>
-                <a className="inline-flex min-h-11 items-center underline underline-offset-4" href={`/api/agent/showcase/${item.slug}?agent=${targetAgent}&lang=${locale}`}>{galleryCopy(locale, 'Agent task API', 'Agent 任务 API')}</a>
+                <a className="inline-flex min-h-11 items-center underline underline-offset-4" href={getShowcaseTaskUrl(item.slug, locale, targetAgent, true)}>{galleryCopy(locale, 'Download task (.md)', '下载任务包（.md）')}</a>
+                <a className="inline-flex min-h-11 items-center underline underline-offset-4" href={getShowcaseTaskUrl(item.slug, locale, targetAgent)}>{galleryCopy(locale, 'Agent task API', 'Agent 任务 API')}</a>
               </div>
             </div>}
           </aside>
