@@ -185,6 +185,17 @@ export function getRankingDefinition(slug: string) {
   return getRankingDefinitions().find((ranking) => ranking.slug === slug)
 }
 
+// Shared by the page and the request boundary; no database access is needed.
+export function isMissingRankingPath(pathname: string) {
+  const slug = pathname.match(/^\/rankings\/([^/]+)/)?.[1]
+  if (!slug) return false
+  try {
+    return !getRankingDefinition(decodeURIComponent(slug))
+  } catch {
+    return true
+  }
+}
+
 function dateValue(value: string | null | undefined) {
   if (!value) return 0
   const timestamp = new Date(value).getTime()
