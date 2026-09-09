@@ -264,6 +264,25 @@ async function main() {
   }
 
   const event = JSON.parse(await readFile(eventPath, 'utf8'))
+  if (process.env.GITHUB_EVENT_NAME === 'schedule') {
+    const issues = await fetchJson(`https://api.github.com/repos/${repository}/issues?state=open&sort=created&direction=asc&per_page=100`, { headers: githubHeaders(githubToken) })
+    const candidates = issues.filter(issue => !issue.pull_request && /^\[Skill\]:/i.test(issue.title || '') && isNewSkillRequest(issue.body || ''))
+    // Bounded rotating sweep. It only reconciles publication; never starts a review.
+    const offset = candidates.length ? (Math.floor(Date.now() / 86400000) * 5) % candidates.length : 0
+    const selected = [...candidates.slice(offset), ...candidates.slice(0, offset)].slice(0, 5)
+    for (const issue of selected) {
+      try {
+        const result = await processSkillIssue({ event: { issue }, repository, githubToken, operation: 'reconcile' })
+        console.log(JSON.stringify({ issue: issue.number, ...result }))
+      } catch {
+        // An outage is not a rejection. Avoid overwriting review comments or spamming the Issue.
+        console.error(`Publication reconciliation unavailable for Issue #${issue.number}; left open.`)
+        process.exitCode = 1
+        break
+      }
+    }
+    return
+  }
   if (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch') {
     if (!/^\d+$/.test(event.inputs?.issue_number || '')) throw new Error('Invalid issue number.')
     event.issue = await fetchJson(`https://api.github.com/repos/${repository}/issues/${event.inputs.issue_number}`, { headers: githubHeaders(githubToken) })

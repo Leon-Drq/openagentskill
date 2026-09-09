@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import {
   AUTOMATION_MARKER,
   buildFailureComment,
@@ -124,5 +125,10 @@ try {
   assert.equal((await processSkillIssue({ event, repository: 'Leon-Drq/openagentskill', githubToken: 'fixture-token' })).skipped, true)
   assert.equal(calls.filter(c => c.url.endsWith('/api/skills/submit')).length, 0, 'same source revision never gets another automatic review')
 } finally { globalThis.fetch = originalFetch }
+const scriptSource = readFileSync(new URL('./process-skill-issue.mjs', import.meta.url), 'utf8')
+const scheduledSweep = scriptSource.slice(scriptSource.indexOf("if (process.env.GITHUB_EVENT_NAME === 'schedule')"), scriptSource.indexOf("if (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch')"))
+assert.ok(scheduledSweep.includes("operation: 'reconcile'"))
+assert.ok(scheduledSweep.includes('.slice(0, 5)'))
+assert.ok(!scheduledSweep.includes('/api/skills/submit'), 'daily reconciliation must not start paid reviews')
 
 console.log('Skill Issue ingestion tests passed.')

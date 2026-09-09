@@ -1,6 +1,8 @@
 name: Import Skill Issue
 
 on:
+  schedule:
+    - cron: '20 12 * * *'
   issues:
     types: [opened, reopened]
   issue_comment:
@@ -30,7 +32,7 @@ permissions:
 jobs:
   import:
     name: Validate, review, and publish
-    if: github.event_name == 'workflow_dispatch' || (startsWith(github.event.issue.title, '[Skill]:') && (github.event_name != 'issue_comment' || startsWith(github.event.comment.body, '/oas ')))
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (startsWith(github.event.issue.title, '[Skill]:') && (github.event_name != 'issue_comment' || startsWith(github.event.comment.body, '/oas ')))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

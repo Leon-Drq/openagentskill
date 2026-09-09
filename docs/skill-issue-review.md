@@ -18,6 +18,7 @@ The **Import Skill Issue** workflow also supports manual dispatch with `issue_nu
 - There is a six-hour per-Issue cooldown for new review attempts, in addition to the application submission limits and model budget. Reconciliation does not call a model.
 - Permission is checked against GitHub, not Issue body text, claimed authorship, or upstream instructions. Workflow checkout is the maintained `main` branch, never submitted repository code. No Skill is executed.
 - Reconciliation looks up the exact public repository + SKILL.md path. A confirmed existing listing is linked without a duplicate submission. A missing, pending or quarantined listing keeps the Issue open.
+- A daily 12:20 UTC sweep reconciles at most five open submission Issues, rotating within the oldest 100 GitHub issues/PRs. It never starts a review or calls a model, and stops on upstream failure. Larger backlogs can use explicit maintainer reconciliation.
 - An already-published different revision is not overwritten via re-review. Use the existing source-version synchronization workflow and preserve the current review history.
 - Only a confirmed public URL allows automatic closure. Publication is not a runtime test, creator verification, or universal safety approval. Comments distinguish static, AI, manual and unclassified legacy review evidence.
 
