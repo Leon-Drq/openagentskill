@@ -21,7 +21,8 @@ import {
   type RankingDimensions,
   type RankingDefinition,
 } from '@/lib/rankings'
-import { rankHotSkills, rankTrendingSkills, type GrowthRankedSkill } from '@/lib/seo/growth-directories'
+import { rankHotSkills, type GrowthRankedSkill } from '@/lib/seo/growth-directories'
+import { buildTrendingSnapshot } from '@/lib/trending-data'
 import { getGitHubOwner } from '@/lib/github-owner'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createPublicClient } from '@/lib/supabase/public'
@@ -164,13 +165,10 @@ export async function generateDailyRankingSnapshots() {
     )
   )
 
+  // Never mix recent activity with lifetime fallback or a quality-limited candidate pool.
+  const trending = await buildTrendingSnapshot(generatedAt)
   rows.push(
-    createSnapshotRow(
-      'trending',
-      rankTrendingSkills(qualitySkills, eventStats, dailyEventStats, outcomeStats, SNAPSHOT_ITEM_LIMIT),
-      generatedAt,
-      sourceCounts
-    ),
+    { ...trending, updated_at: generatedAt },
     createSnapshotRow(
       'hot',
       rankHotSkills(qualitySkills, eventStats, dailyEventStats, SNAPSHOT_ITEM_LIMIT),
