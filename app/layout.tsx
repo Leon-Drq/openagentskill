@@ -143,6 +143,8 @@ export default async function RootLayout({
   return (
     <html lang={lang} suppressHydrationWarning className={`${inter.variable} ${geistMono.variable}`}>
       <head>
+        {/* Consume private receipt fragments before any third-party analytics script can read the URL. */}
+        <script dangerouslySetInnerHTML={{ __html: "if(/^#receipt=[a-f0-9-]{36}\\.[a-f0-9]{48}$/i.test(location.hash)){window.__oasReceiptFragment=location.hash;history.replaceState(null,'',location.pathname+location.search)}" }} />
         <StructuredData />
         <script
           defer

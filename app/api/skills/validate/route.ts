@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { validateGitHubRepo, GitHubAPIError } from '@/lib/github/api'
+import { validateGitHubRepo, fetchRepositoryCommitSha, GitHubAPIError } from '@/lib/github/api'
 import { discoverGitHubSkills, parseGitHubSkillReference } from '@/lib/github/skill-source'
 import { buildRequestFingerprint, enforceValidationRateLimit } from '@/lib/skills/open-submission'
 
@@ -8,11 +8,13 @@ export const runtime = 'nodejs'
 
 const ValidateRequestSchema = z.object({
   repository: z.string().trim().min(1).max(500),
+  offset: z.number().int().min(0).max(100000).optional(),
+  query: z.string().trim().max(160).optional(),
 })
 
 export async function POST(request: NextRequest) {
   try {
-    const parsed = ValidateRequestSchema.safeParse(await request.json())
+    const parsed = ValidateRequestSchema.safeParse(await request.json().catch(() => null))
     if (!parsed.success) {
       return NextResponse.json(
         { valid: false, code: 'REPOSITORY_REQUIRED', error: 'A GitHub repository or SKILL.md URL is required.' },
@@ -43,8 +45,10 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    const discovery = await discoverGitHubSkills(reference, repoData)
-    if (discovery.skills.length === 0) {
+    const commit = await fetchRepositoryCommitSha(reference.owner, reference.repo, reference.ref || repoData.defaultBranch)
+    if (!commit) return NextResponse.json({ valid: false, code: 'SOURCE_UNAVAILABLE', error: 'Unable to pin the source revision. Please retry.' }, { status: 503 })
+    const discovery = await discoverGitHubSkills({ ...reference, ref: commit }, repoData, { offset: parsed.data.offset, query: parsed.data.query, limit: 10 })
+    if (discovery.skills.length === 0 && !discovery.hasMore) {
       return NextResponse.json(
         {
           valid: false,
@@ -70,6 +74,9 @@ export async function POST(request: NextRequest) {
       stars: repoData.stars,
       zeroStarEligible: true,
       treeTruncated: discovery.truncated,
+      hasMore: discovery.hasMore,
+      nextOffset: discovery.nextOffset,
+      totalPaths: discovery.totalPaths,
       skills: discovery.skills.map((skill) => ({
         name: skill.frontmatter.name,
         description: skill.frontmatter.description,
@@ -89,7 +96,7 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error && error.name === 'ValidationRateLimitError') {
       return NextResponse.json(
         { valid: false, code: 'RATE_LIMITED', error: error.message },
-        { status: 429, headers: { 'Retry-After': '3600' } }
+        { status: 429, headers: { 'Retry-After': '86400' } }
       )
     }
     return NextResponse.json(

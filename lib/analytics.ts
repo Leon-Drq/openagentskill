@@ -49,6 +49,7 @@ export type AnalyticsEventName =
   | 'localized_resolve_copy_install'
   | 'skill_submission_result'
   | 'skill_submission_accepted'
+  | 'skill_submission_share_open'
 
 export type AnalyticsConsent = 'granted' | 'denied'
 

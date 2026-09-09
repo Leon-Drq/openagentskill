@@ -2,23 +2,26 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { submissionTokenMatches } from '@/lib/skills/open-submission'
+import { submissionJobEligible } from '@/lib/skills/submission-contract'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const IdSchema = z.string().uuid()
 const TokenSchema = z.string().regex(/^[a-f0-9]{48}$/)
+const privateHeaders = { 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer', 'X-Robots-Tag': 'noindex, nofollow' }
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const token = request.nextUrl.searchParams.get('token') || ''
+  const token = request.headers.get('authorization')?.replace(/^Bearer /, '') || request.nextUrl.searchParams.get('token') || ''
   if (!IdSchema.safeParse(id).success || !TokenSchema.safeParse(token).success) {
-    return NextResponse.json({ error: 'Invalid submission receipt.' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid submission receipt.' }, { status: 400, headers: privateHeaders })
   }
 
+  try {
   const supabase = createAdminClient({ requestTimeoutMs: 8_000 })
   const { data, error } = await supabase
     .from('skill_submissions')
@@ -34,23 +37,26 @@ export async function GET(
       created_at,
       updated_at,
       reviewed_at,
+      review_started_at,
+      validation_result,
       status_token_hash,
-      skills ( slug )
+      skills ( slug, ai_review_approved, listing_status )
     `)
     .eq('id', id)
     .maybeSingle()
 
   if (error) {
-    return NextResponse.json({ error: 'Unable to read submission status.' }, { status: 500 })
+    return NextResponse.json({ error: 'Unable to read submission status.' }, { status: 503, headers: privateHeaders })
   }
   if (!data || !data.status_token_hash || !submissionTokenMatches(token, data.status_token_hash)) {
-    return NextResponse.json({ error: 'Submission not found.' }, { status: 404 })
+    return NextResponse.json({ error: 'Submission not found.' }, { status: 404, headers: privateHeaders })
   }
 
   const review = data.ai_review_result && typeof data.ai_review_result === 'object'
     ? data.ai_review_result as Record<string, unknown>
     : {}
   const relatedSkill = Array.isArray(data.skills) ? data.skills[0] : data.skills
+  const publicSkill = relatedSkill && (relatedSkill.ai_review_approved === true || ['owner_published', 'static_checked'].includes(relatedSkill.listing_status))
 
   return NextResponse.json({
     submission: {
@@ -61,9 +67,13 @@ export async function GET(
         description: data.skill_description,
         path: data.skill_path,
         sourceUrl: data.repository_url,
-        slug: relatedSkill?.slug || null,
+        slug: publicSkill ? relatedSkill.slug : null,
       },
       identityVerified: Boolean(data.identity_verified),
+      queue: {
+        attempts: Number(data.validation_result?.queue?.attempts) || 0,
+        stalled: data.status === 'processing' && submissionJobEligible(data),
+      },
       review: {
         method: typeof review.method === 'string' ? review.method : 'legacy_unclassified',
         approved: review.approved === true,
@@ -79,5 +89,8 @@ export async function GET(
       updatedAt: data.updated_at,
       reviewedAt: data.reviewed_at,
     },
-  })
+  }, { headers: privateHeaders })
+  } catch {
+    return NextResponse.json({ error: 'Unable to read submission status.' }, { status: 503, headers: privateHeaders })
+  }
 }

@@ -10,6 +10,7 @@ import { analyzeCode } from '@/lib/security/static-analysis'
 import { evaluateSkillSubmissionPolicy } from '@/lib/skills/submission-policy'
 import { estimateSubmissionQuality } from '@/lib/skills/submission-quality'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { PUBLIC_SKILL_FILTER } from '@/lib/skills/publication'
 
 export const SUBMISSION_RATE_LIMIT = 5
 export const SUBMISSION_RATE_WINDOW_HOURS = 24
@@ -37,6 +38,8 @@ export interface OpenSubmissionInput {
   codeFiles: { path: string; content: string }[]
   packageFingerprint?: string
   packageComplete?: boolean
+  receiptToken?: string
+  authenticatedUserId?: string | null
 }
 
 export interface OpenSubmissionReceipt {
@@ -72,6 +75,23 @@ export function submissionTokenMatches(token: string, expectedHash: string) {
   const actual = Buffer.from(hashSubmissionToken(token), 'hex')
   const expected = Buffer.from(expectedHash, 'hex')
   return actual.length === expected.length && timingSafeEqual(actual, expected)
+}
+
+export function submissionIdForToken(token: string) {
+  const hex = hashSubmissionToken(token)
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`
+}
+
+export async function findSubmissionReceipt(token: string, repository: string, path: string): Promise<OpenSubmissionReceipt | null> {
+  const { data, error } = await createAdminClient({ requestTimeoutMs: 8_000 }).from('skill_submissions')
+    .select('id,status,status_token_hash,github_repo,skill_path,skill_name,skill_description,repository_url')
+    .eq('id', submissionIdForToken(token)).maybeSingle()
+  if (error) throw error
+  if (!data) return null
+  if (!submissionTokenMatches(token, data.status_token_hash) || data.github_repo.toLowerCase() !== repository.toLowerCase() || data.skill_path !== path) {
+    throw new Error('This submission receipt belongs to a different skill. Start a new submission.')
+  }
+  return { id: data.id, token, status: data.status, skill: { name: data.skill_name, description: data.skill_description, path: data.skill_path, sourceUrl: data.repository_url } }
 }
 
 export function buildRequestFingerprint(ip: string, userAgent: string) {
@@ -178,11 +198,15 @@ function normalizeTags(input: OpenSubmissionInput) {
 }
 
 export async function createOpenSubmission(input: OpenSubmissionInput): Promise<OpenSubmissionReceipt> {
+  if (input.receiptToken) {
+    const existing = await findSubmissionReceipt(input.receiptToken, input.repository.fullName, input.skill.path)
+    if (existing) return existing
+  }
   await enforceSubmissionRateLimit(input.requestFingerprint)
 
   const supabase = createAdminClient({ requestTimeoutMs: 12_000 })
-  const id = randomUUID()
-  const token = randomBytes(24).toString('hex')
+  const token = input.receiptToken || randomBytes(24).toString('hex')
+  const id = input.receiptToken ? submissionIdForToken(token) : randomUUID()
   const staticAnalysis = analyzeCode(input.codeFiles)
   const initialStatus: OpenSubmissionStatus = staticAnalysis.passed ? 'submitted' : 'quarantined'
 
@@ -213,6 +237,10 @@ export async function createOpenSubmission(input: OpenSubmissionInput): Promise<
       repository_readme: input.repository.hasReadme,
       static_analysis: staticAnalysis,
       publisher_identity: 'declared_unverified',
+      repository_snapshot: input.repository,
+      repository_owner: input.repository.owner,
+      submitter: { user_id: input.authenticatedUserId || null, identity_source: input.authenticatedUserId ? 'authenticated' : 'anonymous', handles: 'self_declared', channel: input.submissionSource },
+      queue: { attempts: 0 },
     },
     ai_review_result: staticAnalysis.passed
       ? {}
@@ -226,7 +254,13 @@ export async function createOpenSubmission(input: OpenSubmissionInput): Promise<
     reviewed_at: staticAnalysis.passed ? null : new Date().toISOString(),
   })
 
-  if (error) throw error
+  if (error) {
+    if (error.code === '23505' && input.receiptToken) {
+      const existing = await findSubmissionReceipt(input.receiptToken, input.repository.fullName, input.skill.path)
+      if (existing) return existing
+    }
+    throw error
+  }
 
   return {
     id,
@@ -241,16 +275,20 @@ export async function createOpenSubmission(input: OpenSubmissionInput): Promise<
   }
 }
 
-export async function reviewOpenSubmission(input: OpenSubmissionInput, submissionId: string) {
+export async function reviewOpenSubmission(input: OpenSubmissionInput, submissionId: string, startedAt: string) {
   const supabase = createAdminClient({ requestTimeoutMs: 20_000 })
-  const startedAt = new Date().toISOString()
-  await supabase
-    .from('skill_submissions')
-    .update({ status: 'processing', review_started_at: startedAt })
-    .eq('id', submissionId)
+  const update = (values: Record<string, unknown>) => supabase.from('skill_submissions').update(values)
+    .eq('id', submissionId).eq('status', 'processing').eq('review_started_at', startedAt)
 
   const staticAnalysis = analyzeCode(input.codeFiles)
-  if (!staticAnalysis.passed) return
+  if (!staticAnalysis.passed) {
+    const { error } = await update({ status: 'quarantined', reviewed_at: new Date().toISOString(), ai_review_result: {
+      approved: false, stage: 'static_security', issues: staticAnalysis.issues,
+      suggestions: ['Remove critical-risk behavior and submit a new immutable revision.'],
+    } })
+    if (error) throw error
+    return
+  }
 
   try {
     const versionEvidence = await fetchSkillVersionEvidence(input.skill)
@@ -286,10 +324,7 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
     }
 
     if (!policy.approved) {
-      const { error } = await supabase
-        .from('skill_submissions')
-        .update({ status: 'listed', ai_review_result: reviewPayload, reviewed_at: reviewedAt })
-        .eq('id', submissionId)
+      const { error } = await update({ status: 'listed', ai_review_result: reviewPayload, reviewed_at: reviewedAt })
       if (error) throw error
       return
     }
@@ -297,7 +332,7 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
     const slug = buildSlug(input)
     const category = normalizeCategory(input)
     const tags = normalizeTags(input)
-    const authorName = input.makerGithub || input.skill.frontmatter.author || input.repository.owner
+    const authorName = input.skill.frontmatter.author || input.repository.owner
     const quality = estimateSubmissionQuality({
       githubStars: input.repository.stars,
       githubRepo: input.repository.fullName,
@@ -313,7 +348,7 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
       long_description: input.skill.document.slice(0, 12_000),
       tagline: input.skill.frontmatter.description.slice(0, 280),
       author_name: authorName,
-      author_url: `https://github.com/${input.makerGithub || input.repository.owner}`,
+      author_url: `https://github.com/${input.repository.owner}`,
       repository: input.skill.sourceUrl,
       github_repo: input.repository.fullName,
       github_stars: input.repository.stars,
@@ -357,6 +392,11 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
       quality_signals: quality.signals,
     }
 
+    // A timed-out worker must never finish a newer worker's lease.
+    const { data: lease, error: leaseError } = await supabase.from('skill_submissions').select('id')
+      .eq('id', submissionId).eq('status', 'processing').eq('review_started_at', startedAt).maybeSingle()
+    if (leaseError) throw leaseError
+    if (!lease) return
     const { data: createdSkill, error: createError } = await supabase
       .from('skills')
       .insert(skillPayload)
@@ -369,30 +409,25 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
         .from('skills')
         .select('id, slug')
         .or(`slug.eq.${slug},source_content_hash.eq.${sourceContentHash}`)
+        .or(PUBLIC_SKILL_FILTER)
         .limit(1)
         .maybeSingle()
-      const { error: duplicateError } = await supabase
-        .from('skill_submissions')
-        .update({
-          status: 'duplicate',
+      const { error: duplicateError } = await update({
+          status: existing ? 'duplicate' : 'listed',
           skill_id: existing?.id || null,
           ai_review_result: reviewPayload,
           reviewed_at: reviewedAt,
         })
-        .eq('id', submissionId)
       if (duplicateError) throw duplicateError
       return
     }
 
-    const { error: updateError } = await supabase
-      .from('skill_submissions')
-      .update({
+    const { error: updateError } = await update({
         status: 'reviewed',
         skill_id: createdSkill.id,
         ai_review_result: reviewPayload,
         reviewed_at: reviewedAt,
       })
-      .eq('id', submissionId)
     if (updateError) throw updateError
 
     const { error: qualityRefreshError } = await supabase.rpc('refresh_skill_quality_scores', { p_slug: slug })
@@ -423,20 +458,7 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
       },
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown review error'
-    await supabase
-      .from('skill_submissions')
-      .update({
-        status: 'listed',
-        reviewed_at: new Date().toISOString(),
-        ai_review_result: {
-          approved: false,
-          stage: 'review_error',
-          issues: ['Automatic review could not be completed.'],
-          suggestions: ['The submission remains in the community queue for manual review.'],
-          reasoning: message.slice(0, 1000),
-        },
-      })
-      .eq('id', submissionId)
+    // The durable worker owns bounded retries. Never replace a review with approval.
+    throw error
   }
 }
