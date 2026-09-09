@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   }
   const { data, error } = await createPublicClient({ requestTimeoutMs: 8000 })
     .from('skills').select('slug,name,github_repo,source_path,source_commit_sha,listing_status,ai_review_score,publisher_verified,source_sync_status,license')
-    .ilike('github_repo', repository.replace(/_/g, '\\_')).eq('source_path', path).or(PUBLIC_SKILL_FILTER).order('created_at', { ascending: true }).limit(1).maybeSingle()
+    .ilike('github_repo', repository.replace(/[\\%_]/g, '\\$&')).eq('source_path', path).or(PUBLIC_SKILL_FILTER).order('created_at', { ascending: true }).limit(1).maybeSingle()
   if (error) return NextResponse.json({ error: 'Public source lookup unavailable.' }, { status: 503, headers })
   return NextResponse.json({ skill: data ? { name: data.name, slug: data.slug, repository: data.github_repo,
     path: data.source_path, commit: data.source_commit_sha, listingStatus: data.listing_status,

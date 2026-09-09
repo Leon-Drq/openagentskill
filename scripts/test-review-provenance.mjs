@@ -69,6 +69,13 @@ for (const path of ['lib/skills/open-submission.ts', 'lib/skills/owner-publicati
   assert.doesNotMatch(source, /version[^\n]*\|\| '1\.0\.0'/)
 }
 const migration = readFileSync(new URL('../supabase/migrations/20260909090953_skill_version_provenance.sql', import.meta.url), 'utf8')
+for (const endpoint of ['validate', 'submit']) {
+  const source = readFileSync(new URL(`../app/api/skills/${endpoint}/route.ts`, import.meta.url), 'utf8')
+  const guard = source.indexOf('.isPrivate)')
+  assert.ok(guard > 0 && guard < source.indexOf('await discoverGitHubSkills'), 'public intake must reject private repositories before reading skill content')
+}
+const lookup = readFileSync(new URL('../app/api/skills/lookup/route.ts', import.meta.url), 'utf8')
+assert.ok(lookup.includes(String.raw`replace(/[\\%_]/g, '\\$&')`), 'exact lookup escapes all LIKE metacharacters')
 assert.match(migration, /version_correction/)
 assert.match(migration, /previous_version/)
 assert.match(migration, /perform public\.assert_indexer_secret/)

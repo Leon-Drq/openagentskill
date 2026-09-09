@@ -65,6 +65,7 @@ export async function POST(request: NextRequest) {
       checkReadme: false,
       checkSkillJson: false,
     })
+    if (repository.isPrivate) return NextResponse.json({ error: 'Only public repositories can be submitted.' }, { status: 400 })
     const commit = await fetchRepositoryCommitSha(reference.owner, reference.repo, selectedReference.ref || repository.defaultBranch)
     if (!commit) return NextResponse.json({ error: 'Unable to pin the source revision. Please retry later.' }, { status: 503 })
     const discovery = await discoverGitHubSkills({ ...selectedReference, ref: commit }, repository)
