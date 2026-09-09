@@ -4,7 +4,7 @@ import { register } from 'node:module'
 import ts from 'typescript'
 register('./test-owner-publication-loader.mjs', import.meta.url)
 const { rankingCandidates, rankingLandingJsonLd, validRankingDate } = await import('../lib/ranking-landing.ts')
-const { getRankingDefinitions, getRankingDefinition, rankSkillsForDefinition } = await import('../lib/rankings.ts')
+const { getRankingDefinitions, getRankingDefinition, rankSkillsForDefinition, isMissingRankingPath } = await import('../lib/rankings.ts')
 const { isDirectorySnapshot } = await import('../lib/skills/directory.ts')
 // Isolate Next's server cache and the real network readers; execute the actual loader with injected reads.
 const loaderExports={}
@@ -61,6 +61,13 @@ for(const locale of ['en','zh','ja','ko','es','de','fr','id']) {
 assert.match(localizedRanking(getRankingDefinition('best-local-desktop-skills'),'zh').title,/本地桌面/)
 assert.match(localizedRanking(getRankingDefinition('best-security-compliance-skills'),'de').title,/Sicherheit/)
 const page=readFileSync('app/rankings/[slug]/page.tsx','utf8')
+for(const def of getRankingDefinitions()) {
+  assert.equal(isMissingRankingPath(`/rankings/${def.slug}`),false)
+  assert.equal(isMissingRankingPath(`/rankings/${def.slug}/opengraph-image`),false)
+}
+for(const path of ['/rankings','/trending','/skills']) assert.equal(isMissingRankingPath(path),false)
+for(const path of ['/rankings/unknown','/rankings/%GG','/rankings/unknown/opengraph-image']) assert.equal(isMissingRankingPath(path),true)
+assert.match(readFileSync('proxy.ts','utf8'),/isMissingRankingPath\(pathname\)/)
 assert.match(page,/export const dynamicParams = false/,'Unknown ranking slugs must return a real 404 before streaming')
 assert.equal((page.match(/<h1\b/g)||[]).length,1)
 assert.match(page,/title: \{ absolute: title \}/)

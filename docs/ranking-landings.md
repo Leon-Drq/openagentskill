@@ -14,4 +14,4 @@ SEO: one H1, real anchor links, an ordered list, CollectionPage + ItemList/ListI
 
 Verification: `node scripts/test-ranking-landings.mjs`, full regressions, typecheck, production build, desktop/mobile ranking picker, representative ranking kinds, all locale variants and unknown-route 404.
 
-Ranking slugs are a finite build-time set (`generateStaticParams` + `dynamicParams = false`). Unknown slugs return a real HTTP 404 rather than a streamed soft-404 page with status 200.
+Ranking slugs are a finite build-time set (`generateStaticParams` + `dynamicParams = false`). The request proxy checks the same definitions before streaming, using the site's existing 404 rewrite. Unknown slugs return a real HTTP 404 rather than a streamed soft-404 page with status 200; valid pages, the agent-proven report and their share images are preserved.
