@@ -156,7 +156,7 @@ function buildPayload(
     category: skill.category,
     tags: skill.tags,
     frameworks: skill.frameworks,
-    version: skill.version || '1.0.0',
+    version: skill.version || 'Unknown',
     license: skill.license,
     install_command: skill.install_command,
     verified: listingVerified,

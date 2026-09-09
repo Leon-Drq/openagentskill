@@ -1,6 +1,6 @@
 import { after, NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { validateGitHubRepo, GitHubAPIError } from '@/lib/github/api'
+import { validateGitHubRepo, fetchRepositoryCommitSha, GitHubAPIError } from '@/lib/github/api'
 import {
   discoverGitHubSkills,
   fetchSkillPackageSnapshot,
@@ -65,7 +65,9 @@ export async function POST(request: NextRequest) {
       checkReadme: false,
       checkSkillJson: false,
     })
-    const discovery = await discoverGitHubSkills(selectedReference, repository)
+    const commit = await fetchRepositoryCommitSha(reference.owner, reference.repo, selectedReference.ref || repository.defaultBranch)
+    if (!commit) return NextResponse.json({ error: 'Unable to pin the source revision. Please retry later.' }, { status: 503 })
+    const discovery = await discoverGitHubSkills({ ...selectedReference, ref: commit }, repository)
     const skill = discovery.skills.find((candidate) => candidate.path === body.skillPath)
     if (!skill) {
       return NextResponse.json(

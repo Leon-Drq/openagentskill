@@ -2,6 +2,7 @@ import { auditRiskLabel, type ComputedSkillAudit } from '@/lib/audits'
 import type { SkillRecord } from '@/lib/db/skills'
 import { needsOwnerPublicationReview, OWNER_PUBLICATION_NOTICE } from '@/lib/skills/publication'
 import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
+import { hasSkillRiskHint, SECRET_ACCESS_PATTERN } from '@/lib/security/risk-context'
 
 export type AgentSafetyLevel = 'safe_to_install' | 'review_before_install' | 'avoid_auto_install'
 export type SkillSafetyTier = 'verified' | 'reviewed' | 'experimental' | 'blocked'
@@ -88,7 +89,7 @@ const PERMISSION_PATTERNS: Array<{
     label: 'Secrets or environment access',
     reason: 'Skill metadata references credentials, tokens, environment variables, or secret-bearing workflows.',
     severity: 'high',
-    pattern: /\b(secret|token|credential|api key|env|environment variable|oauth|auth)\b/i,
+    pattern: SECRET_ACCESS_PATTERN,
   },
   {
     id: 'database',
@@ -249,7 +250,7 @@ function safetyTierProfile({
 export function getPermissionHints(skill: SkillRecord): PermissionHint[] {
   const text = skillPolicyText(skill)
   const hints = PERMISSION_PATTERNS
-    .filter((item) => item.pattern.test(text))
+    .filter((item) => item.id === 'secrets' ? hasSkillRiskHint(skill, item.pattern) : item.pattern.test(text))
     .map(({ id, label, reason, severity }) => ({ id, label, reason, severity }))
 
   if (hints.length === 0) {

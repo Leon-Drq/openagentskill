@@ -1783,7 +1783,7 @@ function buildSkill(repo: GitHubSearchRepo, query: HighStarQuery, evaluation: Sk
     category: query.category,
     tags,
     frameworks,
-    version: '1.0.0',
+    version: 'Unknown',
     license: normalizeLicense(repo),
     install_command: `npx skills add ${repo.full_name}`,
     verified: repo.stargazers_count >= 1000,

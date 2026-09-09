@@ -3,9 +3,24 @@ name: Import Skill Issue
 on:
   issues:
     types: [opened, reopened]
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Skill submission Issue number'
+        required: true
+      operation:
+        description: 'Reconcile publication or review a new immutable commit'
+        type: choice
+        options: [reconcile, review]
+        default: reconcile
+      revision:
+        description: 'Full 40-character commit SHA (required for review)'
+        required: false
 
 concurrency:
-  group: skill-issue-${{ github.event.issue.number }}
+  group: skill-issue-${{ github.event.issue.number || inputs.issue_number }}
   cancel-in-progress: false
 
 permissions:
@@ -15,12 +30,15 @@ permissions:
 jobs:
   import:
     name: Validate, review, and publish
-    if: startsWith(github.event.issue.title, '[Skill]:')
+    if: github.event_name == 'workflow_dispatch' || (startsWith(github.event.issue.title, '[Skill]:') && (github.event_name != 'issue_comment' || startsWith(github.event.comment.body, '/oas ')))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          persist-credentials: false
       - name: Process Skill submission
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

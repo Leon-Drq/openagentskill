@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict'
+import { register } from 'node:module'
+register('./test-owner-publication-loader.mjs', import.meta.url)
 // Node's type-stripping runner needs the explicit extension; the app compiler resolves the same module by alias.
 // @ts-expect-error TS5097 is expected for this standalone Node test entrypoint.
-import { detectSkillDelegationName, parseGitHubSkillReference, parseSkillDocument, selectSkillDocumentPaths } from '../lib/github/skill-source.ts'
+const { detectSkillDelegationName, parseGitHubSkillReference, parseSkillDocument, selectSkillDocumentPaths } = await import('../lib/github/skill-source.ts')
 
 assert.deepEqual(parseGitHubSkillReference('Leon-Drq/openagentskill'), {
   owner: 'Leon-Drq',

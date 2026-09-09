@@ -14,6 +14,8 @@ import { getSkillBySlugOrFallbackStrict, getSkillSuggestionsForSlug, isCuratedSk
 import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile, getSkillTrustProfileV5 } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
+import { getStoredSkillVersionEvidence } from '@/lib/skills/version-evidence'
+import { getReviewEvidence } from '@/lib/skills/review-evidence'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -262,6 +264,10 @@ OpenAgentSkill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
         repository: skill.repository,
         github_repo: skill.github_repo,
         version: skill.version,
+        version_provenance: getStoredSkillVersionEvidence(skill),
+        source: { path: skill.source_path || null, ref: skill.source_ref || null, commit: skill.source_commit_sha || null, content_hash: skill.source_content_hash || null },
+        review_evidence: getReviewEvidence(skill),
+        listing_status: skill.listing_status || 'legacy',
         license: skill.license,
         urls: {
           web: `https://www.openagentskill.com/skills/${skill.slug}`,

@@ -4,6 +4,7 @@ import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypt
 import { revalidatePath, revalidateTag } from 'next/cache'
 import type { GitHubRepo } from '@/lib/schema/skill-schema'
 import type { DiscoveredGitHubSkill } from '@/lib/github/skill-source'
+import { fetchSkillVersionEvidence } from '@/lib/github/skill-source'
 import { reviewSkill } from '@/lib/ai-review/reviewer'
 import { analyzeCode } from '@/lib/security/static-analysis'
 import { evaluateSkillSubmissionPolicy } from '@/lib/skills/submission-policy'
@@ -176,10 +177,6 @@ function normalizeTags(input: OpenSubmissionInput) {
   return result
 }
 
-function normalizeVersion(value: string | undefined) {
-  return value && /^\d+\.\d+\.\d+(?:[-+][\w.-]+)?$/.test(value) ? value : '1.0.0'
-}
-
 export async function createOpenSubmission(input: OpenSubmissionInput): Promise<OpenSubmissionReceipt> {
   await enforceSubmissionRateLimit(input.requestFingerprint)
 
@@ -256,6 +253,7 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
   if (!staticAnalysis.passed) return
 
   try {
+    const versionEvidence = await fetchSkillVersionEvidence(input.skill)
     const review = await reviewSkill({
       repository: input.skill.sourceUrl,
       readmeContent: input.skill.document,
@@ -325,12 +323,13 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
       category,
       tags,
       frameworks: input.skill.frontmatter.frameworks,
-      version: normalizeVersion(input.skill.frontmatter.version),
+      version: versionEvidence.value || 'Unknown',
       license: input.skill.frontmatter.license || input.repository.license || 'Unknown',
       install_command: `npx skills add ${input.repository.fullName} --skill ${input.skill.frontmatter.name}`,
       verified: false,
       listing_status: review.method === 'static' ? 'static_checked' : 'reviewed',
       source_ref: input.skill.ref,
+      source_commit_sha: /^[a-f0-9]{40}$/.test(input.skill.ref) ? input.skill.ref : null,
       source_path: input.skill.path,
       source_content_hash: sourceContentHash,
       publisher_github: input.makerGithub || null,
@@ -339,6 +338,7 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
       submission_source: input.submissionSource,
       submitted_by_agent: input.submittedByAgent || null,
       ai_review_score: {
+        version_evidence: versionEvidence,
         ...review.scores,
         total: review.totalScore,
         source: 'open-skill-submission',

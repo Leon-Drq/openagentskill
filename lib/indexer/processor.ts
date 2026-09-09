@@ -331,7 +331,7 @@ export async function processRepo(
       category: review.category,
       tags: review.tags,
       frameworks: repoMeta.language ? [repoMeta.language] : [],
-      version: '1.0.0',
+      version: 'Unknown',
       license,
       install_command: `npx skills add ${repoRef}`,
       verified: stars >= 100,

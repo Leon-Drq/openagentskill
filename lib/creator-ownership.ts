@@ -85,7 +85,7 @@ export function getLicenseEvidence(frontmatterLicense?: string, repositoryLicens
     source: declared ? 'skill_frontmatter' : repository ? 'github_repository' : 'unknown',
     status: !license || ['unknown', 'noassertion', 'other'].includes(normalized)
       ? 'missing'
-      : /non-commercial|cc-by-nc/.test(normalized)
+      : /\bnon[- ]?commercial\b|\bcc[- ]?by[- ]?nc\b/.test(normalized)
         ? 'restricted'
         : 'detected',
   } as const

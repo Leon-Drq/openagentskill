@@ -41,7 +41,7 @@ function snapshotSkill(input: {
     category: input.category,
     tags: input.tags,
     frameworks: input.frameworks,
-    version: '1.0.0',
+    version: 'Unknown',
     license: input.license || 'Unknown',
     install_command: input.installCommand || `npx skills add ${input.repo}`,
     npm_package: null,

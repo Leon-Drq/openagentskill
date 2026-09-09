@@ -2,6 +2,7 @@ import { needsOwnerPublicationReview } from '@/lib/skills/publication'
 import type { SkillAuditRecord, SkillEventStats, SkillRecord } from '@/lib/db/skills'
 import { formatCompactNumber, getFreshnessDays, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
+import { FINANCIAL_EXECUTION_PATTERN, hasSkillRiskHint } from '@/lib/security/risk-context'
 
 export type AuditRiskLevel = SkillAuditRecord['risk_level']
 export type AuditCheckStatus = 'pass' | 'warn' | 'fail' | 'info'
@@ -65,7 +66,7 @@ function licenseKnown(skill: SkillRecord) {
 
 function hasRestrictedLicense(skill: SkillRecord) {
   const license = (skill.license || '').trim().toLowerCase()
-  return license.includes('cc-by-nc') || license.includes('non-commercial')
+  return /\bcc[- ]?by[- ]?nc\b|\bnon[- ]?commercial\b/i.test(license)
 }
 
 function hasInstallPath(skill: SkillRecord) {
@@ -95,16 +96,7 @@ function isFinancialDomainSkill(skill: SkillRecord) {
 }
 
 function hasFinancialExecutionRisk(skill: SkillRecord) {
-  const text = [
-    skill.name,
-    skill.category,
-    skill.description,
-    skill.long_description,
-    skill.install_command,
-    ...(skill.tags || []),
-  ].join(' ').toLowerCase()
-
-  return /\b(place orders?|order execution|execute trades?|trade execution|live trading|brokerage|broker account|exchange connectivity|wallet|private key|swap(?:ping)?|withdraw(?:al)?|deposit(?:ing)?|margin trading|perpetual futures?|api trading)\b/.test(text)
+  return hasSkillRiskHint(skill, FINANCIAL_EXECUTION_PATTERN)
 }
 
 function statusForScore(score: number): AuditCheckStatus {
