@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { register } from 'node:module'
+await import('./test-trending.mjs')
 register('./test-owner-publication-loader.mjs', import.meta.url)
 const { directoryCategories, directoryCategoryOptions, matchesDirectoryCategory, directoryHref, sortDirectoryCandidates, isDirectorySnapshot } = await import('../lib/skills/directory.ts')
 const { directoryCopy, directoryLabel } = await import('../lib/i18n/directory-copy.ts')

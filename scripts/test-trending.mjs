@@ -1,0 +1,50 @@
+import assert from 'node:assert/strict'
+import { readFileSync, readdirSync } from 'node:fs'
+import { register } from 'node:module'
+register('./test-owner-publication-loader.mjs', import.meta.url)
+const { trendingWindow, isTrendingSnapshot, isTrendingStale, trendingJsonLd, TRENDING_METHODOLOGY_VERSION } = await import('../lib/trending.ts')
+const { trendingCopy } = await import('../lib/i18n/trending-copy.ts')
+assert.deepEqual(trendingWindow(new Date('2026-09-09T23:59:59Z')), { start: '2026-09-02', end: '2026-09-09' })
+assert.deepEqual(trendingWindow(new Date('2026-01-01T00:00:00Z')), { start: '2025-12-25', end: '2026-01-01' })
+const activity = { window_start:'2026-09-02', window_end:'2026-09-09', total_events:12, views:8, install_copies:1, compares:1, saves:1, outbound_clicks:1, active_days:2 }
+const item = { rank:1, slug:'test-skill', name:'Test', activity }
+const snapshot = { methodology_version:TRENDING_METHODOLOGY_VERSION, generated_at:'2026-09-09T06:00:00Z', item_count:1, items:[item] }
+assert.ok(isTrendingSnapshot(snapshot))
+for (const invalid of [null, {...snapshot, methodology_version:'legacy'}, {...snapshot, generated_at:'invalid'}, {...snapshot, item_count:2}, {...snapshot, items:[{...item, activity:{...activity, total_events:0}}]}, {...snapshot, items:[{...item, activity:{...activity, window_end:'2026-09-10'}}]}, {...snapshot, items:[{...item, activity:{...activity, active_days:8}}]}, {...snapshot, items:[{...item, activity:undefined}]}, {...snapshot,item_count:2,items:[item,{...item,rank:2}]}]) assert.ok(!isTrendingSnapshot(invalid))
+assert.ok(!isTrendingStale(snapshot,new Date('2026-09-10T06:00:00Z')))
+assert.ok(isTrendingStale(snapshot,new Date('2026-09-11T06:00:00Z')))
+const graph=trendingJsonLd([item],'Trending','Recent activity',snapshot.generated_at)['@graph']
+assert.equal(graph[0].dateModified,snapshot.generated_at)
+assert.equal(graph[1]['@type'],'ItemList')
+assert.equal(graph[1].numberOfItems,1)
+assert.equal(graph[1].itemListElement[0]['@type'],'ListItem')
+assert.equal(graph[2]['@type'],'BreadcrumbList')
+for (const locale of ['en','zh','ja','ko','es','de','fr','id']) {
+  const copy=trendingCopy(locale)
+  assert.deepEqual(Object.keys(copy).sort(),Object.keys(trendingCopy('en')).sort())
+  assert.ok(Object.values(copy).every(value=>value.trim()&&!value.includes('\uFFFD')))
+}
+const page=readFileSync('app/trending/page.tsx','utf8')
+assert.equal((page.match(/<h1\b/g)||[]).length,1)
+assert.match(page,/getLatestRankingSnapshot\('trending'\)/)
+assert.match(page,/isTrendingSnapshot\(saved\)/)
+assert.doesNotMatch(page,/getAllSkills|rankTrendingSkills|InstallCommand|createAdminClient|buildTrendingSnapshot/)
+assert.ok(page.indexOf('data-trending-results')<page.indexOf('data-trending-method'))
+assert.match(page,/c\.unavailable : category \? c\.noMatch : c\.empty/)
+assert.match(page,/canonical = 'https:\/\/www.openagentskill.com\/trending'/)
+assert.match(page,/robots: \{ index: locale === 'en'/)
+assert.match(page,/JSON.stringify\(jsonLd\).replace/)
+const data=readFileSync('lib/trending-data.ts','utf8')
+assert.match(data,/isMcpOnlySkillRecord/)
+assert.match(data,/if \(!complete\) throw/)
+assert.doesNotMatch(data,/getAllSkills|generateText|generateObject/)
+const file=readdirSync('supabase/migrations').find(name=>name.endsWith('_trending_recent_activity.sql'))
+const sql=readFileSync(`supabase/migrations/${file}`,'utf8')
+assert.match(sql,/security invoker/)
+assert.match(sql,/from public, anon, authenticated/)
+assert.match(sql,/to service_role/)
+assert.match(sql,/d.event_date >= window_end - 7 and d.event_date < window_end/)
+assert.match(sql,/s.ai_review_approved = true or s.listing_status in/)
+assert.match(sql,/order by score desc, slug collate "C" asc/)
+assert.doesNotMatch(sql,/security definer|update public.skills|insert into public.skills|author_email/i)
+console.log('Trending: UTC window, snapshot validity, stale state, 8 locales, schema, SSR, bounded background aggregation and authorization passed.')
