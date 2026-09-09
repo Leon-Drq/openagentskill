@@ -6,17 +6,25 @@ import { isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
 import type { SkillRecord } from '@/lib/db/skills'
 import { TRENDING_LIMIT, TRENDING_METHODOLOGY_VERSION, isTrendingSnapshot, trendingWindow, type TrendingEvidence, type TrendingItem, type TrendingSnapshot } from '@/lib/trending'
 
-interface ActivityCandidate {
+export interface ActivityCandidate {
   skill: SkillRecord
   activity: Omit<TrendingEvidence, 'window_start' | 'window_end'>
   score: number
   candidate_count: number
 }
 
-/** Background-only aggregation. Public page requests read the small persisted snapshot. */
-export async function buildTrendingSnapshot(generatedAt: string): Promise<TrendingSnapshot> {
-  const window = trendingWindow(new Date(generatedAt))
+async function readActivityPage(windowEnd: string, offset: number): Promise<ActivityCandidate[]> {
   const client = createAdminClient({ requestTimeoutMs: 15_000 })
+  const { data, error } = await client.rpc('get_trending_activity_candidates', {
+    window_end: windowEnd, page_offset: offset, page_size: 100,
+  })
+  if (error || !Array.isArray(data)) throw new Error(`Trending aggregation failed: ${error?.message || 'invalid response'}`)
+  return data as ActivityCandidate[]
+}
+
+/** Background-only aggregation. Public page requests read the small persisted snapshot. */
+export async function buildTrendingSnapshot(generatedAt: string, readPage = readActivityPage): Promise<TrendingSnapshot> {
+  const window = trendingWindow(new Date(generatedAt))
   const items: TrendingItem[] = []
   const seen = new Set<string>()
   let candidates = 0
@@ -24,11 +32,8 @@ export async function buildTrendingSnapshot(generatedAt: string): Promise<Trendi
   // Each page is already ordered over ALL recently active public records, not a quality shortlist.
   // Fail closed if the bounded job cannot finish; never replace a complete snapshot with a partial one.
   for (let offset = 0; offset < 20_000; offset += 100) {
-    const { data, error } = await client.rpc('get_trending_activity_candidates', {
-      window_end: window.end, page_offset: offset, page_size: 100,
-    })
-    if (error || !Array.isArray(data)) throw new Error(`Trending aggregation failed: ${error?.message || 'invalid response'}`)
-    for (const row of data as ActivityCandidate[]) {
+    const data = await readPage(window.end, offset)
+    for (const row of data) {
       candidates = Number(row.candidate_count)
       const skill = row.skill
       if (seen.has(skill.slug) || isMcpOnlySkillRecord(skill)) continue
