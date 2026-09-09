@@ -1,286 +1,149 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { InstallCommand } from '@/components/install-command'
-import { getAgentProvenProfile } from '@/lib/agent-proven'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+import { ArrowRight, ChevronDown, Star } from 'lucide-react'
+import { MarketingPageShell } from '@/components/marketing-page'
 import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { getGitHubOwner } from '@/lib/github-owner'
-import {
-  convertSkillRecordToManifest,
-  getAgentOutcomeStatsMap,
-  getAllSkills,
-  getSkillStats,
-  type SkillAgentStats,
-  type SkillOutcomeStats,
-} from '@/lib/db/skills'
-import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
-import { getLatestRankingSnapshot, getRankingSnapshotHistory } from '@/lib/ranking-snapshots'
-import {
-  getRankingCompareHref,
-  getRankingDefinition,
-  getRankingDefinitions,
-  normalizeRankingText,
-  rankSkillsForDefinition,
-} from '@/lib/rankings'
+import { getRankingCompareHref, getRankingDefinition, getRankingDefinitions, normalizeRankingText } from '@/lib/rankings'
+import { getRankingLanding } from '@/lib/ranking-landing-data'
+import { rankingLandingJsonLd, validRankingDate } from '@/lib/ranking-landing'
+import { directoryCopy, directoryLabel } from '@/lib/i18n/directory-copy'
+import { rankingCopy, localizedRanking } from '@/lib/i18n/ranking-copy'
+import { trendingCopy } from '@/lib/i18n/trending-copy'
+import { getLocaleFromSearchParam, getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 
 export const revalidate = 300
+type Props = { params: Promise<{ slug: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }
 
 export function generateStaticParams() {
-  return getRankingDefinitions().map((ranking) => ({ slug: ranking.slug }))
+  return getRankingDefinitions().map(({ slug }) => ({ slug }))
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}): Promise<Metadata> {
-  const { slug } = await params
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+  const [{ slug }, query] = await Promise.all([params, searchParams])
   const ranking = getRankingDefinition(slug)
-  if (!ranking) return { title: 'Ranking Not Found' }
-
+  if (!ranking) return { title: 'Ranking Not Found', robots: { index: false, follow: true } }
+  const locale = getLocaleFromSearchParam(query.lang)
+  const c = localizedRanking(ranking, locale)
+  const url = `https://www.openagentskill.com/rankings/${ranking.slug}`
+  const title = `${c.title} | OpenAgentSkill`
   return {
-    title: ranking.title,
-    description: ranking.description,
-    alternates: {
-      canonical: `https://www.openagentskill.com/rankings/${ranking.slug}`,
-    },
-    openGraph: {
-      title: `${ranking.title} — OpenAgentSkill`,
-      description: ranking.description,
-      url: `https://www.openagentskill.com/rankings/${ranking.slug}`,
-      type: 'website',
-    },
+    title: { absolute: title }, description: c.description, alternates: { canonical: url },
+    robots: { index: locale === 'en' && !Object.keys(query).some(key => key !== 'lang'), follow: true },
+    openGraph: { title, description: c.description, url, type: 'website' },
+    twitter: { card: 'summary_large_image', title, description: c.description },
   }
 }
 
-function formatDate(value: string | null) {
-  if (!value) return 'Unknown'
-  return new Date(value).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
-
-export default async function RankingDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
-  const { slug } = await params
+export default async function RankingDetailPage({ params, searchParams }: Props) {
+  const [{ slug }, query] = await Promise.all([params, searchParams])
   const ranking = getRankingDefinition(slug)
   if (!ranking) notFound()
-
-  const usesOutcomeStats = ['highest-quality', 'agent-usage', 'success-rate', 'safe-auto-install', 'agent-platform'].includes(ranking.kind)
-  const sourceSort = ranking.kind === 'most-starred'
-    ? 'stars'
-    : ranking.kind === 'recently-updated'
-      ? 'fresh'
-      : ranking.kind === 'new-this-week'
-        ? 'new'
-        : 'quality'
-  const [skills, statsMap, latestSnapshot, snapshotHistory] = await Promise.all([
-    getAllSkills(sourceSort, undefined, 480).catch(() => []),
-    usesOutcomeStats
-      ? getAgentOutcomeStatsMap().catch((): Record<string, SkillOutcomeStats> => ({}))
-      : getSkillStats().catch((): Record<string, SkillAgentStats> => ({})),
-    getLatestRankingSnapshot(ranking.slug),
-    getRankingSnapshotHistory(ranking.slug, 30).catch(() => []),
-  ])
-  const rankedSkills = rankSkillsForDefinition(skills, ranking, statsMap, 30)
-  const compareHref = getRankingCompareHref(rankedSkills)
-  const oldestSnapshot = snapshotHistory[0]
-  const rankMovement = new Map((latestSnapshot?.items || []).map((item) => {
-    const previous = oldestSnapshot?.items.find((candidate) => candidate.slug === item.slug)
-    return [item.slug, previous ? previous.rank - item.rank : 0]
-  }))
-
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: ranking.title,
-    description: ranking.description,
-    url: `https://www.openagentskill.com/rankings/${ranking.slug}`,
-    mainEntity: {
-      '@type': 'ItemList',
-      numberOfItems: rankedSkills.length,
-      itemListOrder: 'https://schema.org/ItemListOrderDescending',
-      itemListElement: rankedSkills.map((item) => ({
-        '@type': 'ListItem',
-        position: item.rank,
-        name: normalizeRankingText(item.skill.name),
-        url: `https://www.openagentskill.com/skills/${item.skill.slug}`,
-      })),
-    },
-  }
+  const locale = getLocaleFromSearchParam(query.lang)
+  const c = rankingCopy(locale)
+  const d = directoryCopy(locale)
+  const t = trendingCopy(locale)
+  const copy = localizedRanking(ranking, locale)
+  const href = (path: string) => getLocalizedNavigationHref(path, locale)
+  const { items, candidateCount, source } = await getRankingLanding(slug)
+  const number = new Intl.NumberFormat(locale)
+  const date = new Intl.DateTimeFormat(locale, { timeZone: 'UTC', year: 'numeric', month: 'short', day: 'numeric' })
+  const dateText = (value: string | null | undefined) => validRankingDate(value) ? date.format(new Date(value!)) : c.unknown
+  const url = `https://www.openagentskill.com/rankings/${slug}`
+  const jsonLd = rankingLandingJsonLd(ranking, items, copy.title, copy.description)
+  const tabs = [
+    { path: '/trending', label: t.title },
+    { path: '/rankings/most-starred-agent-skills', label: t.stars },
+    { path: '/rankings/new-agent-skills-this-week', label: d.new },
+    { path: '/rankings/recently-updated-agent-skills', label: d.fresh },
+  ]
 
   return (
-    <div className="min-h-screen bg-background">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
-      <SiteHeader />
+    <MarketingPageShell>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
+      <div lang={locale} className="mx-auto max-w-6xl px-5 sm:px-6">
+        <header className="border-b border-border pb-8 pt-8 sm:pb-10 sm:pt-10">
+          <nav aria-label={c.eyebrow} className="mb-7 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-secondary">
+            <Link href={href('/rankings')} className="hover:text-[#006C52]">{t.rankings}</Link><span aria-hidden="true">/</span><span aria-current="page">{copy.shortTitle}</span>
+          </nav>
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#006C52]">{c.eyebrow}</p>
+          <h1 className="mt-4 max-w-4xl font-display text-4xl leading-[1.08] [overflow-wrap:anywhere] sm:text-5xl lg:text-6xl">{copy.title}</h1>
+          <p className="mt-4 max-w-3xl text-sm leading-6 text-secondary sm:text-base">{copy.description}</p>
+        </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-        <nav className="mb-8 flex items-center gap-2 text-sm text-secondary">
-          <Link href="/rankings" className="hover:text-foreground">Rankings</Link>
-          <span>/</span>
-          <span className="text-foreground">{ranking.shortTitle}</span>
-        </nav>
+        <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3 border-b border-border py-4">
+          <nav aria-label={t.rankings} className="flex min-w-0 flex-wrap gap-x-5 gap-y-2 text-sm">
+            {tabs.map(tab => <Link key={tab.path} href={href(tab.path)} aria-current={tab.path === `/rankings/${slug}` ? 'page' : undefined} className={`py-2 ${tab.path === `/rankings/${slug}` ? 'border-b-2 border-[#006C52] font-semibold text-[#006C52]' : 'text-secondary hover:text-foreground'}`}>{tab.label}</Link>)}
+          </nav>
+          <details className="group/menu relative ml-auto max-w-full" data-ranking-menu>
+            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-4 border border-border px-3 text-xs hover:border-foreground">{c.choose}<ChevronDown size={14} aria-hidden="true" className="group-open/menu:rotate-180" /></summary>
+            <nav aria-label={c.choose} className="absolute right-0 z-20 mt-2 max-h-[min(60dvh,26rem)] w-72 max-w-[calc(100vw-2.5rem)] overflow-y-auto overscroll-contain border border-border bg-background p-2 shadow-lg">
+              {getRankingDefinitions().map(def => <Link key={def.slug} prefetch={false} href={href(`/rankings/${def.slug}`)} aria-current={slug === def.slug ? 'page' : undefined} className={`block break-words px-3 py-3 text-sm hover:bg-muted ${slug === def.slug ? 'font-semibold text-[#006C52]' : 'text-secondary'}`}>{localizedRanking(def, locale).shortTitle}</Link>)}
+            </nav>
+          </details>
+        </div>
 
-        <section className="grid gap-10 border-b border-border pb-10 lg:grid-cols-[1.15fr_0.85fr]">
-          <div>
-            <p className="mb-4 text-xs uppercase tracking-widest text-secondary">{ranking.eyebrow}</p>
-            <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">{ranking.title}</h1>
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">{ranking.description}</p>
-            <p className="mt-4 font-mono text-xs uppercase tracking-widest text-secondary">
-              {latestSnapshot
-                ? `Daily snapshot: ${new Date(latestSnapshot.generated_at).toLocaleString('en-US', { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'short' })} UTC`
-                : 'Daily snapshot pending · live ranking shown'}
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              {rankedSkills.length > 1 && (
-                <Link
-                  href={compareHref}
-                  className="border border-foreground bg-foreground px-5 py-2 text-sm font-semibold text-background transition-opacity hover:opacity-80"
-                >
-                  Compare top 4
-                </Link>
-              )}
-              <Link
-                href="/skills?quality=excellent&minStars=500"
-                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
-              >
-                Browse excellent skills
-              </Link>
-              <a
-                href={`https://x.com/intent/post?text=${encodeURIComponent(`${ranking.title} — evidence-based and updated daily`)}&url=${encodeURIComponent(`https://www.openagentskill.com/rankings/${ranking.slug}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
-              >
-                Share ranking
-              </a>
-              <Link href={`/api/agent/rankings/${ranking.slug}/history?days=30`} className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground">30-day data</Link>
-            </div>
-          </div>
+        <div className="flex flex-wrap items-center justify-between gap-4 py-5 text-xs text-secondary">
+          <p>{c.scope.replace('{shown}', number.format(items.length)).replace('{count}', number.format(candidateCount))}</p>
+          {items.length > 1 ? <Link href={href(getRankingCompareHref(items))} className="inline-flex min-h-8 items-center gap-2 text-[#006C52]">{c.compare}<ArrowRight size={14} aria-hidden="true" /></Link> : null}
+        </div>
+        {source === 'saved-directory' ? <p role="status" className="mb-6 border-l-2 border-amber-600 pl-4 text-sm leading-6 text-secondary">{c.saved}</p> : null}
 
-          <div className="grid grid-cols-3 gap-px self-end border border-border bg-border text-center">
-            <div className="bg-background p-4">
-              <div className="font-mono text-2xl">{rankedSkills.length}</div>
-              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">{ranking.entityScope === 'project' ? 'Projects' : 'Ranked skills'}</div>
-            </div>
-            <div className="bg-background p-4">
-              <div className="font-mono text-2xl">
-                {formatCompactNumber(rankedSkills.reduce((sum, item) => sum + Number(item.skill.github_stars || 0), 0))}
-              </div>
-              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">{ranking.entityScope === 'project' ? 'Project stars' : 'Stars'}</div>
-            </div>
-            <div className="bg-background p-4">
-              <div className="font-mono text-2xl">
-                {rankedSkills[0] ? Math.round(rankedSkills[0].score) : 0}
-              </div>
-              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Top score</div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-10">
-          {rankedSkills.length === 0 ? (
-            <div className="border border-border p-8">
-              <h2 className="font-display text-2xl font-semibold">No skills matched this ranking yet.</h2>
-              <p className="mt-3 text-sm leading-relaxed text-secondary">
-                The indexer is expanding this area as new high-star skills are discovered.
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y divide-border border-y border-border">
-              {rankedSkills.map((item) => {
+        <section aria-label={copy.title} data-ranking-results data-ranking-source={source}>
+          {!items.length ? <div role="status" className="border-t border-border py-12 text-sm leading-7 text-secondary"><p>{source === 'unavailable' ? c.unavailable : c.empty}</p><Link href={href('/skills')} className="mt-4 inline-block text-[#006C52] underline underline-offset-4">{d.all}</Link></div> : (
+            <ol className="divide-y divide-border border-t border-border">
+              {items.map(item => {
                 const skill = item.skill
-                const manifest = convertSkillRecordToManifest(skill)
-                const quality = getSkillQualityProfile(skill, statsMap[skill.slug] || null)
-                const outcomeStats = statsMap[skill.slug] && 'total_outcomes' in statsMap[skill.slug]
-                  ? statsMap[skill.slug] as SkillOutcomeStats
-                  : null
-                const proven = getAgentProvenProfile(outcomeStats)
-                const movement = rankMovement.get(skill.slug) || 0
-                const githubOwner = getGitHubOwner(skill)
-                const displayName = normalizeRankingText(skill.name)
-                const displayDescription = normalizeRankingText(skill.description)
-
-                return (
-                  <article key={skill.slug} className="grid gap-5 py-7 lg:grid-cols-[auto_1fr_auto]">
-                    <div className="flex items-center gap-3 lg:flex-col lg:items-start">
-                      <div className="font-mono text-2xl text-secondary tabular-nums">#{item.rank}</div>
-                      <GitHubOwnerAvatar owner={githubOwner} label={skill.author_name} size="lg" />
+                const owner = getGitHubOwner(skill)
+                const recordDate = ranking.kind === 'new-this-week' ? skill.created_at : validRankingDate(skill.github_last_pushed_at) ? skill.github_last_pushed_at : skill.updated_at
+                const dateLabel = ranking.kind === 'new-this-week' ? c.indexed : validRankingDate(skill.github_last_pushed_at) ? c.pushed : c.registryUpdated
+                const showDate = ['new-this-week', 'recently-updated'].includes(ranking.kind)
+                return <li key={skill.slug} value={item.rank} className="grid grid-cols-[2rem_minmax(0,1fr)] gap-x-3 py-6 sm:grid-cols-[2rem_3rem_minmax(0,1fr)_9rem] sm:gap-x-5 sm:py-7">
+                  <span className="pt-1 font-mono text-lg tabular-nums text-secondary" aria-label={`#${item.rank}`}>{String(item.rank).padStart(2, '0')}</span>
+                  <div className="hidden pt-1 sm:block"><GitHubOwnerAvatar owner={owner} label={skill.author_name} size="lg" /></div>
+                  <div className="min-w-0">
+                    <h2 className="font-display text-2xl leading-tight sm:text-[27px]"><Link href={href(`/skills/${skill.slug}`)} className="break-words hover:text-[#006C52]">{normalizeRankingText(skill.name)}</Link></h2>
+                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-secondary">{normalizeRankingText(skill.description)}</p>
+                    <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-secondary">
+                      <span className="inline-flex min-w-0 items-center gap-2"><span className="sm:hidden"><GitHubOwnerAvatar owner={owner} size="sm" linked={false} /></span><span className="break-all">@{owner || skill.author_name}</span></span>
+                      <span>{directoryLabel(locale, skill.category)}</span>
+                      {ranking.kind !== 'most-starred' ? <span className="inline-flex items-center gap-1" title={d.repoStars}><Star size={12} aria-hidden="true" />{number.format(skill.github_stars || 0)}</span> : null}
                     </div>
-                    <div className="min-w-0">
-                      <div className="mb-2 flex flex-wrap items-center gap-2">
-                        <Link href={`/skills/${skill.slug}`} className="min-w-0">
-                          <h2 className="font-display text-2xl font-semibold leading-tight hover:text-secondary">
-                            {displayName}
-                          </h2>
-                        </Link>
-                        <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
-                          {normalizeRankingText(item.badge)}
-                        </span>
-                        <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
-                          {snapshotHistory.length < 2 ? 'Baseline' : movement > 0 ? `↑ ${movement}` : movement < 0 ? `↓ ${Math.abs(movement)}` : '— stable'}
-                        </span>
-                        <span className="border border-border px-2 py-0.5 text-xs font-mono text-secondary">
-                          {quality.label} | {quality.score}
-                        </span>
-                        {githubOwner ? <span className="font-mono text-xs text-secondary">@{githubOwner}</span> : null}
-                        {ranking.kind === 'agent-usage' || ranking.kind === 'success-rate' || ranking.kind === 'safe-auto-install' ? (
-                          <span className="border border-[#c8ded5] bg-[#eef7f2] px-2 py-0.5 text-xs font-mono text-[#006b4f]">
-                            {proven.score}/100 proven
-                          </span>
-                        ) : null}
-                      </div>
-                      <p className="max-w-3xl text-sm leading-relaxed text-secondary">{displayDescription}</p>
-                      <p className="mt-3 max-w-3xl text-sm leading-relaxed">{normalizeRankingText(item.reason)}</p>
-                      <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-mono text-secondary">
-                        <span>ranking {Math.round(item.score)}/100</span>
-                        <span>quality {Math.round(item.dimensions.quality)}</span>
-                        <span>popularity {Math.round(item.dimensions.popularity)}</span>
-                        <span>freshness {Math.round(item.dimensions.freshness)}</span>
-                        <span>evidence {Math.round(item.dimensions.agentEvidence)}</span>
-                        <span>confidence {Math.round(item.dimensions.evidenceConfidence)}</span>
-                        <span>install {Math.round(item.dimensions.installReadiness)}</span>
-                        {item.dimensions.fit !== null ? <span>fit {Math.round(item.dimensions.fit)}</span> : null}
-                      </div>
-                      <div className="mt-4 flex flex-wrap gap-4 text-xs font-mono text-secondary">
-                        <span>{formatCompactNumber(skill.github_stars || 0)} stars</span>
-                        <span>{formatCompactNumber(skill.github_forks || 0)} forks</span>
-                        <span>{formatDate(skill.github_last_pushed_at || skill.updated_at)} push</span>
-                        <span>{normalizeRankingText(skill.category)}</span>
-                        {(ranking.kind === 'agent-usage' || ranking.kind === 'success-rate' || ranking.kind === 'safe-auto-install') && (
-                          <>
-                            <span>{proven.metrics.totalOutcomes.toLocaleString()} outcomes</span>
-                            <span>{proven.metrics.successRate === null ? 'No success data' : `${Math.round(proven.metrics.successRate)}% success`}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                    <div className="lg:w-72">
-                      <InstallCommand
-                        command={manifest.technical.installCommand || `npx skills add ${skill.github_repo}`}
-                        skillSlug={skill.slug}
-                        compact
-                      />
-                    </div>
-                  </article>
-                )
+                    <Link href={href(`/skills/${skill.slug}#source-trust`)} className="mt-3 inline-block text-xs text-secondary underline decoration-border underline-offset-4 hover:text-foreground">{d.review}</Link>
+                  </div>
+                  <div className="col-start-2 mt-3 flex flex-wrap items-center justify-between gap-3 sm:col-start-4 sm:mt-0 sm:block sm:text-right">
+                    {ranking.kind === 'most-starred' ? <div><p className="font-mono text-2xl tabular-nums">{number.format(skill.github_stars || 0)}</p><p className="mt-1 text-[11px] text-secondary">{d.repoStars}</p></div> : null}
+                    {showDate ? <div><p className="font-mono text-sm">{validRankingDate(recordDate) ? <time dateTime={recordDate!}>{dateText(recordDate)}</time> : c.unknown}</p><p className="mt-1 text-[11px] text-secondary">{dateLabel}</p></div> : null}
+                    <Link href={href(`/skills/${skill.slug}`)} className="inline-flex min-h-11 items-center gap-2 text-sm text-[#006C52] sm:mt-3">{d.details}<ArrowRight size={15} aria-hidden="true" /></Link>
+                  </div>
+                  <details className="col-start-2 col-end-[-1] mt-3 text-xs text-secondary sm:col-start-3">
+                    <summary className="flex min-h-8 w-fit cursor-pointer list-none items-center gap-2 hover:text-foreground">{c.evidence}<ChevronDown size={12} aria-hidden="true" /></summary>
+                    <p className="mt-2 max-w-2xl leading-6">{c.signalsNote}</p>
+                    <dl className="mt-3 grid grid-cols-2 gap-x-5 gap-y-3 border-l border-border pl-4 sm:grid-cols-3">
+                      {Object.entries(item.dimensions).filter(([, value]) => value !== null).map(([key, value]) => <div key={key}><dt>{c[key as keyof typeof item.dimensions]}</dt><dd className="mt-1 font-mono text-foreground">{number.format(Math.max(0, Math.min(100, Math.round(value!))))}/100</dd></div>)}
+                    </dl>
+                  </details>
+                </li>
               })}
-            </div>
+            </ol>
           )}
         </section>
-      </main>
 
-      <SiteFooter />
-    </div>
+        <p className="border-t border-border py-5 text-xs leading-6 text-secondary">{c.notice}</p>
+        <details className="border-y border-border py-5" data-ranking-method>
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-xl">{c.method}<ChevronDown size={16} aria-hidden="true" /></summary>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-secondary">{copy.method}</p>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-secondary">{c.signalsNote}</p>
+          {ranking.kind !== 'use-case' ? <Link href={`/api/agent/rankings/${slug}/history?days=30`} className="mt-4 inline-block text-xs text-[#006C52] underline underline-offset-4">{c.history}</Link> : null}
+        </details>
+        <nav aria-label={t.related} className="flex flex-wrap items-center gap-x-6 gap-y-4 py-8 text-sm">
+          <Link href={href('/rankings')} className="text-secondary hover:text-[#006C52]">{t.rankings} ↗</Link>
+          <Link href={href('/skills')} className="text-secondary hover:text-[#006C52]">{d.all} ↗</Link>
+          <Link href={href('/skills?quality=excellent&minStars=500')} className="text-secondary hover:text-[#006C52]">{localizedRanking(getRankingDefinition('highest-quality-agent-skills')!, locale).shortTitle} ↗</Link>
+          <a href={`https://x.com/intent/post?text=${encodeURIComponent(copy.title)}&url=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" className="text-secondary hover:text-[#006C52]">{c.share} ↗</a>
+        </nav>
+      </div>
+    </MarketingPageShell>
   )
 }
