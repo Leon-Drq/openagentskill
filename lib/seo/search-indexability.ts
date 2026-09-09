@@ -47,7 +47,7 @@ export function getSearchEvidenceProfile(
 
   if (skill.ai_review_approved) {
     score += 25
-    signals.push('AI review approved')
+    signals.push('Registry review approval recorded')
   }
   score += Math.min(25, Number(skill.quality_score || 0) / 4)
   if (Number(skill.quality_score || 0) >= SEARCH_INDEX_MIN_QUALITY_SCORE) signals.push('Quality-gated metadata')

@@ -37,6 +37,12 @@ export async function POST(request: NextRequest) {
       checkReadme: false,
       checkSkillJson: false,
     })
+    if (repoData.isPrivate) {
+      return NextResponse.json(
+        { valid: false, code: 'PRIVATE_REPOSITORY', error: 'Only public GitHub repositories can be submitted.' },
+        { status: 400 }
+      )
+    }
     const discovery = await discoverGitHubSkills(reference, repoData)
     if (discovery.skills.length === 0) {
       return NextResponse.json(

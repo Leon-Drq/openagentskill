@@ -9,6 +9,7 @@ import {
   discoverGitHubSkills,
   fetchDelegatedGitHubSkill,
   fetchSkillPackageSnapshot,
+  fetchSkillVersionEvidence,
   parseGitHubSkillReference,
   type DiscoveredGitHubSkill,
   type GitHubTreeItem,
@@ -101,10 +102,6 @@ function normalizeTags(skill: DiscoveredGitHubSkill, extraTags: string[] = []) {
     .slice(0, 10)
 }
 
-function normalizeVersion(value: string | undefined) {
-  return value && /^\d+\.\d+\.\d+(?:[-+][\w.-]+)?$/.test(value) ? value : '1.0.0'
-}
-
 function contentHash(value: string) {
   return createHash('sha256').update(value).digest('hex')
 }
@@ -173,6 +170,7 @@ async function payloadForNew(
     }
   }
   const license = getLicenseEvidence(skill.frontmatter.license, repository.license)
+  const versionEvidence = await fetchSkillVersionEvidence(skill, repositoryTree)
   let reviewScores: { security: number; quality: number; usefulness: number; compliance: number }
   let reviewTotal: number
   let reviewSource: string
@@ -254,7 +252,7 @@ async function payloadForNew(
       category: inferIndexedSkillCategory(skill),
       tags,
       frameworks: skill.frontmatter.frameworks,
-      version: normalizeVersion(skill.frontmatter.version),
+      version: versionEvidence.value || 'Unknown',
       license: license.license,
       license_source: license.source,
       license_status: license.status,
@@ -264,6 +262,7 @@ async function payloadForNew(
       submission_source: discoverySource,
       submitted_by_agent: 'open-agent-skill-source-sync',
       ai_review_score: {
+        version_evidence: versionEvidence,
         ...reviewScores,
         total: reviewTotal,
         source: reviewSource,
@@ -476,10 +475,11 @@ export async function syncRepositorySkills(
         p_source_content_hash: sourceContentHash,
         p_source_ref: skill.ref,
         p_source_path: skill.path,
-        p_version: String(result.payload.version || '1.0.0'),
+        p_version: String(result.payload.version || 'Unknown'),
         p_license: String(result.payload.license || 'Unknown'),
         p_license_source: String(result.payload.license_source || 'unknown'),
         p_metadata: {
+          version_evidence: result.payload.ai_review_score.version_evidence,
           source_url: skill.sourceUrl,
           discovery_source: discoverySource,
         },

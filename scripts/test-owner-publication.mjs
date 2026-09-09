@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import './test-review-provenance.mjs'
 import { readFileSync } from 'node:fs'
 import { register } from 'node:module'
 register('./test-owner-publication-loader.mjs', import.meta.url)

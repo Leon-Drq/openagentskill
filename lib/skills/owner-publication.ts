@@ -1,7 +1,7 @@
 import 'server-only'
 import { createHash } from 'node:crypto'
 import { fetchRepositoryCommitSha, validateGitHubRepo } from '@/lib/github/api'
-import { discoverGitHubSkills, fetchSkillPackageSnapshot, parseGitHubSkillReference } from '@/lib/github/skill-source'
+import { discoverGitHubSkills, fetchSkillPackageSnapshot, fetchSkillVersionEvidence, parseGitHubSkillReference } from '@/lib/github/skill-source'
 import { analyzeCode } from '@/lib/security/static-analysis'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
@@ -31,6 +31,7 @@ export async function prepareOwnerPublication(input: OwnerPublicationInput) {
   // Never execute repository code. Persist the scope of this advisory scan.
   const snapshot = await fetchSkillPackageSnapshot(skill, { maxFiles: 12, repositoryTree: discovery.tree })
   const staticAnalysis = analyzeCode(snapshot.files)
+  const versionEvidence = await fetchSkillVersionEvidence(skill, discovery.tree)
   const hash = createHash('sha256').update(skill.document).digest('hex')
   const slugPart = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
   const base = `${slugPart(repository.owner)}-${slugPart(repository.repo)}`
@@ -56,7 +57,7 @@ export async function prepareOwnerPublication(input: OwnerPublicationInput) {
     category: skill.frontmatter.category || 'developer-tools',
     tags: [...new Set([...skill.frontmatter.tags, 'agent-skill'])].slice(0, 10),
     frameworks: skill.frontmatter.frameworks,
-    version: skill.frontmatter.version || '1.0.0',
+    version: versionEvidence.value || 'Unknown',
     license: skill.frontmatter.license || repository.license || 'Unknown',
     // Quote values sourced from untrusted repository metadata before handing
     // this command to a shell. The source is pinned to the recorded commit.
@@ -70,6 +71,7 @@ export async function prepareOwnerPublication(input: OwnerPublicationInput) {
   return {
     skill: metadata,
     scan: {
+      version_evidence: versionEvidence,
       ...staticAnalysis,
       advisory: true,
       executed: false,

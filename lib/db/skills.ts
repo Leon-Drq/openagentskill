@@ -38,7 +38,7 @@ export interface SkillRecord {
   ai_review_score: any
   ai_review_approved: boolean
   listing_status?: string | null
-  owner_publication?: { channel: string; static_analysis?: { riskLevel?: string }; notice?: string } | null
+  owner_publication?: { channel: string; static_analysis?: { riskLevel?: string; version_evidence?: unknown }; notice?: string } | null
   ai_review_issues: string[]
   ai_review_suggestions: string[]
   downloads: number
@@ -1154,13 +1154,13 @@ export function convertSkillRecordToManifest(record: SkillRecord): Skill {
       weeklyGrowth: 0,
     },
     technical: {
-      version: record.version || '1.0.0',
+      version: record.version || 'Unknown',
       language: ['TypeScript'],
       frameworks: record.frameworks || [],
       dependencies: [],
       documentation: record.repository,
       repository: record.repository,
-      license: record.license || 'MIT',
+      license: record.license || 'Unknown',
       size: '1 MB',
       lastUpdated: record.updated_at,
       installCommand: record.install_command || `npx skills add ${record.github_repo}`,

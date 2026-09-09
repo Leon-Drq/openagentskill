@@ -8,6 +8,7 @@ export function getReviewEvidence(skill: {
     indexed: true,
     static_checked: review.method === 'static' && current,
     ai_reviewed: review.method === 'ai' && Boolean(review.reviewed_at) && current,
+    manual_reviewed: (review.method === 'manual' || review.source === 'manual-review-v1') && Boolean(review.reviewed_at) && current,
     creator_verified: skill.publisher_verified === true,
     review_result: current ? String(review.decision || 'not_recorded') : 'version_needs_review',
     reviewed_at: typeof review.reviewed_at === 'string' ? review.reviewed_at : null,

@@ -1,5 +1,6 @@
 import { needsOwnerPublicationReview, OWNER_PUBLICATION_NOTICE } from '@/lib/skills/publication'
 import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
+import { FINANCIAL_EXECUTION_PATTERN, SECRET_ACCESS_PATTERN, hasSkillRiskHint } from '@/lib/security/risk-context'
 import type { SkillAgentStats, SkillEventStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
 import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { formatCompactNumber, getFreshnessDays } from '@/lib/quality'
@@ -561,9 +562,7 @@ function isFinancialDomainSkill(skill: SkillRecord) {
 }
 
 function hasFinancialExecutionRisk(skill: SkillRecord) {
-  return /\b(place orders?|order execution|execute trades?|trade execution|live trading|brokerage|broker account|exchange connectivity|wallet|private key|swap(?:ping)?|withdraw(?:al)?|deposit(?:ing)?|margin trading|perpetual futures?|api trading)\b/.test(
-    trustSignalText(skill)
-  )
+  return hasSkillRiskHint(skill, FINANCIAL_EXECUTION_PATTERN)
 }
 
 function scoreMaintenance(days: number | null) {
@@ -653,7 +652,7 @@ function getPermissionSurface(skill: SkillRecord) {
   const notes: string[] = []
   let exposure = 0
 
-  if (/\b(secret|token|credential|api key|oauth|env|environment variable|password)\b/.test(text)) {
+  if (hasSkillRiskHint(skill, SECRET_ACCESS_PATTERN)) {
     exposure += 26
     notes.push('secrets or environment access')
   }
@@ -694,7 +693,7 @@ function getDependencyRisk(skill: SkillRecord) {
     risk += 18
     notes.push('command execution surface')
   }
-  if (/\b(secret|token|credential|api key|oauth|env|environment variable)\b/.test(text)) {
+  if (hasSkillRiskHint(skill, SECRET_ACCESS_PATTERN)) {
     risk += 18
     notes.push('credential or environment access')
   }
@@ -884,7 +883,8 @@ export function getSkillTrustProfile(
   }
 
   if (skill.ai_review_approved) {
-    strengths.push('AI review approved')
+    strengths.push(skill.ai_review_score?.source === 'manual-review-v1' || skill.ai_review_score?.method === 'manual'
+      ? 'Manual source review recorded' : skill.ai_review_score?.method === 'ai' ? 'AI review approved' : 'Legacy review approval recorded')
   } else {
     warnings.push('AI review approval is missing')
   }

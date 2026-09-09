@@ -65,6 +65,10 @@ export async function GET(
       },
       identityVerified: Boolean(data.identity_verified),
       review: {
+        method: typeof review.method === 'string' ? review.method : 'legacy_unclassified',
+        approved: review.approved === true,
+        policyVersion: typeof review.policyVersion === 'string' ? review.policyVersion : null,
+        packageFingerprint: typeof review.packageFingerprint === 'string' ? review.packageFingerprint : null,
         scores: review.scores || null,
         totalScore: review.totalScore || null,
         issues: Array.isArray(review.issues) ? review.issues.slice(0, 20) : [],

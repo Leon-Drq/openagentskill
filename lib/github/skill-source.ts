@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import type { GitHubRepo } from '@/lib/schema/skill-schema'
+import { resolveSkillVersion } from '@/lib/skills/version-evidence'
 
 const GITHUB_API = 'https://api.github.com'
 const MAX_DISCOVERED_SKILLS = 50
@@ -196,6 +197,15 @@ function parseFrontmatterBlock(source: string) {
       continue
     }
 
+    if (key === 'metadata' && !rawValue.trim()) {
+      index += 1
+      while (index < lines.length && (/^\s+/.test(lines[index]) || !lines[index].trim())) {
+        const nested = lines[index].match(/^ {2}(version|author):\s*(.+)$/)
+        if (nested) values.set(`metadata.${nested[1]}`, unquote(nested[2]))
+        index += 1
+      }
+      continue
+    }
     values.set(key, unquote(rawValue))
     index += 1
   }
@@ -219,9 +229,9 @@ export function parseSkillDocument(source: string): SkillFrontmatter | null {
   return {
     name: name.slice(0, 120),
     description: description.slice(0, 1000),
-    version: values.get('version') || undefined,
+    version: values.get('version') || values.get('metadata.version') || undefined,
     license: values.get('license') || undefined,
-    author: values.get('author') || undefined,
+    author: values.get('author') || values.get('metadata.author') || undefined,
     category: values.get('category') || undefined,
     tags: parseInlineList(values.get('tags') || values.get('keywords')),
     frameworks: parseInlineList(values.get('frameworks')),
@@ -438,4 +448,22 @@ export async function fetchSkillPackageFiles(
   options: { maxFiles?: number } = {}
 ) {
   return (await fetchSkillPackageSnapshot(skill, options)).files
+}
+
+export async function fetchSkillVersionEvidence(skill: DiscoveredGitHubSkill, repositoryTree?: GitHubTreeItem[] | null) {
+  const input = { name: skill.frontmatter.name, path: skill.path, ref: skill.ref, declared: skill.frontmatter.version }
+  const declared = resolveSkillVersion(input)
+  if (declared.value) return declared
+  const paths = [...new Set([skill.directory ? `${skill.directory}/.claude-plugin/plugin.json` : '.claude-plugin/plugin.json', '.claude-plugin/plugin.json'])]
+    .filter(path => !repositoryTree || repositoryTree.some(item => item.type === 'blob' && item.path === path))
+  const pluginManifests = []
+  for (const path of paths) {
+    try {
+      pluginManifests.push({ path, content: await fetchRepositoryFile(skill.owner, skill.repo, skill.ref, path) })
+    } catch (error) {
+      // Only absence is optional; rate limits/network errors must stop source preparation.
+      if (!(error instanceof Error) || !error.message.includes('(404)')) throw error
+    }
+  }
+  return resolveSkillVersion({ ...input, pluginManifests })
 }
