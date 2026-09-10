@@ -4,7 +4,10 @@ import { siteCopy, localizeSiteText } from '@/lib/i18n/site-copy'
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
-import { ArrowRight, ArrowUpRight, Github, Search } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Search } from 'lucide-react'
+import { HOME_SEARCH_COPY, HOME_SEARCH_EXAMPLES } from '@/lib/i18n/home-search-copy'
+import { AnimatedSearchHint } from './animated-search-hint'
+import { ConnectAiInline } from './connect-ai-inline'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import type { Locale } from '@/lib/i18n/config'
 import { useI18n } from '@/lib/i18n/context'
@@ -808,6 +811,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
   const { t, locale } = useI18n()
   const activeLocale = initialLocale || locale
   const [taskQuery, setTaskQuery] = useState('')
+  const [searchFocused, setSearchFocused] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
   const [resolveResult, setResolveResult] = useState<ResolveResult | null>(null)
   const [searchedCount, setSearchedCount] = useState(0)
@@ -818,6 +822,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
     ? [resolveResult.selected, ...resolveResult.alternatives].filter((item): item is ResolveCandidate => Boolean(item))
     : []
   const copy = HOME_COPY[activeLocale] || HOME_COPY.en
+  const searchCopy = HOME_SEARCH_COPY[activeLocale]
   const discoveryCopy = DISCOVERY_COPY[activeLocale] || DISCOVERY_COPY.en
   const totalSkillsLabel = `${stats.totalSkills.toLocaleString()}${stats.totalSkillsExact ? '' : '+'}`
   const discoveredProjectsLabel = stats.coverageExact && stats.discoveredProjects !== null
@@ -827,7 +832,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
     ? stats.validatedSkills.toLocaleString()
     : 'Live'
   const statItems = [
-    [totalSkillsLabel, copy.stats[0]],
+    [totalSkillsLabel, searchCopy.indexed],
     [stats.evidenceExact ? stats.totalVerifiedInstalls.toLocaleString() : 'Live', stats.evidenceExact ? copy.stats[1] : discoveryCopy.liveApi],
     [stats.evidenceExact ? stats.totalOutcomes.toLocaleString() : '6h', stats.evidenceExact ? copy.stats[2] : discoveryCopy.sourceRefresh],
     [stats.evidenceExact ? stats.provenSkills.toLocaleString() : 'OpenAPI', stats.evidenceExact ? copy.stats[3] : discoveryCopy.machineContract],
@@ -840,6 +845,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
     setIsSearching(true)
     setShowResults(true)
     setResolveResult(null)
+    searchRef.current?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' })
     try {
       const res = await fetch('/api/agent/resolve', {
         method: 'POST',
@@ -868,10 +874,6 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
 
   const handleFindSkills = async () => {
     await runRecommendation(taskQuery)
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleFindSkills()
   }
 
   const copyToClipboard = (cmd: string) => {
@@ -914,31 +916,44 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
             {copy.heroSubtitle}
           </p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-3">
-            <a
-              href="#task-search"
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] bg-[#006b4f] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:w-auto"
+          <div className="mt-9 max-w-3xl">
+            <form
+              role="search"
+              aria-label={copy.taskLabel}
+              onSubmit={(event) => { event.preventDefault(); void handleFindSkills() }}
+              className="flex items-center gap-2 rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8] p-2 shadow-[0_6px_24px_rgba(29,27,24,0.035)] transition-colors focus-within:border-[#006b4f] focus-within:ring-2 focus-within:ring-[#006b4f]/10"
             >
-              {copy.primaryCta}
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </a>
-            <a
-              href="https://github.com/Leon-Drq/openagentskill"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border border-[#d8d2c6] bg-[#fffdf8]/85 px-5 text-sm font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f] sm:w-auto"
-            >
-              <Github className="h-4 w-4" aria-hidden="true" />
-              {copy.githubCta}
-              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-            </a>
-            <Link
-              href={getLocalizedNavigationHref("/api-docs", locale)}
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border border-transparent px-2 font-mono text-xs text-[#6d675e] transition-colors hover:text-[#1d1b18] sm:w-auto"
-            >
-              {copy.registryApi}
-              <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
-            </Link>
+              <label htmlFor="hero-task-query" className="sr-only">{copy.taskLabel}</label>
+              <Search className="ml-3 hidden h-5 w-5 shrink-0 text-[#8b857b] sm:block" aria-hidden="true" />
+              <div className="relative min-w-0 flex-1">
+              <input
+                id="hero-task-query"
+                type="search"
+                value={taskQuery}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
+                onChange={(event) => setTaskQuery(event.target.value)}
+                onKeyDown={(event) => { if (event.key === 'Enter' && event.nativeEvent.isComposing) event.preventDefault() }}
+                placeholder={searchCopy.placeholder}
+                className={`w-full min-w-0 bg-transparent px-2 py-3 text-base text-[#1d1b18] outline-none placeholder:text-[#8b857b] ${!searchFocused && !taskQuery ? 'motion-safe:placeholder:text-transparent' : ''}`}
+              />
+              <AnimatedSearchHint key={activeLocale} active={!searchFocused && !taskQuery && !isSearching} placeholder={searchCopy.placeholder} examples={HOME_SEARCH_EXAMPLES[activeLocale]} />
+              </div>
+              <button
+                type="submit"
+                disabled={isSearching || !taskQuery.trim()}
+                className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-[6px] bg-[#006b4f] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#005640] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006b4f] disabled:cursor-not-allowed disabled:opacity-50 sm:px-6"
+              >
+                {t.hero.findSkills}
+                <ArrowRight className="hidden h-4 w-4 sm:block" aria-hidden="true" />
+              </button>
+            </form>
+            <div className="mt-4 flex flex-wrap items-center gap-x-7 gap-y-1 text-sm">
+              <Link href={getLocalizedNavigationHref('/skills', activeLocale)} className="inline-flex min-h-10 items-center gap-2 text-[#5f5a52] hover:text-[#006b4f]">
+                {searchCopy.browse}<ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+              <ConnectAiInline locale={activeLocale} label={searchCopy.connect} />
+            </div>
           </div>
 
           <div className="mt-14 grid grid-cols-2 gap-x-4 gap-y-6 border-t border-[#d8d2c6] pt-8 md:grid-cols-4">
@@ -1039,7 +1054,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
       <section
         ref={searchRef}
         id="task-search"
-        className="relative overflow-hidden border-b border-[#e4e0d8] px-6 py-20 md:py-24"
+        className="relative scroll-mt-24 overflow-hidden border-b border-[#e4e0d8] px-6 py-14 md:py-16"
       >
         <div
           className="pointer-events-none absolute inset-0 z-0 opacity-50"
@@ -1057,6 +1072,9 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
             <p className="mt-4 max-w-md text-sm leading-relaxed text-[#5f5a52] sm:text-base">
               {copy.taskIntro}
             </p>
+            <Link href={getLocalizedNavigationHref('/api-docs', activeLocale)} className="mt-3 inline-flex items-center gap-2 text-sm text-[#006b4f] hover:underline underline-offset-4">
+              {copy.registryApi}<ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
             <div className="mt-6 flex flex-wrap gap-2">
               {HOME_USE_CASES.slice(0, 4).map((useCase) => (
                 <button
@@ -1073,27 +1091,11 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
 
           <div className="min-w-0 overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8]/92 shadow-[0_18px_55px_rgba(29,27,24,0.05)]">
             <div className="border-b border-[#e4e0d8] p-4 sm:p-5">
-              <label className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">
+              <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">
                 {copy.taskLabel}
-              </label>
-              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-                <input
-                  type="text"
-                  value={taskQuery}
-                  onChange={(e) => setTaskQuery(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder={copy.taskPlaceholder}
-                  className="min-w-0 flex-1 rounded-[8px] border border-[#d8d2c6] bg-[#fbfaf6] px-4 py-3 text-sm outline-none placeholder:text-[#6d675e]/50 focus:border-[#006b4f]"
-                />
-                <button
-                  onClick={handleFindSkills}
-                  disabled={isSearching || !taskQuery.trim()}
-                  className="inline-flex items-center justify-center gap-2 rounded-[8px] bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
-                >
-                  <Search className="h-4 w-4" aria-hidden="true" />
-                  {isSearching ? copy.reviewing : t.hero.findSkills}
-                </button>
-              </div>
+              </p>
+              <p className="mt-3 text-base leading-relaxed text-[#5f5a52]">{showResults ? taskQuery : copy.taskPlaceholder}</p>
+              {showResults && <a href="#hero-task-query" className="mt-3 inline-block text-sm text-[#006b4f] underline underline-offset-4">{searchCopy.placeholder.replace('…', '')}</a>}
               <button
                 type="button"
                 onClick={() => runRecommendation(DEMO_TASK)}
@@ -1105,7 +1107,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
             </div>
 
             {showResults ? (
-              <div>
+              <div aria-live="polite" aria-busy={isSearching}>
                 <div className="flex flex-col gap-2 border-b border-[#e4e0d8] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                   <div>
                     <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">{copy.selectedPlan}</p>
