@@ -129,9 +129,24 @@ await db.getApprovedSkillSitemapCount(3, 50)
 await db.getApprovedSkillSitemapRecords({ minStars: 3, minQualityScore: 50, limit: 10 })
 assert.equal(operations.length, 2)
 for (const query of operations) {
-  assert.ok(query.some(op => op[0] === 'or' && op[1] === indexPolicy.SEARCH_INDEX_PUBLICATION_FILTER))
-  assert.ok(query.some(op => op[0] === 'or' && op[1] === 'github_stars.gte.3,publisher_verified.eq.true'))
-  assert.ok(query.some(op => op[0] === 'gte' && op[1] === 'quality_score' && op[2] === 50))
+  assert.ok(query.some(op => op[0] === 'or' && op[1] === indexPolicy.buildSearchIndexFilter(3, 50)))
+  assert.ok(!query.some(op => op[0] === 'gte' && op[1] === 'quality_score'), 'Editorial eligibility is separate from model scores')
+}
+assert.ok(indexPolicy.buildSearchIndexFilter().includes('and(ai_review_approved.eq.true,quality_score.gte.50,or(github_stars.gte.3,publisher_verified.eq.true))'))
+const editorialEntries = JSON.parse(read('lib/seo/editorial-index.json'))
+for (const entry of editorialEntries) {
+  for (const field of ['slug', 'repository', 'path', 'license']) assert.match(entry[field], /^[\w./-]+$/, 'Filter values must not contain PostgREST operators')
+  assert.match(entry.commit, /^[a-f0-9]{40}$/)
+  assert.match(entry.hash, /^[a-f0-9]{64}$/)
+  const candidate = item(entry.slug, { ai_review_approved: false, quality_score: 0, github_stars: 0, publisher_verified: false,
+    github_repo: entry.repository, source_path: entry.path, source_commit_sha: entry.commit, source_content_hash: entry.hash,
+    source_sync_status: 'current', license: entry.license, listing_status: 'owner_published' })
+  assert.equal(indexPolicy.isSearchIndexEligible(candidate), true)
+  for (const field of ['slug', 'github_repo', 'source_path', 'source_commit_sha', 'source_content_hash', 'source_sync_status', 'license', 'listing_status']) {
+    assert.equal(indexPolicy.isSearchIndexEligible({ ...candidate, [field]: 'changed' }), false, `Changed ${field} must revoke editorial eligibility`)
+    assert.equal(indexPolicy.isSearchIndexEligible({ ...candidate, [field]: undefined }), false)
+  }
+  assert.equal(candidate.ai_review_approved, false, 'Editorial discovery must never grant AI approval')
 }
 assert.equal(indexPolicy.SEARCH_INDEX_PUBLICATION_FILTER, 'ai_review_approved.eq.true')
 assert.equal(indexPolicy.isSearchIndexEligible(item('approved')), true)
@@ -147,7 +162,7 @@ assert.ok(useCases.scoreSkillForUseCase(item('cn', { description: '产品视频�
 assert.equal(useCases.scoreSkillForUseCase(item('cpp', { description: 'C++' }), { keywords: ['C++'], featuredSlugs: [] }) > 0, true)
 
 // Every existing Gallery entry is a reference, not a new publication or runtime claim.
-assert.equal(showcase.SHOWCASE_CASES.length, 100)
+assert.equal(showcase.SHOWCASE_CASES.length, 101)
 const originalCatalog = JSON.stringify(showcase.SHOWCASE_CASES)
 for (const example of showcase.SHOWCASE_CASES) {
   for (const locale of ['en', 'zh']) {
@@ -224,4 +239,4 @@ for (const name of ['find_workflows', 'get_workflow']) {
 for (const path of ['app/openapi.json/route.ts', 'app/.well-known/agent-manifest.json/route.ts', 'app/llms.txt/route.ts', 'app/agent/page.tsx']) {
   assert.ok(read(path).includes('/api/agent/showcase'), `${path} advertises the real discovery route`)
 }
-console.log('Growth discovery passed: lossless bounded cache, outage/recovery, SEO predicates, relevance, 100 evidence-linked tasks, JSON/Markdown APIs, MCP contracts and no fabricated installs.')
+console.log('Growth discovery passed: lossless bounded cache, outage/recovery, SEO predicates, relevance, 101 evidence-linked tasks, JSON/Markdown APIs, MCP contracts and no fabricated installs.')

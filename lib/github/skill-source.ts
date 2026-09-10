@@ -476,5 +476,5 @@ export async function fetchSkillVersionEvidence(skill: DiscoveredGitHubSkill, re
       if (!(error instanceof Error) || !error.message.includes('(404)')) throw error
     }
   }
-  return resolveSkillVersion({ ...input, pluginManifests })
+  return resolveSkillVersion({ ...input, pluginManifests, document: skill.document })
 }

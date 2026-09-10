@@ -7,6 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
 import type { OwnerPublicationInput } from '@/lib/skills/owner-publication-schema'
 import { OWNER_PUBLICATION_NOTICE } from '@/lib/skills/publication'
+import { inferEditorialTaxonomy } from '@/lib/skills/editorial-taxonomy'
 
 export class OwnerPublicationError extends Error {
   constructor(message: string, public status: number, public details?: unknown) {
@@ -54,8 +55,7 @@ export async function prepareOwnerPublication(input: OwnerPublicationInput) {
     github_forks: repository.forks,
     github_language: repository.language || null,
     github_last_pushed_at: repository.pushedAt || repository.updatedAt,
-    category: skill.frontmatter.category || 'developer-tools',
-    tags: [...new Set([...skill.frontmatter.tags, 'agent-skill'])].slice(0, 10),
+    ...inferEditorialTaxonomy(skill.frontmatter),
     frameworks: skill.frontmatter.frameworks,
     version: versionEvidence.value || 'Unknown',
     license: skill.frontmatter.license || repository.license || 'Unknown',

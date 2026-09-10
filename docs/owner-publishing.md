@@ -48,9 +48,11 @@ unreviewed whole-repository bulk promotion.
   a revision, old scores are archived, not represented as a score for the new code.
 - Every request records its reason, source, prior review and result atomically in
   an append-only private publication log. No publication if audit persistence fails.
-- Ordinary automated X distribution and search-engine sitemap eligibility retain
-  their existing review requirements. Owner publishing is not automatic promotion
-  as “safe” or “AI approved”. Existing reviewed pages are unchanged.
+- Ordinary automated X distribution retains its existing review requirements.
+  Search-engine eligibility preserves the legacy reviewed-page rules and also
+  permits explicitly curated, version-pinned editorial entries described in
+  `docs/editorial-search-publication.md`. Owner publication alone does not qualify.
+  Search visibility never means “safe”, “AI approved” or permission to auto-install.
 
 If the source later changes, call the channel again to publish the new pinned
 revision. A previously approved revision does not transfer its approval to new code.

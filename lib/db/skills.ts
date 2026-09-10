@@ -8,7 +8,7 @@ import type { Skill } from '@/lib/types'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSearchTerms, normalizeExactSearchQuery } from '@/lib/search-query'
 import { packCacheJson, unpackCacheJson } from '@/lib/cache/packed-json'
-import { SEARCH_INDEX_PUBLICATION_FILTER } from '@/lib/seo/search-indexability'
+import { buildSearchIndexFilter } from '@/lib/seo/search-indexability'
 
 export interface SkillRecord {
   id: string
@@ -369,7 +369,7 @@ const getCachedApprovedSkillSitemapRecords = unstable_cache(
   ): Promise<SkillSitemapRecord[]> => {
     return fetchApprovedSkillSitemapRecords({ offset, limit, minStars, minQualityScore })
   },
-  ['approved-sitemap-records-v11-index-policy'],
+  ['approved-sitemap-records-v12-editorial-policy'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-records'],
@@ -380,7 +380,7 @@ const getCachedApprovedSkillSitemapCount = unstable_cache(
   async (minStars: number, minQualityScore: number): Promise<number> => {
     return fetchApprovedSkillSitemapCount(minStars, minQualityScore)
   },
-  ['approved-sitemap-count-v11-index-policy'],
+  ['approved-sitemap-count-v12-editorial-policy'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-count'],
@@ -410,23 +410,15 @@ async function fetchApprovedSkillSitemapRecords(
     const remaining = options.limit - rows.length
     if (remaining <= 0) break
     const pageSize = Math.min(SKILLS_PAGE_SIZE, remaining)
-    let query = supabase
+    const query = supabase
       .from('skills')
       .select('slug,github_stars,github_last_pushed_at,created_at,updated_at,quality_score,publisher_verified')
-      .or(SEARCH_INDEX_PUBLICATION_FILTER)
+      .or(buildSearchIndexFilter(options.minStars, options.minQualityScore))
       // This matches the public-directory partial index. A sitemap needs a
       // stable complete traversal, not a star-only ranking, and must never
       // force a full-table sort while a crawler is visiting the site.
       .order('quality_score', { ascending: false })
       .order('github_stars', { ascending: false })
-
-    if (options.minStars > 0) {
-      query = query.or(`github_stars.gte.${options.minStars},publisher_verified.eq.true`)
-    }
-
-    if (options.minQualityScore > 0) {
-      query = query.gte('quality_score', options.minQualityScore)
-    }
 
     const { data, error } = await query.range(from, from + pageSize - 1)
 
@@ -451,20 +443,12 @@ async function fetchApprovedSkillSitemapCount(minStars: number, minQualityScore:
 
   // The general registry counter also includes owner/static publications. It
   // cannot count this narrower SEO set, even when no numeric floors are used.
-  let query = supabase
+  const query = supabase
     .from('skills')
     // This result is cached for 12 hours. An exact indexed count prevents the
     // planner estimate from creating empty sitemap shards or hiding valid ones.
     .select('slug', { count: 'exact', head: true })
-    .or(SEARCH_INDEX_PUBLICATION_FILTER)
-
-  if (minStars > 0) {
-    query = query.or(`github_stars.gte.${minStars},publisher_verified.eq.true`)
-  }
-
-  if (minQualityScore > 0) {
-    query = query.gte('quality_score', minQualityScore)
-  }
+    .or(buildSearchIndexFilter(minStars, minQualityScore))
 
   const { count, error } = await query
   if (error) throw error

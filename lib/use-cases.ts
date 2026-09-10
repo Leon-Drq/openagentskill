@@ -234,7 +234,7 @@ export const USE_CASES: UseCaseDefinition[] = [
     description:
       'Find skills for design systems, Figma workflows, UI generation, presentations, image and video production, and creative automation.',
     heroPrompt: 'I need my agent to produce design assets, UI directions, presentations, or creative media workflows.',
-    keywords: ['design', 'figma', 'ui generation', 'ux', 'presentation', 'creative', 'image generation', 'video generation', 'design system'],
+    keywords: ['design', 'figma', 'ui generation', 'ux', 'presentation', 'creative', 'image generation', 'video generation', 'design system', 'poster', 'posters', 'zine', 'risograph'],
     workflows: ['Prepare design assets', 'Generate UI directions', 'Build presentation materials', 'Automate creative production'],
     agentTasks: ['Inspect visual requirements', 'Generate reusable assets', 'Package output for review'],
   },
@@ -409,7 +409,8 @@ function searchableSkillText(skill: SkillRecord) {
   return [
     skill.name,
     skill.description,
-    skill.long_description,
+    // Long instructions often mention installation, browser previews and
+    // reference analysis. Those are not the skill's primary use cases.
     skill.tagline,
     skill.category,
     skill.github_repo,
