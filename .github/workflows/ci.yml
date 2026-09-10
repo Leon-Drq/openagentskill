@@ -56,6 +56,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Run regression and contract tests
         run: pnpm test
+      - name: Verify read-only agent connection and source eligibility
+        run: node --experimental-strip-types scripts/test-agent-connection.mjs
 
   build:
     name: Production build

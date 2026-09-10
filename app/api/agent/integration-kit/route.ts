@@ -29,6 +29,20 @@ Canonical:
 Recommended Flow:
 ${payload.recommended_flow.map((item, index) => `${index + 1}. ${item}`).join('\n')}
 
+Connection Modes:
+- Session (default): ${payload.connection_modes.session}
+- Persistent: ${payload.connection_modes.persistent}
+
+Read-only Connection Check:
+- Requirements: ${payload.self_check.requirements}
+- Script: ${payload.self_check.script_url}
+- Command after inspection: ${payload.self_check.command}
+- ${payload.self_check.instructions}
+- Report separately: ${payload.self_check.expected_checks.join(', ')}
+- Configuration saved: ${payload.self_check.configuration_saved}
+- Client verification: ${payload.self_check.client_verification}
+- On failure: ${payload.self_check.failure_action}
+
 Supported Agents:
 ${payload.supported_agents.map((agent) => `- ${agent.name}: ${agent.surface}
   Resolve: ${agent.resolve_url}
@@ -36,6 +50,8 @@ ${payload.supported_agents.map((agent) => `- ${agent.name}: ${agent.surface}
   Best for: ${agent.best_for.join(', ')}
   Setup:
 ${agent.setup_steps.map((step) => `    - ${step}`).join('\n')}
+  Copy prompt:
+${agent.copy_prompt}
 `).join('\n')}
 
 Stable Response Fields:
