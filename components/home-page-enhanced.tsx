@@ -2,16 +2,16 @@
 
 import { siteCopy, localizeSiteText } from '@/lib/i18n/site-copy'
 
-import { useState, useRef } from 'react'
+import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowRight, ArrowUpRight, Search } from 'lucide-react'
+import { ArrowRight, Search } from 'lucide-react'
 import { HOME_SEARCH_COPY, HOME_SEARCH_EXAMPLES } from '@/lib/i18n/home-search-copy'
 import { AnimatedSearchHint } from './animated-search-hint'
 import { ConnectAiInline } from './connect-ai-inline'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import type { Locale } from '@/lib/i18n/config'
 import { useI18n } from '@/lib/i18n/context'
-import { USE_CASES } from '@/lib/use-cases'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
 import { HomeShowcase } from './showcase-sections'
@@ -57,79 +57,6 @@ interface HomePageEnhancedProps {
   rankingGeneratedAt: string | null
 }
 
-interface ResolveCandidate {
-  rank: number
-  match_score: number
-  skill: {
-    slug: string
-    name: string
-    description: string
-    category: string
-    repository?: string
-    github_repo?: string
-  }
-  recommendation_reasons: string[]
-  audit: {
-    audit_score: number
-    risk_label: string
-    warnings: string[]
-  }
-  safety: {
-    score: number
-    label: string
-    auto_install_allowed: boolean
-    policy_warnings: string[]
-  }
-  decision?: {
-    readiness_score: number
-    readiness_label: string
-    headline: string
-    role: string
-    best_for: string[]
-    risks: string[]
-    next_steps: string[]
-  }
-  install_plan: {
-    target: string
-    label: string
-    value: string
-    command: string
-  }
-  urls: {
-    web: string
-    install_api: string
-    audit: string
-    repository?: string
-  }
-}
-
-interface ResolveResult {
-  task: string
-  selected: ResolveCandidate | null
-  alternatives: ResolveCandidate[]
-  policy_decision: {
-    status: string
-    summary: string
-  }
-  agent_decision?: {
-    install_command: string
-    why_recommended: string[]
-    risk_summary: {
-      level: string
-      safety: string
-      trust: string
-      notes: string[]
-    }
-    agent_next_steps: string[]
-  } | null
-  meta: {
-    total_skills_searched: number
-    total_candidates: number
-  }
-}
-
-const HOME_USE_CASES = USE_CASES.slice(0, 4)
-const DEMO_TASK = 'Scrape competitor pricing pages every week'
 const DEMO_RECOMMENDATIONS = [
   {
     name: 'Crawl4AI',
@@ -770,29 +697,6 @@ const DISCOVERY_COPY: Record<string, {
   },
 }
 
-function formatCompact(value: number) {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
-  if (value >= 10_000) return `${Math.round(value / 1000)}K`
-  if (value >= 1_000) return `${(value / 1000).toFixed(1)}K`
-  return value.toLocaleString()
-}
-
-function getInstallPreview(rec: ResolveCandidate) {
-  const command = rec.install_plan.command?.trim()
-  const value = rec.install_plan.value?.trim()
-  const source = command || value || 'Install instructions available from the skill page.'
-  const maxLength = 96
-
-  return source.length > maxLength ? `${source.slice(0, maxLength - 1).trim()}...` : source
-}
-
-function getInstallKind(rec: ResolveCandidate) {
-  const command = rec.install_plan.command?.trim()
-  const value = rec.install_plan.value?.trim()
-
-  return value && command && value !== command ? 'Agent prompt' : 'Install command'
-}
-
 function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <div className="min-w-0 max-w-3xl">
@@ -812,15 +716,8 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
   const activeLocale = initialLocale || locale
   const [taskQuery, setTaskQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
-  const [isSearching, setIsSearching] = useState(false)
-  const [resolveResult, setResolveResult] = useState<ResolveResult | null>(null)
-  const [searchedCount, setSearchedCount] = useState(0)
-  const [showResults, setShowResults] = useState(false)
-  const [copiedCmd, setCopiedCmd] = useState<string | null>(null)
-  const searchRef = useRef<HTMLDivElement>(null)
-  const resolvedCandidates = resolveResult
-    ? [resolveResult.selected, ...resolveResult.alternatives].filter((item): item is ResolveCandidate => Boolean(item))
-    : []
+  const [isSearching, startTransition] = useTransition()
+  const router = useRouter()
   const copy = HOME_COPY[activeLocale] || HOME_COPY.en
   const searchCopy = HOME_SEARCH_COPY[activeLocale]
   const discoveryCopy = DISCOVERY_COPY[activeLocale] || DISCOVERY_COPY.en
@@ -838,49 +735,12 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
     [stats.evidenceExact ? stats.provenSkills.toLocaleString() : 'OpenAPI', stats.evidenceExact ? copy.stats[3] : discoveryCopy.machineContract],
   ]
 
-  const runRecommendation = async (query: string) => {
-    const normalizedQuery = query.trim()
-    if (!normalizedQuery || isSearching) return
-    setTaskQuery(normalizedQuery)
-    setIsSearching(true)
-    setShowResults(true)
-    setResolveResult(null)
-    searchRef.current?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' })
-    try {
-      const res = await fetch('/api/agent/resolve', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          task: normalizedQuery,
-          agent: 'codex',
-          limit: 3,
-          constraints: {
-            max_risk: 'medium',
-            needs_install_command: true,
-          },
-        }),
-      })
-      if (!res.ok) throw new Error('Resolve request failed')
-      const data = (await res.json()) as ResolveResult
-      setResolveResult(data)
-      setSearchedCount(data.meta?.total_skills_searched || 0)
-    } catch {
-      setResolveResult(null)
-      setSearchedCount(0)
-    } finally {
-      setIsSearching(false)
-    }
+  const handleFindSkills = () => {
+    const task = taskQuery.trim()
+    if (!task || isSearching) return
+    startTransition(() => router.push(getLocalizedNavigationHref(`/resolve?task=${encodeURIComponent(task)}`, activeLocale)))
   }
 
-  const handleFindSkills = async () => {
-    await runRecommendation(taskQuery)
-  }
-
-  const copyToClipboard = (cmd: string) => {
-    navigator.clipboard.writeText(cmd)
-    setCopiedCmd(cmd)
-    setTimeout(() => setCopiedCmd(null), 2000)
-  }
 
   return (
     <div className="min-h-screen bg-[#fbfaf6] text-[#1d1b18]">
@@ -1048,203 +908,6 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
           ) : (
             <div className="mt-6 rounded-[10px] border border-dashed border-[#d8d2c6] bg-[#fffdf8] p-6 text-sm leading-relaxed text-[#5f5a52]">{siteCopy(locale, "The first daily leaderboard snapshot is being generated. Browse the live rankings while the scheduled snapshot is prepared.")}</div>
           )}
-        </div>
-      </section>
-
-      <section
-        ref={searchRef}
-        id="task-search"
-        className="relative scroll-mt-24 overflow-hidden border-b border-[#e4e0d8] px-6 py-14 md:py-16"
-      >
-        <div
-          className="pointer-events-none absolute inset-0 z-0 opacity-50"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(29,27,24,0.10) 1px, transparent 0)',
-            backgroundSize: '18px 18px',
-          }}
-        />
-        <div className="relative z-10 mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.42fr_0.58fr] lg:items-start">
-          <div>
-            <SectionHeading
-              eyebrow={copy.taskEyebrow}
-              title={copy.taskTitle}
-            />
-            <p className="mt-4 max-w-md text-sm leading-relaxed text-[#5f5a52] sm:text-base">
-              {copy.taskIntro}
-            </p>
-            <Link href={getLocalizedNavigationHref('/api-docs', activeLocale)} className="mt-3 inline-flex items-center gap-2 text-sm text-[#006b4f] hover:underline underline-offset-4">
-              {copy.registryApi}<ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-            </Link>
-            <div className="mt-6 flex flex-wrap gap-2">
-              {HOME_USE_CASES.slice(0, 4).map((useCase) => (
-                <button
-                  key={useCase.slug}
-                  type="button"
-                  onClick={() => runRecommendation(useCase.heroPrompt)}
-                  className="rounded-full border border-[#d8d2c6] bg-[#fffdf8]/80 px-3 py-1.5 text-xs font-medium text-[#5f5a52] transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
-                >
-                  {localizeSiteText(locale, useCase.shortTitle)}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="min-w-0 overflow-hidden rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8]/92 shadow-[0_18px_55px_rgba(29,27,24,0.05)]">
-            <div className="border-b border-[#e4e0d8] p-4 sm:p-5">
-              <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">
-                {copy.taskLabel}
-              </p>
-              <p className="mt-3 text-base leading-relaxed text-[#5f5a52]">{showResults ? taskQuery : copy.taskPlaceholder}</p>
-              {showResults && <a href="#hero-task-query" className="mt-3 inline-block text-sm text-[#006b4f] underline underline-offset-4">{searchCopy.placeholder.replace('…', '')}</a>}
-              <button
-                type="button"
-                onClick={() => runRecommendation(DEMO_TASK)}
-                className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-[#006b4f] transition-opacity hover:opacity-75"
-              >
-                {copy.demoTask}
-                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-              </button>
-            </div>
-
-            {showResults ? (
-              <div aria-live="polite" aria-busy={isSearching}>
-                <div className="flex flex-col gap-2 border-b border-[#e4e0d8] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-                  <div>
-                    <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">{copy.selectedPlan}</p>
-                    <h3 className="mt-1 text-xl font-semibold">
-                      {isSearching
-                        ? copy.reviewing
-                        : resolvedCandidates[0]
-                          ? `${copy.startWith} ${resolvedCandidates[0].skill.name}`
-                          : copy.noReliableMatch}
-                    </h3>
-                    {!isSearching && resolveResult?.policy_decision.summary && (
-                      <p className="mt-1 max-w-xl text-xs leading-relaxed text-[#6d675e]">
-                        {resolveResult.policy_decision.summary}
-                      </p>
-                    )}
-                  </div>
-                  {!isSearching && searchedCount > 0 && (
-                    <div className="rounded-full border border-[#d8d2c6] px-3 py-1.5 font-mono text-xs text-[#6d675e]">
-                      {copy.searchedPrefix} {formatCompact(searchedCount)} {copy.searchedSuffix}
-                    </div>
-                  )}
-                </div>
-
-                {isSearching ? (
-                  <div className="px-5 py-10 text-center text-sm text-[#5f5a52]">
-                    <span className="inline-block animate-pulse">{'>'} {t.hero.searching}</span>
-                  </div>
-                ) : resolvedCandidates.length > 0 ? (
-                  <div className="grid gap-px bg-[#e4e0d8] lg:grid-cols-2 2xl:grid-cols-3">
-                    {resolvedCandidates.slice(0, 3).map((rec, i) => {
-                      const fullInstall = rec.install_plan.value || rec.install_plan.command || getInstallPreview(rec)
-                      const installPreview = getInstallPreview(rec)
-                      const installKind = getInstallKind(rec)
-
-                      return (
-                        <div
-                          key={rec.skill.slug}
-                          className={`flex min-w-0 flex-col bg-[#fffdf8] p-4 sm:p-5 ${i === 2 ? 'lg:col-span-2 2xl:col-span-1' : ''}`}
-                        >
-                          <div className="mb-3 flex flex-wrap items-center gap-2">
-                            <span className="rounded-full bg-[#e8f1ed] px-2 py-1 font-mono text-[11px] font-semibold text-[#006b4f]">
-                              {i === 0 ? copy.selected : `#${rec.rank}`}
-                            </span>
-                            <span className="rounded-full border border-[#d8d2c6] px-2 py-1 font-mono text-[11px] text-[#6d675e]">
-                              {Math.min(99, Math.max(1, Math.round(Number(rec.match_score || 0))))}% {copy.fit}
-                            </span>
-                            <span className="rounded-full border border-[#d8d2c6] px-2 py-1 font-mono text-[11px] text-[#6d675e]">
-                              {copy.safety} {rec.safety.score}
-                            </span>
-                          </div>
-                          <Link href={getLocalizedNavigationHref(`/skills/${rec.skill.slug}`, locale)} className="text-lg font-semibold hover:text-[#006b4f]">
-                            {rec.skill.name}
-                          </Link>
-                          <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[#5f5a52]">
-                            {rec.decision?.headline || rec.recommendation_reasons[0] || rec.skill.description}
-                          </p>
-                          <div className="mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-[8px] border border-[#e0dbd2] bg-[#e0dbd2] text-center">
-                            <div className="bg-[#fbfaf6] p-2">
-                              <p className="font-mono text-[11px] text-[#6d675e]">{copy.audit}</p>
-                              <p className="mt-1 font-mono text-sm font-semibold text-[#1d1b18]">{rec.audit.audit_score}/100</p>
-                            </div>
-                            <div className="min-w-0 bg-[#fbfaf6] p-2">
-                              <p className="font-mono text-[11px] text-[#6d675e]">{copy.target}</p>
-                              <p className="mt-1 min-w-0 truncate font-mono text-xs font-semibold text-[#1d1b18] sm:text-sm">{rec.install_plan.label}</p>
-                            </div>
-                          </div>
-                          <div className="mt-4 rounded-[8px] border border-[#e0dbd2] bg-[#fbfaf6] p-3">
-                            <div className="mb-2 flex min-w-0 items-center justify-between gap-2">
-                              <span className="min-w-0 truncate font-mono text-[10px] uppercase tracking-[0.16em] text-[#6d675e]">
-                                {installKind}
-                              </span>
-                              <span className="shrink-0 rounded-full border border-[#d8d2c6] px-2 py-0.5 font-mono text-[10px] text-[#6d675e]">
-                                Ready
-                              </span>
-                            </div>
-                            <code
-                              className="block min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[11px] leading-5 text-[#5f5a52]"
-                              title={fullInstall}
-                            >
-                              {installPreview}
-                            </code>
-                          </div>
-                          {i === 0 && resolveResult?.agent_decision?.risk_summary && (
-                            <div className="mt-3 rounded-[8px] border border-[#e0dbd2] bg-[#fbfaf6] p-3">
-                              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6d675e]">{siteCopy(locale, "Risk summary")}</p>
-                              <p className="mt-1 text-xs leading-relaxed text-[#5f5a52]">
-                                {resolveResult.agent_decision.risk_summary.safety} · {resolveResult.agent_decision.risk_summary.trust}
-                              </p>
-                              {resolveResult.agent_decision.risk_summary.notes[0] && (
-                                <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[#5f5a52]">
-                                  {resolveResult.agent_decision.risk_summary.notes[0]}
-                                </p>
-                              )}
-                            </div>
-                          )}
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            <button
-                              onClick={() => copyToClipboard(fullInstall)}
-                              className="min-h-10 flex-1 basis-[96px] rounded-[8px] bg-[#1d1b18] px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-85"
-                            >
-                              {copiedCmd === fullInstall ? copy.copied : copy.copyInstall}
-                            </button>
-                            <Link
-                              href={rec.urls.install_api || `/api/skills/${rec.skill.slug}/install`}
-                              className="flex min-h-10 flex-1 basis-[96px] items-center justify-center rounded-[8px] border border-[#d8d2c6] px-3 py-2 text-center text-xs font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
-                            >
-                              {copy.installApi}
-                            </Link>
-                            <Link
-                              href={getLocalizedNavigationHref(`/skills/${rec.skill.slug}`, locale)}
-                              className="flex min-h-10 flex-1 basis-[96px] items-center justify-center rounded-[8px] border border-[#d8d2c6] px-3 py-2 text-center text-xs font-semibold transition-colors hover:border-[#006b4f] hover:text-[#006b4f]"
-                            >
-                              {copy.details}
-                            </Link>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                ) : (
-                  <div className="px-5 py-8 text-center text-sm text-[#5f5a52]">
-                    {t.hero.noResults}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="grid gap-px bg-[#e4e0d8] sm:grid-cols-3">
-                {copy.trustSignals.map(([label, value, signalCopy]) => (
-                  <div key={label} className="bg-[#fffdf8] p-4">
-                    <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#6d675e]">{label}</p>
-                    <p className="mt-2 font-mono text-sm font-semibold text-[#006b4f]">{value}</p>
-                    <p className="mt-1 text-xs leading-relaxed text-[#5f5a52]">{signalCopy}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </section>
 

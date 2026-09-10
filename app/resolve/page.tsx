@@ -1,348 +1,43 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import { AgentResolveWorkbench } from '@/components/agent-resolve-workbench'
-import {
-  MarketingFeatureGrid,
-  MarketingHero,
-  MarketingMetricStrip,
-  MarketingPageShell,
-} from '@/components/marketing-page'
-import { resolveAgentSkill } from '@/lib/agent-resolve'
+import { MarketingPageShell } from '@/components/marketing-page'
+import { ResolveResults } from '@/components/resolve-results'
+import { isLocale } from '@/lib/i18n/config'
 
-type ResolveResult = Awaited<ReturnType<typeof resolveAgentSkill>>
+type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> }
+const one = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value) || ''
 
-export const metadata: Metadata = {
-  title: 'Resolve AI Agent Tasks into Skills',
-  description:
-    'Describe a task and let OpenAgentSkill recommend the right reusable AI agent skill with install command, Trust Score, audit notes, safety gate, and alternatives.',
-  alternates: {
-    canonical: 'https://www.openagentskill.com/resolve',
-  },
-  openGraph: {
-    title: 'Resolve AI Agent Tasks into Skills - OpenAgentSkill',
-    description:
-      'Turn a task into one safe skill plan: recommended skill, alternatives, install command, trust score, audit notes, and safety policy.',
-    url: 'https://www.openagentskill.com/resolve',
-    type: 'website',
-  },
-}
-
-const capabilities = [
-  {
-    label: 'Task fit',
-    title: 'Matches the job your agent needs to do',
-    copy: 'Searches scenario, tags, repository metadata, category, and use-case signals before choosing a skill.',
-  },
-  {
-    label: 'Trust',
-    title: 'Ranks by quality, adoption, and maintenance',
-    copy: 'Combines GitHub stars, freshness, license clarity, install readiness, and OpenAgentSkill Trust Score.',
-  },
-  {
-    label: 'Agent Proven',
-    title: 'Uses real run outcomes when available',
-    copy: 'Surfaces reported success, recent failures, install success, output quality, and production-use signals.',
-  },
-  {
-    label: 'Install',
-    title: 'Returns agent-ready handoffs',
-    copy: 'Provides CLI command, target agent prompt, detail page, audit page, and safer next steps.',
-  },
-]
-
-function normalizeRisk(value: string | undefined) {
-  return value === 'low' || value === 'medium' || value === 'high' ? value : 'medium'
-}
-
-function normalizeParam(value: string | string[] | undefined) {
-  if (Array.isArray(value)) return value[0] || ''
-  return value || ''
-}
-
-function ResolveDecisionCard({ result }: { result: ResolveResult }) {
-  const recommendation = result.recommendation
-  const selected = result.selected
-  const receipt = result.install_receipt
-  const trust = recommendation?.trust_score_v5 || recommendation?.trust_score_v4 || recommendation?.trust_score_v3 || recommendation?.trust_score_v2
-  if (!recommendation || !selected) return null
-
-  const agentProven = selected.agent_proven
-  const outcomeSummary = agentProven?.metrics.totalOutcomes
-    ? `${agentProven.score}/100 Agent Proven`
-    : 'Needs first agent outcome'
-
-  return (
-    <section className="border-b border-border bg-card/45">
-      <div className="mx-auto max-w-6xl px-6 py-8 sm:py-10">
-        <div className="overflow-hidden rounded-[10px] border border-border bg-background shadow-[0_20px_60px_rgba(22,20,16,0.05)]">
-          <div className="grid gap-px bg-border lg:grid-cols-[1.2fr_0.8fr]">
-            <div className="bg-background p-5 sm:p-7">
-              <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Resolved decision</p>
-              <h2 className="mt-4 max-w-3xl font-display text-3xl font-normal leading-tight sm:text-4xl">
-                {recommendation.best_skill.name}
-              </h2>
-              <p className="mt-4 max-w-3xl text-sm leading-6 text-secondary">
-                {recommendation.best_skill.description}
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {[
-	                  `${selected.match_score}/100 task fit`,
-	                  outcomeSummary,
-	                  `${trust?.score ?? '—'}/100 Trust`,
-	                  `${selected.audit.audit_score}/100 audit`,
-	                ].map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-[999px] border border-border bg-card px-3 py-1 font-mono text-[11px] text-secondary"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
-                <div>
-                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Install</p>
-                  <code className="mt-3 block break-words rounded-[8px] border border-border bg-card p-3 font-mono text-xs leading-5 [overflow-wrap:anywhere]">
-                    {recommendation.install.command}
-                  </code>
-                </div>
-                <div>
-                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Safety gate</p>
-                  <div className="mt-3 rounded-[8px] border border-border bg-card p-3 text-sm leading-6 text-secondary">
-                    <strong className="text-foreground">{recommendation.safety_gate.label}</strong>
-                    <br />
-                    {recommendation.safety_gate.recommended_action}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link
-                  href={`/skills/${recommendation.best_skill.slug}`}
-                  className="rounded-[8px] bg-[#006b4f] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                >
-                  Open skill
-                </Link>
-                <Link
-                  href={`/skills/${recommendation.best_skill.slug}/audit`}
-                  className="rounded-[8px] border border-border px-4 py-2 text-sm font-semibold transition-colors hover:border-foreground/50"
-                >
-                  Audit page
-                </Link>
-                <Link
-                  href={`/api/agent/resolve?task=${encodeURIComponent(result.task)}&agent=${encodeURIComponent(result.agent)}&max_risk=${encodeURIComponent(result.constraints.max_risk || 'medium')}&format=text`}
-                  prefetch={false}
-                  className="rounded-[8px] border border-border px-4 py-2 text-sm font-semibold transition-colors hover:border-foreground/50"
-                >
-                  Text API
-                </Link>
-                {receipt ? (
-                  <Link
-                    href={`/api/agent/receipt?task=${encodeURIComponent(result.task)}&agent=${encodeURIComponent(result.agent)}&max_risk=${encodeURIComponent(result.constraints.max_risk || 'medium')}&format=text`}
-                    prefetch={false}
-                    className="rounded-[8px] border border-border px-4 py-2 text-sm font-semibold transition-colors hover:border-foreground/50"
-                  >
-                    Install receipt
-                  </Link>
-                ) : null}
-              </div>
-            </div>
-
-            <aside className="bg-[#fbfaf7] p-5 sm:p-7">
-              <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Why this pick</p>
-              <ul className="mt-4 space-y-3">
-                {recommendation.why_recommended.slice(0, 5).map((reason) => (
-                  <li key={reason} className="border-b border-border pb-3 text-sm leading-6 text-secondary last:border-b-0">
-                    {reason}
-                  </li>
-                ))}
-              </ul>
-	              <div className="mt-6 rounded-[8px] border border-border bg-background p-4">
-	                <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Agent Proven</p>
-	                <div className="mt-3 grid grid-cols-3 gap-px border border-border bg-border text-center">
-	                  {[
-	                    ['Score', agentProven ? agentProven.score : '—'],
-	                    ['Runs', agentProven ? agentProven.metrics.totalOutcomes : 0],
-	                    ['Success', agentProven?.metrics.successRate === null || agentProven?.metrics.successRate === undefined ? 'No data' : `${Math.round(agentProven.metrics.successRate)}%`],
-	                  ].map(([label, value]) => (
-	                    <div key={label} className="bg-card p-2.5">
-	                      <div className="font-mono text-base text-foreground">{value}</div>
-	                      <div className="mt-1 font-mono text-[9px] uppercase tracking-[0.14em] text-secondary">{label}</div>
-	                    </div>
-	                  ))}
-	                </div>
-	                <p className="mt-3 text-sm leading-6 text-secondary">
-	                  {agentProven?.summary || 'No reported agent outcomes yet. Run in a sandbox and report the result to improve future rankings.'}
-	                </p>
-	              </div>
-
-	              <div className="mt-4 rounded-[8px] border border-border bg-background p-4">
-	                <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Receipt + outcome loop</p>
-	                <p className="mt-2 text-sm leading-6 text-secondary">
-                  {receipt
-                    ? `Use receipt ${receipt.receipt_id} as the stable install handoff, then report one narrow run so rankings learn from real use.`
-                    : 'After one narrow run, report the result so Trust Score v5 and Agent-Proven rankings learn from real use.'}
-                </p>
-                {result.feedback?.cli_example ? (
-                  <code className="mt-3 block break-words font-mono text-[11px] leading-5 text-secondary [overflow-wrap:anywhere]">
-                    {result.feedback.cli_example}
-                  </code>
-                ) : null}
-              </div>
-            </aside>
-          </div>
-
-          <div className="border-t border-border bg-card/55 p-5 sm:p-7">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Ranked shortlist</p>
-                <h3 className="mt-2 font-display text-2xl font-normal">Compare the next-best qualified skills</h3>
-              </div>
-              <span className="font-mono text-xs text-secondary">
-                1 best match + {recommendation.alternatives.length} alternative{recommendation.alternatives.length === 1 ? '' : 's'}
-              </span>
-            </div>
-
-            {recommendation.alternatives.length > 0 ? (
-              <div className="mt-5 grid gap-3 md:grid-cols-2">
-                {recommendation.alternatives.slice(0, 4).map((item, index) => (
-                  <Link
-                    key={item.slug}
-                    href={item.url}
-                    className="group border border-border bg-background p-4 transition-colors hover:border-foreground/45"
-                  >
-                    <div className="flex items-start gap-3">
-                      <span className="font-mono text-xs text-secondary">#{index + 2}</span>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-start justify-between gap-3">
-                          <h4 className="break-words font-display text-lg font-normal [overflow-wrap:anywhere] group-hover:underline">
-                            {item.name}
-                          </h4>
-                          <span className="shrink-0 font-mono text-xs text-secondary">Trust {item.trust_score}</span>
-                        </div>
-                        <p className="mt-2 line-clamp-2 text-sm leading-6 text-secondary">{item.why_consider}</p>
-                        <div className="mt-3 flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-secondary">
-                          <span>Audit {item.audit_score}</span>
-                          <span aria-hidden="true">·</span>
-                          <span>Safety {item.safety_score}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-4 border border-border bg-background p-4 text-sm leading-6 text-secondary">
-                No close alternative passed the current task-fit and safety thresholds. The resolver is intentionally returning one qualified match instead of padding the list with unrelated skills.
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-export default async function ResolvePage({
-  searchParams,
-}: {
-  searchParams: Promise<{
-    task?: string | string[]
-    agent?: string | string[]
-    max_risk?: string | string[]
-    min_stars?: string | string[]
-    live?: string | string[]
-  }>
-}) {
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const params = await searchParams
-  const initialTask = normalizeParam(params.task)
-  const initialAgent = normalizeParam(params.agent) || 'codex'
-  const maxRisk = normalizeRisk(normalizeParam(params.max_risk))
-  const minStars = Number(normalizeParam(params.min_stars) || 0)
-  const live = normalizeParam(params.live) !== 'false'
-  const initialResult = initialTask
-    ? await resolveAgentSkill({
-        task: initialTask,
-        agent: initialAgent,
-        constraints: {
-          max_risk: maxRisk,
-          needs_install_command: true,
-          min_stars: Number.isFinite(minStars) ? minStars : 0,
-        },
-        live,
-      }).catch(() => null)
-    : null
-
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: 'OpenAgentSkill Resolve',
-    applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'Web',
-    url: 'https://www.openagentskill.com/resolve',
-    description:
-      'Resolve AI agent tasks into reusable skills with Trust Score, audit notes, alternatives, and install commands.',
+  const hasQuery = Boolean(one(params.task).trim())
+  return {
+    title: 'Resolve AI Agent Tasks into Skills',
+    description: 'Describe a task and let OpenAgentSkill recommend the right reusable AI agent skill with install command, Trust Score, audit notes, safety gate, and alternatives.',
+    alternates: { canonical: 'https://www.openagentskill.com/resolve' },
+    robots: { index: !hasQuery, follow: true },
+    openGraph: {
+      title: 'Resolve AI Agent Tasks into Skills - OpenAgentSkill',
+      description: 'Find reusable skills for your task. Review source evidence, compare alternatives, and bring a skill to your AI.',
+      url: 'https://www.openagentskill.com/resolve',
+      type: 'website',
+    },
   }
+}
 
-  return (
-    <MarketingPageShell>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
-      <MarketingHero
-        eyebrow="Agent skill resolver"
-        title="Describe the task. Get the right reusable skill."
-        description={
-          <>
-            OpenAgentSkill turns vague agent work into a concrete install plan: recommended skill, alternatives,
-            Trust Score, audit notes, safety policy, and target-specific handoff.
-          </>
-        }
-	        aside={
-	          <MarketingMetricStrip
-	            columns="grid-cols-3"
-	            items={[
-	              { value: '1 + 4', label: 'Ranked skills' },
-	              { value: 'Score', label: 'Agent Proven' },
-	              { value: 'Receipt', label: 'Install handoff' },
-	            ]}
-	          />
-	        }
-      />
-
-        {initialResult ? <ResolveDecisionCard result={initialResult} /> : null}
-
-        <section className="border-b border-border bg-card/35">
-          <div className="mx-auto max-w-6xl px-6 py-10">
-	            <MarketingFeatureGrid items={capabilities} columns="md:grid-cols-2 lg:grid-cols-4" />
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
-          <AgentResolveWorkbench initialTask={initialTask} initialLive={live} />
-        </section>
-
-        <section className="border-t border-border">
-          <div className="mx-auto grid max-w-6xl gap-6 px-6 py-10 md:grid-cols-3">
-            <Link href="/api/agent/resolve?task=analyze%20stock%20news&format=text" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground/40">
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Plain text API</p>
-              <h2 className="mt-3 font-display text-xl font-normal">Agent-readable response</h2>
-              <p className="mt-3 text-sm leading-6 text-secondary">Use text output when an agent or CLI needs the decision without rendering JSON.</p>
-            </Link>
-            <Link href="/api-docs#agent-resolve" className="border border-border bg-card p-5 transition-colors hover:border-foreground/40">
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Schema</p>
-              <h2 className="mt-3 font-display text-xl font-normal">OpenAPI contract</h2>
-              <p className="mt-3 text-sm leading-6 text-secondary">Inspect request parameters, response fields, and recommended integration flow.</p>
-            </Link>
-            <Link href="/skills?trust=production" className="border border-border bg-card p-5 transition-colors hover:border-foreground/40">
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-secondary">Human browse</p>
-              <h2 className="mt-3 font-display text-xl font-normal">Review the registry</h2>
-              <p className="mt-3 text-sm leading-6 text-secondary">Browse production candidates with the same trust, safety, and supply signals.</p>
-            </Link>
-          </div>
-        </section>
-    </MarketingPageShell>
-  )
+export default async function ResolvePage({ searchParams }: Props) {
+  const params = await searchParams
+  const task = one(params.task).trim().slice(0, 2000)
+  const requestedAgent = one(params.agent)
+  const agent = ['codex', 'claude-code', 'cursor'].includes(requestedAgent) ? requestedAgent : 'auto'
+  const risk = one(params.max_risk) === 'low' ? 'low' : 'medium'
+  const minStars = Math.max(0, Math.min(1000000, Number(one(params.min_stars)) || 0))
+  const language = one(params.lang)
+  return <MarketingPageShell>
+    {!task && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+      '@context': 'https://schema.org', '@type': 'WebApplication', name: 'OpenAgentSkill Resolve',
+      applicationCategory: 'DeveloperApplication', operatingSystem: 'Web',
+      url: 'https://www.openagentskill.com/resolve',
+      description: 'Resolve AI agent tasks into reusable skills with source evidence, audit notes, alternatives, and install guidance.',
+    }) }} />}
+    <ResolveResults key={JSON.stringify([task, agent, risk, minStars, language])} task={task} agent={agent} risk={risk} minStars={minStars} initialLocale={isLocale(language) ? language : undefined} />
+  </MarketingPageShell>
 }

@@ -989,6 +989,8 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     meta: {
       endpoint: '/api/agent/resolve',
       api_version: '2.0',
+      registry_status: useLiveRegistry && ![...qualityPool, ...queryPool].some((skill) => skill.submission_source !== 'curated_snapshot')
+        ? 'snapshot_only' : useLiveRegistry ? 'live_pool' : 'offline_snapshot',
       generated_at: generatedAt,
       total_skills_searched: skills.length,
       total_candidates: candidates.length,
