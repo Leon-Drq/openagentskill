@@ -13,6 +13,7 @@ import {
 import { getLocalizedCoreLanguageAlternates } from '@/lib/seo/localized-pages'
 import { getSearchMetadataCopy } from '@/lib/seo/search-metadata'
 import SkillsPage from '@/app/skills/page'
+import ResolvePage from '@/app/resolve/page'
 
 const SITE_URL = 'https://www.openagentskill.com'
 
@@ -110,6 +111,10 @@ export default async function LocalizedCoreRoutePage({
   // This route retains its own existing localized metadata and canonical URL.
   if (route.page === 'skills') {
     return <SkillsPage searchParams={Promise.resolve({ ...resolvedSearchParams, lang: route.locale })} />
+  }
+
+  if (route.page === 'resolve') {
+    return <ResolvePage searchParams={Promise.resolve({ ...resolvedSearchParams, lang: route.locale })} />
   }
 
   const queryValue = resolvedSearchParams.q
