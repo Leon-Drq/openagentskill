@@ -86,7 +86,7 @@ export const SHOWCASE_CREATORS: ShowcaseCreator[] = [
 ]
 
 export const SHOWCASE_SKILLS: ShowcaseSkill[] = [
-  { slug: 'liamgvchi-gc-minimal-zine-poster', name: 'GC Minimal Zine Poster', creatorId: 'liamgvchi', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
+  { slug: 'liamgvchi-gc-minimal-zine-poster-v0-3', name: 'GC Minimal Zine Poster', creatorId: 'liamgvchi', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
   { slug: 'yanliudesign-mono-color-skill', name: 'mono-color', creatorId: 'yanliudesign', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
   { slug: 'design-taste-frontend', name: 'Taste Skill', creatorId: 'leonxlnx', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
   { slug: 'op7418-guizang-ppt-skill', name: 'Guizang PPT Skill', creatorId: 'op7418', access: 'open-source', sourceLicense: 'AGPL-3.0', listingIds: [] },
@@ -231,7 +231,7 @@ const voxBase = {
 
 const INITIAL_SHOWCASE_CASES: ShowcaseCase[] = [
   {
-    slug: 'gc-minimal-zine-posters', skillSlug: 'liamgvchi-gc-minimal-zine-poster', category: 'image',
+    slug: 'gc-minimal-zine-posters', skillSlug: 'liamgvchi-gc-minimal-zine-poster-v0-3', category: 'image',
     title: tx('GC Minimal Zine Poster: three quiet studies', 'GC Minimal Zine Poster：三张安静的海报'),
     description: tx('A blue doorway, a yellow stair and a red shore: three author-made posters using paper texture, restrained type and generous negative space.', '蓝色的门、黄色的阶梯与红色的海岸：作者以纸张纹理、克制文字和大面积留白完成的三张海报。'),
     input: tx('A short theme, a sentence or a supplied photograph; the original inputs for these three author examples are not published.', '输入简短主题、一句话或用户照片；作者未公开这三张案例的原始输入。'),

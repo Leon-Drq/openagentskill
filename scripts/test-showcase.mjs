@@ -30,7 +30,7 @@ const zine = getShowcaseCase('gc-minimal-zine-posters')
 assert.equal(zine.provenance, 'author')
 assert.equal(zine.promptKind, 'suggested')
 assert.equal(zine.media.length, 3)
-assert.equal(zine.skillSlug, 'liamgvchi-gc-minimal-zine-poster')
+assert.equal(zine.skillSlug, 'liamgvchi-gc-minimal-zine-poster-v0-3')
 assert.equal(zine.sourceRevision, 'ddb0d66b24a94f9c4fdd1f02835a836a2db3774e')
 
 for (const item of SHOWCASE_CASES) {

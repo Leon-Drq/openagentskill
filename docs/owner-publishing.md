@@ -57,6 +57,13 @@ unreviewed whole-repository bulk promotion.
 If the source later changes, call the channel again to publish the new pinned
 revision. A previously approved revision does not transfer its approval to new code.
 
+Exact pinned path/hash identities take precedence over old repository-only rows.
+Refreshing metadata on the exact same revision preserves the actual review state
+and scores; changing the revision still clears approval and archives its history.
+An existing public content-hash owner is returned as a duplicate rather than
+overwriting another record. Legacy URLs can use the application alias map and a
+permanent redirect; history and submission records are never deleted for this.
+
 ## Permissions and operation
 
 `POST /api/admin/skills/publish` requires the dedicated bearer token, a reason of

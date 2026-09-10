@@ -32,7 +32,8 @@ export function getEditorialSearchProfile(skill: Partial<SearchIndexCandidate>) 
 export function buildSearchIndexFilter(minStars = SEARCH_INDEX_MIN_GITHUB_STARS, minQuality = SEARCH_INDEX_MIN_QUALITY_SCORE) {
   const stars = Math.max(0, Math.floor(Number.isFinite(minStars) ? minStars : SEARCH_INDEX_MIN_GITHUB_STARS))
   const quality = Math.max(0, Math.floor(Number.isFinite(minQuality) ? minQuality : SEARCH_INDEX_MIN_QUALITY_SCORE))
-  const legacy = [SEARCH_INDEX_PUBLICATION_FILTER, ...(quality ? [`quality_score.gte.${quality}`] : []), ...(stars ? [`or(github_stars.gte.${stars},publisher_verified.eq.true)`] : [])]
+  const aliases = editorialEntries.flatMap(entry => entry.aliases)
+  const legacy = [SEARCH_INDEX_PUBLICATION_FILTER, ...(quality ? [`quality_score.gte.${quality}`] : []), ...(stars ? [`or(github_stars.gte.${stars},publisher_verified.eq.true)`] : []), ...(aliases.length ? [`slug.not.in.(${aliases.join(',')})`] : [])]
   const editorial = editorialEntries.map(entry => `and(slug.eq.${entry.slug},github_repo.eq.${entry.repository},source_path.eq.${entry.path},source_commit_sha.eq.${entry.commit},source_content_hash.eq.${entry.hash},license.eq.${entry.license},source_sync_status.eq.current,listing_status.in.(owner_published,static_checked,reviewed))`)
   return [`and(${legacy.join(',')})`, ...editorial].join(',')
 }
@@ -46,6 +47,7 @@ export interface SearchEvidenceProfile {
 }
 
 export function isSearchIndexEligible(skill: SearchIndexCandidate) {
+  if (editorialEntries.some(entry => entry.aliases.includes(skill.slug || ''))) return false
   if (getEditorialSearchProfile(skill)) return true
   return (
     skill.ai_review_approved === true &&

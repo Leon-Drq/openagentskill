@@ -132,9 +132,14 @@ for (const query of operations) {
   assert.ok(query.some(op => op[0] === 'or' && op[1] === indexPolicy.buildSearchIndexFilter(3, 50)))
   assert.ok(!query.some(op => op[0] === 'gte' && op[1] === 'quality_score'), 'Editorial eligibility is separate from model scores')
 }
-assert.ok(indexPolicy.buildSearchIndexFilter().includes('and(ai_review_approved.eq.true,quality_score.gte.50,or(github_stars.gte.3,publisher_verified.eq.true))'))
+assert.ok(indexPolicy.buildSearchIndexFilter().includes('and(ai_review_approved.eq.true,quality_score.gte.50,or(github_stars.gte.3,publisher_verified.eq.true),'))
 const editorialEntries = JSON.parse(read('lib/seo/editorial-index.json'))
 for (const entry of editorialEntries) {
+  for (const alias of entry.aliases) {
+    assert.match(alias, /^[a-z0-9-]+$/)
+    assert.equal(indexPolicy.isSearchIndexEligible(item(alias)), false, 'Redirecting aliases must not be in the sitemap')
+    assert.ok(read('lib/skill-fallbacks.ts').includes(`'${alias}': '${entry.slug}'`))
+  }
   for (const field of ['slug', 'repository', 'path', 'license']) assert.match(entry[field], /^[\w./-]+$/, 'Filter values must not contain PostgREST operators')
   assert.match(entry.commit, /^[a-f0-9]{40}$/)
   assert.match(entry.hash, /^[a-f0-9]{64}$/)

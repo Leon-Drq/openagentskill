@@ -3,6 +3,7 @@ import { withTimeout } from '@/lib/async'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 
 const SLUG_ALIASES: Record<string, string> = {
+  'liamgvchi-gc-minimal-zine-poster': 'liamgvchi-gc-minimal-zine-poster-v0-3',
   crawl4ai: 'crawl4ai',
   'crawl-4-ai': 'crawl4ai',
   serenity: 'serenity-skill',
