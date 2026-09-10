@@ -53,7 +53,14 @@ function setupPrompt(agent: AgentIntegrationId, agentName: string) {
 
   return [
     `You are using OpenAgentSkill as the skill resolution layer for ${agentName}.`,
+    'Default to this conversation only: do not change project instructions, global configuration, or install packages.',
+    `Read ${SITE_URL}/connect-check.mjs and, if Node.js 18+ is available and execution is authorized, run the inspected read-only check. Alternatively perform its documented HTTP/MCP requests with your existing tools.`,
+    'Report API accessibility, MCP tool availability, and search success separately. Configuration saved remains not_verified unless you actually saved and reloaded the client configuration with user approval.',
+    'For persistent MCP setup, request approval first, add https://www.openagentskill.com/api/mcp using the client supported remote HTTP MCP settings, preserve all existing servers, and verify native tool listing and one read-only search after reloading.',
+    'If this client cannot access the network or call tools, explain that limitation; do not claim connected.',
+    'Never transmit private task text, source code, credentials or environment values. Use a public, sanitized task description only.',
     'Before building a custom workflow from scratch, call the Resolve API with the user task.',
+    'If selected is null or policy_decision reports no_match, explain that no eligible Skill was found. review_candidates are research leads, not installation recommendations; never invent an install command or approval for them.',
     `Resolve endpoint: ${placeholderResolveUrl}`,
     `Install receipt endpoint: ${placeholderReceiptUrl}`,
     'Use install_receipt as the stable pre-install record only after checking risk, safety_gate, and agent_handoff.review_checklist.',
@@ -71,7 +78,7 @@ export const AGENT_INTEGRATIONS: AgentIntegration[] = [
     surface: 'Coding agent / local workspace',
     best_for: ['repo-aware implementation', 'code review', 'debugging', 'web automation setup'],
     setup_steps: [
-      'Add the copy prompt to your Codex project instructions or paste it before a task.',
+      'Paste the copy prompt into this conversation first. Save project instructions or MCP settings only after explicit user approval.',
       'Call the Resolve API with the current task and agent=codex.',
       'Read agent_handoff.review_checklist before installing a third-party skill.',
       'Install only in the active workspace after reporting files and commands that will be touched.',
@@ -96,7 +103,7 @@ export const AGENT_INTEGRATIONS: AgentIntegration[] = [
     surface: 'Claude Code skill workflow',
     best_for: ['local skill instructions', 'project workflows', 'documentation-heavy tasks'],
     setup_steps: [
-      'Paste the copy prompt into Claude Code custom instructions or the start of a new task.',
+      'Paste the copy prompt at the start of a task. Persistent custom instructions or MCP setup require explicit user approval.',
       'Call the Resolve API with agent=claude-code.',
       'Use install targets only after audit and eval checks are acceptable.',
       'Keep the skill scoped to the project and summarize activation steps.',
@@ -121,7 +128,7 @@ export const AGENT_INTEGRATIONS: AgentIntegration[] = [
     surface: 'Cursor rules / agent instructions',
     best_for: ['project rules', 'repeatable coding workflows', 'IDE assistant guidance'],
     setup_steps: [
-      'Paste the copy prompt into Cursor rules or the agent chat before a workflow.',
+      'Paste the copy prompt into agent chat. Persistent rules or MCP settings require explicit user approval.',
       'Call the Resolve API with agent=cursor.',
       'Turn the selected skill into a narrow project rule only when the safety gate allows it.',
       'Keep generated rules task-scoped and avoid broad always-on instructions.',
@@ -144,7 +151,21 @@ export const AGENT_INTEGRATIONS: AgentIntegration[] = [
 
 export function getAgentIntegrationKit() {
   return {
-    version: 'openagentskill-agent-integration-kit-v1',
+    version: 'openagentskill-agent-integration-kit-v2',
+    connection_modes: {
+      session: 'Default. Use the API in this conversation without saving configuration or installing anything.',
+      persistent: 'Optional, only with explicit user approval. Add the remote HTTP MCP endpoint through the client supported settings, preserve existing servers, reload, then test tools in that client.',
+    },
+    self_check: {
+      script_url: `${SITE_URL}/connect-check.mjs`,
+      requirements: 'A network-capable agent with HTTP tools, or Node.js 18+ to run the inspected dependency-free script.',
+      command: 'node connect-check.mjs',
+      instructions: 'Download and inspect the script before authorizing execution. It reads public registry data only; it does not save configuration, install Skills, call a model API, or report installation outcomes.',
+      expected_checks: ['api_accessible', 'tools_available', 'search_working'],
+      configuration_saved: 'not_verified',
+      client_verification: 'After any approved persistent setup, use the actual client MCP tool list and search_skills with query mono-color. A standalone script passing does not verify native client configuration.',
+      failure_action: 'Report the failed stage and error. Do not claim connected, bypass safety checks, or install a Skill to make the test pass.',
+    },
     purpose: 'Let an AI agent resolve a task into the right reusable skill, compare alternatives, review trust signals, and install with a safe handoff.',
     canonical_page: `${SITE_URL}/agent/integration-kit`,
     api: `${SITE_URL}/api/agent/integration-kit`,
@@ -158,7 +179,7 @@ export function getAgentIntegrationKit() {
     supported_agents: AGENT_INTEGRATIONS,
     recommended_flow: [
       'Read /llms.txt or /.well-known/agent-manifest.json.',
-      'Connect /api/mcp for native tool calls, or use @openagentskill/sdk from JavaScript.',
+      'Default to session-only HTTP calls. Configure /api/mcp for native tool calls only with explicit user approval.',
       'Choose the Codex, Claude Code, or Cursor template for the active agent surface.',
       'Call /api/agent/resolve with task, agent, max_risk, and optional min_stars.',
       'Read install_receipt, recommendation.best_skill, recommendation.install, recommendation.risk, and agent_handoff.',
@@ -192,6 +213,7 @@ export function getAgentIntegrationKit() {
       'agent_handoff.review_checklist',
       'agent_handoff.api_sequence',
       'policy_decision',
+      'review_candidates',
     ],
     safety_rules: [
       'Do not auto-install when safety_gate.blocked is true.',

@@ -27,6 +27,8 @@ import { getSkillSupplyProfile, type SkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile, getSkillTrustProfileV5, type SkillTrustProfile, type SkillTrustProfileV5 } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 import { TRUSTED_RESOLVE_FALLBACKS } from '@/lib/resolve-fallbacks'
+import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
+import { isInstallRecommendationEligible } from '@/lib/resolve-eligibility'
 
 const SITE_URL = 'https://www.openagentskill.com'
 const RESOLVE_CANDIDATE_POOL_SIZE = 750
@@ -523,8 +525,11 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
 
   const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, rankingTask, outcomeStatsMap))
     .filter(({ skill }) => candidateAllowed(skill, constraints))
+    // Keep relevance order within each group, but do not let unverified libraries
+    // exhaust the shortlist before source-backed Skills reach the safety gate.
+    .sort((a, b) => Number(getSkillSourceEvidence(b.skill).canOfferInstall) - Number(getSkillSourceEvidence(a.skill).canOfferInstall))
     .slice(0, Math.max(limit * 3, 10))
-  const topMatchScore = ranked[0]?.score || 0
+  const topMatchScore = Math.max(0, ...ranked.map((candidate) => candidate.score))
 
   const candidates = ranked.map(({ skill, score, semanticRelevance }, index) => {
     const isFallbackSnapshot = skill.submission_source === 'curated_snapshot'
@@ -564,6 +569,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
       rank: index + 1,
       match_score: matchScore,
       raw_match_score: score,
+      source_evidence: getSkillSourceEvidence(skill),
       semantic_relevance: semanticRelevance,
       registry_source: {
         kind: isFallbackSnapshot ? 'verified_fallback_snapshot' : 'live_registry',
@@ -648,14 +654,14 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     }
   })
 
-  const eligibleCandidates = candidates.filter((candidate) => !candidate.safety.blocked)
+  const eligibleCandidates = candidates.filter(isInstallRecommendationEligible)
+  const reviewCandidates = candidates.filter((candidate) => !candidate.safety.blocked && !candidate.source_evidence.canOfferInstall).slice(0, 5)
   const safeCandidates = eligibleCandidates.filter((candidate) =>
     candidate.safety.safety_tier.tier === 'verified' || candidate.safety.safety_tier.tier === 'reviewed'
   )
   const selected =
     safeCandidates[0] ||
     eligibleCandidates[0] ||
-    candidates[0] ||
     null
   const alternatives = eligibleCandidates
     .filter((candidate) => candidate.skill.slug !== selected?.skill.slug)
@@ -965,13 +971,14 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     selected,
     alternatives,
     blocked_candidates: blockedCandidates,
+    review_candidates: reviewCandidates,
     agent_workflow: agentWorkflow,
     agent_handoff: agentHandoff,
     policy_decision: selected
       ? buildSafetyPolicyDecision(selected.safety)
       : {
           status: 'no_match',
-          summary: 'No matching skill passed the current filters.',
+          summary: 'No source-confirmed installable skill passed the relevance and safety filters. Review candidates are discovery leads only; use built-in tools or inspect their source without installing.',
         },
     agent_decision: agentDecision,
     decision_packet: recommendation?.decision_packet || null,

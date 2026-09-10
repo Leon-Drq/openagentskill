@@ -185,6 +185,9 @@ ${payload.agent_handoff.blocked_actions.map((item) => `- ${item}`).join('\n')}` 
 Alternatives:
 ${alternatives || 'No alternatives'}
 
+Review candidates (not installation recommendations):
+${payload.review_candidates.map((item) => `- ${item.skill.name} (${item.skill.slug}): ${item.urls.web}`).join('\n') || 'No review candidates'}
+
 Blocked for auto-install:
 ${blocked || 'No blocked candidates'}
 `,

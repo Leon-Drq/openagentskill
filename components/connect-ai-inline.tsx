@@ -6,7 +6,7 @@ import { Check, Copy } from 'lucide-react'
 import type { Locale } from '@/lib/i18n/config'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 
-export const CONNECT_AI_PROMPT = 'Read https://www.openagentskill.com/api/agent/integration-kit?format=text and help me set up OpenAgentSkill for this AI assistant. Explain the supported setup and ask before changing files or installing anything. Preserve all safety checks. Do not send private project data or credentials to external services.'
+export const CONNECT_AI_PROMPT = 'Read https://www.openagentskill.com/api/agent/integration-kit?format=text and help me use OpenAgentSkill in this conversation. Use the template for this assistant and perform the documented read-only connection checks with your available tools. Report API accessibility, MCP tool availability and search success separately. Do not claim configuration is saved or a Skill is installed. Explain persistent setup and ask before changing files or installing anything. Preserve all safety checks. Do not send private project data or credentials to external services. Once the checks pass, ask which task I want help with.'
 
 const COPY: Record<Locale, readonly [string, string, string, string, string]> = {
   en: ['Copy for AI', 'Copied — paste into your AI', 'Paste into Codex, Claude Code, or Cursor. Copying does not install anything.', 'Setup guide', 'Copy failed. Select the text above and copy it manually.'],

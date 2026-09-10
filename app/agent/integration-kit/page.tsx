@@ -51,7 +51,7 @@ export default function AgentIntegrationKitPage() {
             items={[
               { value: kit.supported_agents.length, label: 'Agent templates' },
               { value: kit.stable_response_fields.length, label: 'Stable fields' },
-              { value: 'v1', label: 'Kit version' },
+              { value: 'v2', label: 'Kit version' },
               { value: 'API', label: 'Install handoff' },
             ]}
           />
@@ -59,6 +59,19 @@ export default function AgentIntegrationKitPage() {
       />
 
       <div className="mx-auto max-w-6xl px-6">
+        <section className="grid gap-6 border-b border-border py-10 md:grid-cols-2">
+          <div>
+            <h2 className="font-display text-2xl font-normal">Try it in this conversation first.</h2>
+            <p className="mt-3 text-sm leading-6 text-secondary">{kit.connection_modes.session}</p>
+            <p className="mt-3 text-sm leading-6 text-secondary">{kit.connection_modes.persistent}</p>
+          </div>
+          <div>
+            <h2 className="font-display text-2xl font-normal">Verify before saying connected.</h2>
+            <p className="mt-3 text-sm leading-6 text-secondary">{kit.self_check.requirements} {kit.self_check.instructions}</p>
+            <Link href="/connect-check.mjs" prefetch={false} className="mt-3 inline-block text-sm underline underline-offset-4">Inspect the read-only connection check</Link>
+            <p className="mt-3 text-sm leading-6 text-secondary">Report API access, MCP tools, and search separately. A passing check does not prove native client configuration was saved or any Skill was installed.</p>
+          </div>
+        </section>
         <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.72fr_1.28fr]">
           <div>
             <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-secondary">Canonical flow</p>
