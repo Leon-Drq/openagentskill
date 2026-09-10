@@ -369,7 +369,7 @@ const getCachedApprovedSkillSitemapRecords = unstable_cache(
   ): Promise<SkillSitemapRecord[]> => {
     return fetchApprovedSkillSitemapRecords({ offset, limit, minStars, minQualityScore })
   },
-  ['approved-sitemap-records-v12-editorial-policy'],
+  ['approved-sitemap-records-v13-canonical-editorial'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-records'],
@@ -380,7 +380,7 @@ const getCachedApprovedSkillSitemapCount = unstable_cache(
   async (minStars: number, minQualityScore: number): Promise<number> => {
     return fetchApprovedSkillSitemapCount(minStars, minQualityScore)
   },
-  ['approved-sitemap-count-v12-editorial-policy'],
+  ['approved-sitemap-count-v13-canonical-editorial'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-count'],

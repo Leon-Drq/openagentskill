@@ -29,3 +29,7 @@ GC Minimal Zine Poster v0.3.1: source pinned to the commit and SKILL.md hash in 
 editorial entry. Three MIT-licensed author images form one Gallery series with a
 local license copy and pinned source link. Register its engagement identity using
 `scripts/register-gc-zine-gallery.sql`; the idempotent seed creates no votes.
+
+The canonical listing is `liamgvchi-gc-minimal-zine-poster-v0-3`, the existing
+source-pinned record. The older repo-only URL redirects permanently to it and is
+excluded from sitemap rows/counts. Both historical database records are retained.

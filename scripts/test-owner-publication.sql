@@ -50,6 +50,23 @@ begin
   assert result->>'status' = 'updated';
   assert exists(select 1 from skills where slug=test_slug and ai_review_score is null and not ai_review_approved and ai_review_issues=array['fixture old issue']);
   assert exists(select 1 from owner_skill_publications where skill_slug=test_slug and previous_review->'scores'->>'security'='5');
+
+  -- Historical repo-only duplicates must not steal the exact pinned source.
+  insert into skills(slug,name,description,author_name,repository,github_repo,category,license,ai_review_approved,created_at)
+  values(test_slug || '-legacy','Legacy duplicate','Untracked legacy fixture','Test','https://github.com/' || test_repo,test_repo,'developer-tools','MIT',true,now()-interval '1 year');
+  update skills set ai_review_approved=true,listing_status='reviewed',ai_review_score='{"security":41}' where slug=test_slug;
+  source := source || '{"version":"2.0.0"}'::jsonb;
+  result := public.publish_owner_skill(gen_random_uuid(),source,'Owner metadata refresh verification','{}');
+  assert result->>'status' = 'updated';
+  assert result->>'slug' = test_slug;
+  assert result->>'ai_review_approved' = 'true';
+  assert exists(select 1 from skills where slug=test_slug and version='2.0.0' and ai_review_approved and listing_status='reviewed' and ai_review_score->>'security'='41');
+  assert exists(select 1 from skills where slug=test_slug || '-legacy' and source_content_hash is null and ai_review_approved);
+  result := public.publish_owner_skill(gen_random_uuid(),source,'Owner unchanged metadata verification','{}');
+  assert result->>'status' = 'unchanged';
+  result := public.publish_owner_skill(gen_random_uuid(),source || jsonb_build_object('github_repo','duplicate/' || test_slug,'slug','duplicate-' || test_slug),'Owner existing hash verification','{}');
+  assert result->>'status' = 'duplicate';
+  assert result->>'slug' = test_slug;
   assert not has_function_privilege('anon','public.publish_owner_skill(uuid,jsonb,text,jsonb)','execute');
   assert not has_function_privilege('authenticated','public.publish_owner_skill(uuid,jsonb,text,jsonb)','execute');
   assert not has_table_privilege('anon','public.owner_skill_publications','select');

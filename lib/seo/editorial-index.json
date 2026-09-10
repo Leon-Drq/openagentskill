@@ -1,6 +1,7 @@
 [
   {
-    "slug": "liamgvchi-gc-minimal-zine-poster",
+    "slug": "liamgvchi-gc-minimal-zine-poster-v0-3",
+    "aliases": ["liamgvchi-gc-minimal-zine-poster"],
     "repository": "LiamGvchi/gc-minimal-zine-poster",
     "path": "SKILL.md",
     "commit": "ddb0d66b24a94f9c4fdd1f02835a836a2db3774e",
