@@ -2,7 +2,7 @@
 
 import { siteCopy, localizeSiteText } from '@/lib/i18n/site-copy'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowRight, Search } from 'lucide-react'
@@ -14,11 +14,11 @@ import type { Locale } from '@/lib/i18n/config'
 import { useI18n } from '@/lib/i18n/context'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
-import { HomeShowcase } from './showcase-sections'
-import { HomeCreators } from './home-creators'
 import { GitHubPopularityList } from './github-popularity-list'
 
-interface HomePageEnhancedProps {
+export interface HomePageEnhancedProps {
+  showcase: ReactNode
+  creators: ReactNode
   initialLocale?: Locale
   stats: {
     totalSkills: number
@@ -711,7 +711,7 @@ function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) 
   )
 }
 
-export function HomePageEnhanced({ initialLocale, stats, featuredSkills, rankingGeneratedAt }: HomePageEnhancedProps) {
+export function HomePageEnhanced({ initialLocale, stats, featuredSkills, rankingGeneratedAt, showcase, creators }: HomePageEnhancedProps) {
   const { t, locale } = useI18n()
   const activeLocale = initialLocale || locale
   const [taskQuery, setTaskQuery] = useState('')
@@ -832,7 +832,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
         </div>
       </section>
 
-      <HomeShowcase />
+      {showcase}
 
       <section className="border-b border-[#e4e0d8] bg-[#f3f1ea]/55 px-6 py-14 md:py-20">
         <div className="mx-auto max-w-6xl">
@@ -1249,7 +1249,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
 
       </main>
 
-      <HomeCreators />
+      {creators}
       <SiteFooter />
 
     </div>

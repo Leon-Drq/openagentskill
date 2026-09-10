@@ -1,8 +1,7 @@
-'use client'
 import Link from 'next/link'
 import { CreatorDirectoryCard } from '@/components/creator-directory-card'
 import { buildCreatorDirectory } from '@/lib/creator-directory'
-import { useI18n } from '@/lib/i18n/context'
+import type { Locale } from '@/lib/i18n/config'
 import { creatorCopy } from '@/lib/i18n/creator-copy'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 
@@ -18,8 +17,7 @@ const selected = buildCreatorDirectory().filter((c) =>
     'alisa0808',
   ].includes(c.owner.toLowerCase()),
 )
-export function HomeCreators() {
-  const { locale } = useI18n()
+export function HomeCreators({ locale }: { locale: Locale }) {
   return (
     <section
       aria-labelledby="home-creators-heading"

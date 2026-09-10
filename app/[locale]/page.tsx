@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { HomePageEnhanced } from '@/components/home-page-enhanced'
+import { HomePage as HomePageEnhanced } from '@/components/home-page'
 import type { Locale } from '@/lib/i18n/config'
 import { getHomePageData } from '@/lib/home-page-data'
 import {

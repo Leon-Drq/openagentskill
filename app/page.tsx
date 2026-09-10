@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { HomePageEnhanced } from '@/components/home-page-enhanced'
+import { HomePage as HomePageEnhanced } from '@/components/home-page'
 import { getHomePageData } from '@/lib/home-page-data'
 import {
   HOME_SOCIAL_DESCRIPTION,

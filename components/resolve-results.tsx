@@ -9,9 +9,9 @@ import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import type { Locale } from '@/lib/i18n/config'
-import type { resolveAgentSkill } from '@/lib/agent-resolve'
+import type { ResolveWebResponse } from '@/lib/resolve-web-response'
 
-type Result = Awaited<ReturnType<typeof resolveAgentSkill>>
+type Result = ResolveWebResponse
 type Candidate = NonNullable<Result['selected']>
 const labels = {
   en: ['Find your next skill.', 'Describe a task or skill name', 'Find Skills', 'All agents', 'Advanced filters', 'Recommended match', 'Other matches', 'View details', 'Copy for AI', 'Copied', 'Copy failed — try again', 'Review before install', 'Source recorded', 'Why this matches', 'Searching for matching skills…', 'No eligible match yet', 'Try a specific outcome, such as “design a brand logo”.', 'Search is temporarily unavailable.', 'Try again', 'Candidates to investigate', 'These are not installation recommendations.', 'Browse skills', 'Use public task descriptions only. Do not include secrets or customer data.', 'Choose your agent', 'Source & review', 'Related use cases', 'Minimum GitHub stars', 'Maximum risk', 'Low', 'Medium', 'Find a skill, review the source, then bring it to your AI.'],
@@ -28,7 +28,7 @@ const controlLabels: Partial<Record<Locale, string[]>> = {
 const field = 'min-h-11 rounded-md border border-[#d8d2c6] bg-[#fffdf8] px-3 text-sm'
 const button = 'inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-[#d8d2c6] px-4 text-sm font-medium transition-colors hover:border-[#006b4f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006b4f]'
 
-export function ResolveResults({ task, agent: initialAgent = 'auto', risk = 'medium', minStars = 0, initialLocale }: { task: string; agent?: string; risk?: string; minStars?: number; initialLocale?: Locale }) {
+export function ResolveResults({ task, agent: initialAgent = 'auto', risk = 'medium', minStars = 0, initialLocale, initialResult, initialError = false }: { task: string; agent?: string; risk?: string; minStars?: number; initialLocale?: Locale; initialResult?: Result | null; initialError?: boolean }) {
   const { locale: contextLocale } = useI18n()
   const locale = initialLocale || contextLocale
   const c = (i: number) => controlLabels[locale]?.[i] || (locale === 'zh' ? labels.zh : labels.en)[i]
@@ -40,21 +40,21 @@ export function ResolveResults({ task, agent: initialAgent = 'auto', risk = 'med
   const [maxRisk, setMaxRisk] = useState(risk)
   const [stars, setStars] = useState(minStars)
   const [attempt, setAttempt] = useState(0)
-  const [loading, setLoading] = useState(Boolean(task))
-  const [result, setResult] = useState<Result | null>(null)
-  const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(Boolean(task) && initialResult === undefined && !initialError)
+  const [result, setResult] = useState<Result | null>(initialResult || null)
+  const [error, setError] = useState(initialError)
   const [copyTarget, setCopyTarget] = useState<string | null>(null)
   const [copyAgent, setCopyAgent] = useState(initialAgent === 'auto' ? 'codex' : initialAgent)
   const [copyState, setCopyState] = useState('')
 
   useEffect(() => {
-    if (!task) return
+    if (!task || (attempt === 0 && (initialResult !== undefined || initialError))) return
     const controller = new AbortController()
     let ignore = false
     const timeout = setTimeout(() => controller.abort(), 15000)
     fetch('/api/agent/resolve', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
-      body: JSON.stringify({ task, agent: initialAgent, limit: 5, constraints: { max_risk: risk, min_stars: minStars, needs_install_command: true } }),
+      body: JSON.stringify({ task, agent: initialAgent, limit: 5, format: 'web', constraints: { max_risk: risk, min_stars: minStars, needs_install_command: true } }),
     }).then(async response => {
       if (!response.ok) throw new Error('Search unavailable')
       const data = await response.json()
@@ -63,7 +63,7 @@ export function ResolveResults({ task, agent: initialAgent = 'auto', risk = 'med
       if (!ignore) setResult(data)
     }).catch(() => { if (!ignore) setError(true) }).finally(() => { clearTimeout(timeout); if (!ignore) setLoading(false) })
     return () => { ignore = true; clearTimeout(timeout); controller.abort() }
-  }, [task, initialAgent, risk, minStars, attempt])
+  }, [task, initialAgent, risk, minStars, attempt, initialResult, initialError])
 
   function retry() { setError(false); setResult(null); setLoading(true); setAttempt(value => value + 1) }
   function search() {

@@ -1,7 +1,8 @@
 import { ImageResponse } from 'next/og'
 import { getXShortlist, isXShortlistLane } from '@/lib/x/shortlist'
 
-export const runtime = 'edge'
+// Shared shortlist data uses the Node-compatible packed directory cache.
+export const runtime = 'nodejs'
 export const alt = 'OpenAgentSkill task shortlist'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'

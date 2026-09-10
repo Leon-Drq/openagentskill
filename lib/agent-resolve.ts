@@ -48,21 +48,12 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): P
   }
 }
 
-const getResolveCandidatePool = unstable_cache(
-  async () => {
-    try {
-      return await getAllSkills('quality', undefined, RESOLVE_CANDIDATE_POOL_SIZE)
-    } catch (error) {
-      // Resolve is the primary agent path. A curated fallback is better than
-      // failing a request or scheduling repeated cache revalidations while the
-      // registry database is temporarily unavailable.
-      console.warn('Agent resolve cache fallback:', error)
-      return TRUSTED_RESOLVE_FALLBACKS
-    }
-  },
-  ['agent-resolve-candidate-pool-v2'],
-  { revalidate: RESOLVE_CACHE_REVALIDATE }
-)
+function getResolveCandidatePool() {
+  // The directory already owns the shared cache and in-flight deduplication.
+  // A second cache would serialize the same pool again and cache a transient
+  // fallback as a successful result for another five minutes.
+  return getAllSkills('quality', undefined, RESOLVE_CANDIDATE_POOL_SIZE)
+}
 
 const getResolveEventStatsMap = unstable_cache(
   async () => getSkillEventStatsMap().catch((): Record<string, SkillEventStats> => ({})),
