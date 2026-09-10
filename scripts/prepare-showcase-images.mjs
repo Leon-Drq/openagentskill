@@ -7,7 +7,9 @@ import path from 'node:path'
 const require = createRequire(import.meta.url)
 const sharp = require(require.resolve('sharp', { paths: [require.resolve('next/package.json')] }))
 const directory = fileURLToPath(new URL('../public/showcase/', import.meta.url))
-const originals = (await readdir(directory)).filter((file) => /\.(png|jpe?g|webp)$/.test(file) && !/\.(card|preview)\.webp$/.test(file))
+const requested = new Set(process.argv.slice(2))
+const originals = (await readdir(directory)).filter((file) => /\.(png|jpe?g|webp)$/.test(file) && !/\.(card|preview)\.webp$/.test(file) && (!requested.size || requested.has(file)))
+if (requested.size && originals.length !== requested.size) throw new Error('Select existing original image filenames in public/showcase.')
 let before = 0
 let after = 0
 for (const file of originals) {

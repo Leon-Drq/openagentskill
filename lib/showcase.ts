@@ -14,7 +14,8 @@ export type ShowcaseText = { en: string; zh: string }
 export const showcaseText = (en: string, zh: string): ShowcaseText => ({ en, zh })
 export const localizeShowcase = localizeEditorialText
 export const getShowcaseImageSrc = (src: string, kind: 'card' | 'preview') => src.replace(/\.[^.]+$/, `.${kind}.webp`)
-export const SHOWCASE_UPDATED_AT = '2026-09-08'
+export const SHOWCASE_UPDATED_AT = '2026-09-11'
+const ORIGINAL_SHOWCASE_UPDATED_AT = '2026-09-08'
 
 export const SHOWCASE_CATEGORIES: { id: ShowcaseCategory; label: ShowcaseText }[] = [
   { id: 'web', label: showcaseText('Web & UI', '网页与界面') },
@@ -70,6 +71,7 @@ export interface ShowcaseSkill {
 }
 
 export const SHOWCASE_CREATORS: ShowcaseCreator[] = [
+  { id: 'liamgvchi', name: 'LiamGvchi', githubUsername: 'LiamGvchi', url: 'https://github.com/LiamGvchi', profile: null },
   { id: 'yanliudesign', name: 'yanliudesign', githubUsername: 'yanliudesign', url: 'https://github.com/yanliudesign', profile: null },
   { id: 'leonxlnx', name: 'Leonxlnx', githubUsername: 'Leonxlnx', url: 'https://github.com/Leonxlnx', profile: null },
   { id: 'alisa0808', name: 'alisa0808', githubUsername: 'alisa0808', url: 'https://github.com/alisa0808', profile: null },
@@ -84,6 +86,7 @@ export const SHOWCASE_CREATORS: ShowcaseCreator[] = [
 ]
 
 export const SHOWCASE_SKILLS: ShowcaseSkill[] = [
+  { slug: 'liamgvchi-gc-minimal-zine-poster', name: 'GC Minimal Zine Poster', creatorId: 'liamgvchi', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
   { slug: 'yanliudesign-mono-color-skill', name: 'mono-color', creatorId: 'yanliudesign', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
   { slug: 'design-taste-frontend', name: 'Taste Skill', creatorId: 'leonxlnx', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
   { slug: 'op7418-guizang-ppt-skill', name: 'Guizang PPT Skill', creatorId: 'op7418', access: 'open-source', sourceLicense: 'AGPL-3.0', listingIds: [] },
@@ -213,7 +216,7 @@ const openDesignBase = {
   sourceRevision: openRevision, license: 'Apache-2.0', licenseUrl: '/showcase/open-LICENSE.txt',
   requirements: tx('Open Design local setup and a connected coding agent. This is an app workflow that composes skills.', '需安装 Open Design 本地应用并连接编程 Agent；这是组合使用技能的应用工作流。'),
   productionNote: tx('An example published by the Open Design authors. The original prompt, model, runtime and cost were not disclosed for this sample. Screens show demonstration content.', 'Open Design 作者发布的案例。该示例的原始提示词、模型、耗时与成本未公开；画面中的内容为演示数据。'),
-  updatedAt: SHOWCASE_UPDATED_AT,
+  updatedAt: ORIGINAL_SHOWCASE_UPDATED_AT,
 }
 const voxBase = {
   skillSlug: 'vox-director', category: 'video' as const,
@@ -223,10 +226,30 @@ const voxBase = {
   output: tx('A narrated collage-style explainer video.', '带旁白的拼贴风格科普短视频。'),
   requirements: tx('A compatible agent, Atlas Cloud API credentials and FFmpeg. Image, motion and audio generation may incur usage charges.', '兼容的 Agent、Atlas Cloud API 凭据与 FFmpeg。图像、动态画面和音频生成可能产生用量费用。'),
   productionNote: tx('A video published in the author’s showcase. The exact original prompt, model, runtime and cost were not disclosed. The task below is our suggested starting point.', '作者作品集中的视频，未公开该次制作的完整提示词、模型、耗时与成本。下方任务是我们整理的尝试起点。'),
-  updatedAt: SHOWCASE_UPDATED_AT,
+  updatedAt: ORIGINAL_SHOWCASE_UPDATED_AT,
 }
 
 const INITIAL_SHOWCASE_CASES: ShowcaseCase[] = [
+  {
+    slug: 'gc-minimal-zine-posters', skillSlug: 'liamgvchi-gc-minimal-zine-poster', category: 'image',
+    title: tx('GC Minimal Zine Poster: three quiet studies', 'GC Minimal Zine Poster：三张安静的海报'),
+    description: tx('A blue doorway, a yellow stair and a red shore: three author-made posters using paper texture, restrained type and generous negative space.', '蓝色的门、黄色的阶梯与红色的海岸：作者以纸张纹理、克制文字和大面积留白完成的三张海报。'),
+    input: tx('A short theme, a sentence or a supplied photograph; the original inputs for these three author examples are not published.', '输入简短主题、一句话或用户照片；作者未公开这三张案例的原始输入。'),
+    output: tx('A portrait poster image and an image-generation prompt. These author previews are images, not editable website UI.', '竖版海报图片与生图提示词。这些作者预览是图像作品，不是可编辑的网页 UI。'),
+    requirements: tx('A compatible agent with image generation and image inspection. Provider charges may apply. Review the pinned skill and license before setup.', '需要具备图像生成和图像查看能力的兼容 Agent，服务可能按用量收费。安装前核对固定版本的技能与许可证。'),
+    prompt: tx('Use gc-minimal-zine-poster-v0-3 to create an original minimal editorial poster about [my theme]. Use a 3:5 portrait page, generous negative space, one small visual focus, subtle paper texture and one vivid color accent. Return both the image and final prompt. Treat these author examples as style references only; do not copy their text or composition. Confirm any image-generation costs before proceeding.', '使用 gc-minimal-zine-poster-v0-3，为[我的主题]制作原创极简编辑式海报。采用 3:5 竖版、大面积留白、一个小视觉焦点、轻微纸张质感和一个鲜明点缀色，交付图片与最终提示词。仅参考作者案例的风格，不照搬文字或构图；生成前先确认可能产生的费用。'),
+    promptKind: 'suggested', provenance: 'author', evidenceKind: 'work', creatorId: 'liamgvchi',
+    sourceUrl: 'https://github.com/LiamGvchi/gc-minimal-zine-poster/tree/ddb0d66b24a94f9c4fdd1f02835a836a2db3774e/examples',
+    sourceRevision: 'ddb0d66b24a94f9c4fdd1f02835a836a2db3774e',
+    license: 'MIT', licenseUrl: '/showcase/gc-zine-LICENSE.txt',
+    productionNote: tx('Author examples selected from the pinned repository on 2026-09-11. Original JPEG files are preserved; display copies are only resized and compressed. OpenAgentSkill inspected these images but did not execute the skill. The original prompts, model, duration and cost are not verified; the task above is a suggested starting point.', '于 2026-09-11 从作者固定版本仓库中精选。保留原始 JPEG，展示副本仅缩放压缩。OpenAgentSkill 查看了图片，但没有执行技能；未核实原始提示词、模型、耗时与费用。上方任务是本站建议的起点。'),
+    media: [
+      { src: '/showcase/gc-zine-night-door.jpeg', width: 686, height: 1144, alt: tx('Night Door: a small blue door and restrained type on warm paper with wide margins.', 'Night Door：暖色纸张上的小蓝门、克制文字与宽阔留白。') },
+      { src: '/showcase/gc-zine-yellow-step.jpeg', width: 686, height: 1144, alt: tx('Yellow Step: a grayscale stair photograph beside a yellow block on textured paper.', 'Yellow Step：纸张纹理上的灰度阶梯照片与黄色色块。') },
+      { src: '/showcase/gc-zine-shore-pause.jpeg', width: 686, height: 1144, alt: tx('Shore Pause: a white bird silhouette inside a red square with sparse annotations.', 'Shore Pause：红色方块中的白鸟剪影与稀疏注释。') },
+    ],
+    cardFit: 'contain', updatedAt: '2026-09-11',
+  },
   {
     slug: 'room-to-grow-poster', skillSlug: 'yanliudesign-mono-color-skill', category: 'image',
     title: tx('Room to grow', '留一点生长空间'),
@@ -239,7 +262,7 @@ const INITIAL_SHOWCASE_CASES: ShowcaseCase[] = [
     sourceRevision: monoRevision, license: 'Original platform artwork', licenseUrl: '/showcase/ATTRIBUTION.md',
     productionNote: tx('Produced by OpenAgentSkill on September 7, 2026, using a locally installed mono-color method and the Codex image-generation tool. One generation; no manual retouching. The service did not report its underlying model or per-image cost. This is one demonstration, not a cross-agent benchmark.', 'OpenAgentSkill 于 2026 年 9 月 7 日，参考本地安装的 mono-color 方法，用 Codex 图像生成工具制作。单次生成，未人工修图；服务未返回底层模型名称或单张费用。这是一次制作记录，不代表跨 Agent 测试。'),
     media: [{ src: '/showcase/mono-room-to-grow.png', width: 1086, height: 1448, alt: tx('Room to Grow poster: a green fern with large red serif lettering on white textured paper.', '暖白纸面上的绿色蕨叶与红色大衬线字植物海报。') }],
-    cardFit: 'contain', updatedAt: SHOWCASE_UPDATED_AT,
+    cardFit: 'contain', updatedAt: ORIGINAL_SHOWCASE_UPDATED_AT,
   },
   {
     slug: 'floria-floral-studio', skillSlug: 'design-taste-frontend', category: 'web',
@@ -256,7 +279,7 @@ const INITIAL_SHOWCASE_CASES: ShowcaseCase[] = [
     media: [
       { src: '/showcase/taste-floria-top.webp', width: 1906, height: 3724, alt: tx('Floria floral studio: dark landing page with oversized type, flower photography and product cards.', 'Floria 花艺工作室网页上半部分：大标题、花卉摄影与产品卡片。') },
       { src: '/showcase/taste-floria-bottom.webp', width: 1906, height: 3725, alt: tx('Lower sections of the Floria website, including the studio story and contact information.', 'Floria 网页下半部分，展示工作室故事与联系信息。') },
-    ], updatedAt: SHOWCASE_UPDATED_AT,
+    ], updatedAt: ORIGINAL_SHOWCASE_UPDATED_AT,
   },
   {
     slug: 'editorial-html-slides', skillSlug: 'op7418-guizang-ppt-skill', category: 'slides',
@@ -270,7 +293,7 @@ const INITIAL_SHOWCASE_CASES: ShowcaseCase[] = [
     sourceUrl: `https://github.com/op7418/guizang-ppt-skill/blob/${pptRevision}/README.en.md`, sourceRevision: pptRevision,
     license: 'AGPL-3.0', licenseUrl: '/showcase/ppt-LICENSE.txt',
     productionNote: tx('An unmodified showcase image from the author’s repository. Original source and its license are linked below. Individual generation settings and costs were not disclosed.', '直接收录作者仓库中的作品展示图，未修改。下方附原始来源及许可；各案例的具体生成配置与成本未公开。'),
-    media: [{ src: '/showcase/ppt-ppt-skill-showcase.png', width: 2400, height: 1350, alt: tx('A collage of editorial slide designs from Guizang PPT Skill, mixing oversized text and imagery.', '归藏 PPT Skill 的演示文稿案例总览，大字排版与图片相结合。') }], updatedAt: SHOWCASE_UPDATED_AT,
+    media: [{ src: '/showcase/ppt-ppt-skill-showcase.png', width: 2400, height: 1350, alt: tx('A collage of editorial slide designs from Guizang PPT Skill, mixing oversized text and imagery.', '归藏 PPT Skill 的演示文稿案例总览，大字排版与图片相结合。') }], updatedAt: ORIGINAL_SHOWCASE_UPDATED_AT,
   },
   {
     ...voxBase, slug: 'football-collage-explainer', title: tx('The story behind the game', '把足球讲成一个视觉故事'),

@@ -1,0 +1,27 @@
+[
+  {
+    "slug": "liamgvchi-gc-minimal-zine-poster",
+    "repository": "LiamGvchi/gc-minimal-zine-poster",
+    "path": "SKILL.md",
+    "commit": "ddb0d66b24a94f9c4fdd1f02835a836a2db3774e",
+    "hash": "89c7dc90c9aa80ba020c55e54b7de2fa2b49b49d20c240b150cd79ebea59775d",
+    "license": "MIT",
+    "reviewedAt": "2026-09-11",
+    "name": "GC Minimal Zine Poster",
+    "title": "GC Minimal Zine Poster — AI Editorial Poster Skill",
+    "description": "Explore GC Minimal Zine Poster: paper-texture posters, reference analysis, photo input and prompt-only workflows, with author examples and source-pinned setup guidance.",
+    "gallerySlug": "gc-minimal-zine-posters",
+    "summary": {
+      "en": "GC Minimal Zine Poster turns a theme, short text or supplied photograph into a sparse editorial poster. Its source specifies a default 3:5 page, generous negative space, a small focal element, restrained typography and one vivid color accent. It is an image-design skill, not a tool for generating website UI or frontend code.",
+      "zh": "GC Minimal Zine Poster 将主题、短文或用户照片转化为留白充足的编辑式海报。源码规定默认使用 3:5 画布、小面积视觉焦点、克制字体与一个鲜明的点缀色。它属于图像设计技能，不是生成网页 UI 或前端代码的工具。"
+    },
+    "workflow": {
+      "en": "Choose Generate for a poster, Prompt-only for an image prompt, or Reference Analysis to extract a visual system. Photo Input asks the agent to distinguish an edit target from a style reference and record what must be preserved. Generation needs a compatible image-capable agent; provider usage charges may apply. The skill itself declares no separate API key requirement.",
+      "zh": "需要海报时选择 Generate，只要生图提示词时选择 Prompt-only，提取视觉规则时选择 Reference Analysis。Photo Input 会区分编辑目标与风格参考，并记录必须保留的主体特征。生成图片需要具备图像能力的兼容 Agent，可能产生服务用量费用；该技能本身未要求单独提供 API 密钥。"
+    },
+    "limitations": {
+      "en": "Best suited to quiet zine pages, editorial illustrations and poetic visual studies. It deliberately avoids glossy commercial layouts, dense collages and 3D rendering. The Gallery shows three author-published examples, not outputs executed or verified by OpenAgentSkill. Exact typography, photo preservation and model compatibility still need a small test in your own environment.",
+      "zh": "适合安静的杂志页面、编辑插图和诗意视觉练习；不适合高光商业广告、密集拼贴或 3D 渲染。Gallery 展示的是作者公开的三张案例，不是 OpenAgentSkill 执行或验证的成果。文字准确度、照片主体保真与模型兼容性仍需在自己的环境中小范围测试。"
+    }
+  }
+]

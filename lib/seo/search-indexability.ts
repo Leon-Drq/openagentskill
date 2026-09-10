@@ -1,4 +1,5 @@
 import type { SkillRecord } from '@/lib/db/skills'
+import editorialEntries from './editorial-index.json' with { type: 'json' }
 
 // Search should showcase skills with enough public evidence to stand on their
 // own. The full catalog stays available to people and agents, while this
@@ -11,15 +12,30 @@ import type { SkillRecord } from '@/lib/db/skills'
 // but it never bypasses AI review or the quality floor.
 export const SEARCH_INDEX_MIN_QUALITY_SCORE = 50
 export const SEARCH_INDEX_MIN_GITHUB_STARS = 3
-// Keep the existing robots eligibility stable during this rollout. Publication
-// is broader than search indexing; never turn a static/owner listing into an
-// AI approval just to enter a sitemap. SQL list AND count use this same gate.
+// Legacy approved pages retain their existing eligibility. An additional,
+// source-pinned editorial lane controls search visibility, NEVER installation.
 export const SEARCH_INDEX_PUBLICATION_FILTER = 'ai_review_approved.eq.true'
 
 type SearchIndexCandidate = Pick<
   SkillRecord,
   'ai_review_approved' | 'quality_score' | 'github_stars' | 'publisher_verified'
->
+> & Partial<Pick<SkillRecord, 'slug' | 'github_repo' | 'source_path' | 'source_commit_sha' | 'source_content_hash' | 'source_sync_status' | 'license' | 'listing_status'>>
+
+export function getEditorialSearchProfile(skill: Partial<SearchIndexCandidate>) {
+  if (!['owner_published', 'static_checked', 'reviewed'].includes(skill.listing_status || '') || skill.source_sync_status !== 'current') return undefined
+  return editorialEntries.find(entry => entry.slug === skill.slug &&
+    entry.repository === skill.github_repo && entry.path === skill.source_path &&
+    entry.commit === skill.source_commit_sha && entry.hash === skill.source_content_hash && entry.license === skill.license)
+}
+
+/** One predicate for sitemap COUNT and rows; no caller-controlled SQL values. */
+export function buildSearchIndexFilter(minStars = SEARCH_INDEX_MIN_GITHUB_STARS, minQuality = SEARCH_INDEX_MIN_QUALITY_SCORE) {
+  const stars = Math.max(0, Math.floor(Number.isFinite(minStars) ? minStars : SEARCH_INDEX_MIN_GITHUB_STARS))
+  const quality = Math.max(0, Math.floor(Number.isFinite(minQuality) ? minQuality : SEARCH_INDEX_MIN_QUALITY_SCORE))
+  const legacy = [SEARCH_INDEX_PUBLICATION_FILTER, ...(quality ? [`quality_score.gte.${quality}`] : []), ...(stars ? [`or(github_stars.gte.${stars},publisher_verified.eq.true)`] : [])]
+  const editorial = editorialEntries.map(entry => `and(slug.eq.${entry.slug},github_repo.eq.${entry.repository},source_path.eq.${entry.path},source_commit_sha.eq.${entry.commit},source_content_hash.eq.${entry.hash},license.eq.${entry.license},source_sync_status.eq.current,listing_status.in.(owner_published,static_checked,reviewed))`)
+  return [`and(${legacy.join(',')})`, ...editorial].join(',')
+}
 
 export interface SearchEvidenceProfile {
   tier: 'verified-owner' | 'outcome-backed' | 'repository-backed' | 'thin'
@@ -30,6 +46,7 @@ export interface SearchEvidenceProfile {
 }
 
 export function isSearchIndexEligible(skill: SearchIndexCandidate) {
+  if (getEditorialSearchProfile(skill)) return true
   return (
     skill.ai_review_approved === true &&
     Number(skill.quality_score || 0) >= SEARCH_INDEX_MIN_QUALITY_SCORE &&
@@ -53,6 +70,7 @@ export function getSearchEvidenceProfile(
     score += 25
     signals.push('Registry review approval recorded')
   }
+  if (getEditorialSearchProfile(skill)) signals.push('Source-pinned editorial search listing; not installation approval')
   score += Math.min(25, Number(skill.quality_score || 0) / 4)
   if (Number(skill.quality_score || 0) >= SEARCH_INDEX_MIN_QUALITY_SCORE) signals.push('Quality-gated metadata')
   if (Number(skill.github_stars || 0) >= SEARCH_INDEX_MIN_GITHUB_STARS) {

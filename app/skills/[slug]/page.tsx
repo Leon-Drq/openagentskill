@@ -9,7 +9,7 @@ import { withTimeout } from '@/lib/async'
 import { defaultLocale, getLocaleFromSearchParam } from '@/lib/i18n/config'
 import { I18nProvider } from '@/lib/i18n/context'
 import { buildSkillSearchMetadata } from '@/lib/seo/search-metadata'
-import { isSearchIndexEligible } from '@/lib/seo/search-indexability'
+import { getEditorialSearchProfile, isSearchIndexEligible } from '@/lib/seo/search-indexability'
 import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
 import { getReviewEvidence } from '@/lib/skills/review-evidence'
 import { SkillReviewEvidence } from '@/components/skill-review-evidence'
@@ -102,6 +102,8 @@ export async function generateMetadata({
   if (!dbSkill || !skill) return { title: 'Skill Not Found' }
   const canonicalSlug = skill.slug || getCanonicalSkillSlug(slug)
   const seo = buildSkillSearchMetadata(dbSkill, defaultLocale)
+  const editorial = getEditorialSearchProfile(dbSkill)
+  if (editorial) Object.assign(seo, { title: editorial.title, openGraphTitle: editorial.title, description: editorial.description })
   const indexable = isSearchIndexEligible(dbSkill)
   const pageUrl = `https://www.openagentskill.com/skills/${canonicalSlug}`
   const imageAlt = seo.imageAlt
@@ -167,6 +169,8 @@ export default async function SkillDetailPage({ params, searchParams }: {
   const dbSkill = await getCachedSkillBySlug(slug)
   if (!dbSkill) notFound()
   const skill = convertSkillRecordToManifest(dbSkill)
+  const editorial = getEditorialSearchProfile(dbSkill)
+  const editorialLocale = initialLocale === 'zh' ? 'zh' : 'en'
   if (slug !== skill.slug) permanentRedirect(`/skills/${skill.slug}`)
   const support = await getCachedSkillDetailSupport(skill.id, skill.category, skill.slug)
   const { eventStats, outcomeStats, approvedClaim } = support
@@ -248,6 +252,13 @@ export default async function SkillDetailPage({ params, searchParams }: {
               {hasShowcase && <SkillShowcase skillSlug={skill.slug} profile />}
               <section id="overview" className={sectionClass}>
                 <h2 className={headingClass}><Text id="overview" /></h2>
+                {editorial && <div lang={editorialLocale} className="my-6 space-y-4 text-sm leading-7 text-secondary" data-editorial-source={editorial.commit}>
+                  <h3 className="font-display text-2xl text-foreground">{editorial.name}</h3>
+                  <p>{editorial.summary[editorialLocale]}</p>
+                  <p>{editorial.workflow[editorialLocale]}</p>
+                  <p>{editorial.limitations[editorialLocale]}</p>
+                  <Link href={`/showcase/${editorial.gallerySlug}`} className="inline-block font-medium text-[#006b4f] underline underline-offset-4">{editorialLocale === 'zh' ? '查看作者海报案例' : 'Explore the author’s poster examples'} →</Link>
+                </div>}
                 <SkillDocument source={skill.longDescription} summary={skill.description} sourceUrl={sourceHref || ''} locale={initialLocale} />
               </section>
 
