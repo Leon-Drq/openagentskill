@@ -134,11 +134,13 @@ for (const query of operations) {
 }
 assert.ok(indexPolicy.buildSearchIndexFilter().includes('and(ai_review_approved.eq.true,quality_score.gte.50,or(github_stars.gte.3,publisher_verified.eq.true),'))
 const editorialEntries = JSON.parse(read('lib/seo/editorial-index.json'))
+const redirects = await (await import('../next.config.mjs')).default.redirects()
 for (const entry of editorialEntries) {
   for (const alias of entry.aliases) {
     assert.match(alias, /^[a-z0-9-]+$/)
     assert.equal(indexPolicy.isSearchIndexEligible(item(alias)), false, 'Redirecting aliases must not be in the sitemap')
     assert.ok(read('lib/skill-fallbacks.ts').includes(`'${alias}': '${entry.slug}'`))
+    assert.ok(redirects.some(rule => rule.source === `/skills/${alias}` && rule.destination === `/skills/${entry.slug}` && rule.permanent), 'Canonical aliases redirect before streaming')
   }
   for (const field of ['slug', 'repository', 'path', 'license']) assert.match(entry[field], /^[\w./-]+$/, 'Filter values must not contain PostgREST operators')
   assert.match(entry.commit, /^[a-f0-9]{40}$/)
