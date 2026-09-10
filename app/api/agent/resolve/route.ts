@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { resolveAgentSkill, type AgentResolveInput } from '@/lib/agent-resolve'
 import { formatAgentInstallReceiptText } from '@/lib/agent-install-receipt'
+import { toResolveWebResponse } from '@/lib/resolve-web-response'
 
 export const revalidate = 300
 
@@ -248,6 +249,7 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as AgentResolveInput & { format?: string }
     const payload = await resolveAgentSkill(body)
 
+    if (body.format === 'web') return NextResponse.json(toResolveWebResponse(payload), { headers: { 'Cache-Control': 'private, no-store' } })
     if (body.format === 'text') return textResponse(payload)
     if (body.format === 'lockfile') return NextResponse.json(buildResolveLockfile(payload))
     return NextResponse.json(payload)

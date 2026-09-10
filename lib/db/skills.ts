@@ -253,10 +253,16 @@ export async function getSkillDirectory(
   // Interactive pages usually render fewer than 100 records. Do not make
   // those navigations wait for a 1,200-row directory read. Small, medium, and
   // full consumers share bounded cache tiers instead.
-  const sourceLimit = rowLimit <= 160
+  const sourceLimit = rowLimit <= 96
+    ? 96
+    : rowLimit <= 160
     ? 160
+    : rowLimit <= 320
+      ? 320
     : rowLimit <= 480
       ? 480
+      : rowLimit <= 800
+        ? 800
       : rowLimit <= DEFAULT_SKILL_QUERY_LIMIT
         ? DEFAULT_SKILL_QUERY_LIMIT
         : rowLimit

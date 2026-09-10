@@ -2,7 +2,9 @@ import { ImageResponse } from 'next/og'
 import type { ReactNode } from 'react'
 import { getXShortlist, isXShortlistLane, type XShortlist } from '@/lib/x/shortlist'
 
-export const runtime = 'edge'
+// The shared directory cache uses CompressionStream/DecompressionStream.
+// Keep OG generation in a runtime that supports that data dependency.
+export const runtime = 'nodejs'
 export const alt = 'OpenAgentSkill task shortlist share asset'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
