@@ -4,6 +4,7 @@ import { buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { getSkillDirectory, getCategories, type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsStrict } from '@/lib/db/skills'
 import { SkillsPageClient } from '@/components/skills-page-client'
+import { ExternalSkillResults } from '@/components/external-skills'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillSupplyProfile, getSupplyTrackSummaries } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
@@ -1053,6 +1054,7 @@ export default async function SkillsPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <SkillsPageClient
+        externalDiscovery={<ExternalSkillResults query={query} locale={locale} />}
         skills={skills}
         query={query}
         sort={sort}

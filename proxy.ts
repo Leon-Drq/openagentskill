@@ -4,6 +4,7 @@ import { getCanonicalSkillSlug } from '@/lib/skill-slug-aliases'
 import { isMissingShowcasePath } from '@/lib/showcase'
 import { isMissingFeaturedCreatorPath } from '@/lib/creator-directory'
 import { isMissingRankingPath } from '@/lib/rankings'
+import { isMissingExternalSkillPath } from '@/lib/skills/external-catalog'
 
 const MARKET_LOCALE_CODES = new Set(['zh', 'ja', 'ko', 'es', 'de', 'fr', 'id'])
 const DOCUMENT_LANG_BY_LOCALE: Record<string, string> = {
@@ -92,7 +93,7 @@ export async function proxy(request: NextRequest) {
   const locale = pathLocale || (queryLocale && MARKET_LOCALE_CODES.has(queryLocale) ? queryLocale : null)
   const noindex = isSkillDetailVariant(pathname, searchParams)
 
-  if (isMissingShowcasePath(pathname) || isMissingFeaturedCreatorPath(pathname) || isMissingRankingPath(pathname)) {
+  if (isMissingShowcasePath(pathname) || isMissingFeaturedCreatorPath(pathname) || isMissingRankingPath(pathname) || isMissingExternalSkillPath(pathname)) {
     return NextResponse.rewrite(new URL('/404', request.url), {
       status: 404,
       headers: { 'X-Robots-Tag': 'noindex, follow' },
