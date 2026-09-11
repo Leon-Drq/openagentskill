@@ -4,7 +4,7 @@ import { NativeSelect } from '@/components/ui/native-select'
 
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useSyncExternalStore, useTransition } from 'react'
+import { useSyncExternalStore, useTransition, type ReactNode } from 'react'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
 import type { SupplyTrackSummary } from '@/lib/supply'
@@ -174,6 +174,7 @@ interface Props {
   degraded: boolean
   directorySections: DirectorySection[]
   directoryLinks: DirectoryLink[]
+  externalDiscovery?: ReactNode
 }
 
 
@@ -345,6 +346,7 @@ export function SkillsPageClient(props: Props) {
           </nav>}
         </section>
 
+        {props.externalDiscovery}
         {!query && directorySections.length > 0 && <section className="mt-16 border-t border-border pt-8" aria-labelledby="directory-collections">
           <h2 id="directory-collections" className="font-display text-3xl">{c.collections}</h2>
           <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2">

@@ -1,5 +1,9 @@
 # Owner/developer publishing channel
 
+For non-GitHub, link-only external platform listings, use the separate
+[external publication interface](external-skill-publication.md). Do not invent
+a GitHub repository or pass external entries through this repository-only API.
+
 The site's owner can publish a valid public GitHub Skill without waiting for an
 AI review or a minimum star count. Ordinary community submissions still use the
 existing static-analysis and AI-review gates. Website code development is unrelated

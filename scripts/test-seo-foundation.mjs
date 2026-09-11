@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict'
+import './test-external-skills.mjs'
+import * as externalCatalog from '../lib/skills/external-catalog.ts'
 import { readFileSync } from 'node:fs'
 import ts from 'typescript'
 import { selectGuideSkills, selectComparisonSkills, scoreSkillForGuide } from '../lib/seo/guide-selection.ts'
@@ -33,6 +35,7 @@ function compile(path, dependencies) {
   return exports
 }
 const mocks = {
+  '@/lib/skills/external-catalog': externalCatalog,
   '@/lib/agent-tasks': { AGENT_TASKS: [] }, '@/lib/collections': { SKILL_STACKS: [] },
   '@/lib/async': { withTimeout: promise => promise },
   '@/lib/db/skills': { getApprovedSkillSitemapCount: async () => 2001, getApprovedSkillSitemapRecords: async () => [] },
@@ -50,6 +53,7 @@ const mocks = {
 }
 const sitemap = compile('lib/seo/sitemap.ts', mocks)
 const core = sitemap.getCoreSitemapEntries()
+assert.equal(core.filter(p => p.url.endsWith('/skills/external/redskill-curtain-branch-swallow')).length, 1)
 assert.equal(core.find(p => p.url.endsWith('/about')).lastModified, undefined)
 assert.equal(core.find(p => p.url.endsWith('/showcase/example')).lastModified, '2026-09-01')
 assert.equal(sitemap.getGuideSitemapEntries().find(p => p.url.endsWith(videoGuide.slug)).lastModified, videoGuide.updatedAt)
