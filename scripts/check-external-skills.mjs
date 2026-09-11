@@ -10,7 +10,8 @@ for (const lang of ['', '?lang=zh']) {
   assert.equal(response.status, 200)
   assert.ok(html.includes('流白Livo'))
   assert.ok(html.includes('CC BY-NC 4.0'))
-  assert.ok(html.includes('https://xhslink.cn/o/2WbYk12a1h4'))
+  const links = [...html.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)].map(match => match[1])
+  assert.ok(links.some(href => href === 'https://xhslink.cn/o/2WbYk12a1h4'), 'exact author source link')
   const title = html.match(/<title>(.*?)<\/title>/)?.[1]
   assert.equal((title?.match(/OpenAgentSkill/g) || []).length, 1, 'single title suffix')
   assert.ok(html.includes(`rel="canonical" href="https://www.openagentskill.com${path}"`))
