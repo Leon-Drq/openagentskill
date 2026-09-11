@@ -1,6 +1,6 @@
 # External-platform Skill listings
 
-External entries are owner-curated **link-only editorial records**, not GitHub
+External entries are owner-curated **external editorial records**, not GitHub
 SkillRecords. The first entry is `redskill-curtain-branch-swallow` by 流白Livo,
 published at the explicit request of the site owner. Its source is the author post
 provided by the owner: https://xhslink.cn/o/2WbYk12a1h4.
@@ -42,8 +42,33 @@ infer ownership certification from a supplied author name or a package checksum.
 
 No remote API is called on page loads; there is no added model/API cost. RedSkill
 version `1.0.0` and bundle SHA-256 are observations at listing time, not a promise
-of automatic synchronization. The original Skill was not executed. No package,
-template code, screenshots or creator media are mirrored on this site.
+of automatic synchronization. No package or template code is mirrored on this site.
+Optional runtime recordings require explicit publication permission and scoped evidence;
+they do not change the false AI-review, general runtime-verification or auto-install flags.
+
+## Authorized runtime recording: p5-animation
+
+On 2026-09-11 the owner confirmed they had obtained permission to publicly display
+the recording and that this use is noncommercial. This records the owner's
+statement, not an independent verification of a license grant or author endorsement.
+Original CC BY-NC restrictions and the README license discrepancy remain visible.
+
+The installed 1.0.0 bundle was exercised locally using its three templates with
+default parameter substitution. A browser harness supplied pointer interactions,
+reset branch growth and triggered the swallow flock. It recorded real canvas
+output (rain 8s, branches 8s, swallows 5s), not an AI-generated approximation.
+Environment: Windows 10, Chrome 152, p5.js 1.11.11. Recorded at
+2026-09-11T07:15:53.653Z. Runtime report: rain 3→484 frames, branch 2→482 frames,
+swallow 2→268 frames; all three reported zero errors during this run. This does
+not establish installer, other-agent, other-parameter or security compatibility.
+
+The 21s silent H.264 MP4 is 1280×720 at 30fps, 3,817,967 bytes. SHA-256:
+`b58b7d7a40c1d1d9cbbd374b10e27ae80b1ddcc3eb66de42959f8bbff63ccf6f`.
+`public/media/external/p5-animation` contains this recording, an extracted poster,
+EN/ZH descriptive captions and attribution. No source template is distributed.
+The player uses native controls, inline playback, a fixed aspect ratio and
+`preload="none"`; no autoplay or client-side model calls are added. VideoObject
+metadata describes the actual recording; existing canonical routes are retained.
 
 The RedSkill package README declares CC BY-NC 4.0 and separately mentions
 share-alike. Preserve that discrepancy and the noncommercial restriction. Do not
