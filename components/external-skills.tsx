@@ -16,7 +16,7 @@ export function ExternalSkillResults({ query = '', locale = 'en' }: { query?: st
       <p className="font-mono text-xs text-secondary">RedSkill · {entry.author.name} · {entry.version}</p>
       <h3 className="mt-2 text-lg font-semibold"><Link href={`${externalSkillHref(entry.slug)}${suffix}`} className="hover:text-[#006b4f]">{entry.title[lang]} →</Link></h3>
       <p className="mt-2 max-w-3xl text-sm leading-7 text-secondary">{entry.description[lang]}</p>
-      <p className="mt-3 text-xs font-medium">{zh ? '仅限非商业用途 · 未运行验证 · 前往原平台使用' : 'Noncommercial use only · Not runtime-verified · Use on the source platform'}</p>
+      <p className="mt-3 text-xs font-medium">{entry.runtimeDemo ? (zh ? '仅限非商业用途 · 附本地实测录像 · 前往原平台使用' : 'Noncommercial use only · Local runtime recording · Use on the source platform') : (zh ? '仅限非商业用途 · 未运行验证 · 前往原平台使用' : 'Noncommercial use only · Not runtime-verified · Use on the source platform')}</p>
     </article>)}
     {entries.length === 0 && <p className="mt-4 text-sm text-secondary">{zh ? '外部目录没有匹配此关键词的条目。' : 'No external entries match this query.'}</p>}
   </section>

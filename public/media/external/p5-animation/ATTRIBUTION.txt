@@ -1,0 +1,13 @@
+p5-animation 1.0.0 — skill by 流白Livo
+Author: https://www.xiaohongshu.com/user/profile/687e6455000000001e00b765
+Source: https://www.xiaohongshu.com/explore/6a632c13000000000a03a59a
+License: CC BY-NC 4.0 — https://creativecommons.org/licenses/by-nc/4.0/
+The package README additionally mentions share-alike; clarify with the author before redistribution.
+
+Runtime recording, poster extraction and descriptive captions by OpenAgentSkill.
+Recorded 2026-09-11, Windows 10 / Chrome 152 / p5.js 1.11.11.
+Default template parameters, test-driven pointer and flock-start interactions.
+21 seconds, 1280x720, 30fps, silent. This recording is not a security certification.
+Displayed noncommercially based on permission confirmed by the site owner on 2026-09-11.
+No commercial permission or author endorsement is implied. Original skill license unchanged.
+No skill template source code or bundle is hosted in this directory.

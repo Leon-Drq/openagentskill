@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import ts from 'typescript'
 import { EXTERNAL_SKILLS, ExternalSkillSchema, validateExternalCatalog, searchExternalSkills, getExternalSkill, externalSkillDiscoveryRecord, isMissingExternalSkillPath } from '../lib/skills/external-catalog.ts'
 
@@ -33,6 +34,15 @@ assert.equal(record.ai_reviewed, false)
 assert.equal(record.install_command, null)
 assert.equal(record.github_stars, undefined)
 assert.equal(record.commercial_use, 'not-permitted-without-separate-permission')
+assert.equal(record.runtime_demo.security_certification, false)
+assert.equal(record.runtime_demo.duration_seconds, 21)
+assert.equal(entry.runtimeDemo.displayPermission, 'site-owner-confirmed-noncommercial-display')
+assert.equal(createHash('sha256').update(readFileSync(new URL('../public' + entry.runtimeDemo.video, import.meta.url))).digest('hex'), entry.runtimeDemo.sha256)
+assert.ok(readFileSync(new URL('../public' + entry.runtimeDemo.poster, import.meta.url)).length > 1000)
+assert.equal(externalSkillDiscoveryRecord({ ...entry, runtimeDemo: undefined }).runtime_demo, null)
+for (const changes of [{ video: '//example.com/a.mp4' }, { poster: '/media/external/../a.webp' }, { displayPermission: 'assumed' }, { durationSeconds: -1 }]) {
+  assert.equal(ExternalSkillSchema.safeParse({ ...entry, runtimeDemo: { ...entry.runtimeDemo, ...changes } }).success, false)
+}
 assert.match(record.url, /\/skills\/external\//)
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
 assert.match(read('proxy.ts'), /isMissingExternalSkillPath\(pathname\)/)
@@ -53,7 +63,11 @@ const page = read('app/skills/external/[slug]/page.tsx')
 assert.match(page, /notFound\(\)/)
 assert.match(page, /export const dynamicParams = false/)
 assert.match(page, /alternates: \{ canonical: url \}/)
-assert.doesNotMatch(page, /aggregateRating|install_command|<iframe|<video|<img/)
+assert.doesNotMatch(page, /aggregateRating|install_command|<iframe|<img|autoPlay/)
+assert.match(page, /<video controls playsInline preload="none"/)
+assert.match(page, /'@type': 'VideoObject'/)
+assert.match(page, /aria-describedby="runtime-caption"/)
+for (const lang of ['en', 'zh']) assert.match(read(`public/media/external/p5-animation/captions-${lang}.vtt`), /^WEBVTT/)
 assert.match(read('app/skills/page.tsx'), /externalDiscovery=\{<ExternalSkillResults query=\{query\}/)
 assert.match(read('lib/seo/sitemap.ts'), /EXTERNAL_SKILLS\.map/)
 for (const path of ['lib/skills/owner-publication.ts', 'app/api/admin/skills/publish/route.ts']) {
