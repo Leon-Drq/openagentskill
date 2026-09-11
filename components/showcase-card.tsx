@@ -25,8 +25,8 @@ export function ShowcaseCard({ item, placement = 'gallery', priority = false }: 
   const category = SHOWCASE_CATEGORIES.find((entry) => entry.id === item.category)!
 
   return (
-    <article className="group min-w-0">
-      {item.videoUrl && <div className="relative overflow-hidden rounded-lg border border-[#e4e0d8]">
+    <article className="group flex h-full min-w-0 flex-col" data-showcase-card={item.slug}>
+      {item.videoUrl && <div className="relative shrink-0 overflow-hidden rounded-lg border border-[#e4e0d8]">
         <ShowcaseVideoPlayer item={item} locale={locale} compact priority={priority} />
         <span className="pointer-events-none absolute left-3 top-3 rounded bg-[#fbfaf6]/95 px-2 py-1 font-mono text-[10px] text-[#1d1b18] shadow-sm">{localizeShowcase(category.label, locale)}</span>
       </div>}
@@ -34,7 +34,7 @@ export function ShowcaseCard({ item, placement = 'gallery', priority = false }: 
         href={getLocalizedNavigationHref(`/showcase/${item.slug}`, locale)}
         prefetch={false}
         onClick={() => trackAnalyticsEvent('showcase_open', { case_slug: item.slug, skill_slug: item.skillSlug, placement })}
-        className="block rounded-lg outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#006b4f]"
+        className="block shrink-0 rounded-lg outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#006b4f]"
       >
         {!item.videoUrl && <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-[#e4e0d8] bg-[#eeece5] transition-colors group-hover:border-[#006b4f]/50">
           <Image
@@ -53,20 +53,24 @@ export function ShowcaseCard({ item, placement = 'gallery', priority = false }: 
             <span className="shrink-0">{getShowcaseEvidenceLabel(item, locale)}</span>
           </div>
           <div className="mt-2 flex items-start justify-between gap-3">
-            <h3 className="text-base font-semibold leading-snug tracking-tight text-[#1d1b18] group-hover:text-[#006b4f]">{title}</h3>
+            <h3 title={title} className="min-h-11 line-clamp-2 break-words text-base font-semibold leading-snug tracking-tight text-[#1d1b18] group-hover:text-[#006b4f]">{title}</h3>
             <ArrowUpRight className="mt-0.5 h-4 w-4 shrink-0 text-[#6d675e] group-hover:text-[#006b4f]" aria-hidden="true" />
           </div>
           <p className="mt-2 line-clamp-2 min-h-[2.875rem] text-sm leading-relaxed text-[#6d675e]">{localizeShowcase(item.description, locale)}</p>
         </div>
       </Link>
-      {getShowcaseTags(item).map((tag) => <Link key={tag.id} prefetch={false} href={getLocalizedNavigationHref(`/showcase?tag=${tag.id}`, locale)} className="mt-3 inline-flex min-h-9 items-center rounded-full border border-[#e4e0d8] px-3 text-xs text-[#006b4f] hover:border-[#006b4f]">{localizeShowcase(tag.label, locale)}</Link>)}
-      <div className="mt-4 flex min-w-0 items-center justify-between gap-3 border-t border-[#e4e0d8] pt-3">
-        <ShowcaseCreatorCredit creatorId={skill.creatorId} label={galleryCopy(locale, "Skill by", "技能作者")} />
-        <Link href={getLocalizedNavigationHref(`/skills/${item.skillSlug}`, locale)} className="shrink-0 rounded border border-[#e4e0d8] px-2 py-1 text-[10px] text-[#6d675e] hover:border-[#006b4f] hover:text-[#006b4f]" title={`${skill.name} · ${skill.sourceLicense}`}>
-          {getShowcaseAccessLabel(skill, locale)}
-        </Link>
+      <div className="mt-3 flex min-h-9 flex-wrap items-start gap-2" data-showcase-tags>
+        {getShowcaseTags(item).map((tag) => <Link key={tag.id} prefetch={false} href={getLocalizedNavigationHref(`/showcase?tag=${tag.id}`, locale)} className="inline-flex min-h-9 max-w-full items-center rounded-full border border-[#e4e0d8] px-3 py-1 text-xs text-[#006b4f] [overflow-wrap:anywhere] hover:border-[#006b4f]">{localizeShowcase(tag.label, locale)}</Link>)}
       </div>
-      {(placement === 'gallery' || placement === 'related') && <ShowcaseActions item={item} />}
+      <div className="mt-auto pt-4" data-showcase-footer>
+        <div className="flex min-w-0 items-center justify-between gap-3 border-t border-[#e4e0d8] pt-3">
+          <ShowcaseCreatorCredit creatorId={skill.creatorId} label={galleryCopy(locale, "Skill by", "技能作者")} />
+          <Link href={getLocalizedNavigationHref(`/skills/${item.skillSlug}`, locale)} className="shrink-0 rounded border border-[#e4e0d8] px-2 py-1 text-[10px] text-[#6d675e] hover:border-[#006b4f] hover:text-[#006b4f]" title={`${skill.name} · ${skill.sourceLicense}`}>
+            {getShowcaseAccessLabel(skill, locale)}
+          </Link>
+        </div>
+        {(placement === 'gallery' || placement === 'related') && <ShowcaseActions item={item} />}
+      </div>
     </article>
   )
 }

@@ -82,6 +82,11 @@ for (const component of ['showcase-card', 'showcase-detail']) {
   assert.ok(source.includes('<ShowcaseVideoPlayer'), 'Cards and detail must share the same player')
 }
 const gallerySource = await readFile(new URL('../components/showcase-gallery.tsx', import.meta.url), 'utf8')
+const cardLayoutSource = await readFile(new URL('../components/showcase-card.tsx', import.meta.url), 'utf8')
+assert.ok(cardLayoutSource.includes('group flex h-full min-w-0 flex-col'), 'Gallery cards must stretch to equal row height')
+assert.ok(cardLayoutSource.includes('min-h-11 line-clamp-2 break-words'), 'Reserve two title lines without overflowing long titles')
+assert.ok(cardLayoutSource.includes('mt-3 flex min-h-9 flex-wrap'), 'Keep a tag slot for untagged cards, and allow longer tags to wrap')
+assert.ok(cardLayoutSource.includes('className="mt-auto pt-4" data-showcase-footer'), 'Anchor creator credit and actions together at the card bottom')
 assert.ok(gallerySource.includes('Filter by use case') && !gallerySource.includes('#video-skills'), 'Use-case controls must not mix in navigation to a skill directory')
 const logoSlugs = ['ip-mascot-directions', 'motion-logo-outro']
 assert.deepEqual(filterShowcaseCases('all', '', '', 'logo').map((item) => item.slug).sort(), logoSlugs)
