@@ -11,6 +11,8 @@ import * as discovery from '../lib/showcase-discovery.ts'
 import * as indexPolicy from '../lib/seo/search-indexability.ts'
 import * as useCases from '../lib/use-cases.ts'
 import { locales } from '../lib/i18n/config.ts'
+import * as searchResults from '../lib/search-results.ts'
+import * as presentationCategory from '../lib/skills/presentation-category.ts'
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
 function compile(path, dependencies, clock = Date) {
@@ -23,6 +25,26 @@ function compile(path, dependencies, clock = Date) {
   return exports
 }
 const forbidden = () => { throw new Error('Unexpected network, execution or database access') }
+const sourceEvidence = compile('lib/skills/source-evidence.ts', {})
+const directory = compile('lib/skills/directory.ts', { './source-evidence': sourceEvidence })
+
+const ok = value => ({ status: 'fulfilled', value })
+const fail = { status: 'rejected', reason: new Error('timeout') }
+assert.deepEqual(searchResults.collectSearchResults([fail, ok([{slug:'broad'}])], 10), { records: [{slug:'broad'}], degraded: true })
+assert.deepEqual(searchResults.collectSearchResults([ok([{slug:'exact'}]), fail], 10), { records: [{slug:'exact'}], degraded: true })
+assert.deepEqual(searchResults.collectSearchResults([ok([{slug:'exact'}]), ok([{slug:'exact'}, {slug:'other'}])], 10), { records: [{slug:'exact'}, {slug:'other'}], degraded: false })
+assert.throws(() => searchResults.collectSearchResults([ok([]), fail], 10), /incomplete/)
+assert.throws(() => searchResults.collectSearchResults([fail, fail], 10), /incomplete/)
+assert.deepEqual(searchResults.collectSearchResults([ok([]), ok([])], 10), { records: [], degraded: false })
+assert.ok(directory.directoryCategoryTerms('Coding Agents').includes('developer tools'))
+assert.deepEqual(directory.directoryCategoryTerms('bad,or(x)'), ['bad'])
+for (const item of showcase.SHOWCASE_CASES) {
+  const card = showcase.getShowcaseCardData(item)
+  assert.equal(card.slug, item.slug)
+  assert.equal(card.media.length, 1)
+  for (const field of ['prompt','productionNote','requirements','sourceRevision']) assert.ok(!(field in card), `Gallery card must not serialize ${field}`)
+}
+assert.ok(JSON.stringify(showcase.SHOWCASE_CASES.map(showcase.getShowcaseCardData)).length < JSON.stringify(showcase.SHOWCASE_CASES).length / 3)
 
 for (const agent of tasks.SHOWCASE_AGENT_TARGETS) {
   assert.equal(tasks.normalizeShowcaseAgentTarget(agent), agent)
@@ -75,6 +97,7 @@ const client = { from(table) {
     gte(...args) { operationsForQuery.push(['gte', ...args]); return query },
     order(...args) { operationsForQuery.push(['order', ...args]); return query },
     range(...args) { operationsForQuery.push(['range', ...args]); return query },
+    limit(...args) { operationsForQuery.push(['limit', ...args]); return query },
     then(resolve, reject) {
       reads++
       return Promise.resolve(failing ? { data: null, error: new Error('Simulated outage') } : { data: rows, count: rows.length, error: null }).then(resolve, reject)
@@ -87,6 +110,9 @@ const db = compile('lib/db/skills.ts', {
   '@/lib/supabase/public': { createPublicClient: () => client },
   '@/lib/supabase/admin': { createAdminClient: () => client },
   '@/lib/async': { withTimeout: promise => promise },
+  '@/lib/search-results': searchResults,
+  '@/lib/skills/directory': directory,
+  '@/lib/skills/presentation-category': presentationCategory,
   '@/lib/skills/registry-scope': { isMcpOnlyCategory: () => false, isMcpOnlySkillRecord: () => false },
   '@/lib/seo/curated-skill-snapshot': { CURATED_SKILL_SNAPSHOT: snapshot },
   '@/lib/search-query': {},
@@ -247,3 +273,18 @@ for (const path of ['app/openapi.json/route.ts', 'app/.well-known/agent-manifest
   assert.ok(read(path).includes('/api/agent/showcase'), `${path} advertises the real discovery route`)
 }
 console.log('Growth discovery passed: lossless bounded cache, outage/recovery, SEO predicates, relevance, 101 evidence-linked tasks, JSON/Markdown APIs, MCP contracts and no fabricated installs.')
+
+failing = false
+rows = live
+const browse = await db.getBrowseSkillCandidates('stars', 'Research', 96, true, 20)
+assert.deepEqual(browse.records, live)
+const browseOps = operations.at(-1)
+assert.ok(browseOps.some(op => op[0] === 'or' && op[1] === 'PUBLIC_TEST_GATE'))
+assert.ok(browseOps.some(op => op[0] === 'or' && op[1].includes('source_path.ilike.*SKILL.md')))
+assert.ok(browseOps.some(op => op[0] === 'or' && op[1].includes('rag knowledge')))
+assert.ok(browseOps.findIndex(op => op[0] === 'gte') < browseOps.findIndex(op => op[0] === 'limit'))
+const writesBeforeFailure = sharedWrites.length
+failing = true
+await assert.rejects(db.getBrowseSkillCandidates('stars', 'Research', 96, true, 20))
+assert.deepEqual(await db.getCategories(), [])
+assert.equal(sharedWrites.length, writesBeforeFailure, 'Failed category and filtered reads must not poison shared caches')

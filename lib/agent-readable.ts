@@ -14,6 +14,8 @@ import { getReviewEvidence } from '@/lib/skills/review-evidence'
 
 const SITE_URL = 'https://www.openagentskill.com'
 
+import { skillPresentationCategory } from '@/lib/skills/presentation-category'
+
 export interface AgentReadableSkillMetadata {
   review_evidence: ReturnType<typeof getReviewEvidence>
   version: 'openagentskill-agent-metadata-v2'
@@ -277,7 +279,7 @@ export function buildAgentReadableSkillMetadata(
       slug: skill.slug,
       name: skill.name,
       description: skill.description,
-      category: skill.category,
+      category: skillPresentationCategory(skill),
       url: absoluteUrl(baseUrl, `/skills/${skill.slug}`),
       repository: skill.repository || null,
       github_repo: skill.github_repo || null,

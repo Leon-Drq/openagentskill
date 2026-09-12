@@ -5,7 +5,7 @@ import { galleryCopy } from '@/lib/i18n/gallery-copy'
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { SHOWCASE_VIDEO_SKILLS } from '@/lib/showcase-video-skills'
-import { localizeShowcase } from '@/lib/showcase'
+import { localizeShowcase } from '@/lib/showcase-shared'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import type { Locale } from '@/lib/i18n/config'
 

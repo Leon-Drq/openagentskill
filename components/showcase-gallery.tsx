@@ -17,13 +17,23 @@ import { sortShowcaseCases, type ShowcaseSort } from '@/lib/showcase-engagement'
 import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { trackAnalyticsEvent } from '@/lib/analytics'
-import { filterShowcaseCases, getShowcaseCreator, getShowcasePage, localizeShowcase, SHOWCASE_CASES, SHOWCASE_CATEGORIES, SHOWCASE_SKILLS, SHOWCASE_TAGS } from '@/lib/showcase'
+import { getShowcaseCreator, getShowcasePage, localizeShowcase, SHOWCASE_CATEGORIES, SHOWCASE_SKILLS, SHOWCASE_TAGS, type ShowcaseCardData } from '@/lib/showcase-shared'
 
-export function ShowcaseGallery() {
-  return <ShowcaseEngagementProvider><GalleryContent /></ShowcaseEngagementProvider>
+export type GalleryData = {
+  cases: ShowcaseCardData[]
+  total: number
+  totalMatches: number
+  pagination: { page: number; pageCount: number; offset: number; total: number }
+  workflowCount: number
+  categoryCounts: Record<string, number>
+  tagCounts: Record<string, number>
 }
 
-function GalleryContent() {
+export function ShowcaseGallery({ data }: { data: GalleryData }) {
+  return <ShowcaseEngagementProvider><GalleryContent data={data} /></ShowcaseEngagementProvider>
+}
+
+function GalleryContent({ data }: { data: GalleryData }) {
   const { locale } = useI18n()
   const router = useRouter()
   const params = useSearchParams()
@@ -36,9 +46,11 @@ function GalleryContent() {
   const viewed = useRef(false)
   const { stats, ready, failed, refresh } = useShowcaseEngagement()
   const sort: ShowcaseSort = params.get('sort') === 'top' ? 'top' : 'curated'
-  const cases = sortShowcaseCases(filterShowcaseCases(category, query, creatorId, tagId), ready ? sort : 'curated', stats)
-  const pagination = getShowcasePage(cases, params.get('page'))
-  const workflowCount = new Set(SHOWCASE_CASES.map((item) => item.skillSlug)).size
+  const cases = sortShowcaseCases(data.cases, ready ? sort : 'curated', stats)
+  // Curated pages receive only the visible cards. Top-rated mode receives the
+  // filtered shortlist so a live vote can still update its ordering correctly.
+  const pagination = sort === 'top' ? getShowcasePage(cases, params.get('page')) : { ...data.pagination, items: cases }
+  const workflowCount = data.workflowCount
 
   useEffect(() => {
     if (viewed.current) return
@@ -83,7 +95,7 @@ function GalleryContent() {
               </h1>
               <div className="pb-1">
                 <p className="max-w-md text-sm leading-relaxed text-[#6d675e]">{galleryCopy(locale, "Discover the work, meet its creators, and make something of your own.", "发现作品，认识作者，用 Skill 开始创作。")}</p>
-                <p className="mt-3 font-mono text-[11px] uppercase tracking-wider text-[#6d675e]">{galleryCopy(locale, '{count} selected examples · {workflows} skills & workflows', '{count} 个精选案例 · {workflows} 个技能与工作流', { count: formatGalleryNumber(SHOWCASE_CASES.length, locale), workflows: workflowCount })}</p>
+                <p className="mt-3 font-mono text-[11px] uppercase tracking-wider text-[#6d675e]">{galleryCopy(locale, '{count} selected examples · {workflows} skills & workflows', '{count} 个精选案例 · {workflows} 个技能与工作流', { count: formatGalleryNumber(data.total, locale), workflows: workflowCount })}</p>
                 {!['en', 'zh'].includes(locale) && <p className="mt-3 text-xs leading-relaxed text-[#6d675e]">{galleryCopy(locale, 'Original-language content', '作品说明和提示词可能保留原文。')}</p>}
               </div>
             </div>
@@ -96,7 +108,7 @@ function GalleryContent() {
             <div className="flex flex-wrap items-center gap-2" aria-label={galleryCopy(locale, "Output format", "作品形式")}>
               <span className="mr-1 text-xs text-[#6d675e]">{galleryCopy(locale, "Format", "形式")}</span>
               {[{ id: 'all', label: { en: 'All work', zh: '全部作品' } }, ...SHOWCASE_CATEGORIES].map((entry) => {
-                const count = entry.id === 'all' ? SHOWCASE_CASES.length : SHOWCASE_CASES.filter((item) => item.category === entry.id).length
+                const count = entry.id === 'all' ? data.total : data.categoryCounts[entry.id] || 0
                 return <button key={entry.id} type="button" aria-pressed={category === entry.id} onClick={() => filter(entry.id, query)}
                   className={`inline-flex min-h-11 items-center gap-2 rounded-md border px-3 text-sm transition-colors ${category === entry.id ? 'border-[#1d1b18] bg-[#1d1b18] text-[#fbfaf6]' : 'border-[#e4e0d8] bg-transparent text-[#6d675e] hover:border-[#6d675e]'}`}>
                   {localizeShowcase(entry.label, locale)}<span className="font-mono text-[10px] opacity-70">{count}</span>
@@ -111,13 +123,13 @@ function GalleryContent() {
           </div>
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">
-              <p aria-live="polite" role="status" className="text-xs text-[#6d675e]">{galleryCopy(locale, '{count} examples', '{count} 个案例', { count: formatGalleryNumber(cases.length, locale) })}{cases.length > 0 && ` · ${galleryCopy(locale, 'Showing {start}–{end}', '当前 {start}–{end}', { start: pagination.offset + 1, end: pagination.offset + pagination.items.length })}`}{query && ` · “${query}”`}</p>
+              <p aria-live="polite" role="status" className="text-xs text-[#6d675e]">{galleryCopy(locale, '{count} examples', '{count} 个案例', { count: formatGalleryNumber(data.totalMatches, locale) })}{cases.length > 0 && ` · ${galleryCopy(locale, 'Showing {start}–{end}', '当前 {start}–{end}', { start: pagination.offset + 1, end: pagination.offset + pagination.items.length })}`}{query && ` · “${query}”`}</p>
               {(query || category !== 'all' || creatorId || tagId) && <button type="button" onClick={() => filter('all', '', '', sort, '')} className="inline-flex min-h-11 items-center gap-1 text-xs text-[#006b4f]"><X className="h-3 w-3" aria-hidden="true" />{galleryCopy(locale, "Clear filters", "清除筛选")}</button>}
             </div>
             <div className="grid w-full min-w-0 gap-2 sm:flex sm:w-auto sm:max-w-full sm:flex-wrap">
             <NativeSelect value={tagId} onChange={(event) => filter(category, query, creatorId, sort, event.target.value)} aria-label={galleryCopy(locale, "Filter by use case", "按用途筛选")} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
               <option value="">{galleryCopy(locale, "All use cases", "全部用途")}</option>
-              {SHOWCASE_TAGS.map((tag) => { const count = filterShowcaseCases(category, query, creatorId, tag.id).length; return <option key={tag.id} value={tag.id} disabled={!count && tagId !== tag.id}>{localizeShowcase(tag.label, locale)} · {count}</option> })}
+              {SHOWCASE_TAGS.map((tag) => { const count = data.tagCounts[tag.id] || 0; return <option key={tag.id} value={tag.id} disabled={!count && tagId !== tag.id}>{localizeShowcase(tag.label, locale)} · {count}</option> })}
             </NativeSelect>
             <NativeSelect value={creatorId} onChange={(event) => filter(category, query, event.target.value)} aria-label={galleryCopy(locale, "Filter by skill creator", "按技能作者筛选")} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
               <option value="">{galleryCopy(locale, "All skill creators", "全部技能作者")}</option>

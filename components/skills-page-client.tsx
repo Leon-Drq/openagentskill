@@ -154,6 +154,7 @@ interface Props {
   skills: Skill[]
   query?: string
   sort: string
+  view: 'skills' | 'all'
   category: string
   categories: string[]
   useCase: string
@@ -180,7 +181,7 @@ interface Props {
 
 export function SkillsPageClient(props: Props) {
   const { skills, query, sort, category, categories, useCase, useCases, platform, platformOptions,
-    quality, trust, safety, supplyTrack, supplyTracks, minStars, resultCount, page, rankOffset,
+    quality, trust, safety, supplyTrack, minStars, resultCount, page, rankOffset,
     hasPreviousResults, hasMoreResults, degraded, directorySections, directoryLinks } = props
   const { locale } = useI18n()
   const c = directoryCopy(locale)
@@ -197,7 +198,7 @@ export function SkillsPageClient(props: Props) {
   const href = (updates: Record<string, string | undefined>) => directoryHref(pathname, searchParams.toString(), updates)
   const navigate = (updates: Record<string, string | undefined>) => startTransition(() => router.push(href(updates), { scroll: false }))
   const resetHref = directoryHref(pathname, searchParams.toString(), Object.fromEntries(
-    ['q','sort','category','useCase','platform','quality','trust','safety','track','minStars','page'].map(key => [key, undefined])
+    ['q','sort','category','useCase','platform','quality','trust','safety','track','minStars','page','view'].map(key => [key, undefined])
   ))
   const toggleCompare = (slug: string) => writeSelection(compareSlugs.includes(slug) ? compareSlugs.filter(v => v !== slug) : [...compareSlugs, slug].slice(-4))
   const label = (key: string) => directoryLabel(locale, key)
@@ -207,18 +208,14 @@ export function SkillsPageClient(props: Props) {
   const activeFilters = Object.entries({ category, useCase, platform, quality, trust, safety, track: supplyTrack, minStars: minStars ? String(minStars) : 'all' })
     .filter(([, value]) => value && value !== 'all')
   const sortOptions = [
-    ['stars', c.stars], ['quality', query ? c.relevance : c.recommended],
+    ['quality', query ? c.relevance : c.recommended], ['stars', c.stars],
     ['fresh', c.fresh], ['new', c.new], ['trending', c.trending],
     ...(sort === 'downloads' ? [['downloads', c.trending]] : []),
   ]
   const advanced = [
     { key: 'useCase', title: c.useCase, value: useCase, options: useCases.map(v => [v.slug, v.shortTitle]) },
     { key: 'platform', title: c.platform, value: platform, options: [...new Set([...platformOptions, ...(platform !== 'all' ? [platform] : [])])].map(v => [v, v]) },
-    { key: 'quality', title: c.quality, value: quality, options: ['excellent','strong','promising'].map(v => [v, label(v)]) },
-    { key: 'trust', title: c.trust, value: trust, options: ['production','strong','review','risk'].map(v => [v, label(v)]) },
-    { key: 'safety', title: c.safety, value: safety, options: ['verified','reviewed','experimental','blocked'].map(v => [v, label(v)]) },
     { key: 'minStars', title: c.minimum, value: String(minStars || 'all'), options: ['20','100','500','1000','5000'].map(v => [v, v + '+']) },
-    { key: 'track', title: c.useCase, value: supplyTrack, options: supplyTracks.map(v => [v.slug, v.shortLabel]) },
   ]
   const stars = (value: number) => new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 1 }).format(value)
 
@@ -233,7 +230,7 @@ export function SkillsPageClient(props: Props) {
           <form role="search" onSubmit={event => {
             event.preventDefault()
             const q = String(new FormData(event.currentTarget).get('q') || '').trim()
-            navigate({ q: q || undefined, sort: undefined })
+            navigate({ q: q || undefined, sort: undefined, view: q ? 'all' : undefined })
           }} className="mt-6 flex max-w-3xl items-center gap-2 border border-border bg-card p-2 focus-within:border-[#006b4f]">
             <Search size={18} className="ml-2 hidden shrink-0 text-secondary sm:block" aria-hidden="true" />
             <input key={query || ''} type="search" name="q" defaultValue={query} aria-label={c.search}
@@ -256,7 +253,7 @@ export function SkillsPageClient(props: Props) {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="min-w-0">
               <h2 id="directory-results-heading" className="break-words text-base font-semibold">
-                {query ? `${c.results} · “${query}”` : c.all}
+                {query ? `${c.results} · “${query}”` : label('selectedSkills')}
               </h2>
               <p className="mt-1 font-mono text-xs text-secondary" data-directory-count>
                 {skills.length ? rankOffset + 1 : 0}–{rankOffset + skills.length} / {resultCount.toLocaleString(locale)}
@@ -300,9 +297,8 @@ export function SkillsPageClient(props: Props) {
               <Link href={resetHref} prefetch={false} className="p-2 text-[#006b4f] underline underline-offset-4">{c.reset}</Link>
             </div>
           )}
-          <p className="my-4 max-w-3xl text-xs leading-5 text-secondary">{c.pool}</p>
           <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${resultCount}`}</p>
-          {degraded && <p role="status" className="mb-5 border-l-2 border-amber-600 bg-amber-50 p-4 text-sm text-amber-950">{c.offline}</p>}
+          {degraded && <p role="status" className="my-5 border-l-2 border-amber-600 bg-amber-50 p-4 text-sm text-amber-950">{label('dataUnavailable')}</p>}
 
           {skills.length === 0 ? (
             <div className="border-y border-border py-14 text-center">
@@ -322,7 +318,9 @@ export function SkillsPageClient(props: Props) {
                   <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-secondary">
                     <Link href={href({ category: directoryCategories(skill.category)[0] })} prefetch={false} className="underline decoration-border underline-offset-4">{directoryCategories(skill.category).map(label).join(' · ')}</Link>
                     {[...new Set(skill.platformHints || skill.compatibility.map(v => v.platform))].slice(0, 2).map(value => <span key={value}>{value}</span>)}
-                    <span className={skill.safetyProfile?.blocked ? 'text-red-700' : ''}>{skill.snapshot ? c.snapshot : skill.safetyProfile?.blocked ? c.blocked : label(skill.sourceStatus || 'unverified')}</span>
+                    {skill.safetyProfile?.blocked ? <span className="text-red-700">{c.blocked}</span>
+                      : skill.snapshot ? <span>{label('savedInfo')}</span>
+                      : skill.sourceStatus !== 'source-recorded' ? <span>{c.review}</span> : null}
                   </div>
                 </div>
                 <div className="col-start-2 mt-4 flex flex-wrap items-center justify-between gap-4 sm:col-start-3 sm:row-start-1 sm:mt-0 sm:flex-col sm:items-end sm:justify-start sm:gap-5">

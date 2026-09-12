@@ -18,13 +18,13 @@ import { copyText } from '@/lib/copy-text'
 import { NativeSelect } from '@/components/ui/native-select'
 import { getShowcaseTaskUrl, normalizeShowcaseAgentTarget, renderShowcaseTaskMarkdown, type ShowcaseAgentTarget } from '@/lib/showcase-task'
 import { trackAnalyticsEvent } from '@/lib/analytics'
-import { getShowcaseAccessLabel, getShowcaseCreator, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, getShowcaseTags, localizeShowcase, SHOWCASE_CASES, SHOWCASE_CATEGORIES, type ShowcaseCase } from '@/lib/showcase'
+import { getShowcaseAccessLabel, getShowcaseCreator, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, getShowcaseTags, localizeShowcase, SHOWCASE_CATEGORIES, type ShowcaseCase, type ShowcaseCardData } from '@/lib/showcase-shared'
 
-export function ShowcaseDetail({ item }: { item: ShowcaseCase }) {
-  return <ShowcaseEngagementProvider><DetailContent key={item.slug} item={item} /></ShowcaseEngagementProvider>
+export function ShowcaseDetail({ item, related }: { item: ShowcaseCase; related: ShowcaseCardData[] }) {
+  return <ShowcaseEngagementProvider><DetailContent key={item.slug} item={item} related={related} /></ShowcaseEngagementProvider>
 }
 
-function DetailContent({ item }: { item: ShowcaseCase }) {
+function DetailContent({ item, related }: { item: ShowcaseCase; related: ShowcaseCardData[] }) {
   const { locale } = useI18n()
   const [activeMedia, setActiveMedia] = useState(0)
   const [copied, setCopied] = useState<'task' | 'handoff' | null>(null)
@@ -40,7 +40,6 @@ function DetailContent({ item }: { item: ShowcaseCase }) {
   const category = SHOWCASE_CATEGORIES.find((entry) => entry.id === item.category)!
   const task = localizeShowcase(item.prompt, locale)
   const handoff = renderShowcaseTaskMarkdown(item, locale, targetAgent)
-  const related = [...SHOWCASE_CASES].filter((entry) => entry.slug !== item.slug).sort((a, b) => Number(b.category === item.category) - Number(a.category === item.category)).slice(0, 3)
 
   useEffect(() => {
     if (viewed.current) return

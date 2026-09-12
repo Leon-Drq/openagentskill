@@ -10,7 +10,7 @@ import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { copyText } from '@/lib/copy-text'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { getShowcaseShareUrl, type ShowcaseStats, type ShowcaseVote } from '@/lib/showcase-engagement'
-import { localizeShowcase, type ShowcaseCase } from '@/lib/showcase'
+import { localizeShowcase, type ShowcaseCase } from '@/lib/showcase-shared'
 
 const EngagementContext = createContext<{
   stats: ShowcaseStats; ready: boolean; failed: boolean; refresh: () => Promise<void>
@@ -86,7 +86,7 @@ export function useShowcaseEngagement() {
   return value
 }
 
-export function ShowcaseActions({ item }: { item: ShowcaseCase }) {
+export function ShowcaseActions({ item }: { item: Pick<ShowcaseCase, 'slug' | 'title'> }) {
   const { locale } = useI18n()
   const { stats, ready, failed, refresh, toggle } = useShowcaseEngagement()
   const [busy, setBusy] = useState(false)

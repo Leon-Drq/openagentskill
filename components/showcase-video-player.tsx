@@ -6,12 +6,12 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Play } from 'lucide-react'
 import { trackAnalyticsEvent } from '@/lib/analytics'
-import { getShowcaseImageSrc, localizeShowcase, type ShowcaseCase } from '@/lib/showcase'
+import { getShowcaseImageSrc, localizeShowcase, type ShowcaseCase } from '@/lib/showcase-shared'
 import type { Locale } from '@/lib/i18n/config'
 
 /** No video source is attached until an explicit click. Used by cards and detail. */
 export function ShowcaseVideoPlayer({ item, locale, compact = false, priority = false }: {
-  item: ShowcaseCase; locale: Locale; compact?: boolean; priority?: boolean
+  item: Pick<ShowcaseCase, 'slug' | 'skillSlug' | 'title' | 'media' | 'videoUrl'>; locale: Locale; compact?: boolean; priority?: boolean
 }) {
   const [started, setStarted] = useState(false)
   const [failed, setFailed] = useState(false)

@@ -43,5 +43,7 @@ export default async function ShowcaseCasePage({ params, searchParams }: Props) 
     creditText: `Skill by ${creator.name}. Example by ${getShowcaseCreator(item.creatorId).name}.`,
     citation: item.sourceUrl, about: { '@type': 'CreativeWork', name: skill.name, url: `${BASE_URL}/skills/${item.skillSlug}` },
   }
-  return <I18nProvider initialLocale={locale}><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} /><ShowcaseDetail key={item.slug} item={item} /></I18nProvider>
+  const related = SHOWCASE_CASES.filter(entry => entry.slug !== item.slug).sort((a, b) => Number(b.category === item.category) - Number(a.category === item.category)).slice(0, 3).map(getShowcaseCardData)
+  return <I18nProvider initialLocale={locale}><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} /><ShowcaseDetail key={item.slug} item={item} related={related} /></I18nProvider>
 }
+import { getShowcaseCardData } from '@/lib/showcase-shared'

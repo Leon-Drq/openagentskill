@@ -7,9 +7,9 @@ import { ArrowRight } from 'lucide-react'
 import { ShowcaseCard } from '@/components/showcase-card'
 import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
-import { FEATURED_SHOWCASE_SLUGS, getShowcaseCase, getShowcaseSkill, getShowcasesForSkill } from '@/lib/showcase'
+import { getShowcaseSkill, type ShowcaseCardData } from '@/lib/showcase-shared'
 
-export function HomeShowcase() {
+export function HomeShowcase({ items = [] }: { items?: ShowcaseCardData[] }) {
   const { locale } = useI18n()
   return (
     <section className="border-b border-[#e4e0d8] bg-[#fbfaf6] px-6 py-14 md:py-20" aria-labelledby="home-showcase-title">
@@ -22,15 +22,14 @@ export function HomeShowcase() {
           </div>
           <Link href={getLocalizedNavigationHref('/showcase', locale)} className="inline-flex min-h-11 shrink-0 items-center gap-2 text-sm font-semibold text-[#006b4f]">{galleryCopy(locale, "Explore the gallery", "查看 Skill Gallery")}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
         </div>
-        <div className="mt-8 grid gap-7 sm:grid-cols-3">{FEATURED_SHOWCASE_SLUGS.map((slug) => <ShowcaseCard key={slug} item={getShowcaseCase(slug)!} placement="home" />)}</div>
+        <div className="mt-8 grid gap-7 sm:grid-cols-3">{items.map(item => <ShowcaseCard key={item.slug} item={item} placement="home" />)}</div>
       </div>
     </section>
   )
 }
 
-export function SkillShowcase({ skillSlug, profile = false }: { skillSlug: string; profile?: boolean }) {
+export function SkillShowcase({ skillSlug, cases, profile = false }: { skillSlug: string; cases: ShowcaseCardData[]; profile?: boolean }) {
   const { locale } = useI18n()
-  const cases = getShowcasesForSkill(skillSlug)
   if (!cases.length) return null
   return (
     <section id="showcase" className={profile ? 'scroll-mt-28 border-t border-border py-9 sm:py-12' : 'mb-10 scroll-mt-24 rounded-lg border border-[#e4e0d8] bg-[#fbfaf6] p-5 sm:p-6'} aria-labelledby="skill-showcase-title">

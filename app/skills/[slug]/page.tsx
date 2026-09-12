@@ -11,6 +11,8 @@ import { I18nProvider } from '@/lib/i18n/context'
 import { buildSkillSearchMetadata } from '@/lib/seo/search-metadata'
 import { getEditorialSearchProfile, isSearchIndexEligible } from '@/lib/seo/search-indexability'
 import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
+import { skillPresentationCategory } from '@/lib/skills/presentation-category'
+import { directoryLabel } from '@/lib/i18n/directory-copy'
 import { getReviewEvidence } from '@/lib/skills/review-evidence'
 import { SkillReviewEvidence } from '@/components/skill-review-evidence'
 import { buildDetailStructuredData, selectDetailAlternatives, serializeDetailJson } from '@/lib/skills/detail-profile'
@@ -24,6 +26,7 @@ import { getGitHubOwner } from '@/lib/github-owner'
 import { FEATURED_CREATORS, creatorHref } from '@/lib/creator-directory'
 import { getSkillAttribution } from '@/lib/skill-attribution'
 import { getShowcasesForSkill } from '@/lib/showcase'
+import { getShowcaseCardData } from '@/lib/showcase-shared'
 import { needsOwnerPublicationReview } from '@/lib/skills/publication'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
@@ -51,60 +54,62 @@ const getCachedSkillBySlug = cache(async (slug: string) =>
   getSkillBySlugOrFallbackStrict(getCanonicalSkillSlug(slug))
 )
 
-const getSharedSkillDetailSupport = unstable_cache(
-  async (skillId: string, category: string, slug: string) => {
-    if (skillId.startsWith('snapshot-')) {
-      return { relatedSkills: [], eventStats: null, outcomeStats: null, approvedClaim: null }
-    }
-
-    const [relatedSkills, eventStats, outcomeStats, approvedClaim] = await Promise.all([
-      withTimeout(
-        getRelatedSkills(skillId, category, 4),
-        SKILL_DETAIL_SUPPORT_TIMEOUT_MS,
-        'skill related query'
-      ).catch(() => []),
-      withTimeout(
-        getSkillEventStats(slug),
-        SKILL_DETAIL_SUPPORT_TIMEOUT_MS,
-        'skill event stats query'
-      ).catch(() => null),
-      withTimeout(
-        getAgentOutcomeStats(slug),
-        SKILL_DETAIL_SUPPORT_TIMEOUT_MS,
-        'skill outcome stats query'
-      ).catch(() => null),
-      withTimeout(
-        getApprovedClaimBySkillSlug(slug),
-        SKILL_DETAIL_SUPPORT_TIMEOUT_MS,
-        'skill claim query'
-      ).catch(() => null),
-    ])
-
-    return { relatedSkills, eventStats, outcomeStats, approvedClaim }
-  },
-  ['skill-detail-support-v1'],
-  {
-    revalidate: 300,
-    tags: ['public-skill-directory', 'public-skill-stats', 'public-skill-outcomes'],
-  }
+// Independent success-only caches: one timed-out service must not erase the
+// healthy related items, telemetry or claim record for the next five minutes.
+const getSharedRelatedSkills = unstable_cache(
+  (id: string, category: string) => getRelatedSkills(id, category, 4, true),
+  ['skill-detail-related-v2'],
+  { revalidate: 300, tags: ['public-skill-directory'] }
+)
+const getSharedEventStats = unstable_cache(
+  (slug: string) => getSkillEventStats(slug, true),
+  ['skill-detail-events-v2'],
+  { revalidate: 300, tags: ['public-skill-events'] }
+)
+const getSharedOutcomeStats = unstable_cache(
+  (slug: string) => getAgentOutcomeStats(slug, true),
+  ['skill-detail-outcomes-v2'],
+  { revalidate: 300, tags: ['public-skill-outcomes'] }
+)
+const getSharedApprovedClaim = unstable_cache(
+  (slug: string) => getApprovedClaimBySkillSlug(slug, true),
+  ['skill-detail-claim-v2'],
+  { revalidate: 300, tags: ['public-skill-directory', 'public-skill-claims'] }
 )
 
-const getCachedSkillDetailSupport = cache(getSharedSkillDetailSupport)
+const getCachedSkillDetailSupport = cache(async (skillId: string, category: string, slug: string) => {
+  if (skillId.startsWith('snapshot-')) {
+    return { relatedSkills: [], eventStats: null, outcomeStats: null, approvedClaim: null }
+  }
+  // Timeouts and cold-cache fallbacks are request-local, never persistent data.
+  const [relatedSkills, eventStats, outcomeStats, approvedClaim] = await Promise.all([
+    withTimeout(getSharedRelatedSkills(skillId, category), SKILL_DETAIL_SUPPORT_TIMEOUT_MS, 'skill related query').catch(() => []),
+    withTimeout(getSharedEventStats(slug), SKILL_DETAIL_SUPPORT_TIMEOUT_MS, 'skill event stats query').catch(() => null),
+    withTimeout(getSharedOutcomeStats(slug), SKILL_DETAIL_SUPPORT_TIMEOUT_MS, 'skill outcome stats query').catch(() => null),
+    withTimeout(getSharedApprovedClaim(slug), SKILL_DETAIL_SUPPORT_TIMEOUT_MS, 'skill claim query').catch(() => null),
+  ])
+  return { relatedSkills, eventStats, outcomeStats, approvedClaim }
+})
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>
+  searchParams?: Promise<Record<string, string | string[] | undefined>>
 }): Promise<Metadata> {
   const { slug } = await params
   const dbSkill = await getCachedSkillBySlug(slug)
   const skill = dbSkill ? convertSkillRecordToManifest(dbSkill) : null
-  if (!dbSkill || !skill) return { title: 'Skill Not Found' }
+  if (!dbSkill || !skill) notFound()
   const canonicalSlug = skill.slug || getCanonicalSkillSlug(slug)
-  const seo = buildSkillSearchMetadata(dbSkill, defaultLocale)
+  const query = await searchParams || {}
+  const seo = buildSkillSearchMetadata(dbSkill, getLocaleFromSearchParam(query.lang) || defaultLocale)
   const editorial = getEditorialSearchProfile(dbSkill)
   if (editorial) Object.assign(seo, { title: editorial.title, openGraphTitle: editorial.title, description: editorial.description })
-  const indexable = isSearchIndexEligible(dbSkill)
+  // Match the proxy's X-Robots-Tag on query variants. Preserve the canonical
+  // URL and existing eligibility; search indexing is not install approval.
+  const indexable = Object.keys(query).length === 0 && isSearchIndexEligible(dbSkill)
   const pageUrl = `https://www.openagentskill.com/skills/${canonicalSlug}`
   const imageAlt = seo.imageAlt
   const imageVersion = '8'
@@ -168,7 +173,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
   const initialLocale = getLocaleFromSearchParam(lang) || undefined
   const dbSkill = await getCachedSkillBySlug(slug)
   if (!dbSkill) notFound()
-  const skill = convertSkillRecordToManifest(dbSkill)
+  const skill = { ...convertSkillRecordToManifest(dbSkill), category: skillPresentationCategory(dbSkill) }
   const editorial = getEditorialSearchProfile(dbSkill)
   const editorialLocale = initialLocale === 'zh' ? 'zh' : 'en'
   if (slug !== skill.slug) permanentRedirect(`/skills/${skill.slug}`)
@@ -227,7 +232,6 @@ export default async function SkillDetailPage({ params, searchParams }: {
                   <p className="mt-1 text-xs text-secondary"><Value value={attribution.statusLabel} /></p>
                 </div>
               </div>
-              <span className="rounded-full border border-border px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-secondary"><ProfileText id={sourceStatus} /></span>
             </div>
             <h1 className="max-w-5xl break-words font-display text-4xl font-normal leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl [overflow-wrap:anywhere]">{skill.name}</h1>
             <p className="mt-5 max-w-3xl text-lg leading-relaxed text-secondary sm:text-xl">{skill.tagline || skill.description}</p>
@@ -249,7 +253,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
 
           <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-14">
             <div className="min-w-0">
-              {hasShowcase && <SkillShowcase skillSlug={skill.slug} profile />}
+              {hasShowcase && <SkillShowcase skillSlug={skill.slug} cases={getShowcasesForSkill(skill.slug).slice(0, 2).map(getShowcaseCardData)} profile />}
               <section id="overview" className={sectionClass}>
                 <h2 className={headingClass}><Text id="overview" /></h2>
                 {editorial && <div lang={editorialLocale} className="my-6 space-y-4 text-sm leading-7 text-secondary" data-editorial-source={editorial.commit}>
@@ -268,7 +272,8 @@ export default async function SkillDetailPage({ params, searchParams }: {
                   <p className="font-semibold"><ProfileText id={sourceStatus} /></p>
                   <p className="mt-2"><ProfileText id={sourceNote} /></p>
                   <p className="mt-2"><Text id="reviewBeforeInstall" />: <Value value={safety.label} /></p>
-                  {warnings.length > 0 && <ul className="mt-3 list-disc space-y-1 pl-5">{warnings.slice(0, 4).map(warning => <li key={warning}><Value value={warning} /></li>)}</ul>}
+                  <p className="mt-2"><Text id="license" />: <Value value={dbSkill.license || 'Unknown'} /></p>
+                  {warnings.length > 0 && <ul className="mt-3 list-disc space-y-1 pl-5">{warnings.map(warning => <li key={warning}><Value value={warning} /></li>)}</ul>}
                 </div>
                 {!safety.blocked && <SkillInstallTargets skillSlug={skill.slug} targets={installTargets} compact />}
                 {safety.blocked && <Link href={auditHref} className={actionClass}><Text id="openFullAudit" /></Link>}
@@ -281,10 +286,15 @@ export default async function SkillDetailPage({ params, searchParams }: {
               </section>
 
               <section id="source-trust" className={sectionClass}>
-                <h2 className={headingClass}><ProfileText id="sourceTrust" /></h2>
+                <details className="group" data-source-disclosure>
+                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 [&::-webkit-details-marker]:hidden">
+                  <h2 className={headingClass}>{directoryLabel(initialLocale || defaultLocale, 'sourceDetails')}</h2>
+                  <span aria-hidden="true" className="shrink-0 text-2xl text-secondary group-open:rotate-45">+</span>
+                </summary>
                 <SkillReviewEvidence evidence={getReviewEvidence(dbSkill)} installable={source.canOfferInstall && !safety.blocked} />
                 <p className="mt-4 max-w-2xl text-sm leading-relaxed text-secondary"><ProfileText id="signalsNote" /></p>
                 <dl className="mt-6 grid gap-x-8 sm:grid-cols-2">
+                  <div className="min-w-0 border-b border-border py-4 sm:col-span-2"><dt className="text-xs text-secondary">{directoryLabel(initialLocale || defaultLocale, 'repository')}</dt><dd className="mt-2 break-words text-sm">{dbSkill.github_repo || '—'}</dd></div>
                   <div className="border-b border-border py-4"><dt className="text-xs text-secondary"><Text id="license" /></dt><dd className="mt-2 text-sm"><Value value={dbSkill.license || 'Unknown'} /></dd></div>
                   <div className="border-b border-border py-4"><dt className="text-xs text-secondary"><Text id="version" /></dt><dd className="mt-2 font-mono text-sm">{dbSkill.version || '—'}</dd></div>
                   <div className="border-b border-border py-4"><dt className="text-xs text-secondary"><Text id="lastGitHubPush" /></dt><dd className="mt-2 text-sm"><DateText value={dbSkill.github_last_pushed_at} /></dd></div>
@@ -306,6 +316,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
                   <div><dt className="text-xs text-secondary"><Text id="outcomes" /></dt><dd className="mt-1 font-mono text-xl">{outcomeStats?.total_outcomes ?? '—'}</dd></div>
                 </dl>
                 <p className="mt-3 text-xs leading-relaxed text-secondary"><ProfileText id="copyNote" /></p>
+                </details>
               </section>
 
               <section id="agent-access" className={sectionClass}>
@@ -349,7 +360,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
                   {hasShowcase && <Link href="#showcase" className="block py-2 text-secondary hover:text-[#006b4f]">Gallery</Link>}
                   <Link href="#overview" className="block py-2 text-secondary hover:text-[#006b4f]"><Text id="overview" /></Link>
                   <Link href="#install-options" className="block py-2 text-secondary hover:text-[#006b4f]"><ProfileText id={source.canOfferInstall && !safety.blocked ? 'useAgent' : 'reviewSource'} /></Link>
-                  <Link href="#source-trust" className="block py-2 text-secondary hover:text-[#006b4f]"><ProfileText id="sourceTrust" /></Link>
+                  <Link href="#source-trust" className="block py-2 text-secondary hover:text-[#006b4f]">{directoryLabel(initialLocale || defaultLocale, 'sourceDetails')}</Link>
                   <Link href="#agent-access" className="block py-2 text-secondary hover:text-[#006b4f]"><ProfileText id="agentAccess" /></Link>
                   <Link href="#related-skills" className="block py-2 text-secondary hover:text-[#006b4f]"><Text id="relatedSkills" /></Link>
                   <Link href="#creator-tools" className="block py-2 text-secondary hover:text-[#006b4f]"><ProfileText id="creatorTools" /></Link>

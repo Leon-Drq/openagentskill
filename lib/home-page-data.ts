@@ -51,7 +51,6 @@ async function getStableApprovedSkillCount(): Promise<HomeSkillCount> {
 }
 
 async function fetchEvidenceStats() {
-  try {
     const statsMap = await getAgentOutcomeStatsMapStrict()
     const rows = Object.values(statsMap)
 
@@ -67,31 +66,28 @@ async function fetchEvidenceStats() {
       provenSkills: rows.filter((row) => Number(row.total_outcomes || 0) > 0).length,
       evidenceExact: true,
     }
-  } catch {
-    // Never replace missing first-party evidence with a marketing estimate.
-    return {
-      totalVerifiedInstalls: 0,
-      totalOutcomes: 0,
-      provenSkills: 0,
-      evidenceExact: false,
-    }
-  }
 }
 
 const getCachedEvidenceStats = unstable_cache(
   fetchEvidenceStats,
-  ['home-evidence-stats-v1'],
+  ['home-evidence-stats-v2'],
   { revalidate: 300 }
 )
 
 export function getRegistryEvidenceStats() {
-  return getCachedEvidenceStats()
+  // A failed refresh must not replace a healthy cache entry with zeroes.
+  return getCachedEvidenceStats().catch(() => ({
+    totalVerifiedInstalls: 0,
+    totalOutcomes: 0,
+    provenSkills: 0,
+    evidenceExact: false,
+  }))
 }
 
 export async function getHomePageData() {
   const [totalSkills, evidence, coverage, popularitySnapshot, trendingSnapshot] = await Promise.all([
     getStableApprovedSkillCount(),
-    getCachedEvidenceStats(),
+    getRegistryEvidenceStats(),
     getRegistryCoverageStats(),
     getLatestRankingSnapshot('most-starred-agent-skills'),
     getLatestRankingSnapshot('trending'),

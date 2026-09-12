@@ -82,3 +82,11 @@ assert.doesNotMatch(
 )
 
 console.log('Performance regression tests passed.')
+
+// Protect the client boundary: previews never import the complete source catalogue.
+for (const file of ['showcase-gallery', 'showcase-detail', 'showcase-sections', 'showcase-card', 'showcase-video-player', 'showcase-creator', 'showcase-engagement']) {
+  assert.doesNotMatch(read(`components/${file}.tsx`), /from ['"]@\/lib\/showcase['"]/, `${file} must receive cases from the server`)
+}
+assert.doesNotMatch(read('lib/showcase-task.ts'), /from ['"]\.\/showcase\.ts['"]/, 'Task rendering must not pull the full catalogue into client bundles')
+assert.doesNotMatch(skillsPage, /skills-page-categories-v1|skills-page-stats-v1/, 'Avoid caching request-local fallback in a second layer')
+assert.doesNotMatch(read('app/skills/[slug]/page.tsx'), /skill-detail-support-v1/, 'Independent reads need independent success-only caches')

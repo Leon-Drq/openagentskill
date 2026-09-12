@@ -1,4 +1,5 @@
 import 'server-only'
+import { skillPresentationCategory } from '@/lib/skills/presentation-category'
 
 import { unstable_cache } from 'next/cache'
 import {
@@ -227,7 +228,12 @@ const getCachedLatestRankingSnapshot = unstable_cache(
 )
 
 export async function getLatestRankingSnapshot(rankingSlug: string) {
-  return getCachedLatestRankingSnapshot(rankingSlug).catch(() => null)
+  const snapshot = await getCachedLatestRankingSnapshot(rankingSlug).catch(() => null)
+  if (!snapshot) return null
+  return { ...snapshot, items: snapshot.items.map(item => ({
+    ...item,
+    category: skillPresentationCategory(item),
+  })) }
 }
 
 export async function getRankingSnapshotHistory(rankingSlug: string, days = 30) {

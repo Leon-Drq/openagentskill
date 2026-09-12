@@ -1,11 +1,10 @@
-import type { ShowcaseCase } from './showcase'
 
 export type ShowcaseVote = 1 | -1 | null
 export type ShowcaseStats = Record<string, { likes: number; dislikes: number; vote: ShowcaseVote }>
 export type ShowcaseSort = 'curated' | 'top'
 
 // Stable ties preserve the editorial order, including when every case has zero likes.
-export function sortShowcaseCases(cases: ShowcaseCase[], sort: ShowcaseSort, stats: ShowcaseStats) {
+export function sortShowcaseCases<T extends { slug: string }>(cases: T[], sort: ShowcaseSort, stats: ShowcaseStats) {
   const score = (slug: string) => (stats[slug]?.likes ?? 0) - (stats[slug]?.dislikes ?? 0)
   return sort === 'top'
     ? [...cases].sort((a, b) => score(b.slug) - score(a.slug))
