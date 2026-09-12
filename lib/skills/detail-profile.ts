@@ -1,5 +1,6 @@
 import type { SkillRecord } from '@/lib/db/skills'
 import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
+import { skillPresentationCategory } from '@/lib/skills/presentation-category'
 
 const generic = new Set(['skill', 'skills', 'agent', 'agents', 'code', 'coding', 'with', 'from', 'that', 'this', 'your', 'github', 'repository', 'tool', 'tools', 'workflow', 'workflows', 'claude', 'codex', 'cursor', 'open', 'source', 'using', 'support', 'supports', 'create'])
 function words(skill: SkillRecord) {
@@ -18,6 +19,7 @@ export function selectDetailAlternatives(skill: SkillRecord, candidates: SkillRe
 }
 
 export function buildDetailStructuredData(skill: SkillRecord) {
+  const category = skillPresentationCategory(skill)
   const evidence = getSkillSourceEvidence(skill)
   const url = `https://www.openagentskill.com/skills/${skill.slug}`
   const validDate = (value: string | null | undefined) => value && Number.isFinite(Date.parse(value)) ? value : undefined
@@ -40,7 +42,7 @@ export function buildDetailStructuredData(skill: SkillRecord) {
         '@type': 'BreadcrumbList',
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'Skills', item: 'https://www.openagentskill.com/skills' },
-          { '@type': 'ListItem', position: 2, name: skill.category, item: `https://www.openagentskill.com/skills?category=${encodeURIComponent(skill.category)}` },
+          { '@type': 'ListItem', position: 2, name: category, item: `https://www.openagentskill.com/skills?category=${encodeURIComponent(category)}` },
           { '@type': 'ListItem', position: 3, name: skill.name, item: url },
         ],
       },

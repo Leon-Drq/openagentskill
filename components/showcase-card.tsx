@@ -11,10 +11,10 @@ import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { ShowcaseCreatorCredit } from '@/components/showcase-creator'
 import { ShowcaseActions } from '@/components/showcase-engagement'
-import { getShowcaseAccessLabel, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, getShowcaseTags, localizeShowcase, SHOWCASE_CATEGORIES, type ShowcaseCase } from '@/lib/showcase'
+import { getShowcaseAccessLabel, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, getShowcaseTags, localizeShowcase, SHOWCASE_CATEGORIES, type ShowcaseCardData } from '@/lib/showcase-shared'
 
 export function ShowcaseCard({ item, placement = 'gallery', priority = false }: {
-  item: ShowcaseCase
+  item: ShowcaseCardData
   placement?: 'gallery' | 'home' | 'skill' | 'related'
   priority?: boolean
 }) {

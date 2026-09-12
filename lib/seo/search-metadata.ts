@@ -1,5 +1,6 @@
 import type { SkillRecord } from '@/lib/db/skills'
 import type { Locale } from '@/lib/i18n/config'
+import { skillPresentationCategory, skillPresentationOverride } from '@/lib/skills/presentation-category'
 
 type SearchMetadataCopy = {
   directoryTitle: string
@@ -33,7 +34,7 @@ type SkillSearchFocus =
 
 const SEARCH_METADATA_COPY: Record<Locale, SearchMetadataCopy> = {
   en: {
-    directoryTitle: 'AI Agent Skills Directory - Audited Skills for Codex, Claude Code & Cursor',
+    directoryTitle: 'AI Agent Skills Directory - Codex, Claude Code & Cursor',
     directoryDescription:
       'Find reusable AI agent skills for Codex, Claude Code, Cursor, research, finance, web scraping, and more. Compare trust, risk, maintenance, and install guidance first.',
     directoryKeywords: [
@@ -42,7 +43,7 @@ const SEARCH_METADATA_COPY: Record<Locale, SearchMetadataCopy> = {
       'Codex skills',
       'Claude Code skills',
       'Cursor skills',
-      'audited agent skills',
+      'agent skill sources',
     ],
     directoryCollectionName: 'OpenAgentSkill AI Agent Skills Directory',
     directoryBreadcrumbName: 'AI Agent Skills Directory',
@@ -73,7 +74,7 @@ const SEARCH_METADATA_COPY: Record<Locale, SearchMetadataCopy> = {
     openGraphLocale: 'zh_CN',
   },
   ja: {
-    directoryTitle: 'AI Agent Skills ディレクトリ - Codex、Claude Code、Cursor 向け監査済み Skills',
+    directoryTitle: 'AI Agent Skills ディレクトリ - Codex、Claude Code、Cursor 向け',
     directoryDescription:
       'Codex、Claude Code、Cursor、リサーチ、金融、Web スクレイピング向けの再利用可能な AI Agent Skills を探せます。導入前に信頼性、リスク、保守状況、導入手順を比較できます。',
     directoryKeywords: [
@@ -93,7 +94,7 @@ const SEARCH_METADATA_COPY: Record<Locale, SearchMetadataCopy> = {
     openGraphLocale: 'ja_JP',
   },
   ko: {
-    directoryTitle: 'AI Agent Skills 디렉터리 - Codex, Claude Code, Cursor를 위한 검토된 Skills',
+    directoryTitle: 'AI Agent Skills 디렉터리 - Codex, Claude Code, Cursor',
     directoryDescription:
       'Codex, Claude Code, Cursor, 리서치, 금융, 웹 스크래핑을 위한 재사용 가능한 AI Agent Skills를 찾아보세요. 설치 전에 신뢰도, 위험, 유지보수, 설치 안내를 비교할 수 있습니다.',
     directoryKeywords: [
@@ -113,7 +114,7 @@ const SEARCH_METADATA_COPY: Record<Locale, SearchMetadataCopy> = {
     openGraphLocale: 'ko_KR',
   },
   es: {
-    directoryTitle: 'Directorio de AI Agent Skills - Skills auditados para Codex, Claude Code y Cursor',
+    directoryTitle: 'Directorio de AI Agent Skills - Codex, Claude Code y Cursor',
     directoryDescription:
       'Encuentra AI Agent Skills reutilizables para Codex, Claude Code, Cursor, investigacion, finanzas, web scraping y mas. Compara confianza, riesgo, mantenimiento e instalacion antes de usar.',
     directoryKeywords: [
@@ -132,7 +133,7 @@ const SEARCH_METADATA_COPY: Record<Locale, SearchMetadataCopy> = {
     openGraphLocale: 'es_ES',
   },
   de: {
-    directoryTitle: 'AI Agent Skills Verzeichnis - Geprufte Skills fur Codex, Claude Code und Cursor',
+    directoryTitle: 'AI Agent Skills Verzeichnis - Codex, Claude Code und Cursor',
     directoryDescription:
       'Finde wiederverwendbare AI Agent Skills fur Codex, Claude Code, Cursor, Recherche, Finanzen, Web Scraping und mehr. Vergleiche Vertrauen, Risiko, Wartung und Installationshinweise vor dem Einsatz.',
     directoryKeywords: [
@@ -151,7 +152,7 @@ const SEARCH_METADATA_COPY: Record<Locale, SearchMetadataCopy> = {
     openGraphLocale: 'de_DE',
   },
   fr: {
-    directoryTitle: 'Repertoire de AI Agent Skills - Skills verifies pour Codex, Claude Code et Cursor',
+    directoryTitle: 'Répertoire de AI Agent Skills - Codex, Claude Code et Cursor',
     directoryDescription:
       'Trouvez des AI Agent Skills reutilisables pour Codex, Claude Code, Cursor, la recherche, la finance, le web scraping et plus. Comparez confiance, risque, maintenance et conseils d installation avant utilisation.',
     directoryKeywords: [
@@ -170,7 +171,7 @@ const SEARCH_METADATA_COPY: Record<Locale, SearchMetadataCopy> = {
     openGraphLocale: 'fr_FR',
   },
   id: {
-    directoryTitle: 'Direktori AI Agent Skills - Skill terverifikasi untuk Codex, Claude Code, dan Cursor',
+    directoryTitle: 'Direktori AI Agent Skills - Codex, Claude Code, dan Cursor',
     directoryDescription:
       'Temukan AI Agent Skills yang dapat digunakan kembali untuk Codex, Claude Code, Cursor, riset, keuangan, web scraping, dan lainnya. Bandingkan kepercayaan, risiko, pemeliharaan, dan panduan pemasangan sebelum digunakan.',
     directoryKeywords: [
@@ -377,7 +378,13 @@ function unique(values: string[]) {
   return [...new Set(values.map((value) => cleanText(value)).filter(Boolean))]
 }
 
-function getSkillSearchFocus(skill: Pick<SkillRecord, 'category' | 'tags' | 'frameworks'>): SkillSearchFocus {
+function getSkillSearchFocus(skill: Pick<SkillRecord, 'category' | 'tags' | 'frameworks'> & { github_repo?: string | null }): SkillSearchFocus {
+  // A source-specific editorial correction outranks stale imported tags.
+  const corrected = skillPresentationOverride(skill)
+  if (corrected === 'coding-agents') return 'coding'
+  if (corrected === 'design-creative') return 'design'
+  if (corrected === 'presentation') return 'presentation'
+  if (corrected === 'video-creation') return 'video'
   const source = [skill.category, ...(skill.tags || []), ...(skill.frameworks || [])]
     .join(' ')
     .toLowerCase()
@@ -419,7 +426,8 @@ export function getSearchMetadataCopy(locale: Locale) {
   return SEARCH_METADATA_COPY[locale]
 }
 
-export function buildSkillSearchMetadata(skill: Pick<SkillRecord, 'name' | 'description' | 'tagline' | 'category' | 'tags' | 'frameworks'>, locale: Locale) {
+export function buildSkillSearchMetadata(sourceSkill: Pick<SkillRecord, 'name' | 'description' | 'tagline' | 'category' | 'tags' | 'frameworks'> & { github_repo?: string | null }, locale: Locale) {
+  const skill = { ...sourceSkill, category: skillPresentationCategory(sourceSkill) }
   const copy = getSearchMetadataCopy(locale)
   const focusKey = getSkillSearchFocus(skill)
   const focus = SEARCH_FOCUS_LABELS[locale][focusKey]

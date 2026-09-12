@@ -7,7 +7,7 @@ import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { trackAnalyticsEvent } from '@/lib/analytics'
-import { getShowcaseCreator, getShowcaseCreatorHref } from '@/lib/showcase'
+import { getShowcaseCreator, getShowcaseCreatorHref } from '@/lib/showcase-shared'
 
 export function ShowcaseCreatorCredit({ creatorId, label }: { creatorId: string; label: string }) {
   const { locale } = useI18n()

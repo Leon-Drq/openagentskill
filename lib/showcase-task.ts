@@ -1,5 +1,5 @@
 // @ts-expect-error Direct Node regression tests require the TypeScript extension.
-import { getShowcaseHandoff, getShowcaseSkill, localizeShowcase, type ShowcaseCase } from './showcase.ts'
+import { getShowcaseHandoff, getShowcaseSkill, localizeShowcase, type ShowcaseCase } from './showcase-shared.ts'
 
 export const SHOWCASE_AGENT_TARGETS = ['auto', 'codex', 'claude-code', 'cursor'] as const
 export type ShowcaseAgentTarget = typeof SHOWCASE_AGENT_TARGETS[number]

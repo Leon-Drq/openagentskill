@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { getShowcaseCardData } from '@/lib/showcase-shared'
 import { ShowcaseGallery } from '@/components/showcase-gallery'
 import { I18nProvider } from '@/lib/i18n/context'
 import { getLocaleFromSearchParam } from '@/lib/i18n/config'
@@ -42,5 +43,14 @@ export default async function ShowcasePage({ searchParams }: Props) {
     '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Skill Gallery', inLanguage: locale, url: `${BASE_URL}/showcase`,
     mainEntity: { '@type': 'ItemList', numberOfItems: cases.length, itemListOrder: 'https://schema.org/ItemListUnordered', itemListElement: pagination.items.map((item, index) => ({ '@type': 'ListItem', position: pagination.offset + index + 1, name: localizeShowcase(item.title, locale), url: `${BASE_URL}/showcase/${item.slug}` })) },
   }
-  return <I18nProvider initialLocale={locale}><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} /><ShowcaseGallery /></I18nProvider>
+  const data = {
+    cases: (params.sort === 'top' ? cases : pagination.items).map(getShowcaseCardData),
+    total: SHOWCASE_CASES.length,
+    totalMatches: cases.length,
+    pagination: { page: pagination.page, pageCount: pagination.pageCount, offset: pagination.offset, total: pagination.total },
+    workflowCount: new Set(SHOWCASE_CASES.map(item => item.skillSlug)).size,
+    categoryCounts: Object.fromEntries(SHOWCASE_CATEGORIES.map(entry => [entry.id, SHOWCASE_CASES.filter(item => item.category === entry.id).length])),
+    tagCounts: Object.fromEntries(SHOWCASE_TAGS.map(tag => [tag.id, filterShowcaseCases(category, query, creatorId, tag.id).length])),
+  }
+  return <I18nProvider initialLocale={locale}><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} /><ShowcaseGallery data={data} /></I18nProvider>
 }

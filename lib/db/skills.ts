@@ -2,6 +2,9 @@ import { PUBLIC_SKILL_FILTER } from '@/lib/skills/publication'
 import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { withTimeout } from '@/lib/async'
+import { collectSearchResults } from '@/lib/search-results'
+import { directoryCategoryTerms } from '@/lib/skills/directory'
+import { skillPresentationCategory, skillPresentationOverride } from '@/lib/skills/presentation-category'
 import { isMcpOnlyCategory, isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
 import { unstable_cache } from 'next/cache'
 import type { Skill } from '@/lib/types'
@@ -587,7 +590,8 @@ const getCachedSkillStats = unstable_cache(
   async (): Promise<Record<string, SkillAgentStats>> => {
   const supabase = createPublicClient({ requestTimeoutMs: SKILL_STATS_REQUEST_TIMEOUT_MS })
   const { data, error } = await supabase.from('skill_stats').select('*')
-  if (error || !data) return {}
+  if (error) throw error
+  if (!data) return {}
 
   const map: Record<string, SkillAgentStats> = {}
   for (const row of data) {
@@ -602,7 +606,7 @@ const getCachedSkillStats = unstable_cache(
   }
   return map
   },
-  ['public-skill-agent-stats-v2'],
+  ['public-skill-agent-stats-v3'],
   { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-stats'] }
 )
 
@@ -663,7 +667,7 @@ export async function getAgentOutcomeStatsMapStrict(): Promise<Record<string, Sk
   return getCachedAgentOutcomeStatsMap()
 }
 
-export async function getAgentOutcomeStats(skillSlug: string): Promise<SkillOutcomeStats | null> {
+export async function getAgentOutcomeStats(skillSlug: string, strict = false): Promise<SkillOutcomeStats | null> {
   const supabase = createPublicClient()
   const { data, error } = await supabase
     .from('agent_outcome_stats')
@@ -671,6 +675,7 @@ export async function getAgentOutcomeStats(skillSlug: string): Promise<SkillOutc
     .eq('skill_slug', skillSlug)
     .maybeSingle()
 
+  if (error && strict) throw error
   if (error || !data) return null
   const row = data as Record<string, any>
   return {
@@ -708,7 +713,8 @@ const getCachedSkillEventStatsMap = unstable_cache(
   async (): Promise<Record<string, SkillEventStats>> => {
   const supabase = createPublicClient({ requestTimeoutMs: SKILL_STATS_REQUEST_TIMEOUT_MS })
   const { data, error } = await supabase.from('skill_event_stats').select('*')
-  if (error || !data) return {}
+  if (error) throw error
+  if (!data) return {}
 
   const map: Record<string, SkillEventStats> = {}
   for (const row of data as SkillEventStats[]) {
@@ -716,7 +722,7 @@ const getCachedSkillEventStatsMap = unstable_cache(
   }
   return map
   },
-  ['public-skill-event-stats-v2'],
+  ['public-skill-event-stats-v3'],
   { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-events'] }
 )
 
@@ -724,7 +730,7 @@ export async function getSkillEventStatsMap(): Promise<Record<string, SkillEvent
   return getCachedSkillEventStatsMap().catch(() => ({}))
 }
 
-export async function getSkillEventStats(skillSlug: string): Promise<SkillEventStats | null> {
+export async function getSkillEventStats(skillSlug: string, strict = false): Promise<SkillEventStats | null> {
   const supabase = createPublicClient()
   const { data, error } = await supabase
     .from('skill_event_stats')
@@ -732,6 +738,7 @@ export async function getSkillEventStats(skillSlug: string): Promise<SkillEventS
     .eq('skill_slug', skillSlug)
     .maybeSingle()
 
+  if (error && strict) throw error
   if (error || !data) return null
   return data as SkillEventStats
 }
@@ -793,7 +800,7 @@ export async function getSkillAuditsMap(): Promise<Record<string, SkillAuditReco
   return map
 }
 
-export async function getApprovedClaimBySkillSlug(skillSlug: string): Promise<SkillClaimRecord | null> {
+export async function getApprovedClaimBySkillSlug(skillSlug: string, strict = false): Promise<SkillClaimRecord | null> {
   const supabase = createPublicClient()
   const { data, error } = await supabase
     .from('skill_claims')
@@ -804,6 +811,7 @@ export async function getApprovedClaimBySkillSlug(skillSlug: string): Promise<Sk
     .limit(1)
     .maybeSingle()
 
+  if (error && strict) throw error
   if (error || !data) return null
   return data as SkillClaimRecord
 }
@@ -822,7 +830,8 @@ const getCachedCategories = unstable_cache(
         .or(PUBLIC_SKILL_FILTER)
         .range(from, from + SKILLS_PAGE_SIZE - 1)
 
-      if (error || !data?.length) break
+      if (error) throw error
+      if (!data?.length) break
       for (const row of data) {
         if (row.category) categories.add(row.category)
       }
@@ -833,7 +842,7 @@ const getCachedCategories = unstable_cache(
       .filter((category) => !isMcpOnlyCategory(category))
       .sort()
   },
-  ['public-skill-categories-v2'],
+  ['public-skill-categories-v3'],
   { revalidate: CATEGORY_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
 
@@ -1060,12 +1069,12 @@ function mergeSearchMatches(exactMatches: SkillRecord[], broadMatches: SkillReco
     .slice(0, rowLimit)
 }
 
-export async function searchSkillsStrict(query: string, limit = 120): Promise<SkillRecord[]> {
+export async function searchSkillsWithStatus(query: string, limit = 120) {
   const normalizedQuery = normalizeExactSearchQuery(query)
-  if (!normalizedQuery) return []
+  if (!normalizedQuery) return { records: [] as SkillRecord[], degraded: false }
 
   const rowLimit = Math.min(Math.max(Math.floor(limit) || 1, 1), 200)
-  const [exactMatches, broadMatches] = await Promise.all([
+  const results = await Promise.allSettled([
     withTimeout(
       fetchExactSearchSkills(normalizedQuery),
       SKILL_EXACT_SEARCH_TIMEOUT_MS,
@@ -1075,9 +1084,47 @@ export async function searchSkillsStrict(query: string, limit = 120): Promise<Sk
       getCachedSearchSkills(normalizedQuery.toLowerCase(), rowLimit),
       SKILL_BROAD_SEARCH_TIMEOUT_MS,
       'broad skill search'
-    ).catch(() => [] as SkillRecord[]),
+    ),
   ])
-  return mergeSearchMatches(exactMatches, broadMatches, rowLimit)
+  return collectSearchResults(results, rowLimit)
+}
+
+// Apply discoverability filters BEFORE limiting the pool. Otherwise the top
+// 96 generic repositories can hide valid source-recorded skills entirely.
+const getCachedBrowseCandidates = unstable_cache(
+  async (sort: SkillSortMode, category: string, limit: number, sourceOnly: boolean, minStars: number) => {
+    const supabase = createPublicClient({ requestTimeoutMs: SKILL_DIRECTORY_REQUEST_TIMEOUT_MS })
+    let query = supabase.from('skills').select(SKILL_DIRECTORY_SELECT).or(PUBLIC_SKILL_FILTER)
+    if (sourceOnly) query = query.or('source_path.ilike.*SKILL.md,ai_review_score->>skill_path.ilike.*SKILL.md')
+    if (minStars > 0) query = query.gte('github_stars', minStars)
+    const terms = directoryCategoryTerms(category)
+    if (category !== 'all' && terms.length) {
+      // Include known taxonomy corrections without changing stored audit data.
+      const correctedRepos = [...new Set(CURATED_SKILL_SNAPSHOT.filter(skill =>
+        skillPresentationOverride(skill) && directoryCategoryTerms(skillPresentationCategory(skill)).some(term => terms.includes(term))
+      ).map(skill => skill.github_repo).filter(repo => /^[a-z0-9_.-]+\/[a-z0-9_.-]+$/i.test(repo || '')))]
+      query = query.or([...terms.map(term => `category.ilike.*${term}*`), ...correctedRepos.map(repo => `github_repo.eq.${repo}`)].join(','))
+    }
+    const order = sort === 'stars' ? 'github_stars' : sort === 'new' ? 'created_at'
+      : sort === 'fresh' ? 'github_last_pushed_at' : sort === 'downloads' || sort === 'trending' ? 'downloads' : 'quality_score'
+    const { data, error } = await query.order(order, { ascending: false, nullsFirst: false })
+      .order('github_stars', { ascending: false }).order('slug', { ascending: true }).limit(limit)
+    if (error) throw error
+    return packCacheJson(filterSkillOnly((data || []) as unknown as SkillRecord[]))
+  },
+  ['skills-browse-candidates-v2'],
+  { revalidate: 300, tags: ['public-skill-directory'] }
+)
+
+export async function getBrowseSkillCandidates(sort: SkillSortMode, category: string, limit: number, sourceOnly: boolean, minStars: number) {
+  const size = Math.min(480, Math.max(96, Math.ceil(limit / 96) * 96))
+  const stars = Number.isFinite(minStars) ? Math.min(1_000_000_000, Math.max(0, Math.floor(minStars))) : 0
+  const packed = await getCachedBrowseCandidates(sort, category, size, sourceOnly, stars)
+  return { records: await unpackCacheJson<SkillRecord[]>(packed), degraded: false }
+}
+
+export async function searchSkillsStrict(query: string, limit = 120): Promise<SkillRecord[]> {
+  return (await searchSkillsWithStatus(query, limit)).records
 }
 
 export async function searchSkills(query: string, limit = 120): Promise<SkillRecord[]> {
@@ -1101,7 +1148,8 @@ export async function searchSkills(query: string, limit = 120): Promise<SkillRec
 export async function getRelatedSkills(
   skillId: string,
   category: string,
-  limit = 4
+  limit = 4,
+  strict = false
 ): Promise<SkillRecord[]> {
   const supabase = createPublicClient()
 
@@ -1115,6 +1163,7 @@ export async function getRelatedSkills(
     .order('quality_score', { ascending: false })
     .limit(limit)
 
+  if (error && strict) throw error
   if (error) return []
   return filterSkillOnly(data || [])
 }
