@@ -10,6 +10,7 @@
 - Retain either healthy search branch when its sibling fails, report degradation, and never present an unknown empty response as a definitive no-match result.
 - Apply recorded-source, category-alias and star filters before limiting directory candidates. The recommendation pool is still bounded; this is not unrestricted full-registry pagination.
 - Move the full Gallery catalogue out of client imports. Curated pages receive only their visible cards and compact counts; top-rated mode receives only filtered card summaries so live voting can update ordering. Source prompts and production notes remain available on the individual detail page and agent API.
+- Apply dependency security patches: Next.js / eslint-config-next 16.3.5, patched Sharp image processing, js-yaml 4.3.2 and provider-utils 4.0.33. Preserve React, routes and existing authentication/review policies.
 
 ## Release checks
 
