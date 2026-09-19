@@ -4,10 +4,19 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { createRequire } from 'node:module'
 import { syncGallery } from './sync-gallery.mjs'
+import { selectGalleryCI } from './select-gallery-ci.mjs'
 import { boundedFetch, candidates, digest, planItem, safePath, slugFor } from './gallery/core.mjs'
 
 for (const bad of ['../secret','/etc/passwd','images/../../a.png','a\\b.png','a/%2e%2e/b','https://evil/a.png']) assert.equal(safePath(bad),false)
 const rule = {source:'test',group:'cover',prefix:'screenshots/'}
+const deployment = {sender:{login:'vercel[bot]'},deployment_status:{state:'success'},deployment:{environment:'Preview – openagentskill',sha:'a'.repeat(40)}}
+const candidateBranches = async()=>[{name:'codex/gallery-sync-123-1'}]
+assert.equal(await selectGalleryCI('pull_request',{},async()=>{throw new Error('Unexpected lookup')}),true)
+assert.equal(await selectGalleryCI('deployment_status',deployment,candidateBranches),true)
+assert.equal(await selectGalleryCI('deployment_status',deployment,async()=>[{name:'main'}]),false)
+assert.equal(await selectGalleryCI('deployment_status',{...deployment,deployment_status:{state:'failure'}},candidateBranches),false)
+assert.equal(await selectGalleryCI('deployment_status',{...deployment,sender:{login:'other'}},candidateBranches),false)
+assert.equal(await selectGalleryCI('deployment_status',{...deployment,deployment:{...deployment.deployment,environment:'Production'}},candidateBranches),false)
 const blob = (path) => ({path,type:'blob',mode:'100644'})
 const tree = { tree:[blob('screenshots/a.png'),blob('screenshots/b.svg'),blob('screenshots/nested/c.png'),{...blob('screenshots/link.png'),mode:'120000'},blob('outside/a.png')] }
 assert.deepEqual(candidates(tree,[rule]).map(x=>x.path),['screenshots/a.png'])

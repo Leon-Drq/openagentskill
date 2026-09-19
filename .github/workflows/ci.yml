@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  deployment_status:
   workflow_dispatch:
   pull_request:
     branches: [main]
@@ -8,7 +9,7 @@ on:
     branches: [main]
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.event.deployment.sha || github.ref }}-${{ github.event.deployment.environment || '' }}-${{ github.event.deployment_status.state || '' }}
   cancel-in-progress: true
 
 permissions:
@@ -18,12 +19,30 @@ env:
   CI: true
 
 jobs:
+  gallery-gate:
+    name: Select CI source
+    runs-on: ubuntu-latest
+    outputs:
+      selected: ${{ steps.select.outputs.selected }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.deployment.sha || github.sha }}
+          persist-credentials: false
+      - id: select
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/select-gallery-ci.mjs
   quality:
-    name: Lint and typecheck
+    name: ${{ needs.gallery-gate.outputs.selected == 'true' && 'Lint and typecheck' || 'Gallery event (lint not applicable)' }}
+    needs: gallery-gate
+    if: needs.gallery-gate.outputs.selected == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.deployment.sha || github.sha }}
       - name: Setup pnpm
         run: corepack enable && corepack prepare pnpm@10.28.2 --activate
       - name: Setup Node.js
@@ -41,11 +60,15 @@ jobs:
         run: pnpm run test:links
 
   tests:
-    name: Regression tests
+    name: ${{ needs.gallery-gate.outputs.selected == 'true' && 'Regression tests' || 'Gallery event (tests not applicable)' }}
+    needs: gallery-gate
+    if: needs.gallery-gate.outputs.selected == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.deployment.sha || github.sha }}
       - name: Setup pnpm
         run: corepack enable && corepack prepare pnpm@10.28.2 --activate
       - name: Setup Node.js
@@ -61,12 +84,14 @@ jobs:
         run: node --experimental-strip-types scripts/test-agent-connection.mjs
 
   build:
-    name: Production build
-    needs: [quality, tests]
+    name: ${{ needs.gallery-gate.outputs.selected == 'true' && 'Production build' || 'Gallery event (build not applicable)' }}
+    needs: [gallery-gate, quality, tests]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.deployment.sha || github.sha }}
       - name: Setup pnpm
         run: corepack enable && corepack prepare pnpm@10.28.2 --activate
       - name: Setup Node.js

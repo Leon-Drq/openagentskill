@@ -11,7 +11,7 @@ concurrency:
 
 permissions:
   contents: write
-  actions: write
+  actions: read
 
 jobs:
   sync:
@@ -45,7 +45,7 @@ jobs:
           git push origin "HEAD:refs/heads/$branch"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
-      - name: Run required CI on the candidate commit
+      - name: Wait for required CI on the candidate commit
         if: steps.candidate.outputs.sha != ''
         env:
           GH_TOKEN: ${{ github.token }}
