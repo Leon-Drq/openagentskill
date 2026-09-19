@@ -197,7 +197,7 @@ assert.ok(useCases.scoreSkillForUseCase(item('cn', { description: '产品视频�
 assert.equal(useCases.scoreSkillForUseCase(item('cpp', { description: 'C++' }), { keywords: ['C++'], featuredSlugs: [] }) > 0, true)
 
 // Every existing Gallery entry is a reference, not a new publication or runtime claim.
-assert.equal(showcase.SHOWCASE_CASES.length, 101)
+assert.ok(showcase.SHOWCASE_CASES.length >= 101, 'Keep historical examples as the automatic catalog grows')
 const originalCatalog = JSON.stringify(showcase.SHOWCASE_CASES)
 for (const example of showcase.SHOWCASE_CASES) {
   for (const locale of ['en', 'zh']) {

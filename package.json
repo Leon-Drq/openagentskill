@@ -30,7 +30,7 @@
     "test:marketplace-foundation": "node --experimental-strip-types scripts/test-marketplace-foundation.ts",
     "test:og-social-cards": "node --experimental-strip-types scripts/test-og-social-cards.ts",
     "test:registry-layers": "node --experimental-strip-types scripts/test-registry-layers.ts",
-    "test:showcase": "node --experimental-strip-types scripts/test-showcase.mjs && node --experimental-strip-types scripts/test-showcase-engagement.mjs",
+    "test:showcase": "node --experimental-strip-types scripts/test-showcase.mjs && node --experimental-strip-types scripts/test-showcase-engagement.mjs && pnpm test:gallery-sync",
     "test:form-controls": "node scripts/test-form-controls.mjs",
     "test:seo": "node --experimental-strip-types scripts/test-seo-foundation.mjs && node scripts/test-growth-discovery.mjs",
     "test:skill-detail": "node scripts/test-skill-detail.mjs && node scripts/test-skill-document.mjs && node scripts/test-skills-directory.mjs",
@@ -45,7 +45,9 @@
     "test:review-cost-controls": "node scripts/test-review-cost-controls.mjs",
     "test": "pnpm run test:review-cost-controls && pnpm run test:owner-publish && pnpm run test:submission && pnpm run test:submission-discovery && pnpm run test:submission-flow && pnpm run test:skill-issue-ingest && pnpm run test:supabase-circuit && pnpm run test:security && pnpm run test:x-automation && pnpm run test:github-owner && pnpm run test:performance && pnpm run test:candidate-intake && pnpm run test:creator-growth && pnpm run test:creator-directory && pnpm run test:marketplace-foundation && pnpm run test:registry-layers && pnpm run test:og-social-cards && pnpm run test:showcase && pnpm run test:localization && pnpm run test:navigation && pnpm run test:form-controls && pnpm run test:seo && pnpm run test:skill-detail && pnpm run test:cli && pnpm run test:sdk",
     "typecheck": "next typegen && tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "gallery:sync": "node scripts/sync-gallery.mjs",
+    "test:gallery-sync": "node scripts/test-gallery-sync.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

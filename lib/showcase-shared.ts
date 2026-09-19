@@ -1,5 +1,6 @@
 // Small presentation helpers only. The complete catalogue stays server-side.
 import featuredCreators from './featured-creators.json' with { type: 'json' }
+import syncStatus from './showcase-sync.json' with { type: 'json' }
 // @ts-expect-error Direct Node regression tests require the TypeScript extension.
 import { galleryCopy, localizeEditorialText } from './i18n/gallery-copy.ts'
 
@@ -8,7 +9,7 @@ export type ShowcaseText = { en: string; zh: string }
 export const showcaseText = (en: string, zh: string): ShowcaseText => ({ en, zh })
 export const localizeShowcase = localizeEditorialText
 export const getShowcaseImageSrc = (src: string, kind: 'card' | 'preview') => src.replace(/\.[^.]+$/, `.${kind}.webp`)
-export const SHOWCASE_UPDATED_AT = '2026-09-11'
+export const SHOWCASE_UPDATED_AT = syncStatus.updatedAt
 export const ORIGINAL_SHOWCASE_UPDATED_AT = '2026-09-08'
 
 export const SHOWCASE_CATEGORIES: { id: ShowcaseCategory; label: ShowcaseText }[] = [

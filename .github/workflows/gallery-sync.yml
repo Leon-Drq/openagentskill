@@ -1,0 +1,78 @@
+name: Daily Gallery sync
+
+on:
+  schedule:
+    - cron: '23 1 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: gallery-publication
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  sync:
+    if: github.repository == 'Leon-Drq/openagentskill' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+      - run: corepack enable && corepack prepare pnpm@10.28.2 --activate
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Collect pinned author previews
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: pnpm gallery:sync
+      - name: Prepare candidate catalog
+        id: candidate
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add lib/showcase-auto.json lib/showcase-sync.json public/showcase/auto-*
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Update Gallery author previews [automated]'
+          branch="codex/gallery-sync-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          git push origin "HEAD:refs/heads/$branch"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+      - name: Run required CI on the candidate commit
+        if: steps.candidate.outputs.sha != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_BRANCH: ${{ steps.candidate.outputs.branch }}
+          EXPECTED_SHA: ${{ steps.candidate.outputs.sha }}
+        run: node scripts/validate-gallery-candidate.mjs
+      - name: Publish tested catalog
+        if: steps.candidate.outputs.sha != ''
+        run: |
+          # Required CI checks belong to this exact commit. A concurrent main
+          # update rejects the push; never force-push or merge untested changes.
+          git push origin HEAD:main
+      - name: Verify production deployment
+        if: steps.candidate.outputs.sha != ''
+        env:
+          EXPECTED_SHA: ${{ steps.candidate.outputs.sha }}
+        run: node scripts/verify-gallery-deploy.mjs
+      - name: Remove published candidate branch
+        if: steps.candidate.outputs.sha != ''
+        env:
+          CANDIDATE_BRANCH: ${{ steps.candidate.outputs.branch }}
+        run: git push origin --delete "$CANDIDATE_BRANCH"
+      - name: Preserve collection report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: gallery-sync-report
+          path: artifacts/gallery-sync-report.json
+          if-no-files-found: ignore
+          retention-days: 30

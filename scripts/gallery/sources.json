@@ -1,0 +1,15 @@
+{
+  "maxNewPerRun": 12,
+  "maxAssetsPerRun": 100,
+  "rules": [
+    { "source": "baoyu", "group": "infographic", "prefix": "screenshots/infographic-layouts/" },
+    { "source": "baoyu", "group": "comic", "prefix": "screenshots/comic-layouts/" },
+    { "source": "baoyu", "group": "cover", "prefix": "screenshots/cover-image-styles/" },
+    { "source": "baoyu", "group": "illustration", "prefix": "screenshots/article-illustrator-styles/" },
+    { "source": "baoyu", "group": "social", "prefix": "screenshots/xhs-images-layouts/" },
+    { "source": "baoyu", "group": "raster-slides", "prefix": "screenshots/slide-deck-styles/" },
+    { "source": "frontend", "group": "frontend", "prefix": "screenshots/", "suffix": "-1.png" },
+    { "source": "huashu", "group": "huashu", "prefix": "assets/showcases/cover/", "category": "image" },
+    { "source": "huashu", "group": "huashu", "prefix": "assets/showcases/infographic/", "category": "image" }
+  ]
+}

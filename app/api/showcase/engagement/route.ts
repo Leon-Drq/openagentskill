@@ -56,6 +56,11 @@ export async function PUT(request: NextRequest) {
     const { data: { user }, error } = await supabase.auth.getUser()
     if (error && error.name !== 'AuthSessionMissingError' && error.status !== 401) throw error
     if (!user || user.is_anonymous) return json({ error: 'sign_in_required' }, 401)
+    // Only the server catalog can register cases; never accept arbitrary slugs.
+    // Ignore existing rows so repeated votes cannot reset counters or history.
+    const registration = await createAdminClient({ requestTimeoutMs: 8000 })
+      .from('showcase_entries').upsert({ slug }, { onConflict: 'slug', ignoreDuplicates: true })
+    if (registration.error) throw registration.error
     // Unique (user_id, case_slug) makes retries idempotent; writes retain the user's RLS.
     const result = await supabase.rpc('set_showcase_vote', { target_slug: slug, direction: vote })
     if (result.error) throw result.error

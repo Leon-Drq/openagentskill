@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2026-09-19T15:47:06.534Z",
+  "updatedAt": "2026-09-19",
+  "sources": [
+    {
+      "source": "baoyu",
+      "repository": "JimLiu/baoyu-skills",
+      "revision": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+      "candidates": 89,
+      "missing": [],
+      "skips": [],
+      "error": null
+    },
+    {
+      "source": "frontend",
+      "repository": "zarazhangrui/beautiful-html-templates",
+      "revision": "e5e204fb1f3b06290846e7dcd7aceddabeceec8c",
+      "candidates": 33,
+      "missing": [],
+      "skips": [],
+      "error": null
+    },
+    {
+      "source": "huashu",
+      "repository": "alchaincyf/huashu-design",
+      "revision": "0e842afc1fa4f008071e34ae1df16c66d3f5d18a",
+      "candidates": 6,
+      "missing": [],
+      "skips": [],
+      "error": null
+    }
+  ],
+  "added": 12,
+  "updated": 0,
+  "unchanged": 0,
+  "skipped": 0,
+  "deferred": 62
+}

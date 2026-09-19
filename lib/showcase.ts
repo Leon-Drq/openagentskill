@@ -1,4 +1,5 @@
 import curatedEntries from './showcase-curation.json' with { type: 'json' }
+import automaticEntries from './showcase-auto.json' with { type: 'json' }
 import curatedSources from './showcase-sources.json' with { type: 'json' }
 import curatedMedia from './showcase-media.json' with { type: 'json' }
 import curatedGroups from './showcase-groups.json' with { type: 'json' }
@@ -202,7 +203,25 @@ const INITIAL_SHOWCASE_CASES: ShowcaseCase[] = [
   },
 ]
 
-export const SHOWCASE_CASES: ShowcaseCase[] = [...INITIAL_SHOWCASE_CASES, ...interleavedExpanded]
+const automaticCases: ShowcaseCase[] = automaticEntries.map((entry) => {
+  const group = curatedGroups[entry.group as keyof typeof curatedGroups]
+  const source = curatedSources[entry.source as keyof typeof curatedSources]
+  return {
+    slug: entry.slug, skillSlug: group.skillSlug, category: entry.category as ShowcaseCategory,
+    title: tx(entry.title, entry.title),
+    description: tx(`Author preview: ${entry.title}. Collected from ${source.repo}.`, `作者预览：${entry.title}。收录自 ${source.repo}。`),
+    input: group.input, output: group.output, requirements: group.requirements,
+    prompt: tx(`Use ${getShowcaseSkill(group.skillSlug).name} to create an original work for [my content]. Use this author preview only as a visual reference. Confirm inputs, format and budget first. Do not copy the example or invent results.`, `使用 ${getShowcaseSkill(group.skillSlug).name}，为[我的内容]制作原创作品。仅将作者预览作为视觉参考，先确认输入、格式与预算，不复制示例或编造成果。`),
+    promptKind: 'suggested', provenance: 'author', evidenceKind: group.evidenceKind as ShowcaseCase['evidenceKind'],
+    creatorId: source.creatorId, sourceRevision: entry.revision,
+    sourceUrl: `https://github.com/${source.repo}/blob/${entry.revision}/${entry.asset}`,
+    license: source.license, licenseUrl: `/showcase/curated-${entry.source}-LICENSE.txt`,
+    productionNote: tx('Automatically collected from the author repository. Source license and image format were checked; the work was not manually reviewed and the skill was not executed. The title comes from the source filename. Original prompt, model, cost and factual claims are not verified.', '自动收录自作者仓库，已检查来源许可证与图片格式；作品未经人工审阅，也没有执行技能。标题来自源文件名，未核实原始提示词、模型、费用及事实表述。'),
+    media: [{ ...entry.media, alt: tx(`${entry.title} — author preview`, `${entry.title}：作者预览`) }],
+    cardFit: 'contain', updatedAt: entry.updatedAt,
+  }
+})
+export const SHOWCASE_CASES: ShowcaseCase[] = [...INITIAL_SHOWCASE_CASES, ...interleavedExpanded, ...automaticCases]
 export const getShowcaseCase = (slug: string) => SHOWCASE_CASES.find((item) => item.slug === slug)
 export const getShowcasesForSkill = (skillSlug: string) => SHOWCASE_CASES.filter((item) => item.skillSlug === skillSlug)
 export const FEATURED_SHOWCASE_SLUGS = ['floria-floral-studio', 'room-to-grow-poster', 'editorial-html-slides']
