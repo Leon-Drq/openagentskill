@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-09-19T15:47:06.534Z",
+  "checkedAt": "2026-09-19T15:57:26.377Z",
   "updatedAt": "2026-09-19",
   "sources": [
     {
@@ -32,7 +32,7 @@
   ],
   "added": 12,
   "updated": 0,
-  "unchanged": 0,
+  "unchanged": 12,
   "skipped": 0,
-  "deferred": 62
+  "deferred": 50
 }

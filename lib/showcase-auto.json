@@ -1,6 +1,42 @@
 [
   {
     "source": "baoyu",
+    "group": "cover",
+    "asset": "screenshots/cover-image-styles/blueprint.webp",
+    "slug": "auto-baoyu-blueprint-04625c0ce4",
+    "title": "blueprint",
+    "category": "image",
+    "revision": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+    "blobSha": "67d99928dd286062ddb054662513c4d76e31ee1e",
+    "sha256": "0d4673b5f2514f1ce9fe0654be61dd6c0aa90f5a9a46d4508aa8a3f77bbe6fcb",
+    "media": {
+      "src": "/showcase/auto-0d4673b5f2514f1ce9fe0654.webp",
+      "width": 1584,
+      "height": 672
+    },
+    "createdAt": "2026-09-19",
+    "updatedAt": "2026-09-19"
+  },
+  {
+    "source": "baoyu",
+    "group": "cover",
+    "asset": "screenshots/cover-image-styles/chalkboard.webp",
+    "slug": "auto-baoyu-chalkboard-34605d221b",
+    "title": "chalkboard",
+    "category": "image",
+    "revision": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+    "blobSha": "115236650cbeea81adec5d3dce29ca61f326a542",
+    "sha256": "9a2808df533faca926d7f285251f5568a6f9c14990ec4866d34c724592fc75c2",
+    "media": {
+      "src": "/showcase/auto-9a2808df533faca926d7f285.webp",
+      "width": 1584,
+      "height": 672
+    },
+    "createdAt": "2026-09-19",
+    "updatedAt": "2026-09-19"
+  },
+  {
+    "source": "baoyu",
     "group": "illustration",
     "asset": "screenshots/article-illustrator-styles/chalkboard.webp",
     "slug": "auto-baoyu-chalkboard-41a593ac50",
@@ -19,6 +55,24 @@
   },
   {
     "source": "baoyu",
+    "group": "cover",
+    "asset": "screenshots/cover-image-styles/dark-atmospheric.webp",
+    "slug": "auto-baoyu-dark-atmospheric-22b9039001",
+    "title": "dark atmospheric",
+    "category": "image",
+    "revision": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+    "blobSha": "44e4d6d0f452cf33f1f097d36f5c46015542368f",
+    "sha256": "5a8ed89149a27ba2d55e111c8c46b387f50052ad1a677a5a8bcb97e0496a3b3d",
+    "media": {
+      "src": "/showcase/auto-5a8ed89149a27ba2d55e111c.webp",
+      "width": 1584,
+      "height": 672
+    },
+    "createdAt": "2026-09-19",
+    "updatedAt": "2026-09-19"
+  },
+  {
+    "source": "baoyu",
     "group": "illustration",
     "asset": "screenshots/article-illustrator-styles/editorial.webp",
     "slug": "auto-baoyu-editorial-6fea6024f1",
@@ -31,6 +85,24 @@
       "src": "/showcase/auto-2d2f28d31b1b0d98dc050cd3.webp",
       "width": 1408,
       "height": 768
+    },
+    "createdAt": "2026-09-19",
+    "updatedAt": "2026-09-19"
+  },
+  {
+    "source": "baoyu",
+    "group": "cover",
+    "asset": "screenshots/cover-image-styles/editorial-infographic.webp",
+    "slug": "auto-baoyu-editorial-infographic-673df68049",
+    "title": "editorial infographic",
+    "category": "image",
+    "revision": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+    "blobSha": "fbb68b5fcf24b26b56875876148e0a9ed19d6851",
+    "sha256": "d213ddb8645be7b70ed5f75f477b5f79244c59e496e86cfc4e1947140312ca02",
+    "media": {
+      "src": "/showcase/auto-d213ddb8645be7b70ed5f75f.webp",
+      "width": 1584,
+      "height": 672
     },
     "createdAt": "2026-09-19",
     "updatedAt": "2026-09-19"
@@ -127,6 +199,24 @@
   },
   {
     "source": "baoyu",
+    "group": "comic",
+    "asset": "screenshots/comic-layouts/mixed.webp",
+    "slug": "auto-baoyu-mixed-f959d7fa37",
+    "title": "mixed",
+    "category": "image",
+    "revision": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+    "blobSha": "efe37353b7a4308928bc8d38942d54405c589033",
+    "sha256": "97685f3c285fdcc5fab785268dede8a4dea249695129658a4ef71aca37f39fe5",
+    "media": {
+      "src": "/showcase/auto-97685f3c285fdcc5fab78526.webp",
+      "width": 896,
+      "height": 1200
+    },
+    "createdAt": "2026-09-19",
+    "updatedAt": "2026-09-19"
+  },
+  {
+    "source": "baoyu",
     "group": "illustration",
     "asset": "screenshots/article-illustrator-styles/nature.webp",
     "slug": "auto-baoyu-nature-80bc000a2f",
@@ -209,6 +299,132 @@
     "sha256": "f247d91761bbc2cfc6bfb6147dcb912030a5baad1dd71e582ee493da9565df2c",
     "media": {
       "src": "/showcase/auto-f247d91761bbc2cfc6bfb614.webp",
+      "width": 1408,
+      "height": 768
+    },
+    "createdAt": "2026-09-19",
+    "updatedAt": "2026-09-19"
+  },
+  {
+    "source": "baoyu",
+    "group": "illustration",
+    "asset": "screenshots/article-illustrator-styles/sketch.webp",
+    "slug": "auto-baoyu-sketch-971c4518bb",
+    "title": "sketch",
+    "category": "image",
+    "revision": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+    "blobSha": "34f855efd5edabaa658b08ce21000a8e38f32452",
+    "sha256": "b824162a77fbfb5e3033f0a3f28dc1d49d27731d480ccfc3f23804a749904122",
+    "media": {
+      "src": "/showcase/auto-b824162a77fbfb5e3033f0a3.webp",
+      "width": 1408,
+      "height": 768
+    },
+    "createdAt": "2026-09-19",
+    "updatedAt": "2026-09-19"
+  },
+  {
+    "source": "baoyu",
+    "group": "illustration",
+    "asset": "screenshots/article-illustrator-styles/sketch-notes.webp",
+    "slug": "auto-baoyu-sketch-notes-afda2c60b6",
+    "title": "sketch notes",
+    "category": "image",
+    "revision": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+    "blobSha": "30fa9732b9979d94cb7243bb78c82100ec2b622a",
+    "sha256": "ae117db5fb7fb46025b5ebca3bd31ba0fd780c80d18d919d80cf7dbb74584fd6",
+    "media": {
+      "src": "/showcase/auto-ae117db5fb7fb46025b5ebca.webp",
+      "width": 1376,
+      "height": 768
+    },
+    "createdAt": "2026-09-19",
+    "updatedAt": "2026-09-19"
+  },
+  {
+    "source": "baoyu",
+    "group": "comic",
+    "asset": "screenshots/comic-layouts/splash.webp",
+    "slug": "auto-baoyu-splash-3dfeadb862",
+    "title": "splash",
+    "category": "image",
+    "revision": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+    "blobSha": "f86c987cc4cab2dc1ef33ad4e01b5c7b0fdd6f04",
+    "sha256": "2efcb1b836623a2658babcf1c534ceb545deb61728deb8e2d88840bae0a64e3d",
+    "media": {
+      "src": "/showcase/auto-2efcb1b836623a2658babcf1.webp",
+      "width": 896,
+      "height": 1200
+    },
+    "createdAt": "2026-09-19",
+    "updatedAt": "2026-09-19"
+  },
+  {
+    "source": "baoyu",
+    "group": "comic",
+    "asset": "screenshots/comic-layouts/standard.webp",
+    "slug": "auto-baoyu-standard-0adb9c1ddd",
+    "title": "standard",
+    "category": "image",
+    "revision": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+    "blobSha": "8643c9235ed4157ed6f9ed2b1c31ca61a439a3e3",
+    "sha256": "657ae26a6aa37c6aef567198775b7720d2180b8ed50a9dfb0ee79d9a7839df63",
+    "media": {
+      "src": "/showcase/auto-657ae26a6aa37c6aef567198.webp",
+      "width": 896,
+      "height": 1200
+    },
+    "createdAt": "2026-09-19",
+    "updatedAt": "2026-09-19"
+  },
+  {
+    "source": "baoyu",
+    "group": "illustration",
+    "asset": "screenshots/article-illustrator-styles/vector-illustration.webp",
+    "slug": "auto-baoyu-vector-illustration-608af5ae9d",
+    "title": "vector illustration",
+    "category": "image",
+    "revision": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+    "blobSha": "60c6baca67636f03522527ccd65da0ebf59628a9",
+    "sha256": "b859b6b73f0c06ad797895b5377285bf6f1dc79a8df12d1e10209775e558889e",
+    "media": {
+      "src": "/showcase/auto-b859b6b73f0c06ad797895b5.webp",
+      "width": 1376,
+      "height": 768
+    },
+    "createdAt": "2026-09-19",
+    "updatedAt": "2026-09-19"
+  },
+  {
+    "source": "baoyu",
+    "group": "illustration",
+    "asset": "screenshots/article-illustrator-styles/vintage.webp",
+    "slug": "auto-baoyu-vintage-7f4a4d9ab7",
+    "title": "vintage",
+    "category": "image",
+    "revision": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+    "blobSha": "a36ab0d514ba8922216b47ab99a8895fbaa8d7a2",
+    "sha256": "f08733d896249cea45659cf622e176cc5672942fc4d04314a91586efb3cd5474",
+    "media": {
+      "src": "/showcase/auto-f08733d896249cea45659cf6.webp",
+      "width": 1408,
+      "height": 768
+    },
+    "createdAt": "2026-09-19",
+    "updatedAt": "2026-09-19"
+  },
+  {
+    "source": "baoyu",
+    "group": "illustration",
+    "asset": "screenshots/article-illustrator-styles/warm.webp",
+    "slug": "auto-baoyu-warm-e268164c21",
+    "title": "warm",
+    "category": "image",
+    "revision": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+    "blobSha": "47190e11f88d61d705647c51bde8c942ebb51f58",
+    "sha256": "7921d1011742cc1c358852e063dfc039d38eab1aacc209f1dda2a4ffec6d183b",
+    "media": {
+      "src": "/showcase/auto-7921d1011742cc1c358852e0.webp",
       "width": 1408,
       "height": 768
     },
