@@ -3,7 +3,9 @@ import assert from 'node:assert/strict'
 
 const base = process.argv[2] || 'http://localhost:3117'
 const canonical = 'https://www.openagentskill.com/skills'
-const text = html => html.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ')
+// Text extraction only; never HTML sanitization or content for insertion.
+// Keep separators rather than joining fragments into new markup sequences.
+const text = html => html.replace(/<!--[\s\S]*?-->/g, ' ').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ')
 const cards = html => [...html.matchAll(/<article\b[^>]*data-directory-skill[^>]*>([\s\S]*?)<\/article>/g)]
   .map(([, card]) => card.match(/<h3\b[^>]*>[\s\S]*?href="([^"]+)"/)?.[1])
 async function page(path, indexable = false) {
