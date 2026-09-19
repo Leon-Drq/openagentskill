@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
-import { getBrowseSkillCandidates } from '@/lib/db/skills'
+import { getBrowseSkillCandidates, getSkillCatalogPage } from '@/lib/db/skills'
+import { catalogPageNumber, catalogStars } from '@/lib/skills/catalog-query'
 import { buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { getCategories, type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsWithStatus } from '@/lib/db/skills'
@@ -102,7 +103,7 @@ const MAX_SKILL_CANDIDATE_LIMIT = 480
 const VISIBLE_SKILL_LIMIT = 16
 const MAX_SKILLS_PAGE = Math.ceil(MAX_SKILL_CANDIDATE_LIMIT / VISIBLE_SKILL_LIMIT)
 const SKILLS_PAGE_QUERY_TIMEOUT_MS = 1800
-const SKILLS_PAGE_EXACT_SEARCH_TIMEOUT_MS = 3000
+const SKILLS_PAGE_EXACT_SEARCH_TIMEOUT_MS = 4000
 const SKILLS_PAGE_EXACT_SEARCH_LIMIT = 120
 const DIRECTORY_SECTION_SOURCE_LIMIT = 120
 const FALLBACK_DATE = '2026-06-01T00:00:00.000Z'
@@ -902,17 +903,18 @@ export default async function SkillsPage({
   const trust = firstSearchValue(params.trust) || 'all'
   const safety = firstSearchValue(params.safety) || 'all'
   const supplyTrack = firstSearchValue(params.track) || 'all'
-  const minStars = Number(firstSearchValue(params.minStars) || 0)
-  const page = clampPage(firstSearchValue(params.page))
-  const query = firstSearchValue(params.q)
+  const minStars = catalogStars(Number(firstSearchValue(params.minStars) || 0))
+  const query = firstSearchValue(params.q)?.trim().slice(0, 180)
+  const catalogMode = view === 'all' && !query && [useCase, platform, quality, trust, safety, supplyTrack].every(value => value === 'all')
+  const page = catalogMode ? catalogPageNumber(firstSearchValue(params.page)) : clampPage(firstSearchValue(params.page))
   const requestedPageOffset = (page - 1) * VISIBLE_SKILL_LIMIT
   // Category, stars and recorded-source filters now run in SQL. Only filters
   // derived from richer profiles need a wider in-memory candidate pool.
   const hasHighIntentFilter = Boolean(useCase !== 'all' || platform !== 'all' || supplyTrack !== 'all')
   const baseLimit = hasHighIntentFilter ? SEARCH_SKILL_CANDIDATE_LIMIT : BASE_SKILL_CANDIDATE_LIMIT
   const candidateLimit = Math.min(baseLimit + requestedPageOffset, MAX_SKILL_CANDIDATE_LIMIT)
-  const [recordsResult, searchAugmentRecords, categories, statsMap] = await Promise.all([
-    query?.trim() ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
+  const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult] = await Promise.all([
+    query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
       : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, view === 'skills', minStars), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
         .catch(() => ({ records: getFallbackSkills(sort, undefined, candidateLimit), degraded: true })),
     getSearchAugmentRecords(firstSearchValue(params.q)),
@@ -920,10 +922,13 @@ export default async function SkillsPage({
       .catch(() => [...new Set(mergeSkillRecords(FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT).map((skill) => skill.category))].sort()),
     withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
+    catalogMode ? getSkillCatalogPage(sort, category, page, minStars)
+      .then(result => ({ ...result, degraded: false }))
+      .catch(() => ({ records: [] as SkillRecord[], total: 0, hasMore: false, degraded: true })) : Promise.resolve(null),
   ])
-  const records = mergeSkillRecords(searchAugmentRecords.records, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
-  const degraded = recordsResult.degraded || searchAugmentRecords.degraded
-  const effectivePage = degraded && records.length <= requestedPageOffset ? 1 : page
+  const records = catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
+  const degraded = Boolean(catalogResult?.degraded || recordsResult.degraded || searchAugmentRecords.degraded)
+  const effectivePage = !catalogMode && degraded && records.length <= requestedPageOffset ? 1 : page
   const pageOffset = (effectivePage - 1) * VISIBLE_SKILL_LIMIT
   const rawCategoryOptions = categories.length > 0
     ? categories
@@ -959,6 +964,9 @@ export default async function SkillsPage({
 
   let filteredRecords = enrichedRecords.filter((item) => {
     const { record } = item
+    // Catalog filters/order/pagination are already applied in the database.
+    // Re-filtering corrected presentation categories here would drop rows.
+    if (catalogMode) return true
     if (view === 'skills' && getSkillSourceEvidence(record).status !== 'source-recorded') return false
     if (!matchesDirectoryCategory(record.category, category)) return false
     if (supplyTrack !== 'all' && item.supplyProfile.track.slug !== supplyTrack) return false
@@ -994,17 +1002,17 @@ export default async function SkillsPage({
 
   // Merging live candidates and saved snapshots must not append high-star items
   // out of order. Keep query relevance unless the visitor explicitly sorts.
-  if (!query?.trim() || sort !== 'quality') {
+  if (!catalogMode && (!query?.trim() || sort !== 'quality')) {
     filteredRecords = sortDirectoryCandidates(filteredRecords, sort)
   }
 
-  const resultCount = filteredRecords.length
-  const visibleRecords = filteredRecords.slice(pageOffset, pageOffset + VISIBLE_SKILL_LIMIT)
+  const resultCount = catalogMode ? catalogResult!.total : filteredRecords.length
+  const visibleRecords = catalogMode ? filteredRecords : filteredRecords.slice(pageOffset, pageOffset + VISIBLE_SKILL_LIMIT)
   const hasPreviousResults = effectivePage > 1
-  const hasMoreResults = resultCount > pageOffset + visibleRecords.length
+  const hasMoreResults = catalogMode ? catalogResult!.hasMore : resultCount > pageOffset + visibleRecords.length
 
   const skills = visibleRecords.map(toSkillsPageSkill)
-  const directorySections = buildDirectorySections(
+  const directorySections = catalogMode ? [] : buildDirectorySections(
     enrichedRecords.slice(0, DIRECTORY_SECTION_SOURCE_LIMIT)
   )
   const directoryLinks: DirectoryLink[] = POPULAR_DIRECTORY_LINKS.map((link) => ({ ...link }))
@@ -1023,6 +1031,7 @@ export default async function SkillsPage({
         query={query}
         sort={sort}
         view={view}
+        catalogMode={catalogMode}
         category={category}
         categories={categoryOptions}
         useCase={useCase}

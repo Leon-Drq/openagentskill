@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { register } from 'node:module'
+await import('./test-discovery-funnel.mjs')
 await import('./test-trending.mjs')
 await import('./test-ranking-landings.mjs')
 register('./test-owner-publication-loader.mjs', import.meta.url)

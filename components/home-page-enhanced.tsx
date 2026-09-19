@@ -817,14 +817,14 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
           </div>
 
           <div className="mt-14 grid grid-cols-2 gap-x-4 gap-y-6 border-t border-[#d8d2c6] pt-8 md:grid-cols-4">
-            {statItems.map(([value, label]) => (
+            {statItems.map(([value, label], index) => (
               <div key={label} className="flex flex-col gap-1">
                 <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#6d675e]">{label}</span>
                 <span
                   className="text-2xl tracking-normal"
                   style={{ fontFamily: value === 'API' ? 'var(--font-mono)' : 'Georgia, "Times New Roman", serif' }}
                 >
-                  {value}
+                  {index === 0 ? <Link href={`/skills?view=all${activeLocale === 'en' ? '' : `&lang=${activeLocale}`}`} className="underline decoration-transparent underline-offset-4 hover:decoration-current" aria-label={`${label}: ${value}`}>{value}</Link> : value}
                 </span>
               </div>
             ))}

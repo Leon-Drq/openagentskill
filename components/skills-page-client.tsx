@@ -4,7 +4,8 @@ import { NativeSelect } from '@/components/ui/native-select'
 
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useSyncExternalStore, useTransition, type ReactNode } from 'react'
+import { useEffect, useRef, useSyncExternalStore, useTransition, type ReactNode } from 'react'
+import { trackAnalyticsEvent } from '@/lib/analytics'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
 import type { SupplyTrackSummary } from '@/lib/supply'
@@ -155,6 +156,7 @@ interface Props {
   query?: string
   sort: string
   view: 'skills' | 'all'
+  catalogMode: boolean
   category: string
   categories: string[]
   useCase: string
@@ -185,6 +187,18 @@ export function SkillsPageClient(props: Props) {
     hasPreviousResults, hasMoreResults, degraded, directorySections, directoryLinks } = props
   const { locale } = useI18n()
   const c = directoryCopy(locale)
+  const reportedResult = useRef('')
+  useEffect(() => {
+    const key = JSON.stringify([query, sort, category, page, resultCount, degraded, props.view])
+    if (reportedResult.current === key) return
+    reportedResult.current = key
+    // No raw queries, task text, URLs or user identifiers in event parameters.
+    trackAnalyticsEvent('directory_results', {
+      mode: props.catalogMode ? 'catalog' : query ? 'search' : 'selected',
+      result_count: resultCount, visible_count: skills.length, page, degraded,
+      has_query: Boolean(query), locale,
+    })
+  }, [query, sort, category, page, resultCount, degraded, props.view, props.catalogMode, skills.length, locale])
   const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -200,7 +214,10 @@ export function SkillsPageClient(props: Props) {
   const resetHref = directoryHref(pathname, searchParams.toString(), Object.fromEntries(
     ['q','sort','category','useCase','platform','quality','trust','safety','track','minStars','page','view'].map(key => [key, undefined])
   ))
-  const toggleCompare = (slug: string) => writeSelection(compareSlugs.includes(slug) ? compareSlugs.filter(v => v !== slug) : [...compareSlugs, slug].slice(-4))
+  const toggleCompare = (slug: string) => {
+    trackAnalyticsEvent('skill_compare', { skill_slug: slug, source: 'directory', selected: !compareSlugs.includes(slug) })
+    writeSelection(compareSlugs.includes(slug) ? compareSlugs.filter(v => v !== slug) : [...compareSlugs, slug].slice(-4))
+  }
   const label = (key: string) => directoryLabel(locale, key)
   const primaryCategories = ['coding-agents','design-creative','video-creation','research','presentation','finance']
   const categoryOptions = directoryCategoryOptions([...categories, ...primaryCategories, category === 'all' ? '' : category])
@@ -208,13 +225,15 @@ export function SkillsPageClient(props: Props) {
   const activeFilters = Object.entries({ category, useCase, platform, quality, trust, safety, track: supplyTrack, minStars: minStars ? String(minStars) : 'all' })
     .filter(([, value]) => value && value !== 'all')
   const sortOptions = [
-    ['quality', query ? c.relevance : c.recommended], ['stars', c.stars],
+    ['quality', query ? c.relevance : props.catalogMode ? c.quality : c.recommended], ['stars', c.stars],
     ['fresh', c.fresh], ['new', c.new], ['trending', c.trending],
     ...(sort === 'downloads' ? [['downloads', c.trending]] : []),
   ]
   const advanced = [
-    { key: 'useCase', title: c.useCase, value: useCase, options: useCases.map(v => [v.slug, v.shortTitle]) },
-    { key: 'platform', title: c.platform, value: platform, options: [...new Set([...platformOptions, ...(platform !== 'all' ? [platform] : [])])].map(v => [v, v]) },
+    ...(!props.catalogMode ? [
+      { key: 'useCase', title: c.useCase, value: useCase, options: useCases.map(v => [v.slug, v.shortTitle]) },
+      { key: 'platform', title: c.platform, value: platform, options: [...new Set([...platformOptions, ...(platform !== 'all' ? [platform] : [])])].map(v => [v, v]) },
+    ] : []),
     { key: 'minStars', title: c.minimum, value: String(minStars || 'all'), options: ['20','100','500','1000','5000'].map(v => [v, v + '+']) },
   ]
   const stars = (value: number) => new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 1 }).format(value)
@@ -230,6 +249,7 @@ export function SkillsPageClient(props: Props) {
           <form role="search" onSubmit={event => {
             event.preventDefault()
             const q = String(new FormData(event.currentTarget).get('q') || '').trim()
+            trackAnalyticsEvent('directory_search', { has_query: Boolean(q), query_length: q.length, locale })
             navigate({ q: q || undefined, sort: undefined, view: q ? 'all' : undefined })
           }} className="mt-6 flex max-w-3xl items-center gap-2 border border-border bg-card p-2 focus-within:border-[#006b4f]">
             <Search size={18} className="ml-2 hidden shrink-0 text-secondary sm:block" aria-hidden="true" />
@@ -237,6 +257,17 @@ export function SkillsPageClient(props: Props) {
               placeholder={c.placeholder} className="min-w-0 flex-1 bg-transparent px-2 py-2.5 text-sm outline-none" />
             <button type="submit" disabled={pending} className="shrink-0 bg-[#006b4f] px-4 py-3 text-sm font-semibold text-white hover:bg-[#00533d] disabled:opacity-50 sm:px-6">{c.search}</button>
           </form>
+          <nav aria-label={label('browseMode')} className="mt-6 flex flex-wrap gap-3" data-directory-modes>
+            {(['skills', 'all'] as const).map(mode => <Link key={mode} prefetch={false}
+              href={href({ view: mode, q: undefined, useCase: undefined, platform: undefined, quality: undefined, trust: undefined, safety: undefined, track: undefined })}
+              aria-current={props.view === mode && !query ? 'page' : undefined}
+              className={`px-4 py-2.5 text-sm border ${props.view === mode && !query ? 'border-[#006b4f] bg-[#006b4f] text-white' : 'border-border text-secondary hover:text-foreground'}`}>
+              {label(mode === 'skills' ? 'selectedSkills' : 'fullCatalog')}
+            </Link>)}
+          </nav>
+          <p className="mt-3 max-w-3xl text-xs leading-6 text-secondary" data-directory-scope>
+            {label(props.catalogMode ? 'catalogNote' : query ? 'searchNote' : 'selectionNote')}
+          </p>
         </header>
 
         <nav aria-label={c.category} className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-border py-4 text-sm" data-directory-categories>
@@ -244,7 +275,7 @@ export function SkillsPageClient(props: Props) {
             <Link key={key} prefetch={false} href={href({ category: key, track: undefined, useCase: undefined })}
               aria-current={selectedCategory === key ? 'page' : undefined}
               className={`border-b-2 py-2 transition-colors ${selectedCategory === key ? 'border-[#006b4f] font-semibold text-[#006b4f]' : 'border-transparent text-secondary hover:text-foreground'}`}>
-              {key === 'all' ? c.all : label(key)}
+              {key === 'all' ? label('allCategories') : label(key)}
             </Link>
           ))}
         </nav>
@@ -253,10 +284,12 @@ export function SkillsPageClient(props: Props) {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="min-w-0">
               <h2 id="directory-results-heading" className="break-words text-base font-semibold">
-                {query ? `${c.results} · “${query}”` : label('selectedSkills')}
+                {query ? `${c.results} · “${query}”` : label(props.catalogMode ? 'fullCatalog' : 'selectedSkills')}
               </h2>
               <p className="mt-1 font-mono text-xs text-secondary" data-directory-count>
-                {skills.length ? rankOffset + 1 : 0}–{rankOffset + skills.length} / {resultCount.toLocaleString(locale)}
+                {props.catalogMode
+                  ? `${c.page} ${page} · ${skills.length} ${label('shown')} · ${degraded ? '—' : resultCount.toLocaleString(locale)} ${label('registryEntries')}`
+                  : <>{skills.length ? rankOffset + 1 : 0}–{rankOffset + skills.length} / {resultCount.toLocaleString(locale)}</>}
               </p>
             </div>
             <label className="flex min-w-0 max-w-full items-center gap-3 text-xs text-secondary">
@@ -298,11 +331,11 @@ export function SkillsPageClient(props: Props) {
             </div>
           )}
           <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${resultCount}`}</p>
-          {degraded && <p role="status" className="my-5 border-l-2 border-amber-600 bg-amber-50 p-4 text-sm text-amber-950">{label('dataUnavailable')}</p>}
+          {degraded && <p role="status" className="my-5 border-l-2 border-amber-600 bg-amber-50 p-4 text-sm text-amber-950">{label(props.catalogMode ? 'catalogUnavailable' : 'dataUnavailable')}</p>}
 
           {skills.length === 0 ? (
             <div className="border-y border-border py-14 text-center">
-              <p className="text-secondary">{c.empty}</p>
+              <p className="text-secondary">{degraded ? label('catalogUnavailable') : props.catalogMode && hasMoreResults ? label('excludedResources') : c.empty}</p>
               <Link href={resetHref} className="mt-5 inline-block text-[#006b4f] underline">{c.reset}</Link>
             </div>
           ) : <div className="border-t border-border" data-skill-list>
@@ -311,7 +344,9 @@ export function SkillsPageClient(props: Props) {
                 <div className="pt-1"><GitHubOwnerAvatar owner={skill.author.owner} label={skill.author.name} size="md" /></div>
                 <div className="min-w-0">
                   <h3 className="break-words text-lg font-semibold leading-snug [overflow-wrap:anywhere] sm:text-xl">
-                    <Link prefetch={false} href={`/skills/${skill.slug}${locale === 'en' ? '' : '?lang=' + locale}`} className="hover:text-[#006b4f]">{skill.name}</Link>
+                    <Link prefetch={false} href={`/skills/${skill.slug}${locale === 'en' ? '' : '?lang=' + locale}`}
+                      onClick={() => trackAnalyticsEvent('directory_skill_open', { skill_slug: skill.slug, mode: props.catalogMode ? 'catalog' : query ? 'search' : 'selected', position: rankOffset + skills.indexOf(skill) + 1 })}
+                      className="hover:text-[#006b4f]">{skill.name}</Link>
                   </h3>
                   <p className="mt-1 truncate font-mono text-[11px] text-secondary">{skill.author.owner || skill.author.name}</p>
                   <p className="mt-3 max-w-2xl break-words text-sm leading-6 text-secondary">{skill.tagline}</p>
@@ -329,6 +364,7 @@ export function SkillsPageClient(props: Props) {
                     <button type="button" aria-pressed={compareSlugs.includes(skill.slug)} onClick={() => toggleCompare(skill.slug)}
                       className="min-h-10 text-secondary hover:text-[#006b4f]">{compareSlugs.includes(skill.slug) ? c.selected : c.compare}</button>
                     <Link prefetch={false} href={`/skills/${skill.slug}${locale === 'en' ? '' : '?lang=' + locale}`}
+                      onClick={() => trackAnalyticsEvent('directory_skill_open', { skill_slug: skill.slug, mode: props.catalogMode ? 'catalog' : query ? 'search' : 'selected', position: rankOffset + skills.indexOf(skill) + 1 })}
                       aria-label={`${c.details}: ${skill.name}`} className="inline-flex min-h-10 items-center gap-1 text-[#006b4f]">{c.details}<ArrowRight size={14} aria-hidden="true" /></Link>
                   </div>
                 </div>

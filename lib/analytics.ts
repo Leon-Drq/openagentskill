@@ -3,6 +3,11 @@
 export type AnalyticsParameterValue = string | number | boolean
 
 export type AnalyticsEventName =
+  | 'directory_search'
+  | 'directory_results'
+  | 'directory_skill_open'
+  | 'skill_handoff_target'
+  | 'skill_handoff_error'
   | 'showcase_view'
   | 'showcase_creator_open'
   | 'showcase_filter'

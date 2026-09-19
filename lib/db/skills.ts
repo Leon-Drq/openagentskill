@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { withTimeout } from '@/lib/async'
 import { collectSearchResults } from '@/lib/search-results'
 import { directoryCategoryTerms } from '@/lib/skills/directory'
+import { CATALOG_PAGE_SIZE, catalogPageNumber, catalogSortColumn, catalogStars } from '@/lib/skills/catalog-query'
 import { skillPresentationCategory, skillPresentationOverride } from '@/lib/skills/presentation-category'
 import { isMcpOnlyCategory, isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
 import { unstable_cache } from 'next/cache'
@@ -82,7 +83,9 @@ const SKILL_STATS_REQUEST_TIMEOUT_MS = 3000
 const SKILL_LOOKUP_TIMEOUT_MS = 7000
 const SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS = 300
 const SKILL_EXACT_SEARCH_TIMEOUT_MS = 2500
-const SKILL_BROAD_SEARCH_TIMEOUT_MS = 1500
+// Cold full-text responses include source/review evidence. A 1.5s outer
+// deadline could expire before a successful ~2s response had been decoded.
+const SKILL_BROAD_SEARCH_TIMEOUT_MS = 3500
 // Sitemap refreshes run off the interactive navigation path. Give a cold
 // registry shard enough time to return the complete URL set, then let the
 // shared and edge caches keep that work away from visitors.
@@ -972,7 +975,7 @@ async function searchSkillsWithLegacyFilter(
   searchTerms: string[],
   limit: number
 ): Promise<SkillRecord[]> {
-  const supabase = createPublicClient({ requestTimeoutMs: SKILL_DIRECTORY_REQUEST_TIMEOUT_MS })
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_BROAD_SEARCH_TIMEOUT_MS })
   const fields = ['slug', 'name', 'description', 'long_description', 'tagline', 'category', 'github_repo', 'repository']
   const filter = searchTerms
     .flatMap((term) => fields.map((field) => `${field}.ilike.%${term}%`))
@@ -991,7 +994,7 @@ async function searchSkillsWithLegacyFilter(
 
 async function fetchSearchSkills(normalizedQuery: string, limit: number): Promise<SkillRecord[]> {
   const searchTerms = getSearchTerms(normalizedQuery)
-  const supabase = createPublicClient({ requestTimeoutMs: SKILL_DIRECTORY_REQUEST_TIMEOUT_MS })
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_BROAD_SEARCH_TIMEOUT_MS })
   const fullTextQuery = searchTerms.map((term) => term.replace(/[^a-z0-9-]/g, '')).filter(Boolean).join(' OR ')
 
   const { data, error } = await supabase
@@ -1017,7 +1020,7 @@ async function fetchSearchSkills(normalizedQuery: string, limit: number): Promis
 
 const getCachedSearchSkills = unstable_cache(
   async (normalizedQuery: string, limit: number) => fetchSearchSkills(normalizedQuery, limit),
-  ['public-skill-search-v4'],
+  ['public-skill-search-v5-task-terms'],
   { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
 
@@ -1121,6 +1124,35 @@ export async function getBrowseSkillCandidates(sort: SkillSortMode, category: st
   const stars = Number.isFinite(minStars) ? Math.min(1_000_000_000, Math.max(0, Math.floor(minStars))) : 0
   const packed = await getCachedBrowseCandidates(sort, category, size, sourceOnly, stars)
   return { records: await unpackCacheJson<SkillRecord[]>(packed), degraded: false }
+}
+
+// True database pagination, not another increasingly large candidate pool.
+// Count describes public registry entries; the UI separately labels the number
+// of visible skills because MCP-only resources are omitted, as on detail pages.
+const getCachedCatalogPage = unstable_cache(
+  async (sort: SkillSortMode, category: string, page: number, minStars: number) => {
+    const supabase = createPublicClient({ requestTimeoutMs: 4000 })
+    let query = supabase.from('skills').select(SKILL_DIRECTORY_SELECT, { count: 'exact' }).or(PUBLIC_SKILL_FILTER)
+    if (minStars > 0) query = query.gte('github_stars', minStars)
+    const terms = directoryCategoryTerms(category)
+    if (category !== 'all') {
+      if (!terms.length) return { records: [] as SkillRecord[], total: 0, hasMore: false }
+      query = query.or(terms.map(term => `category.ilike.*${term}*`).join(','))
+    }
+    const from = (page - 1) * CATALOG_PAGE_SIZE
+    const { data, count, error } = await query
+      .order(catalogSortColumn(sort), { ascending: false, nullsFirst: false })
+      .order('slug', { ascending: true }).range(from, from + CATALOG_PAGE_SIZE - 1)
+    if (error) throw error
+    if (count === null) throw new Error('Catalog count unavailable')
+    return { records: filterSkillOnly((data || []) as unknown as SkillRecord[]), total: count, hasMore: from + CATALOG_PAGE_SIZE < count }
+  },
+  ['public-catalog-pages-v1'],
+  { revalidate: 300, tags: ['public-skill-directory'] }
+)
+
+export function getSkillCatalogPage(sort: SkillSortMode, category: string, page: number, minStars: number) {
+  return getCachedCatalogPage(sort, category.slice(0, 80), catalogPageNumber(String(page)), catalogStars(minStars))
 }
 
 export async function searchSkillsStrict(query: string, limit = 120): Promise<SkillRecord[]> {

@@ -10,6 +10,8 @@ import type { SkillInstallTarget } from '@/lib/install-targets'
 import { copyText } from '@/lib/copy-text'
 import { cn } from '@/lib/utils'
 import { SkillProfileText } from '@/components/skill-profile-text'
+import { handoffCopy } from '@/lib/i18n/handoff-copy'
+import { trackAnalyticsEvent } from '@/lib/analytics'
 
 interface SkillInstallTargetsProps {
   skillSlug: string
@@ -21,11 +23,13 @@ export function SkillInstallTargets({ skillSlug, targets, compact = false }: Ski
   const { locale } = useI18n()
   const [activeId, setActiveId] = useState(targets[0]?.id)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [copyFailed, setCopyFailed] = useState(false)
   const activeTarget = targets.find((target) => target.id === activeId) || targets[0]
 
   if (!activeTarget) return null
 
   async function copyTarget(target: SkillInstallTarget) {
+    setCopyFailed(false)
     try {
       const copied = await copyText(target.value)
       if (!copied) throw new Error('Clipboard is unavailable')
@@ -34,11 +38,25 @@ export function SkillInstallTargets({ skillSlug, targets, compact = false }: Ski
         trackSkillEvent(skillSlug, 'install_copy', { target: target.id, kind: target.kind })
       }
       setCopiedId(target.id)
-      setTimeout(() => setCopiedId(null), 1800)
     } catch (error) {
+      setCopyFailed(true)
+      trackAnalyticsEvent('skill_handoff_error', { skill_slug: skillSlug, target: target.id })
       console.error('Failed to copy install target:', error)
     }
   }
+
+  function selectTarget(target: SkillInstallTarget) {
+    setActiveId(target.id)
+    setCopiedId(null)
+    setCopyFailed(false)
+    trackAnalyticsEvent('skill_handoff_target', { skill_slug: skillSlug, target: target.id })
+  }
+  const nextStep = <div className="border-t border-border px-4 py-3 text-xs leading-6 text-secondary" data-handoff-next-step>
+    <p>{handoffCopy(locale, 'evidence')}</p>
+    <p role="status" aria-live="polite" className={copyFailed ? 'text-red-700' : 'font-medium text-[#006b4f]'}>
+      {copyFailed ? handoffCopy(locale, 'failed') : copiedId ? handoffCopy(locale, activeTarget.kind === 'command' ? 'terminal' : 'next') : null}
+    </p>
+  </div>
 
   if (compact) {
     return (
@@ -60,7 +78,7 @@ export function SkillInstallTargets({ skillSlug, targets, compact = false }: Ski
               <button
                 key={target.id}
                 type="button"
-                onClick={() => setActiveId(target.id)}
+                onClick={() => selectTarget(target)}
                 className={cn(
                   'min-h-8 rounded-[6px] px-2.5 text-xs font-semibold transition-colors',
                   activeTarget.id === target.id
@@ -96,6 +114,7 @@ export function SkillInstallTargets({ skillSlug, targets, compact = false }: Ski
               : <SkillDetailValue value={activeTarget.copyLabel} />}
           </button>
         </div>
+        {nextStep}
       </section>
     )
   }
@@ -124,7 +143,7 @@ export function SkillInstallTargets({ skillSlug, targets, compact = false }: Ski
             <button
               key={target.id}
               type="button"
-              onClick={() => setActiveId(target.id)}
+              onClick={() => selectTarget(target)}
               className={cn(
                 'min-h-14 border-b border-border px-4 py-3 text-left text-sm transition-colors sm:border-r sm:border-b-0 lg:border-r-0 lg:border-b',
                 activeTarget.id === target.id
@@ -176,6 +195,7 @@ export function SkillInstallTargets({ skillSlug, targets, compact = false }: Ski
           </pre>
         </div>
       </div>
+      {nextStep}
     </section>
   )
 }

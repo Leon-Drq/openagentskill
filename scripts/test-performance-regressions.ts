@@ -47,7 +47,8 @@ assert.match(useCasePage, /searchSkills\(useCase\.heroPrompt, 240\)/, 'use-case 
 assert.doesNotMatch(useCasePage, /getAllSkills\('quality', undefined, 4000\)/, 'use-case pages must not cache the full registry')
 
 const skillsPage = read('app/skills/page.tsx')
-assert.match(skillsPage, /SKILLS_PAGE_EXACT_SEARCH_TIMEOUT_MS = 3000/, 'skills search must not block navigation for many seconds')
+const searchDeadline = Number(skillsPage.match(/SKILLS_PAGE_EXACT_SEARCH_TIMEOUT_MS = (\d+)/)?.[1])
+assert.ok(searchDeadline >= 3500 && searchDeadline <= 4000, 'search must allow the bounded 3.5s evidence read but never wait beyond 4s')
 
 const loadingBoundary = read('app/loading.tsx')
 assert.match(loadingBoundary, /role="progressbar"/, 'route transitions need immediate visual feedback')

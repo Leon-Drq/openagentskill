@@ -13,6 +13,7 @@ import * as useCases from '../lib/use-cases.ts'
 import { locales } from '../lib/i18n/config.ts'
 import * as searchResults from '../lib/search-results.ts'
 import * as presentationCategory from '../lib/skills/presentation-category.ts'
+import * as catalogQuery from '../lib/skills/catalog-query.ts'
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
 function compile(path, dependencies, clock = Date) {
@@ -113,6 +114,7 @@ const db = compile('lib/db/skills.ts', {
   '@/lib/search-results': searchResults,
   '@/lib/skills/directory': directory,
   '@/lib/skills/presentation-category': presentationCategory,
+  '@/lib/skills/catalog-query': catalogQuery,
   '@/lib/skills/registry-scope': { isMcpOnlyCategory: () => false, isMcpOnlySkillRecord: () => false },
   '@/lib/seo/curated-skill-snapshot': { CURATED_SKILL_SNAPSHOT: snapshot },
   '@/lib/search-query': {},
@@ -288,3 +290,19 @@ failing = true
 await assert.rejects(db.getBrowseSkillCandidates('stars', 'Research', 96, true, 20))
 assert.deepEqual(await db.getCategories(), [])
 assert.equal(sharedWrites.length, writesBeforeFailure, 'Failed category and filtered reads must not poison shared caches')
+
+// Full catalog uses SQL pagination, stable ordering and the same public gate.
+failing = false
+rows = live
+const catalogPage = await db.getSkillCatalogPage('stars', 'all', 31, 100)
+assert.equal(catalogPage.total, live.length)
+assert.deepEqual(catalogPage.records, live)
+const catalogOps = operations.at(-1)
+assert.ok(catalogOps.some(op => op[0] === 'or' && op[1] === 'PUBLIC_TEST_GATE'))
+assert.ok(catalogOps.some(op => op[0] === 'gte' && op[1] === 'github_stars' && op[2] === 100))
+assert.deepEqual(catalogOps.find(op => op[0] === 'range'), ['range', 480, 495])
+assert.deepEqual(catalogOps.filter(op => op[0] === 'order').map(op => op[1]), ['github_stars', 'slug'])
+const cachedBeforeCatalogFailure = sharedWrites.length
+failing = true
+await assert.rejects(db.getSkillCatalogPage('stars', 'all', 32, 100))
+assert.equal(sharedWrites.length, cachedBeforeCatalogFailure, 'Catalog failures must not cache zero or fabricated snapshots')
