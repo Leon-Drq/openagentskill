@@ -1,6 +1,6 @@
 'use client'
 
-import { getNavigationCopy } from '@/lib/site-navigation'
+import { getNavigationCopy, getPartnershipLabels } from '@/lib/site-navigation'
 import { siteCopy } from '@/lib/i18n/site-copy'
 
 import Link from 'next/link'
@@ -135,6 +135,7 @@ export function SiteFooter() {
 <FooterLink href="/docs" className="hover:text-foreground">{t.nav.docs}</FooterLink>
                 <FooterLink href="/about" className="hover:text-foreground">{siteCopy(locale, "About")}</FooterLink>
                 <FooterLink href="/contact" className="hover:text-foreground">{siteCopy(locale, "Contact")}</FooterLink>
+                <FooterLink href="/sponsor" className="hover:text-foreground">{getPartnershipLabels(locale).sponsor}</FooterLink>
                 <FooterLink href="/api-docs" className="hover:text-foreground">{t.nav.apiDocs}</FooterLink>
                 <details className="group">
                   <summary className="cursor-pointer py-1 text-sm hover:text-foreground">{getNavigationCopy(locale).more}</summary>
@@ -161,6 +162,7 @@ export function SiteFooter() {
           <div className="flex flex-wrap items-center gap-4">
             <FooterLink href="/privacy" className="transition-colors hover:text-foreground">{shell.footerPrivacy}</FooterLink>
             <FooterLink href="/contact" className="transition-colors hover:text-foreground">{siteCopy(locale, "Contact")}</FooterLink>
+            <FooterLink href="/sponsor" className="transition-colors hover:text-foreground">{getPartnershipLabels(locale).sponsor}</FooterLink>
             <span>{shell.footerTagline}</span>
           </div>
         </div>

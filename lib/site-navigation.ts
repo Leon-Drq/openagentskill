@@ -2,7 +2,7 @@ import type { Locale } from './i18n/config'
 import type en from './i18n/dictionaries/en'
 
 type NavKey = keyof typeof en.nav
-export type NavigationLink = { href: string; label: NavKey | 'gallery' | 'resources' | 'developers' | 'creatorShort' | 'reports' }
+export type NavigationLink = { href: string; label: NavKey | 'gallery' | 'resources' | 'developers' | 'creatorShort' | 'reports' | 'contact' | 'sponsor' }
 export type NavigationSection = NavigationLink & { id: string; items?: readonly NavigationLink[]; activePaths?: readonly string[] }
 
 // One hierarchy for desktop and mobile. Existing public URLs are deliberately retained.
@@ -16,6 +16,7 @@ export const SITE_NAVIGATION: readonly NavigationSection[] = [
   { id: 'creators', href: '/creators', label: 'creatorShort', activePaths: ['/creator', '/creator-kit'] },
   { id: 'resources', href: '/guides', label: 'resources', activePaths: ['/reports'], items: [
     { href: '/blog', label: 'blog' }, { href: '/guides', label: 'guides' }, { href: '/reports/weekly', label: 'reports' },
+    { href: '/contact', label: 'contact' }, { href: '/sponsor', label: 'sponsor' },
   ] },
   { id: 'developers', href: '/docs', label: 'developers', activePaths: ['/safety', '/outcomes'], items: [
     { href: '/docs', label: 'docs' }, { href: '/agent', label: 'agentEntry' },
@@ -34,7 +35,19 @@ const copy: Record<Locale, { resources: string; developers: string; creatorShort
   id: { resources: 'Sumber daya', developers: 'Pengembang', creatorShort: 'Kreator', reports: 'Laporan', more: 'Tautan lainnya', navigation: 'Navigasi utama', toggle: 'Buka atau tutup submenu' },
 }
 export const getNavigationCopy = (locale: Locale) => copy[locale]
+const partnershipLabels: Record<Locale, { contact: string; sponsor: string }> = {
+  en: { contact: 'Contact', sponsor: 'Sponsor' },
+  zh: { contact: '联系我们', sponsor: '赞助合作' },
+  ja: { contact: 'お問い合わせ', sponsor: 'スポンサー' },
+  ko: { contact: '문의하기', sponsor: '후원' },
+  es: { contact: 'Contacto', sponsor: 'Patrocinar' },
+  de: { contact: 'Kontakt', sponsor: 'Sponsoring' },
+  fr: { contact: 'Contact', sponsor: 'Parrainage' },
+  id: { contact: 'Kontak', sponsor: 'Sponsor' },
+}
+export const getPartnershipLabels = (locale: Locale) => partnershipLabels[locale]
 export function navigationLabel(link: NavigationLink, locale: Locale, nav: Record<NavKey, string>, gallery: string) {
+  if (link.label === 'contact' || link.label === 'sponsor') return partnershipLabels[locale][link.label]
   if (link.label === 'gallery') return gallery
   if (link.label === 'resources' || link.label === 'developers' || link.label === 'creatorShort' || link.label === 'reports') return copy[locale][link.label]
   return nav[link.label]

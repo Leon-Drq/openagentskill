@@ -134,6 +134,7 @@ export function getCoreSitemapEntries(): SitemapEntry[] {
     { url: `${SITEMAP_BASE_URL}/skills-registry`, changeFrequency: 'weekly', priority: 0.91 },
     { url: `${SITEMAP_BASE_URL}/about`, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${SITEMAP_BASE_URL}/contact`, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${SITEMAP_BASE_URL}/sponsor`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${SITEMAP_BASE_URL}/agent`, changeFrequency: 'daily', priority: 0.93 },
     { url: `${SITEMAP_BASE_URL}/agent/integration-kit`, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${SITEMAP_BASE_URL}/evals/resolve`, changeFrequency: 'daily', priority: 0.88 },
