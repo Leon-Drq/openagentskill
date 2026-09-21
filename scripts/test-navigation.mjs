@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import './test-partnerships.mjs'
+import './test-mysticism-collection.mjs'
 import { readFileSync } from 'node:fs'
 import ts from 'typescript'
 import { SITE_NAVIGATION, getNavigationCopy, navigationLabel, isNavigationSectionActive, isNavigationPath } from '../lib/site-navigation.ts'
