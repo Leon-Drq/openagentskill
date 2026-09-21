@@ -246,6 +246,7 @@ const terms: Record<string, readonly string[]> = {
   ]
 }
 export function directoryLabel(locale: Locale, value: string) {
+  if (value === 'mysticism') return ({ en: 'Mysticism & reflection', zh: '玄学与自我探索', ja: '占術と自己探求', ko: '점술과 자기 성찰', es: 'Misticismo y reflexión', de: 'Mystik und Reflexion', fr: 'Mysticisme et réflexion', id: 'Mistisisme dan refleksi' })[locale]
   const index = ['en','zh','ja','ko','es','de','fr','id'].indexOf(locale)
   return terms[value]?.[index] || value.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase())
 }

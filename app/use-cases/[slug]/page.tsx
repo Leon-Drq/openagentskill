@@ -6,7 +6,8 @@ import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
-import { convertSkillRecordToManifest, getAllSkills, searchSkills } from '@/lib/db/skills'
+import { convertSkillRecordToManifest, getAllSkills, getSkillsBySlugs, searchSkills } from '@/lib/db/skills'
+import { MYSTICISM_PACK, MYSTICISM_USE_CASE } from '@/lib/mysticism-collection'
 import { SKILL_STACKS } from '@/lib/collections'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
@@ -65,12 +66,13 @@ export default async function UseCasePage({
   const useCase = getUseCaseBySlug(slug)
   if (!useCase) notFound()
 
-  const [taskMatches, qualityBaseline] = await Promise.all([
+  const [taskMatches, qualityBaseline, featuredSkills] = await Promise.all([
     searchSkills(useCase.heroPrompt, 240).catch(() => []),
     getAllSkills('quality', undefined, 160).catch(() => []),
+    getSkillsBySlugs(useCase.featuredSlugs || []).catch(() => []),
   ])
   const allSkills = [...new Map(
-    [...taskMatches, ...qualityBaseline].map((skill) => [skill.slug, skill])
+    [...taskMatches, ...qualityBaseline, ...featuredSkills].map((skill) => [skill.slug, skill])
   ).values()]
   const matchedSkills = selectSkillsForUseCase(allSkills, useCase, 18)
   const enrichedSkills = matchedSkills.map((skill) => {
@@ -161,6 +163,7 @@ export default async function UseCasePage({
             <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">{useCase.title}</h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">{useCase.description}</p>
             <div className="mt-7 flex flex-wrap gap-3">
+              {useCase.slug === MYSTICISM_USE_CASE && <Link href={`/skill-packs/${MYSTICISM_PACK}`} className="border border-border px-5 py-2 text-sm text-secondary hover:text-foreground">Open skill pack · 玄学技能包</Link>}
               <Link
                 href={`/skills?useCase=${useCase.slug}`}
                 className="border border-foreground bg-foreground px-5 py-2 text-sm text-background transition-colors hover:bg-background hover:text-foreground"

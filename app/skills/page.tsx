@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { getBrowseSkillCandidates, getSkillCatalogPage } from '@/lib/db/skills'
+import { getBrowseSkillCandidates, getSkillCatalogPage, getSkillsBySlugs } from '@/lib/db/skills'
 import { catalogPageNumber, catalogStars } from '@/lib/skills/catalog-query'
 import { buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
@@ -898,6 +898,7 @@ export default async function SkillsPage({
   const view = firstSearchValue(params.view) === 'all' || (firstSearchValue(params.view) !== 'skills' && firstSearchValue(params.q)?.trim()) ? 'all' : 'skills'
   const category = firstSearchValue(params.category) || 'all'
   const useCase = firstSearchValue(params.useCase) || 'all'
+  const selectedUseCase = useCase !== 'all' ? getUseCaseBySlug(useCase) : undefined
   const platform = firstSearchValue(params.platform) || 'all'
   const quality = firstSearchValue(params.quality) || 'all'
   const trust = firstSearchValue(params.trust) || 'all'
@@ -913,7 +914,7 @@ export default async function SkillsPage({
   const hasHighIntentFilter = Boolean(useCase !== 'all' || platform !== 'all' || supplyTrack !== 'all')
   const baseLimit = hasHighIntentFilter ? SEARCH_SKILL_CANDIDATE_LIMIT : BASE_SKILL_CANDIDATE_LIMIT
   const candidateLimit = Math.min(baseLimit + requestedPageOffset, MAX_SKILL_CANDIDATE_LIMIT)
-  const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult] = await Promise.all([
+  const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured] = await Promise.all([
     query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
       : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, view === 'skills', minStars), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
         .catch(() => ({ records: getFallbackSkills(sort, undefined, candidateLimit), degraded: true })),
@@ -925,8 +926,9 @@ export default async function SkillsPage({
     catalogMode ? getSkillCatalogPage(sort, category, page, minStars)
       .then(result => ({ ...result, degraded: false }))
       .catch(() => ({ records: [] as SkillRecord[], total: 0, hasMore: false, degraded: true })) : Promise.resolve(null),
+    getSkillsBySlugs(selectedUseCase?.featuredSlugs || []).catch(() => []),
   ])
-  const records = catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
+  const records = catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, useCaseFeatured, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
   const degraded = Boolean(catalogResult?.degraded || recordsResult.degraded || searchAugmentRecords.degraded)
   const effectivePage = !catalogMode && degraded && records.length <= requestedPageOffset ? 1 : page
   const pageOffset = (effectivePage - 1) * VISIBLE_SKILL_LIMIT
@@ -941,8 +943,6 @@ export default async function SkillsPage({
   ]).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b))
     .slice(0, 48)
-
-  const selectedUseCase = useCase !== 'all' ? getUseCaseBySlug(useCase) : undefined
 
   const enrichedRecords = records.map((record) => {
     const agentStats = statsMap[record.slug] || null

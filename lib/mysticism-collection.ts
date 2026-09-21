@@ -1,6 +1,8 @@
 // Editorial navigation only: publication/review state remains on each Skill record.
 // Membership does not grant AI approval, creator verification or install permission.
 export const MYSTICISM_PATH = '/topics/mysticism'
+export const MYSTICISM_USE_CASE = 'mysticism'
+export const MYSTICISM_PACK = 'mysticism-agent-pack'
 export const MYSTICISM_GROUPS = ['divination', 'charts', 'reflection', 'space'] as const
 export type MysticismGroup = typeof MYSTICISM_GROUPS[number]
 
@@ -41,3 +43,4 @@ export const MYSTICISM_SKILLS: Array<{
 ]
 
 export const mysticismSkillPath = (repo: string) => `/skills/leon-drq-${repo}`
+export const MYSTICISM_SLUGS = MYSTICISM_SKILLS.map(skill => `leon-drq-${skill.repo}`)

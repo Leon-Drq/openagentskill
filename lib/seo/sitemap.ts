@@ -121,7 +121,6 @@ export async function getSitemapIndexEntries() {
 
 export function getCoreSitemapEntries(): SitemapEntry[] {
   const staticPages: SitemapEntry[] = [
-    { url: `${SITEMAP_BASE_URL}/topics/mysticism`, lastModified: '2026-09-21', changeFrequency: 'monthly', priority: 0.6 },
     { url: `${SITEMAP_BASE_URL}/skills/external`, changeFrequency: 'weekly', priority: 0.6 },
     ...EXTERNAL_SKILLS.map((entry): SitemapEntry => ({ url: `${SITEMAP_BASE_URL}${externalSkillHref(entry.slug)}`, lastModified: entry.runtimeDemo?.publishedAt ?? entry.publishedAt, changeFrequency: 'monthly', priority: 0.6 })),
     { url: `${SITEMAP_BASE_URL}/showcase`, lastModified: SHOWCASE_UPDATED_AT, changeFrequency: 'weekly', priority: 0.9 },

@@ -1,33 +1,13 @@
-# Mysticism collection
+# Mysticism discovery integration
 
-`/topics/mysticism` is an editorial topic page, not a new publication or review policy.
-The Skills dropdown links to it on desktop and mobile. The existing Skills URLs,
-category taxonomy, ranking and search-index eligibility are unchanged.
+The 15 owner-published Leon-Drq/6yao skills belong to the existing discovery system:
 
-The initial 15 entries are the site owner's Leon-Drq/6yao repositories. They were
-published individually through `scripts/owner-publish-skill.mjs`, each pinned to
-a commit with its own request ID. This does not grant AI approval, runtime
-verification, creator verification or permission for unattended installation.
-Current review and version evidence lives on each Skill detail page, not in this
-editorial list. Do not fabricate scores to put a repository in this collection.
+- Scenario: `/use-cases/mysticism`, listed in `/use-cases` and the Skills scenario filter.
+- Pack: `/skill-packs/mysticism-agent-pack`, listed in the pack directories and Agent Pack API.
+- Legacy `/topics/mysticism` permanently redirects to the scenario. No dedicated navigation item or sitemap entry remains.
 
-`lib/mysticism-collection.ts` contains names, descriptions, groups and upstream
-demo paths. `lib/i18n/mysticism-copy.ts` provides an eight-language interface;
-editorial Skill summaries are Chinese or English, explicitly labeled for other
-languages. Counts derive from entries and are collection counts, not usage stats.
+`MYSTICISM_SLUGS` is the shared membership source. Scenario/detail/filter queries explicitly fetch published featured records so low-star entries are not lost from a quality-ranked baseline pool. Membership does not create records, invent scores, approve reviews or grant runtime verification. Missing records are not fabricated.
 
-The four groups distinguish divination, chart interpretation, reflection tools,
-and space/image-based traditions. Talent Discovery is explicitly non-divination.
-The page discloses the owner's affiliation, limits on claims, personal-data risks
-and the difference between an MIT source license and paid hosted services.
-No Skill, demo API, image analysis or birth-chart calculation was executed to list
-these sources. Photos cannot establish personality, intelligence, trustworthiness
-or sensitive traits. This topic does not offer professional advice.
+The pack exposes all 15 members, not the generic ten-result default. Choose a relevant skill, review its source and test in isolation. Descriptions disclose affiliation and cultural/entertainment limits. Personal data requires consent, external services may charge fees, and appearance cannot establish sensitive traits, health or trustworthiness.
 
-SEO: one canonical topic URL, server-rendered collection and breadcrumb schema,
-one core sitemap entry. Query-language variants remain noindex/follow, consistent
-with auxiliary pages. No individual Skill's indexing gate is changed.
-
-Before changing membership, confirm publication with `/api/skills/lookup` and
-verify the public detail URL. Run `node scripts/test-mysticism-collection.mjs`,
-the existing regressions, typecheck and production build before deployment.
+Run the mysticism regression, full regression suite, typecheck and production build. Verify both directories, scenario filtering, 15 pack members, the Pack API and legacy redirect on production.

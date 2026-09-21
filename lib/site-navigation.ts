@@ -2,7 +2,7 @@ import type { Locale } from './i18n/config'
 import type en from './i18n/dictionaries/en'
 
 type NavKey = keyof typeof en.nav
-export type NavigationLink = { href: string; label: NavKey | 'gallery' | 'resources' | 'developers' | 'creatorShort' | 'reports' | 'contact' | 'sponsor' | 'mysticism' }
+export type NavigationLink = { href: string; label: NavKey | 'gallery' | 'resources' | 'developers' | 'creatorShort' | 'reports' | 'contact' | 'sponsor' }
 export type NavigationSection = NavigationLink & { id: string; items?: readonly NavigationLink[]; activePaths?: readonly string[] }
 
 // One hierarchy for desktop and mobile. Existing public URLs are deliberately retained.
@@ -10,7 +10,6 @@ export const SITE_NAVIGATION: readonly NavigationSection[] = [
   { id: 'skills', href: '/skills', label: 'skills', activePaths: ['/tasks', '/collections', '/best'], items: [
     { href: '/skills', label: 'browseSkills' }, { href: '/resolve', label: 'aiSkillFinder' },
     { href: '/use-cases', label: 'useCases' }, { href: '/skill-packs', label: 'packs' }, { href: '/compare', label: 'compare' },
-    { href: '/topics/mysticism', label: 'mysticism' },
   ] },
   { id: 'gallery', href: '/showcase', label: 'gallery' },
   { id: 'rankings', href: '/rankings', label: 'rankings', activePaths: ['/trending'] },
@@ -47,9 +46,7 @@ const partnershipLabels: Record<Locale, { contact: string; sponsor: string }> = 
   id: { contact: 'Kontak', sponsor: 'Sponsor' },
 }
 export const getPartnershipLabels = (locale: Locale) => partnershipLabels[locale]
-const mysticismLabels: Record<Locale, string> = { en: 'Mysticism', zh: '玄学', ja: '占術・文化', ko: '점술·문화', es: 'Misticismo', de: 'Mystik', fr: 'Mysticisme', id: 'Mistisisme' }
 export function navigationLabel(link: NavigationLink, locale: Locale, nav: Record<NavKey, string>, gallery: string) {
-  if (link.label === 'mysticism') return mysticismLabels[locale]
   if (link.label === 'contact' || link.label === 'sponsor') return partnershipLabels[locale][link.label]
   if (link.label === 'gallery') return gallery
   if (link.label === 'resources' || link.label === 'developers' || link.label === 'creatorShort' || link.label === 'reports') return copy[locale][link.label]

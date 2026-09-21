@@ -90,13 +90,13 @@ export default async function SkillPackDetailPage({
 
   const [featuredSkills, candidateSkills] = await Promise.all([
     getSkillsBySlugs(pack.featuredSlugs || []).catch(() => []),
-    getAllSkills('quality', undefined, PACK_CANDIDATE_LIMIT).catch(() => []),
+    pack.featuredOnly ? Promise.resolve([]) : getAllSkills('quality', undefined, PACK_CANDIDATE_LIMIT).catch(() => []),
   ])
   const featuredFallbacks = (pack.featuredSlugs || [])
     .map((featuredSlug) => getCuratedSkillFallback(featuredSlug))
     .filter((skill): skill is SkillRecord => Boolean(skill))
   const skills = mergeSkills(featuredSkills, featuredFallbacks, candidateSkills)
-  const picks = selectSkillsForPack(skills, pack, 10)
+  const picks = selectSkillsForPack(skills, pack, pack.selectionLimit || 10)
   const installPlan = buildSkillPackInstallPlan(pack, picks, { limit: 4 })
 
   const structuredData = {

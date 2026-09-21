@@ -1,4 +1,5 @@
 import type { SkillRecord } from '@/lib/db/skills'
+import { MYSTICISM_SLUGS, MYSTICISM_USE_CASE } from './mysticism-collection'
 
 export interface UseCaseDefinition {
   slug: string
@@ -14,6 +15,18 @@ export interface UseCaseDefinition {
 }
 
 export const USE_CASES: UseCaseDefinition[] = [
+  {
+    slug: MYSTICISM_USE_CASE,
+    shortTitle: 'Mysticism · 玄学与自我探索',
+    title: 'Mysticism and self-reflection skills · 玄学与自我探索',
+    eyebrow: 'Traditional culture and entertainment',
+    description: 'Explore Liu Yao, BaZi, Zi Wei, Feng Shui and reflection tools. These traditions are not scientifically validated predictions or professional advice. The initial 15 Leon-Drq/6yao skills are owner-published, not runtime-verified.',
+    heroPrompt: 'Explore traditional divination, birth-chart symbolism and self-reflection for cultural learning and entertainment, not factual predictions.',
+    keywords: ['liuyao', 'bazi', 'ziwei', 'qimen', 'fengshui', 'divination', 'astrology', '玄学', '八字', '六爻', '紫微', '梅花易数'],
+    featuredSlugs: MYSTICISM_SLUGS,
+    workflows: ['Explore a traditional hexagram', 'Read chart symbolism', 'Reflect on habits and relationships', 'Study traditional space and imagery'],
+    agentTasks: ['Choose one relevant skill, not the entire set', 'Protect birth data and images; external services may charge fees', 'Never infer sensitive traits, health or trustworthiness from appearance'],
+  },
   {
     slug: 'web-scraping',
     shortTitle: 'Web scraping',

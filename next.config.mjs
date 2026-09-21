@@ -14,6 +14,11 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/topics/mysticism',
+        destination: '/use-cases/mysticism',
+        permanent: true,
+      },
+      {
         // Redirect before streaming begins so crawlers receive HTTP 308, not
         // a 200 page with a client-side redirect. Query parameters are retained.
         source: '/skills/liamgvchi-gc-minimal-zine-poster',

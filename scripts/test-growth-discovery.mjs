@@ -9,11 +9,14 @@ import * as showcase from '../lib/showcase.ts'
 import * as tasks from '../lib/showcase-task.ts'
 import * as discovery from '../lib/showcase-discovery.ts'
 import * as indexPolicy from '../lib/seo/search-indexability.ts'
-import * as useCases from '../lib/use-cases.ts'
+import { register } from 'node:module'
 import { locales } from '../lib/i18n/config.ts'
 import * as searchResults from '../lib/search-results.ts'
 import * as presentationCategory from '../lib/skills/presentation-category.ts'
 import * as catalogQuery from '../lib/skills/catalog-query.ts'
+
+register('./test-owner-publication-loader.mjs', import.meta.url)
+const useCases = await import('../lib/use-cases.ts')
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
 function compile(path, dependencies, clock = Date) {

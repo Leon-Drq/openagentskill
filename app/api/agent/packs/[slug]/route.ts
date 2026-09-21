@@ -35,8 +35,8 @@ export async function GET(
 ) {
   const { slug } = await params
   const format = request.nextUrl.searchParams.get('format') || 'json'
-  const limit = clampLimit(request.nextUrl.searchParams.get('limit'), 10, 20)
   const pack = getSkillPackBySlug(slug)
+  const limit = clampLimit(request.nextUrl.searchParams.get('limit'), pack?.selectionLimit || 10, 20)
 
   if (!pack) {
     return NextResponse.json({ error: `Skill pack not found: ${slug}` }, { status: 404 })
@@ -45,7 +45,7 @@ export async function GET(
   try {
     const [featuredSkills, candidateSkills] = await Promise.all([
       getSkillsBySlugs(pack.featuredSlugs || []),
-      getAllSkills('quality', undefined, PACK_CANDIDATE_LIMIT),
+      pack.featuredOnly ? Promise.resolve([]) : getAllSkills('quality', undefined, PACK_CANDIDATE_LIMIT),
     ])
     const featuredFallbacks = (pack.featuredSlugs || [])
       .map((featuredSlug) => getCuratedSkillFallback(featuredSlug))

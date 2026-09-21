@@ -15,6 +15,7 @@ import {
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { getApprovedRegistrySkillCount, LAST_VERIFIED_APPROVED_SKILL_COUNT } from '@/lib/registry-stats'
 import { selectSkillsForPack, SKILL_PACKS } from '@/lib/skill-packs'
+import { getLocalizedPackContent } from '@/lib/i18n/curated-content'
 import { getSkillTrustProfileV5 } from '@/lib/trust'
 
 const PACK_CANDIDATE_LIMIT = 1200
@@ -134,9 +135,9 @@ async function LocalizedSkillPacksPage({ locale }: { locale: MarketLocale }) {
       <section className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
         <div className="grid gap-4 md:grid-cols-2">
           {SKILL_PACKS.map((pack) => {
-            const picks = selectSkillsForPack(skills, pack, 5)
+            const picks = selectSkillsForPack(skills, pack, pack.selectionLimit || 5)
             const bestScore = picks[0] ? getSkillQualityProfile(picks[0]).score : 0
-            const localizedPack = copy.cards[pack.slug]
+            const localizedPack = getLocalizedPackContent(locale, pack)
 
             return (
               <Link
@@ -148,7 +149,7 @@ async function LocalizedSkillPacksPage({ locale }: { locale: MarketLocale }) {
                   <div className="min-w-0">
                     <p className="text-xs uppercase tracking-widest text-secondary">{copy.workflow}</p>
                     <h2 className="mt-2 font-display text-2xl font-semibold leading-tight group-hover:text-[#006b4f]">
-                      {localizedPack?.title || pack.shortTitle}
+                      {localizedPack.shortTitle}
                     </h2>
                   </div>
                   <span className="w-fit shrink-0 border border-border px-2 py-1 font-mono text-xs text-secondary">

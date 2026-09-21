@@ -2,7 +2,7 @@ import { NavigationHubLinks } from '@/components/navigation-hub-links'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
-import { getAllSkills } from '@/lib/db/skills'
+import { getAllSkills, getSkillsBySlugs } from '@/lib/db/skills'
 import { SKILL_STACKS } from '@/lib/collections'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { USE_CASES, selectSkillsForUseCase } from '@/lib/use-cases'
@@ -30,7 +30,11 @@ function formatNumber(value: number) {
 }
 
 export default async function UseCasesPage() {
-  const skills = await getAllSkills('quality', undefined, 4000).catch(() => [])
+  const [baseline, featured] = await Promise.all([
+    getAllSkills('quality', undefined, 4000).catch(() => []),
+    getSkillsBySlugs(USE_CASES.flatMap(item => item.featuredSlugs || [])).catch(() => []),
+  ])
+  const skills = [...new Map([...baseline, ...featured].map(skill => [skill.slug, skill])).values()]
 
   return (
     <MarketingPageShell>
@@ -54,7 +58,7 @@ export default async function UseCasesPage() {
       <div className="mx-auto max-w-6xl px-6">
         <section className="grid gap-5 py-10 md:grid-cols-2 lg:grid-cols-3">
           {USE_CASES.map((useCase) => {
-            const matchedSkills = selectSkillsForUseCase(skills, useCase, 12)
+            const matchedSkills = selectSkillsForUseCase(skills, useCase, Math.max(12, useCase.featuredSlugs?.length || 0))
             const topSkills = matchedSkills.slice(0, 3)
             const trustProfiles = matchedSkills.map((skill) => getSkillTrustProfile(skill))
             const strongTrustCount = trustProfiles.filter((profile) => profile.tier === 'production' || profile.tier === 'strong').length

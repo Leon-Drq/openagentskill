@@ -106,7 +106,7 @@ export default async function SkillPacksPage() {
 
         <section className="grid gap-4 py-10 md:grid-cols-2">
           {SKILL_PACKS.map((pack) => {
-            const picks = selectSkillsForPack(skills, pack, 5)
+            const picks = selectSkillsForPack(skills, pack, pack.selectionLimit || 5)
             return (
               <Link
                 key={pack.slug}

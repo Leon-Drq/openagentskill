@@ -3,6 +3,8 @@ import { defaultLocale, type Locale } from '@/lib/i18n/config'
 import { getLocalizedNavigationContent } from '@/lib/i18n/localized-navigation-pages'
 import { isMarketLocale, type MarketLocale } from '@/lib/i18n/market-routing'
 import type { SkillPackDefinition } from '@/lib/skill-packs'
+import { MYSTICISM_PACK } from '@/lib/mysticism-collection'
+import { getMysticismCopy } from '@/lib/i18n/mysticism-copy'
 
 type LocalizedStep = {
   title: string
@@ -334,6 +336,23 @@ export function getLocalizedPackContent(locale: Locale, pack: SkillPackDefinitio
   bestFor: string[]
   avoidWhen: string[]
 } {
+  if (pack.slug === MYSTICISM_PACK) {
+    const c = getMysticismCopy(locale)
+    return {
+      shortTitle: c.title,
+      title: `${c.title} ${packTitleSuffix[locale]}`,
+      description: `${c.intro} ${locale === 'zh' ? c.disclosure.replace('本专题', '本技能包') : c.disclosure}`,
+      persona: c.notice,
+      workflowSteps: locale === 'zh' ? [
+        { title: '选择', description: '按起卦、命盘、自我探索或空间用途选一个技能，无需一次安装全部。天赋发现属于非占卜工具。' },
+        { title: '检查', description: '阅读来源与当前审核状态，取得个人数据使用许可。外部在线服务可能收费。' },
+        { title: '体验', description: '区分计算结果与象征解释，不据照片推断健康、智力、可信度或敏感属性。' },
+        { title: '回顾', description: '用于文化娱乐和自我观察，不代替医疗、法律、金融等专业决策。' },
+      ] : pack.workflowSteps,
+      bestFor: c.groups,
+      avoidWhen: [c.notice, c.privacy],
+    }
+  }
   if (!isMarketLocale(locale)) {
     return {
       shortTitle: pack.shortTitle,

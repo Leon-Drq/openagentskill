@@ -1,4 +1,5 @@
 import type { SkillRecord } from '@/lib/db/skills'
+import { MYSTICISM_PACK, MYSTICISM_SLUGS } from './mysticism-collection'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getPrimaryInstallCommand, getSkillRepoRef } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
@@ -14,6 +15,7 @@ export interface SkillPackDefinition {
   keywords: string[]
   featuredSlugs?: string[]
   featuredOnly?: boolean
+  selectionLimit?: number
   outcomes: string[]
   workflowSteps: Array<{
     title: string
@@ -67,6 +69,27 @@ export interface SkillPackInstallPlan {
 }
 
 export const SKILL_PACKS: SkillPackDefinition[] = [
+  {
+    slug: MYSTICISM_PACK,
+    shortTitle: 'Mysticism · 玄学与自我探索',
+    title: 'Mysticism and self-reflection skill pack',
+    eyebrow: 'Traditional culture and entertainment',
+    description: '15 owner-published Leon-Drq/6yao skills: divination, chart symbolism, reflection and traditional space or imagery. Choose the relevant tool, not all 15. Listing is not AI approval or runtime verification.',
+    persona: 'For cultural learning, entertainment and reflective journaling, not scientifically validated predictions or professional advice.',
+    keywords: ['liuyao', 'bazi', 'ziwei', 'divination', '玄学'],
+    featuredSlugs: MYSTICISM_SLUGS,
+    featuredOnly: true,
+    selectionLimit: 15,
+    outcomes: ['Choose a tradition', 'Check source and privacy', 'Explore symbolic interpretation', 'Reflect on controllable actions'],
+    workflowSteps: [
+      { title: 'Choose', description: 'Select one skill for the question: divination, charts, reflection or space. Talent Discovery is a non-divination companion.' },
+      { title: 'Review', description: 'Read the source and audit status before installing. Obtain permission for personal data; hosted 6yao services may require payment.' },
+      { title: 'Explore', description: 'Separate calculation from symbolic interpretation. Do not infer health, intelligence, trustworthiness or sensitive traits from images.' },
+      { title: 'Reflect', description: 'Use findings as optional journaling prompts, not decisions about health, money, law or another person.' },
+    ],
+    bestFor: ['Traditional culture', 'Entertainment', 'Symbolic journaling', 'Self-reflection'],
+    avoidWhen: ['You need scientifically validated predictions or professional advice.', 'Personal data or photos are shared without consent.', 'A reading is used to determine another person’s character, health or fate.'],
+  },
   {
     slug: 'frontend-engineer-agent-pack',
     shortTitle: 'Frontend engineer',
