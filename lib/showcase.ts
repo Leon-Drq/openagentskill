@@ -4,6 +4,8 @@ import curatedSources from './showcase-sources.json' with { type: 'json' }
 import curatedMedia from './showcase-media.json' with { type: 'json' }
 import curatedGroups from './showcase-groups.json' with { type: 'json' }
 // @ts-expect-error Direct Node regression tests require the TypeScript extension.
+import { HYPIT_SHOWCASE_CASES } from './showcase-hypit.ts'
+// @ts-expect-error Direct Node regression tests require the TypeScript extension.
 import { editorialSearchText } from './i18n/gallery-copy.ts'
 
 // Exact prompt used for the platform-produced poster on 2026-09-07.
@@ -221,7 +223,7 @@ const automaticCases: ShowcaseCase[] = automaticEntries.map((entry) => {
     cardFit: 'contain', updatedAt: entry.updatedAt,
   }
 })
-export const SHOWCASE_CASES: ShowcaseCase[] = [...INITIAL_SHOWCASE_CASES, ...interleavedExpanded, ...automaticCases]
+export const SHOWCASE_CASES: ShowcaseCase[] = [...HYPIT_SHOWCASE_CASES, ...INITIAL_SHOWCASE_CASES, ...interleavedExpanded, ...automaticCases]
 export const getShowcaseCase = (slug: string) => SHOWCASE_CASES.find((item) => item.slug === slug)
 export const getShowcasesForSkill = (skillSlug: string) => SHOWCASE_CASES.filter((item) => item.skillSlug === skillSlug)
 export const FEATURED_SHOWCASE_SLUGS = ['floria-floral-studio', 'room-to-grow-poster', 'editorial-html-slides']

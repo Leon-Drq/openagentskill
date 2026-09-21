@@ -216,7 +216,7 @@ for (const example of showcase.SHOWCASE_CASES) {
 }
 assert.equal(JSON.stringify(showcase.SHOWCASE_CASES), originalCatalog)
 const video = discovery.searchShowcaseWorkflows({ category: 'video', limit: 8 })
-assert.equal(video.total, 20)
+assert.equal(video.total, 22)
 assert.equal(video.items.length, 8)
 const secondVideo = discovery.searchShowcaseWorkflows({ category: 'video', limit: 8, offset: video.next_offset })
 assert.equal(new Set([...video.items, ...secondVideo.items].map(v => v.slug)).size, 16)
@@ -260,7 +260,7 @@ const rpc = async (method, params) => (await mcp.POST(new Request('https://examp
 const toolNames = (await rpc('tools/list')).result.tools.map(t => t.name)
 const manifest = compile('app/.well-known/mcp.json/route.ts', { 'next/server': { NextResponse } })
 assert.deepEqual(toolNames, (await manifest.GET().json()).capabilities)
-assert.equal((await rpc('tools/call', { name: 'find_workflows', arguments: { category: 'video' } })).result.structuredContent.total, 20)
+assert.equal((await rpc('tools/call', { name: 'find_workflows', arguments: { category: 'video' } })).result.structuredContent.total, 22)
 assert.equal((await rpc('tools/call', { name: 'find_workflows', arguments: { limit: 100 } })).result.isError, true)
 assert.equal((await rpc('tools/call', { name: 'get_workflow', arguments: { slug: video.items[0].slug } })).result.structuredContent.status, 'reference_only')
 assert.equal((await rpc('tools/call', { name: 'get_workflow', arguments: { slug: 'unknown' } })).result.isError, true)

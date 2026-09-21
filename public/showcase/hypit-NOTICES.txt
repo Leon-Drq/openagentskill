@@ -1,0 +1,41 @@
+Hypit author examples — source and rights notice
+Curated by OpenAgentSkill on 2026-09-21.
+
+Publisher: Hypit AI (https://github.com/hypit-ai).
+Source snapshot: hypit-ai/hypit at
+9c9918d0cedf2f06574ab0d517b1b6b0afb56a66.
+
+These are references to author-published examples, not OpenAgentSkill productions,
+runtime verifications, endorsements, or stock media offered for reuse.
+Playback uses the external media addresses linked by the source publisher.
+OpenAgentSkill does not mirror or distribute the full videos.
+Preview images are single frames extracted for identification and commentary;
+card and detail copies are resized and compressed without altering their content.
+
+Software license (NOT an artwork license):
+https://github.com/hypit-ai/hypit/blob/9c9918d0cedf2f06574ab0d517b1b6b0afb56a66/LICENSE
+Hypit uses Apache-2.0 with additional commercial conditions. Do not describe this
+as unmodified Apache-2.0 or as unrestricted open source. Consult the actual terms.
+The statement that users own their generated outputs does not grant rights to
+reuse someone else's published example. No separate broad media-reuse license
+was established. Contact the relevant rights holders before reuse; third-party
+likenesses, marks, recordings, music and provider terms may apply.
+
+Football ranking:
+https://github.com/hypit-ai/hypit/blob/9c9918d0cedf2f06574ab0d517b1b6b0afb56a66/README.md#examples
+https://github.com/user-attachments/assets/f573bdac-62da-4b5d-825d-54d5880a7026
+Preview: hypit-football-ranking.jpg, 2 seconds, 720 x 1280.
+Video inspected: H.264/AAC, 20.066667 seconds.
+
+Product explainer:
+https://github.com/hypit-ai/hypit/blob/9c9918d0cedf2f06574ab0d517b1b6b0afb56a66/examples/complex-explainer/README.md
+https://storage.googleapis.com/hypit-public-assets/assets/examples/complex-explainer/v1/20260914/final.mp4
+Preview: hypit-product-explainer.jpg, 28 seconds, 1080 x 1920.
+Video inspected: H.264/AAC, 137.066667 seconds.
+Upstream asset provenance:
+https://github.com/hypit-ai/hypit/blob/9c9918d0cedf2f06574ab0d517b1b6b0afb56a66/examples/complex-explainer/productions/explainer/ASSET-PROVENANCE.md
+
+External media URLs are not Git blobs and can change independently of the pinned
+documentation. Historical costs and comparisons are the author's claims, not
+reproduced measurements. Do not infer generation cost from video duration.
+Questions or removal requests: qudongqi2023@gmail.com.
