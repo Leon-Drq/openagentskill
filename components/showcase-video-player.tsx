@@ -17,7 +17,8 @@ export function ShowcaseVideoPlayer({ item, locale, compact = false, priority = 
   const [failed, setFailed] = useState(false)
   const title = localizeShowcase(item.title, locale)
   const poster = getShowcaseImageSrc(item.media[0].src, compact ? 'card' : 'preview')
-  return <div className={`relative overflow-hidden bg-[#1d1b18] ${compact ? 'aspect-[16/10]' : 'aspect-video'}`} data-video-preview={item.slug}>
+  const portrait = item.media[0].height > item.media[0].width
+  return <div className={`relative overflow-hidden bg-[#1d1b18] ${compact ? 'aspect-[16/10]' : portrait ? 'mx-auto w-full max-w-[360px]' : 'aspect-video'}`} style={!compact && portrait ? { aspectRatio: `${item.media[0].width} / ${item.media[0].height}` } : undefined} data-video-preview={item.slug}>
     {started && !failed ? <video controls playsInline autoPlay preload="none" src={item.videoUrl} poster={poster} aria-label={title} className="h-full w-full object-contain"
       onError={() => setFailed(true)} onPlay={(event) => {
         // Only one preview should produce sound, even when several cards are open.

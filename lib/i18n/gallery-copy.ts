@@ -120,6 +120,7 @@ export const galleryTranslations = {
   'Educational explainers': ['解説・学習', '교육 및 해설', 'Vídeos educativos', 'Wissensvermittlung', 'Explications pédagogiques', 'Penjelasan edukatif'],
   'Data storytelling': ['データで伝える', '데이터 스토리텔링', 'Narración con datos', 'Geschichten mit Daten', 'Récits de données', 'Bercerita dengan data'],
   'Open source': ['オープンソース', '오픈 소스', 'Código abierto', 'Open Source', 'Open source', 'Sumber terbuka'],
+  'Source available': ['ソース公開', '소스 공개', 'Código disponible', 'Quellcode verfügbar', 'Code source disponible', 'Kode sumber tersedia'],
   'Free': ['無料', '무료', 'Gratis', 'Kostenlos', 'Gratuit', 'Gratis'],
   'Paid': ['有料', '유료', 'De pago', 'Kostenpflichtig', 'Payant', 'Berbayar'],
   'Free + paid': ['無料・有料プラン', '무료 및 유료', 'Gratis y de pago', 'Kostenlos und kostenpflichtig', 'Gratuit et payant', 'Gratis dan berbayar'],

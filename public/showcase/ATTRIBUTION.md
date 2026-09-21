@@ -1,5 +1,14 @@
 # Showcase assets
 
+## Hypit — author-hosted video references (2026-09-21)
+
+Two examples are documented in `lib/showcase-hypit.ts`, linked to the existing
+`hypit-ai-hypit-hypit` Skill. Full videos remain on the publisher-linked hosts.
+`hypit-football-ranking.jpg` and `hypit-product-explainer.jpg` are identifying
+frames at 2 and 28 seconds respectively; WebP derivatives are display copies.
+See [source and rights notice](hypit-NOTICES.txt). Software terms are not represented
+as a media license. No blanket permission to reuse example footage is claimed.
+
 Curated on 2026-09-07. Each listed original file is preserved without changes.
 Files ending in `.card.webp` and `.preview.webp` are resized, compressed display
 copies made by OpenAgentSkill; their sources and applicable licenses are below.

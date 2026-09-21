@@ -29,6 +29,7 @@ export const SHOWCASE_TAGS = [
 ] as const
 export type ShowcaseTag = typeof SHOWCASE_TAGS[number]['id']
 const SHOWCASE_CASE_TAGS: Partial<Record<string, ShowcaseTag[]>> = {
+  'hypit-product-explainer': ['product-demo'],
   'ip-mascot-directions': ['logo'],
   'motion-logo-outro': ['logo'],
   'motion-bold-signal': ['product-demo'],
@@ -59,13 +60,14 @@ export interface ShowcaseSkill {
   slug: string
   name: string
   creatorId: string
-  access: 'open-source' | 'free' | 'paid' | 'freemium'
+  access: 'open-source' | 'source-available' | 'free' | 'paid' | 'freemium'
   sourceLicense: string
   /** Future commercial editions/offers belong to listings, not to artwork. */
   listingIds: string[]
 }
 
 export const SHOWCASE_CREATORS: ShowcaseCreator[] = [
+  { id: 'hypit-ai', name: 'Hypit AI', githubUsername: 'hypit-ai', url: 'https://github.com/hypit-ai', profile: null },
   { id: 'liamgvchi', name: 'LiamGvchi', githubUsername: 'LiamGvchi', url: 'https://github.com/LiamGvchi', profile: null },
   { id: 'yanliudesign', name: 'yanliudesign', githubUsername: 'yanliudesign', url: 'https://github.com/yanliudesign', profile: null },
   { id: 'leonxlnx', name: 'Leonxlnx', githubUsername: 'Leonxlnx', url: 'https://github.com/Leonxlnx', profile: null },
@@ -81,6 +83,7 @@ export const SHOWCASE_CREATORS: ShowcaseCreator[] = [
 ]
 
 export const SHOWCASE_SKILLS: ShowcaseSkill[] = [
+  { slug: 'hypit-ai-hypit-hypit', name: 'Hypit', creatorId: 'hypit-ai', access: 'source-available', sourceLicense: 'Apache-2.0 with additional conditions', listingIds: [] },
   { slug: 'liamgvchi-gc-minimal-zine-poster-v0-3', name: 'GC Minimal Zine Poster', creatorId: 'liamgvchi', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
   { slug: 'yanliudesign-mono-color-skill', name: 'mono-color', creatorId: 'yanliudesign', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
   { slug: 'design-taste-frontend', name: 'Taste Skill', creatorId: 'leonxlnx', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
@@ -117,6 +120,7 @@ export function getShowcaseCreatorHref(creator: ShowcaseCreator) {
 export function getShowcaseAccessLabel(skill: ShowcaseSkill, locale: string) {
   const labels = {
     'open-source': { en: 'Open source', zh: '开源技能' },
+    'source-available': { en: 'Source available', zh: '源码可用' },
     free: { en: 'Free', zh: '免费技能' },
     paid: { en: 'Paid', zh: '付费技能' },
     freemium: { en: 'Free + paid', zh: '免费 / 付费版' },

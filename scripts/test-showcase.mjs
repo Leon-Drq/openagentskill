@@ -7,6 +7,7 @@ import path from 'node:path'
 import { getShowcasePage, getShowcaseEvidenceLabel } from '../lib/showcase.ts'
 import { SHOWCASE_TAGS, getShowcaseTags } from '../lib/showcase.ts'
 import { SHOWCASE_VIDEO_SKILLS } from '../lib/showcase-video-skills.ts'
+import { HYPIT_SHOWCASE_CASES, HYPIT_REVISION } from '../lib/showcase-hypit.ts'
 import { SHOWCASE_CASES, SHOWCASE_CATEGORIES, SHOWCASE_CREATORS, SHOWCASE_SKILLS, FEATURED_SHOWCASE_SLUGS, filterShowcaseCases, getShowcaseCase, getShowcaseCreator, getShowcaseCreatorHref, getShowcaseHandoff, getShowcaseImageSrc, getShowcaseSkill, getShowcaseAccessLabel, isMissingShowcasePath } from '../lib/showcase.ts'
 
 const require = createRequire(import.meta.url)
@@ -66,17 +67,25 @@ for (const item of SHOWCASE_CASES) {
       if (kind === 'card') assert.ok((await stat(display)).size < 180 * 1024, `${media.src}: thumbnail exceeds 180 KB`)
     }
   }
-  if (item.videoUrl) assert.ok(item.videoUrl.startsWith('https://raw.githubusercontent.com/') && item.videoUrl.includes(item.sourceRevision))
+  if (item.videoUrl) {
+    const externallyHostedHypit = HYPIT_SHOWCASE_CASES.find(entry => entry.slug === item.slug)
+    if (externallyHostedHypit) {
+      assert.equal(item.videoUrl, externallyHostedHypit.videoUrl)
+      assert.equal(item.sourceRevision, HYPIT_REVISION)
+      assert.match(item.license, /reuse permission not established/)
+    } else assert.ok(item.videoUrl.startsWith('https://raw.githubusercontent.com/') && item.videoUrl.includes(item.sourceRevision))
+  }
 }
 assert.equal(filterShowcaseCases('all', '').length, SHOWCASE_CASES.length)
 assert.equal(new Set(SHOWCASE_TAGS.map((tag) => tag.id)).size, SHOWCASE_TAGS.length)
 for (const tag of SHOWCASE_TAGS) assert.ok(filterShowcaseCases('all', '', '', tag.id).length > 0, `Use case ${tag.id} needs real examples`)
-assert.equal(filterShowcaseCases('video', '', '', 'product-demo').length, 2)
+assert.equal(filterShowcaseCases('video', '', '', 'product-demo').length, 3)
 assert.equal(filterShowcaseCases('video', '', '', 'explainer').length, 4)
 assert.equal(filterShowcaseCases('video', '', '', 'data-story').length, 4)
 const playerSource = await readFile(new URL('../components/showcase-video-player.tsx', import.meta.url), 'utf8')
 assert.ok(playerSource.includes('started && !failed ? <video'), 'Do not attach video sources before user interaction')
 assert.ok(playerSource.includes('preload="none"') && playerSource.includes('video.pause()'), 'Keep video loading explicit and only one preview audible')
+assert.ok(playerSource.includes('!compact && portrait') && playerSource.includes('aspectRatio:'), 'Portrait details preserve framing without changing the card grid')
 for (const component of ['showcase-card', 'showcase-detail']) {
   const source = await readFile(new URL(`../components/${component}.tsx`, import.meta.url), 'utf8')
   assert.ok(source.includes('<ShowcaseVideoPlayer'), 'Cards and detail must share the same player')
@@ -125,8 +134,21 @@ assert.equal(isMissingShowcasePath('/showcase/unknown.png'), true)
 assert.equal(isMissingShowcasePath('/showcase'), false)
 assert.equal(isMissingShowcasePath('/skills'), false)
 const autoEntries = JSON.parse(await readFile(new URL('../lib/showcase-auto.json', import.meta.url), 'utf8'))
-assert.equal(SHOWCASE_CASES.length, 101 + autoEntries.length, 'The zine series adds one case, not three duplicate skill listings')
-assert.equal(SHOWCASE_SKILLS.length, 15, 'Cases must link to real skill/workflow entries')
+assert.equal(SHOWCASE_CASES.length, 103 + autoEntries.length, 'Two distinct Hypit productions add two cases, not duplicated variants')
+assert.equal(SHOWCASE_SKILLS.length, 16, 'Cases must link to real skill/workflow entries')
+assert.equal(HYPIT_SHOWCASE_CASES.length, 2)
+assert.equal(new Set(HYPIT_SHOWCASE_CASES.map(item => item.videoUrl)).size, 2)
+assert.equal(getShowcaseSkill('hypit-ai-hypit-hypit').access, 'source-available', 'Restricted licenses must not receive an open-source badge')
+assert.equal(filterShowcaseCases('video', 'hypit', 'hypit-ai').length, 2)
+assert.equal(getShowcaseAccessLabel(getShowcaseSkill('hypit-ai-hypit-hypit'), 'zh'), '源码可用')
+for (const item of HYPIT_SHOWCASE_CASES) {
+  assert.equal(item.skillSlug, 'hypit-ai-hypit-hypit')
+  assert.equal(item.provenance, 'author')
+  assert.equal(item.promptKind, 'suggested')
+  assert.match(item.productionNote.en, /not|did not/)
+}
+const hypitFrames = { 'hypit-football-ranking': 'd698057ec06835afe1b9dd8f2a58e79e532ea0d7f577a3d72e21d58d9c95fda1', 'hypit-product-explainer': '05eaf15fa65ec98ef55cd8533233133992740990b4c6d24cca530d1fc645ab95' }
+for (const item of HYPIT_SHOWCASE_CASES) assert.equal(createHash('sha256').update(await readFile(file(item.media[0].src))).digest('hex'), hypitFrames[item.slug])
 const seeds = JSON.parse(await readFile(new URL('../lib/showcase-curation.json', import.meta.url), 'utf8'))
 const mediaManifest = JSON.parse(await readFile(new URL('../lib/showcase-media.json', import.meta.url), 'utf8'))
 const sources = JSON.parse(await readFile(new URL('../lib/showcase-sources.json', import.meta.url), 'utf8'))
