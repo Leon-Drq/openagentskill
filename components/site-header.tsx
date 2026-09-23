@@ -8,6 +8,7 @@ import { BrandMark } from '@/components/brand-mark'
 import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
+import { CreatorMenuProfile } from '@/components/creator-menu-profile'
 import { useI18n } from '@/lib/i18n/context'
 import { getShowcaseNavLabel } from '@/lib/i18n/showcase-label'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
@@ -58,6 +59,7 @@ function NavDropdown({ pathname, section }: { pathname: string; section: Navigat
             {navigationLabel(item, locale, t.nav, getShowcaseNavLabel(locale))}
           </Link>
         })}
+        {open && section.id === 'creators' && <CreatorMenuProfile onNavigate={() => setOpen(false)} />}
       </div>
     </div>
   )

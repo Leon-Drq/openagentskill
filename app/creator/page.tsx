@@ -6,16 +6,23 @@ import { CreatorIdentityConnections } from '@/components/creator-identity-connec
 import { CreatorBatchClaim } from '@/components/creator-batch-claim'
 import { CreatorActivationTracker } from '@/components/creator-activation-tracker'
 import { MarketingPageShell } from '@/components/marketing-page'
+import type { Metadata } from 'next'
+import { CreatorProfileEditor } from '@/components/creator-profile-editor'
+import { CreatorProfileShare } from '@/components/creator-profile-share'
+import { creatorDateWindow, readCreatorDailyPages } from '@/lib/creator-profile'
+import { studioCopy, type StudioKey } from '@/lib/i18n/creator-studio-copy'
+import { getLocaleFromSearchParam } from '@/lib/i18n/config'
+import { I18nProvider } from '@/lib/i18n/context'
+import { SHOWCASE_CASES } from '@/lib/showcase'
+import { getShowcaseCardData } from '@/lib/showcase-shared'
+import { ShowcaseCard } from '@/components/showcase-card'
 import { updateCreatorProfile } from './actions'
 
+export const metadata: Metadata = { title: 'Creator Center', robots: { index: false, follow: false } }
 export const dynamic = 'force-dynamic'
 
 function metric(value: unknown) {
   return Number(value || 0).toLocaleString('en-US')
-}
-
-function percent(numerator: number, denominator: number) {
-  return denominator > 0 ? `${Math.round((numerator / denominator) * 100)}%` : '—'
 }
 
 function shortSha(value: string | null | undefined) {
@@ -30,12 +37,18 @@ function dateLabel(value: string | null | undefined) {
 export default async function CreatorDashboard({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; connected?: string; error?: string }>
+  searchParams: Promise<{ saved?: string; connected?: string; error?: string; tab?: string; lang?: string }>
 }) {
   const params = await searchParams
+  const locale = getLocaleFromSearchParam(params.lang) || 'en'
+  const t = (key: StudioKey) => studioCopy(locale, key)
+  const tabs = ['overview', 'profile', 'skills', 'works', 'analytics'] as const
+  const tab = tabs.find(value => value === params.tab) || 'overview'
+  const tabHref = (value: string) => `/creator?tab=${value}&lang=${locale}`
+  const dateWindow = creatorDateWindow()
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/auth/login?next=/creator')
+  if (!user) redirect(`/auth/login?next=${encodeURIComponent(tabHref(tab))}`)
 
   const [{ data: profile }, { data: claims }] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
@@ -69,7 +82,7 @@ export default async function CreatorDashboard({
       ? supabase.from('agent_outcome_stats').select('*').in('skill_slug', approvedSlugs)
       : Promise.resolve({ data: [] }),
     approvedSlugs.length
-      ? supabase.from('skill_events_daily').select('skill_slug,event_date,views,install_starts,install_successes,outcome_successes').in('skill_slug', approvedSlugs).order('event_date', { ascending: false }).limit(Math.max(30, approvedSlugs.length * 31))
+      ? readCreatorDailyPages(offset => supabase.from('skill_events_daily').select('skill_slug,event_date,views,install_starts,install_successes,outcome_successes').in('skill_slug', approvedSlugs).gte('event_date', dateWindow.start).lte('event_date', dateWindow.end).order('event_date', { ascending: false }).order('skill_slug').range(offset, offset + 999))
       : Promise.resolve({ data: [] }),
     approvedSlugs.length
       ? supabase.from('skill_versions').select('skill_slug,source_content_hash,detected_at').in('skill_slug', approvedSlugs).order('detected_at', { ascending: false })
@@ -88,9 +101,9 @@ export default async function CreatorDashboard({
       const event = eventMap.get(skill.slug)
       const outcome = outcomeMap.get(skill.slug)
       sum.views += Number(event?.views || 0)
-      sum.installStarts += Number(event?.install_starts || event?.install_copies || 0)
-      sum.verifiedInstalls += Number(outcome?.verified_installs || event?.install_successes || 0)
-      sum.successes += Number(outcome?.successful_outcomes || event?.outcome_successes || 0)
+      sum.installStarts += Number(event?.install_starts ?? 0)
+      sum.verifiedInstalls += Number(outcome?.verified_installs ?? 0)
+      sum.successes += Number(outcome?.successful_outcomes ?? 0)
       return sum
     },
     { views: 0, installStarts: 0, verifiedInstalls: 0, successes: 0 }
@@ -101,7 +114,10 @@ export default async function CreatorDashboard({
     installs: sum.installs + Number(row.install_successes || 0),
     outcomes: sum.outcomes + Number(row.outcome_successes || 0),
   }), { views: 0, starts: 0, installs: 0, outcomes: 0 })
-  const username = profile?.username || user.email?.split('@')[0]?.toLowerCase().replace(/[^a-z0-9-]/g, '-') || 'creator'
+  const username = profile?.username || verifiedGitHubUsername || ''
+  const works = SHOWCASE_CASES.filter(item => approvedSlugs.includes(item.skillSlug))
+  const dailyUnavailable = dailyEvents === null
+  const analyticsAvailable = events !== null && outcomes !== null
   const hasVerifiedClaim = approvedSlugs.length > 0
   const steps = [
     { label: 'Account', detail: user.email || 'Signed in', done: true },
@@ -111,16 +127,16 @@ export default async function CreatorDashboard({
   ]
 
   return (
-    <MarketingPageShell><div className="mx-auto min-h-screen max-w-6xl px-5 py-12 sm:px-6 sm:py-16">
+    <I18nProvider initialLocale={locale}><MarketingPageShell><div className="mx-auto min-h-screen max-w-6xl px-5 py-12 sm:px-6 sm:py-16">
       <CreatorActivationTracker
         githubConnected={params.connected === 'github'}
         profilePublished={params.saved === '1'}
       />
       <header className="grid gap-8 border-b border-border pb-10 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
         <div>
-          <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">Creator ownership console</p>
-          <h1 className="mt-4 max-w-3xl font-display text-4xl font-semibold leading-[0.98] sm:text-6xl">Turn a GitHub repository into a verified creator asset.</h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-secondary">Claim provenance, keep source versions synchronized, publish license evidence, and see the path from discovery to a successful Agent outcome.</p>
+          <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">OpenAgentSkill / Creators</p>
+          <h1 className="mt-4 max-w-3xl font-display text-4xl font-semibold leading-[0.98] sm:text-6xl">{t('center')}</h1>
+          <p className="mt-5 max-w-2xl text-base leading-7 text-secondary">{t('intro')}</p>
         </div>
         <div className="flex flex-wrap gap-3 lg:justify-end">
           <Link href="/submit" className="bg-foreground px-4 py-3 text-sm font-semibold text-background">Add a skill</Link>
@@ -128,11 +144,14 @@ export default async function CreatorDashboard({
         </div>
       </header>
 
-      {params.saved ? <p className="mt-6 border border-emerald-600/40 bg-emerald-500/5 p-3 text-sm">Creator profile saved.</p> : null}
+      <nav aria-label={t('center')} className="my-8 flex flex-wrap gap-2 border-b border-border pb-4">
+        {tabs.map(value => <Link key={value} href={tabHref(value)} aria-current={tab === value ? 'page' : undefined} className={`min-h-11 px-4 py-3 text-sm ${tab === value ? 'bg-[#006b4f] text-white' : 'hover:bg-muted'}`}>{t(value === 'profile' ? 'edit' : value)}</Link>)}
+      </nav>
+      {params.saved ? <p role="status" className="mt-6 border border-emerald-600/40 bg-emerald-500/5 p-3 text-sm">Creator profile saved.</p> : null}
       {params.connected === 'github' ? <p className="mt-6 border border-emerald-600/40 bg-emerald-500/5 p-3 text-sm">GitHub identity connected and verified.</p> : null}
-      {params.error ? <p className="mt-6 border border-red-600/40 bg-red-500/5 p-3 text-sm">Could not complete that action. Check the fields or try repository verification.</p> : null}
+      {params.error ? <p role="alert" className="mt-6 border border-red-600/40 bg-red-500/5 p-3 text-sm">{params.error === 'handle-taken' ? 'That profile handle is already in use. Choose another.' : params.error === 'handle-locked' ? t('stable') : 'Could not save. Check the fields and connection, then try again.'}</p> : null}
 
-      <section className="mt-8 grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-4" aria-label="Ownership progress">
+      {tab === 'overview' && <section className="mt-8 grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-4" aria-label="Ownership progress">
         {steps.map((step, index) => (
           <div key={step.label} className="bg-background p-5">
             <div className="flex items-center justify-between">
@@ -143,24 +162,24 @@ export default async function CreatorDashboard({
             <p className="mt-1 text-xs text-secondary">{step.detail}</p>
           </div>
         ))}
-      </section>
+      </section>}
 
-      <section className="mt-10 grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-4" aria-label="Creator analytics">
+      {(tab === 'overview' || tab === 'analytics') && <section className="mt-10 grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-4" aria-label="Creator analytics">
         {[
-          ['Views', totals.views, `${metric(last30.views)} in 30 days`],
-          ['Install starts', totals.installStarts, `${percent(totals.installStarts, totals.views)} from views`],
-          ['Verified installs', totals.verifiedInstalls, `${percent(totals.verifiedInstalls, totals.installStarts)} completion`],
-          ['Successful outcomes', totals.successes, `${percent(totals.successes, totals.verifiedInstalls)} post-install success`],
+          ['Views', totals.views, dailyUnavailable ? '30-day total temporarily unavailable' : `${metric(last30.views)} in 30 UTC dates`],
+          ['Install starts', totals.installStarts, dailyUnavailable ? '30-day total temporarily unavailable' : `${metric(last30.starts)} in 30 UTC dates`],
+          ['Verified installs', totals.verifiedInstalls, 'Receipt-confirmed · all time'],
+          ['Successful outcomes', totals.successes, 'Reported successful outcomes · all time'],
         ].map(([label, value, note]) => (
           <div key={String(label)} className="bg-background p-5">
             <p className="font-mono text-xs uppercase tracking-[0.16em] text-secondary">{label}</p>
-            <p className="mt-3 font-display text-3xl">{metric(value)}</p>
-            <p className="mt-2 text-xs text-secondary">{note}</p>
+            <p className="mt-3 font-display text-3xl">{analyticsAvailable ? metric(value) : '—'}</p>
+            <p className="mt-2 text-xs text-secondary">{analyticsAvailable ? note : 'Analytics temporarily unavailable'}</p>
           </div>
         ))}
-      </section>
+      </section>}
 
-      <section className="mt-10 grid gap-8 lg:grid-cols-[0.92fr_1.08fr]">
+      {(tab === 'overview' || tab === 'skills') && <section className="mt-10 grid gap-8 lg:grid-cols-[0.92fr_1.08fr]">
         <div className="space-y-8">
           {verifiedGitHubUsername ? (
             <CreatorBatchClaim
@@ -175,29 +194,7 @@ export default async function CreatorDashboard({
             githubOAuthEnabled={process.env.NEXT_PUBLIC_GITHUB_OAUTH_ENABLED === 'true'}
             githubAppInstallUrl={process.env.NEXT_PUBLIC_GITHUB_APP_INSTALL_URL || null}
           />
-          <form action={updateCreatorProfile} className="border border-border p-6">
-            <h2 className="font-display text-2xl">Public creator record</h2>
-            <p className="mt-2 text-sm leading-6 text-secondary">This page is crawlable only after a verified Skill claim. OAuth-verified handles cannot be overwritten by text fields.</p>
-            <div className="mt-6 space-y-4">
-              {[
-                ['username', 'Public profile handle', username],
-                ['display_name', 'Display name', profile?.display_name || ''],
-                ['website', 'Website', profile?.website || ''],
-                ['github_username', profile?.github_verified_at ? 'GitHub username · OAuth verified' : 'GitHub username', profile?.github_username || ''],
-                ['x_username', 'X username · optional, self-reported', profile?.x_username || ''],
-              ].map(([name, label, value]) => (
-                <label key={name} className="block text-sm">
-                  <span className="mb-1.5 block text-secondary">{label}</span>
-                  <input name={name} defaultValue={value} readOnly={name === 'github_username' && Boolean(profile?.github_verified_at)} className="w-full border border-border bg-background px-3 py-2.5 outline-none focus:border-foreground read-only:bg-muted/40 read-only:text-secondary" />
-                </label>
-              ))}
-              <label className="block text-sm">
-                <span className="mb-1.5 block text-secondary">Bio</span>
-                <textarea name="bio" rows={4} defaultValue={profile?.bio || ''} className="w-full border border-border bg-background px-3 py-2.5 outline-none focus:border-foreground" />
-              </label>
-              <button className="w-full bg-foreground px-4 py-3 font-semibold text-background">Save public profile</button>
-            </div>
-          </form>
+
         </div>
 
         <section className="border border-border" aria-labelledby="claimed-skills-heading">
@@ -222,7 +219,7 @@ export default async function CreatorDashboard({
                   {claim.status === 'approved' && skill ? <>
                     <div className="mt-4 grid grid-cols-4 gap-3 border-y border-border py-3 text-xs text-secondary">
                       <span>Views <b className="block text-base text-foreground">{metric(event?.views)}</b></span>
-                      <span>Starts <b className="block text-base text-foreground">{metric(event?.install_starts || event?.install_copies)}</b></span>
+                      <span>Starts <b className="block text-base text-foreground">{metric(event?.install_starts)}</b></span>
                       <span>Installs <b className="block text-base text-foreground">{metric(outcome?.verified_installs)}</b></span>
                       <span>Success <b className="block text-base text-foreground">{metric(outcome?.successful_outcomes)}</b></span>
                     </div>
@@ -244,7 +241,23 @@ export default async function CreatorDashboard({
             </div>
           ) : <div className="p-8 text-sm leading-6 text-secondary">No ownership claims yet. Open one of your Skill pages and choose “Claim this skill” to generate a verifiable repository challenge.</div>}
         </section>
-      </section>
-    </div></MarketingPageShell>
+      </section>}
+      {tab === 'profile' && <section className="mt-10">
+        <h2 className="mb-6 font-display text-3xl">{t('edit')}</h2>
+        <CreatorProfileEditor locale={locale} action={updateCreatorProfile} handleLocked={Boolean(profile?.username)} githubVerified={Boolean(profile?.github_verified_at)} xVerified={Boolean(profile?.x_verified_at)}
+          initial={{ username, display_name: profile?.display_name || '', bio: profile?.bio || '', website: profile?.website || '', github_username: profile?.github_username || '', x_username: profile?.x_username || '' }} />
+      </section>}
+      {tab === 'overview' && <section className="mt-10 flex flex-wrap items-center justify-between gap-6 border-t border-border py-8">
+        <div><h2 className="font-display text-2xl">{t('profile')}</h2><p className="mt-2 text-sm text-secondary">{t('privacy')}</p></div>
+        <Link href={tabHref('profile')} className="border border-border px-4 py-3 text-sm">{t('edit')}</Link>
+        {profile?.username && <CreatorProfileShare username={profile.username} locale={locale} />}
+      </section>}
+      {tab === 'works' && <section className="mt-10">
+        <h2 className="font-display text-3xl">{t('gallery')}</h2><p className="mt-3 text-sm text-secondary">{t('galleryNote')}</p>
+        {works.length ? <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">{works.slice(0, 12).map(item => <ShowcaseCard key={item.slug} item={getShowcaseCardData(item)} />)}</div> : <p className="my-8 border border-border p-6 text-secondary">{t('emptyWorks')}</p>}
+        <Link href="/contact" className="mt-6 inline-block border border-border px-4 py-3 text-sm">Submit a Gallery example →</Link>
+      </section>}
+      {tab === 'analytics' && <p className="mt-6 max-w-3xl text-sm leading-7 text-secondary">Views and install starts are recorded events, not unique people. Confirmed installs and outcomes are separate receipt/report totals, not a conversion funnel. The 30-day window uses UTC dates ({dateWindow.start}–{dateWindow.end}). Missing analytics are not evidence of unsuccessful usage.</p>}
+    </div></MarketingPageShell></I18nProvider>
   )
 }

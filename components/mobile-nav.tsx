@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronDown, Menu, Plus, X } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'
+import { CreatorMenuProfile } from '@/components/creator-menu-profile'
 import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { useI18n } from '@/lib/i18n/context'
@@ -118,6 +119,7 @@ export function MobileNav() {
                         </Link>
                       </li>)}
                     </ul>
+                    {section.id === 'creators' && <CreatorMenuProfile onNavigate={() => setIsOpen(false)} />}
                   </details>}
                 </div>
               ))}

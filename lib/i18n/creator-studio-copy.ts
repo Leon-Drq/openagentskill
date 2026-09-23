@@ -1,0 +1,41 @@
+import type { Locale } from './config'
+
+const rows = {
+  claimed: ['Claimed skills', '已认领技能', '所有権確認済みスキル', '소유권 확인 스킬', 'Skills reclamadas', 'Beanspruchte Skills', 'Skills revendiquées', 'Skill yang diklaim'],
+  stars: ['Stars · unique repositories', 'Stars · 仓库去重', 'スター・重複を除くリポジトリ', '스타 · 중복 없는 저장소', 'Estrellas · repositorios únicos', 'Sterne · eindeutige Repositories', 'Étoiles · dépôts uniques', 'Bintang · repositori unik'],
+  installs: ['Receipt-confirmed installs', '凭据确认安装', '証跡で確認されたインストール', '증빙 확인 설치', 'Instalaciones con comprobante', 'Belegte Installationen', 'Installations avec preuve', 'Instalasi dengan bukti'],
+  ownership: ['Repository ownership verified', '仓库所有权已确认', 'リポジトリ所有権確認済み', '저장소 소유권 확인됨', 'Propiedad del repositorio verificada', 'Repository-Eigentum bestätigt', 'Propriété du dépôt vérifiée', 'Kepemilikan repositori terverifikasi'],
+  official: ['Official publisher', '官方发布者', '公式パブリッシャー', '공식 게시자', 'Editor oficial', 'Offizieller Herausgeber', 'Éditeur officiel', 'Penerbit resmi'],
+  source: ['Source & ownership', '来源与所有权', '出典と所有権', '출처 및 소유권', 'Origen y propiedad', 'Quelle und Eigentum', 'Source et propriété', 'Sumber dan kepemilikan'],
+  allCreators: ['All creators', '全部创作者', 'すべてのクリエイター', '모든 크리에이터', 'Todos los creadores', 'Alle Kreativen', 'Tous les créateurs', 'Semua kreator'],
+  allSkills: ['All skills', '全部技能', 'すべてのスキル', '모든 스킬', 'Todas las skills', 'Alle Skills', 'Toutes les skills', 'Semua skill'],
+  center: ['Creator Center', '创作者中心', 'クリエイターセンター', '크리에이터 센터', 'Centro de creadores', 'Creator-Center', 'Espace créateur', 'Pusat kreator'],
+  intro: ['Your profile, skills, and work. In one place.', '管理你的主页、技能与作品。', 'プロフィール、スキル、作品を一か所で。', '프로필, 스킬, 작품을 한곳에서 관리하세요.', 'Tu perfil, skills y trabajos en un solo lugar.', 'Profil, Skills und Werke an einem Ort.', 'Votre profil, vos skills et vos créations, au même endroit.', 'Profil, skill, dan karya Anda di satu tempat.'],
+  overview: ['Overview', '概览', '概要', '개요', 'Resumen', 'Übersicht', 'Vue d’ensemble', 'Ringkasan'],
+  edit: ['Edit profile', '编辑主页', 'プロフィール編集', '프로필 편집', 'Editar perfil', 'Profil bearbeiten', 'Modifier le profil', 'Edit profil'],
+  skills: ['My skills', '我的技能', 'マイスキル', '내 스킬', 'Mis skills', 'Meine Skills', 'Mes skills', 'Skill saya'],
+  works: ['Works', '作品', '作品', '작품', 'Trabajos', 'Werke', 'Réalisations', 'Karya'],
+  analytics: ['Analytics', '数据分析', '分析', '분석', 'Estadísticas', 'Statistik', 'Statistiques', 'Analitik'],
+  profile: ['Public profile', '公开主页', '公開プロフィール', '공개 프로필', 'Perfil público', 'Öffentliches Profil', 'Profil public', 'Profil publik'],
+  preview: ['Live preview · not saved', '实时预览 · 尚未保存', 'プレビュー・未保存', '실시간 미리보기 · 저장 전', 'Vista previa · sin guardar', 'Vorschau · nicht gespeichert', 'Aperçu · non enregistré', 'Pratinjau · belum disimpan'],
+  save: ['Save profile', '保存主页', '保存する', '프로필 저장', 'Guardar perfil', 'Profil speichern', 'Enregistrer', 'Simpan profil'],
+  saving: ['Saving…', '保存中…', '保存中…', '저장 중…', 'Guardando…', 'Wird gespeichert…', 'Enregistrement…', 'Menyimpan…'],
+  name: ['Display name', '显示名称', '表示名', '표시 이름', 'Nombre', 'Anzeigename', 'Nom affiché', 'Nama tampilan'],
+  handle: ['Profile handle', '主页标识', 'ユーザー名', '프로필 아이디', 'Identificador', 'Profilkennung', 'Identifiant', 'Nama pengguna'],
+  bio: ['About you', '个人介绍', '自己紹介', '소개', 'Acerca de ti', 'Über dich', 'À propos de vous', 'Tentang Anda'],
+  website: ['Website', '个人网站', 'ウェブサイト', '웹사이트', 'Sitio web', 'Website', 'Site web', 'Situs web'],
+  share: ['Copy profile link', '复制主页链接', 'リンクをコピー', '프로필 링크 복사', 'Copiar enlace', 'Profillink kopieren', 'Copier le lien', 'Salin tautan profil'],
+  copied: ['Link copied', '链接已复制', 'コピーしました', '복사됨', 'Enlace copiado', 'Link kopiert', 'Lien copié', 'Tautan disalin'],
+  failed: ['Could not copy. Select the link below.', '复制失败，请选择下方链接。', '下のリンクを選択してください。', '아래 링크를 선택하세요.', 'Selecciona el enlace de abajo.', 'Bitte den Link unten auswählen.', 'Sélectionnez le lien ci-dessous.', 'Pilih tautan di bawah.'],
+  popular: ['Popular skills', '代表技能', '人気のスキル', '인기 스킬', 'Skills populares', 'Beliebte Skills', 'Skills populaires', 'Skill populer'],
+  popularNote: ['Up to three claimed skills, ordered by repository stars.', '按仓库 Stars 展示最多三个已认领技能。', '所有権確認済みスキルをスター順で最大3件表示。', '소유권 확인 스킬을 스타순으로 최대 3개 표시합니다.', 'Hasta tres skills reclamadas, ordenadas por estrellas.', 'Bis zu drei beanspruchte Skills, nach Sternen sortiert.', 'Jusqu’à trois skills revendiquées, classées par étoiles.', 'Maksimal tiga skill yang diklaim, diurutkan berdasarkan bintang.'],
+  evidence: ['Ownership is not a safety audit or a runtime test.', '所有权确认不等于安全审核或运行测试。', '所有権の確認は安全監査や実行テストではありません。', '소유권 확인은 안전 감사나 실행 테스트가 아닙니다.', 'La propiedad no equivale a una auditoría de seguridad.', 'Eigentum ist kein Sicherheitsaudit oder Laufzeittest.', 'La propriété ne constitue pas un audit de sécurité.', 'Kepemilikan bukan audit keamanan atau uji eksekusi.'],
+  gallery: ['Made with these skills', '这些技能创作的作品', 'このスキルで作られた作品', '이 스킬로 만든 작품', 'Hecho con estas skills', 'Mit diesen Skills erstellt', 'Créé avec ces skills', 'Dibuat dengan skill ini'],
+  galleryNote: ['Gallery examples with original creator credits. Skill authors and artwork creators may differ.', '保留原始作者署名的 Gallery 案例；技能作者与作品创作者可能不同。', '原作者のクレジットを保持。スキル作者と作品作者は異なる場合があります。', '원작자 표시가 있는 사례입니다. 스킬과 작품의 제작자는 다를 수 있습니다.', 'Ejemplos con créditos originales; los autores pueden ser diferentes.', 'Beispiele mit Originalquellen; Skill- und Werkautoren können verschieden sein.', 'Exemples crédités ; les auteurs des skills et des œuvres peuvent différer.', 'Contoh dengan kredit asli; pembuat skill dan karya dapat berbeda.'],
+  privacy: ['Only these public fields appear on your profile. Your sign-in email stays private. X is optional and self-reported.', '仅这些公开字段会展示在主页；登录邮箱不公开。X 为选填、自行声明。', '公開項目のみ表示。ログイン用メールは非公開。Xは任意の自己申告です。', '공개 필드만 표시됩니다. 로그인 이메일은 비공개입니다. X는 선택 사항입니다.', 'Solo se muestran estos campos públicos. El correo de acceso es privado. X es opcional.', 'Nur öffentliche Felder werden angezeigt. Login-E-Mail bleibt privat. X ist optional.', 'Seuls ces champs sont publics. L’e-mail de connexion reste privé. X est facultatif.', 'Hanya kolom publik ini ditampilkan. Email masuk tetap privat. X opsional.'],
+  stable: ['Your profile address stays fixed after the first save.', '首次保存后主页地址固定，保护已分享链接。', '初回保存後はプロフィールURLが固定されます。', '첫 저장 후 프로필 주소는 고정됩니다.', 'La dirección queda fija tras guardar por primera vez.', 'Die Profiladresse bleibt nach dem ersten Speichern fest.', 'L’adresse reste fixe après le premier enregistrement.', 'Alamat profil tetap setelah penyimpanan pertama.'],
+  emptyWorks: ['No Gallery examples linked yet. Submit a real example with its source and permission details.', '暂无关联的 Gallery 作品。可以提交真实案例，并附来源与授权说明。', '作品はまだありません。出典と許可情報を添えて実例を送信してください。', '연결된 작품이 없습니다. 출처와 허가 정보를 포함해 사례를 제출하세요.', 'Aún no hay ejemplos. Envía uno con su fuente y permisos.', 'Noch keine Beispiele. Reiche ein Werk mit Quelle und Erlaubnis ein.', 'Aucun exemple associé. Proposez-en un avec sa source et ses droits.', 'Belum ada contoh. Kirim contoh dengan sumber dan izin.'],
+} as const
+export type StudioKey = keyof typeof rows
+const languages: Locale[] = ['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr', 'id']
+export const studioCopy = (locale: Locale, key: StudioKey) => rows[key][languages.indexOf(locale)] || rows[key][0]

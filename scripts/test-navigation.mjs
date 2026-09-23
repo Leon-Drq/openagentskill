@@ -12,7 +12,7 @@ function dictionary(locale) {
   return exports.default
 }
 assert.deepEqual(SITE_NAVIGATION.map(s => s.id), ['skills', 'gallery', 'rankings', 'creators', 'resources', 'developers'])
-assert.equal(SITE_NAVIGATION.filter(s => s.items).length, 3)
+assert.equal(SITE_NAVIGATION.filter(s => s.items).length, 4)
 const links = SITE_NAVIGATION.flatMap(s => [s, ...(s.items || [])])
 for (const link of links) assert.ok(read('app' + link.href + '/page.tsx').length)
 for (const locale of ['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr', 'id']) {

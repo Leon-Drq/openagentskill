@@ -13,7 +13,10 @@ export const SITE_NAVIGATION: readonly NavigationSection[] = [
   ] },
   { id: 'gallery', href: '/showcase', label: 'gallery' },
   { id: 'rankings', href: '/rankings', label: 'rankings', activePaths: ['/trending'] },
-  { id: 'creators', href: '/creators', label: 'creatorShort', activePaths: ['/creator', '/creator-kit'] },
+  { id: 'creators', href: '/creators', label: 'creatorShort', activePaths: ['/creator', '/creator-kit'], items: [
+    { href: '/creators', label: 'creators' }, { href: '/creator', label: 'creatorConsole' },
+    { href: '/submit', label: 'submitSkill' }, { href: '/creator-kit', label: 'creatorKit' },
+  ] },
   { id: 'resources', href: '/guides', label: 'resources', activePaths: ['/reports'], items: [
     { href: '/blog', label: 'blog' }, { href: '/guides', label: 'guides' }, { href: '/reports/weekly', label: 'reports' },
     { href: '/contact', label: 'contact' }, { href: '/sponsor', label: 'sponsor' },
