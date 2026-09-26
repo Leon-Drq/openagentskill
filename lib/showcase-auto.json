@@ -1294,5 +1294,41 @@
     },
     "createdAt": "2026-09-25",
     "updatedAt": "2026-09-25"
+  },
+  {
+    "source": "huashu",
+    "group": "huashu",
+    "asset": "assets/showcases/infographic/infographic-build.png",
+    "slug": "auto-huashu-infographic-build-2927985e6a",
+    "title": "infographic build",
+    "category": "image",
+    "revision": "0830494ecb1c117e25b313a8114fe55a6bf2b125",
+    "blobSha": "e947be8f6f6a21638cab5d6036a56b1d2a0d335a",
+    "sha256": "fa9afbfdf559ed0c541f8dc77aedd3796a7a98dcbb75ad2c6e2ac0121f0c0c1b",
+    "media": {
+      "src": "/showcase/auto-fa9afbfdf559ed0c541f8dc7.png",
+      "width": 1080,
+      "height": 1920
+    },
+    "createdAt": "2026-09-26",
+    "updatedAt": "2026-09-26"
+  },
+  {
+    "source": "huashu",
+    "group": "huashu",
+    "asset": "assets/showcases/infographic/infographic-takram.png",
+    "slug": "auto-huashu-infographic-takram-9e68be6091",
+    "title": "infographic takram",
+    "category": "image",
+    "revision": "0830494ecb1c117e25b313a8114fe55a6bf2b125",
+    "blobSha": "1ea03e40bb064294dcf771eba5988bcdbc67cb09",
+    "sha256": "5eba3094dd2a860083c150665772c7d96a5bf93a47f3cfbe5d797f51989ae3ea",
+    "media": {
+      "src": "/showcase/auto-5eba3094dd2a860083c15066.png",
+      "width": 1080,
+      "height": 1920
+    },
+    "createdAt": "2026-09-26",
+    "updatedAt": "2026-09-26"
   }
 ]
