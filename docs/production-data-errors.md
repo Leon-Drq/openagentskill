@@ -20,6 +20,13 @@ bounds writes to a 3-second fetch deadline in their own circuit, does not retry
 writes, and maps unavailable/private targets to 404 instead of a retryable 503.
 Actual database/network failures return an uncached 503 with `Retry-After: 15`.
 
+Post-deployment smoke also exposed a URL/database alias mismatch: the canonical
+URL `last30days-skill` is stored under `mvanhorn-last30days-skill`. Known alias
+families now resolve the existing public database slug before writing an event,
+preferring the canonical slug when it exists. This uses the same anonymous RLS
+client, without changing any skill records. Ordinary slugs still require only
+one write; failed lookups never produce writes or cached false 404s.
+
 The shared fetch circuit also allowed three slow optional/bulk reads to block
 critical skill lookups and exact searches in the same warm function. Fixed
 workload scopes now isolate bulk reads, single-skill lookups, exact search,

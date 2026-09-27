@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createPublicClient } from '@/lib/supabase/public'
-import { getCanonicalSkillSlug } from '@/lib/skill-slug-aliases'
+import { getCanonicalSkillSlug, SKILL_SLUG_ALIASES } from '@/lib/skill-slug-aliases'
 
 const EventSchema = z.object({
   skill_slug: z.string().min(1).max(200),
@@ -34,8 +34,24 @@ export async function POST(request: NextRequest) {
     // Remain an anonymous, RLS-checked writer. Telemetry must neither hang nor
     // share a failure circuit with content reads, and writes are never retried.
     const supabase = createPublicClient({ requestTimeoutMs: 3000, circuitScope: 'telemetry' })
+    let skillSlug = getCanonicalSkillSlug(parsed.data.skill_slug)
+    const candidates = [...new Set([skillSlug, ...Object.keys(SKILL_SLUG_ALIASES)
+      .filter(alias => SKILL_SLUG_ALIASES[alias] === skillSlug)])]
+    // URL canonicalization does not rename existing database foreign keys.
+    // Only known alias families need a lookup; ordinary events retain one write.
+    // Anonymous SELECT and INSERT both enforce the existing public listing RLS.
+    if (candidates.length > 1) {
+      const { data, error: lookupError } = await supabase.from('skills')
+        .select('slug').in('slug', candidates)
+      if (lookupError) throw lookupError
+      const storedSlug = candidates.find(candidate => data?.some(skill => skill.slug === candidate))
+      if (!storedSlug) {
+        return NextResponse.json({ ok: false, error: 'Skill is not available for public events' }, { status: 404 })
+      }
+      skillSlug = storedSlug
+    }
     const { error } = await supabase.from('skill_events').insert({
-      skill_slug: getCanonicalSkillSlug(parsed.data.skill_slug),
+      skill_slug: skillSlug,
       event_type: parsed.data.event_type,
       session_id: parsed.data.session_id || null,
       path: parsed.data.path || null,
