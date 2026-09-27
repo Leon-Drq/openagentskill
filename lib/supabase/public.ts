@@ -1,5 +1,5 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-import { createResilientTimeoutFetch } from '@/lib/supabase/resilient-fetch'
+import { createResilientTimeoutFetch, type SupabaseCircuitScope } from '@/lib/supabase/resilient-fetch'
 
 // Supabase anon key is intentionally public — it is safe to commit.
 // RLS policies on the database enforce all access control.
@@ -19,6 +19,7 @@ export interface PublicClientOptions {
    * using the normal client, while bounded jobs can fail one request safely.
    */
   requestTimeoutMs?: number
+  circuitScope?: SupabaseCircuitScope
 }
 
 /**
@@ -29,7 +30,7 @@ export function createPublicClient(options: PublicClientOptions = {}) {
   const requestTimeoutMs = Number(options.requestTimeoutMs)
   if (Number.isFinite(requestTimeoutMs) && requestTimeoutMs > 0) {
     return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: { fetch: createResilientTimeoutFetch(Math.floor(requestTimeoutMs)) },
+      global: { fetch: createResilientTimeoutFetch(Math.floor(requestTimeoutMs), options.circuitScope) },
     })
   }
 

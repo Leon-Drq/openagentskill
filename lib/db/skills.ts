@@ -863,7 +863,7 @@ function normalizeSkillLookupSlug(slug: string) {
 // they are never stored as a false missing record.
 const getCachedSkillBySlug = unstable_cache(
   async (slug: string): Promise<SkillRecord | null> => {
-    const supabase = createPublicClient({ requestTimeoutMs: SKILL_LOOKUP_TIMEOUT_MS })
+    const supabase = createPublicClient({ requestTimeoutMs: SKILL_LOOKUP_TIMEOUT_MS, circuitScope: 'skill-lookup' })
     const { data, error } = await supabase
       .from('skills')
       .select('*')
@@ -1028,7 +1028,7 @@ async function fetchExactSearchSkills(query: string): Promise<SkillRecord[]> {
   const exactQuery = normalizeExactSearchQuery(query)
   if (!exactQuery) return []
 
-  const supabase = createPublicClient({ requestTimeoutMs: SKILL_EXACT_SEARCH_TIMEOUT_MS })
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_EXACT_SEARCH_TIMEOUT_MS, circuitScope: 'skill-search' })
   const [slugResult, nameResult] = await Promise.all([
     supabase
       .from('skills')

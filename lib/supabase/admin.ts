@@ -31,7 +31,7 @@ export function createAdminClient(options: AdminClientOptions = {}) {
       persistSession: false,
     },
     ...(Number.isFinite(requestTimeoutMs) && requestTimeoutMs > 0
-      ? { global: { fetch: createResilientTimeoutFetch(Math.floor(requestTimeoutMs)) } }
+      ? { global: { fetch: createResilientTimeoutFetch(Math.floor(requestTimeoutMs), 'admin') } }
       : {}),
   })
 }

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import './test-skill-events.mjs'
 
 // Node's type-stripping runner needs the explicit extension.
 // @ts-expect-error TS5097 is expected for this standalone Node test entrypoint.
