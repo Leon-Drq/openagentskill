@@ -47,7 +47,7 @@ assert.equal(selectSkillsForUseCase([...records,unrelated],scenario,18).length,1
 assert.equal(selectSkillsForPack([...records,unrelated],pack,pack.selectionLimit).length,15)
 for (const record of records) assert.equal(getUseCasesForSkill(record)[0].slug,'mysticism')
 assert.equal(JSON.stringify(records),before,'Classification must not modify review states')
-for (const path of ['app/use-cases/page.tsx','app/use-cases/[slug]/page.tsx','app/skills/page.tsx']) assert.match(read(path),/getSkillsBySlugs/,path+' must fetch published featured skills outside the quality baseline')
+for (const path of ['app/use-cases/page.tsx','app/use-cases/[slug]/page.tsx','app/skills/content.tsx']) assert.match(read(path),/getSkillsBySlugs/,path+' must fetch published featured skills outside the quality baseline')
 assert.match(read('app/skill-packs/[slug]/page.tsx'),/pack.selectionLimit \|\| 10/)
 assert.match(read('app/api/agent/packs/[slug]/route.ts'),/pack\?\.selectionLimit \|\| 10/)
 const {getLocalizedPackContent}=await import('../lib/i18n/curated-content.ts')

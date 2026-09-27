@@ -238,12 +238,16 @@ function unique(values: string[], limit: number) {
   return result
 }
 
-export function getSkillSupplyProfile(skill: SkillRecord, eventStats?: SkillEventStats | null): SkillSupplyProfile {
+export function getSkillSupplyProfile(skill: SkillRecord, eventStats?: SkillEventStats | null, profiles?: {
+  quality: ReturnType<typeof getSkillQualityProfile>
+  trust: ReturnType<typeof getSkillTrustProfile>
+  audit: ReturnType<typeof buildSkillAudit>
+}): SkillSupplyProfile {
   const track = getSupplyTrackForSkill(skill)
   const useCases = getUseCasesForSkill(skill, 6)
-  const quality = getSkillQualityProfile(skill)
-  const trust = getSkillTrustProfile(skill, false, eventStats || null)
-  const audit = buildSkillAudit(skill, eventStats || null)
+  const quality = profiles?.quality ?? getSkillQualityProfile(skill)
+  const trust = profiles?.trust ?? getSkillTrustProfile(skill, false, eventStats || null)
+  const audit = profiles?.audit ?? buildSkillAudit(skill, eventStats || null, { quality, trust })
   const installTargets = getSkillInstallTargets(skill)
   const platformHints = getPlatformHints(skill)
   const freshnessDays = getFreshnessDays(skill.github_last_pushed_at || skill.updated_at)
