@@ -1,16 +1,17 @@
 import assert from 'node:assert/strict'
+import './test-supabase-circuit-isolation.mjs'
 
 // Node's type-stripping runner needs the explicit extension for this standalone test.
 // @ts-expect-error TS5097 is expected for this standalone Node test entrypoint.
 import { createResilientTimeoutFetch } from '../lib/supabase/resilient-fetch.ts'
 
 type CircuitGlobal = typeof globalThis & {
-  __openagentskillSupabaseCircuit?: unknown
+  __openagentskillSupabaseCircuits?: unknown
 }
 
 async function main() {
   const shared = globalThis as CircuitGlobal
-  shared.__openagentskillSupabaseCircuit = undefined
+  shared.__openagentskillSupabaseCircuits = undefined
 
   const originalFetch = globalThis.fetch
   let upstreamCalls = 0
@@ -36,7 +37,7 @@ async function main() {
     console.log('Supabase circuit breaker regression test passed.')
   } finally {
     globalThis.fetch = originalFetch
-    shared.__openagentskillSupabaseCircuit = undefined
+    shared.__openagentskillSupabaseCircuits = undefined
   }
 }
 

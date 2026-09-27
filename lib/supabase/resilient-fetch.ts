@@ -2,48 +2,60 @@ type CircuitState = {
   consecutiveFailures: number
   openUntil: number
   probeInFlight: boolean
+  generation: number
 }
 
+export type SupabaseCircuitScope = 'public-read' | 'skill-lookup' | 'skill-search' | 'telemetry' | 'admin'
+
 type CircuitGlobal = typeof globalThis & {
-  __openagentskillSupabaseCircuit?: CircuitState
+  __openagentskillSupabaseCircuits?: Partial<Record<SupabaseCircuitScope, CircuitState>>
 }
 
 const FAILURE_THRESHOLD = 3
 const OPEN_INTERVAL_MS = 15_000
 
-function getCircuitState(): CircuitState {
+function getCircuitState(scope: SupabaseCircuitScope): CircuitState {
   const shared = globalThis as CircuitGlobal
-  if (!shared.__openagentskillSupabaseCircuit) {
-    shared.__openagentskillSupabaseCircuit = {
+  const circuits = shared.__openagentskillSupabaseCircuits ??= {}
+  if (!circuits[scope]) {
+    circuits[scope] = {
       consecutiveFailures: 0,
       openUntil: 0,
       probeInFlight: false,
+      generation: 0,
     }
   }
-  return shared.__openagentskillSupabaseCircuit
+  return circuits[scope]
 }
 
 function recordFailure(state: CircuitState) {
   state.consecutiveFailures += 1
   if (state.consecutiveFailures >= FAILURE_THRESHOLD) {
     state.openUntil = Date.now() + OPEN_INTERVAL_MS
+    state.generation += 1
+    state.probeInFlight = false
   }
 }
 
 function recordSuccess(state: CircuitState) {
+  if (state.probeInFlight) state.generation += 1
   state.consecutiveFailures = 0
   state.openUntil = 0
+  state.probeInFlight = false
 }
 
 /**
  * Bound Supabase requests and stop a degraded gateway from consuming every
  * serverless invocation. The circuit is shared by warm invocations of the
- * same function bundle, opens after three failures, and automatically allows
- * one half-open probe after the cooldown.
+ * same workload, opens after three failures, and allows one half-open probe
+ * after the cooldown. Optional/bulk reads must not trip critical lookups or
+ * writes. The fixed scope set keeps process-local state bounded.
  */
-export function createResilientTimeoutFetch(timeoutMs: number): typeof fetch {
+export function createResilientTimeoutFetch(timeoutMs: number, scope: SupabaseCircuitScope = 'public-read'): typeof fetch {
   return async (input, init) => {
-    const state = getCircuitState()
+    const externalSignal = init?.signal ?? (input instanceof Request ? input.signal : undefined)
+    externalSignal?.throwIfAborted()
+    const state = getCircuitState(scope)
     const now = Date.now()
     let ownsProbe = false
 
@@ -59,8 +71,8 @@ export function createResilientTimeoutFetch(timeoutMs: number): typeof fetch {
       ownsProbe = true
     }
 
+    const generation = state.generation
     const controller = new AbortController()
-    const externalSignal = init?.signal
     const signal = externalSignal
       ? AbortSignal.any([externalSignal, controller.signal])
       : controller.signal
@@ -68,18 +80,20 @@ export function createResilientTimeoutFetch(timeoutMs: number): typeof fetch {
 
     try {
       const response = await fetch(input, { ...init, signal })
-      if (response.status >= 500) {
-        recordFailure(state)
-      } else {
-        recordSuccess(state)
+      // Requests started before a circuit opened cannot close it late or
+      // extend its cooldown. Only the recovery probe can change that state.
+      if (state.generation === generation) {
+        if (response.status >= 500) recordFailure(state)
+        else recordSuccess(state)
       }
       return response
     } catch (error) {
-      recordFailure(state)
+      // A caller navigating away/cancelling work is not a database outage.
+      if (!externalSignal?.aborted && state.generation === generation) recordFailure(state)
       throw error
     } finally {
       clearTimeout(timeout)
-      if (ownsProbe) state.probeInFlight = false
+      if (ownsProbe && state.generation === generation) state.probeInFlight = false
     }
   }
 }
