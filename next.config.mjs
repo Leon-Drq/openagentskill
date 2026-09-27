@@ -11,6 +11,13 @@ const nextConfig = {
   turbopack: {
     root: __dirname,
   },
+  async headers() {
+    return [{ source: '/internal-render/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }] }, ...Object.entries({ zh: 'zh-CN', ja: 'ja', ko: 'ko', es: 'es', de: 'de', fr: 'fr', id: 'id' })
+      .map(([locale, language]) => ({
+        source: `/${locale}/:path*`,
+        headers: [{ key: 'Content-Language', value: language }],
+      }))]
+  },
   async redirects() {
     return [
       {

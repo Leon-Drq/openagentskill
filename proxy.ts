@@ -1,10 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getCanonicalSkillSlug } from '@/lib/skill-slug-aliases'
-import { isMissingShowcasePath } from '@/lib/showcase'
-import { isMissingFeaturedCreatorPath } from '@/lib/creator-directory'
-import { isMissingRankingPath } from '@/lib/rankings'
-import { isMissingExternalSkillPath } from '@/lib/skills/external-catalog'
+import { publicPageRewrite, publicPageQueryVariant } from '@/lib/routing/public-page-cache'
 
 const MARKET_LOCALE_CODES = new Set(['zh', 'ja', 'ko', 'es', 'de', 'fr', 'id'])
 const DOCUMENT_LANG_BY_LOCALE: Record<string, string> = {
@@ -65,8 +62,26 @@ function createNextResponse(locale: string | null, noindex = false) {
   return response
 }
 
-function isSkillDetailVariant(pathname: string, searchParams: URLSearchParams) {
-  return /^\/skills\/[^/]+$/.test(pathname) && Array.from(searchParams.keys()).length > 0
+async function isMissingPublicPath(pathname: string) {
+  // Ordinary page/cache hits do not initialize the full Gallery, ranking and
+  // external catalogs just to discover that their paths do not match.
+  if (pathname.startsWith('/showcase/')) {
+    const { isMissingShowcasePath } = await import('@/lib/showcase')
+    return isMissingShowcasePath(pathname)
+  }
+  if (pathname.startsWith('/creators/github/')) {
+    const { isMissingFeaturedCreatorPath } = await import('@/lib/creator-directory')
+    return isMissingFeaturedCreatorPath(pathname)
+  }
+  if (pathname.startsWith('/rankings/')) {
+    const { isMissingRankingPath } = await import('@/lib/rankings')
+    return isMissingRankingPath(pathname)
+  }
+  if (pathname.startsWith('/skills/external/')) {
+    const { isMissingExternalSkillPath } = await import('@/lib/skills/external-catalog')
+    return isMissingExternalSkillPath(pathname)
+  }
+  return false
 }
 
 function needsSessionRefresh(pathname: string) {
@@ -91,9 +106,9 @@ export async function proxy(request: NextRequest) {
   const queryLocale = searchParams.get('lang')
   const pathLocale = getLocaleFromPath(pathname)
   const locale = pathLocale || (queryLocale && MARKET_LOCALE_CODES.has(queryLocale) ? queryLocale : null)
-  const noindex = isSkillDetailVariant(pathname, searchParams)
+  const noindex = publicPageQueryVariant(pathname, searchParams)
 
-  if (isMissingShowcasePath(pathname) || isMissingFeaturedCreatorPath(pathname) || isMissingRankingPath(pathname) || isMissingExternalSkillPath(pathname)) {
+  if (await isMissingPublicPath(pathname)) {
     return NextResponse.rewrite(new URL('/404', request.url), {
       status: 404,
       headers: { 'X-Robots-Tag': 'noindex, follow' },
@@ -120,6 +135,18 @@ export async function proxy(request: NextRequest) {
       url.searchParams.delete('lang')
       return NextResponse.redirect(url, 308)
     }
+  }
+
+  const renderPath = publicPageRewrite(pathname, searchParams)
+  if (renderPath) {
+    const url = request.nextUrl.clone()
+    url.pathname = renderPath
+    return NextResponse.rewrite(url, {
+      headers: {
+        'X-Robots-Tag': 'noindex, follow',
+        ...(locale ? { 'Content-Language': DOCUMENT_LANG_BY_LOCALE[locale] || locale } : {}),
+      },
+    })
   }
 
   const initialResponse = createNextResponse(locale, noindex)
@@ -159,7 +186,16 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api(?:/|$)|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|sitemaps/).*)',
+    '/skills/:path*',
+    '/showcase/:path+',
+    '/creators/github/:path+',
+    '/rankings/:path+',
+    '/:locale(zh|ja|ko|es|de|fr|id)/:page(resolve|skills|tasks|skill-packs|compare|api-docs|agent-skill|agent-skills-registry|docs)',
+    '/profile/:path*',
+    {
+      source: '/((?!api(?:/|$)|_next/|favicon.ico|robots.txt|sitemap.xml|sitemaps/).*)',
+      has: [{ type: 'query', key: 'lang', value: 'zh|ja|ko|es|de|fr|id' }],
+    },
     '/api/claims/:path*',
     '/api/points/:path*',
   ],

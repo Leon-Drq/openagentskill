@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import './test-web-performance.mjs'
+import './test-cpu-cost.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -46,7 +47,7 @@ const useCasePage = read('app/use-cases/[slug]/page.tsx')
 assert.match(useCasePage, /searchSkills\(useCase\.heroPrompt, 240\)/, 'use-case pages must use an indexed task query')
 assert.doesNotMatch(useCasePage, /getAllSkills\('quality', undefined, 4000\)/, 'use-case pages must not cache the full registry')
 
-const skillsPage = read('app/skills/page.tsx')
+const skillsPage = read('components/skills-directory-page.tsx')
 const searchDeadline = Number(skillsPage.match(/SKILLS_PAGE_EXACT_SEARCH_TIMEOUT_MS = (\d+)/)?.[1])
 assert.ok(searchDeadline >= 3500 && searchDeadline <= 4000, 'search must allow the bounded 3.5s evidence read but never wait beyond 4s')
 
@@ -90,4 +91,4 @@ for (const file of ['showcase-gallery', 'showcase-detail', 'showcase-sections', 
 }
 assert.doesNotMatch(read('lib/showcase-task.ts'), /from ['"]\.\/showcase\.ts['"]/, 'Task rendering must not pull the full catalogue into client bundles')
 assert.doesNotMatch(skillsPage, /skills-page-categories-v1|skills-page-stats-v1/, 'Avoid caching request-local fallback in a second layer')
-assert.doesNotMatch(read('app/skills/[slug]/page.tsx'), /skill-detail-support-v1/, 'Independent reads need independent success-only caches')
+assert.doesNotMatch(read('components/skill-detail-page.tsx'), /skill-detail-support-v1/, 'Independent reads need independent success-only caches')

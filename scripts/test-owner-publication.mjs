@@ -135,5 +135,5 @@ assert.match(refreshSql, /jsonb_each\(p_skill - 'slug' - 'github_last_pushed_at'
 assert.match(refreshSql, /listing_status=case when v_same_revision then listing_status else 'owner_published' end/)
 assert.doesNotMatch(refreshSql, /delete from|update public.skill_submissions|drop index|security definer/i)
 assert.match(refreshSql, /revoke all on function public.publish_owner_skill.*from public, anon, authenticated/)
-assert.match(source('app/skills/[slug]/page.tsx'), /<OwnerPublicationNote/)
+assert.match(source('components/skill-detail-page.tsx'), /<OwnerPublicationNote/)
 console.log('Owner publication tests passed: authorization, strict input, pinned source, no LLM, no DB writes on dry-run, private-source protection, truthful trust/safety and unchanged user gates.')

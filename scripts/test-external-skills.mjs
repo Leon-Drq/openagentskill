@@ -68,7 +68,7 @@ assert.match(page, /<video controls playsInline preload="none"/)
 assert.match(page, /'@type': 'VideoObject'/)
 assert.match(page, /aria-describedby="runtime-caption"/)
 for (const lang of ['en', 'zh']) assert.match(read(`public/media/external/p5-animation/captions-${lang}.vtt`), /^WEBVTT/)
-assert.match(read('app/skills/page.tsx'), /externalDiscovery=\{<ExternalSkillResults query=\{query\}/)
+assert.match(read('components/skills-directory-page.tsx'), /externalDiscovery=\{<ExternalSkillResults query=\{query\}/)
 assert.match(read('lib/seo/sitemap.ts'), /EXTERNAL_SKILLS\.map/)
 for (const path of ['lib/skills/owner-publication.ts', 'app/api/admin/skills/publish/route.ts']) {
   assert.doesNotMatch(read(path), /EXTERNAL_SKILLS|external-catalog/, 'GitHub owner lane unchanged')

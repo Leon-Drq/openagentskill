@@ -23,7 +23,7 @@ const search = readFileSync(new URL('../app/api/skills/search/route.ts', import.
 assert.match(search, /hybrid-v2-task-fit-quality-outcomes/, 'search must disclose its hybrid ranking model')
 assert.match(search, /one best match plus up to four distinct alternatives/, 'search must expose the shortlist policy')
 
-const detailPage = readFileSync(new URL('../app/skills/[slug]/page.tsx', import.meta.url), 'utf8')
+const detailPage = readFileSync(new URL('../components/skill-detail-page.tsx', import.meta.url), 'utf8')
 const detailSchema = readFileSync(new URL('../lib/skills/detail-profile.ts', import.meta.url), 'utf8')
 assert.match(detailPage, /serializeDetailJson\(buildDetailStructuredData\(dbSkill\)\)/, 'skill detail pages must render the structured-data builder')
 assert.match(detailSchema, /'@type': 'BreadcrumbList'/, 'skill detail schema must publish breadcrumbs')

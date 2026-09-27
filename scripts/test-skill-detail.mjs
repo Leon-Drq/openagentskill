@@ -61,7 +61,7 @@ for (const [locale, values] of Object.entries(skillProfileLocales)) {
   assert.equal(values.length, skillProfileCopyKeys.length,locale)
   for (const key of skillProfileCopyKeys) assert.ok(skillProfileCopy(locale,key)?.trim(),locale+key)
 }
-const page = readFileSync(new URL('../app/skills/[slug]/page.tsx',import.meta.url),'utf8')
+const page = readFileSync(new URL('../components/skill-detail-page.tsx',import.meta.url),'utf8')
 for (const id of ['overview','install-options','source-trust','agent-access','related-skills','creator-tools']) assert.ok(page.includes(`id="${id}"`),id)
 assert.match(page,/source=\{skill\.longDescription\}/, 'retain full original descriptive content in the document renderer')
 assert.equal((page.match(/<h1\b/g)||[]).length,1)
