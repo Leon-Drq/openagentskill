@@ -3,7 +3,7 @@
 import { NativeSelect } from '@/components/ui/native-select'
 
 import Link from 'next/link'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useSyncExternalStore, useTransition, type ReactNode } from 'react'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { SiteFooter } from './site-footer'
@@ -152,6 +152,8 @@ function writeSelection(slugs: string[]) {
 }
 
 interface Props {
+  pathname: string
+  queryString: string
   skills: Skill[]
   query?: string
   sort: string
@@ -199,9 +201,10 @@ export function SkillsPageClient(props: Props) {
       has_query: Boolean(query), locale,
     })
   }, [query, sort, category, page, resultCount, degraded, props.view, props.catalogMode, skills.length, locale])
-  const pathname = usePathname()
+  // Server-provided URL state preserves SSR on cached pages. Reading
+  // useSearchParams here would bail the entire directory out to client render.
+  const { pathname, queryString } = props
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [pending, startTransition] = useTransition()
   const storedSelection = useSyncExternalStore(subscribeSelection, readSelection, () => '[]')
   let compareSlugs: string[] = []
@@ -209,9 +212,9 @@ export function SkillsPageClient(props: Props) {
     const stored: unknown = JSON.parse(storedSelection)
     if (Array.isArray(stored)) compareSlugs = [...new Set(stored.filter((v): v is string => typeof v === 'string'))].slice(0, 4)
   } catch { /* Invalid saved data must not break the directory. */ }
-  const href = (updates: Record<string, string | undefined>) => directoryHref(pathname, searchParams.toString(), updates)
+  const href = (updates: Record<string, string | undefined>) => directoryHref(pathname, queryString, updates)
   const navigate = (updates: Record<string, string | undefined>) => startTransition(() => router.push(href(updates), { scroll: false }))
-  const resetHref = directoryHref(pathname, searchParams.toString(), Object.fromEntries(
+  const resetHref = directoryHref(pathname, queryString, Object.fromEntries(
     ['q','sort','category','useCase','platform','quality','trust','safety','track','minStars','page','view'].map(key => [key, undefined])
   ))
   const toggleCompare = (slug: string) => {

@@ -5,6 +5,7 @@ import { isMissingShowcasePath } from '@/lib/showcase'
 import { isMissingFeaturedCreatorPath } from '@/lib/creator-directory'
 import { isMissingRankingPath } from '@/lib/rankings'
 import { isMissingExternalSkillPath } from '@/lib/skills/external-catalog'
+import { publicQueryRoute } from '@/lib/public-page-routing'
 
 const MARKET_LOCALE_CODES = new Set(['zh', 'ja', 'ko', 'es', 'de', 'fr', 'id'])
 const DOCUMENT_LANG_BY_LOCALE: Record<string, string> = {
@@ -66,7 +67,7 @@ function createNextResponse(locale: string | null, noindex = false) {
 }
 
 function isSkillDetailVariant(pathname: string, searchParams: URLSearchParams) {
-  return /^\/skills\/[^/]+$/.test(pathname) && Array.from(searchParams.keys()).length > 0
+  return /^\/skills\/[^/]+$/.test(pathname) && Array.from(searchParams.keys()).some(key => key !== '_rsc')
 }
 
 function needsSessionRefresh(pathname: string) {
@@ -92,6 +93,13 @@ export async function proxy(request: NextRequest) {
   const pathLocale = getLocaleFromPath(pathname)
   const locale = pathLocale || (queryLocale && MARKET_LOCALE_CODES.has(queryLocale) ? queryLocale : null)
   const noindex = isSkillDetailVariant(pathname, searchParams)
+
+  // Internal rewrite targets are not extra public/SEO URLs.
+  if (pathname === '/render-query' || pathname.startsWith('/render-query/')) {
+    return NextResponse.rewrite(new URL('/404', request.url), {
+      status: 404, headers: { 'X-Robots-Tag': 'noindex, follow' },
+    })
+  }
 
   if (isMissingShowcasePath(pathname) || isMissingFeaturedCreatorPath(pathname) || isMissingRankingPath(pathname) || isMissingExternalSkillPath(pathname)) {
     return NextResponse.rewrite(new URL('/404', request.url), {
@@ -120,6 +128,16 @@ export async function proxy(request: NextRequest) {
       url.searchParams.delete('lang')
       return NextResponse.redirect(url, 308)
     }
+  }
+
+  const queryRoute = publicQueryRoute(pathname, searchParams)
+  if (queryRoute) {
+    const url = request.nextUrl.clone()
+    url.pathname = queryRoute
+    const response = NextResponse.rewrite(url)
+    if (locale) response.headers.set('Content-Language', DOCUMENT_LANG_BY_LOCALE[locale] || locale)
+    if (noindex) response.headers.set('X-Robots-Tag', 'noindex, follow')
+    return response
   }
 
   const initialResponse = createNextResponse(locale, noindex)
@@ -159,7 +177,13 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api(?:/|$)|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|sitemaps/).*)',
+    // Only routes with locale, alias, missing-page or auth behavior need proxy.
+    '/',
+    '/(zh|ja|ko|es|de|fr|id)/:path*',
+    '/(skills|showcase|creators|rankings|profile|render-query)/:path*',
+    '/(resolve|tasks|skill-packs|compare|api-docs|agent-skill|agent-skills-registry|docs|submit)',
+    '/(skill-packs|collections)/:path*',
+    { source: '/((?!api(?:/|$)|_next/|favicon.ico|robots.txt|sitemap.xml|sitemaps/).*)', has: [{ type: 'query', key: 'lang' }] },
     '/api/claims/:path*',
     '/api/points/:path*',
   ],

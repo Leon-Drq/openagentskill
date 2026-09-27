@@ -126,9 +126,14 @@ export function auditRiskColor(level: AuditRiskLevel) {
   return '#991b1b'
 }
 
-export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats | null): ComputedSkillAudit {
-  const quality = getSkillQualityProfile(skill)
-  const trust = getSkillTrustProfile(skill, false, eventStats || null)
+export function buildSkillAudit(skill: SkillRecord, eventStats?: SkillEventStats | null, profiles?: {
+  quality: ReturnType<typeof getSkillQualityProfile>
+  trust: ReturnType<typeof getSkillTrustProfile>
+}): ComputedSkillAudit {
+  // Optional profiles must describe this exact record and eventStats. Public
+  // callers without precomputed profiles retain the original calculation.
+  const quality = profiles?.quality ?? getSkillQualityProfile(skill)
+  const trust = profiles?.trust ?? getSkillTrustProfile(skill, false, eventStats || null)
   const freshnessDays = getFreshnessDays(skill.github_last_pushed_at || skill.updated_at)
   const maintenanceScore = scoreFreshness(freshnessDays)
   const dependencyDimension = trust.dimensions.find((dimension) => dimension.id === 'dependency_risk')
