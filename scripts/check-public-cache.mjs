@@ -16,8 +16,12 @@ function seo(html, path) {
   assert.doesNotMatch(html, /href="(?:https?:\/\/[^/]+)?\/render-query\//, 'internal routes must not leak into links')
 }
 function nonemptyDirectory(html) {
-  const count = html.match(/data-directory-count[^>]*>(.*?)<\/p>/)?.[1]?.replace(/<!--.*?-->/g, '') || ''
-  assert.match(count, /^1–16\s*\/\s*[1-9]/, 'default cached directory must include real visible cards, not an empty outage fallback')
+  // Read numeric text only. This is an assertion, not an HTML sanitizer, and
+  // no fetched markup is reinserted into a page or written to a public file.
+  const count = html.match(/data-directory-count[^>]*>([\s\S]*?)<\/p>/)?.[1] || ''
+  const numbers = (count.match(/\d+/g) || []).map(Number)
+  assert.deepEqual(numbers.slice(0, 2), [1, 16], 'default cached directory must include real visible cards, not an empty outage fallback')
+  assert.ok(numbers[2] > 0, 'default directory has candidates')
 }
 for (const path of ['/skills', '/zh/skills', detail]) {
   let hit = false
