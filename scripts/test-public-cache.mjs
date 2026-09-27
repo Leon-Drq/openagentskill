@@ -16,6 +16,7 @@ for (const path of ['app/skills/page.tsx', 'app/skills/[slug]/page.tsx', 'app/[l
 assert.match(read('app/skills/[slug]/page.tsx'), /generateStaticParams\(\) \{ return \[\] \}/)
 assert.doesNotMatch(read('components/skills-page-client.tsx'), /const .* = useSearchParams\(/, 'cached directory must keep SSR content, not a loading bailout')
 assert.match(read('components/skills-page-client.tsx'), /directoryHref\(pathname, queryString,/)
+assert.match(read('app/skills/content.tsx'), /key === 'lang' && locale !== defaultLocale/, 'localized reset must return to the cacheable path without an injected lang query')
 assert.match(read('app/skills/content.tsx'), /if \(requireHealthy && degraded && visibleRecords.length === 0\) \{\s*throw new Error/, 'do not persist an empty outage page')
 for (const path of ['/skills', '/skills/example', '/zh/skills', '/ja/docs']) {
   assert.equal(publicQueryRoute(path, new URLSearchParams()), null)

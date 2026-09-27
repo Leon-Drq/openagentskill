@@ -1029,7 +1029,8 @@ export default async function SkillsPage({
       <SkillsPageClient
         pathname={locale === defaultLocale ? '/skills' : `/${locale}/skills`}
         queryString={new URLSearchParams(Object.entries(params).flatMap(([key, value]): [string, string][] =>
-          key === '_rsc' || value === undefined ? [] : (Array.isArray(value) ? value : [value]).map(item => [key, item])
+          key === '_rsc' || (key === 'lang' && locale !== defaultLocale) || value === undefined
+            ? [] : (Array.isArray(value) ? value : [value]).map(item => [key, item])
         )).toString()}
         externalDiscovery={<ExternalSkillResults query={query} locale={locale} />}
         skills={skills}
