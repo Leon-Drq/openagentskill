@@ -3,11 +3,11 @@ import Link from 'next/link'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { GitHubOwnerAvatar } from './github-owner-avatar'
 import { EditorialLink } from './editorial-link'
-import { ShowcasePriceBadge } from './showcase-pricing'
+import { ShowcaseTags } from './showcase-tags'
 import { galleryCopy } from '@/lib/i18n/gallery-copy'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import type { Locale } from '@/lib/i18n/config'
-import { FEATURED_SHOWCASE_SLUGS, SHOWCASE_CATEGORIES, getShowcaseCase, getShowcaseSkill, getShowcaseCreator, getShowcaseCreatorHref, getShowcaseImageSrc, getShowcaseEvidenceLabel, getShowcaseAccessLabel, getShowcaseTags, localizeShowcase } from '@/lib/showcase'
+import { FEATURED_SHOWCASE_SLUGS, SHOWCASE_CATEGORIES, getShowcaseCase, getShowcaseSkill, getShowcaseCreator, getShowcaseCreatorHref, getShowcaseImageSrc, getShowcaseEvidenceLabel, getShowcaseAccessLabel, localizeShowcase } from '@/lib/showcase'
 
 export function HomeShowcaseStatic({ locale }: { locale: Locale }) {
   const href = (path: string) => getLocalizedNavigationHref(path, locale)
@@ -36,8 +36,7 @@ export function HomeShowcaseStatic({ locale }: { locale: Locale }) {
               <div className="mt-2 flex items-start justify-between gap-3"><h3 className="text-base font-semibold leading-snug tracking-tight text-[#1d1b18] group-hover:text-[#006b4f]">{localizeShowcase(item.title, locale)}</h3><ArrowUpRight className="mt-0.5 h-4 w-4 shrink-0 text-[#6d675e]" /></div>
               <p className="mt-2 line-clamp-2 min-h-[2.875rem] text-sm leading-relaxed text-[#6d675e]">{localizeShowcase(item.description, locale)}</p></div>
           </EditorialLink>
-          {getShowcaseTags(item).map(tag => <Link key={tag.id} prefetch={false} href={href(`/showcase?tag=${tag.id}`)} className="mt-3 inline-flex min-h-9 items-center rounded-full border border-[#e4e0d8] px-3 text-xs text-[#006b4f]">{localizeShowcase(tag.label, locale)}</Link>)}
-          <ShowcasePriceBadge slug={item.skillSlug} locale={locale} className="mt-3" />
+          <ShowcaseTags item={item} locale={locale} />
           <div className="mt-4 flex min-w-0 items-center justify-between gap-3 border-t border-[#e4e0d8] pt-3">
             <EditorialLink eventName="showcase_creator_open" eventData={{ creator_id: creator.id, role: t('Skill by', '技能作者') }} href={creatorPath.startsWith('/') ? href(creatorPath) : creatorPath} target={creatorPath.startsWith('/') ? undefined : '_blank'} rel={creatorPath.startsWith('/') ? undefined : 'noopener noreferrer'} className="inline-flex min-h-11 min-w-0 items-center gap-2.5 hover:text-[#006b4f]">
               <GitHubOwnerAvatar owner={creator.githubUsername} size="sm" linked={false} /><span><span className="block text-[10px] text-[#6d675e]">{t('Skill by', '技能作者')}</span><span className="text-xs font-medium">{creator.name} ↗</span></span>

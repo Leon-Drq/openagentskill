@@ -2,6 +2,29 @@
 
 ## Gallery discovery
 
+### Free-first rollout — 2026-09-28
+
+All 16 skills currently represented in Gallery have now had their official source
+installation instructions checked: they provide the source edition without a
+purchase. The shared offer register includes the source URLs. This covers all
+177 current Gallery cases; it is not a claim that every historic registry entry
+has been individually checked. No repository code was executed. Required model,
+API and compute costs are independent from acquiring the source files.
+
+Price and use-case tags now share one compact component (32px minimum height,
+6px radius, 11px type, 8px gap), including home previews and work detail pages.
+Paid options are hidden until actual commercial offers exist. Old paid-filter
+URLs keep a meaningful empty state and reset rather than changing canonical URLs.
+
+New web submissions must explicitly attest `freeAcquisition: true`; the checkbox
+starts unchecked and resets when the repository changes. The declaration is
+stored in the existing private `validation_result.acquisition_declaration` JSON
+with its pinned revision and `verified: false`. It does not become a reviewed
+offer, free badge, license, approval or safety score automatically. Legacy API /
+agent clients can omit the field during migration; they remain unconfirmed.
+Explicit false is rejected for new intake; existing receipt retries still work.
+No schema migration, extra model call, backfill or change to review gates is made.
+
 Gallery uses the same reviewed prices as Skills. It exposes only Free and Paid
 filters plus the unfiltered All state. Free-plus-paid editions belong to Paid,
 with an explicit disclosure. Unconfirmed or expired entries have no price badge

@@ -50,6 +50,7 @@ export default async function ShowcasePage({ searchParams }: Props) {
     cases: (params.sort === 'top' ? cases : pagination.items).map(getShowcaseCardData),
     total: SHOWCASE_CASES.length,
     priceTotal: priceCases.length,
+    hasPaid: SHOWCASE_CASES.some(item => matchesShowcasePrice(item.skillSlug, 'paid')),
     totalMatches: cases.length,
     pagination: { page: pagination.page, pageCount: pagination.pageCount, offset: pagination.offset, total: pagination.total },
     workflowCount: new Set(SHOWCASE_CASES.map(item => item.skillSlug)).size,

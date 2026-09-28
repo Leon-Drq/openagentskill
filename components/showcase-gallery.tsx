@@ -25,6 +25,7 @@ export type GalleryData = {
   cases: ShowcaseCardData[]
   total: number
   priceTotal: number
+  hasPaid: boolean
   totalMatches: number
   pagination: { page: number; pageCount: number; offset: number; total: number }
   workflowCount: number
@@ -138,7 +139,7 @@ function GalleryContent({ data }: { data: GalleryData }) {
             <NativeSelect value={pricing} onChange={event => filter(category, query, creatorId, sort, tagId, normalizeShowcasePrice(event.target.value))} aria-label={priceCopy.price} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
               <option value="all">{priceCopy.all}</option>
               <option value="free">{priceCopy.free}</option>
-              <option value="paid">{priceCopy.paid}</option>
+              {(data.hasPaid || pricing === 'paid') && <option value="paid">{priceCopy.paid}</option>}
             </NativeSelect>
             <NativeSelect value={tagId} onChange={(event) => filter(category, query, creatorId, sort, event.target.value)} aria-label={galleryCopy(locale, "Filter by use case", "按用途筛选")} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
               <option value="">{galleryCopy(locale, "All use cases", "全部用途")}</option>

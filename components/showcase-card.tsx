@@ -1,7 +1,7 @@
 'use client'
 
 import { galleryCopy } from '@/lib/i18n/gallery-copy'
-import { ShowcasePriceBadge } from '@/components/showcase-pricing'
+import { ShowcaseTags } from '@/components/showcase-tags'
 
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,7 +12,7 @@ import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { ShowcaseCreatorCredit } from '@/components/showcase-creator'
 import { ShowcaseActions } from '@/components/showcase-engagement'
-import { getShowcaseAccessLabel, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, getShowcaseTags, localizeShowcase, SHOWCASE_CATEGORIES, type ShowcaseCardData } from '@/lib/showcase-shared'
+import { getShowcaseAccessLabel, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, localizeShowcase, SHOWCASE_CATEGORIES, type ShowcaseCardData } from '@/lib/showcase-shared'
 
 export function ShowcaseCard({ item, placement = 'gallery', priority = false }: {
   item: ShowcaseCardData
@@ -60,10 +60,7 @@ export function ShowcaseCard({ item, placement = 'gallery', priority = false }: 
           <p className="mt-2 line-clamp-2 min-h-[2.875rem] text-sm leading-relaxed text-[#6d675e]">{localizeShowcase(item.description, locale)}</p>
         </div>
       </Link>
-      <div className="mt-3 flex min-h-9 flex-wrap items-start gap-2" data-showcase-tags>
-        <ShowcasePriceBadge slug={item.skillSlug} locale={locale} />
-        {getShowcaseTags(item).map((tag) => <Link key={tag.id} prefetch={false} href={getLocalizedNavigationHref(`/showcase?tag=${tag.id}`, locale)} className="inline-flex min-h-9 max-w-full items-center rounded-full border border-[#e4e0d8] px-3 py-1 text-xs text-[#006b4f] [overflow-wrap:anywhere] hover:border-[#006b4f]">{localizeShowcase(tag.label, locale)}</Link>)}
-      </div>
+      <ShowcaseTags item={item} locale={locale} />
       <div className="mt-auto pt-4" data-showcase-footer>
         <div className="flex min-w-0 items-center justify-between gap-3 border-t border-[#e4e0d8] pt-3">
           <ShowcaseCreatorCredit creatorId={skill.creatorId} label={galleryCopy(locale, "Skill by", "技能作者")} />

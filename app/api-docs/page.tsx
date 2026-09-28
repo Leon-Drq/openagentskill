@@ -939,7 +939,7 @@ This skill enables agents to perform comprehensive web research...`}</code>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
                   <code className="font-mono bg-muted px-2 py-1 w-fit shrink-0">{'submissionSource'}</code>
-                  <span className="text-secondary">{'Set to "agent" for automated submissions (optional, default: "web")'}</span>
+                  <span className="text-secondary">{'Set to "agent" for automated submissions (optional, default: "web"). New web submissions require freeAcquisition: true. Legacy api/agent clients may omit it; their price remains unconfirmed. Explicit false is rejected while paid intake is closed. Never assert true without checking the complete skill files are freely obtainable; runtime/API fees are separate. This declaration does not bypass review.'}</span>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
                   <code className="font-mono bg-muted px-2 py-1 w-fit shrink-0">{'submittedByAgent'}</code>

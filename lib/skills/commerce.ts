@@ -26,7 +26,25 @@ export function safeCommerceUrl(value: string | undefined) {
   } catch { return undefined }
 }
 
+// Official acquisition instructions checked without running repository code.
+// This records the freely available source edition, not free model/API usage.
+const freeSource = (sourceUrl: string, runtime: SkillOffer['runtime'] = 'model'): SkillOffer => ({
+  type: 'free', billing: 'free', runtime, checkedAt: '2026-09-28', sourceUrl,
+})
+
 export const reviewedSkillOffers: Readonly<Record<string, SkillOffer>> = {
+  'liamgvchi-gc-minimal-zine-poster-v0-3': freeSource('https://github.com/LiamGvchi/gc-minimal-zine-poster'),
+  'yanliudesign-mono-color-skill': freeSource('https://github.com/yanliudesign/mono-color-skill#install'),
+  'design-taste-frontend': freeSource('https://github.com/Leonxlnx/taste-skill#installing'),
+  'op7418-guizang-ppt-skill': freeSource('https://github.com/op7418/guizang-ppt-skill'),
+  'vox-director': freeSource('https://github.com/alisa0808/vox-director'),
+  'nexu-io-open-design': freeSource('https://github.com/nexu-io/open-design#quick-start'),
+  ...Object.fromEntries(['infographic', 'comic', 'cover-image', 'article-illustrator', 'xhs-images', 'slide-deck'].map(name => [
+    `jimliu-baoyu-skills-baoyu-${name}`, freeSource(`https://github.com/JimLiu/baoyu-skills/tree/main/skills/baoyu-${name}`),
+  ])),
+  'zarazhangrui-frontend-slides': freeSource('https://github.com/zarazhangrui/frontend-slides#installation'),
+  'alchaincyf-huashu-design-1d891f8f': freeSource('https://github.com/alchaincyf/huashu-design'),
+  's1dashu-ip-as-logo-skill': freeSource('https://github.com/s1dashu/ip-as-logo-skill#install'),
   'anthropic-frontend-design': {
     type: 'free', billing: 'free', runtime: 'model', checkedAt: '2026-09-28',
     sourceUrl: 'https://github.com/anthropics/skills/tree/main/skills/frontend-design',
@@ -72,6 +90,11 @@ export function getSkillCommerce(slug: string, now = Date.now()) {
   }
 }
 export type SkillCommerce = ReturnType<typeof getSkillCommerce>
+
+/** Keep empty commercial categories out of navigation, not out of old URLs. */
+export function hasCommercialOffers(now = Date.now()) {
+  return Object.values(reviewedSkillOffers).some(offer => offer.type !== 'free' && validSkillOffer(offer, now))
+}
 
 /** Apply this bounded slug set in SQL before sorting, LIMIT and counting. */
 export function commerceFilterSlugs(filter: PriceFilter) {

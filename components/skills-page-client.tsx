@@ -2,7 +2,7 @@
 
 import { NativeSelect } from '@/components/ui/native-select'
 import { commerceCopy } from '@/lib/i18n/commerce-copy'
-import { acquisitionTypes, type PriceFilter, type SkillCommerce } from '@/lib/skills/commerce'
+import { acquisitionTypes, hasCommercialOffers, type PriceFilter, type SkillCommerce } from '@/lib/skills/commerce'
 import { SkillPrice } from '@/components/skill-commerce'
 
 import Link from 'next/link'
@@ -306,7 +306,7 @@ export function SkillsPageClient(props: Props) {
               <span className="shrink-0">{prices.pricing}</span>
               <NativeSelect aria-label={prices.pricing} value={props.pricing} onChange={e => navigate({ pricing: e.target.value })} className="w-48 max-w-full bg-transparent text-sm">
                 <option value="all">{prices.all}</option>
-                {acquisitionTypes.map(type => <option key={type} value={type}>{prices[type]}</option>)}
+                {acquisitionTypes.filter(type => !['paid', 'freemium'].includes(type) || hasCommercialOffers() || props.pricing === type).map(type => <option key={type} value={type}>{prices[type]}</option>)}
               </NativeSelect>
             </label>
             <label className="flex min-w-0 max-w-full items-center gap-3 text-xs text-secondary">

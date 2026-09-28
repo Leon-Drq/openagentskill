@@ -19,7 +19,8 @@ import { NativeSelect } from '@/components/ui/native-select'
 import { ShowcaseCostDisclosure } from '@/components/showcase-pricing'
 import { getShowcaseTaskUrl, normalizeShowcaseAgentTarget, renderShowcaseTaskMarkdown, type ShowcaseAgentTarget } from '@/lib/showcase-task'
 import { trackAnalyticsEvent } from '@/lib/analytics'
-import { getShowcaseAccessLabel, getShowcaseCreator, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, getShowcaseTags, localizeShowcase, SHOWCASE_CATEGORIES, type ShowcaseCase, type ShowcaseCardData } from '@/lib/showcase-shared'
+import { getShowcaseAccessLabel, getShowcaseCreator, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, localizeShowcase, SHOWCASE_CATEGORIES, type ShowcaseCase, type ShowcaseCardData } from '@/lib/showcase-shared'
+import { ShowcaseTags } from '@/components/showcase-tags'
 
 export function ShowcaseDetail({ item, related }: { item: ShowcaseCase; related: ShowcaseCardData[] }) {
   return <ShowcaseEngagementProvider><DetailContent key={item.slug} item={item} related={related} /></ShowcaseEngagementProvider>
@@ -97,7 +98,7 @@ function DetailContent({ item, related }: { item: ShowcaseCase; related: Showcas
             <Link href={getLocalizedNavigationHref(`/skills/${item.skillSlug}`, locale)} className="inline-flex items-center gap-1.5 rounded border border-[#e4e0d8] px-3 py-2 text-xs text-[#006b4f]">{getShowcaseAccessLabel(skill, locale)} · {skill.sourceLicense}<ArrowUpRight className="h-3 w-3" aria-hidden="true" /></Link>
           </div>
           <ShowcaseActions item={item} />
-          {getShowcaseTags(item).map((tag) => <Link key={tag.id} prefetch={false} href={getLocalizedNavigationHref(`/showcase?tag=${tag.id}`, locale)} className="mt-3 inline-flex min-h-11 items-center rounded-full border border-[#e4e0d8] px-3 text-xs text-[#006b4f] hover:border-[#006b4f]">{localizeShowcase(tag.label, locale)}</Link>)}
+          <ShowcaseTags item={item} locale={locale} />
           <a href="#make-your-own" className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md bg-[#006b4f] px-4 text-sm font-semibold text-white hover:bg-[#005640] lg:hidden">
             {galleryCopy(locale, "Copy task & get started", "复制任务并开始使用")}<ArrowRight className="h-4 w-4" aria-hidden="true" />
           </a>

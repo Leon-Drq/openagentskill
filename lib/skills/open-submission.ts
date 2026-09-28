@@ -40,6 +40,7 @@ export interface OpenSubmissionInput {
   packageComplete?: boolean
   receiptToken?: string
   authenticatedUserId?: string | null
+  freeAcquisition?: boolean
 }
 
 export interface OpenSubmissionReceipt {
@@ -237,6 +238,10 @@ export async function createOpenSubmission(input: OpenSubmissionInput): Promise<
       repository_readme: input.repository.hasReadme,
       static_analysis: staticAnalysis,
       publisher_identity: 'declared_unverified',
+      acquisition_declaration: input.freeAcquisition === true ? {
+        type: 'free', evidence: 'submitter_declared', verified: false,
+        declared_at: new Date().toISOString(), source_ref: input.skill.ref,
+      } : null,
       repository_snapshot: input.repository,
       repository_owner: input.repository.owner,
       submitter: { user_id: input.authenticatedUserId || null, identity_source: input.authenticatedUserId ? 'authenticated' : 'anonymous', handles: 'self_declared', channel: input.submissionSource },

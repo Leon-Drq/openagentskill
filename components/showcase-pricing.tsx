@@ -6,10 +6,12 @@ import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { getSkillCommerce } from '@/lib/skills/commerce'
 import { getShowcasePrice } from '@/lib/showcase-pricing'
 
+export const showcaseTagClass = 'inline-flex min-h-8 max-w-full items-center rounded-[6px] border border-[#e4e0d8] px-2.5 py-1 text-[11px] font-medium leading-5 [overflow-wrap:anywhere]'
+
 export function ShowcasePriceBadge({ slug, locale, className = '' }: { slug: string; locale: Locale; className?: string }) {
   const price = getShowcasePrice(slug)
   if (!price) return null
-  return <span data-showcase-price={price} className={`inline-flex max-w-full items-center rounded border border-[#e4e0d8] px-2 py-1 text-[10px] text-[#006b4f] ${className}`}>{galleryPricingCopy(locale)[price]}</span>
+  return <span data-showcase-price={price} title={galleryPricingCopy(locale).note} className={`${showcaseTagClass} bg-[#eaf0e9] text-[#006b4f] ${className}`}>{galleryPricingCopy(locale)[price]}</span>
 }
 
 export function ShowcaseCostDisclosure({ slug, locale }: { slug: string; locale: Locale }) {
