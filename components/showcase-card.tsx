@@ -1,6 +1,7 @@
 'use client'
 
 import { galleryCopy } from '@/lib/i18n/gallery-copy'
+import { ShowcasePriceBadge } from '@/components/showcase-pricing'
 
 import Image from 'next/image'
 import Link from 'next/link'
@@ -60,6 +61,7 @@ export function ShowcaseCard({ item, placement = 'gallery', priority = false }: 
         </div>
       </Link>
       <div className="mt-3 flex min-h-9 flex-wrap items-start gap-2" data-showcase-tags>
+        <ShowcasePriceBadge slug={item.skillSlug} locale={locale} />
         {getShowcaseTags(item).map((tag) => <Link key={tag.id} prefetch={false} href={getLocalizedNavigationHref(`/showcase?tag=${tag.id}`, locale)} className="inline-flex min-h-9 max-w-full items-center rounded-full border border-[#e4e0d8] px-3 py-1 text-xs text-[#006b4f] [overflow-wrap:anywhere] hover:border-[#006b4f]">{localizeShowcase(tag.label, locale)}</Link>)}
       </div>
       <div className="mt-auto pt-4" data-showcase-footer>

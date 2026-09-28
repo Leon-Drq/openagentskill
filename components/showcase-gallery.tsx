@@ -1,6 +1,8 @@
 'use client'
 
 import { NativeSelect } from '@/components/ui/native-select'
+import { normalizeShowcasePrice, type ShowcasePriceFilter } from '@/lib/showcase-pricing'
+import { galleryPricingCopy } from '@/lib/i18n/gallery-pricing-copy'
 
 import { galleryCopy, formatGalleryNumber } from '@/lib/i18n/gallery-copy'
 
@@ -22,6 +24,7 @@ import { getShowcaseCreator, getShowcasePage, localizeShowcase, SHOWCASE_CATEGOR
 export type GalleryData = {
   cases: ShowcaseCardData[]
   total: number
+  priceTotal: number
   totalMatches: number
   pagination: { page: number; pageCount: number; offset: number; total: number }
   workflowCount: number
@@ -37,6 +40,8 @@ function GalleryContent({ data }: { data: GalleryData }) {
   const { locale } = useI18n()
   const router = useRouter()
   const params = useSearchParams()
+  const pricing = normalizeShowcasePrice(params.get('pricing'))
+  const priceCopy = galleryPricingCopy(locale)
   const rawCategory = params.get('category') || 'all'
   const category = SHOWCASE_CATEGORIES.some((entry) => entry.id === rawCategory) ? rawCategory : 'all'
   const query = params.get('q') || ''
@@ -58,9 +63,11 @@ function GalleryContent({ data }: { data: GalleryData }) {
     trackAnalyticsEvent('showcase_view', { placement: 'gallery' })
   }, [])
 
-  function filter(nextCategory: string, nextQuery: string, nextCreator = creatorId, nextSort = sort, nextTag = tagId) {
+  function filter(nextCategory: string, nextQuery: string, nextCreator = creatorId, nextSort = sort, nextTag = tagId, nextPrice: ShowcasePriceFilter = pricing) {
     const next = new URLSearchParams(params.toString())
     next.delete('page')
+    if (nextPrice === 'all') next.delete('pricing')
+    else next.set('pricing', nextPrice)
     if (nextTag) next.set('tag', nextTag)
     else next.delete('tag')
     if (nextCategory === 'all') next.delete('category')
@@ -104,11 +111,12 @@ function GalleryContent({ data }: { data: GalleryData }) {
 
         <section className="mx-auto max-w-6xl px-6 pb-20 pt-8" aria-label={galleryCopy(locale, "Browse examples", "浏览作品")}>
           <h2 className="sr-only">{galleryCopy(locale, "Browse examples", "浏览作品")}</h2>
+          {pricing !== 'all' && <p className="mb-5 text-xs leading-relaxed text-[#6d675e]">{priceCopy.note}</p>}
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-wrap items-center gap-2" aria-label={galleryCopy(locale, "Output format", "作品形式")}>
               <span className="mr-1 text-xs text-[#6d675e]">{galleryCopy(locale, "Format", "形式")}</span>
               {[{ id: 'all', label: { en: 'All work', zh: '全部作品' } }, ...SHOWCASE_CATEGORIES].map((entry) => {
-                const count = entry.id === 'all' ? data.total : data.categoryCounts[entry.id] || 0
+                const count = entry.id === 'all' ? data.priceTotal : data.categoryCounts[entry.id] || 0
                 return <button key={entry.id} type="button" aria-pressed={category === entry.id} onClick={() => filter(entry.id, query)}
                   className={`inline-flex min-h-11 items-center gap-2 rounded-md border px-3 text-sm transition-colors ${category === entry.id ? 'border-[#1d1b18] bg-[#1d1b18] text-[#fbfaf6]' : 'border-[#e4e0d8] bg-transparent text-[#6d675e] hover:border-[#6d675e]'}`}>
                   {localizeShowcase(entry.label, locale)}<span className="font-mono text-[10px] opacity-70">{count}</span>
@@ -124,9 +132,14 @@ function GalleryContent({ data }: { data: GalleryData }) {
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">
               <p aria-live="polite" role="status" className="text-xs text-[#6d675e]">{galleryCopy(locale, '{count} examples', '{count} 个案例', { count: formatGalleryNumber(data.totalMatches, locale) })}{cases.length > 0 && ` · ${galleryCopy(locale, 'Showing {start}–{end}', '当前 {start}–{end}', { start: pagination.offset + 1, end: pagination.offset + pagination.items.length })}`}{query && ` · “${query}”`}</p>
-              {(query || category !== 'all' || creatorId || tagId) && <button type="button" onClick={() => filter('all', '', '', sort, '')} className="inline-flex min-h-11 items-center gap-1 text-xs text-[#006b4f]"><X className="h-3 w-3" aria-hidden="true" />{galleryCopy(locale, "Clear filters", "清除筛选")}</button>}
+              {(query || category !== 'all' || creatorId || tagId || pricing !== 'all') && <button type="button" onClick={() => filter('all', '', '', sort, '', 'all')} className="inline-flex min-h-11 items-center gap-1 text-xs text-[#006b4f]"><X className="h-3 w-3" aria-hidden="true" />{galleryCopy(locale, "Clear filters", "清除筛选")}</button>}
             </div>
             <div className="grid w-full min-w-0 gap-2 sm:flex sm:w-auto sm:max-w-full sm:flex-wrap">
+            <NativeSelect value={pricing} onChange={event => filter(category, query, creatorId, sort, tagId, normalizeShowcasePrice(event.target.value))} aria-label={priceCopy.price} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
+              <option value="all">{priceCopy.all}</option>
+              <option value="free">{priceCopy.free}</option>
+              <option value="paid">{priceCopy.paid}</option>
+            </NativeSelect>
             <NativeSelect value={tagId} onChange={(event) => filter(category, query, creatorId, sort, event.target.value)} aria-label={galleryCopy(locale, "Filter by use case", "按用途筛选")} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
               <option value="">{galleryCopy(locale, "All use cases", "全部用途")}</option>
               {SHOWCASE_TAGS.map((tag) => { const count = data.tagCounts[tag.id] || 0; return <option key={tag.id} value={tag.id} disabled={!count && tagId !== tag.id}>{localizeShowcase(tag.label, locale)} · {count}</option> })}
@@ -146,7 +159,7 @@ function GalleryContent({ data }: { data: GalleryData }) {
           {cases.length ? <div className="mt-5 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">{pagination.items.map((item, index) => <ShowcaseCard key={item.slug} item={item} priority={index < 3} />)}</div> : <div className="py-24 text-center">
             <h2 className="font-display text-3xl">{galleryCopy(locale, "No examples just yet.", "还没有匹配的作品")}</h2>
             <p className="mt-3 text-sm text-[#6d675e]">{galleryCopy(locale, "Try a different search, or clear the filters to see all work.", "试试其他关键词，或清除筛选查看全部作品。")}</p>
-            <button type="button" onClick={() => filter('all', '', '', sort, '')} className="mt-6 rounded-md bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white">{galleryCopy(locale, "See all work", "查看全部作品")}</button>
+            <button type="button" onClick={() => filter('all', '', '', sort, '', 'all')} className="mt-6 rounded-md bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white">{galleryCopy(locale, "See all work", "查看全部作品")}</button>
           </div>}
           {pagination.pageCount > 1 && <nav aria-label={galleryCopy(locale, "Gallery pagination", "作品分页")} className="mt-12 flex flex-wrap items-center justify-center gap-2">
             {pagination.page > 1 && <Link prefetch={false} href={pageHref(pagination.page - 1)} className="inline-flex min-h-11 items-center rounded-md border border-[#e4e0d8] px-4 text-sm">{galleryCopy(locale, "Previous", "上一页")}</Link>}

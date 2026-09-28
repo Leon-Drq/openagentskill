@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { normalizeShowcasePrice, matchesShowcasePrice } from '@/lib/showcase-pricing'
 import { getShowcaseCardData } from '@/lib/showcase-shared'
 import { ShowcaseGallery } from '@/components/showcase-gallery'
 import { I18nProvider } from '@/lib/i18n/context'
@@ -16,7 +17,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const zh = locale === 'zh'
   const rawPage = Array.isArray(params.page) ? params.page[0] : params.page
   const { page } = getShowcasePage(SHOWCASE_CASES, rawPage)
-  const filtered = Boolean(params.q || params.category || params.creator || params.lang || params.sort || params.tag)
+  const filtered = Boolean(params.q || params.category || params.creator || params.lang || params.sort || params.tag || params.pricing)
   const canonical = `${BASE_URL}/showcase${!filtered && page > 1 ? `?page=${page}` : ''}`
   const pageLabel = page > 1 ? ` — ${galleryCopy(locale, 'Page {page}', '第 {page} 页', { page })}` : ''
   const title = zh ? `Skill Gallery — 技能作品集与作者${pageLabel} | OpenAgentSkill` : locale === 'en' ? `Skill Gallery — Agent Skills, Creative Work & Creators${pageLabel} | OpenAgentSkill` : `Skill Gallery — ${getShowcaseNavLabel(locale)}${pageLabel} | OpenAgentSkill`
@@ -37,7 +38,9 @@ export default async function ShowcasePage({ searchParams }: Props) {
   const creatorId = SHOWCASE_SKILLS.some((skill) => skill.creatorId === rawCreator) ? rawCreator : ''
   const rawTag = Array.isArray(params.tag) ? params.tag[0] : params.tag
   const tagId = SHOWCASE_TAGS.find((tag) => tag.id === rawTag)?.id || ''
-  const cases = filterShowcaseCases(category, query, creatorId, tagId)
+  const pricing = normalizeShowcasePrice(Array.isArray(params.pricing) ? params.pricing[0] : params.pricing)
+  const priceCases = SHOWCASE_CASES.filter(item => matchesShowcasePrice(item.skillSlug, pricing))
+  const cases = filterShowcaseCases(category, query, creatorId, tagId, pricing)
   const pagination = getShowcasePage(cases, Array.isArray(params.page) ? params.page[0] : params.page)
   const schema = {
     '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Skill Gallery', inLanguage: locale, url: `${BASE_URL}/showcase`,
@@ -46,11 +49,12 @@ export default async function ShowcasePage({ searchParams }: Props) {
   const data = {
     cases: (params.sort === 'top' ? cases : pagination.items).map(getShowcaseCardData),
     total: SHOWCASE_CASES.length,
+    priceTotal: priceCases.length,
     totalMatches: cases.length,
     pagination: { page: pagination.page, pageCount: pagination.pageCount, offset: pagination.offset, total: pagination.total },
     workflowCount: new Set(SHOWCASE_CASES.map(item => item.skillSlug)).size,
-    categoryCounts: Object.fromEntries(SHOWCASE_CATEGORIES.map(entry => [entry.id, SHOWCASE_CASES.filter(item => item.category === entry.id).length])),
-    tagCounts: Object.fromEntries(SHOWCASE_TAGS.map(tag => [tag.id, filterShowcaseCases(category, query, creatorId, tag.id).length])),
+    categoryCounts: Object.fromEntries(SHOWCASE_CATEGORIES.map(entry => [entry.id, priceCases.filter(item => item.category === entry.id).length])),
+    tagCounts: Object.fromEntries(SHOWCASE_TAGS.map(tag => [tag.id, filterShowcaseCases(category, query, creatorId, tag.id, pricing).length])),
   }
   return <I18nProvider initialLocale={locale}><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} /><ShowcaseGallery data={data} /></I18nProvider>
 }

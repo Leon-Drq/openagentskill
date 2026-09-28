@@ -16,6 +16,7 @@ import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { copyText } from '@/lib/copy-text'
 import { NativeSelect } from '@/components/ui/native-select'
+import { ShowcaseCostDisclosure } from '@/components/showcase-pricing'
 import { getShowcaseTaskUrl, normalizeShowcaseAgentTarget, renderShowcaseTaskMarkdown, type ShowcaseAgentTarget } from '@/lib/showcase-task'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { getShowcaseAccessLabel, getShowcaseCreator, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, getShowcaseTags, localizeShowcase, SHOWCASE_CATEGORIES, type ShowcaseCase, type ShowcaseCardData } from '@/lib/showcase-shared'
@@ -149,6 +150,7 @@ function DetailContent({ item, related }: { item: ShowcaseCase; related: Showcas
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#006b4f]">{galleryCopy(locale, "Your starting point", "从这里开始")}</p>
               <h2 className="mt-3 font-display text-3xl font-normal">{galleryCopy(locale, "Make it yours.", "做出你的版本。")}</h2>
               <p className="mt-3 text-sm leading-relaxed text-[#6d675e]">{galleryCopy(locale, "Copy the task, add your own subject and assets, then hand it to your agent.", "复制任务，替换自己的主题与素材，再交给你的 Agent。")}</p>
+              <ShowcaseCostDisclosure slug={item.skillSlug} locale={locale} />
               <div className="mb-2 mt-6 flex items-center justify-between gap-3">
                 <h3 className="text-xs font-semibold">{galleryCopy(locale, "01 / Copy the task", "01 / 复制任务")}</h3>
                 <span className="rounded bg-[#f2f0e9] px-2 py-1 text-[10px] text-[#6d675e]">{item.promptKind === 'original' ? (galleryCopy(locale, "Original prompt", "实际使用原文")) : (galleryCopy(locale, "Suggested task", "建议任务"))}</span>

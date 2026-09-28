@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import './test-showcase-pricing.mjs'
 import { access, readFile, stat } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'

@@ -1,4 +1,6 @@
 import curatedEntries from './showcase-curation.json' with { type: 'json' }
+// @ts-expect-error Direct Node regression tests require the TypeScript extension.
+import { matchesShowcasePrice, type ShowcasePriceFilter } from './showcase-pricing.ts'
 import automaticEntries from './showcase-auto.json' with { type: 'json' }
 import curatedSources from './showcase-sources.json' with { type: 'json' }
 import curatedMedia from './showcase-media.json' with { type: 'json' }
@@ -244,9 +246,10 @@ export function isMissingShowcasePath(pathname: string) {
   return pathname.startsWith('/showcase/') && !casePaths.has(pathname) && !assetPaths.has(pathname)
 }
 
-export function filterShowcaseCases(category: string, query: string, skillCreatorId = '', tagId = '') {
+export function filterShowcaseCases(category: string, query: string, skillCreatorId = '', tagId = '', pricing: ShowcasePriceFilter = 'all') {
   const terms = query.normalize('NFKC').trim().toLowerCase().split(/\s+/).filter(Boolean)
   return SHOWCASE_CASES.filter((item) => {
+    if (!matchesShowcasePrice(item.skillSlug, pricing)) return false
     const skill = getShowcaseSkill(item.skillSlug)
     const skillCreator = getShowcaseCreator(skill.creatorId)
     const artworkCreator = getShowcaseCreator(item.creatorId)
