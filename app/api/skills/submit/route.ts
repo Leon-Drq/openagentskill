@@ -32,6 +32,7 @@ const SkillSubmitRequestSchema = z.object({
   submissionSource: z.enum(['web', 'api', 'agent']).default('web'),
   submittedByAgent: z.string().trim().min(1).max(200).optional(),
   receiptToken: z.string().regex(/^[a-f0-9]{48}$/).optional(),
+  freeAcquisition: z.boolean().optional(),
 })
 
 function accepted(receipt: Awaited<ReturnType<typeof createOpenSubmission>>) {
@@ -70,6 +71,11 @@ export async function POST(request: NextRequest) {
     if (body.receiptToken) {
       const previous = await findSubmissionReceipt(body.receiptToken, `${reference.owner}/${reference.repo}`, body.skillPath)
       if (previous) return accepted(previous)
+    }
+    // New web intake is free-first. Legacy agent/API clients without an
+    // attestation remain unconfirmed, never silently labelled free.
+    if (body.freeAcquisition === false || (body.submissionSource === 'web' && body.freeAcquisition !== true)) {
+      return NextResponse.json({ code: 'FREE_ACQUISITION_REQUIRED', error: 'Confirm that the complete skill files are available without a purchase. Model/API fees are separate.' }, { status: 400 })
     }
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || 'unknown'
     const fingerprint = buildRequestFingerprint(ip, request.headers.get('user-agent') || 'unknown')
@@ -116,6 +122,7 @@ export async function POST(request: NextRequest) {
       codeFiles: [{ path: skill.path, content: skill.document }],
       receiptToken: body.receiptToken,
       authenticatedUserId,
+      freeAcquisition: body.freeAcquisition,
     }
     const receipt = await createOpenSubmission(submissionInput)
 

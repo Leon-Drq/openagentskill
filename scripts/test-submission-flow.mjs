@@ -91,7 +91,7 @@ const { processSubmissionJob, runSubmissionQueue } = await import('../lib/skills
 const { POST } = await import('../app/api/skills/submit/route.ts')
 const { GET } = await import('../app/api/skills/submissions/[id]/route.ts')
 const { NextRequest } = await import('next/server')
-const input = { repository: repo, skill, submissionSource: 'web', requestFingerprint: 'test', codeFiles: [], receiptToken: 'b'.repeat(48), makerGithub: 'curator' }
+const input = { repository: repo, skill, submissionSource: 'web', requestFingerprint: 'test', codeFiles: [], receiptToken: 'b'.repeat(48), makerGithub: 'curator', freeAcquisition: true }
 for (const [value, provider, expected] of [['https://github.com/octocat','github','octocat'], ['@maker','x','maker'], ['https://x.com/maker?s=20','x','maker'], ['twitter.com/maker','x','maker']]) assert.equal(contract.normalizeSocialHandle(value, provider), expected)
 for (const [value, provider] of [['https://evil.com/maker','github'], ['https://github.com/a/b','github'], ['https://x.com/maker','github'], ['a b','x']]) assert.equal(contract.validSocialHandle(contract.normalizeSocialHandle(value, provider), provider), false)
 assert.equal(contract.validSocialHandle('', 'github'), true)
@@ -101,6 +101,9 @@ assert.equal(rows.size, 1)
 assert.equal(rows.get(receipt.id).submitter_github, 'curator')
 assert.equal(rows.get(receipt.id).validation_result.repository_owner, 'fixture')
 assert.equal(rows.get(receipt.id).identity_verified, false)
+assert.equal(rows.get(receipt.id).validation_result.acquisition_declaration.type, 'free')
+assert.equal(rows.get(receipt.id).validation_result.acquisition_declaration.verified, false)
+assert.equal(rows.get(receipt.id).validation_result.acquisition_declaration.source_ref, commit)
 assert.deepEqual(await createOpenSubmission(input), receipt)
 assert.equal(rows.size, 1, 'Retry must reuse row and token')
 await assert.rejects(findSubmissionReceipt(input.receiptToken, 'different/repo', 'SKILL.md'))
@@ -179,6 +182,13 @@ assert.equal(invalid.status, 400)
 assert.equal((await invalid.json()).issues[0].path, 'makerGithub')
 const malformed = await POST(new NextRequest('http://localhost/api/skills/submit', { method:'POST', body:'{' }))
 assert.equal(malformed.status, 400)
+const beforeFreeGate = calls.length
+for (const freeAcquisition of [undefined, false]) {
+  const denied = await POST(new NextRequest('http://localhost/api/skills/submit', { method:'POST', body:JSON.stringify({ repository: repo.fullName, skillPath: skill.path, freeAcquisition }) }))
+  assert.equal(denied.status, 400)
+  assert.equal((await denied.json()).code, 'FREE_ACQUISITION_REQUIRED')
+}
+assert.equal(calls.length, beforeFreeGate, 'Missing confirmation cannot call GitHub, a model, or the database')
 rows.get(receipt.id).review_started_at = '2026-01-01T00:00:00Z'
 rows.get(receipt.id).updated_at = '2026-01-01T00:00:00Z'
 rows.get(receipt.id).status = 'processing'
@@ -200,5 +210,18 @@ const { POST: validate } = await import('../app/api/skills/validate/route.ts')
 const discovered = await validate(new NextRequest('http://localhost/api/skills/validate', {method:'POST',body:JSON.stringify({repository:repo.fullName})}))
 assert.equal(discovered.status, 200)
 assert.equal((await discovered.json()).skills[0].ref, commit, 'Validation results must identify an immutable revision')
+rows.clear()
+for (const body of [
+  { submissionSource: 'web', freeAcquisition: true },
+  { submissionSource: 'api' },
+  { submissionSource: 'agent' },
+]) {
+  const accepted = await POST(new NextRequest('http://localhost/api/skills/submit', {method:'POST',body:JSON.stringify({repository:repo.fullName,skillPath:skill.path,...body})}))
+  assert.equal(accepted.status, 202)
+  const saved = rows.get((await accepted.json()).submission.id)
+  assert.equal(saved.status, 'submitted', 'Declaration is not approval')
+  assert.equal(saved.validation_result.acquisition_declaration?.type ?? null, body.freeAcquisition ? 'free' : null)
+  assert.equal(saved.validation_result.acquisition_declaration?.verified ?? false, false)
+}
 assert.match(submissionIdForToken(receipt.token), /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-a[a-f0-9]{3}-[a-f0-9]{12}$/)
 console.log('Submission flow passed: idempotency, atomic claims, bounded retry, immutable source, unchanged review gates, attribution, authenticated receipts, safe sharing and API validation. No external requests.')

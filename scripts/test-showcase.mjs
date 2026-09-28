@@ -95,7 +95,7 @@ const gallerySource = await readFile(new URL('../components/showcase-gallery.tsx
 const cardLayoutSource = await readFile(new URL('../components/showcase-card.tsx', import.meta.url), 'utf8')
 assert.ok(cardLayoutSource.includes('group flex h-full min-w-0 flex-col'), 'Gallery cards must stretch to equal row height')
 assert.ok(cardLayoutSource.includes('min-h-11 line-clamp-2 break-words'), 'Reserve two title lines without overflowing long titles')
-assert.ok(cardLayoutSource.includes('mt-3 flex min-h-9 flex-wrap'), 'Keep a tag slot for untagged cards, and allow longer tags to wrap')
+assert.ok(cardLayoutSource.includes('<ShowcaseTags item={item} locale={locale}'), 'Use the shared tag family; tag slot and wrapping are tested in test-showcase-pricing')
 assert.ok(cardLayoutSource.includes('className="mt-auto pt-4" data-showcase-footer'), 'Anchor creator credit and actions together at the card bottom')
 assert.ok(gallerySource.includes('Filter by use case') && !gallerySource.includes('#video-skills'), 'Use-case controls must not mix in navigation to a skill directory')
 const logoSlugs = ['ip-mascot-directions', 'motion-logo-outro']

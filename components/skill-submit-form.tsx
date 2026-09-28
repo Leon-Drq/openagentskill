@@ -4,12 +4,13 @@ import { useEffect, useRef, useState } from 'react'
 import { NativeSelect } from '@/components/ui/native-select'
 import { submissionCopy } from '@/lib/i18n/submission-copy'
 import { submissionFlowCopy } from '@/lib/i18n/submission-flow-copy'
+import { freeIntakeCopy } from '@/lib/i18n/free-intake-copy'
 import { useI18n } from '@/lib/i18n/context'
 import { normalizeSocialHandle, validSocialHandle, SUBMISSION_BATCH_LIMIT } from '@/lib/skills/submission-contract'
 
 export interface SubmitFormData {
   repository: string; skillPath: string; sourceRef?: string; category?: string; tags: string[]
-  makerGithub?: string; makerX?: string; submissionSource: 'web'
+  makerGithub?: string; makerX?: string; submissionSource: 'web'; freeAcquisition: true
 }
 interface SkillCandidate { name: string; description: string; path: string; ref: string; sourceUrl: string }
 const DRAFT_KEY = 'openagentskill.submitDraft.v2'
@@ -31,6 +32,7 @@ export function SkillSubmitForm({ onSubmit }: { onSubmit: (data: SubmitFormData[
   const [pagination, setPagination] = useState({ hasMore: false, nextOffset: 0, truncated: false, total: 0 })
   const [validating, setValidating] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [freeAcquisition, setFreeAcquisition] = useState(false)
   const [error, setError] = useState('')
   const [fields, setFields] = useState<Record<string, string>>({})
   const [draftLoaded, setDraftLoaded] = useState(false)
@@ -61,6 +63,7 @@ export function SkillSubmitForm({ onSubmit }: { onSubmit: (data: SubmitFormData[
     generation.current++
     request.current?.abort()
     setRepository(value); setCandidates([]); setSelected([]); setError(''); setValidating(false)
+    setFreeAcquisition(false)
     setQuery(''); setAppliedQuery('')
     setPagination({ hasMore: false, nextOffset: 0, truncated: false, total: 0 })
   }
@@ -114,6 +117,7 @@ export function SkillSubmitForm({ onSubmit }: { onSubmit: (data: SubmitFormData[
     const x = normalizeSocialHandle(makerX, 'x')
     const allTags = [...new Set([...tags, ...(tagInput.trim() ? [tagInput.trim()] : [])])]
     const errors: Record<string, string> = {}
+    if (!freeAcquisition) errors.freeAcquisition = freeIntakeCopy(locale, 'required')
     if (!validSocialHandle(github, 'github')) errors.makerGithub = c('githubError')
     if (!validSocialHandle(x, 'x')) errors.makerX = c('xError')
     if (allTags.length > 10 || allTags.some(tag => tag.length > 40)) errors.tags = c('tagsError')
@@ -129,7 +133,7 @@ export function SkillSubmitForm({ onSubmit }: { onSubmit: (data: SubmitFormData[
     setSubmitting(true); setError('')
     try {
       await onSubmit(chosen.map(candidate => ({ repository, skillPath: candidate.path, sourceRef: candidate.ref,
-        category: category || undefined, tags: allTags, makerGithub: github || undefined, makerX: x || undefined, submissionSource: 'web' })))
+        category: category || undefined, tags: allTags, makerGithub: github || undefined, makerX: x || undefined, submissionSource: 'web', freeAcquisition: true })))
       try { localStorage.removeItem(DRAFT_KEY) } catch { /* Storage is optional. */ }
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : c('failed'))
@@ -176,6 +180,15 @@ export function SkillSubmitForm({ onSubmit }: { onSubmit: (data: SubmitFormData[
         })}</div>
       </fieldset>
     </details>
+    <fieldset disabled={submitting} className="space-y-3">
+      <legend className="mb-3 text-sm font-semibold">{freeIntakeCopy(locale, 'title')}</legend>
+      <label className="flex min-h-11 cursor-pointer items-start gap-3 text-sm leading-6">
+        <input id="free-acquisition" type="checkbox" checked={freeAcquisition} onChange={e => { setFreeAcquisition(e.target.checked); setFields(previous => ({ ...previous, freeAcquisition: '' })) }} aria-invalid={Boolean(fields.freeAcquisition)} aria-describedby="free-acquisition-note free-acquisition-error" className="mt-1 size-4 shrink-0 accent-primary" />
+        <span>{freeIntakeCopy(locale, 'confirm')}</span>
+      </label>
+      <p id="free-acquisition-note" className="text-xs leading-5 text-secondary">{freeIntakeCopy(locale, 'note')}</p>
+      <p id="free-acquisition-error" role={fields.freeAcquisition ? 'alert' : undefined} className="text-xs text-destructive">{fields.freeAcquisition}</p>
+    </fieldset>
     <p className="text-xs leading-5 text-secondary">{c('limits')}</p>
     {error && <p role="alert" className="border-l-2 border-destructive pl-3 text-sm text-destructive">{error}</p>}
     <button type="submit" disabled={!selected.length || validating || submitting} className="w-full bg-primary px-6 py-3.5 font-semibold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-40">{submitting ? submissionCopy(locale, 'Saving…', '正在保存…') : submissionCopy(locale, 'Submit to community queue', '提交到社区队列')}</button>
