@@ -1,6 +1,9 @@
 'use client'
 
 import { NativeSelect } from '@/components/ui/native-select'
+import { commerceCopy } from '@/lib/i18n/commerce-copy'
+import { acquisitionTypes, type PriceFilter, type SkillCommerce } from '@/lib/skills/commerce'
+import { SkillPrice } from '@/components/skill-commerce'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -91,6 +94,7 @@ interface DirectoryLink {
 }
 
 interface Skill {
+  commerce: SkillCommerce
   id: string
   slug: string
   name: string
@@ -152,6 +156,7 @@ function writeSelection(slugs: string[]) {
 }
 
 interface Props {
+  pricing: PriceFilter
   pathname: string
   queryString: string
   skills: Skill[]
@@ -189,6 +194,7 @@ export function SkillsPageClient(props: Props) {
     hasPreviousResults, hasMoreResults, degraded, directorySections, directoryLinks } = props
   const { locale } = useI18n()
   const c = directoryCopy(locale)
+  const prices = commerceCopy(locale)
   const reportedResult = useRef('')
   useEffect(() => {
     const key = JSON.stringify([query, sort, category, page, resultCount, degraded, props.view])
@@ -215,7 +221,7 @@ export function SkillsPageClient(props: Props) {
   const href = (updates: Record<string, string | undefined>) => directoryHref(pathname, queryString, updates)
   const navigate = (updates: Record<string, string | undefined>) => startTransition(() => router.push(href(updates), { scroll: false }))
   const resetHref = directoryHref(pathname, queryString, Object.fromEntries(
-    ['q','sort','category','useCase','platform','quality','trust','safety','track','minStars','page','view'].map(key => [key, undefined])
+    ['q','sort','category','useCase','platform','quality','trust','safety','track','minStars','page','view','pricing'].map(key => [key, undefined])
   ))
   const toggleCompare = (slug: string) => {
     trackAnalyticsEvent('skill_compare', { skill_slug: slug, source: 'directory', selected: !compareSlugs.includes(slug) })
@@ -225,7 +231,7 @@ export function SkillsPageClient(props: Props) {
   const primaryCategories = ['coding-agents','design-creative','video-creation','research','presentation','finance']
   const categoryOptions = directoryCategoryOptions([...categories, ...primaryCategories, category === 'all' ? '' : category])
   const selectedCategory = category === 'all' ? 'all' : directoryCategories(category)[0]
-  const activeFilters = Object.entries({ category, useCase, platform, quality, trust, safety, track: supplyTrack, minStars: minStars ? String(minStars) : 'all' })
+  const activeFilters = Object.entries({ pricing: props.pricing, category, useCase, platform, quality, trust, safety, track: supplyTrack, minStars: minStars ? String(minStars) : 'all' })
     .filter(([, value]) => value && value !== 'all')
   const sortOptions = [
     ['quality', query ? c.relevance : props.catalogMode ? c.quality : c.recommended], ['stars', c.stars],
@@ -295,12 +301,21 @@ export function SkillsPageClient(props: Props) {
                   : <>{skills.length ? rankOffset + 1 : 0}–{rankOffset + skills.length} / {resultCount.toLocaleString(locale)}</>}
               </p>
             </div>
+            <div className="flex max-w-full flex-wrap gap-3">
+            <label className="flex min-w-0 max-w-full items-center gap-3 text-xs text-secondary">
+              <span className="shrink-0">{prices.pricing}</span>
+              <NativeSelect aria-label={prices.pricing} value={props.pricing} onChange={e => navigate({ pricing: e.target.value })} className="w-48 max-w-full bg-transparent text-sm">
+                <option value="all">{prices.all}</option>
+                {acquisitionTypes.map(type => <option key={type} value={type}>{prices[type]}</option>)}
+              </NativeSelect>
+            </label>
             <label className="flex min-w-0 max-w-full items-center gap-3 text-xs text-secondary">
               <span className="shrink-0">{c.sort}</span>
               <NativeSelect value={sort} onChange={e => navigate({ sort: e.target.value })} className="w-48 max-w-full bg-transparent text-sm">
                 {sortOptions.map(([value, title]) => <option key={value} value={value}>{title}</option>)}
               </NativeSelect>
             </label>
+            </div>
           </div>
 
           <details className="mt-4 border-b border-border pb-4" data-directory-filters>
@@ -327,18 +342,20 @@ export function SkillsPageClient(props: Props) {
           {activeFilters.length > 0 && (
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs" aria-label={c.active}>
               {activeFilters.map(([key,value]) => <Link key={key} prefetch={false} href={href({ [key]: undefined })}
-                className="inline-flex max-w-full items-center gap-2 rounded-full border border-border px-3 py-2" aria-label={`${c.remove}: ${value}`}>
-                <span className="break-all">{label(value)}</span><X size={12} className="shrink-0" aria-hidden="true" />
+                className="inline-flex max-w-full items-center gap-2 rounded-full border border-border px-3 py-2" aria-label={`${c.remove}: ${key === 'pricing' ? prices[props.pricing] : label(value)}`}>
+                <span className="break-all">{key === 'pricing' ? prices[props.pricing] : label(value)}</span><X size={12} className="shrink-0" aria-hidden="true" />
               </Link>)}
               <Link href={resetHref} prefetch={false} className="p-2 text-[#006b4f] underline underline-offset-4">{c.reset}</Link>
             </div>
           )}
           <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${resultCount}`}</p>
+          {props.pricing !== 'all' && <p className="my-4 text-xs leading-6 text-secondary">{prices.caveat}</p>}
           {degraded && <p role="status" className="my-5 border-l-2 border-amber-600 bg-amber-50 p-4 text-sm text-amber-950">{label(props.catalogMode ? 'catalogUnavailable' : 'dataUnavailable')}</p>}
 
           {skills.length === 0 ? (
             <div className="border-y border-border py-14 text-center">
-              <p className="text-secondary">{degraded ? label('catalogUnavailable') : props.catalogMode && hasMoreResults ? label('excludedResources') : c.empty}</p>
+              <p className="text-secondary">{degraded ? label('catalogUnavailable') : props.pricing !== 'all' ? prices.empty : props.catalogMode && hasMoreResults ? label('excludedResources') : c.empty}</p>
+              {props.pricing !== 'all' && <Link href={`/contact${locale === 'en' ? '' : '?lang=' + locale}`} className="mt-4 block text-sm text-[#006b4f] underline underline-offset-4">{prices.contribute} →</Link>}
               <Link href={resetHref} className="mt-5 inline-block text-[#006b4f] underline">{c.reset}</Link>
             </div>
           ) : <div className="border-t border-border" data-skill-list>
@@ -354,6 +371,7 @@ export function SkillsPageClient(props: Props) {
                   <p className="mt-1 truncate font-mono text-[11px] text-secondary">{skill.author.owner || skill.author.name}</p>
                   <p className="mt-3 max-w-2xl break-words text-sm leading-6 text-secondary">{skill.tagline}</p>
                   <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-secondary">
+                    <SkillPrice commerce={skill.commerce} />
                     <Link href={href({ category: directoryCategories(skill.category)[0] })} prefetch={false} className="underline decoration-border underline-offset-4">{directoryCategories(skill.category).map(label).join(' · ')}</Link>
                     {[...new Set(skill.platformHints || skill.compatibility.map(v => v.platform))].slice(0, 2).map(value => <span key={value}>{value}</span>)}
                     {skill.safetyProfile?.blocked ? <span className="text-red-700">{c.blocked}</span>

@@ -38,6 +38,8 @@ import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { SkillActionLink } from '@/components/skill-action-link'
 import { SkillEventTracker } from '@/components/skill-event-tracker'
 import { SkillInstallTargets } from '@/components/skill-install-targets'
+import { SkillCommercePanel, SkillPrice } from '@/components/skill-commerce'
+import { getSkillCommerce } from '@/lib/skills/commerce'
 import { SkillShareButton } from '@/components/skill-share-button'
 import { SaveSkillButton } from '@/components/save-skill-button'
 import { SkillShowcase } from '@/components/showcase-sections'
@@ -244,6 +246,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
               <SkillShareButton skillSlug={skill.slug} skillName={skill.name} />
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-secondary">
+              <SkillPrice commerce={getSkillCommerce(skill.slug)} />
               <span>★ {Number(dbSkill.github_stars || 0).toLocaleString('en-US')} <Text id="githubStars" /></span>
               <span><ProfileText id="registryUpdated" /> · <DateText value={skill.updatedAt} /></span>
               {skill.tags.slice(0, 3).map(tag => <Link key={tag} href={`/skills?q=${encodeURIComponent(tag)}`} className="underline decoration-border underline-offset-4 hover:decoration-foreground">{tag}</Link>)}
@@ -268,6 +271,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
 
               <section id="install-options" className={sectionClass}>
                 <h2 className={headingClass}><ProfileText id={source.canOfferInstall && !safety.blocked ? 'useAgent' : 'reviewSource'} /></h2>
+                <SkillCommercePanel commerce={getSkillCommerce(skill.slug)} license={dbSkill.license || 'Unknown'} blocked={safety.blocked} />
                 <div className={`my-6 border-l-2 p-4 text-sm leading-relaxed ${source.canOfferInstall && !safety.human_review_required ? 'border-[#006b4f] bg-[#eef5f0]' : 'border-amber-600 bg-amber-50/60'}`} data-source-state={source.status}>
                   <p className="font-semibold"><ProfileText id={sourceStatus} /></p>
                   <p className="mt-2"><ProfileText id={sourceNote} /></p>

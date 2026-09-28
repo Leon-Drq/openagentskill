@@ -60,7 +60,7 @@ export interface TechnicalDetails {
 }
 
 export interface PricingInfo {
-  type: 'free' | 'freemium' | 'paid'
+  type: 'free' | 'freemium' | 'paid' | 'unknown'
   price?: number
   currency?: string
   pricingModel?: 'one-time' | 'subscription' | 'usage-based'

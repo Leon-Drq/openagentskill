@@ -1,4 +1,5 @@
 import { PUBLIC_SKILL_FILTER } from '@/lib/skills/publication'
+import { commerceFilterSlugs, getSkillCommerce, type PriceFilter } from '@/lib/skills/commerce'
 import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { withTimeout } from '@/lib/async'
@@ -1095,9 +1096,13 @@ export async function searchSkillsWithStatus(query: string, limit = 120) {
 // Apply discoverability filters BEFORE limiting the pool. Otherwise the top
 // 96 generic repositories can hide valid source-recorded skills entirely.
 const getCachedBrowseCandidates = unstable_cache(
-  async (sort: SkillSortMode, category: string, limit: number, sourceOnly: boolean, minStars: number) => {
+  async (sort: SkillSortMode, category: string, limit: number, sourceOnly: boolean, minStars: number, pricing: PriceFilter, pricingSlugs: string[]) => {
     const supabase = createPublicClient({ requestTimeoutMs: SKILL_DIRECTORY_REQUEST_TIMEOUT_MS })
     let query = supabase.from('skills').select(SKILL_DIRECTORY_SELECT).or(PUBLIC_SKILL_FILTER)
+    if (pricing !== 'all' && pricing !== 'unknown') {
+      if (!pricingSlugs.length) return packCacheJson([])
+      query = query.in('slug', pricingSlugs)
+    } else if (pricing === 'unknown' && pricingSlugs.length) query = query.not('slug', 'in', `(${pricingSlugs.join(',')})`)
     if (sourceOnly) query = query.or('source_path.ilike.*SKILL.md,ai_review_score->>skill_path.ilike.*SKILL.md')
     if (minStars > 0) query = query.gte('github_stars', minStars)
     const terms = directoryCategoryTerms(category)
@@ -1115,14 +1120,14 @@ const getCachedBrowseCandidates = unstable_cache(
     if (error) throw error
     return packCacheJson(filterSkillOnly((data || []) as unknown as SkillRecord[]))
   },
-  ['skills-browse-candidates-v2'],
+  ['skills-browse-candidates-v3-pricing'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 
-export async function getBrowseSkillCandidates(sort: SkillSortMode, category: string, limit: number, sourceOnly: boolean, minStars: number) {
+export async function getBrowseSkillCandidates(sort: SkillSortMode, category: string, limit: number, sourceOnly: boolean, minStars: number, pricing: PriceFilter = 'all') {
   const size = Math.min(480, Math.max(96, Math.ceil(limit / 96) * 96))
   const stars = Number.isFinite(minStars) ? Math.min(1_000_000_000, Math.max(0, Math.floor(minStars))) : 0
-  const packed = await getCachedBrowseCandidates(sort, category, size, sourceOnly, stars)
+  const packed = await getCachedBrowseCandidates(sort, category, size, sourceOnly, stars, pricing, commerceFilterSlugs(pricing))
   return { records: await unpackCacheJson<SkillRecord[]>(packed), degraded: false }
 }
 
@@ -1130,9 +1135,13 @@ export async function getBrowseSkillCandidates(sort: SkillSortMode, category: st
 // Count describes public registry entries; the UI separately labels the number
 // of visible skills because MCP-only resources are omitted, as on detail pages.
 const getCachedCatalogPage = unstable_cache(
-  async (sort: SkillSortMode, category: string, page: number, minStars: number) => {
+  async (sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter, pricingSlugs: string[]) => {
     const supabase = createPublicClient({ requestTimeoutMs: 4000 })
     let query = supabase.from('skills').select(SKILL_DIRECTORY_SELECT, { count: 'exact' }).or(PUBLIC_SKILL_FILTER)
+    if (pricing !== 'all' && pricing !== 'unknown') {
+      if (!pricingSlugs.length) return { records: [] as SkillRecord[], total: 0, hasMore: false }
+      query = query.in('slug', pricingSlugs)
+    } else if (pricing === 'unknown' && pricingSlugs.length) query = query.not('slug', 'in', `(${pricingSlugs.join(',')})`)
     if (minStars > 0) query = query.gte('github_stars', minStars)
     const terms = directoryCategoryTerms(category)
     if (category !== 'all') {
@@ -1147,12 +1156,12 @@ const getCachedCatalogPage = unstable_cache(
     if (count === null) throw new Error('Catalog count unavailable')
     return { records: filterSkillOnly((data || []) as unknown as SkillRecord[]), total: count, hasMore: from + CATALOG_PAGE_SIZE < count }
   },
-  ['public-catalog-pages-v1'],
+  ['public-catalog-pages-v2-pricing'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 
-export function getSkillCatalogPage(sort: SkillSortMode, category: string, page: number, minStars: number) {
-  return getCachedCatalogPage(sort, category.slice(0, 80), catalogPageNumber(String(page)), catalogStars(minStars))
+export function getSkillCatalogPage(sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter = 'all') {
+  return getCachedCatalogPage(sort, category.slice(0, 80), catalogPageNumber(String(page)), catalogStars(minStars), pricing, commerceFilterSlugs(pricing))
 }
 
 export async function searchSkillsStrict(query: string, limit = 120): Promise<SkillRecord[]> {
@@ -1252,7 +1261,7 @@ export function convertSkillRecordToManifest(record: SkillRecord): Skill {
       githubRepo: record.github_repo,
     },
     pricing: {
-      type: 'free' as const,
+      type: getSkillCommerce(record.slug).type,
     },
     createdAt: record.created_at,
     updatedAt: record.updated_at,

@@ -14,6 +14,7 @@ import { locales } from '../lib/i18n/config.ts'
 import * as searchResults from '../lib/search-results.ts'
 import * as presentationCategory from '../lib/skills/presentation-category.ts'
 import * as catalogQuery from '../lib/skills/catalog-query.ts'
+import * as commerce from '../lib/skills/commerce.ts'
 
 register('./test-owner-publication-loader.mjs', import.meta.url)
 const useCases = await import('../lib/use-cases.ts')
@@ -98,6 +99,8 @@ const client = { from(table) {
     select(...args) { operationsForQuery.push(['select', ...args]); return query },
     or(...args) { operationsForQuery.push(['or', ...args]); return query },
     eq(...args) { operationsForQuery.push(['eq', ...args]); return query },
+    in(...args) { operationsForQuery.push(['in', ...args]); return query },
+    not(...args) { operationsForQuery.push(['not', ...args]); return query },
     gte(...args) { operationsForQuery.push(['gte', ...args]); return query },
     order(...args) { operationsForQuery.push(['order', ...args]); return query },
     range(...args) { operationsForQuery.push(['range', ...args]); return query },
@@ -118,6 +121,7 @@ const db = compile('lib/db/skills.ts', {
   '@/lib/skills/directory': directory,
   '@/lib/skills/presentation-category': presentationCategory,
   '@/lib/skills/catalog-query': catalogQuery,
+  '@/lib/skills/commerce': commerce,
   '@/lib/skills/registry-scope': { isMcpOnlyCategory: () => false, isMcpOnlySkillRecord: () => false },
   '@/lib/seo/curated-skill-snapshot': { CURATED_SKILL_SNAPSHOT: snapshot },
   '@/lib/search-query': {},

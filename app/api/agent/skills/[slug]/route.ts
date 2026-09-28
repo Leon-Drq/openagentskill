@@ -16,6 +16,7 @@ import { getSkillTrustProfile, getSkillTrustProfileV5 } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 import { getStoredSkillVersionEvidence } from '@/lib/skills/version-evidence'
 import { getReviewEvidence } from '@/lib/skills/review-evidence'
+import { getSkillCommerce } from '@/lib/skills/commerce'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -106,6 +107,8 @@ Description:
 ${skill.long_description || skill.description}
 
 Technical Details:
+- Acquisition: ${getSkillCommerce(skill.slug).type} (running costs separate; purchases require user consent)
+- Pricing source: ${getSkillCommerce(skill.slug).sourceUrl || 'Unconfirmed'}
 - Version: ${skill.version}
 - License: ${skill.license}
 - Platforms: ${(skill.frameworks || []).join(', ')}
@@ -185,6 +188,7 @@ OpenAgentSkill — ${skill.verified ? 'Verified' : 'Unverified'} skill.`
         long_description: skill.long_description,
         tagline: skill.tagline,
         category: skill.category,
+        commerce: getSkillCommerce(skill.slug),
         tags: skill.tags,
         author: skill.author_name,
         verified: skill.verified,

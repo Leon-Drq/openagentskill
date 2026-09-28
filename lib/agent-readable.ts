@@ -11,12 +11,14 @@ import { getUseCasesForSkill } from '@/lib/use-cases'
 import { AGENT_OUTCOMES } from '@/lib/agent-outcomes'
 import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
 import { getReviewEvidence } from '@/lib/skills/review-evidence'
+import { getSkillCommerce } from '@/lib/skills/commerce'
 
 const SITE_URL = 'https://www.openagentskill.com'
 
 import { skillPresentationCategory } from '@/lib/skills/presentation-category'
 
 export interface AgentReadableSkillMetadata {
+  commerce: ReturnType<typeof getSkillCommerce>
   review_evidence: ReturnType<typeof getReviewEvidence>
   version: 'openagentskill-agent-metadata-v2'
   skill: {
@@ -275,6 +277,7 @@ export function buildAgentReadableSkillMetadata(
   return {
     version: 'openagentskill-agent-metadata-v2',
     review_evidence: getReviewEvidence(skill),
+    commerce: getSkillCommerce(skill.slug),
     skill: {
       slug: skill.slug,
       name: skill.name,
