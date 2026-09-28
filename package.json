@@ -8,6 +8,7 @@
     "openagentskill": "./bin/openagentskill.mjs"
   },
   "scripts": {
+    "test:commerce": "node --experimental-strip-types scripts/test-skill-commerce.mjs",
     "owner:publish": "node scripts/owner-publish-skill.mjs",
     "test:owner-publish": "node --experimental-strip-types scripts/test-owner-publication.mjs",
     "dev": "next dev",

@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { commerceFilterSlugs, getSkillCommerce, matchesCommerce, normalizePriceFilter } from '@/lib/skills/commerce'
 import { getBrowseSkillCandidates, getSkillCatalogPage, getSkillsBySlugs } from '@/lib/db/skills'
 import { catalogPageNumber, catalogStars } from '@/lib/skills/catalog-query'
 import { getDirectoryProfiles } from '@/lib/skills/directory-profiles'
@@ -610,6 +611,7 @@ function toSkillsPageSkill({
       name: record.author_name,
       owner: getGitHubOwner(record),
     },
+    commerce: getSkillCommerce(record.slug),
     snapshot: isDirectorySnapshot(record),
     sourceStatus: getSkillSourceEvidence(record).status,
     verified: Boolean(record.verified),
@@ -899,6 +901,7 @@ export default async function SkillsPage({
     : 'quality'
   const view = firstSearchValue(params.view) === 'all' || (firstSearchValue(params.view) !== 'skills' && firstSearchValue(params.q)?.trim()) ? 'all' : 'skills'
   const category = firstSearchValue(params.category) || 'all'
+  const pricing = normalizePriceFilter(firstSearchValue(params.pricing))
   const useCase = firstSearchValue(params.useCase) || 'all'
   const selectedUseCase = useCase !== 'all' ? getUseCaseBySlug(useCase) : undefined
   const platform = firstSearchValue(params.platform) || 'all'
@@ -918,17 +921,17 @@ export default async function SkillsPage({
   const candidateLimit = Math.min(baseLimit + requestedPageOffset, MAX_SKILL_CANDIDATE_LIMIT)
   const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured] = await Promise.all([
     query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
-      : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, view === 'skills', minStars), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
+      : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, view === 'skills', minStars, pricing), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
         .catch(() => ({ records: getFallbackSkills(sort, undefined, candidateLimit), degraded: true })),
     getSearchAugmentRecords(firstSearchValue(params.q)),
     withTimeout(getCachedCategories(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills categories query')
       .catch(() => [...new Set(mergeSkillRecords(FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT).map((skill) => skill.category))].sort()),
     withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
-    catalogMode ? getSkillCatalogPage(sort, category, page, minStars)
+    catalogMode ? getSkillCatalogPage(sort, category, page, minStars, pricing)
       .then(result => ({ ...result, degraded: false }))
       .catch(() => ({ records: [] as SkillRecord[], total: 0, hasMore: false, degraded: true })) : Promise.resolve(null),
-    getSkillsBySlugs(selectedUseCase?.featuredSlugs || []).catch(() => []),
+    getSkillsBySlugs([...new Set([...(selectedUseCase?.featuredSlugs || []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
   ])
   const records = catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, useCaseFeatured, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
   const degraded = Boolean(catalogResult?.degraded || recordsResult.degraded || searchAugmentRecords.degraded)
@@ -962,6 +965,7 @@ export default async function SkillsPage({
     // Catalog filters/order/pagination are already applied in the database.
     // Re-filtering corrected presentation categories here would drop rows.
     if (catalogMode) return true
+    if (!matchesCommerce(record.slug, pricing)) return false
     if (view === 'skills' && getSkillSourceEvidence(record).status !== 'source-recorded') return false
     if (!matchesDirectoryCategory(record.category, category)) return false
     if (supplyTrack !== 'all' && item.supplyProfile.track.slug !== supplyTrack) return false
@@ -1039,6 +1043,7 @@ export default async function SkillsPage({
         view={view}
         catalogMode={catalogMode}
         category={category}
+        pricing={pricing}
         categories={categoryOptions}
         useCase={useCase}
         useCases={USE_CASES.map((item) => ({
