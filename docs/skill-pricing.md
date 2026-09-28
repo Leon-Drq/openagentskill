@@ -1,5 +1,16 @@
 # Skill pricing pilot
 
+## Gallery discovery
+
+Gallery uses the same reviewed prices as Skills. It exposes only Free and Paid
+filters plus the unfiltered All state. Free-plus-paid editions belong to Paid,
+with an explicit disclosure. Unconfirmed or expired entries have no price badge
+and remain visible under All; a license alone does not prove free acquisition.
+Prices concern skill access, not the sale of an artwork. Runtime/model costs
+remain separate. Filters apply before pagination and combine with format,
+creator, search and use case. Filtered URLs remain noindex with the original
+Gallery canonical; clearing filters retains language and sort preferences.
+
 This release is a discovery layer, not a payment processor. Existing free source
 links, installation paths, safety checks, rankings and canonical URLs stay intact.
 There are no model calls or database migrations for commerce metadata.
