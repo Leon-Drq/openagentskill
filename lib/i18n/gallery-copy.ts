@@ -6,6 +6,7 @@ import { isLocale, type Locale } from './config.ts'
 // repository names, commands, licenses, or the text inside an author's artwork.
 type Translations = readonly [ja: string, ko: string, es: string, de: string, fr: string, id: string]
 export const galleryTranslations = {
+  'Explore skills with examples': ['作例のあるスキルを探す', '사례가 있는 스킬 둘러보기', 'Explorar skills con ejemplos', 'Skills mit Beispielen entdecken', 'Explorer les skills avec exemples', 'Jelajahi skill dengan contoh'],
   'Target agent': ['対象 Agent', '대상 Agent', 'Agente de destino', 'Ziel-Agent', 'Agent cible', 'Agent tujuan'],
   'Any agent': ['任意の Agent', '모든 Agent', 'Cualquier agente', 'Beliebiger Agent', 'Tout agent', 'Agent apa pun'],
   'Download task (.md)': ['タスクをダウンロード (.md)', '작업 다운로드 (.md)', 'Descargar tarea (.md)', 'Aufgabe herunterladen (.md)', 'Télécharger la tâche (.md)', 'Unduh tugas (.md)'],

@@ -227,6 +227,7 @@ const automaticCases: ShowcaseCase[] = automaticEntries.map((entry) => {
 })
 export const SHOWCASE_CASES: ShowcaseCase[] = [...HYPIT_SHOWCASE_CASES, ...INITIAL_SHOWCASE_CASES, ...interleavedExpanded, ...automaticCases]
 export const getShowcaseCase = (slug: string) => SHOWCASE_CASES.find((item) => item.slug === slug)
+export const SHOWCASE_SKILL_SLUGS = [...new Set(SHOWCASE_CASES.map(item => item.skillSlug))]
 export const getShowcasesForSkill = (skillSlug: string) => SHOWCASE_CASES.filter((item) => item.skillSlug === skillSlug)
 export const FEATURED_SHOWCASE_SLUGS = ['floria-floral-studio', 'room-to-grow-poster', 'editorial-html-slides']
 

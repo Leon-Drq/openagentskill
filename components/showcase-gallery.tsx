@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowRight, Search, SlidersHorizontal, X } from 'lucide-react'
-import { DiscoveryTabs, discoveryIcons } from '@/components/discovery-navigation'
+import { discoveryIcons } from '@/components/discovery-navigation'
 import { DISCOVERY_TASKS, DISCOVERY_OUTPUTS, discoveryCopy } from '@/lib/discovery'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
@@ -118,7 +118,7 @@ function GalleryContent({ data }: { data: GalleryData }) {
                 {!['en', 'zh'].includes(locale) && <p className="mt-3 text-xs leading-relaxed text-[#6d675e]">{galleryCopy(locale, 'Original-language content', '作品说明和提示词可能保留原文。')}</p>}
               </div>
             </div>
-            <DiscoveryTabs active="gallery" source="gallery" search={params.toString()} />
+            <Link href={getLocalizedNavigationHref('/skills', locale)} prefetch={false} className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#006b4f]">{discovery.browse}<ArrowRight size={16} aria-hidden="true" /></Link>
           </div>
         </section>
 

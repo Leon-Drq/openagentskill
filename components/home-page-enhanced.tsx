@@ -824,7 +824,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                   className="text-2xl tracking-normal"
                   style={{ fontFamily: value === 'API' ? 'var(--font-mono)' : 'Georgia, "Times New Roman", serif' }}
                 >
-                  {index === 0 ? <Link href={`/skills?view=all${activeLocale === 'en' ? '' : `&lang=${activeLocale}`}`} className="underline decoration-transparent underline-offset-4 hover:decoration-current" aria-label={`${label}: ${value}`}>{value}</Link> : value}
+                  {index === 0 ? <Link href={getLocalizedNavigationHref('/skills', activeLocale)} className="underline decoration-transparent underline-offset-4 hover:decoration-current" aria-label={`${label}: ${value}`}>{value}</Link> : value}
                 </span>
               </div>
             ))}
