@@ -28,16 +28,11 @@ function getSkillShareText(
     .toLowerCase()
 }
 
-export function getXContentLane(skill: SkillRecord) {
-  const text = getSkillShareText(skill, {
-    includeCategory: true,
-    includeGeneratedSignals: true,
-  })
-
+function laneFromTaskText(text: string) {
   if (/\b(presentation|presentations|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides)\b/.test(text)) {
     return 'presentation'
   }
-  if (/\b(finance|financial|quant|trading|portfolio|markets?|stocks?|equity|earnings|filings?|sec|edgar)\b/.test(text)) {
+  if (/\b(finance|financial|quant|trading|equity|earnings|filings?|edgar|market data|stock analysis|stock research|stock market|investment portfolio|portfolio allocation)\b/.test(text)) {
     return 'finance'
   }
   if (/\b(football|soccer|world cup|fifa|sports?|xg|match|scouting)\b/.test(text)) {
@@ -65,6 +60,16 @@ export function getXContentLane(skill: SkillRecord) {
   }
 
   return 'general'
+}
+
+export function getXContentLane(skill: SkillRecord) {
+  // Long repository descriptions and secondary tags often enumerate unrelated
+  // features. Classify the stated purpose first; use taxonomy only as a fallback.
+  const primary = [skill.name, stripGeneratedSkillBoilerplate(skill.description), stripGeneratedSkillBoilerplate(skill.tagline)]
+    .filter(Boolean).join(' ').toLowerCase()
+  const lane = laneFromTaskText(primary)
+  if (lane !== 'general') return lane
+  return laneFromTaskText([skill.category, ...(skill.tags || [])].join(' ').replace(/[_-]/g, ' ').toLowerCase())
 }
 
 export function isGenericFoundationRepoName(value: string | null | undefined) {

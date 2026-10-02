@@ -22,6 +22,7 @@ const editorial = { buildXEditorialCopy, getXEditorialFormat, getXTextLength, X_
 const shortlist = compile('lib/x/shortlist.ts', {
   '@/lib/db/skills': {}, '@/lib/x/candidates': candidates, '@/lib/x/attribution': attribution,
   '@/lib/x/editorial': editorial, '@/lib/skill-likeness': likeness,
+  '@/lib/skills/source-evidence': compile('lib/skills/source-evidence.ts', {}),
   '@/lib/install-targets': { getPrimaryInstallCommand: skill => skill.install_command || '' },
   '@/lib/quality': { getSkillQualityProfile: skill => ({ score: skill.quality_score }), formatCompactNumber: String },
 })
@@ -45,6 +46,21 @@ for (const [description, lane] of [
   ['Agent skill for code review of a git diff.', 'coding'],
 ]) assert.equal(candidates.getXContentLane(skill('topic', { category: 'agent-skills', description })), lane)
 assert.equal(candidates.isGoodXCandidate(skill('unreviewed', { ai_review_approved: false }), 50), false)
+assert.equal(candidates.getXContentLane(skill('last30days', {
+  name: 'Last30days Skill', description: 'Research the last 30 days across Reddit, X and the web.',
+  long_description: 'Can analyze financial markets and stock portfolios.', category: 'research',
+})), 'research', 'A secondary use case must not override the stated task')
+assert.equal(candidates.getXContentLane(skill('khoj', {
+  description: 'Get answers from your docs and do deep research.', tags: ['image-generation'],
+})), 'research', 'An image tag must not override the research purpose')
+assert.equal(candidates.getXContentLane(skill('design-portfolio', {
+  description: 'Design a portfolio website with good typography.',
+})), 'creative', 'A design portfolio is not a financial portfolio')
+const sourcePreferred = shortlist.buildXShortlist('coding', [
+  skill('generic-tool', { github_stars: 100000, quality_score: 100 }),
+  skill('specific-skill', { github_stars: 50, quality_score: 60, source_path: 'SKILL.md' }),
+], { edition: '2026-10-02' })
+assert.equal(sourcePreferred.picks[0].skill.slug, 'specific-skill', 'Recorded Skill instructions outrank an untracked high-star tool')
 
 const pool = [review, skill('tests'), skill('debugging'), skill('planning'), skill('release'),
   skill('duplicate', { github_repo: 'AUTHOR/code-review' }),
