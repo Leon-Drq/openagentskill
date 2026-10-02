@@ -78,11 +78,12 @@ function buildRows(
 }
 
 export default async function AuditsPage() {
-  const [skills, auditsMap, eventStatsMap] = await Promise.all([
+  const [skills, eventStatsMap] = await Promise.all([
     getAllSkills('quality', undefined, 1200).catch(() => []),
-    getSkillAuditsMap().catch((): Record<string, SkillAuditRecord> => ({})),
     getSkillEventStatsMap().catch((): Record<string, SkillEventStats> => ({})),
   ])
+  const auditsMap = await getSkillAuditsMap(skills.map(skill => skill.slug))
+    .catch((): Record<string, SkillAuditRecord> => ({}))
 
   const rows = buildRows(skills, eventStatsMap)
     .map((row) => {

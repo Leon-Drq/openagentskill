@@ -1,10 +1,7 @@
 import { AGENT_TASKS } from '@/lib/agent-tasks'
-import { withTimeout } from '@/lib/async'
 import { SKILL_STACKS } from '@/lib/collections'
-import {
-  getApprovedSkillSitemapCount,
-  getApprovedSkillSitemapRecords,
-} from '@/lib/db/skills'
+import { getSkillSitemapSnapshot } from '@/lib/seo/skill-sitemap-data'
+import type { SkillSitemapSnapshot } from '@/lib/seo/sitemap-snapshot'
 import { getRankingDefinitions } from '@/lib/rankings'
 import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
 import { AGENT_PROFILES, OFFICIAL_CREATORS } from '@/lib/seo/growth-directories'
@@ -22,10 +19,7 @@ import { SHOWCASE_CASES, SHOWCASE_UPDATED_AT } from '@/lib/showcase'
 import { EXTERNAL_SKILLS, externalSkillHref } from '@/lib/skills/external-catalog'
 import { createPublicClient } from '@/lib/supabase/public'
 import { FEATURED_CREATORS, creatorHref } from '@/lib/creator-directory'
-import {
-  SEARCH_INDEX_MIN_GITHUB_STARS,
-  SEARCH_INDEX_MIN_QUALITY_SCORE,
-} from '@/lib/seo/search-indexability'
+import { SEARCH_INDEX_MIN_GITHUB_STARS, SEARCH_INDEX_MIN_QUALITY_SCORE } from '@/lib/seo/search-indexability'
 
 export const SITEMAP_BASE_URL = 'https://www.openagentskill.com'
 // Supabase's public API pages the catalog at 1,000 rows. Matching sitemap
@@ -38,7 +32,6 @@ export const SITEMAP_CHUNK_SIZE = 1000
 // on pages with enough repository evidence to stand on their own.
 export const SITEMAP_MIN_QUALITY_SCORE = SEARCH_INDEX_MIN_QUALITY_SCORE
 export const SITEMAP_MIN_GITHUB_STARS = SEARCH_INDEX_MIN_GITHUB_STARS
-const SITEMAP_SKILL_QUERY_TIMEOUT_MS = 7200
 
 export interface SitemapEntry {
   url: string
@@ -57,48 +50,12 @@ export type SitemapSection =
   | 'guides'
   | 'skills'
 
-function dateFrom(value: string | null | undefined) {
-  if (!value) return undefined
-  const date = new Date(value)
-  return Number.isFinite(date.getTime()) ? date : undefined
-}
-
 function chunkCount(total: number) {
-  return Math.max(1, Math.ceil(total / SITEMAP_CHUNK_SIZE))
+  return Math.ceil(total / SITEMAP_CHUNK_SIZE)
 }
 
-async function getSitemapSkillCount(
-  minStars = SITEMAP_MIN_GITHUB_STARS,
-  minQualityScore = SITEMAP_MIN_QUALITY_SCORE
-) {
-  return withTimeout(
-    getApprovedSkillSitemapCount(minStars, minQualityScore),
-    SITEMAP_SKILL_QUERY_TIMEOUT_MS,
-    `sitemap approved skills count${minStars ? ` ${minStars}+` : ''} quality ${minQualityScore}+`
-  )
-}
-
-export async function getSitemapSkillRecords(
-  index = 0,
-  minStars = SITEMAP_MIN_GITHUB_STARS,
-  minQualityScore = SITEMAP_MIN_QUALITY_SCORE
-) {
-  const offset = Math.max(0, index) * SITEMAP_CHUNK_SIZE
-
-  return withTimeout(
-    getApprovedSkillSitemapRecords({
-      offset,
-      limit: SITEMAP_CHUNK_SIZE,
-      minStars,
-      minQualityScore,
-    }),
-    SITEMAP_SKILL_QUERY_TIMEOUT_MS,
-    `sitemap approved skills page ${index}${minStars ? ` ${minStars}+` : ''} quality ${minQualityScore}+`
-  )
-}
-
-export async function getSitemapIndexEntries() {
-  const skillCount = await getSitemapSkillCount()
+export async function getSitemapIndexEntries(snapshot?: SkillSitemapSnapshot) {
+  const skillCount = (snapshot || await getSkillSitemapSnapshot()).count
 
   // Do not attach a request-time lastmod to sitemap index entries. Google only
   // treats lastmod as a signal when it represents a real, verifiable update.
@@ -299,23 +256,9 @@ export async function getCreatorSitemapEntries(): Promise<SitemapEntry[]> {
   }))]
 }
 
-export async function getSkillSitemapEntries(section: SitemapSection, index = 0): Promise<SitemapEntry[]> {
-  const skills = await getSitemapSkillRecords(index)
-
-  return skills.map((skill) => {
-    // Metadata refreshes update `updated_at`, but do not mean the public
-    // repository content changed. Use a repository push (or the listing's
-    // creation) so sitemap lastmod stays an honest crawl signal.
-    const lastModified = dateFrom(skill.github_last_pushed_at || skill.created_at)
-    const highSignal = Number(skill.github_stars || 0) >= 500
-
-    return {
-      url: `${SITEMAP_BASE_URL}/skills/${skill.slug}`,
-      lastModified,
-      changeFrequency: 'weekly',
-      priority: highSignal ? 0.82 : 0.76,
-    }
-  })
+export async function getSkillSitemapEntries(_section: SitemapSection, index = 0, snapshot?: SkillSitemapSnapshot): Promise<SitemapEntry[]> {
+  const complete = snapshot || await getSkillSitemapSnapshot()
+  return complete.entries.slice(index * SITEMAP_CHUNK_SIZE, (index + 1) * SITEMAP_CHUNK_SIZE)
 }
 
 function escapeXml(value: string) {

@@ -28,14 +28,28 @@ export function getEditorialSearchProfile(skill: Partial<SearchIndexCandidate>) 
     entry.commit === skill.source_commit_sha && entry.hash === skill.source_content_hash && entry.license === skill.license)
 }
 
-/** One predicate for sitemap COUNT and rows; no caller-controlled SQL values. */
-export function buildSearchIndexFilter(minStars = SEARCH_INDEX_MIN_GITHUB_STARS, minQuality = SEARCH_INDEX_MIN_QUALITY_SCORE) {
+export function buildLegacySearchIndexFilter(minStars = SEARCH_INDEX_MIN_GITHUB_STARS, minQuality = SEARCH_INDEX_MIN_QUALITY_SCORE) {
   const stars = Math.max(0, Math.floor(Number.isFinite(minStars) ? minStars : SEARCH_INDEX_MIN_GITHUB_STARS))
   const quality = Math.max(0, Math.floor(Number.isFinite(minQuality) ? minQuality : SEARCH_INDEX_MIN_QUALITY_SCORE))
   const aliases = editorialEntries.flatMap(entry => entry.aliases)
   const legacy = [SEARCH_INDEX_PUBLICATION_FILTER, ...(quality ? [`quality_score.gte.${quality}`] : []), ...(stars ? [`or(github_stars.gte.${stars},publisher_verified.eq.true)`] : []), ...(aliases.length ? [`slug.not.in.(${aliases.join(',')})`] : [])]
-  const editorial = editorialEntries.map(entry => `and(slug.eq.${entry.slug},github_repo.eq.${entry.repository},source_path.eq.${entry.path},source_commit_sha.eq.${entry.commit},source_content_hash.eq.${entry.hash},license.eq.${entry.license},source_sync_status.eq.current,listing_status.in.(owner_published,static_checked,reviewed))`)
-  return [`and(${legacy.join(',')})`, ...editorial].join(',')
+  return `and(${legacy.join(',')})`
+}
+
+export function buildEditorialSearchIndexFilter() {
+  return editorialEntries.map(entry => `and(slug.eq.${entry.slug},github_repo.eq.${entry.repository},source_path.eq.${entry.path},source_commit_sha.eq.${entry.commit},source_content_hash.eq.${entry.hash},license.eq.${entry.license},source_sync_status.eq.current,listing_status.in.(owner_published,static_checked,reviewed))`).join(',')
+}
+
+export function matchesLegacySearchIndex(skill: SearchIndexCandidate, minStars: number, minQuality: number) {
+  return !editorialEntries.some(entry => entry.aliases.includes(skill.slug || '')) &&
+    skill.ai_review_approved === true && Number(skill.quality_score || 0) >= minQuality &&
+    (minStars === 0 || Number(skill.github_stars || 0) >= minStars || skill.publisher_verified === true)
+}
+
+/** The union is unchanged; sitemap reads query its two lanes separately so
+ * the broad OR cannot disable the approved-listing partial index. */
+export function buildSearchIndexFilter(minStars = SEARCH_INDEX_MIN_GITHUB_STARS, minQuality = SEARCH_INDEX_MIN_QUALITY_SCORE) {
+  return [buildLegacySearchIndexFilter(minStars, minQuality), buildEditorialSearchIndexFilter()].filter(Boolean).join(',')
 }
 
 export interface SearchEvidenceProfile {

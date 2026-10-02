@@ -20,7 +20,7 @@ try {
   await assert.rejects(() => createResilientTimeoutFetch(100)(url), /circuit is temporarily open/)
   assert.equal(calls, 3, 'Warm invocations in the same workload share protection')
   globalThis.fetch = good
-  for (const scope of ['public-catalog', 'skill-lookup', 'skill-search', 'telemetry', 'admin']) {
+  for (const scope of ['public-catalog', 'skill-lookup', 'skill-search', 'skill-support', 'sitemap', 'telemetry', 'admin']) {
     assert.equal((await createResilientTimeoutFetch(100, scope)(url)).status, 200, 'Bulk read failures cannot disable critical work')
   }
   now += 15_001

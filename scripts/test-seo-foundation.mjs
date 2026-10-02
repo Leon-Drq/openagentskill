@@ -1,3 +1,4 @@
+await import('./test-sitemap-recovery.mjs')
 import assert from 'node:assert/strict'
 import './test-external-skills.mjs'
 import * as externalCatalog from '../lib/skills/external-catalog.ts'
@@ -38,7 +39,7 @@ const mocks = {
   '@/lib/skills/external-catalog': externalCatalog,
   '@/lib/agent-tasks': { AGENT_TASKS: [] }, '@/lib/collections': { SKILL_STACKS: [] },
   '@/lib/async': { withTimeout: promise => promise },
-  '@/lib/db/skills': { getApprovedSkillSitemapCount: async () => 2001, getApprovedSkillSitemapRecords: async () => [] },
+  '@/lib/seo/skill-sitemap-data': { getSkillSitemapSnapshot: async () => ({count:2001,entries:Array.from({length:2001},(_,i)=>({url:`https://www.openagentskill.com/skills/test-${i}`,changeFrequency:'weekly',priority:0.76})),generatedAt:'2026-10-02T00:00:00Z'}) },
   '@/lib/rankings': { getRankingDefinitions: () => [] },
   '@/lib/seo/growth-guides': { GROWTH_GUIDES },
   '@/lib/seo/growth-directories': { AGENT_PROFILES: [], OFFICIAL_CREATORS: [] },
@@ -60,8 +61,7 @@ assert.equal(sitemap.getGuideSitemapEntries().find(p => p.url.endsWith(videoGuid
 const xml = sitemap.renderUrlSet([{ url: 'https://example.com/?a=1&b=2', lastModified: 'invalid' }])
 assert.ok(xml.includes('&amp;') && !xml.includes('<lastmod>'))
 assert.equal((await sitemap.getSitemapIndexEntries()).filter(p => p.loc.includes('skills-')).length, 3)
-mocks['@/lib/db/skills'].getApprovedSkillSitemapCount = async () => { throw new Error('db unavailable') }
-mocks['@/lib/db/skills'].getApprovedSkillSitemapRecords = async () => { throw new Error('db unavailable') }
+mocks['@/lib/seo/skill-sitemap-data'].getSkillSitemapSnapshot = async () => { throw new Error('No complete snapshot available') }
 await assert.rejects(sitemap.getSitemapIndexEntries())
 await assert.rejects(sitemap.getSkillSitemapEntries('skills', 4))
 
@@ -72,6 +72,7 @@ assert.equal(unavailable.headers.get('retry-after'), '300')
 assert.equal(unavailable.headers.get('x-robots-tag'), null)
 const routeDeps = {
   '@/lib/seo/sitemap': sitemap,
+  '@/lib/seo/skill-sitemap-data': mocks['@/lib/seo/skill-sitemap-data'],
   '@/lib/seo/sitemap-response': { sitemapUnavailableResponse },
   'next/navigation': { notFound: () => { throw new Error('404') } },
 }
@@ -89,6 +90,6 @@ const db = read('lib/db/skills.ts')
 assert.ok(!db.includes('getSitemapFallbackRecords'))
 const cacheCode = db.slice(db.indexOf('const getCachedApprovedSkillSitemapRecords'), db.indexOf('export async function getApprovedSkillSitemapRecords'))
 assert.ok(!cacheCode.includes('catch'))
-assert.ok(cacheCode.includes('approved-sitemap-count-v13-canonical-editorial') && cacheCode.includes('approved-sitemap-records-v13-canonical-editorial'))
+assert.ok(cacheCode.includes('approved-sitemap-count-v14-partitioned') && cacheCode.includes('approved-sitemap-records-v14-partitioned'))
 assert.ok(!read('lib/seo/sitemap.ts').includes('lastModified: now'))
 console.log('SEO regressions passed: relevance, honest comparisons, dates, XML, index/shard outage 503s and cold-cache safety.')
