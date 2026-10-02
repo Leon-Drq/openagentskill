@@ -40,6 +40,7 @@ const client = readFileSync('components/skills-page-client.tsx', 'utf8')
 assert.doesNotMatch(client, /DiscoveryTabs/)
 assert.match(client, /data-discovery-filters/)
 assert.match(client, /data-skill-examples/)
+assert.match(readFileSync('app/render-query/[locale]/layout.tsx', 'utf8'), /export \{ default \} from '@\/app\/\[locale\]\/layout'/, 'Localized query rewrites inherit the SSR language provider')
 assert.ok(existsSync('app/showcase/page.tsx') && existsSync('app/showcase/[slug]/page.tsx'), 'Indexed case routes remain available')
 for (const item of [...DISCOVERY_TASKS, ...DISCOVERY_OUTPUTS, ...DISCOVERY_AGENTS]) {
   const root = item.href.split('/')[1]
