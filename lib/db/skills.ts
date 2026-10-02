@@ -14,7 +14,7 @@ import type { Skill } from '@/lib/types'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSearchTerms, normalizeExactSearchQuery } from '@/lib/search-query'
 import { packCacheJson, unpackCacheJson } from '@/lib/cache/packed-json'
-import { buildSearchIndexFilter } from '@/lib/seo/search-indexability'
+import { buildLegacySearchIndexFilter, buildEditorialSearchIndexFilter, matchesLegacySearchIndex } from '@/lib/seo/search-indexability'
 
 export interface SkillRecord {
   id: string
@@ -177,10 +177,10 @@ export interface SkillSitemapQueryOptions {
 
 function createSitemapClient(requestTimeoutMs = SITEMAP_QUERY_TIMEOUT_MS) {
   if (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY) {
-    return createAdminClient({ requestTimeoutMs })
+    return createAdminClient({ requestTimeoutMs, circuitScope: 'sitemap' })
   }
 
-  return createPublicClient({ requestTimeoutMs })
+  return createPublicClient({ requestTimeoutMs, circuitScope: 'sitemap' })
 }
 
 type SkillOnlyScopeRecord = Pick<
@@ -377,7 +377,7 @@ const getCachedApprovedSkillSitemapRecords = unstable_cache(
   ): Promise<SkillSitemapRecord[]> => {
     return fetchApprovedSkillSitemapRecords({ offset, limit, minStars, minQualityScore })
   },
-  ['approved-sitemap-records-v13-canonical-editorial'],
+  ['approved-sitemap-records-v14-partitioned'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-records'],
@@ -386,13 +386,42 @@ const getCachedApprovedSkillSitemapRecords = unstable_cache(
 
 const getCachedApprovedSkillSitemapCount = unstable_cache(
   async (minStars: number, minQualityScore: number): Promise<number> => {
-    return fetchApprovedSkillSitemapCount(minStars, minQualityScore)
+    const [count, extra] = await Promise.all([
+      getCachedLegacySitemapCount(minStars, minQualityScore),
+      getCachedEditorialSitemapExtras(minStars, minQualityScore),
+    ])
+    return count + extra.length
   },
-  ['approved-sitemap-count-v13-canonical-editorial'],
+  ['approved-sitemap-count-v14-partitioned'],
   {
     revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS,
     tags: ['approved-sitemap-count'],
   }
+)
+
+const SITEMAP_RECORD_SELECT = 'slug,github_stars,github_last_pushed_at,created_at,updated_at,quality_score,publisher_verified'
+
+const getCachedLegacySitemapCount = unstable_cache(
+  fetchApprovedSkillSitemapCount,
+  ['approved-sitemap-legacy-count-v1'],
+  { revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS, tags: ['approved-sitemap-count'] }
+)
+
+const getCachedEditorialSitemapExtras = unstable_cache(
+  async (minStars: number, minQuality: number): Promise<SkillSitemapRecord[]> => {
+    const filter = buildEditorialSearchIndexFilter()
+    if (!filter) return []
+    const { data, error } = await createSitemapClient().from('skills')
+      .select(`${SITEMAP_RECORD_SELECT},ai_review_approved`)
+      .or(filter).order('slug', { ascending: true })
+    if (error) throw error
+    // A source-pinned listing may also qualify through the approved lane.
+    // Keep its single canonical URL in the union, not two counted entries.
+    return ((data || []) as (SkillSitemapRecord & { ai_review_approved: boolean })[])
+      .filter(row => !matchesLegacySearchIndex(row, minStars, minQuality))
+  },
+  ['approved-sitemap-editorial-extras-v1'],
+  { revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS, tags: ['approved-sitemap-count', 'approved-sitemap-records'] }
 )
 
 export async function getApprovedSkillSitemapRecords(
@@ -413,20 +442,21 @@ async function fetchApprovedSkillSitemapRecords(
 ): Promise<SkillSitemapRecord[]> {
   const supabase = createSitemapClient()
   const rows: SkillSitemapRecord[] = []
+  const [legacyCount, extra] = await Promise.all([
+    getCachedLegacySitemapCount(options.minStars, options.minQualityScore),
+    getCachedEditorialSitemapExtras(options.minStars, options.minQualityScore),
+  ])
 
-  for (let from = options.offset; ; from += SKILLS_PAGE_SIZE) {
+  for (let from = options.offset; from < legacyCount; from += SKILLS_PAGE_SIZE) {
     const remaining = options.limit - rows.length
     if (remaining <= 0) break
-    const pageSize = Math.min(SKILLS_PAGE_SIZE, remaining)
+    const pageSize = Math.min(SKILLS_PAGE_SIZE, remaining, legacyCount - from)
     const query = supabase
       .from('skills')
-      .select('slug,github_stars,github_last_pushed_at,created_at,updated_at,quality_score,publisher_verified')
-      .or(buildSearchIndexFilter(options.minStars, options.minQualityScore))
-      // This matches the public-directory partial index. A sitemap needs a
-      // stable complete traversal, not a star-only ranking, and must never
-      // force a full-table sort while a crawler is visiting the site.
-      .order('quality_score', { ascending: false })
-      .order('github_stars', { ascending: false })
+      .select(SITEMAP_RECORD_SELECT)
+      .or(buildLegacySearchIndexFilter(options.minStars, options.minQualityScore))
+      .order('quality_score', { ascending: false, nullsFirst: false })
+      .order('slug', { ascending: true })
 
     const { data, error } = await query.range(from, from + pageSize - 1)
 
@@ -437,12 +467,20 @@ async function fetchApprovedSkillSitemapRecords(
     if (data.length < pageSize) break
   }
 
+  rows.push(...extra.slice(Math.max(0, options.offset - legacyCount), Math.max(0, options.offset - legacyCount) + Math.max(0, options.limit - rows.length)))
   return rows
 }
 
-export async function getApprovedSkillSitemapCount(minStars = 0, minQualityScore = 0): Promise<number> {
+export async function getApprovedSkillSitemapCount(minStars = 0, minQualityScore = 0, fresh = false): Promise<number> {
   const normalizedMinStars = Math.max(0, Math.floor(minStars || 0))
   const normalizedMinQualityScore = Math.max(0, Math.floor(minQualityScore || 0))
+  if (fresh) {
+    const [count, extra] = await Promise.all([
+      fetchApprovedSkillSitemapCount(normalizedMinStars, normalizedMinQualityScore),
+      getCachedEditorialSitemapExtras(normalizedMinStars, normalizedMinQualityScore),
+    ])
+    return count + extra.length
+  }
   return getCachedApprovedSkillSitemapCount(normalizedMinStars, normalizedMinQualityScore)
 }
 
@@ -453,14 +491,15 @@ async function fetchApprovedSkillSitemapCount(minStars: number, minQualityScore:
   // cannot count this narrower SEO set, even when no numeric floors are used.
   const query = supabase
     .from('skills')
-    // This result is cached for 12 hours. An exact indexed count prevents the
+    // This result is cached for one hour. An exact indexed count prevents the
     // planner estimate from creating empty sitemap shards or hiding valid ones.
     .select('slug', { count: 'exact', head: true })
-    .or(buildSearchIndexFilter(minStars, minQualityScore))
+    .or(buildLegacySearchIndexFilter(minStars, minQualityScore))
 
   const { count, error } = await query
   if (error) throw error
-  return count || 0
+  if (count === null) throw new Error('Sitemap count unavailable')
+  return count
 }
 
 export interface SkillAgentStats {
@@ -783,26 +822,42 @@ export async function getSkillAuditBySlug(skillSlug: string): Promise<SkillAudit
   return data as SkillAuditRecord
 }
 
-export async function getSkillAuditsMap(): Promise<Record<string, SkillAuditRecord>> {
-  const supabase = createPublicClient()
-  const rows: SkillAuditRecord[] = []
+const getCachedSkillAuditsMap = unstable_cache(
+  async (slugs: string[]): Promise<Record<string, SkillAuditRecord>> => {
+    const signal = AbortSignal.timeout(SKILL_STATS_REQUEST_TIMEOUT_MS)
+    const supabase = createPublicClient({ requestTimeoutMs: SKILL_STATS_REQUEST_TIMEOUT_MS, circuitScope: 'skill-support' })
+    const map: Record<string, SkillAuditRecord> = {}
+    let next = 0
+    // Small URL-safe batches, two requests at most, one deadline for the
+    // entire read. Never traverse unrelated audit records or cache a partial
+    // map when a batch fails.
+    const worker = async () => {
+      while (next < slugs.length) {
+        signal.throwIfAborted()
+        const batch = slugs.slice(next, next + 80)
+        next += batch.length
+        const { data, error } = await supabase.from('skill_audits').select('*')
+          .in('skill_slug', batch).limit(batch.length).abortSignal(signal)
+        if (error) throw error
+        for (const row of (data || []) as SkillAuditRecord[]) map[row.skill_slug] = row
+      }
+    }
+    await Promise.all([worker(), worker()])
+    return map
+  },
+  ['public-skill-audits-by-slug-v1'],
+  { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-audits'] }
+)
 
-  for (let from = 0; ; from += SKILLS_PAGE_SIZE) {
-    const { data, error } = await supabase
-      .from('skill_audits')
-      .select('*')
-      .range(from, from + SKILLS_PAGE_SIZE - 1)
+const readCoalescedAuditMap = createCoalescedCache<Record<string, SkillAuditRecord>>({
+  ttlMs: ALL_SKILLS_CACHE_TTL_MS, maxEntries: 16, cacheWhen: () => true,
+})
 
-    if (error || !data?.length) break
-    rows.push(...(data as SkillAuditRecord[]))
-    if (data.length < SKILLS_PAGE_SIZE) break
-  }
-
-  const map: Record<string, SkillAuditRecord> = {}
-  for (const row of rows) {
-    map[row.skill_slug] = row
-  }
-  return map
+export async function getSkillAuditsMap(skillSlugs: string[]): Promise<Record<string, SkillAuditRecord>> {
+  const slugs = [...new Set(skillSlugs)].sort()
+  if (slugs.length > DEFAULT_SKILL_QUERY_LIMIT) throw new Error('Audit shortlist exceeds its query budget')
+  if (!slugs.length) return {}
+  return readCoalescedAuditMap(JSON.stringify(slugs), () => getCachedSkillAuditsMap(slugs))
 }
 
 export async function getApprovedClaimBySkillSlug(skillSlug: string, strict = false): Promise<SkillClaimRecord | null> {

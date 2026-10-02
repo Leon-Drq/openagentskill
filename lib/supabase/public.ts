@@ -15,8 +15,8 @@ const SUPABASE_ANON_KEY =
 
 export interface PublicClientOptions {
   /**
-   * Optional request deadline for background work. Public page reads continue
-   * using the normal client, while bounded jobs can fail one request safely.
+   * Optional request deadline override. All public reads default to eight
+   * seconds; specific workloads can use a shorter budget.
    */
   requestTimeoutMs?: number
   circuitScope?: SupabaseCircuitScope
@@ -27,12 +27,10 @@ export interface PublicClientOptions {
  * Does NOT depend on cookies() — works in any server context.
  */
 export function createPublicClient(options: PublicClientOptions = {}) {
-  const requestTimeoutMs = Number(options.requestTimeoutMs)
-  if (Number.isFinite(requestTimeoutMs) && requestTimeoutMs > 0) {
-    return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: { fetch: createResilientTimeoutFetch(Math.floor(requestTimeoutMs), options.circuitScope) },
-    })
-  }
-
-  return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  const requested = Number(options.requestTimeoutMs)
+  const requestTimeoutMs = Number.isFinite(requested) && requested > 0 ? Math.floor(requested) : 8000
+  return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    db: { retry: false },
+    global: { fetch: createResilientTimeoutFetch(requestTimeoutMs, options.circuitScope) },
+  })
 }

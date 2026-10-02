@@ -164,9 +164,9 @@ assert.deepEqual((await db.getSkillDirectory('new', 'empty', 20)).records, [], '
 operations.length = 0
 await db.getApprovedSkillSitemapCount(3, 50)
 await db.getApprovedSkillSitemapRecords({ minStars: 3, minQualityScore: 50, limit: 10 })
-assert.equal(operations.length, 2)
+assert.ok(operations.length >= 3)
 for (const query of operations) {
-  assert.ok(query.some(op => op[0] === 'or' && op[1] === indexPolicy.buildSearchIndexFilter(3, 50)))
+  assert.ok(query.some(op => op[0] === 'or' && [indexPolicy.buildLegacySearchIndexFilter(3, 50),indexPolicy.buildEditorialSearchIndexFilter()].includes(op[1])))
   assert.ok(!query.some(op => op[0] === 'gte' && op[1] === 'quality_score'), 'Editorial eligibility is separate from model scores')
 }
 assert.ok(indexPolicy.buildSearchIndexFilter().includes('and(ai_review_approved.eq.true,quality_score.gte.50,or(github_stars.gte.3,publisher_verified.eq.true),'))

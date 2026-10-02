@@ -5,7 +5,7 @@ type CircuitState = {
   generation: number
 }
 
-export type SupabaseCircuitScope = 'public-read' | 'public-catalog' | 'skill-lookup' | 'skill-search' | 'telemetry' | 'admin' | 'x-automation'
+export type SupabaseCircuitScope = 'public-read' | 'public-catalog' | 'skill-lookup' | 'skill-search' | 'skill-support' | 'sitemap' | 'telemetry' | 'admin' | 'x-automation'
 
 type CircuitGlobal = typeof globalThis & {
   __openagentskillSupabaseCircuits?: Partial<Record<SupabaseCircuitScope, CircuitState>>
@@ -80,13 +80,17 @@ export function createResilientTimeoutFetch(timeoutMs: number, scope: SupabaseCi
 
     try {
       const response = await fetch(input, { ...init, signal })
+      // fetch resolves when headers arrive. Keep the deadline active until
+      // the database body is complete, so a stalled JSON stream cannot leave
+      // a build or an ISR refresh hanging after the timer was cleared.
+      const body = response.body === null ? null : await response.arrayBuffer()
       // Requests started before a circuit opened cannot close it late or
       // extend its cooldown. Only the recovery probe can change that state.
       if (state.generation === generation) {
         if (response.status >= 500) recordFailure(state)
         else recordSuccess(state)
       }
-      return response
+      return new Response(body, { status: response.status, statusText: response.statusText, headers: response.headers })
     } catch (error) {
       // A caller navigating away/cancelling work is not a database outage.
       if (!externalSignal?.aborted && state.generation === generation) recordFailure(state)

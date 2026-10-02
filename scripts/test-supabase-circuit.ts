@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict'
-import './test-supabase-circuit-isolation.mjs'
 
 // Node's type-stripping runner needs the explicit extension for this standalone test.
 // @ts-expect-error TS5097 is expected for this standalone Node test entrypoint.
@@ -10,6 +9,8 @@ type CircuitGlobal = typeof globalThis & {
 }
 
 async function main() {
+  await import('./test-supabase-circuit-isolation.mjs')
+  await import('./test-system-data-reliability.mjs')
   const shared = globalThis as CircuitGlobal
   shared.__openagentskillSupabaseCircuits = undefined
 

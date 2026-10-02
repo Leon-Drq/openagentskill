@@ -43,6 +43,7 @@ export function createAdminClient(options: AdminClientOptions = {}) {
   }
 
   return createSupabaseClient(SUPABASE_URL, serviceKey, {
+    db: { retry: false },
     auth: {
       autoRefreshToken: false,
       persistSession: false,

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { sitemapUnavailableResponse } from '@/lib/seo/sitemap-response'
+import { getSkillSitemapSnapshot } from '@/lib/seo/skill-sitemap-data'
 import {
   getBestSitemapEntries,
   getCoreSitemapEntries,
@@ -13,6 +14,7 @@ import {
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 3600
+export const maxDuration = 120
 
 const SHARDED_SECTION_PREFIXES: Array<[RegExp, SitemapSection]> = [
   [/^skills-(\d+)\.xml$/, 'skills'],
@@ -70,21 +72,23 @@ export async function GET(
     const index = Number(match[1])
     if (!Number.isSafeInteger(index) || index < 0 || String(index) !== match[1]) notFound()
 
-    const entries = await getSkillSitemapEntries(sitemapSection, index).catch(() => null)
-    if (!entries) return sitemapUnavailableResponse()
+    const snapshot = await getSkillSitemapSnapshot().catch(() => null)
+    if (!snapshot) return sitemapUnavailableResponse()
+    const entries = await getSkillSitemapEntries(sitemapSection, index, snapshot)
     if (entries.length === 0) notFound()
 
-    return xmlResponse(renderUrlSet(entries))
+    return xmlResponse(renderUrlSet(entries), snapshot.generatedAt)
   }
 
   notFound()
 }
 
-function xmlResponse(body: string) {
+function xmlResponse(body: string, generatedAt?: string) {
   return new Response(body, {
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',
       'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      ...(generatedAt ? { 'X-Sitemap-Snapshot': generatedAt } : {}),
     },
   })
 }
