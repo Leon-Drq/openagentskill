@@ -5,6 +5,7 @@ import { catalogPageNumber, catalogStars } from '@/lib/skills/catalog-query'
 import { getDirectoryProfiles } from '@/lib/skills/directory-profiles'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { getCategories, type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsWithStatus } from '@/lib/db/skills'
+import { getShowcasesForSkill, getShowcaseCardData } from '@/lib/showcase'
 import { SkillsPageClient } from '@/components/skills-page-client'
 import { ExternalSkillResults } from '@/components/external-skills'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
@@ -120,35 +121,35 @@ const DIRECTORY_SCENARIOS = [
   {
     title: 'Coding agent skills',
     eyebrow: 'Codex, Claude Code, Cursor',
-    href: '/skills?category=Coding+Agents',
+    href: '/best/coding-agents',
     description: 'Code review, repo inspection, testing, planning, shipping, and engineering workflows for coding agents.',
     terms: ['agent-skills', 'coding agent', 'coding agents', 'code review', 'codex', 'claude code', 'cursor', 'gemini cli', 'repo automation', 'engineering skill'],
   },
   {
     title: 'Research and RAG skills',
     eyebrow: 'Documents and knowledge',
-    href: '/skills?category=Research',
+    href: '/best/research-agents',
     description: 'Research, recent-events briefings, PDF parsing, markdown conversion, RAG ingestion, and knowledge workflows.',
     terms: ['research', 'rag', 'pdf', 'document', 'markdown', 'knowledge', 'retrieval', 'briefing', 'recent', 'news'],
   },
   {
     title: 'Finance and trading skills',
     eyebrow: 'Markets and quant',
-    href: '/skills?category=Finance',
+    href: '/best/finance-quant',
     description: 'Stock analysis, market research, quant backtesting, financial data, and investment research skills.',
     terms: ['finance', 'financial', 'stock', 'stocks', 'trading', 'trade skill', 'market research', 'quant', 'backtesting', 'investment'],
   },
   {
     title: 'Web scraping skills',
     eyebrow: 'Crawlers and extraction',
-    href: '/skills?category=Web+Scraping',
+    href: '/best/web-scraping',
     description: 'Crawling, scraping, extraction, browser automation, structured data capture, and website-to-markdown workflows.',
     terms: ['web scraping', 'scraping', 'crawler', 'crawl', 'extract', 'extraction', 'browser', 'html', 'markdown', 'website'],
   },
   {
     title: 'PPT and presentation skills',
     eyebrow: 'Slides and decks',
-    href: '/skills?q=ppt',
+    href: '/best/presentation-generation',
     description: 'Presentation generation, editable PPTX, slide decks, speaker notes, and visual storytelling workflows.',
     terms: ['ppt', 'pptx', 'presentation', 'slide', 'slides', 'deck', 'powerpoint', 'speaker note'],
   },
@@ -162,42 +163,42 @@ const DIRECTORY_SCENARIOS = [
   {
     title: 'Design and creative skills',
     eyebrow: 'Images, video, UI',
-    href: '/skills?category=design-creative',
+    href: '/best/design-creative',
     description: 'Image, video, creative production, UI design, multimodal generation, and visual workflow skills.',
     terms: ['design', 'image', 'video', 'creative', 'ui', 'ux', 'seedance', 'visual', 'multimodal', 'filmmaking'],
   },
   {
     title: 'Data and analytics skills',
     eyebrow: 'Analysis and pipelines',
-    href: '/skills?q=data',
+    href: '/best/data-analysis',
     description: 'Data analysis, analytics, ETL, notebooks, databases, tables, charts, and reporting workflows.',
     terms: ['data', 'analytics', 'analysis', 'etl', 'database', 'table', 'chart', 'notebook', 'pipeline', 'reporting'],
   },
   {
     title: 'Marketing and growth skills',
     eyebrow: 'SEO and content',
-    href: '/skills?q=marketing',
+    href: '/best/marketing-growth',
     description: 'SEO, content research, growth workflows, social listening, campaign analysis, and publishing helpers.',
     terms: ['marketing', 'seo', 'content', 'growth', 'social', 'campaign', 'copywriting', 'newsletter', 'traffic'],
   },
   {
     title: 'Legal and compliance skills',
     eyebrow: 'Contracts and policy',
-    href: '/skills?q=legal',
+    href: '/best/legal-compliance',
     description: 'Contract review, policy analysis, compliance research, audit support, and legal document workflows.',
     terms: ['legal', 'contract', 'law', 'policy', 'compliance', 'audit', 'risk'],
   },
   {
     title: 'Education and teaching skills',
     eyebrow: 'Learning workflows',
-    href: '/skills?q=teach',
+    href: '/best/education-tutoring',
     description: 'Teaching, tutoring, course creation, lesson planning, learning support, and explanation skills.',
     terms: ['education', 'teach', 'teaching', 'tutor', 'learning', 'course', 'lesson', 'student'],
   },
   {
     title: 'Football and World Cup skills',
     eyebrow: 'Sports analytics',
-    href: '/skills?q=football',
+    href: '/best/football-analytics',
     description: 'Football analytics, match data, World Cup dashboards, scouting analysis, and sports research workflows.',
     terms: ['football', 'soccer', 'world cup', 'sports', 'match', 'statsbomb', 'mplsoccer', 'scouting'],
   },
@@ -1016,7 +1017,10 @@ export default async function SkillsPage({
   const hasPreviousResults = effectivePage > 1
   const hasMoreResults = catalogMode ? catalogResult!.hasMore : resultCount > pageOffset + visibleRecords.length
 
-  const skills = visibleRecords.map(toSkillsPageSkill)
+  const skills = visibleRecords.map(item => {
+    const example = getShowcasesForSkill(item.record.slug)[0]
+    return { ...toSkillsPageSkill(item), preview: example ? getShowcaseCardData(example) : null }
+  })
   const directorySections = catalogMode ? [] : buildDirectorySections(
     enrichedRecords.slice(0, DIRECTORY_SECTION_SOURCE_LIMIT)
   )

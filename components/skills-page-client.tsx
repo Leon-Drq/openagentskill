@@ -5,9 +5,14 @@ import { commerceCopy } from '@/lib/i18n/commerce-copy'
 import { acquisitionTypes, hasCommercialOffers, type PriceFilter, type SkillCommerce } from '@/lib/skills/commerce'
 import { SkillPrice } from '@/components/skill-commerce'
 
+import Image from 'next/image'
+import { DiscoveryTabs, discoveryIcons } from './discovery-navigation'
+import { DISCOVERY_TASKS, discoveryCopy } from '@/lib/discovery'
+import { getShowcaseImageSrc, getShowcaseEvidenceLabel, localizeShowcase, type ShowcaseCardData } from '@/lib/showcase-shared'
+import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useSyncExternalStore, useTransition, type ReactNode } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore, useTransition, type ReactNode } from 'react'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
@@ -94,6 +99,7 @@ interface DirectoryLink {
 }
 
 interface Skill {
+  preview?: ShowcaseCardData | null
   commerce: SkillCommerce
   id: string
   slug: string
@@ -193,6 +199,15 @@ export function SkillsPageClient(props: Props) {
     quality, trust, safety, supplyTrack, minStars, resultCount, page, rankOffset,
     hasPreviousResults, hasMoreResults, degraded, directorySections, directoryLinks } = props
   const { locale } = useI18n()
+  const discovery = discoveryCopy(locale)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 1024px)')
+    const update = () => setFiltersOpen(media.matches)
+    update()
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
   const c = directoryCopy(locale)
   const prices = commerceCopy(locale)
   const reportedResult = useRef('')
@@ -250,7 +265,7 @@ export function SkillsPageClient(props: Props) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
-      <main className="skills-directory mx-auto max-w-6xl px-4 pb-16 sm:px-6" aria-busy={pending}>
+      <main className="skills-directory mx-auto max-w-[1440px] px-4 pb-16 sm:px-6" aria-busy={pending}>
         <header className="border-b border-border pb-7 pt-10 sm:pb-9 sm:pt-14" data-directory-hero>
           <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#006b4f]">OPENAGENTSKILL / DIRECTORY</p>
           <h1 className="mt-4 font-display text-4xl font-normal tracking-tight sm:text-6xl">AI Agent <em className="font-normal text-[#006b4f]">Skills</em></h1>
@@ -260,36 +275,61 @@ export function SkillsPageClient(props: Props) {
             const q = String(new FormData(event.currentTarget).get('q') || '').trim()
             trackAnalyticsEvent('directory_search', { has_query: Boolean(q), query_length: q.length, locale })
             navigate({ q: q || undefined, sort: undefined, view: q ? 'all' : undefined })
-          }} className="mt-6 flex max-w-3xl items-center gap-2 border border-border bg-card p-2 focus-within:border-[#006b4f]">
+          }} className="mt-6 flex max-w-3xl items-center gap-2 rounded-[12px] border border-border bg-card p-2 focus-within:border-[#006b4f]">
             <Search size={18} className="ml-2 hidden shrink-0 text-secondary sm:block" aria-hidden="true" />
             <input key={query || ''} type="search" name="q" defaultValue={query} aria-label={c.search}
-              placeholder={c.placeholder} className="min-w-0 flex-1 bg-transparent px-2 py-2.5 text-sm outline-none" />
-            <button type="submit" disabled={pending} className="shrink-0 bg-[#006b4f] px-4 py-3 text-sm font-semibold text-white hover:bg-[#00533d] disabled:opacity-50 sm:px-6">{c.search}</button>
+              id="skill-search" placeholder={c.placeholder} className="min-w-0 flex-1 bg-transparent px-2 py-2.5 text-sm outline-none" />
+            <button type="submit" disabled={pending} className="shrink-0 rounded-lg bg-[#006b4f] px-4 py-3 text-sm font-semibold text-white hover:bg-[#00533d] disabled:opacity-50 sm:px-6">{c.search}</button>
           </form>
-          <nav aria-label={label('browseMode')} className="mt-6 flex flex-wrap gap-3" data-directory-modes>
-            {(['skills', 'all'] as const).map(mode => <Link key={mode} prefetch={false}
-              href={href({ view: mode, q: undefined, useCase: undefined, platform: undefined, quality: undefined, trust: undefined, safety: undefined, track: undefined })}
-              aria-current={props.view === mode && !query ? 'page' : undefined}
-              className={`px-4 py-2.5 text-sm border ${props.view === mode && !query ? 'border-[#006b4f] bg-[#006b4f] text-white' : 'border-border text-secondary hover:text-foreground'}`}>
-              {label(mode === 'skills' ? 'selectedSkills' : 'fullCatalog')}
-            </Link>)}
-          </nav>
+          <DiscoveryTabs active={props.view === 'all' ? 'all' : 'featured'} source="skills" search={queryString} />
           <p className="mt-3 max-w-3xl text-xs leading-6 text-secondary" data-directory-scope>
             {label(props.catalogMode ? 'catalogNote' : query ? 'searchNote' : 'selectionNote')}
           </p>
         </header>
 
-        <nav aria-label={c.category} className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-border py-4 text-sm" data-directory-categories>
-          {['all', ...primaryCategories].map(key => (
-            <Link key={key} prefetch={false} href={href({ category: key, track: undefined, useCase: undefined })}
-              aria-current={selectedCategory === key ? 'page' : undefined}
-              className={`border-b-2 py-2 transition-colors ${selectedCategory === key ? 'border-[#006b4f] font-semibold text-[#006b4f]' : 'border-transparent text-secondary hover:text-foreground'}`}>
-              {key === 'all' ? label('allCategories') : label(key)}
-            </Link>
-          ))}
-        </nav>
-
-        <section aria-labelledby="directory-results-heading" className="pt-5" data-directory-results>
+        <div className="mt-6 grid items-start gap-6 lg:grid-cols-[232px_minmax(0,1fr)] lg:gap-8">
+          <aside className="min-w-0 lg:sticky lg:top-24" aria-label={discovery.filters}>
+            <details data-directory-filters open={filtersOpen} onToggle={event => setFiltersOpen(event.currentTarget.open)} className="rounded-[12px] border border-border bg-card/40 p-4">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold lg:hidden">
+                <span className="inline-flex items-center gap-2"><SlidersHorizontal size={16} aria-hidden="true" />{discovery.filters}{activeFilters.length ? ` · ${activeFilters.length}` : ''}</span><ArrowRight size={16} aria-hidden="true" />
+              </summary>
+              <div className="mt-4 space-y-6 lg:mt-0">
+                <nav aria-label={c.category} data-directory-categories>
+                  <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-secondary">{c.category}</h2>
+                  {['all', ...new Set([...DISCOVERY_TASKS.map(item => item.id), 'finance'])].map(key => {
+                    const item = DISCOVERY_TASKS.find(item => item.id === key)
+                    const Icon = item ? discoveryIcons[item.icon] : Search
+                    return <Link key={key} prefetch={false} href={href({ category: key, track: undefined, useCase: undefined })} aria-current={selectedCategory === key ? 'page' : undefined}
+                      className={`flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm ${selectedCategory === key ? 'bg-[#006b4f]/10 font-semibold text-[#006b4f]' : 'text-secondary hover:bg-muted hover:text-foreground'}`}>
+                      <Icon size={16} className="shrink-0" aria-hidden="true" />{key === 'all' ? label('allCategories') : label(key)}
+                    </Link>
+                  })}
+                </nav>
+                <div className="grid gap-4 border-t border-border pt-5">
+                  <label className="grid gap-2 text-xs text-secondary">{c.category}
+                    <NativeSelect value={selectedCategory} onChange={e => navigate({ category: e.target.value })} className="w-full bg-transparent text-sm">
+                      <option value="all">{c.all}</option>{categoryOptions.map(key => <option key={key} value={key}>{label(key)}</option>)}
+                    </NativeSelect>
+                  </label>
+                  <label className="grid gap-2 text-xs text-secondary">{prices.pricing}
+                    <NativeSelect aria-label={prices.pricing} value={props.pricing} onChange={e => navigate({ pricing: e.target.value })} className="w-full bg-transparent text-sm">
+                      <option value="all">{prices.all}</option>{acquisitionTypes.filter(type => !['paid', 'freemium'].includes(type) || hasCommercialOffers() || props.pricing === type).map(type => <option key={type} value={type}>{prices[type]}</option>)}
+                    </NativeSelect>
+                  </label>
+                  {advanced.map(filter => <label key={filter.key} className="grid gap-2 text-xs text-secondary">{filter.title}
+                    <NativeSelect value={filter.value} onChange={e => navigate({ [filter.key]: e.target.value })} className="w-full bg-transparent text-sm">
+                      <option value="all">{c.any}</option>{filter.options.map(([value, title]) => <option key={value} value={value}>{title}</option>)}
+                    </NativeSelect>
+                  </label>)}
+                </div>
+                <nav className="border-t border-border pt-5" aria-label={discovery.explore}>
+                  <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-secondary">{discovery.explore}</h2>
+                  {DISCOVERY_TASKS.slice(0, 4).map(item => <Link key={item.id} href={getLocalizedNavigationHref(item.href, locale)} prefetch={false} className="flex min-h-11 items-center justify-between gap-2 text-xs text-secondary hover:text-[#006b4f]">{item.label[locale]}<ArrowRight size={12} aria-hidden="true" /></Link>)}
+                </nav>
+              </div>
+            </details>
+          </aside>
+        <section aria-labelledby="directory-results-heading" className="min-w-0" data-directory-results>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="min-w-0">
               <h2 id="directory-results-heading" className="break-words text-base font-semibold">
@@ -303,42 +343,14 @@ export function SkillsPageClient(props: Props) {
             </div>
             <div className="flex max-w-full flex-wrap gap-3">
             <label className="flex min-w-0 max-w-full items-center gap-3 text-xs text-secondary">
-              <span className="shrink-0">{prices.pricing}</span>
-              <NativeSelect aria-label={prices.pricing} value={props.pricing} onChange={e => navigate({ pricing: e.target.value })} className="w-48 max-w-full bg-transparent text-sm">
-                <option value="all">{prices.all}</option>
-                {acquisitionTypes.filter(type => !['paid', 'freemium'].includes(type) || hasCommercialOffers() || props.pricing === type).map(type => <option key={type} value={type}>{prices[type]}</option>)}
-              </NativeSelect>
-            </label>
-            <label className="flex min-w-0 max-w-full items-center gap-3 text-xs text-secondary">
               <span className="shrink-0">{c.sort}</span>
-              <NativeSelect value={sort} onChange={e => navigate({ sort: e.target.value })} className="w-48 max-w-full bg-transparent text-sm">
+              <NativeSelect aria-label={c.sort} value={sort} onChange={e => navigate({ sort: e.target.value })} className="w-48 max-w-full bg-transparent text-sm">
                 {sortOptions.map(([value, title]) => <option key={value} value={value}>{title}</option>)}
               </NativeSelect>
             </label>
             </div>
           </div>
 
-          <details className="mt-4 border-b border-border pb-4" data-directory-filters>
-            <summary className="flex w-fit cursor-pointer list-none items-center gap-2 text-sm text-secondary hover:text-foreground">
-              <SlidersHorizontal size={15} aria-hidden="true" />{c.filters}{activeFilters.length ? ` · ${activeFilters.length}` : ''}
-            </summary>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <label className="grid gap-2 text-xs text-secondary">{c.category}
-                <NativeSelect value={selectedCategory} onChange={e => navigate({ category: e.target.value })} className="w-full bg-transparent text-sm">
-                  <option value="all">{c.all}</option>
-                  {categoryOptions.map(key => <option key={key} value={key}>{label(key)}</option>)}
-                </NativeSelect>
-              </label>
-              {advanced.map(filter => (
-                <label key={filter.key} className="grid gap-2 text-xs text-secondary">{filter.title}
-                  <NativeSelect value={filter.value} onChange={e => navigate({ [filter.key]: e.target.value })} className="w-full bg-transparent text-sm">
-                    <option value="all">{c.any}</option>
-                    {filter.options.map(([value, title]) => <option key={value} value={value}>{title}</option>)}
-                  </NativeSelect>
-                </label>
-              ))}
-            </div>
-          </details>
           {activeFilters.length > 0 && (
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs" aria-label={c.active}>
               {activeFilters.map(([key,value]) => <Link key={key} prefetch={false} href={href({ [key]: undefined })}
@@ -358,18 +370,29 @@ export function SkillsPageClient(props: Props) {
               {props.pricing !== 'all' && <Link href={`/contact${locale === 'en' ? '' : '?lang=' + locale}`} className="mt-4 block text-sm text-[#006b4f] underline underline-offset-4">{prices.contribute} →</Link>}
               <Link href={resetHref} className="mt-5 inline-block text-[#006b4f] underline">{c.reset}</Link>
             </div>
-          ) : <div className="border-t border-border" data-skill-list>
+          ) : <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
             {skills.map(skill => (
-              <article key={skill.id} className="grid min-w-0 grid-cols-[40px_minmax(0,1fr)] gap-x-4 border-b border-border py-6 sm:grid-cols-[48px_minmax(0,1fr)_150px] sm:gap-x-5 sm:py-7" data-directory-skill>
-                <div className="pt-1"><GitHubOwnerAvatar owner={skill.author.owner} label={skill.author.name} size="md" /></div>
-                <div className="min-w-0">
-                  <h3 className="break-words text-lg font-semibold leading-snug [overflow-wrap:anywhere] sm:text-xl">
+              <article key={skill.id} className="group flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-border bg-card transition-colors hover:border-[#006b4f]/50" data-directory-skill>
+                {skill.preview ? <Link href={getLocalizedNavigationHref(`/showcase/${skill.preview.slug}`, locale)} prefetch={false} className="relative block aspect-[16/10] overflow-hidden border-b border-border bg-muted" aria-label={`${discovery.examples}: ${skill.name}`}>
+                  <Image src={getShowcaseImageSrc(skill.preview.media[0].src, 'card')} alt={localizeShowcase(skill.preview.media[0].alt, locale)} fill sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 360px" className={skill.preview.cardFit === 'contain' ? 'object-contain p-3' : 'object-cover object-top'} />
+                  <span className="absolute bottom-3 left-3 rounded-md bg-background/95 px-2 py-1 text-[10px]">{getShowcaseEvidenceLabel(skill.preview, locale)}</span>
+                </Link> : <Link href={getLocalizedNavigationHref(`/skills/${skill.slug}`, locale)} prefetch={false} className="flex aspect-[16/10] flex-col justify-between border-b border-border bg-[#eeece5]/65 p-5 text-[#006b4f]" data-skill-capability>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.2em]">Agent Skill</span>
+                  <span className="font-display text-3xl leading-tight">{directoryCategories(skill.category).map(label).join(' · ')}</span>
+                  <span className="text-xs leading-5 text-secondary">{[...new Set(skill.platformHints || skill.compatibility.map(v => v.platform))].slice(0, 2).join(' · ') || skill.author.name}</span>
+                </Link>}
+                <div className="flex min-w-0 items-start gap-3 p-5 pb-0">
+                <div className="shrink-0"><GitHubOwnerAvatar owner={skill.author.owner} label={skill.author.name} size="md" /></div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="break-words text-base font-semibold leading-snug [overflow-wrap:anywhere]">
                     <Link prefetch={false} href={`/skills/${skill.slug}${locale === 'en' ? '' : '?lang=' + locale}`}
                       onClick={() => trackAnalyticsEvent('directory_skill_open', { skill_slug: skill.slug, mode: props.catalogMode ? 'catalog' : query ? 'search' : 'selected', position: rankOffset + skills.indexOf(skill) + 1 })}
                       className="hover:text-[#006b4f]">{skill.name}</Link>
                   </h3>
                   <p className="mt-1 truncate font-mono text-[11px] text-secondary">{skill.author.owner || skill.author.name}</p>
-                  <p className="mt-3 max-w-2xl break-words text-sm leading-6 text-secondary">{skill.tagline}</p>
+                </div></div>
+                <div className="flex-1 p-5 pt-3">
+                  <p className="line-clamp-3 min-h-[4.5rem] break-words text-sm leading-6 text-secondary">{skill.tagline}</p>
                   <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-secondary">
                     <SkillPrice commerce={skill.commerce} />
                     <Link href={href({ category: directoryCategories(skill.category)[0] })} prefetch={false} className="underline decoration-border underline-offset-4">{directoryCategories(skill.category).map(label).join(' · ')}</Link>
@@ -379,7 +402,7 @@ export function SkillsPageClient(props: Props) {
                       : skill.sourceStatus !== 'source-recorded' ? <span>{c.review}</span> : null}
                   </div>
                 </div>
-                <div className="col-start-2 mt-4 flex flex-wrap items-center justify-between gap-4 sm:col-start-3 sm:row-start-1 sm:mt-0 sm:flex-col sm:items-end sm:justify-start sm:gap-5">
+                <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border bg-background/45 px-5 py-3">
                   <span title={c.repoStars} className="inline-flex items-center gap-1.5 font-mono text-sm"><Star size={14} aria-hidden="true" />{stars(skill.stats.stars)}<span className="text-[10px] text-secondary">GitHub</span></span>
                   <div className="flex items-center gap-4 text-xs">
                     <button type="button" aria-pressed={compareSlugs.includes(skill.slug)} onClick={() => toggleCompare(skill.slug)}
@@ -400,6 +423,7 @@ export function SkillsPageClient(props: Props) {
             </div>
           </nav>}
         </section>
+        </div>
 
         {props.externalDiscovery}
         {!query && directorySections.length > 0 && <section className="mt-16 border-t border-border pt-8" aria-labelledby="directory-collections">

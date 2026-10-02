@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronDown, Menu, Plus, X } from 'lucide-react'
+import { DiscoveryCategories } from '@/components/discovery-navigation'
 import { BrandMark } from '@/components/brand-mark'
 import { CreatorMenuProfile } from '@/components/creator-menu-profile'
 import { GitHubStarButton } from '@/components/github-star-button'
@@ -105,13 +106,14 @@ export function MobileNav() {
                     className={cn('block rounded px-3 py-3 text-base font-semibold', isNavigationSectionActive(pathname, section) && 'text-[#006b4f]')}>
                     {navigationLabel(section, locale, t.nav, getShowcaseNavLabel(locale))}
                   </Link>
-                  {section.items && <details className="group px-3" open={isNavigationSectionActive(pathname, section) || section.id === 'skills'}>
+                  {section.items && <details className="group px-3" open={isNavigationSectionActive(pathname, section) || section.id === 'categories'}>
                     <summary className="flex cursor-pointer list-none items-center justify-between pb-3 text-sm text-secondary">
                       {getNavigationCopy(locale).more}
                       <ChevronDown className="h-4 w-4 group-open:rotate-180" aria-hidden="true" />
                     </summary>
+                    {section.id === 'categories' && <DiscoveryCategories onNavigate={() => setIsOpen(false)} />}
                     <ul className="grid gap-x-6 pb-3 sm:grid-cols-2">
-                      {section.items.map(item => <li key={item.href}>
+                      {section.items.filter(item => section.id !== 'categories' || !['/skills', '/showcase', '/resolve'].includes(item.href)).map(item => <li key={item.href}>
                         <Link href={getLocalizedNavigationHref(item.href, locale)} prefetch={false} onClick={() => setIsOpen(false)}
                           aria-current={isNavigationPath(pathname, item.href) ? 'page' : undefined}
                           className={cn('block rounded px-3 py-2.5 text-sm hover:bg-muted', isNavigationPath(pathname, item.href) ? 'bg-muted text-foreground' : 'text-secondary')}>

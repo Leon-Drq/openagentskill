@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { ChevronDown, Plus } from 'lucide-react'
+import { ChevronDown, Plus, Search } from 'lucide-react'
+import { DiscoveryCategories } from '@/components/discovery-navigation'
+import { discoveryCopy } from '@/lib/discovery'
 import { BrandMark } from '@/components/brand-mark'
 import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -34,23 +36,28 @@ function NavDropdown({ pathname, section }: { pathname: string; section: Navigat
     return () => document.removeEventListener('pointerdown', dismiss)
   }, [open])
   return (
-    <div ref={root} className="relative h-full" data-nav-section={section.id}
+    <div ref={root} className={section.id === 'categories' ? 'h-full' : 'relative h-full'} data-nav-section={section.id}
+      onPointerLeave={event => { if (event.pointerType === 'mouse' && !root.current?.contains(document.activeElement)) setOpen(false) }}
       onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false) }}
       onKeyDown={event => { if (event.key === 'Escape') { setOpen(false); root.current?.querySelector('button')?.focus() } }}>
       <div className={cn('flex h-16 items-center border-b-2 border-transparent text-sm text-secondary', isNavigationSectionActive(pathname, section) && 'border-[#006b4f] text-foreground')}>
-        <Link href={href} prefetch={false} onPointerEnter={() => router.prefetch(href)} onPointerDown={() => warmRoute(href)} onFocus={() => router.prefetch(href)}
+        {section.id === 'categories' ? <button type="button" className="flex h-16 items-center gap-2 whitespace-nowrap px-2 hover:text-foreground"
+          aria-label={`${getNavigationCopy(locale).toggle}: ${label}`} aria-expanded={open} aria-controls={id} onClick={() => setOpen(value => !value)}>
+          {label}<ChevronDown className={cn('h-3.5 w-3.5', open && 'rotate-180')} aria-hidden="true" />
+        </button> : <><Link href={href} prefetch={false} onPointerEnter={() => router.prefetch(href)} onPointerDown={() => warmRoute(href)} onFocus={() => router.prefetch(href)}
           onClick={() => setOpen(false)} className="flex h-full items-center whitespace-nowrap pl-2 pr-1 hover:text-foreground"
           aria-current={isNavigationPath(pathname, section.href) ? 'page' : undefined}>{label}</Link>
         <button type="button" className="flex h-10 w-7 items-center justify-center rounded hover:bg-muted"
           aria-label={`${getNavigationCopy(locale).toggle}: ${label}`} aria-expanded={open} aria-controls={id} onClick={() => setOpen(value => !value)}>
           <ChevronDown className={cn('h-3.5 w-3.5', open && 'rotate-180')} aria-hidden="true" />
-        </button>
+        </button></>}
       </div>
-      <div id={id} aria-hidden={!open} className={cn(
-        'absolute right-0 top-[calc(100%-1px)] z-50 w-64 max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain rounded-[8px] border border-border bg-background p-1.5 shadow-[0_18px_55px_rgba(29,27,24,0.12)]',
+      <div id={id} aria-hidden={!open} inert={!open} className={cn(
+        'absolute top-[calc(100%-1px)] z-50 max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain border border-border bg-background shadow-[0_18px_55px_rgba(29,27,24,0.12)]',
+        section.id === 'categories' ? 'left-1/2 w-[min(960px,calc(100vw-3rem))] -translate-x-1/2 rounded-[16px] p-5' : 'right-0 w-64 rounded-lg p-1.5',
         !open && 'invisible pointer-events-none'
       )}>
-        {section.items?.map(item => {
+        {section.id === 'categories' ? <DiscoveryCategories onNavigate={() => setOpen(false)} /> : section.items?.map(item => {
           const target = getLocalizedNavigationHref(item.href, locale)
           return <Link key={item.href} href={target} prefetch={false} tabIndex={open ? 0 : -1}
             onPointerEnter={() => router.prefetch(target)} onFocus={() => router.prefetch(target)} onClick={() => setOpen(false)}
@@ -68,6 +75,7 @@ function NavDropdown({ pathname, section }: { pathname: string; section: Navigat
 export function SiteHeader() {
   const { t, locale } = useI18n()
   const pathname = usePathname()
+  const discovery = discoveryCopy(locale)
   const router = useRouter()
 
   const warmRoute = (href: string) => {
@@ -103,6 +111,8 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex h-full shrink-0 items-center gap-1.5 sm:gap-2">
+          <Link href={getLocalizedNavigationHref('/skills#skill-search', locale)} prefetch={false} aria-label={discovery.search}
+            className="hidden h-10 w-10 items-center justify-center rounded-full text-secondary hover:bg-muted hover:text-[#006b4f] xl:flex"><Search className="h-4 w-4" aria-hidden="true" /></Link>
           <div className="hidden items-center gap-2 xl:flex">
             <GitHubStarButton />
             <Link

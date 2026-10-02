@@ -11,7 +11,7 @@ function dictionary(locale) {
   new Function('exports', 'require', source)(exports, () => ({ default: dictionary('en') }))
   return exports.default
 }
-assert.deepEqual(SITE_NAVIGATION.map(s => s.id), ['skills', 'gallery', 'rankings', 'creators', 'resources', 'developers'])
+assert.deepEqual(SITE_NAVIGATION.map(s => s.id), ['skills', 'categories', 'rankings', 'creators', 'resources', 'developers'])
 assert.equal(SITE_NAVIGATION.filter(s => s.items).length, 4)
 const links = SITE_NAVIGATION.flatMap(s => [s, ...(s.items || [])])
 for (const link of links) assert.ok(read('app' + link.href + '/page.tsx').length)
