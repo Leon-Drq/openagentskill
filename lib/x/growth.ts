@@ -392,7 +392,10 @@ export async function refreshQueuedXEditorialContent() {
       metadata: {
         ...metadata,
         ...editorialMetadata(shortlist),
-        ...(experimentId !== metadata.experiment_id ? { previous_experiment_id: metadata.experiment_id } : {}),
+        ...(experimentId !== metadata.experiment_id ? {
+          previous_experiment_id: metadata.experiment_id,
+          experiment_started_at: new Date().toISOString(),
+        } : {}),
         experiment_id: experimentId,
         tracking_url: shortlist.url,
         refreshed_at: new Date().toISOString(),
@@ -473,6 +476,7 @@ export async function enqueueXDigestPostQueue(
         digest_type: 'task_shortlist',
         ...editorialMetadata(shortlist),
         experiment_id: experimentId,
+        experiment_started_at: date.toISOString(),
         experiment_topic: `${lane}-${edition}`,
         tracking_code: trackingCode,
         tracking_url: shortlist.url,

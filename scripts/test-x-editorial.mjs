@@ -141,7 +141,7 @@ assert.equal(rows[0].metadata.previous_experiment_id, 'x-feedback-loop-v1')
 
 const reportTables = {
   x_content_queue: [
-    { id: 'q1', content_type: 'weekly_thread', created_at: '2026-10-02T16:00:00Z', metadata: { experiment_id: 'x-feedback-loop-v2', content_format: 'skill_spotlight_v2', lane: 'coding', experiment_topic: 'coding-1', tracking_code: 'c1' } },
+    { id: 'q1', content_type: 'weekly_thread', created_at: '2026-09-01T16:00:00Z', metadata: { experiment_started_at: '2026-10-02T16:00:00Z', experiment_id: 'x-feedback-loop-v2', content_format: 'skill_spotlight_v2', lane: 'coding', experiment_topic: 'coding-1', tracking_code: 'c1' } },
     { id: 'q2', content_type: 'weekly_thread', created_at: '2026-10-02T16:01:00Z', metadata: { experiment_id: 'x-feedback-loop-v2', content_format: 'task_shortlist_v2', lane: 'creative', experiment_topic: 'creative-1', tracking_code: 'c2' } },
   ],
   x_post_history: [
@@ -161,6 +161,7 @@ const report = compile('lib/x/report.ts', {
   } }) },
 })
 const feedback = await report.getXGrowthReport()
+assert.equal(feedback.startedAt, '2026-10-02T16:00:00.000Z', 'Refreshing an old draft starts the new experiment today')
 assert.equal(feedback.summary.posts, 2, 'Replies must not count as separate editorial trials')
 assert.equal(feedback.summary.measuredPosts, 1, 'Missing metrics are not measured zeroes')
 assert.equal(feedback.summary.medianImpressions, 100)

@@ -281,7 +281,9 @@ export async function getXGrowthReport(
   const queueById = new Map(queues.map((queue) => [queue.id, queue]))
   const experimentQueues = queues.filter((queue) => isExperimentQueue(queue, experimentId))
   const startTimestamp = experimentQueues.length
-    ? Math.min(...experimentQueues.map((queue) => asTimestamp(queue.created_at)).filter(Boolean))
+    ? Math.min(...experimentQueues.map(queue =>
+      asTimestamp(String(asRecord(queue.metadata).experiment_started_at || '')) || asTimestamp(queue.created_at)
+    ).filter(Boolean))
     : 0
 
   if (!startTimestamp) {
