@@ -15,7 +15,8 @@ connections; it is not a claim about sustained CPU utilization or billing quotas
 - Full-text searches sometimes walked the quality index and filtered thousands
   of unrelated rows. `search_public_skills` materializes indexed matching IDs
   before the bounded quality sort, retains the public visibility predicate and
-  runs as SECURITY INVOKER with a three-second statement timeout. A sample
+  runs with a three-second statement timeout. The release follow-up below covers
+  the anonymous API/RLS plan and final restricted SECURITY DEFINER implementation. A sample
   `video OR editing OR captions` request returned 120 rows with 3,961 buffer
   accesses and 24.263 ms execution, versus a prior 23,536-buffer plan.
 - Exact slug/name reads now share five-minute caches independently. Failed
@@ -79,3 +80,36 @@ Migrations are additive indexes/RPC and equivalent policy/grant changes. Local
 filenames match the actual versions recorded by Supabase's migration API.
 Application rollback remains possible; the new search RPC is backward compatible
 and no user data was rewritten.
+
+## Anonymous API plan follow-up
+
+The initial literal SQL plan did not represent anonymous PostgREST execution.
+After the first deployment, the 14:21–14:23 UTC window recorded 125 search RPC
+timeouts. An anonymous role EXPLAIN showed that RLS prevents the non-leakproof
+full-text operator from using its GIN index, resulting in 185,401 buffer accesses
+for the same video task. A custom prepared plan alone did not remove that barrier.
+
+The final search function is STABLE, read-only SECURITY DEFINER with an empty
+search path, bound parameters, an explicit unchanged public-publication predicate
+and only the 42 existing directory fields. Private contact/full-document fields
+are absent from its return type and cannot be selected through the RPC. Its
+PL/pgSQL query uses a custom parameter plan. Anonymous execution through a generic
+outer prepared statement returned 120 rows in 28.751 ms with 3,959 buffer accesses.
+The next 289 actual PostgREST calls averaged 40.99 ms; no 57014/53300/53100 errors
+were found in the checked 14:32–14:34 UTC window. These are bounded observations.
+
+Exact-name ILIKE had the same RLS barrier (20,771 buffer accesses in the inspected
+anonymous plan). The final lookup uses a case-insensitive equality index and the
+same restricted directory-only return type, fixed publication predicate, empty
+search path, eight-row cap and statement deadline. Slug lookups retain ordinary
+RLS and their equality index. Shared exact caches remain independent.
+
+The exposed definer functions are intentionally public, narrowly scoped search
+endpoints. This is not blanket RLS disabling or a grant for arbitrary database
+access. Private row filtering and private-column rejection are verified using
+the actual anonymous REST API, not only administrator SQL.
+
+Repeat the anonymous REST release probe with `node scripts/check-public-search.mjs`.
+The inspected cold exact-name RPC returned eight rows in 4.108 ms (1,139 buffer
+accesses including function setup), versus the anonymous direct ILIKE plan
+with 20,771 accesses and 48.411 ms. Private-column selections were rejected.
