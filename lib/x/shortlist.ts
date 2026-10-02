@@ -5,6 +5,7 @@ import { getXContentLane, isGoodXCandidate } from '@/lib/x/candidates'
 import { buildXTrackingUrl, getXShareAssets, type XShareAsset, type XTrackingInput } from '@/lib/x/attribution'
 import { stripGeneratedSkillBoilerplate } from '@/lib/skill-likeness'
 import { buildXEditorialCopy, type XEditorialFormat } from '@/lib/x/editorial'
+import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
 
 const SITE_URL = 'https://www.openagentskill.com'
 const DEFAULT_SHORTLIST_LIMIT = 5
@@ -269,8 +270,13 @@ export function buildXShortlist(
     .filter((skill) => getXContentLane(skill) === lane)
     .filter((skill) => isGoodXCandidate(skill, MIN_SHORTLIST_STARS))
     .filter((skill) => !excludedSlugs.has(skill.slug))
-    .map((skill) => ({ skill, role: getXShortlistRole(skill, lane), score: getShortlistScore(skill) }))
-    .sort((left, right) => right.score - left.score || Number(right.skill.github_stars || 0) - Number(left.skill.github_stars || 0))
+    .map((skill) => ({
+      skill,
+      role: getXShortlistRole(skill, lane),
+      score: getShortlistScore(skill),
+      sourceRecorded: getSkillSourceEvidence(skill).status === 'source-recorded' ? 1 : 0,
+    }))
+    .sort((left, right) => right.sourceRecorded - left.sourceRecorded || right.score - left.score || Number(right.skill.github_stars || 0) - Number(left.skill.github_stars || 0))
 
   const selected: XShortlistPick[] = []
   const seenSlugs = new Set<string>()

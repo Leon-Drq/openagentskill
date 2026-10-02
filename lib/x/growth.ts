@@ -332,6 +332,7 @@ async function retireLegacyAutoQueueItems() {
 function editorialMetadata(shortlist: ReturnType<typeof buildXShortlist>) {
   return {
     editorial_version: X_EDITORIAL_VERSION,
+    selection_version: 2,
     content_format: shortlist.contentFormat,
     skills: shortlist.picks
       .filter(pick => shortlist.featuredSlugs.includes(pick.skill.slug))
@@ -357,7 +358,7 @@ export async function refreshQueuedXEditorialContent() {
     .order('created_at', { ascending: true })
     .limit(30)
   if (error) throw new Error(`Unable to load editorial drafts: ${error.message}`)
-  const drafts = (data || []).filter(item => item.metadata?.editorial_version !== X_EDITORIAL_VERSION)
+  const drafts = (data || []).filter(item => item.metadata?.editorial_version !== X_EDITORIAL_VERSION || item.metadata?.selection_version !== 2)
   if (!drafts.length) return 0
   const slugs = [...new Set(drafts.flatMap(item => {
     const picks = Array.isArray(item.metadata?.skills) ? item.metadata.skills : []
@@ -403,7 +404,7 @@ export async function refreshQueuedXEditorialContent() {
     } : {
       status: 'skipped',
       error: 'No currently eligible source remains for this editorial draft',
-      metadata: { ...metadata, editorial_version: X_EDITORIAL_VERSION },
+      metadata: { ...metadata, editorial_version: X_EDITORIAL_VERSION, selection_version: 2 },
     }
     const result = await supabase.from('x_content_queue').update(update)
       .eq('id', draft.id).eq('status', 'queued').eq('source', 'editorial_shortlist_generator').select('id')

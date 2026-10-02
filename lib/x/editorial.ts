@@ -80,7 +80,7 @@ function spotlightFrame(pick: XEditorialPick, lane: string) {
     hook: 'Need usable text from your source documents?',
     prompt: 'Try: Extract the text from this sample document.',
   }
-  return { hook: `One skill to shortlist for ${TASKS[lane] || 'your next agent task'}:`, prompt: '' }
+  return { hook: `One workflow to shortlist for ${TASKS[lane] || 'your next agent task'}:`, prompt: '' }
 }
 
 function buildSpotlight(pick: XEditorialPick, lane: string) {

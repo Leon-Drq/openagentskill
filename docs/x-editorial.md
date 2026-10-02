@@ -27,6 +27,8 @@ Avoid invented first-person experience, time savings, benchmarks, free-service c
 
 Runtime names such as Claude Code or Codex do not put an academic or marketing workflow into the coding lane. Shortlists avoid duplicate repositories. Selection still requires the existing approval, quality and candidate gates.
 
+Topic matching uses the name and primary description before category hints. Long repository descriptions and secondary tags cannot override the stated task. Within eligible sources, a recorded Skill instruction path ranks ahead of an untracked tool; this is source-structure evidence, not a runtime or safety badge. Drafts also record selection version 2 so an earlier copy refresh can be rebuilt with the corrected selection.
+
 ## Example preview
 
 This preview uses the stored description of Code Review from `mattpocock/skills`; it is not a runtime test or a new public post.
