@@ -11,6 +11,7 @@ import {
 } from '@/lib/i18n/skill-detail-copy'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { trackAnalyticsEvent } from '@/lib/analytics'
+import { withTimeout } from '@/lib/async'
 
 interface ClaimSkillPanelProps {
   skillSlug: string
@@ -74,6 +75,8 @@ export function ClaimSkillPanel({
   const { locale } = useI18n()
   const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [accountFailed, setAccountFailed] = useState(false)
+  const [accountRetry, setAccountRetry] = useState(0)
   const [hasUser, setHasUser] = useState<boolean | null>(null)
   const [existingClaim, setExistingClaim] = useState<ClaimState | null>(null)
   const [githubUsername, setGithubUsername] = useState('')
@@ -86,16 +89,19 @@ export function ClaimSkillPanel({
   const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
+    if (approvedClaim) return
     let active = true
+    const controller = new AbortController()
 
     async function load() {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user }, error } = await withTimeout(supabase.auth.getUser(), 8000, 'claim account')
+      if (error && error.name !== 'AuthSessionMissingError' && error.status !== 401) throw error
       if (!active) return
       setHasUser(Boolean(user))
       if (!user) return
 
-      const response = await fetch(`/api/claims?skill_slug=${encodeURIComponent(skillSlug)}`)
+      const response = await fetch(`/api/claims?skill_slug=${encodeURIComponent(skillSlug)}`, { signal: AbortSignal.any([controller.signal, AbortSignal.timeout(8000)]) })
       if (!active || !response.ok) return
       const data = await response.json()
       if (data.claim) {
@@ -107,11 +113,12 @@ export function ClaimSkillPanel({
       }
     }
 
-    load()
+    load().catch(() => { if (active) setAccountFailed(true) })
     return () => {
       active = false
+      controller.abort()
     }
-  }, [skillSlug, repository])
+  }, [skillSlug, repository, approvedClaim, accountRetry])
 
   useEffect(() => {
     if (!hasUser || typeof window === 'undefined') return
@@ -135,7 +142,11 @@ export function ClaimSkillPanel({
   function openPanel() {
     trackSkillEvent(skillSlug, 'claim_start')
 
-    if (hasUser === null) return
+    if (hasUser === null) {
+      setAccountFailed(false)
+      setAccountRetry((current) => current + 1)
+      return
+    }
     if (!hasUser) {
       const next = getLocalizedNavigationHref(`/skills/${skillSlug}`, locale)
       const separator = next.includes('?') ? '&' : '?'
@@ -149,42 +160,49 @@ export function ClaimSkillPanel({
   async function submitClaim() {
     if (status === 'loading') return
     setStatus('loading')
+    setErrorMessage('')
 
-    const response = await fetch('/api/claims', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        skill_slug: skillSlug,
-        github_username: githubUsername,
-        x_username: xUsername,
-        repo_url: repository || null,
-        verification_method: 'github_profile',
-        evidence_url: evidenceUrl || null,
-        evidence_note: evidenceNote || null,
-      }),
-    })
-
-    const data = await response.json().catch(() => ({}))
-    if (!response.ok) {
-      setErrorMessage(data.error || 'Could not create the ownership challenge.')
-      setStatus('error')
-      return
-    }
-
-    trackAnalyticsEvent('skill_claim_submit', {
-      skill_slug: skillSlug,
-      verification_method: data.claim?.verification_method || 'repository_file',
-    })
-    setExistingClaim(data.claim)
-    setChallenge(data.challenge || null)
-    setStatus('saved')
-    if (data.claim?.status === 'approved') {
-      trackAnalyticsEvent('skill_claim_verified', {
-        skill_slug: skillSlug,
-        verification_method: data.claim.verification_method || 'github_oauth',
+    try {
+      const response = await fetch('/api/claims', {
+        signal: AbortSignal.timeout(12000),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          skill_slug: skillSlug,
+          github_username: githubUsername,
+          x_username: xUsername,
+          repo_url: repository || null,
+          verification_method: 'github_profile',
+          evidence_url: evidenceUrl || null,
+          evidence_note: evidenceNote || null,
+        }),
       })
-      router.refresh()
-      window.setTimeout(() => document.getElementById('creator-badge-kit')?.scrollIntoView({ behavior: 'smooth' }), 450)
+
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setErrorMessage(data.error || 'Could not create the ownership challenge.')
+        setStatus('error')
+        return
+      }
+
+      trackAnalyticsEvent('skill_claim_submit', {
+        skill_slug: skillSlug,
+        verification_method: data.claim?.verification_method || 'repository_file',
+      })
+      setExistingClaim(data.claim)
+      setChallenge(data.challenge || null)
+      setStatus('saved')
+      if (data.claim?.status === 'approved') {
+        trackAnalyticsEvent('skill_claim_verified', {
+          skill_slug: skillSlug,
+          verification_method: data.claim.verification_method || 'github_oauth',
+        })
+        router.refresh()
+        window.setTimeout(() => document.getElementById('creator-badge-kit')?.scrollIntoView({ behavior: 'smooth' }), 450)
+      }
+    } catch {
+      setErrorMessage(formatSkillDetailCopy(locale, 'feedbackError'))
+      setStatus('error')
     }
   }
 
@@ -192,26 +210,32 @@ export function ClaimSkillPanel({
     if (verificationStatus === 'checking') return
     setVerificationStatus('checking')
     setErrorMessage('')
-    const response = await fetch('/api/claims/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ skill_slug: skillSlug }),
-    })
-    const data = await response.json().catch(() => ({}))
-    if (!response.ok) {
-      setErrorMessage(data.error || 'Verification failed. Check the file and try again.')
+    try {
+      const response = await fetch('/api/claims/verify', {
+        signal: AbortSignal.timeout(12000),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ skill_slug: skillSlug }),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setErrorMessage(data.error || 'Verification failed. Check the file and try again.')
+        setVerificationStatus('error')
+        return
+      }
+      setExistingClaim((current) => current ? { ...current, status: 'approved', verified_at: data.verified_at } : current)
+      trackAnalyticsEvent('skill_claim_verified', {
+        skill_slug: skillSlug,
+        verification_method: 'repository_file',
+      })
+      setVerificationStatus('verified')
+      setChallenge(null)
+      router.refresh()
+      window.setTimeout(() => document.getElementById('creator-badge-kit')?.scrollIntoView({ behavior: 'smooth' }), 450)
+    } catch {
+      setErrorMessage(formatSkillDetailCopy(locale, 'feedbackError'))
       setVerificationStatus('error')
-      return
     }
-    setExistingClaim((current) => current ? { ...current, status: 'approved', verified_at: data.verified_at } : current)
-    trackAnalyticsEvent('skill_claim_verified', {
-      skill_slug: skillSlug,
-      verification_method: 'repository_file',
-    })
-    setVerificationStatus('verified')
-    setChallenge(null)
-    router.refresh()
-    window.setTimeout(() => document.getElementById('creator-badge-kit')?.scrollIntoView({ behavior: 'smooth' }), 450)
   }
 
   async function copyChallengeToken() {
@@ -271,15 +295,16 @@ export function ClaimSkillPanel({
         </div>
       ) : null}
 
+      {accountFailed && <p role="status" className="mt-3 text-xs text-secondary">{formatSkillDetailCopy(locale, 'feedbackError')}</p>}
       {!open ? (
         <button
           type="button"
           onClick={openPanel}
-          disabled={hasUser === null}
+          disabled={hasUser === null && !accountFailed}
           className="mt-4 w-full border border-border px-3 py-2 text-sm transition-colors hover:border-foreground"
         >
           {hasUser === null
-            ? 'Checking account…'
+            ? accountFailed ? formatSkillDetailCopy(locale, 'claimSkill') : 'Checking account…'
             : hasUser
             ? formatSkillDetailCopy(locale, 'verifyMaintainerClaim')
             : formatSkillDetailCopy(locale, 'claimSkill')}

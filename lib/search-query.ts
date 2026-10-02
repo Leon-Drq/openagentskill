@@ -41,7 +41,8 @@ export function getSearchTerms(normalizedQuery: string) {
 export function normalizeExactSearchQuery(query: string) {
   return query
     .trim()
-    .replace(/[%_,{},()]/g, ' ')
+    .replace(/[%_*{},()]/g, ' ')
     .replace(/\s+/g, ' ')
+    .trim()
     .slice(0, 180)
 }

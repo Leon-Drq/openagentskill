@@ -15,12 +15,12 @@ assert.equal(validate(snapshot),snapshot)
 for(const value of [{...snapshot,count:2002},{...snapshot,policy:'old policy'},{...snapshot,entries:[snapshot.entries[0],...snapshot.entries.slice(0,2000)]},{...snapshot,entries:[{...snapshot.entries[0],url:'https://evil.test/'},...snapshot.entries.slice(1)]}]) assert.throws(()=>validate(value))
 const backup=await packed.packCacheJson(snapshot)
 function manager(mode,saved={packed:backup}) {
-  let counts=0,writes=0,reads=0
+  let writes=0,reads=0
   const result=compile('lib/seo/skill-sitemap-data.ts',{
     'next/cache':{unstable_cache:fn=>async()=>{const value=await fn();writes++;return value}},
     '@/lib/db/skills':{
-      getApprovedSkillSitemapCount:async()=>{if(mode==='outage')throw new Error('database timeout');return mode==='changed'&&++counts>1?2002:2001},
-      getApprovedSkillSitemapRecords:async({offset,limit})=>{reads++;if(mode==='partial'&&offset===1000)throw new Error('database timeout');return snapshot.entries.slice(offset,offset+limit-(mode==='truncated'?1:0)).map(entry=>({slug:entry.url.split('/').at(-1),created_at:entry.lastModified,github_stars:10}))},
+      getApprovedSkillSitemapCount:async()=>mode==='changed'?2002:2001,
+      getApprovedSkillSitemapSource:async()=>{if(mode==='outage')throw new Error('database timeout');return {count:2001,read:async(offset,limit)=>{reads++;if(mode==='partial'&&offset===1000)throw new Error('database timeout');return snapshot.entries.slice(offset,offset+limit-(mode==='truncated'?1:0)).map(entry=>({slug:entry.url.split('/').at(-1),created_at:entry.lastModified,github_stars:10}))}}},
     },
     '@/lib/seo/search-indexability':policy,'@/lib/seo/sitemap-snapshot':validation,
     '@/lib/cache/packed-json':packed,'@/lib/cache/coalesced':coalesced,'./sitemap-backup.json':{default:saved},
@@ -46,10 +46,11 @@ const overlap={...pinned(editorial[0]),ai_review_approved:true,quality_score:80,
 const extra=pinned(editorial[0]);let legacy=[item('legacy-a'),item('legacy-b'),overlap], editorialRows=[overlap]
 const operations=[]
 const client={from(){let filter,head=false,range;const q={select(_s,opts){head=opts?.head;return q},or(f){filter=f;operations.push(f);return q},order(){return q},range(a,b){range=[a,b];return q},then(resolve){const rows=filter===policy.buildEditorialSearchIndexFilter()?editorialRows:legacy;return Promise.resolve({data:head?null:range?rows.slice(range[0],range[1]+1):rows,count:rows.length,error:null}).then(resolve)}};return q}}
-const db=compile('lib/db/skills.ts',Object.fromEntries([
+const dbDependencies=Object.fromEntries([
   ['next/cache',{unstable_cache:fn=>fn}],['@/lib/supabase/public',{createPublicClient:()=>client}],['@/lib/supabase/admin',{createAdminClient:()=>client}],['@/lib/seo/search-indexability',policy],['@/lib/cache/coalesced',coalesced],
   ...['@/lib/skills/publication','@/lib/async','@/lib/search-results','@/lib/skills/directory','@/lib/skills/presentation-category','@/lib/skills/catalog-query','@/lib/skills/commerce','@/lib/skills/registry-scope','@/lib/seo/curated-skill-snapshot','@/lib/search-query','@/lib/cache/packed-json'].map(name=>[name,{}]),
-]))
+])
+const db=compile('lib/db/skills.ts',dbDependencies)
 assert.equal(await db.getApprovedSkillSitemapCount(3,50),3,'An eligible canonical listing is counted once')
 assert.deepEqual((await db.getApprovedSkillSitemapRecords({offset:2,limit:2,minStars:3,minQualityScore:50})).map(x=>x.slug),[overlap.slug])
 legacy=legacy.slice(0,2);editorialRows=[extra]
@@ -58,3 +59,13 @@ assert.deepEqual((await db.getApprovedSkillSitemapRecords({offset:1,limit:2,minS
 assert.deepEqual((await db.getApprovedSkillSitemapRecords({offset:2,limit:2,minStars:3,minQualityScore:50})).map(x=>x.slug),[extra.slug])
 assert.ok(operations.every(f=>[policy.buildLegacySearchIndexFilter(),policy.buildEditorialSearchIndexFilter()].includes(f)),'No broad cross-lane OR read')
 console.log('Sitemap recovery passed: complete generations, cold-cache backup, outage/partial/change rejection, coalescing, unchanged policy, partition overlap and boundaries.')
+
+const cachedDb=compile('lib/db/skills.ts',{...dbDependencies,'next/cache':{unstable_cache:fn=>{const cache=new Map();return async(...args)=>{const key=JSON.stringify(args);if(cache.has(key))return cache.get(key);const value=await fn(...args);cache.set(key,value);return value}}}})
+legacy=[item('legacy-a'),item('legacy-b'),overlap];editorialRows=[overlap]
+await cachedDb.getApprovedSkillSitemapCount(3,50)
+await cachedDb.getApprovedSkillSitemapRecords({offset:2,limit:2,minStars:3,minQualityScore:50})
+legacy=legacy.slice(0,2);editorialRows=[extra]
+const freshSource=await cachedDb.getApprovedSkillSitemapSource(3,50)
+assert.equal(freshSource.count,3)
+assert.deepEqual((await freshSource.read(1,2)).map(x=>x.slug),['legacy-b',extra.slug],'A new capture must use fresh partition boundaries even when prior counts and shards remain cached')
+assert.equal(await cachedDb.getApprovedSkillSitemapCount(3,50,true),3)

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getShowcaseCase, SHOWCASE_CASES } from '@/lib/showcase'
 import type { ShowcaseStats } from '@/lib/showcase-engagement'
+import { unstable_cache, revalidateTag } from 'next/cache'
 
 const headers = { 'Cache-Control': 'private, no-store', Vary: 'Cookie' }
 const json = (body: unknown, status = 200) => NextResponse.json(body, { status, headers })
@@ -14,11 +15,18 @@ async function counts(slugs: string[]) {
   return data as { case_slug: string; likes: number; dislikes: number }[]
 }
 
+// Only anonymous aggregate counts are shared. Auth and each user's vote stay private.
+const publicCounts = unstable_cache(
+  () => counts(SHOWCASE_CASES.map((item) => item.slug)),
+  ['showcase-public-counts-v1', SHOWCASE_CASES.map((item) => item.slug).join(',')],
+  { revalidate: 60, tags: ['public-showcase-counts'] },
+)
+
 export async function GET() {
   try {
     const supabase = await createClient()
     const [{ data: { user }, error: authError }, totals] = await Promise.all([
-      supabase.auth.getUser(), counts(SHOWCASE_CASES.map((item) => item.slug)),
+      supabase.auth.getUser(), publicCounts(),
     ])
     if (authError && authError.name !== 'AuthSessionMissingError' && authError.status !== 401) throw authError
     const signedIn = Boolean(user && !user.is_anonymous)
@@ -64,6 +72,7 @@ export async function PUT(request: NextRequest) {
     // Unique (user_id, case_slug) makes retries idempotent; writes retain the user's RLS.
     const result = await supabase.rpc('set_showcase_vote', { target_slug: slug, direction: vote })
     if (result.error) throw result.error
+    revalidateTag('public-showcase-counts', { expire: 0 })
     const totals = await counts([slug])
     return json({ slug, vote, likes: Number(totals[0]?.likes ?? 0), dislikes: Number(totals[0]?.dislikes ?? 0) })
   } catch {

@@ -4,14 +4,10 @@ import { syncRepositorySkills } from '@/lib/indexer/repository-skill-sync'
 import { AUTOMATIC_DISCOVERY_MIN_STARS } from '@/lib/indexer/intake-policy'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 import { createPublicClient } from '@/lib/supabase/public'
+import { scheduleSourceSync, type SourceRequest } from '@/lib/indexer/source-sync-scheduler'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
-
-interface SourceRequest {
-  sourceUrl: string
-  discoverySource: string
-}
 
 function normalizeRepositoryUrl(githubRepo: string) {
   return `https://github.com/${githubRepo.trim().replace(/^\/+|\/+$/g, '')}`
@@ -103,14 +99,17 @@ async function handleRun(request: NextRequest) {
         .filter(Boolean)
         .map((sourceUrl: string) => ({ sourceUrl, discoverySource: 'manual-source-sync' }))
     : []
-  const claimedSources = await staleClaimedRepositories(Math.max(2, Math.floor(limit / 2)))
-  const staleSources = await staleIndexedRepositories(limit)
-  const sources = uniqueSources([
-    ...requestedSources,
-    ...claimedSources,
-    ...HIGH_SIGNAL_SKILL_SOURCES.map(({ sourceUrl, discoverySource }) => ({ sourceUrl, discoverySource })),
-    ...staleSources,
-  ]).slice(0, limit)
+  const [claimedSources, staleSources] = await Promise.all([
+    staleClaimedRepositories(Math.max(2, Math.floor(limit / 2))),
+    staleIndexedRepositories(limit),
+  ])
+  const sources = scheduleSourceSync({
+    requested: requestedSources,
+    claimed: claimedSources,
+    stale: staleSources,
+    seeds: HIGH_SIGNAL_SKILL_SOURCES,
+    limit,
+  })
 
   const results = []
   for (const source of sources) {
