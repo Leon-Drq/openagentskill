@@ -43,6 +43,8 @@ try {
   }))
   await assert.rejects(createResilientTimeoutFetch(10, 'skill-support')('https://example.test'), /abort/i,
     'Receiving headers must not clear the deadline for a stalled response body')
+  globalThis.fetch = async () => new Promise(() => {})
+  await assert.rejects(createResilientTimeoutFetch(10, 'skill-support')('https://example.test'), /abort/i, 'A fetch wrapper ignoring cancellation cannot exceed our deadline')
   globalThis.fetch = async () => new Response('["complete"]', {headers:{'content-type':'application/json'}})
   assert.deepEqual(await (await createResilientTimeoutFetch(100)('https://example.test')).json(), ['complete'])
   const originalTimer = globalThis.setTimeout

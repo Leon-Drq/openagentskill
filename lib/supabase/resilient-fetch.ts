@@ -77,13 +77,24 @@ export function createResilientTimeoutFetch(timeoutMs: number, scope: SupabaseCi
       ? AbortSignal.any([externalSignal, controller.signal])
       : controller.signal
     const timeout = setTimeout(() => controller.abort(), timeoutMs)
+    let onAbort: () => void = () => undefined
+    const aborted = new Promise<never>((_resolve, reject) => {
+      onAbort = () => reject(signal.reason)
+      signal.addEventListener('abort', onAbort, { once: true })
+    })
 
     try {
-      const response = await fetch(input, { ...init, signal })
-      // fetch resolves when headers arrive. Keep the deadline active until
-      // the database body is complete, so a stalled JSON stream cannot leave
-      // a build or an ISR refresh hanging after the timer was cleared.
-      const body = response.body === null ? null : await response.arrayBuffer()
+      const readResponse = async () => {
+        const response = await fetch(input, { ...init, signal })
+        // fetch resolves when headers arrive. Keep the deadline active until
+        // the database body is complete, so a stalled JSON stream cannot leave
+        // a build or an ISR refresh hanging after the timer was cleared.
+        const body = response.body === null ? null : await response.arrayBuffer()
+        signal.throwIfAborted()
+        return { response, body }
+      }
+      // Also bound wrappers that do not promptly observe the AbortSignal.
+      const { response, body } = await Promise.race([readResponse(), aborted])
       // Requests started before a circuit opened cannot close it late or
       // extend its cooldown. Only the recovery probe can change that state.
       if (state.generation === generation) {
@@ -97,6 +108,7 @@ export function createResilientTimeoutFetch(timeoutMs: number, scope: SupabaseCi
       throw error
     } finally {
       clearTimeout(timeout)
+      signal.removeEventListener('abort', onAbort)
       if (ownsProbe && state.generation === generation) state.probeInFlight = false
     }
   }
