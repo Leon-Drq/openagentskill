@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from 'node:crypto'
+import { fetchX } from '@/lib/x/request'
 
 const X_AUTHORIZE_URL = 'https://x.com/i/oauth2/authorize'
 const X_TOKEN_URL = 'https://api.x.com/2/oauth2/token'
@@ -159,7 +160,7 @@ export async function exchangeXCodeForToken(code: string, codeVerifier: string) 
     code_verifier: codeVerifier,
   })
 
-  const response = await fetch(X_TOKEN_URL, {
+  const response = await fetchX(X_TOKEN_URL, {
     method: 'POST',
     headers: {
       Authorization: getClientAuthHeader(clientId, clientSecret),
@@ -178,7 +179,7 @@ export async function refreshXAccessToken(refreshToken: string) {
     refresh_token: refreshToken,
   })
 
-  const response = await fetch(X_TOKEN_URL, {
+  const response = await fetchX(X_TOKEN_URL, {
     method: 'POST',
     headers: {
       Authorization: getClientAuthHeader(clientId, clientSecret),
@@ -191,7 +192,7 @@ export async function refreshXAccessToken(refreshToken: string) {
 }
 
 export async function getXCurrentUser(accessToken: string) {
-  const response = await fetch(X_USER_ME_URL, {
+  const response = await fetchX(X_USER_ME_URL, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -201,7 +202,7 @@ export async function getXCurrentUser(accessToken: string) {
 }
 
 export async function createXPost(accessToken: string, text: string) {
-  const response = await fetch(X_CREATE_POST_URL, {
+  const response = await fetchX(X_CREATE_POST_URL, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -214,7 +215,7 @@ export async function createXPost(accessToken: string, text: string) {
 }
 
 export async function createXReplyPost(accessToken: string, text: string, inReplyToTweetId: string) {
-  const response = await fetch(X_CREATE_POST_URL, {
+  const response = await fetchX(X_CREATE_POST_URL, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -239,7 +240,7 @@ export async function getXTweetsByIds(accessToken: string, ids: string[]) {
   url.searchParams.set('ids', uniqueIds.join(','))
   url.searchParams.set('tweet.fields', 'created_at,public_metrics')
 
-  const response = await fetch(url.toString(), {
+  const response = await fetchX(url.toString(), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -263,7 +264,7 @@ export async function getXUserMentions(
   url.searchParams.set('user.fields', 'username,name')
   if (options.sinceId) url.searchParams.set('since_id', options.sinceId)
 
-  const response = await fetch(url.toString(), {
+  const response = await fetchX(url.toString(), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

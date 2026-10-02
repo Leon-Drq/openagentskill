@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createPublicClient } from '@/lib/supabase/public'
+import { createXAutomationClient } from '@/lib/x/client'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 import { getStoredXConnection } from '@/lib/x/poster'
 import { getCreatorOutreachStatus } from '@/lib/x/growth'
@@ -27,7 +27,7 @@ async function getConnectionStatus() {
   }
 
   try {
-    const connection = await getStoredXConnection(createPublicClient(), serverSecret)
+    const connection = await getStoredXConnection(createXAutomationClient(), serverSecret)
     return {
       authorized: Boolean(connection),
       health: connection ? 'ready' : 'disconnected',
@@ -54,6 +54,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const db = createXAutomationClient()
+  const since = new Date(Date.now() - 24 * 60 * 60_000).toISOString()
+  const [latestPost, queuedPosts, recentPosts] = await Promise.all([
+    db.from('x_post_history').select('posted_at').eq('status', 'posted').order('posted_at', { ascending: false }).limit(1),
+    db.from('x_content_queue').select('id', { count: 'exact', head: true }).eq('status', 'queued'),
+    db.from('x_post_history').select('id', { count: 'exact', head: true }).eq('status', 'posted').gte('posted_at', since),
+  ])
+  const publishingError = Boolean(latestPost.error || queuedPosts.error || recentPosts.error)
+  const lastSuccessfulPostAt = latestPost.data?.[0]?.posted_at || null
+  const publishing = {
+    health: publishingError ? 'unknown' : lastSuccessfulPostAt && Date.parse(lastSuccessfulPostAt) >= Date.now() - 24 * 60 * 60_000 ? 'ready' : 'stale',
+    lastSuccessfulPostAt,
+    queued: queuedPosts.count ?? null,
+    postedLast24Hours: recentPosts.count ?? null,
+  }
   const connection = await getConnectionStatus()
   const skillRadarXMaxQueries = numberFromEnv('SKILL_RADAR_X_MAX_QUERIES', 1)
   const skillRadarXResultsPerQuery = numberFromEnv('SKILL_RADAR_X_RESULTS_PER_QUERY', 10)
@@ -84,9 +99,11 @@ export async function GET(request: NextRequest) {
       GITHUB_TOKEN: hasEnv('GITHUB_TOKEN'),
     },
     xOAuth: connection,
+    publishing,
     budget: {
       dailyAutoPostsTarget: '3-5',
       postDailyCron: '30 15,19,23 * * *',
+      creatorReplyCron: '35 15,19,23 * * *',
       growthRunCron: '30 14 * * *',
       skillRadarCron: '45 * * * *',
       postQueueBuildLimit: 3,

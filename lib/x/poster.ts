@@ -1,4 +1,5 @@
 import { createPublicClient } from '@/lib/supabase/public'
+import { createXAutomationClient } from '@/lib/x/client'
 import { getAllSkills, type SkillRecord } from '@/lib/db/skills'
 import {
   createXPost,
@@ -274,6 +275,19 @@ export async function saveRefreshedXToken(
   if (error) throw new Error(`Failed to update X OAuth token: ${error.message}`)
 }
 
+// Reuse tokens until close to expiry. This avoids rotating credentials once
+// for every job, including jobs whose queues are empty.
+export async function getValidXAccessToken(
+  supabase: ReturnType<typeof createPublicClient>, serverSecret: string, connection: XOAuthConnection
+) {
+  if (connection.access_token && Date.parse(connection.expires_at || '') > Date.now() + 120_000) {
+    return { access_token: connection.access_token, token_type: 'bearer' }
+  }
+  const token = await refreshXAccessToken(connection.refresh_token)
+  await saveRefreshedXToken(supabase, serverSecret, token)
+  return token
+}
+
 async function pickSkill(supabase: ReturnType<typeof createPublicClient>, serverSecret: string) {
   const { data, error } = await supabase.rpc('pick_x_post_skill', {
     p_server_secret: serverSecret,
@@ -300,14 +314,13 @@ export async function postDailySkillToX(): Promise<XPostResult> {
   const serverSecret = process.env.INDEXER_SECRET
   if (!serverSecret) throw new Error('Missing INDEXER_SECRET')
 
-  const supabase = createPublicClient()
+  const supabase = createXAutomationClient()
   const connection = await getStoredXConnection(supabase, serverSecret)
   if (!connection) {
     return { status: 'skipped', reason: 'X account is not authorized yet' }
   }
 
-  const token = await refreshXAccessToken(connection.refresh_token)
-  await saveRefreshedXToken(supabase, serverSecret, token)
+  const token = await getValidXAccessToken(supabase, serverSecret, connection)
 
   const skill = await pickSkill(supabase, serverSecret)
   if (!skill) {

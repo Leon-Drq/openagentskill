@@ -87,9 +87,12 @@ assert.equal(
 const postDailyRoute = readProjectFile('app/api/x/post-daily/route.ts')
 assert.match(
   postDailyRoute,
-  /postNextQueuedSkillToX\(\{ autoBuildQueue: true, buildLimit: 3 \}\)/,
-  'the publishing cron must recover from an empty queue'
+  /postNextQueuedSkillToX\(\{ autoBuildQueue: false \}\)/,
+  'the publishing cron must only consume its prebuilt queue'
 )
+
+assert.equal(postDailyRoute.includes('postNextCreatorReplyToX'), false, 'creator replies must not block editorial publishing')
+assert.ok(vercelConfig.crons?.some(cron => cron.path === '/api/x/post-creator-reply'), 'creator replies retain an independent schedule')
 
 const growthSource = readProjectFile('lib/x/growth.ts')
 const postNextSource = growthSource.slice(growthSource.indexOf('export async function postNextQueuedSkillToX'))

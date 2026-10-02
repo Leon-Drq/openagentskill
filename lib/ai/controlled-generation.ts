@@ -3,16 +3,17 @@ import { generateText } from 'ai'
 import { createHash } from 'node:crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export class DeferredAnalysisError extends Error {}
+import { DeferredAnalysisError } from '@/lib/ai/deferred-analysis'
+export { DeferredAnalysisError } from '@/lib/ai/deferred-analysis'
 
 /** All model calls share a durable reservation, retry cooldown, and cache. Fail closed. */
 export async function controlledGeneration(input: {
   model: string; prompt: string; fingerprint: string; feature: string;
 }) {
   // Do not silently route a cost-controlled job to an unpriced premium model.
-  if (input.model !== 'deepseek/deepseek-v4-flash') throw new DeferredAnalysisError('Model requires an explicit reviewed price envelope')
+  if (input.model !== 'deepseek/deepseek-v4-flash') throw new DeferredAnalysisError('Model requires an explicit reviewed price envelope', 'model_not_priced')
   const bytes = Buffer.byteLength(input.prompt, 'utf8')
-  if (bytes > 30_000) throw new DeferredAnalysisError('Analysis input exceeds the bounded context')
+  if (bytes > 30_000) throw new DeferredAnalysisError('Analysis input exceeds the bounded context', 'input_limit')
   const maxOutputTokens = 2048
   // Conservative price envelope, NOT a supplier invoice or a supplier-side spending limit.
   const reservationUsd = (bytes * 0.5 + maxOutputTokens * 2) / 1_000_000
@@ -21,13 +22,15 @@ export async function controlledGeneration(input: {
   const { data: reservation, error } = await db.rpc('reserve_skill_analysis', {
     p_key: requestKey, p_feature: input.feature, p_model: input.model, p_reserved_usd: reservationUsd,
   })
-  if (error) throw new DeferredAnalysisError('Analysis ledger unavailable; queued without calling model')
+  if (error || !reservation || typeof reservation.status !== 'string') throw new DeferredAnalysisError('Analysis ledger unavailable; queued without calling model', 'database_unavailable')
   if (reservation.status === 'cached') {
-    const cached = JSON.parse(String(reservation.response)) as { text: string; reviewedAt: string }
-    if (typeof cached.text !== 'string' || !Number.isFinite(Date.parse(cached.reviewedAt))) throw new DeferredAnalysisError('Cached review metadata unavailable')
+    let cached: { text: string; reviewedAt: string }
+    try { cached = JSON.parse(String(reservation.response)) }
+    catch { throw new DeferredAnalysisError('Cached review metadata unavailable', 'invalid_cache') }
+    if (!cached || typeof cached.text !== 'string' || !Number.isFinite(Date.parse(cached.reviewedAt))) throw new DeferredAnalysisError('Cached review metadata unavailable', 'invalid_cache')
     return cached
   }
-  if (reservation.status !== 'reserved') throw new DeferredAnalysisError(`Analysis deferred: ${reservation.status}`)
+  if (reservation.status !== 'reserved') throw new DeferredAnalysisError(`Analysis deferred: ${reservation.status}`, reservation.status === 'budget_exhausted' ? 'budget_exhausted' : 'cooldown')
   try {
     const result = await generateText({
       model: input.model, prompt: input.prompt, temperature: 0.2,
@@ -41,14 +44,17 @@ export async function controlledGeneration(input: {
       p_output_tokens: result.usage.outputTokens ?? null,
       p_error: null,
     })
-    if (saveError) throw new DeferredAnalysisError('Unable to persist analysis; reservation retained')
+    if (saveError) throw new DeferredAnalysisError('Unable to persist analysis; reservation retained', 'persistence_failed')
     return completed
   } catch (error) {
+    // A successful model response with an uncertain ledger write must not be
+    // overwritten by a second finish call carrying a failure.
+    if (error instanceof DeferredAnalysisError) throw error
     await db.rpc('finish_skill_analysis', {
       p_id: reservation.id, p_response: null, p_input_tokens: null, p_output_tokens: null,
-      p_error: error instanceof Error ? error.name : 'AnalysisError',
+      p_error: 'provider_unavailable',
     })
     // Never log prompts, source code, raw provider errors, or credentials.
-    throw new DeferredAnalysisError('Analysis unavailable; retained reservation and 24-hour cooldown')
+    throw new DeferredAnalysisError('Analysis provider unavailable; reservation retained', 'provider_unavailable')
   }
 }

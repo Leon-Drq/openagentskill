@@ -1,3 +1,4 @@
+import { analysisRetryDelayMs } from '@/lib/ai/deferred-analysis'
 import { PUBLIC_SKILL_FILTER } from '@/lib/skills/publication'
 import 'server-only'
 
@@ -496,8 +497,8 @@ async function publishCandidate(candidate: SkillCandidateRow) {
       const reason = failure?.reason || 'Candidate did not pass publication review'
       if (failure?.deferred) {
         await updateCandidate(candidate.id, {
-          status: 'review_required', next_attempt_at: new Date(Date.now() + 86_400_000).toISOString(),
-          last_error: 'Analysis budget, cooldown or availability: queued without approval',
+          status: 'review_required', next_attempt_at: new Date(Date.now() + analysisRetryDelayMs(failure.deferReason)).toISOString(),
+          last_error: `Analysis deferred: ${failure.deferReason || 'provider_unavailable'}`,
         })
         return { status: 'retry' as const, slug: null }
       }
