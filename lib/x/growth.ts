@@ -25,8 +25,10 @@ import {
   isGenericFoundationRepoName,
   isGoodXCandidate,
 } from '@/lib/x/candidates'
-import { buildXShortlist, getXShortlistEdition, getXShortlistLaneForDate } from '@/lib/x/shortlist'
+import { buildXShortlist, getXShortlistEdition, getXShortlistLaneForDate, isXShortlistLane } from '@/lib/x/shortlist'
 import { createXTrackingCode, X_GROWTH_EXPERIMENT_ID } from '@/lib/x/attribution'
+import { X_EDITORIAL_VERSION, getXEditorialFormat } from '@/lib/x/editorial'
+import { PUBLIC_SKILL_FILTER } from '@/lib/skills/publication'
 
 type SupabasePublicClient = ReturnType<typeof createPublicClient>
 
@@ -143,6 +145,7 @@ export interface XGrowthRunResult {
   queue: XQueueBuildResult
   digest: XQueueBuildResult
   retiredLegacyQueueItems: number
+  refreshedEditorialQueueItems: number
   metrics: XMetricsSyncResult | { status: 'error'; error: string }
   replies: XReplyDraftSyncResult | { status: 'error'; error: string }
 }
@@ -326,6 +329,90 @@ async function retireLegacyAutoQueueItems() {
   }
 }
 
+function editorialMetadata(shortlist: ReturnType<typeof buildXShortlist>) {
+  return {
+    editorial_version: X_EDITORIAL_VERSION,
+    content_format: shortlist.contentFormat,
+    skills: shortlist.picks
+      .filter(pick => shortlist.featuredSlugs.includes(pick.skill.slug))
+      .map(pick => ({
+        slug: pick.skill.slug,
+        name: pick.skill.name,
+        role: pick.role,
+        reason: pick.reason,
+        stars: pick.skill.github_stars,
+        quality_score: pick.qualityScore,
+      })),
+  }
+}
+
+// Refresh only unclaimed drafts produced by our editorial generator. This runs
+// in the queue-building job, keeping database reads off the publishing deadline.
+export async function refreshQueuedXEditorialContent() {
+  const supabase = createAdminClient({ requestTimeoutMs: 3500 })
+  const { data, error } = await supabase.from('x_content_queue')
+    .select('id, campaign, metadata')
+    .eq('source', 'editorial_shortlist_generator')
+    .eq('status', 'queued')
+    .order('created_at', { ascending: true })
+    .limit(30)
+  if (error) throw new Error(`Unable to load editorial drafts: ${error.message}`)
+  const drafts = (data || []).filter(item => item.metadata?.editorial_version !== X_EDITORIAL_VERSION)
+  if (!drafts.length) return 0
+  const slugs = [...new Set(drafts.flatMap(item => {
+    const picks = Array.isArray(item.metadata?.skills) ? item.metadata.skills : []
+    return picks.flatMap((pick: { slug?: unknown }) => typeof pick?.slug === 'string' ? [pick.slug] : [])
+  }))] as string[]
+  if (!slugs.length) return 0
+  const records = await supabase.from('skills').select('*').or(PUBLIC_SKILL_FILTER).in('slug', slugs)
+  // A database outage must leave drafts intact, rather than retiring them as
+  // though their sources had failed editorial or community review.
+  if (records.error) throw new Error(`Unable to reload editorial sources: ${records.error.message}`)
+  let refreshed = 0
+  for (const draft of drafts) {
+    const metadata = draft.metadata as Record<string, unknown>
+    if (typeof metadata.lane !== 'string' || !isXShortlistLane(metadata.lane) || typeof metadata.edition !== 'string') continue
+    const originalPicks = Array.isArray(metadata.skills) ? metadata.skills : []
+    const originalSlugs = new Set(originalPicks.map((pick: { slug?: unknown }) => pick?.slug))
+    const experimentId = metadata.experiment_id === 'x-feedback-loop-v1'
+      ? X_GROWTH_EXPERIMENT_ID : metadata.experiment_id
+    const shortlist = buildXShortlist(metadata.lane, (records.data as SkillRecord[] || []).filter(skill => originalSlugs.has(skill.slug)), {
+      edition: metadata.edition,
+      ...(typeof metadata.tracking_code === 'string' && typeof experimentId === 'string' ? {
+        tracking: {
+          campaign: draft.campaign,
+          content: metadata.tracking_code,
+          experimentId,
+        },
+      } : {}),
+    })
+    const update = shortlist.featuredSlugs.length ? {
+      post_text: shortlist.mainText,
+      reply_text: shortlist.replyText,
+      metadata: {
+        ...metadata,
+        ...editorialMetadata(shortlist),
+        ...(experimentId !== metadata.experiment_id ? {
+          previous_experiment_id: metadata.experiment_id,
+          experiment_started_at: new Date().toISOString(),
+        } : {}),
+        experiment_id: experimentId,
+        tracking_url: shortlist.url,
+        refreshed_at: new Date().toISOString(),
+      },
+    } : {
+      status: 'skipped',
+      error: 'No currently eligible source remains for this editorial draft',
+      metadata: { ...metadata, editorial_version: X_EDITORIAL_VERSION },
+    }
+    const result = await supabase.from('x_content_queue').update(update)
+      .eq('id', draft.id).eq('status', 'queued').eq('source', 'editorial_shortlist_generator').select('id')
+    if (result.error) throw new Error(`Unable to refresh editorial draft: ${result.error.message}`)
+    refreshed += result.data?.length || 0
+  }
+  return refreshed
+}
+
 export async function enqueueXDigestPostQueue(
   options: {
     minStars?: number
@@ -352,7 +439,7 @@ export async function enqueueXDigestPostQueue(
   }
 
   const recentSkillSlugs = await getRecentlyFeaturedShortlistSkillSlugs(14)
-  const trackingCode = createXTrackingCode({ lane, edition, format: 'shortlist' })
+  const trackingCode = createXTrackingCode({ lane, edition, format: getXEditorialFormat(lane, edition) })
   const experimentId = options.experimentId || X_GROWTH_EXPERIMENT_ID
   const campaign = options.campaign || `editorial_shortlist_${lane}`
   const shortlist = buildXShortlist(lane, candidates, {
@@ -365,7 +452,7 @@ export async function enqueueXDigestPostQueue(
       experimentId,
     },
   })
-  if (shortlist.picks.length < 3) {
+  if (!shortlist.featuredSlugs.length) {
     return { status: 'skipped', queued: 0, skipped: 1, considered: candidates.length, results: [] }
   }
 
@@ -387,8 +474,9 @@ export async function enqueueXDigestPostQueue(
       metadata: {
         generated_by: 'x_growth_os',
         digest_type: 'task_shortlist',
-        content_format: 'scenario_shortlist',
+        ...editorialMetadata(shortlist),
         experiment_id: experimentId,
+        experiment_started_at: date.toISOString(),
         experiment_topic: `${lane}-${edition}`,
         tracking_code: trackingCode,
         tracking_url: shortlist.url,
@@ -398,14 +486,6 @@ export async function enqueueXDigestPostQueue(
         edition: shortlist.edition,
         shortlist_url: shortlist.url,
         share_assets: shortlist.shareAssets,
-        skills: shortlist.picks.map((pick) => ({
-          slug: pick.skill.slug,
-          name: pick.skill.name,
-          role: pick.role,
-          reason: pick.reason,
-          stars: pick.skill.github_stars,
-          quality_score: pick.qualityScore,
-        })),
       },
     },
   })
@@ -1129,6 +1209,7 @@ export async function syncXReplyDrafts(
 }
 
 export async function runXGrowthOS(): Promise<XGrowthRunResult> {
+  const refreshedEditorialQueueItems = await refreshQueuedXEditorialContent()
   const retiredLegacyQueueItems = await retireLegacyAutoQueueItems()
   const queue: XQueueBuildResult = {
     status: 'skipped',
@@ -1170,5 +1251,5 @@ export async function runXGrowthOS(): Promise<XGrowthRunResult> {
     error: error instanceof Error ? error.message : 'Unknown X replies sync error',
   }))
 
-  return { queue, digest, retiredLegacyQueueItems, metrics, replies }
+  return { queue, digest, retiredLegacyQueueItems, refreshedEditorialQueueItems, metrics, replies }
 }
