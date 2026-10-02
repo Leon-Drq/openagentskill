@@ -364,7 +364,7 @@ export function SkillsPageClient(props: Props) {
               <Link href={resetHref} prefetch={false} className="p-2 text-[#006b4f] underline underline-offset-4">{c.reset}</Link>
             </div>
           )}
-          <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${resultCount}`}</p>
+          <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${degraded ? skills.length : resultCount}`}</p>
           {props.pricing !== 'all' && <p className="my-4 text-xs leading-6 text-secondary">{prices.caveat}</p>}
           {degraded && <p role="status" className="my-5 border-l-2 border-amber-600 bg-amber-50 p-4 text-sm text-amber-950">{label(props.catalogMode && skills.length === 0 ? 'catalogUnavailable' : 'dataUnavailable')}</p>}
 
