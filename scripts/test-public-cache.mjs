@@ -115,3 +115,33 @@ try {
   }
 } finally { Date.now = clock }
 console.log('Public cache: static/query separation, RSC, locale/alias preservation, private route blocking, auth scope, bounded memo and identical safety/score semantics passed.')
+
+// Prerendering must stop before the DB-backed directory component is created.
+// Simulate Next's build interruption at connection(), and check localized pages
+// still render without it unless they are skills directories.
+async function checkDirectoryBoundary(path, props, shouldWait) {
+  const mod = {}
+  let waits = 0, rendered = 0
+  const boundary = new Error('prerender interrupted')
+  const stubs = {
+    'next/server': { connection: async () => { waits++; throw boundary } },
+    './content': { default: () => null, generateMetadata: () => ({}), generateStaticParams: () => [] },
+    'react/jsx-runtime': { jsx: (_component, componentProps) => { rendered++; return componentProps } },
+  }
+  new Function('exports', 'require', ts.transpileModule(read(path), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
+  }).outputText)(mod, name => { assert.ok(name in stubs, name); return stubs[name] })
+  if (shouldWait) {
+    await assert.rejects(() => mod.default(props), error => error === boundary)
+    assert.equal(waits, 1)
+    assert.equal(rendered, 0, 'database content cannot render during build')
+  } else {
+    const result = await mod.default(props)
+    assert.equal(waits, 0)
+    assert.equal(rendered, 1)
+    assert.equal(result.requireHealthy, true)
+  }
+}
+await checkDirectoryBoundary('app/skills/page.tsx', undefined, true)
+await checkDirectoryBoundary('app/[locale]/[page]/page.tsx', { params: Promise.resolve({ locale: 'zh', page: 'skills' }) }, true)
+await checkDirectoryBoundary('app/[locale]/[page]/page.tsx', { params: Promise.resolve({ locale: 'zh', page: 'docs' }) }, false)
