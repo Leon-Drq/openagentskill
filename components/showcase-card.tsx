@@ -26,8 +26,8 @@ export function ShowcaseCard({ item, placement = 'gallery', priority = false }: 
   const category = SHOWCASE_CATEGORIES.find((entry) => entry.id === item.category)!
 
   return (
-    <article className="group flex h-full min-w-0 flex-col" data-showcase-card={item.slug}>
-      {item.videoUrl && <div className="relative shrink-0 overflow-hidden rounded-lg border border-[#e4e0d8]">
+    <article className="group flex h-full min-w-0 flex-col rounded-[12px] border border-border bg-card/60 p-3 sm:p-4" data-showcase-card={item.slug}>
+      {item.videoUrl && <div className="relative shrink-0 overflow-hidden rounded-[12px] border border-[#e4e0d8]">
         <ShowcaseVideoPlayer item={item} locale={locale} compact priority={priority} />
         <span className="pointer-events-none absolute left-3 top-3 rounded bg-[#fbfaf6]/95 px-2 py-1 font-mono text-[10px] text-[#1d1b18] shadow-sm">{localizeShowcase(category.label, locale)}</span>
       </div>}
@@ -35,9 +35,9 @@ export function ShowcaseCard({ item, placement = 'gallery', priority = false }: 
         href={getLocalizedNavigationHref(`/showcase/${item.slug}`, locale)}
         prefetch={false}
         onClick={() => trackAnalyticsEvent('showcase_open', { case_slug: item.slug, skill_slug: item.skillSlug, placement })}
-        className="block shrink-0 rounded-lg outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#006b4f]"
+        className="block shrink-0 rounded-[12px] outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#006b4f]"
       >
-        {!item.videoUrl && <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-[#e4e0d8] bg-[#eeece5] transition-colors group-hover:border-[#006b4f]/50">
+        {!item.videoUrl && <div className="relative aspect-[16/10] overflow-hidden rounded-[12px] border border-[#e4e0d8] bg-[#eeece5] transition-colors group-hover:border-[#006b4f]/50">
           <Image
             src={getShowcaseImageSrc(media.src, 'card')} alt={localizeShowcase(media.alt, locale)} fill
             sizes={placement === 'skill' ? '(max-width: 1023px) 100vw, 768px' : '(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 380px'}

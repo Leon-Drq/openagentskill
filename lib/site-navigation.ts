@@ -1,17 +1,20 @@
 import type { Locale } from './i18n/config'
+// @ts-expect-error Direct Node regression tests require the TypeScript extension.
+import { discoveryCopy } from './discovery.ts'
 import type en from './i18n/dictionaries/en'
 
 type NavKey = keyof typeof en.nav
-export type NavigationLink = { href: string; label: NavKey | 'gallery' | 'resources' | 'developers' | 'creatorShort' | 'reports' | 'contact' | 'sponsor' }
+export type NavigationLink = { href: string; label: NavKey | 'gallery' | 'resources' | 'developers' | 'creatorShort' | 'reports' | 'contact' | 'sponsor' | 'categories' }
 export type NavigationSection = NavigationLink & { id: string; items?: readonly NavigationLink[]; activePaths?: readonly string[] }
 
 // One hierarchy for desktop and mobile. Existing public URLs are deliberately retained.
 export const SITE_NAVIGATION: readonly NavigationSection[] = [
-  { id: 'skills', href: '/skills', label: 'skills', activePaths: ['/tasks', '/collections', '/best'], items: [
-    { href: '/skills', label: 'browseSkills' }, { href: '/resolve', label: 'aiSkillFinder' },
-    { href: '/use-cases', label: 'useCases' }, { href: '/skill-packs', label: 'packs' }, { href: '/compare', label: 'compare' },
+  { id: 'skills', href: '/skills', label: 'skills', activePaths: ['/showcase', '/resolve', '/skill-packs', '/compare'] },
+  { id: 'categories', href: '/best', label: 'categories', activePaths: ['/collections', '/use-cases', '/tasks'], items: [
+    { href: '/skills', label: 'browseSkills' }, { href: '/showcase', label: 'gallery' },
+    { href: '/resolve', label: 'aiSkillFinder' }, { href: '/use-cases', label: 'useCases' },
+    { href: '/skill-packs', label: 'packs' }, { href: '/compare', label: 'compare' },
   ] },
-  { id: 'gallery', href: '/showcase', label: 'gallery' },
   { id: 'rankings', href: '/rankings', label: 'rankings', activePaths: ['/trending'] },
   { id: 'creators', href: '/creators', label: 'creatorShort', activePaths: ['/creator', '/creator-kit'], items: [
     { href: '/creators', label: 'creators' }, { href: '/creator', label: 'creatorConsole' },
@@ -50,6 +53,7 @@ const partnershipLabels: Record<Locale, { contact: string; sponsor: string }> = 
 }
 export const getPartnershipLabels = (locale: Locale) => partnershipLabels[locale]
 export function navigationLabel(link: NavigationLink, locale: Locale, nav: Record<NavKey, string>, gallery: string) {
+  if (link.label === 'categories') return discoveryCopy(locale).categories
   if (link.label === 'contact' || link.label === 'sponsor') return partnershipLabels[locale][link.label]
   if (link.label === 'gallery') return gallery
   if (link.label === 'resources' || link.label === 'developers' || link.label === 'creatorShort' || link.label === 'reports') return copy[locale][link.label]
@@ -61,5 +65,6 @@ export function isNavigationPath(pathname: string, href: string) {
   return path === target || path.startsWith(`${target}/`)
 }
 export function isNavigationSectionActive(pathname: string, section: NavigationSection) {
+  if (section.id === 'categories') return ['/best', '/collections', '/use-cases', '/tasks'].some(href => isNavigationPath(pathname, href))
   return [section.href, ...(section.items?.map(item => item.href) || []), ...(section.activePaths || [])].some(href => isNavigationPath(pathname, href))
 }

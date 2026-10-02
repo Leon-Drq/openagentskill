@@ -6,10 +6,12 @@ import { galleryPricingCopy } from '@/lib/i18n/gallery-pricing-copy'
 
 import { galleryCopy, formatGalleryNumber } from '@/lib/i18n/gallery-copy'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ArrowRight, Search, X } from 'lucide-react'
+import { ArrowRight, Search, SlidersHorizontal, X } from 'lucide-react'
+import { DiscoveryTabs, discoveryIcons } from '@/components/discovery-navigation'
+import { DISCOVERY_TASKS, DISCOVERY_OUTPUTS, discoveryCopy } from '@/lib/discovery'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { ShowcaseCard } from '@/components/showcase-card'
@@ -39,6 +41,15 @@ export function ShowcaseGallery({ data }: { data: GalleryData }) {
 
 function GalleryContent({ data }: { data: GalleryData }) {
   const { locale } = useI18n()
+  const discovery = discoveryCopy(locale)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 1024px)')
+    const update = () => setFiltersOpen(media.matches)
+    update()
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
   const router = useRouter()
   const params = useSearchParams()
   const pricing = normalizeShowcasePrice(params.get('pricing'))
@@ -91,14 +102,14 @@ function GalleryContent({ data }: { data: GalleryData }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#fbfaf6] text-[#1d1b18]">
+    <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <main>
         <section className="border-b border-[#e4e0d8]">
-          <div className="mx-auto max-w-6xl px-6 pb-10 pt-12 md:pb-12 md:pt-16">
+          <div className="mx-auto max-w-[1440px] px-4 sm:px-6 pb-10 pt-12 md:pb-12 md:pt-16">
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#006b4f]">{galleryCopy(locale, "Made with skills", "精选技能作品")}</p>
             <div className="mt-4 grid gap-5 md:grid-cols-[1.2fr_1fr] md:items-end md:gap-10">
-              <h1 className="whitespace-nowrap font-display text-[42px] font-normal leading-[1.1] tracking-tight sm:text-6xl xl:text-7xl">
+              <h1 className="font-display text-[42px] font-normal leading-[1.1] tracking-tight sm:text-6xl xl:text-7xl">
                 Skill <em className="font-normal text-[#006b4f]">Gallery</em>
               </h1>
               <div className="pb-1">
@@ -107,57 +118,76 @@ function GalleryContent({ data }: { data: GalleryData }) {
                 {!['en', 'zh'].includes(locale) && <p className="mt-3 text-xs leading-relaxed text-[#6d675e]">{galleryCopy(locale, 'Original-language content', '作品说明和提示词可能保留原文。')}</p>}
               </div>
             </div>
+            <DiscoveryTabs active="gallery" source="gallery" search={params.toString()} />
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-6 pb-20 pt-8" aria-label={galleryCopy(locale, "Browse examples", "浏览作品")}>
+        <section className="mx-auto max-w-[1440px] px-4 sm:px-6 pb-20 pt-8" aria-label={galleryCopy(locale, "Browse examples", "浏览作品")}>
           <h2 className="sr-only">{galleryCopy(locale, "Browse examples", "浏览作品")}</h2>
           {pricing !== 'all' && <p className="mb-5 text-xs leading-relaxed text-[#6d675e]">{priceCopy.note}</p>}
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex flex-wrap items-center gap-2" aria-label={galleryCopy(locale, "Output format", "作品形式")}>
-              <span className="mr-1 text-xs text-[#6d675e]">{galleryCopy(locale, "Format", "形式")}</span>
-              {[{ id: 'all', label: { en: 'All work', zh: '全部作品' } }, ...SHOWCASE_CATEGORIES].map((entry) => {
-                const count = entry.id === 'all' ? data.priceTotal : data.categoryCounts[entry.id] || 0
-                return <button key={entry.id} type="button" aria-pressed={category === entry.id} onClick={() => filter(entry.id, query)}
-                  className={`inline-flex min-h-11 items-center gap-2 rounded-md border px-3 text-sm transition-colors ${category === entry.id ? 'border-[#1d1b18] bg-[#1d1b18] text-[#fbfaf6]' : 'border-[#e4e0d8] bg-transparent text-[#6d675e] hover:border-[#6d675e]'}`}>
-                  {localizeShowcase(entry.label, locale)}<span className="font-mono text-[10px] opacity-70">{count}</span>
-                </button>
-              })}
-            </div>
-            <form key={query} role="search" onSubmit={(event) => { event.preventDefault(); filter(category, String(new FormData(event.currentTarget).get('q') || '')) }} className="flex min-w-0 items-center gap-2 border-b border-[#bdb7ac] focus-within:border-[#006b4f] lg:w-60">
+          <div className="grid items-start gap-6 lg:grid-cols-[232px_minmax(0,1fr)] lg:gap-8">
+            <aside className="min-w-0 lg:sticky lg:top-24" aria-label={discovery.filters}>
+              <details open={filtersOpen} onToggle={event => setFiltersOpen(event.currentTarget.open)} className="rounded-[12px] border border-border bg-card/40 p-4" data-gallery-filters>
+                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold lg:hidden"><span className="inline-flex items-center gap-2"><SlidersHorizontal className="h-4 w-4" aria-hidden="true" />{discovery.filters}</span><ArrowRight className="h-4 w-4" aria-hidden="true" /></summary>
+                <div className="mt-4 space-y-6 lg:mt-0">
+                  <nav aria-label={discovery.output}>
+                    <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-secondary">{discovery.output}</h2>
+                    {[{ id: 'all', label: { en: 'All work', zh: '全部作品' } }, ...SHOWCASE_CATEGORIES].map(entry => {
+                      const count = entry.id === 'all' ? data.priceTotal : data.categoryCounts[entry.id] || 0
+                      const Icon = discoveryIcons[DISCOVERY_OUTPUTS.find(item => item.id === entry.id)?.icon || 'image']
+                      const next = new URLSearchParams(params.toString())
+                      next.delete('page')
+                      if (entry.id === 'all') next.delete('category'); else next.set('category', entry.id)
+                      const target = getLocalizedNavigationHref(`/showcase${next.size ? `?${next}` : ''}`, locale)
+                      return <Link key={entry.id} href={target} prefetch={false} aria-current={category === entry.id ? 'page' : undefined}
+                        className={`flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm ${category === entry.id ? 'bg-[#006b4f]/10 font-semibold text-[#006b4f]' : 'text-secondary hover:bg-muted hover:text-foreground'}`}>
+                        <Icon className="h-4 w-4 shrink-0" aria-hidden="true" /><span>{localizeShowcase(entry.label, locale)}</span><span className="ml-auto font-mono text-[10px] opacity-70">{count}</span>
+                      </Link>
+                    })}
+                  </nav>
+                  <div className="grid gap-4 border-t border-border pt-5" data-gallery-advanced>            <label className="grid gap-2 text-xs text-secondary">{priceCopy.price}<NativeSelect value={pricing} onChange={event => filter(category, query, creatorId, sort, tagId, normalizeShowcasePrice(event.target.value))} aria-label={priceCopy.price} className="w-full min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
+              <option value="all">{priceCopy.all}</option>
+              <option value="free">{priceCopy.free}</option>
+              {(data.hasPaid || pricing === 'paid') && <option value="paid">{priceCopy.paid}</option>}
+            </NativeSelect></label>
+            <label className="grid gap-2 text-xs text-secondary">{discovery.task}<NativeSelect value={tagId} onChange={(event) => filter(category, query, creatorId, sort, event.target.value)} aria-label={galleryCopy(locale, "Filter by use case", "按用途筛选")} className="w-full min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
+              <option value="">{galleryCopy(locale, "All use cases", "全部用途")}</option>
+              {SHOWCASE_TAGS.map((tag) => { const count = data.tagCounts[tag.id] || 0; return <option key={tag.id} value={tag.id} disabled={!count && tagId !== tag.id}>{localizeShowcase(tag.label, locale)} · {count}</option> })}
+            </NativeSelect></label>
+            <label className="grid gap-2 text-xs text-secondary">{galleryCopy(locale, "All skill creators", "全部技能作者")}<NativeSelect value={creatorId} onChange={(event) => filter(category, query, event.target.value)} aria-label={galleryCopy(locale, "Filter by skill creator", "按技能作者筛选")} className="w-full min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
+              <option value="">{galleryCopy(locale, "All skill creators", "全部技能作者")}</option>
+              {[...new Set(SHOWCASE_SKILLS.map((skill) => skill.creatorId))].map((id) => <option key={id} value={id}>{getShowcaseCreator(id).name}</option>)}
+            </NativeSelect></label>
+</div>
+                  <nav className="border-t border-border pt-5" aria-label={discovery.explore}>
+                    <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-secondary">{discovery.explore}</h2>
+                    {DISCOVERY_TASKS.filter(item => ['design-creative', 'video-creation', 'presentation'].includes(item.id)).map(item => <Link key={item.id} href={getLocalizedNavigationHref(item.href, locale)} prefetch={false} className="flex min-h-11 items-center justify-between gap-2 text-xs text-secondary hover:text-[#006b4f]">{item.label[locale]}<ArrowRight className="h-3 w-3" aria-hidden="true" /></Link>)}
+                  </nav>
+                </div>
+              </details>
+            </aside>
+            <div className="min-w-0">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <form key={query} role="search" onSubmit={(event) => { event.preventDefault(); filter(category, String(new FormData(event.currentTarget).get('q') || '')) }} className="flex min-w-0 flex-1 items-center gap-2 rounded-[12px] border border-border bg-card px-3 focus-within:border-[#006b4f]">
               <Search className="h-4 w-4 shrink-0 text-[#6d675e]" aria-hidden="true" />
               <input name="q" type="search" defaultValue={query} aria-label={galleryCopy(locale, "Search examples or skills", "搜索作品或技能")} placeholder={galleryCopy(locale, "Search work or skills…", "搜索作品或技能…")} className="min-h-11 w-full min-w-0 bg-transparent text-base outline-none placeholder:text-[#6d675e] sm:text-sm" />
               <button type="submit" aria-label={galleryCopy(locale, "Search", "搜索")} className="flex h-11 w-11 shrink-0 items-center justify-center text-[#006b4f]"><ArrowRight className="h-4 w-4" aria-hidden="true" /></button>
             </form>
-          </div>
+                            <NativeSelect value={sort} onChange={(event) => filter(category, query, creatorId, event.target.value as ShowcaseSort)} aria-label={galleryCopy(locale, "Sort examples", "作品排序")} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
+              <option value="curated">{galleryCopy(locale, "Curated", "精选推荐")}</option>
+              <option value="top">{galleryCopy(locale, "Top rated", "社区好评")}</option>
+            </NativeSelect>
+              </div>
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">
               <p aria-live="polite" role="status" className="text-xs text-[#6d675e]">{galleryCopy(locale, '{count} examples', '{count} 个案例', { count: formatGalleryNumber(data.totalMatches, locale) })}{cases.length > 0 && ` · ${galleryCopy(locale, 'Showing {start}–{end}', '当前 {start}–{end}', { start: pagination.offset + 1, end: pagination.offset + pagination.items.length })}`}{query && ` · “${query}”`}</p>
               {(query || category !== 'all' || creatorId || tagId || pricing !== 'all') && <button type="button" onClick={() => filter('all', '', '', sort, '', 'all')} className="inline-flex min-h-11 items-center gap-1 text-xs text-[#006b4f]"><X className="h-3 w-3" aria-hidden="true" />{galleryCopy(locale, "Clear filters", "清除筛选")}</button>}
             </div>
-            <div className="grid w-full min-w-0 gap-2 sm:flex sm:w-auto sm:max-w-full sm:flex-wrap">
-            <NativeSelect value={pricing} onChange={event => filter(category, query, creatorId, sort, tagId, normalizeShowcasePrice(event.target.value))} aria-label={priceCopy.price} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
-              <option value="all">{priceCopy.all}</option>
-              <option value="free">{priceCopy.free}</option>
-              {(data.hasPaid || pricing === 'paid') && <option value="paid">{priceCopy.paid}</option>}
-            </NativeSelect>
-            <NativeSelect value={tagId} onChange={(event) => filter(category, query, creatorId, sort, event.target.value)} aria-label={galleryCopy(locale, "Filter by use case", "按用途筛选")} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
-              <option value="">{galleryCopy(locale, "All use cases", "全部用途")}</option>
-              {SHOWCASE_TAGS.map((tag) => { const count = data.tagCounts[tag.id] || 0; return <option key={tag.id} value={tag.id} disabled={!count && tagId !== tag.id}>{localizeShowcase(tag.label, locale)} · {count}</option> })}
-            </NativeSelect>
-            <NativeSelect value={creatorId} onChange={(event) => filter(category, query, event.target.value)} aria-label={galleryCopy(locale, "Filter by skill creator", "按技能作者筛选")} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
-              <option value="">{galleryCopy(locale, "All skill creators", "全部技能作者")}</option>
-              {[...new Set(SHOWCASE_SKILLS.map((skill) => skill.creatorId))].map((id) => <option key={id} value={id}>{getShowcaseCreator(id).name}</option>)}
-            </NativeSelect>
-            <NativeSelect value={sort} onChange={(event) => filter(category, query, creatorId, event.target.value as ShowcaseSort)} aria-label={galleryCopy(locale, "Sort examples", "作品排序")} className="min-h-11 max-w-full rounded-md border border-[#e4e0d8] bg-transparent px-3 text-base text-[#6d675e] focus-visible:outline-[#006b4f] sm:text-xs">
-              <option value="curated">{galleryCopy(locale, "Curated", "精选推荐")}</option>
-              <option value="top">{galleryCopy(locale, "Top rated", "社区好评")}</option>
-            </NativeSelect>
-            </div>
+
           </div>
           {category === 'video' && <p className="mt-4 text-xs leading-relaxed text-[#6d675e]">{galleryCopy(locale, "Play a preview on the card; open the title for the task and workflow. Videos load only when you press play.", "点击封面播放预览，点击标题查看案例与制作方法。视频仅在点击后加载。")}</p>}
           {sort === 'top' && <p role="status" className="mt-3 text-xs text-[#6d675e]">{failed ? (galleryCopy(locale, "Votes are unavailable. Showing curated order.", "投票数据暂时不可用，当前按精选顺序展示。")) : !ready ? (galleryCopy(locale, "Loading votes…", "正在加载投票排行…")) : (galleryCopy(locale, "Ranked by likes minus dislikes. Ties keep the curated order.", "按净赞数（赞 − 踩）排序，同分保留精选顺序。"))} {failed && <button type="button" onClick={() => void refresh()} className="min-h-11 text-[#006b4f] underline">{galleryCopy(locale, "Retry", "重试")}</button>}</p>}
-          {cases.length ? <div className="mt-5 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">{pagination.items.map((item, index) => <ShowcaseCard key={item.slug} item={item} priority={index < 3} />)}</div> : <div className="py-24 text-center">
+          {cases.length ? <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{pagination.items.map((item, index) => <ShowcaseCard key={item.slug} item={item} priority={index < 3} />)}</div> : <div className="py-24 text-center">
             <h2 className="font-display text-3xl">{galleryCopy(locale, "No examples just yet.", "还没有匹配的作品")}</h2>
             <p className="mt-3 text-sm text-[#6d675e]">{galleryCopy(locale, "Try a different search, or clear the filters to see all work.", "试试其他关键词，或清除筛选查看全部作品。")}</p>
             <button type="button" onClick={() => filter('all', '', '', sort, '', 'all')} className="mt-6 rounded-md bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white">{galleryCopy(locale, "See all work", "查看全部作品")}</button>
@@ -168,6 +198,8 @@ function GalleryContent({ data }: { data: GalleryData }) {
             {pagination.page < pagination.pageCount && <Link prefetch={false} href={pageHref(pagination.page + 1)} className="inline-flex min-h-11 items-center rounded-md border border-[#e4e0d8] px-4 text-sm">{galleryCopy(locale, "Next", "下一页")}</Link>}
           </nav>}
           {category === 'video' && <ShowcaseVideoSkills locale={locale} />}
+            </div>
+          </div>
           <div className="mt-16 flex flex-col gap-4 border-t border-[#e4e0d8] pt-7 sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-xl text-sm leading-relaxed text-[#6d675e]">{galleryCopy(locale, "Curated work, reusable templates and style studies are labeled separately, alongside work made here. Each names its source, requirements and prompt status. Author previews are not platform retests; multiple views of one work count once.", "精选作者作品、可复用模板与风格示例，分别标注，另有本站实际制作。每项注明来源、使用条件和提示词性质；作者预览不代表本站复测成功，同一作品的多张截图仅计一项。")}</p>
             <Link href={getLocalizedNavigationHref('/skills', locale)} className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-[#006b4f]">{galleryCopy(locale, "Explore the skill registry", "浏览全部技能")}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
