@@ -46,7 +46,9 @@ export function getXContentLane(skill: SkillRecord) {
   if (/\b(design|creative|figma|motion|animation|video|image|seedance|slides?)\b/.test(text)) {
     return 'creative'
   }
-  if (/\b(code review|pull request|repo analysis|test generation|coding agent|claude code|cursor|codex)\b/.test(text)) {
+  // Agent runtimes are compatibility hints, not the task being shared. A
+  // marketing or academic skill mentioning Claude Code stays in its domain.
+  if (/\b(code review|pull request|repo analysis|test generation|coding agent|debugging|self-debugging|git diff|code generation|repository standards)\b/.test(text)) {
     return 'coding'
   }
   if (/\b(research|rag|retrieval|document|pdf|knowledge|search|recent web|last30)\b/.test(text)) {
@@ -57,6 +59,9 @@ export function getXContentLane(skill: SkillRecord) {
   }
   if (/\b(workflow|automation|browser|scraper|crawler|extractor)\b/.test(text)) {
     return 'automation'
+  }
+  if (/\b(coding-agents|developer-tools|development|coding|codex|claude code|cursor)\b/.test(text)) {
+    return 'coding'
   }
 
   return 'general'

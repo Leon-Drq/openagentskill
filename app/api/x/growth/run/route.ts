@@ -26,6 +26,7 @@ async function handleRun(request: NextRequest) {
       considered: result.digest.considered,
     },
     retiredLegacyQueueItems: result.retiredLegacyQueueItems,
+    refreshedEditorialQueueItems: result.refreshedEditorialQueueItems,
     metrics: result.metrics.status,
     replies: result.replies.status,
   })
