@@ -18,8 +18,14 @@ export function catalogStars(value: number) {
 }
 
 // Saved selections cannot implement database filters or later registry pages.
-export function canShowCatalogSnapshot(page: number, category: string, minStars: number, pricing: string, examplesOnly: boolean) {
-  return page === 1 && category === 'all' && minStars === 0 && pricing === 'all' && !examplesOnly
+export function canShowCatalogSnapshot(page: number, category: string, minStars: number, pricing: string) {
+  return page === 1 && category === 'all' && minStars === 0 && pricing === 'all'
+}
+
+// Case membership is available locally; intersect it before limiting the saved
+// selection. This remains a snapshot, never a live total or registry page.
+export function selectCatalogSnapshot<T extends { slug: string }>(records: readonly T[], exampleSlugs: readonly string[] | null) {
+  return records.filter(record => exampleSlugs === null || exampleSlugs.includes(record.slug)).slice(0, CATALOG_PAGE_SIZE)
 }
 
 // Explicit new filters take precedence over bookmarked legacy view URLs.
