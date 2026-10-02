@@ -304,8 +304,9 @@ async function buildSkillCandidateRow(
 ) {
   const hash = contentHash(skill.document)
   const sourceKey = buildCandidateSourceKey(repository.id || parent.github_repository_id, repository.fullName, skill.path)
+  const sourceUrl = canonicalGitHubSourceUrl(repository.fullName, skill.ref, skill.path)
   const license = getLicenseEvidence(skill.frontmatter.license, repository.license)
-  const duplicate = await findDuplicateContent(sourceKey, hash, skill.sourceUrl)
+  const duplicate = await findDuplicateContent(sourceKey, hash, sourceUrl)
   let files: Array<{ path: string; content: string }> = [{ path: skill.path, content: skill.document }]
   let packageTruncated = false
   let hasUnreviewedFiles = false
@@ -342,7 +343,7 @@ async function buildSkillCandidateRow(
     github_repo: repository.repo,
     source_ref: skill.ref,
     source_path: skill.path,
-    canonical_source_url: skill.sourceUrl,
+    canonical_source_url: sourceUrl,
     source_content_hash: hash,
     skill_name: skill.frontmatter.name,
     skill_description: skill.frontmatter.description,
@@ -409,9 +410,16 @@ async function validateRepositoryCandidate(candidate: SkillCandidateRow) {
     for (const skill of discovery.skills.slice(0, 20)) {
       rows.push(await buildSkillCandidateRow(candidate, repository, skill, discovery.tree))
     }
-    const data = (await Promise.all(rows.map(insertExpandedCandidate))).flat()
+    // Exact SKILL.md discoveries already own the document source key. Validate
+    // that row in place rather than silently ignoring its child insertion.
+    const ownRow = rows.find(row => row.source_key === candidate.source_key)
+    const data = (await Promise.all(rows.filter(row => row !== ownRow).map(insertExpandedCandidate))).flat()
+    if (ownRow) {
+      await updateCandidate(candidate.id, ownRow)
+      data.push({ id: candidate.id, status: ownRow.status })
+    }
 
-    await updateCandidate(candidate.id, {
+    if (!ownRow) await updateCandidate(candidate.id, {
       status: 'expanded',
       github_repository_id: repository.id || candidate.github_repository_id,
       github_stars: repository.stars,

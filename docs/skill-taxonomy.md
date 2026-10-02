@@ -16,4 +16,6 @@ Old category query links continue to normalize; browser automation and scraping 
 
 Only GitHub tree references or exact SKILL.md file references are accepted. The job records original marketplace/source provenance and enqueues internal candidates, subject to the existing star floor, repository/path deduplication, license evidence, content hashes, static scanning and review gates. It never creates public Skill pages directly or copies marketplace descriptions, scores, downloads or verification badges. Package contents are fetched from the original repository by the existing validator.
 
+Expanded document candidates use exact GitHub blob URLs, distinct from their directory discovery parent. An exact-document discovery is validated in place because it already owns the document source key. Both paths use the same license, duplicate-content and review decisions; source identity handling never overrides a review state.
+
 This is bounded public source discovery, not an authenticated catalog mirror. LobeHub's official API requires client registration. If the public page blocks access or changes format, the job reports failure and enqueues nothing; it does not bypass authentication or rate limits. Scaling requires confirming the supported interface and content permissions first. Missing/restricted licenses keep their existing review treatment.
