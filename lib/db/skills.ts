@@ -407,22 +407,36 @@ const getCachedLegacySitemapCount = unstable_cache(
   { revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS, tags: ['approved-sitemap-count'] }
 )
 
+async function fetchEditorialSitemapExtras(minStars: number, minQuality: number): Promise<SkillSitemapRecord[]> {
+  const filter = buildEditorialSearchIndexFilter()
+  if (!filter) return []
+  const { data, error } = await createSitemapClient().from('skills')
+    .select(`${SITEMAP_RECORD_SELECT},ai_review_approved`)
+    .or(filter).order('slug', { ascending: true })
+  if (error) throw error
+  return ((data || []) as (SkillSitemapRecord & { ai_review_approved: boolean })[])
+    .filter(row => !matchesLegacySearchIndex(row, minStars, minQuality))
+}
+
 const getCachedEditorialSitemapExtras = unstable_cache(
-  async (minStars: number, minQuality: number): Promise<SkillSitemapRecord[]> => {
-    const filter = buildEditorialSearchIndexFilter()
-    if (!filter) return []
-    const { data, error } = await createSitemapClient().from('skills')
-      .select(`${SITEMAP_RECORD_SELECT},ai_review_approved`)
-      .or(filter).order('slug', { ascending: true })
-    if (error) throw error
-    // A source-pinned listing may also qualify through the approved lane.
-    // Keep its single canonical URL in the union, not two counted entries.
-    return ((data || []) as (SkillSitemapRecord & { ai_review_approved: boolean })[])
-      .filter(row => !matchesLegacySearchIndex(row, minStars, minQuality))
-  },
+  fetchEditorialSitemapExtras,
   ['approved-sitemap-editorial-extras-v1'],
   { revalidate: SITEMAP_CACHE_REVALIDATE_SECONDS, tags: ['approved-sitemap-count', 'approved-sitemap-records'] }
 )
+
+/** Capture metadata once, then read every shard without older page/count caches. */
+export async function getApprovedSkillSitemapSource(minStars: number, minQualityScore: number) {
+  const [legacyCount, extra] = await Promise.all([
+    fetchApprovedSkillSitemapCount(minStars, minQualityScore),
+    fetchEditorialSitemapExtras(minStars, minQualityScore),
+  ])
+  return {
+    count: legacyCount + extra.length,
+    read: (offset: number, limit: number) => fetchApprovedSkillSitemapRecords(
+      { offset, limit, minStars, minQualityScore }, { legacyCount, extra }
+    ),
+  }
+}
 
 export async function getApprovedSkillSitemapRecords(
   options: SkillSitemapQueryOptions = {}
@@ -438,11 +452,12 @@ export async function getApprovedSkillSitemapRecords(
 }
 
 async function fetchApprovedSkillSitemapRecords(
-  options: Required<SkillSitemapQueryOptions>
+  options: Required<SkillSitemapQueryOptions>,
+  source?: { legacyCount: number; extra: SkillSitemapRecord[] }
 ): Promise<SkillSitemapRecord[]> {
   const supabase = createSitemapClient()
   const rows: SkillSitemapRecord[] = []
-  const [legacyCount, extra] = await Promise.all([
+  const [legacyCount, extra] = source ? [source.legacyCount, source.extra] : await Promise.all([
     getCachedLegacySitemapCount(options.minStars, options.minQualityScore),
     getCachedEditorialSitemapExtras(options.minStars, options.minQualityScore),
   ])
@@ -477,7 +492,7 @@ export async function getApprovedSkillSitemapCount(minStars = 0, minQualityScore
   if (fresh) {
     const [count, extra] = await Promise.all([
       fetchApprovedSkillSitemapCount(normalizedMinStars, normalizedMinQualityScore),
-      getCachedEditorialSitemapExtras(normalizedMinStars, normalizedMinQualityScore),
+      fetchEditorialSitemapExtras(normalizedMinStars, normalizedMinQualityScore),
     ])
     return count + extra.length
   }
@@ -1054,13 +1069,20 @@ async function fetchSearchSkills(normalizedQuery: string, limit: number): Promis
   const supabase = createPublicClient({ requestTimeoutMs: SKILL_BROAD_SEARCH_TIMEOUT_MS })
   const fullTextQuery = searchTerms.map((term) => term.replace(/[^a-z0-9-]/g, '')).filter(Boolean).join(' OR ')
 
-  const { data, error } = await supabase
-    .from('skills')
+  let { data, error } = await supabase
+    .rpc('search_public_skills', { p_query: fullTextQuery || normalizedQuery, p_limit: limit })
     .select(SKILL_DIRECTORY_SELECT)
-    .or(PUBLIC_SKILL_FILTER)
-    .textSearch('search_document', fullTextQuery || normalizedQuery, { config: 'simple', type: 'websearch' })
-    .order('quality_score', { ascending: false })
-    .limit(limit)
+
+  // Older preview/local databases may not have the additive migration yet.
+  // Do not replay a timeout or an arbitrary database failure as another query.
+  if (error && ['PGRST202', '42883'].includes(error.code || '')) {
+    const fallback = await supabase.from('skills').select(SKILL_DIRECTORY_SELECT)
+      .or(PUBLIC_SKILL_FILTER)
+      .textSearch('search_document', fullTextQuery || normalizedQuery, { config: 'simple', type: 'websearch' })
+      .order('quality_score', { ascending: false }).limit(limit)
+    data = fallback.data
+    error = fallback.error
+  }
 
   if (error) {
     // Keep deploys backward compatible while a database migration is rolling
@@ -1077,56 +1099,42 @@ async function fetchSearchSkills(normalizedQuery: string, limit: number): Promis
 
 const getCachedSearchSkills = unstable_cache(
   async (normalizedQuery: string, limit: number) => fetchSearchSkills(normalizedQuery, limit),
-  ['public-skill-search-v5-task-terms'],
+  ['public-skill-search-v6-indexed-matches'],
   { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
 
-async function fetchExactSearchSkills(query: string): Promise<SkillRecord[]> {
-  const exactQuery = normalizeExactSearchQuery(query)
-  if (!exactQuery) return []
+const getCachedExactSearchPart = unstable_cache(
+  async (field: 'slug' | 'name', exactQuery: string): Promise<string> => {
+    const supabase = createPublicClient({ requestTimeoutMs: SKILL_EXACT_SEARCH_TIMEOUT_MS, circuitScope: 'skill-search' })
+    const query = supabase.from('skills').select(SKILL_DIRECTORY_SELECT).or(PUBLIC_SKILL_FILTER)
+    const { data, error } = await (field === 'slug'
+      ? query.eq('slug', exactQuery).limit(4)
+      : query.ilike('name', exactQuery).limit(8))
+    if (error) throw error
+    return packCacheJson(data || [])
+  },
+  ['public-exact-search-parts-v1'],
+  { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
+)
 
-  const supabase = createPublicClient({ requestTimeoutMs: SKILL_EXACT_SEARCH_TIMEOUT_MS, circuitScope: 'skill-search' })
-  const [slugResult, nameResult] = await Promise.all([
-    supabase
-      .from('skills')
-      .select(SKILL_DIRECTORY_SELECT)
-      .or(PUBLIC_SKILL_FILTER)
-      .eq('slug', exactQuery.toLowerCase())
-      .limit(4),
-    supabase
-      .from('skills')
-      .select(SKILL_DIRECTORY_SELECT)
-      .or(PUBLIC_SKILL_FILTER)
-      .ilike('name', exactQuery)
-      .limit(8),
+async function fetchExactSearchSkills(query: string): Promise<{ records: SkillRecord[]; degraded: boolean }> {
+  const exactQuery = normalizeExactSearchQuery(query).toLowerCase()
+  if (!exactQuery) return { records: [], degraded: false }
+  const results = await Promise.allSettled([
+    getCachedExactSearchPart('slug', exactQuery).then(packed => unpackCacheJson<SkillRecord[]>(packed)),
+    getCachedExactSearchPart('name', exactQuery).then(packed => unpackCacheJson<SkillRecord[]>(packed)),
   ])
-
-  const records = [...(slugResult.data || []), ...(nameResult.data || [])] as unknown as SkillRecord[]
-  // A partial response is sufficient when it already contains a definitive
-  // match. If the healthy query returned nothing, however, do not let the
-  // failed sibling query turn an unknown result into a false empty result.
-  if (records.length === 0 && (slugResult.error || nameResult.error)) {
-    throw slugResult.error || nameResult.error
-  }
-
-  const seen = new Set<string>()
-  return filterSkillOnly(records)
-    .filter((skill) => {
-      if (seen.has(skill.slug)) return false
-      seen.add(skill.slug)
-      return true
-    })
+  // Cache the two successful reads independently. An unavailable sibling must
+  // not poison the cache or hide a definitive exact match from the healthy read.
+  const collected = collectSearchResults(results, 12)
+  return { ...collected, records: filterSkillOnly(collected.records) }
 }
 
 function mergeSearchMatches(exactMatches: SkillRecord[], broadMatches: SkillRecord[], rowLimit: number) {
-  const seen = new Set<string>()
-  return [...exactMatches, ...broadMatches]
-    .filter((skill) => {
-      if (seen.has(skill.slug)) return false
-      seen.add(skill.slug)
-      return true
-    })
-    .slice(0, rowLimit)
+  return collectSearchResults([
+    { status: 'fulfilled', value: exactMatches },
+    { status: 'fulfilled', value: broadMatches },
+  ], rowLimit).records
 }
 
 const readCoalescedSearch = createCoalescedCache<{ records: SkillRecord[]; degraded: boolean }>({
@@ -1157,7 +1165,12 @@ async function fetchSearchSkillsWithStatus(query: string, limit = 120) {
       'broad skill search'
     ),
   ])
-  return collectSearchResults(results, rowLimit)
+  const [exact, broad] = results
+  const collected = collectSearchResults([
+    exact.status === 'fulfilled' ? { status: 'fulfilled', value: exact.value.records } : exact,
+    broad,
+  ], rowLimit)
+  return { ...collected, degraded: collected.degraded || (exact.status === 'fulfilled' && exact.value.degraded) }
 }
 
 // Apply discoverability filters BEFORE limiting the pool. Otherwise the top

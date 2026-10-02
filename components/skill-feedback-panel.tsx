@@ -10,43 +10,44 @@ interface SkillFeedbackPanelProps {
 
 function getAnonymousAgentId() {
   const key = 'openagentskill.webAgentId'
-  const existing = window.localStorage.getItem(key)
-  if (existing) return existing
+  try {
+    const existing = window.localStorage.getItem(key)
+    if (existing) return existing
+  } catch { /* Private browsing may block storage; feedback still works. */ }
   const created = `web-user-${crypto.randomUUID()}`
-  window.localStorage.setItem(key, created)
+  try { window.localStorage.setItem(key, created) } catch { /* Keep this request's ID. */ }
   return created
 }
 
 export function SkillFeedbackPanel({ skillSlug }: SkillFeedbackPanelProps) {
   const { locale } = useI18n()
-  const [agentId] = useState<string | null>(() => {
-    if (typeof window === 'undefined') return null
-    return getAnonymousAgentId()
-  })
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
   async function sendFeedback(success: boolean) {
-    if (!agentId || status === 'saving') return
+    if (status === 'saving') return
     setStatus('saving')
-    const response = await fetch('/api/agent/feedback', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        skill_slug: skillSlug,
-        agent_id: agentId,
-        success,
-        latency_ms: null,
-        error_message: success ? null : message || 'User marked this skill for review',
-        metadata: {
-          source: 'skill_detail_page',
-          comment: message || null,
-        },
-      }),
-    })
+    try {
+      const response = await fetch('/api/agent/feedback', {
+        signal: AbortSignal.timeout(8000),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          skill_slug: skillSlug,
+          agent_id: getAnonymousAgentId(),
+          success,
+          latency_ms: null,
+          error_message: success ? null : message || 'User marked this skill for review',
+          metadata: {
+            source: 'skill_detail_page',
+            comment: message || null,
+          },
+        }),
+      })
 
-    setStatus(response.ok ? 'saved' : 'error')
-    if (response.ok) setMessage('')
+      setStatus(response.ok ? 'saved' : 'error')
+      if (response.ok) setMessage('')
+    } catch { setStatus('error') }
   }
 
   return (

@@ -92,3 +92,9 @@ for (const file of ['showcase-gallery', 'showcase-detail', 'showcase-sections', 
 assert.doesNotMatch(read('lib/showcase-task.ts'), /from ['"]\.\/showcase\.ts['"]/, 'Task rendering must not pull the full catalogue into client bundles')
 assert.doesNotMatch(skillsPage, /skills-page-categories-v1|skills-page-stats-v1/, 'Avoid caching request-local fallback in a second layer')
 assert.doesNotMatch(read('app/skills/[slug]/content.tsx'), /skill-detail-support-v1/, 'Independent reads need independent success-only caches')
+
+async function runRecoveryRegressions() {
+  await import('./test-recovery-performance.mjs')
+  await import('./test-client-recovery.mjs')
+}
+runRecoveryRegressions().catch(error => { console.error(error); process.exitCode = 1 })
