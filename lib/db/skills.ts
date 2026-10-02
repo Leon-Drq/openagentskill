@@ -1106,14 +1106,18 @@ const getCachedSearchSkills = unstable_cache(
 const getCachedExactSearchPart = unstable_cache(
   async (field: 'slug' | 'name', exactQuery: string): Promise<string> => {
     const supabase = createPublicClient({ requestTimeoutMs: SKILL_EXACT_SEARCH_TIMEOUT_MS, circuitScope: 'skill-search' })
-    const query = supabase.from('skills').select(SKILL_DIRECTORY_SELECT).or(PUBLIC_SKILL_FILTER)
-    const { data, error } = await (field === 'slug'
-      ? query.eq('slug', exactQuery).limit(4)
-      : query.ilike('name', exactQuery).limit(8))
+    let { data, error } = await (field === 'slug'
+      ? supabase.from('skills').select(SKILL_DIRECTORY_SELECT).or(PUBLIC_SKILL_FILTER).eq('slug', exactQuery).limit(4)
+      : supabase.rpc('lookup_public_skill_name', { p_name: exactQuery }).select(SKILL_DIRECTORY_SELECT))
+    if (field === 'name' && error && ['PGRST202', '42883'].includes(error.code || '')) {
+      const fallback = await supabase.from('skills').select(SKILL_DIRECTORY_SELECT).or(PUBLIC_SKILL_FILTER).ilike('name', exactQuery).limit(8)
+      data = fallback.data
+      error = fallback.error
+    }
     if (error) throw error
     return packCacheJson(data || [])
   },
-  ['public-exact-search-parts-v1'],
+  ['public-exact-search-parts-v2-public-name'],
   { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
 

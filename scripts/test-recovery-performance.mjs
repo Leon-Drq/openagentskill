@@ -42,7 +42,7 @@ function searchFixture() {
     }
     return q
   }
-  const client = { from: () => query(), rpc: () => query('rpc') }
+  const client = { from: () => query(), rpc: name => query(name === 'lookup_public_skill_name' ? 'name' : 'rpc') }
   const names = [...readFileSync(new URL('../lib/db/skills.ts', import.meta.url), 'utf8').matchAll(/from '([^']+)'/g)].map(x => x[1])
   const deps = Object.fromEntries(names.map(x => [x, {}]))
   Object.assign(deps, {
@@ -102,3 +102,28 @@ aggregateCache.clear(); failCounts = true
 assert.equal((await route.GET()).status, 503); assert.equal(aggregateCache.size, 0)
 failCounts = false; assert.equal((await route.GET()).status, 200)
 console.log('Recovery performance: fair source scheduling, seed rotation, indexed RPC, independent exact caches, degraded recovery, no timeout replay, private vote isolation and aggregate invalidation passed.')
+
+// Security/performance contracts of the final DB API: the caller must not be
+// able to widen the projection or turn the definer into arbitrary SQL access.
+const files = (await import('node:fs')).readdirSync(new URL('../supabase/migrations/', import.meta.url))
+const projectedFields = [...readFileSync(new URL('../lib/db/skills.ts', import.meta.url), 'utf8').split('const SKILL_DIRECTORY_SELECT = [')[1].split('].join')[0].matchAll(/'([^']+)'/g)].map(x => x[1])
+for (const suffix of ['public_search_rls_index_plan.sql', 'public_exact_name_lookup.sql']) {
+  const migration = readFileSync(new URL('../supabase/migrations/' + files.find(x => x.endsWith(suffix)), import.meta.url), 'utf8')
+  const returned = migration.split('returns table (')[1].split(')\nlanguage')[0].trim().split(/,\n/).map(line => line.trim().split(' ')[0])
+  assert.deepEqual(returned, projectedFields, 'RPC has precisely the public directory projection')
+  assert.match(migration, /stable security definer/)
+  assert.match(migration, /set search_path = ''/)
+  assert.match(migration, /set statement_timeout = '3s'/)
+  assert.match(migration, /revoke all on function[\s\S]*from public/)
+  assert.match(migration, /s\.ai_review_approved=true or s\.listing_status in \('owner_published','static_checked'\)/)
+  assert.doesNotMatch(migration, /select\s+s\.\*|returns setof public\.skills|execute\s+format\(/i)
+  if (suffix.startsWith('public_search_rls')) {
+    assert.match(migration, /force_custom_plan/)
+    assert.match(migration, /left\(p_query,512\)/)
+    assert.match(migration, /least\(200,greatest\(1/)
+  } else {
+    assert.match(migration, /lower\(s\.name\)=lower\(left\(trim\(p_name\),180\)\)/)
+    assert.match(migration, /limit 8/)
+  }
+}
+console.log('Public search SQL contracts: exact projection, fixed publication gate, read-only definer, bound input, empty search path and result/statement caps passed.')
