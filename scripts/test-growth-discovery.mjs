@@ -13,11 +13,12 @@ import * as indexPolicy from '../lib/seo/search-indexability.ts'
 import { register } from 'node:module'
 import { locales } from '../lib/i18n/config.ts'
 import * as searchResults from '../lib/search-results.ts'
-import * as presentationCategory from '../lib/skills/presentation-category.ts'
+import * as taxonomy from '../lib/skills/taxonomy.ts'
 import * as catalogQuery from '../lib/skills/catalog-query.ts'
 import * as commerce from '../lib/skills/commerce.ts'
 
 register('./test-owner-publication-loader.mjs', import.meta.url)
+const presentationCategory = await import('../lib/skills/presentation-category.ts')
 const useCases = await import('../lib/use-cases.ts')
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
@@ -32,7 +33,7 @@ function compile(path, dependencies, clock = Date) {
 }
 const forbidden = () => { throw new Error('Unexpected network, execution or database access') }
 const sourceEvidence = compile('lib/skills/source-evidence.ts', {})
-const directory = compile('lib/skills/directory.ts', { './source-evidence': sourceEvidence })
+const directory = compile('lib/skills/directory.ts', { './source-evidence': sourceEvidence, './taxonomy': taxonomy })
 
 const ok = value => ({ status: 'fulfilled', value })
 const fail = { status: 'rejected', reason: new Error('timeout') }
@@ -121,6 +122,7 @@ const db = compile('lib/db/skills.ts', {
   '@/lib/async': { withTimeout: promise => promise },
   '@/lib/search-results': searchResults,
   '@/lib/skills/directory': directory,
+  '@/lib/skills/taxonomy': taxonomy,
   '@/lib/skills/presentation-category': presentationCategory,
   '@/lib/skills/catalog-query': catalogQuery,
   '@/lib/skills/commerce': commerce,
@@ -292,7 +294,8 @@ assert.deepEqual(browse.records, live)
 const browseOps = operations.at(-1)
 assert.ok(browseOps.some(op => op[0] === 'or' && op[1] === 'PUBLIC_TEST_GATE'))
 assert.ok(browseOps.some(op => op[0] === 'or' && op[1].includes('source_path.ilike.*SKILL.md')))
-assert.ok(browseOps.some(op => op[0] === 'or' && op[1].includes('rag knowledge')))
+assert.ok(browseOps.some(op => op[0] === 'eq' && op[1] === 'primary_category' && op[2] === 'research'))
+assert.ok(!browseOps.some(op => op[0] === 'or' && op[1].includes('rag knowledge')))
 assert.ok(browseOps.findIndex(op => op[0] === 'gte') < browseOps.findIndex(op => op[0] === 'limit'))
 const writesBeforeFailure = sharedWrites.length
 failing = true

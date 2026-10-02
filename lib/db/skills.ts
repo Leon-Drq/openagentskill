@@ -6,8 +6,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { withTimeout } from '@/lib/async'
 import { collectSearchResults } from '@/lib/search-results'
 import { directoryCategoryTerms } from '@/lib/skills/directory'
+import { normalizeSkillCategory, normalizeTopic, normalizeOutput, type SkillTaxonomy } from '@/lib/skills/taxonomy'
 import { CATALOG_PAGE_SIZE, catalogPageNumber, catalogSortColumn, catalogStars } from '@/lib/skills/catalog-query'
-import { skillPresentationCategory, skillPresentationOverride } from '@/lib/skills/presentation-category'
 import { isMcpOnlyCategory, isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
 import { unstable_cache } from 'next/cache'
 import type { Skill } from '@/lib/types'
@@ -16,7 +16,7 @@ import { getSearchTerms, normalizeExactSearchQuery } from '@/lib/search-query'
 import { packCacheJson, unpackCacheJson } from '@/lib/cache/packed-json'
 import { buildLegacySearchIndexFilter, buildEditorialSearchIndexFilter, matchesLegacySearchIndex } from '@/lib/seo/search-indexability'
 
-export interface SkillRecord {
+export interface SkillRecord extends Partial<SkillTaxonomy> {
   id: string
   slug: string
   name: string
@@ -141,6 +141,8 @@ const SKILL_DIRECTORY_SELECT = [
   'created_at',
   'updated_at',
 ].join(',')
+
+const SKILL_TAXONOMY_SELECT = `${SKILL_DIRECTORY_SELECT},primary_category,taxonomy_tags,output_types,taxonomy_version`
 
 export type SkillDirectoryResult = {
   records: SkillRecord[]
@@ -1177,26 +1179,33 @@ async function fetchSearchSkillsWithStatus(query: string, limit = 120) {
   return { ...collected, degraded: collected.degraded || (exact.status === 'fulfilled' && exact.value.degraded) }
 }
 
+function applyTaxonomyFilters<T extends { eq: (column: string, value: string) => T; contains: (column: string, value: string[]) => T; or: (filters: string) => T }>(query: T, category: string, topic: string, output: string): T {
+  const primary = normalizeSkillCategory(category)
+  if (category !== 'all') {
+    if (primary) query = query.eq('primary_category', primary)
+    else {
+      const terms = directoryCategoryTerms(category)
+      query = terms.length ? query.or(terms.map(term => `category.ilike.*${term}*`).join(',')) : query.eq('primary_category', '__unknown__')
+    }
+  }
+  if (topic !== 'all') query = query.contains('taxonomy_tags', [topic])
+  if (output !== 'all') query = query.contains('output_types', [output])
+  return query
+}
+
 // Apply discoverability filters BEFORE limiting the pool. Otherwise the top
 // 96 generic repositories can hide valid source-recorded skills entirely.
 const getCachedBrowseCandidates = unstable_cache(
-  async (sort: SkillSortMode, category: string, limit: number, sourceOnly: boolean, minStars: number, pricing: PriceFilter, pricingSlugs: string[]) => {
+  async (sort: SkillSortMode, category: string, limit: number, sourceOnly: boolean, minStars: number, pricing: PriceFilter, pricingSlugs: string[], topic: string, output: string) => {
     const supabase = createPublicClient({ requestTimeoutMs: SKILL_DIRECTORY_REQUEST_TIMEOUT_MS })
-    let query = supabase.from('skills').select(SKILL_DIRECTORY_SELECT).or(PUBLIC_SKILL_FILTER)
+    let query = supabase.from('skills').select(SKILL_TAXONOMY_SELECT).or(PUBLIC_SKILL_FILTER)
     if (pricing !== 'all' && pricing !== 'unknown') {
       if (!pricingSlugs.length) return packCacheJson([])
       query = query.in('slug', pricingSlugs)
     } else if (pricing === 'unknown' && pricingSlugs.length) query = query.not('slug', 'in', `(${pricingSlugs.join(',')})`)
     if (sourceOnly) query = query.or('source_path.ilike.*SKILL.md,ai_review_score->>skill_path.ilike.*SKILL.md')
     if (minStars > 0) query = query.gte('github_stars', minStars)
-    const terms = directoryCategoryTerms(category)
-    if (category !== 'all' && terms.length) {
-      // Include known taxonomy corrections without changing stored audit data.
-      const correctedRepos = [...new Set(CURATED_SKILL_SNAPSHOT.filter(skill =>
-        skillPresentationOverride(skill) && directoryCategoryTerms(skillPresentationCategory(skill)).some(term => terms.includes(term))
-      ).map(skill => skill.github_repo).filter(repo => /^[a-z0-9_.-]+\/[a-z0-9_.-]+$/i.test(repo || '')))]
-      query = query.or([...terms.map(term => `category.ilike.*${term}*`), ...correctedRepos.map(repo => `github_repo.eq.${repo}`)].join(','))
-    }
+    query = applyTaxonomyFilters(query, category, topic, output)
     const order = sort === 'stars' ? 'github_stars' : sort === 'new' ? 'created_at'
       : sort === 'fresh' ? 'github_last_pushed_at' : sort === 'downloads' || sort === 'trending' ? 'downloads' : 'quality_score'
     const { data, error } = await query.order(order, { ascending: false, nullsFirst: false })
@@ -1204,14 +1213,14 @@ const getCachedBrowseCandidates = unstable_cache(
     if (error) throw error
     return packCacheJson(filterSkillOnly((data || []) as unknown as SkillRecord[]))
   },
-  ['skills-browse-candidates-v3-pricing'],
+  ['skills-browse-candidates-v4-taxonomy'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 
-export async function getBrowseSkillCandidates(sort: SkillSortMode, category: string, limit: number, sourceOnly: boolean, minStars: number, pricing: PriceFilter = 'all') {
+export async function getBrowseSkillCandidates(sort: SkillSortMode, category: string, limit: number, sourceOnly: boolean, minStars: number, pricing: PriceFilter = 'all', topic = 'all', output = 'all') {
   const size = Math.min(480, Math.max(96, Math.ceil(limit / 96) * 96))
   const stars = Number.isFinite(minStars) ? Math.min(1_000_000_000, Math.max(0, Math.floor(minStars))) : 0
-  const packed = await getCachedBrowseCandidates(sort, category, size, sourceOnly, stars, pricing, commerceFilterSlugs(pricing))
+  const packed = await getCachedBrowseCandidates(sort, category, size, sourceOnly, stars, pricing, commerceFilterSlugs(pricing), normalizeTopic(topic), normalizeOutput(output))
   return { records: await unpackCacheJson<SkillRecord[]>(packed), degraded: false }
 }
 
@@ -1219,10 +1228,10 @@ export async function getBrowseSkillCandidates(sort: SkillSortMode, category: st
 // Count describes public registry entries; the UI separately labels the number
 // of visible skills because MCP-only resources are omitted, as on detail pages.
 const getCachedCatalogPage = unstable_cache(
-  async (sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null) => {
+  async (sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null, topic: string, output: string) => {
     // Optional bulk reads must not open the main directory's circuit.
     const supabase = createPublicClient({ requestTimeoutMs: 8000, circuitScope: 'public-catalog' })
-    let query = supabase.from('skills').select(SKILL_DIRECTORY_SELECT, { count: 'exact' }).or(PUBLIC_SKILL_FILTER)
+    let query = supabase.from('skills').select(SKILL_TAXONOMY_SELECT, { count: 'exact' }).or(PUBLIC_SKILL_FILTER)
     if (pricing !== 'all' && pricing !== 'unknown') {
       if (!pricingSlugs.length) return { records: [] as SkillRecord[], total: 0, hasMore: false }
       query = query.in('slug', pricingSlugs)
@@ -1232,11 +1241,7 @@ const getCachedCatalogPage = unstable_cache(
       query = query.in('slug', exampleSlugs)
     }
     if (minStars > 0) query = query.gte('github_stars', minStars)
-    const terms = directoryCategoryTerms(category)
-    if (category !== 'all') {
-      if (!terms.length) return { records: [] as SkillRecord[], total: 0, hasMore: false }
-      query = query.or(terms.map(term => `category.ilike.*${term}*`).join(','))
-    }
+    query = applyTaxonomyFilters(query, category, topic, output)
     const from = (page - 1) * CATALOG_PAGE_SIZE
     const { data, count, error } = await query
       .order(catalogSortColumn(sort), { ascending: false, nullsFirst: false })
@@ -1245,12 +1250,12 @@ const getCachedCatalogPage = unstable_cache(
     if (count === null) throw new Error('Catalog count unavailable')
     return { records: filterSkillOnly((data || []) as unknown as SkillRecord[]), total: count, hasMore: from + CATALOG_PAGE_SIZE < count }
   },
-  ['public-catalog-pages-v4-isolated'],
+  ['public-catalog-pages-v5-taxonomy'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 
-export function getSkillCatalogPage(sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter = 'all', exampleSlugs: string[] | null = null) {
-  return getCachedCatalogPage(sort, category.slice(0, 80), catalogPageNumber(String(page)), catalogStars(minStars), pricing, commerceFilterSlugs(pricing), exampleSlugs)
+export function getSkillCatalogPage(sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter = 'all', exampleSlugs: string[] | null = null, topic = 'all', output = 'all') {
+  return getCachedCatalogPage(sort, category.slice(0, 80), catalogPageNumber(String(page)), catalogStars(minStars), pricing, commerceFilterSlugs(pricing), exampleSlugs, normalizeTopic(topic), normalizeOutput(output))
 }
 
 export async function searchSkillsStrict(query: string, limit = 120): Promise<SkillRecord[]> {

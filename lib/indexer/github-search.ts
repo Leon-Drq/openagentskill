@@ -21,6 +21,7 @@ function githubHeaders() {
 export interface CandidateDiscovery {
   /** Where this repository first entered the intake queue. */
   source: string
+  market?: { url: string; sourceUrl: string; observedAt: string }
   x?: {
     tweetId: string
     sourceUrl: string

@@ -148,7 +148,7 @@ export async function enqueueRepositoryCandidates(
       github_full_name: candidate.fullName,
       github_owner: candidate.owner,
       github_repo: candidate.repo,
-      source_ref: null,
+      source_ref: candidate.skillSourceUrl ? parseGitHubSkillReference(candidate.skillSourceUrl)?.ref || null : null,
       source_path: normalizeCandidateSourcePath(sourcePath),
       canonical_source_url: candidate.skillSourceUrl || candidate.htmlUrl || canonicalGitHubSourceUrl(candidate.fullName),
       github_stars: Math.max(0, candidate.stars || 0),

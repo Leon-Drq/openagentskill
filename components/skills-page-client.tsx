@@ -1,5 +1,6 @@
 'use client'
 
+import { SKILL_CATEGORIES, TOPIC_RULES, OUTPUT_RULES, categoryLabel } from '@/lib/skills/taxonomy'
 import { NativeSelect } from '@/components/ui/native-select'
 import { commerceCopy } from '@/lib/i18n/commerce-copy'
 import { acquisitionTypes, hasCommercialOffers, type PriceFilter, type SkillCommerce } from '@/lib/skills/commerce'
@@ -108,6 +109,7 @@ interface Skill {
   name: string
   tagline: string
   category: string
+  taxonomyTags: string[]
   stats: {
     downloads: number
     stars: number
@@ -174,6 +176,8 @@ interface Props {
   examplesOnly: boolean
   catalogMode: boolean
   category: string
+  topic: string
+  output: string
   categories: string[]
   useCase: string
   useCases: Array<{ slug: string; shortTitle: string }>
@@ -246,17 +250,20 @@ export function SkillsPageClient(props: Props) {
     navigateTo(destination)
   }
   const resetHref = directoryHref(pathname, queryString, Object.fromEntries(
-    ['q','sort','category','useCase','platform','quality','trust','safety','track','minStars','page','view','pricing','featured','examples'].map(key => [key, undefined])
+    ['q','sort','category','useCase','platform','quality','trust','safety','track','minStars','page','tag','output','view','pricing','featured','examples'].map(key => [key, undefined])
   ))
   const toggleCompare = (slug: string) => {
     trackAnalyticsEvent('skill_compare', { skill_slug: slug, source: 'directory', selected: !compareSlugs.includes(slug) })
     writeSelection(compareSlugs.includes(slug) ? compareSlugs.filter(v => v !== slug) : [...compareSlugs, slug].slice(-4))
   }
-  const label = (key: string) => directoryLabel(locale, key)
+  const label = (key: string) => {
+    const facet = TOPIC_RULES.find(t => t[0] === key)
+    return SKILL_CATEGORIES.some(c => c[0] === key) ? categoryLabel(key, locale) : facet ? facet[locale === 'zh' ? 3 : 2] : directoryLabel(locale, key)
+  }
   const primaryCategories = ['coding-agents','design-creative','video-creation','research','presentation','finance']
   const categoryOptions = directoryCategoryOptions([...categories, ...primaryCategories, category === 'all' ? '' : category])
   const selectedCategory = category === 'all' ? 'all' : directoryCategories(category)[0]
-  const activeFilters = Object.entries({ featured: props.featured ? 'featured' : 'all', examples: props.examplesOnly ? 'withExamples' : 'all', pricing: props.pricing, category, useCase, platform, quality, trust, safety, track: supplyTrack, minStars: minStars ? String(minStars) : 'all' })
+  const activeFilters = Object.entries({ featured: props.featured ? 'featured' : 'all', examples: props.examplesOnly ? 'withExamples' : 'all', pricing: props.pricing, category, tag: props.topic, output: props.output, useCase, platform, quality, trust, safety, track: supplyTrack, minStars: minStars ? String(minStars) : 'all' })
     .filter(([, value]) => value && value !== 'all')
   const sortOptions = [
     ['quality', query ? c.relevance : props.catalogMode ? c.quality : c.recommended], ['stars', c.stars],
@@ -282,7 +289,7 @@ export function SkillsPageClient(props: Props) {
         </header>
 
         <div className="mt-6 grid items-start gap-6 lg:grid-cols-[232px_minmax(0,1fr)] lg:gap-8">
-          <aside className="min-w-0 lg:sticky lg:top-24" aria-label={discovery.filters}>
+          <aside className="min-w-0 lg:sticky lg:top-24 lg:max-h-[calc(100dvh-8rem)] lg:overflow-y-auto" aria-label={discovery.filters}>
             <details data-directory-filters open={filtersOpen} onToggle={event => setFiltersOpen(event.currentTarget.open)} className="rounded-[12px] border border-border bg-card/40 p-4">
               <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold lg:hidden">
                 <span className="inline-flex items-center gap-2"><SlidersHorizontal size={16} aria-hidden="true" />{discovery.filters}{activeFilters.length ? ` · ${activeFilters.length}` : ''}</span><ArrowRight size={16} aria-hidden="true" />
@@ -297,11 +304,11 @@ export function SkillsPageClient(props: Props) {
                 </div>
                 <nav aria-label={c.category} data-directory-categories>
                   <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-secondary">{c.category}</h2>
-                  {['all', ...new Set([...DISCOVERY_TASKS.map(item => item.id), 'finance'])].map(key => {
-                    const item = DISCOVERY_TASKS.find(item => item.id === key)
-                    const Icon = item ? discoveryIcons[item.icon] : Search
-                    return <Link key={key} prefetch={false} href={href({ category: key, track: undefined, useCase: undefined })} scroll={false}
-                      onNavigate={filterNavigation(href({ category: key, track: undefined, useCase: undefined }))} aria-current={selectedCategory === key ? 'page' : undefined}
+                  {['all', ...SKILL_CATEGORIES.slice(0, 15).map(item => item[0])].map(key => {
+                    const item = SKILL_CATEGORIES.find(item => item[0] === key)
+                    const Icon = item ? discoveryIcons[item[3]] : Search
+                    return <Link key={key} prefetch={false} href={href({ category: key, tag: undefined, track: undefined, useCase: undefined })} scroll={false}
+                      onNavigate={filterNavigation(href({ category: key, tag: undefined, track: undefined, useCase: undefined }))} aria-current={selectedCategory === key ? 'page' : undefined}
                       className={`flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm ${selectedCategory === key ? 'bg-[#006b4f]/10 font-semibold text-[#006b4f]' : 'text-secondary hover:bg-muted hover:text-foreground'}`}>
                       <Icon size={16} className="shrink-0" aria-hidden="true" />{key === 'all' ? label('allCategories') : label(key)}
                     </Link>
@@ -309,8 +316,18 @@ export function SkillsPageClient(props: Props) {
                 </nav>
                 <div className="grid gap-4 border-t border-border pt-5">
                   <label className="grid gap-2 text-xs text-secondary">{c.category}
-                    <NativeSelect disabled={pending} value={selectedCategory} onChange={e => navigate({ category: e.target.value })} className="w-full bg-transparent text-sm">
+                    <NativeSelect disabled={pending} value={selectedCategory} onChange={e => navigate({ category: e.target.value, tag: undefined })} className="w-full bg-transparent text-sm">
                       <option value="all">{c.all}</option>{categoryOptions.map(key => <option key={key} value={key}>{label(key)}</option>)}
+                    </NativeSelect>
+                  </label>
+                  <label className="grid gap-2 text-xs text-secondary">{label('taskTag')}
+                    <NativeSelect aria-label={label('taskTag')} disabled={pending} value={props.topic} onChange={e => navigate({ tag: e.target.value })} className="w-full bg-transparent text-sm">
+                      <option value="all">{c.any}</option>{TOPIC_RULES.filter(t => selectedCategory === 'all' || t[1] === selectedCategory || t[0] === props.topic).map(t => <option key={t[0]} value={t[0]}>{t[locale === 'zh' ? 3 : 2]}</option>)}
+                    </NativeSelect>
+                  </label>
+                  <label className="grid gap-2 text-xs text-secondary">{label('outputType')}
+                    <NativeSelect aria-label={label('outputType')} disabled={pending} value={props.output} onChange={e => navigate({ output: e.target.value })} className="w-full bg-transparent text-sm">
+                      <option value="all">{c.any}</option>{OUTPUT_RULES.map(t => <option key={t[0]} value={t[0]}>{t[locale === 'zh' ? 2 : 1]}</option>)}
                     </NativeSelect>
                   </label>
                   <label className="grid gap-2 text-xs text-secondary">{prices.pricing}
@@ -422,6 +439,7 @@ export function SkillsPageClient(props: Props) {
                       : skill.snapshot ? <span>{label('savedInfo')}</span>
                       : skill.sourceStatus !== 'source-recorded' ? <span>{c.review}</span> : null}
                   </div>
+                  {skill.taxonomyTags.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{skill.taxonomyTags.slice(0, 2).map(tag => <Link key={tag} href={href({ tag })} onNavigate={filterNavigation(href({ tag }))} scroll={false} prefetch={false} className="rounded-full border border-border px-2 py-1 text-[10px] text-secondary hover:text-[#006b4f]">{label(tag)}</Link>)}</div>}
                   {skill.exampleCount > 0 && <Link prefetch={false} href={getLocalizedNavigationHref(`/skills/${skill.slug}#showcase`, locale)} className="mt-3 inline-flex min-h-10 items-center gap-2 text-xs font-medium text-[#006b4f]" data-skill-examples>{discovery.examples} · {skill.exampleCount}<ArrowRight size={12} aria-hidden="true" /></Link>}
                 </div>
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border bg-background/45 px-5 py-3">

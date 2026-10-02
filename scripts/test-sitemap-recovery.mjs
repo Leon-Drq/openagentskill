@@ -48,7 +48,7 @@ const operations=[]
 const client={from(){let filter,head=false,range;const q={select(_s,opts){head=opts?.head;return q},or(f){filter=f;operations.push(f);return q},order(){return q},range(a,b){range=[a,b];return q},then(resolve){const rows=filter===policy.buildEditorialSearchIndexFilter()?editorialRows:legacy;return Promise.resolve({data:head?null:range?rows.slice(range[0],range[1]+1):rows,count:rows.length,error:null}).then(resolve)}};return q}}
 const dbDependencies=Object.fromEntries([
   ['next/cache',{unstable_cache:fn=>fn}],['@/lib/supabase/public',{createPublicClient:()=>client}],['@/lib/supabase/admin',{createAdminClient:()=>client}],['@/lib/seo/search-indexability',policy],['@/lib/cache/coalesced',coalesced],
-  ...['@/lib/skills/publication','@/lib/async','@/lib/search-results','@/lib/skills/directory','@/lib/skills/presentation-category','@/lib/skills/catalog-query','@/lib/skills/commerce','@/lib/skills/registry-scope','@/lib/seo/curated-skill-snapshot','@/lib/search-query','@/lib/cache/packed-json'].map(name=>[name,{}]),
+  ...['@/lib/skills/taxonomy','@/lib/skills/publication','@/lib/async','@/lib/search-results','@/lib/skills/directory','@/lib/skills/presentation-category','@/lib/skills/catalog-query','@/lib/skills/commerce','@/lib/skills/registry-scope','@/lib/seo/curated-skill-snapshot','@/lib/search-query','@/lib/cache/packed-json'].map(name=>[name,{}]),
 ])
 const db=compile('lib/db/skills.ts',dbDependencies)
 assert.equal(await db.getApprovedSkillSitemapCount(3,50),3,'An eligible canonical listing is counted once')
