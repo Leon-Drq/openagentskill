@@ -138,7 +138,7 @@ import { GitHubOwnerAvatar } from './github-owner-avatar'
 import { useI18n } from '@/lib/i18n/context'
 import { directoryCopy, directoryLabel } from '@/lib/i18n/directory-copy'
 import { directoryCategories, directoryCategoryOptions, directoryHref } from '@/lib/skills/directory'
-import { Search, ArrowRight, SlidersHorizontal, Star, X } from 'lucide-react'
+import { Search, ArrowRight, SlidersHorizontal, Star, X, LoaderCircle } from 'lucide-react'
 
 // A stable server snapshot avoids localStorage hydration mismatches. Selection
 // still works in memory when private browsing disables persistence.
@@ -237,7 +237,14 @@ export function SkillsPageClient(props: Props) {
     if (Array.isArray(stored)) compareSlugs = [...new Set(stored.filter((v): v is string => typeof v === 'string'))].slice(0, 4)
   } catch { /* Invalid saved data must not break the directory. */ }
   const href = (updates: Record<string, string | undefined>) => directoryHref(pathname, queryString, updates)
-  const navigate = (updates: Record<string, string | undefined>) => startTransition(() => router.push(href(updates), { scroll: false }))
+  const navigateTo = (destination: string) => startTransition(() => router.push(destination, { scroll: false }))
+  const navigate = (updates: Record<string, string | undefined>) => navigateTo(href(updates))
+  // onNavigate only handles same-tab client navigation. Real hrefs remain
+  // available to crawlers, no-JS browsers and Cmd/Ctrl-click.
+  const filterNavigation = (destination: string) => (event: { preventDefault: () => void }) => {
+    event.preventDefault()
+    navigateTo(destination)
+  }
   const resetHref = directoryHref(pathname, queryString, Object.fromEntries(
     ['q','sort','category','useCase','platform','quality','trust','safety','track','minStars','page','view','pricing','featured','examples'].map(key => [key, undefined])
   ))
@@ -266,22 +273,11 @@ export function SkillsPageClient(props: Props) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
-      <main className="skills-directory mx-auto max-w-[1440px] px-4 pb-16 sm:px-6" aria-busy={pending}>
+      <main className="skills-directory mx-auto max-w-[1440px] px-4 pb-16 sm:px-6">
         <header className="border-b border-border pb-7 pt-10 sm:pb-9 sm:pt-14" data-directory-hero>
           <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#006b4f]">OPENAGENTSKILL / DIRECTORY</p>
           <h1 className="mt-4 font-display text-4xl font-normal tracking-tight sm:text-6xl">AI Agent <em className="font-normal text-[#006b4f]">Skills</em></h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-secondary sm:text-base">{c.intro}</p>
-          <form role="search" onSubmit={event => {
-            event.preventDefault()
-            const q = String(new FormData(event.currentTarget).get('q') || '').trim()
-            trackAnalyticsEvent('directory_search', { has_query: Boolean(q), query_length: q.length, locale })
-            navigate({ q: q || undefined, sort: undefined })
-          }} className="mt-6 flex max-w-3xl items-center gap-2 rounded-[12px] border border-border bg-card p-2 focus-within:border-[#006b4f]">
-            <Search size={18} className="ml-2 hidden shrink-0 text-secondary sm:block" aria-hidden="true" />
-            <input key={query || ''} type="search" name="q" defaultValue={query} aria-label={c.search}
-              id="skill-search" placeholder={c.placeholder} className="min-w-0 flex-1 bg-transparent px-2 py-2.5 text-sm outline-none" />
-            <button type="submit" disabled={pending} className="shrink-0 rounded-lg bg-[#006b4f] px-4 py-3 text-sm font-semibold text-white hover:bg-[#00533d] disabled:opacity-50 sm:px-6">{c.search}</button>
-          </form>
           <p className="mt-3 max-w-3xl text-xs leading-6 text-secondary" data-directory-scope>{discovery.directoryNote}</p>
         </header>
 
@@ -304,7 +300,8 @@ export function SkillsPageClient(props: Props) {
                   {['all', ...new Set([...DISCOVERY_TASKS.map(item => item.id), 'finance'])].map(key => {
                     const item = DISCOVERY_TASKS.find(item => item.id === key)
                     const Icon = item ? discoveryIcons[item.icon] : Search
-                    return <Link key={key} prefetch={false} href={href({ category: key, track: undefined, useCase: undefined })} aria-current={selectedCategory === key ? 'page' : undefined}
+                    return <Link key={key} prefetch={false} href={href({ category: key, track: undefined, useCase: undefined })} scroll={false}
+                      onNavigate={filterNavigation(href({ category: key, track: undefined, useCase: undefined }))} aria-current={selectedCategory === key ? 'page' : undefined}
                       className={`flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm ${selectedCategory === key ? 'bg-[#006b4f]/10 font-semibold text-[#006b4f]' : 'text-secondary hover:bg-muted hover:text-foreground'}`}>
                       <Icon size={16} className="shrink-0" aria-hidden="true" />{key === 'all' ? label('allCategories') : label(key)}
                     </Link>
@@ -312,17 +309,17 @@ export function SkillsPageClient(props: Props) {
                 </nav>
                 <div className="grid gap-4 border-t border-border pt-5">
                   <label className="grid gap-2 text-xs text-secondary">{c.category}
-                    <NativeSelect value={selectedCategory} onChange={e => navigate({ category: e.target.value })} className="w-full bg-transparent text-sm">
+                    <NativeSelect disabled={pending} value={selectedCategory} onChange={e => navigate({ category: e.target.value })} className="w-full bg-transparent text-sm">
                       <option value="all">{c.all}</option>{categoryOptions.map(key => <option key={key} value={key}>{label(key)}</option>)}
                     </NativeSelect>
                   </label>
                   <label className="grid gap-2 text-xs text-secondary">{prices.pricing}
-                    <NativeSelect aria-label={prices.pricing} value={props.pricing} onChange={e => navigate({ pricing: e.target.value })} className="w-full bg-transparent text-sm">
+                    <NativeSelect disabled={pending} aria-label={prices.pricing} value={props.pricing} onChange={e => navigate({ pricing: e.target.value })} className="w-full bg-transparent text-sm">
                       <option value="all">{prices.all}</option>{acquisitionTypes.filter(type => !['paid', 'freemium'].includes(type) || hasCommercialOffers() || props.pricing === type).map(type => <option key={type} value={type}>{prices[type]}</option>)}
                     </NativeSelect>
                   </label>
                   {advanced.map(filter => <label key={filter.key} className="grid gap-2 text-xs text-secondary">{filter.title}
-                    <NativeSelect value={filter.value} onChange={e => navigate({ [filter.key]: e.target.value })} className="w-full bg-transparent text-sm">
+                    <NativeSelect disabled={pending} value={filter.value} onChange={e => navigate({ [filter.key]: e.target.value })} className="w-full bg-transparent text-sm">
                       <option value="all">{c.any}</option>{filter.options.map(([value, title]) => <option key={value} value={value}>{title}</option>)}
                     </NativeSelect>
                   </label>)}
@@ -334,11 +331,34 @@ export function SkillsPageClient(props: Props) {
               </div>
             </details>
           </aside>
-        <section aria-labelledby="directory-results-heading" className="min-w-0" data-directory-results>
+        <section aria-labelledby="directory-results-heading" aria-busy={pending} className="relative min-w-0" data-directory-results>
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center" data-directory-toolbar>
+            <form role="search" action={pathname} method="get" data-directory-search onSubmit={event => {
+              event.preventDefault()
+              const q = String(new FormData(event.currentTarget).get('q') || '').trim()
+              trackAnalyticsEvent('directory_search', { has_query: Boolean(q), query_length: q.length, locale })
+              navigate({ q: q || undefined, sort: undefined })
+            }} className="flex min-w-0 flex-1 items-center gap-2 rounded-[12px] border border-border bg-card p-2 focus-within:border-[#006b4f]">
+              <Search size={18} className="ml-2 hidden shrink-0 text-secondary sm:block" aria-hidden="true" />
+              <input key={query || ''} type="search" name="q" defaultValue={query} aria-label={c.search}
+                id="skill-search" placeholder={c.placeholder} className="min-w-0 flex-1 bg-transparent px-2 py-2.5 text-base outline-none sm:text-sm" />
+              <button type="submit" disabled={pending} className="shrink-0 rounded-lg bg-[#006b4f] px-4 py-3 text-sm font-semibold text-white hover:bg-[#00533d] disabled:opacity-50 sm:px-6">{c.search}</button>
+            </form>
+            <div className="shrink-0 sm:w-52">
+              <label className="flex min-h-[62px] min-w-0 max-w-full items-center gap-3 rounded-[12px] border border-border bg-card px-3 text-xs text-secondary">
+                <span className="shrink-0">{c.sort}</span>
+                <NativeSelect aria-label={c.sort} value={sort} onChange={e => navigate({ sort: e.target.value })} disabled={pending} className="w-full max-w-full bg-transparent text-sm">
+                  {sortOptions.map(([value, title]) => <option key={value} value={value}>{title}</option>)}
+                </NativeSelect>
+              </label>
+            </div>
+          </div>
+          {pending && <div data-directory-loading aria-hidden="true" className="pointer-events-none absolute inset-x-0 -top-2 h-0.5 overflow-hidden rounded-full bg-border"><div className="h-full w-2/3 animate-pulse bg-[#006b4f]" /></div>}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="min-w-0">
               <h2 id="directory-results-heading" className="break-words text-base font-semibold">
                 {query ? `${c.results} · “${query}”` : props.featured ? discovery.featured : discovery.all}
+                {pending && <LoaderCircle size={14} className="ml-2 inline-block animate-spin text-[#006b4f]" aria-hidden="true" />}
               </h2>
               <p className="mt-1 font-mono text-xs text-secondary" data-directory-count>
                 {props.catalogMode
@@ -346,23 +366,16 @@ export function SkillsPageClient(props: Props) {
                   : <>{skills.length ? rankOffset + 1 : 0}–{rankOffset + skills.length} / {resultCount.toLocaleString(locale)}</>}
               </p>
             </div>
-            <div className="flex max-w-full flex-wrap gap-3">
-            <label className="flex min-w-0 max-w-full items-center gap-3 text-xs text-secondary">
-              <span className="shrink-0">{c.sort}</span>
-              <NativeSelect aria-label={c.sort} value={sort} onChange={e => navigate({ sort: e.target.value })} className="w-48 max-w-full bg-transparent text-sm">
-                {sortOptions.map(([value, title]) => <option key={value} value={value}>{title}</option>)}
-              </NativeSelect>
-            </label>
-            </div>
           </div>
 
           {activeFilters.length > 0 && (
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs" aria-label={c.active}>
-              {activeFilters.map(([key,value]) => <Link key={key} prefetch={false} href={href({ [key]: undefined, ...(key === 'featured' ? { view: undefined } : {}) })}
+              {activeFilters.map(([key,value]) => <Link key={key} prefetch={false} href={href({ [key]: undefined, ...(key === 'featured' ? { view: undefined } : {}) })} scroll={false}
+                onNavigate={filterNavigation(href({ [key]: undefined, ...(key === 'featured' ? { view: undefined } : {}) }))}
                 className="inline-flex max-w-full items-center gap-2 rounded-full border border-border px-3 py-2" aria-label={`${c.remove}: ${key === 'pricing' ? prices[props.pricing] : key === 'featured' || key === 'examples' ? discovery[value as 'featured' | 'withExamples'] : label(value)}`}>
                 <span className="break-all">{key === 'pricing' ? prices[props.pricing] : key === 'featured' || key === 'examples' ? discovery[value as 'featured' | 'withExamples'] : label(value)}</span><X size={12} className="shrink-0" aria-hidden="true" />
               </Link>)}
-              <Link href={resetHref} prefetch={false} className="p-2 text-[#006b4f] underline underline-offset-4">{c.reset}</Link>
+              <Link href={resetHref} prefetch={false} scroll={false} onNavigate={filterNavigation(resetHref)} className="p-2 text-[#006b4f] underline underline-offset-4">{c.reset}</Link>
             </div>
           )}
           <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${degraded ? skills.length : resultCount}`}</p>
@@ -373,7 +386,7 @@ export function SkillsPageClient(props: Props) {
             <div className="border-y border-border py-14 text-center">
               <p className="text-secondary">{degraded ? label('catalogUnavailable') : props.pricing !== 'all' ? prices.empty : props.catalogMode && hasMoreResults ? label('excludedResources') : c.empty}</p>
               {props.pricing !== 'all' && <Link href={`/contact${locale === 'en' ? '' : '?lang=' + locale}`} className="mt-4 block text-sm text-[#006b4f] underline underline-offset-4">{prices.contribute} →</Link>}
-              <Link href={resetHref} className="mt-5 inline-block text-[#006b4f] underline">{c.reset}</Link>
+              <Link href={resetHref} prefetch={false} scroll={false} onNavigate={filterNavigation(resetHref)} className="mt-5 inline-block text-[#006b4f] underline">{c.reset}</Link>
             </div>
           ) : <SkillEngagementProvider key={skills.map(skill => skill.slug).join(',')} slugs={skills.map(skill => skill.slug)}><div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
             {skills.map(skill => (
@@ -427,8 +440,8 @@ export function SkillsPageClient(props: Props) {
           {(hasPreviousResults || hasMoreResults) && <nav aria-label={c.page} className="mt-6 flex flex-wrap items-center justify-between gap-4 text-sm">
             <span className="font-mono text-xs text-secondary">{c.page} {page}</span>
             <div className="flex gap-3">
-              {hasPreviousResults && <Link prefetch={false} rel="prev" href={href({ page: page > 2 ? String(page - 1) : undefined })} className="border border-border px-4 py-3">{c.previous}</Link>}
-              {hasMoreResults && <Link prefetch={false} rel="next" href={href({ page: String(page + 1) })} className="bg-foreground px-5 py-3 text-background">{c.next} →</Link>}
+              {hasPreviousResults && <Link prefetch={false} rel="prev" href={href({ page: page > 2 ? String(page - 1) : undefined })} scroll={false} onNavigate={filterNavigation(href({ page: page > 2 ? String(page - 1) : undefined }))} className="border border-border px-4 py-3">{c.previous}</Link>}
+              {hasMoreResults && <Link prefetch={false} rel="next" href={href({ page: String(page + 1) })} scroll={false} onNavigate={filterNavigation(href({ page: String(page + 1) }))} className="bg-foreground px-5 py-3 text-background">{c.next} →</Link>}
             </div>
           </nav>}
         </section>

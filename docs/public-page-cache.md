@@ -2,19 +2,24 @@
 
 ## Scope
 
-Default `/skills`, `/skills/[slug]` and the fixed `/{locale}/{page}` routes use
-300-second ISR. The public route wrappers never read request `searchParams`.
-Skill details are generated on demand rather than prebuilding the whole registry.
+The English and localized `/skills` directories render at request time, after
+`connection()` prevents database work during the build. Their filtered and
+unfiltered URLs now share the same public route segment. Data-layer caches and
+existing `public-skill-directory` tags still limit repeated database reads.
+Skill detail pages and other fixed localized pages retain 300-second ISR;
+skill details are generated on demand rather than prebuilding the registry.
 
 The directory client receives URL state as server props rather than reading
-`useSearchParams`, so its full heading, cards and links remain in cached HTML
-instead of a client-rendering loading fallback.
+`useSearchParams`, so its heading, cards, links and relocated search toolbar are
+server-rendered. Filter links keep real hrefs, use `scroll: false` transitions
+and show loading only in the right-hand results region while retaining cards.
+Back/forward navigation and copied filter URLs use the same server renderer.
 
 The existing renderers and metadata live in adjacent `content.tsx` files. Proxy
-rewrites query variants to dynamic `/render-query/...` wrappers, preserving the
-browser URL, filters, SSR content, locale, canonical and robots policy. Direct
-requests to the internal routes return a noindex 404. `_rsc` alone does not select
-the query renderer. Reserved `/skills/new` and `/skills/external` remain untouched.
+still rewrites query variants of skill details and other localized pages to
+`/render-query/...` wrappers. Direct requests to those internal routes return a
+noindex 404. `_rsc` transport state does not change route or indexing policy.
+Reserved `/skills/new` and `/skills/external` remain untouched.
 
 This is not a public CDN header override on an authenticated response. Public
 pages do not read sessions. `/profile`, claim and points session refresh remain
@@ -49,21 +54,21 @@ publication transitions or as evidence of a security review. Urgent takedowns
 must use authorized publication/data invalidation and invalidate the affected
 public path; do not merely wait for a clock TTL or change a review score.
 
-Cached directories throw on an empty outage fallback, preserving the last healthy
-ISR page during regeneration. A cold build encountering this state fails instead
-of publishing an empty directory. Query pages keep their uncached degraded UI.
+The shared renderer still rejects empty degraded output when `requireHealthy` is
+requested. Request-time directories show the explicit degraded state without
+persisting it as a healthy ISR page.
 
 ## Validation
 
 Run `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, then `pnpm start --port 3124`.
 Run `node scripts/check-public-cache.mjs`; set `BASE_URL` for a deployed target.
-The smoke test checks real HIT headers, server-rendered headings/canonicals,
+The smoke test checks detail-page HIT headers, server-rendered headings/canonicals,
 uncached query variants, redirects and internal route blocking. Regression tests
 also cover proxy matching, reserved routes, RSC handling, auth scope, LRU/TTL,
 mutation isolation and identical safety/score outputs across record variants.
 
 Browser-check category, sort, pagination, search, language switching and navigation
-back to an unfiltered cached page. Inspect both HTML and RSC navigation behavior.
+back to an unfiltered directory. Inspect both HTML and RSC navigation behavior.
 Local builds without private environment values can use labelled data fallbacks;
 the deployment build and live checks are additional gates, not equivalent to local
 validation alone.

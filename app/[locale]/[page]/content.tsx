@@ -48,7 +48,8 @@ export async function generateMetadata({
   const title = directoryCopy?.directoryTitle || coreCopy.title
   const description = directoryCopy?.directoryDescription || coreCopy.description
   const canonical = `${SITE_URL}${getLocalizedCorePath(route.locale, route.page)}`
-  const hasSearchVariant = Object.values(resolvedSearchParams).some((value) => {
+  const hasSearchVariant = Object.entries(resolvedSearchParams).some(([key, value]) => {
+    if (key === '_rsc') return false
     const normalized = Array.isArray(value) ? value[0] : value
     return Boolean(normalized?.trim())
   })

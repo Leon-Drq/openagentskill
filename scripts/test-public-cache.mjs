@@ -7,23 +7,21 @@ import { publicQueryRoute } from '../lib/public-page-routing.ts'
 import { createBoundedContentMemo } from '../lib/bounded-content-memo.ts'
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
-for (const path of ['app/skills/page.tsx', 'app/skills/[slug]/page.tsx', 'app/[locale]/[page]/page.tsx']) {
-  const source = read(path)
-  assert.doesNotMatch(source, /await.*searchParams|props\.searchParams|searchParams:\s*Promise</, path)
-  assert.match(source, /revalidate = 300/)
-  assert.match(source, /searchParams=\{Promise.resolve\(\{\}\)\}/)
-}
+const detailWrapper = read('app/skills/[slug]/page.tsx')
+assert.doesNotMatch(detailWrapper, /await.*searchParams|props\.searchParams|searchParams:\s*Promise</)
+assert.match(detailWrapper, /revalidate = 300/)
+assert.match(detailWrapper, /searchParams=\{Promise.resolve\(\{\}\)\}/)
 assert.match(read('app/skills/[slug]/page.tsx'), /generateStaticParams\(\) \{ return \[\] \}/)
 assert.doesNotMatch(read('components/skills-page-client.tsx'), /const .* = useSearchParams\(/, 'cached directory must keep SSR content, not a loading bailout')
 assert.match(read('components/skills-page-client.tsx'), /directoryHref\(pathname, queryString,/)
 assert.match(read('app/skills/content.tsx'), /key === 'lang' && locale !== defaultLocale/, 'localized reset must return to the cacheable path without an injected lang query')
 assert.match(read('app/skills/content.tsx'), /if \(requireHealthy && degraded && visibleRecords.length === 0\) \{\s*throw new Error/, 'do not persist an empty outage page')
-for (const path of ['/skills', '/skills/example', '/zh/skills', '/ja/docs']) {
+for (const path of ['/skills/example', '/ja/docs']) {
   assert.equal(publicQueryRoute(path, new URLSearchParams()), null)
   assert.equal(publicQueryRoute(path, new URLSearchParams('_rsc=prefetch')), null)
   assert.equal(publicQueryRoute(path, new URLSearchParams('q=design&page=2')), '/render-query' + path)
 }
-for (const path of ['/skills/new', '/skills/external', '/skills/external/test', '/api/skills/search', '/profile', '/zz/skills']) {
+for (const path of ['/skills', '/zh/skills', '/ja/skills', '/ko/skills', '/es/skills', '/de/skills', '/fr/skills', '/id/skills', '/skills/new', '/skills/external', '/skills/external/test', '/api/skills/search', '/profile', '/zz/skills']) {
   assert.equal(publicQueryRoute(path, new URLSearchParams('q=test')), null)
 }
 
@@ -58,7 +56,9 @@ for (const url of ['/skills', '/skills/a', '/es/docs', '/profile', '/api/claims'
 }
 const request = path => new NextRequest('https://www.openagentskill.com' + path)
 const result = await exports.proxy(request('/skills?q=design&sort=stars&page=2'))
-assert.equal(result.headers.get('x-middleware-rewrite'), 'https://www.openagentskill.com/render-query/skills?q=design&sort=stars&page=2')
+assert.equal(result.headers.get('x-middleware-rewrite'), null, 'filtered directory keeps the unfiltered route segment')
+assert.equal((await exports.proxy(request('/zh/skills?category=design-creative'))).headers.get('x-middleware-rewrite'), null)
+assert.equal((await exports.proxy(request('/ja/docs?q=test'))).headers.get('x-middleware-rewrite'), 'https://www.openagentskill.com/render-query/ja/docs?q=test')
 assert.equal((await exports.proxy(request('/skills?_rsc=abc'))).headers.get('x-middleware-rewrite'), null)
 assert.equal((await exports.proxy(request('/skills?lang=zh&q=test'))).headers.get('location'), 'https://www.openagentskill.com/zh/skills?q=test')
 assert.equal((await exports.proxy(request('/skills/alias?q=test'))).headers.get('location'), 'https://www.openagentskill.com/skills/canonical?q=test')
@@ -142,6 +142,29 @@ async function checkDirectoryBoundary(path, props, shouldWait) {
     assert.equal(result.requireHealthy, true)
   }
 }
-await checkDirectoryBoundary('app/skills/page.tsx', undefined, true)
+await checkDirectoryBoundary('app/skills/page.tsx', { searchParams: Promise.resolve({ q: 'design' }) }, true)
 await checkDirectoryBoundary('app/[locale]/[page]/page.tsx', { params: Promise.resolve({ locale: 'zh', page: 'skills' }) }, true)
 await checkDirectoryBoundary('app/[locale]/[page]/page.tsx', { params: Promise.resolve({ locale: 'zh', page: 'docs' }) }, false)
+
+// Directory wrappers forward the actual query for SSR and metadata without
+// making unrelated localized pages depend on request-time search parameters.
+async function checkDirectoryInputs(path, page) {
+  const mod = {}, empty = Promise.resolve({}), input = Promise.resolve({ q: 'design', sort: 'stars' })
+  let waits = 0
+  const stubs = {
+    'next/server': { connection: async () => { waits++ } },
+    './content': { default: () => null, generateMetadata: async props => props, generateStaticParams: () => [] },
+    'react/jsx-runtime': { jsx: (_component, props) => props },
+  }
+  new Function('exports', 'require', ts.transpileModule(read(path), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
+  }).outputText)(mod, name => stubs[name])
+  const props = { searchParams: input, params: Promise.resolve({ locale: 'zh', page }) }
+  for (const result of [await mod.default(props), await mod.generateMetadata(props)]) {
+    assert.deepEqual(await result.searchParams, page === 'skills' ? await input : await empty)
+  }
+  assert.equal(waits, page === 'skills' ? 1 : 0)
+}
+await checkDirectoryInputs('app/skills/page.tsx', 'skills')
+await checkDirectoryInputs('app/[locale]/[page]/page.tsx', 'skills')
+await checkDirectoryInputs('app/[locale]/[page]/page.tsx', 'docs')

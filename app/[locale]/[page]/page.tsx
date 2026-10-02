@@ -5,16 +5,20 @@ export { generateStaticParams } from './content'
 export const revalidate = 300
 export const dynamicParams = false
 
-type Props = { params: Promise<{ locale: string; page: string }> }
-
-export function generateMetadata({ params }: Props) {
-  return buildMetadata({ params, searchParams: Promise.resolve({}) })
+type Props = {
+  params: Promise<{ locale: string; page: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export default async function LocalizedCoreRoutePage({ params }: Props) {
+export async function generateMetadata({ params, searchParams }: Props) {
+  const { page } = await params
+  return buildMetadata({ params, searchParams: page === 'skills' ? searchParams : Promise.resolve({}) })
+}
+
+export default async function LocalizedCoreRoutePage({ params, searchParams }: Props) {
   const { page } = await params
   // Only the database-backed directory waits for a request. Other localized
   // navigation pages retain their static generation and ISR behavior.
   if (page === 'skills') await connection()
-  return <LocalizedContent params={params} searchParams={Promise.resolve({})} requireHealthy={page !== 'skills'} />
+  return <LocalizedContent params={params} searchParams={page === 'skills' ? searchParams : Promise.resolve({})} requireHealthy={page !== 'skills'} />
 }

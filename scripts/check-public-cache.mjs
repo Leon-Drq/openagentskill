@@ -20,16 +20,23 @@ function nonemptyDirectory(html) {
   // no fetched markup is reinserted into a page or written to a public file.
   const count = html.match(/data-directory-count[^>]*>([\s\S]*?)<\/p>/)?.[1] || ''
   const numbers = (count.match(/\d+/g) || []).map(Number)
-  assert.deepEqual(numbers.slice(0, 2), [1, 16], 'default cached directory must include real visible cards, not an empty outage fallback')
+  assert.deepEqual(numbers.slice(0, 2), [1, 16], 'default directory must include real visible cards, not an empty outage fallback')
   assert.ok(numbers[2] > 0, 'default directory has candidates')
 }
-for (const path of ['/skills', '/zh/skills', detail]) {
+for (const path of ['/skills', '/zh/skills']) {
+  const { response, html } = await read(path)
+  assert.equal(response.status, 200, path)
+  seo(html, path)
+  nonemptyDirectory(html)
+  assert.match(response.headers.get('cache-control') || '', /private|no-store/, `${path}: request-time HTML uses shared data caches`)
+  console.log(`${path}: SSR directory and uncached HTML passed`)
+}
+for (const path of [detail]) {
   let hit = false
   for (let attempt = 0; attempt < 8; attempt++) {
     const { response, html } = await read(path)
     assert.equal(response.status, 200, path)
     seo(html, path)
-    if (path.endsWith('/skills')) nonemptyDirectory(html)
     const cache = response.headers.get('x-vercel-cache') || response.headers.get('x-nextjs-cache')
     console.log(JSON.stringify({ path, attempt: attempt + 1, cache, control: response.headers.get('cache-control') }))
     if (cache === 'HIT') { hit = true; break }
@@ -60,4 +67,4 @@ for (const path of ['/render-query/skills', '/render-query/zh/skills']) {
   assert.equal(response.status, 404, path)
   assert.match(response.headers.get('x-robots-tag') || '', /noindex/)
 }
-console.log('Public cache smoke passed: real HITs, SSR/canonicals, query isolation, locale redirects and internal-route 404s.')
+console.log('Public cache smoke passed: detail HITs, SSR/canonicals, stable directory routes, query isolation, locale redirects and internal-route 404s.')
