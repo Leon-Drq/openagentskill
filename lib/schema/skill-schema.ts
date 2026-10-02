@@ -121,6 +121,7 @@ export const AIReviewResultSchema = z.object({
   packageFingerprint: z.string().optional(),
   policyVersion: z.string().optional(),
   deferred: z.boolean().optional(),
+  deferReason: z.string().optional(),
 })
 
 export type AIReviewResult = z.infer<typeof AIReviewResultSchema>

@@ -71,6 +71,10 @@
     {
       "path": "/api/x/metrics/sync",
       "schedule": "15 */12 * * *"
+    },
+    {
+      "path": "/api/x/post-creator-reply",
+      "schedule": "35 15,19,23 * * *"
     }
   ]
 }

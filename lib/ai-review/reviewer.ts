@@ -227,8 +227,8 @@ Return only JSON without markdown fences:
       ...provenance,
     }
   } catch (error) {
-    console.warn('[submission-review] deferred', { reason: error instanceof Error ? error.name : 'AnalysisError' })
-    return { ...heuristicReview(data, 'analysis deferred'), ...provenance, method: 'manual', deferred: error instanceof DeferredAnalysisError }
+    console.warn('[submission-review] deferred', { reason: error instanceof DeferredAnalysisError ? error.code : 'invalid_review_response' })
+    return { ...heuristicReview(data, 'analysis deferred'), ...provenance, method: 'manual', deferred: error instanceof DeferredAnalysisError, deferReason: error instanceof DeferredAnalysisError ? error.code : undefined }
   }
 }
 

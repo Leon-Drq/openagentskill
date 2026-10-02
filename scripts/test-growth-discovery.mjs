@@ -4,6 +4,7 @@ import { randomBytes } from 'node:crypto'
 import { gzipSync } from 'node:zlib'
 import ts from 'typescript'
 import { z } from 'zod'
+import * as coalesced from '../lib/cache/coalesced.ts'
 import * as packed from '../lib/cache/packed-json.ts'
 import * as showcase from '../lib/showcase.ts'
 import * as tasks from '../lib/showcase-task.ts'
@@ -113,6 +114,7 @@ const client = { from(table) {
   return query
 } }
 const db = compile('lib/db/skills.ts', {
+  '@/lib/cache/coalesced': coalesced,
   '@/lib/skills/publication': { PUBLIC_SKILL_FILTER: 'PUBLIC_TEST_GATE' },
   '@/lib/supabase/public': { createPublicClient: () => client },
   '@/lib/supabase/admin': { createAdminClient: () => client },

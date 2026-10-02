@@ -38,6 +38,7 @@ export interface RepositorySkillSyncEntry {
   reason?: string
   retryable?: boolean
   deferred?: boolean
+  deferReason?: string
 }
 
 export interface RepositorySkillSyncResult {
@@ -210,6 +211,7 @@ async function payloadForNew(
         reason: policy.issues.slice(0, 2).join('; ') || 'Automated review did not approve this skill.',
         retryable: shouldRetryAutomatedReview(review.reviewModel),
         deferred: review.deferred === true,
+        deferReason: review.deferReason,
       }
     }
     reviewScores = review.scores
@@ -444,6 +446,7 @@ export async function syncRepositorySkills(
           reason: result.reason || 'Automated review rejected the skill.',
           retryable: result.retryable,
           deferred: result.deferred,
+          deferReason: result.deferReason,
         })
         continue
       }
@@ -502,6 +505,7 @@ export async function syncRepositorySkills(
         sourceUrl: skill.sourceUrl,
         status: 'error',
         reason: error instanceof Error ? error.message : 'Unknown recursive skill sync error.',
+        retryable: true,
       })
     }
   }

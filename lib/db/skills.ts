@@ -1,3 +1,4 @@
+import { createCoalescedCache } from '@/lib/cache/coalesced'
 import { PUBLIC_SKILL_FILTER } from '@/lib/skills/publication'
 import { commerceFilterSlugs, getSkillCommerce, type PriceFilter } from '@/lib/skills/commerce'
 import { createPublicClient } from '@/lib/supabase/public'
@@ -1073,7 +1074,18 @@ function mergeSearchMatches(exactMatches: SkillRecord[], broadMatches: SkillReco
     .slice(0, rowLimit)
 }
 
+const readCoalescedSearch = createCoalescedCache<{ records: SkillRecord[]; degraded: boolean }>({
+  ttlMs: 60_000, maxEntries: 64, cacheWhen: result => !result.degraded,
+})
+
 export async function searchSkillsWithStatus(query: string, limit = 120) {
+  const normalized = normalizeExactSearchQuery(query).toLowerCase()
+  if (!normalized) return { records: [] as SkillRecord[], degraded: false }
+  const rowLimit = Math.min(Math.max(Math.floor(limit) || 1, 1), 200)
+  return readCoalescedSearch(JSON.stringify([normalized, rowLimit]), () => fetchSearchSkillsWithStatus(normalized, rowLimit))
+}
+
+async function fetchSearchSkillsWithStatus(query: string, limit = 120) {
   const normalizedQuery = normalizeExactSearchQuery(query)
   if (!normalizedQuery) return { records: [] as SkillRecord[], degraded: false }
 

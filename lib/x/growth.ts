@@ -2,13 +2,13 @@ import { buildSkillAudit } from '@/lib/audits'
 import { getAllSkills, type SkillRecord } from '@/lib/db/skills'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createPublicClient } from '@/lib/supabase/public'
+import { createXAutomationClient } from '@/lib/x/client'
 import { getSkillTrustProfile } from '@/lib/trust'
 import {
   createXPost,
   createXReplyPost,
   getXTweetsByIds,
   getXUserMentions,
-  refreshXAccessToken,
   type XTweetRecord,
 } from '@/lib/x/oauth'
 import {
@@ -16,7 +16,7 @@ import {
   buildSkillPostText,
   getStoredXConnection,
   recordXPost,
-  saveRefreshedXToken,
+  getValidXAccessToken,
   type XPostResult,
 } from '@/lib/x/poster'
 import {
@@ -337,7 +337,7 @@ export async function enqueueXDigestPostQueue(
   } = {}
 ): Promise<XQueueBuildResult> {
   const serverSecret = getServerSecret()
-  const supabase = createPublicClient()
+  const supabase = createXAutomationClient()
   const minStars = Math.max(options.minStars || 100, 25)
   const candidatePool = Math.min(Math.max(options.candidatePool || 500, 120), 1000)
   const date = options.date || new Date()
@@ -431,7 +431,7 @@ export async function enqueueXSkillPostQueue(
   } = {}
 ): Promise<XQueueBuildResult> {
   const serverSecret = getServerSecret()
-  const supabase = createPublicClient()
+  const supabase = createXAutomationClient()
   const limit = Math.min(Math.max(options.limit || 10, 1), 50)
   const minStars = Math.max(options.minStars || 500, 100)
   const candidatePool = Math.min(Math.max(options.candidatePool || limit * 12, 50), 500)
@@ -495,7 +495,7 @@ export async function enqueueXSkillPostQueueForSlugs(
   }
 ): Promise<XQueueBuildResult> {
   const serverSecret = getServerSecret()
-  const supabase = createPublicClient()
+  const supabase = createXAutomationClient()
   const limit = Math.min(Math.max(options.limit || 8, 1), 25)
   const minStars = Math.max(options.minStars || 10, 10)
   const campaign = options.campaign || 'github_hot_daily'
@@ -593,7 +593,7 @@ async function completeCreatorReplyDraft(
 
 export async function getCreatorOutreachStatus(): Promise<XCreatorOutreachStatus> {
   const serverSecret = getServerSecret()
-  const { data, error } = await createPublicClient().rpc('get_creator_outreach_status', {
+  const { data, error } = await createXAutomationClient().rpc('get_creator_outreach_status', {
     p_server_secret: serverSecret,
   })
 
@@ -620,14 +620,13 @@ export async function postNextCreatorReplyToX(): Promise<XCreatorReplyPostResult
   }
 
   const serverSecret = getServerSecret()
-  const supabase = createPublicClient()
+  const supabase = createXAutomationClient()
   const connection = await getStoredXConnection(supabase, serverSecret)
   if (!connection) return { status: 'skipped', reason: 'X account is not authorized yet' }
 
   // Refresh before locking a draft, so a temporary OAuth issue never leaves a
   // candidate stuck in the posting state.
-  const token = await refreshXAccessToken(connection.refresh_token)
-  await saveRefreshedXToken(supabase, serverSecret, token)
+  const token = await getValidXAccessToken(supabase, serverSecret, connection)
 
   const dailyLimit = creatorReplyDailyLimit()
   const claimed = await claimNextCreatorReplyDraft(supabase, serverSecret, dailyLimit)
@@ -695,7 +694,7 @@ export async function postNextCreatorReplyToX(): Promise<XCreatorReplyPostResult
     await completeCreatorReplyDraft(supabase, serverSecret, draft.id, 'error', { error: message }).catch((completionError) => {
       console.error('[x-growth] creator reply error completion failed:', completionError)
     })
-    return { status: 'skipped', reason: `Creator reply failed: ${message}`, draftId: draft.id, skillSlug: draft.skill_slug }
+    throw error
   }
 }
 
@@ -722,14 +721,13 @@ export async function postNextQueuedSkillToX(
   } = {}
 ): Promise<XPostResult & { queueItemId?: string }> {
   const serverSecret = getServerSecret()
-  const supabase = createPublicClient()
+  const supabase = createXAutomationClient()
   const connection = await getStoredXConnection(supabase, serverSecret)
   if (!connection) {
     return { status: 'skipped', reason: 'X account is not authorized yet' }
   }
 
-  const token = await refreshXAccessToken(connection.refresh_token)
-  await saveRefreshedXToken(supabase, serverSecret, token)
+  const token = await getValidXAccessToken(supabase, serverSecret, connection)
 
   let queueBuild: Pick<XQueueBuildResult, 'status' | 'queued' | 'skipped' | 'considered'> | null = null
   let item: XContentQueueItem | null = null
@@ -874,7 +872,9 @@ export async function postNextQueuedSkillToX(
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown X post error'
-    await completeQueueItem(supabase, serverSecret, item.id, 'error', { error: message })
+    await completeQueueItem(supabase, serverSecret, item.id, 'error', { error: message, metadata: { reconciliation_required: true } }).catch(() => {
+      console.error('[x-growth] error state write failed', { queueItemId: item.id })
+    })
     await recordXPost(supabase, serverSecret, {
       queue_item_id: item.id,
       skill_id: item.skill_id || skill?.id,
@@ -890,7 +890,7 @@ export async function postNextQueuedSkillToX(
           attempts: item.attempts,
         },
       },
-    })
+    }).catch(() => { console.error('[x-growth] failure history write failed', { queueItemId: item.id }) })
     throw error
   }
 }
@@ -942,7 +942,7 @@ export async function syncXPostMetrics(
   } = {}
 ): Promise<XMetricsSyncResult> {
   const serverSecret = getServerSecret()
-  const supabase = createPublicClient()
+  const supabase = createXAutomationClient()
   const limit = Math.min(Math.max(options.limit || numberFromEnv('X_METRICS_SYNC_LIMIT', 12), 1), 100)
   const targets = await getMetricTargets(supabase, serverSecret, limit)
   if (!targets.length) {
@@ -954,8 +954,7 @@ export async function syncXPostMetrics(
     return { status: 'skipped', reason: 'X account is not authorized yet', requested: targets.length, recorded: 0, missing: targets.length }
   }
 
-  const token = await refreshXAccessToken(connection.refresh_token)
-  await saveRefreshedXToken(supabase, serverSecret, token)
+  const token = await getValidXAccessToken(supabase, serverSecret, connection)
 
   const lookup = await getXTweetsByIds(token.access_token, targets.map((target) => target.x_post_id))
   const tweetsById = new Map((lookup.data || []).map((tweet) => [tweet.id, tweet]))
@@ -1075,13 +1074,12 @@ export async function syncXReplyDrafts(
   } = {}
 ): Promise<XReplyDraftSyncResult> {
   const serverSecret = getServerSecret()
-  const supabase = createPublicClient()
+  const supabase = createXAutomationClient()
   const connection = await getStoredXConnection(supabase, serverSecret)
   if (!connection) return { status: 'skipped', reason: 'X account is not authorized yet', mentions: 0, drafted: 0, skipped: 0 }
   if (!connection.x_user_id) return { status: 'skipped', reason: 'Stored X connection is missing user id', mentions: 0, drafted: 0, skipped: 0 }
 
-  const token = await refreshXAccessToken(connection.refresh_token)
-  await saveRefreshedXToken(supabase, serverSecret, token)
+  const token = await getValidXAccessToken(supabase, serverSecret, connection)
 
   const mentions = await getXUserMentions(token.access_token, connection.x_user_id, {
     maxResults: Math.min(Math.max(options.limit || numberFromEnv('X_REPLY_SYNC_LIMIT', 8), 5), 100),
