@@ -75,7 +75,11 @@ export function SkillActions({ slug, name, compact = false }: { slug: string; na
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const stat = stats[slug]
-  const button = `inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-md border border-border px-2.5 text-xs text-secondary transition-colors hover:border-[#006b4f] hover:text-[#006b4f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006b4f] disabled:opacity-50 ${compact ? 'bg-background/95 shadow-sm' : ''}`
+  const button = compact
+    ? 'inline-flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-full border-0 bg-transparent px-1 text-xs text-inherit shadow-none transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-current disabled:opacity-40'
+    : 'inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-md border border-border px-2.5 text-xs text-secondary transition-colors hover:border-[#006b4f] hover:text-[#006b4f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006b4f] disabled:opacity-50'
+  const selectedClass = compact ? '' : 'border-[#006b4f]/50 bg-[#006b4f]/5 text-[#006b4f]'
+  const iconClass = compact ? 'h-[18px] w-[18px]' : 'h-3.5 w-3.5'
   async function act(intent: { vote: 1 | -1 | null } | { saved: boolean }) {
     if (busy) return
     setBusy(true); setMessage('')
@@ -83,29 +87,31 @@ export function SkillActions({ slug, name, compact = false }: { slug: string; na
     catch { setMessage('saved' in intent ? formatSkillDetailCopy(locale, 'saveError') : galleryCopy(locale, 'Voting is unavailable. Please retry.', '投票暂时不可用，请重试。')) }
     finally { setBusy(false) }
   }
-  return <div data-skill-actions={slug} className="min-w-0">
-    <div className="flex flex-wrap gap-2">
+  return <div data-skill-actions={slug} className={`min-w-0 ${compact ? 'text-white' : ''}`}>
+    <div className={`flex flex-wrap ${compact ? 'justify-end gap-0.5' : 'gap-2'}`}>
       {([1, -1] as const).map(direction => {
         const selected = stat?.vote === direction
         const Icon = direction === 1 ? ThumbsUp : ThumbsDown
         const label = direction === 1 ? galleryCopy(locale, 'Like', '点赞') : galleryCopy(locale, 'Dislike', '点踩')
+        const count = ready && stat ? (direction === 1 ? stat.likes : stat.dislikes).toLocaleString(locale) : '—'
+        const action = selected ? galleryCopy(locale, 'Remove {action}', '取消{action}', { action: label }) : label
         return <button key={direction} type="button" disabled={busy || !ready || !stat} aria-pressed={selected}
-          aria-label={`${selected ? galleryCopy(locale, 'Remove {action}', '取消{action}', { action: label }) : label} · ${name}`}
-          title={selected ? galleryCopy(locale, 'Remove {action}', '取消{action}', { action: label }) : label}
-          onClick={() => void act({ vote: selected ? null : direction })} className={`${button} ${selected ? 'border-[#006b4f]/50 bg-[#006b4f]/5 text-[#006b4f]' : ''}`}>
-          <Icon className={`h-3.5 w-3.5 ${selected ? 'fill-current' : ''}`} aria-hidden="true" />
-          <span className={compact ? 'sr-only' : undefined}>{label}</span><span className="font-mono tabular-nums">{ready && stat ? (direction === 1 ? stat.likes : stat.dislikes).toLocaleString(locale) : '—'}</span>
+          aria-label={`${action} · ${count} · ${name}`}
+          title={`${action} · ${count}`}
+          onClick={() => void act({ vote: selected ? null : direction })} className={`${button} ${selected ? selectedClass : ''}`}>
+          <Icon strokeWidth={compact ? 1.5 : 2} className={`${iconClass} ${selected ? 'fill-current' : ''}`} aria-hidden="true" />
+          <span className={compact ? 'sr-only' : undefined}>{label}</span><span className={compact && (count === '—' || (direction === 1 ? stat?.likes : stat?.dislikes) === 0) ? 'sr-only' : `font-mono tabular-nums ${compact ? 'text-[10px]' : ''}`}>{count}</span>
         </button>
       })}
       <button type="button" disabled={busy || !ready || !stat} aria-pressed={stat?.saved ?? false}
         aria-label={`${formatSkillDetailCopy(locale, stat?.saved ? 'saved' : 'save')} · ${name}`}
         title={formatSkillDetailCopy(locale, stat?.saved ? 'saved' : 'save')}
-        onClick={() => void act({ saved: !stat?.saved })} className={`${button} ${stat?.saved ? 'border-[#006b4f]/50 bg-[#006b4f]/5 text-[#006b4f]' : ''}`}>
-        <Bookmark className={`h-3.5 w-3.5 ${stat?.saved ? 'fill-current' : ''}`} aria-hidden="true" /><span className={compact ? 'sr-only' : undefined}>{formatSkillDetailCopy(locale, stat?.saved ? 'saved' : 'save')}</span>
+        onClick={() => void act({ saved: !stat?.saved })} className={`${button} ${stat?.saved ? selectedClass : ''}`}>
+        <Bookmark strokeWidth={compact ? 1.5 : 2} className={`${iconClass} ${stat?.saved ? 'fill-current' : ''}`} aria-hidden="true" /><span className={compact ? 'sr-only' : undefined}>{formatSkillDetailCopy(locale, stat?.saved ? 'saved' : 'save')}</span>
       </button>
       {failed && compact && <button type="button" onClick={() => void refresh()} className={button}
         title={galleryCopy(locale, 'Voting unavailable. Retry', '互动暂不可用，点击重试')}
-        aria-label={galleryCopy(locale, 'Voting unavailable. Retry', '互动暂不可用，点击重试')}><RefreshCw className="h-3.5 w-3.5" aria-hidden="true" /></button>}
+        aria-label={galleryCopy(locale, 'Voting unavailable. Retry', '互动暂不可用，点击重试')}><RefreshCw strokeWidth={1.5} className={iconClass} aria-hidden="true" /></button>}
     </div>
     {failed && !compact && <button type="button" onClick={() => void refresh()} className="mt-1 min-h-11 rounded-md bg-background/95 px-2 text-xs text-[#006b4f] underline">{galleryCopy(locale, 'Voting unavailable. Retry', '互动暂不可用，点击重试')}</button>}
     {message && <p role="status" className="mt-2 max-w-64 rounded-md bg-background/95 p-2 text-xs text-secondary">{message}</p>}
