@@ -16,6 +16,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, useTransition, type 
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
+import { SkillActions, SkillEngagementProvider } from './skill-engagement'
 import type { SupplyTrackSummary } from '@/lib/supply'
 
 interface AgentStats {
@@ -374,17 +375,20 @@ export function SkillsPageClient(props: Props) {
               {props.pricing !== 'all' && <Link href={`/contact${locale === 'en' ? '' : '?lang=' + locale}`} className="mt-4 block text-sm text-[#006b4f] underline underline-offset-4">{prices.contribute} →</Link>}
               <Link href={resetHref} className="mt-5 inline-block text-[#006b4f] underline">{c.reset}</Link>
             </div>
-          ) : <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
+          ) : <SkillEngagementProvider key={skills.map(skill => skill.slug).join(',')} slugs={skills.map(skill => skill.slug)}><div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
             {skills.map(skill => (
               <article key={skill.id} className="group flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-border bg-card transition-colors hover:border-[#006b4f]/50" data-directory-skill>
+                <div className="relative">
+                <div className="absolute left-3 top-3 z-10 max-w-[calc(100%-1.5rem)]"><SkillActions slug={skill.slug} name={skill.name} compact /></div>
                 {skill.preview ? <Link href={getLocalizedNavigationHref(`/showcase/${skill.preview.slug}`, locale)} prefetch={false} className="relative block aspect-[16/10] overflow-hidden border-b border-border bg-muted" aria-label={`${discovery.examples}: ${skill.name}`}>
                   <Image src={getShowcaseImageSrc(skill.preview.media[0].src, 'card')} alt={localizeShowcase(skill.preview.media[0].alt, locale)} fill sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 360px" className={skill.preview.cardFit === 'contain' ? 'object-contain p-3' : 'object-cover object-top'} />
                   <span className="absolute bottom-3 left-3 rounded-md bg-background/95 px-2 py-1 text-[10px]">{getShowcaseEvidenceLabel(skill.preview, locale)}</span>
-                </Link> : <Link href={getLocalizedNavigationHref(`/skills/${skill.slug}`, locale)} prefetch={false} className="flex aspect-[16/10] flex-col justify-between border-b border-border bg-[#eeece5]/65 p-5 text-[#006b4f]" data-skill-capability>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.2em]">Agent Skill</span>
+                </Link> : <Link href={getLocalizedNavigationHref(`/skills/${skill.slug}`, locale)} prefetch={false} className="flex aspect-[16/10] min-h-52 flex-col justify-between gap-2 border-b border-border bg-[#eeece5]/65 p-5 pt-20 text-[#006b4f]" data-skill-capability>
+                  <span className="sr-only">Agent Skill</span>
                   <span className="font-display text-3xl leading-tight">{directoryCategories(skill.category).map(label).join(' · ')}</span>
                   <span className="text-xs leading-5 text-secondary">{[...new Set(skill.platformHints || skill.compatibility.map(v => v.platform))].slice(0, 2).join(' · ') || skill.author.name}</span>
                 </Link>}
+                </div>
                 <div className="flex min-w-0 items-start gap-3 p-5 pb-0">
                 <div className="shrink-0"><GitHubOwnerAvatar owner={skill.author.owner} label={skill.author.name} size="md" /></div>
                 <div className="min-w-0 flex-1">
@@ -419,7 +423,7 @@ export function SkillsPageClient(props: Props) {
                 </div>
               </article>
             ))}
-          </div>}
+          </div></SkillEngagementProvider>}
           {(hasPreviousResults || hasMoreResults) && <nav aria-label={c.page} className="mt-6 flex flex-wrap items-center justify-between gap-4 text-sm">
             <span className="font-mono text-xs text-secondary">{c.page} {page}</span>
             <div className="flex gap-3">
