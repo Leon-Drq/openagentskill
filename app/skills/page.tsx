@@ -1,13 +1,15 @@
+import { connection } from 'next/server'
 import SkillsContent, { generateMetadata as buildMetadata } from './content'
 
 export const revalidate = 300
 
-// Do not read Next's request searchParams here: even an empty query opts the
-// complete route out of ISR. Proxy sends query variants to /render-query/skills.
+// Query variants still use /render-query/skills. Shared database reads retain
+// their caches; the directory HTML must not depend on database health at build.
 export function generateMetadata() {
   return buildMetadata({ searchParams: Promise.resolve({}) })
 }
 
-export default function SkillsPage() {
-  return <SkillsContent searchParams={Promise.resolve({})} requireHealthy />
+export default async function SkillsPage() {
+  await connection()
+  return <SkillsContent searchParams={Promise.resolve({})} />
 }
