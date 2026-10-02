@@ -5,7 +5,7 @@ type CircuitState = {
   generation: number
 }
 
-export type SupabaseCircuitScope = 'public-read' | 'skill-lookup' | 'skill-search' | 'telemetry' | 'admin' | 'x-automation'
+export type SupabaseCircuitScope = 'public-read' | 'public-catalog' | 'skill-lookup' | 'skill-search' | 'telemetry' | 'admin' | 'x-automation'
 
 type CircuitGlobal = typeof globalThis & {
   __openagentskillSupabaseCircuits?: Partial<Record<SupabaseCircuitScope, CircuitState>>

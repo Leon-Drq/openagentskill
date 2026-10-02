@@ -366,7 +366,7 @@ export function SkillsPageClient(props: Props) {
           )}
           <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${resultCount}`}</p>
           {props.pricing !== 'all' && <p className="my-4 text-xs leading-6 text-secondary">{prices.caveat}</p>}
-          {degraded && <p role="status" className="my-5 border-l-2 border-amber-600 bg-amber-50 p-4 text-sm text-amber-950">{label(props.catalogMode ? 'catalogUnavailable' : 'dataUnavailable')}</p>}
+          {degraded && <p role="status" className="my-5 border-l-2 border-amber-600 bg-amber-50 p-4 text-sm text-amber-950">{label(props.catalogMode && skills.length === 0 ? 'catalogUnavailable' : 'dataUnavailable')}</p>}
 
           {skills.length === 0 ? (
             <div className="border-y border-border py-14 text-center">

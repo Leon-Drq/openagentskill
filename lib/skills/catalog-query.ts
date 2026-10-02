@@ -17,6 +17,11 @@ export function catalogStars(value: number) {
   return Number.isFinite(value) ? Math.max(0, Math.min(10_000_000, Math.floor(value))) : 0
 }
 
+// Saved selections cannot implement database filters or later registry pages.
+export function canShowCatalogSnapshot(page: number, category: string, minStars: number, pricing: string, examplesOnly: boolean) {
+  return page === 1 && category === 'all' && minStars === 0 && pricing === 'all' && !examplesOnly
+}
+
 // Explicit new filters take precedence over bookmarked legacy view URLs.
 export function directoryDiscoveryFilters(params: { featured?: string; examples?: string; view?: string }) {
   return {
