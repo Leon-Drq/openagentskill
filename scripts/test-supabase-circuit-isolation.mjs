@@ -20,7 +20,7 @@ try {
   await assert.rejects(() => createResilientTimeoutFetch(100)(url), /circuit is temporarily open/)
   assert.equal(calls, 3, 'Warm invocations in the same workload share protection')
   globalThis.fetch = good
-  for (const scope of ['skill-lookup', 'skill-search', 'telemetry', 'admin']) {
+  for (const scope of ['public-catalog', 'skill-lookup', 'skill-search', 'telemetry', 'admin']) {
     assert.equal((await createResilientTimeoutFetch(100, scope)(url)).status, 200, 'Bulk read failures cannot disable critical work')
   }
   now += 15_001
@@ -84,6 +84,7 @@ try {
   assert.equal((await telemetry(url)).status, 200, 'Permission errors are not gateway failures')
 
   const db = readFileSync(new URL('../lib/db/skills.ts', import.meta.url), 'utf8')
+  assert.match(db, /requestTimeoutMs: 8000, circuitScope: 'public-catalog'/)
   assert.match(db, /requestTimeoutMs: SKILL_LOOKUP_TIMEOUT_MS, circuitScope: 'skill-lookup'/)
   assert.match(db, /requestTimeoutMs: SKILL_EXACT_SEARCH_TIMEOUT_MS, circuitScope: 'skill-search'/)
   console.log('Circuit isolation passed: workloads, deadlines, cancellation, concurrent recovery and stale responses.')

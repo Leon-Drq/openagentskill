@@ -1148,7 +1148,8 @@ export async function getBrowseSkillCandidates(sort: SkillSortMode, category: st
 // of visible skills because MCP-only resources are omitted, as on detail pages.
 const getCachedCatalogPage = unstable_cache(
   async (sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null) => {
-    const supabase = createPublicClient({ requestTimeoutMs: 4000 })
+    // Optional bulk reads must not open the main directory's circuit.
+    const supabase = createPublicClient({ requestTimeoutMs: 8000, circuitScope: 'public-catalog' })
     let query = supabase.from('skills').select(SKILL_DIRECTORY_SELECT, { count: 'exact' }).or(PUBLIC_SKILL_FILTER)
     if (pricing !== 'all' && pricing !== 'unknown') {
       if (!pricingSlugs.length) return { records: [] as SkillRecord[], total: 0, hasMore: false }
@@ -1172,7 +1173,7 @@ const getCachedCatalogPage = unstable_cache(
     if (count === null) throw new Error('Catalog count unavailable')
     return { records: filterSkillOnly((data || []) as unknown as SkillRecord[]), total: count, hasMore: from + CATALOG_PAGE_SIZE < count }
   },
-  ['public-catalog-pages-v3-examples'],
+  ['public-catalog-pages-v4-isolated'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 

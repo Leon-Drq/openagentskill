@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { DISCOVERY_TASKS, DISCOVERY_OUTPUTS, DISCOVERY_AGENTS, discoveryCopy } from '../lib/discovery.ts'
 
 import ts from 'typescript'
-import { directoryDiscoveryFilters, catalogSortColumn } from '../lib/skills/catalog-query.ts'
+import { directoryDiscoveryFilters, catalogSortColumn, canShowCatalogSnapshot } from '../lib/skills/catalog-query.ts'
 
 assert.deepEqual(directoryDiscoveryFilters({}), { featured: false, examplesOnly: false }, 'Canonical directory defaults to all skills')
 assert.deepEqual(directoryDiscoveryFilters({ view: 'all' }), { featured: false, examplesOnly: false })
@@ -11,6 +11,10 @@ assert.deepEqual(directoryDiscoveryFilters({ view: 'skills' }), { featured: true
 assert.deepEqual(directoryDiscoveryFilters({ view: 'skills', featured: 'false', examples: 'true' }), { featured: false, examplesOnly: true })
 assert.deepEqual(directoryDiscoveryFilters({ featured: 'true', examples: 'true' }), { featured: true, examplesOnly: true })
 assert.deepEqual(directoryDiscoveryFilters({ featured: 'garbage', examples: 'false' }), { featured: false, examplesOnly: false })
+assert.equal(canShowCatalogSnapshot(1, 'all', 0, 'all', false), true)
+for (const args of [[2, 'all', 0, 'all', false], [1, 'Design', 0, 'all', false], [1, 'all', 100, 'all', false], [1, 'all', 0, 'free', false], [1, 'all', 0, 'all', true]]) {
+  assert.equal(canShowCatalogSnapshot(...args), false, 'Outage snapshots cannot impersonate filtered results or later registry pages')
+}
 
 // Execute the actual cached SQL query with a fake public client: filters must
 // intersect before exact counting and pagination, including empty selections.
