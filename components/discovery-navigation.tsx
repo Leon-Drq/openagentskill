@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import { SKILL_CATEGORIES, OUTPUT_RULES, categoryLabel } from '@/lib/skills/taxonomy'
 import { ArrowRight, Code2, FileText, Image as ImageIcon, Monitor, Presentation, Search, Terminal, Workflow, ChartNoAxesCombined } from 'lucide-react'
 import { Video } from 'lucide-react'
-import { DISCOVERY_TASKS, DISCOVERY_OUTPUTS, DISCOVERY_AGENTS, discoveryCopy } from '@/lib/discovery'
+import { DISCOVERY_OUTPUTS, DISCOVERY_AGENTS, discoveryCopy } from '@/lib/discovery'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { useI18n } from '@/lib/i18n/context'
 import { cn } from '@/lib/utils'
@@ -14,8 +15,8 @@ export function DiscoveryCategories({ onNavigate }: { onNavigate?: () => void })
   const { locale } = useI18n()
   const c = discoveryCopy(locale)
   const groups = [
-    { title: c.task, note: c.taskNote, items: DISCOVERY_TASKS },
-    { title: c.output, note: c.outputNote, items: DISCOVERY_OUTPUTS },
+    { title: c.task, note: c.taskNote, items: SKILL_CATEGORIES.slice(0, 15).map(item => ({ id: item[0], href: `/skills?category=${item[0]}`, icon: item[3], label: categoryLabel(item[0], locale) })) },
+    { title: c.output, note: c.outputNote, items: OUTPUT_RULES.map(item => ({ id: item[0], href: `/skills?output=${item[0]}`, icon: item[0] === 'code' ? 'code' as const : item[0] === 'data' ? 'data' as const : DISCOVERY_OUTPUTS.find(output => output.id === item[0])!.icon, label: item[locale === 'zh' ? 2 : 1] })) },
     { title: c.agent, note: c.agentNote, items: DISCOVERY_AGENTS },
   ]
   return <div data-discovery-categories>
@@ -28,7 +29,7 @@ export function DiscoveryCategories({ onNavigate }: { onNavigate?: () => void })
             const Icon = discoveryIcons[item.icon]
             return <li key={item.id}><Link href={getLocalizedNavigationHref(item.href, locale)} prefetch={false} onClick={onNavigate}
               className="flex min-h-11 items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm leading-5 transition-colors hover:bg-card hover:text-[#006b4f] focus-visible:outline-2 focus-visible:outline-[#006b4f]">
-              <Icon className="h-4 w-4 shrink-0 text-[#006b4f]" aria-hidden="true" /><span>{item.label[locale]}</span>
+              <Icon className="h-4 w-4 shrink-0 text-[#006b4f]" aria-hidden="true" /><span>{typeof item.label === 'string' ? item.label : item.label[locale]}</span>
             </Link></li>
           })}
         </ul>

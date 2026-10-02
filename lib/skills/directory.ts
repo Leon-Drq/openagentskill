@@ -1,3 +1,4 @@
+import { normalizeSkillCategory } from './taxonomy'
 import { getSkillSourceEvidence } from './source-evidence'
 import type { SkillRecord } from '@/lib/db/skills'
 
@@ -6,10 +7,10 @@ const aliases: Record<string, string> = {
   coding: 'coding-agents', 'coding-agent': 'coding-agents', development: 'coding-agents', 'developer-tools': 'coding-agents',
   design: 'design-creative', creative: 'design-creative',
   video: 'video-creation', 'video-generation': 'video-creation',
-  'rag-knowledge': 'research',
+  'rag-knowledge': 'ai-knowledge',
   'presentation-generation': 'presentation', 'ppt': 'presentation',
   'finance-quant': 'finance', 'marketing-growth': 'marketing', 'growth-marketing': 'marketing',
-  'web-automation': 'web-scraping', 'browser-automation': 'web-scraping',
+  'web-automation': 'automation', 'browser-automation': 'automation', 'web-scraping': 'automation',
   'legal-compliance': 'legal', 'data-analysis': 'data',
 }
 
@@ -17,7 +18,7 @@ export function directoryCategories(value: string): string[] {
   // Some historic categories were stored as bracketed, comma-separated arrays.
   return [...new Set(value.replace(/[\[\]"']/g, '').split(',').map(part => {
     const key = part.trim().toLowerCase().replace(/[\s_]+/g, '-')
-    return aliases[key] || key
+    return normalizeSkillCategory(key) || aliases[key] || key
   }).filter(Boolean))]
 }
 

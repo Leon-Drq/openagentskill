@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { DISCOVERY_TASKS, DISCOVERY_OUTPUTS, DISCOVERY_AGENTS, discoveryCopy } from '../lib/discovery.ts'
 
 import ts from 'typescript'
+import { normalizeSkillCategory } from '../lib/skills/taxonomy.ts'
 import { directoryDiscoveryFilters, catalogSortColumn, canShowCatalogSnapshot, selectCatalogSnapshot } from '../lib/skills/catalog-query.ts'
 
 assert.deepEqual(directoryDiscoveryFilters({}), { featured: false, examplesOnly: false }, 'Canonical directory defaults to all skills')
@@ -24,14 +25,15 @@ assert.deepEqual(selectCatalogSnapshot(saved, []), [])
 // intersect before exact counting and pagination, including empty selections.
 const db = readFileSync('lib/db/skills.ts', 'utf8')
 const part = db.slice(db.indexOf('const getCachedCatalogPage'), db.indexOf('export function getSkillCatalogPage'))
-const code = ts.transpileModule(part, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText
+const helper = db.slice(db.indexOf('function applyTaxonomyFilters'), db.indexOf('// Apply discoverability'))
+const code = ts.transpileModule(helper + part, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText
 const calls = []
 const fakeQuery = { then: done => Promise.resolve({ data: [{ slug: 'example-skill' }], count: 17, error: null }).then(done) }
-for (const method of ['select','or','in','not','gte','order','range']) fakeQuery[method] = (...args) => { calls.push([method, ...args]); return fakeQuery }
-const getPage = new Function('unstable_cache','createPublicClient','SKILL_DIRECTORY_SELECT','PUBLIC_SKILL_FILTER','directoryCategoryTerms','CATALOG_PAGE_SIZE','catalogSortColumn','filterSkillOnly', code + ';return getCachedCatalogPage')(
-  fn => fn, () => ({ from: name => { calls.push(['from', name]); return fakeQuery } }), 'slug', 'public gate', () => [], 16, catalogSortColumn, rows => rows,
+for (const method of ['select','or','in','not','gte','order','range','eq','contains']) fakeQuery[method] = (...args) => { calls.push([method, ...args]); return fakeQuery }
+const getPage = new Function('unstable_cache','createPublicClient','SKILL_TAXONOMY_SELECT','PUBLIC_SKILL_FILTER','normalizeSkillCategory','directoryCategoryTerms','CATALOG_PAGE_SIZE','catalogSortColumn','filterSkillOnly', code + ';return getCachedCatalogPage')(
+  fn => fn, () => ({ from: name => { calls.push(['from', name]); return fakeQuery } }), 'slug', 'public gate', normalizeSkillCategory, value => [value], 16, catalogSortColumn, rows => rows,
 )
-const result = await getPage('quality', 'all', 2, 0, 'free', ['example-skill', 'other-skill'], ['example-skill'])
+const result = await getPage('quality', 'all', 2, 0, 'free', ['example-skill', 'other-skill'], ['example-skill'], 'all', 'all')
 assert.equal(result.total, 17)
 assert.equal(result.hasMore, false)
 assert.deepEqual(calls.filter(call => call[0] === 'in'), [['in', 'slug', ['example-skill', 'other-skill']], ['in', 'slug', ['example-skill']]])
@@ -41,6 +43,11 @@ assert.ok(calls.some(call => call[0] === 'or' && call[1] === 'public gate'))
 calls.length = 0
 assert.deepEqual(await getPage('quality', 'all', 1, 0, 'all', [], []), { records: [], total: 0, hasMore: false })
 assert.ok(!calls.some(call => call[0] === 'range'))
+calls.length = 0
+await getPage('quality','ai-knowledge',1,0,'all',[],null,'rag','document')
+assert.ok(calls.some(c => c[0]==='eq' && c[1]==='primary_category' && c[2]==='ai-knowledge'))
+assert.deepEqual(calls.filter(c => c[0]==='contains'),[['contains','taxonomy_tags',['rag']],['contains','output_types',['document']]])
+assert.ok(calls.findIndex(c => c[0]==='contains') < calls.findIndex(c => c[0]==='range'))
 const server = readFileSync('app/skills/content.tsx', 'utf8')
 assert.match(server, /const catalogMode = !featured/)
 assert.match(server, /examplesOnly && !SHOWCASE_SKILL_SLUGS.includes/)

@@ -75,6 +75,10 @@
     {
       "path": "/api/x/post-creator-reply",
       "schedule": "35 15,19,23 * * *"
+    },
+    {
+      "path": "/api/cron/lobehub-discovery",
+      "schedule": "45 18 * * *"
     }
   ]
 }

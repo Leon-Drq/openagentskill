@@ -1,10 +1,11 @@
 import { Metadata } from 'next'
+import { SKILL_CATEGORIES, legacyCategoryTopic, normalizeSkillCategory, normalizeTopic, normalizeOutput, skillTaxonomy } from '@/lib/skills/taxonomy'
 import { commerceFilterSlugs, getSkillCommerce, matchesCommerce, normalizePriceFilter } from '@/lib/skills/commerce'
 import { getBrowseSkillCandidates, getSkillCatalogPage, getSkillsBySlugs } from '@/lib/db/skills'
 import { catalogPageNumber, catalogStars, directoryDiscoveryFilters, canShowCatalogSnapshot, selectCatalogSnapshot } from '@/lib/skills/catalog-query'
 import { getDirectoryProfiles } from '@/lib/skills/directory-profiles'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
-import { getCategories, type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsWithStatus } from '@/lib/db/skills'
+import { type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsWithStatus } from '@/lib/db/skills'
 import { getShowcasesForSkill, getShowcaseCardData, SHOWCASE_SKILL_SLUGS } from '@/lib/showcase'
 import { SkillsPageClient } from '@/components/skills-page-client'
 import { ExternalSkillResults } from '@/components/external-skills'
@@ -495,7 +496,6 @@ const FALLBACK_SKILLS: SkillRecord[] = [
 ]
 
 // These reads already own success-only shared caches in the data layer.
-const getCachedCategories = getCategories
 const getCachedSkillStats = getSkillStats
 
 async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
@@ -596,6 +596,7 @@ function toSkillsPageSkill({
     name: record.name,
     tagline: clampText(record.tagline || record.description, 170),
     category: record.category,
+    taxonomyTags: skillTaxonomy(record).taxonomy_tags,
     stats: {
       downloads: Number(record.downloads || 0),
       stars: Number(record.github_stars || 0),
@@ -903,7 +904,9 @@ export default async function SkillsPage({
   const { featured, examplesOnly } = directoryDiscoveryFilters({
     featured: firstSearchValue(params.featured), examples: firstSearchValue(params.examples), view: firstSearchValue(params.view),
   })
-  const category = firstSearchValue(params.category) || 'all'
+  const category = firstSearchValue(params.category)?.slice(0, 80) || 'all'
+  const topic = normalizeTopic(firstSearchValue(params.tag) || legacyCategoryTopic(category))
+  const output = normalizeOutput(firstSearchValue(params.output))
   const pricing = normalizePriceFilter(firstSearchValue(params.pricing))
   const useCase = firstSearchValue(params.useCase) || 'all'
   const selectedUseCase = useCase !== 'all' ? getUseCaseBySlug(useCase) : undefined
@@ -924,17 +927,16 @@ export default async function SkillsPage({
   const candidateLimit = Math.min(baseLimit + requestedPageOffset, MAX_SKILL_CANDIDATE_LIMIT)
   const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured] = await Promise.all([
     query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
-      : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, featured, minStars, pricing), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
+      : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, featured, minStars, pricing, topic, output), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
         .catch(() => ({ records: getFallbackSkills(sort, undefined, candidateLimit), degraded: true })),
     getSearchAugmentRecords(firstSearchValue(params.q)),
-    withTimeout(getCachedCategories(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills categories query')
-      .catch(() => [...new Set(mergeSkillRecords(FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT).map((skill) => skill.category))].sort()),
+    Promise.resolve(SKILL_CATEGORIES.map(c => c[0])),
     withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
-    catalogMode ? getSkillCatalogPage(sort, category, page, minStars, pricing, examplesOnly ? SHOWCASE_SKILL_SLUGS : null)
+    catalogMode ? getSkillCatalogPage(sort, category, page, minStars, pricing, examplesOnly ? SHOWCASE_SKILL_SLUGS : null, topic, output)
       .then(result => ({ ...result, degraded: false }))
       .catch(() => ({
-        records: canShowCatalogSnapshot(page, category, minStars, pricing)
+        records: canShowCatalogSnapshot(page, category, minStars, pricing) && topic === 'all' && output === 'all'
           ? selectCatalogSnapshot(
             getFallbackSkills(sort, undefined, FALLBACK_SKILLS.length + CURATED_SKILL_SNAPSHOT.length),
             examplesOnly ? SHOWCASE_SKILL_SLUGS : null,
@@ -962,7 +964,8 @@ export default async function SkillsPage({
   const enrichedRecords = records.map((record) => {
     const agentStats = statsMap[record.slug] || null
     return {
-      record: { ...record, category: skillPresentationCategory(record) },
+      sourceCategory: record.category,
+      record: { ...record, ...skillTaxonomy(record), category: skillPresentationCategory(record) },
       agentStats,
       ...getDirectoryProfiles(record, agentStats),
     }
@@ -978,7 +981,10 @@ export default async function SkillsPage({
     if (examplesOnly && !SHOWCASE_SKILL_SLUGS.includes(record.slug)) return false
     if (!matchesCommerce(record.slug, pricing)) return false
     if (featured && getSkillSourceEvidence(record).status !== 'source-recorded') return false
-    if (!matchesDirectoryCategory(record.category, category)) return false
+    if (!matchesDirectoryCategory(normalizeSkillCategory(category) ? record.category : item.sourceCategory, category)) return false
+    const taxonomy = skillTaxonomy(record)
+    if (topic !== 'all' && !taxonomy.taxonomy_tags.includes(topic)) return false
+    if (output !== 'all' && !taxonomy.output_types.includes(output)) return false
     if (supplyTrack !== 'all' && item.supplyProfile.track.slug !== supplyTrack) return false
     if (selectedUseCase && scoreSkillForUseCase(record, selectedUseCase) < 6) return false
     if (platform !== 'all') {
@@ -1058,6 +1064,8 @@ export default async function SkillsPage({
         examplesOnly={examplesOnly}
         catalogMode={catalogMode}
         category={category}
+        topic={topic}
+        output={output}
         pricing={pricing}
         categories={categoryOptions}
         useCase={useCase}
