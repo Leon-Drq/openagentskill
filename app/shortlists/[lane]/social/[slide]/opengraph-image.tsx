@@ -144,7 +144,7 @@ function PicksSlide({ shortlist }: { shortlist: XShortlist }) {
         <div style={{ display: 'flex', width: 400, flexDirection: 'column' }}>
           <div style={{ display: 'flex', color: muted, fontSize: 13, fontWeight: 760, letterSpacing: 3 }}>{shortlist.config.eyebrow.toUpperCase()}</div>
           <div style={{ display: 'flex', marginTop: 20, fontFamily: 'Georgia, serif', fontSize: 50, lineHeight: 1, fontWeight: 700 }}>
-            Five picks. Five different jobs.
+            {shortlist.picks.length} picks. Source details for each.
           </div>
           <div style={{ display: 'flex', marginTop: 22, color: muted, fontSize: 19, lineHeight: 1.35 }}>
             Popularity alone is not a workflow. Each pick earns a role in the list.

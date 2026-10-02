@@ -1,4 +1,4 @@
-export const X_GROWTH_EXPERIMENT_ID = 'x-feedback-loop-v1'
+export const X_GROWTH_EXPERIMENT_ID = 'x-feedback-loop-v2'
 export const X_GROWTH_EXPERIMENT_DAYS = 14
 export const X_GROWTH_EXPERIMENT_TOPICS = 10
 

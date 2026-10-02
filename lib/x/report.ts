@@ -51,6 +51,7 @@ interface EventRow {
 
 export interface XGrowthSummary {
   posts: number
+  measuredPosts: number
   impressions: number
   medianImpressions: number
   reactions: number
@@ -82,6 +83,7 @@ export interface XGrowthReport {
   summary: XGrowthSummary
   baseline: XGrowthSummary
   lanes: XGrowthLaneReport[]
+  formats: Array<XGrowthSummary & { format: string }>
   recommendation: {
     status: 'waiting' | 'learning' | 'winner'
     title: string
@@ -154,7 +156,9 @@ function buildSummary(
   latestMetrics: Map<string, MetricRow>,
   events: EventRow[]
 ): XGrowthSummary {
-  const impressions = posts.map((post) => latestMetrics.get(post.x_post_id || '')?.impression_count || 0)
+  const impressions = posts
+    .map((post) => latestMetrics.get(post.x_post_id || '')?.impression_count)
+    .filter((count): count is number => typeof count === 'number' && Number.isFinite(count))
   const reactions = posts.reduce((sum, post) => {
     const metrics = latestMetrics.get(post.x_post_id || '')
     return sum + asNumber(metrics?.like_count) + asNumber(metrics?.repost_count) + asNumber(metrics?.quote_count) + asNumber(metrics?.bookmark_count)
@@ -176,6 +180,7 @@ function buildSummary(
 
   return {
     posts: posts.length,
+    measuredPosts: impressions.length,
     impressions: totalImpressions,
     medianImpressions: median(impressions),
     reactions,
@@ -192,6 +197,7 @@ function buildSummary(
 function emptySummary(): XGrowthSummary {
   return {
     posts: 0,
+    measuredPosts: 0,
     impressions: 0,
     medianImpressions: 0,
     reactions: 0,
@@ -292,6 +298,7 @@ export async function getXGrowthReport(
       summary: blank,
       baseline: blank,
       lanes: [],
+      formats: [],
       recommendation: buildRecommendation('waiting_for_first_post', [], X_GROWTH_EXPERIMENT_DAYS),
     }
   }
@@ -305,6 +312,19 @@ export async function getXGrowthReport(
   const experimentEvents = events.filter((event) => isExperimentEvent(event, experimentId, trackingCodes))
   const latestMetrics = latestMetricsByPost(metrics)
   const summary = buildSummary(mainExperimentPosts, latestMetrics, experimentEvents)
+  const formats = [...new Set(experimentQueues.map(queue => String(asRecord(queue.metadata).content_format || queue.content_type)))].map(format => {
+    const formatQueues = experimentQueues.filter(queue => (asRecord(queue.metadata).content_format || queue.content_type) === format)
+    const ids = new Set(formatQueues.map(queue => queue.id))
+    const codes = new Set(formatQueues.map(getTrackingCode).filter((code): code is string => Boolean(code)))
+    return {
+      format,
+      ...buildSummary(
+        mainExperimentPosts.filter(post => ids.has(post.queue_item_id || '')),
+        latestMetrics,
+        experimentEvents.filter(event => codes.has(String(asRecord(asRecord(event.metadata).attribution).content))),
+      ),
+    }
+  })
 
   const baselineStart = startTimestamp - X_GROWTH_EXPERIMENT_DAYS * 86_400_000
   const baselinePosts = posts.filter((post) => {
@@ -389,6 +409,7 @@ export async function getXGrowthReport(
     summary,
     baseline,
     lanes,
+    formats,
     recommendation: buildRecommendation(status, lanes, daysRemaining),
   }
 }
