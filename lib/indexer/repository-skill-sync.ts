@@ -505,6 +505,7 @@ export async function syncRepositorySkills(
         sourceUrl: skill.sourceUrl,
         status: 'error',
         reason: error instanceof Error ? error.message : 'Unknown recursive skill sync error.',
+        retryable: true,
       })
     }
   }

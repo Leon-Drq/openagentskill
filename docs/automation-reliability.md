@@ -36,3 +36,6 @@ existing production server credentials; no new environment secrets or migration
 are needed. Verify the authenticated status endpoint and scheduled run logs after
 rollout. Never increase the supplier budget or approve deferred candidates simply
 to clear the queue.
+
+Infrastructure errors remain pending after their bounded immediate retries;
+they do not become rejected reviews. Existing rejected candidates are untouched.

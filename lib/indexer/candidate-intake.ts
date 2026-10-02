@@ -439,7 +439,7 @@ async function validateRepositoryCandidate(candidate: SkillCandidateRow) {
     const delayMinutes = rateLimited ? 60 : Math.min(360, 5 * 2 ** Math.min(candidate.attempt_count, 6))
     await updateCandidate(candidate.id, {
       status: !rateLimited && candidate.attempt_count >= 4 ? 'rejected' : 'validation_error',
-      next_attempt_at: new Date(Date.now() + delayMinutes * 60_000).toISOString(),
+      next_attempt_at: new Date(Date.now() + (!rateLimited && candidate.attempt_count >= 4 ? analysisRetryDelayMs('cooldown') : delayMinutes * 60_000)).toISOString(),
       last_error: error instanceof Error ? error.message.slice(0, 1000) : 'Candidate validation failed',
     })
     return { expanded: 0, fastTrack: 0, reviewRequired: 0, duplicates: 0, rejected: 0, errors: 1, rateLimited }
@@ -505,14 +505,14 @@ async function publishCandidate(candidate: SkillCandidateRow) {
       const retryable = Boolean(failure?.retryable)
       const shouldRetry = retryable && candidate.attempt_count < 4
       await updateCandidate(candidate.id, {
-        status: shouldRetry ? 'publication_error' : 'rejected',
+        status: shouldRetry ? 'publication_error' : failure?.status === 'error' ? 'review_required' : 'rejected',
         next_attempt_at: shouldRetry
           ? new Date(Date.now() + Math.min(360, 15 * 2 ** Math.min(candidate.attempt_count, 4)) * 60_000).toISOString()
-          : new Date().toISOString(),
+          : failure?.status === 'error' ? new Date(Date.now() + analysisRetryDelayMs('cooldown')).toISOString() : new Date().toISOString(),
         last_error: reason.slice(0, 1000),
       })
       if (shouldRetry) return { status: 'retry' as const, slug: null }
-      return { status: 'rejected' as const, slug: null }
+      return { status: failure?.status === 'error' ? 'retry' as const : 'rejected' as const, slug: null }
     }
 
     await updateCandidate(candidate.id, {
@@ -526,8 +526,9 @@ async function publishCandidate(candidate: SkillCandidateRow) {
     const rateLimited = isGitHubRateLimitError(error)
     const delayMinutes = rateLimited ? 60 : Math.min(360, 5 * 2 ** Math.min(candidate.attempt_count, 6))
     await updateCandidate(candidate.id, {
-      status: !rateLimited && candidate.attempt_count >= 4 ? 'rejected' : 'publication_error',
-      next_attempt_at: new Date(Date.now() + delayMinutes * 60_000).toISOString(),
+      // Transport/database failures are not a negative review decision.
+      status: !rateLimited && candidate.attempt_count >= 4 ? 'review_required' : 'publication_error',
+      next_attempt_at: new Date(Date.now() + (!rateLimited && candidate.attempt_count >= 4 ? analysisRetryDelayMs('cooldown') : delayMinutes * 60_000)).toISOString(),
       last_error: error instanceof Error ? error.message.slice(0, 1000) : 'Candidate publication failed',
     })
     return { status: 'error' as const, slug: null, rateLimited }
