@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { commerceFilterSlugs, getSkillCommerce, matchesCommerce, normalizePriceFilter } from '@/lib/skills/commerce'
 import { getBrowseSkillCandidates, getSkillCatalogPage, getSkillsBySlugs } from '@/lib/db/skills'
-import { catalogPageNumber, catalogStars, directoryDiscoveryFilters, canShowCatalogSnapshot } from '@/lib/skills/catalog-query'
+import { catalogPageNumber, catalogStars, directoryDiscoveryFilters, canShowCatalogSnapshot, selectCatalogSnapshot } from '@/lib/skills/catalog-query'
 import { getDirectoryProfiles } from '@/lib/skills/directory-profiles'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { getCategories, type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsWithStatus } from '@/lib/db/skills'
@@ -934,8 +934,11 @@ export default async function SkillsPage({
     catalogMode ? getSkillCatalogPage(sort, category, page, minStars, pricing, examplesOnly ? SHOWCASE_SKILL_SLUGS : null)
       .then(result => ({ ...result, degraded: false }))
       .catch(() => ({
-        records: canShowCatalogSnapshot(page, category, minStars, pricing, examplesOnly)
-          ? getFallbackSkills(sort, undefined, VISIBLE_SKILL_LIMIT) : [] as SkillRecord[],
+        records: canShowCatalogSnapshot(page, category, minStars, pricing)
+          ? selectCatalogSnapshot(
+            getFallbackSkills(sort, undefined, FALLBACK_SKILLS.length + CURATED_SKILL_SNAPSHOT.length),
+            examplesOnly ? SHOWCASE_SKILL_SLUGS : null,
+          ) : [] as SkillRecord[],
         total: 0, hasMore: false, degraded: true,
       })) : Promise.resolve(null),
     getSkillsBySlugs([...new Set([...(selectedUseCase?.featuredSlugs || []), ...(!catalogMode && examplesOnly ? SHOWCASE_SKILL_SLUGS : []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
