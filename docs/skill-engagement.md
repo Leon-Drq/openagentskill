@@ -1,9 +1,11 @@
 # Skill cards: voting and saving
 
 The unified `/skills` directory renders Like, Dislike and Save on every card,
-in a compact toolbar at the top left, including skills with examples and technical skills without a preview. Detail
+in a transparent icon toolbar at the top right, including skills with examples and technical skills without a preview. Detail
 pages use the same controls. Compact controls keep accessible labels/tooltips and
-44-pixel touch targets. One provider requests a bounded batch of the visible
+44-pixel touch targets. Icons use difference blending inside the isolated preview
+to remain visible over light and dark covers. Zero counts stay in accessible
+labels/tooltips; positive counts remain visible. One provider requests a bounded batch of the visible
 slugs; cards never individually query Auth or bookmarks.
 
 Skill votes are one mutually exclusive vote per signed-in account and skill.

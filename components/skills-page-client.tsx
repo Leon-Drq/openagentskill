@@ -378,8 +378,8 @@ export function SkillsPageClient(props: Props) {
           ) : <SkillEngagementProvider key={skills.map(skill => skill.slug).join(',')} slugs={skills.map(skill => skill.slug)}><div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
             {skills.map(skill => (
               <article key={skill.id} className="group flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-border bg-card transition-colors hover:border-[#006b4f]/50" data-directory-skill>
-                <div className="relative">
-                <div className="absolute left-3 top-3 z-10 max-w-[calc(100%-1.5rem)]"><SkillActions slug={skill.slug} name={skill.name} compact /></div>
+                <div className="relative isolate">
+                <div className="absolute right-2 top-2 z-10 max-w-[calc(100%-1rem)] mix-blend-difference"><SkillActions slug={skill.slug} name={skill.name} compact /></div>
                 {skill.preview ? <Link href={getLocalizedNavigationHref(`/showcase/${skill.preview.slug}`, locale)} prefetch={false} className="relative block aspect-[16/10] overflow-hidden border-b border-border bg-muted" aria-label={`${discovery.examples}: ${skill.name}`}>
                   <Image src={getShowcaseImageSrc(skill.preview.media[0].src, 'card')} alt={localizeShowcase(skill.preview.media[0].alt, locale)} fill sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 360px" className={skill.preview.cardFit === 'contain' ? 'object-contain p-3' : 'object-cover object-top'} />
                   <span className="absolute bottom-3 left-3 rounded-md bg-background/95 px-2 py-1 text-[10px]">{getShowcaseEvidenceLabel(skill.preview, locale)}</span>
