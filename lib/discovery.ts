@@ -19,6 +19,8 @@ export const discoveryText = {
   filters: text('Filters', '筛选', '絞り込み', '필터', 'Filtros', 'Filter', 'Filtres', 'Filter'),
   explore: text('Explore by task', '按任务探索', 'タスクから探す', '작업별 탐색', 'Explorar por tarea', 'Nach Aufgabe entdecken', 'Explorer par tâche', 'Jelajahi menurut tugas'),
   examples: text('View examples', '查看案例', '作例を見る', '사례 보기', 'Ver ejemplos', 'Beispiele ansehen', 'Voir les exemples', 'Lihat contoh'),
+  withExamples: text('With examples', '有案例', '作例あり', '사례 있음', 'Con ejemplos', 'Mit Beispielen', 'Avec exemples', 'Dengan contoh'),
+  directoryNote: text('Find a skill for your next task. Preview examples where available.', '找到适合下一个任务的 Skill，有案例的技能可直接预览效果。', '次のタスクに合うスキルを探し、作例で成果を確認。', '다음 작업에 맞는 스킬을 찾고 사례를 확인하세요.', 'Encuentra un skill para tu próxima tarea y explora sus ejemplos.', 'Finde einen Skill für deine nächste Aufgabe und entdecke Beispiele.', 'Trouvez un skill pour votre prochaine tâche et découvrez ses exemples.', 'Temukan skill untuk tugas berikutnya dan lihat contohnya.'),
   views: text('Browse skills and examples', '浏览技能与案例', 'スキルと作例を探す', '스킬과 사례 탐색', 'Explorar skills y ejemplos', 'Skills und Beispiele durchsuchen', 'Explorer les skills et exemples', 'Jelajahi skill dan contoh'),
 }
 export const discoveryCopy = (locale: Locale) => Object.fromEntries(Object.entries(discoveryText).map(([key, value]) => [key, value[locale]])) as Record<keyof typeof discoveryText, string>
@@ -49,23 +51,3 @@ export const DISCOVERY_AGENTS = [
   { id: 'cursor', href: '/best/cursor-code-review', icon: 'code', label: text('Cursor · code review', 'Cursor · 代码审查', 'Cursor · コードレビュー', 'Cursor · 코드 리뷰', 'Cursor · revisión de código', 'Cursor · Code-Review', 'Cursor · revue de code', 'Cursor · tinjauan kode') },
   { id: 'other', href: '/agents', icon: 'workflow', label: text('More agents', '更多 Agents', 'その他のエージェント', '더 많은 에이전트', 'Más agentes', 'Weitere Agents', 'Autres agents', 'Agen lainnya') },
 ] as const
-
-export type DiscoveryMode = 'featured' | 'all' | 'gallery'
-// Only carry filters with shared meaning. Never copy pagination, sort, creator
-// or agent constraints to a destination that cannot apply them.
-export function discoveryModePath(mode: DiscoveryMode, source: 'skills' | 'gallery', search = '') {
-  const current = new URLSearchParams(search)
-  const next = new URLSearchParams()
-  const query = current.get('q')?.trim()
-  if (query) next.set('q', query)
-  const price = current.get('pricing')
-  if (price === 'free' || price === 'paid') next.set('pricing', price)
-  const rawCategory = current.get('category')
-  const toGallery: Record<string, string> = { 'video-creation': 'video', video: 'video', presentation: 'slides', 'document-processing': 'document' }
-  const toSkills: Record<string, string> = { web: 'design-creative', image: 'design-creative', video: 'video-creation', slides: 'presentation', document: 'document-processing' }
-  const category = source === (mode === 'gallery' ? 'gallery' : 'skills') ? rawCategory : rawCategory ? (mode === 'gallery' ? toGallery[rawCategory] : toSkills[rawCategory]) : undefined
-  if (category && category !== 'all') next.set('category', category)
-  if (mode === 'all') next.set('view', 'all')
-  if (mode === 'featured' && query) next.set('view', 'skills')
-  return `${mode === 'gallery' ? '/showcase' : '/skills'}${next.size ? `?${next}` : ''}`
-}

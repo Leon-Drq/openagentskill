@@ -18,7 +18,7 @@ export function HomeShowcaseStatic({ locale }: { locale: Locale }) {
         <div><p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#006b4f]">{t('Made with skills', '用技能做出来的作品')}</p>
           <h2 id="home-showcase-title" className="mt-3 font-display text-3xl font-normal tracking-tight md:text-5xl">{t('Your next project starts here.', '你的下一个作品，从这里开始。')}</h2>
           <p className="mt-4 text-sm leading-relaxed text-[#6d675e]">{t('See the result. Copy a task. Make it yours with the skill behind it.', '看效果，复制任务，用背后的技能制作自己的版本。')}</p></div>
-        <Link href={href('/showcase')} className="inline-flex min-h-11 shrink-0 items-center gap-2 text-sm font-semibold text-[#006b4f]">{t('Explore the gallery', '查看 Skill Gallery')}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+        <Link href={href('/skills?examples=true')} className="inline-flex min-h-11 shrink-0 items-center gap-2 text-sm font-semibold text-[#006b4f]">{t('Explore skills with examples', '探索有案例的 Skills')}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
       </div>
       <div className="mt-8 grid gap-7 sm:grid-cols-3">{FEATURED_SHOWCASE_SLUGS.map(slug => {
         const item = getShowcaseCase(slug)!

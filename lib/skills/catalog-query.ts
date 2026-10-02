@@ -16,3 +16,11 @@ export function catalogSortColumn(sort: string) {
 export function catalogStars(value: number) {
   return Number.isFinite(value) ? Math.max(0, Math.min(10_000_000, Math.floor(value))) : 0
 }
+
+// Explicit new filters take precedence over bookmarked legacy view URLs.
+export function directoryDiscoveryFilters(params: { featured?: string; examples?: string; view?: string }) {
+  return {
+    featured: params.featured === undefined ? params.view === 'skills' : params.featured === 'true',
+    examplesOnly: params.examples === 'true',
+  }
+}

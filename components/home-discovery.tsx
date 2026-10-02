@@ -15,7 +15,7 @@ export function HomeDiscovery({ locale }: { locale: Locale }) {
           <h2 id="home-discovery-title" className="mt-3 font-display text-3xl font-normal tracking-tight md:text-5xl">{c.explore}</h2>
           <p className="mt-4 text-sm text-secondary">{c.taskNote}</p>
         </div>
-        <Link href={getLocalizedNavigationHref('/skills?view=all', locale)} prefetch={false} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#006b4f]">{c.browse}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+        <Link href={getLocalizedNavigationHref('/skills', locale)} prefetch={false} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#006b4f]">{c.browse}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
       </div>
       <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {DISCOVERY_TASKS.map(item => <li key={item.id}>

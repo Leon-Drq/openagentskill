@@ -6,7 +6,7 @@ import { acquisitionTypes, hasCommercialOffers, type PriceFilter, type SkillComm
 import { SkillPrice } from '@/components/skill-commerce'
 
 import Image from 'next/image'
-import { DiscoveryTabs, discoveryIcons } from './discovery-navigation'
+import { discoveryIcons } from './discovery-navigation'
 import { DISCOVERY_TASKS, discoveryCopy } from '@/lib/discovery'
 import { getShowcaseImageSrc, getShowcaseEvidenceLabel, localizeShowcase, type ShowcaseCardData } from '@/lib/showcase-shared'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
@@ -99,6 +99,7 @@ interface DirectoryLink {
 }
 
 interface Skill {
+  exampleCount: number
   preview?: ShowcaseCardData | null
   commerce: SkillCommerce
   id: string
@@ -168,7 +169,8 @@ interface Props {
   skills: Skill[]
   query?: string
   sort: string
-  view: 'skills' | 'all'
+  featured: boolean
+  examplesOnly: boolean
   catalogMode: boolean
   category: string
   categories: string[]
@@ -212,7 +214,7 @@ export function SkillsPageClient(props: Props) {
   const prices = commerceCopy(locale)
   const reportedResult = useRef('')
   useEffect(() => {
-    const key = JSON.stringify([query, sort, category, page, resultCount, degraded, props.view])
+    const key = JSON.stringify([query, sort, category, page, resultCount, degraded, props.featured, props.examplesOnly])
     if (reportedResult.current === key) return
     reportedResult.current = key
     // No raw queries, task text, URLs or user identifiers in event parameters.
@@ -221,7 +223,7 @@ export function SkillsPageClient(props: Props) {
       result_count: resultCount, visible_count: skills.length, page, degraded,
       has_query: Boolean(query), locale,
     })
-  }, [query, sort, category, page, resultCount, degraded, props.view, props.catalogMode, skills.length, locale])
+  }, [query, sort, category, page, resultCount, degraded, props.featured, props.examplesOnly, props.catalogMode, skills.length, locale])
   // Server-provided URL state preserves SSR on cached pages. Reading
   // useSearchParams here would bail the entire directory out to client render.
   const { pathname, queryString } = props
@@ -236,7 +238,7 @@ export function SkillsPageClient(props: Props) {
   const href = (updates: Record<string, string | undefined>) => directoryHref(pathname, queryString, updates)
   const navigate = (updates: Record<string, string | undefined>) => startTransition(() => router.push(href(updates), { scroll: false }))
   const resetHref = directoryHref(pathname, queryString, Object.fromEntries(
-    ['q','sort','category','useCase','platform','quality','trust','safety','track','minStars','page','view','pricing'].map(key => [key, undefined])
+    ['q','sort','category','useCase','platform','quality','trust','safety','track','minStars','page','view','pricing','featured','examples'].map(key => [key, undefined])
   ))
   const toggleCompare = (slug: string) => {
     trackAnalyticsEvent('skill_compare', { skill_slug: slug, source: 'directory', selected: !compareSlugs.includes(slug) })
@@ -246,7 +248,7 @@ export function SkillsPageClient(props: Props) {
   const primaryCategories = ['coding-agents','design-creative','video-creation','research','presentation','finance']
   const categoryOptions = directoryCategoryOptions([...categories, ...primaryCategories, category === 'all' ? '' : category])
   const selectedCategory = category === 'all' ? 'all' : directoryCategories(category)[0]
-  const activeFilters = Object.entries({ pricing: props.pricing, category, useCase, platform, quality, trust, safety, track: supplyTrack, minStars: minStars ? String(minStars) : 'all' })
+  const activeFilters = Object.entries({ featured: props.featured ? 'featured' : 'all', examples: props.examplesOnly ? 'withExamples' : 'all', pricing: props.pricing, category, useCase, platform, quality, trust, safety, track: supplyTrack, minStars: minStars ? String(minStars) : 'all' })
     .filter(([, value]) => value && value !== 'all')
   const sortOptions = [
     ['quality', query ? c.relevance : props.catalogMode ? c.quality : c.recommended], ['stars', c.stars],
@@ -254,10 +256,8 @@ export function SkillsPageClient(props: Props) {
     ...(sort === 'downloads' ? [['downloads', c.trending]] : []),
   ]
   const advanced = [
-    ...(!props.catalogMode ? [
-      { key: 'useCase', title: c.useCase, value: useCase, options: useCases.map(v => [v.slug, v.shortTitle]) },
-      { key: 'platform', title: c.platform, value: platform, options: [...new Set([...platformOptions, ...(platform !== 'all' ? [platform] : [])])].map(v => [v, v]) },
-    ] : []),
+    { key: 'useCase', title: c.useCase, value: useCase, options: useCases.map(v => [v.slug, v.shortTitle]) },
+    { key: 'platform', title: c.platform, value: platform, options: [...new Set(['Codex', 'Claude Code', 'Cursor', ...platformOptions, ...(platform !== 'all' ? [platform] : [])])].map(v => [v, v]) },
     { key: 'minStars', title: c.minimum, value: String(minStars || 'all'), options: ['20','100','500','1000','5000'].map(v => [v, v + '+']) },
   ]
   const stars = (value: number) => new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 1 }).format(value)
@@ -274,17 +274,14 @@ export function SkillsPageClient(props: Props) {
             event.preventDefault()
             const q = String(new FormData(event.currentTarget).get('q') || '').trim()
             trackAnalyticsEvent('directory_search', { has_query: Boolean(q), query_length: q.length, locale })
-            navigate({ q: q || undefined, sort: undefined, view: q ? 'all' : undefined })
+            navigate({ q: q || undefined, sort: undefined })
           }} className="mt-6 flex max-w-3xl items-center gap-2 rounded-[12px] border border-border bg-card p-2 focus-within:border-[#006b4f]">
             <Search size={18} className="ml-2 hidden shrink-0 text-secondary sm:block" aria-hidden="true" />
             <input key={query || ''} type="search" name="q" defaultValue={query} aria-label={c.search}
               id="skill-search" placeholder={c.placeholder} className="min-w-0 flex-1 bg-transparent px-2 py-2.5 text-sm outline-none" />
             <button type="submit" disabled={pending} className="shrink-0 rounded-lg bg-[#006b4f] px-4 py-3 text-sm font-semibold text-white hover:bg-[#00533d] disabled:opacity-50 sm:px-6">{c.search}</button>
           </form>
-          <DiscoveryTabs active={props.view === 'all' ? 'all' : 'featured'} source="skills" search={queryString} />
-          <p className="mt-3 max-w-3xl text-xs leading-6 text-secondary" data-directory-scope>
-            {label(props.catalogMode ? 'catalogNote' : query ? 'searchNote' : 'selectionNote')}
-          </p>
+          <p className="mt-3 max-w-3xl text-xs leading-6 text-secondary" data-directory-scope>{discovery.directoryNote}</p>
         </header>
 
         <div className="mt-6 grid items-start gap-6 lg:grid-cols-[232px_minmax(0,1fr)] lg:gap-8">
@@ -294,6 +291,13 @@ export function SkillsPageClient(props: Props) {
                 <span className="inline-flex items-center gap-2"><SlidersHorizontal size={16} aria-hidden="true" />{discovery.filters}{activeFilters.length ? ` · ${activeFilters.length}` : ''}</span><ArrowRight size={16} aria-hidden="true" />
               </summary>
               <div className="mt-4 space-y-6 lg:mt-0">
+                <div data-discovery-filters className="grid gap-1">
+                  {[['featured', discovery.featured, props.featured], ['examples', discovery.withExamples, props.examplesOnly]].map(([key, title, checked]) =>
+                    <label key={String(key)} className="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
+                      <input type="checkbox" checked={Boolean(checked)} disabled={pending} onChange={event => navigate({ [String(key)]: event.target.checked ? 'true' : undefined, ...(key === 'featured' ? { view: undefined } : {}) })} className="h-4 w-4 accent-[#006b4f]" />
+                      {title}
+                    </label>)}
+                </div>
                 <nav aria-label={c.category} data-directory-categories>
                   <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-secondary">{c.category}</h2>
                   {['all', ...new Set([...DISCOVERY_TASKS.map(item => item.id), 'finance'])].map(key => {
@@ -333,7 +337,7 @@ export function SkillsPageClient(props: Props) {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="min-w-0">
               <h2 id="directory-results-heading" className="break-words text-base font-semibold">
-                {query ? `${c.results} · “${query}”` : label(props.catalogMode ? 'fullCatalog' : 'selectedSkills')}
+                {query ? `${c.results} · “${query}”` : props.featured ? discovery.featured : discovery.all}
               </h2>
               <p className="mt-1 font-mono text-xs text-secondary" data-directory-count>
                 {props.catalogMode
@@ -353,9 +357,9 @@ export function SkillsPageClient(props: Props) {
 
           {activeFilters.length > 0 && (
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs" aria-label={c.active}>
-              {activeFilters.map(([key,value]) => <Link key={key} prefetch={false} href={href({ [key]: undefined })}
-                className="inline-flex max-w-full items-center gap-2 rounded-full border border-border px-3 py-2" aria-label={`${c.remove}: ${key === 'pricing' ? prices[props.pricing] : label(value)}`}>
-                <span className="break-all">{key === 'pricing' ? prices[props.pricing] : label(value)}</span><X size={12} className="shrink-0" aria-hidden="true" />
+              {activeFilters.map(([key,value]) => <Link key={key} prefetch={false} href={href({ [key]: undefined, ...(key === 'featured' ? { view: undefined } : {}) })}
+                className="inline-flex max-w-full items-center gap-2 rounded-full border border-border px-3 py-2" aria-label={`${c.remove}: ${key === 'pricing' ? prices[props.pricing] : key === 'featured' || key === 'examples' ? discovery[value as 'featured' | 'withExamples'] : label(value)}`}>
+                <span className="break-all">{key === 'pricing' ? prices[props.pricing] : key === 'featured' || key === 'examples' ? discovery[value as 'featured' | 'withExamples'] : label(value)}</span><X size={12} className="shrink-0" aria-hidden="true" />
               </Link>)}
               <Link href={resetHref} prefetch={false} className="p-2 text-[#006b4f] underline underline-offset-4">{c.reset}</Link>
             </div>
@@ -401,6 +405,7 @@ export function SkillsPageClient(props: Props) {
                       : skill.snapshot ? <span>{label('savedInfo')}</span>
                       : skill.sourceStatus !== 'source-recorded' ? <span>{c.review}</span> : null}
                   </div>
+                  {skill.exampleCount > 0 && <Link prefetch={false} href={getLocalizedNavigationHref(`/skills/${skill.slug}#showcase`, locale)} className="mt-3 inline-flex min-h-10 items-center gap-2 text-xs font-medium text-[#006b4f]" data-skill-examples>{discovery.examples} · {skill.exampleCount}<ArrowRight size={12} aria-hidden="true" /></Link>}
                 </div>
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border bg-background/45 px-5 py-3">
                   <span title={c.repoStars} className="inline-flex items-center gap-1.5 font-mono text-sm"><Star size={14} aria-hidden="true" />{stars(skill.stats.stars)}<span className="text-[10px] text-secondary">GitHub</span></span>

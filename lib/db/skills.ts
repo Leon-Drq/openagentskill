@@ -1147,13 +1147,17 @@ export async function getBrowseSkillCandidates(sort: SkillSortMode, category: st
 // Count describes public registry entries; the UI separately labels the number
 // of visible skills because MCP-only resources are omitted, as on detail pages.
 const getCachedCatalogPage = unstable_cache(
-  async (sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter, pricingSlugs: string[]) => {
+  async (sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null) => {
     const supabase = createPublicClient({ requestTimeoutMs: 4000 })
     let query = supabase.from('skills').select(SKILL_DIRECTORY_SELECT, { count: 'exact' }).or(PUBLIC_SKILL_FILTER)
     if (pricing !== 'all' && pricing !== 'unknown') {
       if (!pricingSlugs.length) return { records: [] as SkillRecord[], total: 0, hasMore: false }
       query = query.in('slug', pricingSlugs)
     } else if (pricing === 'unknown' && pricingSlugs.length) query = query.not('slug', 'in', `(${pricingSlugs.join(',')})`)
+    if (exampleSlugs !== null) {
+      if (!exampleSlugs.length) return { records: [] as SkillRecord[], total: 0, hasMore: false }
+      query = query.in('slug', exampleSlugs)
+    }
     if (minStars > 0) query = query.gte('github_stars', minStars)
     const terms = directoryCategoryTerms(category)
     if (category !== 'all') {
@@ -1168,12 +1172,12 @@ const getCachedCatalogPage = unstable_cache(
     if (count === null) throw new Error('Catalog count unavailable')
     return { records: filterSkillOnly((data || []) as unknown as SkillRecord[]), total: count, hasMore: from + CATALOG_PAGE_SIZE < count }
   },
-  ['public-catalog-pages-v2-pricing'],
+  ['public-catalog-pages-v3-examples'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 
-export function getSkillCatalogPage(sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter = 'all') {
-  return getCachedCatalogPage(sort, category.slice(0, 80), catalogPageNumber(String(page)), catalogStars(minStars), pricing, commerceFilterSlugs(pricing))
+export function getSkillCatalogPage(sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter = 'all', exampleSlugs: string[] | null = null) {
+  return getCachedCatalogPage(sort, category.slice(0, 80), catalogPageNumber(String(page)), catalogStars(minStars), pricing, commerceFilterSlugs(pricing), exampleSlugs)
 }
 
 export async function searchSkillsStrict(query: string, limit = 120): Promise<SkillRecord[]> {

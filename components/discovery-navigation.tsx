@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { ArrowRight, Code2, FileText, Image as ImageIcon, Monitor, Presentation, Search, Terminal, Workflow, ChartNoAxesCombined } from 'lucide-react'
 import { Video } from 'lucide-react'
-import { DISCOVERY_TASKS, DISCOVERY_OUTPUTS, DISCOVERY_AGENTS, discoveryCopy, discoveryModePath, type DiscoveryMode } from '@/lib/discovery'
+import { DISCOVERY_TASKS, DISCOVERY_OUTPUTS, DISCOVERY_AGENTS, discoveryCopy } from '@/lib/discovery'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { useI18n } from '@/lib/i18n/context'
 import { cn } from '@/lib/utils'
@@ -35,20 +35,8 @@ export function DiscoveryCategories({ onNavigate }: { onNavigate?: () => void })
       </section>)}
     </div>
     <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border pt-3">
-      {[[c.browse, '/skills?view=all'], [c.gallery, '/showcase'], [c.finder, '/resolve']].map(([label, path]) =>
+      {[[c.browse, '/skills'], [c.withExamples, '/skills?examples=true'], [c.finder, '/resolve']].map(([label, path]) =>
         <Link key={path} href={getLocalizedNavigationHref(path, locale)} prefetch={false} onClick={onNavigate} className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[#006b4f]">{label}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>)}
     </div>
   </div>
-}
-
-export function DiscoveryTabs({ active, source, search = '' }: { active: DiscoveryMode; source: 'skills' | 'gallery'; search?: string }) {
-  const { locale } = useI18n()
-  const c = discoveryCopy(locale)
-  return <nav aria-label={c.views} className="mt-6 flex flex-wrap gap-1 border-b border-border" data-discovery-tabs data-directory-modes>
-    {(['featured', 'all', 'gallery'] as const).map(mode => <Link key={mode} prefetch={false}
-      href={getLocalizedNavigationHref(discoveryModePath(mode, source, search), locale)} aria-current={mode === active ? 'page' : undefined}
-      className={cn('inline-flex min-h-12 items-center gap-2 border-b-2 px-3 py-3 text-sm sm:px-5', mode === active ? 'border-[#006b4f] font-semibold text-[#006b4f]' : 'border-transparent text-secondary hover:text-foreground')}>
-      {c[mode]}
-    </Link>)}
-  </nav>
 }

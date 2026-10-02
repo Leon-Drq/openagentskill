@@ -65,7 +65,7 @@ assert.doesNotMatch(source, /<InstallCommand|skill\.verified &&|Supply tracks|De
 const server=readFileSync('app/skills/content.tsx','utf8')
 assert.match(server, /matchesDirectoryCategory\(record.category, category\)/)
 assert.match(server, /sortDirectoryCandidates\(filteredRecords, sort\)/)
-assert.match(server,/view === 'skills' && getSkillSourceEvidence\(record\).status !== 'source-recorded'/)
+assert.match(server,/featured && getSkillSourceEvidence\(record\).status !== 'source-recorded'/)
 assert.doesNotMatch(source,/data-directory-source-views|\{c\.pool\}/)
 assert.doesNotMatch(source, /key: '(quality|trust|safety)'/)
 const detail=readFileSync('app/skills/[slug]/content.tsx','utf8')

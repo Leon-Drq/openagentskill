@@ -48,7 +48,7 @@ for (const name of ['getCachedBrowseCandidates','getCachedCatalogPage']) {
 assert.doesNotMatch(db.slice(db.indexOf('export function convertSkillRecordToManifest')), /type: 'free'/)
 const page = readFileSync('app/skills/content.tsx','utf8')
 assert.match(page,/matchesCommerce\(record.slug, pricing\)/)
-assert.match(page,/getSkillCatalogPage\(sort, category, page, minStars, pricing\)/)
+assert.match(page,/getSkillCatalogPage\(sort, category, page, minStars, pricing,/)
 assert.match(page,/index: isCanonicalEnglishDirectory/)
 assert.match(readFileSync('app/skills/page.tsx','utf8'),/export const revalidate = 300/)
 const ui = readFileSync('components/skill-commerce.tsx','utf8')

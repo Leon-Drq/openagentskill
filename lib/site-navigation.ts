@@ -11,7 +11,7 @@ export type NavigationSection = NavigationLink & { id: string; items?: readonly 
 export const SITE_NAVIGATION: readonly NavigationSection[] = [
   { id: 'skills', href: '/skills', label: 'skills', activePaths: ['/showcase', '/resolve', '/skill-packs', '/compare'] },
   { id: 'categories', href: '/best', label: 'categories', activePaths: ['/collections', '/use-cases', '/tasks'], items: [
-    { href: '/skills', label: 'browseSkills' }, { href: '/showcase', label: 'gallery' },
+    { href: '/skills', label: 'browseSkills' },
     { href: '/resolve', label: 'aiSkillFinder' }, { href: '/use-cases', label: 'useCases' },
     { href: '/skill-packs', label: 'packs' }, { href: '/compare', label: 'compare' },
   ] },
