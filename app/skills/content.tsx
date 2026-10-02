@@ -48,7 +48,7 @@ function firstSearchValue(value: string | string[] | undefined) {
 
 function isDirectorySearchVariant(params: SkillsSearchParams) {
   return Object.entries(params).some(([key, value]) => {
-    if (key === 'lang') return false
+    if (key === 'lang' || key === '_rsc') return false
     return Boolean(firstSearchValue(value)?.trim())
   })
 }
