@@ -41,7 +41,7 @@ import { SkillInstallTargets } from '@/components/skill-install-targets'
 import { SkillCommercePanel, SkillPrice } from '@/components/skill-commerce'
 import { getSkillCommerce } from '@/lib/skills/commerce'
 import { SkillShareButton } from '@/components/skill-share-button'
-import { SaveSkillButton } from '@/components/save-skill-button'
+import { SkillActions, SkillEngagementProvider } from '@/components/skill-engagement'
 import { SkillShowcase } from '@/components/showcase-sections'
 import { ClaimSkillPanel } from '@/components/claim-skill-panel'
 import { CreatorBadgeKit } from '@/components/creator-badge-kit'
@@ -242,7 +242,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
                 <ProfileText id={source.canOfferInstall && !safety.blocked ? 'useAgent' : 'reviewSource'} /><ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               {skill.technical.repository && <SkillActionLink href={skill.technical.repository} skillSlug={skill.slug} eventType="outbound_github" external className={actionClass}><Text id="viewGitHub" /><ArrowUpRight className="h-4 w-4" aria-hidden="true" /></SkillActionLink>}
-              <SaveSkillButton skillSlug={skill.slug} compact className="min-h-11 rounded-md px-4" />
+              <SkillEngagementProvider slugs={[skill.slug]}><SkillActions slug={skill.slug} name={skill.name} /></SkillEngagementProvider>
               <SkillShareButton skillSlug={skill.slug} skillName={skill.name} />
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-secondary">
