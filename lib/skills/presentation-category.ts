@@ -1,3 +1,4 @@
+import { skillTaxonomy, type TaxonomyInput, type SkillTaxonomy } from './taxonomy'
 // Source-specific display corrections, checked against each GitHub repository's
 // own description on 2026-09-12. Never changes review, publication or install state.
 const sourceCategories: Record<string, string> = {
@@ -9,11 +10,13 @@ const sourceCategories: Record<string, string> = {
   'tt-a1i/archify': 'design-creative',
 }
 
-export function skillPresentationOverride(skill: { github_repo?: string | null; repository?: string | null }) {
+export function skillPresentationOverride(skill: { github_repo?: string | null; repository?: string | null; source_path?: string | null }) {
   const repo = (skill.github_repo || skill.repository || '').replace(/^https?:\/\/github\.com\//i, '').split('/').slice(0, 2).join('/').toLowerCase()
-  return sourceCategories[repo]
+  // Historical repository corrections only apply to records without an exact package path.
+  return skill.source_path ? undefined : sourceCategories[repo]
 }
 
-export function skillPresentationCategory(skill: { category: string; github_repo?: string | null; repository?: string | null }) {
-  return skillPresentationOverride(skill) || skill.category
+export function skillPresentationCategory(skill: TaxonomyInput & Partial<SkillTaxonomy> & { category: string; github_repo?: string | null; repository?: string | null }) {
+  if (skill.taxonomy_version === 1 && skill.primary_category) return skill.primary_category
+  return skillPresentationOverride(skill) || skillTaxonomy(skill).primary_category
 }

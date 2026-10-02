@@ -1,3 +1,4 @@
+import { classifySkill } from '@/lib/skills/taxonomy'
 import { PUBLIC_SKILL_FILTER } from '@/lib/skills/publication'
 import 'server-only'
 
@@ -79,19 +80,8 @@ export function buildIndexedSkillSlug(owner: string, skillName: string) {
   return `${slugPart(owner)}-${slugPart(skillName)}`.replace(/-+/g, '-').slice(0, 180)
 }
 
-export function inferIndexedSkillCategory(skill: Pick<DiscoveredGitHubSkill, 'path' | 'frontmatter'>) {
-  const declared = skill.frontmatter.category?.trim().toLowerCase()
-  if (declared) return declared
-
-  const text = `${skill.frontmatter.name} ${skill.frontmatter.description} ${skill.path}`.toLowerCase()
-  if (/security|audit|vulnerab|secret|compliance/.test(text)) return 'security'
-  if (/research|search|source|summari|interview|requirement|spec/.test(text)) return 'research'
-  if (/design|taste|image|video|creative|visual|ui|ux/.test(text)) return 'design-creative'
-  if (/data|csv|spreadsheet|analytics|chart/.test(text)) return 'data-analysis'
-  if (/react|code|developer|github|test|debug|desktop app/.test(text)) return 'coding-agents'
-  if (/business|marketing|sales|finance/.test(text)) return 'business'
-  if (/write|email|communication|social|simplif/.test(text)) return 'productivity'
-  return 'automation'
+export function inferIndexedSkillCategory(skill: Pick<DiscoveredGitHubSkill, 'path' | 'frontmatter' | 'owner' | 'repo'>) {
+  return classifySkill({ name: skill.frontmatter.name, description: skill.frontmatter.description, source_path: skill.path, github_repo: `${skill.owner}/${skill.repo}`, category: skill.frontmatter.category, tags: skill.frontmatter.tags }).primary_category
 }
 
 function normalizeTags(skill: DiscoveredGitHubSkill, extraTags: string[] = []) {
