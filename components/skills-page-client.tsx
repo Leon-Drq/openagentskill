@@ -138,6 +138,7 @@ export interface DirectorySkillCard {
 
 
 import { GitHubOwnerAvatar } from './github-owner-avatar'
+import { SkillryLogo } from './skillry-logo'
 import { useI18n } from '@/lib/i18n/context'
 import { directoryCopy, directoryLabel } from '@/lib/i18n/directory-copy'
 import { directoryCategories, directoryCategoryOptions, directoryHref } from '@/lib/skills/directory'
@@ -424,7 +425,7 @@ export function SkillsPageClient(props: Props) {
                 </Link>}
                 </div>
                 <div className="flex min-w-0 items-start gap-3 p-5 pb-0">
-                <div className="shrink-0"><GitHubOwnerAvatar owner={skill.author.owner} label={skill.author.name} size="md" /></div>
+                <div className="shrink-0">{skill.provider?.label === 'Skillry' ? <SkillryLogo /> : <GitHubOwnerAvatar owner={skill.author.owner} label={skill.author.name} size="md" />}</div>
                 <div className="min-w-0 flex-1">
                   <h3 className="break-words text-base font-semibold leading-snug [overflow-wrap:anywhere]">
                     <Link prefetch={false} href={`/skills/${skill.slug}${locale === 'en' ? '' : '?lang=' + locale}`}
