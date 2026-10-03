@@ -2,13 +2,62 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import ts from 'typescript'
-import { EXTERNAL_SKILLS, ExternalSkillSchema, validateExternalCatalog, searchExternalSkills, getExternalSkill, externalSkillDiscoveryRecord, isMissingExternalSkillPath } from '../lib/skills/external-catalog.ts'
+import { register } from 'node:module'
+register('./test-owner-publication-loader.mjs', import.meta.url)
+const { EXTERNAL_SKILLS, ExternalSkillSchema, validateExternalCatalog, searchExternalSkills, getExternalSkill, externalSkillDiscoveryRecord, isMissingExternalSkillPath } = await import('../lib/skills/external-catalog.ts')
+const { externalSourceHref, externalSourceRel } = await import('../lib/skills/external-outbound.ts')
+
+const selectedSources = [
+  'bs-grokbot-avatar', 'bs-field-notes-deck', 'bs-scattered-cards-magazine',
+  'bs-cadence-marketing-landing', 'bs-inclusive-cutpaper-deck', 'bs-sky-glass-deck',
+  'bs-claude-style-illustration', 'bs-research-talk-deck',
+]
+const skillryEntries = EXTERNAL_SKILLS.filter(value => value.provider === 'skillry')
+assert.equal(skillryEntries.length, 8, 'Only the requested Featured + Free selection')
+assert.deepEqual(skillryEntries.map(value => value.sourceUrl.split('/').at(-1)).sort(), selectedSources.sort())
+assert.equal(searchExternalSkills('Skillry').length, 8)
+assert.equal(searchExternalSkills('学术').length, 1)
+assert.equal(getExternalSkill('skillry-dot-avatar-maker'), undefined, 'Unrequested Free items excluded')
+assert.doesNotThrow(() => validateExternalCatalog(skillryEntries), 'Null bundle hashes do not count as duplicate packages')
+for (const item of skillryEntries) {
+  assert.equal(item.listingEvidence.priceUsdCents, 0)
+  assert.equal(item.listingEvidence.featured, true)
+  assert.equal(item.bundleSha256, null, 'Public page checksum is not a package checksum')
+  assert.equal(item.examples.length, 0, 'No unlicensed previews or invented runtime evidence')
+  const data = externalSkillDiscoveryRecord(item)
+  assert.equal(data.author, null, 'The provider is not an identified individual author')
+  assert.equal(data.publisher.name, 'Skillry')
+  assert.equal(data.install_command, null)
+  assert.equal(data.runtime_demo, null)
+  assert.equal(data.ai_reviewed, false)
+  assert.equal(data.source_url, item.sourceUrl)
+  assert.equal(new URL(data.source_url).search, '', 'Source evidence stays canonical')
+  assert.equal(new URL(data.acquisition_url).searchParams.get('via'), 'openagentskill')
+  assert.equal(new URL(data.acquisition_url).pathname, new URL(item.sourceUrl).pathname)
+  assert.equal(externalSourceRel(item.sourceUrl), 'sponsored noopener noreferrer')
+  for (const changes of [
+    { aiReviewed: true }, { runtimeVerified: true }, { autoInstallAllowed: true },
+    { sourceUrl: `${item.sourceUrl}?via=openagentskill` }, { sourceUrl: 'https://example.com/skill' },
+    { bundleSha256: 'a'.repeat(64) }, { license: 'MIT' }, { runtimeDemo: {} },
+    { listingEvidence: { ...item.listingEvidence, priceUsdCents: 100 } },
+    { listingEvidence: { ...item.listingEvidence, featured: false } },
+  ]) assert.equal(ExternalSkillSchema.safeParse({ ...item, ...changes }).success, false)
+}
+assert.throws(() => validateExternalCatalog([skillryEntries[0], { ...skillryEntries[1], sourceUrl: skillryEntries[0].sourceUrl }]), /Duplicate external sourceUrl/)
+for (const source of ['https://example.com/a', 'https://skillry.dev.evil.example/a', 'http://skillry.dev/a', 'https://user:pass@skillry.dev/a', 'javascript:alert(1)', 'invalid']) {
+  assert.equal(externalSourceHref(source), source, 'Tracking is restricted to the authorized HTTPS provider')
+}
+assert.equal(externalSourceHref('https://skillry.dev'), 'https://skillry.dev/?via=openagentskill')
+assert.equal(externalSourceHref('https://skillry.dev/skills/a?lang=zh&via=old#about'), 'https://skillry.dev/skills/a?lang=zh&via=openagentskill#about')
+assert.equal(externalSourceHref(externalSourceHref(skillryEntries[0].sourceUrl)), externalSourceHref(skillryEntries[0].sourceUrl), 'No duplicate tracking parameters')
 
 const entry = getExternalSkill('redskill-curtain-branch-swallow')
 assert.ok(entry)
 assert.equal(entry.author.name, '流白Livo')
 assert.equal(entry.license, 'CC-BY-NC-4.0')
 assert.equal(entry.version, '1.0.0')
+assert.equal(externalSourceHref(entry.sourceUrl), entry.sourceUrl, 'RedSkill links unchanged')
+assert.equal(externalSourceRel(entry.sourceUrl), 'noopener noreferrer')
 assert.ok(entry.licenseNote.en.includes('share-alike'))
 for (const query of ['p5.js', 'p5js', '雨帘', '花枝', '飞燕', '流白Livo', 'skill-curtain-branch-swallow', 'p5-animation', 'RedSkill', 'RAIN BRANCHES']) {
   assert.equal(searchExternalSkills(query).length, 1, query)
