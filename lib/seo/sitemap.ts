@@ -78,7 +78,7 @@ export async function getSitemapIndexEntries(snapshot?: SkillSitemapSnapshot) {
 
 export function getCoreSitemapEntries(): SitemapEntry[] {
   const staticPages: SitemapEntry[] = [
-    ...EXTERNAL_SKILLS.map((entry): SitemapEntry => ({ url: `${SITEMAP_BASE_URL}${externalSkillHref(entry.slug)}`, lastModified: entry.runtimeDemo?.publishedAt ?? entry.publishedAt, changeFrequency: 'monthly', priority: 0.6 })),
+    ...EXTERNAL_SKILLS.filter(entry => entry.provider !== 'skillry' || (entry.active && entry.seoIndexable)).map((entry): SitemapEntry => ({ url: `${SITEMAP_BASE_URL}${externalSkillHref(entry.slug)}`, lastModified: entry.provider === 'skillry' ? entry.listingEvidence.observedAt : entry.runtimeDemo?.publishedAt ?? entry.publishedAt, changeFrequency: 'monthly', priority: 0.6 })),
     { url: `${SITEMAP_BASE_URL}/showcase`, lastModified: SHOWCASE_UPDATED_AT, changeFrequency: 'weekly', priority: 0.9 },
     ...SHOWCASE_CASES.map((item): SitemapEntry => ({ url: `${SITEMAP_BASE_URL}/showcase/${item.slug}`, lastModified: item.updatedAt, changeFrequency: 'monthly', priority: 0.8 })),
     { url: SITEMAP_BASE_URL, changeFrequency: 'daily', priority: 1 },

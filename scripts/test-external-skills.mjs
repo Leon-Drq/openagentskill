@@ -13,15 +13,16 @@ const selectedSources = [
   'bs-claude-style-illustration', 'bs-research-talk-deck',
 ]
 const skillryEntries = EXTERNAL_SKILLS.filter(value => value.provider === 'skillry')
-assert.equal(skillryEntries.length, 8, 'Only the requested Featured + Free selection')
-assert.deepEqual(skillryEntries.map(value => value.sourceUrl.split('/').at(-1)).sort(), selectedSources.sort())
-assert.equal(searchExternalSkills('Skillry').length, 8)
-assert.equal(searchExternalSkills('学术').length, 1)
-assert.equal(getExternalSkill('skillry-dot-avatar-maker'), undefined, 'Unrequested Free items excluded')
+assert.ok(skillryEntries.length >= 42, 'Full eligible public catalog, not the previous Featured subset')
+for (const source of selectedSources) assert.ok(skillryEntries.some(value=>value.sourceUrl.endsWith('/'+source)))
+assert.equal(searchExternalSkills('Skillry').length, skillryEntries.filter(e=>e.active).length)
+assert.ok(getExternalSkill('skillry-dot-avatar-maker'))
+assert.ok(skillryEntries.some(value=>value.listingEvidence.priceUsdCents>0 && !value.listingEvidence.featured))
 assert.doesNotThrow(() => validateExternalCatalog(skillryEntries), 'Null bundle hashes do not count as duplicate packages')
 for (const item of skillryEntries) {
-  assert.equal(item.listingEvidence.priceUsdCents, 0)
-  assert.equal(item.listingEvidence.featured, true)
+  assert.ok(item.listingEvidence.priceUsdCents >= 0)
+  assert.ok(item.listingEvidence.downloadCount > 10)
+  assert.equal(typeof item.listingEvidence.featured, 'boolean')
   assert.equal(item.bundleSha256, null, 'Public page checksum is not a package checksum')
   assert.equal(item.examples.length, 0, 'Preview metadata never invents execution evidence')
   const data = externalSkillDiscoveryRecord(item)
@@ -47,8 +48,8 @@ for (const item of skillryEntries) {
     { previewImages: [item.previewImages[0] + '&token=secret'] },
     { sourceUrl: `${item.sourceUrl}?via=openagentskill` }, { sourceUrl: 'https://example.com/skill' },
     { bundleSha256: 'a'.repeat(64) }, { license: 'MIT' }, { runtimeDemo: {} },
-    { listingEvidence: { ...item.listingEvidence, priceUsdCents: 100 } },
-    { listingEvidence: { ...item.listingEvidence, featured: false } },
+    { listingEvidence: { ...item.listingEvidence, priceUsdCents: -1 } },
+    { listingEvidence: { ...item.listingEvidence, downloadCount: 10 } },
   ]) assert.equal(ExternalSkillSchema.safeParse({ ...item, ...changes }).success, false)
 }
 assert.throws(() => validateExternalCatalog([skillryEntries[0], { ...skillryEntries[1], sourceUrl: skillryEntries[0].sourceUrl }]), /Duplicate external sourceUrl/)
@@ -126,7 +127,7 @@ assert.match(page, /'@type': 'VideoObject'/)
 assert.match(page, /aria-describedby="runtime-caption"/)
 for (const lang of ['en', 'zh']) assert.match(read(`public/media/external/p5-animation/captions-${lang}.vtt`), /^WEBVTT/)
 assert.match(read('app/skills/content.tsx'), /mergeProviderCatalogPage/)
-assert.match(read('lib/seo/sitemap.ts'), /EXTERNAL_SKILLS\.map/)
+assert.match(read('lib/seo/sitemap.ts'), /EXTERNAL_SKILLS\.filter/)
 for (const path of ['lib/skills/owner-publication.ts', 'app/api/admin/skills/publish/route.ts']) {
   assert.doesNotMatch(read(path), /EXTERNAL_SKILLS|external-catalog/, 'GitHub owner lane unchanged')
 }

@@ -5,14 +5,20 @@ import ts from 'typescript'
 import { z } from 'zod'
 register('./test-owner-publication-loader.mjs', import.meta.url)
 const { EXTERNAL_SKILLS } = await import('../lib/skills/external-catalog.ts')
-const { selectProviderSkills, providerCatalogWindow, mergeProviderCatalogPage, toProviderDirectorySkill } = await import('../lib/skills/provider-directory.ts')
+const { selectProviderSkills, providerCatalogWindow, mergeProviderCatalogPage, toProviderDirectorySkill, providerCommerce } = await import('../lib/skills/provider-directory.ts')
 const defaults = {category:'all',topic:'all',output:'all',pricing:'all',examplesOnly:true,platform:'all',quality:'all',trust:'all',safety:'all',supplyTrack:'all',minStars:0,useCase:'all'}
-assert.equal(selectProviderSkills(defaults).length,9)
-assert.equal(selectProviderSkills({...defaults,query:'Skillry'}).length,8)
-assert.equal(selectProviderSkills({...defaults,pricing:'free'}).length,8)
-assert.equal(selectProviderSkills({...defaults,category:'presentation'}).length,4)
-assert.equal(selectProviderSkills({...defaults,output:'image'}).length,2)
-assert.equal(selectProviderSkills({...defaults,topic:'ui-design'}).length,3)
+const skillry = EXTERNAL_SKILLS.filter(e=>e.provider==='skillry'&&e.active)
+assert.equal(selectProviderSkills(defaults).length,skillry.length+1)
+assert.equal(selectProviderSkills({...defaults,query:'Skillry'}).length,skillry.length)
+assert.equal(selectProviderSkills({...defaults,pricing:'free'}).length,skillry.filter(e=>e.listingEvidence.priceUsdCents===0).length)
+assert.equal(selectProviderSkills({...defaults,pricing:'paid'}).length,skillry.filter(e=>e.listingEvidence.priceUsdCents>0).length)
+assert.ok(selectProviderSkills({...defaults,category:'video-creation'}).length>0)
+assert.ok(selectProviderSkills({...defaults,featured:true}).every(e=>e.provider==='skillry'&&e.listingEvidence.featured))
+const paid=skillry.find(e=>e.listingEvidence.priceUsdCents>0)
+assert.equal(providerCommerce(paid).amount,paid.listingEvidence.priceUsdCents/100)
+assert.equal(providerCommerce(paid).currency,'USD')
+assert.equal(providerCommerce(paid).billing,'one-time')
+assert.equal(providerCommerce(paid,Date.parse(paid.listingEvidence.observedAt)+91*86400000).type,'unknown')
 for (const filter of ['platform','quality','trust','safety','supplyTrack','useCase']) assert.equal(selectProviderSkills({...defaults,[filter]:'verified'}).length,0)
 assert.equal(selectProviderSkills({...defaults,minStars:1}).length,0)
 for (const entry of EXTERNAL_SKILLS) {
@@ -26,10 +32,11 @@ for (const entry of EXTERNAL_SKILLS) {
 }
 // Walk actual windows with a simulated SQL slice. Every row appears once, even
 // when the provider segment straddles a page, registry is empty or a page is past end.
-for (const count of [0,1,7,16,17,35,100]) for (const providerCount of [0,1,9,16,17,35]) for (const sort of ['quality','stars','downloads','trending']) {
+for (const count of [0,1,7,16,17,35,100]) for (const providerCount of [0,1,9,16,17,35,385]) for (const sort of ['quality','stars','downloads','trending']) {
   const registry = Array.from({length:count},(_,i)=>'registry-'+i)
   const providers = Array.from({length:providerCount},(_,i)=>'provider-'+i)
-  const expected = sort==='quality'?[...providers,...registry]:[...registry,...providers]
+  const prefix=sort==='quality'?Math.min(8,providerCount):0
+  const expected=[...providers.slice(0,prefix),...registry,...providers.slice(prefix)]
   const all=[]
   for (let offset=0;offset<=expected.length+16;offset+=16) {
     const window=providerCatalogWindow(offset,providerCount,sort)

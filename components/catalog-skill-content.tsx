@@ -3,14 +3,15 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { externalSkillHref, getExternalSkill } from '@/lib/skills/external-catalog'
+import { externalSkillHref, getExternalSkill, EXTERNAL_SKILLS } from '@/lib/skills/external-catalog'
 import { externalSourceHref, externalSourceRel } from '@/lib/skills/external-outbound'
 import Image from 'next/image'
+import { ProviderVideoPreview } from './provider-video-preview'
 import { SkillActions, SkillEngagementProvider } from '@/components/skill-engagement'
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ lang?: string | string[] }> }
 const base = 'https://www.openagentskill.com'
-const externalOutputLabels = { image: { en: 'Images', zh: '图像' }, presentation: { en: 'Presentations', zh: '演示文稿' }, html: { en: 'Web & HTML', zh: '网页与 HTML' } }
+const externalOutputLabels = { image: { en: 'Images', zh: '图像' }, presentation: { en: 'Presentations', zh: '演示文稿' }, html: { en: 'Web & HTML', zh: '网页与 HTML' }, video: { en: 'Video', zh: '视频' } }
 export async function buildCatalogSkillMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const entry = getExternalSkill((await params).slug)
   if (!entry) return { title: 'External skill not found', robots: { index: false, follow: false } }
@@ -19,7 +20,7 @@ export async function buildCatalogSkillMetadata({ params, searchParams }: Props)
   const url = base + externalSkillHref(entry.slug)
   return {
     title: entry.title[lang], description: entry.description[lang],
-    alternates: { canonical: url }, robots: { index: Object.keys(query).length === 0, follow: true },
+    alternates: { canonical: url }, robots: { index: Object.keys(query).length === 0 && (entry.provider !== 'skillry' || (entry.active && entry.seoIndexable)), follow: true },
     openGraph: { type: 'website', title: entry.title[lang], description: entry.description[lang], url,
       ...(entry.runtimeDemo ? { images: [{ url: base + entry.runtimeDemo.poster, width: 1280, height: 720, alt: entry.title[lang] }] } : {}) },
     twitter: { card: entry.runtimeDemo ? 'summary_large_image' : 'summary', title: entry.title[lang], description: entry.description[lang],
@@ -35,11 +36,13 @@ export default async function CatalogSkillContent({ params, searchParams }: Prop
   const demo = entry.runtimeDemo
   const skillry = entry.provider === 'skillry'
   const provider = skillry ? 'Skillry' : 'RedSkill'
+  const price = skillry ? entry.listingEvidence.priceUsdCents === 0 ? (zh ? '免费' : 'Free') : new Intl.NumberFormat(zh ? 'zh-CN' : 'en-US', { style: 'currency', currency: 'USD' }).format(entry.listingEvidence.priceUsdCents / 100) + (zh ? ' · 单次购买' : ' · one-time') : ''
+  const related = skillry ? EXTERNAL_SKILLS.filter(item => item.provider === 'skillry' && item.active && item.slug !== entry.slug && item.outputType === entry.outputType).slice(0, 4) : []
   const output = skillry ? externalOutputLabels[entry.outputType][lang] : 'p5.js'
   const jsonLd = {
     '@context': 'https://schema.org', '@graph': [
       { '@type': 'WebPage', '@id': url, url, name: entry.title[lang], description: entry.description[lang], inLanguage: lang,
-        about: { '@type': 'CreativeWork', name: entry.skillName, version: entry.version, license: entry.licenseUrl,
+        about: { '@type': 'CreativeWork', name: entry.skillName, ...(entry.version ? { version: entry.version } : {}), license: entry.licenseUrl,
           ...(skillry ? { publisher: { '@type': 'Organization', name: entry.author.name, url: entry.author.url } }
             : { author: { '@type': 'Person', name: entry.author.name, url: entry.author.url } }), url: entry.sourcePostUrl } },
       { '@type': 'BreadcrumbList', itemListElement: [
@@ -67,13 +70,14 @@ export default async function CatalogSkillContent({ params, searchParams }: Prop
       </nav>
       <header className="border-b border-border py-12 sm:py-16">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#006b4f]">{provider} / {output} / {zh ? '站长收录' : 'Owner curated'}</p>
-        <h1 className="mt-6 max-w-4xl text-balance font-display text-4xl leading-tight sm:text-6xl">{entry.title[lang]}</h1>
+        <h1 className="mt-6 max-w-4xl text-balance font-display text-4xl leading-tight sm:text-6xl">{skillry ? entry.skillName : entry.title[lang]}</h1>
+        {skillry && zh && entry.title.zh !== entry.skillName && <p className="mt-3 text-lg text-secondary">{entry.title.zh}</p>}
         <p className="mt-6 max-w-3xl text-base leading-8 text-secondary sm:text-lg">{entry.description[lang]}</p>
         <p className="mt-5 text-sm">{skillry ? (zh ? '发布平台' : 'Published on') : (zh ? '作者' : 'By')} <a href={externalSourceHref(entry.author.url)} target="_blank" rel={externalSourceRel(entry.author.url)} className="underline underline-offset-4">{entry.author.name} ↗</a></p>
         <div className="mt-6 flex flex-wrap items-center gap-4">
           <SkillEngagementProvider slugs={[entry.slug]} untrackedSlugs={[entry.slug]}><SkillActions slug={entry.slug} name={entry.title[lang]} /></SkillEngagementProvider>
-          <a href={externalSourceHref(entry.sourceUrl)} target="_blank" rel={externalSourceRel(entry.sourceUrl)} className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white hover:bg-[#00533d]">{skillry ? (zh ? '在 Skillry 获取' : 'Get on Skillry') : (zh ? '打开作者原帖' : 'Open the author’s post')} ↗</a>
-          <p className="text-xs text-secondary">{skillry ? (zh ? '收录时免费 · 未运行验证' : 'Free at listing · Not runtime-verified') : demo ? (zh ? '仅限非商业用途 · 附本地实测录像' : 'Noncommercial use only · Local runtime recording') : (zh ? '仅限非商业用途 · 未运行验证' : 'Noncommercial use only · Not runtime-verified')}</p>
+          <a href={externalSourceHref(entry.sourceUrl)} target="_blank" rel={externalSourceRel(entry.sourceUrl)} className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white hover:bg-[#00533d]">{skillry ? (zh ? '获取技能' : 'Get skill') : (zh ? '打开作者原帖' : 'Open the author’s post')} ↗</a>
+          <p className="text-xs text-secondary">{skillry ? `${price} · ${zh ? '在 Skillry 获取' : 'Available on Skillry'}` : demo ? (zh ? '仅限非商业用途 · 附本地实测录像' : 'Noncommercial use only · Local runtime recording') : (zh ? '仅限非商业用途 · 未运行验证' : 'Noncommercial use only · Not runtime-verified')}</p>
         </div>
       </header>
       {skillry && <section id="showcase" className="scroll-mt-24 border-b border-border py-10" aria-labelledby="source-examples">
@@ -82,6 +86,7 @@ export default async function CatalogSkillContent({ params, searchParams }: Prop
           <a href={externalSourceHref(entry.sourceUrl)} target="_blank" rel={externalSourceRel(entry.sourceUrl)} className="inline-flex min-h-11 items-center text-sm text-[#006b4f] underline underline-offset-4">{zh ? '在 Skillry 查看案例' : 'View examples on Skillry'} ↗</a>
         </div>
         <p className="mb-6 text-sm leading-7 text-secondary">{zh ? 'Skillry 原站公开案例，图片从原站加载。本站未执行技能，原始提示词、模型和制作耗时未核实。' : 'Public examples from Skillry, loaded from the source. We have not run the skill or verified the original prompts, model or production time.'}</p>
+        {entry.previewVideo && <div className="mb-6"><ProviderVideoPreview src={entry.previewVideo} poster={entry.previewImages[0]} title={entry.skillName} zh={zh} /><p className="mt-3 text-xs text-secondary">{zh ? '原站案例视频 · 点击后加载' : 'Source video example · Loads when played'}</p></div>}
         <div className="grid gap-4 sm:grid-cols-2">
           {entry.previewImages.map((src, index) => <figure key={src} className="min-w-0 overflow-hidden rounded-xl border border-border bg-card">
             <div className="relative aspect-video"><Image src={src} alt={`${entry.title[lang]} — ${zh ? '原站案例' : 'source example'} ${index + 1}`} fill unoptimized sizes="(max-width: 639px) 100vw, 560px" className="object-contain" /></div>
@@ -126,18 +131,20 @@ export default async function CatalogSkillContent({ params, searchParams }: Prop
             <p className="mt-4 text-sm leading-8 text-secondary">{entry.usage[lang]}</p>
             <p className="mt-4 text-sm leading-8 text-secondary">{entry.limitations[lang]}</p>
           </section>
+          {related.length > 0 && <section className="mt-10" aria-labelledby="related-skills"><h2 id="related-skills" className="font-display text-3xl">{zh ? '相关技能' : 'Related skills'}</h2><ul className="mt-4 grid gap-3 sm:grid-cols-2">{related.map(item => <li key={item.slug}><Link prefetch={false} href={externalSkillHref(item.slug) + (zh ? '?lang=zh' : '')} className="inline-flex min-h-11 items-center text-sm text-[#006b4f] underline underline-offset-4">{item.skillName} →</Link></li>)}</ul></section>}
           <section className="mt-10 border-t border-border pt-8" aria-labelledby="external-source">
             <h2 id="external-source" className="font-display text-3xl">{zh ? '来源与版本记录' : 'Source & version record'}</h2>
             <dl className="mt-5 space-y-4 text-sm">
               <div><dt className="text-secondary">{zh ? '平台标识' : 'Platform identifier'}</dt><dd className="mt-1 break-all font-mono text-xs">{entry.identifier}</dd></div>
-              <div><dt className="text-secondary">{zh ? '收录时版本' : 'Version at listing'}</dt><dd>{entry.version} · {skillry ? (zh ? 'Skillry 公开产品页面' : 'Skillry public product page') : 'RedSkill manifest'}</dd></div>
+              {entry.version && <div><dt className="text-secondary">{zh ? '核对时版本' : 'Version when checked'}</dt><dd>{entry.version} · {skillry ? `${zh ? 'Skillry 产品页面' : 'Skillry product page'} · ${entry.versionObservedAt?.slice(0, 10)}` : 'RedSkill manifest'}</dd></div>}
               {skillry && <>
-                <div><dt className="text-secondary">{zh ? '核对时价格' : 'Price when checked'}</dt><dd>{zh ? '免费 · 原站精选' : 'Free · Featured on Skillry'} · {entry.listingEvidence.observedAt.slice(0, 10)} UTC</dd></div>
+                <div><dt className="text-secondary">{zh ? '核对时价格' : 'Price when checked'}</dt><dd>{price} · {entry.listingEvidence.observedAt.slice(0, 10)} UTC</dd></div>
+                <div><dt className="text-secondary">{zh ? '原站累计下载量' : 'Downloads on Skillry'}</dt><dd>{entry.listingEvidence.downloadCount} · {entry.listingEvidence.observedAt.slice(0, 10)} UTC</dd></div>
                 <div><dt className="text-secondary">{zh ? '成果类型' : 'Output'}</dt><dd>{output}</dd></div>
               </>}
               {entry.bundleSha256 && <div><dt className="text-secondary">{zh ? '包校验值（不代表安全认证）' : 'Bundle checksum (not a safety certification)'}</dt><dd className="mt-1 break-all font-mono text-xs">SHA-256 {entry.bundleSha256}</dd></div>}
             </dl>
-            <p className="mt-5 text-xs leading-6 text-secondary">{skillry ? (zh ? '版本与价格来自核对时的公开页面，当前不自动同步。本站提供原站入口，不托管技能包；原站当前条款与价格为准。' : 'Version and price come from the public page when checked and are not automatically synchronized. We link to the provider without hosting the package; its current terms and pricing apply.') : (zh ? '版本为收录时快照，当前不自动同步外部平台。实测录像仅说明所列环境中的示例效果，不代表 AI 审核、安全认证或创作者身份认证。' : 'Version is a listing-time snapshot, not automatically synchronized. A runtime recording demonstrates only the examples in the stated environment, not AI review, security certification or creator-identity verification.')}</p>
+            <p className="mt-5 text-xs leading-6 text-secondary">{skillry ? (zh ? '目录每周核对下载量、价格和案例。版本只在产品页面核实后记录。本站提供原站入口，当前价格、获取条件和条款以 Skillry 为准。' : 'Downloads, prices and examples are checked weekly. Package versions are recorded only when verified on a product page. Skillry’s current pricing, access requirements and terms apply.') : (zh ? '版本为收录时快照，当前不自动同步外部平台。实测录像仅说明所列环境中的示例效果，不代表 AI 审核、安全认证或创作者身份认证。' : 'Version is a listing-time snapshot, not automatically synchronized. A runtime recording demonstrates only the examples in the stated environment, not AI review, security certification or creator-identity verification.')}</p>
             <Link href={`/api/external-skills/${entry.slug}`} className="mt-4 inline-block text-sm text-[#006b4f] underline underline-offset-4">{zh ? '查看只读元数据' : 'Read-only metadata'} →</Link>
           </section>
         </div>

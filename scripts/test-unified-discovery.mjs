@@ -49,11 +49,11 @@ assert.ok(calls.some(c => c[0]==='eq' && c[1]==='primary_category' && c[2]==='ai
 assert.deepEqual(calls.filter(c => c[0]==='contains'),[['contains','taxonomy_tags',['rag']],['contains','output_types',['document']]])
 assert.ok(calls.findIndex(c => c[0]==='contains') < calls.findIndex(c => c[0]==='range'))
 calls.length = 0
-await getPage('quality','all',1,0,'all',[],null,'all','all',0,7)
-assert.deepEqual(calls.find(c=>c[0]==='range'),['range',0,6], 'Provider cards occupy nine of the first sixteen slots')
+await getPage('quality','all',1,0,'all',[],null,'all','all',0,8)
+assert.deepEqual(calls.find(c=>c[0]==='range'),['range',0,7], 'Provider cards occupy eight of the first sixteen slots')
 calls.length = 0
-await getPage('quality','all',2,0,'all',[],null,'all','all',7,16)
-assert.deepEqual(calls.find(c=>c[0]==='range'),['range',7,22], 'Next page resumes after the seven displayed registry rows')
+await getPage('quality','all',2,0,'all',[],null,'all','all',8,16)
+assert.deepEqual(calls.find(c=>c[0]==='range'),['range',8,23], 'Next page resumes after the eight displayed registry rows')
 const server = readFileSync('app/skills/content.tsx', 'utf8')
 assert.match(server, /const catalogMode = !featured/)
 assert.match(server, /examplesOnly && !SHOWCASE_SKILL_SLUGS.includes/)

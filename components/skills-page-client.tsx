@@ -132,7 +132,7 @@ export interface DirectorySkillCard {
   safetyProfile?: SkillSafetySummary
   platformHints?: string[]
   supplyProfile?: SkillSupplySummary
-  provider?: { label: string; sourceHref: string; sourceRel: string; image?: string; exampleLabel: string }
+  provider?: { label: string; sourceHref: string; sourceRel: string; image?: string; exampleLabel: string; localizedName?: string; sourceDownloads?: number }
 }
 
 
@@ -168,6 +168,7 @@ function writeSelection(slugs: string[]) {
 
 interface Props {
   pricing: PriceFilter
+  providerCommercialOffers?: boolean
   pathname: string
   queryString: string
   skills: DirectorySkillCard[]
@@ -332,7 +333,7 @@ export function SkillsPageClient(props: Props) {
                   </label>
                   <label className="grid gap-2 text-xs text-secondary">{prices.pricing}
                     <NativeSelect disabled={pending} aria-label={prices.pricing} value={props.pricing} onChange={e => navigate({ pricing: e.target.value })} className="w-full bg-transparent text-sm">
-                      <option value="all">{prices.all}</option>{acquisitionTypes.filter(type => !['paid', 'freemium'].includes(type) || hasCommercialOffers() || props.pricing === type).map(type => <option key={type} value={type}>{prices[type]}</option>)}
+                      <option value="all">{prices.all}</option>{acquisitionTypes.filter(type => !['paid', 'freemium'].includes(type) || (hasCommercialOffers() || props.providerCommercialOffers) || props.pricing === type).map(type => <option key={type} value={type}>{prices[type]}</option>)}
                     </NativeSelect>
                   </label>
                   {advanced.map(filter => <label key={filter.key} className="grid gap-2 text-xs text-secondary">{filter.title}
@@ -429,6 +430,7 @@ export function SkillsPageClient(props: Props) {
                     <Link prefetch={false} href={`/skills/${skill.slug}${locale === 'en' ? '' : '?lang=' + locale}`}
                       onClick={() => trackAnalyticsEvent('directory_skill_open', { skill_slug: skill.slug, mode: props.catalogMode ? 'catalog' : query ? 'search' : 'selected', position: rankOffset + skills.indexOf(skill) + 1 })}
                       className="hover:text-[#006b4f]">{skill.name}</Link>
+                    {skill.provider?.localizedName && <p className="mt-1 text-xs font-normal leading-5 text-secondary">{skill.provider.localizedName}</p>}
                   </h3>
                   <p className="mt-1 truncate font-mono text-[11px] text-secondary">{skill.author.owner || skill.author.name}</p>
                 </div></div>
@@ -446,7 +448,7 @@ export function SkillsPageClient(props: Props) {
                   {skill.exampleCount > 0 && <Link prefetch={false} href={getLocalizedNavigationHref(`/skills/${skill.slug}#showcase`, locale)} className="mt-3 inline-flex min-h-10 items-center gap-2 text-xs font-medium text-[#006b4f]" data-skill-examples>{discovery.examples} · {skill.exampleCount}<ArrowRight size={12} aria-hidden="true" /></Link>}
                 </div>
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border bg-background/45 px-5 py-3">
-                  {skill.provider ? <a href={skill.provider.sourceHref} target="_blank" rel={skill.provider.sourceRel} className="inline-flex min-h-10 items-center gap-1 text-xs text-[#006b4f]">{locale === 'zh' ? '前往' : 'Get on'} {skill.provider.label} ↗</a> : <span title={c.repoStars} className="inline-flex items-center gap-1.5 font-mono text-sm"><Star size={14} aria-hidden="true" />{stars(skill.stats.stars)}<span className="text-[10px] text-secondary">GitHub</span></span>}
+                  {skill.provider ? <a aria-label={`${locale === 'zh' ? '在' : 'Get on'} ${skill.provider.label}: ${skill.name}`} href={skill.provider.sourceHref} target="_blank" rel={skill.provider.sourceRel} className="inline-flex min-h-10 items-center gap-1 text-xs text-[#006b4f]">{locale === 'zh' ? '获取技能' : 'Get skill'} ↗</a> : <span title={c.repoStars} className="inline-flex items-center gap-1.5 font-mono text-sm"><Star size={14} aria-hidden="true" />{stars(skill.stats.stars)}<span className="text-[10px] text-secondary">GitHub</span></span>}
                   <div className="flex items-center gap-4 text-xs">
                     {!skill.provider && <button type="button" aria-pressed={compareSlugs.includes(skill.slug)} onClick={() => toggleCompare(skill.slug)}
                       className="min-h-10 text-secondary hover:text-[#006b4f]">{compareSlugs.includes(skill.slug) ? c.selected : c.compare}</button>}

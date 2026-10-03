@@ -1,0 +1,8 @@
+{
+  "paidPermitted": true,
+  "permissionReference": "Site owner confirmed on 2026-10-03 in this task that Skillry partnership permits catalog descriptions and example display.",
+  "scope": "All public Skillry Skills with source downloadCount strictly greater than 10, Free and paid.",
+  "termsUrl": "https://skillry.dev/terms",
+  "termsCheckedAt": "2026-10-03",
+  "termsContentSha256": "db27c034eb6ae65f5e076f82c369513004e800e4e27340dc716263c5ac0ea1ee"
+}

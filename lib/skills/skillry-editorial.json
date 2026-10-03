@@ -1,0 +1,606 @@
+{
+  "bs-grokbot-avatar": {
+    "title": {
+      "en": "GrokBot Avatar",
+      "zh": "GrokBot 头像"
+    },
+    "description": {
+      "en": "Turn a character brief into a rounded mascot avatar with a soft vinyl appearance. Useful for profile images and playful product identities.",
+      "zh": "把角色设定转成圆润、柔和的潮玩机器人头像，适合个人头像和轻松活泼的产品形象。"
+    },
+    "usage": {
+      "en": "Describe the character, expression, colors and intended crop. Check that the resulting avatar stays recognizable at small sizes.",
+      "zh": "提供角色、表情、配色和裁切需求，并检查生成头像缩小后是否仍清晰易辨。"
+    },
+    "version": "1.0.1",
+    "versionObservedAt": "2026-10-03T00:43:54.002Z"
+  },
+  "bs-field-notes-deck": {
+    "title": {
+      "en": "Field Notes Deck",
+      "zh": "Field Notes 田野笔记演示文稿"
+    },
+    "description": {
+      "en": "Build an outdoor learning presentation around photography, blue skies and sage green accents. Suitable for introducing field programs, activities and educational projects.",
+      "zh": "以摄影、天空蓝和鼠尾草绿组织户外学习演示，适合介绍研学项目、活动安排与教育计划。"
+    },
+    "usage": {
+      "en": "Prepare the audience, learning goals, itinerary and photographs you have permission to use. Review slide readability and practical details before presenting.",
+      "zh": "准备受众、学习目标、行程和有权使用的照片，演示前检查文字可读性及活动安排。"
+    },
+    "version": "1.0.1",
+    "versionObservedAt": "2026-10-03T00:43:54.002Z"
+  },
+  "bs-scattered-cards-magazine": {
+    "title": {
+      "en": "Scattered-Cards Magazine",
+      "zh": "散落卡片杂志网站"
+    },
+    "description": {
+      "en": "Organize articles and photographs into an editorial HTML site with layered, rotated cards. Useful for portfolios, independent magazines and collections of visual stories.",
+      "zh": "把文章与摄影组织成带叠放、旋转卡片的 HTML 杂志网站，适合个人作品集、独立杂志与视觉故事集合。"
+    },
+    "usage": {
+      "en": "Supply article titles, excerpts, images and page relationships. Check navigation, narrow-screen layouts and text contrast in the generated site.",
+      "zh": "提供文章标题、摘要、图片和页面关系，再检查生成网站的导航、窄屏布局与文字对比度。"
+    },
+    "version": "1.0.1",
+    "versionObservedAt": "2026-10-03T00:43:54.002Z"
+  },
+  "bs-cadence-marketing-landing": {
+    "title": {
+      "en": "Cadence Marketing Landing",
+      "zh": "Cadence 营销落地页"
+    },
+    "description": {
+      "en": "Create a dark HTML landing page that presents a software product through motion and a clear call to action. Useful for turning a product brief into a focused marketing page.",
+      "zh": "用动效与清晰行动入口构建深色 HTML 产品落地页，适合把软件产品介绍转成完整营销页面。"
+    },
+    "usage": {
+      "en": "Provide the product audience, real features, evidence and desired call to action. Verify claims, links and reduced-motion behavior before publishing.",
+      "zh": "提供产品受众、真实功能、证据和行动目标，上线前核对宣传信息、链接及减少动画模式。"
+    },
+    "version": "1.0.0",
+    "versionObservedAt": "2026-10-03T00:43:54.002Z"
+  },
+  "bs-inclusive-cutpaper-deck": {
+    "title": {
+      "en": "Inclusive Cutpaper Deck",
+      "zh": "包容主题剪纸演示文稿"
+    },
+    "description": {
+      "en": "Present workshops and team ideas with warm backgrounds, bold headings and colorful cut-paper portraits. Useful for sessions about collaboration, belonging and participation.",
+      "zh": "通过温暖背景、醒目标题和彩色剪纸人物展示工作坊与团队创意，适合协作、归属感及参与主题。"
+    },
+    "usage": {
+      "en": "Outline the session, audience and discussion prompts. Review the portraits and examples for the people represented, and keep the slides readable.",
+      "zh": "列出活动结构、受众与讨论问题，检查人物与案例是否适合参与者，并保持幻灯片清晰易读。"
+    },
+    "version": "1.0.1",
+    "versionObservedAt": "2026-10-03T00:43:54.002Z"
+  },
+  "bs-sky-glass-deck": {
+    "title": {
+      "en": "Sky Glass Deck",
+      "zh": "天空玻璃风格演示文稿"
+    },
+    "description": {
+      "en": "Explain a topic through a presentation that combines sky photography with translucent content cards. Useful for visual briefings with a calm, spacious atmosphere.",
+      "zh": "将天空摄影与半透明内容卡片结合，制作舒展、平静的主题演示，适合视觉简报与概念讲解。"
+    },
+    "usage": {
+      "en": "Supply the narrative, supporting facts and preferred imagery. Inspect text contrast over photographs and simplify crowded slides.",
+      "zh": "提供叙事结构、支撑信息和图片偏好，检查照片上文字的对比度，并精简拥挤页面。"
+    },
+    "version": "1.0.1",
+    "versionObservedAt": "2026-10-03T00:43:54.002Z"
+  },
+  "bs-claude-style-illustration": {
+    "title": {
+      "en": "Claude Style Illustration",
+      "zh": "Claude 风格插画"
+    },
+    "description": {
+      "en": "Express one editorial idea through a warm illustration with a clear visual metaphor. This independent Skillry listing uses the Claude Style Illustration name; it is not an Anthropic endorsement.",
+      "zh": "用温暖插画和明确的视觉隐喻表达一个编辑观点。这是 Skillry 的独立条目，原名 Claude Style Illustration，不代表 Anthropic 官方背书。"
+    },
+    "usage": {
+      "en": "Describe the central idea, audience, format and palette. Review the metaphor, image rights and consistency when creating a series.",
+      "zh": "描述核心观点、受众、画幅与配色，制作系列时检查隐喻、图片权利与风格一致性。"
+    },
+    "version": "1.0.0",
+    "versionObservedAt": "2026-10-03T00:43:54.002Z"
+  },
+  "bs-research-talk-deck": {
+    "title": {
+      "en": "Research Talk Deck",
+      "zh": "研究报告演示文稿"
+    },
+    "description": {
+      "en": "Structure a research talk as a 16:9 HTML presentation with room for equations, methods and results. Useful for academic seminars and technical explanations that need a clear argument.",
+      "zh": "把研究报告组织成 16:9 HTML 演示，为公式、方法与结果留出空间，适合学术研讨与需要清晰论证的技术讲解。"
+    },
+    "usage": {
+      "en": "Prepare the research question, methods, figures, results and limitations. Check equation rendering, citations and speaker notes before the talk.",
+      "zh": "准备研究问题、方法、图表、结果与局限，报告前检查公式显示、引文和演讲备注。"
+    },
+    "version": "1.0.0",
+    "versionObservedAt": "2026-10-03T00:43:54.002Z"
+  },
+  "bs-creatormotion-type-title-takeover": {
+    "title": {
+      "en": "CreatorMotion · Title Scene Takeover",
+      "zh": "CreatorMotion · 标题接管画面"
+    },
+    "description": {
+      "en": "Keep a large headline fixed while the presenter leaves the frame, creating a strong transition from a speaker to the message.",
+      "zh": "让大标题保持位置与比例，在人物退出画面后继续承接信息，适合从口播切换到主题强调。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for CreatorMotion · Title Scene Takeover. Choose reference examples and an appropriate video format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 CreatorMotion · Title Scene Takeover 的受众与内容，选择参考案例及视频格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-dot-avatar-maker": {
+    "title": {
+      "en": "Dot Avatar Maker",
+      "zh": "Dot 头像制作器"
+    },
+    "description": {
+      "en": "Explore a browser character builder with editable shapes, materials and outfits. Use it as a starting point for a branded avatar tool.",
+      "zh": "在浏览器中选择角色形状、材质与服装，制作头像，也可作为品牌角色工具的起点。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Dot Avatar Maker. Choose reference examples and an appropriate web interface format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Dot Avatar Maker 的受众与内容，选择参考案例及网页格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-creatormotion-cards-action-checklist": {
+    "title": {
+      "en": "CreatorMotion · Synchronized Action Checklist",
+      "zh": "CreatorMotion · 同步操作清单"
+    },
+    "description": {
+      "en": "Pair a screen demonstration with checklist items that complete at chosen timestamps. Prepare your recording and action times for the sequence.",
+      "zh": "把屏幕演示与定时完成的操作清单配合起来，提供录屏及各步骤时间点即可组织演示节奏。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for CreatorMotion · Synchronized Action Checklist. Choose reference examples and an appropriate video format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 CreatorMotion · Synchronized Action Checklist 的受众与内容，选择参考案例及视频格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-hyperframes-velocity-sting": {
+    "title": {
+      "en": "Velocity-Matched UI Sting",
+      "zh": "速度匹配界面短片"
+    },
+    "description": {
+      "en": "Connect interface scenes through movement with matching speed. Useful for a short product introduction that feels like one continuous camera move.",
+      "zh": "以速度一致的镜头运动连接多个界面场景，让简短产品介绍形成连续推进的视觉节奏。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Velocity-Matched UI Sting. Choose reference examples and an appropriate video format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Velocity-Matched UI Sting 的受众与内容，选择参考案例及视频格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-hyperframes-agent-chorus-reel": {
+    "title": {
+      "en": "Agent-Chorus Capability Reel",
+      "zh": "多界面 Agent 能力展示短片"
+    },
+    "description": {
+      "en": "Show the same prompt across several interfaces, then assemble the results into a launch reel. Supply real examples that support the capability being shown.",
+      "zh": "在多个界面展示同一提示词，再剪辑生成结果，适合用真实案例说明 Agent 的使用场景。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Agent-Chorus Capability Reel. Choose reference examples and an appropriate video format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Agent-Chorus Capability Reel 的受众与内容，选择参考案例及视频格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-hyperframes-device-canvas-launch": {
+    "title": {
+      "en": "Device-Canvas Product Launch",
+      "zh": "设备画布产品发布视频"
+    },
+    "description": {
+      "en": "Present a product interface on a device in a dark studio setting. Plan the scroll, key interaction and final brand frame around your actual interface.",
+      "zh": "将产品界面放入暗色摄影棚中的设备画面，围绕真实界面安排滚动、关键操作与品牌收尾。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Device-Canvas Product Launch. Choose reference examples and an appropriate video format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Device-Canvas Product Launch 的受众与内容，选择参考案例及视频格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-hyperframes-liquid-logo-reveal": {
+    "title": {
+      "en": "Liquid-Rupture Logo Reveal",
+      "zh": "液滴破裂 Logo 展示"
+    },
+    "description": {
+      "en": "Reveal a brand mark through the refraction and rupture of a liquid bead. Useful for a compact visual opening or closing sequence.",
+      "zh": "借助液滴折射与破裂露出品牌标志，适合简短片头、片尾及品牌转场。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Liquid-Rupture Logo Reveal. Choose reference examples and an appropriate video format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Liquid-Rupture Logo Reveal 的受众与内容，选择参考案例及视频格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-hyperframes-chat-to-result-launch": {
+    "title": {
+      "en": "Chat-to-Result Launch Film",
+      "zh": "从对话到成果的产品视频"
+    },
+    "description": {
+      "en": "Tell a product story through a prompt, streamed answer, follow-up action and final result inside an app interface. Plan the script around a real workflow.",
+      "zh": "在应用界面中串联提问、回答、后续操作与最终成果，以实际使用流程构建产品故事。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Chat-to-Result Launch Film. Choose reference examples and an appropriate video format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Chat-to-Result Launch Film 的受众与内容，选择参考案例及视频格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-hand-drawn-visual-notes": {
+    "title": {
+      "en": "Hand-Drawn Visual Notes",
+      "zh": "手绘视觉笔记"
+    },
+    "description": {
+      "en": "Condense a lesson or process into an illustrated note with a clear reading order. Choose one central idea and a small set of supporting labels.",
+      "zh": "围绕一个核心概念，用手绘图示与少量标签组织课程或流程，形成清晰可读的视觉笔记。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Hand-Drawn Visual Notes. Choose reference examples and an appropriate image format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Hand-Drawn Visual Notes 的受众与内容，选择参考案例及图像格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-sage-sneaker-store": {
+    "title": {
+      "en": "Sage Sneaker Store",
+      "zh": "Sage 球鞋商店网站"
+    },
+    "description": {
+      "en": "Build a footwear storefront around sage accents, editorial photography and product grids. Prepare product details and connected store pages for a coherent shopping journey.",
+      "zh": "以鼠尾草绿、编辑摄影与商品网格构建球鞋商店，组织商品资料和关联页面，形成完整浏览路径。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Sage Sneaker Store. Choose reference examples and an appropriate web interface format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Sage Sneaker Store 的受众与内容，选择参考案例及网页格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-scrapbook-resume-site": {
+    "title": {
+      "en": "Scrapbook Resume Site",
+      "zh": "剪贴簿风格简历网站"
+    },
+    "description": {
+      "en": "Organize a resume as connected scrapbook pages with notes, badges and role stories. Prepare career information, contact details and examples of your work.",
+      "zh": "用便签、证件卡与经历故事组织多页简历网站，适合展示职业背景、联系方式和工作成果。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Scrapbook Resume Site. Choose reference examples and an appropriate web interface format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Scrapbook Resume Site 的受众与内容，选择参考案例及网页格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-yellow-sketchnote-deck": {
+    "title": {
+      "en": "Yellow Sketchnote Deck",
+      "zh": "黄色手绘笔记演示文稿"
+    },
+    "description": {
+      "en": "Use black and yellow type with small hand-drawn figures to explain a team experiment. Keep the argument brief and use the visual contrast to mark key decisions.",
+      "zh": "以黑黄文字与手绘人物介绍团队实验，通过鲜明对比突出结论和关键决策。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Yellow Sketchnote Deck. Choose reference examples and an appropriate presentation format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Yellow Sketchnote Deck 的受众与内容，选择参考案例及演示文稿格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-hero-minimal-motion": {
+    "title": {
+      "en": "Minimal Motion Hero",
+      "zh": "极简动效首屏"
+    },
+    "description": {
+      "en": "Start a landing page with a restrained animated hero and editable visual tokens. Adapt the copy, color and interface state to the product being introduced.",
+      "zh": "使用克制入场动画与可调整样式变量构建首屏，按产品需求修改文案、配色和交互状态。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Minimal Motion Hero. Choose reference examples and an appropriate web interface format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Minimal Motion Hero 的受众与内容，选择参考案例及网页格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-hyperframes-code-change-launch": {
+    "title": {
+      "en": "Code-Change Explainer Film",
+      "zh": "代码变更说明短片"
+    },
+    "description": {
+      "en": "Explain a software change through a fast view of the diff, a readable summary and capability scenes. Supply the actual change and the audience-facing result.",
+      "zh": "把代码差异、易读摘要与能力场景组成说明短片，帮助无需阅读代码的受众理解变更成果。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Code-Change Explainer Film. Choose reference examples and an appropriate video format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Code-Change Explainer Film 的受众与内容，选择参考案例及视频格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-editable-visual-deck": {
+    "title": {
+      "en": "Editable Visual Deck",
+      "zh": "可编辑视觉演示文稿"
+    },
+    "description": {
+      "en": "Plan a presentation around editable text, shapes, diagrams and chart elements. Useful when later revisions matter as much as the initial visual result.",
+      "zh": "用可编辑文字、形状、图解和图表规划演示文稿，适合需要持续修改内容与版式的场景。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Editable Visual Deck. Choose reference examples and an appropriate presentation format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Editable Visual Deck 的受众与内容，选择参考案例及演示文稿格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-notion-style-og": {
+    "title": {
+      "en": "Notion Style OG Image",
+      "zh": "Notion 风格分享卡片"
+    },
+    "description": {
+      "en": "Create a simple social sharing image inspired by Notion’s visual language. Provide the page title, main idea and intended sharing format.",
+      "zh": "参考 Notion 的简洁视觉语言制作社交分享图片，提供页面标题、核心概念与分享尺寸。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Notion Style OG Image. Choose reference examples and an appropriate image format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Notion Style OG Image 的受众与内容，选择参考案例及图像格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-chalkboard-infographic": {
+    "title": {
+      "en": "Chalkboard Infographic",
+      "zh": "黑板风格信息图"
+    },
+    "description": {
+      "en": "Explain a lesson, procedure or data finding with a chalkboard composition. Use a clear hierarchy and a small set of illustrations to support one takeaway.",
+      "zh": "用黑板构图解释课程、步骤或数据发现，以清晰层级和少量插画突出一个核心结论。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Chalkboard Infographic. Choose reference examples and an appropriate image format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Chalkboard Infographic 的受众与内容，选择参考案例及图像格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-data-visualization-activity-calendar": {
+    "title": {
+      "en": "Activity Calendar Chart",
+      "zh": "活动日历图表"
+    },
+    "description": {
+      "en": "Present activity over time in an editable calendar visualization. Prepare the date range, values and meaningful labels before adapting the chart.",
+      "zh": "通过可编辑日历图表展示时间维度上的活动，准备日期范围、数值与标签后再调整呈现。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Activity Calendar Chart. Choose reference examples and an appropriate web interface format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Activity Calendar Chart 的受众与内容，选择参考案例及网页格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-slate-admin-console": {
+    "title": {
+      "en": "Slate Admin Console",
+      "zh": "Slate 管理控制台"
+    },
+    "description": {
+      "en": "Organize analytics, customers, finances and planning inside a calm admin workspace. Define the real data and daily management tasks before building the views.",
+      "zh": "在统一管理空间中组织分析、客户、财务与计划视图，先明确真实数据和日常管理任务。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Slate Admin Console. Choose reference examples and an appropriate web interface format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Slate Admin Console 的受众与内容，选择参考案例及网页格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-monochrome-studio-portrait": {
+    "title": {
+      "en": "Monochrome Studio Portrait",
+      "zh": "黑白摄影棚人像"
+    },
+    "description": {
+      "en": "Style an authorized portrait with directional light, texture and deliberate empty space. Useful for a personal profile or an editorial portrait layout.",
+      "zh": "将有权使用的人像调整为有定向光线、自然质感与留白的黑白半身形象，适合个人资料和编辑版面。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Monochrome Studio Portrait. Choose reference examples and an appropriate image format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Monochrome Studio Portrait 的受众与内容，选择参考案例及图像格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-beacon-saas-landing": {
+    "title": {
+      "en": "Beacon SaaS Landing",
+      "zh": "Beacon SaaS 落地页"
+    },
+    "description": {
+      "en": "Present a software product or waitlist with restrained sections and a clear narrative. Prepare real features and a focused next action for the visitor.",
+      "zh": "以克制版式与清晰叙事介绍软件产品或候补名单，围绕真实功能设计用户下一步行动。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Beacon SaaS Landing. Choose reference examples and an appropriate web interface format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Beacon SaaS Landing 的受众与内容，选择参考案例及网页格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-image-narrative-deck": {
+    "title": {
+      "en": "Image Narrative Deck",
+      "zh": "图像叙事演示文稿"
+    },
+    "description": {
+      "en": "Develop a presentation through full-frame imagery and concise captions. Plan the story sequence for a documentary pitch, cultural explanation or launch narrative.",
+      "zh": "以满幅图像与简洁字幕推进演示故事，适合纪录片提案、文化讲解和产品发布叙事。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Image Narrative Deck. Choose reference examples and an appropriate presentation format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Image Narrative Deck 的受众与内容，选择参考案例及演示文稿格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-ochre-editorial-deck": {
+    "title": {
+      "en": "Ochre Editorial Deck",
+      "zh": "赭色编辑风格演示文稿"
+    },
+    "description": {
+      "en": "Combine paper tones, warm collage and large headlines into an editorial presentation. Choose photographs and supporting text for a consistent visual story.",
+      "zh": "组合纸张色调、暖色拼贴与大标题形成编辑式演示，以摄影和辅助文字建立统一视觉故事。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Ochre Editorial Deck. Choose reference examples and an appropriate presentation format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Ochre Editorial Deck 的受众与内容，选择参考案例及演示文稿格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-project-knowledge-graph": {
+    "title": {
+      "en": "Project Knowledge Graph",
+      "zh": "项目知识图谱"
+    },
+    "description": {
+      "en": "Turn project records into a browsable offline graph of entities and relationships. Keep the original paths available so readers can trace the supporting evidence.",
+      "zh": "把项目记录组织成可离线浏览的实体关系图，保留来源路径以便追溯信息依据。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Project Knowledge Graph. Choose reference examples and an appropriate web interface format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Project Knowledge Graph 的受众与内容，选择参考案例及网页格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-cobalt-system-deck": {
+    "title": {
+      "en": "Cobalt System Deck",
+      "zh": "钴蓝视觉系统演示文稿"
+    },
+    "description": {
+      "en": "Present an identity system through typography, color, marks and applied examples. Use cobalt fields and contrasting accents to organize the guidelines.",
+      "zh": "围绕字体、色彩、标志与应用案例介绍视觉识别系统，以钴蓝色块和对比配色组织规范。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Cobalt System Deck. Choose reference examples and an appropriate presentation format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Cobalt System Deck 的受众与内容，选择参考案例及演示文稿格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-article-brief-deck": {
+    "title": {
+      "en": "Article Brief Deck",
+      "zh": "文章简报演示文稿"
+    },
+    "description": {
+      "en": "Turn a checked article into a briefing with a main argument, evidence and discussion prompts. Prepare citations and speaker notes for a complete presentation.",
+      "zh": "把已核实文章转成有主线、证据和讨论问题的简报，配合引文与演讲备注组织演示。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Article Brief Deck. Choose reference examples and an appropriate presentation format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Article Brief Deck 的受众与内容，选择参考案例及演示文稿格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-testimonial-masonry-wall": {
+    "title": {
+      "en": "Masonry Testimonial Wall",
+      "zh": "瀑布流评价墙"
+    },
+    "description": {
+      "en": "Arrange customer quotations in a masonry section with a subtle generated backdrop. Prepare authentic quotations and attribution before adapting the layout.",
+      "zh": "以瀑布流版式和轻量背景展示客户评价，使用真实引文与署名后再调整页面风格。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Masonry Testimonial Wall. Choose reference examples and an appropriate web interface format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Masonry Testimonial Wall 的受众与内容，选择参考案例及网页格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-interactive-system-map": {
+    "title": {
+      "en": "Interactive System Map",
+      "zh": "交互式系统地图"
+    },
+    "description": {
+      "en": "Explore architecture, data flow and lifecycle relationships in an offline interactive map. Supply a system description or a typed node-and-edge specification.",
+      "zh": "从系统说明或节点关系数据构建离线交互地图，探索架构、数据流和生命周期关系。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Interactive System Map. Choose reference examples and an appropriate web interface format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Interactive System Map 的受众与内容，选择参考案例及网页格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-linktree-style-og": {
+    "title": {
+      "en": "Linktree Style OG Image",
+      "zh": "Linktree 风格分享卡片"
+    },
+    "description": {
+      "en": "Build a social sharing image inspired by Linktree’s visual language. Choose one recognizable subject and match the format to the page being shared.",
+      "zh": "参考 Linktree 的视觉语言制作分享卡片，以一个可识别主体呼应被分享页面。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Linktree Style OG Image. Choose reference examples and an appropriate image format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Linktree Style OG Image 的受众与内容，选择参考案例及图像格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-brand-story-deck": {
+    "title": {
+      "en": "Brand Story Deck",
+      "zh": "品牌故事演示文稿"
+    },
+    "description": {
+      "en": "Explain a brand’s origin, positioning and visual identity as a connected story. Structure the narrative before choosing the high-contrast editorial scenes.",
+      "zh": "把品牌起源、定位与视觉识别组织成连贯故事，先确定叙事结构，再选择高对比编辑场景。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Brand Story Deck. Choose reference examples and an appropriate presentation format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Brand Story Deck 的受众与内容，选择参考案例及演示文稿格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-consulting-storyline-deck": {
+    "title": {
+      "en": "Consulting Storyline Deck",
+      "zh": "咨询叙事演示文稿"
+    },
+    "description": {
+      "en": "Lead an audience from analysis and evidence to a recommendation and implementation plan. Make the assumptions and decision points visible in the presentation.",
+      "zh": "按分析、证据、建议与执行计划推进咨询演示，明确假设和决策节点。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Consulting Storyline Deck. Choose reference examples and an appropriate presentation format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Consulting Storyline Deck 的受众与内容，选择参考案例及演示文稿格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-confetti-gathering-deck": {
+    "title": {
+      "en": "Confetti Gathering Deck",
+      "zh": "彩纸聚会演示文稿"
+    },
+    "description": {
+      "en": "Introduce a gathering with vivid color fields, candid portraits and festive graphics. Prepare the event purpose, participants and schedule around the visual rhythm.",
+      "zh": "使用鲜明色块、人物照片与节庆图形介绍活动，围绕视觉节奏组织主题、参与者及日程。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Confetti Gathering Deck. Choose reference examples and an appropriate presentation format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Confetti Gathering Deck 的受众与内容，选择参考案例及演示文稿格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-basalt-dev-portfolio": {
+    "title": {
+      "en": "Basalt Dev Portfolio",
+      "zh": "Basalt 开发者作品集"
+    },
+    "description": {
+      "en": "Connect a developer biography, projects, writing and career milestones in one portfolio. Prepare the links and evidence that best explain the work.",
+      "zh": "在统一作品集中串联开发者简介、项目、文章和职业节点，选择能说明成果的链接与证据。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Basalt Dev Portfolio. Choose reference examples and an appropriate web interface format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Basalt Dev Portfolio 的受众与内容，选择参考案例及网页格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  },
+  "bs-learning-loop-deck": {
+    "title": {
+      "en": "Learning Loop Deck",
+      "zh": "学习循环演示文稿"
+    },
+    "description": {
+      "en": "Shape training material into short cycles of explanation, participation and application. Define learning outcomes and practice tasks before designing the deck.",
+      "zh": "把培训内容组织成解释、参与和应用的短循环，先明确学习目标、练习任务和反馈环节。"
+    },
+    "usage": {
+      "en": "Prepare the content and audience for Learning Loop Deck. Choose reference examples and an appropriate presentation format, then acquire the skill on Skillry and follow its instructions. Review the result with your own content before sharing.",
+      "zh": "准备 Learning Loop Deck 的受众与内容，选择参考案例及演示文稿格式。在 Skillry 获取技能并按说明设置，分享前用自己的内容检查最终效果。"
+    }
+  }
+}
