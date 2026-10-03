@@ -1,11 +1,16 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { parseSkillryDirectory, planSnapshot, selectSkillryRows, fetchPublicPage } from './skillry/core.mjs'
+import { parseSkillryDirectory, parseSkillryTerms, planSnapshot, selectSkillryRows, fetchPublicPage } from './skillry/core.mjs'
 
 const template = { slug: 'bs-test', name: 'Test', outputType: 'image', downloadCount: 11, priceUsdCents: 0, isFeatured: false,
   publishedAt: '2026-10-01T00:00:00.000Z', previewImageUrls: ['/skills/bs-test/media/preview-1.webp?v=public'], previewVideoUrl: null,
   tags: [{ kind: 'task', value: 'create-image', label: 'Create image' }] }
 const serialize = rows => `<script>const state = { publishedSkills: ${JSON.stringify(rows)} }</script>`
+const terms = 'Terms of Service ' + 'Public source terms. '.repeat(100)
+for (const closingTag of ['</script >', '</script\t>', '</SCRIPT\n>']) {
+  assert.deepEqual(parseSkillryDirectory(serialize([template]).replace('</script>', closingTag)), [template])
+  assert.equal(parseSkillryTerms(`<script>const state={content:${JSON.stringify(terms)}}</script>`.replace('</script>', closingTag)), terms)
+}
 const rows = [10, 11, 9].map((downloadCount, index) => ({ ...template, slug: `bs-test-${index}`, downloadCount }))
 rows.push({ ...template, slug: 'bs-paid', priceUsdCents: 499 })
 assert.deepEqual(selectSkillryRows(parseSkillryDirectory(serialize(rows))).map(row => row.slug), ['bs-test-1'])

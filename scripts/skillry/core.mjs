@@ -49,7 +49,7 @@ export function literalData(node, refs = new Map()) {
 export function parseSkillryDirectory(html) {
   if (Buffer.byteLength(html) > 8 * 1024 * 1024) throw Error('Directory byte limit exceeded')
   const arrays = []
-  for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {
+  for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)) {
     if (!match[1].includes('publishedSkills:')) continue
     const ast = ts.createSourceFile('public-directory.js', match[1], ts.ScriptTarget.Latest, true, ts.ScriptKind.JS)
     const visit = node => {
@@ -66,7 +66,7 @@ export function parseSkillryDirectory(html) {
 
 export function parseSkillryTerms(html) {
   const values = []
-  for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {
+  for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)) {
     if (!match[1].includes('Terms of Service')) continue
     const ast = ts.createSourceFile('terms.js', match[1], ts.ScriptTarget.Latest, true, ts.ScriptKind.JS)
     const visit = node => {
