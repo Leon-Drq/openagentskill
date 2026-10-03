@@ -14,6 +14,7 @@ import type { Locale } from '@/lib/i18n/config'
 import { useI18n } from '@/lib/i18n/context'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
+import { HomeSkillryBanner } from './home-skillry-banner'
 import { GitHubPopularityList } from './github-popularity-list'
 
 export interface HomePageEnhancedProps {
@@ -755,7 +756,8 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
             backgroundSize: '18px 18px',
           }}
         />
-        <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-20 pt-20 md:pb-24 md:pt-28">
+        <HomeSkillryBanner locale={activeLocale} />
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-20 pt-12 md:pb-24 md:pt-16">
           <div className="mb-8 flex items-center gap-3">
             <span className="h-1.5 w-1.5 rounded-full bg-[#d7a642]" aria-hidden="true" />
             <span className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d675e]">{copy.heroEyebrow}</span>
