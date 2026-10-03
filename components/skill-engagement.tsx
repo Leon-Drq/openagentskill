@@ -17,7 +17,7 @@ const EngagementContext = createContext<{
 } | null>(null)
 
 // One batch per visible page. Never mount an auth/bookmark query for every card.
-export function SkillEngagementProvider({ slugs, children }: { slugs: string[]; children: ReactNode }) {
+export function SkillEngagementProvider({ slugs, untrackedSlugs = [], children }: { slugs: string[]; untrackedSlugs?: string[]; children: ReactNode }) {
   const key = [...new Set(slugs)].sort().join(',')
   const { locale } = useI18n()
   const router = useRouter()
@@ -60,7 +60,7 @@ export function SkillEngagementProvider({ slugs, children }: { slugs: string[]; 
       if (!response.ok) throw Error('Unavailable')
       const data = await response.json()
       setStats(previous => ({ ...previous, [slug]: { ...previous[slug], ...('vote' in intent ? { vote: data.vote, likes: data.likes, dislikes: data.dislikes } : { saved: data.saved }) } }))
-      if ('saved' in intent && intent.saved) trackSkillEvent(slug, 'save')
+      if ('saved' in intent && intent.saved && !untrackedSlugs.includes(slug)) trackSkillEvent(slug, 'save')
     } catch (error) { await refresh(); throw error }
     finally { pending.current.delete(slug) }
   }

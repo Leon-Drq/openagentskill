@@ -13,7 +13,7 @@ import { getShowcaseImageSrc, getShowcaseEvidenceLabel, localizeShowcase, type S
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState, useSyncExternalStore, useTransition, type ReactNode } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore, useTransition } from 'react'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
@@ -100,7 +100,7 @@ interface DirectoryLink {
   description: string
 }
 
-interface Skill {
+export interface DirectorySkillCard {
   exampleCount: number
   preview?: ShowcaseCardData | null
   commerce: SkillCommerce
@@ -132,6 +132,7 @@ interface Skill {
   safetyProfile?: SkillSafetySummary
   platformHints?: string[]
   supplyProfile?: SkillSupplySummary
+  provider?: { label: string; sourceHref: string; sourceRel: string; image?: string; exampleLabel: string }
 }
 
 
@@ -169,7 +170,7 @@ interface Props {
   pricing: PriceFilter
   pathname: string
   queryString: string
-  skills: Skill[]
+  skills: DirectorySkillCard[]
   query?: string
   sort: string
   featured: boolean
@@ -197,7 +198,6 @@ interface Props {
   degraded: boolean
   directorySections: DirectorySection[]
   directoryLinks: DirectoryLink[]
-  externalDiscovery?: ReactNode
 }
 
 
@@ -405,12 +405,15 @@ export function SkillsPageClient(props: Props) {
               {props.pricing !== 'all' && <Link href={`/contact${locale === 'en' ? '' : '?lang=' + locale}`} className="mt-4 block text-sm text-[#006b4f] underline underline-offset-4">{prices.contribute} →</Link>}
               <Link href={resetHref} prefetch={false} scroll={false} onNavigate={filterNavigation(resetHref)} className="mt-5 inline-block text-[#006b4f] underline">{c.reset}</Link>
             </div>
-          ) : <SkillEngagementProvider key={skills.map(skill => skill.slug).join(',')} slugs={skills.map(skill => skill.slug)}><div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
+          ) : <SkillEngagementProvider key={skills.map(skill => skill.slug).join(',')} slugs={skills.map(skill => skill.slug)} untrackedSlugs={skills.filter(skill => skill.provider).map(skill => skill.slug)}><div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
             {skills.map(skill => (
               <article key={skill.id} className="group flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-border bg-card transition-colors hover:border-[#006b4f]/50" data-directory-skill>
                 <div className="relative isolate">
                 <div className="absolute right-2 top-2 z-10 max-w-[calc(100%-1rem)] mix-blend-difference"><SkillActions slug={skill.slug} name={skill.name} compact /></div>
-                {skill.preview ? <Link href={getLocalizedNavigationHref(`/showcase/${skill.preview.slug}`, locale)} prefetch={false} className="relative block aspect-[16/10] overflow-hidden border-b border-border bg-muted" aria-label={`${discovery.examples}: ${skill.name}`}>
+                {skill.provider?.image ? <Link href={getLocalizedNavigationHref(`/skills/${skill.slug}#showcase`, locale)} prefetch={false} className="relative block aspect-[16/10] overflow-hidden border-b border-border bg-muted" aria-label={`${discovery.examples}: ${skill.name}`}>
+                  <Image src={skill.provider.image} alt={`${skill.name} — ${skill.provider.exampleLabel}`} fill unoptimized sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 360px" className="object-cover object-top" />
+                  <span className="absolute bottom-3 left-3 rounded-md bg-background/95 px-2 py-1 text-[10px]">{skill.provider.exampleLabel}</span>
+                </Link> : skill.preview ? <Link href={getLocalizedNavigationHref(`/showcase/${skill.preview.slug}`, locale)} prefetch={false} className="relative block aspect-[16/10] overflow-hidden border-b border-border bg-muted" aria-label={`${discovery.examples}: ${skill.name}`}>
                   <Image src={getShowcaseImageSrc(skill.preview.media[0].src, 'card')} alt={localizeShowcase(skill.preview.media[0].alt, locale)} fill sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 360px" className={skill.preview.cardFit === 'contain' ? 'object-contain p-3' : 'object-cover object-top'} />
                   <span className="absolute bottom-3 left-3 rounded-md bg-background/95 px-2 py-1 text-[10px]">{getShowcaseEvidenceLabel(skill.preview, locale)}</span>
                 </Link> : <Link href={getLocalizedNavigationHref(`/skills/${skill.slug}`, locale)} prefetch={false} className="flex aspect-[16/10] min-h-52 flex-col justify-between gap-2 border-b border-border bg-[#eeece5]/65 p-5 pt-20 text-[#006b4f]" data-skill-capability>
@@ -435,7 +438,7 @@ export function SkillsPageClient(props: Props) {
                     <SkillPrice commerce={skill.commerce} />
                     <Link href={href({ category: directoryCategories(skill.category)[0] })} prefetch={false} className="underline decoration-border underline-offset-4">{directoryCategories(skill.category).map(label).join(' · ')}</Link>
                     {[...new Set(skill.platformHints || skill.compatibility.map(v => v.platform))].slice(0, 2).map(value => <span key={value}>{value}</span>)}
-                    {skill.safetyProfile?.blocked ? <span className="text-red-700">{c.blocked}</span>
+                    {skill.provider ? <span>{skill.provider.label}</span> : skill.safetyProfile?.blocked ? <span className="text-red-700">{c.blocked}</span>
                       : skill.snapshot ? <span>{label('savedInfo')}</span>
                       : skill.sourceStatus !== 'source-recorded' ? <span>{c.review}</span> : null}
                   </div>
@@ -443,10 +446,10 @@ export function SkillsPageClient(props: Props) {
                   {skill.exampleCount > 0 && <Link prefetch={false} href={getLocalizedNavigationHref(`/skills/${skill.slug}#showcase`, locale)} className="mt-3 inline-flex min-h-10 items-center gap-2 text-xs font-medium text-[#006b4f]" data-skill-examples>{discovery.examples} · {skill.exampleCount}<ArrowRight size={12} aria-hidden="true" /></Link>}
                 </div>
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border bg-background/45 px-5 py-3">
-                  <span title={c.repoStars} className="inline-flex items-center gap-1.5 font-mono text-sm"><Star size={14} aria-hidden="true" />{stars(skill.stats.stars)}<span className="text-[10px] text-secondary">GitHub</span></span>
+                  {skill.provider ? <a href={skill.provider.sourceHref} target="_blank" rel={skill.provider.sourceRel} className="inline-flex min-h-10 items-center gap-1 text-xs text-[#006b4f]">{locale === 'zh' ? '前往' : 'Get on'} {skill.provider.label} ↗</a> : <span title={c.repoStars} className="inline-flex items-center gap-1.5 font-mono text-sm"><Star size={14} aria-hidden="true" />{stars(skill.stats.stars)}<span className="text-[10px] text-secondary">GitHub</span></span>}
                   <div className="flex items-center gap-4 text-xs">
-                    <button type="button" aria-pressed={compareSlugs.includes(skill.slug)} onClick={() => toggleCompare(skill.slug)}
-                      className="min-h-10 text-secondary hover:text-[#006b4f]">{compareSlugs.includes(skill.slug) ? c.selected : c.compare}</button>
+                    {!skill.provider && <button type="button" aria-pressed={compareSlugs.includes(skill.slug)} onClick={() => toggleCompare(skill.slug)}
+                      className="min-h-10 text-secondary hover:text-[#006b4f]">{compareSlugs.includes(skill.slug) ? c.selected : c.compare}</button>}
                     <Link prefetch={false} href={`/skills/${skill.slug}${locale === 'en' ? '' : '?lang=' + locale}`}
                       onClick={() => trackAnalyticsEvent('directory_skill_open', { skill_slug: skill.slug, mode: props.catalogMode ? 'catalog' : query ? 'search' : 'selected', position: rankOffset + skills.indexOf(skill) + 1 })}
                       aria-label={`${c.details}: ${skill.name}`} className="inline-flex min-h-10 items-center gap-1 text-[#006b4f]">{c.details}<ArrowRight size={14} aria-hidden="true" /></Link>
@@ -465,7 +468,6 @@ export function SkillsPageClient(props: Props) {
         </section>
         </div>
 
-        {props.externalDiscovery}
         {!query && directorySections.length > 0 && <section className="mt-16 border-t border-border pt-8" aria-labelledby="directory-collections">
           <h2 id="directory-collections" className="font-display text-3xl">{c.collections}</h2>
           <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2">

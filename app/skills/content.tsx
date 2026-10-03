@@ -7,8 +7,8 @@ import { getDirectoryProfiles } from '@/lib/skills/directory-profiles'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsWithStatus } from '@/lib/db/skills'
 import { getShowcasesForSkill, getShowcaseCardData, SHOWCASE_SKILL_SLUGS } from '@/lib/showcase'
-import { SkillsPageClient } from '@/components/skills-page-client'
-import { ExternalSkillResults } from '@/components/external-skills'
+import { SkillsPageClient, type DirectorySkillCard } from '@/components/skills-page-client'
+import { selectProviderSkills, toProviderDirectorySkill, providerCatalogWindow, mergeProviderCatalogPage, providerRowsFirst } from '@/lib/skills/provider-directory'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillSupplyProfile, getSupplyTrackSummaries } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
@@ -674,7 +674,7 @@ function toSkillsPageSkill({
   }
 }
 
-type SkillsPageSkill = ReturnType<typeof toSkillsPageSkill>
+type SkillsPageSkill = DirectorySkillCard
 
 interface DirectorySkill {
   slug: string
@@ -925,6 +925,9 @@ export default async function SkillsPage({
   const hasHighIntentFilter = Boolean(useCase !== 'all' || platform !== 'all' || supplyTrack !== 'all')
   const baseLimit = hasHighIntentFilter ? SEARCH_SKILL_CANDIDATE_LIMIT : BASE_SKILL_CANDIDATE_LIMIT
   const candidateLimit = Math.min(baseLimit + requestedPageOffset, MAX_SKILL_CANDIDATE_LIMIT)
+  const providerSkills = selectProviderSkills({ query, category, topic, output, pricing, examplesOnly,
+    platform, quality, trust, safety, supplyTrack, minStars, useCase }).map(entry => toProviderDirectorySkill(entry, locale))
+  const catalogWindow = providerCatalogWindow(requestedPageOffset, providerSkills.length, sort)
   const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured] = await Promise.all([
     query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
       : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, featured, minStars, pricing, topic, output), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
@@ -933,7 +936,7 @@ export default async function SkillsPage({
     Promise.resolve(SKILL_CATEGORIES.map(c => c[0])),
     withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
-    catalogMode ? getSkillCatalogPage(sort, category, page, minStars, pricing, examplesOnly ? SHOWCASE_SKILL_SLUGS : null, topic, output)
+    catalogMode ? getSkillCatalogPage(sort, category, page, minStars, pricing, examplesOnly ? SHOWCASE_SKILL_SLUGS : null, topic, output, catalogWindow)
       .then(result => ({ ...result, degraded: false }))
       .catch(() => ({
         records: canShowCatalogSnapshot(page, category, minStars, pricing) && topic === 'all' && output === 'all'
@@ -1022,7 +1025,7 @@ export default async function SkillsPage({
     filteredRecords = sortDirectoryCandidates(filteredRecords, sort)
   }
 
-  const resultCount = catalogMode ? catalogResult!.total : filteredRecords.length
+  let resultCount = catalogMode ? catalogResult!.total : filteredRecords.length
   const visibleRecords = catalogMode ? filteredRecords : filteredRecords.slice(pageOffset, pageOffset + VISIBLE_SKILL_LIMIT)
   // Never replace a healthy ISR directory with an empty outage fallback. A
   // regeneration error retains the previous page; a cold build must retry/fail.
@@ -1031,12 +1034,20 @@ export default async function SkillsPage({
     throw new Error('Public directory temporarily unavailable; refusing to cache an empty fallback')
   }
   const hasPreviousResults = effectivePage > 1
-  const hasMoreResults = catalogMode ? catalogResult!.hasMore : resultCount > pageOffset + visibleRecords.length
+  let hasMoreResults = catalogMode ? catalogResult!.hasMore : resultCount > pageOffset + visibleRecords.length
 
-  const skills = visibleRecords.map(item => {
+  let skills: DirectorySkillCard[] = (catalogMode ? visibleRecords : filteredRecords).map(item => {
     const examples = getShowcasesForSkill(item.record.slug)
     return { ...toSkillsPageSkill(item), exampleCount: examples.length, preview: examples[0] ? getShowcaseCardData(examples[0]) : null }
   })
+  if (catalogMode) {
+    const merged = mergeProviderCatalogPage(skills, providerSkills, degraded ? skills.length : catalogResult!.total, pageOffset, sort)
+    skills = merged.items; resultCount = merged.total; hasMoreResults = !degraded && merged.hasMore
+  } else {
+    const combined = providerRowsFirst(sort) ? [...providerSkills, ...skills] : [...skills, ...providerSkills]
+    resultCount = combined.length; skills = combined.slice(pageOffset, pageOffset + VISIBLE_SKILL_LIMIT)
+    hasMoreResults = pageOffset + VISIBLE_SKILL_LIMIT < resultCount
+  }
   const directorySections = catalogMode ? [] : buildDirectorySections(
     enrichedRecords.slice(0, DIRECTORY_SECTION_SOURCE_LIMIT)
   )
@@ -1056,7 +1067,6 @@ export default async function SkillsPage({
           key === '_rsc' || (key === 'lang' && locale !== defaultLocale) || value === undefined
             ? [] : (Array.isArray(value) ? value : [value]).map(item => [key, item])
         )).toString()}
-        externalDiscovery={<ExternalSkillResults query={query} locale={locale} />}
         skills={skills}
         query={query}
         sort={sort}

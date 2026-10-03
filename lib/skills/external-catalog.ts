@@ -59,6 +59,12 @@ const SkillrySchema = RedSkillSchema.extend({
   examples: z.array(z.object({ title: localized, description: localized }).strict()).length(0),
   runtimeDemo: z.undefined().optional(),
   outputType: z.enum(['image', 'presentation', 'html']),
+  previewImages: z.array(z.string().url().refine(value => {
+    const url = new URL(value)
+    return url.origin === 'https://skillry.dev' && !url.username && !url.password && !url.hash &&
+      /^\/skills\/bs-[a-z0-9-]+\/media\/preview-\d+\.webp$/.test(url.pathname) &&
+      [...url.searchParams.keys()].every(key => key === 'v' || key === 'variant') && url.searchParams.get('variant') === 'detail'
+  }, 'Use an original public Skillry example image.')).min(1).max(16),
   listingEvidence: z.object({
     featured: z.literal(true), priceUsdCents: z.literal(0),
     observedAt: z.string().datetime(), sourcePageSha256: z.string().regex(/^[a-f0-9]{64}$/),
@@ -129,11 +135,11 @@ export const EXTERNAL_SKILLS = validateExternalCatalog([
   },
 ])
 
-export function externalSkillHref(slug: string) { return `/skills/external/${slug}` }
+export function externalSkillHref(slug: string) { return `/skills/${slug}` }
 export function getExternalSkill(slug: string) { return EXTERNAL_SKILLS.find(entry => entry.slug === slug) }
 // Reject unknown external pages before streaming starts, preserving a real 404.
 export function isMissingExternalSkillPath(pathname: string) {
-  const match = pathname.match(/^\/skills\/external\/([^/]+)\/?$/)
+  const match = pathname.match(/^\/skills\/(?:external\/)?((?:skillry-|redskill-)[^/]+)\/?$/) || pathname.match(/^\/skills\/external\/([^/]+)\/?$/)
   if (!match) return false
   try { return !getExternalSkill(decodeURIComponent(match[1])) } catch { return true }
 }
@@ -156,7 +162,8 @@ export function externalSkillDiscoveryRecord(entry: ExternalSkill) {
     version_source: entry.provider === 'skillry'
       ? 'Skillry public product page observed at publication; not automatically synchronized'
       : 'RedSkill bundle manifest observed at publication; not automatically synchronized',
-    ...(entry.provider === 'skillry' ? { output_type: entry.outputType, listing_evidence: entry.listingEvidence } : {}),
+    ...(entry.provider === 'skillry' ? { output_type: entry.outputType, listing_evidence: entry.listingEvidence,
+      examples: entry.previewImages.map(src => ({ image_url: src, source_url: entry.sourceUrl, attribution: 'Skillry', runtime_verified: false })) } : {}),
     bundle_sha256: entry.bundleSha256, license: entry.license, license_note: entry.licenseNote.en,
     commercial_use: entry.commercialUse, publication_channel: entry.publication.channel,
     ai_reviewed: false, runtime_verified: false, auto_install_allowed: false,

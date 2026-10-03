@@ -3,17 +3,15 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { EXTERNAL_SKILLS, externalSkillHref, getExternalSkill } from '@/lib/skills/external-catalog'
+import { externalSkillHref, getExternalSkill } from '@/lib/skills/external-catalog'
 import { externalSourceHref, externalSourceRel } from '@/lib/skills/external-outbound'
-import { externalOutputLabels } from '@/components/external-skills'
+import Image from 'next/image'
+import { SkillActions, SkillEngagementProvider } from '@/components/skill-engagement'
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ lang?: string | string[] }> }
 const base = 'https://www.openagentskill.com'
-// Catalog releases define the route set. The proxy also rejects unknown entries
-// before streaming, since this page reads dynamic language parameters.
-export const dynamicParams = false
-export function generateStaticParams() { return EXTERNAL_SKILLS.map(({ slug }) => ({ slug })) }
-export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+const externalOutputLabels = { image: { en: 'Images', zh: '图像' }, presentation: { en: 'Presentations', zh: '演示文稿' }, html: { en: 'Web & HTML', zh: '网页与 HTML' } }
+export async function buildCatalogSkillMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const entry = getExternalSkill((await params).slug)
   if (!entry) return { title: 'External skill not found', robots: { index: false, follow: false } }
   const query = await searchParams
@@ -21,19 +19,18 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const url = base + externalSkillHref(entry.slug)
   return {
     title: entry.title[lang], description: entry.description[lang],
-    alternates: { canonical: url }, robots: { index: !query.lang, follow: true },
+    alternates: { canonical: url }, robots: { index: Object.keys(query).length === 0, follow: true },
     openGraph: { type: 'website', title: entry.title[lang], description: entry.description[lang], url,
       ...(entry.runtimeDemo ? { images: [{ url: base + entry.runtimeDemo.poster, width: 1280, height: 720, alt: entry.title[lang] }] } : {}) },
     twitter: { card: entry.runtimeDemo ? 'summary_large_image' : 'summary', title: entry.title[lang], description: entry.description[lang],
       ...(entry.runtimeDemo ? { images: [base + entry.runtimeDemo.poster] } : {}) },
   }
 }
-export default async function ExternalSkillPage({ params, searchParams }: Props) {
+export default async function CatalogSkillContent({ params, searchParams }: Props) {
   const entry = getExternalSkill((await params).slug)
   if (!entry) notFound()
   const zh = (await searchParams).lang === 'zh'
   const lang = zh ? 'zh' : 'en'
-  const suffix = zh ? '?lang=zh' : ''
   const url = base + externalSkillHref(entry.slug)
   const demo = entry.runtimeDemo
   const skillry = entry.provider === 'skillry'
@@ -47,8 +44,7 @@ export default async function ExternalSkillPage({ params, searchParams }: Props)
             : { author: { '@type': 'Person', name: entry.author.name, url: entry.author.url } }), url: entry.sourcePostUrl } },
       { '@type': 'BreadcrumbList', itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Skills', item: base + '/skills' },
-        { '@type': 'ListItem', position: 2, name: 'External Skills', item: base + '/skills/external' },
-        { '@type': 'ListItem', position: 3, name: entry.title[lang], item: url },
+        { '@type': 'ListItem', position: 2, name: entry.title[lang], item: url },
       ] },
       ...(demo ? [{ '@type': 'VideoObject', '@id': url + '#runtime-demo',
         name: `${entry.title[lang]} — ${zh ? '本地实测录像' : 'Local runtime recording'}`,
@@ -63,11 +59,11 @@ export default async function ExternalSkillPage({ params, searchParams }: Props)
   }
   return <div className="min-h-screen bg-background text-foreground">
     <SiteHeader />
-    <main className="mx-auto max-w-6xl px-6 pb-20 pt-10" lang={lang} data-external-skill={entry.slug}>
+    <main className="mx-auto max-w-6xl px-6 pb-20 pt-10" lang={lang} data-catalog-skill={entry.slug}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <nav aria-label={zh ? '面包屑导航' : 'Breadcrumb'} className="flex flex-wrap gap-3 text-sm text-secondary">
         <Link href={zh ? '/zh/skills' : '/skills'}>{zh ? '技能' : 'Skills'}</Link><span>/</span>
-        <Link href={`/skills/external${suffix}`}>{zh ? '外部平台' : 'External platforms'}</Link><span>/ {provider}</span>
+        <span>{entry.title[lang]}</span>
       </nav>
       <header className="border-b border-border py-12 sm:py-16">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#006b4f]">{provider} / {output} / {zh ? '站长收录' : 'Owner curated'}</p>
@@ -75,11 +71,25 @@ export default async function ExternalSkillPage({ params, searchParams }: Props)
         <p className="mt-6 max-w-3xl text-base leading-8 text-secondary sm:text-lg">{entry.description[lang]}</p>
         <p className="mt-5 text-sm">{skillry ? (zh ? '发布平台' : 'Published on') : (zh ? '作者' : 'By')} <a href={externalSourceHref(entry.author.url)} target="_blank" rel={externalSourceRel(entry.author.url)} className="underline underline-offset-4">{entry.author.name} ↗</a></p>
         <div className="mt-6 flex flex-wrap items-center gap-4">
+          <SkillEngagementProvider slugs={[entry.slug]} untrackedSlugs={[entry.slug]}><SkillActions slug={entry.slug} name={entry.title[lang]} /></SkillEngagementProvider>
           <a href={externalSourceHref(entry.sourceUrl)} target="_blank" rel={externalSourceRel(entry.sourceUrl)} className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white hover:bg-[#00533d]">{skillry ? (zh ? '在 Skillry 获取' : 'Get on Skillry') : (zh ? '打开作者原帖' : 'Open the author’s post')} ↗</a>
           <p className="text-xs text-secondary">{skillry ? (zh ? '收录时免费 · 未运行验证' : 'Free at listing · Not runtime-verified') : demo ? (zh ? '仅限非商业用途 · 附本地实测录像' : 'Noncommercial use only · Local runtime recording') : (zh ? '仅限非商业用途 · 未运行验证' : 'Noncommercial use only · Not runtime-verified')}</p>
         </div>
       </header>
-      {demo && <section className="border-b border-border py-10 sm:py-12" aria-labelledby="runtime-heading">
+      {skillry && <section id="showcase" className="scroll-mt-24 border-b border-border py-10" aria-labelledby="source-examples">
+        <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
+          <h2 id="source-examples" className="font-display text-3xl">{zh ? '案例预览' : 'Example previews'}</h2>
+          <a href={externalSourceHref(entry.sourceUrl)} target="_blank" rel={externalSourceRel(entry.sourceUrl)} className="inline-flex min-h-11 items-center text-sm text-[#006b4f] underline underline-offset-4">{zh ? '在 Skillry 查看案例' : 'View examples on Skillry'} ↗</a>
+        </div>
+        <p className="mb-6 text-sm leading-7 text-secondary">{zh ? 'Skillry 原站公开案例，图片从原站加载。本站未执行技能，原始提示词、模型和制作耗时未核实。' : 'Public examples from Skillry, loaded from the source. We have not run the skill or verified the original prompts, model or production time.'}</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {entry.previewImages.map((src, index) => <figure key={src} className="min-w-0 overflow-hidden rounded-xl border border-border bg-card">
+            <div className="relative aspect-video"><Image src={src} alt={`${entry.title[lang]} — ${zh ? '原站案例' : 'source example'} ${index + 1}`} fill unoptimized sizes="(max-width: 639px) 100vw, 560px" className="object-contain" /></div>
+            <figcaption className="px-4 py-3 text-xs text-secondary">Skillry · {zh ? '原站案例' : 'Source example'} {index + 1}</figcaption>
+          </figure>)}
+        </div>
+      </section>}
+      {demo && <section id="showcase" className="scroll-mt-24 border-b border-border py-10 sm:py-12" aria-labelledby="runtime-heading">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div><p className="font-mono text-xs uppercase tracking-[0.18em] text-[#006b4f]">{zh ? '本地实测 · 非模拟效果' : 'Local runtime · Actual output'}</p>
             <h2 id="runtime-heading" className="mt-3 font-display text-3xl sm:text-4xl">{zh ? '先看效果，再开始创作。' : 'See it run. Then make it yours.'}</h2></div>

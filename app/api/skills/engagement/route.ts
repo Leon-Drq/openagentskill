@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { withTimeout } from '@/lib/async'
 import { normalizeEngagementSlugs, type SkillEngagementMap } from '@/lib/skill-engagement'
+import { getExternalSkill } from '@/lib/skills/external-catalog'
 
 const headers = { 'Cache-Control': 'private, no-store', Vary: 'Cookie' }
 const json = (body: unknown, status = 200) => NextResponse.json(body, { status, headers })
@@ -13,11 +14,15 @@ const mutation = z.union([
   z.object({ slug: z.string().min(1).max(200), saved: z.boolean() }).strict(),
 ])
 async function counts(slugs: string[]) {
-  const { data, error } = await createAdminClient({ requestTimeoutMs: 8000 }).rpc('skill_vote_counts', { skill_slugs: slugs })
-  if (error) throw error
-  return data as { skill_slug: string; likes: number; dislikes: number }[]
+  const admin = createAdminClient({ requestTimeoutMs: 8000 })
+  const groups = [slugs.filter(slug => !getExternalSkill(slug)), slugs.filter(slug => getExternalSkill(slug))]
+  const results = await Promise.all(groups.map((group, index) => group.length
+    ? admin.rpc(index ? 'provider_skill_vote_counts' : 'skill_vote_counts', { skill_slugs: group })
+    : Promise.resolve({ data: [], error: null })))
+  for (const result of results) if (result.error) throw result.error
+  return results.flatMap(result => result.data || []) as { skill_slug: string; likes: number; dislikes: number }[]
 }
-const publicCounts = unstable_cache(counts, ['skill-public-votes-v1'], { revalidate: 60, tags: ['public-skill-votes'] })
+const publicCounts = unstable_cache(counts, ['skill-public-votes-v2'], { revalidate: 60, tags: ['public-skill-votes'] })
 
 export async function GET(request: NextRequest) {
   const slugs = normalizeEngagementSlugs((request.nextUrl.searchParams.get('slugs') || '').split(','))
@@ -33,15 +38,19 @@ export async function GET(request: NextRequest) {
       likes: Number(row.likes), dislikes: Number(row.dislikes), vote: null, saved: false,
     }]))
     if (signedIn && user && totals.length) {
-      const visible = totals.map(row => row.skill_slug)
-      const [votes, bookmarks] = await Promise.all([
-        supabase.from('skill_votes').select('skill_slug,vote').eq('user_id', user.id).in('skill_slug', visible).abortSignal(AbortSignal.timeout(8000)),
-        supabase.from('bookmarks').select('skill_slug').eq('user_id', user.id).in('skill_slug', visible).abortSignal(AbortSignal.timeout(8000)),
+      const visible = totals.map(row => row.skill_slug).filter(slug => !getExternalSkill(slug))
+      const providers = totals.map(row => row.skill_slug).filter(slug => getExternalSkill(slug))
+      const [votes, bookmarks, providerStats] = await Promise.all([
+        visible.length ? supabase.from('skill_votes').select('skill_slug,vote').eq('user_id', user.id).in('skill_slug', visible).abortSignal(AbortSignal.timeout(8000)) : { data: [], error: null },
+        visible.length ? supabase.from('bookmarks').select('skill_slug').eq('user_id', user.id).in('skill_slug', visible).abortSignal(AbortSignal.timeout(8000)) : { data: [], error: null },
+        providers.length ? supabase.from('provider_skill_engagement').select('skill_slug,vote,saved').eq('user_id', user.id).in('skill_slug', providers).abortSignal(AbortSignal.timeout(8000)) : { data: [], error: null },
       ])
       if (votes.error) throw votes.error
       if (bookmarks.error) throw bookmarks.error
+      if (providerStats.error) throw providerStats.error
       votes.data.forEach(row => { if (stats[row.skill_slug]) stats[row.skill_slug].vote = row.vote })
       bookmarks.data.forEach(row => { if (stats[row.skill_slug]) stats[row.skill_slug].saved = true })
+      providerStats.data.forEach(row => { if (stats[row.skill_slug]) { stats[row.skill_slug].vote = row.vote; stats[row.skill_slug].saved = row.saved } })
     }
     return json({ signedIn, stats })
   } catch { return json({ error: 'engagement_unavailable' }, 503) }
@@ -63,6 +72,17 @@ export async function PUT(request: NextRequest) {
     const { data: { user }, error } = await withTimeout(supabase.auth.getUser(), 8000, 'skill engagement account')
     if (error && error.name !== 'AuthSessionMissingError' && error.status !== 401) throw error
     if (!user || user.is_anonymous) return json({ error: 'sign_in_required' }, 401)
+    if (getExternalSkill(body.slug)) {
+      const result = await withTimeout(supabase.rpc('set_provider_skill_engagement', {
+        target_slug: body.slug, intent: 'vote' in body ? 'vote' : 'save',
+        direction: 'vote' in body ? body.vote : null, target_saved: 'saved' in body ? body.saved : null,
+      }), 8000, 'provider skill interaction')
+      if (result.error) throw result.error
+      if ('saved' in body) return json({ slug: body.slug, saved: body.saved })
+      revalidateTag('public-skill-votes', { expire: 0 })
+      const totals = await counts([body.slug])
+      return json({ slug: body.slug, vote: body.vote, likes: Number(totals[0]?.likes ?? 0), dislikes: Number(totals[0]?.dislikes ?? 0) })
+    }
     const visible = await supabase.from('skills').select('slug').eq('slug', body.slug).abortSignal(AbortSignal.timeout(8000)).maybeSingle()
     if (visible.error) throw visible.error
     if (!visible.data) return json({ error: 'skill_not_found' }, 404)
