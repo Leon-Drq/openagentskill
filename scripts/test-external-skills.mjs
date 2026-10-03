@@ -23,12 +23,18 @@ for (const item of skillryEntries) {
   assert.equal(item.listingEvidence.priceUsdCents, 0)
   assert.equal(item.listingEvidence.featured, true)
   assert.equal(item.bundleSha256, null, 'Public page checksum is not a package checksum')
-  assert.equal(item.examples.length, 0, 'No unlicensed previews or invented runtime evidence')
+  assert.equal(item.examples.length, 0, 'Preview metadata never invents execution evidence')
   const data = externalSkillDiscoveryRecord(item)
   assert.equal(data.author, null, 'The provider is not an identified individual author')
   assert.equal(data.publisher.name, 'Skillry')
   assert.equal(data.install_command, null)
   assert.equal(data.runtime_demo, null)
+  assert.equal(data.examples.length, item.previewImages.length)
+  for (const example of data.examples) {
+    assert.equal(example.attribution, 'Skillry')
+    assert.equal(example.runtime_verified, false)
+    assert.equal(new URL(example.image_url).origin, 'https://skillry.dev')
+  }
   assert.equal(data.ai_reviewed, false)
   assert.equal(data.source_url, item.sourceUrl)
   assert.equal(new URL(data.source_url).search, '', 'Source evidence stays canonical')
@@ -37,6 +43,8 @@ for (const item of skillryEntries) {
   assert.equal(externalSourceRel(item.sourceUrl), 'sponsored noopener noreferrer')
   for (const changes of [
     { aiReviewed: true }, { runtimeVerified: true }, { autoInstallAllowed: true },
+    { previewImages: [] }, { previewImages: ['https://example.com/image.webp'] },
+    { previewImages: [item.previewImages[0] + '&token=secret'] },
     { sourceUrl: `${item.sourceUrl}?via=openagentskill` }, { sourceUrl: 'https://example.com/skill' },
     { bundleSha256: 'a'.repeat(64) }, { license: 'MIT' }, { runtimeDemo: {} },
     { listingEvidence: { ...item.listingEvidence, priceUsdCents: 100 } },
@@ -65,7 +73,7 @@ for (const query of ['p5.js', 'p5js', '雨帘', '花枝', '飞燕', '流白Livo'
 assert.equal(searchExternalSkills('unrelated finance').length, 0)
 assert.equal(getExternalSkill('missing'), undefined)
 for (const path of ['/skills', '/skills/external', `/skills/external/${entry.slug}`, `/skills/external/${entry.slug}/`]) assert.equal(isMissingExternalSkillPath(path), false)
-for (const path of ['/skills/external/missing', '/skills/external/%GG']) assert.equal(isMissingExternalSkillPath(path), true)
+for (const path of ['/skills/skillry-missing', '/skills/redskill-missing', '/skills/external/missing', '/skills/external/%GG']) assert.equal(isMissingExternalSkillPath(path), true)
 assert.equal(searchExternalSkills('').length, EXTERNAL_SKILLS.length)
 assert.throws(() => validateExternalCatalog([entry, entry]), /Duplicate/)
 for (const changes of [
@@ -92,7 +100,7 @@ assert.equal(externalSkillDiscoveryRecord({ ...entry, runtimeDemo: undefined }).
 for (const changes of [{ video: '//example.com/a.mp4' }, { poster: '/media/external/../a.webp' }, { displayPermission: 'assumed' }, { durationSeconds: -1 }]) {
   assert.equal(ExternalSkillSchema.safeParse({ ...entry, runtimeDemo: { ...entry.runtimeDemo, ...changes } }).success, false)
 }
-assert.match(record.url, /\/skills\/external\//)
+assert.equal(record.url, 'https://www.openagentskill.com/skills/' + entry.slug)
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
 assert.match(read('proxy.ts'), /isMissingExternalSkillPath\(pathname\)/)
 const route = read('app/api/external-skills/[slug]/route.ts')
@@ -108,18 +116,21 @@ assert.equal(response.status, 200)
 assert.equal((await response.json()).auto_install_allowed, false)
 assert.equal(response.headers.get('x-robots-tag'), 'noindex')
 assert.equal((await routeExports.GET(new Request('https://example.com'), { params: Promise.resolve({ slug: 'missing' }) })).status, 404)
-const page = read('app/skills/external/[slug]/page.tsx')
+const page = read('components/catalog-skill-content.tsx')
 assert.match(page, /notFound\(\)/)
-assert.match(page, /export const dynamicParams = false/)
+assert.match(page, /<section id="showcase"/)
 assert.match(page, /alternates: \{ canonical: url \}/)
 assert.doesNotMatch(page, /aggregateRating|install_command|<iframe|<img|autoPlay/)
 assert.match(page, /<video controls playsInline preload="none"/)
 assert.match(page, /'@type': 'VideoObject'/)
 assert.match(page, /aria-describedby="runtime-caption"/)
 for (const lang of ['en', 'zh']) assert.match(read(`public/media/external/p5-animation/captions-${lang}.vtt`), /^WEBVTT/)
-assert.match(read('app/skills/content.tsx'), /externalDiscovery=\{<ExternalSkillResults query=\{query\}/)
+assert.match(read('app/skills/content.tsx'), /mergeProviderCatalogPage/)
 assert.match(read('lib/seo/sitemap.ts'), /EXTERNAL_SKILLS\.map/)
 for (const path of ['lib/skills/owner-publication.ts', 'app/api/admin/skills/publish/route.ts']) {
   assert.doesNotMatch(read(path), /EXTERNAL_SKILLS|external-catalog/, 'GitHub owner lane unchanged')
 }
 console.log('External skill catalog, safe links, licensing, discovery and publication boundaries passed.')
+
+assert.match(read('next.config.mjs'), /source: '\/skills\/external\/:slug', destination: '\/skills\/:slug', permanent: true/)
+assert.doesNotMatch(read('components/catalog-skill-content.tsx'), /name: 'External Skills'/)

@@ -54,7 +54,7 @@ const mocks = {
 }
 const sitemap = compile('lib/seo/sitemap.ts', mocks)
 const core = sitemap.getCoreSitemapEntries()
-assert.equal(core.filter(p => p.url.endsWith('/skills/external/redskill-curtain-branch-swallow')).length, 1)
+assert.equal(core.filter(p => p.url.endsWith('/skills/redskill-curtain-branch-swallow')).length, 1)
 assert.equal(core.find(p => p.url.endsWith('/about')).lastModified, undefined)
 assert.equal(core.find(p => p.url.endsWith('/showcase/example')).lastModified, '2026-09-01')
 assert.equal(sitemap.getGuideSitemapEntries().find(p => p.url.endsWith(videoGuide.slug)).lastModified, videoGuide.updatedAt)

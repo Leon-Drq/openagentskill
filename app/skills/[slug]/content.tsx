@@ -48,6 +48,8 @@ import { CreatorBadgeKit } from '@/components/creator-badge-kit'
 import { SkillFeedbackPanel } from '@/components/skill-feedback-panel'
 import { SkillAttributionPanel } from '@/components/skill-attribution-panel'
 import { OwnerPublicationNote } from '@/components/owner-publication-note'
+import CatalogSkillContent, { buildCatalogSkillMetadata } from '@/components/catalog-skill-content'
+import { getExternalSkill } from '@/lib/skills/external-catalog'
 
 // Shared renderer; cache policy belongs to the public/query route wrappers.
 const SKILL_DETAIL_SUPPORT_TIMEOUT_MS = 1200
@@ -101,6 +103,7 @@ export async function generateMetadata({
   searchParams?: Promise<Record<string, string | string[] | undefined>>
 }): Promise<Metadata> {
   const { slug } = await params
+  if (getExternalSkill(slug)) return buildCatalogSkillMetadata({ params: Promise.resolve({ slug }), searchParams: searchParams || Promise.resolve({}) })
   const dbSkill = await getCachedSkillBySlug(slug)
   const skill = dbSkill ? convertSkillRecordToManifest(dbSkill) : null
   if (!dbSkill || !skill) notFound()
@@ -173,6 +176,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
   const { slug } = await params
   const { lang } = await searchParams
   const initialLocale = getLocaleFromSearchParam(lang) || undefined
+  if (getExternalSkill(slug)) return <CatalogSkillContent params={Promise.resolve({ slug })} searchParams={Promise.resolve({ lang })} />
   const dbSkill = await getCachedSkillBySlug(slug)
   if (!dbSkill) notFound()
   const skill = { ...convertSkillRecordToManifest(dbSkill), category: skillPresentationCategory(dbSkill) }

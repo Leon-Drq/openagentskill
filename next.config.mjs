@@ -18,6 +18,8 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      { source: '/skills/external/:slug', destination: '/skills/:slug', permanent: true },
+      { source: '/skills/external', destination: '/skills', permanent: true },
       {
         source: '/topics/mysticism',
         destination: '/use-cases/mysticism',

@@ -5,7 +5,7 @@ const { EXTERNAL_SKILLS } = await import('../lib/skills/external-catalog.ts')
 
 const base = process.argv[2] || 'http://localhost:3114'
 const slug = 'redskill-curtain-branch-swallow'
-const path = `/skills/external/${slug}`
+const path = `/skills/${slug}`
 const get = (suffix, options = {}) => fetch(base + suffix, { ...options, signal: AbortSignal.timeout(20000) })
 for (const lang of ['', '?lang=zh']) {
   const response = await get(path + lang)
@@ -27,7 +27,7 @@ for (const lang of ['', '?lang=zh']) {
   assert.match(html, /<video[^>]+preload="none"/)
   assert.match(html, /<track[^>]+srcLang="zh"/i)
 }
-assert.equal((await get('/skills/external/unknown-entry')).status, 404)
+assert.equal((await get('/skills/skillry-unknown-entry')).status, 404)
 const api = `/api/external-skills/${slug}`
 const data = await (await get(api)).json()
 assert.equal(data.auto_install_allowed, false)
@@ -50,7 +50,7 @@ assert.ok(sitemap.includes(`https://www.openagentskill.com${path}</loc>`))
 const skillry = EXTERNAL_SKILLS.filter(entry => entry.provider === 'skillry')
 assert.equal(skillry.length, 8)
 for (const entry of skillry) {
-  const detailPath = `/skills/external/${entry.slug}`
+  const detailPath = `/skills/${entry.slug}`
   const metadata = await (await get(`/api/external-skills/${entry.slug}`)).json()
   assert.equal(metadata.bundle_sha256, null)
   assert.equal(metadata.source_url, entry.sourceUrl)
@@ -73,10 +73,27 @@ for (const entry of skillry) {
     assert.equal(work.url, entry.sourceUrl)
     assert.equal(work.version, entry.version)
     assert.ok(!graphs.some(item => item['@type'] === 'VideoObject'))
+    assert.ok(html.includes('id="showcase"'))
+    for (const src of entry.previewImages) assert.ok(html.includes(src.replaceAll('&', '&amp;')), src)
   }
   assert.ok(sitemap.includes(`https://www.openagentskill.com${detailPath}</loc>`))
 }
-const selected = await (await get('/skills/external?q=Skillry')).text()
-for (const entry of skillry) assert.ok(selected.includes(`/skills/external/${entry.slug}`))
+const selected = await (await get('/skills?q=Skillry&examples=true')).text()
+for (const entry of skillry) assert.ok(selected.includes(`/skills/${entry.slug}`))
 assert.ok(!selected.includes(path), 'Search excludes unrelated RedSkill listing')
 console.log(`External listing smoke passed at ${base}: EN/ZH SSR, metadata, JSON-LD, HTTP 404, search, sitemap, read-only API.`)
+
+for (const suffix of ['', '/skillry-grokbot-avatar?lang=zh']) {
+  const response = await get('/skills/external' + suffix, {redirect: 'manual'})
+  assert.equal(response.status, 308)
+  assert.equal(new URL(response.headers.get('location'), base).pathname, '/skills' + suffix.split('?')[0])
+  if (suffix) assert.equal(new URL(response.headers.get('location'),base).searchParams.get('lang'), 'zh')
+}
+assert.ok(!sitemap.includes('/skills/external'))
+const engagement = await get('/api/skills/engagement?slugs=' + skillry.map(e=>e.slug).join(','))
+if (new URL(base).hostname !== 'localhost' || engagement.status !== 503) {
+  assert.equal(engagement.status,200)
+  const body = await engagement.json()
+  assert.equal(body.signedIn,false)
+  for (const entry of skillry) assert.ok(body.stats[entry.slug] && body.stats[entry.slug].saved === false)
+}

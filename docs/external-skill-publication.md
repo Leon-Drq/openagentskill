@@ -27,10 +27,10 @@ infer ownership certification from a supplied author name or a package checksum.
 
 ## Discovery and boundaries
 
-- `/skills/external` lists and searches external entries.
-- `/skills/external/[slug]` presents original editorial descriptions and source links.
-- `/skills?q=...` shows matching external entries in a separate labeled section;
-  the GitHub compatibility/score filters and counts do not apply to that section.
+- `/skills` lists these entries in the same 16-card grid, category/search/price filters and pagination. Source previews qualify for the With examples filter.
+- `/skills/[slug]` presents original editorial descriptions, source attribution and case previews.
+- Legacy `/skills/external` and `/skills/external/[slug]` permanently redirect to the unified URLs. No external-platform directory remains.
+- Repository score/compatibility filters exclude entries without measured evidence. Provider rows have no invented GitHub stars, compatibility or security approval.
 - `GET /api/external-skills/[slug]` returns read-only discovery metadata with
   `auto_install_allowed=false`, `human_review_required=true`, and no install command.
   Other HTTP methods have no implementation. No secrets or package content are returned.
@@ -105,7 +105,7 @@ Skillry's public terms at https://skillry.dev/terms permit personal/internal bus
 use and commercial generated outputs subject to third-party rights, but restrict
 package redistribution unless separate package terms expressly allow it. These are
 link-only entries with original EN/ZH editorial copy. No packages, descriptions,
-provider previews or remote media are mirrored; no Skill code is executed.
+provider media or packages are mirrored; no Skill code is executed. Public preview URLs are embedded directly, labeled Source example · Skillry, and linked to the original product page.
 Skillry is attributed as the publisher, not an identified individual author.
 
 `external-outbound.ts` applies the owner-provided `via=openagentskill` parameter
@@ -113,3 +113,7 @@ to outbound Skillry links, including product deep links, while preserving clean
 source evidence and our canonical detail URLs. Outbound links use `rel=sponsored`
 with `noopener noreferrer`. This configuration adds no scripts, cookies or
 database queries.
+
+## Unified community interactions
+
+`provider_skill_catalog` allowlists owner-curated slugs for interaction storage only. `provider_skill_engagement` stores each authenticated user’s vote and saved state with user-scoped RLS. It does not insert records into `skills`, alter review gates or modify repository voting foreign keys. Atomic upserts preserve votes when saving and saves when voting. Aggregate counts are server-only, cached for 60 seconds and requested in the existing page-level batch. Provider saves appear alongside registry bookmarks in the profile.

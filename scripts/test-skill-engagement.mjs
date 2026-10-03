@@ -33,6 +33,7 @@ const deps = {
     revalidateTag: (tag, profile) => { assert.equal(tag, 'public-skill-votes'); assert.equal(profile.expire, 0); cache.clear() },
   },
   '@/lib/async': { withTimeout }, '@/lib/skill-engagement': { normalizeEngagementSlugs },
+  '@/lib/skills/external-catalog': { getExternalSkill: () => undefined },
   '@/lib/supabase/server': { createClient: async () => ({
     auth: { getUser: async () => ({ data: { user: user ? { id: user, is_anonymous: user === 'anonymous' } : null }, error: null }) },
     from: query, rpc: async (name, params) => { writes.push({ name, params, user }); return { error: failWrite ? Error('offline') : null } },

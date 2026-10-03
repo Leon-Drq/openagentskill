@@ -19,7 +19,7 @@ The existing renderers and metadata live in adjacent `content.tsx` files. Proxy
 still rewrites query variants of skill details and other localized pages to
 `/render-query/...` wrappers. Direct requests to those internal routes return a
 noindex 404. `_rsc` transport state does not change route or indexing policy.
-Reserved `/skills/new` and `/skills/external` remain untouched.
+Reserved `/skills/new` remains untouched. Legacy `/skills/external` URLs permanently redirect to the unified directory and detail routes.
 
 This is not a public CDN header override on an authenticated response. Public
 pages do not read sessions. `/profile`, claim and points session refresh remain
