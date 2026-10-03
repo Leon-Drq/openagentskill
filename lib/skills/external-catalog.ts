@@ -1,4 +1,6 @@
 import { z } from 'zod'
+import { SKILLRY_LISTINGS } from './skillry-catalog'
+import { externalSourceHref } from './external-outbound'
 
 // Editorial metadata only. Never mirror bundles or turn these records into
 // GitHub SkillRecords: external discovery is not installation authorization.
@@ -7,7 +9,7 @@ const httpsUrl = z.string().url().refine(value => {
   return url.protocol === 'https:' && !url.username && !url.password && !url.search && !url.hash
 }, 'Use a stable HTTPS URL without credentials or signed query parameters.')
 const localized = z.object({ en: z.string().min(1), zh: z.string().min(1) }).strict()
-export const ExternalSkillSchema = z.object({
+const RedSkillSchema = z.object({
   slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   provider: z.literal('redskill'),
   identifier: z.string().regex(/^skill-[a-z0-9-]+$/),
@@ -44,17 +46,38 @@ export const ExternalSkillSchema = z.object({
   aiReviewed: z.literal(false),
   autoInstallAllowed: z.literal(false),
 }).strict()
+const skillrySourceUrl = httpsUrl.refine(value => /^https:\/\/skillry\.dev\/skills\/bs-[a-z0-9-]+$/.test(value), 'Use the original Skillry product URL.')
+const SkillrySchema = RedSkillSchema.extend({
+  provider: z.literal('skillry'),
+  author: z.object({ name: z.literal('Skillry'), url: z.literal('https://skillry.dev') }).strict(),
+  sourceUrl: skillrySourceUrl,
+  sourcePostUrl: skillrySourceUrl,
+  bundleSha256: z.null(),
+  license: z.literal('Skillry-terms'),
+  licenseUrl: z.literal('https://skillry.dev/terms'),
+  commercialUse: z.literal('outputs-permitted-package-redistribution-restricted'),
+  examples: z.array(z.object({ title: localized, description: localized }).strict()).length(0),
+  runtimeDemo: z.undefined().optional(),
+  outputType: z.enum(['image', 'presentation', 'html']),
+  listingEvidence: z.object({
+    featured: z.literal(true), priceUsdCents: z.literal(0),
+    observedAt: z.string().datetime(), sourcePageSha256: z.string().regex(/^[a-f0-9]{64}$/),
+  }).strict(),
+}).strict()
+export const ExternalSkillSchema = z.discriminatedUnion('provider', [RedSkillSchema, SkillrySchema])
 export type ExternalSkill = z.infer<typeof ExternalSkillSchema>
 
 export function validateExternalCatalog(input: unknown): ExternalSkill[] {
   const entries = z.array(ExternalSkillSchema).parse(input)
-  for (const key of ['slug', 'identifier', 'bundleSha256'] as const) {
-    if (new Set(entries.map(entry => entry[key])).size !== entries.length) throw new Error(`Duplicate external ${key}`)
+  for (const key of ['slug', 'identifier', 'sourceUrl', 'bundleSha256'] as const) {
+    const values = entries.map(entry => entry[key]).filter(value => value !== null)
+    if (new Set(values).size !== values.length) throw new Error(`Duplicate external ${key}`)
   }
   return entries
 }
 
 export const EXTERNAL_SKILLS = validateExternalCatalog([
+  ...SKILLRY_LISTINGS,
   {
     slug: 'redskill-curtain-branch-swallow', provider: 'redskill',
     identifier: 'skill-curtain-branch-swallow', skillName: 'p5-animation',
@@ -117,7 +140,7 @@ export function isMissingExternalSkillPath(pathname: string) {
 export function searchExternalSkills(query = '') {
   const terms = query.normalize('NFKC').toLocaleLowerCase().trim().slice(0, 200).split(/\s+/).filter(Boolean)
   return EXTERNAL_SKILLS.filter(entry => {
-    const haystack = [entry.slug, entry.identifier, entry.skillName, entry.author.name, ...Object.values(entry.title), ...Object.values(entry.description), ...entry.tags].join(' ').normalize('NFKC').toLocaleLowerCase()
+    const haystack = [entry.provider, entry.slug, entry.identifier, entry.skillName, entry.author.name, ...Object.values(entry.title), ...Object.values(entry.description), ...entry.tags].join(' ').normalize('NFKC').toLocaleLowerCase()
     return terms.every(term => haystack.includes(term))
   })
 }
@@ -127,8 +150,13 @@ export function externalSkillDiscoveryRecord(entry: ExternalSkill) {
     type: 'external-platform-skill', slug: entry.slug, name: entry.title.en,
     description: entry.description.en, provider: entry.provider, identifier: entry.identifier,
     url: `https://www.openagentskill.com${externalSkillHref(entry.slug)}`,
-    source_url: entry.sourceUrl, author: entry.author, version: entry.version,
-    version_source: 'RedSkill bundle manifest observed at publication; not automatically synchronized',
+    source_url: entry.sourceUrl, acquisition_url: externalSourceHref(entry.sourceUrl),
+    author: entry.provider === 'skillry' ? null : entry.author,
+    publisher: entry.provider === 'skillry' ? entry.author : null, version: entry.version,
+    version_source: entry.provider === 'skillry'
+      ? 'Skillry public product page observed at publication; not automatically synchronized'
+      : 'RedSkill bundle manifest observed at publication; not automatically synchronized',
+    ...(entry.provider === 'skillry' ? { output_type: entry.outputType, listing_evidence: entry.listingEvidence } : {}),
     bundle_sha256: entry.bundleSha256, license: entry.license, license_note: entry.licenseNote.en,
     commercial_use: entry.commercialUse, publication_channel: entry.publication.channel,
     ai_reviewed: false, runtime_verified: false, auto_install_allowed: false,

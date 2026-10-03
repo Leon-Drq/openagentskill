@@ -1,7 +1,7 @@
 await import('./test-sitemap-recovery.mjs')
 import assert from 'node:assert/strict'
 import './test-external-skills.mjs'
-import * as externalCatalog from '../lib/skills/external-catalog.ts'
+const externalCatalog = await import('../lib/skills/external-catalog.ts')
 import { readFileSync } from 'node:fs'
 import ts from 'typescript'
 import { selectGuideSkills, selectComparisonSkills, scoreSkillForGuide } from '../lib/seo/guide-selection.ts'

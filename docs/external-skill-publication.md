@@ -19,10 +19,10 @@ GitHub repository publications continue to use the CLI in
 [owner-publishing.md](owner-publishing.md). Community submissions, owner tokens,
 Supabase review records and rejected submissions are not changed by this lane.
 
-Required external fields include provider/identifier, author attribution, stable
-source link, version, bundle checksum, license restrictions, explicit owner reason
+Required external fields include provider/identifier, source attribution, stable
+source link, observed version, license restrictions, explicit owner reason
 and false review/runtime/auto-install flags. Runtime validation rejects unknown
-fields, duplicate slugs/identifiers/checksums and non-HTTPS or signed URLs. Do not
+fields, duplicate slugs/identifiers/source URLs/non-null checksums and non-HTTPS or signed URLs. RedSkill records require the observed bundle checksum; link-only Skillry records require a null bundle checksum and public-page evidence. Do not
 infer ownership certification from a supplied author name or a package checksum.
 
 ## Discovery and boundaries
@@ -81,3 +81,35 @@ Do not republish code or create Gallery previews without addressing usage rights
 the existing SEO regression suite. Also run the complete regression suite,
 typecheck and production build. Check English/Chinese detail pages, directory
 search, unknown slug 404, API read-only policy and the core sitemap after deployment.
+
+## Skillry Featured + Free selection
+
+The owner explicitly selected only items marked Free on
+https://skillry.dev/skills?featured=true, not every free product on Skillry.
+Public product pages were checked on 2026-10-03 UTC (2026-10-02 Pacific).
+`lib/skills/skillry-catalog.ts` records each page's SHA-256, observed zero price,
+Featured flag and displayed version. Checksums refer to public pages, not packages.
+
+| Product source slug | Displayed version | Output |
+| --- | --- | --- |
+| bs-grokbot-avatar | 1.0.1 | Image |
+| bs-field-notes-deck | 1.0.1 | Presentation |
+| bs-scattered-cards-magazine | 1.0.1 | HTML |
+| bs-cadence-marketing-landing | 1.0.0 | HTML |
+| bs-inclusive-cutpaper-deck | 1.0.1 | Presentation |
+| bs-sky-glass-deck | 1.0.1 | Presentation |
+| bs-claude-style-illustration | 1.0.0 | Image |
+| bs-research-talk-deck | 1.0.0 | Presentation |
+
+Skillry's public terms at https://skillry.dev/terms permit personal/internal business
+use and commercial generated outputs subject to third-party rights, but restrict
+package redistribution unless separate package terms expressly allow it. These are
+link-only entries with original EN/ZH editorial copy. No packages, descriptions,
+provider previews or remote media are mirrored; no Skill code is executed.
+Skillry is attributed as the publisher, not an identified individual author.
+
+`external-outbound.ts` applies the owner-provided `via=openagentskill` parameter
+to outbound Skillry links, including product deep links, while preserving clean
+source evidence and our canonical detail URLs. Outbound links use `rel=sponsored`
+with `noopener noreferrer`. This configuration adds no scripts, cookies or
+database queries.

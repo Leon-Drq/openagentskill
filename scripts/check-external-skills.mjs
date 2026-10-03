@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict'
+import { register } from 'node:module'
+register('./test-owner-publication-loader.mjs', import.meta.url)
+const { EXTERNAL_SKILLS } = await import('../lib/skills/external-catalog.ts')
 
 const base = process.argv[2] || 'http://localhost:3114'
 const slug = 'redskill-curtain-branch-swallow'
@@ -44,4 +47,36 @@ const search = await (await get('/skills?q=skill-curtain-branch-swallow')).text(
 assert.ok(search.includes(path))
 const sitemap = await (await get('/sitemaps/core.xml')).text()
 assert.ok(sitemap.includes(`https://www.openagentskill.com${path}</loc>`))
+const skillry = EXTERNAL_SKILLS.filter(entry => entry.provider === 'skillry')
+assert.equal(skillry.length, 8)
+for (const entry of skillry) {
+  const detailPath = `/skills/external/${entry.slug}`
+  const metadata = await (await get(`/api/external-skills/${entry.slug}`)).json()
+  assert.equal(metadata.bundle_sha256, null)
+  assert.equal(metadata.source_url, entry.sourceUrl)
+  assert.equal(metadata.publisher.name, 'Skillry')
+  assert.equal(metadata.listing_evidence.priceUsdCents, 0)
+  assert.equal(metadata.install_command, null)
+  for (const language of ['', '?lang=zh']) {
+    const response = await get(detailPath + language)
+    assert.equal(response.status, 200)
+    const html = await response.text()
+    assert.ok(html.includes(`rel="canonical" href="https://www.openagentskill.com${detailPath}"`))
+    assert.ok(html.includes(`name="robots" content="${language ? 'noindex' : 'index'}, follow"`))
+    assert.ok(html.includes(`href="${entry.sourceUrl}?via=openagentskill" target="_blank" rel="sponsored noopener noreferrer"`))
+    assert.doesNotMatch(html, /referral commission|返佣|佣金/i, 'No user-facing commission explanation')
+    const graphs = [...html.matchAll(/<script[^>]+type="application\/ld\+json"[^>]*>(.*?)<\/script>/gs)].flatMap(match => JSON.parse(match[1])['@graph'] || [])
+    const work = graphs.find(item => item.about)?.about
+    assert.equal(work.publisher['@type'], 'Organization')
+    assert.equal(work.publisher.name, 'Skillry')
+    assert.equal(work.author, undefined)
+    assert.equal(work.url, entry.sourceUrl)
+    assert.equal(work.version, entry.version)
+    assert.ok(!graphs.some(item => item['@type'] === 'VideoObject'))
+  }
+  assert.ok(sitemap.includes(`https://www.openagentskill.com${detailPath}</loc>`))
+}
+const selected = await (await get('/skills/external?q=Skillry')).text()
+for (const entry of skillry) assert.ok(selected.includes(`/skills/external/${entry.slug}`))
+assert.ok(!selected.includes(path), 'Search excludes unrelated RedSkill listing')
 console.log(`External listing smoke passed at ${base}: EN/ZH SSR, metadata, JSON-LD, HTTP 404, search, sitemap, read-only API.`)
