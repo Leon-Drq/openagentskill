@@ -1,6 +1,7 @@
 import ts from 'typescript'
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
+import { parse } from 'parse5'
 
 export const digest = text => createHash('sha256').update(text).digest('hex')
 const outputType = z.enum(['html', 'presentation', 'image', 'video'])
@@ -46,12 +47,22 @@ export function literalData(node, refs = new Map()) {
   throw Error('Unsupported source data; review the parser instead of executing scripts')
 }
 
+function publicScripts(html) {
+  if (Buffer.byteLength(html) > 8 * 1024 * 1024) throw Error('Public document byte limit exceeded')
+  const scripts = [], pending = [parse(html)]
+  while (pending.length) {
+    const node = pending.pop()
+    if (node.tagName === 'script') scripts.push((node.childNodes || []).map(child => child.value || '').join(''))
+    else pending.push(...(node.childNodes || []))
+  }
+  return scripts
+}
+
 export function parseSkillryDirectory(html) {
-  if (Buffer.byteLength(html) > 8 * 1024 * 1024) throw Error('Directory byte limit exceeded')
   const arrays = []
-  for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)) {
-    if (!match[1].includes('publishedSkills:')) continue
-    const ast = ts.createSourceFile('public-directory.js', match[1], ts.ScriptTarget.Latest, true, ts.ScriptKind.JS)
+  for (const script of publicScripts(html)) {
+    if (!script.includes('publishedSkills:')) continue
+    const ast = ts.createSourceFile('public-directory.js', script, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS)
     const visit = node => {
       if (ts.isPropertyAssignment(node) && node.name.getText(ast) === 'publishedSkills') arrays.push(literalData(node.initializer))
       ts.forEachChild(node, visit)
@@ -66,9 +77,9 @@ export function parseSkillryDirectory(html) {
 
 export function parseSkillryTerms(html) {
   const values = []
-  for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)) {
-    if (!match[1].includes('Terms of Service')) continue
-    const ast = ts.createSourceFile('terms.js', match[1], ts.ScriptTarget.Latest, true, ts.ScriptKind.JS)
+  for (const script of publicScripts(html)) {
+    if (!script.includes('Terms of Service')) continue
+    const ast = ts.createSourceFile('terms.js', script, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS)
     const visit = node => {
       if (ts.isPropertyAssignment(node) && node.name.getText(ast) === 'content' && ts.isStringLiteral(node.initializer)) values.push(node.initializer.text)
       ts.forEachChild(node, visit)

@@ -7,10 +7,11 @@ const template = { slug: 'bs-test', name: 'Test', outputType: 'image', downloadC
   tags: [{ kind: 'task', value: 'create-image', label: 'Create image' }] }
 const serialize = rows => `<script>const state = { publishedSkills: ${JSON.stringify(rows)} }</script>`
 const terms = 'Terms of Service ' + 'Public source terms. '.repeat(100)
-for (const closingTag of ['</script >', '</script\t>', '</SCRIPT\n>']) {
+for (const closingTag of ['</script >', '</script\t>', '</SCRIPT\n>', '</script\t\n bar>', '</script/>']) {
   assert.deepEqual(parseSkillryDirectory(serialize([template]).replace('</script>', closingTag)), [template])
   assert.equal(parseSkillryTerms(`<script>const state={content:${JSON.stringify(terms)}}</script>`.replace('</script>', closingTag)), terms)
 }
+assert.throws(() => parseSkillryDirectory(`<!-- ${serialize([template])} -->`), /complete/, 'HTML comments are not source scripts')
 const rows = [10, 11, 9].map((downloadCount, index) => ({ ...template, slug: `bs-test-${index}`, downloadCount }))
 rows.push({ ...template, slug: 'bs-paid', priceUsdCents: 499 })
 assert.deepEqual(selectSkillryRows(parseSkillryDirectory(serialize(rows))).map(row => row.slug), ['bs-test-1'])

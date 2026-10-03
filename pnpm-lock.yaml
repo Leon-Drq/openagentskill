@@ -207,6 +207,9 @@ importers:
       eslint-config-next:
         specifier: 16.3.5
         version: 16.3.5(@typescript-eslint/parser@8.67.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.7.3))(eslint@9.39.4(jiti@2.6.1))(typescript@5.7.3)
+      parse5:
+        specifier: 7.3.0
+        version: 7.3.0
       postcss:
         specifier: ^8.5.23
         version: 8.5.23

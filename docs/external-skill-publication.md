@@ -90,8 +90,8 @@ agreement permits catalog descriptions and example display. The initial director
 snapshot contains 385 eligible products: 42 Free and 343 paid.
 
 `pnpm skillry:sync` reads two bounded public documents: the terms and the complete
-SSR directory. The TypeScript parser reads literal data only, never executes source
-JavaScript. `scripts/skillry/policy.json` records scope, permission and the reviewed
+SSR directory. Standard HTML parsing extracts scripts; the TypeScript parser reads
+literal data only, never executes source JavaScript. `scripts/skillry/policy.json` records scope, permission and the reviewed
 terms hash. Source failure, unknown data, a changed terms document, or a large catalog
 shrink aborts publication. No per-product crawler runs during browsing, no AI review
 calls are made, and packages/media are not copied. Directory descriptions are our own
