@@ -54,6 +54,9 @@ const mocks = {
 }
 const sitemap = compile('lib/seo/sitemap.ts', mocks)
 const core = sitemap.getCoreSitemapEntries()
+for (const entry of externalCatalog.EXTERNAL_SKILLS.filter(e => e.provider === 'skillry')) {
+  assert.equal(core.some(page => page.url.endsWith('/skills/' + entry.slug)), entry.active && entry.seoIndexable, 'Only independently edited active source details enter the sitemap')
+}
 assert.equal(core.filter(p => p.url.endsWith('/skills/redskill-curtain-branch-swallow')).length, 1)
 assert.equal(core.find(p => p.url.endsWith('/about')).lastModified, undefined)
 assert.equal(core.find(p => p.url.endsWith('/showcase/example')).lastModified, '2026-09-01')

@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     },
   },
   globalIgnores([
+    '.codex-tmp/**',
+    'artifacts/**',
     '.next/**',
     'out/**',
     'build/**',

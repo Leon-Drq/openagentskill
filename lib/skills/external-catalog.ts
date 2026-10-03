@@ -58,7 +58,12 @@ const SkillrySchema = RedSkillSchema.extend({
   commercialUse: z.literal('outputs-permitted-package-redistribution-restricted'),
   examples: z.array(z.object({ title: localized, description: localized }).strict()).length(0),
   runtimeDemo: z.undefined().optional(),
-  outputType: z.enum(['image', 'presentation', 'html']),
+  outputType: z.enum(['image', 'presentation', 'html', 'video']),
+  version: z.string().min(1).nullable(), versionObservedAt: z.string().datetime().nullable(),
+  active: z.boolean(), seoIndexable: z.boolean(),
+  previewVideo: z.string().url().refine(value => {
+    const url = new URL(value); return url.origin === 'https://skillry.dev' && !url.username && !url.password && !url.hash && /^\/skills\/bs-[a-z0-9-]+\/media\/preview\.mp4$/.test(url.pathname) && [...url.searchParams.keys()].every(key => key === 'v')
+  }).nullable(),
   previewImages: z.array(z.string().url().refine(value => {
     const url = new URL(value)
     return url.origin === 'https://skillry.dev' && !url.username && !url.password && !url.hash &&
@@ -66,8 +71,8 @@ const SkillrySchema = RedSkillSchema.extend({
       [...url.searchParams.keys()].every(key => key === 'v' || key === 'variant') && url.searchParams.get('variant') === 'detail'
   }, 'Use an original public Skillry example image.')).min(1).max(16),
   listingEvidence: z.object({
-    featured: z.literal(true), priceUsdCents: z.literal(0),
-    observedAt: z.string().datetime(), sourcePageSha256: z.string().regex(/^[a-f0-9]{64}$/),
+    featured: z.boolean(), priceUsdCents: z.number().int().nonnegative().max(1000000), downloadCount: z.number().int().min(11),
+    observedAt: z.string().datetime(), sourceDocumentSha256: z.string().regex(/^[a-f0-9]{64}$/), sourceUrl: z.literal('https://skillry.dev/skills'),
   }).strict(),
 }).strict()
 export const ExternalSkillSchema = z.discriminatedUnion('provider', [RedSkillSchema, SkillrySchema])
@@ -146,6 +151,7 @@ export function isMissingExternalSkillPath(pathname: string) {
 export function searchExternalSkills(query = '') {
   const terms = query.normalize('NFKC').toLocaleLowerCase().trim().slice(0, 200).split(/\s+/).filter(Boolean)
   return EXTERNAL_SKILLS.filter(entry => {
+    if (entry.provider === 'skillry' && !entry.active) return false
     const haystack = [entry.provider, entry.slug, entry.identifier, entry.skillName, entry.author.name, ...Object.values(entry.title), ...Object.values(entry.description), ...entry.tags].join(' ').normalize('NFKC').toLocaleLowerCase()
     return terms.every(term => haystack.includes(term))
   })
@@ -160,9 +166,10 @@ export function externalSkillDiscoveryRecord(entry: ExternalSkill) {
     author: entry.provider === 'skillry' ? null : entry.author,
     publisher: entry.provider === 'skillry' ? entry.author : null, version: entry.version,
     version_source: entry.provider === 'skillry'
-      ? 'Skillry public product page observed at publication; not automatically synchronized'
+      ? entry.versionObservedAt ? `Skillry public product page observed at ${entry.versionObservedAt}` : 'Version not recorded; check Skillry for the current package version'
       : 'RedSkill bundle manifest observed at publication; not automatically synchronized',
-    ...(entry.provider === 'skillry' ? { output_type: entry.outputType, listing_evidence: entry.listingEvidence,
+    ...(entry.provider === 'skillry' ? { output_type: entry.outputType, listing_evidence: entry.listingEvidence, active: entry.active,
+      source_video_url: entry.previewVideo,
       examples: entry.previewImages.map(src => ({ image_url: src, source_url: entry.sourceUrl, attribution: 'Skillry', runtime_verified: false })) } : {}),
     bundle_sha256: entry.bundleSha256, license: entry.license, license_note: entry.licenseNote.en,
     commercial_use: entry.commercialUse, publication_channel: entry.publication.channel,

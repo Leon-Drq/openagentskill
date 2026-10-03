@@ -8,7 +8,7 @@ import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsWithStatus } from '@/lib/db/skills'
 import { getShowcasesForSkill, getShowcaseCardData, SHOWCASE_SKILL_SLUGS } from '@/lib/showcase'
 import { SkillsPageClient, type DirectorySkillCard } from '@/components/skills-page-client'
-import { selectProviderSkills, toProviderDirectorySkill, providerCatalogWindow, mergeProviderCatalogPage, providerRowsFirst } from '@/lib/skills/provider-directory'
+import { selectProviderSkills, toProviderDirectorySkill, providerCatalogWindow, mergeProviderCatalogPage, providerRowsFirst, hasProviderCommercialOffers } from '@/lib/skills/provider-directory'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillSupplyProfile, getSupplyTrackSummaries } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
@@ -561,10 +561,10 @@ function mergeSkillRecords(...pools: SkillRecord[][]) {
   return merged
 }
 
-function clampPage(value: string | undefined) {
+function clampPage(value: string | undefined, providerCount = 0) {
   const parsed = Number(value || 1)
   if (!Number.isFinite(parsed)) return 1
-  return Math.min(Math.max(Math.floor(parsed), 1), MAX_SKILLS_PAGE)
+  return Math.min(Math.max(Math.floor(parsed), 1), MAX_SKILLS_PAGE + Math.ceil(providerCount / VISIBLE_SKILL_LIMIT))
 }
 
 function clampText(value: string | null | undefined, maxLength: number) {
@@ -917,24 +917,25 @@ export default async function SkillsPage({
   const supplyTrack = firstSearchValue(params.track) || 'all'
   const minStars = catalogStars(Number(firstSearchValue(params.minStars) || 0))
   const query = firstSearchValue(params.q)?.trim().slice(0, 180)
+  const providerSkills = selectProviderSkills({ query, category, topic, output, pricing, examplesOnly,
+    platform, quality, trust, safety, supplyTrack, minStars, useCase, featured, sort }).map(entry => toProviderDirectorySkill(entry, locale))
+  const providerOnlyQuery = query?.toLocaleLowerCase() === 'skillry'
   const catalogMode = !featured && !query && [useCase, platform, quality, trust, safety, supplyTrack].every(value => value === 'all')
-  const page = catalogMode ? catalogPageNumber(firstSearchValue(params.page)) : clampPage(firstSearchValue(params.page))
+  const page = catalogMode ? catalogPageNumber(firstSearchValue(params.page)) : clampPage(firstSearchValue(params.page), providerSkills.length)
   const requestedPageOffset = (page - 1) * VISIBLE_SKILL_LIMIT
   // Category, stars and recorded-source filters now run in SQL. Only filters
   // derived from richer profiles need a wider in-memory candidate pool.
   const hasHighIntentFilter = Boolean(useCase !== 'all' || platform !== 'all' || supplyTrack !== 'all')
   const baseLimit = hasHighIntentFilter ? SEARCH_SKILL_CANDIDATE_LIMIT : BASE_SKILL_CANDIDATE_LIMIT
   const candidateLimit = Math.min(baseLimit + requestedPageOffset, MAX_SKILL_CANDIDATE_LIMIT)
-  const providerSkills = selectProviderSkills({ query, category, topic, output, pricing, examplesOnly,
-    platform, quality, trust, safety, supplyTrack, minStars, useCase }).map(entry => toProviderDirectorySkill(entry, locale))
   const catalogWindow = providerCatalogWindow(requestedPageOffset, providerSkills.length, sort)
   const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured] = await Promise.all([
     query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
       : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, featured, minStars, pricing, topic, output), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
         .catch(() => ({ records: getFallbackSkills(sort, undefined, candidateLimit), degraded: true })),
-    getSearchAugmentRecords(firstSearchValue(params.q)),
+    providerOnlyQuery ? Promise.resolve({ records: [] as SkillRecord[], degraded: false }) : getSearchAugmentRecords(firstSearchValue(params.q)),
     Promise.resolve(SKILL_CATEGORIES.map(c => c[0])),
-    withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
+    providerOnlyQuery ? Promise.resolve({} as Record<string, SkillAgentStats>) : withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
     catalogMode ? getSkillCatalogPage(sort, category, page, minStars, pricing, examplesOnly ? SHOWCASE_SKILL_SLUGS : null, topic, output, catalogWindow)
       .then(result => ({ ...result, degraded: false }))
@@ -946,11 +947,11 @@ export default async function SkillsPage({
           ) : [] as SkillRecord[],
         total: 0, hasMore: false, degraded: true,
       })) : Promise.resolve(null),
-    getSkillsBySlugs([...new Set([...(selectedUseCase?.featuredSlugs || []), ...(!catalogMode && examplesOnly ? SHOWCASE_SKILL_SLUGS : []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
+    providerOnlyQuery ? Promise.resolve([] as SkillRecord[]) : getSkillsBySlugs([...new Set([...(selectedUseCase?.featuredSlugs || []), ...(!catalogMode && examplesOnly ? SHOWCASE_SKILL_SLUGS : []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
   ])
-  const records = catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, useCaseFeatured, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
+  const records = providerOnlyQuery ? [] : catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, useCaseFeatured, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
   const degraded = Boolean(catalogResult?.degraded || recordsResult.degraded || searchAugmentRecords.degraded)
-  const effectivePage = !catalogMode && degraded && records.length <= requestedPageOffset ? 1 : page
+  const effectivePage = !catalogMode && degraded && records.length + providerSkills.length <= requestedPageOffset ? 1 : page
   const pageOffset = (effectivePage - 1) * VISIBLE_SKILL_LIMIT
   const rawCategoryOptions = categories.length > 0
     ? categories
@@ -1044,7 +1045,8 @@ export default async function SkillsPage({
     const merged = mergeProviderCatalogPage(skills, providerSkills, degraded ? skills.length : catalogResult!.total, pageOffset, sort)
     skills = merged.items; resultCount = merged.total; hasMoreResults = !degraded && merged.hasMore
   } else {
-    const combined = providerRowsFirst(sort) ? [...providerSkills, ...skills] : [...skills, ...providerSkills]
+    const prefix = providerRowsFirst(sort) ? Math.min(8, providerSkills.length) : 0
+    const combined = [...providerSkills.slice(0, prefix), ...skills, ...providerSkills.slice(prefix)]
     resultCount = combined.length; skills = combined.slice(pageOffset, pageOffset + VISIBLE_SKILL_LIMIT)
     hasMoreResults = pageOffset + VISIBLE_SKILL_LIMIT < resultCount
   }
@@ -1077,6 +1079,7 @@ export default async function SkillsPage({
         topic={topic}
         output={output}
         pricing={pricing}
+        providerCommercialOffers={hasProviderCommercialOffers()}
         categories={categoryOptions}
         useCase={useCase}
         useCases={USE_CASES.map((item) => ({

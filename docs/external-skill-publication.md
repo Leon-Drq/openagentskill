@@ -82,29 +82,51 @@ the existing SEO regression suite. Also run the complete regression suite,
 typecheck and production build. Check English/Chinese detail pages, directory
 search, unknown slug 404, API read-only policy and the core sitemap after deployment.
 
-## Skillry Featured + Free selection
+## Skillry weekly catalog
 
-The owner explicitly selected only items marked Free on
-https://skillry.dev/skills?featured=true, not every free product on Skillry.
-Public product pages were checked on 2026-10-03 UTC (2026-10-02 Pacific).
-`lib/skills/skillry-catalog.ts` records each page's SHA-256, observed zero price,
-Featured flag and displayed version. Checksums refer to public pages, not packages.
+The owner expanded the scope to every public Skillry Skill with `downloadCount > 10`,
+including Free and paid products. On 2026-10-03 the owner confirmed that the partner
+agreement permits catalog descriptions and example display. The initial directory
+snapshot contains 385 eligible products: 42 Free and 343 paid.
 
-| Product source slug | Displayed version | Output |
-| --- | --- | --- |
-| bs-grokbot-avatar | 1.0.1 | Image |
-| bs-field-notes-deck | 1.0.1 | Presentation |
-| bs-scattered-cards-magazine | 1.0.1 | HTML |
-| bs-cadence-marketing-landing | 1.0.0 | HTML |
-| bs-inclusive-cutpaper-deck | 1.0.1 | Presentation |
-| bs-sky-glass-deck | 1.0.1 | Presentation |
-| bs-claude-style-illustration | 1.0.0 | Image |
-| bs-research-talk-deck | 1.0.0 | Presentation |
+`pnpm skillry:sync` reads two bounded public documents: the terms and the complete
+SSR directory. The TypeScript parser reads literal data only, never executes source
+JavaScript. `scripts/skillry/policy.json` records scope, permission and the reviewed
+terms hash. Source failure, unknown data, a changed terms document, or a large catalog
+shrink aborts publication. No per-product crawler runs during browsing, no AI review
+calls are made, and packages/media are not copied. Directory descriptions are our own
+summaries; source tag vocabulary and public preview URLs retain source attribution.
+
+`lib/skills/skillry-snapshot.json` stores observed downloads, USD price, Featured flag,
+output, source document hash and public examples. Product versions are separate,
+dated observations in `skillry-editorial.json`; unknown versions stay null. English
+product names remain primary; Chinese aliases are shown separately when precise.
+Unchanged facts preserve the snapshot; pricing evidence renews at least every 30 days.
+Only new interaction identities produce `artifacts/skillry-new-identities.sql`.
+Before publication, use `supabase migration new` and apply that reviewed additive SQL;
+never edit submission reviews or users' engagement to publish a provider entry.
+
+The local thread heartbeat **Skillry 每周目录更新** checks weekly, tests changed data,
+synchronizes GitHub and verifies the resulting production deployment. A failed check
+retains the last good release. This heartbeat needs the configured Codex host and
+connectors available; it is not a request-time application job.
+
+At most eight source entries prefix the first page, followed by registry results
+and remaining source entries. This keeps the mixed directory useful at larger scale.
+Free/paid and Featured filters apply to both sources. Source download counts are
+explicitly identified as Skillry's; repository metrics and our own votes are unchanged.
+Public video sources attach only after a play click. Old slugs leave discovery when
+removed or below the threshold, but archived details and saved interactions remain.
+
+Independently edited details enter the sitemap. Brief automatically assembled entries
+remain accessible with `noindex, follow`, their own canonical URL and related links
+until they receive independent editorial content. This avoids indexing hundreds of
+near-identical style summaries. Archived entries also remain outside the sitemap.
 
 Skillry's public terms at https://skillry.dev/terms permit personal/internal business
 use and commercial generated outputs subject to third-party rights, but restrict
 package redistribution unless separate package terms expressly allow it. These are
-link-only entries with original EN/ZH editorial copy. No packages, descriptions,
+link-only entries with original EN/ZH editorial copy. No source descriptions,
 provider media or packages are mirrored; no Skill code is executed. Public preview URLs are embedded directly, labeled Source example · Skillry, and linked to the original product page.
 Skillry is attributed as the publisher, not an identified individual author.
 
