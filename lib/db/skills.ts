@@ -7,6 +7,7 @@ import { withTimeout } from '@/lib/async'
 import { collectSearchResults } from '@/lib/search-results'
 import { directoryCategoryTerms } from '@/lib/skills/directory'
 import { normalizeSkillCategory, normalizeTopic, normalizeOutput, type SkillTaxonomy } from '@/lib/skills/taxonomy'
+import { clampResultPage } from '@/lib/skills/pagination'
 import { CATALOG_PAGE_SIZE, catalogPageNumber, catalogSortColumn, catalogStars } from '@/lib/skills/catalog-query'
 import { isMcpOnlyCategory, isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
 import { unstable_cache } from 'next/cache'
@@ -1224,40 +1225,64 @@ export async function getBrowseSkillCandidates(sort: SkillSortMode, category: st
   return { records: await unpackCacheJson<SkillRecord[]>(packed), degraded: false }
 }
 
-// True database pagination, not another increasingly large candidate pool.
-// Count describes public registry entries; the UI separately labels the number
-// of visible skills because MCP-only resources are omitted, as on detail pages.
-const getCachedCatalogPage = unstable_cache(
-  async (sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null, topic: string, output: string, windowOffset?: number, windowLimit = CATALOG_PAGE_SIZE) => {
-    // Optional bulk reads must not open the main directory's circuit.
+// Counts and rows share the view's public/MCP-only scope and all filters.
+// Cache the count independently of sort/page so a page jump does not recount.
+function applyCatalogFilters<T extends {
+  eq: (column: string, value: string) => T
+  contains: (column: string, value: string[]) => T
+  or: (filters: string) => T
+  in: (column: string, values: string[]) => T
+  not: (column: string, operator: string, value: string) => T
+  gte: (column: string, value: number) => T
+}>(query: T, category: string, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null, topic: string, output: string): T {
+  if (pricing !== 'all' && pricing !== 'unknown') query = query.in('slug', pricingSlugs)
+  else if (pricing === 'unknown' && pricingSlugs.length) query = query.not('slug', 'in', `(${pricingSlugs.join(',')})`)
+  if (exampleSlugs !== null) query = query.in('slug', exampleSlugs)
+  if (minStars > 0) query = query.gte('github_stars', minStars)
+  return applyTaxonomyFilters(query, category, topic, output)
+}
+
+const getCachedCatalogCount = unstable_cache(
+  async (category: string, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null, topic: string, output: string) => {
+    if ((pricing !== 'all' && pricing !== 'unknown' && !pricingSlugs.length) || (exampleSlugs !== null && !exampleSlugs.length)) return 0
     const supabase = createPublicClient({ requestTimeoutMs: 8000, circuitScope: 'public-catalog' })
-    let query = supabase.from('skills').select(SKILL_TAXONOMY_SELECT, { count: 'exact' }).or(PUBLIC_SKILL_FILTER)
-    if (pricing !== 'all' && pricing !== 'unknown') {
-      if (!pricingSlugs.length) return { records: [] as SkillRecord[], total: 0, hasMore: false }
-      query = query.in('slug', pricingSlugs)
-    } else if (pricing === 'unknown' && pricingSlugs.length) query = query.not('slug', 'in', `(${pricingSlugs.join(',')})`)
-    if (exampleSlugs !== null) {
-      if (!exampleSlugs.length) return { records: [] as SkillRecord[], total: 0, hasMore: false }
-      query = query.in('slug', exampleSlugs)
-    }
-    if (minStars > 0) query = query.gte('github_stars', minStars)
-    query = applyTaxonomyFilters(query, category, topic, output)
-    const from = windowOffset ?? (page - 1) * CATALOG_PAGE_SIZE
-    const { data, count, error } = await query
-      .order(catalogSortColumn(sort), { ascending: false, nullsFirst: false })
-      .order('slug', { ascending: true }).range(from, from + windowLimit - 1)
+    const query = supabase.from('skill_directory_entries').select('slug', { count: 'exact', head: true }).or(PUBLIC_SKILL_FILTER)
+    const { count, error } = await applyCatalogFilters(query, category, minStars, pricing, pricingSlugs, exampleSlugs, topic, output)
     if (error) throw error
     if (count === null) throw new Error('Catalog count unavailable')
-    return { records: filterSkillOnly((data || []) as unknown as SkillRecord[]), total: count, hasMore: from + windowLimit < count }
+    return count
   },
-  ['public-catalog-pages-v6-unified'],
+  ['public-catalog-count-v1-scope'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 
-export function getSkillCatalogPage(sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter = 'all', exampleSlugs: string[] | null = null, topic = 'all', output = 'all', window?: { offset: number; limit: number }) {
+const getCachedCatalogPage = unstable_cache(
+  async (sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null, topic: string, output: string, windowOffset?: number, windowLimit = CATALOG_PAGE_SIZE, providerCount = 0, providerPrefix = 0) => {
+    const total = await getCachedCatalogCount(category, minStars, pricing, pricingSlugs, exampleSlugs, topic, output)
+    const effectivePage = clampResultPage(page, total + providerCount, CATALOG_PAGE_SIZE)
+    const offset = (effectivePage - 1) * CATALOG_PAGE_SIZE
+    const from = effectivePage === page ? windowOffset ?? offset : Math.max(0, offset - providerPrefix)
+    const limit = effectivePage === page ? windowLimit : CATALOG_PAGE_SIZE - Math.min(CATALOG_PAGE_SIZE, Math.max(0, providerPrefix - offset))
+    // Provider-only tail pages and empty selections need no registry row query.
+    if (from >= total || limit === 0) return { records: [] as SkillRecord[], total, hasMore: false, page: effectivePage }
+    const supabase = createPublicClient({ requestTimeoutMs: 8000, circuitScope: 'public-catalog' })
+    let query = supabase.from('skill_directory_entries').select(SKILL_TAXONOMY_SELECT).or(PUBLIC_SKILL_FILTER)
+    query = applyCatalogFilters(query, category, minStars, pricing, pricingSlugs, exampleSlugs, topic, output)
+    const { data, error } = await query
+      .order(catalogSortColumn(sort), { ascending: false, nullsFirst: false })
+      .order('slug', { ascending: true }).range(from, from + limit - 1)
+    if (error) throw error
+    return { records: (data || []) as unknown as SkillRecord[], total, hasMore: from + limit < total, page: effectivePage }
+  },
+  ['public-catalog-pages-v7-scope'],
+  { revalidate: 300, tags: ['public-skill-directory'] }
+)
+
+export function getSkillCatalogPage(sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter = 'all', exampleSlugs: string[] | null = null, topic = 'all', output = 'all', window?: { offset: number; limit: number; providerCount: number; prefix: number }) {
   return getCachedCatalogPage(sort, category.slice(0, 80), catalogPageNumber(String(page)), catalogStars(minStars), pricing, commerceFilterSlugs(pricing), exampleSlugs, normalizeTopic(topic), normalizeOutput(output),
     window ? Math.max(0, Math.min(1_600_000, Math.floor(window.offset))) : undefined,
-    window ? Math.max(1, Math.min(CATALOG_PAGE_SIZE, Math.floor(window.limit))) : CATALOG_PAGE_SIZE)
+    window ? Math.max(1, Math.min(CATALOG_PAGE_SIZE, Math.floor(window.limit))) : CATALOG_PAGE_SIZE,
+    window ? window.providerCount : 0, window ? window.prefix : 0)
 }
 
 export async function searchSkillsStrict(query: string, limit = 120): Promise<SkillRecord[]> {

@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { SKILL_CATEGORIES, legacyCategoryTopic, normalizeSkillCategory, normalizeTopic, normalizeOutput, skillTaxonomy } from '@/lib/skills/taxonomy'
 import { commerceFilterSlugs, getSkillCommerce, matchesCommerce, normalizePriceFilter } from '@/lib/skills/commerce'
 import { getBrowseSkillCandidates, getSkillCatalogPage, getSkillsBySlugs } from '@/lib/db/skills'
+import { clampResultPage } from '@/lib/skills/pagination'
 import { catalogPageNumber, catalogStars, directoryDiscoveryFilters, canShowCatalogSnapshot, selectCatalogSnapshot } from '@/lib/skills/catalog-query'
 import { getDirectoryProfiles } from '@/lib/skills/directory-profiles'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
@@ -100,8 +101,6 @@ export async function generateMetadata({
 
 // The directory renders 16 cards. Keep its ranking pool broad enough for good
 // recommendations without loading hundreds of unused records into every page.
-const BASE_SKILL_CANDIDATE_LIMIT = 96
-const SEARCH_SKILL_CANDIDATE_LIMIT = 320
 const MAX_SKILL_CANDIDATE_LIMIT = 480
 const VISIBLE_SKILL_LIMIT = 16
 const MAX_SKILLS_PAGE = Math.ceil(MAX_SKILL_CANDIDATE_LIMIT / VISIBLE_SKILL_LIMIT)
@@ -923,11 +922,9 @@ export default async function SkillsPage({
   const catalogMode = !featured && !query && [useCase, platform, quality, trust, safety, supplyTrack].every(value => value === 'all')
   const page = catalogMode ? catalogPageNumber(firstSearchValue(params.page)) : clampPage(firstSearchValue(params.page), providerSkills.length)
   const requestedPageOffset = (page - 1) * VISIBLE_SKILL_LIMIT
-  // Category, stars and recorded-source filters now run in SQL. Only filters
-  // derived from richer profiles need a wider in-memory candidate pool.
-  const hasHighIntentFilter = Boolean(useCase !== 'all' || platform !== 'all' || supplyTrack !== 'all')
-  const baseLimit = hasHighIntentFilter ? SEARCH_SKILL_CANDIDATE_LIMIT : BASE_SKILL_CANDIDATE_LIMIT
-  const candidateLimit = Math.min(baseLimit + requestedPageOffset, MAX_SKILL_CANDIDATE_LIMIT)
+  // Rich profile filters use one bounded, cached candidate pool across pages,
+  // keeping their ranked total stable instead of widening it on every jump.
+  const candidateLimit = MAX_SKILL_CANDIDATE_LIMIT
   const catalogWindow = providerCatalogWindow(requestedPageOffset, providerSkills.length, sort)
   const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured] = await Promise.all([
     query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
@@ -945,14 +942,13 @@ export default async function SkillsPage({
             getFallbackSkills(sort, undefined, FALLBACK_SKILLS.length + CURATED_SKILL_SNAPSHOT.length),
             examplesOnly ? SHOWCASE_SKILL_SLUGS : null,
           ) : [] as SkillRecord[],
-        total: 0, hasMore: false, degraded: true,
+        total: 0, hasMore: false, degraded: true, page,
       })) : Promise.resolve(null),
     providerOnlyQuery ? Promise.resolve([] as SkillRecord[]) : getSkillsBySlugs([...new Set([...(selectedUseCase?.featuredSlugs || []), ...(!catalogMode && examplesOnly ? SHOWCASE_SKILL_SLUGS : []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
   ])
   const records = providerOnlyQuery ? [] : catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, useCaseFeatured, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
   const degraded = Boolean(catalogResult?.degraded || recordsResult.degraded || searchAugmentRecords.degraded)
-  const effectivePage = !catalogMode && degraded && records.length + providerSkills.length <= requestedPageOffset ? 1 : page
-  const pageOffset = (effectivePage - 1) * VISIBLE_SKILL_LIMIT
+  let effectivePage = catalogMode ? catalogResult!.page : page
   const rawCategoryOptions = categories.length > 0
     ? categories
     : [...new Set(records.map((record) => record.category).filter(Boolean))].sort()
@@ -1026,6 +1022,8 @@ export default async function SkillsPage({
     filteredRecords = sortDirectoryCandidates(filteredRecords, sort)
   }
 
+  if (!catalogMode) effectivePage = clampResultPage(page, filteredRecords.length + providerSkills.length, VISIBLE_SKILL_LIMIT)
+  const pageOffset = (effectivePage - 1) * VISIBLE_SKILL_LIMIT
   let resultCount = catalogMode ? catalogResult!.total : filteredRecords.length
   const visibleRecords = catalogMode ? filteredRecords : filteredRecords.slice(pageOffset, pageOffset + VISIBLE_SKILL_LIMIT)
   // Never replace a healthy ISR directory with an empty outage fallback. A

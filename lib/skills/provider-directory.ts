@@ -70,7 +70,7 @@ export function providerCatalogWindow(offset: number, providerCount: number, sor
   const first = providerRowsFirst(sort)
   const prefix = first ? Math.min(8, providerCount) : 0
   const localCount = Math.min(size, Math.max(0, prefix - offset))
-  return { offset: Math.max(0, offset - prefix), limit: Math.max(1, size - localCount) }
+  return { offset: Math.max(0, offset - prefix), limit: Math.max(1, size - localCount), providerCount, prefix }
 }
 export function mergeProviderCatalogPage<T>(registry: T[], providers: T[], registryTotal: number, offset: number, sort: string, size = 16) {
   const total = registryTotal + providers.length

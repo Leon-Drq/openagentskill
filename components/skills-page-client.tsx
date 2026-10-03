@@ -17,6 +17,8 @@ import { useEffect, useRef, useState, useSyncExternalStore, useTransition } from
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
+import { DirectoryPagination } from './directory-pagination'
+import { pageCount } from '@/lib/skills/pagination'
 import { SkillActions, SkillEngagementProvider } from './skill-engagement'
 import type { SupplyTrackSummary } from '@/lib/supply'
 
@@ -236,6 +238,14 @@ export function SkillsPageClient(props: Props) {
   const { pathname, queryString } = props
   const router = useRouter()
   const [pending, startTransition] = useTransition()
+  const paginationRequested = useRef(false)
+  const resultsHeading = useRef<HTMLHeadingElement>(null)
+  useEffect(() => {
+    if (pending || !paginationRequested.current) return
+    paginationRequested.current = false
+    resultsHeading.current?.scrollIntoView({ block: 'start' })
+    resultsHeading.current?.focus({ preventScroll: true })
+  }, [queryString, pending])
   const storedSelection = useSyncExternalStore(subscribeSelection, readSelection, () => '[]')
   let compareSlugs: string[] = []
   try {
@@ -250,6 +260,10 @@ export function SkillsPageClient(props: Props) {
   const filterNavigation = (destination: string) => (event: { preventDefault: () => void }) => {
     event.preventDefault()
     navigateTo(destination)
+  }
+  const paginationNavigation = (destination: string) => (event: { preventDefault: () => void }) => {
+    paginationRequested.current = true
+    filterNavigation(destination)(event)
   }
   const resetHref = directoryHref(pathname, queryString, Object.fromEntries(
     ['q','sort','category','useCase','platform','quality','trust','safety','track','minStars','page','tag','output','view','pricing','featured','examples'].map(key => [key, undefined])
@@ -375,7 +389,7 @@ export function SkillsPageClient(props: Props) {
           {pending && <div data-directory-loading aria-hidden="true" className="pointer-events-none absolute inset-x-0 -top-2 h-0.5 overflow-hidden rounded-full bg-border"><div className="h-full w-2/3 animate-pulse bg-[#006b4f]" /></div>}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="min-w-0">
-              <h2 id="directory-results-heading" className="break-words text-base font-semibold">
+              <h2 ref={resultsHeading} tabIndex={-1} id="directory-results-heading" className="scroll-mt-28 break-words text-base font-semibold focus:outline-none">
                 {query ? `${c.results} · “${query}”` : props.featured ? discovery.featured : discovery.all}
                 {pending && <LoaderCircle size={14} className="ml-2 inline-block animate-spin text-[#006b4f]" aria-hidden="true" />}
               </h2>
@@ -461,13 +475,10 @@ export function SkillsPageClient(props: Props) {
               </article>
             ))}
           </div></SkillEngagementProvider>}
-          {(hasPreviousResults || hasMoreResults) && <nav aria-label={c.page} className="mt-6 flex flex-wrap items-center justify-between gap-4 text-sm">
-            <span className="font-mono text-xs text-secondary">{c.page} {page}</span>
-            <div className="flex gap-3">
-              {hasPreviousResults && <Link prefetch={false} rel="prev" href={href({ page: page > 2 ? String(page - 1) : undefined })} scroll={false} onNavigate={filterNavigation(href({ page: page > 2 ? String(page - 1) : undefined }))} className="border border-border px-4 py-3">{c.previous}</Link>}
-              {hasMoreResults && <Link prefetch={false} rel="next" href={href({ page: String(page + 1) })} scroll={false} onNavigate={filterNavigation(href({ page: String(page + 1) }))} className="bg-foreground px-5 py-3 text-background">{c.next} →</Link>}
-            </div>
-          </nav>}
+          {(skills.length > 0 || hasPreviousResults || hasMoreResults) && <DirectoryPagination
+            page={page} totalPages={degraded ? null : pageCount(resultCount)} previous={hasPreviousResults} next={hasMoreResults}
+            locale={locale} href={value => href({ page: value > 1 ? String(value) : undefined })} onNavigate={paginationNavigation}
+          />}
         </section>
         </div>
 

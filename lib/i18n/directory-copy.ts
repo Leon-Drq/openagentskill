@@ -61,6 +61,9 @@ id: {"title":"AI Agent Skills","intro":"Temukan skill untuk tugas berikutnya den
 export const directoryCopy = (locale: Locale) => copies[locale]
 
 const terms: Record<string, readonly string[]> = {
+ pagination: ['Skill pages', '技能分页', 'スキルのページ', '스킬 페이지', 'Páginas de skills', 'Skill-Seiten', 'Pages des skills', 'Halaman skill'],
+ pageNumber: ['Page {page}', '第 {page} 页', '{page} ページ', '{page} 페이지', 'Página {page}', 'Seite {page}', 'Page {page}', 'Halaman {page}'],
+ pageSummary: ['Page {page} of {total}', '第 {page} 页 / 共 {total} 页', '{page} / {total} ページ', '{page} / {total} 페이지', 'Página {page} de {total}', 'Seite {page} von {total}', 'Page {page} sur {total}', 'Halaman {page} dari {total}'],
  taskTag: ['Task tag','任务标签','タスクタグ','작업 태그','Etiqueta de tarea','Aufgaben-Tag','Tag de tâche','Tag tugas'],
  outputType: ['Output type','产出类型','出力形式','출력 유형','Tipo de resultado','Ausgabeformat','Type de résultat','Jenis hasil'],
   browseMode: ['Browse mode', '浏览范围', '閲覧範囲', '탐색 범위', 'Modo de exploración', 'Ansicht', 'Mode de navigation', 'Mode jelajah'],

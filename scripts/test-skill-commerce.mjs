@@ -40,11 +40,12 @@ for (const locale of ['en','zh','ja','ko','es','de','fr','id']) {
   for (const type of acquisitionTypes) assert.ok(copy[type])
 }
 const db = readFileSync('lib/db/skills.ts','utf8')
-for (const name of ['getCachedBrowseCandidates','getCachedCatalogPage']) {
+for (const name of ['getCachedBrowseCandidates']) {
   const part = db.slice(db.indexOf(`const ${name} =`))
   assert.ok(part.indexOf("query.in('slug', pricingSlugs)") < part.indexOf('.order('),name)
   assert.match(part,/pricing === 'unknown' && pricingSlugs.length/)
 }
+assert.match(db, /query = applyCatalogFilters\(query, category, minStars, pricing, pricingSlugs, exampleSlugs, topic, output\)/)
 assert.doesNotMatch(db.slice(db.indexOf('export function convertSkillRecordToManifest')), /type: 'free'/)
 const page = readFileSync('app/skills/content.tsx','utf8')
 assert.match(page,/matchesCommerce\(record.slug, pricing\)/)
