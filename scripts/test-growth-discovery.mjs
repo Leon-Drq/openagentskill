@@ -15,6 +15,7 @@ import { locales } from '../lib/i18n/config.ts'
 import * as searchResults from '../lib/search-results.ts'
 import * as taxonomy from '../lib/skills/taxonomy.ts'
 import * as catalogQuery from '../lib/skills/catalog-query.ts'
+import * as pagination from '../lib/skills/pagination.ts'
 import * as commerce from '../lib/skills/commerce.ts'
 
 register('./test-owner-publication-loader.mjs', import.meta.url)
@@ -94,7 +95,7 @@ let rows = live
 const operations = [], sharedWrites = []
 class Clock extends Date { static now() { return now } }
 const client = { from(table) {
-  assert.equal(table, 'skills')
+  assert.ok(['skills', 'skill_directory_entries'].includes(table))
   const operationsForQuery = []
   operations.push(operationsForQuery)
   const query = {
@@ -125,6 +126,7 @@ const db = compile('lib/db/skills.ts', {
   '@/lib/skills/taxonomy': taxonomy,
   '@/lib/skills/presentation-category': presentationCategory,
   '@/lib/skills/catalog-query': catalogQuery,
+  '@/lib/skills/pagination': pagination,
   '@/lib/skills/commerce': commerce,
   '@/lib/skills/registry-scope': { isMcpOnlyCategory: () => false, isMcpOnlySkillRecord: () => false },
   '@/lib/seo/curated-skill-snapshot': { CURATED_SKILL_SNAPSHOT: snapshot },
@@ -312,7 +314,8 @@ assert.deepEqual(catalogPage.records, live)
 const catalogOps = operations.at(-1)
 assert.ok(catalogOps.some(op => op[0] === 'or' && op[1] === 'PUBLIC_TEST_GATE'))
 assert.ok(catalogOps.some(op => op[0] === 'gte' && op[1] === 'github_stars' && op[2] === 100))
-assert.deepEqual(catalogOps.find(op => op[0] === 'range'), ['range', 480, 495])
+assert.equal(catalogPage.page, 1, 'An out-of-range request clamps to the actual last page')
+assert.deepEqual(catalogOps.find(op => op[0] === 'range'), ['range', 0, 15])
 assert.deepEqual(catalogOps.filter(op => op[0] === 'order').map(op => op[1]), ['github_stars', 'slug'])
 const cachedBeforeCatalogFailure = sharedWrites.length
 failing = true

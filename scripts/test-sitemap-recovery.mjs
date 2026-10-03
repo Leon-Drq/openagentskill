@@ -5,6 +5,7 @@ import * as packed from '../lib/cache/packed-json.ts'
 import * as coalesced from '../lib/cache/coalesced.ts'
 import * as policy from '../lib/seo/search-indexability.ts'
 import * as validation from '../lib/seo/sitemap-snapshot.ts'
+import * as pagination from '../lib/skills/pagination.ts'
 const compile = (path,deps) => {
   const output=ts.transpileModule(readFileSync(new URL('../'+path,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText
   const exports={};new Function('exports','require',output)(exports,name=>{assert.ok(name in deps,name);return deps[name]});return exports
@@ -47,7 +48,7 @@ const extra=pinned(editorial[0]);let legacy=[item('legacy-a'),item('legacy-b'),o
 const operations=[]
 const client={from(){let filter,head=false,range;const q={select(_s,opts){head=opts?.head;return q},or(f){filter=f;operations.push(f);return q},order(){return q},range(a,b){range=[a,b];return q},then(resolve){const rows=filter===policy.buildEditorialSearchIndexFilter()?editorialRows:legacy;return Promise.resolve({data:head?null:range?rows.slice(range[0],range[1]+1):rows,count:rows.length,error:null}).then(resolve)}};return q}}
 const dbDependencies=Object.fromEntries([
-  ['next/cache',{unstable_cache:fn=>fn}],['@/lib/supabase/public',{createPublicClient:()=>client}],['@/lib/supabase/admin',{createAdminClient:()=>client}],['@/lib/seo/search-indexability',policy],['@/lib/cache/coalesced',coalesced],
+  ['next/cache',{unstable_cache:fn=>fn}],['@/lib/supabase/public',{createPublicClient:()=>client}],['@/lib/supabase/admin',{createAdminClient:()=>client}],['@/lib/seo/search-indexability',policy],['@/lib/cache/coalesced',coalesced],['@/lib/skills/pagination',pagination],
   ...['@/lib/skills/taxonomy','@/lib/skills/publication','@/lib/async','@/lib/search-results','@/lib/skills/directory','@/lib/skills/presentation-category','@/lib/skills/catalog-query','@/lib/skills/commerce','@/lib/skills/registry-scope','@/lib/seo/curated-skill-snapshot','@/lib/search-query','@/lib/cache/packed-json'].map(name=>[name,{}]),
 ])
 const db=compile('lib/db/skills.ts',dbDependencies)
