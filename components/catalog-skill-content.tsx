@@ -7,6 +7,7 @@ import { externalSkillHref, getExternalSkill, EXTERNAL_SKILLS } from '@/lib/skil
 import { externalSourceHref, externalSourceRel } from '@/lib/skills/external-outbound'
 import Image from 'next/image'
 import { ProviderVideoPreview } from './provider-video-preview'
+import { SkillryLogo } from './skillry-logo'
 import { SkillActions, SkillEngagementProvider } from '@/components/skill-engagement'
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ lang?: string | string[] }> }
@@ -73,7 +74,7 @@ export default async function CatalogSkillContent({ params, searchParams }: Prop
         <h1 className="mt-6 max-w-4xl text-balance font-display text-4xl leading-tight sm:text-6xl">{skillry ? entry.skillName : entry.title[lang]}</h1>
         {skillry && zh && entry.title.zh !== entry.skillName && <p className="mt-3 text-lg text-secondary">{entry.title.zh}</p>}
         <p className="mt-6 max-w-3xl text-base leading-8 text-secondary sm:text-lg">{entry.description[lang]}</p>
-        <p className="mt-5 text-sm">{skillry ? (zh ? '发布平台' : 'Published on') : (zh ? '作者' : 'By')} <a href={externalSourceHref(entry.author.url)} target="_blank" rel={externalSourceRel(entry.author.url)} className="underline underline-offset-4">{entry.author.name} ↗</a></p>
+        <div className="mt-5 flex items-center gap-3 text-sm">{skillry && <SkillryLogo size={32} />}<p>{skillry ? (zh ? '发布平台' : 'Published on') : (zh ? '作者' : 'By')} <a href={externalSourceHref(entry.author.url)} target="_blank" rel={externalSourceRel(entry.author.url)} className="underline underline-offset-4">{entry.author.name} ↗</a></p></div>
         <div className="mt-6 flex flex-wrap items-center gap-4">
           <SkillEngagementProvider slugs={[entry.slug]} untrackedSlugs={[entry.slug]}><SkillActions slug={entry.slug} name={entry.title[lang]} /></SkillEngagementProvider>
           <a href={externalSourceHref(entry.sourceUrl)} target="_blank" rel={externalSourceRel(entry.sourceUrl)} className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white hover:bg-[#00533d]">{skillry ? (zh ? '获取技能' : 'Get skill') : (zh ? '打开作者原帖' : 'Open the author’s post')} ↗</a>

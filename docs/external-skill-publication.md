@@ -127,8 +127,11 @@ Skillry's public terms at https://skillry.dev/terms permit personal/internal bus
 use and commercial generated outputs subject to third-party rights, but restrict
 package redistribution unless separate package terms expressly allow it. These are
 link-only entries with original EN/ZH editorial copy. No source descriptions,
-provider media or packages are mirrored; no Skill code is executed. Public preview URLs are embedded directly, labeled Source example · Skillry, and linked to the original product page.
+provider example media or packages are mirrored; no Skill code is executed. Public preview URLs are embedded directly, labeled Source example · Skillry, and linked to the original product page.
 Skillry is attributed as the publisher, not an identified individual author.
+Its brand mark is the original PNG from `https://skillry.dev/logo.png`, also used
+in Skillry's public header. `public/brands/skillry.png` retains those bytes; the
+shared logo component uses a local static import for caching and fixed dimensions.
 
 `external-outbound.ts` applies the owner-provided `via=openagentskill` parameter
 to outbound Skillry links, including product deep links, while preserving clean
