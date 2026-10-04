@@ -38,7 +38,16 @@ export function getSearchTerms(normalizedQuery: string) {
   return terms.length > 0 ? terms : [normalizedQuery]
 }
 
+/** Recognize repository identities before task expansion or wildcard cleanup. */
+export function repositorySearchQuery(query: string): string | null {
+  const match = query.trim().match(/^(?:https:\/\/github\.com\/)?([a-z0-9][a-z0-9_.-]*\/[a-z0-9][a-z0-9_.-]*)\/?$/i)
+  if (!match || match[1].length > 180) return null
+  return match[1].replace(/\.git$/i, '').toLowerCase()
+}
+
 export function normalizeExactSearchQuery(query: string) {
+  const repository = repositorySearchQuery(query)
+  if (repository) return repository
   return query
     .trim()
     .replace(/[%_*{},()]/g, ' ')

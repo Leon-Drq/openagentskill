@@ -1,4 +1,6 @@
 import type { SkillRecord } from '@/lib/db/skills'
+// @ts-expect-error Standalone Node regression tests load TypeScript directly.
+import { repositorySearchQuery } from './search-query.ts'
 
 export type SearchMatchType = 'exact' | 'near' | 'related'
 
@@ -20,12 +22,14 @@ function sourceSegments(skill: SkillRecord) {
 
 export function isDirectSkillLookup(query: string) {
   const value = query.trim()
-  return value.length > 0 && value.length <= 120 && /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/i.test(value)
+  return Boolean(repositorySearchQuery(value)) || (value.length > 0 && value.length <= 120 && /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/i.test(value))
 }
 
 export function classifySearchMatch(skill: SkillRecord, query: string): SearchMatchType {
   const lookup = normalized(query)
   if (!lookup) return 'related'
+  const repository = repositorySearchQuery(query)
+  if (repository) return skill.github_repo?.toLowerCase() === repository ? 'exact' : 'related'
 
   const exactValues = new Set([
     normalized(skill.slug),

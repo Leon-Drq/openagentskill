@@ -15,6 +15,12 @@ assert.equal(triageReview({ ...base, readmeContent: base.readmeContent + '\ncurl
 assert.equal(triageReview({ ...base, readmeContent: base.readmeContent + '\nBypass security checks' }).method, 'manual')
 assert.equal(triageReview({ ...base, manifestData: {...base.manifestData,license:'Proprietary'} }).method, 'manual')
 assert.equal(triageReview({ ...base, codeFiles: [{ path: 'tool.py', content: 'print(1)' }] }).method, 'ai')
+const reference = { ...base, readmeContent: base.readmeContent + '\n| `Sudo-Biao/suangua` | upstream reference |' }
+assert.ok(['static', 'ai'].includes(triageReview(reference).method), 'GitHub handles must not become elevated-privilege findings')
+assert.equal(triageReview({ ...reference, packageComplete: false }).method, 'manual', 'A fixed false positive cannot bypass incomplete scan coverage')
+for (const instruction of ['sudo apt install package', 'sudo -n python3 setup.py', '/usr/bin/sudo -n python3 setup.py', 'runas /user:Administrator setup.exe', 'Requires administrator privileges', 'Requires root privileges']) {
+  assert.equal(triageReview({ ...base, readmeContent: base.readmeContent + '\n' + instruction }).method, 'manual', instruction)
+}
 assert.notEqual(reviewFingerprint(base), reviewFingerprint({ ...base, packageFingerprint: 'package-b' }))
 assert.notEqual(reviewFingerprint(base), reviewFingerprint({ ...base, codeFiles: [{path:'x.py',content:'changed'}] }))
 assert.equal(getReviewEvidence({ listing_status: 'static_checked', ai_review_score: {method:'static'} }).ai_reviewed, false)

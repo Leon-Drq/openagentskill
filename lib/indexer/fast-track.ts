@@ -13,7 +13,9 @@ const DOCUMENT_RISKS: Array<{ pattern: RegExp; reason: string; level: 'medium' |
   { pattern: /\brm\s+-rf\b|\bRemove-Item\b[^\n]{0,120}\b-Recurse\b/i, reason: 'Destructive recursive deletion instruction detected', level: 'critical' },
   { pattern: /(?:seed phrase|private key|wallet key|browser cookies?|\.ssh\/|\.aws\/credentials)/i, reason: 'Sensitive credential or browser data access is requested', level: 'high' },
   { pattern: /(?:read|collect|upload|send|exfiltrat)[^\n]{0,120}(?:api[_ -]?key|token|secret|password|\.env)/i, reason: 'Credential collection or transmission instruction detected', level: 'high' },
-  { pattern: /\b(?:sudo|runas|administrator privileges?|root privileges?)\b/i, reason: 'Elevated privilege instruction detected', level: 'high' },
+  // A source identifier such as Sudo-Biao/suangua is not a shell instruction.
+  // Keep standalone commands (including `sudo -n`) and privilege prose flagged.
+  { pattern: /\b(?:sudo|runas)(?![\w-])|\b(?:administrator privileges?|root privileges?)\b/i, reason: 'Elevated privilege instruction detected', level: 'high' },
   { pattern: /\b(?:curl|wget|webhook|axios\.|requests\.(?:get|post)|fetch\s*\()\b/i, reason: 'Network execution requires deeper review', level: 'medium' },
   { pattern: /\b(?:subprocess|child_process|os\.system|exec\s*\(|eval\s*\()\b/i, reason: 'Command execution requires deeper review', level: 'high' },
 ]
