@@ -284,6 +284,14 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
   const supabase = createAdminClient({ requestTimeoutMs: 20_000 })
   const update = (values: Record<string, unknown>) => supabase.from('skill_submissions').update(values)
     .eq('id', submissionId).eq('status', 'processing').eq('review_started_at', startedAt)
+  const findExistingSource = async () => {
+    const { data, error } = await supabase.from('skills').select('id,slug')
+      .ilike('github_repo', input.repository.fullName.replace(/[\\%_]/g, '\\$&'))
+      .eq('source_path', input.skill.path).or(PUBLIC_SKILL_FILTER)
+      .order('created_at', { ascending: true }).order('id', { ascending: true }).limit(1).maybeSingle()
+    if (error) throw error
+    return data
+  }
 
   const staticAnalysis = analyzeCode(input.codeFiles)
   if (!staticAnalysis.passed) {
@@ -330,6 +338,15 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
 
     if (!policy.approved) {
       const { error } = await update({ status: 'listed', ai_review_result: reviewPayload, reviewed_at: reviewedAt })
+      if (error) throw error
+      return
+    }
+
+    // A different revision is still the same catalog identity. Preserve the
+    // established listing and its review; source synchronization handles updates.
+    const existingSource = await findExistingSource()
+    if (existingSource) {
+      const { error } = await update({ status: 'duplicate', skill_id: existingSource.id, ai_review_result: reviewPayload, reviewed_at: reviewedAt })
       if (error) throw error
       return
     }
@@ -410,13 +427,16 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
 
     if (createError) {
       if (createError.code !== '23505') throw createError
-      const { data: existing } = await supabase
+      const sourceDuplicate = await findExistingSource()
+      const { data: collision, error: collisionError } = await supabase
         .from('skills')
         .select('id, slug')
         .or(`slug.eq.${slug},source_content_hash.eq.${sourceContentHash}`)
         .or(PUBLIC_SKILL_FILTER)
         .limit(1)
         .maybeSingle()
+      if (collisionError) throw collisionError
+      const existing = sourceDuplicate || collision
       const { error: duplicateError } = await update({
           status: existing ? 'duplicate' : 'listed',
           skill_id: existing?.id || null,
