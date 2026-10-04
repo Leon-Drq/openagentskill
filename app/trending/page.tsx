@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, ChevronDown, Star } from 'lucide-react'
 import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
+import { NativeSelect } from '@/components/ui/native-select'
 import { MarketingPageShell } from '@/components/marketing-page'
 import { getLatestRankingSnapshot } from '@/lib/ranking-snapshots'
 import { isTrendingSnapshot, isTrendingStale, trendingJsonLd, trendingWindow } from '@/lib/trending'
@@ -71,11 +72,11 @@ export default async function TrendingSkillsPage({ searchParams }: Props) {
           <form action="/trending" method="get" className="flex max-w-full items-center gap-2">
             {locale !== 'en' ? <input type="hidden" name="lang" value={locale} /> : null}
             <label className="sr-only" htmlFor="trending-category">{d.category}</label>
-            <select id="trending-category" name="category" defaultValue={category} className="w-44 max-w-[55vw] text-xs">
+            <NativeSelect id="trending-category" name="category" defaultValue={category} className="w-44 max-w-[55vw] text-xs">
               <option value="">{c.allCategories}</option>
               {category && !categories.includes(category) ? <option value={category}>{directoryLabel(locale, category)}</option> : null}
               {categories.map(value => <option key={value} value={value}>{directoryLabel(locale, value)}</option>)}
-            </select>
+            </NativeSelect>
             <button type="submit" className="min-h-11 border border-border px-3 text-xs hover:border-foreground">{c.apply}</button>
           </form>
         </div>

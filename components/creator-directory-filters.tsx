@@ -57,7 +57,7 @@ export function CreatorDirectoryFilters({
         <NativeSelect
           name="area"
           defaultValue={area}
-          className="h-11 max-w-full border border-border bg-background px-3 text-sm text-foreground"
+          className="h-11 w-full max-w-full border border-border bg-background px-3 text-sm text-foreground"
           onChange={(e) => e.currentTarget.form?.requestSubmit()}
         >
           <option value="">{t('All fields')}</option>
@@ -73,7 +73,7 @@ export function CreatorDirectoryFilters({
         <NativeSelect
           name="sort"
           defaultValue={sort}
-          className="h-11 max-w-full border border-border bg-background px-3 text-sm text-foreground"
+          className="h-11 w-full max-w-full border border-border bg-background px-3 text-sm text-foreground"
           onChange={(e) => e.currentTarget.form?.requestSubmit()}
         >
           <option value="stars">{t('Repository stars')}</option>
