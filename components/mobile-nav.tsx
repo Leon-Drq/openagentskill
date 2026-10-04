@@ -5,26 +5,28 @@ import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronDown, Menu, Plus, X } from 'lucide-react'
-import { DiscoveryCategories } from '@/components/discovery-navigation'
 import { BrandMark } from '@/components/brand-mark'
-import { CreatorMenuProfile } from '@/components/creator-menu-profile'
+import { HeaderNavigationContent } from '@/components/header-navigation-content'
 import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
+import { NavUserMenu } from '@/components/nav-user-menu'
 import { useI18n } from '@/lib/i18n/context'
 import { getShowcaseNavLabel } from '@/lib/i18n/showcase-label'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { getShellCopy } from '@/lib/i18n/shell-content'
 import { cn } from '@/lib/utils'
-
-import { SITE_NAVIGATION, getNavigationCopy, navigationLabel, isNavigationPath, isNavigationSectionActive } from '@/lib/site-navigation'
+import { HEADER_NAVIGATION, getNavigationCopy, navigationLabel, isNavigationPath, isNavigationSectionActive } from '@/lib/site-navigation'
+import styles from './site-header.module.css'
 
 export function MobileNav() {
   const { t, locale } = useI18n()
   const shell = getShellCopy(locale)
   const [isOpen, setIsOpen] = useState(false)
+  const [openSection, setOpenSection] = useState<string | null>(null)
   const pathname = usePathname()
   const panel = useRef<HTMLDivElement>(null)
   const trigger = useRef<HTMLButtonElement>(null)
+  const close = () => setIsOpen(false)
 
   useEffect(() => {
     if (!isOpen) return
@@ -37,7 +39,7 @@ export function MobileNav() {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') { event.preventDefault(); setIsOpen(false) }
       if (event.key === 'Tab') {
-        const elements = Array.from(panel.current?.querySelectorAll<HTMLElement>('a[href], button, summary, select, [tabindex="0"]') || []).filter(el => el.getClientRects().length && !el.hasAttribute('disabled'))
+        const elements = Array.from(panel.current?.querySelectorAll<HTMLElement>('a[href], button, select, [tabindex="0"]') || []).filter(el => el.getClientRects().length && !el.hasAttribute('disabled'))
         const first = elements[0], last = elements.at(-1)
         if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
@@ -56,98 +58,57 @@ export function MobileNav() {
     }
   }, [isOpen])
 
-  return (
-    <div className="xl:hidden">
-      <button
-        ref={trigger}
-        aria-expanded={isOpen}
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className="-mr-2 flex h-10 w-10 items-center justify-center rounded-[8px] text-secondary transition-colors hover:bg-muted hover:text-foreground"
-        aria-label={shell.openMenu}
-      >
-        <Menu className="h-5 w-5" aria-hidden="true" />
-      </button>
+  return <>
+    <button ref={trigger} aria-expanded={isOpen} aria-controls="mobile-navigation-panel" type="button"
+      onClick={() => { setOpenSection(null); setIsOpen(true) }} className={styles.mobileTrigger} aria-label={shell.openMenu}>
+      <Menu size={21} aria-hidden="true" />
+    </button>
 
-      {isOpen && typeof document !== 'undefined' && createPortal(
-        <div
-          ref={panel}
-          role="dialog"
-          aria-modal="true"
-          aria-label={shell.mobileNavigation}
-          className="fixed inset-0 overflow-y-auto overscroll-contain bg-background text-foreground"
-          style={{ zIndex: 9999 }}
-        >
-          <div className="brand-grain pointer-events-none fixed inset-0 opacity-70" />
-          <div className="relative z-10 flex h-16 items-center justify-between border-b border-border px-6">
-            <span className="flex items-center gap-2 font-sans text-base font-semibold text-foreground">
-              <BrandMark className="h-7 w-7" />
-              OpenAgentSkill
-            </span>
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              className="-mr-2 flex h-10 w-10 items-center justify-center rounded-[8px] text-secondary transition-colors hover:bg-muted hover:text-foreground"
-              aria-label={shell.closeMenu}
-            >
-              <X className="h-5 w-5" aria-hidden="true" />
-            </button>
+    {isOpen && typeof document !== 'undefined' && createPortal(
+      <div ref={panel} id="mobile-navigation-panel" role="dialog" aria-modal="true" aria-label={shell.mobileNavigation} className={styles.mobilePanel}>
+        <div className={styles.mobileTop}>
+          <Link href={getLocalizedNavigationHref('/', locale)} onClick={close} className={styles.brand}>
+            <BrandMark className="h-7 w-7" /><span>OpenAgentSkill</span>
+          </Link>
+          <button type="button" onClick={close} className={styles.mobileClose} aria-label={shell.closeMenu}><X size={21} aria-hidden="true" /></button>
+        </div>
+
+        <nav className={styles.mobileBody} aria-label={shell.mobileNavigation}>
+          <div className={styles.mobileSections}>
+            {HEADER_NAVIGATION.map(section => {
+              const expanded = openSection === section.id
+              const label = navigationLabel(section, locale, t.nav, getShowcaseNavLabel(locale))
+              return <div key={section.id} data-mobile-section={section.id}>
+                <div className={styles.mobileSectionRow}>
+                  <Link href={getLocalizedNavigationHref(section.href, locale)} prefetch={false} onClick={close}
+                    aria-current={isNavigationPath(pathname, section.href) ? 'page' : undefined}
+                    className={cn(isNavigationSectionActive(pathname, section) && styles.mobileActive)}>{label}</Link>
+                  {section.items && <button type="button" className={styles.mobileClose} aria-expanded={expanded}
+                    aria-controls={`mobile-nav-${section.id}`} aria-label={`${getNavigationCopy(locale).toggle}: ${label}`}
+                    onClick={() => setOpenSection(expanded ? null : section.id)}>
+                    <ChevronDown size={18} className={cn(styles.chevron, expanded && styles.rotated)} aria-hidden="true" />
+                  </button>}
+                </div>
+                {section.items && <div id={`mobile-nav-${section.id}`} className={styles.mobileContent} hidden={!expanded}>
+                  <HeaderNavigationContent section={section} onNavigate={close} profileEnabled={expanded} />
+                </div>}
+              </div>
+            })}
           </div>
 
-          <nav
-            className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl flex-col px-6 py-5"
-            aria-label={shell.mobileNavigation}
-          >
-            <div className="divide-y divide-border border-y border-border">
-              {SITE_NAVIGATION.map(section => (
-                <div key={section.id} data-mobile-section={section.id} className="py-1">
-                  <Link href={getLocalizedNavigationHref(section.href, locale)} prefetch={false} onClick={() => setIsOpen(false)}
-                    aria-current={isNavigationPath(pathname, section.href) ? 'page' : undefined}
-                    className={cn('block rounded px-3 py-3 text-base font-semibold', isNavigationSectionActive(pathname, section) && 'text-[#006b4f]')}>
-                    {navigationLabel(section, locale, t.nav, getShowcaseNavLabel(locale))}
-                  </Link>
-                  {section.items && <details className="group px-3" open={isNavigationSectionActive(pathname, section) || section.id === 'categories'}>
-                    <summary className="flex cursor-pointer list-none items-center justify-between pb-3 text-sm text-secondary">
-                      {getNavigationCopy(locale).more}
-                      <ChevronDown className="h-4 w-4 group-open:rotate-180" aria-hidden="true" />
-                    </summary>
-                    {section.id === 'categories' && <DiscoveryCategories onNavigate={() => setIsOpen(false)} />}
-                    <ul className="grid gap-x-6 pb-3 sm:grid-cols-2">
-                      {section.items.filter(item => section.id !== 'categories' || !['/skills', '/showcase', '/resolve'].includes(item.href)).map(item => <li key={item.href}>
-                        <Link href={getLocalizedNavigationHref(item.href, locale)} prefetch={false} onClick={() => setIsOpen(false)}
-                          aria-current={isNavigationPath(pathname, item.href) ? 'page' : undefined}
-                          className={cn('block rounded px-3 py-2.5 text-sm hover:bg-muted', isNavigationPath(pathname, item.href) ? 'bg-muted text-foreground' : 'text-secondary')}>
-                          {navigationLabel(item, locale, t.nav, getShowcaseNavLabel(locale))}
-                        </Link>
-                      </li>)}
-                    </ul>
-                    {section.id === 'creators' && <CreatorMenuProfile onNavigate={() => setIsOpen(false)} />}
-                  </details>}
-                </div>
-              ))}
+          <div className={styles.mobileBottom}>
+            <NavUserMenu mobile onNavigate={close} />
+            <div className={styles.mobileUtilities}>
+              <Link href={getLocalizedNavigationHref('/submit', locale)} prefetch={false} onClick={close} className={styles.mobileSubmit}>
+                <Plus size={17} aria-hidden="true" />{t.nav.submitSkill}
+              </Link>
+              <GitHubStarButton variant="navigation" />
             </div>
-
-            <div className="mt-auto pt-5">
-              <div className="mb-3 flex items-center justify-between gap-4 border-t border-border pt-4">
-                <span className="font-mono text-xs uppercase text-secondary">{shell.mobileLanguage}</span>
-                <LanguageSwitcher />
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Link
-                  href={getLocalizedNavigationHref('/submit', locale)}
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center gap-2 rounded-[8px] border border-border bg-card/70 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40"
-                >
-                  <Plus className="h-5 w-5" aria-hidden="true" />
-                  {t.nav.submitSkill}
-                </Link>
-                <GitHubStarButton fullWidth className="h-10" />
-              </div>
-            </div>
-          </nav>
-        </div>,
-        document.body
-      )}
-    </div>
-  )
+            <div className={styles.mobileLanguage}><span>{shell.mobileLanguage}</span><LanguageSwitcher /></div>
+          </div>
+        </nav>
+      </div>,
+      document.body
+    )}
+  </>
 }

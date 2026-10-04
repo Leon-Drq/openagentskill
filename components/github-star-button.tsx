@@ -18,6 +18,7 @@ interface GitHubStarButtonProps {
   className?: string
   fullWidth?: boolean
   compact?: boolean
+  variant?: 'default' | 'navigation'
 }
 
 const REPO_CACHE_KEY = 'openagentskill.github-repo-summary.v2'
@@ -69,7 +70,7 @@ function fetchRepoSummary() {
   return pendingRepoRequest
 }
 
-export function GitHubStarButton({ className, fullWidth, compact }: GitHubStarButtonProps) {
+export function GitHubStarButton({ className, fullWidth, compact, variant = 'default' }: GitHubStarButtonProps) {
   // Keep the server and initial browser render identical. Cached data is applied
   // after hydration so the header never creates a React hydration mismatch.
   const [repo, setRepo] = useState<GitHubRepoSummary>(FALLBACK_REPO)
@@ -104,17 +105,19 @@ export function GitHubStarButton({ className, fullWidth, compact }: GitHubStarBu
       target="_blank"
       rel="noopener noreferrer"
       className={cn(
-        'inline-flex h-9 shrink-0 items-stretch overflow-hidden rounded-[8px] bg-[#006b4f] text-sm font-semibold text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] transition-opacity hover:opacity-90',
+        variant === 'navigation'
+          ? 'inline-flex h-10 shrink-0 items-center gap-2 rounded-lg text-sm font-medium text-foreground transition-colors hover:text-[#006b4f]'
+          : 'inline-flex h-9 shrink-0 items-stretch overflow-hidden rounded-[8px] bg-[#006b4f] text-sm font-semibold text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] transition-opacity hover:opacity-90',
         fullWidth && 'w-full justify-center',
         className
       )}
       aria-label={`Star ${repo.repo || 'OpenAgentSkill'} on GitHub, ${repo.stars_label || '0'} stars`}
     >
-      <span className={cn('flex items-center gap-2', compact ? 'px-2.5' : 'px-3')}>
+      <span className={cn('flex items-center gap-2', variant !== 'navigation' && (compact ? 'px-2.5' : 'px-3'))}>
         <Github className="h-4 w-4" aria-hidden="true" />
-        <span className={compact ? 'sr-only sm:not-sr-only' : undefined}>Star</span>
+        <span className={compact ? 'sr-only sm:not-sr-only' : undefined}>{variant === 'navigation' ? 'GitHub' : 'Star'}</span>
       </span>
-      <span className="flex min-w-8 items-center justify-center border-l border-white/15 bg-[#075f47] px-2 font-mono text-[11px]">
+      <span className={variant === 'navigation' ? 'font-mono text-[11px] text-secondary' : 'flex min-w-8 items-center justify-center border-l border-white/15 bg-[#075f47] px-2 font-mono text-[11px]'}>
         {repo.stars_label || '0'}
       </span>
     </a>

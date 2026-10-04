@@ -7,7 +7,7 @@ type NavKey = keyof typeof en.nav
 export type NavigationLink = { href: string; label: NavKey | 'gallery' | 'resources' | 'developers' | 'creatorShort' | 'reports' | 'contact' | 'sponsor' | 'categories' }
 export type NavigationSection = NavigationLink & { id: string; items?: readonly NavigationLink[]; activePaths?: readonly string[] }
 
-// One hierarchy for desktop and mobile. Existing public URLs are deliberately retained.
+// Public destinations retained independently of the header's presentation.
 export const SITE_NAVIGATION: readonly NavigationSection[] = [
   { id: 'skills', href: '/skills', label: 'skills', activePaths: ['/showcase', '/resolve', '/skill-packs', '/compare'] },
   { id: 'categories', href: '/best', label: 'categories', activePaths: ['/collections', '/use-cases', '/tasks'], items: [
@@ -28,6 +28,19 @@ export const SITE_NAVIGATION: readonly NavigationSection[] = [
     { href: '/docs', label: 'docs' }, { href: '/agent', label: 'agentEntry' },
     { href: '/api-docs', label: 'apiDocs' }, { href: '/cli', label: 'cli' },
   ] },
+]
+
+// Desktop and mobile share four groups without removing any existing destination.
+const section = (id: string) => SITE_NAVIGATION.find(item => item.id === id)!
+export const HEADER_NAVIGATION: readonly NavigationSection[] = [
+  { ...section('skills'), items: [
+    { href: section('categories').href, label: 'categories' },
+    ...section('categories').items!,
+  ], activePaths: [...section('skills').activePaths!, ...section('categories').activePaths!] },
+  section('rankings'),
+  section('creators'),
+  { ...section('resources'), items: [...section('resources').items!, ...section('developers').items!],
+    activePaths: [...section('resources').activePaths!, ...section('developers').activePaths!] },
 ]
 
 const copy: Record<Locale, { resources: string; developers: string; creatorShort: string; reports: string; more: string; navigation: string; toggle: string }> = {
