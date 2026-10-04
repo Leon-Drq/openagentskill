@@ -25,7 +25,10 @@ historical telemetry is not moved or presented as new runtime evidence.
 Deploy `canonical_skill_sources` before the application. Run the SQL fixture
 script inside a transaction and roll back. Verify a repository search returns
 the canonical page, both catalog counts and pages exclude the duplicate, and
-the old duplicate URL returns HTTP 308. Do not close the issue before rollout.
+the old duplicate URL returns HTTP 308. Localized detail links must reach
+`/skills/socai-io-jev-social?lang=<locale>` and finish with HTTP 200; prefixed
+canonical paths also redirect there to recover cached old redirect targets.
+Do not close the issue before rollout.
 
 ## #100 — bazi-skill manual review
 
