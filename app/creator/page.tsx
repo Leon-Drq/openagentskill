@@ -5,14 +5,14 @@ import { createClient } from '@/lib/supabase/server'
 import { CreatorIdentityConnections } from '@/components/creator-identity-connections'
 import { CreatorBatchClaim } from '@/components/creator-batch-claim'
 import { CreatorActivationTracker } from '@/components/creator-activation-tracker'
-import { MarketingPageShell } from '@/components/marketing-page'
+import { AccountWorkspaceShell } from '@/components/account-workspace-shell'
+import { accountCopy } from '@/lib/i18n/account-copy'
+import { AccountPublicCard } from '@/components/account-public-card'
 import type { Metadata } from 'next'
 import { CreatorProfileEditor } from '@/components/creator-profile-editor'
-import { CreatorProfileShare } from '@/components/creator-profile-share'
 import { creatorDateWindow, readCreatorDailyPages } from '@/lib/creator-profile'
 import { studioCopy, type StudioKey } from '@/lib/i18n/creator-studio-copy'
 import { getLocaleFromSearchParam } from '@/lib/i18n/config'
-import { I18nProvider } from '@/lib/i18n/context'
 import { SHOWCASE_CASES } from '@/lib/showcase'
 import { getShowcaseCardData } from '@/lib/showcase-shared'
 import { ShowcaseCard } from '@/components/showcase-card'
@@ -45,24 +45,26 @@ export default async function CreatorDashboard({
   const tabs = ['overview', 'profile', 'skills', 'works', 'analytics'] as const
   const tab = tabs.find(value => value === params.tab) || 'overview'
   const tabHref = (value: string) => `/creator?tab=${value}&lang=${locale}`
+  const needsAnalytics = tab === 'overview' || tab === 'analytics' || tab === 'skills'
+  const needsClaims = tab !== 'profile'
   const dateWindow = creatorDateWindow()
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/auth/login?next=${encodeURIComponent(tabHref(tab))}`)
+  if (!user || user.is_anonymous) redirect(`/auth/login?next=${encodeURIComponent(tabHref(tab))}`)
 
   const [{ data: profile }, { data: claims }] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
-    supabase
+    needsClaims ? supabase
       .from('skill_claims')
       .select('id,skill_slug,status,github_username,x_username,verification_method,verification_tier,verified_at,challenge_expires_at,created_at,updated_at')
       .eq('user_id', user.id)
-      .order('updated_at', { ascending: false }),
+      .order('updated_at', { ascending: false }) : Promise.resolve({ data: [] }),
   ])
 
   const verifiedGitHubUsername = profile?.github_verified_at && profile?.github_username
     ? String(profile.github_username).toLowerCase()
     : null
-  const { count: matchingGitHubSkillCount } = verifiedGitHubUsername
+  const { count: matchingGitHubSkillCount } = verifiedGitHubUsername && (tab === 'overview' || tab === 'skills')
     ? await supabase
         .from('skills')
         .select('slug', { count: 'exact', head: true })
@@ -75,16 +77,16 @@ export default async function CreatorDashboard({
     approvedSlugs.length
       ? supabase.from('skills').select('slug,name,category,repository,github_repo,version,license,license_source,license_status,source_commit_sha,source_sync_status,last_synced_at').in('slug', approvedSlugs)
       : Promise.resolve({ data: [] }),
-    approvedSlugs.length
+    approvedSlugs.length && needsAnalytics
       ? supabase.from('skill_event_stats').select('*').in('skill_slug', approvedSlugs)
       : Promise.resolve({ data: [] }),
-    approvedSlugs.length
+    approvedSlugs.length && needsAnalytics
       ? supabase.from('agent_outcome_stats').select('*').in('skill_slug', approvedSlugs)
       : Promise.resolve({ data: [] }),
-    approvedSlugs.length
+    approvedSlugs.length && (tab === 'overview' || tab === 'analytics')
       ? readCreatorDailyPages(offset => supabase.from('skill_events_daily').select('skill_slug,event_date,views,install_starts,install_successes,outcome_successes').in('skill_slug', approvedSlugs).gte('event_date', dateWindow.start).lte('event_date', dateWindow.end).order('event_date', { ascending: false }).order('skill_slug').range(offset, offset + 999))
       : Promise.resolve({ data: [] }),
-    approvedSlugs.length
+    approvedSlugs.length && (tab === 'overview' || tab === 'skills')
       ? supabase.from('skill_versions').select('skill_slug,source_content_hash,detected_at').in('skill_slug', approvedSlugs).order('detected_at', { ascending: false })
       : Promise.resolve({ data: [] }),
   ])
@@ -93,7 +95,7 @@ export default async function CreatorDashboard({
   const outcomeMap = new Map((outcomes || []).map((row) => [row.skill_slug, row]))
   const versionCounts = new Map<string, number>()
   for (const row of versions || []) versionCounts.set(row.skill_slug, (versionCounts.get(row.skill_slug) || 0) + 1)
-  const approvedMatchingGitHubCount = verifiedGitHubUsername
+  const approvedMatchingGitHubCount = verifiedGitHubUsername && (tab === 'overview' || tab === 'skills')
     ? (skills || []).filter((skill) => String(skill.github_repo || '').toLowerCase().startsWith(`${verifiedGitHubUsername}/`)).length
     : 0
   const totals = (skills || []).reduce(
@@ -127,7 +129,7 @@ export default async function CreatorDashboard({
   ]
 
   return (
-    <I18nProvider initialLocale={locale}><MarketingPageShell><div className="mx-auto min-h-screen max-w-6xl px-5 py-12 sm:px-6 sm:py-16">
+    <AccountWorkspaceShell locale={locale} active="creator" name={profile?.display_name || profile?.username || accountCopy(locale, 'member')} avatarUrl={profile?.avatar_url}><div>
       <CreatorActivationTracker
         githubConnected={params.connected === 'github'}
         profilePublished={params.saved === '1'}
@@ -148,7 +150,7 @@ export default async function CreatorDashboard({
         {tabs.map(value => <Link key={value} href={tabHref(value)} aria-current={tab === value ? 'page' : undefined} className={`min-h-11 px-4 py-3 text-sm ${tab === value ? 'bg-[#006b4f] text-white' : 'hover:bg-muted'}`}>{t(value === 'profile' ? 'edit' : value)}</Link>)}
       </nav>
       {params.saved ? <p role="status" className="mt-6 border border-emerald-600/40 bg-emerald-500/5 p-3 text-sm">Creator profile saved.</p> : null}
-      {params.connected === 'github' ? <p className="mt-6 border border-emerald-600/40 bg-emerald-500/5 p-3 text-sm">GitHub identity connected and verified.</p> : null}
+      {params.connected === 'github' && profile?.github_verified_at ? <p className="mt-6 border border-emerald-600/40 bg-emerald-500/5 p-3 text-sm">GitHub identity connected and verified.</p> : null}
       {params.error ? <p role="alert" className="mt-6 border border-red-600/40 bg-red-500/5 p-3 text-sm">{params.error === 'handle-taken' ? 'That profile handle is already in use. Choose another.' : params.error === 'handle-locked' ? t('stable') : 'Could not save. Check the fields and connection, then try again.'}</p> : null}
 
       {tab === 'overview' && <section className="mt-8 grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-4" aria-label="Ownership progress">
@@ -188,9 +190,11 @@ export default async function CreatorDashboard({
             />
           ) : null}
           <CreatorIdentityConnections
+            locale={locale}
+            returnTo={tabHref(tab)}
             githubUsername={profile?.github_username}
             githubVerifiedAt={profile?.github_verified_at}
-            xUsername={profile?.x_username}
+            xUsername={profile?.x_username} xVerifiedAt={profile?.x_verified_at}
             githubOAuthEnabled={process.env.NEXT_PUBLIC_GITHUB_OAUTH_ENABLED === 'true'}
             githubAppInstallUrl={process.env.NEXT_PUBLIC_GITHUB_APP_INSTALL_URL || null}
           />
@@ -247,17 +251,13 @@ export default async function CreatorDashboard({
         <CreatorProfileEditor locale={locale} action={updateCreatorProfile} handleLocked={Boolean(profile?.username)} githubVerified={Boolean(profile?.github_verified_at)} xVerified={Boolean(profile?.x_verified_at)}
           initial={{ username, display_name: profile?.display_name || '', bio: profile?.bio || '', website: profile?.website || '', github_username: profile?.github_username || '', x_username: profile?.x_username || '' }} />
       </section>}
-      {tab === 'overview' && <section className="mt-10 flex flex-wrap items-center justify-between gap-6 border-t border-border py-8">
-        <div><h2 className="font-display text-2xl">{t('profile')}</h2><p className="mt-2 text-sm text-secondary">{t('privacy')}</p></div>
-        <Link href={tabHref('profile')} className="border border-border px-4 py-3 text-sm">{t('edit')}</Link>
-        {profile?.username && <CreatorProfileShare username={profile.username} locale={locale} />}
-      </section>}
+      {tab === 'overview' && <AccountPublicCard username={profile?.username || null} name={profile?.display_name || profile?.username || accountCopy(locale, 'member')} bio={profile?.bio || null} locale={locale} />}
       {tab === 'works' && <section className="mt-10">
         <h2 className="font-display text-3xl">{t('gallery')}</h2><p className="mt-3 text-sm text-secondary">{t('galleryNote')}</p>
         {works.length ? <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">{works.slice(0, 12).map(item => <ShowcaseCard key={item.slug} item={getShowcaseCardData(item)} />)}</div> : <p className="my-8 border border-border p-6 text-secondary">{t('emptyWorks')}</p>}
         <Link href="/contact" className="mt-6 inline-block border border-border px-4 py-3 text-sm">Submit a Gallery example →</Link>
       </section>}
       {tab === 'analytics' && <p className="mt-6 max-w-3xl text-sm leading-7 text-secondary">Views and install starts are recorded events, not unique people. Confirmed installs and outcomes are separate receipt/report totals, not a conversion funnel. The 30-day window uses UTC dates ({dateWindow.start}–{dateWindow.end}). Missing analytics are not evidence of unsuccessful usage.</p>}
-    </div></MarketingPageShell></I18nProvider>
+    </div></AccountWorkspaceShell>
   )
 }

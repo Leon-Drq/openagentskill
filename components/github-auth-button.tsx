@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import { Github } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { safeAccountNext } from '@/lib/account-workspace'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 
 function safeNext(value: string | null, fallback: string) {
-  return value && value.startsWith('/') && !value.startsWith('//') ? value : fallback
+  return safeAccountNext(value, fallback)
 }
 
 export function GitHubAuthButton({
@@ -30,11 +31,10 @@ export function GitHubAuthButton({
     const redirectTo = new URL('/auth/callback', window.location.origin)
     redirectTo.searchParams.set('next', next)
 
-    const { error: oauthError } = await createClient().auth.signInWithOAuth({
-      provider: 'github',
-      options: { redirectTo: redirectTo.toString() },
-    })
-    if (oauthError) {
+    try {
+      const { error: oauthError } = await createClient().auth.signInWithOAuth({ provider: 'github', options: { redirectTo: redirectTo.toString() } })
+      if (oauthError) throw oauthError
+    } catch {
       setError('GitHub sign-in could not start. You can still use email and password.')
       setLoading(false)
     }

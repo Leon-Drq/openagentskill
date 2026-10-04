@@ -83,6 +83,16 @@ export async function PUT(request: NextRequest) {
       const totals = await counts([body.slug])
       return json({ slug: body.slug, vote: body.vote, likes: Number(totals[0]?.likes ?? 0), dislikes: Number(totals[0]?.dislikes ?? 0) })
     }
+    // A saved listing may have been withdrawn. Users must still be able to
+    // remove their own bookmark; this never makes a hidden skill public.
+    if ('saved' in body && !body.saved) {
+      const results = await Promise.all([
+        supabase.from('bookmarks').delete().eq('user_id', user.id).eq('skill_slug', body.slug).abortSignal(AbortSignal.timeout(8000)),
+        supabase.from('provider_skill_engagement').update({ saved: false }).eq('user_id', user.id).eq('skill_slug', body.slug).abortSignal(AbortSignal.timeout(8000)),
+      ])
+      if (results.some(result => result.error)) throw new Error('Bookmark removal unavailable')
+      return json({ slug: body.slug, saved: false })
+    }
     const visible = await supabase.from('skills').select('slug').eq('slug', body.slug).abortSignal(AbortSignal.timeout(8000)).maybeSingle()
     if (visible.error) throw visible.error
     if (!visible.data) return json({ error: 'skill_not_found' }, 404)

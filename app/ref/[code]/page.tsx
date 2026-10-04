@@ -1,7 +1,10 @@
 import { redirect } from 'next/navigation'
+import { getLocaleFromSearchParam } from '@/lib/i18n/config'
+import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { createPublicClient } from '@/lib/supabase/public'
 
-export default async function RefPage({ params }: { params: Promise<{ code: string }> }) {
+export default async function RefPage({ params, searchParams }: { params: Promise<{ code: string }>; searchParams: Promise<{ lang?: string }> }) {
+  const locale = getLocaleFromSearchParam((await searchParams).lang) || 'en'
   const { code } = await params
 
   // Verify invite code exists
@@ -12,8 +15,8 @@ export default async function RefPage({ params }: { params: Promise<{ code: stri
     .eq('invite_code', code)
     .single()
 
-  if (!data) redirect('/auth/sign-up')
+  if (!data) redirect(getLocalizedNavigationHref('/auth/sign-up?next='+encodeURIComponent(getLocalizedNavigationHref('/profile', locale)), locale))
 
   // Redirect to sign-up with invite code in query param (stored in cookie by sign-up form)
-  redirect(`/auth/sign-up?ref=${code}&inviter=${encodeURIComponent(data.display_name || 'a member')}`)
+  redirect(getLocalizedNavigationHref(`/auth/sign-up?ref=${encodeURIComponent(code)}&inviter=${encodeURIComponent(data.display_name || 'a member')}&next=${encodeURIComponent(getLocalizedNavigationHref('/profile', locale))}`, locale))
 }

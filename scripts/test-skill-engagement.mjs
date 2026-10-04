@@ -17,6 +17,7 @@ function query(table) {
     maybeSingle: async () => ({ data: { slug: 'alpha' }, error: null }),
     upsert(row, options) { writes.push({ table, row, options }); return q },
     delete() { writes.push({ table, delete: true }); return q },
+    update(row) { writes.push({ table, update: row }); return q },
     then(resolve, reject) {
       personalReads.push({ table, user })
       const data = table === 'skill_votes' ? [{ skill_slug: 'alpha', vote: user === 'one' ? 1 : -1 }]
@@ -68,6 +69,7 @@ assert.equal(cache.size, 0, 'Votes invalidate aggregate state')
 for (let i=0;i<2;i++) assert.equal((await put({ slug: 'alpha', saved: true })).status, 200)
 assert.ok(writes.filter(x => x.row).every(x => x.row.user_id === 'one' && x.options.ignoreDuplicates && x.options.onConflict === 'user_id,skill_slug'))
 assert.equal((await put({ slug: 'alpha', saved: false })).status, 200)
+assert.deepEqual(writes.find(x => x.update)?.update, { saved: false }, 'Unsave preserves provider votes')
 failWrite = true; assert.equal((await put({ slug: 'alpha', vote: 1 })).status, 503); failWrite = false
 assert.equal((await put({ slug: 'alpha', vote: 1 })).status, 200)
 failCounts = true; assert.equal((await get('alpha')).status, 503); assert.equal(cache.size, 0)

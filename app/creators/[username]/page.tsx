@@ -66,6 +66,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical },
     robots: { index: creator.skills.length > 0, follow: true },
     openGraph: { title: `${name} — Agent Skill Creator`, description, url: canonical, type: 'profile' },
+    twitter: { card: 'summary_large_image', title: `${name} — Agent Skill Creator`, description },
   }
 }
 
@@ -151,7 +152,7 @@ export default async function CreatorPage({ params, searchParams }: Props) {
           {profile.github_username ? <a className="inline-flex items-center gap-2 border border-border px-3 py-2 hover:border-foreground" href={`https://github.com/${profile.github_username}`} rel={profile.github_verified_at ? 'me' : undefined}>GitHub @{profile.github_username}{profile.github_verified_at ? <BadgeCheck className="size-3 text-emerald-700" /> : null}</a> : null}
           {profile.x_username ? <a className="border border-border px-3 py-2 hover:border-foreground" href={`https://x.com/${profile.x_username}`}>X @{profile.x_username}{profile.x_verified_at ? ' · verified' : ''}</a> : null}
         </div>
-        <div className="mt-6"><CreatorProfileShare username={profile.username} locale={locale} /></div>
+        <div className="mt-6"><CreatorProfileShare username={profile.username} locale={locale} shareOnX /></div>
         {skills.length > 0 && <p className="mt-4 text-xs leading-5 text-secondary">{t('evidence')}</p>}
         {sourceOwner && <Link className="mt-3 inline-block text-xs underline underline-offset-4" href={href(`/creators/github/${sourceOwner.owner.toLowerCase()}`)}>GitHub source profile ↗</Link>}
       </div>

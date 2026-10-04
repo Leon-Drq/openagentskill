@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
+import { safeAccountNext } from '@/lib/account-workspace'
+import { getLocaleFromSearchParam } from '@/lib/i18n/config'
+import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { GitHubAuthButton } from '@/components/github-auth-button'
 
 export default function SignUpPage() {
@@ -22,10 +25,9 @@ function SignUpForm() {
   const refCode = searchParams.get('ref')
   const inviterName = searchParams.get('inviter')
   const requestedNext = searchParams.get('next')
-  const nextPath = requestedNext && requestedNext.startsWith('/') && !requestedNext.startsWith('//')
-    ? requestedNext
-    : '/creator'
-  const creatorIntent = nextPath === '/creator'
+  const nextPath = safeAccountNext(requestedNext, '/creator')
+  const locale = getLocaleFromSearchParam(searchParams.get('lang')) || getLocaleFromSearchParam(new URL(nextPath, 'https://www.openagentskill.com').searchParams.get('lang')) || 'en'
+  const creatorIntent = nextPath.split('?')[0] === '/creator'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
@@ -37,11 +39,11 @@ function SignUpForm() {
     setLoading(true)
     setError(null)
     const supabase = createClient()
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm`,
+        emailRedirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent(nextPath)}`,
         data: { display_name: displayName, invite_code_used: refCode || null },
       },
     })
@@ -49,7 +51,8 @@ function SignUpForm() {
       setError(error.message)
       setLoading(false)
     } else {
-      router.push('/auth/sign-up-success')
+      router.push(data.session ? nextPath : getLocalizedNavigationHref(`/auth/sign-up-success?next=${encodeURIComponent(nextPath)}`, locale))
+      router.refresh()
     }
   }
 
@@ -62,7 +65,7 @@ function SignUpForm() {
 
         {inviterName && (
           <div className="border border-border px-4 py-3 mb-6 text-sm text-secondary">
-            Invited by <strong className="text-foreground">{inviterName}</strong> — you&apos;ll both earn bonus points.
+            Invited by <strong className="text-foreground">{inviterName}</strong>.
           </div>
         )}
         <h1 className="font-display text-2xl font-bold mb-1">
@@ -75,7 +78,7 @@ function SignUpForm() {
         ) : null}
         <p className="text-sm text-secondary mb-6">
           Already have one?{' '}
-          <Link href={`/auth/login?next=${encodeURIComponent(nextPath)}`} className="underline hover:opacity-70 transition-opacity">
+          <Link href={getLocalizedNavigationHref(`/auth/login?next=${encodeURIComponent(nextPath)}`, locale)} className="underline hover:opacity-70 transition-opacity">
             Sign in
           </Link>
         </p>
@@ -132,7 +135,7 @@ function SignUpForm() {
         </form>
 
         <p className="text-xs text-secondary mt-6 leading-relaxed">
-          By creating an account you agree to our terms of service. Earn points by publishing skills, submitting reviews, and inviting others.
+          By creating an account you agree to our terms of service.
         </p>
       </div>
     </div>
