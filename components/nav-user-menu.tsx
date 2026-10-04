@@ -5,7 +5,7 @@ import { accountCopy } from '@/lib/i18n/account-copy'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, LogOut, UserRound } from 'lucide-react'
+import { Bookmark, ChevronDown, LogOut, Settings2, Sparkles, UserRound } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
@@ -76,9 +76,9 @@ export function NavUserMenu({ mobile = false, onNavigate }: { mobile?: boolean; 
     <Link href={getLocalizedNavigationHref('/profile', locale)} prefetch={false} onClick={navigate}>
       <UserRound size={17} aria-hidden="true" /><span>{accountCopy(locale, 'workspace')}</span>
     </Link>
-    <Link href={getLocalizedNavigationHref('/profile?tab=bookmarks', locale)} prefetch={false} onClick={navigate}>{c.saved}</Link>
-    <Link href={getLocalizedNavigationHref('/profile?tab=settings', locale)} prefetch={false} onClick={navigate}>{accountCopy(locale, 'settings')}</Link>
-    <Link href={getLocalizedNavigationHref('/creator', locale)} prefetch={false} onClick={navigate}>{t.nav.creatorConsole}</Link>
+    <Link href={getLocalizedNavigationHref('/profile?tab=bookmarks', locale)} prefetch={false} onClick={navigate}><Bookmark size={17} aria-hidden="true" />{c.saved}</Link>
+    <Link href={getLocalizedNavigationHref('/profile?tab=settings', locale)} prefetch={false} onClick={navigate}><Settings2 size={17} aria-hidden="true" />{accountCopy(locale, 'settings')}</Link>
+    <Link href={getLocalizedNavigationHref('/creator', locale)} prefetch={false} onClick={navigate}><Sparkles size={17} aria-hidden="true" />{t.nav.creatorConsole}</Link>
     <button type="button" onClick={signOut} disabled={signingOut}><LogOut size={17} aria-hidden="true" />{c.signout}</button>
     {error && <p role="alert" className={styles.accountError}>{c.signoutError}</p>}
   </>

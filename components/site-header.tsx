@@ -27,22 +27,25 @@ function NavDropdown({ pathname, section, open, onOpen }: {
   const router = useRouter()
   const root = useRef<HTMLDivElement>(null)
   const trigger = useRef<HTMLButtonElement>(null)
+  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const label = navigationLabel(section, locale, t.nav, getShowcaseNavLabel(locale))
   const href = getLocalizedNavigationHref(section.href, locale)
   const warmRoute = (href: string) => router.prefetch(href)
   const id = `desktop-nav-${section.id}`
 
   useEffect(() => {
+    clearTimeout(hoverTimeout.current)
     if (!open) return
     const dismiss = (event: PointerEvent) => {
       if (!root.current?.contains(event.target as Node)) onOpen(null)
     }
     document.addEventListener('pointerdown', dismiss)
-    return () => document.removeEventListener('pointerdown', dismiss)
+    return () => { document.removeEventListener('pointerdown', dismiss); clearTimeout(hoverTimeout.current) }
   }, [open, onOpen])
 
   return <div ref={root} className={styles.navSection} data-nav-section={section.id}
-    onPointerLeave={event => { if (event.pointerType === 'mouse' && !root.current?.contains(document.activeElement)) onOpen(null) }}
+    onPointerEnter={() => clearTimeout(hoverTimeout.current)}
+    onPointerLeave={event => { if (event.pointerType === 'mouse' && !root.current?.contains(document.activeElement)) hoverTimeout.current = setTimeout(() => onOpen(null), 150) }}
     onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) onOpen(null) }}
     onKeyDown={event => {
       if (event.key === 'Escape' && open) { event.stopPropagation(); onOpen(null); trigger.current?.focus() }

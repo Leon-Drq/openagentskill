@@ -72,6 +72,19 @@ export function LanguageSwitcher({ compact = false, showName = !compact, classNa
           setOpen(false)
           root.current?.querySelector('button')?.focus()
         }
+        if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+          event.preventDefault()
+          if (!open) {
+            root.current?.querySelector('button')?.click()
+            requestAnimationFrame(() => root.current?.querySelector<HTMLButtonElement>('[aria-selected="true"]')?.focus())
+            return
+          }
+          const options = Array.from(root.current?.querySelectorAll<HTMLButtonElement>('[role="option"]') || [])
+          if (!options.length) return
+          const current = options.indexOf(document.activeElement as HTMLButtonElement)
+          const next = event.key === 'Home' ? 0 : event.key === 'End' ? options.length - 1 : event.key === 'ArrowDown' ? (current + 1) % options.length : (current <= 0 ? options.length : current) - 1
+          options[next]?.focus()
+        }
       }}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
@@ -109,7 +122,7 @@ export function LanguageSwitcher({ compact = false, showName = !compact, classNa
           role="listbox"
           aria-label={siteCopy(locale, 'Select language')}
           style={{ maxHeight: panel.height }}
-          className={cn('absolute right-0 z-50 w-52 max-w-[calc(100vw-2rem)] overflow-y-auto overscroll-contain rounded-[8px] border border-border bg-background shadow-[0_18px_55px_rgba(29,27,24,0.12)]', panel.above ? 'bottom-full mb-2' : 'top-full mt-2')}
+          className={cn('dropdown-surface absolute right-0 z-50 w-56 max-w-[calc(100vw-2rem)] overflow-y-auto p-1.5', panel.above ? 'bottom-full mb-2' : 'top-full mt-2')}
         >
           {locales.map((loc) => {
             const active = loc === activeLocale
@@ -119,10 +132,11 @@ export function LanguageSwitcher({ compact = false, showName = !compact, classNa
                 type="button"
                 role="option"
                 aria-selected={active}
+                tabIndex={active ? 0 : -1}
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => switchLanguage(loc)}
                 className={cn(
-                  'flex min-h-11 w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#006b4f]',
+                  'dropdown-option flex min-h-11 w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#006b4f]',
                   active ? 'bg-muted text-foreground' : 'text-secondary hover:bg-muted/60 hover:text-foreground'
                 )}
               >

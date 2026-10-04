@@ -79,7 +79,7 @@
 .megaMenu {
   position: absolute;
   left: 50%;
-  top: calc(100% - 1px);
+  top: calc(100% + 8px);
   z-index: 50;
   width: min(1160px, calc(100vw - 48px));
   max-height: calc(100dvh - 80px);
@@ -88,9 +88,9 @@
   transform: translateX(-50%);
   padding: 26px 30px 20px;
   border: 1px solid var(--border);
-  border-radius: 0 0 16px 16px;
+  border-radius: 14px;
   background: var(--card);
-  box-shadow: 0 22px 55px rgb(29 27 24 / 10%);
+  box-shadow: var(--dropdown-shadow);
 }
 .creatorMenu { width: min(720px, calc(100vw - 48px)); padding: 30px; }
 .closed { visibility: hidden; pointer-events: none; }
@@ -110,7 +110,7 @@
   font-size: 15px;
   line-height: 1.5;
 }
-.menuLinks a:hover { color: #006b4f; background: var(--background); }
+.menuLinks a:hover, .menuLinks a:focus-visible { color: var(--dropdown-accent); background: var(--dropdown-selected); }
 .menuLinks svg { flex-shrink: 0; color: var(--secondary); }
 .creatorLinks .menuLinks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 42px; }
 .shortcuts { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 4px; }
@@ -134,13 +134,13 @@
 .account { position: relative; }
 .accountTrigger { display: flex; align-items: center; gap: 8px; padding: 3px; cursor: pointer; border-radius: 8px; }
 .avatar { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: #006b4f; color: white; font-size: 13px; }
-.accountMenu { position: absolute; top: calc(100% + 12px); right: 0; width: 264px; padding: 8px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); box-shadow: 0 18px 45px rgb(29 27 24 / 10%); }
+.accountMenu { position: absolute; top: calc(100% + 10px); right: 0; width: 264px; max-width: calc(100vw - 24px); max-height: calc(100dvh - 80px); overflow-y: auto; padding: 6px; border: 1px solid var(--border); border-radius: 12px; background: var(--popover); box-shadow: var(--dropdown-shadow); }
 .accountHeading { display: grid; gap: 4px; padding: 12px; font-size: 13px; font-weight: 600; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
 .accountHeading small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 400; color: var(--secondary); }
 .accountMenu > a, .accountMenu > button,
 .mobileAccount > a, .mobileAccount > button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 10px 12px; border-radius: 6px; font-size: 14px; text-align: left; cursor: pointer; }
-.accountMenu > a:hover, .accountMenu > button:hover,
-.mobileAccount > a:hover, .mobileAccount > button:hover { background: var(--background); color: #006b4f; }
+.accountMenu > a:hover, .accountMenu > button:hover, .accountMenu > a:focus-visible, .accountMenu > button:focus-visible,
+.mobileAccount > a:hover, .mobileAccount > button:hover { background: var(--dropdown-hover); color: var(--dropdown-accent); }
 .accountMenu a small, .mobileAccount a small { display: block; margin-top: 2px; font-size: 12px; color: var(--secondary); }
 .accountMenu button:disabled, .mobileAccount button:disabled { opacity: 0.5; cursor: wait; }
 .accountError { padding: 10px 12px; color: #b42318; font-size: 12px; }

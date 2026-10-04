@@ -79,9 +79,9 @@ export default async function RankingDetailPage({ params, searchParams }: Props)
             {tabs.map(tab => <Link key={tab.path} href={href(tab.path)} aria-current={tab.path === `/rankings/${slug}` ? 'page' : undefined} className={`py-2 ${tab.path === `/rankings/${slug}` ? 'border-b-2 border-[#006C52] font-semibold text-[#006C52]' : 'text-secondary hover:text-foreground'}`}>{tab.label}</Link>)}
           </nav>
           <details className="group/menu relative ml-auto max-w-full" data-ranking-menu>
-            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-4 border border-border px-3 text-xs hover:border-foreground">{c.choose}<ChevronDown size={14} aria-hidden="true" className="group-open/menu:rotate-180" /></summary>
-            <nav aria-label={c.choose} className="absolute right-0 z-20 mt-2 max-h-[min(60dvh,26rem)] w-72 max-w-[calc(100vw-2.5rem)] overflow-y-auto overscroll-contain border border-border bg-background p-2 shadow-lg">
-              {getRankingDefinitions().map(def => <Link key={def.slug} prefetch={false} href={href(`/rankings/${def.slug}`)} aria-current={slug === def.slug ? 'page' : undefined} className={`block break-words px-3 py-3 text-sm hover:bg-muted ${slug === def.slug ? 'font-semibold text-[#006C52]' : 'text-secondary'}`}>{localizedRanking(def, locale).shortTitle}</Link>)}
+            <summary className="form-select-trigger flex min-h-11 cursor-pointer list-none items-center gap-4 px-3 text-xs">{c.choose}<ChevronDown size={14} aria-hidden="true" className="group-open/menu:rotate-180" /></summary>
+            <nav aria-label={c.choose} className="dropdown-surface absolute right-0 z-20 mt-2 max-h-[min(60dvh,26rem)] w-72 max-w-[calc(100vw-2.5rem)] overflow-y-auto overscroll-contain p-1.5">
+              {getRankingDefinitions().map(def => <Link key={def.slug} prefetch={false} href={href(`/rankings/${def.slug}`)} aria-current={slug === def.slug ? 'page' : undefined} className="dropdown-option block break-words px-3 py-3 text-sm">{localizedRanking(def, locale).shortTitle}</Link>)}
             </nav>
           </details>
         </div>
