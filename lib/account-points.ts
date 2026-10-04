@@ -6,4 +6,3 @@ export async function readAccountPoints(client: SupabaseClient, userId: string) 
   // recent activity page. A failed read is unknown, never an invented zero.
   return error ? null : Number(data?.total_points ?? 0)
 }
-
