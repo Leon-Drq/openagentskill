@@ -16,6 +16,7 @@ function query(table) {
   const chain = {
     select(_columns, opts) { selected = true; options = opts || {}; return chain },
     eq(key, value) { filters.push(row => row[key] === value); return chain },
+    ilike(key, value) { filters.push(row => String(row[key] || '').toLowerCase() === value.replace(/\\([_%\\])/g, '$1').toLowerCase()); return chain },
     gte() { return chain }, order() { return chain },
     limit(n) { take = n; return chain },
     or(expression) {
@@ -224,4 +225,17 @@ for (const body of [
   assert.equal(saved.validation_result.acquisition_declaration?.verified ?? false, false)
 }
 assert.match(submissionIdForToken(receipt.token), /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-a[a-f0-9]{3}-[a-f0-9]{12}$/)
+rows.clear(); skills.clear()
+const established = { id: 'established', slug: 'fixture-safe-skill', github_repo: 'FIXTURE/safe-skill', source_path: skill.path, source_commit_sha: 'c'.repeat(40), listing_status: 'static_checked', ai_review_approved: false, ai_review_score: { method: 'static', package_fingerprint: 'prior-review' } }
+skills.set(established.id, clone(established))
+await createOpenSubmission(input)
+assert.equal(await processSubmissionJob(receipt.id), 'processed')
+assert.equal(rows.get(receipt.id).status, 'duplicate', 'A different source revision must reuse the established listing')
+assert.equal(rows.get(receipt.id).skill_id, established.id)
+assert.equal(skills.size, 1)
+assert.deepEqual(skills.get(established.id), established, 'Duplicate submissions must not overwrite source or review evidence')
+rows.clear(); skill.path = 'skills/other/SKILL.md'; skill.directory = 'skills/other'
+await createOpenSubmission(input)
+assert.equal(await processSubmissionJob(receipt.id), 'processed')
+assert.equal(skills.size, 2, 'Distinct Skill paths in one repository remain separate listings')
 console.log('Submission flow passed: idempotency, atomic claims, bounded retry, immutable source, unchanged review gates, attribution, authenticated receipts, safe sharing and API validation. No external requests.')

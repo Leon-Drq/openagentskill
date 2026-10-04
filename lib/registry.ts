@@ -649,6 +649,7 @@ function getSpecializedEngineeringWorkflowScore(normalizedQuery: string, skill: 
 }
 
 export function getCanonicalSkillKey(skill: SkillRecord) {
+  if (skill.github_repo && skill.source_path) return `${skill.github_repo.toLowerCase()}#${skill.source_path}`
   const repositoryPath = (skill.repository || '').toLowerCase()
   const nestedSkillMatch = repositoryPath.match(
     /github\.com\/([^/]+\/[^/]+)\/(?:tree|blob)\/[^/]+\/(.+?)(?:\/skill\.md)?\/?$/
@@ -870,12 +871,20 @@ export function rankSkillsForQuery(
 }
 
 export function dedupeRankedSkills<T extends { skill: SkillRecord; score?: number }>(items: T[]) {
+  const canonicalSources = new Map<string, T>()
+  for (const item of items) {
+    if (!item.skill.github_repo || !item.skill.source_path) continue
+    const key = getCanonicalSkillKey(item.skill)
+    const prior = canonicalSources.get(key)
+    if (!prior || Date.parse(item.skill.created_at) < Date.parse(prior.skill.created_at)) canonicalSources.set(key, item)
+  }
   const seenRepoKeys = new Set<string>()
   const seenNames = new Set<string>()
   const deduped: T[] = []
 
   for (const item of items) {
     const repoKey = getCanonicalSkillKey(item.skill)
+    if (canonicalSources.has(repoKey) && canonicalSources.get(repoKey) !== item) continue
     const nameKey = getNameDuplicateKey(item.skill)
     const duplicateByRepo = repoKey && seenRepoKeys.has(repoKey)
     const duplicateByName = nameKey.length >= 5 && seenNames.has(nameKey)

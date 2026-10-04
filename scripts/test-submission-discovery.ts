@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 // Node's type-stripping runner needs explicit extensions for these standalone tests.
 // @ts-expect-error TS5097 is expected for this standalone Node test entrypoint.
-import { getSearchTerms, normalizeExactSearchQuery } from '../lib/search-query.ts'
+import { getSearchTerms, normalizeExactSearchQuery, repositorySearchQuery } from '../lib/search-query.ts'
 // @ts-expect-error TS5097 is expected for this standalone Node test entrypoint.
 import { reconcileLicenseReviewFeedback } from '../lib/skills/license-review.ts'
 // @ts-expect-error TS5097 is expected for this standalone Node test entrypoint.
@@ -50,5 +50,12 @@ assert.equal(isDirectSkillLookup('find a desktop testing skill'), false)
 assert.equal(classifySearchMatch(searchSkill, 'test-desktop-app'), 'exact')
 assert.equal(classifySearchMatch(searchSkill, 'desktop-app'), 'near')
 assert.equal(classifySearchMatch(searchSkill, 'react-best-practices'), 'related')
+assert.equal(isDirectSkillLookup('bholmesdev/hubble.md'), true)
+assert.equal(classifySearchMatch(searchSkill, 'BHOLMESDEV/hubble.md'), 'exact')
+assert.equal(classifySearchMatch(searchSkill, 'https://github.com/bholmesdev/hubble.md'), 'exact')
+assert.equal(classifySearchMatch(searchSkill, 'someone/hubble.md'), 'related')
+assert.equal(repositorySearchQuery('https://github.com/Some_Owner/Repo_Name.git/'), 'some_owner/repo_name')
+assert.equal(normalizeExactSearchQuery('Some_Owner/Repo_Name'), 'some_owner/repo_name')
+for (const query of ['owner/repo/path', 'https://evil.com/owner/repo', 'owner/repo?token=abc', 'owner/repo,slug.eq.any']) assert.equal(repositorySearchQuery(query), null)
 
 console.log('Submission discovery regression tests passed.')

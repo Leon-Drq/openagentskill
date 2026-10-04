@@ -13,7 +13,7 @@ import { isMcpOnlyCategory, isMcpOnlySkillRecord } from '@/lib/skills/registry-s
 import { unstable_cache } from 'next/cache'
 import type { Skill } from '@/lib/types'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
-import { getSearchTerms, normalizeExactSearchQuery } from '@/lib/search-query'
+import { getSearchTerms, normalizeExactSearchQuery, repositorySearchQuery } from '@/lib/search-query'
 import { packCacheJson, unpackCacheJson } from '@/lib/cache/packed-json'
 import { buildLegacySearchIndexFilter, buildEditorialSearchIndexFilter, matchesLegacySearchIndex } from '@/lib/seo/search-indexability'
 
@@ -1160,6 +1160,17 @@ async function fetchSearchSkillsWithStatus(query: string, limit = 120) {
   if (!normalizedQuery) return { records: [] as SkillRecord[], degraded: false }
 
   const rowLimit = Math.min(Math.max(Math.floor(limit) || 1, 1), 200)
+  const repository = repositorySearchQuery(query)
+  if (repository) {
+    // Repository punctuation is not full-text search. Look up the complete
+    // identity, including low-ranked Skills outside the cached candidate pool.
+    const { data, error } = await createPublicClient({ requestTimeoutMs: SKILL_EXACT_SEARCH_TIMEOUT_MS, circuitScope: 'skill-search' })
+      .from('skill_directory_entries').select(SKILL_DIRECTORY_SELECT)
+      .ilike('github_repo', repository.replace(/[\\%_]/g, '\\$&'))
+      .or(PUBLIC_SKILL_FILTER).order('created_at', { ascending: true }).limit(rowLimit)
+    if (error) throw error
+    return { records: filterSkillOnly((data || []) as unknown as SkillRecord[]), degraded: false }
+  }
   const results = await Promise.allSettled([
     withTimeout(
       fetchExactSearchSkills(normalizedQuery),
@@ -1252,7 +1263,7 @@ const getCachedCatalogCount = unstable_cache(
     if (count === null) throw new Error('Catalog count unavailable')
     return count
   },
-  ['public-catalog-count-v1-scope'],
+  ['public-catalog-count-v2-canonical-sources'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 
@@ -1274,7 +1285,7 @@ const getCachedCatalogPage = unstable_cache(
     if (error) throw error
     return { records: (data || []) as unknown as SkillRecord[], total, hasMore: from + limit < total, page: effectivePage }
   },
-  ['public-catalog-pages-v7-scope'],
+  ['public-catalog-pages-v8-canonical-sources'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 

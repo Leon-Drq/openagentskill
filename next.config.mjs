@@ -18,6 +18,8 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      { source: '/skills/socai-io-jev-social-jev-social', destination: '/skills/socai-io-jev-social', permanent: true },
+      { source: '/:locale/skills/socai-io-jev-social-jev-social', destination: '/:locale/skills/socai-io-jev-social', permanent: true },
       { source: '/skills/external/:slug', destination: '/skills/:slug', permanent: true },
       { source: '/skills/external', destination: '/skills', permanent: true },
       {
