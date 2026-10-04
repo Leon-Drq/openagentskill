@@ -33,7 +33,7 @@ export async function updateCreatorProfile(formData: FormData) {
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/auth/login?next=/creator')
+  if (!user || user.is_anonymous) redirect(`/auth/login?next=${encodeURIComponent(`/creator?tab=profile&lang=${locale}`)}`)
 
   const { data: currentProfile, error: profileError } = await supabase
     .from('profiles')
@@ -69,6 +69,7 @@ export async function updateCreatorProfile(formData: FormData) {
   }
 
   revalidatePath('/creator')
+  revalidatePath('/profile')
   revalidatePath(`/creators/${parsed.data.username.toLowerCase()}`)
   revalidatePath(`/creators/${parsed.data.username.toLowerCase()}/opengraph-image`)
   revalidatePath(`/creators/${parsed.data.username.toLowerCase()}/twitter-image`)

@@ -1,5 +1,7 @@
 'use client'
 
+import { accountCopy } from '@/lib/i18n/account-copy'
+
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -72,8 +74,10 @@ export function NavUserMenu({ mobile = false, onNavigate }: { mobile?: boolean; 
   const accountLinks = <>
     <div className={styles.accountHeading}><span>{c.account}</span><small>{user.email}</small></div>
     <Link href={getLocalizedNavigationHref('/profile', locale)} prefetch={false} onClick={navigate}>
-      <UserRound size={17} aria-hidden="true" /><span>{c.profile}<small>{c.saved}</small></span>
+      <UserRound size={17} aria-hidden="true" /><span>{accountCopy(locale, 'workspace')}</span>
     </Link>
+    <Link href={getLocalizedNavigationHref('/profile?tab=bookmarks', locale)} prefetch={false} onClick={navigate}>{c.saved}</Link>
+    <Link href={getLocalizedNavigationHref('/profile?tab=settings', locale)} prefetch={false} onClick={navigate}>{accountCopy(locale, 'settings')}</Link>
     <Link href={getLocalizedNavigationHref('/creator', locale)} prefetch={false} onClick={navigate}>{t.nav.creatorConsole}</Link>
     <button type="button" onClick={signOut} disabled={signingOut}><LogOut size={17} aria-hidden="true" />{c.signout}</button>
     {error && <p role="alert" className={styles.accountError}>{c.signoutError}</p>}
