@@ -19,7 +19,13 @@ const nextConfig = {
   async redirects() {
     return [
       { source: '/skills/socai-io-jev-social-jev-social', destination: '/skills/socai-io-jev-social', permanent: true },
-      { source: '/:locale/skills/socai-io-jev-social-jev-social', destination: '/:locale/skills/socai-io-jev-social', permanent: true },
+      // Detail pages use ?lang= rather than locale path segments. Cover the
+      // canonical prefixed path too, including cached older 308 destinations.
+      ...['socai-io-jev-social', 'socai-io-jev-social-jev-social'].map((slug) => ({
+        source: `/:locale(en|zh|ja|ko|es|de|fr|id)/skills/${slug}`,
+        destination: '/skills/socai-io-jev-social?lang=:locale',
+        permanent: true,
+      })),
       { source: '/skills/external/:slug', destination: '/skills/:slug', permanent: true },
       { source: '/skills/external', destination: '/skills', permanent: true },
       {

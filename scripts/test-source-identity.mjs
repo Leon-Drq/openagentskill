@@ -65,9 +65,10 @@ assert.equal(ranked[0].skill.slug, canonical.slug, 'A higher-ranking duplicate c
 const fallback = compile('lib/skill-fallbacks.ts', {})
 assert.equal(fallback.getCanonicalSkillSlug('socai-io-jev-social-jev-social'), canonical.slug)
 const redirects = await nextConfig.redirects()
-for (const source of ['/skills/socai-io-jev-social-jev-social', '/:locale/skills/socai-io-jev-social-jev-social']) {
-  const redirect = redirects.find(item => item.source === source)
+for (const slug of [canonical.slug, 'socai-io-jev-social-jev-social']) {
+  const redirect = redirects.find(item => item.source === `/:locale(en|zh|ja|ko|es|de|fr|id)/skills/${slug}`)
   assert.equal(redirect?.permanent, true)
-  assert.ok(redirect.destination.endsWith('/skills/' + canonical.slug))
+  assert.equal(redirect.destination, `/skills/${canonical.slug}?lang=:locale`, 'Localized redirects must reach the existing query-based detail route')
 }
+assert.equal(redirects.find(item => item.source === '/skills/socai-io-jev-social-jev-social')?.destination, `/skills/${canonical.slug}`)
 console.log('Source identity: repository lookup, literal punctuation, failure recovery, distinct paths and permanent canonical redirects passed.')
