@@ -216,6 +216,8 @@ pnpm run build
 
 The public website requires Supabase configuration. Pure parsing, resolver-contract, SDK, CLI, and circuit-breaker regression tests run without production credentials.
 
+GitHub sign-in appears on both login and registration when `NEXT_PUBLIC_GITHUB_OAUTH_ENABLED=true` is set in the local environment (as in `.env.example`) and the GitHub provider is enabled in Supabase. Public environment variables are included at build time; restart development after changing the flag and rebuild before deploying a changed value.
+
 ## Repository map
 
 ```text

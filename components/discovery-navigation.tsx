@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 
 export const discoveryIcons = { web: Monitor, code: Code2, video: Video, search: Search, workflow: Workflow, document: FileText, slides: Presentation, data: ChartNoAxesCombined, image: ImageIcon, terminal: Terminal }
 
-export function DiscoveryCategories({ onNavigate }: { onNavigate?: () => void }) {
+export function DiscoveryCategories({ onNavigate, variant = 'default' }: { onNavigate?: () => void; variant?: 'default' | 'navigation' }) {
   const { locale } = useI18n()
   const c = discoveryCopy(locale)
   const groups = [
@@ -21,7 +21,7 @@ export function DiscoveryCategories({ onNavigate }: { onNavigate?: () => void })
   ]
   return <div data-discovery-categories>
     <div className="grid gap-3 lg:grid-cols-[1.6fr_1fr_0.9fr]">
-      {groups.map((group, index) => <section key={group.title} className={cn('min-w-0 rounded-[12px] border border-border/70 p-4', index === 0 ? 'bg-[#006b4f]/[0.045]' : 'bg-muted/35')}>
+      {groups.map((group, index) => <section key={group.title} className={cn('min-w-0', variant === 'navigation' ? 'px-1 py-2' : ['rounded-[12px] border border-border/70 p-4', index === 0 ? 'bg-[#006b4f]/[0.045]' : 'bg-muted/35'])}>
         <h3 className="text-sm font-semibold">{group.title}</h3>
         <p className="mt-1 text-xs leading-5 text-secondary">{group.note}</p>
         <ul className={cn('mt-3 grid gap-1.5', index === 0 && 'sm:grid-cols-2')}>
