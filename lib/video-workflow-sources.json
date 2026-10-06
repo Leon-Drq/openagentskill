@@ -1,0 +1,116 @@
+[
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-3d-cartoon/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "3a2b1dc969b8c9b702f000ece94a0e021d2d5260113ba874f418d6dcc82079e7"
+  },
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-car-vehicle/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "035789dcfaea3b220d3a419ffe635413321240014e0a99f0f78fd1425ff739f6"
+  },
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-epic-fantasy-scifi/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "10f46c7671ef4724e763b647fdb1a2f7660df38791ab9648a9f6f612a7744b3f"
+  },
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-fashion-lookbook/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "d767087331fd0b01535476779603d77ec0aeca223197e69c79ab47953054714e"
+  },
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-food-asmr/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "ad0494a92e459f8a5b35e1ecfd1e658ab52befbf5b6d6bcccf09c2518ff5f3c4"
+  },
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-game-ui-livestream/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "dbef0d692ba1b0155b3bd3e8373b15266aee50a8a731e81bcb8a469c76fd3389"
+  },
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-horror-suspense/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "d2da46adb6e2af0db22982cdd33d230726c6cbdb69b0dfca953f654cedf5baaa"
+  },
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-meme-comedy/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "3f731001b61f76858365b3ae3cfa278cee13e0b16ff079f22c35c05758fceeba"
+  },
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-pet-animal/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "ac854a2c41435e38b1591dea37815fd2e8c6715302954371a98c99f5d4d18537"
+  },
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-production-workflow/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "b40482f047a3463cd9a4c7cb4fcbf65997b6ae12d35b67d6187334c458ff0ef4"
+  },
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-prompt-library/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "8e20f2012ac48aedd0598ea9f5770a39ae5455b9ee8c86272ecfefb25f19695a"
+  },
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-retro-dv-home-video/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "f993c681db2464e31f0c885e3dc57e3dd353c98de7ce0713deea2e07580608af"
+  },
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-sports-extreme/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "eee26998069bc2cd553475d03c71129a16c69f05eadb07ca43875a18b7606529"
+  },
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-storyboard-grid-to-video/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "eb71e8a4fbc924688ec5ccf4ef6224f6d4c051a123f267b8c4889228cfd5addf"
+  },
+  {
+    "repository": "LearnPrompt/awesome-seedance",
+    "path": "agents/skills/seedance-travel-city-walk/SKILL.md",
+    "ref": "e099fcff13c1ac289698e21f147ec37a6eb67c60",
+    "sha256": "ef9ec7e6f3994173f6e109e775b8935db7377c85b2f496c8d4b59b3b6675e89b"
+  },
+  {
+    "repository": "Kianzzz/xilo-opus-video",
+    "path": "skills/xilo-opus-video/SKILL.md",
+    "ref": "f2cd828e2692e7186186408ee01a936707c2c38d",
+    "sha256": "defac60882a7474153d0742a054d70226e31bbea2a186ff90e0b535b015a43c7"
+  },
+  {
+    "repository": "trustfuture/simon-skills",
+    "path": "skills/whiteboard-video/SKILL.md",
+    "ref": "3ad0a25127c17da48a0e869c9efbf4136c40848b",
+    "sha256": "c2aac93d02fc8e65e9aea4864c02e6cdd2fce0e152ec844e4746ef4c05a44bfe"
+  },
+  {
+    "repository": "aaronyi97/wedding-video-guided-wizard",
+    "path": "SKILL.md",
+    "ref": "4344397a5f9800c0a5550a83c8358f88afea9b03",
+    "sha256": "81efc42e729384ca3d5ac1b68a3a157654b56890932daa39e4728cbcb37a1a65"
+  },
+  {
+    "repository": "luoluoluo22/jianying-editor-skill",
+    "path": "SKILL.md",
+    "ref": "32c56928ded4f9e2c2b80e099dc7abb793d2c30b",
+    "sha256": "a4550b4a4c0598c14847843352ed33bb30b6be92aceca5d36c6782108a3ff8aa"
+  }
+]
