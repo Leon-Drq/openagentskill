@@ -1,0 +1,15 @@
+{
+  "account": "openagentskill",
+  "status": "draft",
+  "campaign": "video_workflows_20261006",
+  "source": "https://x.com/jedeeai/status/2107358191432405329",
+  "posts": [
+    "An AI video Skill can produce a render, an editable draft, or a shot plan. Pick the output first.\n\nWe mapped 5 creator workflows for motion graphics, whiteboards, wedding stories, editing and Seedance prompts.\n\nCompare tools + setup:\nhttps://www.openagentskill.com/use-cases/video-creation?utm_source=x&utm_medium=organic_social&utm_campaign=video_workflows_20261006#video-workflows",
+    "1. Motion graphics: xilo-opus-video by @xilo2991.\n\nStarts with 3 concepts and previews. Choose a direction, then build and render it with code.\n\nBring a topic or product brief; setup includes Playwright + FFmpeg.\nhttps://www.openagentskill.com/use-cases/video-creation?utm_source=x&utm_medium=organic_social&utm_campaign=video_workflows_20261006&utm_content=code_video#code-video",
+    "2. Whiteboard explainers: whiteboard-video by @HanZhang415188.\n\nHand-drawn scenes, narration, captions and covers. Keep its video-common folder; setup also needs local tools and Volcengine TTS credentials.\nhttps://www.openagentskill.com/use-cases/video-creation?utm_source=x&utm_medium=organic_social&utm_campaign=video_workflows_20261006&utm_content=whiteboard#whiteboard-video",
+    "3. Wedding stories: @AaronYiaazw’s guided wizard.\n\n14 stages from the couple’s story to a subtitled film, with script approval, external image/video generation and review checkpoints. Available in English and Chinese.\nhttps://www.openagentskill.com/use-cases/video-creation?utm_source=x&utm_medium=organic_social&utm_campaign=video_workflows_20261006&utm_content=wedding#wedding-video",
+    "4. Editable drafts: jianying-editor-skill by luoluoluo22.\n\nTurn your clips, captions and audio into a Jianying desktop draft. The README specifies manual export on macOS; check your app version before starting.\nhttps://www.openagentskill.com/use-cases/video-creation?utm_source=x&utm_medium=organic_social&utm_campaign=video_workflows_20261006&utm_content=editing#jianying-editing",
+    "5. Shot plans + prompts: awesome-seedance by LearnPrompt / @aiwarts.\n\nWe found 15 Skill entry points, including production planning and style guides. Use a separate video provider to generate footage.\nhttps://www.openagentskill.com/use-cases/video-creation?utm_source=x&utm_medium=organic_social&utm_campaign=video_workflows_20261006&utm_content=seedance#seedance-workflows",
+    "Save the comparison for your next video project:\nhttps://www.openagentskill.com/use-cases/video-creation?utm_source=x&utm_medium=organic_social&utm_campaign=video_workflows_20261006#video-workflows\n\nSource roundup: @jedeeai\nhttps://x.com/jedeeai/status/2107358191432405329\n\nWe checked the source documents, not runtime results. Creator tutorials and setup notes are linked on the page."
+  ]
+}

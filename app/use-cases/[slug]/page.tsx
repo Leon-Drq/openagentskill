@@ -4,9 +4,11 @@ import { notFound } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { VideoWorkflowCollection } from '@/components/video-workflow-collection'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
-import { convertSkillRecordToManifest, getAllSkills, getSkillsBySlugs, searchSkills } from '@/lib/db/skills'
+import { convertSkillRecordToManifest, getAllSkills, getPublishedVideoWorkflowSources, getSkillsBySlugs, searchSkills } from '@/lib/db/skills'
+import { VIDEO_WORKFLOWS } from '@/lib/video-workflows'
 import { MYSTICISM_PACK, MYSTICISM_USE_CASE } from '@/lib/mysticism-collection'
 import { SKILL_STACKS } from '@/lib/collections'
 import { getSkillSupplyProfile } from '@/lib/supply'
@@ -66,10 +68,11 @@ export default async function UseCasePage({
   const useCase = getUseCaseBySlug(slug)
   if (!useCase) notFound()
 
-  const [taskMatches, qualityBaseline, featuredSkills] = await Promise.all([
+  const [taskMatches, qualityBaseline, featuredSkills, videoSources] = await Promise.all([
     searchSkills(useCase.heroPrompt, 240).catch(() => []),
     getAllSkills('quality', undefined, 160).catch(() => []),
     getSkillsBySlugs(useCase.featuredSlugs || []).catch(() => []),
+    slug === 'video-creation' ? getPublishedVideoWorkflowSources(VIDEO_WORKFLOWS.map((item) => item.repository)).catch(() => []) : Promise.resolve([]),
   ])
   const allSkills = [...new Map(
     [...taskMatches, ...qualityBaseline, ...featuredSkills].map((skill) => [skill.slug, skill])
@@ -163,6 +166,7 @@ export default async function UseCasePage({
             <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">{useCase.title}</h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">{useCase.description}</p>
             <div className="mt-7 flex flex-wrap gap-3">
+              {slug === 'video-creation' && <a href="#video-workflows" className="border border-foreground px-5 py-2 text-sm hover:bg-foreground hover:text-background">Compare 5 creator workflows</a>}
               {useCase.slug === MYSTICISM_USE_CASE && <Link href={`/skill-packs/${MYSTICISM_PACK}`} className="border border-border px-5 py-2 text-sm text-secondary hover:text-foreground">Open skill pack · 玄学技能包</Link>}
               <Link
                 href={`/skills?useCase=${useCase.slug}`}
@@ -217,6 +221,8 @@ export default async function UseCasePage({
             </div>
           </div>
         </section>
+
+        {slug === 'video-creation' && <VideoWorkflowCollection listings={videoSources} />}
 
         <section className="grid gap-px border-b border-border bg-border md:grid-cols-3">
           {[

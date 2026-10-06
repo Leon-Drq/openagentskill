@@ -45,7 +45,7 @@
     "test:links": "node scripts/check-repository-links.mjs",
     "test:links:external": "node scripts/check-repository-links.mjs --external",
     "test:review-cost-controls": "node scripts/test-review-cost-controls.mjs",
-    "test": "pnpm test:source-identity && pnpm test:taxonomy && pnpm run test:automation-reliability && pnpm run test:review-cost-controls && pnpm run test:owner-publish && pnpm run test:submission && pnpm run test:submission-discovery && pnpm run test:submission-flow && pnpm run test:skill-issue-ingest && pnpm run test:supabase-circuit && pnpm run test:security && pnpm run test:x-automation && pnpm run test:x-editorial && pnpm run test:github-owner && pnpm run test:performance && pnpm run test:candidate-intake && pnpm run test:creator-growth && pnpm run test:creator-directory && pnpm run test:marketplace-foundation && pnpm run test:registry-layers && pnpm run test:og-social-cards && pnpm run test:showcase && pnpm run test:localization && pnpm run test:navigation && pnpm run test:form-controls && pnpm run test:seo && pnpm run test:skill-detail && pnpm run test:cli && pnpm run test:sdk && pnpm run test:account",
+    "test": "pnpm test:source-identity && pnpm test:taxonomy && pnpm run test:automation-reliability && pnpm run test:review-cost-controls && pnpm run test:owner-publish && pnpm run test:submission && pnpm run test:submission-discovery && pnpm run test:submission-flow && pnpm run test:skill-issue-ingest && pnpm run test:supabase-circuit && pnpm run test:security && pnpm run test:x-automation && pnpm run test:x-editorial && pnpm run test:github-owner && pnpm run test:performance && pnpm run test:candidate-intake && pnpm run test:creator-growth && pnpm run test:creator-directory && pnpm run test:marketplace-foundation && pnpm run test:registry-layers && pnpm run test:og-social-cards && pnpm run test:showcase && pnpm run test:localization && pnpm run test:navigation && pnpm run test:form-controls && pnpm run test:seo && pnpm run test:skill-detail && pnpm run test:cli && pnpm run test:sdk && pnpm run test:account && pnpm test:video-workflows",
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint .",
     "skillry:sync": "node scripts/sync-skillry.mjs",
@@ -56,7 +56,8 @@
     "taxonomy:migration": "node --experimental-strip-types scripts/build-skill-taxonomy-migration.mjs",
     "test:taxonomy": "node --experimental-strip-types scripts/test-skill-taxonomy.mjs",
     "test:x-editorial": "node --experimental-strip-types scripts/test-x-editorial.mjs",
-    "test:account": "node --experimental-strip-types scripts/test-account-workspace.mjs && node scripts/test-skill-engagement.mjs"
+    "test:account": "node --experimental-strip-types scripts/test-account-workspace.mjs && node scripts/test-skill-engagement.mjs",
+    "test:video-workflows": "node --experimental-strip-types scripts/test-video-workflows.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

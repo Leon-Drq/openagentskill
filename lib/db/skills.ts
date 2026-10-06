@@ -16,6 +16,7 @@ import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSearchTerms, normalizeExactSearchQuery, repositorySearchQuery } from '@/lib/search-query'
 import { packCacheJson, unpackCacheJson } from '@/lib/cache/packed-json'
 import { buildLegacySearchIndexFilter, buildEditorialSearchIndexFilter, matchesLegacySearchIndex } from '@/lib/seo/search-indexability'
+import type { VideoWorkflowListing } from '@/lib/video-workflows'
 
 export interface SkillRecord extends Partial<SkillTaxonomy> {
   id: string
@@ -1005,6 +1006,19 @@ export async function getSkillsBySlugs(
   return normalizedSlugs
     .map((slug) => bySlug.get(slug))
     .filter((skill): skill is SkillRecord => Boolean(skill))
+}
+
+export async function getPublishedVideoWorkflowSources(repositories: string[]): Promise<VideoWorkflowListing[]> {
+  const names = Array.from(new Set(repositories)).filter(Boolean)
+  if (!names.length) return []
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_LOOKUP_TIMEOUT_MS })
+  const { data, error } = await supabase.from('skills')
+    .select('slug,github_repo,source_path,source_commit_sha,source_content_hash,listing_status,ai_review_approved')
+    .or(PUBLIC_SKILL_FILTER)
+    .in('github_repo', names)
+    .limit(100)
+  if (error) throw error
+  return data || []
 }
 
 export async function createSkill(skill: Partial<SkillRecord>): Promise<SkillRecord> {
