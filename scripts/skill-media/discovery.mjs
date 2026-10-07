@@ -8,7 +8,7 @@ export const safeRepo = value => typeof value === 'string' && /^[\w.-]+\/[\w.-]+
 export const identity = row => digest([row.github_repo?.toLowerCase(), row.source_path || row.repository || '', row.source_ref || ''].join('\n'))
 const visual = ['presentation', 'image-generation', 'design-creative', 'video-creation']
 const supported = /\.(png|jpe?g|webp|gif|mp4|webm|pdf|pptx)$/i
-const decorative = /(?:^|[\s/_.-])(logo|badge|banner|avatar|sponsor|donate|qrcode|qr-code|icon|appicon|wordmark|logotype|wechat|weixin|qq|star-history|shields)(?:$|[\s/_.-])/i
+const decorative = /(?:^|[\s/_.-])(logo|badge|banner|avatar|sponsor|donate|qrcode|qr-code|icon|appicon|wordmark|logotype|repository[-_]header|repo[-_]header|wechat|weixin|qq|star-history|shields)(?:$|[\s/_.-])/i
 const example = /(?:^|[\s/_.-])(examples?|demos?|outputs?|results?|previews?|slides?|templates?|showcases?|gallery)(?:$|[\s/_.-])/i
 
 function plainLabel(value) {
