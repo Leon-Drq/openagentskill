@@ -213,9 +213,7 @@ export const SCENARIO_GUIDES: GrowthGuideDefinition[] = [
     "skillKeywords": [
       "Anthropic PDF"
     ],
-    "primarySkillSlugs": [
-      "anthropic-pdf"
-    ],
+    "primarySkillSlugs": [],
     "curatedOnly": true,
     "sections": [
       {
@@ -281,8 +279,8 @@ export const SCENARIO_GUIDES: GrowthGuideDefinition[] = [
         "description": "Task fit, source instructions, setup and limitations."
       },
       {
-        "title": "Anthropic PDF source profile",
-        "href": "/skills/anthropic-pdf",
+        "title": "Anthropic PDF pinned source",
+        "href": "https://github.com/anthropics/skills/blob/683bc88e56f3e09ba94f7055977f3d3aa499f202/skills/pdf/SKILL.md",
         "description": "Read, extract, OCR and assemble PDFs"
       }
     ]
@@ -300,9 +298,7 @@ export const SCENARIO_GUIDES: GrowthGuideDefinition[] = [
     "skillKeywords": [
       "Anthropic XLSX"
     ],
-    "primarySkillSlugs": [
-      "anthropic-xlsx"
-    ],
+    "primarySkillSlugs": [],
     "curatedOnly": true,
     "sections": [
       {
@@ -367,8 +363,8 @@ export const SCENARIO_GUIDES: GrowthGuideDefinition[] = [
         "description": "Task fit, source instructions, setup and limitations."
       },
       {
-        "title": "Anthropic XLSX source profile",
-        "href": "/skills/anthropic-xlsx",
+        "title": "Anthropic XLSX pinned source",
+        "href": "https://github.com/anthropics/skills/blob/683bc88e56f3e09ba94f7055977f3d3aa499f202/skills/xlsx/SKILL.md",
         "description": "Clean data and create editable spreadsheets"
       }
     ]
@@ -386,9 +382,7 @@ export const SCENARIO_GUIDES: GrowthGuideDefinition[] = [
     "skillKeywords": [
       "Anthropic DOCX"
     ],
-    "primarySkillSlugs": [
-      "anthropic-docx"
-    ],
+    "primarySkillSlugs": [],
     "curatedOnly": true,
     "sections": [
       {
@@ -449,8 +443,8 @@ export const SCENARIO_GUIDES: GrowthGuideDefinition[] = [
         "description": "Task fit, source instructions, setup and limitations."
       },
       {
-        "title": "Anthropic DOCX source profile",
-        "href": "/skills/anthropic-docx",
+        "title": "Anthropic DOCX pinned source",
+        "href": "https://github.com/anthropics/skills/blob/683bc88e56f3e09ba94f7055977f3d3aa499f202/skills/docx/SKILL.md",
         "description": "Generate and edit Word documents"
       }
     ]

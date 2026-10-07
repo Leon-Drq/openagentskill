@@ -41,6 +41,11 @@ Frontend and video collections use explicit source candidates and batch lookup.
 Taste Skill's checked source excludes dashboards and data tables; the comparison
 reflects that boundary. Existing registry and owner publication flows are untouched.
 
+Full-page checks found that the assumed Anthropic PDF/XLSX/DOCX profile URLs
+returned HTTP 200 with a not-found page. Those sources link to their inspected
+GitHub revisions instead. Scenario guides render pinned instructions directly,
+without inventing registry records, review scores or database-dependent shortlists.
+
 ## Examples and evidence
 
 `public/examples/scenarios` contains original editorial fixtures: three frontend

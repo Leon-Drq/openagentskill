@@ -20,7 +20,7 @@ import { getUseCaseBySlug, getUseCasesForSkill } from '@/lib/use-cases'
 import { withTimeout } from '@/lib/async'
 import { getSkillBySlugOrFallbackStrict } from '@/lib/skill-fallbacks'
 import { ScenarioExamples } from '@/components/scenario-topic'
-import { SCENARIO_TOPICS } from '@/lib/seo/scenario-pages'
+import { SCENARIO_TOPICS, getScenarioSources, scenarioProfileHref, scenarioSourceUrl } from '@/lib/seo/scenario-pages'
 
 export const revalidate = 300
 
@@ -106,10 +106,12 @@ export default async function GrowthGuidePage({
   const { slug } = await params
   const guide = getGrowthGuideBySlug(slug)
   if (!guide) notFound()
+  const scenario = SCENARIO_TOPICS.find(topic => topic.guideSlug === guide.slug)
+  const scenarioSources = scenario ? getScenarioSources(scenario) : []
 
   // Curated guides resolve their exact sources rather than hoping they occur
   // in the first page of a popularity/quality-ranked global catalog.
-  const allSkills = guide.curatedOnly
+  const allSkills = scenario ? [] : guide.curatedOnly
     ? (await Promise.all((guide.primarySkillSlugs || []).slice(0, 8).map(skillSlug =>
         withTimeout(getSkillBySlugOrFallbackStrict(skillSlug), 2500, 'guide source lookup').catch(() => null)
       ))).filter((skill): skill is SkillRecord => Boolean(skill))
@@ -120,7 +122,7 @@ export default async function GrowthGuidePage({
   const comparisonSkills = guideSkills.filter(({ skill }) => comparisonSlugs.has(skill.slug))
   const relatedGuides = getRelatedGrowthGuides(guide)
   const useCase = guide.useCaseSlug ? getUseCaseBySlug(guide.useCaseSlug) : null
-  const exampleIds = SCENARIO_TOPICS.find(topic => topic.guideSlug === guide.slug)?.exampleIds || []
+  const exampleIds = scenario?.exampleIds || []
 
   return (
     <div className="min-h-screen bg-background">
@@ -190,8 +192,8 @@ export default async function GrowthGuidePage({
             <p className="text-lg leading-relaxed text-foreground">{guide.heroPrompt}</p>
             <div className="mt-5 grid grid-cols-2 gap-px border border-border bg-border text-center">
               <div className="bg-background p-4">
-                <div className="font-mono text-2xl">{guideSkills.length}</div>
-                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Shortlist</div>
+                <div className="font-mono text-2xl">{scenario ? scenarioSources.length : guideSkills.length}</div>
+                <div className="mt-1 text-xs uppercase tracking-widest text-secondary">{scenario ? 'Sources' : 'Shortlist'}</div>
               </div>
               <div className="bg-background p-4">
                 <div className="font-mono text-2xl">{guide.intent}</div>
@@ -212,7 +214,7 @@ export default async function GrowthGuidePage({
 
         <p className="mt-5 text-sm leading-relaxed text-secondary">
           Published by <Link href="/about" className="underline underline-offset-4">OpenAgentSkill</Link>.
-          {' '}Candidates are matched to this guide from available registry metadata. Repository stars describe popularity, not task success or safety. Check each source, license and current review before installing.
+          {' '}{scenario ? 'This workflow follows pinned upstream instructions. Inspect the source, prerequisites and deliverable checks before installing.' : 'Candidates are matched to this guide from available registry metadata. Repository stars describe popularity, not task success or safety. Check each source, license and current review before installing.'}
           {guide.updatedAt && <> Editorial update: <time dateTime={guide.updatedAt}>{guide.updatedAt}</time>.</>}
         </p>
 
@@ -306,7 +308,8 @@ export default async function GrowthGuidePage({
             <span className="text-sm text-secondary">Task-matched candidates · not exhaustive</span>
           </div>
 
-          {primarySkills.length === 0 && (
+          {scenario && <div className="mb-6 grid gap-4 md:grid-cols-2">{scenarioSources.map(source => <article key={source.id} className="border border-border bg-card p-5"><h3 className="font-display text-xl"><Link href={scenarioProfileHref(source)} className="underline underline-offset-4">{source.name}</Link></h3><p className="mt-3 text-sm leading-7">{source.role}</p><p className="mt-3 text-sm leading-7 text-secondary">Setup: {source.setup}</p><p className="mt-3 text-sm leading-7 text-secondary">{source.limits}</p><a href={scenarioSourceUrl(source)} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-11 items-center text-sm text-[#006b4f] underline underline-offset-4">Read pinned SKILL.md ↗</a></article>)}</div>}
+          {!scenario && primarySkills.length === 0 && (
             <p className="border border-border p-5 text-sm text-secondary">
               No matching candidates are available in this shortlist right now. The guidance below remains available; use the Skill Finder to search your exact task. Unrelated popular skills are not substituted.
             </p>

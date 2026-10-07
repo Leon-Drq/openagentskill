@@ -1,6 +1,6 @@
 export const SCENARIO_UPDATED_AT = '2026-10-07'
 
-export interface ScenarioSource { id: string; name: string; repository: string; path: string; commit: string; registrySlug: string; role: string; output: string; setup: string; limits: string; topic: string }
+export interface ScenarioSource { id: string; name: string; repository: string; path: string; commit: string; registrySlug: string | null; role: string; output: string; setup: string; limits: string; topic: string }
 export interface ScenarioTopic { slug: string; shortTitle: string; title: string; description: string; useCaseSlug: string; intro: string; sourceIds: string[]; choices: Array<{task: string; sourceId?: string; href?: string; reason: string}>; steps: string[]; exampleIds: string[]; guideSlug?: string; related: Array<{href: string; label: string}>; faq: Array<{question: string; answer: string}> }
 
 export const SCENARIO_SOURCES: ScenarioSource[] = [
@@ -101,7 +101,7 @@ export const SCENARIO_SOURCES: ScenarioSource[] = [
     "path": "skills/pdf/SKILL.md",
     "commit": "683bc88e56f3e09ba94f7055977f3d3aa499f202",
     "name": "Anthropic PDF",
-    "registrySlug": "anthropic-pdf",
+    "registrySlug": null,
     "role": "Read, extract, OCR and assemble PDFs",
     "output": "Extracted text or tables, searchable PDFs, or generated PDF files",
     "setup": "The source's Python / CLI dependencies; OCR needs an OCR engine",
@@ -114,7 +114,7 @@ export const SCENARIO_SOURCES: ScenarioSource[] = [
     "path": "skills/xlsx/SKILL.md",
     "commit": "683bc88e56f3e09ba94f7055977f3d3aa499f202",
     "name": "Anthropic XLSX",
-    "registrySlug": "anthropic-xlsx",
+    "registrySlug": null,
     "role": "Clean data and create editable spreadsheets",
     "output": "XLSX files with typed cells, formulas, formatting and charts",
     "setup": "A coding runtime, spreadsheet libraries and a compatible recalculation / inspection path",
@@ -127,7 +127,7 @@ export const SCENARIO_SOURCES: ScenarioSource[] = [
     "path": "skills/docx/SKILL.md",
     "commit": "683bc88e56f3e09ba94f7055977f3d3aa499f202",
     "name": "Anthropic DOCX",
-    "registrySlug": "anthropic-docx",
+    "registrySlug": null,
     "role": "Generate and edit Word documents",
     "output": "Editable DOCX paragraphs, headings, tables and document structure",
     "setup": "A document library and a renderer for layout checks",
@@ -451,7 +451,7 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
         "label": "Word generation"
       },
       {
-        "href": "/skills/anthropic-pdf",
+        "href": "https://github.com/anthropics/skills/blob/683bc88e56f3e09ba94f7055977f3d3aa499f202/skills/pdf/SKILL.md",
         "label": "PDF source profile"
       }
     ],
@@ -512,7 +512,7 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
         "label": "Word report workflow"
       },
       {
-        "href": "/skills/anthropic-xlsx",
+        "href": "https://github.com/anthropics/skills/blob/683bc88e56f3e09ba94f7055977f3d3aa499f202/skills/xlsx/SKILL.md",
         "label": "XLSX source profile"
       }
     ],
@@ -573,7 +573,7 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
         "label": "Spreadsheet input workflow"
       },
       {
-        "href": "/skills/anthropic-docx",
+        "href": "https://github.com/anthropics/skills/blob/683bc88e56f3e09ba94f7055977f3d3aa499f202/skills/docx/SKILL.md",
         "label": "DOCX source profile"
       }
     ],
@@ -592,6 +592,7 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
 
 export function getScenarioTopic(slug: string) { return SCENARIO_TOPICS.find(topic => topic.slug === slug) }
 export function scenarioSourceUrl(source: ScenarioSource) { return `https://github.com/${source.repository}/blob/${source.commit}/${source.path}` }
+export function scenarioProfileHref(source: ScenarioSource) { return source.registrySlug ? `/skills/${source.registrySlug}` : scenarioSourceUrl(source) }
 export function getScenarioSources(topic: ScenarioTopic) { return topic.sourceIds.map(id => SCENARIO_SOURCES.find(source => source.id === id)!).filter(Boolean) }
 export function getScenarioLinksForSkill(slug: string) {
  const source = SCENARIO_SOURCES.find(source => source.registrySlug === slug)

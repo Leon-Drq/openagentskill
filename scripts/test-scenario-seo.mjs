@@ -40,6 +40,7 @@ const { getBestSitemapEntries, getGuideSitemapEntries }=compile('lib/seo/sitemap
   '@/lib/seo/search-indexability':{SEARCH_INDEX_MIN_GITHUB_STARS:3,SEARCH_INDEX_MIN_QUALITY_SCORE:50},
 })
 const sourceData=await import('../lib/seo/scenario-pages.ts')
+for (const source of SCENARIO_SOURCES.filter(source=>!source.registrySlug)) assert.equal(sourceData.scenarioProfileHref(source), sourceData.scenarioSourceUrl(source))
 const exampleData=await import('../lib/seo/scenario-examples.ts')
 const components=compile('components/scenario-topic.tsx',{
   'react/jsx-runtime':jsx,
@@ -96,11 +97,12 @@ for (const topic of SCENARIO_TOPICS) {
   assert.equal(schema.find(item=>item['@type']==='CollectionPage').url,metadata.alternates.canonical)
   assert.equal(schema.find(item=>item['@type']==='FAQPage').mainEntity.length,topic.faq.length)
   for(const question of topic.faq)assert.ok(html.includes(question.question))
+  assert.doesNotMatch(html,/href="\/skills\/anthropic-(pdf|xlsx|docx)"/,'Unlisted sources must link to pinned instructions, not soft 404 profiles')
 }
 for (const source of SCENARIO_SOURCES) {
   assert.match(source.commit, /^[a-f0-9]{40}$/)
   assert.ok(source.path.endsWith('/SKILL.md'))
-  assert.ok(getScenarioLinksForSkill(source.registrySlug).length > 0)
+  if (source.registrySlug) assert.ok(getScenarioLinksForSkill(source.registrySlug).length > 0)
 }
 assert.deepEqual(getScenarioSources(getScenarioTopic('claude-code-pdf-parsing')).map(source => source.id), ['pdf'], 'PDF parsing excludes visual design and generic high-star libraries')
 assert.deepEqual(getScenarioSources(getScenarioTopic('claude-excel-skills')).map(source => source.id), ['xlsx'], 'Spreadsheet selection does not drift into marketing candidates')
