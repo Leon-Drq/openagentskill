@@ -88,6 +88,138 @@
     ]
   },
   {
+    "skillSlug": "acot-a11y-acot",
+    "repository": "acot-a11y/acot",
+    "revision": "34ff82b04faf65d22f323fd9ea47e03ede0fc13c",
+    "sourceUrl": "https://github.com/acot-a11y/acot/blob/34ff82b04faf65d22f323fd9ea47e03ede0fc13c/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-aeeaa30484430bba6e935b9c5f4b63154def7504bc2140b2c3df6c67b63aa893.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "aeeaa30484430bba6e935b9c5f4b63154def7504bc2140b2c3df6c67b63aa893",
+    "documentSha256": "80c97f4c3ef8457e5fea485a2732ff3abb7060d51d410b51fe59240352063b5e",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-07T04:52:45.299Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/73e5d2b44b951a4e626dc9da7774d9f12b1d70a74a74d832f7830cd91548bf29.preview.webp",
+        "previewSrc": "/skill-previews/auto/73e5d2b44b951a4e626dc9da7774d9f12b1d70a74a74d832f7830cd91548bf29.preview.webp",
+        "cardSrc": "/skill-previews/auto/73e5d2b44b951a4e626dc9da7774d9f12b1d70a74a74d832f7830cd91548bf29.card.webp",
+        "width": 838,
+        "height": 471,
+        "sha256": "73e5d2b44b951a4e626dc9da7774d9f12b1d70a74a74d832f7830cd91548bf29",
+        "originalSrc": "/skill-previews/auto/73e5d2b44b951a4e626dc9da7774d9f12b1d70a74a74d832f7830cd91548bf29.gif",
+        "sourceUrl": "https://github.com/acot-a11y/acot/blob/34ff82b04faf65d22f323fd9ea47e03ede0fc13c/docs/assets/acot-init.gif",
+        "kind": "reference",
+        "title": {
+          "en": "Acot · Animation · still preview",
+          "zh": "Acot · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Acot: Running acot init command",
+          "zh": "Acot：Running acot init command"
+        },
+        "sourcePath": "docs/assets/acot-init.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/527b773f9d73dc5df8dd43e48ab5c560875bf9945f4bca8c30ce44e93ee4a56d.preview.webp",
+        "previewSrc": "/skill-previews/auto/527b773f9d73dc5df8dd43e48ab5c560875bf9945f4bca8c30ce44e93ee4a56d.preview.webp",
+        "cardSrc": "/skill-previews/auto/527b773f9d73dc5df8dd43e48ab5c560875bf9945f4bca8c30ce44e93ee4a56d.card.webp",
+        "width": 838,
+        "height": 471,
+        "sha256": "527b773f9d73dc5df8dd43e48ab5c560875bf9945f4bca8c30ce44e93ee4a56d",
+        "originalSrc": "/skill-previews/auto/527b773f9d73dc5df8dd43e48ab5c560875bf9945f4bca8c30ce44e93ee4a56d.gif",
+        "sourceUrl": "https://github.com/acot-a11y/acot/blob/34ff82b04faf65d22f323fd9ea47e03ede0fc13c/docs/assets/acot-run.gif",
+        "kind": "reference",
+        "title": {
+          "en": "Acot · Animation · still preview",
+          "zh": "Acot · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Acot: Running acot run command",
+          "zh": "Acot：Running acot run command"
+        },
+        "sourcePath": "docs/assets/acot-run.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/99b608792bb55334b8c40b6e4aabdb03bf93d30eb3bf7b59daa34e54486e3353.preview.webp",
+        "previewSrc": "/skill-previews/auto/99b608792bb55334b8c40b6e4aabdb03bf93d30eb3bf7b59daa34e54486e3353.preview.webp",
+        "cardSrc": "/skill-previews/auto/99b608792bb55334b8c40b6e4aabdb03bf93d30eb3bf7b59daa34e54486e3353.card.webp",
+        "width": 1600,
+        "height": 480,
+        "sha256": "99b608792bb55334b8c40b6e4aabdb03bf93d30eb3bf7b59daa34e54486e3353",
+        "originalSrc": "/skill-previews/auto/99b608792bb55334b8c40b6e4aabdb03bf93d30eb3bf7b59daa34e54486e3353.png",
+        "sourceUrl": "https://github.com/acot-a11y/acot/blob/34ff82b04faf65d22f323fd9ea47e03ede0fc13c/docs/assets/repository-header.png",
+        "kind": "reference",
+        "title": {
+          "en": "Acot · Author preview",
+          "zh": "Acot · 作者预览"
+        },
+        "alt": {
+          "en": "Acot: acot",
+          "zh": "Acot：acot"
+        },
+        "sourcePath": "docs/assets/repository-header.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "adaptyvbio-proteinflow",
+    "repository": "adaptyvbio/ProteinFlow",
+    "revision": "19b5c108313902ff64cab1c4a4e966e5487d8878",
+    "sourceUrl": "https://github.com/adaptyvbio/ProteinFlow/blob/19b5c108313902ff64cab1c4a4e966e5487d8878/README.md",
+    "license": "BSD-3-Clause",
+    "licenseUrl": "/skill-previews/auto/LICENSE-05d82d59a4c6f4d6acee1e4fc54969885bc539a7a65d5262a55c321d2adb69a1.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "05d82d59a4c6f4d6acee1e4fc54969885bc539a7a65d5262a55c321d2adb69a1",
+    "documentSha256": "eb94808919cbc8cee0c684b95845f41565cdf0fd36e9531450e5ad287ec8ed11",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-07T04:52:45.299Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/4c32fe3bd42e906e2b224d4ff234940a74c139720bc2a35771b5e33f88bfebea.preview.webp",
+        "previewSrc": "/skill-previews/auto/4c32fe3bd42e906e2b224d4ff234940a74c139720bc2a35771b5e33f88bfebea.preview.webp",
+        "cardSrc": "/skill-previews/auto/4c32fe3bd42e906e2b224d4ff234940a74c139720bc2a35771b5e33f88bfebea.card.webp",
+        "width": 1600,
+        "height": 533,
+        "sha256": "4c32fe3bd42e906e2b224d4ff234940a74c139720bc2a35771b5e33f88bfebea",
+        "originalSrc": "/skill-previews/auto/4c32fe3bd42e906e2b224d4ff234940a74c139720bc2a35771b5e33f88bfebea.png",
+        "sourceUrl": "https://github.com/adaptyvbio/ProteinFlow/blob/19b5c108313902ff64cab1c4a4e966e5487d8878/media/pf-1.png",
+        "kind": "reference",
+        "title": {
+          "en": "ProteinFlow · Author preview",
+          "zh": "ProteinFlow · 作者预览"
+        },
+        "alt": {
+          "en": "ProteinFlow: overview",
+          "zh": "ProteinFlow：overview"
+        },
+        "sourcePath": "media/pf-1.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "advimman-hidt",
     "repository": "advimman/HiDT",
     "revision": "45e67cb0e67e23a342785527b5095d93e671ad51",
@@ -128,6 +260,116 @@
         "sourcePath": "docs/img/1_intro_grid.jpg",
         "documentPath": "README.md",
         "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "agentsope-skillalchemy",
+    "repository": "agentsope/SkillAlchemy",
+    "revision": "6ea799f6deb10ee48d66a644e595b1ffb84ef9a6",
+    "sourceUrl": "https://github.com/agentsope/SkillAlchemy/blob/6ea799f6deb10ee48d66a644e595b1ffb84ef9a6/SKILL.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-1db28de21888d71f5b5fe92ee2afba88de25bdba5d6e50b4f14e276ba063e423.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "1db28de21888d71f5b5fe92ee2afba88de25bdba5d6e50b4f14e276ba063e423",
+    "documentSha256": "867b9d232acba34eb3fc474306be5f5aaf58015b6b9e7ab7d09628700a5a49ca",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-07T04:52:45.299Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/0ebf769b36fde08dea5a36678b09c26d1c74cedbbee3116dcc9a8d08e67bf4ee.preview.webp",
+        "previewSrc": "/skill-previews/auto/0ebf769b36fde08dea5a36678b09c26d1c74cedbbee3116dcc9a8d08e67bf4ee.preview.webp",
+        "cardSrc": "/skill-previews/auto/0ebf769b36fde08dea5a36678b09c26d1c74cedbbee3116dcc9a8d08e67bf4ee.card.webp",
+        "width": 1600,
+        "height": 575,
+        "sha256": "0ebf769b36fde08dea5a36678b09c26d1c74cedbbee3116dcc9a8d08e67bf4ee",
+        "originalSrc": "/skill-previews/auto/0ebf769b36fde08dea5a36678b09c26d1c74cedbbee3116dcc9a8d08e67bf4ee.png",
+        "sourceUrl": "https://github.com/agentsope/SkillAlchemy/blob/6ea799f6deb10ee48d66a644e595b1ffb84ef9a6/assets/framework.png",
+        "kind": "reference",
+        "title": {
+          "en": "SkillAlchemy · Author preview",
+          "zh": "SkillAlchemy · 作者预览"
+        },
+        "alt": {
+          "en": "SkillAlchemy: SkillAlchemy framework",
+          "zh": "SkillAlchemy：SkillAlchemy framework"
+        },
+        "sourcePath": "assets/framework.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "agenui-agenui",
+    "repository": "AGenUI/AGenUI",
+    "revision": "0a448291965198b3943707249b6630f49a7cc849",
+    "sourceUrl": "https://github.com/AGenUI/AGenUI/blob/0a448291965198b3943707249b6630f49a7cc849/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-8eb8c4e6d9ae23bb215d7e135f85a2ce62e929d983f5155eccd45670ac955707.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "c785562d6d1f5ed2e3feb59ec66c84cbb6ba50d27024c764cf37e8dd9753964b",
+    "documentSha256": "a42166a761439268e3cd09c4ff694c9b97e9e4546699c64a3f3446492e12a3a1",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-07T04:52:45.299Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/e1ff2d534ac10a8954d05e36f52a415a11c690c9fcb7dbd6a828abc3cfb4a622.preview.webp",
+        "previewSrc": "/skill-previews/auto/e1ff2d534ac10a8954d05e36f52a415a11c690c9fcb7dbd6a828abc3cfb4a622.preview.webp",
+        "cardSrc": "/skill-previews/auto/e1ff2d534ac10a8954d05e36f52a415a11c690c9fcb7dbd6a828abc3cfb4a622.card.webp",
+        "width": 1460,
+        "height": 1600,
+        "sha256": "e1ff2d534ac10a8954d05e36f52a415a11c690c9fcb7dbd6a828abc3cfb4a622",
+        "originalSrc": "/skill-previews/auto/e1ff2d534ac10a8954d05e36f52a415a11c690c9fcb7dbd6a828abc3cfb4a622.png",
+        "sourceUrl": "https://github.com/AGenUI/AGenUI/blob/0a448291965198b3943707249b6630f49a7cc849/docs/images/a2ui_rendering_effect.png",
+        "kind": "example",
+        "title": {
+          "en": "AGenUI · Author preview",
+          "zh": "AGenUI · 作者预览"
+        },
+        "alt": {
+          "en": "AGenUI: A2UI components rendering showcase",
+          "zh": "AGenUI：A2UI components rendering showcase"
+        },
+        "sourcePath": "docs/images/a2ui_rendering_effect.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/64a9b20ff2eec534f693a8cf675ea426d5d2cc944540b3ce9cf0ddee7297d937.preview.webp",
+        "previewSrc": "/skill-previews/auto/64a9b20ff2eec534f693a8cf675ea426d5d2cc944540b3ce9cf0ddee7297d937.preview.webp",
+        "cardSrc": "/skill-previews/auto/64a9b20ff2eec534f693a8cf675ea426d5d2cc944540b3ce9cf0ddee7297d937.card.webp",
+        "width": 960,
+        "height": 1004,
+        "sha256": "64a9b20ff2eec534f693a8cf675ea426d5d2cc944540b3ce9cf0ddee7297d937",
+        "originalSrc": "/skill-previews/auto/64a9b20ff2eec534f693a8cf675ea426d5d2cc944540b3ce9cf0ddee7297d937.gif",
+        "sourceUrl": "https://github.com/AGenUI/AGenUI/blob/0a448291965198b3943707249b6630f49a7cc849/docs/images/hero.gif",
+        "kind": "reference",
+        "title": {
+          "en": "AGenUI · Animation · still preview",
+          "zh": "AGenUI · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "AGenUI: AGenUI streaming generative UI across iOS, Android, and HarmonyOS",
+          "zh": "AGenUI：AGenUI streaming generative UI across iOS, Android, and HarmonyOS"
+        },
+        "sourcePath": "docs/images/hero.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
       }
     ]
   },
