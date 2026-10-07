@@ -456,4 +456,3 @@ export const SCENARIO_GUIDES: GrowthGuideDefinition[] = [
     ]
   }
 ]
-
