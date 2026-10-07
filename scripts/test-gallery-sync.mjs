@@ -4,19 +4,22 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { createRequire } from 'node:module'
 import { syncGallery } from './sync-gallery.mjs'
-import { selectGalleryCI } from './select-gallery-ci.mjs'
+import { candidateCIState } from './validate-gallery-candidate.mjs'
 import { boundedFetch, candidates, digest, planItem, safePath, slugFor } from './gallery/core.mjs'
 
 for (const bad of ['../secret','/etc/passwd','images/../../a.png','a\\b.png','a/%2e%2e/b','https://evil/a.png']) assert.equal(safePath(bad),false)
 const rule = {source:'test',group:'cover',prefix:'screenshots/'}
-const deployment = {sender:{login:'vercel[bot]'},deployment_status:{state:'success'},deployment:{environment:'Preview – openagentskill',sha:'a'.repeat(40)}}
-const candidateBranches = async()=>[{name:'codex/gallery-sync-123-1'}]
-assert.equal(await selectGalleryCI('pull_request',{},async()=>{throw new Error('Unexpected lookup')}),true)
-assert.equal(await selectGalleryCI('deployment_status',deployment,candidateBranches),true)
-assert.equal(await selectGalleryCI('deployment_status',deployment,async()=>[{name:'main'}]),false)
-assert.equal(await selectGalleryCI('deployment_status',{...deployment,deployment_status:{state:'failure'}},candidateBranches),false)
-assert.equal(await selectGalleryCI('deployment_status',{...deployment,sender:{login:'other'}},candidateBranches),false)
-assert.equal(await selectGalleryCI('deployment_status',{...deployment,deployment:{...deployment.deployment,environment:'Production'}},candidateBranches),false)
+const candidateSha = 'a'.repeat(40)
+const passedRun = { id: 1, head_sha: candidateSha, event: 'deployment_status', status: 'completed', conclusion: 'success' }
+const passedJobs = ['Lint and typecheck', 'Regression tests', 'Production build'].map(name => ({name, conclusion:'success'}))
+assert.equal(candidateCIState([passedRun], passedJobs, candidateSha), 'passed')
+assert.equal(candidateCIState([{...passedRun, event:'workflow_dispatch'}], passedJobs, candidateSha), 'waiting')
+assert.equal(candidateCIState([{...passedRun, head_sha:'b'.repeat(40)}], passedJobs, candidateSha), 'waiting')
+assert.equal(candidateCIState([passedRun, {...passedRun, id:2, status:'in_progress', conclusion:null}], passedJobs, candidateSha), 'waiting', 'Older success cannot mask a newer in-progress run')
+assert.equal(candidateCIState([passedRun, {...passedRun, id:2, conclusion:'cancelled'}], passedJobs, candidateSha), 'waiting')
+assert.equal(candidateCIState([passedRun, {...passedRun, id:2, conclusion:'failure'}], passedJobs, candidateSha), 'failed')
+assert.equal(candidateCIState([passedRun], passedJobs.map(job => ({...job, conclusion:'skipped'})), candidateSha), 'failed', 'Skipped checks must never publish media')
+assert.equal(candidateCIState([passedRun], passedJobs.slice(0,2), candidateSha), 'failed', 'All three real checks are required')
 const blob = (path) => ({path,type:'blob',mode:'100644'})
 const tree = { tree:[blob('screenshots/a.png'),blob('screenshots/b.svg'),blob('screenshots/nested/c.png'),{...blob('screenshots/link.png'),mode:'120000'},blob('outside/a.png')] }
 assert.deepEqual(candidates(tree,[rule]).map(x=>x.path),['screenshots/a.png'])
