@@ -1433,5 +1433,39 @@
     "assets": [
       "assets/ip-as-logo-wall.webp"
     ]
+  },
+  {
+    "group": "open",
+    "slug": "open-dating-web",
+    "title": {
+      "en": "An editorial dating dashboard",
+      "zh": "编辑风格的交友数据看板"
+    },
+    "brief": {
+      "en": "Build a dating-app dashboard with labeled sample metrics, a quiet editorial layout and a clear activity chart.",
+      "zh": "用明确标注的示例数据、简洁的编辑式排版和活动图表制作交友应用看板。"
+    },
+    "assets": [
+      "docs/screenshots/skills/dating-web.png"
+    ],
+    "category": "web",
+    "reviewedAt": "2026-10-07"
+  },
+  {
+    "group": "open",
+    "slug": "open-gamified-app",
+    "title": {
+      "en": "Daily quests, across three screens",
+      "zh": "三个界面里的日常任务"
+    },
+    "brief": {
+      "en": "Design a mobile habit-tracking prototype with daily quests, progress and a focused task view.",
+      "zh": "制作包含日常任务、进度与任务详情的移动端习惯养成原型。"
+    },
+    "assets": [
+      "docs/screenshots/skills/gamified-app.png"
+    ],
+    "category": "web",
+    "reviewedAt": "2026-10-07"
   }
 ]

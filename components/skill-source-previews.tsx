@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import { SkillPreviewImage } from '@/components/skill-preview-image'
 import { ArrowUpRight } from 'lucide-react'
 import { previewCopy, previewText, type SkillSourcePreview } from '@/lib/skill-preview-shared'
 
@@ -12,7 +12,7 @@ export function SkillSourcePreviews({ preview, locale }: { preview: SkillSourceP
         {preview.media.map(media => (
           <figure key={media.src} className="overflow-hidden rounded-[12px] border border-border bg-card">
             <a href={media.src} target="_blank" rel="noreferrer" className="block bg-[#eeece5]/35 p-2 sm:p-4" aria-label={`${previewCopy('full', locale)}: ${previewText(media.title, locale)}`}>
-              <Image src={media.previewSrc} alt={previewText(media.alt, locale)} width={media.width} height={media.height} sizes="(max-width: 1023px) 100vw, 760px" className="h-auto w-full" />
+              <SkillPreviewImage locale={locale} src={media.previewSrc} alt={previewText(media.alt, locale)} width={media.width} height={media.height} sizes="(max-width: 1023px) 100vw, 760px" className="h-auto w-full" />
             </a>
             <figcaption className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 text-sm">
               <div><p className="text-[10px] text-secondary">{previewCopy(media.kind, locale)}</p><h3 className="mt-1 font-medium">{previewText(media.title, locale)}</h3></div>
@@ -25,6 +25,7 @@ export function SkillSourcePreviews({ preview, locale }: { preview: SkillSourceP
       <p className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-xs text-secondary">
         <a href={preview.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-4">{preview.repository}</a>
         <a href={preview.licenseUrl} target="_blank" rel="noreferrer" className="underline underline-offset-4">{previewCopy('license', locale)}: {preview.license}</a>
+        {preview.bindingUrl && <a href={preview.bindingUrl} target="_blank" rel="noreferrer" className="underline underline-offset-4">{previewCopy('binding', locale)}</a>}
       </p>
     </section>
   )

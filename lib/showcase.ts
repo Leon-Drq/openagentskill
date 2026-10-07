@@ -33,9 +33,10 @@ const expandedCases: ShowcaseCase[] = curatedEntries.map((entry) => {
   const category = ('category' in entry ? entry.category : group.category) as ShowcaseCategory
   const videoPath = entry.group === 'motion' ? entry.assets[0].replace(/preview\.png$/, 'preview.mp4') : null
   const sourcePath = entry.group === 'frontend' ? `templates/${entry.slug.replace('frontend-', '')}` : entry.assets[0]
+  const selectedAt = ('reviewedAt' in entry && entry.reviewedAt) || '2026-09-08'
   const note = tx(
-    'Selected from the author’s pinned repository on 2026-09-08. Originals are preserved; display copies are resized and compressed. We inspected the preview, not a fresh agent run. Original prompt, model, production time and cost are not verified. Sample figures and scientific labels require independent checking.',
-    '于 2026-09-08 从作者仓库的固定版本中精选。保留原图，展示副本仅缩放压缩。本站检查了预览，没有重新运行技能；未核实原始提示词、模型、制作时长与成本。示例数字及科学标注需独立核查。',
+    `Selected from the author’s pinned repository on ${selectedAt}. Originals are preserved; display copies are resized and compressed. We inspected the preview, not a fresh agent run. Original prompt, model, production time and cost are not verified. Sample figures and scientific labels require independent checking.`,
+    `于 ${selectedAt} 从作者仓库的固定版本中精选。保留原图，展示副本仅缩放压缩。本站检查了预览，没有重新运行技能；未核实原始提示词、模型、制作时长与成本。示例数字及科学标注需独立核查。`,
   )
   if (entry.group === 'motion') {
     note.en += ' Upstream credits are preserved in Gallery attribution. Studio names describe inspiration, not endorsement.'
@@ -57,7 +58,7 @@ const expandedCases: ShowcaseCase[] = curatedEntries.map((entry) => {
       return { src: meta.src, width: meta.width, height: meta.height, alt: tx(`${entry.title.en} — author preview ${index + 1}`, `${entry.title.zh}：作者预览 ${index + 1}`) }
     }),
     ...(videoPath ? { videoUrl: `https://raw.githubusercontent.com/${source.repo}/${source.revision}/${videoPath}` } : {}),
-    cardFit: category === 'web' ? 'cover' : 'contain', updatedAt: '2026-09-08',
+    cardFit: category === 'web' ? 'cover' : 'contain', updatedAt: selectedAt,
   }
 })
 

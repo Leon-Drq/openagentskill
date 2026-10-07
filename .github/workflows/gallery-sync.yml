@@ -76,3 +76,14 @@ jobs:
           path: artifacts/gallery-sync-report.json
           if-no-files-found: ignore
           retention-days: 30
+      - name: Audit directory, Gallery and provider media
+        if: always()
+        run: pnpm media:audit --remote
+      - name: Preserve media health report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: skill-media-audit
+          path: artifacts/skill-media-audit.json
+          if-no-files-found: ignore
+          retention-days: 30

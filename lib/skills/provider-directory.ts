@@ -59,6 +59,7 @@ export function toProviderDirectorySkill(entry: ExternalSkill, locale: string): 
     provider: { label: entry.provider === 'skillry' ? 'Skillry' : 'RedSkill', localizedName: lang === 'zh' && entry.provider === 'skillry' && entry.title.zh !== entry.skillName ? entry.title.zh : undefined,
       sourceDownloads: entry.provider === 'skillry' ? entry.listingEvidence.downloadCount : undefined, sourceHref: externalSourceHref(entry.sourceUrl), sourceRel: externalSourceRel(entry.sourceUrl),
       image: entry.provider === 'skillry' ? entry.previewImages[0].replace('&variant=detail', '&variant=card') : entry.runtimeDemo?.poster,
+      video: entry.provider === 'skillry' ? entry.previewVideo || undefined : entry.runtimeDemo?.video,
       exampleLabel: entry.provider === 'skillry' ? (lang === 'zh' ? '原站案例 · Skillry' : 'Source example · Skillry') : (lang === 'zh' ? '本站实录' : 'Recorded here') },
   }
 }

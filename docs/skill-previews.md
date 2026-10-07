@@ -44,3 +44,47 @@ assets remain source links until their artwork reuse permission is established.
 The current daily Gallery collector continues to handle its existing approved
 sources. This registry extends the available collection format; it does not
 silently enable crawling or publishing from arbitrary new repositories.
+
+## Reuse existing examples without losing their attribution
+
+`lib/skill-preview-bindings.json` connects an exact registry slug to existing
+Gallery case IDs. Each binding records the repository, Skill document path,
+immutable revision and document SHA-256. `same-skill` requires the author's
+preview for that exact template; `upstream-template` requires an explicit
+upstream reference in that Skill document. A shared repository is insufficient.
+The server resolves the current Gallery assets, captions and license; assets
+are not duplicated. Upstream templates are labeled as references, not outputs
+produced by the downstream Skill. The detail page links both the original
+preview and the Skill document establishing the relationship.
+
+Bindings automatically participate in the existing SQL `With examples` filter
+before counting/pagination. New Gallery/provider media continues to flow into
+cards and details through the same source adapters. Both Gallery and provider
+video URLs are preserved; players attach their source only after a click, and
+pause other previews when playback starts. A failed poster does not block video
+playback. Failed images keep their description and frame; directory cards try
+another available source before showing the compact unavailable state.
+
+## Media health and coverage checks
+
+- `pnpm media:audit`: inspect every configured Gallery, source preview, binding
+  and active provider; verify local assets, media signatures, alt text/dimensions
+  and preservation of video fields. Runs in the required regression suite.
+- `pnpm media:audit --remote`: also probe every remote image/video with a bounded
+  range GET, verify its file signature (an HTTP 200 HTML error is a failure),
+  and cancel the response stream. No Skill code is executed. Only approved
+  public hosts/redirect hosts are accepted. This runs in the existing daily
+  Gallery workflow, with the full report retained as a GitHub Actions artifact.
+- `pnpm media:audit --catalog <public-registry-export.json>`: optionally join
+  the whole registry, check exact binding identities and produce per-category
+  coverage plus a missing-visuals work queue. Input is an array of public
+  `{slug, github_repo, repository, source_path, category}` records, with category
+  taken from `primary_category`. Obtain it with a read-only owner export; never
+  embed database credentials in the script, report or client bundle.
+
+The report is `artifacts/skill-media-audit.json`. Remote probe failures fail the
+check and remain visible in its report. Missing previews are reported separately
+as **not collected**, not automatically treated as broken images or proof that
+the author has no examples. This audit checks the full configured media catalog;
+it does not claim to crawl every upstream repository or confer redistribution
+rights. New sources still follow the attribution/import process above.

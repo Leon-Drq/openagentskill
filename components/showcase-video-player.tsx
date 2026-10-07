@@ -15,6 +15,7 @@ export function ShowcaseVideoPlayer({ item, locale, compact = false, priority = 
 }) {
   const [started, setStarted] = useState(false)
   const [failed, setFailed] = useState(false)
+  const [posterFailed, setPosterFailed] = useState(false)
   const title = localizeShowcase(item.title, locale)
   const poster = getShowcaseImageSrc(item.media[0].src, compact ? 'card' : 'preview')
   const portrait = item.media[0].height > item.media[0].width
@@ -25,7 +26,7 @@ export function ShowcaseVideoPlayer({ item, locale, compact = false, priority = 
         document.querySelectorAll('video').forEach((video) => { if (video !== event.currentTarget) video.pause() })
         trackAnalyticsEvent('showcase_media_play', { case_slug: item.slug, skill_slug: item.skillSlug })
       }} /> : <>
-      <Image src={poster} alt={localizeShowcase(item.media[0].alt, locale)} fill sizes={compact ? '(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 380px' : '(max-width: 1023px) 100vw, 680px'} preload={priority} className="object-contain" />
+      {!posterFailed && <Image src={poster} alt={localizeShowcase(item.media[0].alt, locale)} fill sizes={compact ? '(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 380px' : '(max-width: 1023px) 100vw, 680px'} preload={priority} className="object-contain" onError={() => setPosterFailed(true)} />}
       {failed ? <div role="status" className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#1d1b18]/85 p-4 text-center text-sm text-white">
         <p>{galleryCopy(locale, "Preview could not load", "视频暂时无法加载")}</p>
         <a href={item.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center underline underline-offset-4">{galleryCopy(locale, "Open original video", "打开原视频")}</a>

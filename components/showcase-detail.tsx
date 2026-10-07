@@ -3,7 +3,7 @@
 import { galleryCopy } from '@/lib/i18n/gallery-copy'
 
 import { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
+import { SkillPreviewImage } from '@/components/skill-preview-image'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
@@ -110,14 +110,14 @@ function DetailContent({ item, related }: { item: ShowcaseCase; related: Showcas
             <figure>
               <div className="overflow-hidden rounded-lg border border-[#e4e0d8] bg-[#eeece5]">
                 {item.videoUrl ? <ShowcaseVideoPlayer item={item} locale={locale} priority /> : <div className={`${item.category === 'web' && media.height > media.width ? 'max-h-[700px] overflow-y-auto' : 'p-3 sm:p-5'}`} tabIndex={item.category === 'web' && media.height > media.width ? 0 : undefined} role={item.category === 'web' && media.height > media.width ? 'region' : undefined} aria-label={item.category === 'web' && media.height > media.width ? (galleryCopy(locale, "Scrollable full website preview", "可滚动的完整网页预览")) : undefined}>
-                  <Image key={media.src} src={getShowcaseImageSrc(media.src, 'preview')} alt={localizeShowcase(media.alt, locale)} width={media.width} height={media.height}
+                  <SkillPreviewImage locale={locale} key={media.src} src={getShowcaseImageSrc(media.src, 'preview')} alt={localizeShowcase(media.alt, locale)} width={media.width} height={media.height}
                     sizes="(max-width: 1023px) 100vw, 680px" preload
                     className={`h-auto w-full ${item.cardFit === 'contain' ? 'max-h-[690px] object-contain' : ''}`} />
                 </div>}
               </div>
               {item.media.length > 1 && <div className="mt-3 flex gap-3" aria-label={galleryCopy(locale, "Choose preview image", "选择预览图片")}>
                 {item.media.map((entry, index) => <button key={entry.src} type="button" aria-pressed={activeMedia === index} onClick={() => setActiveMedia(index)} className={`relative h-16 w-24 overflow-hidden rounded-md border-2 ${activeMedia === index ? 'border-[#006b4f]' : 'border-transparent hover:border-[#bdb7ac]'}`} aria-label={galleryCopy(locale, 'Preview image {page}', '预览图片 {page}', { page: index + 1 })}>
-                  <Image src={getShowcaseImageSrc(entry.src, 'card')} alt="" fill sizes="96px" className="object-cover object-top" />
+                  <SkillPreviewImage locale={locale} src={getShowcaseImageSrc(entry.src, 'card')} alt="" fill sizes="96px" className="object-cover object-top" />
                 </button>)}
               </div>}
               <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs leading-relaxed text-[#6d675e]">

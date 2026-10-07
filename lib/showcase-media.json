@@ -943,5 +943,19 @@
     "height": 2200,
     "sha256": "80e4b0e1fecb4648f53be77a1ec1efc6f2ca4a7c01f19305eec28c812df78fd1",
     "sourceUrl": "https://raw.githubusercontent.com/s1dashu/ip-as-logo-skill/acb834c717bcd0a487c49732d08397ba280d690b/assets/ip-as-logo-wall.webp"
+  },
+  "open-dating-web:0": {
+    "src": "/showcase/curated-open-dating-web-1.png",
+    "width": 1024,
+    "height": 576,
+    "sha256": "b8e2346a5c4c8ff68c07e2dd107c8399ae732e1e3f483d46c241b835bc5e6314",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/docs/screenshots/skills/dating-web.png"
+  },
+  "open-gamified-app:0": {
+    "src": "/showcase/curated-open-gamified-app-1.png",
+    "width": 1024,
+    "height": 576,
+    "sha256": "f67fe26d80dd5caf7ad6e510d3debd6b811bbba16b11f5a1efd3739b8b94c773",
+    "sourceUrl": "https://raw.githubusercontent.com/nexu-io/open-design/ad09d388394f1dbe839edb4d7aaf7b62e10a2d54/docs/screenshots/skills/gamified-app.png"
   }
 }

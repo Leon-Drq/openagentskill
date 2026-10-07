@@ -5,7 +5,7 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { externalSkillHref, getExternalSkill, EXTERNAL_SKILLS } from '@/lib/skills/external-catalog'
 import { externalSourceHref, externalSourceRel } from '@/lib/skills/external-outbound'
-import Image from 'next/image'
+import { SkillPreviewImage } from '@/components/skill-preview-image'
 import { ProviderVideoPreview } from './provider-video-preview'
 import { SkillryLogo } from './skillry-logo'
 import { SkillActions, SkillEngagementProvider } from '@/components/skill-engagement'
@@ -19,13 +19,14 @@ export async function buildCatalogSkillMetadata({ params, searchParams }: Props)
   const query = await searchParams
   const lang = query.lang === 'zh' ? 'zh' : 'en'
   const url = base + externalSkillHref(entry.slug)
+  const socialImage = entry.provider === 'skillry' ? entry.previewImages[0] : entry.runtimeDemo ? base + entry.runtimeDemo.poster : null
   return {
     title: entry.title[lang], description: entry.description[lang],
     alternates: { canonical: url }, robots: { index: Object.keys(query).length === 0 && (entry.provider !== 'skillry' || (entry.active && entry.seoIndexable)), follow: true },
     openGraph: { type: 'website', title: entry.title[lang], description: entry.description[lang], url,
-      ...(entry.runtimeDemo ? { images: [{ url: base + entry.runtimeDemo.poster, width: 1280, height: 720, alt: entry.title[lang] }] } : {}) },
-    twitter: { card: entry.runtimeDemo ? 'summary_large_image' : 'summary', title: entry.title[lang], description: entry.description[lang],
-      ...(entry.runtimeDemo ? { images: [base + entry.runtimeDemo.poster] } : {}) },
+      ...(socialImage ? { images: [{ url: socialImage, alt: entry.title[lang] }] } : {}) },
+    twitter: { card: socialImage ? 'summary_large_image' : 'summary', title: entry.title[lang], description: entry.description[lang],
+      ...(socialImage ? { images: [socialImage] } : {}) },
   }
 }
 export default async function CatalogSkillContent({ params, searchParams }: Props) {
@@ -87,10 +88,10 @@ export default async function CatalogSkillContent({ params, searchParams }: Prop
           <a href={externalSourceHref(entry.sourceUrl)} target="_blank" rel={externalSourceRel(entry.sourceUrl)} className="inline-flex min-h-11 items-center text-sm text-[#006b4f] underline underline-offset-4">{zh ? '在 Skillry 查看案例' : 'View examples on Skillry'} ↗</a>
         </div>
         <p className="mb-6 text-sm leading-7 text-secondary">{zh ? 'Skillry 原站公开案例，图片从原站加载。本站未执行技能，原始提示词、模型和制作耗时未核实。' : 'Public examples from Skillry, loaded from the source. We have not run the skill or verified the original prompts, model or production time.'}</p>
-        {entry.previewVideo && <div className="mb-6"><ProviderVideoPreview src={entry.previewVideo} poster={entry.previewImages[0]} title={entry.skillName} zh={zh} /><p className="mt-3 text-xs text-secondary">{zh ? '原站案例视频 · 点击后加载' : 'Source video example · Loads when played'}</p></div>}
+        {entry.previewVideo && <div className="mb-6"><ProviderVideoPreview key={entry.previewVideo} src={entry.previewVideo} poster={entry.previewImages[0]} title={entry.skillName} zh={zh} /><p className="mt-3 text-xs text-secondary">{zh ? '原站案例视频 · 点击后加载' : 'Source video example · Loads when played'}</p></div>}
         <div className="grid gap-4 sm:grid-cols-2">
           {entry.previewImages.map((src, index) => <figure key={src} className="min-w-0 overflow-hidden rounded-xl border border-border bg-card">
-            <div className="relative aspect-video"><Image src={src} alt={`${entry.title[lang]} — ${zh ? '原站案例' : 'source example'} ${index + 1}`} fill unoptimized sizes="(max-width: 639px) 100vw, 560px" className="object-contain" /></div>
+            <div className="relative aspect-video"><SkillPreviewImage locale={lang} src={src} alt={`${entry.title[lang]} — ${zh ? '原站案例' : 'source example'} ${index + 1}`} fill unoptimized sizes="(max-width: 639px) 100vw, 560px" className="object-contain" /></div>
             <figcaption className="px-4 py-3 text-xs text-secondary">Skillry · {zh ? '原站案例' : 'Source example'} {index + 1}</figcaption>
           </figure>)}
         </div>
