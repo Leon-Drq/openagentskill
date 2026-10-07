@@ -1,5 +1,6 @@
 import type { SkillRecord } from '@/lib/db/skills'
 import editorialEntries from './editorial-index.json' with { type: 'json' }
+const editorialAliases: readonly string[] = editorialEntries.flatMap(entry => entry.aliases)
 
 // Search should showcase skills with enough public evidence to stand on their
 // own. The full catalog stays available to people and agents, while this
@@ -31,7 +32,7 @@ export function getEditorialSearchProfile(skill: Partial<SearchIndexCandidate>) 
 export function buildLegacySearchIndexFilter(minStars = SEARCH_INDEX_MIN_GITHUB_STARS, minQuality = SEARCH_INDEX_MIN_QUALITY_SCORE) {
   const stars = Math.max(0, Math.floor(Number.isFinite(minStars) ? minStars : SEARCH_INDEX_MIN_GITHUB_STARS))
   const quality = Math.max(0, Math.floor(Number.isFinite(minQuality) ? minQuality : SEARCH_INDEX_MIN_QUALITY_SCORE))
-  const aliases = editorialEntries.flatMap(entry => entry.aliases)
+  const aliases = editorialAliases
   const legacy = [SEARCH_INDEX_PUBLICATION_FILTER, ...(quality ? [`quality_score.gte.${quality}`] : []), ...(stars ? [`or(github_stars.gte.${stars},publisher_verified.eq.true)`] : []), ...(aliases.length ? [`slug.not.in.(${aliases.join(',')})`] : [])]
   return `and(${legacy.join(',')})`
 }
@@ -41,7 +42,7 @@ export function buildEditorialSearchIndexFilter() {
 }
 
 export function matchesLegacySearchIndex(skill: SearchIndexCandidate, minStars: number, minQuality: number) {
-  return !editorialEntries.some(entry => entry.aliases.includes(skill.slug || '')) &&
+  return !editorialAliases.includes(skill.slug || '') &&
     skill.ai_review_approved === true && Number(skill.quality_score || 0) >= minQuality &&
     (minStars === 0 || Number(skill.github_stars || 0) >= minStars || skill.publisher_verified === true)
 }
@@ -61,7 +62,7 @@ export interface SearchEvidenceProfile {
 }
 
 export function isSearchIndexEligible(skill: SearchIndexCandidate) {
-  if (editorialEntries.some(entry => entry.aliases.includes(skill.slug || ''))) return false
+  if (editorialAliases.includes(skill.slug || '')) return false
   if (getEditorialSearchProfile(skill)) return true
   return (
     skill.ai_review_approved === true &&

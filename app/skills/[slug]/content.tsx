@@ -43,6 +43,7 @@ import { getSkillCommerce } from '@/lib/skills/commerce'
 import { SkillShareButton } from '@/components/skill-share-button'
 import { SkillActions, SkillEngagementProvider } from '@/components/skill-engagement'
 import { SkillShowcase } from '@/components/showcase-sections'
+import { ExampleReproduction } from '@/components/example-reproduction'
 import { ClaimSkillPanel } from '@/components/claim-skill-panel'
 import { CreatorBadgeKit } from '@/components/creator-badge-kit'
 import { SkillFeedbackPanel } from '@/components/skill-feedback-panel'
@@ -261,6 +262,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
           <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-14">
             <div className="min-w-0">
               {hasShowcase && <SkillShowcase skillSlug={skill.slug} cases={getShowcasesForSkill(skill.slug).slice(0, 2).map(getShowcaseCardData)} profile />}
+              {getShowcasesForSkill(skill.slug).filter(example => example.reproduction).map(example => <ExampleReproduction key={example.slug} example={example} locale={initialLocale || defaultLocale} />)}
               <section id="overview" className={sectionClass}>
                 <h2 className={headingClass}><Text id="overview" /></h2>
                 {editorial && <div lang={editorialLocale} className="my-6 space-y-4 text-sm leading-7 text-secondary" data-editorial-source={editorial.commit}>
@@ -268,7 +270,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
                   <p>{editorial.summary[editorialLocale]}</p>
                   <p>{editorial.workflow[editorialLocale]}</p>
                   <p>{editorial.limitations[editorialLocale]}</p>
-                  <Link href={`/showcase/${editorial.gallerySlug}`} className="inline-block font-medium text-[#006b4f] underline underline-offset-4">{editorialLocale === 'zh' ? '查看作者海报案例' : 'Explore the author’s poster examples'} →</Link>
+                  <Link href={`/showcase/${editorial.gallerySlug}`} className="inline-block font-medium text-[#006b4f] underline underline-offset-4">{editorial.galleryLabel?.[editorialLocale] || (editorialLocale === 'zh' ? '查看作者海报案例' : 'Explore the author’s poster examples')} →</Link>
                 </div>}
                 <SkillDocument source={skill.longDescription} summary={skill.description} sourceUrl={sourceHref || ''} locale={initialLocale} />
               </section>

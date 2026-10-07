@@ -33,6 +33,10 @@ const freeSource = (sourceUrl: string, runtime: SkillOffer['runtime'] = 'model')
 })
 
 export const reviewedSkillOffers: Readonly<Record<string, SkillOffer>> = {
+  'chengyi-ai-native-subtitle-quote-image': {
+    type: 'free', billing: 'free', runtime: 'unknown', checkedAt: '2026-10-06',
+    sourceUrl: 'https://github.com/chengyi-ai/native-subtitle-quote-image/tree/f9485e20f03fc0b9e5dfd77d03d5be24f7cebdcd',
+  },
   'liamgvchi-gc-minimal-zine-poster-v0-3': freeSource('https://github.com/LiamGvchi/gc-minimal-zine-poster'),
   'yanliudesign-mono-color-skill': freeSource('https://github.com/yanliudesign/mono-color-skill#install'),
   'design-taste-frontend': freeSource('https://github.com/Leonxlnx/taste-skill#installing'),

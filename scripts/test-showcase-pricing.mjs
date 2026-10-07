@@ -16,7 +16,9 @@ assert.equal(getShowcasePrice('hypit-ai-hypit-hypit', checked), 'free')
 assert.equal(getShowcasePrice('hypit-ai-hypit-hypit', checked + 91 * 86400000), null)
 assert.equal(getShowcasePrice('not-confirmed', checked), null)
 assert.equal(hasCommercialOffers(checked), false)
-for (const item of SHOWCASE_CASES) assert.equal(getShowcasePrice(item.skillSlug, checked), 'free', `Official free-source evidence required for ${item.skillSlug}`)
+// Catalog additions may have evidence recorded after the original expiry fixture.
+const catalogDate = Date.parse('2026-10-06T12:00:00Z')
+for (const item of SHOWCASE_CASES) assert.equal(getShowcasePrice(item.skillSlug, catalogDate), 'free', `Official free-source evidence required for ${item.skillSlug}`)
 assert.equal(filterShowcaseCases('all', '', '', '', 'all').length, SHOWCASE_CASES.length)
 for (const pricing of ['free', 'paid']) {
   const expected = SHOWCASE_CASES.filter(item => getShowcasePrice(item.skillSlug) === pricing)

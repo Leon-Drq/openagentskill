@@ -1,0 +1,78 @@
+{
+  "recorded_at": "2026-10-07T00:40:17.227694+00:00",
+  "source_repository": "chengyi-ai/native-subtitle-quote-image",
+  "source_revision": "f9485e20f03fc0b9e5dfd77d03d5be24f7cebdcd",
+  "skill_version": "2.1.1",
+  "renderer_sha256": "61423e76469d1fe8633c8565cb05d90bc91e51139387e580fcf20e2989efe0b4",
+  "mode": "native",
+  "input": {
+    "creator": "OpenAgentSkill",
+    "kind": "original graphic demonstration",
+    "width": 1080,
+    "height": 1080,
+    "duration_seconds": 10,
+    "fps": 12,
+    "audio": false,
+    "captions_burned_in": true,
+    "captions": [
+      "Keep the words. Keep the context.",
+      "Start with a video you can publish.",
+      "Choose five clear, stable frames.",
+      "Keep the subtitles already in the image.",
+      "Turn the sequence into one shareable card."
+    ]
+  },
+  "environment": {
+    "python": "3.12.14",
+    "pillow": "12.3.0",
+    "ffmpeg": "7.1",
+    "platform": "Darwin"
+  },
+  "exit_code": 0,
+  "stdout": "完成: ./output/01_video-to-quote-card.jpg (1080x1440)\n布局: 主画面 70.0%，字幕条 4 个，条间距 0\n总览图: ./output/final_contact_sheet.jpg",
+  "scope": "One local CLI render of an original English clip. Not an installation, URL download, translation, security or cross-agent test.",
+  "artifacts": [
+    {
+      "path": "input.mp4",
+      "bytes": 153525,
+      "sha256": "437106898c73eea2923e3438aef4ea37c155b5dc3a04b743d027c8b64c66f277"
+    },
+    {
+      "path": "manifest.json",
+      "bytes": 151,
+      "sha256": "25afafb38aba5fe452bd1254a79f7788393bddcbc9c221d31c3b042445e3eab9"
+    },
+    {
+      "path": "output/01_video-to-quote-card.jpg",
+      "bytes": 200838,
+      "sha256": "3fa1d9729e54ce59e8926e53561c795fe0f2862961b537ae9e796713cfd91824",
+      "dimensions": [
+        1080,
+        1440
+      ]
+    },
+    {
+      "path": "output/final_contact_sheet.jpg",
+      "bytes": 37388,
+      "sha256": "f7a3d7a8262e52f3e7d453cea7a70d670d26f4b30017ef1001d2777ae78b58df",
+      "dimensions": [
+        360,
+        480
+      ]
+    },
+    {
+      "path": "output/原生字幕时间点.json",
+      "bytes": 151,
+      "sha256": "25afafb38aba5fe452bd1254a79f7788393bddcbc9c221d31c3b042445e3eab9"
+    }
+  ],
+  "visual_inspection": {
+    "output": "output/01_video-to-quote-card.jpg",
+    "observations": [
+      "All five original English captions are visible and readable.",
+      "No clipping of caption starts or ends was observed.",
+      "The main image and four subtitle strips are in timestamp order."
+    ],
+    "scope": "Visual inspection of this output only."
+  }
+}

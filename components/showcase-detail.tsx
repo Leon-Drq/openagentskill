@@ -21,6 +21,7 @@ import { getShowcaseTaskUrl, normalizeShowcaseAgentTarget, renderShowcaseTaskMar
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { getShowcaseAccessLabel, getShowcaseCreator, getShowcaseEvidenceLabel, getShowcaseImageSrc, getShowcaseSkill, localizeShowcase, SHOWCASE_CATEGORIES, type ShowcaseCase, type ShowcaseCardData } from '@/lib/showcase-shared'
 import { ShowcaseTags } from '@/components/showcase-tags'
+import { ExampleReproduction } from '@/components/example-reproduction'
 
 export function ShowcaseDetail({ item, related }: { item: ShowcaseCase; related: ShowcaseCardData[] }) {
   return <ShowcaseEngagementProvider><DetailContent key={item.slug} item={item} related={related} /></ShowcaseEngagementProvider>
@@ -135,6 +136,7 @@ function DetailContent({ item, related }: { item: ShowcaseCase; related: Showcas
                 ].map(([label, text]) => <div key={label} className="grid gap-2 py-4 sm:grid-cols-[130px_1fr]"><dt className="text-xs font-semibold text-[#1d1b18]">{label}</dt><dd className="text-sm leading-relaxed text-[#6d675e]">{text}</dd></div>)}
               </dl>
             </section>
+            <ExampleReproduction example={item} locale={locale} />
             <details className="mt-5 rounded-lg border border-[#e4e0d8] bg-white/50 px-5 py-4">
               <summary className="cursor-pointer text-sm font-semibold">{galleryCopy(locale, "Source & production notes", "案例来源与制作记录")}</summary>
               <p className="mt-4 text-sm leading-relaxed text-[#6d675e]">{localizeShowcase(item.productionNote, locale)}</p>
