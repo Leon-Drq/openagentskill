@@ -1,6 +1,7 @@
 import 'server-only'
 import previews from './skill-previews.json'
 import bindings from './skill-preview-bindings.json'
+import automatic from './skill-previews-auto.json'
 import { getShowcaseCase, getShowcaseImageSrc } from './showcase'
 import type { SkillPreviewCardData, SkillSourcePreview } from './skill-preview-shared'
 
@@ -30,6 +31,11 @@ for (const binding of bindings) {
       kind: upstream ? 'template' as const : 'example' as const, title: item.title, sourceUrl: item.sourceUrl,
     }))),
   })
+}
+// The automatic collector uses exact source identities and immutable assets.
+// Explicitly curated previews and bindings always take precedence.
+for (const preview of automatic as SkillSourcePreview[]) {
+  if (!registry.has(preview.skillSlug)) registry.set(preview.skillSlug, preview)
 }
 export const SKILL_SOURCE_PREVIEWS = [...registry.values()]
 // An interface or an input image alone is not an output example.

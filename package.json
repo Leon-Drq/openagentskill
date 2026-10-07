@@ -34,7 +34,7 @@
     "test:registry-layers": "node --experimental-strip-types scripts/test-registry-layers.ts",
     "previews:import": "node scripts/import-skill-previews.mjs",
     "test:skill-previews": "node --experimental-strip-types scripts/test-skill-previews.mjs",
-    "test:showcase": "node --experimental-strip-types scripts/test-showcase.mjs && node --experimental-strip-types scripts/test-showcase-engagement.mjs && pnpm test:gallery-sync && pnpm test:skill-previews && pnpm test:media-audit && pnpm media:audit",
+    "test:showcase": "node --experimental-strip-types scripts/test-showcase.mjs && node --experimental-strip-types scripts/test-showcase-engagement.mjs && pnpm test:gallery-sync && pnpm test:skill-previews && pnpm test:media-audit && pnpm media:audit && pnpm test:media-collection",
     "test:form-controls": "node scripts/test-form-controls.mjs",
     "test:seo": "node --experimental-strip-types scripts/test-seo-foundation.mjs && node scripts/test-growth-discovery.mjs && node scripts/test-use-case-directory.mjs && node scripts/test-skill-pack-directory.mjs",
     "test:skill-detail": "node scripts/test-skill-detail.mjs && node scripts/test-skill-document.mjs && node scripts/test-skills-directory.mjs && node scripts/test-external-skills.mjs && node scripts/test-provider-directory.mjs && node scripts/test-skillry-sync.mjs",
@@ -61,7 +61,9 @@
     "test:account": "node --experimental-strip-types scripts/test-account-workspace.mjs && node scripts/test-skill-engagement.mjs",
     "test:video-workflows": "node --experimental-strip-types scripts/test-video-workflows.mjs",
     "media:audit": "node scripts/audit-skill-media.mjs",
-    "test:media-audit": "node scripts/test-media-audit.mjs"
+    "test:media-audit": "node scripts/test-media-audit.mjs",
+    "media:collect": "node scripts/collect-skill-media.mjs",
+    "test:media-collection": "node --experimental-strip-types scripts/test-skill-media-collection.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
