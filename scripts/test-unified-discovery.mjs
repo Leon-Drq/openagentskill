@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { DISCOVERY_TASKS, DISCOVERY_OUTPUTS, DISCOVERY_AGENTS, discoveryCopy } from '../lib/discovery.ts'
 
 import ts from 'typescript'
+import { mediaSlugsNeedPost, slugQueryBatches } from '../lib/skills/media-query.ts'
 import { normalizeSkillCategory } from '../lib/skills/taxonomy.ts'
 import { clampResultPage } from '../lib/skills/pagination.ts'
 import { directoryDiscoveryFilters, catalogSortColumn, canShowCatalogSnapshot, selectCatalogSnapshot } from '../lib/skills/catalog-query.ts'
@@ -38,17 +39,20 @@ const cached = fn => {
   }
 }
 let count = 17
-const fakeClient = () => ({ from: name => {
-  calls.push(['from', name])
+const fakeQuery = (rpcCount = false) => {
   let head = false
-  const query = { then: done => Promise.resolve({ data: head ? null : [{ slug: 'example-skill' }], count: head ? count : null, error: null }).then(done) }
-  for (const method of ['select','or','in','not','gte','order','range','eq','contains']) query[method] = (...args) => {
+  const query = { then: done => Promise.resolve({ data: head ? null : [{ slug: 'example-skill' }], count: head || rpcCount ? count : null, error: null }).then(done) }
+  for (const method of ['select','or','in','not','gte','order','range','eq','contains','limit']) query[method] = (...args) => {
     calls.push([method, ...args]); if (method === 'select') head = Boolean(args[1]?.head); return query
   }
   return query
-}})
-const getPage = new Function('unstable_cache','createPublicClient','SKILL_TAXONOMY_SELECT','PUBLIC_SKILL_FILTER','normalizeSkillCategory','directoryCategoryTerms','CATALOG_PAGE_SIZE','catalogSortColumn','clampResultPage', code + ';return getCachedCatalogPage')(
-  cached, fakeClient, 'slug', 'public gate', normalizeSkillCategory, value => [value], 16, catalogSortColumn, clampResultPage,
+}
+const fakeClient = () => ({
+  from: name => { calls.push(['from', name]); return fakeQuery() },
+  rpc: (name, args, options) => { calls.push(['rpc', name, args, options]); return fakeQuery(Boolean(options?.count)) },
+})
+const getPage = new Function('unstable_cache','createPublicClient','SKILL_TAXONOMY_SELECT','PUBLIC_SKILL_FILTER','normalizeSkillCategory','directoryCategoryTerms','CATALOG_PAGE_SIZE','catalogSortColumn','clampResultPage','mediaSlugsNeedPost', code + ';return getCachedCatalogPage')(
+  cached, fakeClient, 'slug', 'public gate', normalizeSkillCategory, value => [value], 16, catalogSortColumn, clampResultPage, mediaSlugsNeedPost,
 )
 const result = await getPage('quality', 'all', 2, 0, 'free', ['example-skill', 'other-skill'], ['example-skill'], 'all', 'all')
 assert.equal(result.total, 17)
@@ -107,3 +111,16 @@ for (const locale of ['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr', 'id']) {
   assert.ok(Object.values(copy).every(value => value.trim()))
 }
 console.log('Unified discovery: default directory, legacy filters, example SQL pagination, existing topic routes and eight languages passed.')
+
+const many = Array.from({length:5000}, (_, i) => `author-long-skill-example-${i}`)
+assert.ok(mediaSlugsNeedPost(many))
+const batches = slugQueryBatches(many)
+assert.deepEqual(batches.flat(), many)
+assert.ok(batches.every(batch => encodeURIComponent(batch.join(',')).length <= 2400))
+calls.length = 0
+await getPage('quality','presentation',1,0,'all',[],many,'all','all')
+assert.equal(calls.filter(call => call[0] === 'rpc').length, 2)
+assert.ok(calls.filter(call => call[0] === 'rpc').every(call => call[1] === 'skill_directory_by_slugs' && call[2].p_slugs === many))
+assert.ok(!calls.some(call => call[0] === 'in'), 'Large memberships never leak back into the URL')
+assert.ok(calls.some(call => call[0] === 'range'), 'POST membership retains server pagination')
+console.log('Large example catalogs: 5,000 identities use POST bodies, exact counts, SQL pagination and bounded lookup batches.')

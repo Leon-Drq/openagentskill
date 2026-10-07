@@ -1,0 +1,5 @@
+[
+  { "repository": "arcsin1/oh-my-ppt", "asset": "docs/images/88-api.jpg", "reason": "Sponsor logo, not a Skill preview" },
+  { "repository": "nebutra/mineru", "asset": "assets/mineru-skill.jpg", "reason": "Brand integration banner, not an output example" },
+  { "repository": "PaddlePaddle/PaddleGAN", "asset": "docs/imgs/ppgan.jpg", "reason": "Project branding illustration, not a generated result" }
+]

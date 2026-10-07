@@ -9,6 +9,7 @@ import { directoryCategoryTerms } from '@/lib/skills/directory'
 import { normalizeSkillCategory, normalizeTopic, normalizeOutput, type SkillTaxonomy } from '@/lib/skills/taxonomy'
 import { clampResultPage } from '@/lib/skills/pagination'
 import { CATALOG_PAGE_SIZE, catalogPageNumber, catalogSortColumn, catalogStars } from '@/lib/skills/catalog-query'
+import { mediaSlugsNeedPost, slugQueryBatches } from '@/lib/skills/media-query'
 import { isMcpOnlyCategory, isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
 import { unstable_cache } from 'next/cache'
 import type { Skill } from '@/lib/types'
@@ -984,23 +985,27 @@ export async function getSkillsBySlugs(
 
   const timeoutMs = Math.max(SKILL_LOOKUP_TIMEOUT_MS, requestTimeoutMs)
   const supabase = createPublicClient({ requestTimeoutMs: timeoutMs })
-  const { data, error } = await withTimeout(
-    supabase
+  const batches = slugQueryBatches(normalizedSlugs)
+  const records: SkillRecord[] = []
+  for (let start = 0; start < batches.length; start += 4) {
+    const results = await Promise.all(batches.slice(start, start + 4).map(async batch => withTimeout(
+      supabase
       .from('skills')
       .select('*')
       .or(PUBLIC_SKILL_FILTER)
-      .in('slug', normalizedSlugs),
-    timeoutMs,
-    'skill batch slug lookup'
-  ).catch((lookupError) => {
-    console.warn('Skill batch slug lookup fallback:', lookupError)
-    return { data: null, error: lookupError }
-  })
-
-  if (error || !data) return []
+      .in('slug', batch),
+      timeoutMs,
+      'skill batch slug lookup'
+    ).catch((lookupError) => {
+      console.warn('Skill batch slug lookup fallback:', lookupError)
+      return { data: null, error: lookupError }
+    })))
+    if (results.some(result => result.error || !result.data)) return []
+    records.push(...results.flatMap(result => result.data as SkillRecord[]))
+  }
 
   const bySlug = new Map(
-    filterSkillOnly(data as SkillRecord[]).map((skill) => [skill.slug, skill])
+    filterSkillOnly(records).map((skill) => [skill.slug, skill])
   )
 
   return normalizedSlugs
@@ -1271,7 +1276,11 @@ const getCachedCatalogCount = unstable_cache(
   async (category: string, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null, topic: string, output: string) => {
     if ((pricing !== 'all' && pricing !== 'unknown' && !pricingSlugs.length) || (exampleSlugs !== null && !exampleSlugs.length)) return 0
     const supabase = createPublicClient({ requestTimeoutMs: 8000, circuitScope: 'public-catalog' })
-    const query = supabase.from('skill_directory_entries').select('slug', { count: 'exact', head: true }).or(PUBLIC_SKILL_FILTER)
+    const post = mediaSlugsNeedPost(exampleSlugs)
+    const query = (post
+      ? supabase.rpc('skill_directory_by_slugs', { p_slugs: exampleSlugs }, { count: 'exact' }).select('slug').limit(1)
+      : supabase.from('skill_directory_entries').select('slug', { count: 'exact', head: true })).or(PUBLIC_SKILL_FILTER)
+    if (post) exampleSlugs = null // Already filtered in the SQL function, before count.
     const { count, error } = await applyCatalogFilters(query, category, minStars, pricing, pricingSlugs, exampleSlugs, topic, output)
     if (error) throw error
     if (count === null) throw new Error('Catalog count unavailable')
@@ -1291,7 +1300,11 @@ const getCachedCatalogPage = unstable_cache(
     // Provider-only tail pages and empty selections need no registry row query.
     if (from >= total || limit === 0) return { records: [] as SkillRecord[], total, hasMore: false, page: effectivePage }
     const supabase = createPublicClient({ requestTimeoutMs: 8000, circuitScope: 'public-catalog' })
-    let query = supabase.from('skill_directory_entries').select(SKILL_TAXONOMY_SELECT).or(PUBLIC_SKILL_FILTER)
+    const post = mediaSlugsNeedPost(exampleSlugs)
+    let query = (post
+      ? supabase.rpc('skill_directory_by_slugs', { p_slugs: exampleSlugs }).select(SKILL_TAXONOMY_SELECT)
+      : supabase.from('skill_directory_entries').select(SKILL_TAXONOMY_SELECT)).or(PUBLIC_SKILL_FILTER)
+    if (post) exampleSlugs = null // Keep sort, taxonomy and range on the server.
     query = applyCatalogFilters(query, category, minStars, pricing, pricingSlugs, exampleSlugs, topic, output)
     const { data, error } = await query
       .order(catalogSortColumn(sort), { ascending: false, nullsFirst: false })
