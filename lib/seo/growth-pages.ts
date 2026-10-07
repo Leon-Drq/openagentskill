@@ -1,4 +1,5 @@
 import { USE_CASES, type UseCaseDefinition } from '@/lib/use-cases'
+import { SCENARIO_TOPICS, SCENARIO_UPDATED_AT, getScenarioTopic } from './scenario-pages'
 import { getPresentationPage, PRESENTATION_PAGES, PRESENTATION_UPDATED_AT } from '@/lib/seo/presentation-pages'
 
 export interface BestSkillPageDefinition {
@@ -437,6 +438,13 @@ function toBestPage(useCase: UseCaseDefinition): BestSkillPageDefinition {
 export const BEST_SKILL_PAGES: BestSkillPageDefinition[] = [
   ...USE_CASES.map(toBestPage),
   ...CUSTOM_BEST_SKILL_PAGES,
+  ...SCENARIO_TOPICS.filter(topic => !USE_CASES.some(useCase => useCase.slug === topic.slug) && !CUSTOM_BEST_SKILL_PAGES.some(custom => custom.slug === topic.slug)).map(topic => ({
+    slug: topic.slug, title: topic.title, shortTitle: topic.shortTitle,
+    eyebrow: 'Choose by task and output', description: topic.description,
+    useCaseSlug: topic.useCaseSlug, searchIntent: topic.intro,
+    audience: 'Builders choosing a source-backed workflow and checking the actual deliverable.',
+    exampleTasks: topic.choices.map(choice => choice.task),
+  })),
   ...PRESENTATION_PAGES.filter(page => !USE_CASES.some(useCase => useCase.slug === page.slug) && !CUSTOM_BEST_SKILL_PAGES.some(custom => custom.slug === page.slug)).map(page => ({
     slug: page.slug,
     title: page.title,
@@ -451,11 +459,14 @@ export const BEST_SKILL_PAGES: BestSkillPageDefinition[] = [
     exampleTasks: page.quickPicks.map(pick => pick.task),
   })),
 ].map(page => {
+  const scenario = getScenarioTopic(page.slug)
+  if (scenario) return { ...page, title: scenario.title, description: scenario.description, updatedAt: SCENARIO_UPDATED_AT }
   const presentation = getPresentationPage(page.slug)
   return presentation ? { ...page, title: presentation.title, description: presentation.description, updatedAt: PRESENTATION_UPDATED_AT } : page
 })
 
 export const FEATURED_BEST_PAGES = BEST_SKILL_PAGES.filter((page) =>
+  getScenarioTopic(page.slug) ||
   getPresentationPage(page.slug) ||
   ['ai-agent-skills-library', 'open-source-ai-agent-skills', 'codex-skills', 'claude-code-skills', 'openai-agent-skills', 'web-scraping', 'stock-analysis', 'codex-web-scraping', 'codex-finance-analysis', 'claude-code-pdf-parsing', 'sports-analytics', 'football-analytics', 'presentation-generation', 'ppt-generation', 'codex-presentation-decks', 'workbuddy-ppt-skills', 'research-briefs', 'marketing-seo-automation', 'security-review', 'legal-compliance-review', 'coding-agents', 'browser-automation', 'rag-knowledge', 'data-analysis', 'github-automation']
     .includes(page.slug)

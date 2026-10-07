@@ -36,7 +36,7 @@
     "test:skill-previews": "node --experimental-strip-types scripts/test-skill-previews.mjs",
     "test:showcase": "node --experimental-strip-types scripts/test-showcase.mjs && node --experimental-strip-types scripts/test-showcase-engagement.mjs && pnpm test:gallery-sync && pnpm test:skill-previews && pnpm test:media-audit && pnpm media:audit",
     "test:form-controls": "node scripts/test-form-controls.mjs",
-    "test:seo": "node --experimental-strip-types scripts/test-seo-foundation.mjs && node scripts/test-growth-discovery.mjs && node scripts/test-use-case-directory.mjs && node scripts/test-skill-pack-directory.mjs",
+    "test:seo": "node --import ./scripts/test-typescript-register.mjs scripts/test-seo-foundation.mjs && node scripts/test-growth-discovery.mjs && node scripts/test-use-case-directory.mjs && node scripts/test-skill-pack-directory.mjs && node --experimental-strip-types scripts/test-scenario-seo.mjs",
     "test:skill-detail": "node scripts/test-skill-detail.mjs && node scripts/test-skill-document.mjs && node scripts/test-skills-directory.mjs && node scripts/test-external-skills.mjs && node scripts/test-provider-directory.mjs && node scripts/test-skillry-sync.mjs",
     "check:skill-detail": "node scripts/check-skill-detail.mjs",
     "check:seo": "node scripts/check-seo.mjs",

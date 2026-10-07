@@ -54,6 +54,8 @@ import { SkillAttributionPanel } from '@/components/skill-attribution-panel'
 import { OwnerPublicationNote } from '@/components/owner-publication-note'
 import CatalogSkillContent, { buildCatalogSkillMetadata } from '@/components/catalog-skill-content'
 import { getExternalSkill } from '@/lib/skills/external-catalog'
+import { ScenarioSkillLinks } from '@/components/scenario-topic'
+import { SCENARIO_SOURCES } from '@/lib/seo/scenario-pages'
 
 // Shared renderer; cache policy belongs to the public/query route wrappers.
 const SKILL_DETAIL_SUPPORT_TIMEOUT_MS = 1200
@@ -114,6 +116,12 @@ export async function generateMetadata({
   const canonicalSlug = skill.slug || getCanonicalSkillSlug(slug)
   const query = await searchParams || {}
   const seo = buildSkillSearchMetadata(dbSkill, getLocaleFromSearchParam(query.lang) || defaultLocale)
+  const scenarioSource = SCENARIO_SOURCES.find(source => source.registrySlug === canonicalSlug)
+  if (scenarioSource && (getLocaleFromSearchParam(query.lang) || defaultLocale) === 'en') {
+    seo.title = `${scenarioSource.name} Skill: ${scenarioSource.role}`
+    seo.openGraphTitle = seo.title
+    seo.description = `${scenarioSource.output}. Compare task fit, setup and limitations, inspect source instructions and explore related workflow examples.`
+  }
   const editorial = getEditorialSearchProfile(dbSkill)
   if (editorial) Object.assign(seo, { title: editorial.title, openGraphTitle: editorial.title, description: editorial.description })
   // Match the proxy's X-Robots-Tag on query variants. Preserve the canonical
@@ -279,6 +287,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
                   <Link href={`/showcase/${editorial.gallerySlug}`} className="inline-block font-medium text-[#006b4f] underline underline-offset-4">{editorial.galleryLabel?.[editorialLocale] || (editorialLocale === 'zh' ? '查看作者海报案例' : 'Explore the author’s poster examples')} →</Link>
                 </div>}
                 <SkillDocument source={skill.longDescription} summary={skill.description} sourceUrl={sourceHref || ''} locale={initialLocale} />
+                {(initialLocale || defaultLocale) === 'en' && <ScenarioSkillLinks slug={skill.slug} />}
               </section>
 
               <section id="install-options" className={sectionClass}>

@@ -19,6 +19,8 @@ import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCaseBySlug, getUseCasesForSkill } from '@/lib/use-cases'
 import { withTimeout } from '@/lib/async'
 import { getSkillBySlugOrFallbackStrict } from '@/lib/skill-fallbacks'
+import { ScenarioExamples } from '@/components/scenario-topic'
+import { SCENARIO_TOPICS } from '@/lib/seo/scenario-pages'
 
 export const revalidate = 300
 
@@ -118,6 +120,7 @@ export default async function GrowthGuidePage({
   const comparisonSkills = guideSkills.filter(({ skill }) => comparisonSlugs.has(skill.slug))
   const relatedGuides = getRelatedGrowthGuides(guide)
   const useCase = guide.useCaseSlug ? getUseCaseBySlug(guide.useCaseSlug) : null
+  const exampleIds = SCENARIO_TOPICS.find(topic => topic.guideSlug === guide.slug)?.exampleIds || []
 
   return (
     <div className="min-h-screen bg-background">
@@ -480,6 +483,7 @@ export default async function GrowthGuidePage({
             </div>
           </section>
         )}
+        <ScenarioExamples ids={exampleIds} />
       </main>
 
       <SiteFooter />

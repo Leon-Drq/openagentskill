@@ -4,7 +4,9 @@ import { notFound } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
-import { getAllSkills } from '@/lib/db/skills'
+import { getAllSkills, getSkillsBySlugs, type SkillRecord } from '@/lib/db/skills'
+import { getCuratedSkillFallback } from '@/lib/skill-fallbacks'
+import { ScenarioCollectionLinks } from '@/components/scenario-topic'
 import { getSkillStackBySlug, selectSkillsForStack } from '@/lib/collections'
 import { I18nProvider } from '@/lib/i18n/context'
 import { getCuratedPageCopy, getLocalizedCollectionContent } from '@/lib/i18n/curated-content'
@@ -57,7 +59,11 @@ export default async function CollectionDetailPage({
   const localizedStack = getLocalizedCollectionContent(locale, stack)
   const localizedHref = (href: string) => getLocalizedNavigationHref(href, locale)
 
-  const allSkills = await getAllSkills('quality', undefined, 1200).catch(() => [])
+  const sourceSlugs = stack.featuredSlugs || []
+  const sourceRows = stack.curatedOnly ? await getSkillsBySlugs(sourceSlugs, 2500).catch(() => []) : []
+  const allSkills = stack.curatedOnly
+    ? sourceSlugs.map(slug => sourceRows.find(skill => skill.slug === slug) || getCuratedSkillFallback(slug)).filter((skill): skill is SkillRecord => Boolean(skill))
+    : await getAllSkills('quality', undefined, 1200).catch(() => [])
   const picks = selectSkillsForStack(allSkills, stack, 8)
   const compareUrl = `/compare?skills=${encodeURIComponent(picks.slice(0, 4).map((skill) => skill.slug).join(','))}`
 
@@ -110,6 +116,7 @@ export default async function CollectionDetailPage({
           </div>
         </section>
 
+        {locale === 'en' && (slug === 'frontend-product-ui' || slug === 'video-creation-studio') && <ScenarioCollectionLinks kind={slug === 'frontend-product-ui' ? 'frontend' : 'video'} />}
         <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <p className="mb-3 font-mono text-xs uppercase tracking-widest text-secondary">{copy.workflowMap}</p>

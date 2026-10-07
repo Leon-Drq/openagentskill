@@ -1,0 +1,40 @@
+[
+  {
+    "id": "landing",
+    "task": "Build a responsive landing page for a fictional task planning tool",
+    "audience": "Small product teams",
+    "content": [
+      "Lattice",
+      "A calmer place to plan your week",
+      "Plan, focus, review"
+    ],
+    "checks": [
+      "One h1",
+      "Keyboard focus",
+      "No horizontal page overflow at 390px",
+      "FAQ and navigation targets"
+    ]
+  },
+  {
+    "id": "dashboard",
+    "task": "Create a task dashboard with a filter and empty state",
+    "data": "Four fictional local records; no backend",
+    "checks": [
+      "Filter active and blocked records",
+      "Show an empty state for completed",
+      "Keyboard-operable select",
+      "Readable table on mobile"
+    ]
+  },
+  {
+    "id": "handoff",
+    "task": "Implement the local design token specification in HTML",
+    "source": "design-tokens.json; this is not a private Figma export",
+    "checks": [
+      "320px card width",
+      "24px padding",
+      "16px radius",
+      "Specified background and type"
+    ]
+  }
+]

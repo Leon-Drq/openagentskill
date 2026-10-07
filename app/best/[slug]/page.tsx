@@ -5,6 +5,8 @@ import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { PresentationTopic } from '@/components/presentation-topic'
+import { ScenarioTopicPage } from '@/components/scenario-topic'
+import { getScenarioTopic } from '@/lib/seo/scenario-pages'
 import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { convertSkillRecordToManifest, getAgentOutcomeStatsMap, getAllSkills, type SkillOutcomeStats } from '@/lib/db/skills'
@@ -35,6 +37,15 @@ export async function generateMetadata({
   const { slug } = await params
   const page = getBestSkillPage(slug)
   if (!page) return { title: 'Best Skills Not Found' }
+
+  const scenario = getScenarioTopic(slug)
+  if (scenario) {
+    const url = `https://www.openagentskill.com/best/${scenario.slug}`
+    return { title: scenario.title, description: scenario.description,
+      alternates: { canonical: url }, robots: { index: true, follow: true },
+      openGraph: { title: scenario.title, description: scenario.description, url, type: 'website' },
+      twitter: { card: 'summary', title: scenario.title, description: scenario.description } }
+  }
 
   const presentation = getPresentationPage(slug)
   if (presentation) {
@@ -106,6 +117,9 @@ export default async function BestSkillDetailPage({
   const { slug } = await params
   const page = getBestSkillPage(slug)
   if (!page) notFound()
+
+  const scenario = getScenarioTopic(slug)
+  if (scenario) return <ScenarioTopicPage topic={scenario} />
 
   // Editorial PPT comparisons have a bounded, source-backed candidate set.
   // Keep their content available without querying the global top-1,200 pool.

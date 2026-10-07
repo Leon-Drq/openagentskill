@@ -39,6 +39,8 @@ const route = compile('app/best/[slug]/page.tsx', {
   'react/jsx-runtime': jsx, 'next/link': Link, 'next/navigation': { notFound: () => { throw new Error('404') } },
   '@/components/install-command': {}, '@/components/site-footer': {}, '@/components/site-header': {},
   '@/components/presentation-topic': topic,
+  '@/components/scenario-topic': { ScenarioTopicPage: forbidden },
+  '@/lib/seo/scenario-pages': { getScenarioTopic: () => undefined },
   '@/lib/agent-proven': {}, '@/lib/audits': {}, '@/lib/quality': {}, '@/lib/trust': {},
   '@/lib/db/skills': { getAllSkills: forbidden, getAgentOutcomeStatsMap: forbidden },
   '@/lib/rankings': { rankSkillsForDefinition: forbidden },

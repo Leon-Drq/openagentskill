@@ -34,9 +34,9 @@ type SkillSearchFocus =
 
 const SEARCH_METADATA_COPY: Record<Locale, SearchMetadataCopy> = {
   en: {
-    directoryTitle: 'AI Agent Skills Directory - Codex, Claude Code & Cursor',
+    directoryTitle: 'Agent Skills Directory: Codex, Claude Code & Cursor',
     directoryDescription:
-      'Find reusable AI agent skills for Codex, Claude Code, Cursor, research, finance, web scraping, and more. Compare trust, risk, maintenance, and install guidance first.',
+      'Find frontend design, Remotion video, Excel, PDF and Word agent skills. Compare source instructions, task workflows and editable examples before installing.',
     directoryKeywords: [
       'AI agent skills directory',
       'AI agent skill repository',

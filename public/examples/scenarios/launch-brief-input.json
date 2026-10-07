@@ -1,0 +1,14 @@
+{
+  "project": "Sample product launch",
+  "audience": "Internal product team",
+  "status": "Draft for review",
+  "changes": [
+    "A new task filter groups skills by intended output.",
+    "Source links show where a workflow comes from."
+  ],
+  "open_items": [
+    "Confirm the launch date.",
+    "Review the final copy and links."
+  ],
+  "owner": "Sample product team"
+}

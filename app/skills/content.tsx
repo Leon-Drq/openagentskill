@@ -156,9 +156,9 @@ const DIRECTORY_SCENARIOS = [
   },
   {
     title: 'Video creation skills',
-    eyebrow: 'Prompts, B-roll, explainers',
+    eyebrow: 'Remotion, footage, editing',
     href: '/collections/video-creation-studio',
-    description: 'Video-generation prompts, B-roll, Vox-style explainers, camera direction, captions, and creative-production workflows.',
+    description: 'Choose React motion graphics, generated footage or editing; compare dependencies and inspect actual outputs.',
     terms: ['video', 'video generation', 'video prompt', 'seedance', 'vox', 'b-roll', 'broll', 'explainer', 'collage', 'camera movement', 'captions'],
   },
   {
@@ -206,6 +206,10 @@ const DIRECTORY_SCENARIOS = [
 ] as const
 
 const POPULAR_DIRECTORY_LINKS = [
+  { label: 'Frontend design skills', href: '/best/frontend-design-skills', description: 'Choose landing-page design, product UI, Figma implementation or interface review.' },
+  { label: 'Remotion skills', href: '/best/remotion-skills', description: 'Official source instructions, React composition, actual MP4 and production notes.' },
+  { label: 'Excel and XLSX skills', href: '/best/claude-excel-skills', description: 'Clean a messy CSV and inspect an editable workbook with formulas and review flags.' },
+  { label: 'PDF and Word skills', href: '/best/document-processing', description: 'Separate PDF extraction and OCR from editable Word report generation.' },
   {
     label: 'AI agent skills library',
     href: '/best/ai-agent-skills-library',
