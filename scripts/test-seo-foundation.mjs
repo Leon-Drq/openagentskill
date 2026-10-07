@@ -1,4 +1,5 @@
 await import('./test-sitemap-recovery.mjs')
+await import('./test-presentation-seo.mjs')
 import assert from 'node:assert/strict'
 import './test-external-skills.mjs'
 const externalCatalog = await import('../lib/skills/external-catalog.ts')

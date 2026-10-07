@@ -166,6 +166,7 @@ export default async function UseCasePage({
             <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">{useCase.title}</h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-secondary">{useCase.description}</p>
             <div className="mt-7 flex flex-wrap gap-3">
+              {slug === 'presentation-generation' && <Link href="/best/presentation-generation" className="border border-foreground px-5 py-2 text-sm hover:bg-foreground hover:text-background">Compare PPT skills by output</Link>}
               {slug === 'video-creation' && <a href="#video-workflows" className="border border-foreground px-5 py-2 text-sm hover:bg-foreground hover:text-background">Compare 5 creator workflows</a>}
               {useCase.slug === MYSTICISM_USE_CASE && <Link href={`/skill-packs/${MYSTICISM_PACK}`} className="border border-border px-5 py-2 text-sm text-secondary hover:text-foreground">Open skill pack · 玄学技能包</Link>}
               <Link
