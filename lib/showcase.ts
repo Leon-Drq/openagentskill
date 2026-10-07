@@ -229,8 +229,15 @@ const automaticCases: ShowcaseCase[] = automaticEntries.map((entry) => {
 })
 export const SHOWCASE_CASES: ShowcaseCase[] = [NATIVE_SUBTITLE_EXAMPLE, ...HYPIT_SHOWCASE_CASES, ...INITIAL_SHOWCASE_CASES, ...interleavedExpanded, ...automaticCases]
 export const getShowcaseCase = (slug: string) => SHOWCASE_CASES.find((item) => item.slug === slug)
+// The directory still contains this historical slug; next.config redirects its
+// detail URL to the same skill. Bind the preview without cross-repository guesses.
+const SHOWCASE_SKILL_ALIASES: Record<string, string> = {
+  'liamgvchi-gc-minimal-zine-poster': 'liamgvchi-gc-minimal-zine-poster-v0-3',
+}
+// Query only canonical entries for With examples; including both the old and
+// new record would duplicate the same redirected skill in paginated results.
 export const SHOWCASE_SKILL_SLUGS = [...new Set(SHOWCASE_CASES.map(item => item.skillSlug))]
-export const getShowcasesForSkill = (skillSlug: string) => SHOWCASE_CASES.filter((item) => item.skillSlug === skillSlug)
+export const getShowcasesForSkill = (skillSlug: string) => SHOWCASE_CASES.filter((item) => item.skillSlug === (SHOWCASE_SKILL_ALIASES[skillSlug] || skillSlug))
 export const FEATURED_SHOWCASE_SLUGS = ['floria-floral-studio', 'room-to-grow-poster', 'editorial-html-slides']
 
 const casePaths = new Set(SHOWCASE_CASES.map((item) => `/showcase/${item.slug}`))

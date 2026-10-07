@@ -27,6 +27,9 @@ import { FEATURED_CREATORS, creatorHref } from '@/lib/creator-directory'
 import { getSkillAttribution } from '@/lib/skill-attribution'
 import { getShowcasesForSkill } from '@/lib/showcase'
 import { getShowcaseCardData } from '@/lib/showcase-shared'
+import { getSkillSourcePreview } from '@/lib/skill-previews'
+import { previewCopy } from '@/lib/skill-preview-shared'
+import { SkillSourcePreviews } from '@/components/skill-source-previews'
 import { needsOwnerPublicationReview } from '@/lib/skills/publication'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
@@ -197,6 +200,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
   const installTargets = (['codex', 'claude-code', 'cursor', 'openagentskill-cli'] as const)
     .map(id => targets.find(target => target.id === id)).filter((target): target is NonNullable<typeof target> => Boolean(target))
   const hasShowcase = getShowcasesForSkill(skill.slug).length > 0
+  const sourcePreview = getSkillSourcePreview(skill.slug)
   const githubOwner = getGitHubOwner(dbSkill)
   const featuredCreator = FEATURED_CREATORS.find(creator => creator.owner.toLowerCase() === githubOwner.toLowerCase())
   const machineMetadata = buildAgentReadableSkillMetadata(dbSkill, { eventStats, outcomeStats, approvedClaim: Boolean(approvedClaim), alternatives: relatedSkills })
@@ -249,6 +253,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
               {skill.technical.repository && <SkillActionLink href={skill.technical.repository} skillSlug={skill.slug} eventType="outbound_github" external className={actionClass}><Text id="viewGitHub" /><ArrowUpRight className="h-4 w-4" aria-hidden="true" /></SkillActionLink>}
               <SkillEngagementProvider slugs={[skill.slug]}><SkillActions slug={skill.slug} name={skill.name} /></SkillEngagementProvider>
               <SkillShareButton skillSlug={skill.slug} skillName={skill.name} />
+              {sourcePreview && <Link href="#visual-previews" className={actionClass}>{previewCopy('view', initialLocale || defaultLocale)}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-secondary">
               <SkillPrice commerce={getSkillCommerce(skill.slug)} />
@@ -261,6 +266,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
 
           <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-14">
             <div className="min-w-0">
+              {sourcePreview && <SkillSourcePreviews preview={sourcePreview} locale={initialLocale || defaultLocale} />}
               {hasShowcase && <SkillShowcase skillSlug={skill.slug} cases={getShowcasesForSkill(skill.slug).slice(0, 2).map(getShowcaseCardData)} profile />}
               {getShowcasesForSkill(skill.slug).filter(example => example.reproduction).map(example => <ExampleReproduction key={example.slug} example={example} locale={initialLocale || defaultLocale} />)}
               <section id="overview" className={sectionClass}>

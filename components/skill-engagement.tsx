@@ -87,7 +87,7 @@ export function SkillActions({ slug, name, compact = false }: { slug: string; na
     catch { setMessage('saved' in intent ? formatSkillDetailCopy(locale, 'saveError') : galleryCopy(locale, 'Voting is unavailable. Please retry.', '投票暂时不可用，请重试。')) }
     finally { setBusy(false) }
   }
-  return <div data-skill-actions={slug} className={`min-w-0 ${compact ? 'text-white' : ''}`}>
+  return <div data-skill-actions={slug} className={`min-w-0 ${compact ? 'text-secondary' : ''}`}>
     <div className={`flex flex-wrap ${compact ? 'justify-end gap-0.5' : 'gap-2'}`}>
       {([1, -1] as const).map(direction => {
         const selected = stat?.vote === direction
