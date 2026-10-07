@@ -1,0 +1,326 @@
+[
+  {
+    "skillSlug": "hugohe3-ppt-master",
+    "repository": "hugohe3/ppt-master",
+    "revision": "2d72da616cf9fa40d4dcaf59fd4c980ecf534b7d",
+    "sourceUrl": "https://github.com/hugohe3/ppt-master/blob/2d72da616cf9fa40d4dcaf59fd4c980ecf534b7d/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/hugohe3-ppt-master/LICENSE-80cefc234c1e.txt",
+    "format": {
+      "en": "Native PowerPoint",
+      "zh": "原生 PowerPoint"
+    },
+    "note": {
+      "en": "Author-published slide covers from two PPT Master decks. The project documents editable PowerPoint output; these images show appearance, not an independent export test.",
+      "zh": "作者发布的两套 PPT Master 文稿封面。项目文档说明可交付可编辑 PowerPoint；此处展示外观，未独立测试导出。"
+    },
+    "media": [
+      {
+        "src": "/skill-previews/hugohe3-ppt-master/a94972b03dc04dcc628f7acd.webp",
+        "cardSrc": "/skill-previews/hugohe3-ppt-master/a94972b03dc04dcc628f7acd.card.webp",
+        "previewSrc": "/skill-previews/hugohe3-ppt-master/a94972b03dc04dcc628f7acd.preview.webp",
+        "width": 960,
+        "height": 540,
+        "sha256": "a94972b03dc04dcc628f7acdfebc0f5d5b93a6fd054a4d7dc25b15dd228e4a11",
+        "sourceUrl": "https://github.com/hugohe3/ppt-master/blob/2d72da616cf9fa40d4dcaf59fd4c980ecf534b7d/docs/assets/screenshots/preview_attention_is_all_you_need.webp",
+        "kind": "example",
+        "title": {
+          "en": "Attention Is All You Need",
+          "zh": "Attention Is All You Need"
+        },
+        "alt": {
+          "en": "Dark blue slide cover with Transformer architecture diagrams and white typography.",
+          "zh": "深蓝色幻灯片封面，含 Transformer 架构图和白色文字。"
+        }
+      },
+      {
+        "src": "/skill-previews/hugohe3-ppt-master/f5b8846cc3fc73eb6c45e43a.webp",
+        "cardSrc": "/skill-previews/hugohe3-ppt-master/f5b8846cc3fc73eb6c45e43a.card.webp",
+        "previewSrc": "/skill-previews/hugohe3-ppt-master/f5b8846cc3fc73eb6c45e43a.preview.webp",
+        "width": 960,
+        "height": 540,
+        "sha256": "f5b8846cc3fc73eb6c45e43afcee999fdb7406c1c6fd95f2b724cf3929ac9d2a",
+        "sourceUrl": "https://github.com/hugohe3/ppt-master/blob/2d72da616cf9fa40d4dcaf59fd4c980ecf534b7d/docs/assets/screenshots/preview_pixel_breakfast_atlas.webp",
+        "kind": "example",
+        "title": {
+          "en": "Pixel breakfast atlas",
+          "zh": "像素风早餐图鉴"
+        },
+        "alt": {
+          "en": "PPT Master slide cover for a pixel-art Chinese breakfast atlas.",
+          "zh": "PPT Master 制作的像素风中国早餐图鉴封面。"
+        }
+      }
+    ]
+  },
+  {
+    "skillSlug": "ningzimu-codex-ppt-skill",
+    "repository": "ningzimu/codex-ppt-skill",
+    "revision": "6d76c0eded7f8a8b0c4e304697e6f2bda7c408b2",
+    "sourceUrl": "https://github.com/ningzimu/codex-ppt-skill/blob/6d76c0eded7f8a8b0c4e304697e6f2bda7c408b2/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/ningzimu-codex-ppt-skill/LICENSE-68e435621ab2.txt",
+    "format": {
+      "en": "Image-based PPTX",
+      "zh": "整页图片型 PPTX"
+    },
+    "note": {
+      "en": "A multi-page author example and a style reference. Codex PPT assembles full-slide images into PowerPoint; text and charts are not separate editable objects.",
+      "zh": "作者发布的多页作品与风格参考。Codex PPT 将整页图片组装为 PowerPoint，文字和图表不是独立可编辑对象。"
+    },
+    "media": [
+      {
+        "src": "/skill-previews/ningzimu-codex-ppt-skill/998f5fb70966ea0dbddb0624.png",
+        "cardSrc": "/skill-previews/ningzimu-codex-ppt-skill/998f5fb70966ea0dbddb0624.card.webp",
+        "previewSrc": "/skill-previews/ningzimu-codex-ppt-skill/998f5fb70966ea0dbddb0624.preview.webp",
+        "width": 1320,
+        "height": 1088,
+        "sha256": "998f5fb70966ea0dbddb0624329caff6ea014934755e60bad93b66f14c717e0f",
+        "sourceUrl": "https://github.com/ningzimu/codex-ppt-skill/blob/6d76c0eded7f8a8b0c4e304697e6f2bda7c408b2/assets/slides_example.png",
+        "kind": "example",
+        "title": {
+          "en": "LangGraph presentation overview",
+          "zh": "LangGraph 演示文稿总览"
+        },
+        "alt": {
+          "en": "Twelve illustrated slides explaining LangGraph and multi-agent architecture.",
+          "zh": "十二页手绘风幻灯片，讲解 LangGraph 与多 Agent 架构。"
+        }
+      },
+      {
+        "src": "/skill-previews/ningzimu-codex-ppt-skill/94b8f941a3c84cc17970b12c.png",
+        "cardSrc": "/skill-previews/ningzimu-codex-ppt-skill/94b8f941a3c84cc17970b12c.card.webp",
+        "previewSrc": "/skill-previews/ningzimu-codex-ppt-skill/94b8f941a3c84cc17970b12c.preview.webp",
+        "width": 1672,
+        "height": 941,
+        "sha256": "94b8f941a3c84cc17970b12ca4e97e75b6a29fe830d378d16b93b98ad652b214",
+        "sourceUrl": "https://github.com/ningzimu/codex-ppt-skill/blob/6d76c0eded7f8a8b0c4e304697e6f2bda7c408b2/assets/style-previews/clean-professional.png",
+        "kind": "style",
+        "title": {
+          "en": "Clean professional style",
+          "zh": "清爽专业风格"
+        },
+        "alt": {
+          "en": "Author-provided clean professional slide style preview.",
+          "zh": "作者提供的清爽专业风幻灯片样式预览。"
+        }
+      }
+    ]
+  },
+  {
+    "skillSlug": "ningzimu-image-to-editable-ppt-skill",
+    "repository": "ningzimu/image-to-editable-ppt-skill",
+    "revision": "b7be494e31a0ed56ef98716891db5474606b8cdf",
+    "sourceUrl": "https://github.com/ningzimu/image-to-editable-ppt-skill/blob/b7be494e31a0ed56ef98716891db5474606b8cdf/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/ningzimu-image-to-editable-ppt-skill/LICENSE-68e435621ab2.txt",
+    "format": {
+      "en": "Reconstructed PPTX",
+      "zh": "重建为可编辑 PPTX"
+    },
+    "note": {
+      "en": "The author compares a source status-report image with its reconstructed PowerPoint objects. We have not rerun the conversion or checked the exported deck.",
+      "zh": "作者对比了项目汇报原图与重建后的 PowerPoint 对象。本站未重新执行转换或验证导出文稿。"
+    },
+    "media": [
+      {
+        "src": "/skill-previews/ningzimu-image-to-editable-ppt-skill/4d920714faac779cd5f63dd7.png",
+        "cardSrc": "/skill-previews/ningzimu-image-to-editable-ppt-skill/4d920714faac779cd5f63dd7.card.webp",
+        "previewSrc": "/skill-previews/ningzimu-image-to-editable-ppt-skill/4d920714faac779cd5f63dd7.preview.webp",
+        "width": 960,
+        "height": 540,
+        "sha256": "4d920714faac779cd5f63dd70e44a6eb46a8b7b4880ab2d65d8e4abf5057bd60",
+        "sourceUrl": "https://github.com/ningzimu/image-to-editable-ppt-skill/blob/b7be494e31a0ed56ef98716891db5474606b8cdf/assets/showcase-editable-ppt-result-status-report.png",
+        "kind": "example",
+        "title": {
+          "en": "After: PowerPoint objects",
+          "zh": "转换后：PowerPoint 对象"
+        },
+        "alt": {
+          "en": "Status-report slide with selection handles around reconstructed text, icons and shapes.",
+          "zh": "项目汇报幻灯片，重建的文字、图标与形状周围显示选择框。"
+        }
+      },
+      {
+        "src": "/skill-previews/ningzimu-image-to-editable-ppt-skill/9e46b9c913b1898ed0835884.png",
+        "cardSrc": "/skill-previews/ningzimu-image-to-editable-ppt-skill/9e46b9c913b1898ed0835884.card.webp",
+        "previewSrc": "/skill-previews/ningzimu-image-to-editable-ppt-skill/9e46b9c913b1898ed0835884.preview.webp",
+        "width": 960,
+        "height": 540,
+        "sha256": "9e46b9c913b1898ed0835884bc571ae5a7e7413893627c9211b3da320495ede6",
+        "sourceUrl": "https://github.com/ningzimu/image-to-editable-ppt-skill/blob/b7be494e31a0ed56ef98716891db5474606b8cdf/assets/showcase-origin-status-report.png",
+        "kind": "input",
+        "title": {
+          "en": "Before: source image",
+          "zh": "转换前：输入原图"
+        },
+        "alt": {
+          "en": "Original blue and white project status-report image used for the author conversion example.",
+          "zh": "作者转换案例所用的蓝白色项目进展汇报原图。"
+        }
+      }
+    ]
+  },
+  {
+    "skillSlug": "helloianneo-ian-xiaohei-illustrations",
+    "repository": "helloianneo/ian-xiaohei-illustrations",
+    "revision": "4102eb807f03bcb6e538a16e8b31b41db8b5b954",
+    "sourceUrl": "https://github.com/helloianneo/ian-xiaohei-illustrations/blob/4102eb807f03bcb6e538a16e8b31b41db8b5b954/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/helloianneo-ian-xiaohei-illustrations/LICENSE-b995a6b84582.txt",
+    "format": {
+      "en": "Illustrated diagrams",
+      "zh": "图解插画"
+    },
+    "note": {
+      "en": "Two hand-drawn concept illustrations published in the author repository, showing how abstract workflows can be turned into visual metaphors.",
+      "zh": "作者仓库中的两张手绘概念插画，展示如何把抽象流程转换成视觉比喻。"
+    },
+    "media": [
+      {
+        "src": "/skill-previews/helloianneo-ian-xiaohei-illustrations/cce4bd8d5557960633056427.png",
+        "cardSrc": "/skill-previews/helloianneo-ian-xiaohei-illustrations/cce4bd8d5557960633056427.card.webp",
+        "previewSrc": "/skill-previews/helloianneo-ian-xiaohei-illustrations/cce4bd8d5557960633056427.preview.webp",
+        "width": 1672,
+        "height": 941,
+        "sha256": "cce4bd8d555796063305642714c67bab0f37cd3ff9cee0da9d18bd6187cf4397",
+        "sourceUrl": "https://github.com/helloianneo/ian-xiaohei-illustrations/blob/4102eb807f03bcb6e538a16e8b31b41db8b5b954/examples/images/01-two-breakpoints.png",
+        "kind": "example",
+        "title": {
+          "en": "Two breakpoints",
+          "zh": "两个断点"
+        },
+        "alt": {
+          "en": "Hand-drawn conveyor-belt diagram showing missing source material and a broken content handoff.",
+          "zh": "手绘传送带图解，表现素材不足与内容承接中断。"
+        }
+      },
+      {
+        "src": "/skill-previews/helloianneo-ian-xiaohei-illustrations/e23e7974b03d9540662728cc.png",
+        "cardSrc": "/skill-previews/helloianneo-ian-xiaohei-illustrations/e23e7974b03d9540662728cc.card.webp",
+        "previewSrc": "/skill-previews/helloianneo-ian-xiaohei-illustrations/e23e7974b03d9540662728cc.preview.webp",
+        "width": 1672,
+        "height": 941,
+        "sha256": "e23e7974b03d9540662728cc343d57aec8339c37db8ca0eae922e4f0cfdd8980",
+        "sourceUrl": "https://github.com/helloianneo/ian-xiaohei-illustrations/blob/4102eb807f03bcb6e538a16e8b31b41db8b5b954/examples/images/02-sort-by-purpose.png",
+        "kind": "example",
+        "title": {
+          "en": "Sort by purpose",
+          "zh": "按目的分拣"
+        },
+        "alt": {
+          "en": "Hand-drawn illustration explaining how to sort content by purpose.",
+          "zh": "手绘插画，解释如何按内容目的进行分拣。"
+        }
+      }
+    ]
+  },
+  {
+    "skillSlug": "enricoros-big-agi",
+    "repository": "enricoros/big-AGI",
+    "revision": "8c383a508387bd71c7db3d4851692561b82c1b0d",
+    "sourceUrl": "https://github.com/enricoros/big-AGI/blob/8c383a508387bd71c7db3d4851692561b82c1b0d/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/enricoros-big-agi/LICENSE-5ef4b873f878.txt",
+    "format": {
+      "en": "Tool interface",
+      "zh": "工具界面"
+    },
+    "note": {
+      "en": "Author documentation screenshots of SVG drawing and the imagine command in Big AGI. These show the application interface, not a standalone Skill execution by OpenAgentSkill.",
+      "zh": "Big AGI 作者文档中 SVG 绘图与 imagine 命令的截图。它们展示应用界面，不代表 OpenAgentSkill 执行过独立 Skill。"
+    },
+    "media": [
+      {
+        "src": "/skill-previews/enricoros-big-agi/729055566d8d3fd30b8af52f.png",
+        "cardSrc": "/skill-previews/enricoros-big-agi/729055566d8d3fd30b8af52f.card.webp",
+        "previewSrc": "/skill-previews/enricoros-big-agi/729055566d8d3fd30b8af52f.preview.webp",
+        "width": 916,
+        "height": 562,
+        "sha256": "729055566d8d3fd30b8af52f6ff3ae0f99c43fb48185df9db3ca801261082903",
+        "sourceUrl": "https://github.com/enricoros/big-AGI/blob/8c383a508387bd71c7db3d4851692561b82c1b0d/docs/pixels/feature_svg_drawing.png",
+        "kind": "interface",
+        "title": {
+          "en": "SVG drawing in chat",
+          "zh": "在对话中绘制 SVG"
+        },
+        "alt": {
+          "en": "Big AGI chat displaying a capybara SVG illustration and the accompanying explanation.",
+          "zh": "Big AGI 对话界面中的水豚 SVG 插画与文字说明。"
+        }
+      },
+      {
+        "src": "/skill-previews/enricoros-big-agi/3e5f8140cbab441f1b923415.png",
+        "cardSrc": "/skill-previews/enricoros-big-agi/3e5f8140cbab441f1b923415.card.webp",
+        "previewSrc": "/skill-previews/enricoros-big-agi/3e5f8140cbab441f1b923415.preview.webp",
+        "width": 1440,
+        "height": 3200,
+        "sha256": "3e5f8140cbab441f1b92341512c922313de90e6060701f63aa50f4b8e9178104",
+        "sourceUrl": "https://github.com/enricoros/big-AGI/blob/8c383a508387bd71c7db3d4851692561b82c1b0d/docs/pixels/feature_imagine_command.png",
+        "kind": "interface",
+        "title": {
+          "en": "Imagine command",
+          "zh": "Imagine 命令"
+        },
+        "alt": {
+          "en": "Author screenshot of the Big AGI imagine command and image-generation interface.",
+          "zh": "作者展示的 Big AGI imagine 命令与图像生成界面。"
+        }
+      }
+    ]
+  },
+  {
+    "skillSlug": "slidevjs-slidev",
+    "repository": "slidevjs/slidev",
+    "revision": "73053ab2b9653ed475960301b56e1ce4439d9c75",
+    "sourceUrl": "https://github.com/slidevjs/slidev/blob/73053ab2b9653ed475960301b56e1ce4439d9c75/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/slidevjs-slidev/LICENSE-42ccc89fea49.txt",
+    "format": {
+      "en": "Web slides",
+      "zh": "网页幻灯片"
+    },
+    "note": {
+      "en": "The default Slidev demo cover and presenter view from its documentation. These are framework examples, not evidence of an AI agent run.",
+      "zh": "Slidev 文档中的默认演示封面与演讲者视图。这些是框架示例，不代表执行过 AI Agent 任务。"
+    },
+    "media": [
+      {
+        "src": "/skill-previews/slidevjs-slidev/3467621a886ab0e12b282962.png",
+        "cardSrc": "/skill-previews/slidevjs-slidev/3467621a886ab0e12b282962.card.webp",
+        "previewSrc": "/skill-previews/slidevjs-slidev/3467621a886ab0e12b282962.preview.webp",
+        "width": 2122,
+        "height": 1292,
+        "sha256": "3467621a886ab0e12b2829622072069f29745408de320b4c3774cbf76d8e7c6b",
+        "sourceUrl": "https://github.com/slidevjs/slidev/blob/73053ab2b9653ed475960301b56e1ce4439d9c75/assets/screenshots/cover.png",
+        "kind": "template",
+        "title": {
+          "en": "Demo presentation cover",
+          "zh": "示例演示封面"
+        },
+        "alt": {
+          "en": "Slidev demo cover with large white title over an architectural photograph.",
+          "zh": "Slidev 示例封面，在建筑照片上显示白色大标题。"
+        }
+      },
+      {
+        "src": "/skill-previews/slidevjs-slidev/5926533e5bb7070b0c846bb1.png",
+        "cardSrc": "/skill-previews/slidevjs-slidev/5926533e5bb7070b0c846bb1.card.webp",
+        "previewSrc": "/skill-previews/slidevjs-slidev/5926533e5bb7070b0c846bb1.preview.webp",
+        "width": 2122,
+        "height": 1292,
+        "sha256": "5926533e5bb7070b0c846bb14d749fd9b4d7f6bdf1a6b4ec8f2dc055194e8d17",
+        "sourceUrl": "https://github.com/slidevjs/slidev/blob/73053ab2b9653ed475960301b56e1ce4439d9c75/assets/screenshots/presenter-mode.png",
+        "kind": "interface",
+        "title": {
+          "en": "Presenter view",
+          "zh": "演讲者视图"
+        },
+        "alt": {
+          "en": "Slidev presenter view with the current slide, upcoming content and presenter controls.",
+          "zh": "Slidev 演讲者视图，含当前幻灯片、后续内容与演讲控制。"
+        }
+      }
+    ]
+  }
+]

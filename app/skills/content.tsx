@@ -8,6 +8,7 @@ import { getDirectoryProfiles } from '@/lib/skills/directory-profiles'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsWithStatus } from '@/lib/db/skills'
 import { getShowcasesForSkill, getShowcaseCardData, SHOWCASE_SKILL_SLUGS } from '@/lib/showcase'
+import { getSkillPreviewCardData, SOURCE_EXAMPLE_SKILL_SLUGS, SOURCE_GALLERY_LINKS } from '@/lib/skill-previews'
 import { SkillsPageClient, type DirectorySkillCard } from '@/components/skills-page-client'
 import { selectProviderSkills, toProviderDirectorySkill, providerCatalogWindow, mergeProviderCatalogPage, providerRowsFirst, hasProviderCommercialOffers } from '@/lib/skills/provider-directory'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
@@ -887,6 +888,8 @@ function buildSkillsPageJsonLd(
   ]
 }
 
+const DIRECTORY_EXAMPLE_SKILL_SLUGS = [...new Set([...SHOWCASE_SKILL_SLUGS, ...SOURCE_EXAMPLE_SKILL_SLUGS])]
+
 export default async function SkillsPage({
   searchParams,
   requireHealthy = false,
@@ -934,17 +937,17 @@ export default async function SkillsPage({
     Promise.resolve(SKILL_CATEGORIES.map(c => c[0])),
     providerOnlyQuery ? Promise.resolve({} as Record<string, SkillAgentStats>) : withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
-    catalogMode ? getSkillCatalogPage(sort, category, page, minStars, pricing, examplesOnly ? SHOWCASE_SKILL_SLUGS : null, topic, output, catalogWindow)
+    catalogMode ? getSkillCatalogPage(sort, category, page, minStars, pricing, examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : null, topic, output, catalogWindow)
       .then(result => ({ ...result, degraded: false }))
       .catch(() => ({
         records: canShowCatalogSnapshot(page, category, minStars, pricing) && topic === 'all' && output === 'all'
           ? selectCatalogSnapshot(
             getFallbackSkills(sort, undefined, FALLBACK_SKILLS.length + CURATED_SKILL_SNAPSHOT.length),
-            examplesOnly ? SHOWCASE_SKILL_SLUGS : null,
+            examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : null,
           ) : [] as SkillRecord[],
         total: 0, hasMore: false, degraded: true, page,
       })) : Promise.resolve(null),
-    providerOnlyQuery ? Promise.resolve([] as SkillRecord[]) : getSkillsBySlugs([...new Set([...(selectedUseCase?.featuredSlugs || []), ...(!catalogMode && examplesOnly ? SHOWCASE_SKILL_SLUGS : []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
+    providerOnlyQuery ? Promise.resolve([] as SkillRecord[]) : getSkillsBySlugs([...new Set([...(selectedUseCase?.featuredSlugs || []), ...(!catalogMode && examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
   ])
   const records = providerOnlyQuery ? [] : catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, useCaseFeatured, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
   const degraded = Boolean(catalogResult?.degraded || recordsResult.degraded || searchAugmentRecords.degraded)
@@ -978,7 +981,7 @@ export default async function SkillsPage({
     // Catalog filters/order/pagination are already applied in the database.
     // Re-filtering corrected presentation categories here would drop rows.
     if (catalogMode) return true
-    if (examplesOnly && !SHOWCASE_SKILL_SLUGS.includes(record.slug)) return false
+    if (examplesOnly && !DIRECTORY_EXAMPLE_SKILL_SLUGS.includes(record.slug)) return false
     if (!matchesCommerce(record.slug, pricing)) return false
     if (featured && getSkillSourceEvidence(record).status !== 'source-recorded') return false
     if (!matchesDirectoryCategory(normalizeSkillCategory(category) ? record.category : item.sourceCategory, category)) return false
@@ -1037,7 +1040,7 @@ export default async function SkillsPage({
 
   let skills: DirectorySkillCard[] = (catalogMode ? visibleRecords : filteredRecords).map(item => {
     const examples = getShowcasesForSkill(item.record.slug)
-    return { ...toSkillsPageSkill(item), exampleCount: examples.length, preview: examples[0] ? getShowcaseCardData(examples[0]) : null }
+    return { ...toSkillsPageSkill(item), exampleCount: examples.length, sourcePreview: getSkillPreviewCardData(item.record.slug), sourceGalleryHref: SOURCE_GALLERY_LINKS[item.record.slug], preview: examples[0] ? getShowcaseCardData(examples[0]) : null }
   })
   if (catalogMode) {
     const merged = mergeProviderCatalogPage(skills, providerSkills, degraded ? skills.length : catalogResult!.total, pageOffset, sort)

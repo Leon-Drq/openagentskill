@@ -6,10 +6,11 @@ import { commerceCopy } from '@/lib/i18n/commerce-copy'
 import { acquisitionTypes, hasCommercialOffers, type PriceFilter, type SkillCommerce } from '@/lib/skills/commerce'
 import { SkillPrice } from '@/components/skill-commerce'
 
-import Image from 'next/image'
+import { SkillCardPreview } from './skill-card-preview'
 import { discoveryIcons } from './discovery-navigation'
 import { DISCOVERY_TASKS, discoveryCopy } from '@/lib/discovery'
-import { getShowcaseImageSrc, getShowcaseEvidenceLabel, localizeShowcase, type ShowcaseCardData } from '@/lib/showcase-shared'
+import type { ShowcaseCardData } from '@/lib/showcase-shared'
+import { previewCopy, type SkillPreviewCardData } from '@/lib/skill-preview-shared'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -105,6 +106,8 @@ interface DirectoryLink {
 export interface DirectorySkillCard {
   exampleCount: number
   preview?: ShowcaseCardData | null
+  sourcePreview?: SkillPreviewCardData | null
+  sourceGalleryHref?: string
   commerce: SkillCommerce
   id: string
   slug: string
@@ -424,20 +427,11 @@ export function SkillsPageClient(props: Props) {
           ) : <SkillEngagementProvider key={skills.map(skill => skill.slug).join(',')} slugs={skills.map(skill => skill.slug)} untrackedSlugs={skills.filter(skill => skill.provider).map(skill => skill.slug)}><div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
             {skills.map(skill => (
               <article key={skill.id} className="group flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-border bg-card transition-colors hover:border-[#006b4f]/50" data-directory-skill>
-                <div className="relative isolate">
-                <div className="absolute right-2 top-2 z-10 max-w-[calc(100%-1rem)] mix-blend-difference"><SkillActions slug={skill.slug} name={skill.name} compact /></div>
-                {skill.provider?.image ? <Link href={getLocalizedNavigationHref(`/skills/${skill.slug}#showcase`, locale)} prefetch={false} className="relative block aspect-[16/10] overflow-hidden border-b border-border bg-muted" aria-label={`${discovery.examples}: ${skill.name}`}>
-                  <Image src={skill.provider.image} alt={`${skill.name} — ${skill.provider.exampleLabel}`} fill unoptimized sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 360px" className="object-cover object-top" />
-                  <span className="absolute bottom-3 left-3 rounded-md bg-background/95 px-2 py-1 text-[10px]">{skill.provider.exampleLabel}</span>
-                </Link> : skill.preview ? <Link href={getLocalizedNavigationHref(`/showcase/${skill.preview.slug}`, locale)} prefetch={false} className="relative block aspect-[16/10] overflow-hidden border-b border-border bg-muted" aria-label={`${discovery.examples}: ${skill.name}`}>
-                  <Image src={getShowcaseImageSrc(skill.preview.media[0].src, 'card')} alt={localizeShowcase(skill.preview.media[0].alt, locale)} fill sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 360px" className={skill.preview.cardFit === 'contain' ? 'object-contain p-3' : 'object-cover object-top'} />
-                  <span className="absolute bottom-3 left-3 rounded-md bg-background/95 px-2 py-1 text-[10px]">{getShowcaseEvidenceLabel(skill.preview, locale)}</span>
-                </Link> : <Link href={getLocalizedNavigationHref(`/skills/${skill.slug}`, locale)} prefetch={false} className="flex aspect-[16/10] min-h-52 flex-col justify-between gap-2 border-b border-border bg-[#eeece5]/65 p-5 pt-20 text-[#006b4f]" data-skill-capability>
-                  <span className="sr-only">Agent Skill</span>
-                  <span className="font-display text-3xl leading-tight">{directoryCategories(skill.category).map(label).join(' · ')}</span>
-                  <span className="text-xs leading-5 text-secondary">{[...new Set(skill.platformHints || skill.compatibility.map(v => v.platform))].slice(0, 2).join(' · ') || skill.author.name}</span>
-                </Link>}
+                <div className="flex min-h-12 items-center justify-between gap-2 border-b border-border px-4 py-1">
+                  <span className="min-w-0 text-[10px] font-medium text-[#006b4f]">{directoryCategories(skill.category).map(label).join(' · ')}</span>
+                  <SkillActions slug={skill.slug} name={skill.name} compact />
                 </div>
+                <SkillCardPreview slug={skill.slug} name={skill.name} locale={locale} category={directoryCategories(skill.category).map(label).join(' · ')} showcase={skill.preview} sourcePreview={skill.sourcePreview} sourceGalleryHref={skill.sourceGalleryHref} provider={skill.provider} />
                 <div className="flex min-w-0 items-start gap-3 p-5 pb-0">
                 <div className="shrink-0">{skill.provider?.label === 'Skillry' ? <SkillryLogo /> : <GitHubOwnerAvatar owner={skill.author.owner} label={skill.author.name} size="md" />}</div>
                 <div className="min-w-0 flex-1">
@@ -461,6 +455,7 @@ export function SkillsPageClient(props: Props) {
                   </div>
                   {skill.taxonomyTags.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{skill.taxonomyTags.slice(0, 2).map(tag => <Link key={tag} href={href({ tag })} onNavigate={filterNavigation(href({ tag }))} scroll={false} prefetch={false} className="rounded-full border border-border px-2 py-1 text-[10px] text-secondary hover:text-[#006b4f]">{label(tag)}</Link>)}</div>}
                   {skill.exampleCount > 0 && <Link prefetch={false} href={getLocalizedNavigationHref(`/skills/${skill.slug}#showcase`, locale)} className="mt-3 inline-flex min-h-10 items-center gap-2 text-xs font-medium text-[#006b4f]" data-skill-examples>{discovery.examples} · {skill.exampleCount}<ArrowRight size={12} aria-hidden="true" /></Link>}
+                  {skill.sourcePreview && !skill.preview && <Link prefetch={false} href={getLocalizedNavigationHref(`/skills/${skill.slug}#visual-previews`, locale)} className="mt-3 inline-flex min-h-10 items-center gap-2 text-xs font-medium text-[#006b4f]" data-source-previews>{previewCopy('view', locale)} · {skill.sourcePreview.imageCount}<ArrowRight size={12} aria-hidden="true" /></Link>}
                 </div>
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border bg-background/45 px-5 py-3">
                   {skill.provider ? <a aria-label={`${locale === 'zh' ? '在' : 'Get on'} ${skill.provider.label}: ${skill.name}`} href={skill.provider.sourceHref} target="_blank" rel={skill.provider.sourceRel} className="inline-flex min-h-10 items-center gap-1 text-xs text-[#006b4f]">{locale === 'zh' ? '获取技能' : 'Get skill'} ↗</a> : <span title={c.repoStars} className="inline-flex items-center gap-1.5 font-mono text-sm"><Star size={14} aria-hidden="true" />{stars(skill.stats.stars)}<span className="text-[10px] text-secondary">GitHub</span></span>}
