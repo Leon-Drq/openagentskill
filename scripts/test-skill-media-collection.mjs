@@ -34,6 +34,8 @@ assert.equal(rootDiscovery.candidates.length, 0, 'A monorepo root cannot claim s
 const branding = discoverAssets([{ path: 'README.md', text: '![Brand](assets/repo-dark.png)\n![App](assets/appicon.png)\n# Sponsors\n![Partner](assets/partner.png)\n# Usage\n![Architecture](assets/diagram.png)' }], ['assets/repo-dark.png', 'assets/appicon.png', 'assets/partner.png', 'assets/diagram.png'].map(blob), { repository: row.github_repo, revision: rev, ref: 'main' })
 assert.deepEqual(branding.candidates.map(item => item.asset), ['assets/diagram.png'], 'Brand and sponsor art are not Skill previews')
 assert.equal(branding.candidates[0].kind, 'reference', 'Documentation is not an independently verified output example')
+const markup = discoverAssets([{ path: 'README.md', text: '<!-- ![Hidden](hidden.png) -->\n![<b>Actual chart</b><script>ignored</script>](chart.png)\n<!-- unclosed ![Hidden](hidden.png)' }], ['hidden.png', 'chart.png'].map(blob), { repository: row.github_repo, revision: rev, ref: 'main' })
+assert.deepEqual(markup.candidates.map(item => [item.asset, item.label]), [['chart.png', 'Actual chart']], 'Parse comments and caption markup instead of partially stripping tag strings')
 const state = { [row.slug]: { identity: identity(row), nextAt: '2026-10-08T00:00:00Z' } }
 assert.equal(selectBatch([row], state, { now }).batch.length, 0)
 assert.equal(selectBatch([{ ...row, source_path: 'skills/new/SKILL.md' }], state, { now }).batch.length, 1)

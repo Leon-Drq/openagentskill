@@ -11,6 +11,30 @@ const supported = /\.(png|jpe?g|webp|gif|mp4|webm|pdf|pptx)$/i
 const decorative = /(?:^|[\s/_.-])(logo|badge|banner|avatar|sponsor|donate|qrcode|qr-code|icon|appicon|wordmark|logotype|wechat|weixin|qq|star-history|shields)(?:$|[\s/_.-])/i
 const example = /(?:^|[\s/_.-])(examples?|demos?|outputs?|results?|previews?|slides?|templates?|showcases?|gallery)(?:$|[\s/_.-])/i
 
+function plainLabel(value) {
+  const text = node => node.nodeName === '#text' ? node.value
+    : ['script', 'style'].includes(node.tagName) ? ''
+    : (node.childNodes || []).map(text).join(' ')
+  // Captions remain plain strings, rendered by React as text/alt attributes.
+  return text(parseFragment(value)).replace(/\s+/g, ' ').trim().slice(0, 160)
+}
+
+function withoutComments(value) {
+  const ranges = []
+  const visit = node => {
+    if (node.nodeName === '#comment' && node.sourceCodeLocation) ranges.push(node.sourceCodeLocation)
+    for (const child of node.childNodes || []) visit(child)
+  }
+  visit(parseFragment(value, { sourceCodeLocationInfo: true }))
+  const parts = []; let cursor = 0
+  for (const { startOffset, endOffset } of ranges.sort((a, b) => a.startOffset - b.startOffset)) {
+    // Whitespace preserves boundaries instead of joining pieces into new tags.
+    parts.push(value.slice(cursor, startOffset), ' '.repeat(endOffset - startOffset)); cursor = endOffset
+  }
+  parts.push(value.slice(cursor))
+  return parts.join('')
+}
+
 export function selectBatch(rows, state, { limit = 150, now = new Date().toISOString(), excluded = new Set(), refresh = false } = {}) {
   const time = Date.parse(now)
   const due = rows.filter(row => !excluded.has(row.slug) && safeRepo(row.github_repo)).filter(row => {
@@ -91,12 +115,12 @@ export function discoverAssets(documents, tree, { repository, revision, ref, sou
     if (!candidates.has(asset)) candidates.set(asset, {
       asset, documentPath, explicit, size: byPath.get(asset).size,
       kind: example.test(asset + ' ' + label) ? 'example' : 'reference',
-      label: label.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 160),
+      label: plainLabel(label),
     })
   }
   for (const { path: documentPath, text } of documents) {
     // Ignore fenced code and HTML comments: example syntax is not actual media.
-    const body = text.replace(/```[^\n]*\n[\s\S]*?```|~~~[^\n]*\n[\s\S]*?~~~/g, '').replace(/<!--[\s\S]*?-->/g, '')
+    const body = withoutComments(text.replace(/```[^\n]*\n[\s\S]*?```|~~~[^\n]*\n[\s\S]*?~~~/g, ''))
     const definitions = new Map([...body.matchAll(/^\s*\[([^\]]+)\]:\s*<?(\S+?)>?(?:\s+["'].*)?$/gm)].map(match => [match[1].toLowerCase(), match[2]]))
     for (const match of body.matchAll(/!?\[([^\]\n]*)\]\(\s*(?:<([^>]+)>|([^\s)]+))(?:\s+["'][^\n]*?["'])?\s*\)/g)) {
       const heading = [...body.slice(0, match.index).matchAll(/^#{1,6}\s+(.+)$/gm)].at(-1)?.[1] || ''
