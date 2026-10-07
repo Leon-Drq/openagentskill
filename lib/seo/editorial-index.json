@@ -38,23 +38,23 @@
     "reviewedAt": "2026-10-06",
     "name": "Native Subtitle Quote Image",
     "title": "Native Subtitle Quote Image — Video to Quote Card Skill",
-    "description": "Turn video frames into subtitle quote cards. See our original 3:4 example, download the input and timestamps, and reproduce the pinned local render.",
+    "description": "Create speech and interview quote cards from real video frames. Explore our JFK speech example, checked transcript, source credits and reproducible local render.",
     "gallerySlug": "native-subtitle-video-to-quote-card",
     "galleryLabel": {
-      "en": "Explore our reproducible subtitle-image example",
-      "zh": "查看本站制作的可复现字幕长图案例"
+      "en": "Explore the JFK speech quote-card example",
+      "zh": "查看肯尼迪演讲金句长图案例"
     },
     "summary": {
-      "en": "Native Subtitle Quote Image turns selected video frames into a social quote card. Native mode keeps captions already burned into the video; script mode draws supplied, checked text onto frames and must be labeled as added subtitles. Our original example uses native mode: five frames from a silent, ten-second graphic clip become one 1080 × 1440 JPG. The captions are our workflow tips, not an interview quotation.",
-      "zh": "Native Subtitle Quote Image 将选定的视频画面拼成社交字幕长图。原生模式保留画面已有的烧录字幕；脚本模式将提供并核对的文字绘制到画面，须注明是后期字幕。本站原创案例使用原生模式：从无声的十秒图形视频中取五帧，输出一张 1080×1440 JPG。字幕是本站的流程提示，不是采访引语。"
+      "en": "Native Subtitle Quote Image turns speech, interview and film excerpts into social quote cards using real video frames. Native mode preserves captions already burned into a video; script mode draws checked text onto real frames and labels it as added subtitles. Our worked example uses the latter: six English lines from John F. Kennedy’s 1962 Rice University speech become a 1080 × 1440 quote card, with archival footage and official transcript sources supplied.",
+      "zh": "Native Subtitle Quote Image 使用真实视频画面，将演讲、访谈和电影片段制作成社交金句长图。原生模式保留视频中已有的烧录字幕；脚本模式把已核对台词绘制到真实画面，并明确标为后期字幕。本站案例采用脚本模式：选取肯尼迪 1962 年莱斯大学演讲的六行英文原话，制作一张 1080×1440 金句长图，附档案影像与官方文字稿来源。"
     },
     "workflow": {
-      "en": "Start with a local video you may process and publish. Confirm that captions remain visible with player subtitles switched off, choose stable timestamps, inspect the subtitle band, then render and open the result. Our input, timestamp JSON, exact command and actual run record are downloadable beside the preview. The local renderer needs Python 3.10+, Pillow and FFmpeg or imageio-ffmpeg, with no model API key. Online acquisition additionally needs yt-dlp and suitable access.",
-      "zh": "先准备有权处理和发布的本地视频，确认关闭播放器字幕后画面中仍有字幕，再选择稳定时间点、检查字幕区域，最后渲染并打开成品检查。预览旁提供输入视频、时间点 JSON、准确命令与实际运行记录。此本地渲染需要 Python 3.10+、Pillow，以及 FFmpeg 或 imageio-ffmpeg，不需要模型 API 密钥；在线获取另需 yt-dlp 与适当访问权限。"
+      "en": "Choose a video you may process and publish, verify the speaker and quotation, and select stable frames at the relevant timestamps. If text remains visible with player captions switched off, use native mode. Otherwise, review a timestamped script and use script mode. Our example provides a 28-second NASA archival excerpt, checked English lines, source and timing references, exact command and actual run record. Open the result to check the speaker, line order and text boundaries. Local rendering needs Python, Pillow, FFmpeg and a suitable font for script text.",
+      "zh": "先选取有权处理和发布的视频，核对演讲者和引语，再按相关时间点挑选稳定画面。关闭播放器字幕后文字仍在画面里，可用原生模式；否则核对带时间点的台词脚本，使用脚本模式。本站案例提供 28 秒 NASA 档案片段、已核对英文原话、影像与时间点来源、准确命令和实际运行记录。打开成品检查人物、句子顺序和文字边界。本地渲染需要 Python、Pillow、FFmpeg，脚本字幕另需合适字体。"
     },
     "limitations": {
-      "en": "This curated page and example match the cataloged v2.1.1 source at f9485e20. Upstream has newer revisions; their changes are not covered by this run. A separate caption track cannot be preserved as native subtitle pixels. Subtitle transitions, long lines and crop boundaries need visual checking, and enlarging a low-resolution frame does not recover detail. We exercised one local English native render, not installation, URL downloading, translation, script mode, cross-agent compatibility or security certification. The existing review score and installation policy are unchanged.",
-      "zh": "本精选页和案例对应目录已收录的 v2.1.1 固定源码 f9485e20；上游有更新版本，本次运行未覆盖其改动。独立字幕轨不能当作画面原生字幕像素保留。字幕切换、长句和裁切边界需要逐张检查，放大低清画面也不能恢复细节。本次仅运行了一次本地英文原生渲染，没有测试安装、在线下载、翻译、脚本模式、跨 Agent 兼容性或安全认证；原审核评分与安装策略保留。"
+      "en": "This example uses the cataloged v2.1.1 source at f9485e20; newer upstream revisions are not covered. JFK’s footage has no burned-in captions, so the text in our output is post-production script subtitles. Archival frames retain their original limitations; cropping and enlarging them does not restore detail. One local English script render was exercised, not installation, native mode, translation, cross-agent compatibility or security certification. Source footage is credited separately from our selection and rendering. The existing review score and installation policy are unchanged.",
+      "zh": "本案例使用目录已收录的 v2.1.1 固定源码 f9485e20，未覆盖上游新版本。肯尼迪的源影像没有烧录字幕，成品文字由脚本模式后期绘制。档案画面的清晰度受源素材限制，裁切和放大不能恢复细节。本次测试覆盖一次本地英文脚本渲染，未测试安装、原生模式、翻译、跨 Agent 兼容性或安全认证。影像来源与本站选句、渲染贡献分别署名；原审核评分与安装策略保留。"
     }
   }
 ]

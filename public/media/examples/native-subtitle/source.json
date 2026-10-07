@@ -1,0 +1,45 @@
+{
+  "speaker": "John F. Kennedy",
+  "event": "Address at Rice University on the Nation's Space Effort",
+  "event_date": "1962-09-12",
+  "footage_credit": "NASA, Shuttle–Mir history video archive",
+  "source_page": "https://www.nasa.gov/history/SP-4225/multimedia/before-video.htm",
+  "source_video": "https://www.nasa.gov/wp-content/uploads/static/history/SP-4225/imagery/videos/v-004.mpg",
+  "rights_reference": "https://www.jfklibrary.org/learn/about-jfk/historic-speeches/address-at-rice-university-on-the-nations-space-effort",
+  "source_sha256": "95b594e413dd2569146317fe043f6eb712258873ec615326142be65b1823c2b1",
+  "source_bytes": 2142212,
+  "transcript_url": "https://www.jfklibrary.org/archives/other-resources/john-f-kennedy-speeches/rice-university-19620912",
+  "frame_selection": "Six representative frames at 1, 7, 11, 14, 18 and 22 seconds. These illustrate the selected speech quotation; word-level audio alignment was not verified.",
+  "clip_start_seconds": 0,
+  "clip_duration_seconds": 28.29,
+  "subtitle_origin": "Post-production English script subtitles; selected quotation checked against the JFK Library transcript, illustrated with real frames from NASA’s speech clip.",
+  "selected_lines": [
+    {
+      "t": 1,
+      "text": "We choose to go to the moon in this decade"
+    },
+    {
+      "t": 7,
+      "text": "and do the other things,"
+    },
+    {
+      "t": 11,
+      "text": "not because they are easy,"
+    },
+    {
+      "t": 14,
+      "text": "but because they are hard,"
+    },
+    {
+      "t": 18,
+      "text": "because that goal will serve to organize and measure"
+    },
+    {
+      "t": 22,
+      "text": "the best of our energies and skills,"
+    }
+  ],
+  "rights": "NASA archival footage, used as an informational worked example under NASA media usage guidelines. JFK Library identifies its NASA recording of this speech as Public Domain.",
+  "media_guidelines": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+  "editing": "NASA’s 28-second MPEG excerpt preserved byte-for-byte, with audio and source 352 x 240 pixels. Display output crops and enlarges frames; this does not recover archival detail."
+}

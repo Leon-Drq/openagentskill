@@ -43,13 +43,18 @@ installation policy. The editorial entry matches the existing cataloged v2.1.1
 revision `f9485e20f03fc0b9e5dfd77d03d5be24f7cebdcd` and SKILL.md hash exactly.
 Upstream has newer revisions; this example does not cover them.
 
-OpenAgentSkill created a silent ten-second graphic input with five original
-burned-in English caption lines, inspected the upstream Python renderer and
-executed it locally without project credentials. The actual native-mode JPG,
-input, manifest, environment, artifact hashes and visual observations are stored
-in `public/media/examples/native-subtitle`. The original input builder is
-`scripts/render-native-subtitle-example.py`. The Skill page and Gallery case
-both expose the reproduction files and command.
+The worked example uses NASA's 28-second archival clip of JFK's 1962 Rice
+University speech, preserved byte-for-byte. Six quotation lines were checked
+against the JFK Library transcript and rendered onto representative real frames
+with the pinned Skill's script-subtitle mode. The text is explicitly labeled as
+post-production subtitles; word-level audio alignment was not verified. This
+replaces the earlier graphic workflow-tip demo with the Skill's intended speech
+quote-card scenario. NASA footage and the JFK Library transcript are credited
+separately from OpenAgentSkill's selection and rendering. The actual JPG, input,
+script, sources, environment and artifact hashes are stored in
+`public/media/examples/native-subtitle`. The local builder is
+`scripts/render-native-subtitle-example.py`; the Skill and Gallery pages both
+expose reproduction files and the command.
 
 This adds useful original reference content, a descriptive title, source/version
 attribution and image alt text through existing canonical/sitemap/index rules.
