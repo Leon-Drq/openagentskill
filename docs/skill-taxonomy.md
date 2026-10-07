@@ -6,6 +6,16 @@ Classification uses each Skill's name, source path, description, source category
 
 The generated SQL and JS use the same rules. Run `pnpm taxonomy:migration` after vocabulary changes and create a new versioned migration for future rule revisions. Do not overwrite an applied migration. Deployment order is additive migration, bounded backfill, query verification, then application release.
 
+For an exact-package correction, create an empty migration with `supabase migration new <name>` and generate only that follow-up file:
+
+```sh
+node --experimental-strip-types scripts/build-skill-taxonomy-migration.mjs \
+  --exact-source-output supabase/migrations/<created-file>.sql \
+  --source chengyi-ai/native-subtitle-quote-image:skills/native-subtitle-quote-image/SKILL.md
+```
+
+Native Subtitle Quote Image consumes video frames and delivers JPG quote cards. Its exact package is therefore classified as `image-generation`, with the `image-editing` task tag and `image` output. Other packages in that repository use the common rules. The follow-up generator preserves applied migration files, updates only the selected package's derived fields, and rolls back if any original source, review, publication or timestamp field changes.
+
 For a fresh database, backfill records in batches using `classify_skill_taxonomy(name,description,tagline,source_path,category,tags,github_repo)` and assign only `primary_category`, `taxonomy_tags`, `output_types`, `taxonomy_version`. Limit each batch to 3,000 rows with version zero. Existing publication and timestamp functions are preserved and ignore derived-only updates. Check source/review/slug/timestamp equality per batch. The 2026-10-02 production backfill updated 34,115 records with zero source/review changes. The second migration adds three verified exceptions keyed by repository and exact Skill path, leaving other Skills in those repositories to the common rules.
 
 Old category query links continue to normalize; browser automation and scraping links additionally retain the corresponding task tag. Skill/showcase URLs, existing topic pages, canonical URLs, localization alternates and sitemap publication gates remain unchanged. Filter combinations stay noindex. Curated task pages remain linked from the directory and preserve their editorial content; new thin category pages are not generated.
