@@ -1,14 +1,17 @@
 'use client'
 
-import { SKILL_CATEGORIES, TOPIC_RULES, OUTPUT_RULES, categoryLabel } from '@/lib/skills/taxonomy'
+import { SKILL_CATEGORIES, TOPIC_RULES, categoryLabel } from '@/lib/skills/taxonomy'
 import { NativeSelect } from '@/components/ui/native-select'
 import { commerceCopy } from '@/lib/i18n/commerce-copy'
-import { acquisitionTypes, hasCommercialOffers, type PriceFilter, type SkillCommerce } from '@/lib/skills/commerce'
+import { type PriceFilter, type SkillCommerce } from '@/lib/skills/commerce'
+import { DirectoryFilterPanel } from './directory-filter-panel'
+import { Drawer, DrawerTrigger, DrawerContent, DrawerTitle, DrawerDescription, DrawerClose } from './ui/drawer'
+import { directoryFilterCopy } from '@/lib/i18n/directory-filter-copy'
+import { directoryFilterUpdates, emptyDirectoryFilters, updateDirectoryFilters, type DirectoryAccess, type DirectoryFilterDraft } from '@/lib/skills/directory-filters'
 import { SkillPrice } from '@/components/skill-commerce'
 
 import { SkillCardPreview } from './skill-card-preview'
-import { discoveryIcons } from './discovery-navigation'
-import { DISCOVERY_TASKS, discoveryCopy } from '@/lib/discovery'
+import { discoveryCopy } from '@/lib/discovery'
 import type { ShowcaseCardData } from '@/lib/showcase-shared'
 import { previewCopy, type SkillPreviewCardData } from '@/lib/skill-preview-shared'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
@@ -174,7 +177,7 @@ function writeSelection(slugs: string[]) {
 
 interface Props {
   pricing: PriceFilter
-  providerCommercialOffers?: boolean
+  access: DirectoryAccess
   pathname: string
   queryString: string
   skills: DirectorySkillCard[]
@@ -215,15 +218,16 @@ export function SkillsPageClient(props: Props) {
   const { locale } = useI18n()
   const discovery = discoveryCopy(locale)
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [draftFilters, setDraftFilters] = useState<DirectoryFilterDraft>(emptyDirectoryFilters)
   useEffect(() => {
-    const media = window.matchMedia('(min-width: 1024px)')
-    const update = () => setFiltersOpen(media.matches)
-    update()
-    media.addEventListener('change', update)
-    return () => media.removeEventListener('change', update)
+    const desktop = window.matchMedia('(min-width: 1024px)')
+    const closeOnDesktop = () => { if (desktop.matches) setFiltersOpen(false) }
+    desktop.addEventListener('change', closeOnDesktop)
+    return () => desktop.removeEventListener('change', closeOnDesktop)
   }, [])
   const c = directoryCopy(locale)
   const prices = commerceCopy(locale)
+  const filterCopy = directoryFilterCopy(locale)
   const reportedResult = useRef('')
   useEffect(() => {
     const key = JSON.stringify([query, sort, category, page, resultCount, degraded, props.featured, props.examplesOnly])
@@ -269,7 +273,7 @@ export function SkillsPageClient(props: Props) {
     filterNavigation(destination)(event)
   }
   const resetHref = directoryHref(pathname, queryString, Object.fromEntries(
-    ['q','sort','category','useCase','platform','quality','trust','safety','track','minStars','page','tag','output','view','pricing','featured','examples'].map(key => [key, undefined])
+    ['q','sort','access','category','useCase','platform','quality','trust','safety','track','minStars','page','tag','output','view','pricing','featured','examples'].map(key => [key, undefined])
   ))
   const toggleCompare = (slug: string) => {
     trackAnalyticsEvent('skill_compare', { skill_slug: slug, source: 'directory', selected: !compareSlugs.includes(slug) })
@@ -282,146 +286,115 @@ export function SkillsPageClient(props: Props) {
   const primaryCategories = ['coding-agents','design-creative','video-creation','research','presentation','finance']
   const categoryOptions = directoryCategoryOptions([...categories, ...primaryCategories, category === 'all' ? '' : category])
   const selectedCategory = category === 'all' ? 'all' : directoryCategories(category)[0]
-  const activeFilters = Object.entries({ featured: props.featured ? 'featured' : 'all', examples: props.examplesOnly ? 'withExamples' : 'all', pricing: props.pricing, category, tag: props.topic, output: props.output, useCase, platform, quality, trust, safety, track: supplyTrack, minStars: minStars ? String(minStars) : 'all' })
+  const activeFilters = Object.entries({ access: props.access, featured: props.featured ? 'featured' : 'all', examples: props.examplesOnly ? 'withExamples' : 'all', pricing: props.access === 'free' || props.access === 'paid' ? 'all' : props.pricing, category, tag: props.topic, output: props.output, useCase, platform, quality, trust, safety, track: supplyTrack, minStars: minStars ? String(minStars) : 'all' })
     .filter(([, value]) => value && value !== 'all')
   const sortOptions = [
     ['quality', query ? c.relevance : props.catalogMode ? c.quality : c.recommended], ['stars', c.stars],
     ['fresh', c.fresh], ['new', c.new], ['trending', c.trending],
     ...(sort === 'downloads' ? [['downloads', c.trending]] : []),
   ]
-  const advanced = [
-    { key: 'useCase', title: c.useCase, value: useCase, options: useCases.map(v => [v.slug, v.shortTitle]) },
-    { key: 'platform', title: c.platform, value: platform, options: [...new Set(['Codex', 'Claude Code', 'Cursor', ...platformOptions, ...(platform !== 'all' ? [platform] : [])])].map(v => [v, v]) },
-    { key: 'minStars', title: c.minimum, value: String(minStars || 'all'), options: ['20','100','500','1000','5000'].map(v => [v, v + '+']) },
-  ]
+  const filterValues: DirectoryFilterDraft = {
+    access: props.access, category: selectedCategory, tag: props.topic, output: props.output,
+    pricing: props.access === 'free' || props.access === 'paid' ? 'all' : props.pricing,
+    featured: props.featured ? 'true' : 'all', examples: props.examplesOnly ? 'true' : 'all',
+    useCase, platform, minStars: String(minStars || 'all'), quality, trust, safety, track: supplyTrack,
+  }
+  const desktopUpdates = (updates: Partial<DirectoryFilterDraft>) => directoryFilterUpdates(updateDirectoryFilters(filterValues, updates))
+  const filterPanelProps = { locale, categories: categoryOptions, useCases, platformOptions }
   const stars = (value: number) => new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 1 }).format(value)
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <main className="skills-directory mx-auto max-w-[1440px] px-4 pb-16 sm:px-6">
-        <header className="border-b border-border pb-7 pt-10 sm:pb-9 sm:pt-14" data-directory-hero>
+        <header className="border-b border-border pb-5 pt-6 sm:pb-9 sm:pt-14" data-directory-hero>
           <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#006b4f]">OPENAGENTSKILL / DIRECTORY</p>
-          <h1 className="mt-4 font-display text-4xl font-normal tracking-tight sm:text-6xl">AI Agent <em className="font-normal text-[#006b4f]">Skills</em></h1>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-secondary sm:text-base">{c.intro}</p>
-          <p className="mt-3 max-w-3xl text-xs leading-6 text-secondary" data-directory-scope>{discovery.directoryNote}</p>
+          <h1 className="mt-3 font-display text-3xl font-normal tracking-tight sm:text-6xl">AI Agent <em className="font-normal text-[#006b4f]">Skills</em></h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-secondary sm:text-base">{c.intro}</p>
+          <p className="mt-3 hidden max-w-3xl text-xs leading-6 sm:block text-secondary" data-directory-scope>{discovery.directoryNote}</p>
         </header>
 
         <div className="mt-6 grid items-start gap-6 lg:grid-cols-[232px_minmax(0,1fr)] lg:gap-8">
-          <aside className="min-w-0 lg:sticky lg:top-24 lg:max-h-[calc(100dvh-8rem)] lg:overflow-y-auto" aria-label={discovery.filters}>
-            <details data-directory-filters open={filtersOpen} onToggle={event => setFiltersOpen(event.currentTarget.open)} className="rounded-[12px] border border-border bg-card/40 p-4">
-              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold lg:hidden">
-                <span className="inline-flex items-center gap-2"><SlidersHorizontal size={16} aria-hidden="true" />{discovery.filters}{activeFilters.length ? ` · ${activeFilters.length}` : ''}</span><ArrowRight size={16} aria-hidden="true" />
-              </summary>
-              <div className="mt-4 space-y-6 lg:mt-0">
-                <div data-discovery-filters className="grid gap-1">
-                  {[['featured', discovery.featured, props.featured], ['examples', discovery.withExamples, props.examplesOnly]].map(([key, title, checked]) =>
-                    <label key={String(key)} className="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
-                      <input type="checkbox" checked={Boolean(checked)} disabled={pending} onChange={event => navigate({ [String(key)]: event.target.checked ? 'true' : undefined, ...(key === 'featured' ? { view: undefined } : {}) })} className="h-4 w-4 accent-[#006b4f]" />
-                      {title}
-                    </label>)}
-                </div>
-                <nav aria-label={c.category} data-directory-categories>
-                  <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-secondary">{c.category}</h2>
-                  {['all', ...SKILL_CATEGORIES.slice(0, 15).map(item => item[0])].map(key => {
-                    const item = SKILL_CATEGORIES.find(item => item[0] === key)
-                    const Icon = item ? discoveryIcons[item[3]] : Search
-                    return <Link key={key} prefetch={false} href={href({ category: key, tag: undefined, track: undefined, useCase: undefined })} scroll={false}
-                      onNavigate={filterNavigation(href({ category: key, tag: undefined, track: undefined, useCase: undefined }))} aria-current={selectedCategory === key ? 'page' : undefined}
-                      className={`flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm ${selectedCategory === key ? 'bg-[#006b4f]/10 font-semibold text-[#006b4f]' : 'text-secondary hover:bg-muted hover:text-foreground'}`}>
-                      <Icon size={16} className="shrink-0" aria-hidden="true" />{key === 'all' ? label('allCategories') : label(key)}
-                    </Link>
-                  })}
-                </nav>
-                <div className="grid gap-4 border-t border-border pt-5">
-                  <label className="grid gap-2 text-xs text-secondary">{c.category}
-                    <NativeSelect disabled={pending} value={selectedCategory} onChange={e => navigate({ category: e.target.value, tag: undefined })} className="w-full bg-transparent text-sm">
-                      <option value="all">{c.all}</option>{categoryOptions.map(key => <option key={key} value={key}>{label(key)}</option>)}
-                    </NativeSelect>
-                  </label>
-                  <label className="grid gap-2 text-xs text-secondary">{label('taskTag')}
-                    <NativeSelect aria-label={label('taskTag')} disabled={pending} value={props.topic} onChange={e => navigate({ tag: e.target.value })} className="w-full bg-transparent text-sm">
-                      <option value="all">{c.any}</option>{TOPIC_RULES.filter(t => selectedCategory === 'all' || t[1] === selectedCategory || t[0] === props.topic).map(t => <option key={t[0]} value={t[0]}>{t[locale === 'zh' ? 3 : 2]}</option>)}
-                    </NativeSelect>
-                  </label>
-                  <label className="grid gap-2 text-xs text-secondary">{label('outputType')}
-                    <NativeSelect aria-label={label('outputType')} disabled={pending} value={props.output} onChange={e => navigate({ output: e.target.value })} className="w-full bg-transparent text-sm">
-                      <option value="all">{c.any}</option>{OUTPUT_RULES.map(t => <option key={t[0]} value={t[0]}>{t[locale === 'zh' ? 2 : 1]}</option>)}
-                    </NativeSelect>
-                  </label>
-                  <label className="grid gap-2 text-xs text-secondary">{prices.pricing}
-                    <NativeSelect disabled={pending} aria-label={prices.pricing} value={props.pricing} onChange={e => navigate({ pricing: e.target.value })} className="w-full bg-transparent text-sm">
-                      <option value="all">{prices.all}</option>{acquisitionTypes.filter(type => !['paid', 'freemium'].includes(type) || (hasCommercialOffers() || props.providerCommercialOffers) || props.pricing === type).map(type => <option key={type} value={type}>{prices[type]}</option>)}
-                    </NativeSelect>
-                  </label>
-                  {advanced.map(filter => <label key={filter.key} className="grid gap-2 text-xs text-secondary">{filter.title}
-                    <NativeSelect disabled={pending} value={filter.value} onChange={e => navigate({ [filter.key]: e.target.value })} className="w-full bg-transparent text-sm">
-                      <option value="all">{c.any}</option>{filter.options.map(([value, title]) => <option key={value} value={value}>{title}</option>)}
-                    </NativeSelect>
-                  </label>)}
-                </div>
-                <nav className="border-t border-border pt-5" aria-label={discovery.explore}>
-                  <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-secondary">{discovery.explore}</h2>
-                  {DISCOVERY_TASKS.slice(0, 4).map(item => <Link key={item.id} href={getLocalizedNavigationHref(item.href, locale)} prefetch={false} className="flex min-h-11 items-center justify-between gap-2 text-xs text-secondary hover:text-[#006b4f]">{item.label[locale]}<ArrowRight size={12} aria-hidden="true" /></Link>)}
-                </nav>
-              </div>
-            </details>
+          <aside className="directory-desktop-filters hidden min-w-0 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100dvh-8rem)] lg:overflow-y-auto" aria-label={discovery.filters}>
+            <div data-directory-filters className="rounded-[12px] border border-border bg-card/40 p-4">
+              <DirectoryFilterPanel {...filterPanelProps} value={filterValues} disabled={pending}
+                href={updates => href(desktopUpdates(updates))} onChange={updates => navigate(desktopUpdates(updates))} />
+            </div>
           </aside>
+          <noscript><style>{`.directory-desktop-filters{display:block!important}`}</style></noscript>
         <section aria-labelledby="directory-results-heading" aria-busy={pending} className="relative min-w-0" data-directory-results>
-          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center" data-directory-toolbar>
+          <div className="mb-4" data-directory-toolbar>
             <form role="search" action={pathname} method="get" data-directory-search onSubmit={event => {
               event.preventDefault()
               const q = String(new FormData(event.currentTarget).get('q') || '').trim()
               trackAnalyticsEvent('directory_search', { has_query: Boolean(q), query_length: q.length, locale })
               navigate({ q: q || undefined, sort: undefined })
-            }} className="flex min-w-0 flex-1 items-center gap-2 rounded-[12px] border border-border bg-card p-2 focus-within:border-[#006b4f]">
-              <Search size={18} className="ml-2 hidden shrink-0 text-secondary sm:block" aria-hidden="true" />
+            }} className="flex min-w-0 flex-1 items-center gap-2 rounded-[12px] border border-border bg-card p-1.5 focus-within:border-[#006b4f]">
+              <Search size={18} className="ml-2 shrink-0 text-secondary" aria-hidden="true" />
+              {[...new URLSearchParams(queryString)].filter(([key]) => !['q', 'page', 'sort'].includes(key)).map(([key, value], index) => <input key={`${key}-${index}`} type="hidden" name={key} value={value} />)}
               <input key={query || ''} type="search" name="q" defaultValue={query} aria-label={c.search}
                 id="skill-search" placeholder={c.placeholder} className="min-w-0 flex-1 bg-transparent px-2 py-2.5 text-base outline-none sm:text-sm" />
-              <button type="submit" disabled={pending} className="shrink-0 rounded-lg bg-[#006b4f] px-4 py-3 text-sm font-semibold text-white hover:bg-[#00533d] disabled:opacity-50 sm:px-6">{c.search}</button>
+              <button type="submit" disabled={pending} className="min-h-10 shrink-0 rounded-[8px] bg-[#006b4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#00533d] disabled:opacity-50 sm:px-6">{c.search}</button>
             </form>
-            <div className="shrink-0 sm:w-52">
-              <label className="flex min-h-[62px] min-w-0 max-w-full items-center gap-3 rounded-[12px] border border-border bg-card px-3 text-xs text-secondary">
-                <span className="shrink-0">{c.sort}</span>
-                <NativeSelect aria-label={c.sort} value={sort} onChange={e => navigate({ sort: e.target.value })} disabled={pending} className="w-full max-w-full bg-transparent text-sm">
-                  {sortOptions.map(([value, title]) => <option key={value} value={value}>{title}</option>)}
-                </NativeSelect>
-              </label>
-            </div>
           </div>
           {pending && <div data-directory-loading aria-hidden="true" className="pointer-events-none absolute inset-x-0 -top-2 h-0.5 overflow-hidden rounded-full bg-border"><div className="h-full w-2/3 animate-pulse bg-[#006b4f]" /></div>}
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="min-w-0">
-              <h2 ref={resultsHeading} tabIndex={-1} id="directory-results-heading" className="scroll-mt-28 break-words text-base font-semibold focus:outline-none">
-                {query ? `${c.results} · “${query}”` : props.featured ? discovery.featured : discovery.all}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="min-w-[80px] flex-1">
+              <h2 ref={resultsHeading} tabIndex={-1} id="directory-results-heading" className="line-clamp-2 scroll-mt-28 break-words text-sm sm:text-base font-semibold focus:outline-none">
+                {query ? `${c.results} · “${query}”` : props.access !== 'all' ? filterCopy[props.access] : props.featured ? discovery.featured : discovery.all}
                 {pending && <LoaderCircle size={14} className="ml-2 inline-block animate-spin text-[#006b4f]" aria-hidden="true" />}
               </h2>
-              <p className="mt-1 font-mono text-xs text-secondary" data-directory-count>
-                {props.catalogMode
-                  ? `${c.page} ${page} · ${skills.length} ${label('shown')} · ${degraded ? '—' : resultCount.toLocaleString(locale)} ${label('registryEntries')}`
-                  : <>{skills.length ? rankOffset + 1 : 0}–{rankOffset + skills.length} / {resultCount.toLocaleString(locale)}</>}
+              <p className="mt-1 text-xs tabular-nums text-secondary" data-directory-count>
+                {degraded ? '—' : resultCount.toLocaleString(locale)} Skills
               </p>
+            </div>
+            <div className="ml-auto flex shrink-0 items-center gap-2">
+              <label className="sr-only" htmlFor="directory-sort">{c.sort}</label>
+              <NativeSelect id="directory-sort" aria-label={c.sort} value={sort} onChange={e => navigate({ sort: e.target.value })} disabled={pending} className="min-h-11 w-[150px] rounded-full bg-card text-xs sm:w-44 sm:text-sm">
+                {sortOptions.map(([value, title]) => <option key={value} value={value}>{title}</option>)}
+              </NativeSelect>
+              <Drawer autoFocus open={filtersOpen} onOpenChange={open => { if (open) setDraftFilters({ ...filterValues }); setFiltersOpen(open) }}>
+                <DrawerTrigger asChild>
+                  <button type="button" disabled={pending} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-medium lg:hidden" data-mobile-filter-trigger>
+                    <SlidersHorizontal size={15} aria-hidden="true" />{discovery.filters}{activeFilters.length > 0 && <span className="rounded-full bg-[#006b4f] px-1.5 py-0.5 text-[10px] text-white">{activeFilters.length}</span>}
+                  </button>
+                </DrawerTrigger>
+                <DrawerContent className="data-[vaul-drawer-direction=bottom]:max-h-[88dvh] data-[vaul-drawer-direction=bottom]:rounded-t-3xl" data-mobile-filter-sheet>
+                  <div className="flex shrink-0 items-center justify-between border-b border-border px-5 py-4">
+                    <DrawerTitle className="text-lg">{discovery.filters}</DrawerTitle>
+                    <DrawerClose asChild><button type="button" aria-label={filterCopy.close} className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-muted"><X size={20} aria-hidden="true" /></button></DrawerClose>
+                  </div>
+                  <DrawerDescription className="sr-only">{filterCopy.description}</DrawerDescription>
+                  <div className="min-h-0 overflow-y-auto overscroll-contain px-5 py-5" data-vaul-no-drag>
+                    <DirectoryFilterPanel {...filterPanelProps} value={draftFilters} onChange={updates => setDraftFilters(current => updateDirectoryFilters(current, updates))} />
+                  </div>
+                  <div className="flex shrink-0 items-center gap-4 border-t border-border bg-background px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+                    <button type="button" onClick={() => setDraftFilters({ ...emptyDirectoryFilters })} className="min-h-12 px-2 text-sm text-secondary underline underline-offset-4">{c.reset}</button>
+                    <button type="button" onClick={() => { navigate(directoryFilterUpdates(draftFilters)); setFiltersOpen(false) }} className="min-h-12 flex-1 rounded-full bg-[#006b4f] px-5 text-sm font-semibold text-white hover:bg-[#00533d]">{filterCopy.apply}</button>
+                  </div>
+                </DrawerContent>
+              </Drawer>
             </div>
           </div>
 
           {activeFilters.length > 0 && (
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs" aria-label={c.active}>
-              {activeFilters.map(([key,value]) => <Link key={key} prefetch={false} href={href({ [key]: undefined, ...(key === 'featured' ? { view: undefined } : {}) })} scroll={false}
-                onNavigate={filterNavigation(href({ [key]: undefined, ...(key === 'featured' ? { view: undefined } : {}) }))}
-                className="inline-flex max-w-full items-center gap-2 rounded-full border border-border px-3 py-2" aria-label={`${c.remove}: ${key === 'pricing' ? prices[props.pricing] : key === 'featured' || key === 'examples' ? discovery[value as 'featured' | 'withExamples'] : label(value)}`}>
-                <span className="break-all">{key === 'pricing' ? prices[props.pricing] : key === 'featured' || key === 'examples' ? discovery[value as 'featured' | 'withExamples'] : label(value)}</span><X size={12} className="shrink-0" aria-hidden="true" />
+              {activeFilters.map(([key,value]) => <Link key={key} prefetch={false} href={href({ [key]: undefined, ...(key === 'access' ? { pricing: undefined } : {}), ...(key === 'featured' ? { view: undefined } : {}) })} scroll={false}
+                onNavigate={filterNavigation(href({ [key]: undefined, ...(key === 'access' ? { pricing: undefined } : {}), ...(key === 'featured' ? { view: undefined } : {}) }))}
+                className="inline-flex max-w-full items-center gap-2 rounded-full border border-border px-3 py-2" aria-label={`${c.remove}: ${key === 'access' ? filterCopy[props.access] : key === 'pricing' ? prices[props.pricing] : key === 'featured' || key === 'examples' ? discovery[value as 'featured' | 'withExamples'] : label(value)}`}>
+                <span className="break-all">{key === 'access' ? filterCopy[props.access] : key === 'pricing' ? prices[props.pricing] : key === 'featured' || key === 'examples' ? discovery[value as 'featured' | 'withExamples'] : label(value)}</span><X size={12} className="shrink-0" aria-hidden="true" />
               </Link>)}
               <Link href={resetHref} prefetch={false} scroll={false} onNavigate={filterNavigation(resetHref)} className="p-2 text-[#006b4f] underline underline-offset-4">{c.reset}</Link>
             </div>
           )}
           <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${degraded ? skills.length : resultCount}`}</p>
-          {props.pricing !== 'all' && <p className="my-4 text-xs leading-6 text-secondary">{prices.caveat}</p>}
+          {props.access !== 'paid' && (props.access !== 'all' || props.pricing !== 'all') && <p className="my-4 text-xs leading-6 text-secondary">{props.access === 'free' ? filterCopy.freeNote : props.access === 'third-party' ? filterCopy.thirdPartyNote : prices.caveat}</p>}
           {degraded && <p role="status" className="my-5 border-l-2 border-amber-600 bg-amber-50 p-4 text-sm text-amber-950">{label(props.catalogMode && skills.length === 0 ? 'catalogUnavailable' : 'dataUnavailable')}</p>}
 
           {skills.length === 0 ? (
             <div className="border-y border-border py-14 text-center">
-              <p className="text-secondary">{degraded ? label('catalogUnavailable') : props.pricing !== 'all' ? prices.empty : props.catalogMode && hasMoreResults ? label('excludedResources') : c.empty}</p>
-              {props.pricing !== 'all' && <Link href={`/contact${locale === 'en' ? '' : '?lang=' + locale}`} className="mt-4 block text-sm text-[#006b4f] underline underline-offset-4">{prices.contribute} →</Link>}
+              <p className="text-secondary">{degraded ? label('catalogUnavailable') : props.access === 'paid' ? filterCopy.paidNote : props.pricing !== 'all' ? prices.empty : props.catalogMode && hasMoreResults ? label('excludedResources') : c.empty}</p>
+              {props.pricing !== 'all' && props.access !== 'paid' && <Link href={`/contact${locale === 'en' ? '' : '?lang=' + locale}`} className="mt-4 block text-sm text-[#006b4f] underline underline-offset-4">{prices.contribute} →</Link>}
               <Link href={resetHref} prefetch={false} scroll={false} onNavigate={filterNavigation(resetHref)} className="mt-5 inline-block text-[#006b4f] underline">{c.reset}</Link>
             </div>
           ) : <SkillEngagementProvider key={skills.map(skill => skill.slug).join(',')} slugs={skills.map(skill => skill.slug)} untrackedSlugs={skills.filter(skill => skill.provider).map(skill => skill.slug)}><div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>

@@ -5,6 +5,8 @@ export const acquisitionTypes = ['free', 'paid', 'freemium', 'unknown'] as const
 export type AcquisitionType = typeof acquisitionTypes[number]
 export type PriceFilter = AcquisitionType | 'all'
 export interface SkillOffer {
+  /** Explicit owner-maintained attribution; never infer ownership from a listing. */
+  seller?: 'openagentskill'
   type: Exclude<AcquisitionType, 'unknown'>
   billing: 'free' | 'one-time' | 'monthly' | 'yearly' | 'usage-based' | 'contact'
   amount?: number

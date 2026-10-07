@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { register } from 'node:module'
 await import('./test-skill-commerce.mjs')
+await import('./test-directory-filters.mjs')
 await import('./test-discovery-funnel.mjs')
 await import('./test-trending.mjs')
 await import('./test-ranking-landings.mjs')
@@ -57,7 +58,8 @@ const source=readFileSync('components/skills-page-client.tsx','utf8')
 assert.equal((source.match(/<form\b/g)||[]).length,1)
 assert.equal((source.match(/<h1\b/g)||[]).length,1)
 assert.ok(source.indexOf('data-directory-results')<source.indexOf('id="directory-collections"'))
-assert.match(source, /<details[^>]+data-directory-filters/)
+assert.match(source, /<DirectoryFilterPanel/)
+assert.match(source, /<DrawerContent[^>]+data-mobile-filter-sheet/)
 assert.match(readFileSync('components/directory-pagination.tsx','utf8'), /<Link[^>]+rel="next"[^>]+href=/)
 assert.match(source, /<GitHubOwnerAvatar/)
 assert.match(source, /skill\.snapshot \? <span>\{label\('savedInfo'\)\}/)

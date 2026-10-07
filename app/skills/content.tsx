@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { SKILL_CATEGORIES, legacyCategoryTopic, normalizeSkillCategory, normalizeTopic, normalizeOutput, skillTaxonomy } from '@/lib/skills/taxonomy'
-import { commerceFilterSlugs, getSkillCommerce, matchesCommerce, normalizePriceFilter } from '@/lib/skills/commerce'
+import { directoryAccessScope, firstPartyPaidSlugs } from '@/lib/skills/directory-filters'
+import { commerceFilterSlugs, getSkillCommerce, matchesCommerce } from '@/lib/skills/commerce'
 import { getBrowseSkillCandidates, getSkillCatalogPage, getSkillsBySlugs } from '@/lib/db/skills'
 import { clampResultPage } from '@/lib/skills/pagination'
 import { catalogPageNumber, catalogStars, directoryDiscoveryFilters, canShowCatalogSnapshot, selectCatalogSnapshot } from '@/lib/skills/catalog-query'
@@ -10,7 +11,7 @@ import { type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillSta
 import { getShowcasesForSkill, getShowcaseCardData, SHOWCASE_SKILL_SLUGS } from '@/lib/showcase'
 import { getSkillPreviewCardData, SOURCE_EXAMPLE_SKILL_SLUGS, SOURCE_GALLERY_LINKS } from '@/lib/skill-previews'
 import { SkillsPageClient, type DirectorySkillCard } from '@/components/skills-page-client'
-import { selectProviderSkills, toProviderDirectorySkill, providerCatalogWindow, mergeProviderCatalogPage, providerRowsFirst, hasProviderCommercialOffers } from '@/lib/skills/provider-directory'
+import { selectProviderSkills, toProviderDirectorySkill, providerCatalogWindow, mergeProviderCatalogPage, providerRowsFirst } from '@/lib/skills/provider-directory'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
 import { getSkillSupplyProfile, getSupplyTrackSummaries } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
@@ -913,7 +914,8 @@ export default async function SkillsPage({
   const category = firstSearchValue(params.category)?.slice(0, 80) || 'all'
   const topic = normalizeTopic(firstSearchValue(params.tag) || legacyCategoryTopic(category))
   const output = normalizeOutput(firstSearchValue(params.output))
-  const pricing = normalizePriceFilter(firstSearchValue(params.pricing))
+  const { access, pricing, includeProviders, includeRegistry: registryAccess } = directoryAccessScope(firstSearchValue(params.access), firstSearchValue(params.pricing))
+  const paidSlugs = access === 'paid' ? firstPartyPaidSlugs() : []
   const useCase = firstSearchValue(params.useCase) || 'all'
   const selectedUseCase = useCase !== 'all' ? getUseCaseBySlug(useCase) : undefined
   const platform = firstSearchValue(params.platform) || 'all'
@@ -923,10 +925,12 @@ export default async function SkillsPage({
   const supplyTrack = firstSearchValue(params.track) || 'all'
   const minStars = catalogStars(Number(firstSearchValue(params.minStars) || 0))
   const query = firstSearchValue(params.q)?.trim().slice(0, 180)
-  const providerSkills = selectProviderSkills({ query, category, topic, output, pricing, examplesOnly,
-    platform, quality, trust, safety, supplyTrack, minStars, useCase, featured, sort }).map(entry => toProviderDirectorySkill(entry, locale))
+  const providerSkills = (includeProviders ? selectProviderSkills({ query, category, topic, output, pricing, examplesOnly,
+    platform, quality, trust, safety, supplyTrack, minStars, useCase, featured, sort }) : []).map(entry => toProviderDirectorySkill(entry, locale))
   const providerOnlyQuery = query?.toLocaleLowerCase() === 'skillry'
-  const catalogMode = !featured && !query && [useCase, platform, quality, trust, safety, supplyTrack].every(value => value === 'all')
+  const includeRegistry = registryAccess && !providerOnlyQuery
+  const restrictedRegistry = !includeRegistry || access === 'paid'
+  const catalogMode = !featured && !query && !restrictedRegistry && [useCase, platform, quality, trust, safety, supplyTrack].every(value => value === 'all')
   const page = catalogMode ? catalogPageNumber(firstSearchValue(params.page)) : clampPage(firstSearchValue(params.page), providerSkills.length)
   const requestedPageOffset = (page - 1) * VISIBLE_SKILL_LIMIT
   // Rich profile filters use one bounded, cached candidate pool across pages,
@@ -934,12 +938,12 @@ export default async function SkillsPage({
   const candidateLimit = MAX_SKILL_CANDIDATE_LIMIT
   const catalogWindow = providerCatalogWindow(requestedPageOffset, providerSkills.length, sort)
   const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured] = await Promise.all([
-    query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
+    restrictedRegistry || query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
       : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, featured, minStars, pricing, topic, output), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
         .catch(() => ({ records: getFallbackSkills(sort, undefined, candidateLimit), degraded: true })),
-    providerOnlyQuery ? Promise.resolve({ records: [] as SkillRecord[], degraded: false }) : getSearchAugmentRecords(firstSearchValue(params.q)),
+    restrictedRegistry ? Promise.resolve({ records: [] as SkillRecord[], degraded: false }) : getSearchAugmentRecords(firstSearchValue(params.q)),
     Promise.resolve(SKILL_CATEGORIES.map(c => c[0])),
-    providerOnlyQuery ? Promise.resolve({} as Record<string, SkillAgentStats>) : withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
+    restrictedRegistry ? Promise.resolve({} as Record<string, SkillAgentStats>) : withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
     catalogMode ? getSkillCatalogPage(sort, category, page, minStars, pricing, examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : null, topic, output, catalogWindow)
       .then(result => ({ ...result, degraded: false }))
@@ -951,9 +955,9 @@ export default async function SkillsPage({
           ) : [] as SkillRecord[],
         total: 0, hasMore: false, degraded: true, page,
       })) : Promise.resolve(null),
-    providerOnlyQuery ? Promise.resolve([] as SkillRecord[]) : getSkillsBySlugs([...new Set([...(selectedUseCase?.featuredSlugs || []), ...(!catalogMode && examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
+    !includeRegistry ? Promise.resolve([] as SkillRecord[]) : getSkillsBySlugs(access === 'paid' ? paidSlugs : [...new Set([...(selectedUseCase?.featuredSlugs || []), ...(!catalogMode && examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
   ])
-  const records = providerOnlyQuery ? [] : catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, useCaseFeatured, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
+  const records = !includeRegistry ? [] : access === 'paid' ? useCaseFeatured.filter(record => paidSlugs.includes(record.slug)) : catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, useCaseFeatured, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
   const degraded = Boolean(catalogResult?.degraded || recordsResult.degraded || searchAugmentRecords.degraded)
   let effectivePage = catalogMode ? catalogResult!.page : page
   const rawCategoryOptions = categories.length > 0
@@ -1084,7 +1088,7 @@ export default async function SkillsPage({
         topic={topic}
         output={output}
         pricing={pricing}
-        providerCommercialOffers={hasProviderCommercialOffers()}
+        access={access}
         categories={categoryOptions}
         useCase={useCase}
         useCases={USE_CASES.map((item) => ({

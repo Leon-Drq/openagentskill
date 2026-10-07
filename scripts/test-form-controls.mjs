@@ -6,7 +6,7 @@ import { createElement as h, Fragment } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 const read = p => readFileSync(new URL('../'+p, import.meta.url), 'utf8')
 let count=0
-for(const [file, expected] of [['showcase-gallery',4],['creator-directory-filters',2],['skills-page-client',6],['agent-resolve-workbench',2],['skill-submit-form',1]]) {
+for(const [file, expected] of [['showcase-gallery',4],['creator-directory-filters',2],['skills-page-client',1],['directory-filter-panel',1],['agent-resolve-workbench',2],['skill-submit-form',1]]) {
   const source=read(`components/${file}.tsx`)
   assert.doesNotMatch(source, /<select\b/)
   assert.equal((source.match(/<NativeSelect\b/g)||[]).length, expected)
