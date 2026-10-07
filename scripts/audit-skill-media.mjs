@@ -13,7 +13,10 @@ export function publicMediaUrl(value) {
 }
 export function mediaSignature(bytes, type) {
   if (type === 'video') return bytes.subarray(4, 8).toString() === 'ftyp' || bytes.subarray(0, 4).equals(Buffer.from([0x1a, 0x45, 0xdf, 0xa3]))
+  if (type === 'pdf') return bytes.subarray(0, 5).toString() === '%PDF-'
+  if (type === 'pptx') return bytes.subarray(0, 4).equals(Buffer.from([80, 75, 3, 4]))
   return bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])) ||
+    ['GIF87a', 'GIF89a'].includes(bytes.subarray(0, 6).toString()) ||
     (bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255) ||
     (bytes.subarray(0, 4).toString() === 'RIFF' && bytes.subarray(8, 12).toString() === 'WEBP')
 }
@@ -72,6 +75,8 @@ export async function auditMedia({ catalog, remote = false, fetcher = fetch, out
   }
   for (const preview of SKILL_SOURCE_PREVIEWS) for (const media of preview.media) {
     for (const src of [media.src, media.cardSrc, media.previewSrc]) add(src, 'image', preview.skillSlug)
+    if (media.videoSrc) add(media.videoSrc, 'video', preview.skillSlug)
+    if (media.originalSrc) add(media.originalSrc, /\.pdf$/.test(media.originalSrc) ? 'pdf' : /\.pptx$/.test(media.originalSrc) ? 'pptx' : 'image', preview.skillSlug)
     if (!media.alt.en || !media.alt.zh || media.width <= 0 || media.height <= 0) errors.push({ slug: preview.skillSlug, error: 'Missing alt text or dimensions' })
   }
   const providers = EXTERNAL_SKILLS.filter(item => item.provider !== 'skillry' || item.active)

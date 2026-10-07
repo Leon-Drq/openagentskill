@@ -1,3 +1,4 @@
+import * as mediaQuery from '../lib/skills/media-query.ts'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { randomBytes } from 'node:crypto'
@@ -126,6 +127,7 @@ const db = compile('lib/db/skills.ts', {
   '@/lib/skills/taxonomy': taxonomy,
   '@/lib/skills/presentation-category': presentationCategory,
   '@/lib/skills/catalog-query': catalogQuery,
+  '@/lib/skills/media-query': mediaQuery,
   '@/lib/skills/pagination': pagination,
   '@/lib/skills/commerce': commerce,
   '@/lib/skills/registry-scope': { isMcpOnlyCategory: () => false, isMcpOnlySkillRecord: () => false },

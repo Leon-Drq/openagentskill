@@ -40,11 +40,12 @@ export function SkillCardPreview({ slug, name, locale, category, showcase, sourc
   // Playback is independent of poster loading. No video URL is attached to a
   // player until the visitor clicks; the caption remains a crawlable detail link.
   const video = provider?.video && provider.image ? <ProviderVideoPreview key={provider.video} src={provider.video} poster={provider.image} title={name} zh={locale === 'zh'} compact />
-    : showcase?.videoUrl ? <ShowcaseVideoPlayer key={showcase.videoUrl} item={showcase} locale={locale} compact /> : null
+    : showcase?.videoUrl ? <ShowcaseVideoPlayer key={showcase.videoUrl} item={showcase} locale={locale} compact />
+    : sourcePreview?.media.videoSrc ? <ProviderVideoPreview key={sourcePreview.media.videoSrc} src={sourcePreview.media.videoSrc} poster={sourcePreview.media.cardSrc} title={name} zh={locale === 'zh'} compact /> : null
   if (video) return <div className="border-b border-border" data-skill-preview="video">
     {video}
-    <Link href={getLocalizedNavigationHref(provider?.video ? `/skills/${slug}#showcase` : `/showcase/${showcase!.slug}`, locale)} prefetch={false} className="flex min-h-11 items-center justify-between gap-2 px-4 py-2 text-[10px] text-secondary">
-      <span>{provider?.video ? provider.exampleLabel : getShowcaseEvidenceLabel(showcase!, locale)}</span><span className="inline-flex items-center gap-1 text-[#006b4f]">{previewCopy('view', locale)}<ArrowRight size={12} aria-hidden="true" /></span>
+    <Link href={getLocalizedNavigationHref(provider?.video ? `/skills/${slug}#showcase` : showcase?.videoUrl ? `/showcase/${showcase.slug}` : `/skills/${slug}#visual-previews`, locale)} prefetch={false} className="flex min-h-11 items-center justify-between gap-2 px-4 py-2 text-[10px] text-secondary">
+      <span>{provider?.video ? provider.exampleLabel : showcase?.videoUrl ? getShowcaseEvidenceLabel(showcase, locale) : previewCopy(sourcePreview!.media.kind, locale)}</span><span className="inline-flex items-center gap-1 text-[#006b4f]">{previewCopy('view', locale)}<ArrowRight size={12} aria-hidden="true" /></span>
     </Link>
   </div>
 

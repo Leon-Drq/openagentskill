@@ -9,7 +9,10 @@ on:
     branches: [main]
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.event.deployment.sha || github.ref }}-${{ github.event.deployment.environment || '' }}-${{ github.event.deployment_status.state || '' }}
+  # A later Vercel event for the same commit replaces the earlier run. Every
+  # event runs real checks with fixed names; skipped deployment jobs must never
+  # shadow the checks required by main's branch protection.
+  group: ci-${{ github.workflow }}-${{ github.event.deployment.sha || github.sha }}
   cancel-in-progress: true
 
 permissions:
@@ -19,24 +22,8 @@ env:
   CI: true
 
 jobs:
-  gallery-gate:
-    name: Select CI source
-    runs-on: ubuntu-latest
-    outputs:
-      selected: ${{ steps.select.outputs.selected }}
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          ref: ${{ github.event.deployment.sha || github.sha }}
-          persist-credentials: false
-      - id: select
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: node scripts/select-gallery-ci.mjs
   quality:
-    name: ${{ needs.gallery-gate.outputs.selected == 'true' && 'Lint and typecheck' || 'Gallery event (lint not applicable)' }}
-    needs: gallery-gate
-    if: needs.gallery-gate.outputs.selected == 'true'
+    name: Lint and typecheck
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -60,9 +47,7 @@ jobs:
         run: pnpm run test:links
 
   tests:
-    name: ${{ needs.gallery-gate.outputs.selected == 'true' && 'Regression tests' || 'Gallery event (tests not applicable)' }}
-    needs: gallery-gate
-    if: needs.gallery-gate.outputs.selected == 'true'
+    name: Regression tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -84,8 +69,8 @@ jobs:
         run: node --experimental-strip-types scripts/test-agent-connection.mjs
 
   build:
-    name: ${{ needs.gallery-gate.outputs.selected == 'true' && 'Production build' || 'Gallery event (build not applicable)' }}
-    needs: [gallery-gate, quality, tests]
+    name: Production build
+    needs: [quality, tests]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

@@ -1,4 +1,5 @@
 import { SkillPreviewImage } from '@/components/skill-preview-image'
+import { ProviderVideoPreview } from '@/components/provider-video-preview'
 import { ArrowUpRight } from 'lucide-react'
 import { previewCopy, previewText, type SkillSourcePreview } from '@/lib/skill-preview-shared'
 
@@ -11,12 +12,15 @@ export function SkillSourcePreviews({ preview, locale }: { preview: SkillSourceP
       <div className="mt-6 space-y-6">
         {preview.media.map(media => (
           <figure key={media.src} className="overflow-hidden rounded-[12px] border border-border bg-card">
-            <a href={media.src} target="_blank" rel="noreferrer" className="block bg-[#eeece5]/35 p-2 sm:p-4" aria-label={`${previewCopy('full', locale)}: ${previewText(media.title, locale)}`}>
+            {media.videoSrc ? <ProviderVideoPreview key={media.videoSrc} src={media.videoSrc} poster={media.previewSrc} title={previewText(media.title, locale)} zh={locale === 'zh'} /> : <a href={media.src} target="_blank" rel="noreferrer" className="block bg-[#eeece5]/35 p-2 sm:p-4" aria-label={`${previewCopy('full', locale)}: ${previewText(media.title, locale)}`}>
               <SkillPreviewImage locale={locale} src={media.previewSrc} alt={previewText(media.alt, locale)} width={media.width} height={media.height} sizes="(max-width: 1023px) 100vw, 760px" className="h-auto w-full" />
-            </a>
+            </a>}
             <figcaption className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 text-sm">
               <div><p className="text-[10px] text-secondary">{previewCopy(media.kind, locale)}</p><h3 className="mt-1 font-medium">{previewText(media.title, locale)}</h3></div>
-              <a href={media.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-1 text-xs text-[#006b4f]">{previewCopy('source', locale)}<ArrowUpRight size={14} aria-hidden="true" /></a>
+              <div className="flex flex-wrap gap-4">
+                {media.originalSrc && <a href={media.originalSrc} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-1 text-xs text-[#006b4f]">{previewCopy('original', locale)}<ArrowUpRight size={14} aria-hidden="true" /></a>}
+                <a href={media.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-1 text-xs text-[#006b4f]">{previewCopy('source', locale)}<ArrowUpRight size={14} aria-hidden="true" /></a>
+              </div>
             </figcaption>
           </figure>
         ))}

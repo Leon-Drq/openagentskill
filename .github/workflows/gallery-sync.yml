@@ -28,10 +28,18 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Install media decoders
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends ffmpeg poppler-utils
       - name: Collect pinned author previews
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: pnpm gallery:sync
+      - name: Collect media for newly published Skills and backfill older listings
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: pnpm media:collect
+      - name: Validate collected previews before preparing publication
+        run: MEDIA_NATIVE_TESTS=1 pnpm test:media-collection && pnpm media:audit
       - name: Prepare candidate catalog
         id: candidate
         shell: bash
@@ -39,6 +47,8 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add lib/showcase-auto.json lib/showcase-sync.json public/showcase/auto-*
+          git add lib/skill-previews-auto.json lib/skill-media-sync.json
+          if [ -d public/skill-previews/auto ]; then git add public/skill-previews/auto; fi
           if git diff --cached --quiet; then exit 0; fi
           git commit -m 'Update Gallery author previews [automated]'
           branch="codex/gallery-sync-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
@@ -74,6 +84,14 @@ jobs:
         with:
           name: gallery-sync-report
           path: artifacts/gallery-sync-report.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Preserve Skill media collection report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: skill-media-collection
+          path: artifacts/skill-media-collection.json
           if-no-files-found: ignore
           retention-days: 30
       - name: Audit directory, Gallery and provider media
