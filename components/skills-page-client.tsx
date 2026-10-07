@@ -137,7 +137,7 @@ export interface DirectorySkillCard {
   safetyProfile?: SkillSafetySummary
   platformHints?: string[]
   supplyProfile?: SkillSupplySummary
-  provider?: { label: string; sourceHref: string; sourceRel: string; image?: string; exampleLabel: string; localizedName?: string; sourceDownloads?: number }
+  provider?: { label: string; sourceHref: string; sourceRel: string; image?: string; video?: string; exampleLabel: string; localizedName?: string; sourceDownloads?: number }
 }
 
 

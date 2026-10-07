@@ -24,6 +24,7 @@ assert.equal(selectProviderSkills({...defaults,minStars:1}).length,0)
 for (const entry of EXTERNAL_SKILLS) {
   const card = toProviderDirectorySkill(entry,'zh')
   assert.ok(card.exampleCount>0 && card.provider.image)
+  assert.equal(card.provider.video, entry.provider === 'skillry' ? entry.previewVideo || undefined : entry.runtimeDemo?.video, 'Preserve every video from its source on directory cards')
   assert.equal(card.verified,false)
   assert.equal(card.technical.installCommand,undefined)
   assert.deepEqual(card.compatibility,[])

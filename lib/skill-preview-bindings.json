@@ -1,0 +1,200 @@
+[
+  {
+    "skillSlug": "nexu-io-dating-web",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/dating-web/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "ecf42ba6b4dbbab25d21c5094de7052d358f3ab55a62a8fbbbdb380ba3ad6267",
+    "relationship": "same-skill",
+    "caseSlugs": [
+      "open-dating-web"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-digital-eguide",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/digital-eguide/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "79c861215b7db5ab08c1e6bd5fc826af251853b84d94c43a13875783f4ccc6cc",
+    "relationship": "same-skill",
+    "caseSlugs": [
+      "open-digital-eguide"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-email-marketing",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/email-marketing/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "197f084a1b73858c14f9bea683000209a880b13956c00d54eb5323b52d36c695",
+    "relationship": "same-skill",
+    "caseSlugs": [
+      "open-email-marketing"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-flowai-live-dashboard-template",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/flowai-live-dashboard-template/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "d63fbb97ee558961a127ed4638111eb7ee61952de1ce4ad64cf8842db54acf52",
+    "relationship": "same-skill",
+    "caseSlugs": [
+      "open-flowai-live-dashboard-template"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-gamified-app",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/gamified-app/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "0fbc09046b5b94bdc20cb67d09489e13d6ad4bbc234bc7018099843f063eae12",
+    "relationship": "same-skill",
+    "caseSlugs": [
+      "open-gamified-app"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-github-dashboard",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/github-dashboard/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "f69eda62ae8a77e4f2c2a09b55fd8952ca3d1255579262080fb12433a2445a3e",
+    "relationship": "same-skill",
+    "caseSlugs": [
+      "open-github-dashboard"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-html-ppt-zhangzara-8-bit-orbit",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/html-ppt-zhangzara-8-bit-orbit/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "e4a19487ef41f4eab6d536befe62fca771d6d2c8d6e6fed7d17d19b076125f4c",
+    "relationship": "upstream-template",
+    "caseSlugs": [
+      "frontend-8-bit-orbit"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-html-ppt-zhangzara-biennale-yellow",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/html-ppt-zhangzara-biennale-yellow/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "56341d6021ee63b4a6cf71d186ac6389e45638ea46da060d6b9fd48a0dfc394c",
+    "relationship": "upstream-template",
+    "caseSlugs": [
+      "frontend-biennale-yellow"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-html-ppt-zhangzara-block-frame",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/html-ppt-zhangzara-block-frame/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "df21e93abba019be104fa80cd115ff1c0e0ae8023e77869b97157bb05e498b99",
+    "relationship": "upstream-template",
+    "caseSlugs": [
+      "frontend-block-frame"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-html-ppt-zhangzara-blue-professional",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/html-ppt-zhangzara-blue-professional/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "8c68dcbb860ee165556e51bf9b39a65a13642c44682c494cf28c7ea08bf485a5",
+    "relationship": "upstream-template",
+    "caseSlugs": [
+      "auto-frontend-blue-professional-1-a7b052f096"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-html-ppt-zhangzara-broadside",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/html-ppt-zhangzara-broadside/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "f79b05c53b608b8595168fa097be564699adb54838399befe568619c0db58e28",
+    "relationship": "upstream-template",
+    "caseSlugs": [
+      "frontend-broadside"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-html-ppt-zhangzara-capsule",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/html-ppt-zhangzara-capsule/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "f85012cb34ebc2385e014af549edd693b0e397e09a907e905679c8caefb044a1",
+    "relationship": "upstream-template",
+    "caseSlugs": [
+      "frontend-capsule"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-html-ppt-zhangzara-cartesian",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/html-ppt-zhangzara-cartesian/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "0fd882c998c657614e5679652c17fd2a9ff798e84a6ee3ad87c20356a5e444d0",
+    "relationship": "upstream-template",
+    "caseSlugs": [
+      "frontend-cartesian"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-html-ppt-zhangzara-cobalt-grid",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/html-ppt-zhangzara-cobalt-grid/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "49984c8f83a739c2a77f66ca6d91e4b68187a236b3e048448a40d3d9510a7a54",
+    "relationship": "upstream-template",
+    "caseSlugs": [
+      "frontend-cobalt-grid"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-html-ppt-zhangzara-coral",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/html-ppt-zhangzara-coral/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "082b7e080e24758e7e601b7cd962a1c652f9b5b846de4823f767187a0eba4d6d",
+    "relationship": "upstream-template",
+    "caseSlugs": [
+      "auto-frontend-coral-1-a785f369ef"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-html-ppt-zhangzara-creative-mode",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/html-ppt-zhangzara-creative-mode/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "126d767c50e1c671967dff11dff6f5cc60ce5c113edbf4b7e50fbe680702703f",
+    "relationship": "upstream-template",
+    "caseSlugs": [
+      "frontend-creative-mode"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-html-ppt-zhangzara-daisy-days",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/html-ppt-zhangzara-daisy-days/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "052fce345d8fe8cf398b8780f80eb1b172adce3086fc201625752411df768320",
+    "relationship": "upstream-template",
+    "caseSlugs": [
+      "frontend-daisy-days"
+    ]
+  },
+  {
+    "skillSlug": "nexu-io-html-ppt-zhangzara-editorial-tri-tone",
+    "repository": "nexu-io/open-design",
+    "sourcePath": "design-templates/html-ppt-zhangzara-editorial-tri-tone/SKILL.md",
+    "revision": "46700f6e8b97c873e953392231bcf62b525c8dd3",
+    "documentSha256": "9114a44e359125f1afda35b57fe93c2b28bdaaf0929b7c407ec169b010a8b44d",
+    "relationship": "upstream-template",
+    "caseSlugs": [
+      "frontend-editorial-tri-tone"
+    ]
+  }
+]

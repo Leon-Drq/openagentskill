@@ -3,7 +3,7 @@
 import { galleryCopy } from '@/lib/i18n/gallery-copy'
 import { ShowcaseTags } from '@/components/showcase-tags'
 
-import Image from 'next/image'
+import { SkillPreviewImage } from '@/components/skill-preview-image'
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 import { ShowcaseVideoPlayer } from '@/components/showcase-video-player'
@@ -38,7 +38,7 @@ export function ShowcaseCard({ item, placement = 'gallery', priority = false }: 
         className="block shrink-0 rounded-[12px] outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#006b4f]"
       >
         {!item.videoUrl && <div className="relative aspect-[16/10] overflow-hidden rounded-[12px] border border-[#e4e0d8] bg-[#eeece5] transition-colors group-hover:border-[#006b4f]/50">
-          <Image
+          <SkillPreviewImage locale={locale}
             src={getShowcaseImageSrc(media.src, 'card')} alt={localizeShowcase(media.alt, locale)} fill
             sizes={placement === 'skill' ? '(max-width: 1023px) 100vw, 768px' : '(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 380px'}
             preload={priority}

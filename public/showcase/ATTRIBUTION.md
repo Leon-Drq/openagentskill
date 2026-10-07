@@ -224,6 +224,8 @@ watermarks. Scientific diagrams are visual examples, not validated teaching refe
 | `curated-huashu-saas-1.png` | alchaincyf/huashu-design | `assets/showcases/website-saas/saas-takram.png` |
 | `curated-open-deck-swiss-international-1.png` | nexu-io/open-design | `docs/screenshots/skills/deck-swiss-international.png` |
 | `curated-open-digital-eguide-1.png` | nexu-io/open-design | `docs/screenshots/skills/digital-eguide.png` |
+| `curated-open-dating-web-1.png` | nexu-io/open-design | `docs/screenshots/skills/dating-web.png` |
+| `curated-open-gamified-app-1.png` | nexu-io/open-design | `docs/screenshots/skills/gamified-app.png` |
 | `curated-open-doc-kami-parchment-1.png` | nexu-io/open-design | `docs/screenshots/skills/doc-kami-parchment.png` |
 | `curated-open-email-marketing-1.png` | nexu-io/open-design | `docs/screenshots/skills/email-marketing.png` |
 | `curated-open-flowai-live-dashboard-template-1.png` | nexu-io/open-design | `docs/screenshots/skills/flowai-live-dashboard-template.png` |

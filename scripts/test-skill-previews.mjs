@@ -56,12 +56,15 @@ assert.deepEqual(showcase.getShowcasesForSkill('liamgvchi-gc-minimal-zine-poster
 assert.ok(!showcase.SHOWCASE_SKILL_SLUGS.includes('liamgvchi-gc-minimal-zine-poster'), 'With examples queries the canonical record once, while old cards can still resolve their preview')
 assert.equal(showcase.getShowcasesForSkill('unrelated-gc-minimal-zine-poster').length, 0)
 
-let failedSrc = null
+let failedSrc = []
 const dependencies = {
   react: { ...react, useState: () => [failedSrc, () => {}] }, 'react/jsx-runtime': jsx, 'lucide-react': icons,
   'next/image': { default: ({ fill, sizes, onError, ...props }) => { void fill; void sizes; void onError; return createElement('img', props) } },
   'next/link': { default: ({ children, prefetch, ...props }) => { void prefetch; return createElement('a', props, children) } },
   '@/lib/skill-preview-shared': shared, '@/lib/showcase-shared': showcase, '@/lib/i18n/market-routing': routing,
+  '@/components/skill-preview-image': { SkillPreviewImage: ({ locale, ...props }) => { void locale; return createElement(dependencies['next/image'].default, props) } },
+  '@/components/showcase-video-player': { ShowcaseVideoPlayer: ({ item }) => createElement('button', { 'data-gallery-video': item.videoUrl }, 'Play preview') },
+  '@/components/provider-video-preview': { ProviderVideoPreview: ({ src }) => createElement('button', { 'data-provider-video': src }, 'Play preview') },
 }
 function component(path) {
   const exports = {}
@@ -80,11 +83,11 @@ const props = { slug: 'hugohe3-ppt-master', name: 'PPT Master', locale: 'zh', ca
 let all = render(SkillCardPreview, props)
 assert.ok(all.some(node => node.tagName === 'img' && attr(node, 'alt') === props.sourcePreview.media.alt.zh && attr(node, 'class').includes('object-contain')))
 assert.ok(all.some(node => node.tagName === 'a' && attr(node, 'href') === '/skills/hugohe3-ppt-master?lang=zh#visual-previews'))
-failedSrc = props.sourcePreview.media.cardSrc
+failedSrc = [props.sourcePreview.media.cardSrc]
 all = render(SkillCardPreview, props)
 assert.ok(!all.some(node => node.tagName === 'img'))
 assert.ok(all.some(node => node.tagName === 'p' && text(node).includes('预览暂不可用')))
-failedSrc = null
+failedSrc = []
 all = render(SkillCardPreview, { ...props, sourcePreview: null })
 assert.ok(all.some(node => node.tagName === 'p' && text(node).includes('暂未收录效果图')))
 assert.ok(!all.some(node => /aspect-|min-h-52/.test(attr(node, 'class') || '')), 'Missing media must not reserve a giant empty cover')
@@ -94,6 +97,29 @@ assert.ok(all.some(node => node.tagName === 'img' && attr(node, 'src').includes(
 assert.ok(!all.some(node => node.tagName === 'img' && attr(node, 'src') === props.sourcePreview.media.cardSrc), 'Existing Gallery media takes precedence')
 all = render(SkillCardPreview, { ...props, provider: { image: '/provider-preview.webp', exampleLabel: 'Source example' } })
 assert.ok(all.some(node => node.tagName === 'img' && attr(node, 'src') === '/provider-preview.webp'))
+failedSrc = ['/provider-preview.webp']
+all = render(SkillCardPreview, { ...props, provider: { image: '/provider-preview.webp', exampleLabel: 'Source example' } })
+assert.ok(all.some(node => node.tagName === 'img' && attr(node, 'src') === props.sourcePreview.media.cardSrc), 'A failed preferred image falls back to another real source')
+failedSrc = []
+all = render(SkillCardPreview, { ...props, provider: { image: '/poster.webp', video: '/example.mp4', exampleLabel: 'Source example' } })
+assert.ok(all.some(node => attr(node, 'data-provider-video') === '/example.mp4'))
+const videoCase = showcase.SHOWCASE_CASES.find(item => item.videoUrl)
+all = render(SkillCardPreview, { ...props, showcase: showcase.getShowcaseCardData(videoCase) })
+assert.ok(all.some(node => attr(node, 'data-gallery-video') === videoCase.videoUrl))
+const bindings = JSON.parse(readFileSync('lib/skill-preview-bindings.json', 'utf8'))
+for (const binding of bindings) {
+  const preview = getSkillSourcePreview(binding.skillSlug)
+  assert.ok(preview && SOURCE_EXAMPLE_SKILL_SLUGS.includes(binding.skillSlug))
+  assert.equal(preview.bindingUrl, `https://github.com/${binding.repository}/blob/${binding.revision}/${binding.sourcePath}`)
+  assert.match(binding.documentSha256, /^[a-f0-9]{64}$/)
+  assert.match(binding.revision, /^[a-f0-9]{40}$/)
+  assert.equal(getSkillSourcePreview('fork-' + binding.skillSlug), null)
+  const expected = binding.caseSlugs.flatMap(slug => showcase.getShowcaseCase(slug).media.map(media => media.src))
+  assert.deepEqual(preview.media.map(media => media.src), expected)
+  all = render(SkillSourcePreviews, { preview, locale: 'zh' })
+  assert.ok(all.some(node => attr(node, 'href') === preview.bindingUrl))
+  assert.ok(all.some(node => node.tagName === 'p' && text(node) === preview.note.zh))
+}
 for (const preview of previews) {
   all = render(SkillSourcePreviews, { preview, locale: 'en' })
   assert.equal(all.filter(node => node.tagName === 'img').length, preview.media.length)
