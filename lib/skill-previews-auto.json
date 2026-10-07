@@ -616,6 +616,336 @@
     ]
   },
   {
+    "skillSlug": "algolia-voice-overlay-ios",
+    "repository": "algolia/voice-overlay-ios",
+    "revision": "55a1047be9e0d9e4d4295ef127cc31b3ef7b8b54",
+    "sourceUrl": "https://github.com/algolia/voice-overlay-ios/blob/55a1047be9e0d9e4d4295ef127cc31b3ef7b8b54/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-24119cd1eb102addcc8f8534a170265318a33e07e7d627d21a2347c7b5ab538a.txt",
+    "licenseSourcePath": "LICENSE.md",
+    "licenseSha256": "24119cd1eb102addcc8f8534a170265318a33e07e7d627d21a2347c7b5ab538a",
+    "documentSha256": "4d3e75051b9ba929f41bd36d04214d0c1bfb3d3091050e2ea349244cc5df7698",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-07T07:18:22.038Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/56530d39c3fdbf16f5a4711d73d6bedf1d47aec8d1336240c5f5b38f36b5cdb0.preview.webp",
+        "previewSrc": "/skill-previews/auto/56530d39c3fdbf16f5a4711d73d6bedf1d47aec8d1336240c5f5b38f36b5cdb0.preview.webp",
+        "cardSrc": "/skill-previews/auto/56530d39c3fdbf16f5a4711d73d6bedf1d47aec8d1336240c5f5b38f36b5cdb0.card.webp",
+        "width": 600,
+        "height": 1067,
+        "sha256": "56530d39c3fdbf16f5a4711d73d6bedf1d47aec8d1336240c5f5b38f36b5cdb0",
+        "originalSrc": "/skill-previews/auto/56530d39c3fdbf16f5a4711d73d6bedf1d47aec8d1336240c5f5b38f36b5cdb0.gif",
+        "sourceUrl": "https://github.com/algolia/voice-overlay-ios/blob/55a1047be9e0d9e4d4295ef127cc31b3ef7b8b54/Resources/demo.gif",
+        "kind": "example",
+        "title": {
+          "en": "Voice Overlay Ios · Animation · still preview",
+          "zh": "Voice Overlay Ios · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Voice Overlay Ios: demo.gif",
+          "zh": "Voice Overlay Ios：demo.gif"
+        },
+        "sourcePath": "Resources/demo.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/e4c2f74557c8160d87447024b9de3d2c49f3c8618cd50925380a0148de62d0ad.preview.webp",
+        "previewSrc": "/skill-previews/auto/e4c2f74557c8160d87447024b9de3d2c49f3c8618cd50925380a0148de62d0ad.preview.webp",
+        "cardSrc": "/skill-previews/auto/e4c2f74557c8160d87447024b9de3d2c49f3c8618cd50925380a0148de62d0ad.card.webp",
+        "width": 738,
+        "height": 1600,
+        "sha256": "e4c2f74557c8160d87447024b9de3d2c49f3c8618cd50925380a0148de62d0ad",
+        "originalSrc": "/skill-previews/auto/e4c2f74557c8160d87447024b9de3d2c49f3c8618cd50925380a0148de62d0ad.gif",
+        "sourceUrl": "https://github.com/algolia/voice-overlay-ios/blob/55a1047be9e0d9e4d4295ef127cc31b3ef7b8b54/Resources/voiceoverlay_result_screen.gif",
+        "kind": "example",
+        "title": {
+          "en": "Voice Overlay Ios · Animation · still preview",
+          "zh": "Voice Overlay Ios · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Voice Overlay Ios: voiceoverlay_result_screen.gif",
+          "zh": "Voice Overlay Ios：voiceoverlay_result_screen.gif"
+        },
+        "sourcePath": "Resources/voiceoverlay_result_screen.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/0d45a67a49055f6a208c6cc4f26b0e9242cc674fb2712f2d211b666dbdd01f15.preview.webp",
+        "previewSrc": "/skill-previews/auto/0d45a67a49055f6a208c6cc4f26b0e9242cc674fb2712f2d211b666dbdd01f15.preview.webp",
+        "cardSrc": "/skill-previews/auto/0d45a67a49055f6a208c6cc4f26b0e9242cc674fb2712f2d211b666dbdd01f15.card.webp",
+        "width": 900,
+        "height": 1600,
+        "sha256": "0d45a67a49055f6a208c6cc4f26b0e9242cc674fb2712f2d211b666dbdd01f15",
+        "originalSrc": "/skill-previews/auto/0d45a67a49055f6a208c6cc4f26b0e9242cc674fb2712f2d211b666dbdd01f15.png",
+        "sourceUrl": "https://github.com/algolia/voice-overlay-ios/blob/55a1047be9e0d9e4d4295ef127cc31b3ef7b8b54/Resources/listeninginitial.png",
+        "kind": "reference",
+        "title": {
+          "en": "Voice Overlay Ios · Author preview",
+          "zh": "Voice Overlay Ios · 作者预览"
+        },
+        "alt": {
+          "en": "Voice Overlay Ios: listeninginitial.png",
+          "zh": "Voice Overlay Ios：listeninginitial.png"
+        },
+        "sourcePath": "Resources/listeninginitial.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "altai-ui-qui",
+    "repository": "altai-ui/qui",
+    "revision": "3ead95280f7ecc870f3284006c2b59c24f1fd489",
+    "sourceUrl": "https://github.com/altai-ui/qui/blob/3ead95280f7ecc870f3284006c2b59c24f1fd489/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-1525651a04b946189233f990e382986f34b56ce09b1790a006979df0381583af.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "1525651a04b946189233f990e382986f34b56ce09b1790a006979df0381583af",
+    "documentSha256": "de7220bdd1b9bcc6f11523e682528b03f08e3c29fdeb0007cc83bb5a225095b7",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-07T07:18:22.038Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/f5ddacee8c103f65cf082c2c47df5d6618554d684fa071e0b24902be4e1e8999.preview.webp",
+        "previewSrc": "/skill-previews/auto/f5ddacee8c103f65cf082c2c47df5d6618554d684fa071e0b24902be4e1e8999.preview.webp",
+        "cardSrc": "/skill-previews/auto/f5ddacee8c103f65cf082c2c47df5d6618554d684fa071e0b24902be4e1e8999.card.webp",
+        "width": 1600,
+        "height": 950,
+        "sha256": "f5ddacee8c103f65cf082c2c47df5d6618554d684fa071e0b24902be4e1e8999",
+        "originalSrc": "/skill-previews/auto/f5ddacee8c103f65cf082c2c47df5d6618554d684fa071e0b24902be4e1e8999.jpg",
+        "sourceUrl": "https://github.com/altai-ui/qui/blob/3ead95280f7ecc870f3284006c2b59c24f1fd489/.readme-assets/buttons.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "Qui · Author preview",
+          "zh": "Qui · 作者预览"
+        },
+        "alt": {
+          "en": "Qui: buttons",
+          "zh": "Qui：buttons"
+        },
+        "sourcePath": ".readme-assets/buttons.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/f25de0e433a204c61a27685d67c6cb25806fe8e2d73ab77f9a89c2040e54aab8.preview.webp",
+        "previewSrc": "/skill-previews/auto/f25de0e433a204c61a27685d67c6cb25806fe8e2d73ab77f9a89c2040e54aab8.preview.webp",
+        "cardSrc": "/skill-previews/auto/f25de0e433a204c61a27685d67c6cb25806fe8e2d73ab77f9a89c2040e54aab8.card.webp",
+        "width": 1600,
+        "height": 791,
+        "sha256": "f25de0e433a204c61a27685d67c6cb25806fe8e2d73ab77f9a89c2040e54aab8",
+        "originalSrc": "/skill-previews/auto/f25de0e433a204c61a27685d67c6cb25806fe8e2d73ab77f9a89c2040e54aab8.jpg",
+        "sourceUrl": "https://github.com/altai-ui/qui/blob/3ead95280f7ecc870f3284006c2b59c24f1fd489/.readme-assets/datepicker.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "Qui · Author preview",
+          "zh": "Qui · 作者预览"
+        },
+        "alt": {
+          "en": "Qui: datepicker",
+          "zh": "Qui：datepicker"
+        },
+        "sourcePath": ".readme-assets/datepicker.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/bd7f6a0efa744cf8a5907ec2a6be64e2bb908a72f6901de532955e00ca251d95.preview.webp",
+        "previewSrc": "/skill-previews/auto/bd7f6a0efa744cf8a5907ec2a6be64e2bb908a72f6901de532955e00ca251d95.preview.webp",
+        "cardSrc": "/skill-previews/auto/bd7f6a0efa744cf8a5907ec2a6be64e2bb908a72f6901de532955e00ca251d95.card.webp",
+        "width": 1402,
+        "height": 730,
+        "sha256": "bd7f6a0efa744cf8a5907ec2a6be64e2bb908a72f6901de532955e00ca251d95",
+        "originalSrc": "/skill-previews/auto/bd7f6a0efa744cf8a5907ec2a6be64e2bb908a72f6901de532955e00ca251d95.gif",
+        "sourceUrl": "https://github.com/altai-ui/qui/blob/3ead95280f7ecc870f3284006c2b59c24f1fd489/.readme-assets/icons.gif",
+        "kind": "reference",
+        "title": {
+          "en": "Qui · Animation · still preview",
+          "zh": "Qui · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Qui: icons",
+          "zh": "Qui：icons"
+        },
+        "sourcePath": ".readme-assets/icons.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
+    "skillSlug": "altai-ui-qui-max",
+    "repository": "altai-ui/qui-max",
+    "revision": "7d7614f966fa89e2f5cf4d31d1eb057287721682",
+    "sourceUrl": "https://github.com/altai-ui/qui-max/blob/7d7614f966fa89e2f5cf4d31d1eb057287721682/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-1525651a04b946189233f990e382986f34b56ce09b1790a006979df0381583af.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "1525651a04b946189233f990e382986f34b56ce09b1790a006979df0381583af",
+    "documentSha256": "11e83ddf925688edaa2ac11d9864c86877c5f4f9df20e37b4a96d2f5472cc44a",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-07T07:18:22.038Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/f5ddacee8c103f65cf082c2c47df5d6618554d684fa071e0b24902be4e1e8999.preview.webp",
+        "previewSrc": "/skill-previews/auto/f5ddacee8c103f65cf082c2c47df5d6618554d684fa071e0b24902be4e1e8999.preview.webp",
+        "cardSrc": "/skill-previews/auto/f5ddacee8c103f65cf082c2c47df5d6618554d684fa071e0b24902be4e1e8999.card.webp",
+        "width": 1600,
+        "height": 950,
+        "sha256": "f5ddacee8c103f65cf082c2c47df5d6618554d684fa071e0b24902be4e1e8999",
+        "originalSrc": "/skill-previews/auto/f5ddacee8c103f65cf082c2c47df5d6618554d684fa071e0b24902be4e1e8999.jpg",
+        "sourceUrl": "https://github.com/altai-ui/qui-max/blob/7d7614f966fa89e2f5cf4d31d1eb057287721682/.readme-assets/buttons.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "Qui Max · Author preview",
+          "zh": "Qui Max · 作者预览"
+        },
+        "alt": {
+          "en": "Qui Max: buttons",
+          "zh": "Qui Max：buttons"
+        },
+        "sourcePath": ".readme-assets/buttons.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/bd7f6a0efa744cf8a5907ec2a6be64e2bb908a72f6901de532955e00ca251d95.preview.webp",
+        "previewSrc": "/skill-previews/auto/bd7f6a0efa744cf8a5907ec2a6be64e2bb908a72f6901de532955e00ca251d95.preview.webp",
+        "cardSrc": "/skill-previews/auto/bd7f6a0efa744cf8a5907ec2a6be64e2bb908a72f6901de532955e00ca251d95.card.webp",
+        "width": 1402,
+        "height": 730,
+        "sha256": "bd7f6a0efa744cf8a5907ec2a6be64e2bb908a72f6901de532955e00ca251d95",
+        "originalSrc": "/skill-previews/auto/bd7f6a0efa744cf8a5907ec2a6be64e2bb908a72f6901de532955e00ca251d95.gif",
+        "sourceUrl": "https://github.com/altai-ui/qui-max/blob/7d7614f966fa89e2f5cf4d31d1eb057287721682/.readme-assets/icons.gif",
+        "kind": "reference",
+        "title": {
+          "en": "Qui Max · Animation · still preview",
+          "zh": "Qui Max · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Qui Max: icons",
+          "zh": "Qui Max：icons"
+        },
+        "sourcePath": ".readme-assets/icons.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/91969e02f0492d48a0818d351faa47484929487a332a3ac17fa2a848e8cb0355.preview.webp",
+        "previewSrc": "/skill-previews/auto/91969e02f0492d48a0818d351faa47484929487a332a3ac17fa2a848e8cb0355.preview.webp",
+        "cardSrc": "/skill-previews/auto/91969e02f0492d48a0818d351faa47484929487a332a3ac17fa2a848e8cb0355.card.webp",
+        "width": 1402,
+        "height": 767,
+        "sha256": "91969e02f0492d48a0818d351faa47484929487a332a3ac17fa2a848e8cb0355",
+        "originalSrc": "/skill-previews/auto/91969e02f0492d48a0818d351faa47484929487a332a3ac17fa2a848e8cb0355.gif",
+        "sourceUrl": "https://github.com/altai-ui/qui-max/blob/7d7614f966fa89e2f5cf4d31d1eb057287721682/.readme-assets/inputs.gif",
+        "kind": "reference",
+        "title": {
+          "en": "Qui Max · Animation · still preview",
+          "zh": "Qui Max · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Qui Max: inputs",
+          "zh": "Qui Max：inputs"
+        },
+        "sourcePath": ".readme-assets/inputs.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
+    "skillSlug": "alvinunreal-lazyskills",
+    "repository": "alvinunreal/lazyskills",
+    "revision": "4ce98ca91650d3a0154cd93bbed50fd65771f7b4",
+    "sourceUrl": "https://github.com/alvinunreal/lazyskills/blob/4ce98ca91650d3a0154cd93bbed50fd65771f7b4/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-1e883c49af14fe37ae2b8a392012c7eec019c5101811e8eb18b21412900428fe.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "1e883c49af14fe37ae2b8a392012c7eec019c5101811e8eb18b21412900428fe",
+    "documentSha256": "917ad3afebd353405a4fafe9c14e01b99f0a1cadc04b3c78240495cd5618cae2",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-07T07:18:22.038Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/fa5fcabbfd229d19af8f407b394f4a8a0471fe00723ecf08c843a2517f5802d9.preview.webp",
+        "previewSrc": "/skill-previews/auto/fa5fcabbfd229d19af8f407b394f4a8a0471fe00723ecf08c843a2517f5802d9.preview.webp",
+        "cardSrc": "/skill-previews/auto/fa5fcabbfd229d19af8f407b394f4a8a0471fe00723ecf08c843a2517f5802d9.card.webp",
+        "width": 760,
+        "height": 636,
+        "sha256": "fa5fcabbfd229d19af8f407b394f4a8a0471fe00723ecf08c843a2517f5802d9",
+        "originalSrc": "/skill-previews/auto/fa5fcabbfd229d19af8f407b394f4a8a0471fe00723ecf08c843a2517f5802d9.gif",
+        "sourceUrl": "https://github.com/alvinunreal/lazyskills/blob/4ce98ca91650d3a0154cd93bbed50fd65771f7b4/assets/demo.gif",
+        "kind": "example",
+        "title": {
+          "en": "Lazyskills · Animation · still preview",
+          "zh": "Lazyskills · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Lazyskills: Lazy Skills terminal UI demo",
+          "zh": "Lazyskills：Lazy Skills terminal UI demo"
+        },
+        "sourcePath": "assets/demo.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/817903e3e3f8aae37a676cef9207e90ffabbd3da837ecf2aca7c24bf46fb54ae.preview.webp",
+        "previewSrc": "/skill-previews/auto/817903e3e3f8aae37a676cef9207e90ffabbd3da837ecf2aca7c24bf46fb54ae.preview.webp",
+        "cardSrc": "/skill-previews/auto/817903e3e3f8aae37a676cef9207e90ffabbd3da837ecf2aca7c24bf46fb54ae.card.webp",
+        "width": 1600,
+        "height": 681,
+        "sha256": "817903e3e3f8aae37a676cef9207e90ffabbd3da837ecf2aca7c24bf46fb54ae",
+        "originalSrc": "/skill-previews/auto/817903e3e3f8aae37a676cef9207e90ffabbd3da837ecf2aca7c24bf46fb54ae.webp",
+        "sourceUrl": "https://github.com/alvinunreal/lazyskills/blob/4ce98ca91650d3a0154cd93bbed50fd65771f7b4/assets/stickers.webp",
+        "kind": "reference",
+        "title": {
+          "en": "Lazyskills · Author preview",
+          "zh": "Lazyskills · 作者预览"
+        },
+        "alt": {
+          "en": "Lazyskills: Lazy Skills stickers",
+          "zh": "Lazyskills：Lazy Skills stickers"
+        },
+        "sourcePath": "assets/stickers.webp",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "andy1314chen-architecture-drawer",
     "repository": "Andy1314Chen/architecture-drawer",
     "revision": "3f5fb5a8bcd3e024c9358dd1ce9fc73503f646b0",
