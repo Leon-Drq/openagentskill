@@ -4,7 +4,7 @@ import { register } from 'node:module'
 register('./test-owner-publication-loader.mjs', import.meta.url)
 const { acquisitionTypes, getSkillCommerce, validSkillOffer, reviewedSkillOffers, commerceFilterSlugs, normalizePriceFilter, matchesCommerce, safeCommerceUrl } = await import('../lib/skills/commerce.ts')
 const { commerceCopy } = await import('../lib/i18n/commerce-copy.ts')
-const now = Date.parse('2026-09-28T12:00:00Z')
+const now = Date.parse('2026-10-06T12:00:00Z')
 for (const slug of ['unknown-repo', '__proto__', 'constructor']) {
   const result = getSkillCommerce(slug, now)
   assert.equal(result.type, 'unknown')

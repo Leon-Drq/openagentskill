@@ -1,7 +1,9 @@
 [
   {
     "slug": "liamgvchi-gc-minimal-zine-poster-v0-3",
-    "aliases": ["liamgvchi-gc-minimal-zine-poster"],
+    "aliases": [
+      "liamgvchi-gc-minimal-zine-poster"
+    ],
     "repository": "LiamGvchi/gc-minimal-zine-poster",
     "path": "SKILL.md",
     "commit": "ddb0d66b24a94f9c4fdd1f02835a836a2db3774e",
@@ -23,6 +25,36 @@
     "limitations": {
       "en": "Best suited to quiet zine pages, editorial illustrations and poetic visual studies. It deliberately avoids glossy commercial layouts, dense collages and 3D rendering. The Gallery shows three author-published examples, not outputs executed or verified by OpenAgentSkill. Exact typography, photo preservation and model compatibility still need a small test in your own environment.",
       "zh": "适合安静的杂志页面、编辑插图和诗意视觉练习；不适合高光商业广告、密集拼贴或 3D 渲染。Gallery 展示的是作者公开的三张案例，不是 OpenAgentSkill 执行或验证的成果。文字准确度、照片主体保真与模型兼容性仍需在自己的环境中小范围测试。"
+    }
+  },
+  {
+    "slug": "chengyi-ai-native-subtitle-quote-image",
+    "aliases": [],
+    "repository": "chengyi-ai/native-subtitle-quote-image",
+    "path": "skills/native-subtitle-quote-image/SKILL.md",
+    "commit": "f9485e20f03fc0b9e5dfd77d03d5be24f7cebdcd",
+    "hash": "aaeafa98bd74bdc8347030e33b5fda699e4c8ac49a83167eee524fb225171c29",
+    "license": "MIT",
+    "reviewedAt": "2026-10-06",
+    "name": "Native Subtitle Quote Image",
+    "title": "Native Subtitle Quote Image — Video to Quote Card Skill",
+    "description": "Turn video frames into subtitle quote cards. See our original 3:4 example, download the input and timestamps, and reproduce the pinned local render.",
+    "gallerySlug": "native-subtitle-video-to-quote-card",
+    "galleryLabel": {
+      "en": "Explore our reproducible subtitle-image example",
+      "zh": "查看本站制作的可复现字幕长图案例"
+    },
+    "summary": {
+      "en": "Native Subtitle Quote Image turns selected video frames into a social quote card. Native mode keeps captions already burned into the video; script mode draws supplied, checked text onto frames and must be labeled as added subtitles. Our original example uses native mode: five frames from a silent, ten-second graphic clip become one 1080 × 1440 JPG. The captions are our workflow tips, not an interview quotation.",
+      "zh": "Native Subtitle Quote Image 将选定的视频画面拼成社交字幕长图。原生模式保留画面已有的烧录字幕；脚本模式将提供并核对的文字绘制到画面，须注明是后期字幕。本站原创案例使用原生模式：从无声的十秒图形视频中取五帧，输出一张 1080×1440 JPG。字幕是本站的流程提示，不是采访引语。"
+    },
+    "workflow": {
+      "en": "Start with a local video you may process and publish. Confirm that captions remain visible with player subtitles switched off, choose stable timestamps, inspect the subtitle band, then render and open the result. Our input, timestamp JSON, exact command and actual run record are downloadable beside the preview. The local renderer needs Python 3.10+, Pillow and FFmpeg or imageio-ffmpeg, with no model API key. Online acquisition additionally needs yt-dlp and suitable access.",
+      "zh": "先准备有权处理和发布的本地视频，确认关闭播放器字幕后画面中仍有字幕，再选择稳定时间点、检查字幕区域，最后渲染并打开成品检查。预览旁提供输入视频、时间点 JSON、准确命令与实际运行记录。此本地渲染需要 Python 3.10+、Pillow，以及 FFmpeg 或 imageio-ffmpeg，不需要模型 API 密钥；在线获取另需 yt-dlp 与适当访问权限。"
+    },
+    "limitations": {
+      "en": "This curated page and example match the cataloged v2.1.1 source at f9485e20. Upstream has newer revisions; their changes are not covered by this run. A separate caption track cannot be preserved as native subtitle pixels. Subtitle transitions, long lines and crop boundaries need visual checking, and enlarging a low-resolution frame does not recover detail. We exercised one local English native render, not installation, URL downloading, translation, script mode, cross-agent compatibility or security certification. The existing review score and installation policy are unchanged.",
+      "zh": "本精选页和案例对应目录已收录的 v2.1.1 固定源码 f9485e20；上游有更新版本，本次运行未覆盖其改动。独立字幕轨不能当作画面原生字幕像素保留。字幕切换、长句和裁切边界需要逐张检查，放大低清画面也不能恢复细节。本次仅运行了一次本地英文原生渲染，没有测试安装、在线下载、翻译、脚本模式、跨 Agent 兼容性或安全认证；原审核评分与安装策略保留。"
     }
   }
 ]

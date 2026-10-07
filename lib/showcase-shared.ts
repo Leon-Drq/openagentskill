@@ -67,6 +67,7 @@ export interface ShowcaseSkill {
 }
 
 export const SHOWCASE_CREATORS: ShowcaseCreator[] = [
+  { id: 'chengyi-ai', name: 'Chengyi / 程意', githubUsername: 'chengyi-ai', url: 'https://github.com/chengyi-ai', profile: null },
   { id: 'hypit-ai', name: 'Hypit AI', githubUsername: 'hypit-ai', url: 'https://github.com/hypit-ai', profile: null },
   { id: 'liamgvchi', name: 'LiamGvchi', githubUsername: 'LiamGvchi', url: 'https://github.com/LiamGvchi', profile: null },
   { id: 'yanliudesign', name: 'yanliudesign', githubUsername: 'yanliudesign', url: 'https://github.com/yanliudesign', profile: null },
@@ -83,6 +84,7 @@ export const SHOWCASE_CREATORS: ShowcaseCreator[] = [
 ]
 
 export const SHOWCASE_SKILLS: ShowcaseSkill[] = [
+  { slug: 'chengyi-ai-native-subtitle-quote-image', name: 'Native Subtitle Quote Image', creatorId: 'chengyi-ai', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
   { slug: 'hypit-ai-hypit-hypit', name: 'Hypit', creatorId: 'hypit-ai', access: 'source-available', sourceLicense: 'Apache-2.0 with additional conditions', listingIds: [] },
   { slug: 'liamgvchi-gc-minimal-zine-poster-v0-3', name: 'GC Minimal Zine Poster', creatorId: 'liamgvchi', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
   { slug: 'yanliudesign-mono-color-skill', name: 'mono-color', creatorId: 'yanliudesign', access: 'open-source', sourceLicense: 'MIT', listingIds: [] },
@@ -152,6 +154,11 @@ export interface ShowcaseCase {
   productionNote: ShowcaseText
   media: { src: string; width: number; height: number; alt: ShowcaseText }[]
   videoUrl?: string
+  /** Downloadable input and exact command for a scoped platform demonstration. */
+  reproduction?: {
+    resources: { href: string; label: ShowcaseText }[]
+    command: string
+  }
   cardFit?: 'cover' | 'contain'
   updatedAt: string
 }

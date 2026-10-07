@@ -8,6 +8,8 @@ import curatedGroups from './showcase-groups.json' with { type: 'json' }
 // @ts-expect-error Direct Node regression tests require the TypeScript extension.
 import { HYPIT_SHOWCASE_CASES } from './showcase-hypit.ts'
 // @ts-expect-error Direct Node regression tests require the TypeScript extension.
+import { NATIVE_SUBTITLE_EXAMPLE } from './showcase-native-subtitle.ts'
+// @ts-expect-error Direct Node regression tests require the TypeScript extension.
 import { editorialSearchText } from './i18n/gallery-copy.ts'
 
 // Exact prompt used for the platform-produced poster on 2026-09-07.
@@ -225,7 +227,7 @@ const automaticCases: ShowcaseCase[] = automaticEntries.map((entry) => {
     cardFit: 'contain', updatedAt: entry.updatedAt,
   }
 })
-export const SHOWCASE_CASES: ShowcaseCase[] = [...HYPIT_SHOWCASE_CASES, ...INITIAL_SHOWCASE_CASES, ...interleavedExpanded, ...automaticCases]
+export const SHOWCASE_CASES: ShowcaseCase[] = [NATIVE_SUBTITLE_EXAMPLE, ...HYPIT_SHOWCASE_CASES, ...INITIAL_SHOWCASE_CASES, ...interleavedExpanded, ...automaticCases]
 export const getShowcaseCase = (slug: string) => SHOWCASE_CASES.find((item) => item.slug === slug)
 export const SHOWCASE_SKILL_SLUGS = [...new Set(SHOWCASE_CASES.map(item => item.skillSlug))]
 export const getShowcasesForSkill = (skillSlug: string) => SHOWCASE_CASES.filter((item) => item.skillSlug === skillSlug)

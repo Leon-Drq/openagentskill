@@ -175,6 +175,10 @@ for (const query of operations) {
 }
 assert.ok(indexPolicy.buildSearchIndexFilter().includes('and(ai_review_approved.eq.true,quality_score.gte.50,or(github_stars.gte.3,publisher_verified.eq.true),'))
 const editorialEntries = JSON.parse(read('lib/seo/editorial-index.json'))
+const sitemapFallback = await packed.unpackCacheJson(JSON.parse(read('lib/seo/sitemap-backup.json')).packed)
+assert.equal(sitemapFallback.policy, indexPolicy.buildSearchIndexFilter(), 'An editorial policy update must keep the cold-cache sitemap backup usable')
+assert.equal(sitemapFallback.entries.length, sitemapFallback.count)
+assert.ok(sitemapFallback.entries.some(entry => entry.url.endsWith('/skills/chengyi-ai-native-subtitle-quote-image')), 'The curated example must remain discoverable during a database outage')
 const redirects = await (await import('../next.config.mjs')).default.redirects()
 for (const entry of editorialEntries) {
   for (const alias of entry.aliases) {
