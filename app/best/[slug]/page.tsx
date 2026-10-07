@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { PresentationTopic } from '@/components/presentation-topic'
 import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { convertSkillRecordToManifest, getAgentOutcomeStatsMap, getAllSkills, type SkillOutcomeStats } from '@/lib/db/skills'
@@ -16,6 +17,7 @@ import {
 import { BEST_SKILL_PAGES, getBestSkillPage } from '@/lib/seo/growth-pages'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSkillTrustProfile } from '@/lib/trust'
+import { getPresentationPage } from '@/lib/seo/presentation-pages'
 import { getUseCaseBySlug, getUseCasesForSkill } from '@/lib/use-cases'
 
 export const revalidate = 300
@@ -33,6 +35,19 @@ export async function generateMetadata({
   const { slug } = await params
   const page = getBestSkillPage(slug)
   if (!page) return { title: 'Best Skills Not Found' }
+
+  const presentation = getPresentationPage(slug)
+  if (presentation) {
+    const url = `https://www.openagentskill.com/best/${presentation.slug}`
+    return {
+      title: presentation.title,
+      description: presentation.description,
+      alternates: { canonical: url },
+      robots: { index: true, follow: true },
+      openGraph: { title: presentation.title, description: presentation.description, url, type: 'website' },
+      twitter: { card: 'summary', title: presentation.title, description: presentation.description },
+    }
+  }
 
   return {
     title: page.title,
@@ -91,6 +106,11 @@ export default async function BestSkillDetailPage({
   const { slug } = await params
   const page = getBestSkillPage(slug)
   if (!page) notFound()
+
+  // Editorial PPT comparisons have a bounded, source-backed candidate set.
+  // Keep their content available without querying the global top-1,200 pool.
+  const presentation = getPresentationPage(slug)
+  if (presentation) return <PresentationTopic page={presentation} />
 
   const useCase = getUseCaseBySlug(page.useCaseSlug)
   const ranking = toRanking(page)

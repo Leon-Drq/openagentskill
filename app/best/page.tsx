@@ -11,6 +11,7 @@ import { formatCompactNumber } from '@/lib/quality'
 import { rankSkillsForDefinition, type RankingDefinition } from '@/lib/rankings'
 import { BEST_SKILL_PAGES, FEATURED_BEST_PAGES } from '@/lib/seo/growth-pages'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
+import { getPresentationPage, getPresentationSources } from '@/lib/seo/presentation-pages'
 
 export const revalidate = 300
 const BEST_PAGE_QUERY_TIMEOUT_MS = 2000
@@ -95,7 +96,11 @@ export default async function BestSkillsPage() {
       <div className="mx-auto max-w-6xl px-6">
         <section className="grid gap-4 border-b border-border py-10 lg:grid-cols-3">
           {FEATURED_BEST_PAGES.slice(0, 3).map((page) => {
+            const presentation = getPresentationPage(page.slug)
             const topSkills = rankSkillsForDefinition(skills, toRanking(page), statsMap, 3)
+            const picks = presentation
+              ? getPresentationSources(presentation).slice(0, 3).map(source => ({ slug: source.id, name: source.name, label: source.output }))
+              : topSkills.map(item => ({ slug: item.skill.slug, name: item.skill.name, label: item.badge }))
 
             return (
               <Link
@@ -113,10 +118,10 @@ export default async function BestSkillsPage() {
                 <div className="mt-8">
                   <p className="mb-3 text-xs uppercase text-secondary">Leading picks</p>
                   <div className="space-y-2">
-                    {topSkills.map((item) => (
-                      <div key={item.skill.slug} className="flex items-center justify-between gap-3 text-sm">
-                        <span className="truncate">{item.skill.name}</span>
-                        <span className="shrink-0 font-mono text-xs text-secondary">{item.badge}</span>
+                    {picks.map((item) => (
+                      <div key={item.slug} className="flex items-center justify-between gap-3 text-sm">
+                        <span className="truncate">{item.name}</span>
+                        <span className="shrink-0 font-mono text-xs text-secondary">{item.label}</span>
                       </div>
                     ))}
                   </div>
@@ -139,6 +144,7 @@ export default async function BestSkillsPage() {
 
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {BEST_SKILL_PAGES.map((page) => {
+              const presentation = getPresentationPage(page.slug)
               const topSkill = rankSkillsForDefinition(skills, toRanking(page), statsMap, 1)[0]
 
               return (
@@ -150,7 +156,7 @@ export default async function BestSkillsPage() {
                   <p className="text-xs uppercase text-secondary">{page.eyebrow}</p>
                   <h3 className="mt-2 font-display text-xl font-semibold">{page.shortTitle}</h3>
                   <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary">{page.description}</p>
-                  {topSkill && (
+                  {presentation ? <p className="mt-5 border-t border-border pt-4 text-xs text-secondary">Compare {presentation.sourceIds.length} source-backed workflows by output and editing needs.</p> : topSkill && (
                     <p className="mt-5 border-t border-border pt-4 text-xs text-secondary">
                       Leading pick: <span className="text-foreground">{topSkill.skill.name}</span>
                     </p>

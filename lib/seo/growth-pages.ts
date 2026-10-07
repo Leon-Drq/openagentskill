@@ -1,4 +1,5 @@
 import { USE_CASES, type UseCaseDefinition } from '@/lib/use-cases'
+import { getPresentationPage, PRESENTATION_PAGES, PRESENTATION_UPDATED_AT } from '@/lib/seo/presentation-pages'
 
 export interface BestSkillPageDefinition {
   slug: string
@@ -12,6 +13,7 @@ export interface BestSkillPageDefinition {
   agentSurface?: string
   primaryKeyword?: string
   exampleTasks?: string[]
+  updatedAt?: string
 }
 
 const BEST_PAGE_OVERRIDES: Record<string, Partial<BestSkillPageDefinition>> = {
@@ -56,9 +58,9 @@ const BEST_PAGE_OVERRIDES: Record<string, Partial<BestSkillPageDefinition>> = {
     ],
   },
   'presentation-generation': {
-    title: 'Best AI agent skills for PPT and presentation decks',
-    searchIntent: 'Find reusable AI agent skills for creating PPTX decks, HTML slides, pitch decks, speaker notes, and presentation workflows from source material.',
-    primaryKeyword: 'best AI agent skills for PPT generation',
+    shortTitle: 'PPT skills',
+    searchIntent: 'Compare PPT skills by native editing, image-based output, browser delivery, dependencies and source evidence.',
+    primaryKeyword: 'PPT skills',
     exampleTasks: [
       'Turn a research brief into an editable PPTX deck',
       'Create HTML slides from product notes',
@@ -251,15 +253,15 @@ const CUSTOM_BEST_SKILL_PAGES: BestSkillPageDefinition[] = [
   {
     slug: 'ppt-generation',
     title: 'Best AI agent skills for PPT generation',
-    shortTitle: 'PPT generation',
+    shortTitle: 'Editable PowerPoint',
     eyebrow: 'Presentation agents',
     description:
       'Ranked OpenAgentSkill shortlist for agents that generate PPTX decks, HTML slides, speaker notes, pitch decks, and editable presentation workflows from briefs, PDFs, URLs, and research notes.',
     useCaseSlug: 'presentation-generation',
-    searchIntent: 'Find AI agent skills for PPT generation, slide decks, PowerPoint workflows, HTML slides, speaker notes, and pitch deck creation.',
+    searchIntent: 'Choose a skill for native editable PPTX, browser export or reconstructing an existing visual deck.',
     audience: 'Founders, analysts, marketers, designers, and builders creating presentation agents or deck automation workflows.',
     agentSurface: 'AI agents',
-    primaryKeyword: 'best AI agent skills for PPT generation',
+    primaryKeyword: 'editable PowerPoint skills',
     exampleTasks: [
       'Generate a PowerPoint deck from a product brief',
       'Convert research notes into editable slides',
@@ -269,20 +271,33 @@ const CUSTOM_BEST_SKILL_PAGES: BestSkillPageDefinition[] = [
   {
     slug: 'codex-presentation-decks',
     title: 'Best Codex skills for presentation decks',
-    shortTitle: 'Codex presentations',
+    shortTitle: 'Codex PPT workflows',
     eyebrow: 'Codex deck workflows',
     description:
       'Ranked OpenAgentSkill shortlist for Codex users creating presentation decks, PPTX exports, HTML slides, and speaker-ready slide workflows from source material.',
     useCaseSlug: 'presentation-generation',
-    searchIntent: 'Find Codex-ready skills for creating presentation decks, PPTX files, HTML slides, and pitch deck workflows.',
+    searchIntent: 'Build a Codex PPT workflow from source review and one sample slide through export checks.',
     audience: 'Codex users building deck generation, research presentation, product update, and pitch deck workflows.',
     agentSurface: 'Codex',
-    primaryKeyword: 'best Codex skills for presentation decks',
+    primaryKeyword: 'Codex PPT skills',
     exampleTasks: [
       'Turn a document into a first-pass deck',
       'Generate HTML slides for a product update',
       'Compare PPT skills before installing one into a workflow',
     ],
+  },
+  {
+    slug: 'workbuddy-ppt-skills',
+    title: 'WorkBuddy PPT Skills: Create and Edit Slides',
+    shortTitle: 'WorkBuddy PPT skills',
+    eyebrow: 'WorkBuddy presentation workflows',
+    description: 'Use WorkBuddy PPTX / Office skills, or inspect a community presentation workflow with documented WorkBuddy support.',
+    useCaseSlug: 'presentation-generation',
+    searchIntent: 'Choose between WorkBuddy native PPTX / Office skills and a community browser-editing and PowerPoint export workflow.',
+    audience: 'WorkBuddy users creating project reviews, office presentations and editable PowerPoint handoffs.',
+    agentSurface: 'WorkBuddy',
+    primaryKeyword: 'WorkBuddy PPT skills',
+    exampleTasks: ['Summarize and rebuild an existing PowerPoint in WorkBuddy', 'Create a project review deck from verified notes', 'Use Dashi PPT for browser editing and PPTX export'],
   },
   {
     slug: 'cursor-code-review',
@@ -422,10 +437,27 @@ function toBestPage(useCase: UseCaseDefinition): BestSkillPageDefinition {
 export const BEST_SKILL_PAGES: BestSkillPageDefinition[] = [
   ...USE_CASES.map(toBestPage),
   ...CUSTOM_BEST_SKILL_PAGES,
-]
+  ...PRESENTATION_PAGES.filter(page => !USE_CASES.some(useCase => useCase.slug === page.slug) && !CUSTOM_BEST_SKILL_PAGES.some(custom => custom.slug === page.slug)).map(page => ({
+    slug: page.slug,
+    title: page.title,
+    shortTitle: `${page.platformGuide?.platform ?? 'Agent'} PPT skills`,
+    eyebrow: `${page.platformGuide?.platform ?? 'Agent'} presentation workflows`,
+    description: page.description,
+    useCaseSlug: 'presentation-generation',
+    searchIntent: page.description,
+    audience: `${page.platformGuide?.platform ?? 'Agent'} users choosing a presentation workflow and checking the final handoff.`,
+    agentSurface: page.platformGuide?.platform,
+    primaryKeyword: `${page.platformGuide?.platform ?? 'Agent'} PPT skills`,
+    exampleTasks: page.quickPicks.map(pick => pick.task),
+  })),
+].map(page => {
+  const presentation = getPresentationPage(page.slug)
+  return presentation ? { ...page, title: presentation.title, description: presentation.description, updatedAt: PRESENTATION_UPDATED_AT } : page
+})
 
 export const FEATURED_BEST_PAGES = BEST_SKILL_PAGES.filter((page) =>
-  ['ai-agent-skills-library', 'open-source-ai-agent-skills', 'codex-skills', 'claude-code-skills', 'openai-agent-skills', 'web-scraping', 'stock-analysis', 'codex-web-scraping', 'codex-finance-analysis', 'claude-code-pdf-parsing', 'sports-analytics', 'football-analytics', 'presentation-generation', 'ppt-generation', 'codex-presentation-decks', 'research-briefs', 'marketing-seo-automation', 'security-review', 'legal-compliance-review', 'coding-agents', 'browser-automation', 'rag-knowledge', 'data-analysis', 'github-automation']
+  getPresentationPage(page.slug) ||
+  ['ai-agent-skills-library', 'open-source-ai-agent-skills', 'codex-skills', 'claude-code-skills', 'openai-agent-skills', 'web-scraping', 'stock-analysis', 'codex-web-scraping', 'codex-finance-analysis', 'claude-code-pdf-parsing', 'sports-analytics', 'football-analytics', 'presentation-generation', 'ppt-generation', 'codex-presentation-decks', 'workbuddy-ppt-skills', 'research-briefs', 'marketing-seo-automation', 'security-review', 'legal-compliance-review', 'coding-agents', 'browser-automation', 'rag-knowledge', 'data-analysis', 'github-automation']
     .includes(page.slug)
 )
 

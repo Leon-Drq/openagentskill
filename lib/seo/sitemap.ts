@@ -203,6 +203,7 @@ export function getCoreSitemapEntries(): SitemapEntry[] {
 export function getBestSitemapEntries(): SitemapEntry[] {
   return BEST_SKILL_PAGES.map((page) => ({
     url: `${SITEMAP_BASE_URL}/best/${page.slug}`,
+    lastModified: page.updatedAt,
     changeFrequency: 'daily',
     priority: 0.88,
   }))

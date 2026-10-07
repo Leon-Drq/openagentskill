@@ -15,8 +15,8 @@ export function DiscoveryCategories({ onNavigate, variant = 'default' }: { onNav
   const { locale } = useI18n()
   const c = discoveryCopy(locale)
   const groups = [
-    { title: c.task, note: c.taskNote, items: SKILL_CATEGORIES.slice(0, 15).map(item => ({ id: item[0], href: `/skills?category=${item[0]}`, icon: item[3], label: categoryLabel(item[0], locale) })) },
-    { title: c.output, note: c.outputNote, items: OUTPUT_RULES.map(item => ({ id: item[0], href: `/skills?output=${item[0]}`, icon: item[0] === 'code' ? 'code' as const : item[0] === 'data' ? 'data' as const : DISCOVERY_OUTPUTS.find(output => output.id === item[0])!.icon, label: item[locale === 'zh' ? 2 : 1] })) },
+    { title: c.task, note: c.taskNote, items: SKILL_CATEGORIES.slice(0, 15).map(item => ({ id: item[0], href: variant === 'navigation' && item[0] === 'presentation' ? '/best/presentation-generation' : `/skills?category=${item[0]}`, icon: item[3], label: variant === 'navigation' && item[0] === 'presentation' && locale === 'en' ? 'PPT skills & slides' : categoryLabel(item[0], locale) })) },
+    { title: c.output, note: c.outputNote, items: OUTPUT_RULES.map(item => ({ id: item[0], href: variant === 'navigation' && item[0] === 'slides' ? '/best/presentation-generation' : `/skills?output=${item[0]}`, icon: item[0] === 'code' ? 'code' as const : item[0] === 'data' ? 'data' as const : DISCOVERY_OUTPUTS.find(output => output.id === item[0])!.icon, label: item[locale === 'zh' ? 2 : 1] })) },
     { title: c.agent, note: c.agentNote, items: DISCOVERY_AGENTS },
   ]
   return <div data-discovery-categories>

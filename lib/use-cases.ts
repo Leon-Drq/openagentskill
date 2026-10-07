@@ -437,6 +437,10 @@ function searchableSkillText(skill: SkillRecord) {
 
 export function scoreSkillForUseCase(skill: SkillRecord, useCase: UseCaseDefinition) {
   const text = searchableSkillText(skill)
+  // A bare "deck" (for example Deck.gl) or a general NotebookLM mention is
+  // insufficient evidence of a presentation workflow. Apply this before
+  // featured/popularity bonuses; those cannot create task relevance.
+  if (useCase.slug === 'presentation-generation' && !/(^|[^a-z0-9])(pptx?|powerpoint|presentations?|slides?|slide[- ]deck|speaker[- ]notes)($|[^a-z0-9])|幻灯片|演示文稿/i.test(text)) return 0
   let score = 0
 
   if (useCase.featuredSlugs?.includes(skill.slug)) score += 90
