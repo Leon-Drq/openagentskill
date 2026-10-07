@@ -1,5 +1,12 @@
 import { writeFileSync } from 'node:fs'
-import { EXACT_SOURCE_CATEGORIES, CATEGORY_RULES, TOPIC_RULES, OUTPUT_RULES, LEGACY_CATEGORY_MAP, SKILL_CATEGORIES, facetPattern } from '../lib/skills/taxonomy.ts'
+import { parseArgs } from 'node:util'
+import { EXACT_SOURCE_CATEGORIES, EXACT_SOURCE_FACETS, CATEGORY_RULES, TOPIC_RULES, OUTPUT_RULES, LEGACY_CATEGORY_MAP, SKILL_CATEGORIES, facetPattern } from '../lib/skills/taxonomy.ts'
+const { values: options } = parseArgs({ options: {
+  'exact-source-output': { type: 'string' }, source: { type: 'string' },
+} })
+if (options.source && (!options['exact-source-output'] || !EXACT_SOURCE_CATEGORIES[options.source])) {
+  throw new Error('--source requires --exact-source-output and a known exact package identity.')
+}
 const quote = text => "'" + text.replaceAll("'", "''") + "'"
 const values = CATEGORY_RULES.map((r,i) => `(${i},${quote(r.category)},${quote(r.pattern)})`).join(',\n')
 const canonical = [...Object.entries(LEGACY_CATEGORY_MAP),...SKILL_CATEGORIES.map(c => [c[0],c[0]])]
@@ -58,7 +65,7 @@ create index if not exists skills_taxonomy_tags_idx on public.skills using gin(t
 create index if not exists skills_output_types_idx on public.skills using gin(output_types);
 comment on column public.skills.primary_category is 'Versioned per-Skill task classification; does not change source metadata or review.';
 `
-writeFileSync('supabase/migrations/20261002180000_skill_task_taxonomy.sql',sql)
+if (!options['exact-source-output']) writeFileSync('supabase/migrations/20261002180000_skill_task_taxonomy.sql',sql)
 // Existing publication and timestamp triggers must ignore derived-only backfills.
 // Any change to original source/review fields still invokes the original functions.
 const triggers = `
@@ -80,18 +87,24 @@ begin
  execute format('create trigger update_skills_updated_at before update on public.skills for each row when (row(%s) is distinct from row(%s)) execute function public.update_updated_at_column()',old_fields,new_fields);
 end $$;
 `
-writeFileSync('supabase/migrations/20261002180000_skill_task_taxonomy.sql',sql + triggers)
+if (!options['exact-source-output']) writeFileSync('supabase/migrations/20261002180000_skill_task_taxonomy.sql',sql + triggers)
 
-const sourceCases = Object.entries(EXACT_SOURCE_CATEGORIES).map(([source,category]) => `when ${quote(source)} then ${quote(category)}`).join('\n')
-writeFileSync('supabase/migrations/20261002180100_skill_taxonomy_exact_sources.sql',`-- Exact package corrections; source metadata/review remain unchanged.
+const sourceCases = Object.entries(EXACT_SOURCE_CATEGORIES).map(([source,category]) =>
+  `when ${quote(source)} then ${quote(JSON.stringify({ primary_category: category, ...EXACT_SOURCE_FACETS[source] }))}::jsonb`
+).join('\n')
+const selectedSources = options.source ? [options.source] : Object.keys(EXACT_SOURCE_CATEGORIES)
+const selected = `lower(coalesce(github_repo,'')) || ':' || coalesce(source_path,'') in (${selectedSources.map(quote).join(',')})`
+const classifier = `-- Generated exact package corrections; source metadata/review remain unchanged.
 create or replace function public.classify_skill_taxonomy(p_name text,p_description text,p_tagline text,p_path text,p_category text,p_tags text[],p_repo text)
 returns jsonb language sql immutable security invoker set search_path = pg_catalog as $$
- select case when corrected is null then result else jsonb_set(result,'{primary_category}',to_jsonb(corrected)) end
+ select result || coalesce(corrected,'{}'::jsonb)
  from (select public.classify_skill_taxonomy(p_name,p_description,p_tagline,p_path,p_category,p_tags) as result,
  case lower(coalesce(p_repo,'')) || ':' || coalesce(p_path,'') ${sourceCases} else null end as corrected) input;
 $$;
 revoke all on function public.classify_skill_taxonomy(text,text,text,text,text,text[],text) from public;
 grant execute on function public.classify_skill_taxonomy(text,text,text,text,text,text[],text) to anon,authenticated,service_role;
+`
+const exactTrigger = `
 create or replace function public.set_skill_taxonomy() returns trigger language plpgsql security invoker set search_path = pg_catalog as $$
 declare result jsonb;
 begin
@@ -105,6 +118,30 @@ end $$;
 revoke all on function public.set_skill_taxonomy() from public;
 drop trigger if exists skills_set_taxonomy on public.skills;
 create trigger skills_set_taxonomy before insert or update of name,description,tagline,source_path,category,tags,github_repo on public.skills for each row execute function public.set_skill_taxonomy();
-update public.skills set primary_category=case lower(coalesce(github_repo,'')) || ':' || coalesce(source_path,'') ${sourceCases} else primary_category end
-where lower(coalesce(github_repo,'')) || ':' || coalesce(source_path,'') in (${Object.keys(EXACT_SOURCE_CATEGORIES).map(quote).join(',')});
-`)
+`
+const backfill = `
+-- Only derived discovery fields may change, including through existing triggers.
+do $$
+declare before_original jsonb; after_original jsonb;
+begin
+ select jsonb_agg(to_jsonb(s) - 'primary_category' - 'taxonomy_tags' - 'output_types' - 'taxonomy_version' order by s.slug)
+ into before_original from public.skills s where ${selected};
+ with corrected as (
+  select id, public.classify_skill_taxonomy(name,description,tagline,source_path,category,tags,github_repo) as taxonomy
+  from public.skills where ${selected}
+ )
+ update public.skills s set
+  primary_category = corrected.taxonomy->>'primary_category',
+  taxonomy_tags = array(select jsonb_array_elements_text(corrected.taxonomy->'taxonomy_tags')),
+  output_types = array(select jsonb_array_elements_text(corrected.taxonomy->'output_types')),
+  taxonomy_version = (corrected.taxonomy->>'taxonomy_version')::integer
+ from corrected where s.id = corrected.id;
+ select jsonb_agg(to_jsonb(s) - 'primary_category' - 'taxonomy_tags' - 'output_types' - 'taxonomy_version' order by s.slug)
+ into after_original from public.skills s where ${selected};
+ if before_original is distinct from after_original then
+  raise exception 'Taxonomy correction changed original source, publication, review or timestamp fields';
+ end if;
+end $$;
+`
+writeFileSync(options['exact-source-output'] || 'supabase/migrations/20261002180100_skill_taxonomy_exact_sources.sql',
+ options['exact-source-output'] ? `begin;\nset local lock_timeout = '5s';\n${classifier}${backfill}commit;\n` : classifier + exactTrigger + backfill)

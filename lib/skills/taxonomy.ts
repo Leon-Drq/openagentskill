@@ -280,6 +280,13 @@ export const EXACT_SOURCE_CATEGORIES: Record<string, SkillCategory> = {
  'obra/superpowers:skills/using-superpowers/SKILL.md': 'coding-agents',
  'obra/superpowers:skills/verification-before-completion/SKILL.md': 'coding-agents',
  'tt-a1i/archify:archify/SKILL.md': 'design-creative',
+ 'chengyi-ai/native-subtitle-quote-image:skills/native-subtitle-quote-image/SKILL.md': 'image-generation',
+}
+// This package consumes video frames but delivers JPG quote cards, not video.
+export const EXACT_SOURCE_FACETS: Record<string, Pick<SkillTaxonomy, 'taxonomy_tags' | 'output_types'>> = {
+ 'chengyi-ai/native-subtitle-quote-image:skills/native-subtitle-quote-image/SKILL.md': {
+   taxonomy_tags: ['image-editing'], output_types: ['image'],
+ },
 }
 export function classifySkill(input: TaxonomyInput): SkillTaxonomy {
   const identity = `${input.name || ''} ${input.source_path || ''}`.toLowerCase().slice(0, 4000)
@@ -293,8 +300,10 @@ export function classifySkill(input: TaxonomyInput): SkillTaxonomy {
     if (score > best) { best = score; primary = rule.category }
   }
   const text = `${identity} ${summary} ${tags}`
-  primary = EXACT_SOURCE_CATEGORIES[`${(input.github_repo || '').toLowerCase()}:${input.source_path || ''}`] || primary
-  return { primary_category: primary, taxonomy_tags: compiledTopicRules.filter(t => t.regex.test(text)).map(t => t.rule[0]), output_types: compiledOutputRules.filter(t => t.regex.test(text)).map(t => t.rule[0]), taxonomy_version: TAXONOMY_VERSION }
+  const source = `${(input.github_repo || '').toLowerCase()}:${input.source_path || ''}`
+  primary = EXACT_SOURCE_CATEGORIES[source] || primary
+  const facets = EXACT_SOURCE_FACETS[source]
+  return { primary_category: primary, taxonomy_tags: facets ? [...facets.taxonomy_tags] : compiledTopicRules.filter(t => t.regex.test(text)).map(t => t.rule[0]), output_types: facets ? [...facets.output_types] : compiledOutputRules.filter(t => t.regex.test(text)).map(t => t.rule[0]), taxonomy_version: TAXONOMY_VERSION }
 }
 export function skillTaxonomy(input: TaxonomyInput & Partial<SkillTaxonomy>): SkillTaxonomy {
   return input.taxonomy_version === TAXONOMY_VERSION && input.primary_category
