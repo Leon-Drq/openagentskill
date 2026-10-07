@@ -1,3 +1,5 @@
+import { SCENARIO_GUIDES } from './scenario-guides'
+
 export type GrowthGuideIntent = 'best' | 'install' | 'compare' | 'standard'
 
 export interface GrowthGuideStep {
@@ -40,6 +42,7 @@ export interface GrowthGuideDefinition {
 }
 
 export const GROWTH_GUIDES: GrowthGuideDefinition[] = [
+  ...SCENARIO_GUIDES,
   {
     slug: 'agent-skills-for-product-videos',
     shortTitle: 'Product video workflows',
@@ -47,7 +50,7 @@ export const GROWTH_GUIDES: GrowthGuideDefinition[] = [
     eyebrow: 'Product video workflow guide',
     description: 'Choose a workflow for a product demo, launch animation or recorded walkthrough. Prepare inputs, check costs and permissions, then verify the exported video.',
     intent: 'best',
-    updatedAt: '2026-09-08',
+    updatedAt: '2026-10-07',
     heroPrompt: 'Help me make a short product demo video from my screenshots and product copy. Ask for missing inputs, explain dependencies and costs, and propose a storyboard before rendering. Do not invent product features or customer claims.',
     skillKeywords: ['product demo', 'product launch', 'remotion', 'hyperframes', 'video editing'],
     primarySkillSlugs: ['noamdorr-saas-product-demo-video-saas-product-demo-video', 'heygen-com-hyperframes-product-launch-video', 'remotion-dev-skills', 'browser-use-video-use'],
@@ -86,6 +89,8 @@ export const GROWTH_GUIDES: GrowthGuideDefinition[] = [
       { question: 'Should I start by generating or editing?', answer: 'Edit if you already have a recording with the correct product behavior. Use a demo or animation workflow when your starting material is screenshots, assets or a storyboard.' },
     ],
     resources: [
+      { title: 'Remotion composition and actual MP4', href: '/best/remotion-skills#examples', description: 'Original React composition, local render and production notes.' },
+      { title: 'Compare video workflows', href: '/best/video-creation', description: 'Code animation, generated footage and editing.' },
       { title: 'SaaS Product Demo Video', href: '/skills/noamdorr-saas-product-demo-video-saas-product-demo-video', description: 'Registry listing and current review for the screenshot-based demo workflow.' },
       { title: 'HyperFrames Product Launch Video', href: '/skills/heygen-com-hyperframes-product-launch-video', description: 'Registry listing and current findings for launch-video creation.' },
       { title: 'Remotion Agent Skills', href: '/skills/remotion-dev-skills', description: 'Source and installation context for React-based video composition.' },

@@ -1,0 +1,18 @@
+import React from 'react'
+import { AbsoluteFill, Composition, interpolate, useCurrentFrame } from 'remotion'
+
+function SkillWorkflow() {
+  const frame = useCurrentFrame()
+  return <AbsoluteFill style={{ backgroundColor: '#F3F5EF', color: '#172C24', fontFamily: 'Arial, sans-serif', padding: 70 }}>
+    <div style={{ fontSize: 26, letterSpacing: 2 }}>OPENAGENTSKILL / AN EDITORIAL EXAMPLE</div>
+    <div style={{ fontSize: 76, lineHeight: 1.05, maxWidth: 1000, fontWeight: 700, marginTop: 48, opacity: interpolate(frame, [0, 18], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) }}>Find a skill.<br />Know what it delivers.</div>
+    <div style={{ display: 'flex', gap: 22, marginTop: 55 }}>
+      <div style={{ flex: 1, padding: 26, backgroundColor: '#DDE9DB', borderRadius: 16, opacity: interpolate(frame, [20, 40], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) }}><div style={{ fontSize: 22 }}>01 / CHOOSE</div><div style={{ fontSize: 34, fontWeight: 700, marginTop: 22 }}>Start with<br />your task</div></div>
+      <div style={{ flex: 1, padding: 26, backgroundColor: '#DDE9DB', borderRadius: 16, opacity: interpolate(frame, [60, 80], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) }}><div style={{ fontSize: 22 }}>02 / INSPECT</div><div style={{ fontSize: 34, fontWeight: 700, marginTop: 22 }}>Read the<br />source</div></div>
+      <div style={{ flex: 1, padding: 26, backgroundColor: '#DDE9DB', borderRadius: 16, opacity: interpolate(frame, [100, 120], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) }}><div style={{ fontSize: 22 }}>03 / VERIFY</div><div style={{ fontSize: 34, fontWeight: 700, marginTop: 22 }}>Check the<br />actual output</div></div>
+    </div>
+    <div style={{ marginTop: 42, fontSize: 24, opacity: interpolate(frame, [130, 150], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) }}>openagentskill.com · Original code animation · No generated footage</div>
+  </AbsoluteFill>
+}
+
+export const RemotionRoot = () => <Composition id="SkillWorkflow" component={SkillWorkflow} durationInFrames={180} fps={30} width={1280} height={720} />

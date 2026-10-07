@@ -12,6 +12,7 @@ export interface SkillStackDefinition {
   useCaseSlug: string
   keywords: string[]
   featuredSlugs?: string[]
+  curatedOnly?: boolean
   outcomes: string[]
   workflowSteps: Array<{
     title: string
@@ -113,6 +114,7 @@ export const SKILL_STACKS: SkillStackDefinition[] = [
     useCaseSlug: 'design-creative',
     keywords: ['frontend', 'ui', 'ux', 'figma', 'react', 'next.js', 'design', 'accessibility', 'browser', 'test', 'deploy'],
     featuredSlugs: [
+      'nextlevelbuilder-ui-ux-pro-max-skill',
       'design-taste-frontend',
       'anthropic-frontend-design',
       'figma-implement-design',
@@ -120,10 +122,9 @@ export const SKILL_STACKS: SkillStackDefinition[] = [
       'vercel-react-best-practices',
       'openai-playwright',
       'anthropic-webapp-testing',
-      'anthropic-canvas-design',
-      'anthropic-brand-guidelines',
       'vercel-deploy-to-vercel',
     ],
+    curatedOnly: true,
     outcomes: ['Set a visual direction', 'Implement Figma faithfully', 'Review UI and performance', 'Test and deploy safely'],
     workflowSteps: [
       { title: 'Direct', description: 'Choose an intentional visual direction and capture the product constraints before coding.' },
@@ -143,8 +144,9 @@ export const SKILL_STACKS: SkillStackDefinition[] = [
       'A practical workflow for agents that shape a video brief, create strong multimodal prompts, generate supporting B-roll, and prepare a reviewable short-form or explainer video.',
     persona: 'Creative teams, marketers, and founders turning product stories into short videos without losing control of source assets or final review.',
     useCaseSlug: 'video-creation',
-    keywords: ['video', 'seedance', 'vox', 'b-roll', 'broll', 'explainer', 'collage', 'camera', 'captions', 'voice-over', 'editing'],
-    featuredSlugs: ['seedance-prompt-en', 'vox-director', 'seedance-2-0'],
+    keywords: ['video', 'remotion', 'seedance', 'vox', 'b-roll', 'broll', 'explainer', 'captions', 'editing'],
+    featuredSlugs: ['remotion-dev-skills', 'browser-use-video-use', 'seedance-prompt-en', 'vox-director', 'seedance-2-0'],
+    curatedOnly: true,
     outcomes: ['Turn a brief into a shot plan', 'Write controlled generation prompts', 'Generate supporting B-roll', 'Review rights, cost, and final output'],
     workflowSteps: [
       { title: 'Frame', description: 'Set the audience, one message, format, duration, and the approved inputs before generation.' },
@@ -218,6 +220,7 @@ export function getSkillStackBySlug(slug: string) {
 }
 
 export function scoreSkillForStack(skill: SkillRecord, stack: SkillStackDefinition) {
+  if (stack.curatedOnly && !stack.featuredSlugs?.includes(skill.slug)) return 0
   const text = searchableSkillText(skill)
   const useCase = getUseCaseBySlug(stack.useCaseSlug)
   let score = useCase ? scoreSkillForUseCase(skill, useCase) : 0

@@ -1,0 +1,20 @@
+{
+  "colors": {
+    "background": "#F4F5EF",
+    "foreground": "#17342B",
+    "accent": "#145B44",
+    "surface": "#FFFFFF"
+  },
+  "spacing": {
+    "cardPadding": 24,
+    "cardGap": 20
+  },
+  "component": {
+    "cardWidth": 320,
+    "borderRadius": 16
+  },
+  "typography": {
+    "font": "Arial",
+    "bodySize": 16
+  }
+}

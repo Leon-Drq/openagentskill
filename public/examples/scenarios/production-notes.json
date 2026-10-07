@@ -1,0 +1,108 @@
+{
+  "updatedAt": "2026-10-07",
+  "author": "OpenAgentSkill editorial team",
+  "scope": "Original synthetic examples. They demonstrate deliverables and validation, not comparative runtime tests of upstream skills or every client.",
+  "frontend": {
+    "inputs": [
+      "frontend-briefs.json",
+      "design-tokens.json"
+    ],
+    "outputs": [
+      "landing.html",
+      "dashboard.html",
+      "design-handoff.html"
+    ],
+    "checks": [
+      {
+        "page": "landing",
+        "width": 1280,
+        "layout": "pass",
+        "interactions": "pass"
+      },
+      {
+        "page": "landing",
+        "width": 390,
+        "layout": "pass",
+        "interactions": "pass"
+      },
+      {
+        "page": "dashboard",
+        "width": 1280,
+        "layout": "pass",
+        "interactions": "pass"
+      },
+      {
+        "page": "dashboard",
+        "width": 390,
+        "layout": "pass",
+        "interactions": "pass"
+      },
+      {
+        "page": "design-handoff",
+        "width": 1280,
+        "layout": "pass",
+        "interactions": "pass"
+      },
+      {
+        "page": "design-handoff",
+        "width": 390,
+        "layout": "pass",
+        "interactions": "pass"
+      }
+    ],
+    "handoff": "Local token specification: 320px card, 24px padding, 16px radius, white surface. No private Figma export."
+  },
+  "video": {
+    "runtime": "Remotion 4.0.533",
+    "composition": "SkillWorkflow",
+    "output": "remotion-demo.mp4",
+    "durationSeconds": 6,
+    "dimensions": [
+      1280,
+      720
+    ],
+    "fps": 30,
+    "frames": 180,
+    "codec": "H.264",
+    "checks": [
+      "Browser playback reached the end without decode errors",
+      "FFprobe metadata: 6 seconds, 1280x720, 30 FPS, 180 frames",
+      "Whole file decoded by FFmpeg with rawvideo output",
+      "FFmpeg-extracted beginning, middle and end frames visually inspected"
+    ],
+    "reproduce": [
+      "Create a blank Remotion 4.0.533 project and install its dependencies",
+      "Save remotion-composition.tsx.txt as src/remotion-composition.tsx",
+      "Save remotion-index.ts.txt as src/index.ts",
+      "Run npx remotion render src/index.ts SkillWorkflow out.mp4 --codec=h264"
+    ],
+    "audio": "Silent. No external stock media or generation service."
+  },
+  "spreadsheet": {
+    "runtime": "@oai/artifact-tool 2.8.59",
+    "inputs": [
+      "messy-sales.csv"
+    ],
+    "output": "cleaned-sales.xlsx",
+    "checks": [
+      "Original CSV has six rows and one exact duplicate",
+      "Cleaned sheet has five unique text IDs; leading zeros preserved",
+      "Known revenue total is 2650.50 USD; missing and invalid revenues remain unavailable",
+      "Formula total changes to 2750.50 when the first revenue changes from 1200 to 1300, and restores after resetting input",
+      "Workbook recalculated with no formula errors",
+      "Both sheets rendered and visually inspected; exported values checked with openpyxl"
+    ],
+    "limitations": "Native Excel was not executed. This is a synthetic cleanup example, not an upstream skill benchmark."
+  },
+  "document": {
+    "runtime": "python-docx",
+    "input": "launch-brief-input.json",
+    "output": "editable-launch-brief.docx",
+    "checks": [
+      "Native Word headings and a project context table retained",
+      "Saved paragraphs and table content compared with the input",
+      "One page rendered and visually inspected"
+    ],
+    "limitations": "Fictional project; launch date remains unconfirmed. Not a comparative upstream skill test."
+  }
+}
