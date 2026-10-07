@@ -150,28 +150,6 @@
         "sourcePath": "docs/assets/acot-run.gif",
         "documentPath": "README.md",
         "format": "animation-poster"
-      },
-      {
-        "src": "/skill-previews/auto/99b608792bb55334b8c40b6e4aabdb03bf93d30eb3bf7b59daa34e54486e3353.preview.webp",
-        "previewSrc": "/skill-previews/auto/99b608792bb55334b8c40b6e4aabdb03bf93d30eb3bf7b59daa34e54486e3353.preview.webp",
-        "cardSrc": "/skill-previews/auto/99b608792bb55334b8c40b6e4aabdb03bf93d30eb3bf7b59daa34e54486e3353.card.webp",
-        "width": 1600,
-        "height": 480,
-        "sha256": "99b608792bb55334b8c40b6e4aabdb03bf93d30eb3bf7b59daa34e54486e3353",
-        "originalSrc": "/skill-previews/auto/99b608792bb55334b8c40b6e4aabdb03bf93d30eb3bf7b59daa34e54486e3353.png",
-        "sourceUrl": "https://github.com/acot-a11y/acot/blob/34ff82b04faf65d22f323fd9ea47e03ede0fc13c/docs/assets/repository-header.png",
-        "kind": "reference",
-        "title": {
-          "en": "Acot · Author preview",
-          "zh": "Acot · 作者预览"
-        },
-        "alt": {
-          "en": "Acot: acot",
-          "zh": "Acot：acot"
-        },
-        "sourcePath": "docs/assets/repository-header.png",
-        "documentPath": "README.md",
-        "format": "image"
       }
     ]
   },
