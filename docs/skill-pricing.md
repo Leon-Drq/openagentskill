@@ -107,3 +107,22 @@ build. Check desktop and mobile `/skills`, `/skills?pricing=free`,
 Hypit's detail costs. Unknown prices must remain unknown. Check the cached default
 directory and canonical/noindex query metadata after deployment. Paid fixtures in
 unit tests are synthetic test data and must never be listed in production.
+
+## Directory access filters
+
+The directory uses `access=free|paid|third-party` as browsing shortcuts. Free means
+confirmed free acquisition, including qualifying external listings; it does not
+promise free model/API usage. Third-party means entries in the external provider
+catalog (for example Skillry), regardless of acquisition price. Unconfirmed
+prices remain visible in All and never automatically qualify as free.
+
+`access=paid` is reserved for OpenAgentSkill's own paid Skills. To include a future
+offer, explicitly set `seller: 'openagentskill'` in `reviewedSkillOffers`, alongside
+the existing valid paid offer evidence and a published registry entry. No checkout
+or entitlement is created by this flag. External prices never become first-party
+offers automatically. The empty paid view remains available before launch.
+
+Existing `pricing` links retain their meanings (including external paid listings).
+Selecting a new access shortcut clears the old price filter. Filtering takes place
+before counting and pagination. Query variants retain noindex/follow and the
+directory's canonical URL; the rendered directory and links remain server-side.
