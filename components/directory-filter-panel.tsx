@@ -10,7 +10,7 @@ import { directoryFilterCopy } from '@/lib/i18n/directory-filter-copy'
 import { commerceCopy } from '@/lib/i18n/commerce-copy'
 import type { Locale } from '@/lib/i18n/config'
 import { directoryAccessOptions, type DirectoryFilterDraft } from '@/lib/skills/directory-filters'
-import { SKILL_CATEGORIES, OUTPUT_RULES, TOPIC_RULES, categoryLabel } from '@/lib/skills/taxonomy'
+import { SKILL_CATEGORIES, TOPIC_RULES, categoryLabel } from '@/lib/skills/taxonomy'
 
 type Updates = Partial<DirectoryFilterDraft>
 interface Props {
@@ -65,13 +65,6 @@ export function DirectoryFilterPanel({ locale, value, onChange, disabled, href, 
         <input type="checkbox" checked={value[key] === 'true'} disabled={disabled} onChange={event => onChange({ [key]: event.target.checked ? 'true' : 'all' })} className="h-4 w-4 accent-[#006b4f]" />{title}
       </label>)}
     </div>
-    <section className="border-t border-border pt-4" aria-label={label('outputType')}>
-      <h3 className="mb-2.5 text-xs font-medium text-secondary">{label('outputType')}</h3>
-      <div className="grid grid-cols-2 gap-1.5">
-        {choice('output', 'all', f.all, true)}
-        {OUTPUT_RULES.map(item => choice('output', item[0], item[locale === 'zh' ? 2 : 1], true, discoveryIcons[item[0] === 'code' ? 'code' : item[0]]))}
-      </div>
-    </section>
     <nav className="border-t border-border pt-4" aria-label={c.category} data-directory-categories>
       <h3 className="mb-2 text-xs font-medium text-secondary">{c.category}</h3>
       {['all', ...primaryCategories].map(categoryChoice)}
