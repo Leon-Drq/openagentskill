@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "checkedAt": "2026-10-07T07:18:22.038Z",
+  "checkedAt": "2026-10-08T07:38:31.045Z",
   "records": {
     "00200200-maintainer-skills-lab-mkl-write-tutorial": {
       "identity": "2c3e9caccb35de6ebf8c82548113932ff4397bc181eecdafb5803e99142cdade",
@@ -950,15 +950,15 @@
     "adeleempurpled290-vivado-constraints": {
       "identity": "696f243096c45483012bd9b71c3c0b28dfd87b29c3e37f42c2602d0584030571",
       "status": "error",
-      "checkedAt": "2026-10-07T04:52:45.299Z",
-      "nextAt": "2026-10-08T04:52:45.299Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "HTTP 404"
     },
     "adeleempurpled290-vivado-tcl": {
       "identity": "6bfed8151ef3a18297a51fb763fbfe76931964177180658f0bf95da366a308a2",
       "status": "error",
-      "checkedAt": "2026-10-07T04:52:45.299Z",
-      "nextAt": "2026-10-08T04:52:45.299Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "HTTP 404"
     },
     "aden-hive-hive-image-generation": {
@@ -1724,6 +1724,90 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "ai-driven-dev-aidd-dev-00-sdlc": {
+      "identity": "6ce0161544ce66585d638ec84fa41ecc79e985194f6e2336cb3e101d87760529",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "6e30640191738f50a632f5c2b98ee10badab8ce6",
+      "documentPath": "cli/tests/fixtures/framework-real/plugins/aidd-dev/skills/00-sdlc/SKILL.md",
+      "documentSha256": "19bd4a8cf8c6531a6db232c31855e39475c71e2b58c91b439832d813ff594b78",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ai-driven-dev-distribution": {
+      "identity": "fc668da4068e79befc4ea93750dc890e1289bced7825927c64d72b3c18ce1755",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "6e30640191738f50a632f5c2b98ee10badab8ce6",
+      "documentPath": "cli/.claude/skills/distribution/SKILL.md",
+      "documentSha256": "3de2f0ddb55511e18028a465913bfda28ec00f5a04229a6fc8b407fa892923a2",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ai-driven-dev-framework": {
+      "identity": "fe98d2d1e0eb9294354336728521059d6b2493d7d419d0b23599770ffde92b7f",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "6e30640191738f50a632f5c2b98ee10badab8ce6",
+      "documentPath": "cli/.claude/skills/framework/SKILL.md",
+      "documentSha256": "dc972768c8501bf825f51bad3de70c9190dfa4d0f184f15d0b77db746e19626f",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ai-driven-dev-telemetry": {
+      "identity": "54e92cbcd5a8efb089a20f0ae778b1757bab4b1d219ac876a0f71a76ad379183",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "6e30640191738f50a632f5c2b98ee10badab8ce6",
+      "documentPath": "cli/.claude/skills/telemetry/SKILL.md",
+      "documentSha256": "dccdaa7a33de225cc25eb361786b545476370b2df8ade91112f7a989ec96058c",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ai-driven-dev-test": {
+      "identity": "eb7830ce2835a5be666ef0d105256e0d73a79c700c21b11e35d8fed39a61cbe8",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "6e30640191738f50a632f5c2b98ee10badab8ce6",
+      "documentPath": "cli/.claude/skills/test/SKILL.md",
+      "documentSha256": "53f4fe4b1c1aa56d590c4ea49236cfab73a6633ef97b384ff54236c93490979d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ai-driven-dev-tools": {
+      "identity": "7d98e615f5dcb425f7953018077331b9bdfa730ce0774da9b41d62a44d78dc37",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "6e30640191738f50a632f5c2b98ee10badab8ce6",
+      "documentPath": "cli/.claude/skills/tools/SKILL.md",
+      "documentSha256": "5791d484e3b98b1fe4be7a5800df91241b622e9455aaa57bfd52ecb509eaf08d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ai-driven-dev-translate": {
+      "identity": "e5afaf4f061d49f7e63c2c804464e2f2e98a37ac6cd690957e52157ea8f2af52",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "6e30640191738f50a632f5c2b98ee10badab8ce6",
+      "documentPath": "cli/.claude/skills/translate/SKILL.md",
+      "documentSha256": "f28b02c1a96731b277cda4a77cecacfe2baa1cef785a6a6bdd5f38cdeca80e63",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "ai-forever-kandinsky-2": {
       "identity": "242b9de65ec81d79ab1f9c7938db0c65db4954b7bf1e1376e0167227a5f2ed9e",
       "status": "collected",
@@ -1808,8 +1892,8 @@
     "aidc-ai-ovis-image": {
       "identity": "440e6059246f90cc1cedc9f232a93834ffec3e850059b2af3ede04ba9cbb4946",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "aidevgtm-growth-loops": {
@@ -3258,6 +3342,182 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "anthropic-frontend-design": {
+      "identity": "678e401c615a05d1a3eafb9a466cfaef03e3531f4c10698420ee475b02cf98eb",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "683bc88e56f3e09ba94f7055977f3d3aa499f202",
+      "documentPath": "skills/frontend-design/SKILL.md",
+      "documentSha256": "d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "anycap-ai-anycap-human-interaction": {
+      "identity": "aa05fd82b3bd70d469c8ba1abd82333c1ef5e6754aa6552178bebe63a307c58b",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "93f689e8c78d30772f9ad5b7d9039feb72990031",
+      "documentPath": "skills/anycap-human-interaction/SKILL.md",
+      "documentSha256": "e3a6e8ace1fca644bbdccda5075dfc06e93fec64008180193b7515fa989b6f1d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "anysiteio-anysite-crm-score": {
+      "identity": "003440116fab4317bfd3901677251c9c6ab851a148b2d5689ff7112ef9c1f057",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "fe97d12b0ce68660d4ecffe1d6f717f531e7a8c6",
+      "documentPath": "plugins/anysite-gtm/skills/anysite-crm-score/SKILL.md",
+      "documentSha256": "43eb2aa4175098d7750d05edff6bd69e03ff0ab1eb0d1d5ea47694799e65c431",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "apache-magpie-good-first-issue-sweep": {
+      "identity": "577adefe40d73535431f47a38159093be31d882bc2a8021f6594b7a652313d94",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "reason": "no-exact-source-document",
+      "revision": "f3cab5ce60319da987549a8523ac1226885f1ae7"
+    },
+    "aperivue-cross-national": {
+      "identity": "7c2c0c0884bdc73119eacb2047d23d3da99cf152a2b5043eb5d017406df5a201",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "3b14ae2a9424a3a2b14f38338bc527823df06e96",
+      "documentPath": "skills/cross-national/SKILL.md",
+      "documentSha256": "cd1659f013b942595fd592aaba73492900b3dd77112d80ff0d0b95966d25501b",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "aperivue-design-ai-benchmarking": {
+      "identity": "818897cf24ddfc9935f4acad85194d08c066d93281ba42f42f6c020b2dc1a876",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "3b14ae2a9424a3a2b14f38338bc527823df06e96",
+      "documentPath": "skills/design-ai-benchmarking/SKILL.md",
+      "documentSha256": "fb18e9acb611a51132e25f4f8690ea61138c424ebdda5a18ea32da5c0cfb99d7",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "aperivue-find-journal": {
+      "identity": "f517c93cf5c2ed74d9d97879ca55820e10c9fb02dc026b6e7ece0b16d5eca3f9",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "3b14ae2a9424a3a2b14f38338bc527823df06e96",
+      "documentPath": "skills/find-journal/SKILL.md",
+      "documentSha256": "f4b4e02ee78b4d9b92cf80da53ee67e7901ce36e868fd3fd47e97e51d4931e83",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "apexcheng-xbot-project-diagnostics": {
+      "identity": "cde41a1600e2b8403fbdc8532569b574ece78255548d24fc633b9214b67e5b43",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "fbb8f00f1b8f26d5fa9446d3a856147b4d0204ac",
+      "documentPath": "project-template/.claude/skills/xbot-project-diagnostics/SKILL.md",
+      "documentSha256": "17bb7389c929872038ddaf65fb7a0af652c0917778758d5a6e2a086e8c52fa1b",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "apollographql-apollo-federation": {
+      "identity": "3df00c77b4277dd1b7bce2825c559d82dc1027f736ea93108d0bd64769432842",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "c288eb80629dd2309eed81f23d693f66a452d043",
+      "documentPath": "skills/apollo-federation/SKILL.md",
+      "documentSha256": "3c54892777b0d5586242a6287d74a134c90425b83af016c9a2c34a436bacba6c",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "apollographql-apollo-kotlin": {
+      "identity": "c265c3fbaa1ecb00f1c4f99bac95979a96d2ce63d47f37231288e69a9a9d4f94",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "c288eb80629dd2309eed81f23d693f66a452d043",
+      "documentPath": "skills/apollo-kotlin/SKILL.md",
+      "documentSha256": "2c90308aa0aed7f301052d9ba3e2e0799ca3dd8b16ec50cc7cbdd67d98655589",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "apollographql-apollo-router-plugin-creator": {
+      "identity": "e5f34d49c5f87b33e9717550579c434052ca53dd70c7f28c47c4e01ded800cc8",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "c288eb80629dd2309eed81f23d693f66a452d043",
+      "documentPath": "skills/apollo-router-plugin-creator/SKILL.md",
+      "documentSha256": "2e1baedb3327549d783add3154dd9e2ba2829e79ad6653268d8f63d4674e5ecd",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "apollographql-graphql-operations": {
+      "identity": "66de62c0dcf9ee0b22962cda969a6dbcee843d9aecb257f6c2a40d927a8ee984",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "c288eb80629dd2309eed81f23d693f66a452d043",
+      "documentPath": "skills/graphql-operations/SKILL.md",
+      "documentSha256": "1dbec2cb28dbae3bddffb1004f00c965dbe2a70b08c43a144b91d63a0c5d14c6",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "appandflow-react-native-design-utility": {
+      "identity": "cc7f5af654e8f1e3b459618ce8d6078b3c1a4325ddbedc99688c5eda6226d1b1",
+      "status": "collected",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-11-07T07:38:31.045Z",
+      "revision": "f827dad88caae053d6ff1799203fcc53ac253479",
+      "documentPath": "README.md",
+      "documentSha256": "04704167ab684ae1485ba8d4e9ce1f99863b9aae8a0dd03b0c08575c08edcae0",
+      "candidates": 7,
+      "previews": 3,
+      "skipped": []
+    },
+    "appautomaton-arxiv-paper-writer": {
+      "identity": "7f0329705886e00ec7f6322831612648236d4812931190cd36cbccffb08c4cb6",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "b5b058350796bd6c9df7725a5d2e1607a9d45b2a",
+      "documentPath": ".codex/skills/arxiv-paper-writer/SKILL.md",
+      "documentSha256": "2553d9c0bcd447bdcd6b4b775075e785c22bdc7645946f8ea1be38d1388e1a5b",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "appautomaton-brand-system": {
+      "identity": "d9642fbe6731245fe0836deb904d45a00d71a137e3710cc3bea954e2f07e977b",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "1512dc8c51a6e09403a705b83a6bd363486a245b",
+      "documentPath": "brand-system/SKILL.md",
+      "documentSha256": "65fe5486388fcf6f7bda93145a5cde5c705ea859ae18fc74453933d6ad310cc5",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "appautomaton-consultant": {
       "identity": "78913488990eb2e930b2c39769d951c2b0c3a2281e69a7f2fc77ed79793db5fe",
       "status": "not-found",
@@ -3270,6 +3530,30 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "appautomaton-deck-design-pdf": {
+      "identity": "ae8a7967023f4ec4fd04a255900882b17ec5162d76b1b42dfb868ea36f9f10cb",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "1512dc8c51a6e09403a705b83a6bd363486a245b",
+      "documentPath": "deck-design-pdf/SKILL.md",
+      "documentSha256": "7fef8da5869119b788af0eb8635c1526b19c500a6dc01dc263ecd8931719f4a3",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "appautomaton-deck-design-ppt": {
+      "identity": "521224515215b012e755c0f73cde2d4a9ae32625cf22f37b9db789f6024e6a63",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "1512dc8c51a6e09403a705b83a6bd363486a245b",
+      "documentPath": "deck-design-ppt/SKILL.md",
+      "documentSha256": "a1d4b0b532a2dd413a59fa71812d056da80026ecb11fdf9f9cc1c88b64aa1a85",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "appautomaton-pptx": {
       "identity": "7f19a1b1cc6e03696518c065b5b1b78b7d144463ad9dc0c288b59e095bc3acb3",
       "status": "not-found",
@@ -3278,6 +3562,138 @@
       "revision": "ec542a6121c124dd2b6f73c9e8912e40fd64b184",
       "documentPath": "pptx/SKILL.md",
       "documentSha256": "ecc0427730419992236640ccfe89add29422aa36e8daae213e097dd6a5bf5d7d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "appwrite-pink": {
+      "identity": "190a4d1e569d0bb9787143597601368372cdc3062217e60ef4ef3963eefc74f2",
+      "status": "collected",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-11-07T07:38:31.045Z",
+      "revision": "bfc9ba160fcd444e6dbbf45ee31d59213cece1c6",
+      "documentPath": "README.md",
+      "documentSha256": "264421e475620c7c6f44585033b03d88d9e1c12dc3bd2e25a0f2a65f725e556b",
+      "candidates": 1,
+      "previews": 1,
+      "skipped": []
+    },
+    "ar9av-obsidian-layout-adjustment": {
+      "identity": "3a05ed55c93f01e32a4bffde9efad74176c877f18eb9cfcb05e8ef1a91f2a3f3",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "709727e2a8ac35cfc57bf50479e23d4701213e39",
+      "documentPath": ".skills/obsidian-layout-adjustment/SKILL.md",
+      "documentSha256": "07da9bfa8d2a7c24e442338b9ec0d453b0f854098568af7be37a5951fd8dae6a",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ar9av-wiki-dashboard": {
+      "identity": "0939bc812e7b886bef8b3de8b27538fdfb03e7c4372aad08f826d57c060e2ea2",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "709727e2a8ac35cfc57bf50479e23d4701213e39",
+      "documentPath": ".skills/wiki-dashboard/SKILL.md",
+      "documentSha256": "9727caf3c77e17246600df816f178ef1485e2660666863d8b41e1143b1f26e8e",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ar9av-wiki-dedup": {
+      "identity": "041deea6b3f6ae7132a3ac1f0e7765a96c728bb23b0f5a1f0d9e80e77d1978a9",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "709727e2a8ac35cfc57bf50479e23d4701213e39",
+      "documentPath": ".skills/wiki-dedup/SKILL.md",
+      "documentSha256": "21129360dafb313afbb8ba4629f98ec808f0e44280e587e74467f7e5a8b48345",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arakoodev-edgechains": {
+      "identity": "ddb038247899cd00c356c5ca868c88b3911995444cba9599e1786821a0457d21",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "451f0ff689b0f2a4c49202e6a04d7a2145fc6483",
+      "documentPath": "README.md",
+      "documentSha256": "31cead379ee9bc6d21c73abbd73f4c396be11aaf86f1389e0a36fd2018a8d7b8",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arbazkhan971-a11y": {
+      "identity": "4e6290afc136e3eb6dc82f61e00349ef481db10cfe7ccd1a748d371af9d104e2",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "18bfc31d669804856ba232f04cdbd172afbdc379",
+      "documentPath": "skills/a11y/SKILL.md",
+      "documentSha256": "70800e5e1029cac18b4de17f61fa161018ed810fc91d8d2ef780524c6987ee45",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arbazkhan971-agent": {
+      "identity": "eadd8e3e1dc93ce087468ef7526e4a8dcd708053cfa5f715424af085814e836b",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "18bfc31d669804856ba232f04cdbd172afbdc379",
+      "documentPath": "skills/agent/SKILL.md",
+      "documentSha256": "919f67344c2c2ddaa50feb401f10fa0a74d063118715170f5939889469256cf9",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arbazkhan971-architect": {
+      "identity": "5ec57a9411a5eef35ad79f3f12ca7961e4cdebee100d0ee3f897823bac22a416",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "18bfc31d669804856ba232f04cdbd172afbdc379",
+      "documentPath": "skills/architect/SKILL.md",
+      "documentSha256": "1300628aefa7359e9c9d976b5fce209e954b59a20a27f475163dd45c57c9a063",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arbazkhan971-build": {
+      "identity": "f4276650b6b06c9ed2a650897de04dc92f8a9abcaf75805a3c90934418cdb5b0",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "18bfc31d669804856ba232f04cdbd172afbdc379",
+      "documentPath": "skills/build/SKILL.md",
+      "documentSha256": "3fc5e3acd74f446b66c3b3162a5fc701f94e6816ec4f270bc4447386f628eed2",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arbazkhan971-cicd": {
+      "identity": "5d85fdb23286304246bbc0681f25aa5c9812493cccf4d3f0c39ed9a3daf23978",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "18bfc31d669804856ba232f04cdbd172afbdc379",
+      "documentPath": "skills/cicd/SKILL.md",
+      "documentSha256": "082e4347330c5c6b06c32a36b59345b4f6d45f0b5ce124fc94cc42ce345dffec",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arcasilesgroup-feature-batch": {
+      "identity": "0536a8695c6f5064590bb02e536c2f1dd5290f4636bbee7995a20f5b9e8f30d0",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "954a7b827fc6171a5b37580367e7627268c721b2",
+      "documentPath": "skills/ai-goal/feature-batch/SKILL.md",
+      "documentSha256": "b96a523f38facc45e1173f8013ea96a363d6d9359ca3bd2b0336cee3a1adcdb2",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -3302,6 +3718,91 @@
       "revision": "ab9c4b178b62075098d507330348bbe8fa6073fb",
       "documentPath": "skills/compare-shows/SKILL.md",
       "documentSha256": "62137fecbc7e0a27d25ad3a03302ac33ef818df705abda5f85fc40bdb071c7b7",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arco-design-arco-design": {
+      "identity": "0ff6e34f7de57b5173a16b15390b020a0a587fa16a49d08fb1c56d7e18f99a89",
+      "status": "needs-review",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "c2b050d9c7ce94bebba94f616a0721344231caac",
+      "documentPath": "README.md",
+      "documentSha256": "4261ef0e2ebd8ab931d2b1deafe3b105c64015afde5893bba4aea120e5c9a0ac",
+      "candidates": 0,
+      "reason": "source-association-or-license",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "arco-design-arco-design-vue": {
+      "identity": "8c2ffb83d2d31522aa715748b00c86993be4865c9c5ba4512492cd5cee4532ec",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "ee158dd75e81f636f34d1929fd3b19b5a6f0e32a",
+      "documentPath": "README.md",
+      "documentSha256": "26345cc745b0286bb18e0a51d183902e9257b87543fa79b8d86ac0cfa50a0bd8",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arcreel-frontend-design": {
+      "identity": "d9136d1bb7ec9b1e328a9ac6e6601685d774af632e9cc72db1e6010ff0c0da59",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "dec992c3866dd1bfbdd207d3c115f895f0e07b49",
+      "documentPath": ".agents/skills/frontend-design/SKILL.md",
+      "documentSha256": "d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arcreel-grill-with-docs": {
+      "identity": "9df1ec97173e8ebff40df66c312f9e450c4a44c7c6da37e3d0dbc68e24c3b158",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "dec992c3866dd1bfbdd207d3c115f895f0e07b49",
+      "documentPath": ".agents/skills/grill-with-docs/SKILL.md",
+      "documentSha256": "7de372c13488f1ee96cc11cd8907b56b6809cc93eef776eeddd37de6b6cbe3fe",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arcreel-prototype": {
+      "identity": "4f5d43ed44555fbc21ea00d8d2f7932feabd5064a763e46ca7a00be505191eb4",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "dec992c3866dd1bfbdd207d3c115f895f0e07b49",
+      "documentPath": ".agents/skills/prototype/SKILL.md",
+      "documentSha256": "714de632d116bb73f65cdb5a882db15b9369a6713b9a47c0fad827848f0bfbe3",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -3331,6 +3832,54 @@
         }
       ]
     },
+    "ardov-huetone": {
+      "identity": "9884b6a8f804878959c86d78b60c7890d9ed62938db130a06a08600425cbedb1",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "edb99b2e5c3b65510884ee354888188ec225fbca",
+      "documentPath": "README.md",
+      "documentSha256": "0e0b915720c59180a01c6f2532ffff4abf79c46cda28ab3e4fa236155448f134",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arham43-ops-neobrutalist": {
+      "identity": "a9c5df968970483cc2b4a2942651eefe7a3400cdc7da8833e922bbeaf6c43e69",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "0edf3a157d64249cf4f1d31c2653538ab7e4f28a",
+      "documentPath": "README.md",
+      "documentSha256": "d840604600a988747c74f17f3067c6ead2e73ee1b2fdad1cb79ca080f5709849",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arielsalminen-vue-design-system": {
+      "identity": "c89e83775388d70df56912be5719d721d85fa272115f01321225dd2b801863d8",
+      "status": "collected",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-11-07T07:38:31.045Z",
+      "revision": "38c4c43613029bddec43fb79316ab582197496ce",
+      "documentPath": "README.md",
+      "documentSha256": "9b3a10de0c103c33fb7f297c954be1df49031f628824629e4814d0ceea69c4db",
+      "candidates": 1,
+      "previews": 1,
+      "skipped": []
+    },
+    "arize-ai-arize-link": {
+      "identity": "4ccd38aec2dde9cd1b56a092d776a73fde869190158c988631b3da6895d1ef63",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "20ea1034e2ff400aceb90e77d410aa878923954e",
+      "documentPath": "skills/arize-link/SKILL.md",
+      "documentSha256": "a1456da6a70cd790876be4b16d1231b09dc9d77c47c57ecc157b351d208aaf30",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "arnehilmann-markdeck": {
       "identity": "bd368b96e21b76f15145687eebcf80e1e136316a2ec4110cd9776288f794b654",
       "status": "not-found",
@@ -3339,6 +3888,428 @@
       "revision": "f8ea0b937afce76d0d61e8518325a61f46e90265",
       "documentPath": "README.md",
       "documentSha256": "e897f2fc8fec19b54d4926410de2a19ca88dbbeb643f6509df5b7f3db3dbbef7",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arohitu-salesforce-revenue-cloud-pricing": {
+      "identity": "02f92cdcdd72f0a4d4c39821b4446075278fbd1d4bf7c01d000705a5182945cf",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "6c9ce0673225559adbedf8555ba8404d2d01265a",
+      "documentPath": "skills/salesforce-revenue-cloud-pricing/SKILL.md",
+      "documentSha256": "931336403cca5938bef7b51ab7155b0a993d9242ee54faf298c11f8c24fd2c83",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arozumenko-accessibility-audit": {
+      "identity": "156bfd2b993b46db375d111ebcacd52f802c3840b2bb2359de54962fe386231c",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "f94a44a898c8075a89f227fc5370b99c7582e8f1",
+      "documentPath": "bundles/manual-qa/skills/accessibility-audit/SKILL.md",
+      "documentSha256": "b3cb8504eebd89869d757f10f6c98c4c30951e30d3800418c53dee00b5e6ff21",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arpitg1304-robotics-design-patterns": {
+      "identity": "c83c8eef548d72e9fbcc373e5cc64bef6f61f14eeb1b635acc2d0681e75b0259",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "f9bc5467ff9ee3d23f1a1b0b29a649843bb6ad11",
+      "documentPath": "skills/robotics-design-patterns/SKILL.md",
+      "documentSha256": "9d911e5462eac45ba165ef248504d4c0f17a67b30de538e48c634f83d7a09f86",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arpitg1304-ros1": {
+      "identity": "fa7eb5e137fd55ba2bc77565bf46a9cf12affdac93bf18cd098f6fef32f37837",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "f9bc5467ff9ee3d23f1a1b0b29a649843bb6ad11",
+      "documentPath": "skills/ros1/SKILL.md",
+      "documentSha256": "f415dea885641c673be1637464335a4556878c541432c6ed6ed282edd5f09e24",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "arriemeijer-creator-aerojax": {
+      "identity": "2402889b34be5e52f3edbf95ebe72b079b541a21506ae72a41abc785b1683a0e",
+      "status": "needs-review",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9e4fa16d5faa7b711ed546be19afad5806562430",
+      "documentPath": "README.md",
+      "documentSha256": "7399c46ae268aa15cb693694d567735a003c4dec41488c8b3058804828706db9",
+      "candidates": 2,
+      "reason": "image-license-not-established",
+      "skipped": []
+    },
+    "aryaniyaps-lamina-67b73dff": {
+      "identity": "1b148dc7ed45ccf0a05a74b99400176d51a961b468a7ca5ead0bcbf59aca15c0",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "af269ef3347fb7edeb956f3af9c943641717891c",
+      "documentPath": "skills/lamina/SKILL.md",
+      "documentSha256": "4a18ec9295be7653d5069b6247f7fe49590499fa98444db0caa12cb000705822",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "aryaniyaps-lamina-design": {
+      "identity": "63eaebc2974d33da589e9b60ae2ae8e76b8d5159f49b7689b76110aa109e0b88",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "af269ef3347fb7edeb956f3af9c943641717891c",
+      "documentPath": "skills/lamina-design/SKILL.md",
+      "documentSha256": "c90bcc5d84e310f1b39f3f7ea42f4dc69a184c2cbb12cd1a2e63898fb0e52ca2",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "aryaniyaps-lamina-product-behavior": {
+      "identity": "bb97d1f7a78f5b7755b2397ea8cda682cebd0c26fa89563a654e30b31e384873",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "af269ef3347fb7edeb956f3af9c943641717891c",
+      "documentPath": "skills/lamina-product-behavior/SKILL.md",
+      "documentSha256": "5c718d753aa99673030d9622a13cfb8e3f7e7c2255e689c28fc57b9bd460d6d7",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "aryaniyaps-lamina-product-discovery": {
+      "identity": "13927e436e2ffd9e9f028538c523938d342b9429c690de7a701d2934675e9f22",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "af269ef3347fb7edeb956f3af9c943641717891c",
+      "documentPath": "skills/lamina-product-discovery/SKILL.md",
+      "documentSha256": "1672e9b701186b7e18f4c2ed4672471a3713d832cc4496fe30dbfcf05b833294",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "aryaniyaps-lamina-ux": {
+      "identity": "010b31c7f84e5b71b85e9e94744faee6726db3414271aa63010fcc2fd436ed60",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "af269ef3347fb7edeb956f3af9c943641717891c",
+      "documentPath": "skills/lamina-ux/SKILL.md",
+      "documentSha256": "0862439ad73631088ed66a1dca40d07818716c335c8aabcf54ff582599f12e78",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "aryaniyaps-lamina-verify": {
+      "identity": "c17f24de00713ed2a2a8122db9b9bafda882b31010d798893c1be95801cf92d8",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "af269ef3347fb7edeb956f3af9c943641717891c",
+      "documentPath": "skills/lamina-verify/SKILL.md",
+      "documentSha256": "e79672dc3da914d14f68a861befeb9caf4fec69f9a7749e023d1516a519e23ea",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ash1794-vibe-devil-advocate-review": {
+      "identity": "9953ce25803d13bc0cecfee272f96dd32a53aa92a0bb13a896955352cb3ecf52",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "98188aba78809b2f2edd424d4c3fbcb9376d42b0",
+      "documentPath": "plugins/vibe-engineering/skills/vibe-devil-advocate-review/SKILL.md",
+      "documentSha256": "edf1048a3934be37599c6e44dec45247756f01e487beeb80e9bf53556ef97038",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ash1794-vibe-doc-quality-gate": {
+      "identity": "17372b1c734a94d5050b585042b40cdaa967e556d70a0c6fcd40a08da4925428",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "98188aba78809b2f2edd424d4c3fbcb9376d42b0",
+      "documentPath": "plugins/vibe-engineering/skills/vibe-doc-quality-gate/SKILL.md",
+      "documentSha256": "414717732abc5fc2b04e47eb4b498d9d188853d8cc24fd899edc8e87d4e8e0d7",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ash1794-vibe-research-before-design": {
+      "identity": "456a241c467cc862fd0dba5cacc193143a5a16f9f609d45f09e97efacd981154",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "c9fd7bebb397d395028650c3e28b7408b374ade3",
+      "documentPath": "plugins/vibe-engineering/skills/vibe-research-before-design/SKILL.md",
+      "documentSha256": "019aea1725cc79646086f2c5af69090a1ef8beed1851e0d6a0608558c0df6461",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ashishsahu1-ml-projectyard": {
+      "identity": "57f82adc85593b51fe79d62c25278feeb830ad4d8c629229c5ca37279c519ef1",
+      "status": "needs-review",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "0d49beef30354e167b1eaef89c70bc51267ca65d",
+      "documentPath": "README.md",
+      "documentSha256": "212dc5478e996b873b44875b55fa1db8d29888ebff42910fb547f7413600b4c4",
+      "candidates": 0,
+      "reason": "source-association-or-license",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "ashual-scene-generation": {
+      "identity": "6569ab65331e88af1a5a5f1ba3c9febef0d9f4ff70144c5fb3295ef0d7072288",
+      "status": "collected",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-11-07T07:38:31.045Z",
+      "revision": "6f6fe6afffae58da94c0c061e4dcaf273cdb9f44",
+      "documentPath": "README.md",
+      "documentSha256": "c51a0301379c1abd12cbd870466ae1294fab5466440d038d0d30fcd34d125731",
+      "candidates": 1,
+      "previews": 1,
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "asmcss-assembler": {
+      "identity": "c77367590492aa2f77b0dee702580259c85a8b2e64efe4eaef28c5670f37898b",
+      "status": "needs-review",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "3d3a4af516185ec0d8f6c9021f61167925c49023",
+      "documentPath": "README.md",
+      "documentSha256": "602dec86b8e813486e5a937f46b4900743216893728eedfd63db660ff59a245c",
+      "candidates": 0,
+      "reason": "source-association-or-license",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "aspjt-dungeontemplatelibrary": {
+      "identity": "324ce3429ecb770eec93b8c6a46d2e4177206a31a52de9601d1b9d051d97c458",
+      "status": "needs-review",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "7819dcd58dc2d8d7d2d3299d8918aee184d5bb05",
+      "documentPath": "README.md",
+      "documentSha256": "4bd494dd4075a430261fe28b1a1a1ab9047fc962a8d4abffd81b4739508d961a",
+      "candidates": 0,
+      "reason": "source-association-or-license",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "asqatasun-asqatasun": {
+      "identity": "f25f8ddceb4d771b6712d8c8887b0e54a3af509625ea79350d7e06a297fda9cb",
+      "status": "needs-review",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "af9064357e881786cc7cc72e782662908bd91c5b",
+      "documentPath": "README.md",
+      "documentSha256": "4175423ffaa2c53f719200614bb3eddb98b8f5c982c016583eecbd2e20e438cf",
+      "candidates": 0,
+      "reason": "source-association-or-license",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "assistant-ui-assistant-ui": {
+      "identity": "fab3c249469c24a0d0cb807e1852eb6685c98f6536d1f3d1ae4699bbeffdf058",
+      "status": "collected",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-11-07T07:38:31.045Z",
+      "revision": "3ed5eb54688cdd6d2b0bee4b325f2c28c5a6669d",
+      "documentPath": "README.md",
+      "documentSha256": "91f519bdf12a72584e13dcca4bb42bb1d6aff47e3ea0692dcccd6ab1213a9b3c",
+      "candidates": 5,
+      "previews": 3,
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "assistant-ui-copilots": {
+      "identity": "798df183519db6ac7bd53f60d060c6cdb02f759cdb3d4718b0f11745ca92accc",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9bd7535202aa446138ee2b42ca259b72dcac5df3",
+      "documentPath": "assistant-ui/skills/copilots/SKILL.md",
+      "documentSha256": "f675eee189806a7d2614345ee05931ed808a4b34d467b6840a22cdc4b2fe2e7f",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "assistant-ui-ink": {
+      "identity": "616091351c70857cd3794527d2041707c8a3c6dbfaf9a73021935abe9a91f53d",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9bd7535202aa446138ee2b42ca259b72dcac5df3",
+      "documentPath": "assistant-ui/skills/ink/SKILL.md",
+      "documentSha256": "cee6ed157ef1dfd691d049aec869cdee3b34476012bc27ca954fa3bbd1bcebb6",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "assistant-ui-streaming": {
+      "identity": "c511fa35ab14e6632731ef7f7ce385b715c497d74223dfdc9ac389cddb2ba682",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9bd7535202aa446138ee2b42ca259b72dcac5df3",
+      "documentPath": "assistant-ui/skills/streaming/SKILL.md",
+      "documentSha256": "67810e2afce6355c7e2a1100d785e34018b8eab50c3b003e939ee55fd1f772c5",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "assistant-ui-update": {
+      "identity": "800d6283b159d2f8538e5b8925ec1074add87debdeb5e3d7f8b9ba1ca104b2bb",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9bd7535202aa446138ee2b42ca259b72dcac5df3",
+      "documentPath": "assistant-ui/skills/update/SKILL.md",
+      "documentSha256": "403b723dc6e0d689ec4f156dd505ffdcd3c5760f3c1dc37fff32dffca7e823ff",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "asteroid-belt-autobuild": {
+      "identity": "0d29e22cc088951fc50a977991c735df35c0f51bf834619c3311c87c2fc03762",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "f2cefa1130d37afef1f45f318ea9dbafa34a67d4",
+      "documentPath": ".codex/skills/autobuild/SKILL.md",
+      "documentSha256": "066641a7fb393c2393112db1a66758a793d0969d0c920ef1286af4ec76cdd5f8",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "astrit-css-gg": {
+      "identity": "2c2153cab7869852cbf1a5260e21f9ccb5ed9da15b7742d9c30e7cb87ef70d4c",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "ad0428df5491082b29a81d64dbdc59b9602cc059",
+      "documentPath": "README.md",
+      "documentSha256": "cae9a611027707dbf46cf062196fdddc53d7a64a5b7cfdc71527e8abee16059d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "asyrafhussin-laravel-inertia-react": {
+      "identity": "0f4e6da79f2a50b5b3ac96e088d661e219c68210430a95147568fe31be5b2bee",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "1aa0ff717c10309226c9e678f00873976450fd76",
+      "documentPath": "skills/laravel-inertia-react/SKILL.md",
+      "documentSha256": "b26e2bf8a257933187434d90aa2da8c04130920ebe40d55b310c8466468490c9",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "atastech-pitroom-brainstorming": {
+      "identity": "160aef0088635ab78ecb4f1c15d3091ffb8bd8b8aba52ee14a51374d468e48b0",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "bb01e8e78e3d095d66488e8f625500805e8a5fe2",
+      "documentPath": "skills/pitroom-brainstorming/SKILL.md",
+      "documentSha256": "5e308047e3ae98ff957d60aa276910d943e3d8c75f35483cfe64fa0cdfbd4d61",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "athola-night-market-architecture-contract": {
+      "identity": "bed38178f9517504d8dbd1f5ac63b9acaedca4e35df904db01d7e6b4be0fb27c",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9f3eb003bedbd1d84389c5dd68711ea56c8c69b4",
+      "documentPath": ".claude/skills/night-market-architecture-contract/SKILL.md",
+      "documentSha256": "0adc25e6adefbe0ccbb29fcd7087b3bd32919f6d50621841033a07fe188af54a",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "athola-night-market-build-and-env": {
+      "identity": "e3b81b5b057680a795a4c4a0ec8953866231683fd3996fd292c28104c64f8901",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9f3eb003bedbd1d84389c5dd68711ea56c8c69b4",
+      "documentPath": ".claude/skills/night-market-build-and-env/SKILL.md",
+      "documentSha256": "d254d7591b9eb12ef217bd98ed26f9a7e3bdfc8331fa7b3470181d0c61c252c8",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -3451,8 +4422,8 @@
     "bria-ai-bria-ai": {
       "identity": "8ec965957e5a8c36e88c5f03ec25e07244e80fa2c79c44b888eae55581043bab",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "HTTP 422"
     },
     "bria-ai-fibo": {
@@ -3470,8 +4441,8 @@
     "bria-ai-vgl": {
       "identity": "36e67e17c4bc71a7f2a9570b5267f91788148e32db2e7ba30365b9f6d4049385",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "HTTP 422"
     },
     "bruc3van-bruce-doc-converter": {
@@ -3602,6 +4573,18 @@
       "revision": "43947be6e779cd9972e6cb9b18cbd65b493328d3",
       "documentPath": "skills/native-subtitle-quote-image/SKILL.md",
       "documentSha256": "9f8d0ba2257f253545138e807c4eac3ceb38b630d374bca816e1f7d748da9f82",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chenshuo2004-cs-chatcut-video-blueprint": {
+      "identity": "fd40d516da985797a3160f5ba2e98ff7a7545214aa16da84bb037d145ca4e955",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "6f5009d710ed73eeda6bd13e5be4f902ce56d7c5",
+      "documentPath": "cs-chatcut-video-blueprint/SKILL.md",
+      "documentSha256": "dad48e9fefc810a43c236c45a3256a6af9f54b0dc61da44be855f10771b270c9",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -3854,8 +4837,8 @@
     "chuspeeism-dashiai-ppt-skill": {
       "identity": "a26509a0d802f8185b467f4ae93856f69cf31f5d94fc1692943b503bdd181471",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "claude-office-skills-academic-search": {
@@ -3918,6 +4901,174 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "claude-office-skills-amazon-seller": {
+      "identity": "3fd581ab19d2e79c1185f308bd5f80a80ade13a4eb8f3e39df3fc4c4169c7e5c",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
+      "documentPath": "amazon-seller/SKILL.md",
+      "documentSha256": "830a0f3e09e07dd99272f974e1a3b0a33769abe9fe8e8b28190977db3f2a20ca",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "claude-office-skills-apple-shortcuts-integration": {
+      "identity": "6bc61be1b61dc8eb243026f31ffe7511ef53acebbe09ba81d65d0e355082442f",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
+      "documentPath": "apple-shortcuts/SKILL.md",
+      "documentSha256": "4181fda67ceef4f7cad1243642fdb26f237004574ae351dbec70b9becc9f2cc7",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "claude-office-skills-applicant-screening": {
+      "identity": "63a55e1851a497d5c7b466a9d0fff69d20f78c6338224cf2b5503c218f17bfdc",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
+      "documentPath": "applicant-screening/SKILL.md",
+      "documentSha256": "9f23c9384db7d157eb8335f9d5d27d9013b89ba1698d97cdcbe9d3ab17568ef5",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "claude-office-skills-asana-automation": {
+      "identity": "e1744e899fb92ec9fe5f5a767f1ecb5ae3d5c07d5c946c7bfc8d07fd61c02e81",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
+      "documentPath": "asana-automation/SKILL.md",
+      "documentSha256": "5c3910d4c42a2dda90b482b8b059b7dde955a7c913d35cd72d0daf91c37d64f7",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "claude-office-skills-batch-processor": {
+      "identity": "d652651f80bed163e8228375aa5ad9721b38d167a7f957abd041e4fcb3ad3ba0",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
+      "documentPath": "batch-processor/SKILL.md",
+      "documentSha256": "7749379ca776c3f6ed45a2f886490f5708d5959bb308fce88ac6e73afbfade10",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "claude-office-skills-browser-automation": {
+      "identity": "877d1a284c0dcc1a97af4f0ba11edf0f1baf9660bb78b35e5313e3a95aff7a18",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
+      "documentPath": "browser-automation/SKILL.md",
+      "documentSha256": "ea60c224bab82e180035358f22d86e4639696d74f7be02f06b76bc9a1dcdeb16",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "claude-office-skills-calendar-automation": {
+      "identity": "2605eab1c34b12d89c21e941a752c9cf29815dfddc4a27b4c12df284389f79b7",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
+      "documentPath": "calendar-automation/SKILL.md",
+      "documentSha256": "d42d4dc3761345f63be578a5f619e5446201aa52d58fc04b05fce31a584d06e9",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "claude-office-skills-changelog-generator": {
+      "identity": "823f80c05881dfecd29447e34d7e1a3e7f06052856a8f9e071d185b772645e5c",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
+      "documentPath": "changelog-generator/SKILL.md",
+      "documentSha256": "4d4afb015bda4793b1d62bcb6a598f950e582e7ed132102d54adcfb0396e1d75",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "claude-office-skills-chat-with-pdf": {
+      "identity": "a177080c8c901d3c3fbb372834db741e2da2cbc6e89d1490e7f2f148abda1d7a",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
+      "documentPath": "chat-with-pdf/SKILL.md",
+      "documentSha256": "f85e7af4767bac419139f195ca7688cc4018b0525007a3157140afce75e907b8",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "claude-office-skills-clickup-automation": {
+      "identity": "4b7a384154dbd8b97f6433a0ea040aa5f3de28291ab332abab5c15b8c3701e4a",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
+      "documentPath": "clickup-automation/SKILL.md",
+      "documentSha256": "a6d3126529d996e1557a3f852488cce8a9a8e0d1f0aa2064f95878aa74bdc44b",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "claude-office-skills-company-research": {
+      "identity": "5c193f823f401d8bcaa2772f1a22bbe76193101de95c02cc8b9e9308dd1ebca0",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
+      "documentPath": "company-research/SKILL.md",
+      "documentSha256": "0f4b98909876887079eacc3297322cfb7b0fa995c02c50e56516d2d9b6e52beb",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "claude-office-skills-competitive-analysis": {
+      "identity": "d3b209c35578994a286cef1626a88e54d186d43c6322cb99134600a68a90de43",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
+      "documentPath": "competitive-analysis/SKILL.md",
+      "documentSha256": "0147807fc659db91d30f0857b8d79676bf8c24f9b7a17f0a7ace12b86191772a",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "claude-office-skills-content-research-writer": {
+      "identity": "f28ce97574681df1b6c6914ff7b504741cb6b63b1f1a83a4c85de6cc97d76ae4",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
+      "documentPath": "content-writer/SKILL.md",
+      "documentSha256": "315eb73c65b667b96dfbb7bdab2a94a7fc443d2ee76fe6802bbbef1e6aa5989f",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "claude-office-skills-contract-template": {
+      "identity": "468160bd7ce72838df09d6d432ea09b15be883568104ed66e96805b0dcd0ab1d",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
+      "documentPath": "contract-template/SKILL.md",
+      "documentSha256": "2135099b5a7be8383a860fcf40563a46c5e15c22745683447cd613ff2c7bc069",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "claude-office-skills-skill-name": {
       "identity": "e0fbd5fd8ba104769edeef94cadadd313b8aa44ef251ddb19e1c4d2d04a423d5",
       "status": "not-found",
@@ -3950,6 +5101,30 @@
       "revision": "1868b816090246ced9be9ef3556726c4dc94877c",
       "documentPath": "skills/slide-deck/SKILL.md",
       "documentSha256": "5d64c8a65340076f247e99197007a4c2b0f74cc3198fc0f6db1d6021e402363e",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "creatoonforge-korean-writing-reviewer": {
+      "identity": "89e1bb2882b324ccb10917c88545544db26c5f523054c71dd17b2b0852b12d3f",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "8f37444fa5ce7237602606c3e325e272fff3622e",
+      "documentPath": "skills/general-agent/SKILL.md",
+      "documentSha256": "f2a7e1328f1edd49bcf5335d08269b22e625c86bbf296716478aca7f31902a26",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "creatoonforge-korean-writing-reviewer-fad60c7d": {
+      "identity": "59181f375acdea8de4baca4b7e13074c5442e02097ea124db92dfca257347dee",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "8f37444fa5ce7237602606c3e325e272fff3622e",
+      "documentPath": "skills/obsidian-yolo/SKILL.md",
+      "documentSha256": "dbcbaf42cb6105e6a2e3484de87f6eb1abb5d5af993a9117e2f4e735510413a3",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -4027,13 +5202,13 @@
       "skipped": []
     },
     "danjdewhurst-adaptation": {
-      "identity": "463d8bbf41fdba468eb096a9d898900bb85c4f1dd0c536fffd989849929ed603",
+      "identity": "250e158608c47079bae7b1819e7335363e8bf1d52088ca02b4efd279cfcb3371",
       "status": "not-found",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-14T04:15:41.778Z",
-      "revision": "e2f59af0003377490632fa192db40fe325d151df",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "c2c18abbe8dc73ab8b44d7d62ac37e8dc2b40032",
       "documentPath": "skills/adaptation/SKILL.md",
-      "documentSha256": "70865250fa1cfb10eac9ad4db0b50fa5f3c3dce12d582d2487faa42b6a6bd081",
+      "documentSha256": "ffe16394a610ecbd11206a7a7afbbb94f4f90fd42d79a5a7159c2fd61cf5d0ca",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -4798,8 +5973,8 @@
     "gozen3ji-consulting-pptx-skill": {
       "identity": "828cb89085f364779123dd1c1345e8557b888e9a3fe41bcfb74b2f649c65831e",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "gsarig-double-check": {
@@ -5081,8 +6256,8 @@
     "hyqibot-pptx": {
       "identity": "f5665cb2cd587006894f4a68fe43e0d74f31ea6dd16016683603ec61242bdd26",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "iflytek-storytelling-advisor": {
@@ -5350,8 +6525,8 @@
     "kimsh-1-deck-factory": {
       "identity": "52c420f6f88992448b7e09591a7a3e65c40dac97ae8c3b4df0c49de8f73e8b54",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "knight6669-knight-imagetopptx-skill": {
@@ -5419,6 +6594,30 @@
       "previews": 3,
       "skipped": []
     },
+    "leanmcp-publicity-distribution": {
+      "identity": "ae77aa694343d6b9d575770193ffeae5996015f7c97b828e1e56cfd2db4383ca",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "7a708ce17d05bd390da88b2350f4b794d9427f18",
+      "documentPath": "skills/publicity-distribution/SKILL.md",
+      "documentSha256": "ef99571a1dc5487dcf4b6ddd19f11ea3863da1ef423430491f96de6f44d3c0a8",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "leanmcp-translate-explanation": {
+      "identity": "b6ef73eb1d104a2b5e12303eeb84a53de10b90657ddcb5de6bc5ddfc782c0749",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "7a708ce17d05bd390da88b2350f4b794d9427f18",
+      "documentPath": "skills/translate-explanation/SKILL.md",
+      "documentSha256": "62e6e1fde9a7d0e7e5b9cbd11c3cf330c34105c40a00c0ade20f9f8eb0cd5f94",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "learnprompt-humanize-ppt": {
       "identity": "505638b46691fca34c41a9462d8e58f462f61921bdd3766cc146b80bc51fe633",
       "status": "needs-review",
@@ -5434,8 +6633,8 @@
     "leeguooooo-chatgpt-imagegen": {
       "identity": "5924bdf09ea006a4567a93750625655b5a83c79fb92ba332ef19461bf472be16",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "leonchaox-generate-image": {
@@ -5956,6 +7155,18 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "microsoft-pg-graph": {
+      "identity": "5b5071bf38dfc82dc599a82086d6065155e5a80dc18e4288c561e5b89bf0589f",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9ba96abc800a574a0872f3d6b912ea8be1a6735e",
+      "documentPath": "plugin/skills/pg-graph/SKILL.md",
+      "documentSha256": "54be354edc88b4a46d5af1f8bd19b601d2c74b3f4655ecb4dca6c10dc83998dd",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "minorun365-slide-design-dark": {
       "identity": "e2f2357b6dedb38caad975f6f7ed6c25a4d06e31104ae9821682b733f202e510",
       "status": "not-found",
@@ -6287,13 +7498,61 @@
       "skipped": []
     },
     "nanmicoder-img-gen-taste": {
-      "identity": "1d460bd7921746581d74bacedb316f6682d0b05db98c05bd372b17ad5c1a0897",
+      "identity": "b5e855fe5c0b97dc0992ea9091c173ed3ee992e768484e9f96e99a4ffb2f7520",
       "status": "not-found",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-14T04:15:41.778Z",
-      "revision": "027780b368a33f84dadff03eb3552246bb95d72f",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "4d9df9495df75f5d91e47d67dae823fe27b9bd97",
       "documentPath": "skills/img-gen-taste/SKILL.md",
       "documentSha256": "c1e4820216cce7e246426d50155290bb7b65907d71d2fd01240de306fca5e3b7",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "nathanonn-ask-first": {
+      "identity": "b65007628458490d860366d2c84bfda44309b277f9daf00a03171348ec6f02cf",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9be9fcbe25ab549a6f46da372d9a2c9a1bc7cd59",
+      "documentPath": "plugins/ask-first/skills/ask-first/SKILL.md",
+      "documentSha256": "065c290bdff0d4b5ad168ea799bbe0124d48e66746d2ac84c47f515c5d0f8309",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "nathanonn-handoff-doc": {
+      "identity": "ee61ce6135f35ad084346b2462eaabca6f0ea9576b99f34da78de700e9da1ca9",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9be9fcbe25ab549a6f46da372d9a2c9a1bc7cd59",
+      "documentPath": "skills/handoff-doc/SKILL.md",
+      "documentSha256": "aac719251eec9a43e08cc714e21945739796cf232c4146a70dcb87f1dbaeced6",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "nathanonn-webg-spec-to-goal": {
+      "identity": "a1faf384dce4b9967f2547058b8242301fce3cb4e997e6629f28667e3df8f3cb",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9be9fcbe25ab549a6f46da372d9a2c9a1bc7cd59",
+      "documentPath": "plugins/webg-spec-to-goal/skills/webg-spec-to-goal/SKILL.md",
+      "documentSha256": "1afa8a1fa6248920abdcbbf4ae5a6be2397546991eb41bdbf7f002329e656510",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "nathanonn-wp-spec-to-goal": {
+      "identity": "921f3d43ca0cc1fab3b10316a990dc43c4fe775c18d3c636e8dea23f08f26798",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "9be9fcbe25ab549a6f46da372d9a2c9a1bc7cd59",
+      "documentPath": "plugins/wp-spec-to-goal/skills/wp-spec-to-goal/SKILL.md",
+      "documentSha256": "df340ffaf10b99563bba1f0eaf3fec36df304cfeeefcab5dc1efbe5e8145da13",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -6575,6 +7834,18 @@
       "revision": "f3d62c07f775530eddb13d435b91a9a86e7c9049",
       "documentPath": "README.md",
       "documentSha256": "956325c460711fc28f1d0ea45cd1e1dbb869a5049fafb456eba382a373345704",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "nonlooped-roblox": {
+      "identity": "7af98c4c72f2182750028c4f73f86918d6e8c9491991bafb90819a5086c0baf5",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "c914ce65470a6eb1b28000b8c58d5543b48760ca",
+      "documentPath": "roblox/SKILL.md",
+      "documentSha256": "39f0ed6402e5738f6c9135fcda8006575eb54dee57aa8ca4fe8da5bfb43bbf6b",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -6971,64 +8242,64 @@
     "player-yn-briefing-deck": {
       "identity": "d81753eca0954613cd439e9b2e8d93775adc76b54a621a4c34ddcacd61637940",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "player-yn-compose-image": {
       "identity": "c13c4c5060509788a0f3981c7a741ed321164337e766a40f40046a0b40e6bb55",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "player-yn-html-preview": {
       "identity": "ed1bfce4c0953feb4c5d30267589a83eedd7d49a2ef736773e6e7f47684158b5",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "player-yn-html-site": {
       "identity": "ae5275915f073354855c6d283a76c11a93d78d9e337ddb1e21bb67992a40bd2b",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "player-yn-listing-sheet": {
       "identity": "76b8ed131e6b3d19a065ae574139dd6666abf88de5177786df679ea963d1856d",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "player-yn-poster": {
       "identity": "ced6301f1b673442d14abdfdcc0df76b8f59938594895c44f3cd6e28ae5a5cfa",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "player-yn-remake-poster": {
       "identity": "6675c06983ee7ea0b407ccc787baa65c3e044aefbace4ba4b1517131361d79c8",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "player-yn-sheet-nl": {
       "identity": "d54be3e9d520af1090920ceac02a535fd2ac521deef8562f4c9fc4579a7bba49",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "player-yn-slides": {
       "identity": "7a367099074fb0aa806b85f444e1b2e39b55d5176d00a956ef6790ae9700ced0",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "plugin87-critique": {
@@ -7123,8 +8394,8 @@
     "presenton-presenton": {
       "identity": "5b03b03c375d08c89f4daef68f16f568153beeada007918167e9fd895e847ae3",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "prodigeproject-pradaslides": {
@@ -7139,11 +8410,131 @@
       "previews": 3,
       "skipped": []
     },
+    "qa-aman-acceptance-criteria-writer": {
+      "identity": "94ffefaaf67174f8d7dc3c5593ef880963f0208322773756bb980069a1b60465",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
+      "documentPath": "skills/by-role/business-analyst/acceptance-criteria-writer/SKILL.md",
+      "documentSha256": "0af3002e15e2ac3024704de4681bd5b024d5a4212b72e532b635fc59d1051aff",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "qa-aman-brd-writer": {
+      "identity": "46bbbd5b9c7a9b287f4b804b8b3239d351c9fe8ac151879ef9b67a90fd96166e",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
+      "documentPath": "skills/by-role/business-analyst/brd-writer/SKILL.md",
+      "documentSha256": "54a2ec238d3de89beaf9b1c28ebadb0111ff6abb9681b2bb0745fe860870aa47",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "qa-aman-budget-variance-analysis": {
+      "identity": "23b00d9cc2f42d4ea1835adc90d1ecb0d0e4ebd6fbfec3a72164b6fb8dc66aa5",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
+      "documentPath": "skills/by-role/accountant/budget-variance-analysis/SKILL.md",
+      "documentSha256": "46df80f501fa31f56b8e70a43026aa446fcd4affee5521c364d104d4b079083a",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "qa-aman-data-dictionary": {
+      "identity": "e669775c71e855062030631c280dfc857fdf808f7466f992d5855ef06fcb79a2",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
+      "documentPath": "skills/by-role/business-analyst/data-dictionary/SKILL.md",
+      "documentSha256": "1cdb8df9bc55e31776bb9bfd08fa33f0b3570300faf06e3781a3d9bb134b0d27",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "qa-aman-financial-statement-review": {
+      "identity": "2403ee57ba40a05f60656520839c366e4c66cd81d056a2ff2d41f7454612255d",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
+      "documentPath": "skills/by-role/accountant/financial-statement-review/SKILL.md",
+      "documentSha256": "f8e51a94a72679569c108451d044108c2977843c346ffc2da5cd47a68f302608",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "qa-aman-frd-writer": {
+      "identity": "067d314783c0df12d8a040684873ffcf7eb74700d942f741b9f4289d5d8f55bd",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
+      "documentPath": "skills/by-role/business-analyst/frd-writer/SKILL.md",
+      "documentSha256": "56227c0fa71fc5ad0b73d95b4c652dbaf188b3fe2a4ecf08cc84e15c99c31d36",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "qa-aman-impact-assessment": {
+      "identity": "6ff4087491889150f7271132ed5cf9f6dbaf8eb7a2fb017eadf5d66ca9bfddd3",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
+      "documentPath": "skills/by-role/business-analyst/impact-assessment/SKILL.md",
+      "documentSha256": "0d726f35731fa6a0c3f859fdc53cea88b4c6d50d81cf4be8206419704f809783",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "qa-aman-root-cause-analysis": {
+      "identity": "f237157c2305d23f3838f20dadca4018243bdf062c4a75696de9491e1207cd78",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
+      "documentPath": "skills/by-role/business-analyst/root-cause-analysis/SKILL.md",
+      "documentSha256": "5fa758d7913f547b424536b394668b354f1b7760fa5f0f86ebd2ec0cbce40eb8",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "qa-aman-stakeholder-map": {
+      "identity": "47663910d94cb99a93614116d2335e5385295d1914eba2e06b9abee176d9d4b1",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
+      "documentPath": "skills/by-role/business-analyst/stakeholder-map/SKILL.md",
+      "documentSha256": "e0b183d229df1784a0fc8be8dc6d8d6b5e43673b9f8d93f273b1c63393d3c181",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "qa-aman-traceability-matrix": {
+      "identity": "d1413ab2d76d5c12b8eb0b6896d3643c9de79666f8054c2516bbc6ff3183c763",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
+      "documentPath": "skills/by-role/business-analyst/traceability-matrix/SKILL.md",
+      "documentSha256": "20021ef957beaa3da1bcbdd38b4dc07a55fa2e08acaa36a39e139aa7eb882bec",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "qiushen-first-cn-ib-deck-qc": {
       "identity": "64e295c1b1e53001fa635917a0f0b68e13e52be2dd4cc14ba4ff37de8320b003",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "rafaelob-claude-code-orchestrator": {
@@ -7567,6 +8958,30 @@
       "revision": "852b23ce876fe280168260fbdc45a7d7c5a7bb04",
       "documentPath": "skills/seo-analytics/SKILL.md",
       "documentSha256": "745739feb600102b992fe87a531fffd9c957bcfb9c5b96e1f0eb694c56d49d49",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ronaldships-seo-content-strategy": {
+      "identity": "3667dbaa461bb00dbf1305037f40d543c37a76b13a035433111d10c07e24d0c9",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "80ab9599da8f5da7d220e65b9ef489a38e5e0fed",
+      "documentPath": "skills/seo-content-strategy/SKILL.md",
+      "documentSha256": "4c88633557bd66f2943d6ef315430527082e530f8863f71ae6c1fca222891a61",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ronaldships-seo-local": {
+      "identity": "bb2a6c27da7c52a29739b95d989fbb99762fa6c5e04e37021e9e261b53f4c18c",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "80ab9599da8f5da7d220e65b9ef489a38e5e0fed",
+      "documentPath": "skills/seo-local/SKILL.md",
+      "documentSha256": "7616cd155a126311d2f2e3f6453016d0dc709403e7a40322e6bccaab28c36485",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -8038,8 +9453,8 @@
     "solanabr-pitch-deck": {
       "identity": "ab7d0361a8c2fd8d416793f258f09a769db7851715f43530ef574d7fda5ad801",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "solanabr-pitch-deck-19f7f01a": {
@@ -8303,6 +9718,54 @@
       "revision": "c87ab30868a1929baa403610afd1218fe195a8a4",
       "documentPath": "README.md",
       "documentSha256": "7be9bebfc30819a3a1ddeb7018a9f80a90ce9b37c59710e9c4e14e85c17179df",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "thomast1906-api-security-review": {
+      "identity": "c780761c02ba803d3d91937deb86d5d6ec569a0e03b7ecd8ab01d25c6779fb73",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "554ac0b5ccbaef54730566cbb5a8b889963e3457",
+      "documentPath": ".github/skills/api-security-review/SKILL.md",
+      "documentSha256": "b505f5f28cf024b3ad3ac0deed07eba7618d5d522047548d432d3c19e9d65c5a",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "thomast1906-azure-apim-architecture": {
+      "identity": "990d40a5e84191286a93479a875f141e3853a913b0978a90316e324b7955659b",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "554ac0b5ccbaef54730566cbb5a8b889963e3457",
+      "documentPath": ".github/skills/azure-apim-architecture/SKILL.md",
+      "documentSha256": "b8c6affc145e002582f32566f2274a26ae431ab3b965303ea70708edf818ef34",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "timharris707-orchestrate": {
+      "identity": "069e278ef0b1fbc3ec42c29da57d09dfe9e9baf5ad233d58a0bee5f682e32e20",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "a93abb11d5e6c8ebff43cf46ae32d26ac5fb6c6f",
+      "documentPath": "plugins/clickai-codex/skills/run/orchestrate/SKILL.md",
+      "documentSha256": "af6790f193db84569ad8c195971c8950e5c4f3152f5711427a263e2cea4271c7",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "timharris707-to-tickets": {
+      "identity": "c39ee15ea405f5d306e8a42b5572159a7fd59a16c1d875f3f47abf7b08ed47f5",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "a93abb11d5e6c8ebff43cf46ae32d26ac5fb6c6f",
+      "documentPath": "plugins/clickai-codex/skills/run/to-tickets/SKILL.md",
+      "documentSha256": "ebeedc8b16458efba29d693488ae5d6cf7d46d77c9fce1a1b97c38943306bcb0",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -8613,6 +10076,18 @@
         }
       ]
     },
+    "vojtaholik-good-css": {
+      "identity": "5a7a250a3af3170a286d3d37139aed5493d72c86cc8a066e7b61f67af22ee98d",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "6d16d2fd27f4892e2aea4b5c5c2b016f45be7eef",
+      "documentPath": "skills/good-css/SKILL.md",
+      "documentSha256": "5958eb7629b3029b98e2890fb662ab805b909c76426e4c5c7ae952bdac574ecc",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "w1163222589-coder-slide-image-to-editable-pptx": {
       "identity": "c4689044eb29f0c3494f2964dd1145357e9c00e7cd17bf205af9033b5d49dc99",
       "status": "collected",
@@ -8693,64 +10168,64 @@
     "wubin1836-ad-image": {
       "identity": "3f868a5c10237cc90523e40435732bd46cbff63174a1de3144a6fb2e1e237ac0",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "wubin1836-ai-hive-agent-skills-amazon-listing-image-generation-editing": {
       "identity": "039157f0fcae91ea8ff3a733c7d77313744e3ce86e9e1fda766aeb243e457f9c",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "wubin1836-ai-hive-agent-skills-gpt-image-2": {
       "identity": "e5f44ebb11002bef7c2b44fc545203aedcc609d204213f6422eee2a693354679",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "wubin1836-ai-hive-agent-skills-gpt-image-2-image-edit": {
       "identity": "fb71c7cb86e97ac53fada430d56243320b79dfd4d32e552882624859f19e2056",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "wubin1836-ai-hive-agent-skills-gpt-image-2-product-image": {
       "identity": "ad756fa63629dd06ba8413f3e119f8a75e9b75c17cb0c703626b633483d4d206",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "wubin1836-ai-hive-agent-skills-nano-banana-pro": {
       "identity": "c0002d1b95568128fb8a5f2fda3f1cb3bfc93bee298e18462f5a37c3902673da",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "wubin1836-ai-hive-agent-skills-nano-banana-pro-image-edit": {
       "identity": "3d478906b3e3311219ba605adc84770c101e9d4c59af8f97c32c07a8b79aa72c",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "wubin1836-ai-hive-agent-skills-seedream-5-lite": {
       "identity": "8c6d08dccc48418d79f2982d5b0ce9b63ca8cff3feed9e80ee95a161a029dfdf",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "wubin1836-ai-model-expert-ai-poster-generation-editing": {
       "identity": "afdd343c0887ad2dbd241c58fa97bcd859c049e398b03fe23ee3efa9bfbd3580",
       "status": "error",
-      "checkedAt": "2026-10-07T04:15:41.778Z",
-      "nextAt": "2026-10-08T04:15:41.778Z",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-09T07:38:31.045Z",
       "reason": "source-unavailable"
     },
     "xianyu110-hook-3s-script": {
@@ -8931,6 +10406,18 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "youbaiyun-dsh-browser-crossplatform-troubleshooting": {
+      "identity": "5f6d8f0e9659b5a698d87e53f01a6226e4e3dfb5116505788455925c6b015d88",
+      "status": "not-found",
+      "checkedAt": "2026-10-08T07:38:31.045Z",
+      "nextAt": "2026-10-15T07:38:31.045Z",
+      "revision": "a42a7bc2b30ae7ed70284812992dcc453aabdb47",
+      "documentPath": "skills/dsh-browser-crossplatform-troubleshooting/SKILL.md",
+      "documentSha256": "5ceb350889f9af7d9378f2df4f96b222fa317c657601ab64a3e5b2a525b4e5d9",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "yuan1z0825-nature-paper2ppt": {
       "identity": "bd6f9fbfe4b4a51c2dd3e822d05e2b92a0b634020930c4d09310c71e95c82625",
       "status": "not-found",
@@ -9086,14 +10573,15 @@
     }
   },
   "summary": {
-    "catalogRecords": 34697,
+    "catalogRecords": 34792,
     "attempted": 150,
-    "pending": 33996,
-    "collectedSkills": 58,
+    "pending": 33975,
+    "collectedSkills": 63,
     "statuses": {
-      "not-found": 135,
-      "needs-review": 11,
-      "collected": 4
+      "not-found": 108,
+      "error": 31,
+      "collected": 5,
+      "needs-review": 6
     }
   }
 }

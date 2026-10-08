@@ -1034,6 +1034,138 @@
     ]
   },
   {
+    "skillSlug": "appandflow-react-native-design-utility",
+    "repository": "AppAndFlow/react-native-design-utility",
+    "revision": "f827dad88caae053d6ff1799203fcc53ac253479",
+    "sourceUrl": "https://github.com/AppAndFlow/react-native-design-utility/blob/f827dad88caae053d6ff1799203fcc53ac253479/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-30396e6e99e19bd5da50438447bc410efe9c632271d3f40e667124f39707abd7.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "30396e6e99e19bd5da50438447bc410efe9c632271d3f40e667124f39707abd7",
+    "documentSha256": "04704167ab684ae1485ba8d4e9ce1f99863b9aae8a0dd03b0c08575c08edcae0",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-08T07:38:31.045Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/00c3fbe2e509b085bc3edaf9119398f06f969cc59ab118280feb0987205e25a0.preview.webp",
+        "previewSrc": "/skill-previews/auto/00c3fbe2e509b085bc3edaf9119398f06f969cc59ab118280feb0987205e25a0.preview.webp",
+        "cardSrc": "/skill-previews/auto/00c3fbe2e509b085bc3edaf9119398f06f969cc59ab118280feb0987205e25a0.card.webp",
+        "width": 879,
+        "height": 1600,
+        "sha256": "00c3fbe2e509b085bc3edaf9119398f06f969cc59ab118280feb0987205e25a0",
+        "originalSrc": "/skill-previews/auto/00c3fbe2e509b085bc3edaf9119398f06f969cc59ab118280feb0987205e25a0.png",
+        "sourceUrl": "https://github.com/AppAndFlow/react-native-design-utility/blob/f827dad88caae053d6ff1799203fcc53ac253479/docs/img/flexRows.png",
+        "kind": "reference",
+        "title": {
+          "en": "React Native Design Utility · Author preview",
+          "zh": "React Native Design Utility · 作者预览"
+        },
+        "alt": {
+          "en": "React Native Design Utility: flexRows.png",
+          "zh": "React Native Design Utility：flexRows.png"
+        },
+        "sourcePath": "docs/img/flexRows.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/c595781f54bd8804d7531043e9173944cdee7db848b92c60cd8ae135a2bdc5ae.preview.webp",
+        "previewSrc": "/skill-previews/auto/c595781f54bd8804d7531043e9173944cdee7db848b92c60cd8ae135a2bdc5ae.preview.webp",
+        "cardSrc": "/skill-previews/auto/c595781f54bd8804d7531043e9173944cdee7db848b92c60cd8ae135a2bdc5ae.card.webp",
+        "width": 912,
+        "height": 1600,
+        "sha256": "c595781f54bd8804d7531043e9173944cdee7db848b92c60cd8ae135a2bdc5ae",
+        "originalSrc": "/skill-previews/auto/c595781f54bd8804d7531043e9173944cdee7db848b92c60cd8ae135a2bdc5ae.png",
+        "sourceUrl": "https://github.com/AppAndFlow/react-native-design-utility/blob/f827dad88caae053d6ff1799203fcc53ac253479/docs/img/flexRowsWithDiffSize.png",
+        "kind": "reference",
+        "title": {
+          "en": "React Native Design Utility · Author preview",
+          "zh": "React Native Design Utility · 作者预览"
+        },
+        "alt": {
+          "en": "React Native Design Utility: flexRowsWithDiffSize.png",
+          "zh": "React Native Design Utility：flexRowsWithDiffSize.png"
+        },
+        "sourcePath": "docs/img/flexRowsWithDiffSize.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/f6f603c1fcc76298e28299167b4a54c47a49654605a5f6f64ea47ade2db386b8.preview.webp",
+        "previewSrc": "/skill-previews/auto/f6f603c1fcc76298e28299167b4a54c47a49654605a5f6f64ea47ade2db386b8.preview.webp",
+        "cardSrc": "/skill-previews/auto/f6f603c1fcc76298e28299167b4a54c47a49654605a5f6f64ea47ade2db386b8.card.webp",
+        "width": 879,
+        "height": 1600,
+        "sha256": "f6f603c1fcc76298e28299167b4a54c47a49654605a5f6f64ea47ade2db386b8",
+        "originalSrc": "/skill-previews/auto/f6f603c1fcc76298e28299167b4a54c47a49654605a5f6f64ea47ade2db386b8.png",
+        "sourceUrl": "https://github.com/AppAndFlow/react-native-design-utility/blob/f827dad88caae053d6ff1799203fcc53ac253479/docs/img/roundedAvatar.png",
+        "kind": "reference",
+        "title": {
+          "en": "React Native Design Utility · Author preview",
+          "zh": "React Native Design Utility · 作者预览"
+        },
+        "alt": {
+          "en": "React Native Design Utility: roundedAvatar.png",
+          "zh": "React Native Design Utility：roundedAvatar.png"
+        },
+        "sourcePath": "docs/img/roundedAvatar.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "appwrite-pink",
+    "repository": "appwrite/pink",
+    "revision": "bfc9ba160fcd444e6dbbf45ee31d59213cece1c6",
+    "sourceUrl": "https://github.com/appwrite/pink/blob/bfc9ba160fcd444e6dbbf45ee31d59213cece1c6/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-fe171b353da8ffef39dbf8ee79b722eca264928709d17f146c5f9bfd54583bdb.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "fe171b353da8ffef39dbf8ee79b722eca264928709d17f146c5f9bfd54583bdb",
+    "documentSha256": "264421e475620c7c6f44585033b03d88d9e1c12dc3bd2e25a0f2a65f725e556b",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-08T07:38:31.045Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/019d51f12e04927e9c48ef23e7fb687aa96dadf9c643749859cf73f97b83c479.preview.webp",
+        "previewSrc": "/skill-previews/auto/019d51f12e04927e9c48ef23e7fb687aa96dadf9c643749859cf73f97b83c479.preview.webp",
+        "cardSrc": "/skill-previews/auto/019d51f12e04927e9c48ef23e7fb687aa96dadf9c643749859cf73f97b83c479.card.webp",
+        "width": 1600,
+        "height": 609,
+        "sha256": "019d51f12e04927e9c48ef23e7fb687aa96dadf9c643749859cf73f97b83c479",
+        "originalSrc": "/skill-previews/auto/019d51f12e04927e9c48ef23e7fb687aa96dadf9c643749859cf73f97b83c479.png",
+        "sourceUrl": "https://github.com/appwrite/pink/blob/bfc9ba160fcd444e6dbbf45ee31d59213cece1c6/github.png",
+        "kind": "reference",
+        "title": {
+          "en": "Pink · Author preview",
+          "zh": "Pink · 作者预览"
+        },
+        "alt": {
+          "en": "Pink: Visit the Pink Design repo",
+          "zh": "Pink：Visit the Pink Design repo"
+        },
+        "sourcePath": "github.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "archlizheng-frontend-slides-editable",
     "repository": "archlizheng/frontend-slides-editable",
     "revision": "e5663e6a0bdc2c2a673198bab3fb61036a7f20ee",
@@ -1206,6 +1338,182 @@
         "sourcePath": "docs/images/edit2.webp",
         "documentPath": "README.md",
         "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "arielsalminen-vue-design-system",
+    "repository": "arielsalminen/vue-design-system",
+    "revision": "38c4c43613029bddec43fb79316ab582197496ce",
+    "sourceUrl": "https://github.com/arielsalminen/vue-design-system/blob/38c4c43613029bddec43fb79316ab582197496ce/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-a43845d43c6db6bcb1511feee0d7c0e97dea6d4c41de44ebf7d715f25bea96d9.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "a43845d43c6db6bcb1511feee0d7c0e97dea6d4c41de44ebf7d715f25bea96d9",
+    "documentSha256": "9b3a10de0c103c33fb7f297c954be1df49031f628824629e4814d0ceea69c4db",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-08T07:38:31.045Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/8ce52a22d2472c4765df468b0a7df783f20f986e29d109cab041e27474766f23.preview.webp",
+        "previewSrc": "/skill-previews/auto/8ce52a22d2472c4765df468b0a7df783f20f986e29d109cab041e27474766f23.preview.webp",
+        "cardSrc": "/skill-previews/auto/8ce52a22d2472c4765df468b0a7df783f20f986e29d109cab041e27474766f23.card.webp",
+        "width": 1600,
+        "height": 928,
+        "sha256": "8ce52a22d2472c4765df468b0a7df783f20f986e29d109cab041e27474766f23",
+        "originalSrc": "/skill-previews/auto/8ce52a22d2472c4765df468b0a7df783f20f986e29d109cab041e27474766f23.gif",
+        "sourceUrl": "https://github.com/arielsalminen/vue-design-system/blob/38c4c43613029bddec43fb79316ab582197496ce/docs/preview.gif",
+        "kind": "example",
+        "title": {
+          "en": "Vue Design System · Animation · still preview",
+          "zh": "Vue Design System · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Vue Design System: ![Screenshot",
+          "zh": "Vue Design System：![Screenshot"
+        },
+        "sourcePath": "docs/preview.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
+    "skillSlug": "ashual-scene-generation",
+    "repository": "ashual/scene_generation",
+    "revision": "6f6fe6afffae58da94c0c061e4dcaf273cdb9f44",
+    "sourceUrl": "https://github.com/ashual/scene_generation/blob/6f6fe6afffae58da94c0c061e4dcaf273cdb9f44/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "documentSha256": "c51a0301379c1abd12cbd870466ae1294fab5466440d038d0d30fcd34d125731",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-08T07:38:31.045Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/183d7c440dcbbd4a720ae3cc54d582f47ddd4ad7e66bbe775b62253af315924e.preview.webp",
+        "previewSrc": "/skill-previews/auto/183d7c440dcbbd4a720ae3cc54d582f47ddd4ad7e66bbe775b62253af315924e.preview.webp",
+        "cardSrc": "/skill-previews/auto/183d7c440dcbbd4a720ae3cc54d582f47ddd4ad7e66bbe775b62253af315924e.card.webp",
+        "width": 1600,
+        "height": 478,
+        "sha256": "183d7c440dcbbd4a720ae3cc54d582f47ddd4ad7e66bbe775b62253af315924e",
+        "originalSrc": "/skill-previews/auto/183d7c440dcbbd4a720ae3cc54d582f47ddd4ad7e66bbe775b62253af315924e.png",
+        "sourceUrl": "https://github.com/ashual/scene_generation/blob/6f6fe6afffae58da94c0c061e4dcaf273cdb9f44/images/arch.png",
+        "kind": "reference",
+        "title": {
+          "en": "Scene Generation · Author preview",
+          "zh": "Scene Generation · 作者预览"
+        },
+        "alt": {
+          "en": "Scene Generation: arch.png",
+          "zh": "Scene Generation：arch.png"
+        },
+        "sourcePath": "images/arch.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "assistant-ui-assistant-ui",
+    "repository": "assistant-ui/assistant-ui",
+    "revision": "3ed5eb54688cdd6d2b0bee4b325f2c28c5a6669d",
+    "sourceUrl": "https://github.com/assistant-ui/assistant-ui/blob/3ed5eb54688cdd6d2b0bee4b325f2c28c5a6669d/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-eafb05991a572efa34097474b31fef45b14a8879ed1d1a8fd77de62e6fa7d275.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "eafb05991a572efa34097474b31fef45b14a8879ed1d1a8fd77de62e6fa7d275",
+    "documentSha256": "91f519bdf12a72584e13dcca4bb42bb1d6aff47e3ea0692dcccd6ab1213a9b3c",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-08T07:38:31.045Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/bb76752aa4ce27cf94c1d0c1d45aa4a2d853c645915810954be173b659dde35d.preview.webp",
+        "previewSrc": "/skill-previews/auto/bb76752aa4ce27cf94c1d0c1d45aa4a2d853c645915810954be173b659dde35d.preview.webp",
+        "cardSrc": "/skill-previews/auto/bb76752aa4ce27cf94c1d0c1d45aa4a2d853c645915810954be173b659dde35d.card.webp",
+        "width": 1300,
+        "height": 820,
+        "sha256": "bb76752aa4ce27cf94c1d0c1d45aa4a2d853c645915810954be173b659dde35d",
+        "originalSrc": "/skill-previews/auto/bb76752aa4ce27cf94c1d0c1d45aa4a2d853c645915810954be173b659dde35d.webp",
+        "sourceUrl": "https://github.com/assistant-ui/assistant-ui/blob/3ed5eb54688cdd6d2b0bee4b325f2c28c5a6669d/.github/assets/demo-light.webp",
+        "kind": "example",
+        "title": {
+          "en": "Assistant Ui · Animation · still preview",
+          "zh": "Assistant Ui · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Assistant Ui: An assistant-ui chat: a hotel search tool call, a streamed reply, an approval card that the user allows, and follow-up suggestions",
+          "zh": "Assistant Ui：An assistant-ui chat: a hotel search tool call, a streamed reply, an approval card that the user allows, and follow-up suggestions"
+        },
+        "sourcePath": ".github/assets/demo-light.webp",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/abb8e59a9dd79b099a7052571ef2c872c10e067d5a312b53cc198e41b299ec42.preview.webp",
+        "previewSrc": "/skill-previews/auto/abb8e59a9dd79b099a7052571ef2c872c10e067d5a312b53cc198e41b299ec42.preview.webp",
+        "cardSrc": "/skill-previews/auto/abb8e59a9dd79b099a7052571ef2c872c10e067d5a312b53cc198e41b299ec42.card.webp",
+        "width": 1600,
+        "height": 818,
+        "sha256": "abb8e59a9dd79b099a7052571ef2c872c10e067d5a312b53cc198e41b299ec42",
+        "originalSrc": "/skill-previews/auto/abb8e59a9dd79b099a7052571ef2c872c10e067d5a312b53cc198e41b299ec42.webp",
+        "sourceUrl": "https://github.com/assistant-ui/assistant-ui/blob/3ed5eb54688cdd6d2b0bee4b325f2c28c5a6669d/.github/assets/anatomy-light.webp",
+        "kind": "reference",
+        "title": {
+          "en": "Assistant Ui · Animation · still preview",
+          "zh": "Assistant Ui · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Assistant Ui: A chat UI annotated with the primitives that build it: ThreadPrimitive.Viewport, MessagePrimitive.Root and Parts, makeAssistantToolUI, ActionBarPrimitive, Branc",
+          "zh": "Assistant Ui：A chat UI annotated with the primitives that build it: ThreadPrimitive.Viewport, MessagePrimitive.Root and Parts, makeAssistantToolUI, ActionBarPrimitive, Branc"
+        },
+        "sourcePath": ".github/assets/anatomy-light.webp",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/b73e40b67f65407bf3df35208b69dc5b12ddf90ed1dacf5131313e0a9dc6f5d3.preview.webp",
+        "previewSrc": "/skill-previews/auto/b73e40b67f65407bf3df35208b69dc5b12ddf90ed1dacf5131313e0a9dc6f5d3.preview.webp",
+        "cardSrc": "/skill-previews/auto/b73e40b67f65407bf3df35208b69dc5b12ddf90ed1dacf5131313e0a9dc6f5d3.card.webp",
+        "width": 1320,
+        "height": 480,
+        "sha256": "b73e40b67f65407bf3df35208b69dc5b12ddf90ed1dacf5131313e0a9dc6f5d3",
+        "originalSrc": "/skill-previews/auto/b73e40b67f65407bf3df35208b69dc5b12ddf90ed1dacf5131313e0a9dc6f5d3.webp",
+        "sourceUrl": "https://github.com/assistant-ui/assistant-ui/blob/3ed5eb54688cdd6d2b0bee4b325f2c28c5a6669d/.github/assets/cli-init-light.webp",
+        "kind": "reference",
+        "title": {
+          "en": "Assistant Ui · Animation · still preview",
+          "zh": "Assistant Ui · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Assistant Ui: Running npx assistant-ui@latest init in a terminal",
+          "zh": "Assistant Ui：Running npx assistant-ui@latest init in a terminal"
+        },
+        "sourcePath": ".github/assets/cli-init-light.webp",
+        "documentPath": "README.md",
+        "format": "animation-poster"
       }
     ]
   },
