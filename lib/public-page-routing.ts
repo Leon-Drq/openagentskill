@@ -19,7 +19,8 @@ export function publicQueryRoute(pathname: string, query: URLSearchParams): stri
   // filter would make every client navigation bypass the public route cache.
   if (!hasContentQuery(query)) return null
   const detail = /^\/skills\/[^/]+$/.test(pathname) && !['/skills/new', '/skills/external'].includes(pathname)
-  if (pathname === '/skills' || detail || localizedCore.test(pathname)) {
+  const report = /^\/skills\/[^/]+\/(audit|evals)$/.test(pathname)
+  if (detail || report || localizedCore.test(pathname)) {
     return `/render-query${pathname}`
   }
   return null

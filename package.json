@@ -25,7 +25,7 @@
     "test:security": "node --experimental-strip-types scripts/test-security-regressions.ts",
     "test:x-automation": "node --experimental-strip-types scripts/test-x-automation-regressions.ts",
     "test:github-owner": "node --experimental-strip-types scripts/test-github-owner.ts",
-    "test:performance": "node --experimental-strip-types scripts/test-performance-regressions.ts",
+    "test:performance": "node --experimental-strip-types scripts/test-performance-regressions.ts && node scripts/test-render-cost.mjs",
     "test:candidate-intake": "node --experimental-strip-types scripts/test-candidate-intake.ts && node --experimental-strip-types scripts/test-candidate-expansion.mjs",
     "test:creator-growth": "node --experimental-strip-types scripts/test-creator-growth.ts && node --experimental-strip-types scripts/test-creator-experience.mjs",
     "test:creator-directory": "node --experimental-strip-types scripts/test-creator-directory.mjs",
