@@ -1,7 +1,7 @@
 # Vercel 成本优化升级验收
 
 基于 2026-10-09 获取的 GitHub `origin/main`：`1d5654e`，包含 #223 的搜索增长改进。
-开发分支：`codex/reduce-public-render-cost`。本次仅完成代码与本地验收，未部署生产环境。
+开发分支：`codex/reduce-public-render-cost`。本文记录部署前的代码改动与本地验收；上线状态以 GitHub `main` 和 Vercel Production 的部署记录为准。
 
 ## 已实现
 
