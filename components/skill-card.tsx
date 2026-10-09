@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { Skill } from '@/lib/types'
 
 interface SkillCardProps {

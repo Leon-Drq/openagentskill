@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import type { Locale } from '@/lib/i18n/config'
 import { galleryPricingCopy } from '@/lib/i18n/gallery-pricing-copy'
 import { commerceCopy } from '@/lib/i18n/commerce-copy'

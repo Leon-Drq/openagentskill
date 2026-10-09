@@ -1,6 +1,6 @@
 import { NavigationHubLinks } from '@/components/navigation-hub-links'
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { MarketingPageShell } from '@/components/marketing-page'
 import { CreatorDirectoryCard } from '@/components/creator-directory-card'
 import { CreatorDirectoryFilters } from '@/components/creator-directory-filters'

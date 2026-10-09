@@ -2,7 +2,7 @@
 
 import { NativeSelect } from '@/components/ui/native-select'
 
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowRight, CheckCircle2, Copy, Loader2, Search, ShieldCheck, TriangleAlert } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { trackAnalyticsEvent } from '@/lib/analytics'

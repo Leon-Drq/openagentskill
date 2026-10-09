@@ -3,7 +3,7 @@
 import { accountCopy } from '@/lib/i18n/account-copy'
 
 import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { useRouter } from 'next/navigation'
 import { Bookmark, ChevronDown, LogOut, Settings2, Sparkles, UserRound } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'

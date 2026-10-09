@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowRight, FileCode2, SearchCheck } from 'lucide-react'
 import { MarketingButtonLink, MarketingHero, MarketingMetricStrip } from '@/components/marketing-page'
 import { AGENT_TASKS } from '@/lib/agent-tasks'

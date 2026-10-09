@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { SKILL_CATEGORIES, OUTPUT_RULES, categoryLabel } from '@/lib/skills/taxonomy'
 import { ArrowRight, Code2, FileText, Image as ImageIcon, Monitor, Presentation, Search, Terminal, Workflow, ChartNoAxesCombined } from 'lucide-react'
 import { Video } from 'lucide-react'

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowUpRight, ArrowRight, Github, Mail } from 'lucide-react'
 import { MarketingHero, MarketingPageShell, MarketingButtonLink } from '@/components/marketing-page'
 import { I18nProvider } from '@/lib/i18n/context'

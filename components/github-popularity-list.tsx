@@ -1,5 +1,5 @@
 import { ArrowRight } from 'lucide-react'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { getGitHubOwner } from '@/lib/github-owner'
 import type { Locale } from '@/lib/i18n/config'

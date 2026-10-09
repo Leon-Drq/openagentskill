@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { MarketingPageShell } from '@/components/marketing-page'
 import { getScenarioExamples } from '@/lib/seo/scenario-examples'
 import { getScenarioSources, getScenarioLinksForSkill, SCENARIO_UPDATED_AT, scenarioSourceUrl, scenarioProfileHref, type ScenarioTopic } from '@/lib/seo/scenario-pages'

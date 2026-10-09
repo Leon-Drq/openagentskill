@@ -5,7 +5,7 @@ import { isMissingShowcasePath } from '@/lib/showcase'
 import { isMissingFeaturedCreatorPath } from '@/lib/creator-directory'
 import { isMissingRankingPath } from '@/lib/rankings'
 import { isMissingExternalSkillPath } from '@/lib/skills/external-catalog'
-import { publicQueryRoute } from '@/lib/public-page-routing'
+import { publicQueryRoute, hasContentQuery } from '@/lib/public-page-routing'
 
 const MARKET_LOCALE_CODES = new Set(['zh', 'ja', 'ko', 'es', 'de', 'fr', 'id'])
 const DOCUMENT_LANG_BY_LOCALE: Record<string, string> = {
@@ -67,7 +67,7 @@ function createNextResponse(locale: string | null, noindex = false) {
 }
 
 function isSkillDetailVariant(pathname: string, searchParams: URLSearchParams) {
-  return /^\/skills\/[^/]+$/.test(pathname) && Array.from(searchParams.keys()).some(key => key !== '_rsc')
+  return /^\/skills\/[^/]+$/.test(pathname) && hasContentQuery(searchParams)
 }
 
 function needsSessionRefresh(pathname: string) {

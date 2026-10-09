@@ -1,5 +1,12 @@
 export type PaginationItem = number | 'gap-before' | 'gap-after'
 
+export function requestedDirectoryPage(value: string | string[] | undefined): number | null {
+  if (value === undefined) return 1
+  if (typeof value !== 'string' || !/^[1-9]\d*$/.test(value)) return null
+  const page = Number(value)
+  return Number.isSafeInteger(page) ? page : null
+}
+
 export function pageCount(total: number, size = 16) {
   return Math.max(1, Math.ceil(Math.max(0, total) / size))
 }

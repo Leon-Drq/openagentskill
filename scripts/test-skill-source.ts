@@ -50,6 +50,15 @@ frameworks: [Codex, Claude Code]
 
 assert.equal(parseSkillDocument('# Missing frontmatter and useful description'), null)
 
+for (const indicator of ['>', '> ', '>-', '>+', '>2-', '>-2', '> # folded']) {
+  assert.equal(parseSkillDocument(`---\nname: example\ndescription: ${indicator}\n  Inspect a repository,\n  then report findings.\nlicense: MIT\n---\n# Body`)?.description,
+    'Inspect a repository, then report findings.', indicator)
+}
+for (const indicator of ['|', '|-', '|+', '|2-', '| # literal']) {
+  assert.equal(parseSkillDocument(`---\nname: example\ndescription: ${indicator}\n  Inspect a repository.\n  Report findings.\n---`)?.description,
+    'Inspect a repository.\nReport findings.', indicator)
+}
+
 assert.equal(
   detectSkillDelegationName('Call the Skill tool with "grilling".'),
   'grilling'

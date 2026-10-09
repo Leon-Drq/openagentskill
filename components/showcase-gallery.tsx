@@ -7,7 +7,7 @@ import { galleryPricingCopy } from '@/lib/i18n/gallery-pricing-copy'
 import { galleryCopy, formatGalleryNumber } from '@/lib/i18n/gallery-copy'
 
 import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowRight, Search, SlidersHorizontal, X } from 'lucide-react'
 import { discoveryIcons } from '@/components/discovery-navigation'

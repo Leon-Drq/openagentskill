@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { notFound } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SkillInstallTargets } from '@/components/skill-install-targets'

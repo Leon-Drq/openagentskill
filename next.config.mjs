@@ -16,6 +16,11 @@ const nextConfig = {
   turbopack: {
     root: __dirname,
   },
+  async headers() {
+    // Machine-readable endpoints are usable by agents, but are not search
+    // landing pages. Leave them crawlable so existing URLs can see noindex.
+    return [{ source: '/api/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }] }]
+  },
   async redirects() {
     return [
       { source: '/skills/socai-io-jev-social-jev-social', destination: '/skills/socai-io-jev-social', permanent: true },

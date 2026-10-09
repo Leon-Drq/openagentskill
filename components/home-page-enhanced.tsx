@@ -4,7 +4,7 @@ import { siteCopy, localizeSiteText } from '@/lib/i18n/site-copy'
 
 import { useState, useTransition, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowRight, Search } from 'lucide-react'
 import { HOME_SEARCH_COPY, HOME_SEARCH_EXAMPLES } from '@/lib/i18n/home-search-copy'
 import { AnimatedSearchHint } from './animated-search-hint'

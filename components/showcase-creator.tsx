@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowUpRight } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'
 import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'

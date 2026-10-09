@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowRight, ArrowUpRight, ImageOff } from 'lucide-react'
 import { useState } from 'react'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'

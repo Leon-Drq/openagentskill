@@ -10,6 +10,26 @@ Allow: /api/agent/
 # Sitemaps
 Sitemap: https://www.openagentskill.com/sitemap.xml
 
+# Search crawlers should spend requests on canonical pages and sitemaps, not
+# the Cartesian product of interactive search/filter/sort/page parameters.
+# API URLs remain crawlable for now to process their X-Robots-Tag: noindex.
+User-agent: Googlebot
+User-agent: Bingbot
+Allow: /
+Disallow: /skills?
+Disallow: /zh/skills?
+Disallow: /ja/skills?
+Disallow: /ko/skills?
+Disallow: /es/skills?
+Disallow: /de/skills?
+Disallow: /fr/skills?
+Disallow: /id/skills?
+Disallow: /resolve?
+Disallow: /*/resolve?
+Disallow: /compare?
+Disallow: /*/compare?
+Disallow: /render-query/
+
 # Special directives for AI agents
 # Search access is independent of training access. Existing training policy is
 # unchanged. These directives permit crawling; they do not guarantee ranking.

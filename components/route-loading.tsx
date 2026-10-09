@@ -4,6 +4,8 @@ function SkeletonLine({ className = '' }: { className?: string }) {
   return <div className={`animate-pulse rounded-[6px] bg-muted ${className}`} />
 }
 
+// Use only below routes that cannot turn into a missing public document.
+// A root loading boundary sends HTTP 200 before slug lookups can return 404.
 export default function RouteLoading() {
   return (
     <div className="min-h-screen bg-background text-foreground">

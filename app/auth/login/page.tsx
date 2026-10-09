@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { createClient } from '@/lib/supabase/client'
 import { safeAccountNext } from '@/lib/account-workspace'
 import { getLocaleFromSearchParam } from '@/lib/i18n/config'

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { redirect } from 'next/navigation'
 import { CheckCircle2, Circle, ExternalLink, GitCommitHorizontal, ShieldCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'

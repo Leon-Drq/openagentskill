@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Locale } from '@/lib/i18n/config'
 import { directoryCopy, directoryLabel } from '@/lib/i18n/directory-copy'

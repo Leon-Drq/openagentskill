@@ -27,7 +27,7 @@ let unavailable = false
 const sample = { slug: 'addyosmani-agent-skills', name: 'Code review example', description: 'Code review and debugging', github_stars: 100, quality_score: 80, tags: [], frameworks: [] }
 const dependencies = {
   'react/jsx-runtime': jsx,
-  'next/link': { default: ({ children, ...props }) => createElement('a', props, children) },
+  '@/components/crawl-link': { default: ({ children, ...props }) => createElement('a', props, children) },
   'lucide-react': icons,
   '@/components/marketing-page': { MarketingPageShell: ({ children }) => createElement('main', null, children) },
   '@/components/navigation-hub-links': { NavigationHubLinks: () => null },

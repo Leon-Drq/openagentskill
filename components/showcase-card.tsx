@@ -4,7 +4,7 @@ import { galleryCopy } from '@/lib/i18n/gallery-copy'
 import { ShowcaseTags } from '@/components/showcase-tags'
 
 import { SkillPreviewImage } from '@/components/skill-preview-image'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowUpRight } from 'lucide-react'
 import { ShowcaseVideoPlayer } from '@/components/showcase-video-player'
 import { useI18n } from '@/lib/i18n/context'

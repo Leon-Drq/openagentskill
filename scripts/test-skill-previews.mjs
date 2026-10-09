@@ -60,7 +60,7 @@ let failedSrc = []
 const dependencies = {
   react: { ...react, useState: () => [failedSrc, () => {}] }, 'react/jsx-runtime': jsx, 'lucide-react': icons,
   'next/image': { default: ({ fill, sizes, onError, ...props }) => { void fill; void sizes; void onError; return createElement('img', props) } },
-  'next/link': { default: ({ children, prefetch, ...props }) => { void prefetch; return createElement('a', props, children) } },
+  '@/components/crawl-link': { default: ({ children, prefetch, ...props }) => { void prefetch; return createElement('a', props, children) } },
   '@/lib/skill-preview-shared': shared, '@/lib/showcase-shared': showcase, '@/lib/i18n/market-routing': routing,
   '@/components/skill-preview-image': { SkillPreviewImage: ({ locale, ...props }) => { void locale; return createElement(dependencies['next/image'].default, props) } },
   '@/components/showcase-video-player': { ShowcaseVideoPlayer: ({ item }) => createElement('button', { 'data-gallery-video': item.videoUrl }, 'Play preview') },

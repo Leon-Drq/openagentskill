@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import { buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile, type SkillSafetyTier } from '@/lib/agent-safety'

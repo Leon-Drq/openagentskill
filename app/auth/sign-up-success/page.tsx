@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { safeAccountNext } from '@/lib/account-workspace'
 import { getLocaleFromSearchParam } from '@/lib/i18n/config'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'

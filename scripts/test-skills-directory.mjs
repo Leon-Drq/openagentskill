@@ -78,7 +78,7 @@ const installSection = detail.slice(detail.indexOf('<section id="install-options
 assert.match(installSection, /warnings\.map/)
 assert.match(installSection, /dbSkill\.license \|\| 'Unknown'/)
 assert.match(installSection, /!safety\.blocked && <SkillInstallTargets/)
-assert.match(detail,/Object.keys\(query\).length === 0 && isSearchIndexEligible\(dbSkill\)/)
+assert.match(detail,/!Object.keys\(query\).some\(isContentQueryKey\) && isSearchIndexEligible\(dbSkill\)/)
 assert.match(detail,/buildDetailStructuredData\(dbSkill\)/)
 assert.match(server, /index: isCanonicalEnglishDirectory/, 'Index policy remains unchanged in this visual release')
 assert.match(server, /buildSkillsPageJsonLd\(skills, query \? \[\] : directorySections, locale\)/, 'Schema includes only visible sections')

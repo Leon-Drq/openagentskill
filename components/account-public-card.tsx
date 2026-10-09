@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowUpRight } from 'lucide-react'
 import type { Locale } from '@/lib/i18n/config'
 import { accountCopy } from '@/lib/i18n/account-copy'

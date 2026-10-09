@@ -3,7 +3,7 @@
 import { getNavigationCopy, getPartnershipLabels } from '@/lib/site-navigation'
 import { siteCopy } from '@/lib/i18n/site-copy'
 
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { BrandMark } from '@/components/brand-mark'

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { Bookmark, LayoutDashboard, Settings2, Sparkles, CircleUserRound, ArrowUpRight } from 'lucide-react'
 import { I18nProvider } from '@/lib/i18n/context'
 import type { Locale } from '@/lib/i18n/config'

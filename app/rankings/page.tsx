@@ -1,6 +1,6 @@
 import { NavigationHubLinks } from '@/components/navigation-hub-links'
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
 import {
   getAgentOutcomeStatsMap,
