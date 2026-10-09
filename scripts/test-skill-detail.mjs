@@ -50,6 +50,10 @@ const owner = {...recorded,ai_review_approved:false,listing_status:'owner_publis
 assert.equal(buildInstallHandoff(owner).safety_gate.auto_install_allowed, false, 'source discovery must not bypass owner review')
 
 const schema = buildDetailStructuredData(skill)['@graph'][0]
+const editorialSchema = buildDetailStructuredData(skill, { description: 'Visible source summary', citation: 'https://github.com/owner/repo/blob/abc/SKILL.md' })['@graph'][0]
+assert.equal(editorialSchema.description, 'Visible source summary')
+assert.equal(editorialSchema.citation, 'https://github.com/owner/repo/blob/abc/SKILL.md')
+assert.equal(editorialSchema['@type'], schema['@type'], 'Editorial copy never upgrades source evidence')
 assert.equal(schema['@type'], 'CreativeWork')
 for (const key of ['offers','operatingSystem','softwareVersion','aggregateRating']) assert.equal(schema[key],undefined)
 assert.equal(buildDetailStructuredData(recorded)['@graph'][0]['@type'],'SoftwareSourceCode')

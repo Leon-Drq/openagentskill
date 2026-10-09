@@ -173,7 +173,9 @@ export function getRankingDefinitions(): RankingDefinition[] {
     title: `Best ${useCase.shortTitle.toLowerCase()} skills for AI agents`,
     shortTitle: useCase.shortTitle,
     eyebrow: useCase.eyebrow,
-    description: useCase.description,
+    description: useCase.slug === 'design-creative'
+      ? 'Compare AI skills for interface design, architecture diagrams and visual creation. Match the output to your task, then inspect examples, setup and source requirements.'
+      : useCase.description,
     kind: 'use-case' as const,
     useCaseSlug: useCase.slug,
   }))

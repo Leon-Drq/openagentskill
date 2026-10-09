@@ -18,7 +18,7 @@ export function selectDetailAlternatives(skill: SkillRecord, candidates: SkillRe
     .slice(0, limit).map(({candidate}) => candidate)
 }
 
-export function buildDetailStructuredData(skill: SkillRecord) {
+export function buildDetailStructuredData(skill: SkillRecord, editorial?: { description: string; citation: string }) {
   const category = skillPresentationCategory(skill)
   const evidence = getSkillSourceEvidence(skill)
   const url = `https://www.openagentskill.com/skills/${skill.slug}`
@@ -29,7 +29,8 @@ export function buildDetailStructuredData(skill: SkillRecord) {
     '@graph': [
       {
         '@type': evidence.sourceRecorded ? 'SoftwareSourceCode' : 'CreativeWork',
-        '@id': `${url}#skill`, url, name: skill.name, description: skill.description,
+        '@id': `${url}#skill`, url, name: skill.name, description: editorial?.description || skill.description,
+        ...(editorial ? { citation: editorial.citation } : {}),
         ...(evidence.sourceRecorded ? {codeRepository: publicUrl(skill.repository)} : {}),
         // Do not turn registry defaults into free offers, OS compatibility or certified versions.
         datePublished: validDate(skill.created_at), dateModified: validDate(skill.updated_at),

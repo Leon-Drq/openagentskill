@@ -1,8 +1,13 @@
 'use client'
 
+// @ts-expect-error Direct Node regression tests require the TypeScript extension.
+import { ACTIVATION_EVENTS, GROWTH_ATTRIBUTION_KEY, GROWTH_SESSION_MS, analyticsPageType, analyticsPath, inferGrowthAttribution, readGrowthSession, type GrowthSession } from './growth-attribution.ts'
+
 export type AnalyticsParameterValue = string | number | boolean
 
 export type AnalyticsEventName =
+  | 'growth_activation'
+  | 'partner_outbound'
   | 'directory_search'
   | 'directory_results'
   | 'directory_skill_open'
@@ -59,6 +64,29 @@ export type AnalyticsEventName =
 export type AnalyticsConsent = 'granted' | 'denied'
 
 export const ANALYTICS_CONSENT_STORAGE_KEY = 'openagentskill.analytics-consent'
+export const ANALYTICS_CONSENT_EVENT = 'openagentskill:analytics-consent'
+
+let memoryConsent: AnalyticsConsent | undefined
+let growthSession: GrowthSession | null = null
+
+function analyticsAllowed() {
+  if (memoryConsent) return memoryConsent === 'granted'
+  try { return window.localStorage.getItem(ANALYTICS_CONSENT_STORAGE_KEY) === 'granted' } catch { return false }
+}
+
+function session() {
+  const now = Date.now()
+  try { growthSession = readGrowthSession(window.sessionStorage.getItem(GROWTH_ATTRIBUTION_KEY), now) || growthSession } catch { /* Use in-memory attribution when storage is unavailable. */ }
+  if (!growthSession || now - growthSession.lastSeen >= GROWTH_SESSION_MS) {
+    growthSession = { attribution: inferGrowthAttribution(window.location.href, document.referrer), lastSeen: now, activated: false }
+  }
+  growthSession.lastSeen = now
+  return growthSession
+}
+
+function saveSession(value: GrowthSession) {
+  try { window.sessionStorage.setItem(GROWTH_ATTRIBUTION_KEY, JSON.stringify(value)) } catch { /* Never block a product action. */ }
+}
 
 declare global {
   interface Window {
@@ -79,21 +107,39 @@ export function trackAnalyticsEvent(
   eventName: AnalyticsEventName,
   parameters: Record<string, AnalyticsParameterValue | null | undefined> = {}
 ) {
-  if (typeof window === 'undefined' || !window.gtag) return
-  window.gtag('event', eventName, compactParameters(parameters))
+  if (typeof window === 'undefined' || !window.gtag || !analyticsAllowed()) return
+  const current = session()
+  const context = { ...current.attribution, page_type: analyticsPageType(window.location.pathname) }
+  const location = `${window.location.origin}${analyticsPath(window.location.pathname)}`
+  window.gtag('event', eventName, compactParameters({ ...parameters, ...context, page_location: location }))
+  if (ACTIVATION_EVENTS.has(eventName) && !current.activated) {
+    current.activated = true
+    window.gtag('event', 'growth_activation', { ...context, page_location: location, activation_action: eventName })
+  }
+  saveSession(current)
 }
 
 export function trackAnalyticsPageView(path: string) {
-  if (typeof window === 'undefined' || !window.gtag) return
+  if (typeof window === 'undefined' || !window.gtag || !analyticsAllowed()) return
+  const current = session()
   window.gtag('event', 'page_view', {
-    page_path: path,
-    page_location: window.location.href,
+    ...current.attribution,
+    page_type: analyticsPageType(path),
+    page_path: analyticsPath(path),
+    page_location: `${window.location.origin}${analyticsPath(path)}`,
+    page_referrer: document.referrer ? new URL(document.referrer).origin : '',
     page_title: document.title,
   })
+  saveSession(current)
 }
 
 export function updateAnalyticsConsent(consent: AnalyticsConsent) {
   if (typeof window === 'undefined') return
+  memoryConsent = consent
+  if (consent === 'denied') {
+    growthSession = null
+    try { window.sessionStorage.removeItem(GROWTH_ATTRIBUTION_KEY) } catch { /* Storage may be unavailable. */ }
+  }
 
   try {
     window.localStorage.setItem(ANALYTICS_CONSENT_STORAGE_KEY, consent)
@@ -107,4 +153,5 @@ export function updateAnalyticsConsent(consent: AnalyticsConsent) {
     ad_user_data: 'denied',
     ad_personalization: 'denied',
   })
+  window.dispatchEvent?.(new CustomEvent(ANALYTICS_CONSENT_EVENT, { detail: consent }))
 }

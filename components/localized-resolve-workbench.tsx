@@ -1,5 +1,7 @@
 'use client'
 
+import { copyText } from '@/lib/copy-text'
+
 import Link from '@/components/crawl-link'
 import { CheckCircle2, Copy, Loader2, Search, ShieldCheck, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
@@ -47,10 +49,6 @@ type ResolvePayload = {
     audit: { audit_score: number }
     safety: { score: number }
   } | null
-}
-
-function copyText(value: string) {
-  void navigator.clipboard?.writeText(value)
 }
 
 export function LocalizedResolveWorkbench({
@@ -224,9 +222,10 @@ export function LocalizedResolveWorkbench({
                 <div className="mt-3 flex flex-wrap gap-2">
                   <button
                     type="button"
-                    onClick={() => {
-                      copyText(recommendation.install.command)
-                      setCopied(true)
+                    onClick={async () => {
+                      const success = await copyText(recommendation.install.command).catch(() => false)
+                      setCopied(success)
+                      if (!success) return
                       trackAnalyticsEvent('localized_resolve_copy_install', {
                         locale,
                         skill_slug: recommendation.best_skill.slug,

@@ -142,6 +142,7 @@ export const PRESENTATION_FORMATS = [
 ] as const
 
 export interface PresentationPageDefinition {
+  updatedAt?: string
   slug: string
   title: string
   description: string
@@ -168,6 +169,7 @@ export interface PresentationPageDefinition {
 export const PRESENTATION_PAGES: readonly PresentationPageDefinition[] = [
   {
     slug: 'presentation-generation', title: 'Best PPT Skills for AI Agents',
+    updatedAt: '2026-10-09',
     description: 'Compare PPT skills for Codex, Claude Code, WorkBuddy, Trae, Doubao, Cursor and CodeBuddy. Find editable PPTX or HTML slides with setup guides and sources.',
     intro: 'Find a PPT workflow for Codex, Claude Code, WorkBuddy, Trae, Doubao, Cursor or CodeBuddy IDE. Choose the file you need to hand over, then compare seven community skills by output, editing ability and setup requirements. Follow your agent’s guide for the right installation or office-mode route.',
     selectionTitle: 'Which PPT skill fits your task?',
@@ -179,10 +181,13 @@ export const PRESENTATION_PAGES: readonly PresentationPageDefinition[] = [
       { task: 'Present an editorial story in a browser', sourceId: 'guizang-ppt', reason: 'Use an HTML presentation when browser delivery is the intended result.' },
     ],
     sections: [
+      { title: 'Prepare a brief that produces the right file', paragraphs: ['Specify the audience, decision, source documents, slide count and exact deliverable before choosing a skill. Ask for native editable text and charts when colleagues need to revise the deck; choose HTML only when browser delivery is acceptable.', 'A useful starting brief is: “Create an eight-slide product update from these approved notes. Separate facts from assumptions, propose an outline and one sample slide, and list missing dependencies or paid services before generation. Deliver an editable PPTX and check it in the recipient’s presentation software.” Adapt the file requirement to the workflow selected below.'] },
+      { title: 'Check one slide before generating the whole deck', paragraphs: ['Test a representative slide containing the hardest material: a chart, dense table, multilingual text or a brand template. Open the actual exported file, edit its text, inspect chart data and check fonts and clipping.', 'If the slide is flattened, select a native generation or reconstruction workflow. If browser output looks correct but PPTX shifts, inspect the export dependencies and font availability. Record the source revision and unresolved limitations; do not infer export quality from an author preview.'] },
       { title: 'What are PPT skills?', paragraphs: ['A PPT skill gives a coding agent reusable instructions and, sometimes, scripts for preparing slides. The name does not guarantee a PowerPoint file: some produce HTML, some assemble slide images into PPTX, and others create native PowerPoint objects.', 'Start with your audience, source material and required output. A deck that looks polished but cannot be edited is the wrong handoff when a colleague needs to change its charts or text.'] },
       { title: 'How we choose a presentation skill', paragraphs: ['Every choice below has presentation-specific instructions in a linked SKILL.md. We compare the documented workflow and exact output rather than ranking general libraries because their names contain “deck”.', 'GitHub adoption can help you discover a project, but it does not demonstrate output quality or install safety. These are source-based recommendations; a repository review and a completed deck test are separate evidence.'] },
     ],
     faq: [
+      { question: 'Why does my exported PowerPoint look different from the browser preview?', answer: 'Browser rendering and PPTX export are separate steps. Check the exporter requirements, available fonts, slide dimensions and unsupported effects. Compare the actual exported file against the preview and try one representative slide before generating the entire deck.' },
       { question: 'Which PPT skill should I choose for editable PowerPoint?', answer: 'Shortlist PPT Master for new native decks and Dashi PPT for browser editing followed by PPTX export. For existing screenshots or image-based slides, inspect Image to Editable PPT. Check exported objects in PowerPoint before treating the handoff as complete.' },
       { question: 'Is an image-based PPTX editable?', answer: 'You can move or replace a slide image, but its text and charts are not separate PowerPoint objects. For object editing, choose native PPTX generation or a reconstruction workflow.' },
       { question: 'Can I use an HTML PPT skill to create a PowerPoint file?', answer: 'Only when the selected workflow documents a PPTX export route. Guizang PPT and HTML PPT Studio primarily deliver HTML. Dashi PPT documents a separate editable PPTX export step; check its dependencies and exported layout.' },
@@ -254,6 +259,7 @@ export const PRESENTATION_PAGES: readonly PresentationPageDefinition[] = [
   },
   {
     slug: 'codex-presentation-decks', title: 'Codex PPT Skills: Create, Edit and Check Slides',
+    updatedAt: '2026-10-09',
     description: 'Build a Codex presentation workflow: choose editable PPTX, image-based slides or HTML, review the skill source, approve a sample and check the export.',
     intro: 'Give Codex a concrete presentation brief and choose the output before generating a full deck. Compare five documented workflow options, then use the step-by-step brief below.',
     selectionTitle: 'Choose a Codex workflow', sourceIds: ['ppt-master', 'codex-ppt', 'image-to-editable-ppt', 'dashi-ppt', 'guizang-ppt'],
@@ -264,10 +270,13 @@ export const PRESENTATION_PAGES: readonly PresentationPageDefinition[] = [
     ],
     sections: [
       { title: 'A practical Codex presentation workflow', paragraphs: ['1. Prepare the brief: audience, decision, slide count, source documents, brand assets and required file format. Use verified figures and images you can share.', '2. Ask Codex to inspect the selected skill’s instructions and local requirements. Agree on any image or OCR service needed for that workflow.', '3. Approve an outline and one representative slide. Check content density, visual style and required editability before producing the rest.', '4. Generate and export the deck. Open the exported file, check clipping, facts, fonts and speaker notes, and record the source revision and unresolved issues.'] },
+      { title: 'Diagnose the first blocked step', paragraphs: ['If Codex cannot find the skill, check the installed directory and the source’s supported installation route. If the skill loads but cannot export, inspect local dependencies and the actual error before reinstalling the skill.', 'If image generation or OCR needs an external service, confirm the provider, credentials and budget in your local environment. Never paste API keys into a public prompt or example. Start with one slide; a successful script exit still needs a visual check of the exported file.'] },
       { title: 'Use a task brief, not an assumed slash command', paragraphs: ['Codex can use installed skills through its skill discovery and natural-language requests. A Claude Code plugin command is not automatically a Codex command. Follow the installation guide for your actual agent, then name the selected skill and required output.', 'For example: “Use PPT Master to turn these verified research notes into an eight-slide editable PPTX for our product team. Keep charts and text editable. Propose an outline and one sample slide first, then check the exported file in PowerPoint.”'] },
     ],
     faq: [
       { question: 'Which Codex PPT skill should I start with?', answer: 'Start from the deliverable. Inspect PPT Master for editable native PowerPoint, Codex PPT for full-slide image decks, Guizang PPT for browser delivery, and Image to Editable PPT for reconstructing an existing visual deck.' },
+      { question: 'What should I include in a Codex presentation prompt?', answer: 'Specify the audience, decision, verified source material, slide count, brand assets and required format. State whether text and charts must be editable. Ask for an outline and a representative sample before the complete deck, then review the exported file.' },
+      { question: 'Does copying an install command mean the presentation skill works?', answer: 'No. Copying is a preparation step. Installation, dependency setup, generation and export verification are separate stages. Record which stage succeeded and what remains unresolved.' },
       { question: 'Does Codex PPT produce separate editable textboxes?', answer: 'Its documented output assembles complete slide images into PPTX. Choose another workflow when individual textboxes, shapes or charts must be editable.' },
       { question: 'Should I use the Claude Code plugin command in Codex?', answer: 'Use the setup and invocation supported by your installed Codex client. Claude Code plugin namespaces and slash commands are agent-specific; the linked installation guides explain the different handoffs.' },
       { question: 'What should I give Codex before making slides?', answer: 'Supply the audience, desired decision, slide count, verified source content, approved brand assets, output format and editing requirements. Check one sample before generating a full deck.' },
@@ -418,7 +427,7 @@ export function presentationStructuredData(page: PresentationPageDefinition) {
     '@context': 'https://schema.org',
     '@graph': [
       { '@type': 'CollectionPage', '@id': url, url, name: page.title, description: page.description,
-        dateModified: PRESENTATION_UPDATED_AT, inLanguage: 'en',
+        dateModified: page.updatedAt || PRESENTATION_UPDATED_AT, inLanguage: 'en',
         publisher: { '@type': 'Organization', name: 'OpenAgentSkill', url: 'https://www.openagentskill.com' },
         mainEntity: { '@id': `${url}#comparison` } },
       { '@type': 'ItemList', '@id': `${url}#comparison`, numberOfItems: sources.length,

@@ -96,5 +96,7 @@ export function localizedRanking(ranking: RankingDefinition, locale: Locale) {
   const title = locale === 'en' ? ranking.title : label
   return { title, shortTitle: locale === 'en' ? ranking.shortTitle : label,
     description: locale === 'en' ? ranking.description : rankingCopy(locale).intro.replace('{name}', title),
-    method: methods[ranking.kind][index] }
+    method: locale === 'en' && ranking.slug === 'best-design-creative-skills'
+      ? `${methods[ranking.kind][index]} Start with the deliverable: application code, a diagram or a visual asset. Compare a relevant example and inspect the source before installation. Repository stars describe popularity; author previews, community reports and independent runtime checks are different evidence.`
+      : methods[ranking.kind][index] }
 }

@@ -9,6 +9,7 @@ import { siteCopy } from '@/lib/i18n/site-copy'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import {
   ANALYTICS_CONSENT_STORAGE_KEY,
+  ANALYTICS_CONSENT_EVENT,
   trackAnalyticsPageView,
   updateAnalyticsConsent,
   type AnalyticsConsent,
@@ -22,6 +23,11 @@ export function GoogleAnalytics({ measurementId }: { measurementId: string }) {
   const [consent, setConsent] = useState<AnalyticsConsent | null | undefined>(undefined)
 
   useEffect(() => {
+    const onConsentChange = (event: Event) => {
+      const value = (event as CustomEvent<AnalyticsConsent>).detail
+      if (value === 'granted' || value === 'denied') setConsent(value)
+    }
+    window.addEventListener(ANALYTICS_CONSENT_EVENT, onConsentChange)
     const timeoutId = window.setTimeout(() => {
       try {
         const stored = window.localStorage.getItem(ANALYTICS_CONSENT_STORAGE_KEY)
@@ -31,10 +37,14 @@ export function GoogleAnalytics({ measurementId }: { measurementId: string }) {
       }
     }, 0)
 
-    return () => window.clearTimeout(timeoutId)
+    return () => {
+      window.clearTimeout(timeoutId)
+      window.removeEventListener(ANALYTICS_CONSENT_EVENT, onConsentChange)
+    }
   }, [])
 
   useEffect(() => {
+    if (consent !== 'granted') return
     const path = search ? `${pathname}?${search}` : pathname
     let attempts = 0
     let timeoutId: ReturnType<typeof setTimeout> | undefined
@@ -53,7 +63,7 @@ export function GoogleAnalytics({ measurementId }: { measurementId: string }) {
     return () => {
       if (timeoutId) clearTimeout(timeoutId)
     }
-  }, [pathname, search])
+  }, [pathname, search, consent])
 
   function chooseConsent(nextConsent: AnalyticsConsent) {
     updateAnalyticsConsent(nextConsent)
@@ -77,6 +87,8 @@ export function GoogleAnalytics({ measurementId }: { measurementId: string }) {
     window.gtag('js', new Date());
     window.gtag('config', '${measurementId}', {
       send_page_view: false,
+      page_location: window.location.origin + window.location.pathname,
+      page_referrer: document.referrer ? new URL(document.referrer).origin : '',
       allow_google_signals: false,
       allow_ad_personalization_signals: false
     });

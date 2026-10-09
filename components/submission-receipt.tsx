@@ -87,7 +87,7 @@ export function SubmissionReceiptPanel({ receipt, celebrate, onClose }: { receip
         {share?.published && state.skill.slug && <Link href={getLocalizedNavigationHref(`/skills/${state.skill.slug}`, locale)} className="border px-4 py-2.5 text-sm">{submissionCopy(locale, 'View skill', '查看 Skill')}</Link>}
         <button type="button" onClick={() => copy('private')} className="border px-4 py-2.5 text-sm">{copied === 'private' ? c('copied') : c('privateLink')}</button>
       </div>
-      <p className="mt-3 text-xs leading-5 text-secondary">{c('privateHint')}</p>
+      <p className="mt-3 text-xs leading-5 text-secondary">{c('privateHint')}{share?.published && <> {c('publishedIndexing')}</>}</p>
       {copied === 'failed' && <p role="alert" className="mt-2 text-xs text-destructive">{c('copyError')}</p>}
       <div className="mt-6">{shareButtons}</div>
       <a href={`mailto:qudongqi2023@gmail.com?subject=${encodeURIComponent(`Skill submission ${receipt.id}`)}`} className="mt-5 inline-block text-xs text-secondary underline underline-offset-4">{c('support')}</a>

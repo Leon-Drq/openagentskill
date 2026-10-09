@@ -25,7 +25,7 @@ assert.match(search, /one best match plus up to four distinct alternatives/, 'se
 
 const detailPage = readFileSync(new URL('../app/skills/[slug]/content.tsx', import.meta.url), 'utf8')
 const detailSchema = readFileSync(new URL('../lib/skills/detail-profile.ts', import.meta.url), 'utf8')
-assert.match(detailPage, /serializeDetailJson\(buildDetailStructuredData\(dbSkill\)\)/, 'skill detail pages must render the structured-data builder')
+assert.match(detailPage, /serializeDetailJson\(buildDetailStructuredData\(dbSkill,/, 'skill detail pages must render the structured-data builder with visible editorial context')
 assert.match(detailSchema, /'@type': 'BreadcrumbList'/, 'skill detail schema must publish breadcrumbs')
 assert.match(detailPage, /id="githubStars"/, 'skill pages must label repository popularity accurately')
 assert.doesNotMatch(detailPage, /'@type': 'AggregateRating'/, 'unverified legacy ratings must not be emitted as rich-result evidence')
