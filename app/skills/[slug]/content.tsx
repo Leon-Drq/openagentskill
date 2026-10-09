@@ -57,6 +57,7 @@ import CatalogSkillContent, { buildCatalogSkillMetadata } from '@/components/cat
 import { getExternalSkill } from '@/lib/skills/external-catalog'
 import { ScenarioSkillLinks } from '@/components/scenario-topic'
 import { SCENARIO_SOURCES } from '@/lib/seo/scenario-pages'
+import { getSkillGrowthProfile, growthProfileSource } from '@/lib/seo/skill-growth-profiles'
 
 // Shared renderer; cache policy belongs to the public/query route wrappers.
 const SKILL_DETAIL_SUPPORT_TIMEOUT_MS = 1200
@@ -124,6 +125,8 @@ export async function generateMetadata({
     seo.description = `${scenarioSource.output}. Compare task fit, setup and limitations, inspect source instructions and explore related workflow examples.`
   }
   const editorial = getEditorialSearchProfile(dbSkill)
+  const growth = getSkillGrowthProfile(dbSkill, getLocaleFromSearchParam(query.lang) || defaultLocale)
+  if (growth) Object.assign(seo, { title: growth.title, openGraphTitle: growth.title, description: growth.description })
   if (editorial) Object.assign(seo, { title: editorial.title, openGraphTitle: editorial.title, description: editorial.description })
   // Match the proxy's X-Robots-Tag on query variants. Preserve the canonical
   // URL and existing eligibility; search indexing is not install approval.
@@ -195,6 +198,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
   const skill = { ...convertSkillRecordToManifest(dbSkill), category: skillPresentationCategory(dbSkill) }
   const editorial = getEditorialSearchProfile(dbSkill)
   const editorialLocale = initialLocale === 'zh' ? 'zh' : 'en'
+  const growth = getSkillGrowthProfile(dbSkill, initialLocale || defaultLocale)
   if (slug !== skill.slug) permanentRedirect(`/skills/${skill.slug}`)
   const support = await getCachedSkillDetailSupport(skill.id, skill.category, skill.slug)
   const { eventStats, outcomeStats, approvedClaim } = support
@@ -232,7 +236,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
   return (
     <I18nProvider initialLocale={initialLocale}>
       <div className="min-h-screen bg-background">
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeDetailJson(buildDetailStructuredData(dbSkill)) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeDetailJson(buildDetailStructuredData(dbSkill, growth ? { description: growth.summary, citation: growthProfileSource(growth) } : undefined)) }} />
         <script id="agent-skill-metadata" type="application/json" dangerouslySetInnerHTML={{ __html: serializeDetailJson(machineMetadata) }} />
         <SkillEventTracker skillSlug={skill.slug} />
         <SiteHeader />
@@ -287,7 +291,12 @@ export default async function SkillDetailPage({ params, searchParams }: {
                   <p>{editorial.limitations[editorialLocale]}</p>
                   <Link href={`/showcase/${editorial.gallerySlug}`} className="inline-block font-medium text-[#006b4f] underline underline-offset-4">{editorial.galleryLabel?.[editorialLocale] || (editorialLocale === 'zh' ? '查看作者海报案例' : 'Explore the author’s poster examples')} →</Link>
                 </div>}
-                <SkillDocument source={skill.longDescription} summary={skill.description} sourceUrl={sourceHref || ''} locale={initialLocale} />
+                <SkillDocument source={skill.longDescription} summary={skill.description} sourceUrl={sourceHref || ''} locale={initialLocale} editorialSummary={growth ? <div className="space-y-4 break-words text-base leading-8 text-secondary [overflow-wrap:anywhere]" data-growth-overview>
+                  <p>{growth.summary}</p>
+                  <p>{growth.setup}</p>
+                  <p>{growth.limitation}</p>
+                  <p className="text-sm"><a href={growthProfileSource(growth)} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">Source notes · {growth.commit.slice(0, 7)} ↗</a>{' · '}<Link href={growth.relatedHref} className="underline underline-offset-4">{growth.relatedLabel} →</Link></p>
+                </div> : undefined} />
                 {(initialLocale || defaultLocale) === 'en' && <ScenarioSkillLinks slug={skill.slug} />}
               </section>
 

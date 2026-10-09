@@ -78,7 +78,9 @@ for (const page of data.PRESENTATION_PAGES) {
   const collection = structured['@graph'].find(node => node['@type'] === 'CollectionPage')
   const list = structured['@graph'].find(node => node['@type'] === 'ItemList')
   assert.equal(collection.url, canonical)
-  assert.equal(collection.dateModified, data.PRESENTATION_UPDATED_AT)
+  assert.equal(collection.dateModified, page.updatedAt || data.PRESENTATION_UPDATED_AT)
+  assert.ok(nodes.some(node => node.tagName === 'time' && attrs(node).datetime === data.PRESENTATION_UPDATED_AT), 'Source-check date stays separate from editorial updates')
+  if (page.updatedAt) assert.ok(nodes.some(node => node.tagName === 'time' && attrs(node).datetime === page.updatedAt), 'Modified date is visible to readers')
   assert.equal(list.numberOfItems, page.sourceIds.length)
   assert.deepEqual(list.itemListElement.map(item => item.name), data.getPresentationSources(page).map(source => source.name))
   for (const source of data.getPresentationSources(page)) {

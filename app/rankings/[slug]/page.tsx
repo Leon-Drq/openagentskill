@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { isContentQueryKey } from '@/lib/public-page-routing'
 import Link from '@/components/crawl-link'
 import { notFound } from 'next/navigation'
 import { ArrowRight, ChevronDown, Star } from 'lucide-react'
@@ -32,7 +33,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const title = `${c.title} | OpenAgentSkill`
   return {
     title: { absolute: title }, description: c.description, alternates: { canonical: url },
-    robots: { index: locale === 'en' && !Object.keys(query).some(key => key !== 'lang'), follow: true },
+    robots: { index: locale === 'en' && !Object.keys(query).some(isContentQueryKey), follow: true },
     openGraph: { title, description: c.description, url, type: 'website' },
     twitter: { card: 'summary_large_image', title, description: c.description },
   }

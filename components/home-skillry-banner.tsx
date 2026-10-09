@@ -2,6 +2,7 @@ import { ArrowUpRight } from 'lucide-react'
 import type { Locale } from '@/lib/i18n/config'
 import { externalSourceHref, externalSourceRel } from '@/lib/skills/external-outbound'
 import { SkillryLogo } from './skillry-logo'
+import { EditorialLink } from './editorial-link'
 
 const COPY: Record<Locale, {
   label: string
@@ -75,7 +76,7 @@ export function HomeSkillryBanner({ locale }: { locale: Locale }) {
 
   return (
     <aside aria-label={`Skillry · ${copy.label}`} className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-6">
-      <a
+      <EditorialLink eventName="partner_outbound" eventData={{ partner: 'skillry', placement: 'home_banner' }}
         href={externalSourceHref(SOURCE_URL)}
         target="_blank"
         rel={externalSourceRel(SOURCE_URL)}
@@ -97,7 +98,7 @@ export function HomeSkillryBanner({ locale }: { locale: Locale }) {
           <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span className="sr-only">{copy.newTab}</span>
         </span>
-      </a>
+      </EditorialLink>
     </aside>
   )
 }

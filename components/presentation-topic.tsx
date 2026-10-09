@@ -40,7 +40,7 @@ export function PresentationTopic({ page }: { page: PresentationPageDefinition }
             <a href={page.platformGuide ? `#${page.platformGuide.id}` : '#comparison'} className={`${linkClass} border-[#006b4f] bg-[#006b4f] text-white hover:bg-[#00553f]`}>{page.platformGuide ? page.platformGuide.cta : `Compare ${sources.length} ${sources.length === 1 ? 'skill' : 'skills'}`}</a>
             <a href="#choose" className={linkClass}>{page.platformGuide ? 'Explore the community option' : 'Find your workflow'}</a>
           </div>
-          <p className="mt-6 text-xs leading-5 text-secondary">By OpenAgentSkill · Source notes checked <time dateTime={PRESENTATION_UPDATED_AT}>October 6, 2026</time></p>
+          <p className="mt-6 text-xs leading-5 text-secondary">By OpenAgentSkill · Source notes checked <time dateTime={PRESENTATION_UPDATED_AT}>October 6, 2026</time>{page.updatedAt && <> · Guide updated <time dateTime={page.updatedAt}>{page.updatedAt}</time></>}</p>
         </div>
         <aside className="self-start rounded-xl border border-border bg-card p-5 sm:p-6">
           <h2 className="text-lg font-semibold">Choose the output first</h2>
