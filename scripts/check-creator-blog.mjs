@@ -33,6 +33,7 @@ for (const locale of locales) {
   assert.deepEqual(tree.filter(n => n.tagName === 'h1').map(text), [copy.title])
   const article = tree.find(n => n.tagName === 'article')
   assert.equal(attr(article).lang, locale === 'zh' ? 'zh-CN' : locale)
+  assert.ok(!nodes(article).some(n => n.tagName === 'nav' && attr(n)['aria-label'] === copy.languageLabel), `${locale}: language selection belongs in the site header`)
   for (const [id, tool] of Object.entries(copy.tools)) {
     assert.ok(tree.some(n => attr(n).id === `tool-${id}`))
     assert.ok(text(article).includes(tool.use), `${locale}: rendered use for ${id}`)
@@ -61,6 +62,7 @@ assert.equal(blogResponse.status, 200)
 const hub = nodes(parse(await blogResponse.text()))
 for (const locale of locales) {
   assert.ok(sitemap.includes(`<loc>${canonicalOrigin}${pathFor(locale)}</loc>`))
-  assert.ok(hub.some(n => n.tagName === 'a' && attr(n).href === pathFor(locale)), `${locale}: crawlable link from blog hub`)
 }
+assert.ok(hub.some(n => n.tagName === 'a' && attr(n).href === pathFor('en')), 'Default article is linked from blog hub; translations remain in hreflang and sitemap')
+assert.ok(!hub.some(n => n.tagName === 'nav' && attr(n)['aria-label'] === 'Read the creator guide in your language'), 'No duplicate language toolbar on blog hub')
 console.log(`PASS ${origin}: 8 article routes, 7 redirects, 3 missing routes, blog discovery and sitemap`)

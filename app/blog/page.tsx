@@ -11,9 +11,9 @@ import { getBlogHubData, getBlogPosts, type BlogSkillPreview } from '@/lib/blog/
 import { SKILL_STACKS } from '@/lib/collections'
 import { CORE_RANKINGS, getRankingDefinitions } from '@/lib/rankings'
 import { USE_CASES } from '@/lib/use-cases'
-import { BLOG_LOCALES, creatorBlogPath } from '@/lib/blog/routes'
+import { type BlogLocale } from '@/lib/blog/routes'
 import { CREATOR_ARTICLE_COPY } from '@/lib/blog/creator-workflows'
-import { localeNativeNames } from '@/lib/i18n/config'
+import { CreatorGuideFeature } from '@/components/blog/creator-guide-feature'
 
 export const revalidate = 300
 
@@ -114,16 +114,9 @@ export default async function BlogPage() {
       />
 
       <div className="mx-auto max-w-6xl px-6">
-        <section aria-labelledby="creator-guide-title" className="border-b border-border py-8 sm:py-10">
-          <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Creator workflow guide · 8 languages</p>
-          <Link href={creatorBlogPath('en')} prefetch={false} className="hover:text-secondary">
-            <h2 id="creator-guide-title" className="font-display max-w-3xl text-2xl sm:text-3xl font-bold leading-tight text-balance">{CREATOR_ARTICLE_COPY.en.title}</h2>
-          </Link>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-secondary">{CREATOR_ARTICLE_COPY.en.summary}</p>
-          <nav aria-label="Read the creator guide in your language" className="mt-4 flex flex-wrap gap-2">
-            {BLOG_LOCALES.map(locale => <Link key={locale} href={creatorBlogPath(locale)} hrefLang={locale} lang={locale} prefetch={false} className="inline-flex min-h-11 items-center border border-border px-3 py-2 text-sm hover:border-foreground">{localeNativeNames[locale]}</Link>)}
-          </nav>
-        </section>
+        <CreatorGuideFeature copy={Object.fromEntries(Object.entries(CREATOR_ARTICLE_COPY).map(([locale, copy]) =>
+          [locale, { title: copy.title, summary: copy.summary, eyebrow: copy.eyebrow }]
+        )) as Record<BlogLocale, { title: string; summary: string; eyebrow: string }>} />
         {featureSkill && (
           <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
             <div>
