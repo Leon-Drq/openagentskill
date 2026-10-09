@@ -16,7 +16,7 @@ assert.doesNotMatch(read('components/skills-page-client.tsx'), /const .* = useSe
 assert.match(read('components/skills-page-client.tsx'), /directoryHref\(pathname, queryString,/)
 assert.match(read('app/skills/content.tsx'), /key === 'lang' && locale !== defaultLocale/, 'localized reset must return to the cacheable path without an injected lang query')
 assert.match(read('app/skills/content.tsx'), /if \(requireHealthy && degraded && visibleRecords.length === 0\) \{\s*throw new Error/, 'do not persist an empty outage page')
-for (const path of ['/skills/example', '/ja/docs']) {
+for (const path of ['/skills/example', '/skills/example/audit', '/skills/example/evals', '/ja/docs']) {
   assert.equal(publicQueryRoute(path, new URLSearchParams()), null)
   assert.equal(publicQueryRoute(path, new URLSearchParams('_rsc=prefetch')), null)
   assert.equal(publicQueryRoute(path, new URLSearchParams('q=design&page=2')), '/render-query' + path)
@@ -67,6 +67,15 @@ const tracked = await exports.proxy(request('/skills/a?utm_source=github&ref=git
 assert.equal(tracked.headers.get('x-robots-tag'), null)
 assert.equal(tracked.headers.get('x-middleware-rewrite'), null)
 assert.equal((await exports.proxy(request('/render-query/skills'))).status, 404)
+for (const kind of ['audit', 'evals']) {
+  const report = `/skills/example/${kind}`
+  assert.equal((await exports.proxy(request(report))).headers.get('x-middleware-rewrite'), null)
+  assert.equal((await exports.proxy(request(report + '?lang=zh'))).headers.get('x-middleware-rewrite'), `https://www.openagentskill.com/render-query${report}?lang=zh`)
+  assert.equal((await exports.proxy(request('/render-query' + report))).status, 404)
+  const wrapper = read(`app/skills/[slug]/${kind}/page.tsx`)
+  assert.match(wrapper, /generateStaticParams\(\) \{ return \[\] \}/)
+  assert.doesNotMatch(wrapper, /await.*searchParams|searchParams:\s*Promise</)
+}
 assert.equal(authCalls, 0)
 await exports.proxy(request('/profile'))
 assert.equal(authCalls, 1)

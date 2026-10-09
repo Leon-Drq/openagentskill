@@ -1,5 +1,7 @@
 import { Metadata } from 'next'
+import { unstable_cache } from 'next/cache'
 import { notFound } from 'next/navigation'
+import type { ComponentProps } from 'react'
 import { isContentQueryKey } from '@/lib/public-page-routing'
 import { SKILL_CATEGORIES, legacyCategoryTopic, normalizeSkillCategory, normalizeTopic, normalizeOutput, skillTaxonomy } from '@/lib/skills/taxonomy'
 import { directoryAccessScope, firstPartyPaidSlugs } from '@/lib/skills/directory-filters'
@@ -8,6 +10,7 @@ import { getBrowseSkillCandidates, getSkillCatalogPage, getSkillsBySlugs } from 
 import { clampResultPage, requestedDirectoryPage } from '@/lib/skills/pagination'
 import { catalogPageNumber, catalogStars, directoryDiscoveryFilters, canShowCatalogSnapshot, selectCatalogSnapshot } from '@/lib/skills/catalog-query'
 import { getDirectoryProfiles } from '@/lib/skills/directory-profiles'
+import { projectDirectoryWindow } from '@/lib/skills/directory-window'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsWithStatus } from '@/lib/db/skills'
 import { getShowcasesForSkill, getShowcaseCardData, SHOWCASE_SKILL_SLUGS } from '@/lib/showcase'
@@ -898,14 +901,7 @@ function buildSkillsPageJsonLd(
 
 const DIRECTORY_EXAMPLE_SKILL_SLUGS = [...new Set([...SHOWCASE_SKILL_SLUGS, ...SOURCE_EXAMPLE_SKILL_SLUGS])]
 
-export default async function SkillsPage({
-  searchParams,
-  requireHealthy = false,
-}: {
-  searchParams: Promise<SkillsSearchParams>
-  requireHealthy?: boolean
-}) {
-  const params = await searchParams
+async function prepareDirectory(params: SkillsSearchParams, requireHealthy = false) {
   const requestedPage = requestedDirectoryPage(params.page)
   if (requestedPage === null) notFound()
   const locale = getLocaleFromSearchParam(params.lang) || defaultLocale
@@ -1051,17 +1047,19 @@ export default async function SkillsPage({
   const hasPreviousResults = effectivePage > 1
   let hasMoreResults = catalogMode ? catalogResult!.hasMore : resultCount > pageOffset + visibleRecords.length
 
-  let skills: DirectorySkillCard[] = (catalogMode ? visibleRecords : filteredRecords).map(item => {
+  const projectCard = (item: (typeof enrichedRecords)[number]): DirectorySkillCard => {
     const examples = getShowcasesForSkill(item.record.slug)
     return { ...toSkillsPageSkill(item), exampleCount: examples.length, sourcePreview: getSkillPreviewCardData(item.record.slug), sourceGalleryHref: SOURCE_GALLERY_LINKS[item.record.slug], preview: examples[0] ? getShowcaseCardData(examples[0]) : null }
-  })
+  }
+  let skills: DirectorySkillCard[]
   if (catalogMode) {
-    const merged = mergeProviderCatalogPage(skills, providerSkills, degraded ? skills.length : catalogResult!.total, pageOffset, sort)
+    const cards = visibleRecords.map(projectCard)
+    const merged = mergeProviderCatalogPage(cards, providerSkills, degraded ? cards.length : catalogResult!.total, pageOffset, sort)
     skills = merged.items; resultCount = merged.total; hasMoreResults = !degraded && merged.hasMore
   } else {
     const prefix = providerRowsFirst(sort) ? Math.min(8, providerSkills.length) : 0
-    const combined = [...providerSkills.slice(0, prefix), ...skills, ...providerSkills.slice(prefix)]
-    resultCount = combined.length; skills = combined.slice(pageOffset, pageOffset + VISIBLE_SKILL_LIMIT)
+    resultCount = filteredRecords.length + providerSkills.length
+    skills = projectDirectoryWindow(filteredRecords, providerSkills, pageOffset, prefix, projectCard, VISIBLE_SKILL_LIMIT)
     hasMoreResults = pageOffset + VISIBLE_SKILL_LIMIT < resultCount
   }
   const directorySections = catalogMode ? [] : buildDirectorySections(
@@ -1073,6 +1071,56 @@ export default async function SkillsPage({
   if (!degraded && requestedPage > Math.max(1, Math.ceil(resultCount / VISIBLE_SKILL_LIMIT))) notFound()
   const jsonLd = buildSkillsPageJsonLd(skills, query ? [] : directorySections, locale)
 
+  const clientProps: Omit<ComponentProps<typeof SkillsPageClient>, 'queryString'> = {
+    pathname: locale === defaultLocale ? '/skills' : `/${locale}/skills`,
+    skills, query, sort, featured, examplesOnly, catalogMode, category, topic, output,
+    pricing, access, categories: categoryOptions, useCase,
+    useCases: USE_CASES.map(({ slug, shortTitle }) => ({ slug, shortTitle })),
+    platform, platformOptions, quality, trust, safety, supplyTrack, supplyTracks,
+    minStars: Number.isFinite(minStars) ? minStars : 0,
+    resultCount, page: effectivePage, rankOffset: pageOffset, hasPreviousResults,
+    hasMoreResults, degraded, directorySections, directoryLinks,
+  }
+  return { jsonLd, clientProps }
+}
+
+type DirectoryModel = Awaited<ReturnType<typeof prepareDirectory>>
+class DegradedDirectory extends Error {
+  constructor(readonly model: DirectoryModel) {
+    super('Public directory data unavailable; do not cache the fallback')
+  }
+}
+
+// Exactly eight keys, independent of attribution, cookies and arbitrary filters.
+// Cache the public view model, keeping request-time HTML and the same client
+// route segment so filtering/back navigation retain their existing behavior.
+const getDefaultDirectory = unstable_cache(async (locale: Locale) => {
+  const model = await prepareDirectory({ lang: locale })
+  if (model.clientProps.degraded) throw new DegradedDirectory(model)
+  return model
+}, ['public-directory-model-v1'], {
+  revalidate: 300, tags: ['public-skill-directory', 'public-skill-stats'],
+})
+
+export default async function SkillsPage({
+  searchParams, requireHealthy = false,
+}: {
+  searchParams: Promise<SkillsSearchParams>
+  requireHealthy?: boolean
+}) {
+  const params = await searchParams
+  const locale = getLocaleFromSearchParam(params.lang) || defaultLocale
+  const isDefault = Object.keys(params).every(key => key === 'lang' || !isContentQueryKey(key))
+  const model = isDefault
+    ? await getDefaultDirectory(locale).catch(error => {
+        // The current request can show its labelled fallback; failures never
+        // replace a healthy shared model or turn into an empty cached directory.
+        if (error instanceof DegradedDirectory && !requireHealthy) return error.model
+        throw error
+      })
+    : await prepareDirectory(params, requireHealthy)
+  const { jsonLd, clientProps } = model
+
   return (
     <>
       <script
@@ -1081,44 +1129,11 @@ export default async function SkillsPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <SkillsPageClient
-        pathname={locale === defaultLocale ? '/skills' : `/${locale}/skills`}
+        {...clientProps}
         queryString={new URLSearchParams(Object.entries(params).flatMap(([key, value]): [string, string][] =>
           key === '_rsc' || (key === 'lang' && locale !== defaultLocale) || value === undefined
             ? [] : (Array.isArray(value) ? value : [value]).map(item => [key, item])
         )).toString()}
-        skills={skills}
-        query={query}
-        sort={sort}
-        featured={featured}
-        examplesOnly={examplesOnly}
-        catalogMode={catalogMode}
-        category={category}
-        topic={topic}
-        output={output}
-        pricing={pricing}
-        access={access}
-        categories={categoryOptions}
-        useCase={useCase}
-        useCases={USE_CASES.map((item) => ({
-          slug: item.slug,
-          shortTitle: item.shortTitle,
-        }))}
-        platform={platform}
-        platformOptions={platformOptions}
-        quality={quality}
-        trust={trust}
-        safety={safety}
-        supplyTrack={supplyTrack}
-        supplyTracks={supplyTracks}
-        minStars={Number.isFinite(minStars) ? minStars : 0}
-        resultCount={resultCount}
-        page={effectivePage}
-        rankOffset={pageOffset}
-        hasPreviousResults={hasPreviousResults}
-        hasMoreResults={hasMoreResults}
-        degraded={degraded}
-        directorySections={directorySections}
-        directoryLinks={directoryLinks}
       />
     </>
   )

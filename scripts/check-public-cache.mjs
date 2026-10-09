@@ -19,9 +19,9 @@ function nonemptyDirectory(html) {
   // Read numeric text only. This is an assertion, not an HTML sanitizer, and
   // no fetched markup is reinserted into a page or written to a public file.
   const count = html.match(/data-directory-count[^>]*>([\s\S]*?)<\/p>/)?.[1] || ''
-  const numbers = (count.match(/\d+/g) || []).map(Number)
-  assert.deepEqual(numbers.slice(0, 2), [1, 16], 'default directory must include real visible cards, not an empty outage fallback')
-  assert.ok(numbers[2] > 0, 'default directory has candidates')
+  const total = Number((count.match(/\d+/g) || []).join(''))
+  assert.equal((html.match(/<article\b[^>]*\bdata-directory-skill(?:[\s=>])/g) || []).length, 16, 'default directory must include 16 server-rendered cards')
+  assert.ok(total >= 16, 'default directory has candidates')
 }
 for (const path of ['/skills', '/zh/skills']) {
   const { response, html } = await read(path)
@@ -31,12 +31,13 @@ for (const path of ['/skills', '/zh/skills']) {
   assert.match(response.headers.get('cache-control') || '', /private|no-store/, `${path}: request-time HTML uses shared data caches`)
   console.log(`${path}: SSR directory and uncached HTML passed`)
 }
-for (const path of [detail]) {
+for (const path of [detail, detail + '/audit', detail + '/evals']) {
   let hit = false
   for (let attempt = 0; attempt < 8; attempt++) {
     const { response, html } = await read(path)
     assert.equal(response.status, 200, path)
     seo(html, path)
+    if (path !== detail) assert.ok(html.includes('noindex'), 'report indexing policy stays unchanged')
     const cache = response.headers.get('x-vercel-cache') || response.headers.get('x-nextjs-cache')
     console.log(JSON.stringify({ path, attempt: attempt + 1, cache, control: response.headers.get('cache-control') }))
     if (cache === 'HIT') { hit = true; break }
@@ -49,6 +50,8 @@ for (const [path, canonical] of [
   ['/skills?q=design', '/skills'], ['/skills?view=all', '/skills'],
   ['/zh/skills?category=design-creative&sort=stars', '/zh/skills'],
   [detail + '?lang=zh', detail],
+  [detail + '/audit?lang=zh', detail + '/audit'],
+  [detail + '/evals?lang=zh', detail + '/evals'],
 ]) {
   const { response, html } = await read(path)
   assert.equal(response.status, 200, path)
@@ -62,7 +65,7 @@ const location = new URL(localized.response.headers.get('location'), origin)
 assert.equal(location.pathname, '/zh/skills')
 assert.equal(location.searchParams.get('q'), 'design')
 assert.equal(location.searchParams.has('lang'), false)
-for (const path of ['/render-query/skills', '/render-query/zh/skills']) {
+for (const path of ['/render-query/skills', '/render-query/zh/skills', '/render-query' + detail + '/audit', '/render-query' + detail + '/evals']) {
   const { response } = await read(path)
   assert.equal(response.status, 404, path)
   assert.match(response.headers.get('x-robots-tag') || '', /noindex/)
