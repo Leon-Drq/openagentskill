@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { CheckCircle2, Copy, Loader2, Search, ShieldCheck, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
 import { trackAnalyticsEvent } from '@/lib/analytics'

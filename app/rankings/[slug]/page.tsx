@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { notFound } from 'next/navigation'
 import { ArrowRight, ChevronDown, Star } from 'lucide-react'
 import { MarketingPageShell } from '@/components/marketing-page'

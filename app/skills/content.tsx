@@ -1,9 +1,11 @@
 import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { isContentQueryKey } from '@/lib/public-page-routing'
 import { SKILL_CATEGORIES, legacyCategoryTopic, normalizeSkillCategory, normalizeTopic, normalizeOutput, skillTaxonomy } from '@/lib/skills/taxonomy'
 import { directoryAccessScope, firstPartyPaidSlugs } from '@/lib/skills/directory-filters'
 import { commerceFilterSlugs, getSkillCommerce, matchesCommerce } from '@/lib/skills/commerce'
 import { getBrowseSkillCandidates, getSkillCatalogPage, getSkillsBySlugs } from '@/lib/db/skills'
-import { clampResultPage } from '@/lib/skills/pagination'
+import { clampResultPage, requestedDirectoryPage } from '@/lib/skills/pagination'
 import { catalogPageNumber, catalogStars, directoryDiscoveryFilters, canShowCatalogSnapshot, selectCatalogSnapshot } from '@/lib/skills/catalog-query'
 import { getDirectoryProfiles } from '@/lib/skills/directory-profiles'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
@@ -52,7 +54,7 @@ function firstSearchValue(value: string | string[] | undefined) {
 
 function isDirectorySearchVariant(params: SkillsSearchParams) {
   return Object.entries(params).some(([key, value]) => {
-    if (key === 'lang' || key === '_rsc') return false
+    if (key === 'lang' || !isContentQueryKey(key)) return false
     return Boolean(firstSearchValue(value)?.trim())
   })
 }
@@ -64,6 +66,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const params = await searchParams
   const locale = getLocaleFromSearchParam(params.lang) || defaultLocale
+  if (requestedDirectoryPage(params.page) === null) notFound()
   const copy = getSearchMetadataCopy(locale)
   const isVariant = isDirectorySearchVariant(params)
   const isCanonicalEnglishDirectory = !isVariant && locale === defaultLocale
@@ -903,6 +906,8 @@ export default async function SkillsPage({
   requireHealthy?: boolean
 }) {
   const params = await searchParams
+  const requestedPage = requestedDirectoryPage(params.page)
+  if (requestedPage === null) notFound()
   const locale = getLocaleFromSearchParam(params.lang) || defaultLocale
   const requestedSort = firstSearchValue(params.sort)
   const sort: SkillSortMode = ['quality', 'stars', 'fresh', 'new', 'trending', 'downloads'].includes(requestedSort || '')
@@ -1063,6 +1068,9 @@ export default async function SkillsPage({
     enrichedRecords.slice(0, DIRECTORY_SECTION_SOURCE_LIMIT)
   )
   const directoryLinks: DirectoryLink[] = POPULAR_DIRECTORY_LINKS.map((link) => ({ ...link }))
+  // Clamping is useful inside the UI, but a requested nonexistent page must
+  // not become a duplicate of the last page (or a false 404 during an outage).
+  if (!degraded && requestedPage > Math.max(1, Math.ceil(resultCount / VISIBLE_SKILL_LIMIT))) notFound()
   const jsonLd = buildSkillsPageJsonLd(skills, query ? [] : directorySections, locale)
 
   return (

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { Check, Copy } from 'lucide-react'
 import type { Locale } from '@/lib/i18n/config'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'

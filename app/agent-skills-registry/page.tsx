@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { AgentRecommendationDemo } from '@/components/agent-recommendation-demo'
 import { MarketingButtonLink, MarketingHero, MarketingPageShell } from '@/components/marketing-page'
 import { getAllSkills } from '@/lib/db/skills'

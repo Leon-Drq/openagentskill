@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowDown, ArrowRight, Braces, Layers, ListOrdered, ScanSearch } from 'lucide-react'
 import { MarketingPageShell } from '@/components/marketing-page'
 import { getAllSkills, getSkillsBySlugs, type SkillRecord } from '@/lib/db/skills'

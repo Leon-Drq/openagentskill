@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowUpRight, Braces, Github, SearchCheck, ShieldCheck } from 'lucide-react'
 import {
   MarketingButtonLink,

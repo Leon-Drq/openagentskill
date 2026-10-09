@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { usePathname, useRouter } from 'next/navigation'
 import { ChevronDown } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'

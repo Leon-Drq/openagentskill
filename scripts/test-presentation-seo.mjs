@@ -30,13 +30,13 @@ const forbidden = () => { throw new Error('PPT editorial pages must not depend o
 const Link = { default: ({ children, ...props }) => { delete props.prefetch; return createElement('a', props, children) } }
 const Image = { default: ({ ...props }) => { delete props.fill; delete props.sizes; return createElement('img', props) } }
 const topic = compile('components/presentation-topic.tsx', {
-  'react/jsx-runtime': jsx, 'next/link': Link, 'next/image': Image,
+  'react/jsx-runtime': jsx, '@/components/crawl-link': Link, 'next/image': Image,
   '@/components/marketing-page': { MarketingPageShell: ({ children }) => createElement('main', null, children) },
   '@/lib/seo/presentation-pages': data,
   '@/lib/showcase': { SHOWCASE_CASES: [], getShowcaseEvidenceLabel: forbidden, getShowcaseImageSrc: forbidden },
 })
 const route = compile('app/best/[slug]/page.tsx', {
-  'react/jsx-runtime': jsx, 'next/link': Link, 'next/navigation': { notFound: () => { throw new Error('404') } },
+  'react/jsx-runtime': jsx, '@/components/crawl-link': Link, 'next/navigation': { notFound: () => { throw new Error('404') } },
   '@/components/install-command': {}, '@/components/site-footer': {}, '@/components/site-header': {},
   '@/components/presentation-topic': topic,
   '@/components/scenario-topic': { ScenarioTopicPage: forbidden },
@@ -132,7 +132,7 @@ await assert.rejects(route.default({ params: Promise.resolve({ slug: 'not-a-real
 
 const example = (slug, skillSlug) => ({ slug, skillSlug, title: { en: slug }, description: { en: 'Author presentation example' }, media: [{ src: `/showcase/${slug}.webp`, alt: { en: `${slug} preview` } }] })
 const withExamples = compile('components/presentation-topic.tsx', {
-  'react/jsx-runtime': jsx, 'next/link': Link, 'next/image': Image,
+  'react/jsx-runtime': jsx, '@/components/crawl-link': Link, 'next/image': Image,
   '@/components/marketing-page': { MarketingPageShell: ({ children }) => createElement('main', null, children) },
   '@/lib/seo/presentation-pages': data,
   '@/lib/showcase': {
@@ -172,7 +172,7 @@ assert.ok(entries.some(entry => entry.url.endsWith('/best/workbuddy-ppt-skills')
 assert.ok(entries.some(entry => entry.url.endsWith('/coding-agents') && entry.lastModified === undefined))
 
 const nav = compile('components/discovery-navigation.tsx', {
-  'react/jsx-runtime': jsx, 'next/link': Link, 'lucide-react': icons,
+  'react/jsx-runtime': jsx, '@/components/crawl-link': Link, 'lucide-react': icons,
   '@/lib/skills/taxonomy': taxonomy, '@/lib/discovery': discovery,
   '@/lib/i18n/market-routing': { getLocalizedNavigationHref: href => href },
   '@/lib/i18n/context': { useI18n: () => ({ locale: 'en' }) },

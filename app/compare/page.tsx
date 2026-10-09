@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { InstallCommand } from '@/components/install-command'
 import { MarketingHero, MarketingPageShell } from '@/components/marketing-page'
 import { SkillEventTracker } from '@/components/skill-event-tracker'

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 
 interface FeaturedSkill {
   slug: string

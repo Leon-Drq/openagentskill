@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { InstallCommand } from '@/components/install-command'
 import {
   MarketingButtonLink,

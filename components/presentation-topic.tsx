@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { MarketingPageShell } from '@/components/marketing-page'
 import { SHOWCASE_CASES, getShowcaseEvidenceLabel, getShowcaseImageSrc } from '@/lib/showcase'
 import {

@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ChevronDown, Search, type LucideIcon } from 'lucide-react'
 import { NativeSelect } from '@/components/ui/native-select'
 import { discoveryIcons } from './discovery-navigation'

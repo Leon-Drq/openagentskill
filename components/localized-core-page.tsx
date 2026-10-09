@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { unstable_cache } from 'next/cache'
 import { ArrowRight, Search } from 'lucide-react'
 import { LocalizedResolveWorkbench } from '@/components/localized-resolve-workbench'

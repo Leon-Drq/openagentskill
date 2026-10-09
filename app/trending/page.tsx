@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowRight, ChevronDown, Star } from 'lucide-react'
 import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { NativeSelect } from '@/components/ui/native-select'

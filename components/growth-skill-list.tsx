@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { InstallCommand } from '@/components/install-command'
 import { convertSkillRecordToManifest } from '@/lib/db/skills'
 import { formatCompactNumber, getPlatformHints, getSkillQualityProfile } from '@/lib/quality'

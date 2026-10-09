@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { notFound } from 'next/navigation'
 import { cache } from 'react'
 import { BadgeCheck, ExternalLink, GitCommitHorizontal, ShieldCheck } from 'lucide-react'

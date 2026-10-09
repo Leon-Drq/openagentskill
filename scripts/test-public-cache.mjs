@@ -3,7 +3,7 @@ import { AsyncLocalStorage } from 'node:async_hooks'
 import { readFileSync } from 'node:fs'
 import { register, createRequire } from 'node:module'
 import ts from 'typescript'
-import { publicQueryRoute } from '../lib/public-page-routing.ts'
+import { publicQueryRoute, hasContentQuery } from '../lib/public-page-routing.ts'
 import { createBoundedContentMemo } from '../lib/bounded-content-memo.ts'
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
@@ -41,7 +41,7 @@ const deps = {
   '@/lib/creator-directory': { isMissingFeaturedCreatorPath: () => false },
   '@/lib/rankings': { isMissingRankingPath: () => false },
   '@/lib/skills/external-catalog': { isMissingExternalSkillPath: () => false },
-  '@/lib/public-page-routing': { publicQueryRoute },
+  '@/lib/public-page-routing': { publicQueryRoute, hasContentQuery },
 }
 new Function('exports', 'require', ts.transpileModule(read('proxy.ts'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
@@ -63,6 +63,9 @@ assert.equal((await exports.proxy(request('/skills?_rsc=abc'))).headers.get('x-m
 assert.equal((await exports.proxy(request('/skills?lang=zh&q=test'))).headers.get('location'), 'https://www.openagentskill.com/zh/skills?q=test')
 assert.equal((await exports.proxy(request('/skills/alias?q=test'))).headers.get('location'), 'https://www.openagentskill.com/skills/canonical?q=test')
 assert.equal((await exports.proxy(request('/skills/a?lang=zh'))).headers.get('x-robots-tag'), 'noindex, follow')
+const tracked = await exports.proxy(request('/skills/a?utm_source=github&ref=github'))
+assert.equal(tracked.headers.get('x-robots-tag'), null)
+assert.equal(tracked.headers.get('x-middleware-rewrite'), null)
 assert.equal((await exports.proxy(request('/render-query/skills'))).status, 404)
 assert.equal(authCalls, 0)
 await exports.proxy(request('/profile'))

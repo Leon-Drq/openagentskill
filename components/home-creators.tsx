@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { CreatorDirectoryCard } from '@/components/creator-directory-card'
 import { buildCreatorDirectory } from '@/lib/creator-directory'
 import type { Locale } from '@/lib/i18n/config'

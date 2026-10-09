@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { cache } from 'react'
+import { isContentQueryKey } from '@/lib/public-page-routing'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { getApprovedClaimBySkillSlug, convertSkillRecordToManifest, getAgentOutcomeStats, getRelatedSkills, getSkillEventStats } from '@/lib/db/skills'
 import { getSkillBySlugOrFallbackStrict, getCanonicalSkillSlug } from '@/lib/skill-fallbacks'
@@ -126,7 +127,7 @@ export async function generateMetadata({
   if (editorial) Object.assign(seo, { title: editorial.title, openGraphTitle: editorial.title, description: editorial.description })
   // Match the proxy's X-Robots-Tag on query variants. Preserve the canonical
   // URL and existing eligibility; search indexing is not install approval.
-  const indexable = Object.keys(query).length === 0 && isSearchIndexEligible(dbSkill)
+  const indexable = !Object.keys(query).some(isContentQueryKey) && isSearchIndexEligible(dbSkill)
   const pageUrl = `https://www.openagentskill.com/skills/${canonicalSlug}`
   const imageAlt = seo.imageAlt
   const imageVersion = '8'

@@ -1,6 +1,6 @@
 'use client'
 
-import NextLink from 'next/link'
+import NextLink from '@/components/crawl-link'
 import type { ComponentProps } from 'react'
 import { useI18n } from '@/lib/i18n/context'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'

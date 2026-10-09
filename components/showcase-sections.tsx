@@ -2,7 +2,7 @@
 
 import { galleryCopy } from '@/lib/i18n/gallery-copy'
 
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowRight } from 'lucide-react'
 import { ShowcaseCard } from '@/components/showcase-card'
 import { useI18n } from '@/lib/i18n/context'

@@ -17,7 +17,7 @@ const sample = { slug: 'addyosmani-agent-skills', name: 'Live frontend skill', d
 const fallback = { ...sample, name: 'Saved frontend skill' }
 const dependencies = {
   'react/jsx-runtime': jsx,
-  'next/link': { default: ({ children, prefetch, ...props }) => { void prefetch; return createElement('a', props, children) } },
+  '@/components/crawl-link': { default: ({ children, prefetch, ...props }) => { void prefetch; return createElement('a', props, children) } },
   'lucide-react': icons,
   '@/components/marketing-page': { MarketingPageShell: ({ children }) => createElement('main', null, children) },
   '@/lib/db/skills': {

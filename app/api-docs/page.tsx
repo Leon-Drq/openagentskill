@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { MarketingHero, MarketingPageShell } from '@/components/marketing-page'
 
 export const metadata: Metadata = {

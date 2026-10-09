@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import sources from '@/lib/video-workflow-sources.json'
 import { findVideoWorkflowListing, VIDEO_RELATED_GUIDES, VIDEO_WORKFLOWS, videoSourceUrl, type VideoWorkflowListing } from '@/lib/video-workflows'
 

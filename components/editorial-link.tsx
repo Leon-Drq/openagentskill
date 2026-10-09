@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import type { ComponentProps } from 'react'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 

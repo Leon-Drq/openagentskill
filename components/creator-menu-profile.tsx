@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { useI18n } from '@/lib/i18n/context'
 import { studioCopy } from '@/lib/i18n/creator-studio-copy'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowRight } from 'lucide-react'
 import { DISCOVERY_TASKS, discoveryCopy } from '@/lib/discovery'
 import type { Locale } from '@/lib/i18n/config'

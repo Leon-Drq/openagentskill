@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { usePathname } from 'next/navigation'
 import { ChevronDown, Menu, Plus, X } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'

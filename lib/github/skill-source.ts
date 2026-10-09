@@ -185,15 +185,18 @@ function parseFrontmatterBlock(source: string) {
     }
 
     const key = entry[1].toLowerCase()
-    const rawValue = entry[2]
-    if (rawValue === '|' || rawValue === '>') {
+    const rawValue = entry[2].trim()
+    // YAML block scalars may include a chomping/indent indicator and comment.
+    // These are source text, never executable YAML tags or configuration.
+    const scalar = rawValue.match(/^([|>])(?:[1-9][+-]?|[+-][1-9]?)?(?:\s+#.*)?$/)
+    if (scalar) {
       const block: string[] = []
       index += 1
       while (index < lines.length && (/^\s+/.test(lines[index]) || !lines[index].trim())) {
         block.push(lines[index].replace(/^\s{1,4}/, ''))
         index += 1
       }
-      values.set(key, rawValue === '>' ? block.join(' ').replace(/\s+/g, ' ').trim() : block.join('\n').trim())
+      values.set(key, scalar[1] === '>' ? block.join(' ').replace(/\s+/g, ' ').trim() : block.join('\n').trim())
       continue
     }
 

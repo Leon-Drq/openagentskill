@@ -4,7 +4,7 @@ import { galleryCopy } from '@/lib/i18n/gallery-copy'
 
 import { useEffect, useRef, useState } from 'react'
 import { SkillPreviewImage } from '@/components/skill-preview-image'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'

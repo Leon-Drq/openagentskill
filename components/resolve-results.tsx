@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowRight, Search, Copy, Check, SlidersHorizontal } from 'lucide-react'
 import { NativeSelect } from '@/components/ui/native-select'
 import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'

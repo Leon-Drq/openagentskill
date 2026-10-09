@@ -44,13 +44,13 @@ for (const source of SCENARIO_SOURCES.filter(source=>!source.registrySlug)) asse
 const exampleData=await import('../lib/seo/scenario-examples.ts')
 const components=compile('components/scenario-topic.tsx',{
   'react/jsx-runtime':jsx,
-  'next/link':{default:({children,...props})=>createElement('a',props,children)},
+  '@/components/crawl-link':{default:({children,...props})=>createElement('a',props,children)},
   'next/image':{default:props=>createElement('img',props)},
   '@/components/marketing-page':{MarketingPageShell:({children})=>createElement('main',null,children)},
   '@/lib/seo/scenario-pages':sourceData,'@/lib/seo/scenario-examples':exampleData,
 })
 const route=compile('app/best/[slug]/page.tsx',{
-  'react/jsx-runtime':jsx,'next/link':{},'next/navigation':{notFound:forbidden},
+  'react/jsx-runtime':jsx,'@/components/crawl-link':{},'next/navigation':{notFound:forbidden},
   '@/components/install-command':{},'@/components/site-footer':{},'@/components/site-header':{},
   '@/components/presentation-topic':{},'@/components/scenario-topic':components,
   '@/lib/seo/scenario-pages':sourceData,'@/lib/agent-proven':{},'@/lib/audits':{},'@/lib/quality':{},'@/lib/trust':{},

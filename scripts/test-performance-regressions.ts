@@ -51,7 +51,7 @@ const skillsPage = read('app/skills/content.tsx')
 const searchDeadline = Number(skillsPage.match(/SKILLS_PAGE_EXACT_SEARCH_TIMEOUT_MS = (\d+)/)?.[1])
 assert.ok(searchDeadline >= 3500 && searchDeadline <= 4000, 'search must allow the bounded 3.5s evidence read but never wait beyond 4s')
 
-const loadingBoundary = read('app/loading.tsx')
+const loadingBoundary = read('components/crawl-link.tsx')
 assert.match(loadingBoundary, /role="progressbar"/, 'route transitions need immediate visual feedback')
 assert.match(loadingBoundary, /aria-live="polite"/, 'route loading feedback must be announced accessibly')
 

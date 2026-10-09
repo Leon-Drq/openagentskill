@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { ArrowUpRight, Code2 } from 'lucide-react'
 import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { creatorHref, type DirectoryCreator } from '@/lib/creator-directory'

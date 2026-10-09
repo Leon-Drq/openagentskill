@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/crawl-link'
 import { useI18n } from '@/lib/i18n/context'
 import { commerceCopy } from '@/lib/i18n/commerce-copy'
 import { safeCommerceUrl, type SkillCommerce } from '@/lib/skills/commerce'
