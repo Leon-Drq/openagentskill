@@ -1,0 +1,52 @@
+{
+  "title": "12 AI Skill untuk Kreator Konten: dari Riset hingga Draf Siap Terbit",
+  "summary": "Bandingkan alur riset, gambar, video, dan persiapan publikasi: hasil setiap Skill, alat serta akun yang diperlukan, dan hal yang perlu diperiksa sebelum digunakan.",
+  "eyebrow": "Alur kerja kreator",
+  "byline": "Tim editorial OpenAgentSkill",
+  "dateLabel": "Sumber diperiksa",
+  "languageLabel": "Baca dalam bahasa",
+  "contentsLabel": "Isi panduan",
+  "sourceLabel": "Sumber pada revisi yang diperiksa",
+  "profileLabel": "Lihat entri registri",
+  "pathLabel": "Lokasi Skill",
+  "checkLabel": "Sebelum digunakan",
+  "intro": [
+    "Susunan alat yang berguna dimulai dari hasil yang ingin dibuat: kerangka dengan sumber, sampul yang terbaca, transkrip terkoreksi, atau draf tersimpan di editor yang tepat. Memasang dua puluh repositori tidak otomatis menghubungkan tahap-tahap tersebut. Setiap perpindahan membutuhkan format berkas, akun, dan kriteria selesai.",
+    "Kami menelusuri daftar Skill kreator dari 想风, memeriksa repositori yang ditautkan, lalu memilih dua belas alur kerja tertentu berdasarkan tugasnya. Sebagian sudah ada di registri, sebagian masih menjadi kandidat bersyarat. Penyebutan di sini bukan sertifikasi keberhasilan saat dijalankan."
+  ],
+  "groups": ["Riset dan perencanaan", "Desain visual", "Mengolah dan membuat video", "Persiapan publikasi"],
+  "tools": {
+    "workflow": {"use": "self-media-content-workflow mengubah brief menjadi rencana, naskah, dan paket publikasi. Cocok saat Anda kesulitan menentukan langkah berikutnya: arah, platform, judul, dan naskah akhir memiliki titik pemeriksaan sendiri.", "check": "MIT. Instruksinya mengoordinasikan kemampuan lain, bukan menyediakan seluruh alat gambar, peramban, dan publikasi. Mulailah dari satu platform dan tentukan keputusan penerbitan secara jelas."},
+    "search": {"use": "global-content-search dalam creator-buddy mengumpulkan materi publik untuk brief editorial. Simpan URL sumber dan tanggal pengamatan bersama setiap klaim agar bukti dapat dibedakan dari pendapat populer.", "check": "Skill ini menyatakan MIT dan membutuhkan Node serta adaptor seperti agent-reach. Adaptor Douyin tidak disertakan; diperlukan DOUYIN_COMMAND eksternal. Jalur API opsional mungkin memerlukan kredensial atau biaya."},
+    "distiller": {"use": "blogger-distiller mengubah sampel publik kreator menjadi analisis HTML dan panduan menulis. Gunakan untuk mempelajari struktur dan pertanyaan audiens, kemudian kembangkan contoh serta argumen Anda sendiri.", "check": "MIT; membutuhkan Python dan token TikHub. Pemindaian statis terbatas kami menandai operasi penghapusan pada pemasang dan skrip. Periksa jalur sasaran dalam direktori kerja terisolasi. Ini kandidat untuk pemeriksaan lanjutan, bukan pemasangan yang telah disetujui."},
+    "cover": {"use": "baoyu-cover-image menyediakan alur khusus dari brief artikel menjadi sampul. Jika hanya membutuhkan satu thumbnail yang efektif, Anda dapat menilai Skill ini tanpa memasang semua alur baoyu-skills.", "check": "MIT. Mesin pembuat gambar tetap diperlukan dan mungkin berbayar. Periksa teks, rasio, dan keterbacaan thumbnail di ponsel; simpan prompt yang disetujui bersama gambar."},
+    "cards": {"use": "Guizang Social Card menyusun konten menjadi kartu sosial dan sampul. Rangkaian singkat cocok untuk mengembangkan satu gagasan melalui judul, bukti, dan tindakan penutup yang jelas.", "check": "AGPL-3.0. Periksa kewajiban lisensi sesuai penggunaan serta hak font dan gambar. Tinjau setiap kartu hasil ekspor; pratinjau HTML yang baik belum merupakan hasil akhir."},
+    "illustration": {"use": "ian-xiaohei-illustrations mengubah materi padat menjadi penjelasan visual bergaya gambar tangan. Ini kandidat untuk menjelaskan mekanisme atau hubungan yang sulit diwakili judul singkat.", "check": "MIT; membutuhkan kemampuan pembuatan gambar. Gaya yang didokumentasikan menggunakan anotasi bahasa Mandarin dan kanvas lebar. Sesuaikan label untuk bahasa lain dan periksa tulisan yang dihasilkan."},
+    "subtitle": {"use": "video-to-subtitle-summary mengubah video menjadi takarir, teks, dan ringkasan. Alur dalam dokumentasi mengutamakan takarir YouTube yang sudah ada dan mendukung transkripsi lokal dengan faster-whisper.", "check": "MIT. Python, FFmpeg, dan alat unduh yang sesuai diperlukan. Beberapa penghubung platform atau mode cloud memakai API berbayar. Cocokkan nama dan penanda waktu dengan audio. Kami menemukan akses lingkungan dan penggunaan subproses, tetapi tidak melakukan uji eksekusi."},
+    "seedance": {"use": "Seedance prompt Skill membantu menggambarkan bidikan, gerak, dan maksud audiovisual. Hasilnya adalah brief produksi untuk dikirim ke layanan pembuat video.", "check": "Skill ini menulis prompt, bukan merender video. Periksa akses layanan, kredit, dan hak media secara terpisah. Tidak ada lisensi repositori yang eksplisit dalam berkas yang kami periksa, jadi jangan menganggap penggunaan ulang bebas batas."},
+    "hyperframes": {"use": "Alur general-video dari HyperFrames menyusun video dengan HTML dan CSS. Cocok untuk video penjelasan atau produk yang memerlukan kendali atas waktu, tipografi, dan aset.", "check": "Apache-2.0. Skill ini bagian dari runtime HyperFrames serta merujuk alur awal dan sumber pendamping. Menyalin satu SKILL.md saja tidak membentuk lingkungan render lengkap. Ikuti penyiapan proyek dan periksa video hasil ekspor."},
+    "publisher": {"use": "video-publisher membawa paket video yang disetujui ke editor platform kreator. Perilaku bawaan yang didokumentasikan menyiapkan draf dan berhenti sebelum tindakan publikasi terakhir, sehingga dapat mengurangi persiapan unggah berulang.", "check": "MIT; membutuhkan Node, EgoLite, dan akun platform yang sudah masuk. Pemindaian terbatas tidak menemukan peringatan aturan, tetapi tindakan peramban dan pengiriman belum kami uji. Periksa setiap draf dan minta bukti publikasi sebelum melaporkan keberhasilan."},
+    "wewrite": {"use": "WeWrite mengoordinasikan riset, penulisan, dan pemformatan artikel WeChat. Mulailah dari draf lokal dan peninjauan; minta gambar, pratinjau, atau pengiriman ke kotak draf hanya jika diperlukan.", "check": "MIT. Orkestrator bergantung pada Skill pendamping dan CLI-nya. Pembuatan gambar serta pengiriman WeChat memerlukan pengaturan sendiri dan dapat menimbulkan biaya. Pemindaian mencakup direktori Skill terpilih, bukan seluruh kode yang dapat dijalankan dalam repositori."},
+    "xarticle": {"use": "x-article-publisher memindahkan Markdown dan gambar ke draf X Articles. Alur yang didokumentasikan berhenti pada draf, mengurangi pekerjaan editor sambil menyerahkan keputusan terbit kepada pemilik akun.", "check": "MIT; membutuhkan Node, Chrome, profil yang sudah masuk, serta akun X yang memenuhi syarat. Penulis mendokumentasikan pengujian macOS, bukan keberhasilan Windows/Linux. Pemindaian menandai eksekusi dinamis dan akses proses; periksa skrip dan lindungi profil peramban."}
+  },
+  "stacksTitle": "Mulai dari satu perpindahan yang lengkap",
+  "stacks": [
+    {"title": "Artikel dengan satu sampul", "text": "Setujui kerangka dan naskah lewat alur konten, lalu gunakan baoyu-cover-image untuk satu sampul. Periksa sumber, ketepatan judul, dan thumbnail di ponsel sebelum menerima hasilnya."},
+    {"title": "Video menjadi bahan penulisan", "text": "Gunakan alur takarir untuk materi yang boleh diakses dan digunakan ulang. Koreksi transkrip dahulu, lalu minta kerangka dengan rujukan penanda waktu. Jangan membuat klaim faktual hanya dari ringkasan."},
+    {"title": "Konten selesai masuk ke editor", "text": "Pilih video-publisher, WeWrite, atau x-article-publisher menurut tujuan. Serahkan teks, media, dan judul yang disetujui. Draf tersimpan adalah titik penerimaan pertama; publikasi merupakan tindakan terpisah."}
+  ],
+  "briefTitle": "Brief yang dapat digunakan ulang",
+  "brief": "Audiens: [siapa yang membutuhkan]. Hasil: [satu artikel, sampul, atau video].\nGunakan hanya sumber dan aset yang disetujui ini: [tautan/berkas].\nKembalikan hasil, rujukan sumber, biaya aktual, dan pemeriksaan yang belum selesai.\nSimpan sebagai draf. Minta konfirmasi sebelum memakai kredit tambahan atau menerbitkan melalui akun.",
+  "methodTitle": "Cara membaca pilihan ini",
+  "method": [
+    "Kami memeriksa dokumentasi repositori publik dan lokasi SKILL.md yang tepat pada 10 Oktober 2026. Tautan sumber mengarah ke commit yang diperiksa. Entri registri mungkin mengikuti revisi berbeda; periksa sumber dan status peninjauannya sebelum memasang.",
+    "Lima kandidat yang belum terdaftar juga melalui pemindaian saran tanpa menjalankan kode. Cakupannya maksimal dua belas berkas teks yang didukung per pemindaian dan dapat melewatkan kode serta dependensi. Temuan aturan mengarahkan pemeriksaan, bukan membuktikan malware; tidak ada peringatan juga bukan bukti aman. Kami tidak menjalankan alur, memakai akun berbayar, atau menguji hasil publikasi.",
+    "Daftar awal juga mencampurkan koleksi, framework, dan aplikasi. Contohnya, revisi write-then-publish yang diperiksa tidak memiliki SKILL.md dan lisensinya membatasi penggunaan komersial. Jangan menyebutnya Skill yang bisa saling menggantikan dan bebas digunakan secara komersial. Baca setiap lisensi proyek dan ketentuan layanan secara terpisah."
+  ],
+  "creditLabel": "Sumber penemuan: daftar asli 想风 di X",
+  "appSourceLabel": "Kode dan lisensi write-then-publish",
+  "nextTitle": "Pilih menurut hasil berikutnya",
+  "nextText": "Bandingkan sumber yang tepat, penyiapan, dan status peninjauan di registri. Tambahkan alur kedua setelah alur pertama menghasilkan sesuatu yang dapat diperiksa dan digunakan ulang.",
+  "browseLabel": "Jelajahi Skill untuk kreator",
+  "backLabel": "Kembali ke blog"
+}

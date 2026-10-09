@@ -1,0 +1,110 @@
+[
+  {
+    "id": "workflow",
+    "name": "self-media-content-workflow",
+    "group": 0,
+    "repository": "yanhua1010/self-media-content-workflow",
+    "path": "skills/self-media-content-workflow/SKILL.md",
+    "commit": "cf2526942a9f68ff80e1ac77031cd68d8383ec6c",
+    "registrySlug": "yanhua1010-self-media-content-workflow"
+  },
+  {
+    "id": "search",
+    "name": "creator-buddy / global-content-search",
+    "group": 0,
+    "repository": "SpaceZephyr/creator-buddy",
+    "path": "gzh-Skills/global-content-search/SKILL.md",
+    "commit": "edf46c567ff54b72ee2157d06f3a02dbd67aaa9c",
+    "registrySlug": "spacezephyr-global-content-search"
+  },
+  {
+    "id": "distiller",
+    "name": "blogger-distiller",
+    "group": 0,
+    "repository": "otter1101/blogger-distiller",
+    "path": "SKILL.md",
+    "commit": "1d787e721b4518e145dd829e29f1a5af175ed294",
+    "registrySlug": null
+  },
+  {
+    "id": "cover",
+    "name": "baoyu-cover-image",
+    "group": 1,
+    "repository": "JimLiu/baoyu-skills",
+    "path": "skills/baoyu-cover-image/SKILL.md",
+    "commit": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+    "registrySlug": "jimliu-baoyu-skills-baoyu-cover-image"
+  },
+  {
+    "id": "cards",
+    "name": "Guizang Social Card",
+    "group": 1,
+    "repository": "op7418/guizang-social-card-skill",
+    "path": "SKILL.md",
+    "commit": "cf4b810fac1c73fb65a2bb31d8c9278d82cbc4c5",
+    "registrySlug": "op7418-guizang-social-card-skill"
+  },
+  {
+    "id": "illustration",
+    "name": "ian-xiaohei-illustrations",
+    "group": 1,
+    "repository": "helloianneo/ian-xiaohei-illustrations",
+    "path": "ian-xiaohei-illustrations/SKILL.md",
+    "commit": "4102eb807f03bcb6e538a16e8b31b41db8b5b954",
+    "registrySlug": "helloianneo-ian-xiaohei-illustrations"
+  },
+  {
+    "id": "subtitle",
+    "name": "video-to-subtitle-summary",
+    "group": 2,
+    "repository": "imlewc/video-to-subtitle-summary-skill",
+    "path": "SKILL.md",
+    "commit": "50598e25e9962b3f7fef3c7d73c066c00d3ecb87",
+    "registrySlug": null
+  },
+  {
+    "id": "seedance",
+    "name": "Seedance prompt Skill",
+    "group": 2,
+    "repository": "songguoxs/seedance-prompt-skill",
+    "path": ".claude/skills/seedance/SKILL.md",
+    "commit": "57d1e2f273747c238dd892698a05137ab2f10d4a",
+    "registrySlug": "songguoxs-seedance-prompt-skill"
+  },
+  {
+    "id": "hyperframes",
+    "name": "HyperFrames / general-video",
+    "group": 2,
+    "repository": "heygen-com/hyperframes",
+    "path": "skills/general-video/SKILL.md",
+    "commit": "46f6cb356785bed79e1ce7b79d7e7accc697786a",
+    "registrySlug": "heygen-com-hyperframes-general-video"
+  },
+  {
+    "id": "publisher",
+    "name": "video-publisher",
+    "group": 3,
+    "repository": "oil-oil/video-publisher-skill",
+    "path": "video-publisher/SKILL.md",
+    "commit": "b615eacfbd41dde0e268e7e2a52fe6bd69011409",
+    "registrySlug": null
+  },
+  {
+    "id": "wewrite",
+    "name": "WeWrite",
+    "group": 3,
+    "repository": "imraywang/wewrite",
+    "path": "skills/wewrite/SKILL.md",
+    "commit": "95f4d507fb789c695c61cdf0d54bd1ee0fcfd117",
+    "registrySlug": null
+  },
+  {
+    "id": "xarticle",
+    "name": "x-article-publisher",
+    "group": 3,
+    "repository": "xaiwind/x-article-publisher",
+    "path": "SKILL.md",
+    "commit": "6cd2f1b752afe966c00bb803c1a1c5eb7a1085d4",
+    "registrySlug": null
+  }
+]

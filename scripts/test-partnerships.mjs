@@ -5,6 +5,7 @@ import { getPartnershipCopy } from '../lib/i18n/partnership-copy.ts'
 import { SITE_NAVIGATION, getPartnershipLabels, isNavigationSectionActive } from '../lib/site-navigation.ts'
 import * as channels from '../lib/partnerships.ts'
 import * as config from '../lib/i18n/config.ts'
+import * as blogRoutes from '../lib/blog/routes.ts'
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
 function compile(path, dependencies) {
@@ -16,7 +17,7 @@ function compile(path, dependencies) {
   })
   return exports
 }
-const routing = compile('lib/i18n/market-routing.ts', { '@/lib/i18n/config': config })
+const routing = compile('lib/i18n/market-routing.ts', { '@/lib/i18n/config': config, '@/lib/blog/routes': blogRoutes })
 const { partnershipPageData } = compile('lib/seo/partnerships.ts', {
   '@/lib/i18n/market-routing': routing,
   '@/lib/i18n/partnership-copy': { getPartnershipCopy },

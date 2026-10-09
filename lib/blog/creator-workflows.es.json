@@ -1,0 +1,52 @@
+{
+  "title": "12 Skills de IA para creadores: de la investigación al borrador listo para publicar",
+  "summary": "Compara flujos de investigación, imágenes, vídeo y preparación editorial: qué entrega cada Skill, qué herramientas exige y qué comprobar antes de usarlo.",
+  "eyebrow": "Flujos para creadores",
+  "byline": "Equipo editorial de OpenAgentSkill",
+  "dateLabel": "Fuentes consultadas",
+  "languageLabel": "Leer en",
+  "contentsLabel": "En esta guía",
+  "sourceLabel": "Fuente en la revisión consultada",
+  "profileLabel": "Ver ficha en el registro",
+  "pathLabel": "Ruta del Skill",
+  "checkLabel": "Antes de adoptarlo",
+  "intro": [
+    "Un conjunto útil de herramientas empieza por un entregable: un esquema con fuentes, una portada legible, una transcripción corregida o un borrador guardado en el editor adecuado. Instalar veinte repositorios no conecta esas etapas automáticamente. Cada traspaso necesita un formato, una cuenta y un criterio de finalización.",
+    "Partimos de la recopilación de 想风, consultamos los repositorios enlazados y seleccionamos doce flujos concretos. Los agrupamos por tarea. Algunos ya figuran en nuestro registro; otros son candidatos con condiciones. Aparecer aquí no equivale a una certificación de funcionamiento."
+  ],
+  "groups": ["Investigar y planificar", "Diseñar las imágenes", "Trabajar con vídeo", "Preparar la publicación"],
+  "tools": {
+    "workflow": {"use": "self-media-content-workflow convierte un encargo en un plan, un texto y un paquete editorial. Ayuda cuando cuesta decidir el siguiente paso: orientación, plataforma, título y versión final tienen puntos de revisión separados.", "check": "MIT. Las instrucciones coordinan otras capacidades; no incluyen todas las herramientas de imagen, navegador o publicación. Empieza con una plataforma y decide expresamente cuándo publicar."},
+    "search": {"use": "global-content-search, de creator-buddy, reúne material público para una investigación editorial. Conserva las URL y las fechas junto a cada afirmación para distinguir las pruebas de las opiniones populares.", "check": "Este Skill declara MIT y necesita Node y adaptadores como agent-reach. El adaptador de Douyin no está incluido: requiere un DOUYIN_COMMAND externo. Algunas rutas API opcionales necesitan credenciales o pago."},
+    "distiller": {"use": "blogger-distiller transforma muestras públicas de creadores en un análisis HTML y una guía de escritura. Úsalo para estudiar estructuras y preguntas de la audiencia, y desarrolla después tus propios ejemplos y argumentos.", "check": "MIT; necesita Python y un token de TikHub. El análisis estático limitado detectó operaciones de borrado en el instalador y los scripts. Inspecciona las rutas de destino en un entorno aislado. Es un candidato pendiente de revisión, no una instalación aprobada."},
+    "cover": {"use": "baoyu-cover-image ofrece un flujo específico para convertir el encargo de un artículo en una portada. Si necesitas una miniatura, puedes evaluar este Skill sin instalar todos los flujos de baoyu-skills.", "check": "MIT. Sigue siendo necesario un motor de generación de imágenes y puede tener coste. Revisa texto, proporción y legibilidad en una miniatura de móvil; guarda el prompt aprobado junto a la imagen."},
+    "cards": {"use": "Guizang Social Card organiza contenido en tarjetas sociales y portadas. Una secuencia breve sirve para desarrollar una idea con titular, pruebas y una acción final clara.", "check": "AGPL-3.0. Consulta las obligaciones de la licencia según tu uso y los derechos de fuentes tipográficas e imágenes. Comprueba cada tarjeta exportada: la vista previa HTML no es el entregable final."},
+    "illustration": {"use": "ian-xiaohei-illustrations convierte material denso en explicaciones visuales con aspecto dibujado a mano. Es una opción para enseñar mecanismos o relaciones difíciles de resumir en un titular.", "check": "MIT; requiere generación de imágenes. El estilo documentado está pensado para anotaciones en chino y un lienzo horizontal. Adapta las etiquetas a otros idiomas y revisa las letras generadas."},
+    "subtitle": {"use": "video-to-subtitle-summary convierte vídeo en subtítulos, texto y resumen. Su flujo documentado prioriza los subtítulos existentes de YouTube y admite la transcripción local con faster-whisper.", "check": "MIT. Necesita Python, FFmpeg y las herramientas de descarga correspondientes. Algunos conectores y modos en la nube usan API de pago. Contrasta nombres y tiempos con el audio. Detectamos acceso al entorno y subprocesos, pero no realizamos una prueba de ejecución."},
+    "seedance": {"use": "Seedance prompt Skill ayuda a describir planos, movimiento e intención audiovisual. Su resultado es un encargo que puedes enviar a un servicio de generación de vídeo.", "check": "Escribe prompts; no renderiza vídeos. Comprueba por separado el acceso al servicio, los créditos y los derechos del material. No encontramos una licencia explícita del repositorio en los archivos consultados: no presupongas una reutilización sin restricciones."},
+    "hyperframes": {"use": "El flujo general-video de HyperFrames compone vídeos con HTML y CSS. Encaja en explicaciones o vídeos de producto que necesitan control sobre ritmo, tipografía y recursos.", "check": "Apache-2.0. Forma parte del entorno HyperFrames y remite al flujo inicial y a recursos complementarios. Copiar únicamente este SKILL.md no crea un entorno de renderizado completo. Sigue la configuración del proyecto y revisa el vídeo exportado."},
+    "publisher": {"use": "video-publisher lleva un paquete de vídeo aprobado a los editores de las plataformas. Su comportamiento predeterminado documentado prepara borradores y se detiene antes de la publicación final, reduciendo tareas repetidas de carga.", "check": "MIT; necesita Node, EgoLite y sesiones iniciadas. El análisis limitado no encontró alertas de reglas, pero no probamos las acciones del navegador ni la entrega. Verifica cada borrador y exige un comprobante antes de declarar una publicación exitosa."},
+    "wewrite": {"use": "WeWrite coordina investigación, escritura y formato para artículos de WeChat. Empieza por el borrador local y su revisión; solicita imágenes, vista previa o envío a borradores solo cuando los necesites.", "check": "MIT. El orquestador depende de otros Skills y de su CLI. Las imágenes y el envío a WeChat requieren configuración propia y pueden tener coste. Nuestro análisis abarcó el directorio del Skill elegido, no todos los ejecutables del repositorio."},
+    "xarticle": {"use": "x-article-publisher transfiere Markdown e imágenes a un borrador de X Articles. El flujo documentado se detiene ahí, reduciendo trabajo de edición y dejando la decisión de publicar al titular de la cuenta.", "check": "MIT; requiere Node, Chrome, un perfil conectado y una cuenta de X con acceso a la función. El autor documenta pruebas en macOS, no funcionamiento confirmado en Windows/Linux. Detectamos ejecución dinámica y acceso a procesos: revisa los scripts y protege el perfil del navegador."}
+  },
+  "stacksTitle": "Empieza con un traspaso completo",
+  "stacks": [
+    {"title": "Un artículo con su portada", "text": "Aprueba esquema y texto con el flujo de contenido y usa baoyu-cover-image para una portada. Comprueba las fuentes, la precisión del titular y la miniatura en el móvil antes de aceptar el resultado."},
+    {"title": "De vídeo a material para escribir", "text": "Usa el flujo de subtítulos sobre material al que puedas acceder y que puedas reutilizar. Corrige primero la transcripción y solicita después un esquema con referencias temporales. No bases afirmaciones factuales únicamente en el resumen."},
+    {"title": "Del contenido terminado al editor", "text": "Elige video-publisher, WeWrite o x-article-publisher según el destino. Entrega texto, medios y título aprobados. El primer punto de aceptación es un borrador guardado; la publicación es otra acción."}
+  ],
+  "briefTitle": "Un encargo reutilizable",
+  "brief": "Audiencia: [a quién va dirigido]. Entregable: [un artículo, portada o vídeo].\nUsa solo estas fuentes y recursos aprobados: [enlaces/archivos].\nDevuelve el resultado, las fuentes, los costes reales y las comprobaciones pendientes.\nGuarda un borrador. Pide confirmación antes de gastar créditos extra o publicar en una cuenta.",
+  "methodTitle": "Cómo interpretar esta selección",
+  "method": [
+    "Consultamos la documentación pública y las rutas exactas de SKILL.md el 10 de octubre de 2026. Cada enlace de fuente apunta al commit consultado. Las fichas del registro pueden seguir otra revisión; comprueba su fuente y estado de revisión antes de instalar.",
+    "También aplicamos un análisis orientativo sin ejecución a cinco candidatos no registrados. Está limitado a doce archivos de texto compatibles por análisis y puede omitir código y dependencias. Una coincidencia invita a investigar, no demuestra malware; la ausencia de alertas tampoco demuestra seguridad. No ejecutamos los flujos ni usamos cuentas de pago ni probamos resultados de publicación.",
+    "La lista original también incluye colecciones, marcos y aplicaciones. Por ejemplo, la revisión consultada de write-then-publish no contiene SKILL.md y su licencia restringe el uso comercial. No debe presentarse como un Skill intercambiable y libre para usos comerciales. Lee cada licencia y las condiciones de los servicios por separado."
+  ],
+  "creditLabel": "Punto de partida: recopilación original de 想风 en X",
+  "appSourceLabel": "Código y licencia de write-then-publish",
+  "nextTitle": "Elige según tu próximo entregable",
+  "nextText": "Compara fuentes exactas, requisitos y estado de revisión en el registro. Añade un segundo flujo después de obtener con el primero un resultado que puedas comprobar y reutilizar.",
+  "browseLabel": "Explorar Skills para creadores",
+  "backLabel": "Volver al blog"
+}

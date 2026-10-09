@@ -1,4 +1,5 @@
 import { AGENT_TASKS } from '@/lib/agent-tasks'
+import { creatorBlogSitemapEntries } from '@/lib/blog/routes'
 import { SKILL_STACKS } from '@/lib/collections'
 import { getSkillSitemapSnapshot } from '@/lib/seo/skill-sitemap-data'
 import type { SkillSitemapSnapshot } from '@/lib/seo/sitemap-snapshot'
@@ -149,6 +150,7 @@ export function getCoreSitemapEntries(): SitemapEntry[] {
 
   return [
     ...staticPages,
+    ...creatorBlogSitemapEntries(SITEMAP_BASE_URL),
     ...localizedPages,
     ...localizedCorePages,
     ...SKILL_CLUSTERS.map((cluster) => ({

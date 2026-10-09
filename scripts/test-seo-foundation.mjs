@@ -5,6 +5,7 @@ import './test-external-skills.mjs'
 const externalCatalog = await import('../lib/skills/external-catalog.ts')
 import { readFileSync } from 'node:fs'
 import ts from 'typescript'
+import * as blogRoutes from '../lib/blog/routes.ts'
 import { selectGuideSkills, selectComparisonSkills, scoreSkillForGuide } from '../lib/seo/guide-selection.ts'
 import { GROWTH_GUIDES } from '../lib/seo/growth-guides.ts'
 import { sitemapUnavailableResponse } from '../lib/seo/sitemap-response.ts'
@@ -37,6 +38,7 @@ function compile(path, dependencies) {
   return exports
 }
 const mocks = {
+  '@/lib/blog/routes': blogRoutes,
   '@/lib/skills/external-catalog': externalCatalog,
   '@/lib/agent-tasks': { AGENT_TASKS: [] }, '@/lib/collections': { SKILL_STACKS: [] },
   '@/lib/async': { withTimeout: promise => promise },
