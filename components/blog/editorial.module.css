@@ -1,0 +1,35 @@
+/* Shared editorial patterns. See docs/design-system.md. */
+.shell { max-width: 1152px; margin-inline: auto; padding: 32px 16px 64px; }
+.article { max-width: 768px; min-width: 0; margin-inline: auto; overflow-wrap: anywhere; }
+.header { padding-bottom: 32px; border-bottom: 1px solid var(--border); }
+.back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--secondary); font-size: 14px; }
+.eyebrow { margin-block: 24px 16px; color: var(--brand); font-size: 12px; line-height: 1.6; }
+.title { font-family: var(--font-display); font-size: 32px; font-weight: 400; line-height: 1.2; letter-spacing: 0; text-wrap: balance; }
+.summary { margin-top: 20px; color: var(--secondary); font-size: 16px; line-height: 1.8; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 24px; color: var(--secondary); font-size: 13px; line-height: 1.7; }
+.text { color: var(--foreground); font-size: 16px; line-height: 1.9; }
+.heading { color: var(--foreground); font-family: var(--font-display); font-size: 24px; font-weight: 400; line-height: 1.35; }
+.link { text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 4px; transition: color 150ms, text-decoration-color 150ms; }
+.link:hover { color: var(--brand); text-decoration-color: currentColor; }
+.article a:focus-visible, .feature a:focus-visible { outline: 2px solid var(--brand); outline-offset: 4px; border-radius: 4px; }
+.contents { padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+.number { color: var(--brand); font-family: var(--font-mono); font-size: 14px; font-weight: 400; }
+.brief { max-width: 100%; padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--font-mono); font-size: 14px; line-height: 1.9; }
+.next { margin-block: 48px 0; padding: 24px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+.feature { padding-block: 32px; border-bottom: 1px solid var(--border); }
+.feature .eyebrow { margin-block: 0 12px; }
+.feature .summary { max-width: 768px; margin-top: 16px; }
+.featureTitle { max-width: 768px; font-family: var(--font-display); font-size: 24px; font-weight: 400; line-height: 1.3; text-wrap: balance; }
+.feature a { display: inline-block; }
+.feature a:hover { color: var(--brand); }
+@media (min-width: 640px) {
+  .shell { padding: 40px 24px 80px; }
+  .title { font-size: 40px; }
+  .summary { font-size: 18px; }
+  .heading, .featureTitle { font-size: 30px; }
+  .contents, .brief { padding: 24px; }
+  .next { padding: 32px; }
+  .feature { padding-block: 40px; }
+}
+@media (min-width: 1024px) { .title { font-size: 48px; } }
+@media (prefers-reduced-motion: reduce) { .link { transition: none; } }

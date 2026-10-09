@@ -1,5 +1,11 @@
 # OpenAgentSkill development and publication
 
+For UI and page work, read `docs/design-system.md` first. Reuse the existing
+site shell, typography roles, controls and responsive patterns. Language
+selection belongs in the shared header; do not add another language toolbar
+inside an article. Keep page-specific styles scoped and preserve the Skills
+directory's established layout unless the owner requests its redesign.
+
 Normal application development (UI, routes, bug fixes and authorized deployments)
 does not use the community Skill submission review queue.
 
