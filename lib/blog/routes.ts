@@ -1,6 +1,7 @@
 // Keep routing independent of article copy: the header and proxy also use it.
 export const CREATOR_BLOG_SLUG = 'ai-skills-for-content-creators'
-export const CREATOR_BLOG_DATE = '2026-10-10T00:00:00.000Z'
+// Editorial date is recorded in the publisher's time zone, not a future UTC midnight.
+export const CREATOR_BLOG_DATE = '2026-10-10T00:28:00+08:00'
 export const BLOG_LOCALES = ['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr', 'id'] as const
 export type BlogLocale = (typeof BLOG_LOCALES)[number]
 

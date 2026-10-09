@@ -12,7 +12,7 @@ const linkStyle = 'underline underline-offset-4 decoration-border hover:decorati
 export function CreatorWorkflowsArticle({ locale }: { locale: BlogLocale }) {
   const copy = CREATOR_ARTICLE_COPY[locale]
   const language = locale === 'zh' ? 'zh-CN' : locale
-  const date = new Intl.DateTimeFormat(language, { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(CREATOR_BLOG_DATE))
+  const date = new Intl.DateTimeFormat(language, { dateStyle: 'long', timeZone: 'Asia/Shanghai' }).format(new Date(CREATOR_BLOG_DATE))
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
