@@ -1518,6 +1518,402 @@
     ]
   },
   {
+    "skillSlug": "atomicarchitects-equiformer-v2",
+    "repository": "atomicarchitects/equiformer_v2",
+    "revision": "d5ad4be729b56f74012ebb7f097f77c5b00a1004",
+    "sourceUrl": "https://github.com/atomicarchitects/equiformer_v2/blob/d5ad4be729b56f74012ebb7f097f77c5b00a1004/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-3aece7bcdd3897a746c274ae3bc29b8f8bd4e724f5ed57b6201ed0164728870c.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "3aece7bcdd3897a746c274ae3bc29b8f8bd4e724f5ed57b6201ed0164728870c",
+    "documentSha256": "fbde221a253b0892a3ca3b8db019f623aedb3a135f6a35316519f70c03054fda",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-09T07:28:30.393Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/4146e5547442b5087956771f251221977fd1ed8a815f865a71ec692547bc12f5.preview.webp",
+        "previewSrc": "/skill-previews/auto/4146e5547442b5087956771f251221977fd1ed8a815f865a71ec692547bc12f5.preview.webp",
+        "cardSrc": "/skill-previews/auto/4146e5547442b5087956771f251221977fd1ed8a815f865a71ec692547bc12f5.card.webp",
+        "width": 1600,
+        "height": 407,
+        "sha256": "4146e5547442b5087956771f251221977fd1ed8a815f865a71ec692547bc12f5",
+        "originalSrc": "/skill-previews/auto/4146e5547442b5087956771f251221977fd1ed8a815f865a71ec692547bc12f5.png",
+        "sourceUrl": "https://github.com/atomicarchitects/equiformer_v2/blob/d5ad4be729b56f74012ebb7f097f77c5b00a1004/fig/equiformer_v2_adsorbml_results.png",
+        "kind": "example",
+        "title": {
+          "en": "Equiformer V2 · Author preview",
+          "zh": "Equiformer V2 · 作者预览"
+        },
+        "alt": {
+          "en": "Equiformer V2: photo not available",
+          "zh": "Equiformer V2：photo not available"
+        },
+        "sourcePath": "fig/equiformer_v2_adsorbml_results.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/318f98f80edaa380c659be3ae2185a6a782332ae0a8da3cdb3a3ac3b694016bc.preview.webp",
+        "previewSrc": "/skill-previews/auto/318f98f80edaa380c659be3ae2185a6a782332ae0a8da3cdb3a3ac3b694016bc.preview.webp",
+        "cardSrc": "/skill-previews/auto/318f98f80edaa380c659be3ae2185a6a782332ae0a8da3cdb3a3ac3b694016bc.card.webp",
+        "width": 1600,
+        "height": 603,
+        "sha256": "318f98f80edaa380c659be3ae2185a6a782332ae0a8da3cdb3a3ac3b694016bc",
+        "originalSrc": "/skill-previews/auto/318f98f80edaa380c659be3ae2185a6a782332ae0a8da3cdb3a3ac3b694016bc.png",
+        "sourceUrl": "https://github.com/atomicarchitects/equiformer_v2/blob/d5ad4be729b56f74012ebb7f097f77c5b00a1004/fig/equiformer_v2_oc20_results.png",
+        "kind": "example",
+        "title": {
+          "en": "Equiformer V2 · Author preview",
+          "zh": "Equiformer V2 · 作者预览"
+        },
+        "alt": {
+          "en": "Equiformer V2: photo not available",
+          "zh": "Equiformer V2：photo not available"
+        },
+        "sourcePath": "fig/equiformer_v2_oc20_results.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/c6a8784e4eeadfcdb3afcbc1f8bd6d5ac37f9c79bfb73dab23bd2866fb001e6a.preview.webp",
+        "previewSrc": "/skill-previews/auto/c6a8784e4eeadfcdb3afcbc1f8bd6d5ac37f9c79bfb73dab23bd2866fb001e6a.preview.webp",
+        "cardSrc": "/skill-previews/auto/c6a8784e4eeadfcdb3afcbc1f8bd6d5ac37f9c79bfb73dab23bd2866fb001e6a.card.webp",
+        "width": 1600,
+        "height": 900,
+        "sha256": "c6a8784e4eeadfcdb3afcbc1f8bd6d5ac37f9c79bfb73dab23bd2866fb001e6a",
+        "originalSrc": "/skill-previews/auto/c6a8784e4eeadfcdb3afcbc1f8bd6d5ac37f9c79bfb73dab23bd2866fb001e6a.pdf",
+        "sourceUrl": "https://github.com/atomicarchitects/equiformer_v2/blob/d5ad4be729b56f74012ebb7f097f77c5b00a1004/docs/equiformer_v2_poster.pdf",
+        "kind": "reference",
+        "title": {
+          "en": "Equiformer V2 · PDF · first page",
+          "zh": "Equiformer V2 · PDF · 首页预览"
+        },
+        "alt": {
+          "en": "Equiformer V2: Poster",
+          "zh": "Equiformer V2：Poster"
+        },
+        "sourcePath": "docs/equiformer_v2_poster.pdf",
+        "documentPath": "README.md",
+        "format": "pdf-cover"
+      }
+    ]
+  },
+  {
+    "skillSlug": "autodesk-molecular-design-toolkit",
+    "repository": "Autodesk/molecular-design-toolkit",
+    "revision": "5f45a47fea21d3603899a6366cb163024f0e2ec4",
+    "sourceUrl": "https://github.com/Autodesk/molecular-design-toolkit/blob/5f45a47fea21d3603899a6366cb163024f0e2ec4/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+    "documentSha256": "0e81480565acc45033eddf237b16234078b5f89e517d194dfc74727fdc10cc0c",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-09T07:28:30.393Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/452f51d8862cb1b34b601bc23c62717b4d61eb85755176e73996714c74a854ea.preview.webp",
+        "previewSrc": "/skill-previews/auto/452f51d8862cb1b34b601bc23c62717b4d61eb85755176e73996714c74a854ea.preview.webp",
+        "cardSrc": "/skill-previews/auto/452f51d8862cb1b34b601bc23c62717b4d61eb85755176e73996714c74a854ea.card.webp",
+        "width": 1600,
+        "height": 538,
+        "sha256": "452f51d8862cb1b34b601bc23c62717b4d61eb85755176e73996714c74a854ea",
+        "originalSrc": "/skill-previews/auto/452f51d8862cb1b34b601bc23c62717b4d61eb85755176e73996714c74a854ea.png",
+        "sourceUrl": "https://github.com/Autodesk/molecular-design-toolkit/blob/5f45a47fea21d3603899a6366cb163024f0e2ec4/moldesign/_notebooks/img/Header.png",
+        "kind": "reference",
+        "title": {
+          "en": "Molecular Design Toolkit · Author preview",
+          "zh": "Molecular Design Toolkit · 作者预览"
+        },
+        "alt": {
+          "en": "Molecular Design Toolkit: Header.png",
+          "zh": "Molecular Design Toolkit：Header.png"
+        },
+        "sourcePath": "moldesign/_notebooks/img/Header.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "axorax-tkforge",
+    "repository": "Axorax/tkforge",
+    "revision": "d6b5385bb5ff8426fc575b3c89992d52099989bd",
+    "sourceUrl": "https://github.com/Axorax/tkforge/blob/d6b5385bb5ff8426fc575b3c89992d52099989bd/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "documentSha256": "95f3a8d6fa01c9febf73f812e47526ff2b7e73036756d27ea1f74d75c2cd781d",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-09T07:28:30.393Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/6c127aaf4562c112523363c334b4cbce24eb63295272344787ab4eaaf1eed094.preview.webp",
+        "previewSrc": "/skill-previews/auto/6c127aaf4562c112523363c334b4cbce24eb63295272344787ab4eaaf1eed094.preview.webp",
+        "cardSrc": "/skill-previews/auto/6c127aaf4562c112523363c334b4cbce24eb63295272344787ab4eaaf1eed094.card.webp",
+        "width": 1085,
+        "height": 833,
+        "sha256": "6c127aaf4562c112523363c334b4cbce24eb63295272344787ab4eaaf1eed094",
+        "originalSrc": "/skill-previews/auto/6c127aaf4562c112523363c334b4cbce24eb63295272344787ab4eaaf1eed094.png",
+        "sourceUrl": "https://github.com/Axorax/tkforge/blob/d6b5385bb5ff8426fc575b3c89992d52099989bd/preview.png",
+        "kind": "example",
+        "title": {
+          "en": "Tkforge · Author preview",
+          "zh": "Tkforge · 作者预览"
+        },
+        "alt": {
+          "en": "Tkforge: TkForge Application Preview",
+          "zh": "Tkforge：TkForge Application Preview"
+        },
+        "sourcePath": "preview.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "b3nnyl-figgo",
+    "repository": "B3nnyL/figgo",
+    "revision": "0b096f59f9ee8342ba11cca817d636175a513cdd",
+    "sourceUrl": "https://github.com/B3nnyL/figgo/blob/0b096f59f9ee8342ba11cca817d636175a513cdd/readme.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-cf2322ece89f4841ec01d3ae304c9f9a501d4197f87d32499992f0f98ea2f302.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "cf2322ece89f4841ec01d3ae304c9f9a501d4197f87d32499992f0f98ea2f302",
+    "documentSha256": "21ef8568d830c52d7655929feee8cf20c5c5d5a60724b49eefa5d0aaa19d2198",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-09T07:28:30.393Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/ce316c9f4af8a7538028531ba6b222b9b2ba3f28599dba7ed9457e9718193bf1.preview.webp",
+        "previewSrc": "/skill-previews/auto/ce316c9f4af8a7538028531ba6b222b9b2ba3f28599dba7ed9457e9718193bf1.preview.webp",
+        "cardSrc": "/skill-previews/auto/ce316c9f4af8a7538028531ba6b222b9b2ba3f28599dba7ed9457e9718193bf1.card.webp",
+        "width": 1600,
+        "height": 978,
+        "sha256": "ce316c9f4af8a7538028531ba6b222b9b2ba3f28599dba7ed9457e9718193bf1",
+        "originalSrc": "/skill-previews/auto/ce316c9f4af8a7538028531ba6b222b9b2ba3f28599dba7ed9457e9718193bf1.png",
+        "sourceUrl": "https://github.com/B3nnyL/figgo/blob/0b096f59f9ee8342ba11cca817d636175a513cdd/assets/cover.png",
+        "kind": "reference",
+        "title": {
+          "en": "Figgo · Author preview",
+          "zh": "Figgo · 作者预览"
+        },
+        "alt": {
+          "en": "Figgo: img",
+          "zh": "Figgo：img"
+        },
+        "sourcePath": "assets/cover.png",
+        "documentPath": "readme.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "baku89-glisp",
+    "repository": "baku89/glisp",
+    "revision": "c9e4693a77d0837d4134ffe6b4a83c345180c188",
+    "sourceUrl": "https://github.com/baku89/glisp/blob/c9e4693a77d0837d4134ffe6b4a83c345180c188/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-2fab75b6eca95816b8ad2f3f4c299a315fe9eaca9b9cd9c827de85853afe43af.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "2fab75b6eca95816b8ad2f3f4c299a315fe9eaca9b9cd9c827de85853afe43af",
+    "documentSha256": "6c691c62995a6b1258c7a2e07e2c709a06ccad0054b87f285b26a6f319ca728e",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-09T07:28:30.393Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/d92636f196b4092049d99695ff6df41a9f6451ad092518903289d8bb02d819b1.preview.webp",
+        "previewSrc": "/skill-previews/auto/d92636f196b4092049d99695ff6df41a9f6451ad092518903289d8bb02d819b1.preview.webp",
+        "cardSrc": "/skill-previews/auto/d92636f196b4092049d99695ff6df41a9f6451ad092518903289d8bb02d819b1.card.webp",
+        "width": 1600,
+        "height": 1105,
+        "sha256": "d92636f196b4092049d99695ff6df41a9f6451ad092518903289d8bb02d819b1",
+        "originalSrc": "/skill-previews/auto/d92636f196b4092049d99695ff6df41a9f6451ad092518903289d8bb02d819b1.png",
+        "sourceUrl": "https://github.com/baku89/glisp/blob/c9e4693a77d0837d4134ffe6b4a83c345180c188/docs/_media/screenshot.png",
+        "kind": "reference",
+        "title": {
+          "en": "Glisp · Author preview",
+          "zh": "Glisp · 作者预览"
+        },
+        "alt": {
+          "en": "Glisp: screenshot.png",
+          "zh": "Glisp：screenshot.png"
+        },
+        "sourcePath": "docs/_media/screenshot.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "basmilius-meteocons",
+    "repository": "basmilius/meteocons",
+    "revision": "70dfb1d6e30dc9e791cfb0e4c5b5e5e60e972aa0",
+    "sourceUrl": "https://github.com/basmilius/meteocons/blob/70dfb1d6e30dc9e791cfb0e4c5b5e5e60e972aa0/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-2c7646145091766e97569d338a2266684c2c9e5fa7093764ef2d2dd620825c08.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "2c7646145091766e97569d338a2266684c2c9e5fa7093764ef2d2dd620825c08",
+    "documentSha256": "63ffbfa4ecac121cf1efd584ad9f05c3d71f70b1b826b97fca38c9f136a0c519",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-09T07:28:30.393Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/b65accf24da4a7ba10078ef328815b9c7f59addcc356ac3672a16cbb1a4c805c.preview.webp",
+        "previewSrc": "/skill-previews/auto/b65accf24da4a7ba10078ef328815b9c7f59addcc356ac3672a16cbb1a4c805c.preview.webp",
+        "cardSrc": "/skill-previews/auto/b65accf24da4a7ba10078ef328815b9c7f59addcc356ac3672a16cbb1a4c805c.card.webp",
+        "width": 1600,
+        "height": 800,
+        "sha256": "b65accf24da4a7ba10078ef328815b9c7f59addcc356ac3672a16cbb1a4c805c",
+        "originalSrc": "/skill-previews/auto/b65accf24da4a7ba10078ef328815b9c7f59addcc356ac3672a16cbb1a4c805c.png",
+        "sourceUrl": "https://github.com/basmilius/meteocons/blob/70dfb1d6e30dc9e791cfb0e4c5b5e5e60e972aa0/assets/header.png",
+        "kind": "reference",
+        "title": {
+          "en": "Meteocons · Author preview",
+          "zh": "Meteocons · 作者预览"
+        },
+        "alt": {
+          "en": "Meteocons: Meteocons",
+          "zh": "Meteocons：Meteocons"
+        },
+        "sourcePath": "assets/header.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "bergside-awesome-design-skills",
+    "repository": "bergside/awesome-design-skills",
+    "revision": "f631a09b4fcc0166f2e2c1a8c81906ef680c57e8",
+    "sourceUrl": "https://github.com/bergside/awesome-design-skills/blob/f631a09b4fcc0166f2e2c1a8c81906ef680c57e8/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-56e2dc0100744b958d87e5fc790f4e5ed2b5f483d6f2cbade4b6f7a0f5a03862.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "56e2dc0100744b958d87e5fc790f4e5ed2b5f483d6f2cbade4b6f7a0f5a03862",
+    "documentSha256": "44cdba915b42aa94ce5e42b7ed6ce12063701d0b9bf9201aa3b3bfd516545760",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-09T07:28:30.393Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/7ef9a5d020af466c5d02961ebd6283da7e20e7758f6c84b34489eab17d87e7ac.preview.webp",
+        "previewSrc": "/skill-previews/auto/7ef9a5d020af466c5d02961ebd6283da7e20e7758f6c84b34489eab17d87e7ac.preview.webp",
+        "cardSrc": "/skill-previews/auto/7ef9a5d020af466c5d02961ebd6283da7e20e7758f6c84b34489eab17d87e7ac.card.webp",
+        "width": 1022,
+        "height": 636,
+        "sha256": "7ef9a5d020af466c5d02961ebd6283da7e20e7758f6c84b34489eab17d87e7ac",
+        "originalSrc": "/skill-previews/auto/7ef9a5d020af466c5d02961ebd6283da7e20e7758f6c84b34489eab17d87e7ac.png",
+        "sourceUrl": "https://github.com/bergside/awesome-design-skills/blob/f631a09b4fcc0166f2e2c1a8c81906ef680c57e8/registry-examples/agentic-marketing.png",
+        "kind": "example",
+        "title": {
+          "en": "Awesome Design Skills · Author preview",
+          "zh": "Awesome Design Skills · 作者预览"
+        },
+        "alt": {
+          "en": "Awesome Design Skills: Agentic",
+          "zh": "Awesome Design Skills：Agentic"
+        },
+        "sourcePath": "registry-examples/agentic-marketing.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/ac4d8bd8956937a0591bdbfab2cb8c5af74e19b953f299398a5efaefde7a650d.preview.webp",
+        "previewSrc": "/skill-previews/auto/ac4d8bd8956937a0591bdbfab2cb8c5af74e19b953f299398a5efaefde7a650d.preview.webp",
+        "cardSrc": "/skill-previews/auto/ac4d8bd8956937a0591bdbfab2cb8c5af74e19b953f299398a5efaefde7a650d.card.webp",
+        "width": 1022,
+        "height": 636,
+        "sha256": "ac4d8bd8956937a0591bdbfab2cb8c5af74e19b953f299398a5efaefde7a650d",
+        "originalSrc": "/skill-previews/auto/ac4d8bd8956937a0591bdbfab2cb8c5af74e19b953f299398a5efaefde7a650d.png",
+        "sourceUrl": "https://github.com/bergside/awesome-design-skills/blob/f631a09b4fcc0166f2e2c1a8c81906ef680c57e8/registry-examples/ant-marketing.png",
+        "kind": "example",
+        "title": {
+          "en": "Awesome Design Skills · Author preview",
+          "zh": "Awesome Design Skills · 作者预览"
+        },
+        "alt": {
+          "en": "Awesome Design Skills: Ant",
+          "zh": "Awesome Design Skills：Ant"
+        },
+        "sourcePath": "registry-examples/ant-marketing.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/7c8160ecf0b5d5d16ec45d324368a208d2bc700fcd3fd9505d05e591f5172c18.preview.webp",
+        "previewSrc": "/skill-previews/auto/7c8160ecf0b5d5d16ec45d324368a208d2bc700fcd3fd9505d05e591f5172c18.preview.webp",
+        "cardSrc": "/skill-previews/auto/7c8160ecf0b5d5d16ec45d324368a208d2bc700fcd3fd9505d05e591f5172c18.card.webp",
+        "width": 1022,
+        "height": 636,
+        "sha256": "7c8160ecf0b5d5d16ec45d324368a208d2bc700fcd3fd9505d05e591f5172c18",
+        "originalSrc": "/skill-previews/auto/7c8160ecf0b5d5d16ec45d324368a208d2bc700fcd3fd9505d05e591f5172c18.png",
+        "sourceUrl": "https://github.com/bergside/awesome-design-skills/blob/f631a09b4fcc0166f2e2c1a8c81906ef680c57e8/registry-examples/artistic-marketing.png",
+        "kind": "example",
+        "title": {
+          "en": "Awesome Design Skills · Author preview",
+          "zh": "Awesome Design Skills · 作者预览"
+        },
+        "alt": {
+          "en": "Awesome Design Skills: Artistic",
+          "zh": "Awesome Design Skills：Artistic"
+        },
+        "sourcePath": "registry-examples/artistic-marketing.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "binford2k-showoff",
     "repository": "binford2k/showoff",
     "revision": "8c06a49deb8ea788ca509b7d13806c26d449f874",
@@ -1556,6 +1952,204 @@
           "zh": "Showoff：Presenter view"
         },
         "sourcePath": "images/presenter.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "blazorblueprintui-ui",
+    "repository": "blazorblueprintui/ui",
+    "revision": "667809bdcd85b698423c7465e72ce613ce1803a2",
+    "sourceUrl": "https://github.com/blazorblueprintui/ui/blob/667809bdcd85b698423c7465e72ce613ce1803a2/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-ce904676366ad0e1ff1b10434c01f2911ba3ec2025881bc80d7085428c1b0051.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "ff48ec24904a0f41558489c9228a7ed37582c06377f5fc842a55579b635b775a",
+    "documentSha256": "67e178a42e518bb4ee034522181ace57afbb982a722d0bf929a423148aef1190",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-09T07:28:30.393Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/10f919d0732525408ab349673fb4168a2d793a60f6a3f6e477d98686033da551.preview.webp",
+        "previewSrc": "/skill-previews/auto/10f919d0732525408ab349673fb4168a2d793a60f6a3f6e477d98686033da551.preview.webp",
+        "cardSrc": "/skill-previews/auto/10f919d0732525408ab349673fb4168a2d793a60f6a3f6e477d98686033da551.card.webp",
+        "width": 1600,
+        "height": 1000,
+        "sha256": "10f919d0732525408ab349673fb4168a2d793a60f6a3f6e477d98686033da551",
+        "originalSrc": "/skill-previews/auto/10f919d0732525408ab349673fb4168a2d793a60f6a3f6e477d98686033da551.png",
+        "sourceUrl": "https://github.com/blazorblueprintui/ui/blob/667809bdcd85b698423c7465e72ce613ce1803a2/.github/assets/hero.png",
+        "kind": "example",
+        "title": {
+          "en": "Ui · Author preview",
+          "zh": "Ui · 作者预览"
+        },
+        "alt": {
+          "en": "Ui: Blazor Blueprint homepage in light mode, featuring the interactive Gantt chart demo",
+          "zh": "Ui：Blazor Blueprint homepage in light mode, featuring the interactive Gantt chart demo"
+        },
+        "sourcePath": ".github/assets/hero.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "blepping-comfyui-jankhidiffusion",
+    "repository": "blepping/comfyui_jankhidiffusion",
+    "revision": "8de02bc769a02b674e10c0556159b4ebbc8b473c",
+    "sourceUrl": "https://github.com/blepping/comfyui_jankhidiffusion/blob/8de02bc769a02b674e10c0556159b4ebbc8b473c/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-4c1832e9b9c9ef0940a57be4c395d88efa1fe5eba987fac0f58fe96ab35372c7.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "documentSha256": "e0e7181d66fca3ee9fc8540f0fdd5389381c0bc70cf39c0d394b1196b07f6981",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-09T07:28:30.393Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/693caa478f227ab01d94c14b0c9c88515bec43721c7ff8c4b4241c5a6196bb1b.preview.webp",
+        "previewSrc": "/skill-previews/auto/693caa478f227ab01d94c14b0c9c88515bec43721c7ff8c4b4241c5a6196bb1b.preview.webp",
+        "cardSrc": "/skill-previews/auto/693caa478f227ab01d94c14b0c9c88515bec43721c7ff8c4b4241c5a6196bb1b.card.webp",
+        "width": 1600,
+        "height": 775,
+        "sha256": "693caa478f227ab01d94c14b0c9c88515bec43721c7ff8c4b4241c5a6196bb1b",
+        "originalSrc": "/skill-previews/auto/693caa478f227ab01d94c14b0c9c88515bec43721c7ff8c4b4241c5a6196bb1b.png",
+        "sourceUrl": "https://github.com/blepping/comfyui_jankhidiffusion/blob/8de02bc769a02b674e10c0556159b4ebbc8b473c/assets/sd15_workflow.png",
+        "kind": "reference",
+        "title": {
+          "en": "Comfyui Jankhidiffusion · Author preview",
+          "zh": "Comfyui Jankhidiffusion · 作者预览"
+        },
+        "alt": {
+          "en": "Comfyui Jankhidiffusion: Image with embedded SD1.5 workflow",
+          "zh": "Comfyui Jankhidiffusion：Image with embedded SD1.5 workflow"
+        },
+        "sourcePath": "assets/sd15_workflow.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/b774fe892413d0f280592e634aa86f01d0103c573550fb7d2c6c1639f8341a9e.preview.webp",
+        "previewSrc": "/skill-previews/auto/b774fe892413d0f280592e634aa86f01d0103c573550fb7d2c6c1639f8341a9e.preview.webp",
+        "cardSrc": "/skill-previews/auto/b774fe892413d0f280592e634aa86f01d0103c573550fb7d2c6c1639f8341a9e.card.webp",
+        "width": 1600,
+        "height": 671,
+        "sha256": "b774fe892413d0f280592e634aa86f01d0103c573550fb7d2c6c1639f8341a9e",
+        "originalSrc": "/skill-previews/auto/b774fe892413d0f280592e634aa86f01d0103c573550fb7d2c6c1639f8341a9e.png",
+        "sourceUrl": "https://github.com/blepping/comfyui_jankhidiffusion/blob/8de02bc769a02b674e10c0556159b4ebbc8b473c/assets/sdxl_workflow.png",
+        "kind": "reference",
+        "title": {
+          "en": "Comfyui Jankhidiffusion · Author preview",
+          "zh": "Comfyui Jankhidiffusion · 作者预览"
+        },
+        "alt": {
+          "en": "Comfyui Jankhidiffusion: Image with embedded SDXL workflow",
+          "zh": "Comfyui Jankhidiffusion：Image with embedded SDXL workflow"
+        },
+        "sourcePath": "assets/sdxl_workflow.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "boona13-image-extender",
+    "repository": "boona13/image-extender",
+    "revision": "4a8d674cf887b9ab53733cc88f29c5a123f5cbe7",
+    "sourceUrl": "https://github.com/boona13/image-extender/blob/4a8d674cf887b9ab53733cc88f29c5a123f5cbe7/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-d591313b4d51748bd6e876f26a5023a13d7caaa414e5175e3e1355cf79ad3efc.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "d591313b4d51748bd6e876f26a5023a13d7caaa414e5175e3e1355cf79ad3efc",
+    "documentSha256": "903260910fb364f81fa57dd46aa14c4efccf73cfe9d30dcbd96019e6a50ce797",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-10-09T07:28:30.393Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/f23aa7e3ae40e5780dd2448de357a620c3d8fb84286ec13719fcc5936eb064fe.preview.webp",
+        "previewSrc": "/skill-previews/auto/f23aa7e3ae40e5780dd2448de357a620c3d8fb84286ec13719fcc5936eb064fe.preview.webp",
+        "cardSrc": "/skill-previews/auto/f23aa7e3ae40e5780dd2448de357a620c3d8fb84286ec13719fcc5936eb064fe.card.webp",
+        "width": 1024,
+        "height": 543,
+        "sha256": "f23aa7e3ae40e5780dd2448de357a620c3d8fb84286ec13719fcc5936eb064fe",
+        "originalSrc": "/skill-previews/auto/f23aa7e3ae40e5780dd2448de357a620c3d8fb84286ec13719fcc5936eb064fe.jpg",
+        "sourceUrl": "https://github.com/boona13/image-extender/blob/4a8d674cf887b9ab53733cc88f29c5a123f5cbe7/docs/screenshots/mode-parallax.png",
+        "kind": "example",
+        "title": {
+          "en": "Image Extender · Author preview",
+          "zh": "Image Extender · 作者预览"
+        },
+        "alt": {
+          "en": "Image Extender: Parallax Studio — Sky / Far / Mid / Near depth layers with a live multi-layer scrolling preview and ZIP export",
+          "zh": "Image Extender：Parallax Studio — Sky / Far / Mid / Near depth layers with a live multi-layer scrolling preview and ZIP export"
+        },
+        "sourcePath": "docs/screenshots/mode-parallax.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/8405ba84b279a2f7ce24790bb2e9863e63cad1a232ae8473d56d0f317c1b1b1d.preview.webp",
+        "previewSrc": "/skill-previews/auto/8405ba84b279a2f7ce24790bb2e9863e63cad1a232ae8473d56d0f317c1b1b1d.preview.webp",
+        "cardSrc": "/skill-previews/auto/8405ba84b279a2f7ce24790bb2e9863e63cad1a232ae8473d56d0f317c1b1b1d.card.webp",
+        "width": 1024,
+        "height": 526,
+        "sha256": "8405ba84b279a2f7ce24790bb2e9863e63cad1a232ae8473d56d0f317c1b1b1d",
+        "originalSrc": "/skill-previews/auto/8405ba84b279a2f7ce24790bb2e9863e63cad1a232ae8473d56d0f317c1b1b1d.jpg",
+        "sourceUrl": "https://github.com/boona13/image-extender/blob/4a8d674cf887b9ab53733cc88f29c5a123f5cbe7/docs/screenshots/mode-tiles.png",
+        "kind": "example",
+        "title": {
+          "en": "Image Extender · Author preview",
+          "zh": "Image Extender · 作者预览"
+        },
+        "alt": {
+          "en": "Image Extender: Tile Studio — a 13-tile autotile set generated in one call, with a live \"how tiles fit together\" platform preview",
+          "zh": "Image Extender：Tile Studio — a 13-tile autotile set generated in one call, with a live \"how tiles fit together\" platform preview"
+        },
+        "sourcePath": "docs/screenshots/mode-tiles.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/199df88d1a1b29a4cad0f1dca1b17b9fbaad073014cc67f7889f4a0084a325a4.preview.webp",
+        "previewSrc": "/skill-previews/auto/199df88d1a1b29a4cad0f1dca1b17b9fbaad073014cc67f7889f4a0084a325a4.preview.webp",
+        "cardSrc": "/skill-previews/auto/199df88d1a1b29a4cad0f1dca1b17b9fbaad073014cc67f7889f4a0084a325a4.card.webp",
+        "width": 1024,
+        "height": 739,
+        "sha256": "199df88d1a1b29a4cad0f1dca1b17b9fbaad073014cc67f7889f4a0084a325a4",
+        "originalSrc": "/skill-previews/auto/199df88d1a1b29a4cad0f1dca1b17b9fbaad073014cc67f7889f4a0084a325a4.jpg",
+        "sourceUrl": "https://github.com/boona13/image-extender/blob/4a8d674cf887b9ab53733cc88f29c5a123f5cbe7/docs/screenshots/after.png",
+        "kind": "reference",
+        "title": {
+          "en": "Image Extender · Author preview",
+          "zh": "Image Extender · 作者预览"
+        },
+        "alt": {
+          "en": "Image Extender: A 1024² portrait shot extended into a cinematic wide-angle scene with no visible seam",
+          "zh": "Image Extender：A 1024² portrait shot extended into a cinematic wide-angle scene with no visible seam"
+        },
+        "sourcePath": "docs/screenshots/after.png",
         "documentPath": "README.md",
         "format": "image"
       }
