@@ -1,3 +1,6 @@
+import { CREATOR_BLOG_DATE, CREATOR_BLOG_SLUG } from '@/lib/blog/routes'
+import { CREATOR_ARTICLE_COPY, creatorArticleMarkdown } from '@/lib/blog/creator-workflows'
+
 export interface StaticBlogSkill {
   slug: string
   name: string
@@ -16,10 +19,19 @@ export interface StaticBlogPost {
   summary: string
   content: string
   published_at: string
-  skills: StaticBlogSkill
+  skills: StaticBlogSkill | null
 }
 
 export const STATIC_BLOG_POSTS: StaticBlogPost[] = [
+  {
+    id: `static-${CREATOR_BLOG_SLUG}`,
+    slug: CREATOR_BLOG_SLUG,
+    title: CREATOR_ARTICLE_COPY.en.title,
+    summary: CREATOR_ARTICLE_COPY.en.summary,
+    published_at: CREATOR_BLOG_DATE,
+    content: creatorArticleMarkdown('en'),
+    skills: null,
+  },
   {
     id: 'static-introducing-addyosmani-agent-skills',
     slug: 'introducing-addyosmani-agent-skills',

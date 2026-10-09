@@ -1,0 +1,52 @@
+{
+  "title": "12 KI-Skills für Content-Creator: Von der Recherche zum fertigen Entwurf",
+  "summary": "Workflows für Recherche, Bilder, Video und Publikationsvorbereitung: ihre Ergebnisse, benötigte Werkzeuge und Konten sowie Prüfpunkte vor dem Einsatz.",
+  "eyebrow": "Workflows für Content-Creator",
+  "byline": "OpenAgentSkill-Redaktion",
+  "dateLabel": "Quellen geprüft am",
+  "languageLabel": "Artikel lesen auf",
+  "contentsLabel": "In diesem Leitfaden",
+  "sourceLabel": "Quelle im geprüften Stand",
+  "profileLabel": "Registereintrag ansehen",
+  "pathLabel": "Skill-Pfad",
+  "checkLabel": "Vor dem Einsatz",
+  "intro": [
+    "Ein sinnvoller Werkzeugkasten beginnt mit einem Ergebnis: einer Gliederung mit Quellen, einem lesbaren Titelbild, einem korrigierten Transkript oder einem Entwurf im passenden Editor. Zwanzig installierte Repositories verbinden diese Schritte nicht automatisch. Jede Übergabe braucht ein Dateiformat, ein Konto und klare Abnahmekriterien.",
+    "Ausgehend von 想风s Skill-Sammlung haben wir die verlinkten Repositories geprüft und zwölf konkrete Workflows ausgewählt. Wir ordnen sie nach Aufgaben. Einige sind bereits im Register, andere bleiben Kandidaten mit Bedingungen. Die Erwähnung hier ist keine Bestätigung eines erfolgreichen Praxistests."
+  ],
+  "groups": ["Recherchieren und planen", "Bilder gestalten", "Mit Video arbeiten", "Veröffentlichung vorbereiten"],
+  "tools": {
+    "workflow": {"use": "self-media-content-workflow macht aus einem Briefing einen Plan, einen Text und ein Publikationspaket. Er hilft, wenn der nächste Schritt unklar ist: Ausrichtung, Plattform, Titel und Endfassung haben eigene Prüfpunkte.", "check": "MIT. Die Anweisungen koordinieren andere Fähigkeiten; sie liefern nicht alle Bild-, Browser- und Publikationswerkzeuge mit. Beginne mit einer Plattform und entscheide ausdrücklich über die Veröffentlichung."},
+    "search": {"use": "global-content-search aus creator-buddy sammelt öffentliches Material für ein redaktionelles Briefing. Speichere Quellen-URLs und Beobachtungsdaten zu jeder Aussage, damit Belege und verbreitete Meinungen unterscheidbar bleiben.", "check": "Dieser Skill nennt MIT und benötigt Node sowie Adapter wie agent-reach. Der Douyin-Adapter ist nicht enthalten; er erwartet ein externes DOUYIN_COMMAND. Optionale API-Wege können Zugangsdaten oder Zahlungen erfordern."},
+    "distiller": {"use": "blogger-distiller erstellt aus öffentlichen Creator-Beispielen eine HTML-Analyse und einen Schreibleitfaden. Untersuche damit Aufbau und Publikumsfragen und entwickle anschließend eigene Beispiele und Argumente.", "check": "MIT; Python und ein TikHub-Token sind erforderlich. Unser begrenzter statischer Scan meldete Löschoperationen im Installer und in Skripten. Prüfe die Zielpfade in einer isolierten Arbeitskopie. Das ist ein Kandidat für weitere Prüfung, keine freigegebene Installation."},
+    "cover": {"use": "baoyu-cover-image führt vom Artikelbriefing zu einem Titelbild. Wenn du nur ein überzeugendes Vorschaubild brauchst, kannst du diesen einzelnen Skill prüfen, statt alle Workflows aus baoyu-skills zu installieren.", "check": "MIT. Eine verfügbare Bildgenerierung bleibt erforderlich und kann Geld kosten. Kontrolliere Text, Seitenverhältnis und Lesbarkeit als Handy-Vorschaubild. Bewahre den freigegebenen Prompt beim Bild auf."},
+    "cards": {"use": "Guizang Social Card strukturiert Inhalte als Social Cards und Titelbilder. Eine kurze Kartenfolge eignet sich, um eine Idee mit Überschrift, Beleg und einem klaren nächsten Schritt zu vermitteln.", "check": "AGPL-3.0. Prüfe die Lizenzpflichten für deinen Einsatzzweck sowie Schrift- und Bildrechte. Kontrolliere jede exportierte Karte; eine korrekte HTML-Vorschau allein ist noch kein fertiges Ergebnis."},
+    "illustration": {"use": "ian-xiaohei-illustrations verwandelt dichtes Material in handgezeichnet wirkende Erklärbilder. Der Skill ist ein Kandidat für Mechanismen oder Beziehungen, die eine kurze Überschrift nicht gut vermitteln kann.", "check": "MIT; Bildgenerierung wird benötigt. Der dokumentierte Stil sieht chinesische Beschriftungen und ein breites Format vor. Passe Beschriftungen für andere Sprachen an und prüfe die erzeugten Buchstaben."},
+    "subtitle": {"use": "video-to-subtitle-summary erzeugt Untertitel, Text und eine Zusammenfassung aus Video. Der dokumentierte Ablauf bevorzugt vorhandene YouTube-Untertitel und unterstützt ansonsten lokale Transkription mit faster-whisper.", "check": "MIT. Python, FFmpeg und passende Downloadwerkzeuge sind nötig. Manche Plattformzugriffe oder Cloudmodi nutzen kostenpflichtige APIs. Gleiche Namen und Zeitmarken mit dem Ton ab. Umgebungszugriffe und Unterprozesse wurden erkannt; einen Laufzeittest haben wir nicht durchgeführt."},
+    "seedance": {"use": "Seedance prompt Skill hilft, Einstellungen, Bewegung und audiovisuelle Absichten zu beschreiben. Sein Ergebnis ist ein Produktionsbriefing für einen Videogenerierungsdienst.", "check": "Er schreibt Prompts und rendert keine Videos. Prüfe Dienstzugang, Guthaben und Medienrechte separat. In den untersuchten Dateien fanden wir keine ausdrückliche Repository-Lizenz; uneingeschränkte Wiederverwendung darf daher nicht vorausgesetzt werden."},
+    "hyperframes": {"use": "Der general-video-Workflow von HyperFrames erstellt Videokompositionen mit HTML und CSS. Er passt zu Erklär- und Produktvideos, deren Timing, Typografie und Medien bewusst gestaltet werden sollen.", "check": "Apache-2.0. Der Skill gehört zur HyperFrames-Laufzeit und verweist auf den Einstiegsworkflow und weitere Ressourcen. Eine Kopie dieser einzelnen SKILL.md ist keine vollständige Renderumgebung. Befolge die Einrichtung und prüfe das exportierte Video."},
+    "publisher": {"use": "video-publisher überträgt ein freigegebenes Videopaket in die Editoren der Plattformen. Der dokumentierte Standard bereitet Entwürfe vor und stoppt vor der letzten Veröffentlichungsaktion. Das kann wiederholte Uploadvorbereitung erleichtern.", "check": "MIT; Node, EgoLite und angemeldete Plattformkonten sind nötig. Der begrenzte Scan fand keine Regelwarnungen, aber Browseraktionen und tatsächliche Zustellung wurden nicht getestet. Prüfe jeden Entwurf und verlange einen Veröffentlichungsnachweis, bevor du Erfolg meldest."},
+    "wewrite": {"use": "WeWrite koordiniert Recherche, Schreiben und Formatierung für WeChat-Artikel. Beginne mit einem lokalen Entwurf und seiner Prüfung. Bilder, Vorschau oder Übermittlung an den Entwurfsbereich forderst du bei Bedarf gesondert an.", "check": "MIT. Der Orchestrator hängt von begleitenden Skills und seiner CLI ab. Bildgenerierung und WeChat-Übermittlung benötigen eigene Einrichtung und können Kosten verursachen. Unser Scan umfasste das gewählte Skill-Verzeichnis, nicht sämtliche ausführbaren Dateien des Repositories."},
+    "xarticle": {"use": "x-article-publisher überträgt Markdown und Bilder in einen Entwurf von X Articles. Der dokumentierte Ablauf endet beim Entwurf und lässt die Veröffentlichung beim Kontoinhaber, während er Editorarbeit reduziert.", "check": "MIT; Node, Chrome, ein angemeldetes Profil und ein berechtigtes X-Konto sind nötig. Der Autor dokumentiert macOS-Tests, keine bestätigten Windows/Linux-Läufe. Unser Scan meldete dynamische Ausführung und Prozesszugriffe: Prüfe Skripte und schütze das Browserprofil."}
+  },
+  "stacksTitle": "Mit einer vollständigen Übergabe beginnen",
+  "stacks": [
+    {"title": "Ein Artikel mit Titelbild", "text": "Lass Gliederung und Text im Content-Workflow freigeben und erstelle dann ein Titelbild mit baoyu-cover-image. Prüfe Quellen, sachliche Genauigkeit der Überschrift und die Handy-Vorschau vor der Abnahme."},
+    {"title": "Vom Video zum Schreibbriefing", "text": "Verwende den Untertitel-Workflow für Material, auf das du zugreifen und das du wiederverwenden darfst. Korrigiere das Transkript zuerst und fordere dann eine Gliederung mit Zeitverweisen an. Stütze Tatsachenbehauptungen nicht allein auf die Zusammenfassung."},
+    {"title": "Vom fertigen Beitrag zum Editor", "text": "Wähle je nach Ziel video-publisher, WeWrite oder x-article-publisher. Übergib freigegebenen Text, Medien und Titel. Der gespeicherte Entwurf ist der erste Abnahmepunkt; die Veröffentlichung ist eine eigene Aktion."}
+  ],
+  "briefTitle": "Ein wiederverwendbares Briefing",
+  "brief": "Zielgruppe: [wer braucht das]. Ergebnis: [ein Artikel, Titelbild oder Video].\nNutze nur diese freigegebenen Quellen und Medien: [Links/Dateien].\nLiefere Ergebnis, Quellenangaben, tatsächliche Kosten und offene Prüfungen.\nSpeichere einen Entwurf. Frage vor zusätzlichen Ausgaben oder einer Veröffentlichung über ein Konto nach.",
+  "methodTitle": "So ist die Auswahl zu verstehen",
+  "method": [
+    "Wir haben öffentliche Repository-Dokumentation und genaue SKILL.md-Pfade am 10. Oktober 2026 geprüft. Die Quellenlinks verweisen auf den damaligen Commit. Registereinträge können eine andere Revision verfolgen; kontrolliere Quelle und Prüfstatus vor der Installation.",
+    "Für fünf noch nicht gelistete Kandidaten nutzten wir außerdem den beratenden Scan ohne Codeausführung. Er ist auf höchstens zwölf unterstützte Textdateien je Scan begrenzt und kann Code und Abhängigkeiten auslassen. Ein Treffer ist ein Prüfhinweis, kein Malwarebeweis; keine Warnungen beweisen ebenfalls keine Sicherheit. Wir haben weder Workflows ausgeführt noch bezahlte Konten genutzt oder Veröffentlichungsergebnisse getestet.",
+    "Die ursprüngliche Sammlung enthält auch Sammlungen, Frameworks und Anwendungen. Beispielsweise besitzt write-then-publish im untersuchten Stand keine SKILL.md, und seine Lizenz beschränkt die kommerzielle Nutzung. Es ist daher kein beliebig austauschbarer, frei kommerziell nutzbarer Skill. Lies jede Projektlizenz und die jeweiligen Dienstbedingungen separat."
+  ],
+  "creditLabel": "Ausgangspunkt: 想风s ursprüngliche Sammlung auf X",
+  "appSourceLabel": "Quellcode und Lizenz von write-then-publish",
+  "nextTitle": "Nach dem nächsten Ergebnis auswählen",
+  "nextText": "Vergleiche genaue Quellen, Einrichtung und Prüfstatus im Register. Ergänze einen zweiten Workflow erst, wenn der erste ein kontrollierbares, wiederverwendbares Ergebnis liefert.",
+  "browseLabel": "Skills für Content-Creator entdecken",
+  "backLabel": "Zurück zum Blog"
+}

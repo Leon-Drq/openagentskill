@@ -1,4 +1,5 @@
 import { defaultLocale, isLocale, localePaths, type Locale } from '@/lib/i18n/config'
+import { isLocalizedBlogPath } from '@/lib/blog/routes'
 
 // These languages have dedicated versions of the core discovery routes. Keep
 // this in one place so the switcher, sitemap, and static route generation all
@@ -27,6 +28,7 @@ const LOCALIZED_EXPERIENCE_PAGE_SLUGS = ['submit'] as const
 const LOCALIZED_DEEP_ROUTE_ROOTS = ['skill-packs', 'collections'] as const
 
 function isLocalizedDeepRoute(page: string) {
+  if (isLocalizedBlogPath(page)) return true
   const [root, ...segments] = page.split('/').filter(Boolean)
   return segments.length > 0 && LOCALIZED_DEEP_ROUTE_ROOTS.includes(root as (typeof LOCALIZED_DEEP_ROUTE_ROOTS)[number])
 }

@@ -1,0 +1,52 @@
+{
+  "title": "12 AI Skills for Content Creators: From Research to a Publishable Draft",
+  "summary": "A practical guide to creator workflows: what each Skill produces, which tools and accounts it needs, and what to check before publishing.",
+  "eyebrow": "Creator workflows",
+  "byline": "OpenAgentSkill editorial",
+  "dateLabel": "Sources checked",
+  "languageLabel": "Read this article in",
+  "contentsLabel": "In this guide",
+  "sourceLabel": "Source at inspected revision",
+  "profileLabel": "View registry entry",
+  "pathLabel": "Skill path",
+  "checkLabel": "Before adopting",
+  "intro": [
+    "A useful creator stack begins with a deliverable: a sourced outline, a readable cover, a checked transcript, or a draft in the right editor. Installing twenty repositories does not connect those stages automatically. Every handoff still needs a file format, an account and a definition of done.",
+    "We followed 想风’s creator-Skill roundup, checked the linked repositories, and selected twelve specific workflows to evaluate. This guide groups them by the work they do. Some are already in our registry; others are candidates with conditions. A mention here is not runtime certification."
+  ],
+  "groups": ["Research and plan", "Design the visuals", "Work with video", "Prepare publication"],
+  "tools": {
+    "workflow": {"use": "Turn a brief into a staged content plan, draft and publishing package. self-media-content-workflow is useful when the bottleneck is deciding what comes next: direction, platform, title and final copy have separate checkpoints.", "check": "MIT. The instructions coordinate other capabilities; they do not supply every image, browser or publishing tool. Start with one platform and keep the final publishing decision explicit."},
+    "search": {"use": "creator-buddy’s global-content-search gathers public material for an editorial brief. Keep the source URLs and observation dates beside each claim so a writer can separate evidence from a popular opinion.", "check": "This Skill declares MIT and needs Node plus adapters such as agent-reach. The Douyin adapter is not bundled; it expects an external DOUYIN_COMMAND. Optional API routes may require credentials or payment."},
+    "distiller": {"use": "blogger-distiller turns public creator samples into an HTML analysis and a reusable writing guide. Use the output to study structure and audience questions, then develop your own examples and argument.", "check": "MIT; Python and a TikHub token are required. Our bounded scan flagged deletion operations in the installer and scripts. Inspect target paths in an isolated checkout before running; this is a candidate for further review, not a cleared install."},
+    "cover": {"use": "baoyu-cover-image offers a focused path from an article brief to a cover image. Choose it when you need one strong thumbnail rather than installing every workflow in baoyu-skills.", "check": "MIT. An available image-generation backend is still needed and may cost money. Review text, aspect ratio and legibility at phone-thumbnail size; keep the approved prompt with the image."},
+    "cards": {"use": "Guizang Social Card organizes content into social cards and cover assets. A small sequence of cards works well when one idea needs a headline, evidence and a clear closing action.", "check": "AGPL-3.0. Check the repository’s license obligations for your intended use and the rights to any fonts or images. Inspect every exported card; a good HTML preview alone is not the final deliverable."},
+    "illustration": {"use": "ian-xiaohei-illustrations creates hand-drawn explanatory visuals from dense material. It is a useful candidate for teaching a mechanism or relationship that is hard to explain in a headline.", "check": "MIT; image-generation access is required. The documented style targets Chinese annotations and a wide canvas. For another language, adapt labels and inspect the generated lettering before publication."},
+    "subtitle": {"use": "video-to-subtitle-summary turns video into subtitles, text and a summary. Its documented flow prefers existing YouTube subtitles and otherwise supports local faster-whisper transcription.", "check": "MIT. Python, FFmpeg and relevant download tools are needed. Some platform resolvers or cloud modes need paid APIs. Check names and timestamps against the audio; our scan found environment access and subprocess use, not a completed runtime test."},
+    "seedance": {"use": "Seedance prompt Skill helps describe shots, motion and audiovisual intent. Treat its output as a production brief that you submit to a video-generation service.", "check": "It writes prompts; it does not render the video. Check current service access, credits and media rights separately. We did not find an explicit repository license in the inspected files, so do not assume unrestricted reuse."},
+    "hyperframes": {"use": "HyperFrames’ general-video workflow builds an authored video composition with HTML and CSS. It fits an explainer or product video whose timing, typography and assets need deliberate control.", "check": "Apache-2.0. This Skill belongs to the HyperFrames runtime and references its entry workflow and companion resources. Follow that setup; copying this one SKILL.md is not a complete rendering environment. Review an exported video."},
+    "publisher": {"use": "video-publisher takes an approved video package into creator-platform editors. Its documented default prepares drafts and stops before the final publish action, making it useful for repeated upload preparation.", "check": "MIT; Node, EgoLite and logged-in platform accounts are needed. The limited scan found no rule alerts, but browser actions and final delivery were not tested by us. Verify each platform’s draft and require a publication receipt before reporting success."},
+    "wewrite": {"use": "WeWrite coordinates research, writing and formatting for a WeChat article. Start with its local draft and review workflow; request preview, imagery or draft-box delivery only when needed.", "check": "MIT. The orchestrator depends on companion Skills and its CLI. Image generation and WeChat delivery require their own setup and may incur cost. Our scan covered the selected Skill directory, not every executable in the repository."},
+    "xarticle": {"use": "x-article-publisher transfers Markdown and images into an X Articles draft. The documented workflow stops at a draft, so it can remove editor work while leaving the publishing decision with the account owner.", "check": "MIT; Node, Chrome, a logged-in profile and an eligible X account are needed. The author documents macOS testing, not confirmed Windows/Linux operation. Our scan flagged dynamic execution and process access; inspect scripts and protect the browser profile before adoption."}
+  },
+  "stacksTitle": "Start with one complete handoff",
+  "stacks": [
+    {"title": "An article with a cover", "text": "Use the content workflow for an approved outline and draft, then baoyu-cover-image for one cover. Accept the result only after checking sources, headline accuracy and the thumbnail on a phone."},
+    {"title": "A video becomes a written brief", "text": "Use the subtitle workflow on material you can access and reuse. Correct the transcript first, then ask the content workflow for an outline with timestamped references. Do not write factual claims from the summary alone."},
+    {"title": "A finished piece reaches an editor", "text": "Choose video-publisher, WeWrite or x-article-publisher according to the destination. Pass the approved text, media and title. A saved draft is the first acceptance point; actual publication is a separate action."}
+  ],
+  "briefTitle": "A brief you can reuse",
+  "brief": "Audience: [who needs this]. Deliverable: [one article, cover or video].\nUse only these approved sources and assets: [links/files].\nReturn the output, source references, costs incurred and unresolved checks.\nSave a draft. Ask before spending extra credits or publishing to an account.",
+  "methodTitle": "How to read this selection",
+  "method": [
+    "We inspected public repository documentation and exact SKILL.md paths on 10 October 2026. Source links below each entry pin that inspection to a commit. Registry entries may track a different revision; check their source and review state before installing.",
+    "For five unlisted candidates, we also ran the site’s non-executing advisory scan. It is bounded to up to 12 supported text files per scan and can omit code and dependencies. A rule match is a prompt for inspection, not proof of malware; no alerts is not proof of safety. We did not run these workflows, use paid accounts or test publishing outcomes.",
+    "The original roundup also includes collections, frameworks and applications. For example, write-then-publish has no SKILL.md in the inspected revision and its license restricts commercial use. It should not be presented as an interchangeable, freely commercial Skill. Read each project’s license and service terms separately."
+  ],
+  "creditLabel": "Discovery source: 想风’s original roundup on X",
+  "appSourceLabel": "write-then-publish source and license",
+  "nextTitle": "Choose by your next deliverable",
+  "nextText": "Compare the exact source, setup and review state in the registry. Add a second workflow only after the first produces a result you can inspect and reuse.",
+  "browseLabel": "Explore creator Skills",
+  "backLabel": "Back to Blog"
+}
