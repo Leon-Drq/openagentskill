@@ -1,26 +1,13 @@
+import { getResourceMetadata } from '@/lib/seo/resource-pages'
+import { ResourcePageShell } from '@/components/resource-page'
 import type { Metadata } from 'next'
 import Link from '@/components/crawl-link'
-import { MarketingHero, MarketingMetricStrip, MarketingPageShell } from '@/components/marketing-page'
-import { getAllSkills } from '@/lib/db/skills'
+import { MarketingHero, MarketingMetricStrip } from '@/components/marketing-page'
 import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
-import { formatCompactNumber } from '@/lib/quality'
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  title: 'Agent Skills Guides',
-  description:
-    'Practical OpenAgentSkill guides for finding, comparing, and installing AI agent skills for Claude Code, Codex, web scraping, RAG, and agent workflows.',
-  alternates: {
-    canonical: 'https://www.openagentskill.com/guides',
-  },
-  openGraph: {
-    title: 'Agent Skills Guides - OpenAgentSkill',
-    description: 'Find the right Agent Skills with practical best-of, installation, and comparison guides.',
-    url: 'https://www.openagentskill.com/guides',
-    type: 'website',
-  },
-}
+export const metadata: Metadata = getResourceMetadata('guides')
 
 const intentLabels: Record<string, string> = {
   best: 'Best-of guides',
@@ -29,27 +16,25 @@ const intentLabels: Record<string, string> = {
   standard: 'Ecosystem guides',
 }
 
-export default async function GuidesPage() {
-  const skills = await getAllSkills('quality', undefined, 1200).catch(() => [])
-  const totalStars = skills.reduce((sum, skill) => sum + Number(skill.github_stars || 0), 0)
+export default function GuidesPage() {
   const groupedGuides = GROWTH_GUIDES.reduce<Record<string, typeof GROWTH_GUIDES>>((groups, guide) => {
     groups[guide.intent] = [...(groups[guide.intent] || []), guide]
     return groups
   }, {})
 
   return (
-    <MarketingPageShell>
+    <ResourcePageShell page="guides">
       <MarketingHero
         eyebrow="Guides"
         title="Practical guides for choosing agent skills."
-        description="OpenAgentSkill guides turn search intent into action: best skills for a workflow, install paths for a platform, and side-by-side comparisons for real agent builders."
+        description="Start with the task you want to complete. Compare candidate skills, check their sources, and follow installation steps for your agent."
         aside={
           <MarketingMetricStrip
             columns="grid-cols-3"
             items={[
               { value: GROWTH_GUIDES.length, label: 'Guides' },
-              { value: skills.length.toLocaleString(), label: 'Skills' },
-              { value: formatCompactNumber(totalStars), label: 'Stars' },
+              { value: Object.keys(groupedGuides).length, label: 'Guide types' },
+              { value: new Set(GROWTH_GUIDES.map((guide) => guide.platformLabel).filter(Boolean)).size, label: 'Platforms' },
             ]}
           />
         }
@@ -62,7 +47,7 @@ export default async function GuidesPage() {
               <Link
                 key={guide.slug}
                 href={`/guides/${guide.slug}`}
-                className="group flex min-h-[260px] flex-col justify-between border border-border bg-card p-5 transition-colors hover:border-foreground"
+                className="group flex min-h-[260px] flex-col justify-between border border-border bg-card p-5 transition-colors hover:border-foreground rounded-xl"
               >
                 <div>
                   <p className="mb-3 text-xs uppercase tracking-widest text-secondary">{guide.eyebrow}</p>
@@ -122,6 +107,6 @@ export default async function GuidesPage() {
           ))}
         </section>
       </div>
-    </MarketingPageShell>
+    </ResourcePageShell>
   )
 }

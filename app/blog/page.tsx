@@ -1,10 +1,11 @@
+import { getResourceMetadata } from '@/lib/seo/resource-pages'
+import { ResourcePageShell } from '@/components/resource-page'
 import type { Metadata } from 'next'
 import Link from '@/components/crawl-link'
 import {
   MarketingButtonLink,
   MarketingHero,
   MarketingMetricStrip,
-  MarketingPageShell,
 } from '@/components/marketing-page'
 import { SubscribeCard } from '@/components/subscribe-card'
 import { getBlogHubData, getBlogPosts, type BlogSkillPreview } from '@/lib/blog/generate'
@@ -17,26 +18,7 @@ import { CreatorGuideFeature } from '@/components/blog/creator-guide-feature'
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  title: 'OpenAgentSkill Update - AI Agent Skill Guides & Launch Notes',
-  description:
-    'OpenAgentSkill Update tracks newly indexed AI agent skills, practical developer workflows, and high-star tools from the agent ecosystem.',
-  alternates: {
-    canonical: 'https://www.openagentskill.com/blog',
-  },
-  openGraph: {
-    title: 'OpenAgentSkill Update',
-    description: 'Launch notes, skill roundups, and practical guides for AI agent builders.',
-    url: 'https://www.openagentskill.com/blog',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'OpenAgentSkill Update',
-    description: 'Launch notes, skill roundups, and practical guides for AI agent builders.',
-    images: ['/opengraph-image?v=3'],
-  },
-}
+export const metadata: Metadata = getResourceMetadata('blog')
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -81,7 +63,7 @@ export default async function BlogPage() {
   const rankingGuides = getRankingDefinitions()
 
   return (
-    <MarketingPageShell>
+    <ResourcePageShell page="blog">
       <MarketingHero
         eyebrow="OpenAgentSkill Update"
         title="New skills, practical workflows, and agent-builder notes."
@@ -165,10 +147,10 @@ export default async function BlogPage() {
 
         <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
           <div>
-            <p className="text-xs uppercase tracking-widest text-secondary mb-3">SEO playbooks</p>
+            <p className="text-xs uppercase tracking-widest text-secondary mb-3">Workflow guides</p>
             <h2 className="font-display text-2xl font-bold text-foreground">Evergreen guides for agent builders.</h2>
             <p className="mt-3 text-sm leading-relaxed text-secondary">
-              These pages turn marketplace data into search-friendly guides that link back to skills, use cases, and stacks.
+              Choose a task, review the source evidence, and compare the skills and workflows that can help you finish it.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
@@ -176,7 +158,7 @@ export default async function BlogPage() {
               <Link
                 key={useCase.slug}
                 href={`/blog/use-cases/${useCase.slug}`}
-                className="border border-border p-4 transition-colors hover:border-foreground"
+                className="border border-border p-4 transition-colors hover:border-foreground rounded-xl"
               >
                 <p className="text-xs uppercase tracking-widest text-secondary">{useCase.eyebrow}</p>
                 <h3 className="mt-2 font-display text-lg font-semibold">
@@ -191,9 +173,9 @@ export default async function BlogPage() {
         <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
           <div>
             <p className="text-xs uppercase tracking-widest text-secondary mb-3">Ranking guides</p>
-            <h2 className="font-display text-2xl font-bold text-foreground">Turn the index into searchable lists.</h2>
+            <h2 className="font-display text-2xl font-bold text-foreground">Find skills by adoption and maintenance.</h2>
             <p className="mt-3 text-sm leading-relaxed text-secondary">
-              Ranking pages target high-intent searches like most starred, recently updated, and best skills for each workflow.
+              Explore rankings by GitHub stars, recent updates, and workflow fit. Popularity is a starting point; inspect the source before installing.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
@@ -201,7 +183,7 @@ export default async function BlogPage() {
               <Link
                 key={ranking.slug}
                 href={`/rankings/${ranking.slug}`}
-                className="border border-border p-4 transition-colors hover:border-foreground"
+                className="border border-border p-4 transition-colors hover:border-foreground rounded-xl"
               >
                 <p className="text-xs uppercase tracking-widest text-secondary">{ranking.eyebrow}</p>
                 <h3 className="mt-2 font-display text-lg font-semibold">{ranking.shortTitle}</h3>
@@ -221,7 +203,7 @@ export default async function BlogPage() {
               <Link
                 key={stack.slug}
                 href={`/collections/${stack.slug}`}
-                className="border border-border p-4 transition-colors hover:border-foreground"
+                className="border border-border p-4 transition-colors hover:border-foreground rounded-xl"
               >
                 <p className="text-xs uppercase tracking-widest text-secondary">{stack.eyebrow}</p>
                 <h3 className="mt-2 font-display text-lg font-semibold">{stack.shortTitle}</h3>
@@ -306,6 +288,6 @@ export default async function BlogPage() {
           )}
         </section>
       </div>
-    </MarketingPageShell>
+    </ResourcePageShell>
   )
 }

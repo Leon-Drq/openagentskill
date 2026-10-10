@@ -5,6 +5,8 @@ import { SiteHeader } from '@/components/site-header'
 
 interface MarketingPageShellProps {
   children: ReactNode
+  mainClassName?: string
+  language?: string
 }
 
 interface MarketingHeroProps {
@@ -47,11 +49,11 @@ interface MarketingButtonLinkProps extends LinkProps {
   rel?: string
 }
 
-export function MarketingPageShell({ children }: MarketingPageShellProps) {
+export function MarketingPageShell({ children, mainClassName, language }: MarketingPageShellProps) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
-      <main>{children}</main>
+      <main className={mainClassName} lang={language}>{children}</main>
       <SiteFooter />
     </div>
   )

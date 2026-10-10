@@ -16,6 +16,23 @@
 .number { color: var(--brand); font-family: var(--font-mono); font-size: 14px; font-weight: 400; }
 .brief { max-width: 100%; padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--font-mono); font-size: 14px; line-height: 1.9; }
 .next { margin-block: 48px 0; padding: 24px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+.markdown { margin-top: 32px; font-size: 16px; line-height: 1.9; }
+.markdown :where(p, ul, ol, blockquote, pre, table) { margin-block: 20px; }
+.markdown :where(h2) { margin-block: 40px 16px; font-family: var(--font-display); font-size: 24px; font-weight: 400; line-height: 1.35; }
+.markdown :where(h3, h4, h5, h6) { margin-block: 28px 12px; font-family: var(--font-sans); font-size: 18px; font-weight: 600; line-height: 1.5; }
+.markdown :where(ul, ol) { padding-left: 24px; }
+.markdown ul { list-style: disc; }
+.markdown ol { list-style: decimal; }
+.markdown li { margin-block: 8px; }
+.markdown a { text-decoration: underline; text-underline-offset: 4px; }
+.markdown a:hover { color: var(--brand); }
+.markdown pre { max-width: 100%; overflow-x: auto; padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); white-space: pre; overflow-wrap: normal; font-size: 13px; line-height: 1.8; }
+.markdown :where(code) { font-family: var(--font-mono); font-size: .875em; }
+.markdown :where(blockquote) { padding-left: 20px; border-left: 2px solid var(--brand); color: var(--secondary); }
+.markdown :where(table) { min-width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
+.markdown :where(th, td) { padding: 12px; border: 1px solid var(--border); }
+.markdown :where(img) { max-width: 100%; height: auto; border-radius: 8px; }
+.markdown :where(hr) { margin-block: 32px; border-color: var(--border); }
 .feature { padding-block: 32px; border-bottom: 1px solid var(--border); }
 .feature .eyebrow { margin-block: 0 12px; }
 .feature .summary { max-width: 768px; margin-top: 16px; }

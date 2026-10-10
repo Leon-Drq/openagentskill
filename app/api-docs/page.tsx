@@ -1,18 +1,14 @@
+import { getResourceMetadata } from '@/lib/seo/resource-pages'
+import { ResourcePageShell, ResourceContents } from '@/components/resource-page'
 import { Metadata } from 'next'
 import Link from '@/components/crawl-link'
-import { MarketingHero, MarketingPageShell } from '@/components/marketing-page'
+import { MarketingHero } from '@/components/marketing-page'
 
-export const metadata: Metadata = {
-  title: 'API Reference - OpenAgentSkill',
-  description: 'Agent-friendly Resolve API for selecting, auditing, and installing AI agent skills programmatically.',
-  alternates: {
-    canonical: 'https://www.openagentskill.com/api-docs',
-  },
-}
+export const metadata: Metadata = getResourceMetadata('api')
 
 export default function APIDocsPage() {
   return (
-    <MarketingPageShell>
+    <ResourcePageShell page="api">
         <MarketingHero
           eyebrow="API Reference"
           title="Agent-friendly discovery, ranking, and install data."
@@ -21,19 +17,21 @@ export default function APIDocsPage() {
 
         <div className="mx-auto max-w-5xl px-6 py-12 sm:py-14 lg:py-16">
 
+        <ResourceContents items={[{"id": "base-url", "label": "Base URL"}, {"id": "response-formats", "label": "Response Formats"}, {"id": "endpoints", "label": "Endpoints"}, {"id": "agent-resolve", "label": "Resolve a task"}, {"id": "agent-receipt", "label": "Install receipts"}, {"id": "agent-outcome", "label": "Outcome feedback"}, {"id": "submissions", "label": "OpenClaw Auto-Submit"}, {"id": "protocol", "label": "Agent Protocol Discovery"}, {"id": "rate-limits", "label": "Rate Limits"}]} />
+
         {/* Base URL */}
         <section className="mb-10 sm:mb-12 lg:mb-16">
-          <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
+          <h2 id="base-url" className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
             {'Base URL'}
           </h2>
           <div className="grid gap-3">
-            <div className="bg-card p-4 sm:p-6 font-mono text-sm sm:text-base overflow-x-auto border border-border">
+            <div className="bg-card p-4 sm:p-6 font-mono text-sm sm:text-base overflow-x-auto border border-border rounded-xl">
               {'https://www.openagentskill.com/api/registry'}
             </div>
-            <div className="bg-card p-4 sm:p-6 font-mono text-sm sm:text-base overflow-x-auto border border-border">
+            <div className="bg-card p-4 sm:p-6 font-mono text-sm sm:text-base overflow-x-auto border border-border rounded-xl">
               {'https://www.openagentskill.com/api/agent'}
             </div>
-            <div className="bg-card p-4 sm:p-6 font-mono text-sm sm:text-base overflow-x-auto border border-border">
+            <div className="bg-card p-4 sm:p-6 font-mono text-sm sm:text-base overflow-x-auto border border-border rounded-xl">
               {'https://www.openagentskill.com/api/skills'}
             </div>
           </div>
@@ -50,13 +48,13 @@ export default function APIDocsPage() {
 
         {/* Format Parameter */}
         <section className="mb-10 sm:mb-12 lg:mb-16">
-          <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
+          <h2 id="response-formats" className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
             {'Response Formats'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed mb-4">
-            {'All endpoints support two response formats via the '}
+            {'Read endpoints that document format support accept the '}
             <code className="font-mono text-sm bg-muted px-2 py-1">{'format'}</code>
-            {' parameter:'}
+            {' parameter. Check the endpoint examples and OpenAPI contract for supported request and response formats:'}
           </p>
           <ul className="space-y-3 text-base sm:text-lg leading-relaxed text-secondary mb-6">
             <li>
@@ -72,7 +70,7 @@ export default function APIDocsPage() {
 
         {/* Endpoints */}
         <section className="mb-10 sm:mb-12 lg:mb-16">
-          <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-3 sm:mb-4">
+          <h2 id="endpoints" className="font-display text-2xl sm:text-3xl font-semibold mb-3 sm:mb-4">
             {'Endpoints'}
           </h2>
           <div className="flex flex-wrap gap-2 mb-6 sm:mb-8">
@@ -232,7 +230,7 @@ export default function APIDocsPage() {
                   <span className="text-secondary ml-2">{'- Require install handoff'}</span>
                 </div>
               </div>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap rounded-xl">
                 <code>{`POST /api/agent/resolve
 {
   "task": "review a pull request and summarize risky changes",
@@ -244,7 +242,7 @@ export default function APIDocsPage() {
   }
 }`}</code>
               </div>
-              <div className="mt-4 bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+              <div className="mt-4 bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
                 <code>{'GET /api/agent/resolve?task=scrape+pricing+pages&agent=codex&max_risk=medium&format=text'}</code>
               </div>
             </div>
@@ -281,7 +279,7 @@ export default function APIDocsPage() {
                   </div>
                 ))}
               </div>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
                 <code>{'GET /api/agent/receipt?task=scrape+pricing+pages&agent=codex&max_risk=medium&format=text'}</code>
               </div>
             </div>
@@ -302,7 +300,7 @@ export default function APIDocsPage() {
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
                 {'Task-first catalog for agents. Use it when the agent knows the job to be done but has not selected a skill yet.'}
               </p>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
                 <code>{'GET /api/agent/tasks?format=text'}</code>
               </div>
             </div>
@@ -347,7 +345,7 @@ export default function APIDocsPage() {
                   </div>
                 ))}
               </div>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap rounded-xl">
                 <code>{`POST /api/agent/outcome
 {
   "event_id": "resolve_...",
@@ -387,7 +385,7 @@ export default function APIDocsPage() {
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
                 {'Public-safe status for the GitHub auto-discovery pipeline. Shows schedule, filters, thresholds, cross-domain query coverage, indexer health, and recent run summaries.'}
               </p>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
                 <code>{'GET /api/agent/discovery'}</code>
               </div>
               <p className="mt-4 text-sm leading-relaxed text-secondary">
@@ -427,7 +425,7 @@ export default function APIDocsPage() {
                   <span className="text-secondary ml-2">{'- Optional minimum GitHub stars filter'}</span>
                 </div>
               </div>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
                 <code>{'GET /api/skills/search?task=scrape+pricing+pages&min_stars=500&limit=5'}</code>
               </div>
             </div>
@@ -448,7 +446,7 @@ export default function APIDocsPage() {
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
                 {'Get the install command, agent prompt, target-specific install options, safety checklist, and canonical URLs for one skill.'}
               </p>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
                 <code>{'GET /api/skills/crawl4ai/install?format=text'}</code>
               </div>
             </div>
@@ -470,13 +468,13 @@ export default function APIDocsPage() {
                 {'Run registry regression checks, pass slug={skill} for one pre-install Trust + Eval contract, or pass slugs={a,b,c} to compare candidate skills before choosing one to install.'}
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
                   <code>{'GET /api/agent/evals'}</code>
                 </div>
-                <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+                <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
                   <code>{'GET /api/agent/evals?slug=crawl4ai&task=scrape+pricing+pages&format=text'}</code>
                 </div>
-                <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border sm:col-span-2">
+                <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border sm:col-span-2 rounded-xl">
                   <code>{'GET /api/agent/evals?slugs=crawl4ai,markitdown&task=parse+PDFs+into+markdown'}</code>
                 </div>
               </div>
@@ -518,7 +516,7 @@ export default function APIDocsPage() {
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
                 {'Return an SVG README badge for a listed skill. Use metric=listed, trust, quality, stars, audit, or proven.'}
               </p>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
                 <code>{'GET /api/badge/crawl4ai?metric=audit'}</code>
               </div>
             </div>
@@ -570,12 +568,12 @@ export default function APIDocsPage() {
               </div>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Request'}</h3>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-4 sm:mb-6">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-4 sm:mb-6 rounded-xl">
                 <code>{'GET /api/agent/skills?q=web+research&trust=production&format=text'}</code>
               </div>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Response (text format)'}</h3>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap rounded-xl">
                 <code>{`=== Agent Skills Search Results ===
 
 Total: 2 skills found
@@ -634,7 +632,7 @@ Total: 2 skills found
                   </code>
                 ))}
               </div>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
                 <code>{'GET /api/agent/recommend?task=scrape+websites+and+extract+tables&limit=4'}</code>
               </div>
             </div>
@@ -670,7 +668,7 @@ Total: 2 skills found
                   <span className="text-secondary ml-2">{'- Fetch this URL when an agent needs the executable pack plan'}</span>
                 </div>
               </div>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
                 <code>{'GET /api/agent/packs?limit=5&format=text'}</code>
               </div>
             </div>
@@ -706,7 +704,7 @@ Total: 2 skills found
                   <span className="text-secondary ml-2">{'- Endpoint and required fields for reporting whether the pack worked'}</span>
                 </div>
               </div>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
                 <code>{'GET /api/agent/packs/frontend-engineer-agent-pack?limit=8'}</code>
               </div>
             </div>
@@ -742,7 +740,7 @@ Total: 2 skills found
                   <span className="text-secondary ml-2">{'- Response format: json or text'}</span>
                 </div>
               </div>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
                 <code>{'GET /api/agent/rankings?slug=agent-proven&limit=5&format=text'}</code>
               </div>
             </div>
@@ -764,7 +762,7 @@ Total: 2 skills found
               <p className="text-base sm:text-lg mb-4 sm:mb-6">
                 {'Get a weekly operating report with editor picks, new skills, maintained projects, and engagement signals.'}
               </p>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
                 <code>{'GET /api/agent/weekly-report?format=text'}</code>
               </div>
             </div>
@@ -788,12 +786,12 @@ Total: 2 skills found
               </p>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Request'}</h3>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-4 sm:mb-6">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-4 sm:mb-6 rounded-xl">
                 <code>{'GET /api/agent/skills/advanced-web-research?format=text'}</code>
               </div>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Response (text format)'}</h3>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap rounded-xl">
                 <code>{`=== Crawl4AI ===
 
 INSTALL:
@@ -838,7 +836,7 @@ This skill enables agents to perform comprehensive web research...`}</code>
                 {'Get the OpenAgentSkill audit report for a skill, including audit score, risk level, check results, warnings, and signals.'}
               </p>
 
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-4 sm:mb-6">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-4 sm:mb-6 rounded-xl">
                 <code>{'GET /api/audits/crawl4ai'}</code>
               </div>
 
@@ -874,7 +872,7 @@ This skill enables agents to perform comprehensive web research...`}</code>
               </p>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Markdown'}</h3>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-4 sm:mb-6 whitespace-pre-wrap">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-4 sm:mb-6 whitespace-pre-wrap rounded-xl">
                 <code>{`[![Listed](https://www.openagentskill.com/api/badge/crawl4ai?metric=listed&label=Listed)](https://www.openagentskill.com/skills/crawl4ai)
 
 [![Trust](https://www.openagentskill.com/api/badge/crawl4ai?metric=trust&label=Trust)](https://www.openagentskill.com/skills/crawl4ai)
@@ -952,7 +950,7 @@ This skill enables agents to perform comprehensive web research...`}</code>
               </div>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Request'}</h3>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-6 whitespace-pre-wrap">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border mb-6 whitespace-pre-wrap rounded-xl">
                 <code>{`POST /api/skills/submit
 Content-Type: application/json
 
@@ -968,7 +966,7 @@ Content-Type: application/json
               </div>
 
               <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Example Response'}</h3>
-              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
+              <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap rounded-xl">
                 <code>{`{
   "success": true,
   "accepted": true,
@@ -987,7 +985,7 @@ Content-Type: application/json
 
         {/* OpenClaw Auto-Submit */}
         <section className="mb-10 sm:mb-12 lg:mb-16 border-t border-border pt-10 sm:pt-12">
-          <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-2 sm:mb-3">
+          <h2 id="submissions" className="font-display text-2xl sm:text-3xl font-semibold mb-2 sm:mb-3">
             {'OpenClaw Auto-Submit'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed text-secondary mb-8">
@@ -1002,7 +1000,7 @@ Content-Type: application/json
               <div className="min-w-0 flex-1">
                 <h3 className="font-semibold mb-2 text-sm sm:text-base">{'Add the webhook to your OpenClaw config'}</h3>
                 <p className="text-secondary text-sm mb-3">{'In your openclaw.config.yaml, add the submit endpoint as a publish target:'}</p>
-                <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
+                <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap rounded-xl">
                   <code>{`# openclaw.config.yaml
 publish:
   - target: openagentskill
@@ -1022,7 +1020,7 @@ publish:
               <div className="min-w-0 flex-1">
                 <h3 className="font-semibold mb-2 text-sm sm:text-base">{'OpenClaw can POST when SKILL.md is created or updated'}</h3>
                 <p className="text-secondary text-sm mb-3">{'No star threshold is required. The agent can also trigger submission manually:'}</p>
-                <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
+                <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap rounded-xl">
                   <code>{`# Manually submit a specific repo via OpenClaw
 openclaw publish --target openagentskill --repo owner/my-skill`}</code>
                 </div>
@@ -1040,9 +1038,9 @@ openclaw publish --target openagentskill --repo owner/my-skill`}</code>
             </div>
           </div>
 
-          <div className="mt-8 p-4 sm:p-6 border border-border">
+          <div className="mt-8 p-4 sm:p-6 border border-border rounded-xl">
             <h3 className="font-semibold mb-3 text-sm sm:text-base">{'Or call the API directly (no OpenClaw required)'}</h3>
-            <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap">
+            <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border whitespace-pre-wrap rounded-xl">
               <code>{`curl -X POST https://openagentskill.com/api/skills/submit \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -1058,20 +1056,20 @@ openclaw publish --target openagentskill --repo owner/my-skill`}</code>
 
         {/* Agent Protocol */}
         <section className="mb-10 sm:mb-12 lg:mb-16 border-t border-border pt-10 sm:pt-12">
-          <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
+          <h2 id="protocol" className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
             {'Agent Protocol Discovery'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed mb-4">
             {'AI agents can automatically discover our API capabilities via the standard agent protocol file:'}
           </p>
-          <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border">
+          <div className="bg-card p-3 sm:p-4 font-mono text-xs sm:text-sm overflow-x-auto border border-border rounded-xl">
             <code>{'GET /.well-known/agent-protocol.json'}</code>
           </div>
         </section>
 
         {/* Rate Limits */}
         <section className="mb-10 sm:mb-12 lg:mb-16">
-          <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
+          <h2 id="rate-limits" className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
             {'Rate Limits'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed text-secondary">
@@ -1083,6 +1081,6 @@ openclaw publish --target openagentskill --repo owner/my-skill`}</code>
           </p>
         </section>
         </div>
-    </MarketingPageShell>
+    </ResourcePageShell>
   )
 }

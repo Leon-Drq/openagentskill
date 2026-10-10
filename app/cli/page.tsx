@@ -1,18 +1,12 @@
+import { getResourceMetadata } from '@/lib/seo/resource-pages'
+import { ResourcePageShell, ResourceContents } from '@/components/resource-page'
 import { Metadata } from 'next'
 import {
   MarketingButtonLink,
   MarketingHero,
-  MarketingPageShell,
 } from '@/components/marketing-page'
 
-export const metadata: Metadata = {
-  title: 'OpenAgentSkill CLI - Resolve and install AI agent skills',
-  description:
-    'Use the OpenAgentSkill CLI contract to resolve tasks into safe skill install plans for Codex, Claude Code, Cursor, and agent workflows.',
-  alternates: {
-    canonical: 'https://www.openagentskill.com/cli',
-  },
-}
+export const metadata: Metadata = getResourceMetadata('cli')
 
 const CLI = 'npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz'
 
@@ -90,7 +84,7 @@ const lockfile = `{
 
 export default function CliPage() {
   return (
-    <MarketingPageShell>
+    <ResourcePageShell page="cli">
       <MarketingHero
         eyebrow="Official CLI"
         title="Resolve, audit, and install agent skills from the terminal."
@@ -117,9 +111,10 @@ export default function CliPage() {
       />
 
         <section className="min-w-0 border-b border-border">
+          <div className="mx-auto max-w-6xl px-4 pt-10 sm:px-6"><ResourceContents items={commands.map((item) => ({ id: item.label.toLowerCase(), label: item.label }))} /></div>
           <div className="mx-auto grid max-w-6xl gap-4 px-4 py-10 sm:px-6 sm:py-14 md:grid-cols-2 xl:grid-cols-3">
             {commands.map((item) => (
-              <article key={item.label} className="min-w-0 border border-border bg-card p-5">
+              <article id={item.label.toLowerCase()} key={item.label} className="min-w-0 border border-border bg-card p-5 rounded-xl">
                 <p className="font-mono text-xs uppercase text-secondary">{item.label}</p>
                 <h2 className="mt-3 font-display text-2xl font-semibold leading-tight">{item.title}</h2>
                 <p className="mt-3 text-sm leading-6 text-secondary">{item.copy}</p>
@@ -145,20 +140,20 @@ export default function CliPage() {
           </div>
 
           <div className="grid min-w-0 gap-4">
-            <div className="min-w-0 border border-border bg-card p-5">
+            <div className="min-w-0 border border-border bg-card p-5 rounded-xl">
               <p className="mb-3 font-mono text-xs uppercase text-secondary">Request</p>
-              <pre className="max-w-full overflow-x-auto border border-border bg-background p-4 font-mono text-xs leading-relaxed text-secondary">
+              <pre className="max-w-full overflow-x-auto border border-border bg-background p-4 font-mono text-xs leading-relaxed text-secondary rounded-xl">
                 <code>{contract}</code>
               </pre>
             </div>
-            <div className="min-w-0 border border-border bg-card p-5">
+            <div className="min-w-0 border border-border bg-card p-5 rounded-xl">
               <p className="mb-3 font-mono text-xs uppercase text-secondary">Agent lockfile</p>
-              <pre className="max-w-full overflow-x-auto border border-border bg-background p-4 font-mono text-xs leading-relaxed text-secondary">
+              <pre className="max-w-full overflow-x-auto border border-border bg-background p-4 font-mono text-xs leading-relaxed text-secondary rounded-xl">
                 <code>{lockfile}</code>
               </pre>
             </div>
           </div>
         </section>
-    </MarketingPageShell>
+    </ResourcePageShell>
   )
 }

@@ -1,21 +1,14 @@
+import { getResourceMetadata } from '@/lib/seo/resource-pages'
+import { ResourcePageShell, ReportMethod } from '@/components/resource-page'
 import type { Metadata } from 'next'
 import Link from '@/components/crawl-link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
 import { getAllSkills, getSkillEventStatsMap, type SkillRecord } from '@/lib/db/skills'
 import { buildWeeklySkillReport } from '@/lib/reports'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  title: 'Weekly AI Agent Skill Report',
-  description:
-    'OpenAgentSkill weekly report: new AI agent skills, recently updated projects, most viewed skills, and best shortlist candidates.',
-  alternates: {
-    canonical: 'https://www.openagentskill.com/reports/weekly',
-  },
-}
+export const metadata: Metadata = getResourceMetadata('weekly')
 
 function SkillList({ skills }: { skills: SkillRecord[] }) {
   return (
@@ -53,10 +46,9 @@ export default async function WeeklyReportPage() {
   const report = buildWeeklySkillReport(skills, eventStatsMap)
 
   return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
+    <ResourcePageShell page="weekly">
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         <section className="border-b border-border pb-10">
           <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Weekly report</p>
           <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">
@@ -69,22 +61,24 @@ export default async function WeeklyReportPage() {
           <div className="mt-7 grid grid-cols-2 gap-px border border-border bg-border text-center md:grid-cols-4">
             <div className="bg-background p-4">
               <div className="font-mono text-2xl">{report.newSkills.length}</div>
-              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">New</div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">New shown</div>
             </div>
             <div className="bg-background p-4">
               <div className="font-mono text-2xl">{report.recentlyUpdated.length}</div>
-              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Updated</div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Updated shown</div>
             </div>
             <div className="bg-background p-4">
-              <div className="font-mono text-2xl">{report.mostViewed.length}</div>
-              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Viewed</div>
+              <div className="font-mono text-2xl">{report.mostInstalled.length}</div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Install shortlist</div>
             </div>
             <div className="bg-background p-4">
               <div className="font-mono text-2xl">{report.editorPicks.length}</div>
-              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Picks</div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Picks shown</div>
             </div>
           </div>
         </section>
+
+        <ReportMethod count={skills.length} days={7} generatedAt={report.generatedAt} />
 
         <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
           <div>
@@ -100,7 +94,7 @@ export default async function WeeklyReportPage() {
             <h2 className="font-display text-2xl font-semibold">Freshly indexed skills</h2>
           </div>
           {report.newSkills.length > 0 ? <SkillList skills={report.newSkills} /> : (
-            <p className="text-sm text-secondary">No new skills indexed in the current weekly window yet.</p>
+            <p className="text-sm text-secondary">No newly indexed records appear in this weekly sample.</p>
           )}
         </section>
 
@@ -110,7 +104,7 @@ export default async function WeeklyReportPage() {
             <h2 className="font-display text-2xl font-semibold">Recently updated repositories</h2>
           </div>
           {report.recentlyUpdated.length > 0 ? <SkillList skills={report.recentlyUpdated} /> : (
-            <p className="text-sm text-secondary">No recent GitHub push data in this weekly window yet.</p>
+            <p className="text-sm text-secondary">No recent GitHub push data appears in this weekly sample.</p>
           )}
         </section>
 
@@ -132,9 +126,8 @@ export default async function WeeklyReportPage() {
             <p className="text-sm text-secondary">Install-copy engagement will appear here as users interact with skill pages.</p>
           )}
         </section>
-      </main>
+      </div>
 
-      <SiteFooter />
-    </div>
+    </ResourcePageShell>
   )
 }

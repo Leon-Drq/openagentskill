@@ -1,0 +1,39 @@
+/* Resource/developer templates only. The homepage and Skills directory are outside this scope. */
+.page { overflow-wrap: anywhere; }
+.page :where(h1) { font-family: var(--font-display); font-weight: 400; font-size: 32px; line-height: 1.2; letter-spacing: 0; }
+.page :where(h2) { font-family: var(--font-display); font-weight: 400; line-height: 1.35; }
+.page :where(h3) { font-family: var(--font-sans); font-weight: 600; line-height: 1.5; }
+.page :where(article[class~="bg-card"] h2, a[class~="bg-card"] h2) { font-family: var(--font-sans); font-weight: 600; font-size: 20px; line-height: 1.5; }
+.page :where([class~="border"][class~="bg-card"]) { border-radius: 12px; }
+.page :where([class~="grid"] > *, [class~="flex"] > *) { min-width: 0; }
+.page :where(pre) { max-width: 100%; overflow-x: auto; white-space: pre; overflow-wrap: normal; border-radius: 8px; line-height: 1.8; }
+.page :where([id]) { scroll-margin-top: 88px; }
+.page :where(a:focus-visible) { outline: 2px solid var(--brand); outline-offset: 4px; border-radius: 4px; }
+.page :where(p > a) { text-decoration: underline; text-underline-offset: 4px; }
+.page > nav[class~="flex"] a { display: inline-flex; align-items: center; min-height: 44px; }
+.breadcrumb, .related { max-width: 1152px; margin-inline: auto; padding: 16px; }
+.breadcrumb ol { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; color: var(--secondary); font-size: 13px; }
+.breadcrumb li { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.breadcrumb a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-underline-offset: 4px; }
+.breadcrumb [aria-current] { color: var(--foreground); }
+.related { padding-block: 32px 64px; }
+.related h2 { font-size: 24px; }
+.related nav { display: grid; gap: 12px; margin-top: 20px; }
+.related a { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); font-size: 14px; }
+.related a:hover, .contents a:hover, .breadcrumb a:hover { color: var(--brand); border-color: var(--brand); }
+.contents { margin-bottom: 40px; padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+.contents p { font-size: 14px; font-weight: 600; }
+.contents ul { display: grid; column-gap: 24px; margin-top: 8px; }
+.contents a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; }
+.method { margin-top: 32px; padding: 24px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+.method h2 { font-size: 24px; }
+.method p { margin-top: 16px; font-size: 14px; line-height: 1.8; color: var(--secondary); }
+.method a { display: inline-flex; align-items: center; min-height: 44px; margin-top: 12px; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 639px) { .page :where([class~="px-6"]) { padding-inline: 16px; } }
+@media (min-width: 640px) {
+  .page :where(h1) { font-size: 40px; }
+  .breadcrumb, .related { padding-inline: 24px; }
+  .related nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .contents ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) { .page :where(h1) { font-size: 48px; } }

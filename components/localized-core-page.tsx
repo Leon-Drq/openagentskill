@@ -1,3 +1,4 @@
+import { ResourcePageShell } from '@/components/resource-page'
 import Link from '@/components/crawl-link'
 import { unstable_cache } from 'next/cache'
 import { ArrowRight, Search } from 'lucide-react'
@@ -300,6 +301,11 @@ export async function LocalizedCorePage({
 }) {
   const content = getMarketCoreContent(locale)
   const skills = await skillListForPage(page, query)
+  if (page === 'docs' || page === 'api-docs') {
+    return <ResourcePageShell page={page === 'docs' ? 'docs' : 'api'} locale={locale}>
+      {page === 'docs' ? <LocalizedDocsPage locale={locale} /> : <LocalizedNavigationPage locale={locale} page={page} />}
+    </ResourcePageShell>
+  }
   return (
     <MarketingPageShell>
       {page === 'resolve' ? (
@@ -334,12 +340,11 @@ export async function LocalizedCorePage({
         </>
       ) : null}
       {page === 'skills' ? <LocalizedSkillsDirectory locale={locale} query={query} skills={skills} /> : null}
-      {page === 'tasks' || page === 'skill-packs' || page === 'compare' || page === 'api-docs' ? (
+      {page === 'tasks' || page === 'skill-packs' || page === 'compare' ? (
         <LocalizedNavigationPage locale={locale} page={page} />
       ) : null}
       {page === 'agent-skill' ? <LocalizedAgentSkillPage locale={locale} /> : null}
       {page === 'agent-skills-registry' ? <LocalizedRegistryPage locale={locale} skills={skills} /> : null}
-      {page === 'docs' ? <LocalizedDocsPage locale={locale} /> : null}
     </MarketingPageShell>
   )
 }

@@ -58,7 +58,11 @@ export function LanguageSwitcher({ compact = false, showName = !compact, classNa
       // Route through Next even when only the query string changes. Using the
       // History API here leaves useSearchParams stale, so page-level language
       // state and the visible URL can disagree.
-      startTransition(() => router.replace(href, { scroll: false }))
+      // A translated document can have a very different length. Let Next locate
+      // its chapter fragment instead of retaining an unrelated pixel offset.
+      // Query-only UI language changes keep the directory's current position.
+      const documentChanged = href.split(/[?#]/, 1)[0] !== pathname
+      startTransition(() => router.replace(href, { scroll: documentChanged }))
     }
   }
 

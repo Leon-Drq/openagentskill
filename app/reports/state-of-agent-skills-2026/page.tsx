@@ -1,3 +1,5 @@
+import { getResourceMetadata } from '@/lib/seo/resource-pages'
+import { ResourcePageShell } from '@/components/resource-page'
 import type { Metadata } from 'next'
 import Link from '@/components/crawl-link'
 import { ArrowUpRight, Download, FileJson2 } from 'lucide-react'
@@ -5,7 +7,6 @@ import {
   MarketingButtonLink,
   MarketingHero,
   MarketingMetricStrip,
-  MarketingPageShell,
 } from '@/components/marketing-page'
 import { formatCompactNumber } from '@/lib/quality'
 import { getStateOfAgentSkillsReport } from '@/lib/research/state-of-agent-skills'
@@ -17,21 +18,7 @@ const REPORT_URL = `${SITE_URL}/reports/state-of-agent-skills-2026`
 // database connection cannot fail a production deployment.
 export const revalidate = 3_600
 
-export const metadata: Metadata = {
-  title: 'State of Agent Skills 2026',
-  description:
-    'Open data report on AI agent skill specificity, maintenance, licenses, trust, install readiness, risk, and real agent outcome evidence.',
-  alternates: {
-    canonical: REPORT_URL,
-  },
-  openGraph: {
-    title: 'State of Agent Skills 2026',
-    description:
-      'A transparent OpenAgentSkill ecosystem report with methodology and downloadable JSON, CSV, and text data.',
-    url: REPORT_URL,
-    type: 'article',
-  },
-}
+export const metadata: Metadata = getResourceMetadata('research')
 
 function percent(count: number, total: number) {
   if (total <= 0) return '0%'
@@ -131,7 +118,7 @@ export default async function StateOfAgentSkillsPage() {
   ]
 
   return (
-    <MarketingPageShell>
+    <ResourcePageShell page="research">
       <MarketingHero
         eyebrow="Open research · 2026 edition"
         title="State of Agent Skills 2026."
@@ -368,6 +355,6 @@ export default async function StateOfAgentSkillsPage() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
         />
       ))}
-    </MarketingPageShell>
+    </ResourcePageShell>
   )
 }
