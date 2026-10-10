@@ -249,9 +249,9 @@ async function LocalizedComparePage({ locale }: { locale: MarketLocale }) {
 function LocalizedApiDocsPage({ locale }: { locale: MarketLocale }) {
   const copy = getLocalizedNavigationContent(locale).apiDocs
   const endpoints = [
-    { label: copy.agentResolve, description: copy.agentResolveDescription, method: 'GET', path: '/api/agent/resolve?task=your+task&format=text', icon: SearchCheck },
-    { label: copy.registry, description: copy.registryDescription, method: 'GET', path: '/api/registry/search?task=your+task', icon: FileCode2 },
-    { label: copy.outcomes, description: copy.outcomesDescription, method: 'POST', path: '/api/agent/outcome', icon: ArrowRight },
+    { id: 'agent-resolve', label: copy.agentResolve, description: copy.agentResolveDescription, method: 'GET', path: '/api/agent/resolve?task=your+task&format=text', icon: SearchCheck },
+    { id: 'registry-api', label: copy.registry, description: copy.registryDescription, method: 'GET', path: '/api/registry/search?task=your+task', icon: FileCode2 },
+    { id: 'agent-outcome', label: copy.outcomes, description: copy.outcomesDescription, method: 'POST', path: '/api/agent/outcome', icon: ArrowRight },
   ]
 
   return (
@@ -259,7 +259,7 @@ function LocalizedApiDocsPage({ locale }: { locale: MarketLocale }) {
       <MarketingHero eyebrow={copy.eyebrow} title={copy.title} description={copy.description} />
       <div className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
         <section>
-          <h2 className="font-display text-3xl font-normal">{copy.baseUrls}</h2>
+          <h2 id="base-url" className="font-display text-3xl font-normal">{copy.baseUrls}</h2>
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             {['https://www.openagentskill.com/api/registry', 'https://www.openagentskill.com/api/agent', 'https://www.openagentskill.com/api/skills'].map((url) => (
               <code key={url} className="min-w-0 break-all border border-border bg-card p-4 font-mono text-xs leading-6 text-secondary">{url}</code>
@@ -268,7 +268,7 @@ function LocalizedApiDocsPage({ locale }: { locale: MarketLocale }) {
         </section>
 
         <section className="mt-12 border-y border-border py-10">
-          <h2 className="font-display text-3xl font-normal">{copy.responseFormats}</h2>
+          <h2 id="response-formats" className="font-display text-3xl font-normal">{copy.responseFormats}</h2>
           <div className="mt-5 grid gap-4 md:grid-cols-2">
             <article className="border border-border bg-card p-5">
               <code className="font-mono text-sm">format=json</code>
@@ -282,12 +282,12 @@ function LocalizedApiDocsPage({ locale }: { locale: MarketLocale }) {
         </section>
 
         <section className="pt-10">
-          <h2 className="font-display text-3xl font-normal">{copy.endpointOverview}</h2>
+          <h2 id="endpoints" className="font-display text-3xl font-normal">{copy.endpointOverview}</h2>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
             {endpoints.map((endpoint) => {
               const Icon = endpoint.icon
               return (
-                <article key={endpoint.path} className="flex min-w-0 flex-col border border-border bg-card p-5">
+                <article id={endpoint.id} key={endpoint.path} className="flex min-w-0 flex-col border border-border bg-card p-5">
                   <Icon className="h-5 w-5 text-[#006b4f]" aria-hidden="true" />
                   <h3 className="mt-5 font-display text-xl font-semibold">{endpoint.label}</h3>
                   <p className="mt-3 text-sm leading-6 text-secondary">{endpoint.description}</p>

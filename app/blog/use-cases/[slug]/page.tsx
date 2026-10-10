@@ -1,8 +1,8 @@
+import { resourceMetadata, jsonLd } from '@/lib/seo/resource-pages'
+import { ResourcePageShell } from '@/components/resource-page'
 import type { Metadata } from 'next'
 import Link from '@/components/crawl-link'
 import { notFound } from 'next/navigation'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
 import { getAllSkills } from '@/lib/db/skills'
 import { SKILL_STACKS } from '@/lib/collections'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
@@ -22,19 +22,7 @@ export async function generateMetadata({
   const title = `Best ${useCase.shortTitle} skills for AI agents`
   const description = `Compare high-quality AI agent skills for ${useCase.shortTitle.toLowerCase()}, including quality signals, workflow fit, and installation paths.`
 
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: `https://www.openagentskill.com/blog/use-cases/${slug}`,
-    },
-    openGraph: {
-      title: `${title} — OpenAgentSkill Update`,
-      description,
-      url: `https://www.openagentskill.com/blog/use-cases/${slug}`,
-      type: 'article',
-    },
-  }
+  return resourceMetadata({ title, description, path: `/blog/use-cases/${slug}`, article: true })
 }
 
 export default async function BlogUseCaseGuidePage({
@@ -54,6 +42,9 @@ export default async function BlogUseCaseGuidePage({
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: `Best ${useCase.shortTitle} skills for AI agents`,
+    inLanguage: 'en',
+    mainEntityOfPage: `https://www.openagentskill.com/blog/use-cases/${slug}`,
+    author: { '@type': 'Organization', name: 'OpenAgentSkill', url: 'https://www.openagentskill.com/about' },
     description: useCase.description,
     url: `https://www.openagentskill.com/blog/use-cases/${slug}`,
     publisher: {
@@ -64,19 +55,14 @@ export default async function BlogUseCaseGuidePage({
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <ResourcePageShell page="blog" detail={{ title: useCase.shortTitle, path: `/blog/use-cases/${slug}` }}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
       />
-      <SiteHeader />
 
-      <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-        <nav className="mb-8 flex items-center gap-2 text-sm text-secondary">
-          <Link href="/blog" className="hover:text-foreground">Blog</Link>
-          <span>/</span>
-          <span className="text-foreground">{useCase.shortTitle}</span>
-        </nav>
+
+      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
 
         <article>
           <header className="border-b border-border pb-10">
@@ -88,13 +74,13 @@ export default async function BlogUseCaseGuidePage({
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
                 href={`/use-cases/${useCase.slug}`}
-                className="border border-foreground bg-foreground px-5 py-2 text-sm font-semibold text-background transition-opacity hover:opacity-80"
+                className="border border-[var(--brand)] bg-[var(--brand)] px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-80 inline-flex min-h-11 items-center rounded-lg"
               >
                 Open use-case page
               </Link>
               <Link
                 href={`/skills?useCase=${useCase.slug}&quality=excellent`}
-                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground inline-flex min-h-11 items-center rounded-lg"
               >
                 Browse excellent matches
               </Link>
@@ -108,7 +94,7 @@ export default async function BlogUseCaseGuidePage({
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {useCase.workflows.map((workflow) => (
-                <div key={workflow} className="border border-border p-4">
+                <div key={workflow} className="border border-border p-4 rounded-xl">
                   <h3 className="font-display text-lg font-semibold">{workflow}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-secondary">
                     Use quality and freshness signals to decide whether a skill belongs in this workflow.
@@ -127,7 +113,7 @@ export default async function BlogUseCaseGuidePage({
               {skills.length > 1 && (
                 <Link
                   href={`/compare?skills=${encodeURIComponent(skills.slice(0, 4).map((skill) => skill.slug).join(','))}`}
-                  className="self-start border border-border px-4 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground sm:self-auto"
+                  className="self-start border border-border px-4 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground sm:self-auto inline-flex min-h-11 items-center rounded-lg"
                 >
                   Compare top 4
                 </Link>
@@ -172,7 +158,7 @@ export default async function BlogUseCaseGuidePage({
                   <Link
                     key={stack.slug}
                     href={`/collections/${stack.slug}`}
-                    className="border border-border p-5 transition-colors hover:border-foreground"
+                    className="border border-border p-5 transition-colors hover:border-foreground rounded-xl"
                   >
                     <p className="text-xs uppercase tracking-widest text-secondary">{stack.eyebrow}</p>
                     <h3 className="mt-2 font-display text-xl font-semibold">{stack.title}</h3>
@@ -183,9 +169,8 @@ export default async function BlogUseCaseGuidePage({
             </section>
           )}
         </article>
-      </main>
+      </div>
 
-      <SiteFooter />
-    </div>
+    </ResourcePageShell>
   )
 }

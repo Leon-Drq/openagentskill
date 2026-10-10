@@ -1,19 +1,15 @@
+import { getResourceMetadata } from '@/lib/seo/resource-pages'
+import { ResourcePageShell, ResourceContents } from '@/components/resource-page'
 import { NavigationHubLinks } from '@/components/navigation-hub-links'
 import { Metadata } from 'next'
 import Link from '@/components/crawl-link'
-import { MarketingHero, MarketingPageShell } from '@/components/marketing-page'
+import { MarketingHero } from '@/components/marketing-page'
 
-export const metadata: Metadata = {
-  title: 'Documentation - OpenAgentSkill',
-  description: 'Learn how to discover, install, and use skills with your AI agents.',
-  alternates: {
-    canonical: 'https://www.openagentskill.com/docs',
-  },
-}
+export const metadata: Metadata = getResourceMetadata('docs')
 
 export default function DocsPage() {
   return (
-    <MarketingPageShell>
+    <ResourcePageShell page="docs">
       <NavigationHubLinks hub="developers" />
         <MarketingHero
           eyebrow="Documentation"
@@ -23,9 +19,11 @@ export default function DocsPage() {
 
         <div className="mx-auto max-w-4xl px-6 py-12 sm:py-14 lg:py-16">
 
+        <ResourceContents items={[{"id": "what-are-skills", "label": "What are skills?"}, {"id": "getting-started", "label": "Getting started"}, {"id": "ranking", "label": "How skills are ranked"}, {"id": "browse-skills", "label": "Browse skills"}, {"id": "for-agents", "label": "For AI Agents"}, {"id": "creating-skills", "label": "Creating skills"}, {"id": "security", "label": "Security"}]} />
+
         {/* What are skills? */}
         <section className="mb-10 sm:mb-12 lg:mb-16">
-          <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
+          <h2 id="what-are-skills" className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
             {'What are skills?'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed mb-4">
@@ -35,13 +33,13 @@ export default function DocsPage() {
 
         {/* Getting Started */}
         <section className="mb-10 sm:mb-12 lg:mb-16">
-          <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
+          <h2 id="getting-started" className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
             {'Getting started'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed mb-4">
             {'Resolve and inspect a skill before running the source installer:'}
           </p>
-          <div className="border border-border bg-card p-4 sm:p-6 mb-6">
+          <div className="border border-border bg-card p-4 sm:p-6 mb-6 rounded-xl">
             <pre className="font-mono text-sm sm:text-base overflow-x-auto">
               <code>{'npx --yes https://github.com/Leon-Drq/openagentskill/releases/download/cli-v0.3.0/openagentskill-0.3.0.tgz add <skill-slug> --agent codex --dry-run'}</code>
             </pre>
@@ -53,7 +51,7 @@ export default function DocsPage() {
 
         {/* How skills are ranked */}
         <section className="mb-10 sm:mb-12 lg:mb-16">
-          <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
+          <h2 id="ranking" className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
             {'How skills are ranked'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed mb-4">
@@ -66,7 +64,7 @@ export default function DocsPage() {
 
         {/* Browse skills */}
         <section className="mb-10 sm:mb-12 lg:mb-16">
-          <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
+          <h2 id="browse-skills" className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
             {'Browse skills'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed">
@@ -80,13 +78,13 @@ export default function DocsPage() {
 
         {/* API Access */}
         <section className="mb-10 sm:mb-12 lg:mb-16">
-          <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
+          <h2 id="for-agents" className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
             {'For AI Agents'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed mb-4">
             {'AI agents can programmatically access skills via our API:'}
           </p>
-          <div className="border border-border bg-card p-4 sm:p-6 mb-6">
+          <div className="border border-border bg-card p-4 sm:p-6 mb-6 rounded-xl">
             <pre className="font-mono text-xs sm:text-sm overflow-x-auto">
               <code>{`# Get all skills in plain text format
 GET /api/agent/skills?format=text
@@ -115,7 +113,7 @@ GET /api/agent/skills/advanced-web-research?format=text`}</code>
 
         {/* Creating Skills */}
         <section className="mb-10 sm:mb-12 lg:mb-16">
-          <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
+          <h2 id="creating-skills" className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
             {'Creating skills'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed mb-4">
@@ -130,7 +128,7 @@ GET /api/agent/skills/advanced-web-research?format=text`}</code>
           <p className="text-base sm:text-lg leading-relaxed">
             {'Example SKILL.md structure:'}
           </p>
-          <div className="border border-border bg-card p-4 sm:p-6 mt-4">
+          <div className="border border-border bg-card p-4 sm:p-6 mt-4 rounded-xl">
             <pre className="font-mono text-xs sm:text-sm overflow-x-auto">
               <code>{`---
 name: my-awesome-skill
@@ -148,7 +146,7 @@ Explain when an agent should use the skill and the steps it should follow.`}</co
 
         {/* Security */}
         <section className="mb-10 sm:mb-12 lg:mb-16 border-t border-border pt-10 sm:pt-12">
-          <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
+          <h2 id="security" className="font-display text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
             {'Security'}
           </h2>
           <p className="text-base sm:text-lg leading-relaxed mb-4">
@@ -163,6 +161,6 @@ Explain when an agent should use the skill and the steps it should follow.`}</co
           </p>
         </section>
         </div>
-    </MarketingPageShell>
+    </ResourcePageShell>
   )
 }

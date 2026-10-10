@@ -1,27 +1,14 @@
+import { getResourceMetadata } from '@/lib/seo/resource-pages'
+import { ResourcePageShell, ReportMethod } from '@/components/resource-page'
 import type { Metadata } from 'next'
 import Link from '@/components/crawl-link'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
 import { getAllSkills, getSkillEventStatsMap, type SkillEventStats, type SkillRecord } from '@/lib/db/skills'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  title: 'Monthly Agent Skills Index',
-  description:
-    'OpenAgentSkill monthly index report: production-ready agent skills, new indexed skills, maintained repositories, and ecosystem engagement signals.',
-  alternates: {
-    canonical: 'https://www.openagentskill.com/reports/monthly',
-  },
-  openGraph: {
-    title: 'Monthly Agent Skills Index - OpenAgentSkill',
-    description: 'A monthly data report for the AI agent skills ecosystem.',
-    url: 'https://www.openagentskill.com/reports/monthly',
-    type: 'website',
-  },
-}
+export const metadata: Metadata = getResourceMetadata('monthly')
 
 function dateValue(value: string | null | undefined) {
   if (!value) return 0
@@ -143,10 +130,9 @@ export default async function MonthlyReportPage() {
   const totalEvents = Object.values(eventStatsMap).reduce((sum, stats) => sum + Number(stats.total_events || 0), 0)
 
   return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
+    <ResourcePageShell page="monthly">
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         <section className="border-b border-border pb-10">
           <p className="mb-4 text-xs uppercase tracking-widest text-secondary">Monthly report</p>
           <h1 className="font-display text-4xl font-bold leading-tight text-balance md:text-6xl">
@@ -159,27 +145,29 @@ export default async function MonthlyReportPage() {
           <div className="mt-7 grid grid-cols-2 gap-px border border-border bg-border text-center md:grid-cols-4">
             <div className="bg-background p-4">
               <div className="font-mono text-2xl">{skills.length.toLocaleString()}</div>
-              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Skills</div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Sample size</div>
             </div>
             <div className="bg-background p-4">
               <div className="font-mono text-2xl">{formatCompactNumber(totalStars)}</div>
-              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">GitHub stars</div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Stars in sample</div>
             </div>
             <div className="bg-background p-4">
               <div className="font-mono text-2xl">{productionCandidates.length}</div>
-              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Production</div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Candidates shown</div>
             </div>
             <div className="bg-background p-4">
               <div className="font-mono text-2xl">{formatCompactNumber(totalEvents)}</div>
-              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Events</div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-secondary">Cumulative events</div>
             </div>
           </div>
         </section>
 
+        <ReportMethod count={skills.length} days={30} generatedAt={new Date().toISOString()} />
+
         <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
           <div>
             <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Production candidates</p>
-            <h2 className="font-display text-2xl font-semibold">Highest trust skills this month</h2>
+            <h2 className="font-display text-2xl font-semibold">Current trust shortlist</h2>
             <p className="mt-3 text-sm leading-relaxed text-secondary">
               Skills with strong trust profiles across install path, repository, license, adoption, and maintenance.
             </p>
@@ -193,7 +181,7 @@ export default async function MonthlyReportPage() {
             <h2 className="font-display text-2xl font-semibold">Fresh skills added in the last 30 days</h2>
           </div>
           {newSkills.length > 0 ? <SkillRows skills={newSkills} metric="stars" /> : (
-            <p className="text-sm text-secondary">No newly indexed skills in the current monthly window yet.</p>
+            <p className="text-sm text-secondary">No newly indexed records appear in this monthly sample.</p>
           )}
         </section>
 
@@ -203,14 +191,14 @@ export default async function MonthlyReportPage() {
             <h2 className="font-display text-2xl font-semibold">Recently pushed repositories</h2>
           </div>
           {recentlyUpdated.length > 0 ? <SkillRows skills={recentlyUpdated} metric="fresh" /> : (
-            <p className="text-sm text-secondary">No recent GitHub push data in this monthly window yet.</p>
+            <p className="text-sm text-secondary">No recent GitHub push data appears in this monthly sample.</p>
           )}
         </section>
 
         <section className="grid gap-8 border-b border-border py-10 lg:grid-cols-[0.75fr_1.25fr]">
           <div>
             <p className="mb-3 text-xs uppercase tracking-widest text-secondary">GitHub adoption</p>
-            <h2 className="font-display text-2xl font-semibold">Most starred skills in the index</h2>
+            <h2 className="font-display text-2xl font-semibold">Most starred skills in this sample</h2>
           </div>
           <SkillRows skills={topStarred} metric="stars" />
         </section>
@@ -224,9 +212,8 @@ export default async function MonthlyReportPage() {
             <p className="text-sm text-secondary">Engagement rows will appear as users view, save, compare, and copy install commands.</p>
           )}
         </section>
-      </main>
+      </div>
 
-      <SiteFooter />
-    </div>
+    </ResourcePageShell>
   )
 }

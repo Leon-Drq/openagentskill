@@ -1,9 +1,8 @@
+import { ResourcePageShell } from '@/components/resource-page'
 import type { Metadata } from 'next'
 import Link from '@/components/crawl-link'
 import { notFound } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAllSkills, type SkillRecord } from '@/lib/db/skills'
 import { getSkillDecisionProfile } from '@/lib/decision'
@@ -125,7 +124,7 @@ export default async function GrowthGuidePage({
   const exampleIds = scenario?.exampleIds || []
 
   return (
-    <div className="min-h-screen bg-background">
+    <ResourcePageShell page="guides" detail={{ title: guide.shortTitle, path: `/guides/${slug}` }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([
         getFaqSchema(guide),
         {
@@ -135,24 +134,10 @@ export default async function GrowthGuidePage({
           author: { '@type': 'Organization', name: 'OpenAgentSkill', url: 'https://www.openagentskill.com/about' },
           ...(guide.updatedAt ? { dateModified: guide.updatedAt } : {}),
         },
-        {
-          '@context': 'https://schema.org', '@type': 'BreadcrumbList',
-          itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Guides', item: 'https://www.openagentskill.com/guides' },
-            { '@type': 'ListItem', position: 2, name: guide.shortTitle, item: `https://www.openagentskill.com/guides/${guide.slug}` },
-          ],
-        },
       ]).replace(/</g, '\\u003c') }} />
-      <SiteHeader />
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-        <nav className="mb-8 flex flex-wrap items-center gap-2 text-sm text-secondary">
-          <Link href="/guides" className="hover:text-foreground">
-            Guides
-          </Link>
-          <span>/</span>
-          <span className="text-foreground">{guide.shortTitle}</span>
-        </nav>
+
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
 
         <section className="grid gap-10 border-b border-border pb-10 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
@@ -164,30 +149,30 @@ export default async function GrowthGuidePage({
               <Link
                 href={`/resolve?task=${encodeURIComponent(guide.heroPrompt)}`}
                 prefetch={false}
-                className="border border-foreground bg-foreground px-5 py-2 text-sm text-background transition-colors hover:bg-background hover:text-foreground"
+                className="border border-[var(--brand)] bg-[var(--brand)] px-5 py-2 text-sm text-white transition-colors hover:bg-background hover:text-foreground inline-flex min-h-11 items-center rounded-lg"
               >Find skills for this task</Link>
               <a
                 href={`/api/agent/resolve?task=${encodeURIComponent(guide.heroPrompt)}&agent=${encodeURIComponent((guide.platformLabel || 'auto').toLowerCase().replace(/\s+/g, '-'))}&limit=4&format=text`}
-                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground inline-flex min-h-11 items-center rounded-lg"
               >
                 Run resolve API
               </a>
               <Link
                 href={useCase ? `/use-cases/${useCase.slug}` : '/skills?sort=quality'}
-                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground inline-flex min-h-11 items-center rounded-lg"
               >
                 {useCase ? 'View use case' : 'Browse skills'}
               </Link>
               <Link
                 href="/api-docs"
-                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground"
+                className="border border-border px-5 py-2 text-sm text-secondary transition-colors hover:border-foreground hover:text-foreground inline-flex min-h-11 items-center rounded-lg"
               >
                 Agent API docs
               </Link>
             </div>
           </div>
 
-          <div className="border border-border bg-card p-5">
+          <div className="border border-border bg-card p-5 rounded-xl">
             <p className="mb-3 text-xs uppercase tracking-widest text-secondary">Decision prompt</p>
             <p className="text-lg leading-relaxed text-foreground">{guide.heroPrompt}</p>
             <div className="mt-5 grid grid-cols-2 gap-px border border-border bg-border text-center">
@@ -240,7 +225,7 @@ export default async function GrowthGuidePage({
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               {comparisonSkills.map(({ skill, quality, trust, audit, decision, platforms }) => (
-                <article key={skill.slug} className="border border-border bg-card p-5">
+                <article key={skill.slug} className="border border-border bg-card p-5 rounded-xl">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <Link href={`/skills/${skill.slug}`} className="font-display text-2xl font-semibold hover:underline">
@@ -308,15 +293,15 @@ export default async function GrowthGuidePage({
             <span className="text-sm text-secondary">Task-matched candidates · not exhaustive</span>
           </div>
 
-          {scenario && <div className="mb-6 grid gap-4 md:grid-cols-2">{scenarioSources.map(source => <article key={source.id} className="border border-border bg-card p-5"><h3 className="font-display text-xl"><Link href={scenarioProfileHref(source)} className="underline underline-offset-4">{source.name}</Link></h3><p className="mt-3 text-sm leading-7">{source.role}</p><p className="mt-3 text-sm leading-7 text-secondary">Setup: {source.setup}</p><p className="mt-3 text-sm leading-7 text-secondary">{source.limits}</p><a href={scenarioSourceUrl(source)} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-11 items-center text-sm text-[#006b4f] underline underline-offset-4">Read pinned SKILL.md ↗</a></article>)}</div>}
+          {scenario && <div className="mb-6 grid gap-4 md:grid-cols-2">{scenarioSources.map(source => <article key={source.id} className="border border-border bg-card p-5 rounded-xl"><h3 className="font-display text-xl"><Link href={scenarioProfileHref(source)} className="underline underline-offset-4">{source.name}</Link></h3><p className="mt-3 text-sm leading-7">{source.role}</p><p className="mt-3 text-sm leading-7 text-secondary">Setup: {source.setup}</p><p className="mt-3 text-sm leading-7 text-secondary">{source.limits}</p><a href={scenarioSourceUrl(source)} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-11 items-center text-sm text-[#006b4f] underline underline-offset-4">Read pinned SKILL.md ↗</a></article>)}</div>}
           {!scenario && primarySkills.length === 0 && (
-            <p className="border border-border p-5 text-sm text-secondary">
+            <p className="border border-border p-5 text-sm text-secondary rounded-xl">
               No matching candidates are available in this shortlist right now. The guidance below remains available; use the Skill Finder to search your exact task. Unrelated popular skills are not substituted.
             </p>
           )}
           <div className="grid gap-4 lg:grid-cols-4">
             {primarySkills.map(({ skill, quality, trust, audit, decision, platforms, useCases }) => (
-              <article key={skill.slug} className="flex flex-col justify-between border border-border bg-card p-5">
+              <article key={skill.slug} className="flex flex-col justify-between border border-border bg-card p-5 rounded-xl">
                 <div>
                   <div className="mb-3 flex flex-wrap gap-2">
                     <span className="border border-border px-2 py-1 text-xs font-mono text-secondary">
@@ -380,7 +365,7 @@ export default async function GrowthGuidePage({
           </div>
           <div className="grid gap-3">
             {guide.steps.map((step, index) => (
-              <div key={step.title} className="grid gap-4 border border-border bg-card p-5 sm:grid-cols-[auto_1fr]">
+              <div key={step.title} className="grid gap-4 border border-border bg-card p-5 sm:grid-cols-[auto_1fr] rounded-xl">
                 <span className="font-mono text-sm text-secondary">{String(index + 1).padStart(2, '0')}</span>
                 <div>
                   <h3 className="font-display text-lg font-semibold">{step.title}</h3>
@@ -398,7 +383,7 @@ export default async function GrowthGuidePage({
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             {guide.sections.map((section) => (
-              <article key={section.title} className="border border-border bg-card p-5">
+              <article key={section.title} className="border border-border bg-card p-5 rounded-xl">
                 <h3 className="font-display text-xl font-semibold">{section.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-secondary">{section.body}</p>
                 <ul className="mt-4 space-y-2 text-sm leading-relaxed text-secondary">
@@ -476,7 +461,7 @@ export default async function GrowthGuidePage({
                 <Link
                   key={related.slug}
                   href={`/guides/${related.slug}`}
-                  className="border border-border bg-card p-5 transition-colors hover:border-foreground"
+                  className="border border-border bg-card p-5 transition-colors hover:border-foreground rounded-xl"
                 >
                   <p className="text-xs uppercase tracking-widest text-secondary">{related.eyebrow}</p>
                   <h3 className="mt-2 font-display text-xl font-semibold">{related.shortTitle}</h3>
@@ -487,9 +472,8 @@ export default async function GrowthGuidePage({
           </section>
         )}
         <ScenarioExamples ids={exampleIds} />
-      </main>
+      </div>
 
-      <SiteFooter />
-    </div>
+    </ResourcePageShell>
   )
 }

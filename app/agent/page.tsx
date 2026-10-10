@@ -1,3 +1,5 @@
+import { getResourceMetadata } from '@/lib/seo/resource-pages'
+import { ResourcePageShell } from '@/components/resource-page'
 import { NavigationHubLinks } from '@/components/navigation-hub-links'
 import type { Metadata } from 'next'
 import Link from '@/components/crawl-link'
@@ -5,7 +7,6 @@ import {
   MarketingButtonLink,
   MarketingHero,
   MarketingMetricStrip,
-  MarketingPageShell,
 } from '@/components/marketing-page'
 import { AGENT_TASKS, FEATURED_AGENT_TASKS } from '@/lib/agent-tasks'
 import { withTimeout } from '@/lib/async'
@@ -19,20 +20,7 @@ import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  title: 'Agent Entry - OpenAgentSkill',
-  description:
-    'Agent-first entry point for OpenAgentSkill: resolve tasks, browse task pages, read the manifest, fetch OpenAPI, and inspect the GitHub discovery pipeline.',
-  alternates: {
-    canonical: 'https://www.openagentskill.com/agent',
-  },
-  openGraph: {
-    title: 'Agent Entry - OpenAgentSkill',
-    description: 'The agent-readable map for resolving, auditing, and installing AI agent skills.',
-    url: 'https://www.openagentskill.com/agent',
-    type: 'website',
-  },
-}
+export const metadata: Metadata = getResourceMetadata('agent')
 
 function endpointRows() {
   return [
@@ -114,7 +102,7 @@ export default async function AgentPage() {
   const discoveryDomains = HIGH_STAR_DISCOVERY_DOMAINS
 
   return (
-    <MarketingPageShell>
+    <ResourcePageShell page="agent">
       <NavigationHubLinks hub="developers" />
       <MarketingHero
         eyebrow="Agent entry"
@@ -182,7 +170,7 @@ export default async function AgentPage() {
           </div>
           <div className="grid gap-3 md:grid-cols-2">
             {FEATURED_AGENT_TASKS.map((task) => (
-              <Link key={task.slug} href={`/tasks/${task.slug}`} className="border border-border bg-card p-4 transition-colors hover:border-foreground">
+              <Link key={task.slug} href={`/tasks/${task.slug}`} className="border border-border bg-card p-4 transition-colors hover:border-foreground rounded-xl">
                 <p className="text-xs uppercase text-secondary">{task.useCaseSlug}</p>
                 <h3 className="mt-2 font-display text-xl font-semibold">{task.shortTitle}</h3>
                 <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-secondary">{task.intent}</p>
@@ -215,7 +203,7 @@ export default async function AgentPage() {
         <section className="grid gap-8 py-10 lg:grid-cols-[0.75fr_1.25fr]">
           <div>
             <p className="mb-3 text-xs uppercase text-secondary">Auto-discovery</p>
-            <h2 className="font-display text-2xl font-semibold">GitHub collection is scaling toward 10k+ skills</h2>
+            <h2 className="font-display text-2xl font-semibold">How the registry discovers and tracks sources</h2>
             <p className="mt-3 text-sm leading-relaxed text-secondary">
               Production cron calls the indexer hourly. It imports high-star, skill-like GitHub projects across scenario groups, excludes MCP-only projects, records runs, refreshes stars, and submits fresh URLs to search indexes.
             </p>
@@ -242,7 +230,7 @@ export default async function AgentPage() {
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {discoveryDomains.map((domain) => (
-                <div key={domain.key} className="border border-border bg-card p-4">
+                <div key={domain.key} className="border border-border bg-card p-4 rounded-xl">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-mono text-xs uppercase text-secondary">{domain.key}</p>
@@ -258,17 +246,17 @@ export default async function AgentPage() {
             </div>
 
             <div className="mt-4 grid gap-3 md:grid-cols-3">
-              <Link href="/api/agent/discovery" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground">
+              <Link href="/api/agent/discovery" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground rounded-xl">
                 <p className="text-xs uppercase text-secondary">Status API</p>
                 <h3 className="mt-2 font-display text-xl font-semibold">/api/agent/discovery</h3>
                 <p className="mt-2 text-sm leading-relaxed text-secondary">Public-safe scale plan, coverage matrix, thresholds, and recent run summary.</p>
               </Link>
-              <Link href="/api/indexer/run" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground">
+              <Link href="/api/indexer/run" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground rounded-xl">
                 <p className="text-xs uppercase text-secondary">Private cron</p>
                 <h3 className="mt-2 font-display text-xl font-semibold">/api/indexer/run</h3>
                 <p className="mt-2 text-sm leading-relaxed text-secondary">Requires automation bearer token. Production Vercel Cron runs it every hour.</p>
               </Link>
-              <Link href="/api/indexnow/submit" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground">
+              <Link href="/api/indexnow/submit" prefetch={false} className="border border-border bg-card p-5 transition-colors hover:border-foreground rounded-xl">
                 <p className="text-xs uppercase text-secondary">Index notification</p>
                 <h3 className="mt-2 font-display text-xl font-semibold">/api/indexnow/submit</h3>
                 <p className="mt-2 text-sm leading-relaxed text-secondary">Protected endpoint that submits newly published skill URLs and sitemap updates to IndexNow.</p>
@@ -290,7 +278,7 @@ export default async function AgentPage() {
             </div>
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
               {topSkills.map((skill) => (
-                <Link key={skill.slug} href={`/skills/${skill.slug}`} className="border border-border bg-card p-4 transition-colors hover:border-foreground">
+                <Link key={skill.slug} href={`/skills/${skill.slug}`} className="border border-border bg-card p-4 transition-colors hover:border-foreground rounded-xl">
                   <h3 className="font-display text-lg font-semibold">{skill.name}</h3>
                   <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary">{skill.description}</p>
                   <p className="mt-4 font-mono text-xs text-secondary">{skill.github_stars.toLocaleString()} stars</p>
@@ -300,6 +288,6 @@ export default async function AgentPage() {
           </section>
         )}
       </div>
-    </MarketingPageShell>
+    </ResourcePageShell>
   )
 }
