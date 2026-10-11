@@ -4,7 +4,7 @@ import { discoveryCopy } from './discovery.ts'
 import type en from './i18n/dictionaries/en'
 
 type NavKey = keyof typeof en.nav
-export type NavigationLink = { href: string; label: NavKey | 'gallery' | 'resources' | 'developers' | 'creatorShort' | 'reports' | 'contact' | 'sponsor' | 'categories' | 'membership' | 'originalSkills' }
+export type NavigationLink = { href: string; label: NavKey | 'gallery' | 'resources' | 'developers' | 'creatorShort' | 'reports' | 'contact' | 'sponsor' | 'categories' | 'membership' | 'originalSkills' | 'pricing' }
 export type NavigationSection = NavigationLink & { id: string; items?: readonly NavigationLink[]; activePaths?: readonly string[] }
 
 // Public destinations retained independently of the header's presentation.
@@ -31,15 +31,16 @@ export const SITE_NAVIGATION: readonly NavigationSection[] = [
   ] },
 ]
 
-// Desktop and mobile share four groups without removing any existing destination.
+// Desktop and mobile share the same destinations, including a direct Pricing link.
 const section = (id: string) => SITE_NAVIGATION.find(item => item.id === id)!
 export const HEADER_NAVIGATION: readonly NavigationSection[] = [
   { ...section('skills'), items: [
     { href: section('categories').href, label: 'categories' },
-    ...section('categories').items!,
+    ...section('categories').items!.filter(item => item.href !== '/membership'),
   ], activePaths: [...section('skills').activePaths!, ...section('categories').activePaths!] },
   section('rankings'),
   section('creators'),
+  { id: 'pricing', href: '/membership', label: 'pricing' },
   { ...section('resources'), items: [...section('resources').items!, ...section('developers').items!],
     activePaths: [...section('resources').activePaths!, ...section('developers').activePaths!] },
 ]
@@ -66,18 +67,18 @@ const partnershipLabels: Record<Locale, { contact: string; sponsor: string }> = 
   id: { contact: 'Kontak', sponsor: 'Sponsor' },
 }
 export const getPartnershipLabels = (locale: Locale) => partnershipLabels[locale]
-const studioLabels: Record<Locale, { membership: string; originalSkills: string }> = {
-  en: { membership: 'Membership', originalSkills: 'Original Skills' },
-  zh: { membership: '会员方案', originalSkills: '自有技能' },
-  ja: { membership: 'メンバーシップ', originalSkills: 'オリジナル Skill' },
-  ko: { membership: '멤버십', originalSkills: '오리지널 Skill' },
-  es: { membership: 'Membresía', originalSkills: 'Skills originales' },
-  de: { membership: 'Mitgliedschaft', originalSkills: 'Eigene Skills' },
-  fr: { membership: 'Abonnement', originalSkills: 'Skills originaux' },
-  id: { membership: 'Keanggotaan', originalSkills: 'Skill orisinal' },
+const studioLabels: Record<Locale, { membership: string; originalSkills: string; pricing: string }> = {
+  en: { membership: 'Membership', originalSkills: 'Original Skills', pricing: 'Pricing' },
+  zh: { membership: '会员方案', originalSkills: '自有技能', pricing: '价格方案' },
+  ja: { membership: 'メンバーシップ', originalSkills: 'オリジナル Skill', pricing: '料金' },
+  ko: { membership: '멤버십', originalSkills: '오리지널 Skill', pricing: '요금제' },
+  es: { membership: 'Membresía', originalSkills: 'Skills originales', pricing: 'Precios' },
+  de: { membership: 'Mitgliedschaft', originalSkills: 'Eigene Skills', pricing: 'Preise' },
+  fr: { membership: 'Abonnement', originalSkills: 'Skills originaux', pricing: 'Tarifs' },
+  id: { membership: 'Keanggotaan', originalSkills: 'Skill orisinal', pricing: 'Harga' },
 }
 export function navigationLabel(link: NavigationLink, locale: Locale, nav: Record<NavKey, string>, gallery: string) {
-  if (link.label === 'membership' || link.label === 'originalSkills') return studioLabels[locale][link.label]
+  if (link.label === 'membership' || link.label === 'originalSkills' || link.label === 'pricing') return studioLabels[locale][link.label]
   if (link.label === 'categories') return discoveryCopy(locale).categories
   if (link.label === 'contact' || link.label === 'sponsor') return partnershipLabels[locale][link.label]
   if (link.label === 'gallery') return gallery

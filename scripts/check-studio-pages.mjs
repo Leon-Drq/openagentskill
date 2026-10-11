@@ -24,6 +24,15 @@ for (const path of paths) {
   assert.ok(!attr(meta || {}, 'content')?.includes('noindex'), `${path} indexability`)
   const language = path.split('/')[1]
   const locale = locales.includes(language) ? language : 'en'
+  const pricingHref = `${locale === 'en' ? '' : '/' + locale}/membership`
+  const pricingNav = all.find(node => node.tagName === 'a' && attr(node, 'data-nav-section') === 'pricing')
+  assert.equal(attr(pricingNav, 'href'), pricingHref, `${path} localized Pricing navigation`)
+  if (path.endsWith('/membership')) {
+    assert.equal(attr(pricingNav, 'aria-current'), 'page', `${path} active Pricing navigation`)
+    const main = all.find(node => node.tagName === 'main')
+    assert.equal(nodes(main).filter(node => node.tagName === 'img').length, 0, `${path} image-free pricing`)
+    assert.equal(nodes(main).filter(node => node.tagName === 'article').length, 3, `${path} three plans`)
+  }
   assert.equal(attr(all.find(node => node.tagName === 'main'), 'lang'), locale)
   const standalonePrice = new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(4.99)
   assert.ok(all.some(node => node.tagName === 'strong' && nodes(node).filter(child => child.nodeName === '#text').map(child => child.value).join('') === standalonePrice), `${path} standalone USD 4.99`)

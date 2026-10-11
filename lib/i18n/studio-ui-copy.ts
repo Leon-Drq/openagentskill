@@ -17,4 +17,14 @@ const translations: Record<Exclude<Locale, 'en'>, typeof en> = {
   fr: { overview: 'Vue d’ensemble', editable: 'SVG modifiable', local: 'Exécution locale', formatCount: 'Trois formats', previewTitle: 'Une idée. Trois façons de la partager.', details: 'Dans ce Skill', comparePlans: 'Trouvez votre formule.', compareLead: 'Explorez librement. Choisissez un original selon vos besoins.', annualSaving: 'Économisez 34% par an', original: 'Un original OpenAgentSkill', memberArt: 'Votre prochaine idée prend forme.', collection: 'ORIGINAUX / 001' },
   id: { overview: 'Ringkasan', editable: 'SVG dapat diedit', local: 'Berjalan lokal', formatCount: 'Tiga format', previewTitle: 'Satu ide. Tiga cara untuk berbagi.', details: 'Isi Skill', comparePlans: 'Temukan pilihanmu.', compareLead: 'Jelajahi dengan bebas. Pilih karya orisinal sesuai kebutuhan.', annualSaving: 'Hemat 34% per tahun', original: 'Karya orisinal OpenAgentSkill', memberArt: 'Ide berikutnya, dalam bentuk terbaik.', collection: 'ORISINAL / 001' },
 }
-export function studioUiCopy(locale: Locale) { return locale === 'en' ? en : translations[locale] }
+const pricing: Record<Locale, { singlePlan: string; freePriceNote: string }> = {
+  en: { singlePlan: 'Single Skill', freePriceNote: 'No subscription needed' },
+  zh: { singlePlan: '单项购买', freePriceNote: '无需订阅' },
+  ja: { singlePlan: '単品購入', freePriceNote: 'サブスクリプション不要' },
+  ko: { singlePlan: '개별 구매', freePriceNote: '구독 없이 이용' },
+  es: { singlePlan: 'Skill individual', freePriceNote: 'Sin suscripción' },
+  de: { singlePlan: 'Einzelkauf', freePriceNote: 'Kein Abo nötig' },
+  fr: { singlePlan: 'Skill à l’unité', freePriceNote: 'Sans abonnement' },
+  id: { singlePlan: 'Skill satuan', freePriceNote: 'Tanpa langganan' },
+}
+export function studioUiCopy(locale: Locale) { return { ...(locale === 'en' ? en : translations[locale]), ...pricing[locale] } }

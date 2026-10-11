@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowRight, Check, Layers, Leaf, LockKeyhole, Sparkles } from 'lucide-react'
+import { ArrowRight, Check, Layers, LockKeyhole } from 'lucide-react'
 import Link from '@/components/crawl-link'
 import type { Locale } from '@/lib/i18n/config'
 import { studioCopy } from '@/lib/i18n/studio-copy'
@@ -49,25 +49,25 @@ export function MembershipPlans({ locale }: { locale: Locale }) {
     <div className={styles.billing}><Cycle yearly={yearly} setYearly={setYearly} locale={locale} /><span>{ui.annualSaving}</span></div>
     <div className={styles.plans}>
       <article className={styles.plan}>
-        <div className={styles.planIcon}><Leaf size={24} strokeWidth={1.4} aria-hidden="true" /></div><h2>{c.free}</h2><p className={styles.body}>{c.freeLead}</p>
-        <p className={styles.priceNote}>OpenAgentSkill</p><p className={styles.price}><strong>{studioPrice(0, locale)}</strong></p>
+        <div className={styles.planTop}><h2>{c.free}</h2></div><p className={styles.body}>{c.freeLead}</p>
+        <div className={styles.planPrice}><p className={styles.price}><strong>{studioPrice(0, locale)}</strong></p><p className={styles.priceNote}>{ui.freePriceNote}</p></div>
         <FeatureList items={c.freeFeatures} />
-        <Link href={getLocalizedNavigationHref('/skills?access=free', locale)} className={`${styles.button} ${styles.secondary} ${styles.full}`}>{c.freeAction}</Link>
+        <div className={styles.planAction}><Link href={getLocalizedNavigationHref('/skills?access=free', locale)} className={`${styles.button} ${styles.secondary} ${styles.full}`}>{c.freeAction}</Link></div>
       </article>
       <article className={`${styles.plan} ${styles.proPlan}`}>
-        <div className={styles.planTop}><div className={styles.planIcon}><Layers size={24} strokeWidth={1.4} aria-hidden="true" /></div><span className={styles.badge}>{c.preview}</span></div><h2>{c.pro}</h2><p className={styles.body}>{c.proLead}</p><p className={styles.priceNote}>{c.planned}</p>
-        <p className={styles.price} aria-live="polite"><strong>{studioPrice(yearly ? MEMBERSHIP.yearlyCents : MEMBERSHIP.monthlyCents, locale)}</strong><span>{yearly ? c.year : c.month}</span></p>
+        <div className={styles.planTop}><h2>{c.pro}</h2><span className={styles.badge}>{c.preview}</span></div><p className={styles.body}>{c.proLead}</p>
+        <div className={styles.planPrice}><p className={styles.price} aria-live="polite"><strong>{studioPrice(yearly ? MEMBERSHIP.yearlyCents : MEMBERSHIP.monthlyCents, locale)}</strong><span>{yearly ? c.year : c.month}</span></p><p className={styles.priceNote}>{c.planned}</p></div>
         <FeatureList items={c.proFeatures} />
-        <p className={styles.notice}>{yearly ? c.annually : c.monthlyNote}</p>
-        <button type="button" className={`${styles.button} ${styles.full}`} disabled aria-describedby="membership-status"><LockKeyhole size={15} aria-hidden="true" />{c.soon}</button>
+        <div className={styles.planAction}><p className={styles.notice}>{yearly ? c.annually : c.monthlyNote}</p>
+        <button type="button" className={`${styles.button} ${styles.full}`} disabled aria-describedby="membership-status">{c.soon}</button></div>
       </article>
       <article className={styles.plan}>
-        <div className={styles.planIcon}><Sparkles size={24} strokeWidth={1.4} aria-hidden="true" /></div><h2>{c.single}</h2><p className={styles.body}>{c.singleLead}</p><p className={styles.priceNote}>{c.planned} · {STUDIO_SKILL.name}</p>
-        <p className={styles.price}><strong>{studioPrice(STUDIO_SKILL.plannedPriceCents, locale)}</strong><span>{c.once}</span></p>
+        <div className={styles.planTop}><h2>{ui.singlePlan}</h2></div><p className={styles.body}>{c.singleLead}</p>
+        <div className={styles.planPrice}><p className={styles.price}><strong>{studioPrice(STUDIO_SKILL.plannedPriceCents, locale)}</strong><span>{c.once}</span></p><p className={styles.priceNote}>{c.planned} · {STUDIO_SKILL.name}</p></div>
         <FeatureList items={c.singleFeatures} />
-        <Link href={studioHref(STUDIO_SKILL.path, locale)} className={`${styles.button} ${styles.secondary} ${styles.full}`}>{c.singleAction}</Link>
+        <div className={styles.planAction}><Link href={studioHref(STUDIO_SKILL.path, locale)} className={`${styles.button} ${styles.secondary} ${styles.full}`}>{c.singleAction}<ArrowRight size={15} aria-hidden="true" /></Link></div>
       </article>
     </div>
-    <p id="membership-status" className={styles.notice}>{c.launchNote}</p>
+    <p id="membership-status" className={styles.memberNotice}>{c.previewNotice} {c.launchNote}</p>
   </section>
 }

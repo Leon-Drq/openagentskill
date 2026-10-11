@@ -15,7 +15,7 @@ function dictionary(locale) {
 assert.deepEqual(SITE_NAVIGATION.map(s => s.id), ['skills', 'categories', 'rankings', 'creators', 'resources', 'developers'])
 assert.equal(SITE_NAVIGATION.filter(s => s.items).length, 4)
 const links = SITE_NAVIGATION.flatMap(s => [s, ...(s.items || [])])
-assert.deepEqual(HEADER_NAVIGATION.map(s => s.id), ['skills', 'rankings', 'creators', 'resources'])
+assert.deepEqual(HEADER_NAVIGATION.map(s => s.id), ['skills', 'rankings', 'creators', 'pricing', 'resources'])
 const headerLinks = HEADER_NAVIGATION.flatMap(s => [s, ...(s.items || [])])
 for (const link of links) assert.ok(headerLinks.some(item => item.href === link.href), `Keep existing navigation destination ${link.href}`)
 for (const oldSection of SITE_NAVIGATION) {
@@ -29,6 +29,7 @@ for (const locale of ['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr', 'id']) {
   for (const link of headerLinks) assert.ok(navigationLabel(link, locale, nav, 'Gallery')?.trim())
   for (const value of Object.values(getNavigationCopy(locale))) assert.ok(value.trim())
   for (const value of Object.values(getNavigationAccountCopy(locale))) assert.ok(value.trim())
+  assert.deepEqual(HEADER_NAVIGATION.filter(section => isNavigationSectionActive(`/${locale}/membership`, section)).map(section => section.id), ['pricing'], 'Pricing has one active top-level entry')
 }
 assert.ok(isNavigationPath('/zh/skills?sort=stars', '/skills'))
 assert.ok(!isNavigationPath('/creators', '/creator'))

@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowRight, Info, Layers, PenTool, Terminal } from 'lucide-react'
+import { ArrowRight, Layers, PenTool, Terminal } from 'lucide-react'
 import Link from '@/components/crawl-link'
 import { MarketingPageShell } from '@/components/marketing-page'
 import { jsonLd } from '@/lib/seo/resource-pages'
@@ -9,7 +9,6 @@ import { type Locale } from '@/lib/i18n/config'
 import { STUDIO_SKILL, studioHref } from '@/lib/studio/catalog'
 import { PreviewGallery } from './preview-gallery'
 import { FeatureList, MembershipPlans, PurchaseOptions } from './pricing-options'
-import { Artwork } from './artwork'
 import styles from './studio.module.css'
 
 function PageData({ locale, kind }: { locale: Locale; kind: 'membership' | 'skill' }) {
@@ -57,16 +56,12 @@ export function MembershipPage({ locale }: { locale: Locale }) {
   const ui = studioUiCopy(locale)
   return <MarketingPageShell language={locale} mainClassName={styles.page}>
     <PageData locale={locale} kind="membership" />
-    <nav className={styles.crumbs} aria-label={c.membership}><Link href={studioHref('/', locale)}>{c.home}</Link><span aria-hidden="true">/</span><span>{c.membership}</span></nav>
     <header className={styles.memberHero}>
-      <div className={styles.memberIntro}><p className={styles.eyebrow}>OPENAGENTSKILL / MEMBERSHIP</p><h1>{c.memberTitle}</h1><p className={styles.lead}>{c.memberLead}</p><div className={styles.heroActions}><a href="#plans" className={styles.button}>{c.compare}<ArrowDown size={16} aria-hidden="true" /></a><Link href={studioHref(STUDIO_SKILL.path, locale)} className={styles.textLink}>{c.exploreExample}<ArrowRight size={15} aria-hidden="true" /></Link></div></div>
-      <figure className={styles.heroSample}>
-        <Artwork locale={locale} />
-        <figcaption><span>{ui.memberArt}</span><span className={styles.badge}>{c.preview}</span></figcaption>
-      </figure>
+      <p className={styles.eyebrow}>OPENAGENTSKILL / PRICING</p>
+      <h1>{ui.comparePlans}</h1>
+      <p className={styles.lead}>{ui.compareLead}</p>
     </header>
-    <div className={styles.plansSection} id="plans"><div className={styles.plansHeading}><h2>{ui.comparePlans}</h2><p className={styles.body}>{ui.compareLead}</p></div><MembershipPlans locale={locale} /></div>
-    <p className={styles.memberNotice}><Info size={17} aria-hidden="true" /><span>{c.previewNotice}</span></p>
+    <div className={styles.plansSection} id="plans"><MembershipPlans locale={locale} /></div>
     <section className={styles.scope}><h2>{c.scopeTitle}</h2><p className={styles.body}>{c.scopeBody}</p></section>
     <section className={styles.faq}><h2>{c.faq}</h2>{c.questions.map(([question, answer]) => <details key={question}><summary>{question}</summary><p className={styles.body}>{answer}</p></details>)}</section>
     <Closing locale={locale} membership />
