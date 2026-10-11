@@ -3,7 +3,7 @@
 ## Public release scope
 
 - `/studio/launch-card-studio`: one original product example, three real SVG outputs, format switching and free sample downloads. Desktop preview left / access options right; mobile preview, access, details.
-- `/membership`: free directory, planned Pro subscription and standalone purchase. Planned USD prices: 9.99 single, 9.99 monthly, 79 yearly, with the full annual amount shown.
+- `/membership`: free directory, planned Pro subscription and standalone purchase. Planned USD prices: **4.99 single** (owner correction), 9.99 monthly, 79 yearly, with the full annual amount shown.
 - Both routes have English, Chinese, Japanese, Korean, Spanish, German, French and Indonesian versions, shared navigation language selection, canonical/hreflang, WebPage JSON-LD and sitemap entries.
 - Skills keeps its established layout and actual paid count. A preview card appears only in a healthy, empty paid filter. Navigation and footer provide membership discovery.
 
