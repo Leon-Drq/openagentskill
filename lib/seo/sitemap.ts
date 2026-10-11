@@ -1,6 +1,5 @@
 import { AGENT_TASKS } from '@/lib/agent-tasks'
 import { studioSitemapEntries } from '@/lib/studio/seo'
-import { motionSitemapEntries } from '@/lib/motion/seo'
 import { creatorBlogSitemapEntries } from '@/lib/blog/routes'
 import { SKILL_STACKS } from '@/lib/collections'
 import { getSkillSitemapSnapshot } from '@/lib/seo/skill-sitemap-data'
@@ -153,7 +152,6 @@ export function getCoreSitemapEntries(): SitemapEntry[] {
   return [
     ...staticPages,
     ...studioSitemapEntries(),
-    ...motionSitemapEntries(),
     ...creatorBlogSitemapEntries(SITEMAP_BASE_URL),
     ...localizedPages,
     ...localizedCorePages,

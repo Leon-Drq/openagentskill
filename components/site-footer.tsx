@@ -87,7 +87,6 @@ export function SiteFooter() {
 <FooterLink href="/skills" className="hover:text-foreground">{t.nav.skills}</FooterLink>
                 <FooterLink href="/showcase" className="hover:text-foreground">{getShowcaseNavLabel(locale)}</FooterLink>
                 <FooterLink href="/membership" className="hover:text-foreground">{navigationLabel({ href: '/membership', label: 'membership' }, locale, t.nav, '')}</FooterLink>
-                <FooterLink href="/studio/motion" className="hover:text-foreground">{navigationLabel({ href: '/studio/motion', label: 'motion' }, locale, t.nav, '')}</FooterLink>
                 <FooterLink href="/skills/new" className="hover:text-foreground">{siteCopy(locale, "New submissions")}</FooterLink>
                 <FooterLink href="/agent-skills" className="hover:text-foreground">Agent Skills</FooterLink>
                 <details className="group">

@@ -17,7 +17,7 @@ function PageData({ locale, kind }: { locale: Locale; kind: 'membership' | 'skil
 function Closing({ locale, membership = false }: { locale: Locale; membership?: boolean }) {
   const c = studioCopy(locale)
   return <section className={styles.closing}><div><h2>{c.footerTitle}</h2><p className={styles.body}>{c.footerBody}</p></div>
-    <div className="flex flex-wrap gap-3"><Link href={studioHref(membership ? STUDIO_SKILL.path : '/membership', locale)} className={styles.button}>{membership ? c.exploreExample : c.membership}<ArrowRight size={16} aria-hidden="true" /></Link><Link href={locale === 'zh' ? '/zh/studio/motion' : '/studio/motion'} className={styles.button}>{locale === 'zh' ? '探索动效作品库' : 'Explore Motion Studio'}<ArrowRight size={16} aria-hidden="true" /></Link></div>
+    <Link href={studioHref(membership ? STUDIO_SKILL.path : '/membership', locale)} className={styles.button}>{membership ? c.exploreExample : c.membership}<ArrowRight size={16} aria-hidden="true" /></Link>
   </section>
 }
 export function StudioSkillPage({ locale }: { locale: Locale }) {

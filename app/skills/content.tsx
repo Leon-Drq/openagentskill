@@ -31,6 +31,8 @@ import { getSearchMetadataCopy } from '@/lib/seo/search-metadata'
 import { getGitHubOwner } from '@/lib/github-owner'
 import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
 import { directoryCategoryOptions, matchesDirectoryCategory, isDirectorySnapshot, sortDirectoryCandidates } from '@/lib/skills/directory'
+import { MOTION_CATEGORY } from '@/lib/motion/shared'
+import { selectMotionDirectoryEntries } from '@/lib/motion/directory'
 
 // Shared renderer. Public routes supply fixed inputs; query routes supply request inputs.
 
@@ -929,6 +931,27 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
   const supplyTrack = firstSearchValue(params.track) || 'all'
   const minStars = catalogStars(Number(firstSearchValue(params.minStars) || 0))
   const query = firstSearchValue(params.q)?.trim().slice(0, 180)
+  // Motion is a category of this directory, using its existing shell and URL
+  // state. Preview records remain separate from reviewed registry inventory.
+  if (category === MOTION_CATEGORY) {
+    const entries = selectMotionDirectoryEntries({ query, access, pricing, topic, output, featured,
+      platform, minStars, quality, trust, safety, supplyTrack, useCase })
+    const resultCount = entries.length
+    if (requestedPage > Math.max(1, Math.ceil(resultCount / VISIBLE_SKILL_LIMIT))) notFound()
+    const offset = (requestedPage - 1) * VISIBLE_SKILL_LIMIT
+    const clientProps: Omit<ComponentProps<typeof SkillsPageClient>, 'queryString'> = {
+      pathname: locale === defaultLocale ? '/skills' : `/${locale}/skills`,
+      skills: [], motionEntries: entries.slice(offset, offset + VISIBLE_SKILL_LIMIT),
+      query, sort: 'quality', featured, examplesOnly, catalogMode: true, category, topic, output,
+      pricing, access, categories: SKILL_CATEGORIES.map(c => c[0]), useCase,
+      useCases: USE_CASES.map(({ slug, shortTitle }) => ({ slug, shortTitle })),
+      platform, platformOptions: ['Codex', 'Claude Code', 'Cursor'], quality, trust, safety,
+      supplyTrack, supplyTracks: [], minStars, resultCount, page: requestedPage, rankOffset: offset,
+      hasPreviousResults: requestedPage > 1, hasMoreResults: offset + VISIBLE_SKILL_LIMIT < resultCount,
+      degraded: false, directorySections: [], directoryLinks: POPULAR_DIRECTORY_LINKS.map(link => ({ ...link })),
+    }
+    return { jsonLd: buildSkillsPageJsonLd([], [], locale), clientProps }
+  }
   const providerSkills = (includeProviders ? selectProviderSkills({ query, category, topic, output, pricing, examplesOnly,
     platform, quality, trust, safety, supplyTrack, minStars, useCase, featured, sort }) : []).map(entry => toProviderDirectorySkill(entry, locale))
   const providerOnlyQuery = query?.toLocaleLowerCase() === 'skillry'

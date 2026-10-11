@@ -6,7 +6,7 @@ import {
   motionAsset,
   type MotionEntry,
   type MotionLocale,
-} from "@/lib/motion/catalog";
+} from "@/lib/motion/shared";
 import { motionCopy } from "@/lib/motion/copy";
 import styles from "./motion.module.css";
 

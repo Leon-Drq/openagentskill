@@ -1,4 +1,4 @@
-import type { MotionLocale } from "./catalog";
+import type { MotionLocale } from "./shared";
 const en = {
   collection: "Motion collection",
   eyebrow: "OPENAGENTSKILL / MOTION STUDIO",

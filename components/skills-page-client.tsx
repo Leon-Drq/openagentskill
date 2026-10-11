@@ -1,6 +1,9 @@
 'use client'
 
 import { SKILL_CATEGORIES, TOPIC_RULES, categoryLabel } from '@/lib/skills/taxonomy'
+import dynamic from 'next/dynamic'
+import { MOTION_CATEGORY, motionCategoryLabel, type MotionEntry } from '@/lib/motion/shared'
+const DirectoryMotionCard = dynamic(() => import('./motion/directory-motion-card').then(module => module.DirectoryMotionCard))
 import { NativeSelect } from '@/components/ui/native-select'
 import { DirectoryStudioPreview } from '@/components/studio/directory-preview'
 import { commerceCopy } from '@/lib/i18n/commerce-copy'
@@ -183,6 +186,7 @@ interface Props {
   pathname: string
   queryString: string
   skills: DirectorySkillCard[]
+  motionEntries?: MotionEntry[]
   query?: string
   sort: string
   featured: boolean
@@ -218,6 +222,8 @@ export function SkillsPageClient(props: Props) {
     quality, trust, safety, supplyTrack, minStars, resultCount, page, rankOffset,
     hasPreviousResults, hasMoreResults, degraded, directorySections, directoryLinks } = props
   const { locale } = useI18n()
+  const isMotionCategory = category === MOTION_CATEGORY
+  const visibleCount = skills.length + (props.motionEntries?.length || 0)
   const discovery = discoveryCopy(locale)
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [draftFilters, setDraftFilters] = useState<DirectoryFilterDraft>(emptyDirectoryFilters)
@@ -238,10 +244,10 @@ export function SkillsPageClient(props: Props) {
     // No raw queries, task text, URLs or user identifiers in event parameters.
     trackAnalyticsEvent('directory_results', {
       mode: props.catalogMode ? 'catalog' : query ? 'search' : 'selected',
-      result_count: resultCount, visible_count: skills.length, page, degraded,
+      result_count: resultCount, visible_count: visibleCount, page, degraded,
       has_query: Boolean(query), locale,
     })
-  }, [query, sort, category, page, resultCount, degraded, props.featured, props.examplesOnly, props.catalogMode, skills.length, locale])
+  }, [query, sort, category, page, resultCount, degraded, props.featured, props.examplesOnly, props.catalogMode, visibleCount, locale])
   // Server-provided URL state preserves SSR on cached pages. Reading
   // useSearchParams here would bail the entire directory out to client render.
   const { pathname, queryString } = props
@@ -282,6 +288,7 @@ export function SkillsPageClient(props: Props) {
     writeSelection(compareSlugs.includes(slug) ? compareSlugs.filter(v => v !== slug) : [...compareSlugs, slug].slice(-4))
   }
   const label = (key: string) => {
+    if (key === MOTION_CATEGORY) return motionCategoryLabel(locale)
     const facet = TOPIC_RULES.find(t => t[0] === key)
     return SKILL_CATEGORIES.some(c => c[0] === key) ? categoryLabel(key, locale) : facet ? facet[locale === 'zh' ? 3 : 2] : directoryLabel(locale, key)
   }
@@ -290,7 +297,7 @@ export function SkillsPageClient(props: Props) {
   const selectedCategory = category === 'all' ? 'all' : directoryCategories(category)[0]
   const activeFilters = Object.entries({ access: props.access, featured: props.featured ? 'featured' : 'all', examples: props.examplesOnly ? 'withExamples' : 'all', pricing: props.access === 'free' || props.access === 'paid' ? 'all' : props.pricing, category, tag: props.topic, output: props.output, useCase, platform, quality, trust, safety, track: supplyTrack, minStars: minStars ? String(minStars) : 'all' })
     .filter(([, value]) => value && value !== 'all')
-  const sortOptions = [
+  const sortOptions = isMotionCategory ? [['quality', locale === 'zh' ? '目录顺序' : 'Collection order']] : [
     ['quality', query ? c.relevance : props.catalogMode ? c.quality : c.recommended], ['stars', c.stars],
     ['fresh', c.fresh], ['new', c.new], ['trending', c.trending],
     ...(sort === 'downloads' ? [['downloads', c.trending]] : []),
@@ -343,7 +350,7 @@ export function SkillsPageClient(props: Props) {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="min-w-[80px] flex-1">
               <h2 ref={resultsHeading} tabIndex={-1} id="directory-results-heading" className="line-clamp-2 scroll-mt-28 break-words text-sm sm:text-base font-semibold focus:outline-none">
-                {query ? `${c.results} · “${query}”` : props.access !== 'all' ? filterCopy[props.access] : props.featured ? discovery.featured : discovery.all}
+                {query ? `${c.results} · “${query}”` : isMotionCategory ? motionCategoryLabel(locale) : props.access !== 'all' ? filterCopy[props.access] : props.featured ? discovery.featured : discovery.all}
                 {pending && <LoaderCircle size={14} className="ml-2 inline-block animate-spin text-[#006b4f]" aria-hidden="true" />}
               </h2>
               <p className="mt-1 text-xs tabular-nums text-secondary" data-directory-count>
@@ -389,16 +396,19 @@ export function SkillsPageClient(props: Props) {
               <Link href={resetHref} prefetch={false} scroll={false} onNavigate={filterNavigation(resetHref)} className="p-2 text-[#006b4f] underline underline-offset-4">{c.reset}</Link>
             </div>
           )}
-          <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${degraded ? skills.length : resultCount}`}</p>
+          <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${degraded ? visibleCount : resultCount}`}</p>
+          {isMotionCategory && <p className="mt-4 text-xs leading-6 text-secondary" data-motion-scope>{locale === 'zh' ? '233 个动效 Skill 起始工作流，配套 12 类原创基础样板。点击卡片查看预览、用途与参考来源。' : '233 motion Skill starters with 12 original visual-family samples. Open a card for its preview, workflow and reference.'}</p>}
           {props.access !== 'paid' && (props.access !== 'all' || props.pricing !== 'all') && <p className="my-4 text-xs leading-6 text-secondary">{props.access === 'free' ? filterCopy.freeNote : props.access === 'third-party' ? filterCopy.thirdPartyNote : prices.caveat}</p>}
           {degraded && <DirectoryRecovery key={`${pathname}?${queryString}`} locale={locale} empty={props.catalogMode && skills.length === 0} />}
 
-          {skills.length === 0 ? (
+          {props.motionEntries && props.motionEntries.length > 0 ? <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
+            {props.motionEntries.map(entry => <DirectoryMotionCard key={entry.id} entry={entry} locale={locale} />)}
+          </div> : skills.length === 0 ? (
             <div className="border-y border-border py-14 text-center">
               <p className="text-secondary">{degraded ? label('catalogUnavailable') : props.access === 'paid' ? filterCopy.paidNote : props.pricing !== 'all' ? prices.empty : props.catalogMode && hasMoreResults ? label('excludedResources') : c.empty}</p>
               {props.pricing !== 'all' && props.access !== 'paid' && <Link href={`/contact${locale === 'en' ? '' : '?lang=' + locale}`} className="mt-4 block text-sm text-[#006b4f] underline underline-offset-4">{prices.contribute} →</Link>}
               <Link href={resetHref} prefetch={false} scroll={false} onNavigate={filterNavigation(resetHref)} className="mt-5 inline-block text-[#006b4f] underline">{c.reset}</Link>
-              {props.access === 'paid' && !degraded && <DirectoryStudioPreview locale={locale} />}
+              {props.access === 'paid' && !degraded && !isMotionCategory && <DirectoryStudioPreview locale={locale} />}
             </div>
           ) : <SkillEngagementProvider key={skills.map(skill => skill.slug).join(',')} slugs={skills.filter(skill => !skill.provider?.resource).map(skill => skill.slug)} untrackedSlugs={skills.filter(skill => skill.provider && !skill.provider.resource).map(skill => skill.slug)}><div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
             {skills.map(skill => (
@@ -446,7 +456,7 @@ export function SkillsPageClient(props: Props) {
               </article>
             ))}
           </div></SkillEngagementProvider>}
-          {(skills.length > 0 || hasPreviousResults || hasMoreResults) && <DirectoryPagination
+          {(visibleCount > 0 || hasPreviousResults || hasMoreResults) && <DirectoryPagination
             page={page} totalPages={degraded ? null : pageCount(resultCount)} previous={hasPreviousResults} next={hasMoreResults}
             locale={locale} href={value => href({ page: value > 1 ? String(value) : undefined })} onNavigate={paginationNavigation}
           />}

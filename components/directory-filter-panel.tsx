@@ -1,7 +1,8 @@
 'use client'
 
 import Link from '@/components/crawl-link'
-import { ChevronDown, Search, type LucideIcon } from 'lucide-react'
+import { ChevronDown, Search, Film, type LucideIcon } from 'lucide-react'
+import { MOTION_CATEGORY, motionCategoryLabel } from '@/lib/motion/shared'
 import { NativeSelect } from '@/components/ui/native-select'
 import { discoveryIcons } from './discovery-navigation'
 import { discoveryCopy } from '@/lib/discovery'
@@ -38,7 +39,7 @@ export function DirectoryFilterPanel({ locale, value, onChange, disabled, href, 
   const c = directoryCopy(locale), f = directoryFilterCopy(locale), d = discoveryCopy(locale), prices = commerceCopy(locale)
   const label = (key: string) => directoryLabel(locale, key)
   const primaryCategories = SKILL_CATEGORIES.slice(0, 6).map(item => item[0] as string)
-  const otherCategories = categories.filter(key => !primaryCategories.includes(key))
+  const otherCategories = categories.filter(key => !primaryCategories.includes(key) && key !== MOTION_CATEGORY)
   const choice = (key: keyof DirectoryFilterDraft, option: string, title: string, compact = false, icon?: LucideIcon) => {
     const updates = { [key]: option }
     return <FilterChoice key={option} selected={value[key] === option} disabled={disabled} href={href?.(updates)} onClick={() => onChange(updates)} compact={compact} icon={icon}>{title}</FilterChoice>
@@ -72,6 +73,9 @@ export function DirectoryFilterPanel({ locale, value, onChange, disabled, href, 
         <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between px-2.5 text-xs text-secondary [&::-webkit-details-marker]:hidden">{f.moreCategories}<ChevronDown size={14} aria-hidden="true" className="transition-transform group-open:rotate-180" /></summary>
         {otherCategories.map(categoryChoice)}
       </details>
+      <div className="mt-2 border-t border-border pt-2" data-motion-category>
+        {choice('category', MOTION_CATEGORY, motionCategoryLabel(locale), false, Film)}
+      </div>
     </nav>
     <details key={String(advancedActive)} open={advancedActive || undefined} className="group border-t border-border pt-3" data-directory-advanced>
       <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between text-xs font-medium text-secondary [&::-webkit-details-marker]:hidden">{f.advanced}<ChevronDown size={14} aria-hidden="true" className="transition-transform group-open:rotate-180" /></summary>
