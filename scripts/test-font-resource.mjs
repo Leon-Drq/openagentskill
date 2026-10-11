@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict'
+import { register } from 'node:module'
+register('./test-owner-publication-loader.mjs', import.meta.url)
+const { getExternalSkill, searchExternalSkills, externalSkillDiscoveryRecord, ExternalSkillSchema, isMissingExternalSkillPath } = await import('../lib/skills/external-catalog.ts')
+const { selectProviderSkills, toProviderDirectorySkill } = await import('../lib/skills/provider-directory.ts')
+const entry = getExternalSkill('resource-qiaomu-cover-fonts')
+assert.equal(entry.provider, 'resource')
+for (const q of ['乔木', '字库', 'qiaomu', 'joeseesun/qiaomu-cover-fonts', 'Chinese fonts']) assert.ok(searchExternalSkills(q).includes(entry), q)
+const defaults = {category:'all',topic:'all',output:'all',pricing:'all',examplesOnly:false,platform:'all',quality:'all',trust:'all',safety:'all',supplyTrack:'all',minStars:0,useCase:'all',sort:'new'}
+assert.equal(selectProviderSkills(defaults)[0].slug, entry.slug)
+assert.ok(selectProviderSkills({...defaults,pricing:'free',category:'design-creative'}).includes(entry))
+for (const options of [{pricing:'paid'}, {examplesOnly:true}, {minStars:1}, {platform:'codex'}, {trust:'strong'}]) assert.ok(!selectProviderSkills({...defaults,...options}).includes(entry))
+const data=externalSkillDiscoveryRecord(entry)
+assert.equal(data.type,'design-resource')
+assert.equal(data.install_command,null)
+assert.equal(data.ai_reviewed,false)
+assert.equal(data.auto_install_allowed,false)
+assert.equal(data.runtime_verified,false)
+assert.equal(data.resource_type,'font-library')
+assert.equal(data.source_commit,entry.sourceCommit)
+assert.equal(data.bundle_sha256,null)
+assert.equal(isMissingExternalSkillPath('/skills/resource-missing'),true)
+assert.equal(isMissingExternalSkillPath('/skills/'+entry.slug),false)
+for (const lang of ['en','zh']) {
+  const card=toProviderDirectorySkill(entry,lang)
+  assert.equal(card.commerce.type,'free')
+  assert.equal(card.provider.resource,true)
+  assert.deepEqual(card.compatibility,[])
+}
+for (const changes of [{aiReviewed:true},{autoInstallAllowed:true},{runtimeVerified:true},{sourceCommit:'main'},{install_command:'npx fake'}]) assert.equal(ExternalSkillSchema.safeParse({...entry,...changes}).success,false)
+console.log('Font resource: multilingual discovery, free/new filters, source identity and non-installable boundaries passed.')

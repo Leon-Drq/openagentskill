@@ -9,6 +9,7 @@ import { SkillPreviewImage } from '@/components/skill-preview-image'
 import { ProviderVideoPreview } from './provider-video-preview'
 import { SkillryLogo } from './skillry-logo'
 import { SkillActions, SkillEngagementProvider } from '@/components/skill-engagement'
+import { FontResourceContent } from './font-resource-content'
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ lang?: string | string[] }> }
 const base = 'https://www.openagentskill.com'
@@ -33,6 +34,7 @@ export default async function CatalogSkillContent({ params, searchParams }: Prop
   const entry = getExternalSkill((await params).slug)
   if (!entry) notFound()
   const zh = (await searchParams).lang === 'zh'
+  if (entry.provider === 'resource') return <FontResourceContent entry={entry} zh={zh} />
   const lang = zh ? 'zh' : 'en'
   const url = base + externalSkillHref(entry.slug)
   const demo = entry.runtimeDemo

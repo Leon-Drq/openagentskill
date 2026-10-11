@@ -15,9 +15,27 @@ GitHub pull-request and production deployment workflow. Git history preserves th
 request reason, source, license and listing-time version. Removing an entry from
 the current catalog unpublishes it on the next deployment without erasing history.
 
-GitHub repository publications continue to use the CLI in
+GitHub **Agent Skill** repository publications continue to use the CLI in
 [owner-publishing.md](owner-publishing.md). Community submissions, owner tokens,
 Supabase review records and rejected submissions are not changed by this lane.
+
+## Owner-curated supporting resources
+
+The owner explicitly requested `joeseesun/qiaomu-cover-fonts` in the Skills
+directory on 2026-10-11. It is a font library with no `SKILL.md`, not an installable
+Agent Skill. The `resource` schema records it as a free `font-library`, with the
+source commit and manifest URL pinned, original EN/ZH editorial copy, license
+limitations and a link to the published usage guide. This is a supporting-resource
+listing, not an exemption from the Skill review queue or an AI approval.
+
+Resource cards share the directory's search, free filter and new-arrival sorting.
+They link to a dedicated resource detail page and the upstream repository, with
+no install command, fabricated preview, numeric score or verification badge.
+They do not enter Resolve, repository rankings, install counts or the community
+interaction tables. Font binaries are not mirrored and no additional database or
+model call is required. The listing's source/version are observations, not a
+promise of automatic synchronization. Test coverage is in
+`scripts/test-font-resource.mjs`, included by `test:skill-detail`.
 
 Required external fields include provider/identifier, source attribution, stable
 source link, observed version, license restrictions, explicit owner reason

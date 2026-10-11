@@ -5,6 +5,7 @@ import { externalSourceHref, externalSourceRel } from './external-outbound'
 import type { DirectorySkillCard } from '@/components/skills-page-client'
 
 export function providerTaxonomy(entry: ExternalSkill) {
+  if (entry.provider === 'resource') return { category: 'design-creative', tags: [] as string[], output: 'image' }
   const output = entry.provider === 'skillry' ? entry.outputType : 'html'
   if (output === 'video') return { category: 'video-creation', tags: ['video-generation'], output: 'video' }
   if (entry.tags.some(tag => tag.includes('data-visualization'))) return { category: 'data', tags: ['data-visualization'], output: 'web' }
@@ -14,6 +15,7 @@ export function providerTaxonomy(entry: ExternalSkill) {
     : { category: 'design-creative', tags: ['ui-design'], output: 'web' }
 }
 export function providerCommerce(entry: ExternalSkill, now = Date.now()): SkillCommerce {
+  if (entry.provider === 'resource') return { type: 'free', billing: 'free', amount: null, currency: null, sourceUrl: entry.sourceUrl, checkedAt: entry.publishedAt, runtime: 'unknown', purchaseUrl: null, checkout: 'external', purchaseRequiresUserConsent: true }
   const evidence = entry.provider === 'skillry' ? entry.listingEvidence : null
   const cents = evidence?.priceUsdCents ?? null
   const candidate = cents === null ? null : cents === 0
@@ -53,10 +55,10 @@ export function toProviderDirectorySkill(entry: ExternalSkill, locale: string): 
   const taxonomy = providerTaxonomy(entry)
   return { id: `provider:${entry.slug}`, slug: entry.slug, name: entry.provider === 'skillry' ? entry.skillName : entry.title[lang], tagline: entry.description[lang],
     category: taxonomy.category, taxonomyTags: taxonomy.tags, stats: { downloads: 0, stars: 0, rating: 0 },
-    technical: {}, compatibility: [], author: { name: entry.provider === 'skillry' ? 'Skillry' : entry.author.name },
+    technical: {}, compatibility: [], author: { name: entry.provider === 'skillry' ? 'Skillry' : entry.author.name, ...(entry.provider === 'resource' ? { owner: entry.author.name } : {}) },
     commerce: providerCommerce(entry), verified: false, createdAt: entry.publishedAt,
     exampleCount: providerExampleCount(entry),
-    provider: { label: entry.provider === 'skillry' ? 'Skillry' : 'RedSkill', localizedName: lang === 'zh' && entry.provider === 'skillry' && entry.title.zh !== entry.skillName ? entry.title.zh : undefined,
+    provider: { resource: entry.provider === 'resource', label: entry.provider === 'resource' ? (lang === 'zh' ? '字体资源' : 'Font resource') : entry.provider === 'skillry' ? 'Skillry' : 'RedSkill', localizedName: lang === 'zh' && entry.provider === 'skillry' && entry.title.zh !== entry.skillName ? entry.title.zh : undefined,
       sourceDownloads: entry.provider === 'skillry' ? entry.listingEvidence.downloadCount : undefined, sourceHref: externalSourceHref(entry.sourceUrl), sourceRel: externalSourceRel(entry.sourceUrl),
       image: entry.provider === 'skillry' ? entry.previewImages[0].replace('&variant=detail', '&variant=card') : entry.runtimeDemo?.poster,
       video: entry.provider === 'skillry' ? entry.previewVideo || undefined : entry.runtimeDemo?.video,
