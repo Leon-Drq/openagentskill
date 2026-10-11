@@ -101,6 +101,7 @@ assert.doesNotMatch(read('app/skills/[slug]/content.tsx'), /skill-detail-support
 async function runRecoveryRegressions() {
   await import('./test-recovery-performance.mjs')
   await import('./test-directory-recovery.mjs')
+  await import('./test-skill-batch-cache.mjs')
   await import('./test-client-recovery.mjs')
   await import('./test-skill-engagement.mjs')
 }

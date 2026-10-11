@@ -940,7 +940,7 @@ function normalizeSkillLookupSlug(slug: string) {
 // slug. Cache matches and genuine misses, but let transient errors escape so
 // they are never stored as a false missing record.
 const getCachedSkillBySlug = unstable_cache(
-  async (slug: string): Promise<SkillRecord | null> => {
+  coalesceCacheLoader(async (slug: string): Promise<SkillRecord | null> => {
     const supabase = createPublicClient({ requestTimeoutMs: SKILL_LOOKUP_TIMEOUT_MS, circuitScope: 'skill-lookup' })
     const { data, error } = await supabase
       .from('skills')
@@ -952,7 +952,7 @@ const getCachedSkillBySlug = unstable_cache(
     if (error) throw error
     if (!data || isMcpOnlySkillRecord(data)) return null
     return data as SkillRecord
-  },
+  }),
   ['public-skill-by-slug-v3'],
   {
     revalidate: SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS,
@@ -977,6 +977,21 @@ export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> 
   }
 }
 
+// Rich filters and guide pages reuse the same featured source sets across
+// languages. Cache successful batches, not the caller's outage fallback.
+const getCachedSkillBatch = unstable_cache(
+  coalesceCacheLoader(async (slugs: string[], timeoutMs: number): Promise<string> => {
+    const supabase = createPublicClient({ requestTimeoutMs: timeoutMs, circuitScope: 'skill-lookup' })
+    const { data, error } = await supabase.from('skills').select('*')
+      .or(PUBLIC_SKILL_FILTER).in('slug', slugs)
+    if (error) throw error
+    if (!data) throw new Error('Skill batch lookup unavailable')
+    return packCacheJson(filterSkillOnly(data as SkillRecord[]))
+  }),
+  ['public-skill-batches-v1-packed'],
+  { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
+)
+
 export async function getSkillsBySlugs(
   slugs: string[],
   requestTimeoutMs = SKILL_LOOKUP_TIMEOUT_MS
@@ -985,24 +1000,21 @@ export async function getSkillsBySlugs(
   if (!normalizedSlugs.length) return []
 
   const timeoutMs = Math.max(SKILL_LOOKUP_TIMEOUT_MS, requestTimeoutMs)
-  const supabase = createPublicClient({ requestTimeoutMs: timeoutMs })
-  const batches = slugQueryBatches(normalizedSlugs)
+  // Canonical keys share reads even when callers order the same sources
+  // differently. Restore the caller's ordering only after all batches succeed.
+  const batches = slugQueryBatches([...normalizedSlugs].sort())
   const records: SkillRecord[] = []
   for (let start = 0; start < batches.length; start += 4) {
     const results = await Promise.all(batches.slice(start, start + 4).map(async batch => withTimeout(
-      supabase
-      .from('skills')
-      .select('*')
-      .or(PUBLIC_SKILL_FILTER)
-      .in('slug', batch),
-      timeoutMs,
+      getCachedSkillBatch(batch, timeoutMs).then(packed => unpackCacheJson<SkillRecord[]>(packed)),
+      timeoutMs + 1000,
       'skill batch slug lookup'
     ).catch((lookupError) => {
       console.warn('Skill batch slug lookup fallback:', lookupError)
-      return { data: null, error: lookupError }
+      return null
     })))
-    if (results.some(result => result.error || !result.data)) return []
-    records.push(...results.flatMap(result => result.data as SkillRecord[]))
+    if (results.some(result => result === null)) return []
+    records.push(...results.flatMap(result => result || []))
   }
 
   const bySlug = new Map(

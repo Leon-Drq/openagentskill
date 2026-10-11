@@ -75,3 +75,27 @@ block search-engine traffic merely to make the symptom disappear.
 These changes address demonstrated premature deadlines and duplicate work;
 they do not promise availability during an upstream outage. In-flight
 coalescing is per instance, not a distributed lock across all deployments.
+
+## Production follow-up: repeated source batches
+
+The first deployment did not fully resolve the incident: its production smoke
+check still observed degraded search responses. Database edge logs for
+09:59–10:05 UTC contained 17,649 requests. One identical 19-Skill source batch
+alone was fetched 3,336 times (about 19% of all requests in that sample), with
+median response time of 1,971.5 ms and p95 of 6,406.25 ms. Search p95 was also
+about six seconds. PostgREST recorded 249 statement timeouts and 88 timeout
+manager errors. A healthy point-in-time database probe was insufficient to
+rule out intermittent load.
+
+`getSkillsBySlugs` was uncached. It is used by featured/pricing filters and
+curated guide pages, so the same source set was repeatedly read across queries
+and locales. Successful, canonicalized batches now use a packed 5-minute
+shared cache and in-flight coalescing. Caller order is restored after lookup;
+publication-tag invalidation remains effective. Failed batches still return
+the existing caller fallback outside the cache. Batch sizes and the four-read
+concurrency limit are retained. Single-Skill metadata/body cache misses are
+also coalesced.
+
+Additional regressions exercise reordered source sets, eight concurrent
+requests, shared hits, invalidation, failure recovery, missing/MCP-only rows,
+preserved source evidence, large bounded batches and detail lookup misses.
