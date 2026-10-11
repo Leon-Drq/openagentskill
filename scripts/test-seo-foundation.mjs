@@ -6,6 +6,7 @@ const externalCatalog = await import('../lib/skills/external-catalog.ts')
 import { readFileSync } from 'node:fs'
 import ts from 'typescript'
 import * as blogRoutes from '../lib/blog/routes.ts'
+import * as studioSeo from '../lib/studio/seo.ts'
 import { selectGuideSkills, selectComparisonSkills, scoreSkillForGuide } from '../lib/seo/guide-selection.ts'
 import { GROWTH_GUIDES } from '../lib/seo/growth-guides.ts'
 import { sitemapUnavailableResponse } from '../lib/seo/sitemap-response.ts'
@@ -38,6 +39,7 @@ function compile(path, dependencies) {
   return exports
 }
 const mocks = {
+  '@/lib/studio/seo': studioSeo,
   '@/lib/blog/routes': blogRoutes,
   '@/lib/skills/external-catalog': externalCatalog,
   '@/lib/agent-tasks': { AGENT_TASKS: [] }, '@/lib/collections': { SKILL_STACKS: [] },
@@ -57,6 +59,7 @@ const mocks = {
 }
 const sitemap = compile('lib/seo/sitemap.ts', mocks)
 const core = sitemap.getCoreSitemapEntries()
+for (const entry of studioSeo.studioSitemapEntries()) assert.ok(core.some(page => page.url === entry.url), `Missing studio sitemap route: ${entry.url}`)
 for (const entry of externalCatalog.EXTERNAL_SKILLS.filter(e => e.provider === 'skillry')) {
   assert.equal(core.some(page => page.url.endsWith('/skills/' + entry.slug)), entry.active && entry.seoIndexable, 'Only independently edited active source details enter the sitemap')
 }

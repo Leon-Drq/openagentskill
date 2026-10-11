@@ -30,11 +30,13 @@ const LEGACY_LOCALIZED_NAVIGATION_PATHS = new Set([
   '/agent-skills-registry',
   '/docs',
   '/submit',
+  '/membership',
 ])
 const LOCALIZED_DEEP_ROUTE_ROOTS = new Set(['/skill-packs', '/collections'])
 const SESSION_REFRESH_PATH_PREFIXES = ['/profile', '/api/claims', '/api/points']
 
 function getLocalizedDeepPath(pathname: string, locale: string) {
+  if (pathname === '/studio/launch-card-studio') return `/${locale}${pathname}`
   if (isLocalizedBlogPath(pathname)) return `/${locale}${pathname}`
   const segments = pathname.split('/').filter(Boolean)
   const [root, ...rest] = segments

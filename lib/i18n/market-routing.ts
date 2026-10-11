@@ -24,10 +24,11 @@ export type LocalizedCorePageSlug = (typeof LOCALIZED_CORE_PAGE_SLUGS)[number]
 // Submit is a full localized experience, but its page is implemented as a
 // dedicated route because it includes a client-side review flow rather than a
 // static registry page.
-const LOCALIZED_EXPERIENCE_PAGE_SLUGS = ['submit'] as const
+const LOCALIZED_EXPERIENCE_PAGE_SLUGS = ['submit', 'membership'] as const
 const LOCALIZED_DEEP_ROUTE_ROOTS = ['skill-packs', 'collections'] as const
 
 function isLocalizedDeepRoute(page: string) {
+  if (page === 'studio/launch-card-studio') return true
   if (isLocalizedBlogPath(page)) return true
   const [root, ...segments] = page.split('/').filter(Boolean)
   return segments.length > 0 && LOCALIZED_DEEP_ROUTE_ROOTS.includes(root as (typeof LOCALIZED_DEEP_ROUTE_ROOTS)[number])

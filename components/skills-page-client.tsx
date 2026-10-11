@@ -2,6 +2,7 @@
 
 import { SKILL_CATEGORIES, TOPIC_RULES, categoryLabel } from '@/lib/skills/taxonomy'
 import { NativeSelect } from '@/components/ui/native-select'
+import { DirectoryStudioPreview } from '@/components/studio/directory-preview'
 import { commerceCopy } from '@/lib/i18n/commerce-copy'
 import { type PriceFilter, type SkillCommerce } from '@/lib/skills/commerce'
 import { DirectoryFilterPanel } from './directory-filter-panel'
@@ -397,6 +398,7 @@ export function SkillsPageClient(props: Props) {
               <p className="text-secondary">{degraded ? label('catalogUnavailable') : props.access === 'paid' ? filterCopy.paidNote : props.pricing !== 'all' ? prices.empty : props.catalogMode && hasMoreResults ? label('excludedResources') : c.empty}</p>
               {props.pricing !== 'all' && props.access !== 'paid' && <Link href={`/contact${locale === 'en' ? '' : '?lang=' + locale}`} className="mt-4 block text-sm text-[#006b4f] underline underline-offset-4">{prices.contribute} →</Link>}
               <Link href={resetHref} prefetch={false} scroll={false} onNavigate={filterNavigation(resetHref)} className="mt-5 inline-block text-[#006b4f] underline">{c.reset}</Link>
+              {props.access === 'paid' && !degraded && <DirectoryStudioPreview locale={locale} />}
             </div>
           ) : <SkillEngagementProvider key={skills.map(skill => skill.slug).join(',')} slugs={skills.map(skill => skill.slug)} untrackedSlugs={skills.filter(skill => skill.provider).map(skill => skill.slug)}><div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
             {skills.map(skill => (

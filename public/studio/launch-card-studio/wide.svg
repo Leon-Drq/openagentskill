@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+<title id="title">OpenAgentSkill — Make your next idea visible.</title>
+<desc id="description">One brief. Three formats. Ready for your next launch.</desc>
+<rect width="1200" height="630" fill="#F8F7F3"/>
+<path d="M64 122H1136M64 522H1136" stroke="#171717" stroke-opacity=".18"/>
+<circle cx="73" cy="78" r="9" fill="#006B4F"/>
+<text x="94" y="86" fill="#171717" font-family="Arial, Noto Sans CJK SC, sans-serif" font-size="25" font-weight="600"><tspan x="94" dy="0">OpenAgentSkill</tspan></text>
+<text x="64" y="222" fill="#171717" font-family="Georgia, Noto Serif CJK SC, serif" font-size="80" font-weight="400"><tspan x="64" dy="0">Make your</tspan><tspan x="64" dy="86.4">next idea</tspan><tspan x="64" dy="86.4">visible.</tspan></text>
+<text x="64" y="450.8" fill="#171717" font-family="Arial, Noto Sans CJK SC, sans-serif" font-size="23" font-weight="400"><tspan x="64" dy="0">One brief. Three formats. Ready for your next</tspan><tspan x="64" dy="34">launch.</tspan></text>
+<g transform="translate(810 202)">
+<rect width="280" height="280" rx="32" fill="#006B4F"/>
+<rect x="32" y="32" width="216" height="216" rx="18" fill="none" stroke="#F8F7F3" stroke-opacity=".35"/>
+<path d="M78 204L204 78M104 78H204V178" fill="none" stroke="#F8F7F3" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="64" y="576" fill="#171717" font-family="Arial, sans-serif" font-size="18" font-weight="400"><tspan x="64" dy="0">Launch Card Studio / 01</tspan></text>
+<text x="998" y="576" fill="#006B4F" font-family="monospace" font-size="16" font-weight="400"><tspan x="998" dy="0">1200 × 630</tspan></text>
+</svg>

@@ -1,6 +1,6 @@
 'use client'
 
-import { getNavigationCopy, getPartnershipLabels } from '@/lib/site-navigation'
+import { getNavigationCopy, getPartnershipLabels, navigationLabel } from '@/lib/site-navigation'
 import { siteCopy } from '@/lib/i18n/site-copy'
 
 import Link from '@/components/crawl-link'
@@ -86,6 +86,7 @@ export function SiteFooter() {
               <div className="mt-4 grid gap-2 text-secondary">
 <FooterLink href="/skills" className="hover:text-foreground">{t.nav.skills}</FooterLink>
                 <FooterLink href="/showcase" className="hover:text-foreground">{getShowcaseNavLabel(locale)}</FooterLink>
+                <FooterLink href="/membership" className="hover:text-foreground">{navigationLabel({ href: '/membership', label: 'membership' }, locale, t.nav, '')}</FooterLink>
                 <FooterLink href="/skills/new" className="hover:text-foreground">{siteCopy(locale, "New submissions")}</FooterLink>
                 <FooterLink href="/agent-skills" className="hover:text-foreground">Agent Skills</FooterLink>
                 <details className="group">
