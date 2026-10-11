@@ -1,0 +1,56 @@
+{
+  "title": "Skill REA untuk reverse engineering: MCP dan analisis pertama",
+  "summary": "Gunakan REA bersama Codex, Claude Code, atau Cursor: pahami perbedaan Skill dan MCP, konfigurasi versi 6.4.0, kebutuhan alat, serta analisis pertama dengan bukti yang bisa diperiksa.",
+  "eyebrow": "Alur kerja pengembang",
+  "byline": "Redaksi OpenAgentSkill",
+  "dateLabel": "Sumber diperiksa",
+  "backLabel": "Kembali ke Blog",
+  "blogLabel": "Blog",
+  "contentsLabel": "Dalam panduan ini",
+  "intro": [
+    "REA (Reverse Engineer Anything) menghubungkan agen AI dengan alat untuk menyelidiki perangkat lunak yang sudah didistribusikan: paket aplikasi, biner native, dan sebagian perilaku saat berjalan. Skill reverse-engineer-anything mengarahkan penyelidikan; server MCP atau CLI menyediakan alat analisisnya.",
+    "Mulailah dengan pertanyaan kecil: di mana suatu kolom CSV diubah, atau proses mana yang menulis berkas ekspor? Panduan ini membahas pemilihan target, koneksi alat, dan cara meminta bukti yang dapat diperiksa."
+  ],
+  "sections": [
+    {
+      "id": "what-is-rea",
+      "title": "Kapan REA berguna",
+      "body": "REA berguna ketika jawaban bergantung pada artefak hasil build atau perilaku yang tidak dapat dipastikan dari sumber yang tersedia. Contohnya ASAR Electron, fungsi native, atau perbandingan dua rilis terpaket. Jika repositori sumber lengkap tersedia dan hanya arsitekturnya yang ingin dipahami, [Skill resmi]({{SKILL}}) menyarankan alat repositori biasa.\n\nTentukan artefak, satu perilaku, dan bukti yang dibutuhkan. “Temukan fungsi yang menormalkan kolom ekspor ini” lebih mudah diperiksa daripada “jelaskan aplikasi ini”."
+    },
+    {
+      "id": "skill-mcp-cli",
+      "title": "Skill, MCP, dan CLI memiliki tugas berbeda",
+      "body": "| Komponen | Fungsinya | Hal yang belum terbukti hanya dengan memasangnya |\n| --- | --- | --- |\n| Skill `reverse-engineer-anything` | Petunjuk memilih target, mengumpulkan bukti, dan melaporkan ketidakpastian | Agen bisa memanggil alat REA |\n| Server MCP REA | Alat analisis yang bisa dipanggil agen kompatibel | Seluruh mesin analisis sudah terpasang |\n| CLI `rea-agents` | Akses alur kerja melalui terminal | Sesi agen saat ini sudah terhubung |\n\nSetup terpandu mendaftarkan server dan memasang instruksi yang sesuai. Memasang Skill saja menambahkan petunjuk serta referensi. Bila Skill terlihat tetapi alatnya tidak tersedia, periksa perbedaan ini di [panduan instalasi]({{INSTALL}}#skill-only-installation)."
+    },
+    {
+      "id": "choose-target",
+      "title": "Pilih target sebelum mesin analisis",
+      "body": "| Target | Hasil awal yang berguna | Kebutuhan tambahan |\n| --- | --- | --- |\n| Direktori JavaScript / Electron atau ASAR | Modul, impor, dan batas proses | Node.js dan npm yang didukung; tanpa mesin native |\n| Program native | Assembly, pseudocode, pemanggil, dan referensi | Konfigurasi Hopper, Ghidra, atau IDA yang didukung |\n| Perilaku situs web | Halaman, skrip, dan pengamatan jaringan | Browser keluarga Chrome dan izin yang sesuai |\n| Kode APK Android | Kelas, metode, dan referensi | JADX dan JDK lengkap; periksa dukungan host |\n\nPeriksa [matriks target]({{README}}#what-you-can-analyze) serta versi yang dipasang. Tidak semua format bekerja di setiap sistem. Analisis JavaScript statis membaca berkas tanpa menjalankan aplikasinya. Perekaman runtime dapat menjalankan atau berinteraksi dengan target, sehingga cakupannya perlu ditentukan terpisah.\n\nAnalisis lokal juga tidak membuat seluruh percakapan offline: hasil alat dapat dikirim ke penyedia model agen. Gunakan perangkat lunak dan data yang boleh Anda analisis, dengan konfigurasi model yang sesuai."
+    },
+    {
+      "id": "setup",
+      "title": "Konfigurasi Codex, Claude Code, atau Cursor",
+      "body": "Saat diperiksa, versi npm yang diterbitkan adalah **6.4.0**. Versi ini memerlukan Node.js **22.19 ke atas dalam 22.x, 24.11 ke atas dalam 24.x, atau 26+**. Versi metadata Skill **39** adalah nomor terpisah. Cabang main dapat menjelaskan fitur yang lebih baru daripada rilis npm. [Paket]({{NPM}}) · [Batas versi]({{INSTALL}}#released-package-and-main)\n\nUntuk menargetkan Codex, periksa dahulu rencana perubahan:\n\n```sh\nnpx rea-agents@6.4.0 setup --client codex --dry-run --json\n```\n\nBahkan saat dry run, `npx` dapat mengunduh dan menjalankan paket REA. Dry run tidak menerapkan perubahan konfigurasi. Tinjau tujuan, cadangan, dan penggantian Skill sebelum menerapkannya:\n\n```sh\nnpx rea-agents@6.4.0 setup --client codex\n```\n\nGanti `codex` dengan `claude_code` atau `cursor` sesuai klien, lalu mulai ulang atau sambungkan kembali sesi. Jika alat belum muncul, periksa konfigurasi dan prasyarat melalui `npx rea-agents@6.4.0 doctor --client codex --json`, lalu cek daftar alat di sesi aktif. Koneksi yang sudah bekerja tidak perlu diatur ulang untuk setiap tugas.\n\nUntuk analisis JavaScript statis lewat CLI, ganti jalur dengan direktori atau ASAR milik Anda lalu simpan hasilnya:\n\n```sh\nnpx rea-agents@6.4.0 analyze-javascript-application /absolute/path/to/app --json > app-evidence.json\n```\n\nDi Windows, gunakan misalnya `\"D:/apps/example\"`. Simpan hasil besar sebagai berkas Evidence dan baca tampilan yang relevan, bukan menempelkan semuanya ke konteks model. [Panduan CLI]({{CLI}})"
+    },
+    {
+      "id": "first-investigation",
+      "title": "Merancang penyelidikan pertama yang bisa ditinjau",
+      "body": "Mulailah dari paket aplikasi Electron Anda sendiri dan satu fitur ekspor. Simpan salinan target serta versi atau hash agar berkas yang sama dapat diperiksa kembali. Berikut templat tugas asli dari redaksi, bukan laporan pengujian yang telah kami jalankan:\n\n```text\nTarget: [jalur absolut paket aplikasi saya]\nPertanyaan: di mana kolom CSV “status” dinormalisasi saat diekspor?\nMulai dengan analisis statis. Telusuri titik masuk, perpindahan\nIPC jika ada, dan penulisan berkas. Sertakan lokasi berkas atau\nalamat fungsi untuk setiap kesimpulan. Pisahkan fakta yang\nteramati, inferensi, dan pertanyaan yang belum terjawab.\nJangan jalankan aplikasi atau ubah berkas tanpa meminta izin.\nHasil: jalur pemanggilan singkat, tabel bukti, dan usulan uji\nmenggunakan nilai kosong, nilai tidak dikenal, serta teks Unicode.\n```\n\nTinjau **jalur**, **bukti**, dan **uji yang dapat membantah penjelasan**. Narasi yang masuk akal tanpa lokasi belum lengkap. Jalur statis tanpa pengamatan runtime tetap harus diberi label inferensi statis.\n\nJika perilakunya diterapkan ke produk Anda, uji implementasi itu secara terpisah. Memahami algoritme belum membuktikan bahwa implementasi pengganti menangani semua kasus batas."
+    },
+    {
+      "id": "evidence",
+      "title": "Apa yang ditunjukkan contoh publik",
+      "body": "[Studi Notion]({{NOTION}}) menelusuri permintaan clipboard melintasi proses Electron. [Contoh DX-Ball]({{DXBALL}}) menyelidiki perhitungan panning suara dan mendokumentasikan pemeriksaan rekonstruksinya.\n\nMintalah alur perpindahan dan perhitungan yang bisa diuji di balik suatu fitur. Ini adalah contoh dari pengembang untuk target serta versi tertentu, bukan pengujian runtime OpenAgentSkill atau tingkat keberhasilan universal. Pseudocode adalah titik awal yang perlu diperiksa bersama pemanggil, instruksi, dan keluaran teramati."
+    },
+    {
+      "id": "faq",
+      "title": "Pertanyaan sebelum memakai REA",
+      "body": "### Apakah REA gratis?\n\nRepositorinya memakai lisensi MIT. Penggunaan model dan beberapa penyedia analisis dapat memiliki biaya sendiri. Tidak semua konfigurasi otomatis gratis.\n\n### Apakah mendukung Windows?\n\nPeriksa kombinasi target dan penyedia. JavaScript dan Ghidra native memiliki prasyarat berbeda; dokumentasi menyebut dukungan Ghidra di Windows sebagai eksperimental. Instalasi paket yang berhasil bukan bukti dukungan menyeluruh.\n\n### Bisakah kode sumber asli dipulihkan?\n\nAnalisis native dapat menghasilkan pseudocode dan assembly, tetapi belum tentu mempertahankan nama, komentar, atau struktur proyek asli. Minta agen membedakan informasi yang dipulihkan dari hasil inferensi.\n\n### Mengapa Skill terpasang tetapi alatnya tidak ada?\n\nInstalasi Skill, pendaftaran MCP, dan koneksi sesi adalah tiga keadaan berbeda. Periksa klien yang dipilih, mulai ulang sesi, dan lihat alat yang tersedia. Pasang mesin tambahan hanya ketika target membutuhkannya."
+    }
+  ],
+  "methodTitle": "Sumber dan cakupan editorial",
+  "method": "Diperiksa pada **12 Oktober 2026 (Asia/Shanghai)** berdasarkan commit `23d50ea3bec186b4459d36c04854a92276accdf1` dan metadata npm 6.4.0. GitHub menunjukkan sekitar 94.000 stars saat itu. Angka tersebut menunjukkan perhatian, bukan mutu analisis.\n\nSumber utama: [ikhtisar proyek]({{README}}), [Skill resmi]({{SKILL}}), [instalasi dan versi]({{INSTALL}}), [CLI dan Evidence]({{CLI}}), serta studi kasus yang ditautkan. Panduan independen ini ditulis berdasarkan peninjauan sumber. Kami tidak menjalankan REA atau mereproduksi contoh untuk artikel ini. Pencantuman oleh pemilik situs bukan lencana verifikasi runtime.",
+  "nextTitle": "Periksa Skill dalam katalog",
+  "nextText": "Tinjau repositori, sumber Skill yang tercatat, dan status publikasinya sebelum memilih target pertama.",
+  "cta": "Lihat Skill REA"
+}

@@ -1,4 +1,5 @@
-import { CREATOR_BLOG_DATE, CREATOR_BLOG_SLUG } from '@/lib/blog/routes'
+import { CREATOR_BLOG_DATE, CREATOR_BLOG_SLUG, REA_BLOG_DATE, REA_BLOG_SLUG } from '@/lib/blog/routes'
+import { REA_ARTICLE_COPY, reaArticleMarkdown } from '@/lib/blog/rea-guide'
 import { CREATOR_ARTICLE_COPY, creatorArticleMarkdown } from '@/lib/blog/creator-workflows'
 
 export interface StaticBlogSkill {
@@ -23,6 +24,8 @@ export interface StaticBlogPost {
 }
 
 export const STATIC_BLOG_POSTS: StaticBlogPost[] = [
+  { id: `static-${REA_BLOG_SLUG}`, slug: REA_BLOG_SLUG, title: REA_ARTICLE_COPY.en.title,
+    summary: REA_ARTICLE_COPY.en.summary, published_at: REA_BLOG_DATE, content: reaArticleMarkdown('en'), skills: null },
   {
     id: `static-${CREATOR_BLOG_SLUG}`,
     slug: CREATOR_BLOG_SLUG,

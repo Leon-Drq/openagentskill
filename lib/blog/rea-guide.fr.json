@@ -1,0 +1,56 @@
+{
+  "title": "REA pour la rétro-ingénierie : Skill, MCP et première analyse",
+  "summary": "Utiliser REA avec Codex, Claude Code ou Cursor : distinguer Skill et MCP, configurer la version 6.4.0, choisir les outils et préparer une analyse étayée par des preuves.",
+  "eyebrow": "Méthodes pour développeurs",
+  "byline": "Rédaction OpenAgentSkill",
+  "dateLabel": "Sources vérifiées",
+  "backLabel": "Retour au blog",
+  "blogLabel": "Blog",
+  "contentsLabel": "Dans ce guide",
+  "intro": [
+    "REA (Reverse Engineer Anything) relie un agent d’IA à des outils d’analyse de logiciels distribués : paquets d’applications, binaires natifs et certains comportements à l’exécution. Son Skill reverse-engineer-anything guide l’enquête ; le serveur MCP ou la CLI fournit les outils d’analyse.",
+    "Pour commencer, posez une question précise : où un champ CSV est-il transformé, ou quel processus écrit un fichier exporté ? Ce guide explique comment choisir la cible, connecter les outils et demander des éléments vérifiables."
+  ],
+  "sections": [
+    {
+      "id": "what-is-rea",
+      "title": "Quand REA est utile",
+      "body": "REA convient lorsque la réponse dépend d’un artefact compilé ou d’un comportement que les sources disponibles ne permettent pas de confirmer : ASAR Electron, fonction native ou comparaison de versions empaquetées. Si vous disposez du dépôt complet et souhaitez seulement comprendre son architecture, le [Skill officiel]({{SKILL}}) recommande les outils habituels d’exploration de code.\n\nPrécisez l’artefact, un comportement et la preuve recherchée. « Trouve la fonction qui normalise ce champ exporté » permet de vérifier la réponse, contrairement à une demande trop large comme « explique cette application »."
+    },
+    {
+      "id": "skill-mcp-cli",
+      "title": "Skill, MCP et CLI ont des rôles différents",
+      "body": "| Élément | Apport | Ce que son installation ne confirme pas |\n| --- | --- | --- |\n| Skill `reverse-engineer-anything` | Consignes pour choisir la cible, réunir les preuves et signaler les inconnues | Que l’agent peut appeler les outils REA |\n| Serveur MCP de REA | Outils d’analyse accessibles à un agent compatible | Que tous les moteurs sont installés |\n| CLI `rea-agents` | Accès aux méthodes depuis le terminal | Que la session de l’agent est connectée |\n\nL’installation guidée enregistre le serveur et ajoute les instructions correspondantes. Installer uniquement le Skill fournit des consignes et des références. Si le Skill apparaît mais que les outils manquent, consultez cette distinction dans le [guide d’installation]({{INSTALL}}#skill-only-installation)."
+    },
+    {
+      "id": "choose-target",
+      "title": "Choisir la cible avant le moteur",
+      "body": "| Cible | Premier résultat utile | Conditions supplémentaires |\n| --- | --- | --- |\n| Répertoire JavaScript / Electron ou ASAR | Modules, imports et frontières entre processus | Node.js et npm compatibles ; aucun moteur natif |\n| Exécutable natif | Assembleur, pseudocode, appelants et références | Configuration compatible de Hopper, Ghidra ou IDA |\n| Comportement web | Page, scripts et réseau | Navigateur de la famille Chrome et autorisations adaptées |\n| Code d’un APK Android | Classes, méthodes et références | JADX et JDK complet ; vérifier le système hôte |\n\nConsultez la [matrice des cibles]({{README}}#what-you-can-analyze) et votre version : tous les formats ne fonctionnent pas sur chaque machine. L’analyse statique JavaScript lit les fichiers sans lancer l’application. Une capture à l’exécution peut lancer la cible ou interagir avec elle ; délimitez-la séparément.\n\nUne analyse locale ne rend pas toute la conversation hors ligne : les résultats peuvent être transmis au fournisseur du modèle. Utilisez des logiciels et données que vous êtes autorisé à examiner, avec une configuration adaptée à ces informations."
+    },
+    {
+      "id": "setup",
+      "title": "Configurer Codex, Claude Code ou Cursor",
+      "body": "Lors de notre vérification, la version npm publiée était **6.4.0**. Elle exige Node.js **22.19 ou supérieur dans la branche 22.x, 24.11 ou supérieur dans 24.x, ou 26+**. Le numéro **39** des métadonnées du Skill est distinct. La branche main peut décrire des fonctions plus récentes que la version npm. [Paquet]({{NPM}}) · [Limites entre versions]({{INSTALL}}#released-package-and-main)\n\nPour cibler Codex, examinez d’abord les modifications prévues :\n\n```sh\nnpx rea-agents@6.4.0 setup --client codex --dry-run --json\n```\n\nMême en simulation, `npx` peut télécharger et exécuter le paquet REA. La simulation évite d’appliquer les modifications de configuration. Vérifiez les destinations, sauvegardes et remplacements du Skill, puis appliquez si cela convient :\n\n```sh\nnpx rea-agents@6.4.0 setup --client codex\n```\n\nRemplacez `codex` par `claude_code` ou `cursor` selon le client, puis redémarrez ou reconnectez la session. Si les outils manquent, utilisez `npx rea-agents@6.4.0 doctor --client codex --json` pour vérifier configuration et prérequis. Contrôlez aussi les outils disponibles dans la session réelle. Une connexion fonctionnelle ne nécessite pas une nouvelle installation à chaque tâche.\n\nPour une analyse statique JavaScript en CLI, remplacez le chemin par votre répertoire ou ASAR et conservez le résultat :\n\n```sh\nnpx rea-agents@6.4.0 analyze-javascript-application /absolute/path/to/app --json > app-evidence.json\n```\n\nSous Windows, un chemin comme `\"D:/apps/example\"` convient. Si le résultat est volumineux, gardez le fichier Evidence et consultez des vues ciblées plutôt que de tout placer dans le contexte du modèle. [Guide CLI]({{CLI}})"
+    },
+    {
+      "id": "first-investigation",
+      "title": "Préparer une première enquête vérifiable",
+      "body": "Commencez avec votre propre application Electron empaquetée et une fonction d’export. Gardez une copie et notez sa version ou son empreinte. Voici un modèle de demande original, pas le compte rendu d’un test que nous aurions exécuté :\n\n```text\nCible : [chemin absolu du paquet de mon application]\nQuestion : où le champ CSV exporté « status » est-il normalisé ?\nCommencer par l’analyse statique. Suivre le point d’entrée,\nle passage IPC s’il existe, puis l’écriture. Citer un emplacement\n de fichier ou une adresse de fonction pour chaque conclusion.\nSéparer faits observés, déductions et questions ouvertes.\nNe pas lancer l’application ni modifier de fichier sans demander.\nLivrer : un chemin d’appels court, un tableau de preuves et un\n test proposé avec valeur vide, valeur inconnue et texte Unicode.\n```\n\nVérifiez **le parcours**, **les preuves** et **un test susceptible de réfuter l’explication**. Une narration plausible sans emplacement précis est incomplète. Un parcours statique sans observation à l’exécution doit rester présenté comme une déduction statique.\n\nSi vous réimplémentez le comportement dans votre produit, testez cette implémentation séparément. Comprendre un algorithme ne prouve pas qu’un remplacement généré couvre tous les cas limites."
+    },
+    {
+      "id": "evidence",
+      "title": "Ce que montrent les exemples publiés",
+      "body": "L’[étude Notion]({{NOTION}}) suit une requête de presse-papiers entre processus Electron. L’[exemple DX-Ball]({{DXBALL}}) examine un calcul de panoramique sonore et documente les vérifications de sa reconstruction.\n\nDemandez les passages entre composants et les calculs vérifiables derrière une fonction. Ces exemples viennent du projet et concernent des cibles et versions précises : ce ne sont ni des essais OpenAgentSkill ni un taux de réussite universel. Le pseudocode reste un point de départ à confronter aux appelants, aux instructions et aux sorties observées."
+    },
+    {
+      "id": "faq",
+      "title": "Questions avant d’adopter REA",
+      "body": "### REA est-il gratuit ?\n\nLe dépôt utilise la licence MIT. L’usage des modèles et certains fournisseurs d’analyse peuvent avoir leurs propres coûts. Toutes les configurations ne sont donc pas forcément gratuites.\n\n### Fonctionne-t-il sous Windows ?\n\nVérifiez la combinaison cible et fournisseur. JavaScript et Ghidra natif ont des prérequis différents ; la documentation présente Ghidra sous Windows comme expérimental. Installer le paquet ne prouve pas une compatibilité universelle.\n\n### Peut-il récupérer le code source original ?\n\nL’analyse native fournit du pseudocode et de l’assembleur, sans nécessairement préserver les identifiants, commentaires ou la structure du projet. Demandez de distinguer ce qui est récupéré de ce qui est déduit.\n\n### Pourquoi les outils manquent-ils alors que le Skill est installé ?\n\nInstallation du Skill, enregistrement MCP et connexion active sont trois états distincts. Vérifiez le client, redémarrez et inspectez les outils annoncés. Ajoutez un moteur seulement si la cible choisie en a besoin."
+    }
+  ],
+  "methodTitle": "Sources et périmètre éditorial",
+  "method": "Sources vérifiées le **12 octobre 2026 (Asia/Shanghai)** au commit `23d50ea3bec186b4459d36c04854a92276accdf1`, avec les métadonnées npm 6.4.0. GitHub affichait environ 94 000 étoiles : un signe d’attention, pas une mesure de qualité d’analyse.\n\nSources primaires : [présentation]({{README}}), [Skill officiel]({{SKILL}}), [installation et versions]({{INSTALL}}), [CLI et Evidence]({{CLI}}), ainsi que les études citées. Ce guide indépendant repose sur l’examen des sources. Nous n’avons pas exécuté REA ni reproduit les exemples pour cet article. Une publication par le propriétaire du site n’est pas un badge de validation à l’exécution.",
+  "nextTitle": "Consulter le Skill du catalogue",
+  "nextText": "Examinez le dépôt, la source du Skill enregistrée et son statut de publication avant de choisir votre première cible.",
+  "cta": "Voir le Skill REA"
+}
