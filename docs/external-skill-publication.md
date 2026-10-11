@@ -31,6 +31,15 @@ listing, not an exemption from the Skill review queue or an AI approval.
 Resource cards share the directory's search, free filter and new-arrival sorting.
 They link to a dedicated resource detail page and the upstream repository, with
 no install command, fabricated preview, numeric score or verification badge.
+When the source README already has relevant images, prefer those source examples
+over an empty card: inspect the images and applicable usage terms, pin the same
+repository commit, retain source attribution and link each image to its GitHub
+file. Do not infer an image license from the font license or claim a source
+example is a runtime test. Qiaomu's cover and four Chinese type specimens are
+embedded directly from GitHub, not mirrored; no font files, image-generation
+calls or request-time GitHub API crawling are added. Images use lazy loading,
+uncropped proportions and the existing error fallback. These previews qualify
+for the With examples filter, but never for verified-install metrics.
 They do not enter Resolve, repository rankings, install counts or the community
 interaction tables. Font binaries are not mirrored and no additional database or
 model call is required. The listing's source/version are observations, not a

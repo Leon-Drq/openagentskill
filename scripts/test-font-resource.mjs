@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { register } from 'node:module'
 register('./test-owner-publication-loader.mjs', import.meta.url)
-const { getExternalSkill, searchExternalSkills, externalSkillDiscoveryRecord, ExternalSkillSchema, isMissingExternalSkillPath } = await import('../lib/skills/external-catalog.ts')
+const { getExternalSkill, searchExternalSkills, externalSkillDiscoveryRecord, ExternalSkillSchema, isMissingExternalSkillPath, validateExternalCatalog } = await import('../lib/skills/external-catalog.ts')
 const { selectProviderSkills, toProviderDirectorySkill } = await import('../lib/skills/provider-directory.ts')
 const entry = getExternalSkill('resource-qiaomu-cover-fonts')
 assert.equal(entry.provider, 'resource')
@@ -9,7 +9,8 @@ for (const q of ['乔木', '字库', 'qiaomu', 'joeseesun/qiaomu-cover-fonts', '
 const defaults = {category:'all',topic:'all',output:'all',pricing:'all',examplesOnly:false,platform:'all',quality:'all',trust:'all',safety:'all',supplyTrack:'all',minStars:0,useCase:'all',sort:'new'}
 assert.equal(selectProviderSkills(defaults)[0].slug, entry.slug)
 assert.ok(selectProviderSkills({...defaults,pricing:'free',category:'design-creative'}).includes(entry))
-for (const options of [{pricing:'paid'}, {examplesOnly:true}, {minStars:1}, {platform:'codex'}, {trust:'strong'}]) assert.ok(!selectProviderSkills({...defaults,...options}).includes(entry))
+assert.ok(selectProviderSkills({...defaults, examplesOnly:true}).includes(entry))
+for (const options of [{pricing:'paid'}, {minStars:1}, {platform:'codex'}, {trust:'strong'}]) assert.ok(!selectProviderSkills({...defaults,...options}).includes(entry))
 const data=externalSkillDiscoveryRecord(entry)
 assert.equal(data.type,'design-resource')
 assert.equal(data.install_command,null)
@@ -19,6 +20,12 @@ assert.equal(data.runtime_verified,false)
 assert.equal(data.resource_type,'font-library')
 assert.equal(data.source_commit,entry.sourceCommit)
 assert.equal(data.bundle_sha256,null)
+assert.equal(data.examples.length,5)
+assert.ok(data.examples.every(preview=>preview.runtime_verified===false))
+for (const src of ['https://example.com/image.png',entry.sourcePreviews[0].src.replace(entry.sourceCommit,'main')]) {
+  assert.throws(()=>validateExternalCatalog([{...entry,sourcePreviews:[{...entry.sourcePreviews[0],src}]}]),/pinned GitHub/)
+}
+assert.throws(()=>validateExternalCatalog([{...entry,sourcePreviews:[{...entry.sourcePreviews[0],sourceUrl:entry.sourceUrl}]}]),/pinned GitHub/)
 assert.equal(isMissingExternalSkillPath('/skills/resource-missing'),true)
 assert.equal(isMissingExternalSkillPath('/skills/'+entry.slug),false)
 for (const lang of ['en','zh']) {

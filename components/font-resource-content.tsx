@@ -1,6 +1,7 @@
 import Link from '@/components/crawl-link'
 import { SiteHeader } from './site-header'
 import { SiteFooter } from './site-footer'
+import { SkillPreviewImage } from './skill-preview-image'
 import type { ExternalSkill } from '@/lib/skills/external-catalog'
 
 /** A font asset is discoverable beside Skills without inventing an installer. */
@@ -35,6 +36,16 @@ export function FontResourceContent({ entry, zh }: { entry: Extract<ExternalSkil
       </header>
       <div className="grid gap-12 py-10 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="min-w-0 space-y-10">
+          {entry.sourcePreviews.length > 0 && <section id="showcase" className="scroll-mt-24" aria-labelledby="font-preview-heading">
+            <h2 id="font-preview-heading" className="font-display text-3xl">{zh ? '原仓库字体预览' : 'Font previews from the repository'}</h2>
+            <p className="mt-3 text-sm leading-7 text-secondary">{zh ? '图片来自 joeseesun 的 GitHub README，直接展示固定版本原图；不是本站运行生成的案例。点击图片查看原始文件。' : 'Original images from joeseesun’s GitHub README, pinned to the inspected revision. These are source examples, not outputs generated or tested by OpenAgentSkill. Open an image to inspect its source.'}</p>
+            <div className="mt-5 space-y-4">{entry.sourcePreviews.map(preview => <figure key={preview.src} className="overflow-hidden rounded-xl border border-border bg-card">
+              <a href={preview.sourceUrl} target="_blank" rel="noopener noreferrer" className="block focus-visible:outline-2 focus-visible:outline-[#006b4f]">
+                <SkillPreviewImage locale={lang} src={preview.src} alt={preview.alt[lang]} width={preview.width} height={preview.height} loading="lazy" className="h-auto w-full object-contain" />
+              </a>
+              <figcaption className="px-4 py-3 text-xs leading-6 text-secondary">{preview.alt[lang]} · {zh ? '来源' : 'Source'}: joeseesun / GitHub</figcaption>
+            </figure>)}</div>
+          </section>}
           <section><h2 className="font-display text-3xl">{zh ? '从底图到准确的中文排版' : 'From an image to deliberate typography'}</h2><p className="mt-4 text-base leading-8 text-secondary">{entry.usage[lang]}</p></section>
           <section><h2 className="font-display text-3xl">{zh ? '格式与适用范围' : 'Formats & limitations'}</h2><p className="mt-4 text-base leading-8 text-secondary">{entry.limitations[lang]}</p></section>
           <section><h2 className="font-display text-3xl">{zh ? '来源与版本' : 'Source & version'}</h2>

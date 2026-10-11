@@ -83,6 +83,10 @@ const ResourceSchema = RedSkillSchema.extend({
   sourceCommit: z.string().regex(/^[a-f0-9]{40}$/),
   manifestUrl: httpsUrl,
   articlePath: z.string().regex(/^\/blog\/[a-z0-9-]+$/),
+  sourcePreviews: z.array(z.object({
+    src: httpsUrl, sourceUrl: httpsUrl, alt: localized,
+    width: z.number().int().positive().max(8000), height: z.number().int().positive().max(8000),
+  }).strict()).max(8).default([]),
   bundleSha256: z.null(),
   license: z.literal('OFL-1.1'),
   commercialUse: z.literal('permitted-subject-to-font-license'),
@@ -94,6 +98,16 @@ export type ExternalSkill = z.infer<typeof ExternalSkillSchema>
 
 export function validateExternalCatalog(input: unknown): ExternalSkill[] {
   const entries = z.array(ExternalSkillSchema).parse(input)
+  for (const entry of entries) if (entry.provider === 'resource') {
+    const repo = entry.identifier.slice('github:'.length)
+    for (const preview of entry.sourcePreviews) {
+      const prefix = `https://raw.githubusercontent.com/${repo}/${entry.sourceCommit}/images/`
+      if (!preview.src.startsWith(prefix) || !/^[\w/-]+\.(png|webp|jpg)$/.test(preview.src.slice(prefix.length)) ||
+        preview.sourceUrl !== `https://github.com/${repo}/blob/${entry.sourceCommit}/images/${preview.src.slice(prefix.length)}`) {
+        throw new Error('Resource preview must link to the same pinned GitHub source')
+      }
+    }
+  }
   for (const key of ['slug', 'identifier', 'sourceUrl', 'bundleSha256'] as const) {
     const values = entries.map(entry => entry[key]).filter(value => value !== null)
     if (new Set(values).size !== values.length) throw new Error(`Duplicate external ${key}`)
@@ -116,6 +130,17 @@ export const EXTERNAL_SKILLS = validateExternalCatalog([
     sourceCommit: '415ea71650d6ba896759a2d7fde05ac5317ca3d1',
     manifestUrl: 'https://github.com/joeseesun/qiaomu-cover-fonts/blob/415ea71650d6ba896759a2d7fde05ac5317ca3d1/index.json',
     articlePath: '/blog/qiaomu-cover-fonts-chinese-images-video-titles',
+    sourcePreviews: [
+      { path: 'banner.png', height: 540, en: 'Qiaomu Cover Fonts: the author’s font-library cover', zh: '乔木字库：作者提供的字库封面' },
+      { path: 'chinese/zh-01.png', height: 300, en: 'Noto Serif SC: Chinese specimen in three weights', zh: '思源宋体：三种字重的中文样张' },
+      { path: 'chinese/zh-02.png', height: 300, en: 'Noto Sans SC: Chinese specimen in three weights', zh: '思源黑体：三种字重的中文样张' },
+      { path: 'chinese/zh-03.png', height: 300, en: 'Zhuque Fangsong: Chinese type specimen', zh: '朱雀仿宋：中文字体样张' },
+      { path: 'chinese/zh-04.png', height: 300, en: 'LXGW WenKai: Chinese type specimen', zh: '霞鹜文楷：中文字体样张' },
+    ].map(({ path, height, en, zh }) => ({
+      src: `https://raw.githubusercontent.com/joeseesun/qiaomu-cover-fonts/415ea71650d6ba896759a2d7fde05ac5317ca3d1/images/${path}`,
+      sourceUrl: `https://github.com/joeseesun/qiaomu-cover-fonts/blob/415ea71650d6ba896759a2d7fde05ac5317ca3d1/images/${path}`,
+      width: 1960, height, alt: { en, zh },
+    })),
     version: '1.0.0', bundleSha256: null,
     license: 'OFL-1.1', licenseUrl: 'https://openfontlicense.org/open-font-license-official-text/',
     commercialUse: 'permitted-subject-to-font-license',
@@ -213,7 +238,8 @@ export function externalSkillDiscoveryRecord(entry: ExternalSkill) {
     source_url: entry.sourceUrl, acquisition_url: externalSourceHref(entry.sourceUrl),
     author: entry.provider === 'skillry' ? null : entry.author,
     publisher: entry.provider === 'skillry' ? entry.author : null, version: entry.version,
-    ...(entry.provider === 'resource' ? { resource_type: entry.resourceType, source_commit: entry.sourceCommit, manifest_url: entry.manifestUrl, article_url: `https://www.openagentskill.com${entry.articlePath}` } : {}),
+    ...(entry.provider === 'resource' ? { resource_type: entry.resourceType, source_commit: entry.sourceCommit, manifest_url: entry.manifestUrl, article_url: `https://www.openagentskill.com${entry.articlePath}`,
+      examples: entry.sourcePreviews.map(preview => ({ image_url: preview.src, source_url: preview.sourceUrl, attribution: entry.author.name, runtime_verified: false })) } : {}),
     version_source: entry.provider === 'resource' ? 'Versioned GitHub manifest; not automatically synchronized' : entry.provider === 'skillry'
       ? entry.versionObservedAt ? `Skillry public product page observed at ${entry.versionObservedAt}` : 'Version not recorded; check Skillry for the current package version'
       : 'RedSkill bundle manifest observed at publication; not automatically synchronized',

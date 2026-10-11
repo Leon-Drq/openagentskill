@@ -26,7 +26,7 @@ export function providerCommerce(entry: ExternalSkill, now = Date.now()): SkillC
     sourceUrl: entry.sourceUrl, checkedAt: entry.provider === 'skillry' ? entry.listingEvidence.observedAt : null,
     runtime: 'unknown', purchaseUrl: offer && 'purchaseUrl' in offer && offer.purchaseUrl ? externalSourceHref(offer.purchaseUrl) : null, checkout: 'external', purchaseRequiresUserConsent: true }
 }
-export function providerExampleCount(entry: ExternalSkill) { return entry.provider === 'skillry' ? entry.previewImages.length : entry.runtimeDemo ? 1 : 0 }
+export function providerExampleCount(entry: ExternalSkill) { return entry.provider === 'resource' ? entry.sourcePreviews.length : entry.provider === 'skillry' ? entry.previewImages.length : entry.runtimeDemo ? 1 : 0 }
 export function hasProviderCommercialOffers() { return EXTERNAL_SKILLS.some(entry => (entry.provider !== 'skillry' || entry.active) && providerCommerce(entry).type === 'paid') }
 export function selectProviderSkills(filters: {
   query?: string; category: string; topic: string; output: string; pricing: PriceFilter; examplesOnly: boolean;
@@ -60,9 +60,9 @@ export function toProviderDirectorySkill(entry: ExternalSkill, locale: string): 
     exampleCount: providerExampleCount(entry),
     provider: { resource: entry.provider === 'resource', label: entry.provider === 'resource' ? (lang === 'zh' ? '字体资源' : 'Font resource') : entry.provider === 'skillry' ? 'Skillry' : 'RedSkill', localizedName: lang === 'zh' && entry.provider === 'skillry' && entry.title.zh !== entry.skillName ? entry.title.zh : undefined,
       sourceDownloads: entry.provider === 'skillry' ? entry.listingEvidence.downloadCount : undefined, sourceHref: externalSourceHref(entry.sourceUrl), sourceRel: externalSourceRel(entry.sourceUrl),
-      image: entry.provider === 'skillry' ? entry.previewImages[0].replace('&variant=detail', '&variant=card') : entry.runtimeDemo?.poster,
+      image: entry.provider === 'resource' ? entry.sourcePreviews[0]?.src : entry.provider === 'skillry' ? entry.previewImages[0].replace('&variant=detail', '&variant=card') : entry.runtimeDemo?.poster,
       video: entry.provider === 'skillry' ? entry.previewVideo || undefined : entry.runtimeDemo?.video,
-      exampleLabel: entry.provider === 'skillry' ? (lang === 'zh' ? '原站案例 · Skillry' : 'Source example · Skillry') : (lang === 'zh' ? '本站实录' : 'Recorded here') },
+      exampleLabel: entry.provider === 'resource' ? (lang === 'zh' ? '原仓库示例 · GitHub' : 'Source example · GitHub') : entry.provider === 'skillry' ? (lang === 'zh' ? '原站案例 · Skillry' : 'Source example · Skillry') : (lang === 'zh' ? '本站实录' : 'Recorded here') },
   }
 }
 

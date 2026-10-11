@@ -85,6 +85,7 @@ export async function auditMedia({ catalog, remote = false, fetcher = fetch, out
     // Link-only font resources have no claimed visual example. Other providers
     // still require their observed preview; never fabricate one to pass audit.
     if (entry.provider !== 'resource' || card.provider.image) add(card.provider.image, 'image', entry.slug)
+    if (entry.provider === 'resource') for (const preview of entry.sourcePreviews) add(preview.src, 'image', entry.slug)
     if (entry.provider === 'skillry') for (const src of entry.previewImages) add(src, 'image', entry.slug)
     const video = entry.provider === 'skillry' ? entry.previewVideo : entry.runtimeDemo?.video
     if (video) {

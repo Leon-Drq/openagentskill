@@ -20,7 +20,7 @@ export async function buildCatalogSkillMetadata({ params, searchParams }: Props)
   const query = await searchParams
   const lang = query.lang === 'zh' ? 'zh' : 'en'
   const url = base + externalSkillHref(entry.slug)
-  const socialImage = entry.provider === 'skillry' ? entry.previewImages[0] : entry.runtimeDemo ? base + entry.runtimeDemo.poster : null
+  const socialImage = entry.provider === 'resource' ? entry.sourcePreviews[0]?.src : entry.provider === 'skillry' ? entry.previewImages[0] : entry.runtimeDemo ? base + entry.runtimeDemo.poster : null
   return {
     title: entry.title[lang], description: entry.description[lang],
     alternates: { canonical: url }, robots: { index: Object.keys(query).length === 0 && (entry.provider !== 'skillry' || (entry.active && entry.seoIndexable)), follow: true },

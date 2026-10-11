@@ -9,9 +9,9 @@ const { EXTERNAL_SKILLS } = await import('../lib/skills/external-catalog.ts')
 const { selectProviderSkills, providerCatalogWindow, mergeProviderCatalogPage, toProviderDirectorySkill, providerCommerce } = await import('../lib/skills/provider-directory.ts')
 const defaults = {category:'all',topic:'all',output:'all',pricing:'all',examplesOnly:true,platform:'all',quality:'all',trust:'all',safety:'all',supplyTrack:'all',minStars:0,useCase:'all'}
 const skillry = EXTERNAL_SKILLS.filter(e=>e.provider==='skillry'&&e.active)
-assert.equal(selectProviderSkills(defaults).length,skillry.length+1)
+assert.equal(selectProviderSkills(defaults).length,skillry.length+2)
 assert.equal(selectProviderSkills({...defaults,query:'Skillry'}).length,skillry.length)
-assert.equal(selectProviderSkills({...defaults,pricing:'free'}).length,skillry.filter(e=>e.listingEvidence.priceUsdCents===0).length)
+assert.equal(selectProviderSkills({...defaults,pricing:'free'}).length,skillry.filter(e=>e.listingEvidence.priceUsdCents===0).length+1)
 assert.equal(selectProviderSkills({...defaults,pricing:'paid'}).length,skillry.filter(e=>e.listingEvidence.priceUsdCents>0).length)
 assert.ok(selectProviderSkills({...defaults,category:'video-creation'}).length>0)
 assert.ok(selectProviderSkills({...defaults,featured:true}).every(e=>e.provider==='skillry'&&e.listingEvidence.featured))
@@ -28,7 +28,9 @@ for (const entry of EXTERNAL_SKILLS) {
     assert.equal(card.provider.resource, true)
     assert.equal(card.commerce.type, 'free')
     assert.equal(card.provider.label, '字体资源')
-    assert.equal(card.exampleCount, 0)
+    assert.equal(card.exampleCount, entry.sourcePreviews.length)
+    assert.equal(card.provider.image, entry.sourcePreviews[0].src)
+    assert.equal(card.provider.exampleLabel, '原仓库示例 · GitHub')
     assert.equal(card.technical.installCommand, undefined)
     continue
   }
