@@ -35,6 +35,7 @@ function isLocalizedDeepRoute(page: string) {
 }
 
 function hasDedicatedLocalizedRoute(page: string, locale: Locale) {
+  if (page === 'studio/motion' || /^studio\/motion\/motion-[a-z0-9-]+$/.test(page)) return locale === 'zh'
   return isMarketLocale(locale) && (
     isLocalizedCorePageSlug(page) ||
     LOCALIZED_EXPERIENCE_PAGE_SLUGS.includes(page as (typeof LOCALIZED_EXPERIENCE_PAGE_SLUGS)[number]) ||

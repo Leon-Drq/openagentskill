@@ -1,0 +1,74 @@
+{
+  "type": {
+    "name": "Kinetic typography",
+    "zhName": "文字动效",
+    "description": "A typographic rhythm study with staggered words, oversized letterforms and deliberate reading holds.",
+    "zhDescription": "逐词编排、超大字形与阅读停顿，让文字本身成为主角。"
+  },
+  "product": {
+    "name": "Product films",
+    "zhName": "产品发布",
+    "description": "A product stage with a floating interface, feature focus and a clear closing message.",
+    "zhDescription": "用界面舞台、功能聚焦和收尾信息，展示产品价值。"
+  },
+  "phone": {
+    "name": "Mobile showcases",
+    "zhName": "手机演示",
+    "description": "A mobile interface reveal with layered screens and a single, readable interaction.",
+    "zhDescription": "层叠屏幕、设备揭幕与可读的操作过程。"
+  },
+  "charts": {
+    "name": "Data in motion",
+    "zhName": "数据动效",
+    "description": "Animated bars, a readable scale and a focused data annotation.",
+    "zhDescription": "让数据沿着统一刻度展开，以清楚的标注说明变化。"
+  },
+  "diagrams": {
+    "name": "Visual explainers",
+    "zhName": "图解动画",
+    "description": "A connected sequence that reveals cause, process and outcome in order.",
+    "zhDescription": "按原因、过程、结果依次展开的图解。"
+  },
+  "shapes": {
+    "name": "Shape choreography",
+    "zhName": "几何编舞",
+    "description": "A geometric motion study built around form, balance and elastic timing.",
+    "zhDescription": "通过形状、平衡与弹性节奏，编排几何运动。"
+  },
+  "particles": {
+    "name": "Particle studies",
+    "zhName": "粒子动效",
+    "description": "A seeded field of particles that gathers into a coherent orbital structure.",
+    "zhDescription": "从点阵到轨道结构，展现粒子的聚合与流动。"
+  },
+  "code": {
+    "name": "Code stories",
+    "zhName": "代码演示",
+    "description": "A terminal-inspired sequence that introduces a command and explains its result.",
+    "zhDescription": "围绕命令、运行过程和结果展开的开发者演示。"
+  },
+  "characters": {
+    "name": "Character stories",
+    "zhName": "角色叙事",
+    "description": "An original geometric character scene with anticipation, action and response.",
+    "zhDescription": "用原创几何角色演示预备、行动与回应。"
+  },
+  "editorial": {
+    "name": "Editorial motion",
+    "zhName": "影像排版",
+    "description": "A layered editorial composition with image windows, quiet motion and strong typography.",
+    "zhDescription": "以影像窗口、克制运动和文字层级构成编辑式画面。"
+  },
+  "spatial": {
+    "name": "Spatial studies",
+    "zhName": "空间动效",
+    "description": "An orbital wireframe study with depth cues and controlled camera rhythm.",
+    "zhDescription": "借助轨道、线框和节奏，表现空间深度。"
+  },
+  "audio": {
+    "name": "Rhythm & sound",
+    "zhName": "节奏可视化",
+    "description": "A rhythmic visual score with repeating bars and carefully spaced accents.",
+    "zhDescription": "通过节奏条、重复与停顿，编排视觉乐章。"
+  }
+}

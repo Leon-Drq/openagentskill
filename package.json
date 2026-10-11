@@ -66,9 +66,10 @@
     "test:media-collection": "node --experimental-strip-types scripts/test-skill-media-collection.mjs",
     "test:growth-upgrade": "node --experimental-strip-types scripts/test-growth-upgrade.mjs",
     "test:creator-blog": "node --import ./scripts/test-typescript-register.mjs scripts/test-creator-blog.mjs",
-    "test:resource-pages": "node --import ./scripts/test-typescript-register.mjs scripts/test-resource-pages.mjs && pnpm test:studio",
+    "test:resource-pages": "node --import ./scripts/test-typescript-register.mjs scripts/test-resource-pages.mjs && pnpm test:studio && pnpm test:motion-studio",
     "test:studio": "node --import ./scripts/test-typescript-register.mjs scripts/test-studio-membership.mjs",
-    "check:resource-pages": "node scripts/check-resource-pages.mjs"
+    "check:resource-pages": "node scripts/check-resource-pages.mjs",
+    "test:motion-studio": "node --import ./scripts/test-typescript-register.mjs scripts/test-motion-studio.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

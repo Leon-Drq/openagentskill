@@ -4,7 +4,7 @@ import { discoveryCopy } from './discovery.ts'
 import type en from './i18n/dictionaries/en'
 
 type NavKey = keyof typeof en.nav
-export type NavigationLink = { href: string; label: NavKey | 'gallery' | 'resources' | 'developers' | 'creatorShort' | 'reports' | 'contact' | 'sponsor' | 'categories' | 'membership' | 'originalSkills' | 'pricing' }
+export type NavigationLink = { href: string; label: NavKey | 'gallery' | 'resources' | 'developers' | 'creatorShort' | 'reports' | 'contact' | 'sponsor' | 'categories' | 'membership' | 'originalSkills' | 'pricing' | 'motion' }
 export type NavigationSection = NavigationLink & { id: string; items?: readonly NavigationLink[]; activePaths?: readonly string[] }
 
 // Public destinations retained independently of the header's presentation.
@@ -14,7 +14,7 @@ export const SITE_NAVIGATION: readonly NavigationSection[] = [
     { href: '/skills', label: 'browseSkills' },
     { href: '/resolve', label: 'aiSkillFinder' }, { href: '/use-cases', label: 'useCases' },
     { href: '/skill-packs', label: 'packs' }, { href: '/compare', label: 'compare' },
-    { href: '/studio/launch-card-studio', label: 'originalSkills' }, { href: '/membership', label: 'membership' },
+    { href: '/studio/launch-card-studio', label: 'originalSkills' }, { href: '/studio/motion', label: 'motion' }, { href: '/membership', label: 'membership' },
   ] },
   { id: 'rankings', href: '/rankings', label: 'rankings', activePaths: ['/trending'] },
   { id: 'creators', href: '/creators', label: 'creatorShort', activePaths: ['/creator', '/creator-kit'], items: [
@@ -78,6 +78,7 @@ const studioLabels: Record<Locale, { membership: string; originalSkills: string;
   id: { membership: 'Keanggotaan', originalSkills: 'Skill orisinal', pricing: 'Harga' },
 }
 export function navigationLabel(link: NavigationLink, locale: Locale, nav: Record<NavKey, string>, gallery: string) {
+  if (link.label === 'motion') return ({ en: 'Motion Studio', zh: '动效作品库', ja: 'モーションスタジオ', ko: '모션 스튜디오', es: 'Estudio de motion', de: 'Motion Studio', fr: 'Studio motion', id: 'Studio motion' })[locale]
   if (link.label === 'membership' || link.label === 'originalSkills' || link.label === 'pricing') return studioLabels[locale][link.label]
   if (link.label === 'categories') return discoveryCopy(locale).categories
   if (link.label === 'contact' || link.label === 'sponsor') return partnershipLabels[locale][link.label]
