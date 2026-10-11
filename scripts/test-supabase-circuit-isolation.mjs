@@ -83,6 +83,44 @@ try {
   globalThis.fetch = good
   assert.equal((await telemetry(url)).status, 200, 'Permission errors are not gateway failures')
 
+  for (const [status, retryAfterValue, delay] of [
+    [402, null, 60_000], [429, null, 15_000], [429, '120', 120_000],
+    [429, () => new Date(now + 90_000).toUTCString(), 90_000],
+    [402, '1', 60_000], [429, 'invalid', 15_000], [429, '999999', 300_000],
+  ]) {
+    reset()
+    now = Math.ceil(now / 1000) * 1000 // HTTP-date precision is whole seconds.
+    const retryAfter = typeof retryAfterValue === 'function' ? retryAfterValue() : retryAfterValue
+    globalThis.fetch = async () => {
+      calls++
+      return new Response('quota or rate limit', { status, headers: retryAfter ? { 'retry-after': retryAfter } : {} })
+    }
+    const limited = createResilientTimeoutFetch(100, 'public-catalog')
+    const response = await limited(url)
+    assert.equal(response.status, status, 'Preserve upstream error for the caller')
+    assert.equal(await response.text(), 'quota or rate limit')
+    await assert.rejects(() => limited(url), /circuit is temporarily open/)
+    assert.equal(calls, 1, 'Quota/rate limits pause immediately without more upstream requests')
+    now += delay - 1
+    await assert.rejects(() => limited(url), /circuit is temporarily open/)
+    now++
+    globalThis.fetch = good
+    assert.equal((await limited(url)).status, 200, 'The service can recover after the bounded cooldown')
+  }
+
+  reset()
+  let completeBeforeLimit
+  globalThis.fetch = async () => new Promise(resolve => { completeBeforeLimit = resolve })
+  const inFlight = bulk(url)
+  globalThis.fetch = async () => new Response('quota', { status: 402 })
+  assert.equal((await bulk(url)).status, 402)
+  completeBeforeLimit(new Response('late success'))
+  await inFlight
+  await assert.rejects(() => bulk(url), /circuit is temporarily open/, 'Late success must not cancel quota cooldown')
+  now += 60_000
+  assert.equal((await bulk(url)).status, 402)
+  await assert.rejects(() => bulk(url), /circuit is temporarily open/, 'An unresolved quota pauses the recovery probe again')
+
   const db = readFileSync(new URL('../lib/db/skills.ts', import.meta.url), 'utf8')
   assert.match(db, /requestTimeoutMs: 8000, circuitScope: 'public-catalog'/)
   assert.match(db, /requestTimeoutMs: SKILL_LOOKUP_TIMEOUT_MS, circuitScope: 'skill-lookup'/)

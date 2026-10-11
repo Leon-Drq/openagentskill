@@ -13,6 +13,8 @@ type CircuitGlobal = typeof globalThis & {
 
 const FAILURE_THRESHOLD = 3
 const OPEN_INTERVAL_MS = 15_000
+const QUOTA_INTERVAL_MS = 60_000
+const MAX_RETRY_AFTER_MS = 300_000
 
 function getCircuitState(scope: SupabaseCircuitScope): CircuitState {
   const shared = globalThis as CircuitGlobal
@@ -28,13 +30,25 @@ function getCircuitState(scope: SupabaseCircuitScope): CircuitState {
   return circuits[scope]
 }
 
-function recordFailure(state: CircuitState) {
+function recordFailure(state: CircuitState, backoffMs?: number) {
   state.consecutiveFailures += 1
+  // Explicit quota/rate limits should pause immediately, not be counted as
+  // healthy HTTP responses or require three more requests to a blocked service.
+  if (backoffMs !== undefined) state.consecutiveFailures = Math.max(FAILURE_THRESHOLD, state.consecutiveFailures)
   if (state.consecutiveFailures >= FAILURE_THRESHOLD) {
-    state.openUntil = Date.now() + OPEN_INTERVAL_MS
+    state.openUntil = Date.now() + (backoffMs ?? OPEN_INTERVAL_MS)
     state.generation += 1
     state.probeInFlight = false
   }
+}
+
+function responseBackoff(response: Response): number {
+  const minimum = response.status === 402 ? QUOTA_INTERVAL_MS : OPEN_INTERVAL_MS
+  const header = response.headers.get('retry-after')
+  if (!header) return minimum
+  const seconds = Number(header)
+  const delay = Number.isFinite(seconds) ? seconds * 1000 : Date.parse(header) - Date.now()
+  return Number.isFinite(delay) ? Math.min(MAX_RETRY_AFTER_MS, Math.max(minimum, delay)) : minimum
 }
 
 function recordSuccess(state: CircuitState) {
@@ -47,7 +61,7 @@ function recordSuccess(state: CircuitState) {
 /**
  * Bound Supabase requests and stop a degraded gateway from consuming every
  * serverless invocation. The circuit is shared by warm invocations of the
- * same workload, opens after three failures, and allows one half-open probe
+ * same workload, opens after three failures (immediately for quota/rate limits), and allows one half-open probe
  * after the cooldown. Optional/bulk reads must not trip critical lookups or
  * writes. The fixed scope set keeps process-local state bounded.
  */
@@ -98,7 +112,8 @@ export function createResilientTimeoutFetch(timeoutMs: number, scope: SupabaseCi
       // Requests started before a circuit opened cannot close it late or
       // extend its cooldown. Only the recovery probe can change that state.
       if (state.generation === generation) {
-        if (response.status >= 500) recordFailure(state)
+        if (response.status === 402 || response.status === 429) recordFailure(state, responseBackoff(response))
+        else if (response.status >= 500) recordFailure(state)
         else recordSuccess(state)
       }
       return new Response(body, { status: response.status, statusText: response.statusText, headers: response.headers })

@@ -22,6 +22,7 @@ import { trackAnalyticsEvent } from '@/lib/analytics'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
 import { DirectoryPagination } from './directory-pagination'
+import { DirectoryRecovery } from './directory-recovery'
 import { pageCount } from '@/lib/skills/pagination'
 import { SkillActions, SkillEngagementProvider } from './skill-engagement'
 import type { SupplyTrackSummary } from '@/lib/supply'
@@ -389,7 +390,7 @@ export function SkillsPageClient(props: Props) {
           )}
           <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${degraded ? skills.length : resultCount}`}</p>
           {props.access !== 'paid' && (props.access !== 'all' || props.pricing !== 'all') && <p className="my-4 text-xs leading-6 text-secondary">{props.access === 'free' ? filterCopy.freeNote : props.access === 'third-party' ? filterCopy.thirdPartyNote : prices.caveat}</p>}
-          {degraded && <p role="status" className="my-5 border-l-2 border-amber-600 bg-amber-50 p-4 text-sm text-amber-950">{label(props.catalogMode && skills.length === 0 ? 'catalogUnavailable' : 'dataUnavailable')}</p>}
+          {degraded && <DirectoryRecovery key={`${pathname}?${queryString}`} locale={locale} empty={props.catalogMode && skills.length === 0} />}
 
           {skills.length === 0 ? (
             <div className="border-y border-border py-14 text-center">

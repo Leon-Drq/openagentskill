@@ -61,6 +61,8 @@ id: {"title":"AI Agent Skills","intro":"Temukan skill untuk tugas berikutnya den
 export const directoryCopy = (locale: Locale) => copies[locale]
 
 const terms: Record<string, readonly string[]> = {
+ retry: ['Try again', '重新加载', '再試行', '다시 시도', 'Reintentar', 'Erneut versuchen', 'Réessayer', 'Coba lagi'],
+ retryLater: ['Try again shortly', '请稍后重试', '少し待って再試行', '잠시 후 다시 시도', 'Reintenta en breve', 'In Kürze erneut versuchen', 'Réessayez dans un instant', 'Coba lagi sebentar lagi'],
  pagination: ['Skill pages', '技能分页', 'スキルのページ', '스킬 페이지', 'Páginas de skills', 'Skill-Seiten', 'Pages des skills', 'Halaman skill'],
  pageNumber: ['Page {page}', '第 {page} 页', '{page} ページ', '{page} 페이지', 'Página {page}', 'Seite {page}', 'Page {page}', 'Halaman {page}'],
  pageSummary: ['Page {page} of {total}', '第 {page} 页 / 共 {total} 页', '{page} / {total} ページ', '{page} / {total} 페이지', 'Página {page} de {total}', 'Seite {page} von {total}', 'Page {page} sur {total}', 'Halaman {page} dari {total}'],
