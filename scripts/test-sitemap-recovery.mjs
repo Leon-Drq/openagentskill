@@ -1,4 +1,5 @@
 import * as mediaQuery from '../lib/skills/media-query.ts'
+import * as chronological from '../lib/skills/chronological-directory.ts'
 import assert from 'node:assert/strict'
 import {readFileSync} from 'node:fs'
 import ts from 'typescript'
@@ -53,6 +54,7 @@ const dbDependencies=Object.fromEntries([
   ...['@/lib/skills/taxonomy','@/lib/skills/publication','@/lib/async','@/lib/search-results','@/lib/skills/directory','@/lib/skills/presentation-category','@/lib/skills/catalog-query','@/lib/skills/commerce','@/lib/skills/registry-scope','@/lib/seo/curated-skill-snapshot','@/lib/search-query','@/lib/cache/packed-json'].map(name=>[name,{}]),
 ])
 dbDependencies['@/lib/skills/media-query'] = mediaQuery
+dbDependencies['@/lib/skills/chronological-directory'] = chronological
 const db=compile('lib/db/skills.ts',dbDependencies)
 assert.equal(await db.getApprovedSkillSitemapCount(3,50),3,'An eligible canonical listing is counted once')
 assert.deepEqual((await db.getApprovedSkillSitemapRecords({offset:2,limit:2,minStars:3,minQualityScore:50})).map(x=>x.slug),[overlap.slug])

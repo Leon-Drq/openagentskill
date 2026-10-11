@@ -16,6 +16,7 @@ import { locales } from '../lib/i18n/config.ts'
 import * as searchResults from '../lib/search-results.ts'
 import * as taxonomy from '../lib/skills/taxonomy.ts'
 import * as catalogQuery from '../lib/skills/catalog-query.ts'
+import * as chronological from '../lib/skills/chronological-directory.ts'
 import * as pagination from '../lib/skills/pagination.ts'
 import * as commerce from '../lib/skills/commerce.ts'
 
@@ -127,6 +128,7 @@ const db = compile('lib/db/skills.ts', {
   '@/lib/skills/taxonomy': taxonomy,
   '@/lib/skills/presentation-category': presentationCategory,
   '@/lib/skills/catalog-query': catalogQuery,
+  '@/lib/skills/chronological-directory': chronological,
   '@/lib/skills/media-query': mediaQuery,
   '@/lib/skills/pagination': pagination,
   '@/lib/skills/commerce': commerce,

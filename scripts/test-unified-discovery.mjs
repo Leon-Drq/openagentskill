@@ -8,6 +8,7 @@ import { mediaSlugsNeedPost, slugQueryBatches } from '../lib/skills/media-query.
 import { normalizeSkillCategory } from '../lib/skills/taxonomy.ts'
 import { clampResultPage } from '../lib/skills/pagination.ts'
 import { directoryDiscoveryFilters, catalogSortColumn, canShowCatalogSnapshot, selectCatalogSnapshot } from '../lib/skills/catalog-query.ts'
+import { isChronologicalSort, chronologicalRegistryWindow, chronologicalDirectoryPage } from '../lib/skills/chronological-directory.ts'
 
 assert.deepEqual(directoryDiscoveryFilters({}), { featured: false, examplesOnly: false }, 'Canonical directory defaults to all skills')
 assert.deepEqual(directoryDiscoveryFilters({ view: 'all' }), { featured: false, examplesOnly: false })
@@ -40,10 +41,14 @@ const cached = fn => {
   }
 }
 let count = 17
+let dateRows = null
 const fakeQuery = (rpcCount = false) => {
   let head = false
-  const query = { then: done => Promise.resolve({ data: head ? null : [{ slug: 'example-skill' }], count: head || rpcCount ? count : null, error: null }).then(done) }
+  let rows = dateRows
+  const query = { then: done => Promise.resolve({ data: head ? null : rows ?? [{ slug: 'example-skill' }], count: head || rpcCount ? count : null, error: null }).then(done) }
   for (const method of ['select','or','in','not','gte','order','range','eq','contains','limit']) query[method] = (...args) => {
+    if (rows && method === 'range') rows = rows.slice(args[0], args[1] + 1)
+    if (rows && method === 'in' && args[0] === 'slug') rows = rows.filter(row => args[1].includes(row.slug))
     calls.push([method, ...args]); if (method === 'select') head = Boolean(args[1]?.head); return query
   }
   return query
@@ -52,7 +57,7 @@ const fakeClient = () => ({
   from: name => { calls.push(['from', name]); return fakeQuery() },
   rpc: (name, args, options) => { calls.push(['rpc', name, args, options]); return fakeQuery(Boolean(options?.count)) },
 })
-const makePage = new Function('unstable_cache','createPublicClient','SKILL_TAXONOMY_SELECT','PUBLIC_SKILL_FILTER','normalizeSkillCategory','directoryCategoryTerms','CATALOG_PAGE_SIZE','catalogSortColumn','clampResultPage','mediaSlugsNeedPost','createCoalescedCache', code + ';return getCachedCatalogPage')
+const makePage = (...args) => new Function('unstable_cache','createPublicClient','SKILL_TAXONOMY_SELECT','PUBLIC_SKILL_FILTER','normalizeSkillCategory','directoryCategoryTerms','CATALOG_PAGE_SIZE','catalogSortColumn','clampResultPage','mediaSlugsNeedPost','createCoalescedCache','isChronologicalSort','chronologicalRegistryWindow','chronologicalDirectoryPage', code + ';return getCachedCatalogPage')(...args, isChronologicalSort, chronologicalRegistryWindow, chronologicalDirectoryPage)
 const getPage = makePage(
   cached, fakeClient, 'slug', 'public gate', normalizeSkillCategory, value => [value], 16, catalogSortColumn, clampResultPage, mediaSlugsNeedPost, createCoalescedCache,
 )
@@ -158,3 +163,27 @@ offline = false
 assert.equal((await uncachedPage(...pageArgs)).records[0].slug, 'live')
 assert.deepEqual([countReads, rowReads], [4, 4], 'An outage is not cached; the next read can recover immediately')
 console.log('Catalog reliability: concurrent locales, shared counts, invalidation and uncached outage recovery passed.')
+
+// New arrivals use bounded date keys, then hydrate only visible registry cards.
+count = 1000
+dateRows = Array.from({ length: count }, (_, i) => ({ slug: `registry-${String(i).padStart(4, '0')}`, created_at: new Date(Date.UTC(2026, 9, 11, 0, 0, 2000-i*2)).toISOString(), github_last_pushed_at: null }))
+const providers = Array.from({ length: 385 }, (_, i) => ({ slug: `provider-${i}`, timestamp: new Date(Date.UTC(2026, 9, 11, 0, 0, 1999-i*3)).toISOString() }))
+const dates = dateRows.map(row => ({ slug: row.slug, timestamp: row.created_at }))
+for (const page of [1, 2, 40, 87, 9999]) {
+  calls.length = 0
+  const result = await getPage('new','all',page,0,'all',[],null,'all','all',undefined,16,providers.length,0,providers)
+  const offset = (result.page - 1) * 16
+  const expected = chronologicalDirectoryPage(dates, providers, offset).map(row => row.slug)
+  assert.deepEqual(result.orderedSlugs, expected)
+  assert.deepEqual(result.records.map(row => row.slug), expected.filter(slug => slug.startsWith('registry-')))
+  assert.ok(result.records.length <= 16, 'Full records are never fetched for the whole candidate window')
+  const ranges = calls.filter(call => call[0] === 'range')
+  assert.ok(ranges.every(call => call[2] - call[1] + 1 <= providers.length + 16))
+  assert.ok(calls.some(call => call[0] === 'select' && call[1] === 'slug,created_at,github_last_pushed_at'))
+}
+calls.length = 0
+const onlyProviders = await getPage('new','all',1,0,'all',[],[],'all','all',undefined,16,providers.length,0,providers)
+assert.deepEqual(onlyProviders.orderedSlugs, providers.slice(0, 16).map(row => row.slug))
+assert.equal(calls.length, 0, 'Provider-only selections need no row reads')
+dateRows = null
+console.log('Chronological catalog: globally merged dates, page clamping, compact key reads and <=16 full records passed.')

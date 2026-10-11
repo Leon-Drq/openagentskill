@@ -7,6 +7,7 @@ import { z } from 'zod'
 register('./test-owner-publication-loader.mjs', import.meta.url)
 const { EXTERNAL_SKILLS } = await import('../lib/skills/external-catalog.ts')
 const { selectProviderSkills, providerCatalogWindow, mergeProviderCatalogPage, toProviderDirectorySkill, providerCommerce } = await import('../lib/skills/provider-directory.ts')
+const { chronologicalRegistryWindow, chronologicalDirectoryPage, compareDirectoryDates } = await import('../lib/skills/chronological-directory.ts')
 const defaults = {category:'all',topic:'all',output:'all',pricing:'all',examplesOnly:true,platform:'all',quality:'all',trust:'all',safety:'all',supplyTrack:'all',minStars:0,useCase:'all'}
 const skillry = EXTERNAL_SKILLS.filter(e=>e.provider==='skillry'&&e.active)
 assert.equal(selectProviderSkills(defaults).length,skillry.length+2)
@@ -60,6 +61,26 @@ for (const count of [0,1,7,16,17,35,100]) for (const providerCount of [0,1,9,16,
   }
   assert.deepEqual(all,expected)
 }
+// Dates are merged globally, including far-away pages and null/tied timestamps.
+for (const count of [0,1,16,35,1001]) for (const providerCount of [0,1,8,17,385]) {
+  const dated = (prefix, count, step) => Array.from({length:count}, (_, i) => ({slug:`${prefix}-${String(i).padStart(5,'0')}`, timestamp:i % 19 === 18 ? null : new Date(Date.UTC(2026,9,11,0,0,2000-Math.floor(i/2)*step)).toISOString()}))
+  const registry = dated('registry',count,2).sort(compareDirectoryDates)
+  const providers = dated('provider',providerCount,3)
+  const expected = [...registry,...providers].sort(compareDirectoryDates)
+  const all = []
+  for (let offset=0;offset<=expected.length+16;offset+=16) {
+    const window = chronologicalRegistryWindow(offset,providerCount)
+    const page = chronologicalDirectoryPage(registry.slice(window.offset,window.offset+window.limit),providers,offset,window.offset)
+    assert.deepEqual(page,expected.slice(offset,offset+16), `chronological ${count}/${providerCount}/${offset}`)
+    assert.ok(window.limit<=providerCount+16)
+    all.push(...page)
+  }
+  assert.deepEqual(all,expected,'No omitted or repeated records across pages')
+}
+const latest = Array.from({length:16},(_,i)=>({slug:i===12?'morluto-rea-reverse-engineer-anything':`recent-${i}`,timestamp:new Date(Date.UTC(2026,9,11,16,30-i)).toISOString()}))
+const oldProviders = Array.from({length:8},(_,i)=>({slug:`old-provider-${i}`,timestamp:'2026-10-09T00:00:00Z'}))
+assert.equal(chronologicalDirectoryPage(latest,oldProviders,0)[12].slug,'morluto-rea-reverse-engineer-anything','REA must not be displaced from page one by an editorial prefix')
+assert.ok(compareDirectoryDates({slug:'z',timestamp:'2026-10-11T16:23:51.674044+00:00'},{slug:'a',timestamp:'2026-10-11T16:23:51.674043+00:00'})<0,'Preserve database microsecond ordering')
 // Execute the real route with mocked identity/database clients to verify that
 // provider writes never require a GitHub record or bypass the original review lane.
 const route = readFileSync('app/api/skills/engagement/route.ts','utf8')
