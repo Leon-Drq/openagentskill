@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import './test-font-resource.mjs'
 import { readFileSync } from 'node:fs'
 import { register } from 'node:module'
 import ts from 'typescript'
@@ -23,6 +24,14 @@ for (const filter of ['platform','quality','trust','safety','supplyTrack','useCa
 assert.equal(selectProviderSkills({...defaults,minStars:1}).length,0)
 for (const entry of EXTERNAL_SKILLS) {
   const card = toProviderDirectorySkill(entry,'zh')
+  if (entry.provider === 'resource') {
+    assert.equal(card.provider.resource, true)
+    assert.equal(card.commerce.type, 'free')
+    assert.equal(card.provider.label, '字体资源')
+    assert.equal(card.exampleCount, 0)
+    assert.equal(card.technical.installCommand, undefined)
+    continue
+  }
   assert.ok(card.exampleCount>0 && card.provider.image)
   assert.equal(card.provider.video, entry.provider === 'skillry' ? entry.previewVideo || undefined : entry.runtimeDemo?.video, 'Preserve every video from its source on directory cards')
   assert.equal(card.verified,false)

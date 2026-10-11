@@ -82,7 +82,9 @@ export async function auditMedia({ catalog, remote = false, fetcher = fetch, out
   const providers = EXTERNAL_SKILLS.filter(item => item.provider !== 'skillry' || item.active)
   for (const entry of providers) {
     const card = toProviderDirectorySkill(entry, 'en')
-    add(card.provider.image, 'image', entry.slug)
+    // Link-only font resources have no claimed visual example. Other providers
+    // still require their observed preview; never fabricate one to pass audit.
+    if (entry.provider !== 'resource' || card.provider.image) add(card.provider.image, 'image', entry.slug)
     if (entry.provider === 'skillry') for (const src of entry.previewImages) add(src, 'image', entry.slug)
     const video = entry.provider === 'skillry' ? entry.previewVideo : entry.runtimeDemo?.video
     if (video) {

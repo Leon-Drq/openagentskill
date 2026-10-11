@@ -142,7 +142,7 @@ export interface DirectorySkillCard {
   safetyProfile?: SkillSafetySummary
   platformHints?: string[]
   supplyProfile?: SkillSupplySummary
-  provider?: { label: string; sourceHref: string; sourceRel: string; image?: string; video?: string; exampleLabel: string; localizedName?: string; sourceDownloads?: number }
+  provider?: { resource?: boolean; label: string; sourceHref: string; sourceRel: string; image?: string; video?: string; exampleLabel: string; localizedName?: string; sourceDownloads?: number }
 }
 
 
@@ -400,12 +400,12 @@ export function SkillsPageClient(props: Props) {
               <Link href={resetHref} prefetch={false} scroll={false} onNavigate={filterNavigation(resetHref)} className="mt-5 inline-block text-[#006b4f] underline">{c.reset}</Link>
               {props.access === 'paid' && !degraded && <DirectoryStudioPreview locale={locale} />}
             </div>
-          ) : <SkillEngagementProvider key={skills.map(skill => skill.slug).join(',')} slugs={skills.map(skill => skill.slug)} untrackedSlugs={skills.filter(skill => skill.provider).map(skill => skill.slug)}><div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
+          ) : <SkillEngagementProvider key={skills.map(skill => skill.slug).join(',')} slugs={skills.filter(skill => !skill.provider?.resource).map(skill => skill.slug)} untrackedSlugs={skills.filter(skill => skill.provider && !skill.provider.resource).map(skill => skill.slug)}><div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
             {skills.map(skill => (
               <article key={skill.id} className="group flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-border bg-card transition-colors hover:border-[#006b4f]/50" data-directory-skill>
                 <div className="flex min-h-12 items-center justify-between gap-2 border-b border-border px-4 py-1">
                   <span className="min-w-0 text-[10px] font-medium text-[#006b4f]">{directoryCategories(skill.category).map(label).join(' · ')}</span>
-                  <SkillActions slug={skill.slug} name={skill.name} compact />
+                  {!skill.provider?.resource && <SkillActions slug={skill.slug} name={skill.name} compact />}
                 </div>
                 <SkillCardPreview slug={skill.slug} name={skill.name} locale={locale} category={directoryCategories(skill.category).map(label).join(' · ')} showcase={skill.preview} sourcePreview={skill.sourcePreview} sourceGalleryHref={skill.sourceGalleryHref} provider={skill.provider} />
                 <div className="flex min-w-0 items-start gap-3 p-5 pb-0">
@@ -434,7 +434,7 @@ export function SkillsPageClient(props: Props) {
                   {skill.sourcePreview && !skill.preview && <Link prefetch={false} href={getLocalizedNavigationHref(`/skills/${skill.slug}#visual-previews`, locale)} className="mt-3 inline-flex min-h-10 items-center gap-2 text-xs font-medium text-[#006b4f]" data-source-previews>{previewCopy('view', locale)} · {skill.sourcePreview.imageCount}<ArrowRight size={12} aria-hidden="true" /></Link>}
                 </div>
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border bg-background/45 px-5 py-3">
-                  {skill.provider ? <a aria-label={`${locale === 'zh' ? '在' : 'Get on'} ${skill.provider.label}: ${skill.name}`} href={skill.provider.sourceHref} target="_blank" rel={skill.provider.sourceRel} className="inline-flex min-h-10 items-center gap-1 text-xs text-[#006b4f]">{locale === 'zh' ? '获取技能' : 'Get skill'} ↗</a> : <span title={c.repoStars} className="inline-flex items-center gap-1.5 font-mono text-sm"><Star size={14} aria-hidden="true" />{stars(skill.stats.stars)}<span className="text-[10px] text-secondary">GitHub</span></span>}
+                  {skill.provider ? <a aria-label={`${skill.provider.label}: ${skill.name}`} href={skill.provider.sourceHref} target="_blank" rel={skill.provider.sourceRel} className="inline-flex min-h-10 items-center gap-1 text-xs text-[#006b4f]">{skill.provider.resource ? (locale === 'zh' ? '获取字体' : 'Get fonts') : (locale === 'zh' ? '获取技能' : 'Get skill')} ↗</a> : <span title={c.repoStars} className="inline-flex items-center gap-1.5 font-mono text-sm"><Star size={14} aria-hidden="true" />{stars(skill.stats.stars)}<span className="text-[10px] text-secondary">GitHub</span></span>}
                   <div className="flex items-center gap-4 text-xs">
                     {!skill.provider && <button type="button" aria-pressed={compareSlugs.includes(skill.slug)} onClick={() => toggleCompare(skill.slug)}
                       className="min-h-10 text-secondary hover:text-[#006b4f]">{compareSlugs.includes(skill.slug) ? c.selected : c.compare}</button>}
