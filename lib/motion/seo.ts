@@ -18,7 +18,7 @@ export function motionMetadata(
   const description = entry ? `${entry.title}. ${c.sampleNote}` : c.lead;
   const url = origin + motionHref(locale, entry?.id);
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
       canonical: url,
