@@ -10,6 +10,7 @@ const require = createRequire(import.meta.url)
 const modules = new Map(), shared = new Map(), policies = []
 let reads = 0, unavailable = false, records, stats = {}
 let lookupError = false
+let searchDelay = 0, searchUnavailable = false
 const db = {
   getSkillBySlugStrict: async () => { if (lookupError) throw new Error('lookup unavailable'); return null },
   getSkillCatalogPage: async (_sort, _category, page, _stars, _pricing, _slugs, _topic, _output, window) => {
@@ -20,7 +21,11 @@ const db = {
   getSkillStats: async () => stats,
   getSkillsBySlugs: async slugs => records.filter(record => slugs.includes(record.slug)),
   getBrowseSkillCandidates: async () => ({ records, degraded: false }),
-  searchSkillsWithStatus: async () => ({ records, degraded: false }),
+  searchSkillsWithStatus: async () => {
+    if (searchDelay) await new Promise(resolve => setTimeout(resolve, searchDelay))
+    if (searchUnavailable) throw new Error('search unavailable')
+    return { records, degraded: false }
+  },
 }
 const cached = (fn, keys, policy) => {
   policies.push(policy)
@@ -66,6 +71,13 @@ const renderProps = async (params, extra = {}) => {
   return result.props.children[1].props
 }
 const normalize = value => JSON.parse(JSON.stringify(value))
+searchDelay = 4200
+assert.equal((await renderProps({ q: 'slow cold response' })).degraded, false, 'The page must not abandon a healthy search before its transport budget')
+searchDelay = 0
+searchUnavailable = true
+assert.equal((await renderProps({ q: 'recoverable' })).degraded, true)
+searchUnavailable = false
+assert.equal((await renderProps({ q: 'recoverable' })).degraded, false, 'Refreshing an unavailable search must recover without a stale error flag')
 const defaultProps = await renderProps({})
 assert.equal(defaultProps.skills.length, 16)
 assert.equal(reads, 1)

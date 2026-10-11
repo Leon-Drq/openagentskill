@@ -112,8 +112,10 @@ export async function generateMetadata({
 const MAX_SKILL_CANDIDATE_LIMIT = 480
 const VISIBLE_SKILL_LIMIT = 16
 const MAX_SKILLS_PAGE = Math.ceil(MAX_SKILL_CANDIDATE_LIMIT / VISIBLE_SKILL_LIMIT)
-const SKILLS_PAGE_QUERY_TIMEOUT_MS = 1800
-const SKILLS_PAGE_EXACT_SEARCH_TIMEOUT_MS = 4000
+const SKILLS_PAGE_QUERY_TIMEOUT_MS = 8000
+const SKILLS_PAGE_STATS_TIMEOUT_MS = 1800
+// Leave cache lookup, decompression and transport deadlines time to settle.
+const SKILLS_PAGE_EXACT_SEARCH_TIMEOUT_MS = 9000
 const SKILLS_PAGE_EXACT_SEARCH_LIMIT = 120
 const DIRECTORY_SECTION_SOURCE_LIMIT = 120
 const FALLBACK_DATE = '2026-06-01T00:00:00.000Z'
@@ -941,21 +943,27 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
   const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured] = await Promise.all([
     restrictedRegistry || query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
       : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, featured, minStars, pricing, topic, output), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
-        .catch(() => ({ records: getFallbackSkills(sort, undefined, candidateLimit), degraded: true })),
+        .catch((error: unknown) => {
+          console.warn('Skills directory candidates unavailable:', error)
+          return { records: getFallbackSkills(sort, undefined, candidateLimit), degraded: true }
+        }),
     restrictedRegistry ? Promise.resolve({ records: [] as SkillRecord[], degraded: false }) : getSearchAugmentRecords(firstSearchValue(params.q)),
     Promise.resolve(SKILL_CATEGORIES.map(c => c[0])),
-    restrictedRegistry ? Promise.resolve({} as Record<string, SkillAgentStats>) : withTimeout(getCachedSkillStats(), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'skills stats query')
+    restrictedRegistry ? Promise.resolve({} as Record<string, SkillAgentStats>) : withTimeout(getCachedSkillStats(), SKILLS_PAGE_STATS_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
     catalogMode ? getSkillCatalogPage(sort, category, page, minStars, pricing, examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : null, topic, output, catalogWindow)
       .then(result => ({ ...result, degraded: false }))
-      .catch(() => ({
+      .catch((error: unknown) => {
+        console.warn('Skills directory catalog unavailable:', error)
+        return {
         records: canShowCatalogSnapshot(page, category, minStars, pricing) && topic === 'all' && output === 'all'
           ? selectCatalogSnapshot(
             getFallbackSkills(sort, undefined, FALLBACK_SKILLS.length + CURATED_SKILL_SNAPSHOT.length),
             examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : null,
           ) : [] as SkillRecord[],
         total: 0, hasMore: false, degraded: true, page,
-      })) : Promise.resolve(null),
+        }
+      }) : Promise.resolve(null),
     !includeRegistry ? Promise.resolve([] as SkillRecord[]) : getSkillsBySlugs(access === 'paid' ? paidSlugs : [...new Set([...(selectedUseCase?.featuredSlugs || []), ...(!catalogMode && examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
   ])
   const records = !includeRegistry ? [] : access === 'paid' ? useCaseFeatured.filter(record => paidSlugs.includes(record.slug)) : catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, useCaseFeatured, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)

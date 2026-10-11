@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { DISCOVERY_TASKS, DISCOVERY_OUTPUTS, DISCOVERY_AGENTS, discoveryCopy } from '../lib/discovery.ts'
 
 import ts from 'typescript'
+import { createCoalescedCache } from '../lib/cache/coalesced.ts'
 import { mediaSlugsNeedPost, slugQueryBatches } from '../lib/skills/media-query.ts'
 import { normalizeSkillCategory } from '../lib/skills/taxonomy.ts'
 import { clampResultPage } from '../lib/skills/pagination.ts'
@@ -51,8 +52,9 @@ const fakeClient = () => ({
   from: name => { calls.push(['from', name]); return fakeQuery() },
   rpc: (name, args, options) => { calls.push(['rpc', name, args, options]); return fakeQuery(Boolean(options?.count)) },
 })
-const getPage = new Function('unstable_cache','createPublicClient','SKILL_TAXONOMY_SELECT','PUBLIC_SKILL_FILTER','normalizeSkillCategory','directoryCategoryTerms','CATALOG_PAGE_SIZE','catalogSortColumn','clampResultPage','mediaSlugsNeedPost', code + ';return getCachedCatalogPage')(
-  cached, fakeClient, 'slug', 'public gate', normalizeSkillCategory, value => [value], 16, catalogSortColumn, clampResultPage, mediaSlugsNeedPost,
+const makePage = new Function('unstable_cache','createPublicClient','SKILL_TAXONOMY_SELECT','PUBLIC_SKILL_FILTER','normalizeSkillCategory','directoryCategoryTerms','CATALOG_PAGE_SIZE','catalogSortColumn','clampResultPage','mediaSlugsNeedPost','createCoalescedCache', code + ';return getCachedCatalogPage')
+const getPage = makePage(
+  cached, fakeClient, 'slug', 'public gate', normalizeSkillCategory, value => [value], 16, catalogSortColumn, clampResultPage, mediaSlugsNeedPost, createCoalescedCache,
 )
 const result = await getPage('quality', 'all', 2, 0, 'free', ['example-skill', 'other-skill'], ['example-skill'], 'all', 'all')
 assert.equal(result.total, 17)
@@ -124,3 +126,35 @@ assert.ok(calls.filter(call => call[0] === 'rpc').every(call => call[1] === 'ski
 assert.ok(!calls.some(call => call[0] === 'in'), 'Large memberships never leak back into the URL')
 assert.ok(calls.some(call => call[0] === 'range'), 'POST membership retains server pagination')
 console.log('Large example catalogs: 5,000 identities use POST bodies, exact counts, SQL pagination and bounded lookup batches.')
+
+// No shared-cache coalescing in this fixture: emulate several locale renders
+// revalidating the same expired database window at once.
+let countReads = 0, rowReads = 0, offline = false
+const slowClient = () => ({ from: () => {
+  let head = false
+  const query = {
+    then(done, reject) {
+      if (head) countReads++; else rowReads++
+      return new Promise(resolve => setTimeout(() => resolve({ count: 100, data: [{ slug: 'live' }], error: offline ? Error('offline') : null }), 10)).then(done, reject)
+    },
+  }
+  for (const method of ['select', 'or', 'order', 'range']) query[method] = (...args) => {
+    if (method === 'select') head = Boolean(args[1]?.head)
+    return query
+  }
+  return query
+} })
+const uncachedPage = makePage(fn => fn, slowClient, 'slug', 'public gate', normalizeSkillCategory, value => [value], 16, catalogSortColumn, clampResultPage, mediaSlugsNeedPost, createCoalescedCache)
+const pageArgs = ['quality', 'all', 1, 0, 'all', [], null, 'all', 'all']
+await Promise.all(Array.from({ length: 8 }, () => uncachedPage(...pageArgs)))
+assert.deepEqual([countReads, rowReads], [1, 1], 'Eight locale misses share one count and row read')
+await Promise.all(['quality', 'stars'].map(sort => uncachedPage(sort, ...pageArgs.slice(1))))
+assert.deepEqual([countReads, rowReads], [2, 3], 'Different sorts share an in-flight count, with fresh data after invalidation')
+offline = true
+const failures = await Promise.allSettled(Array.from({ length: 8 }, () => uncachedPage(...pageArgs)))
+assert.ok(failures.every(result => result.status === 'rejected'))
+assert.deepEqual([countReads, rowReads], [3, 3], 'An unavailable count does not trigger eight row scans')
+offline = false
+assert.equal((await uncachedPage(...pageArgs)).records[0].slug, 'live')
+assert.deepEqual([countReads, rowReads], [4, 4], 'An outage is not cached; the next read can recover immediately')
+console.log('Catalog reliability: concurrent locales, shared counts, invalidation and uncached outage recovery passed.')

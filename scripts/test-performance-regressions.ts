@@ -29,7 +29,11 @@ for (const route of cachedPublicRoutes) {
 
 const dbSkills = read('lib/db/skills.ts')
 assert.match(dbSkills, /rowLimit <= 160[\s\S]+?rowLimit <= 480/, 'directory reads must keep bounded cache tiers')
-assert.match(dbSkills, /SKILL_EXACT_SEARCH_TIMEOUT_MS = 2500/, 'interactive exact search must stay bounded')
+const exactDeadline = Number(dbSkills.match(/SKILL_EXACT_SEARCH_TIMEOUT_MS = (\d+)/)?.[1])
+const broadDeadline = Number(dbSkills.match(/SKILL_BROAD_SEARCH_TIMEOUT_MS = (\d+)/)?.[1])
+const resultDeadline = Number(dbSkills.match(/SKILL_SEARCH_RESULT_TIMEOUT_MS = (\d+)/)?.[1])
+assert.ok(exactDeadline > 3000 && broadDeadline > 3000, 'Transport must allow the SQL statement budget plus network time')
+assert.ok(resultDeadline > Math.max(exactDeadline, broadDeadline), 'Result guards must allow transport and body decoding to finish')
 assert.match(dbSkills, /SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS = 300/, 'detail lookups must share a useful cache window')
 assert.match(dbSkills, /if \(sort === 'stars'\)[\s\S]+?order\('github_stars'/, 'star rankings must query the star index directly')
 
@@ -49,7 +53,8 @@ assert.doesNotMatch(useCasePage, /getAllSkills\('quality', undefined, 4000\)/, '
 
 const skillsPage = read('app/skills/content.tsx')
 const searchDeadline = Number(skillsPage.match(/SKILLS_PAGE_EXACT_SEARCH_TIMEOUT_MS = (\d+)/)?.[1])
-assert.ok(searchDeadline >= 3500 && searchDeadline <= 4000, 'search must allow the bounded 3.5s evidence read but never wait beyond 4s')
+assert.ok(searchDeadline > resultDeadline && searchDeadline <= 10000, 'The page must leave cache/decode headroom above bounded database reads')
+assert.match(skillsPage, /SKILLS_PAGE_STATS_TIMEOUT_MS = 1800/, 'Optional statistics must not delay critical directory reads')
 
 const loadingBoundary = read('components/crawl-link.tsx')
 assert.match(loadingBoundary, /role="progressbar"/, 'route transitions need immediate visual feedback')

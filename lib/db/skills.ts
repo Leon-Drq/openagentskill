@@ -80,17 +80,18 @@ const MAX_SKILL_QUERY_LIMIT = 4000
 const ALL_SKILLS_CACHE_TTL_MS = 30 * 1000
 const SHARED_SKILL_CACHE_REVALIDATE_SECONDS = 300
 const CATEGORY_CACHE_REVALIDATE_SECONDS = 3600
-const SKILL_DIRECTORY_REQUEST_TIMEOUT_MS = 1800
+// SQL can use its full 3s statement budget, before network and body decoding.
+// Shorter transport deadlines incorrectly open the circuit on healthy reads.
+const SKILL_DIRECTORY_REQUEST_TIMEOUT_MS = 7000
 const SKILL_STATS_REQUEST_TIMEOUT_MS = 3000
 // Exact lookups are correctness-critical. A cold database request can take a
 // few seconds, so a directory-sized timeout would turn a live skill into a
 // false 404.
 const SKILL_LOOKUP_TIMEOUT_MS = 7000
 const SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS = 300
-const SKILL_EXACT_SEARCH_TIMEOUT_MS = 2500
-// Cold full-text responses include source/review evidence. A 1.5s outer
-// deadline could expire before a successful ~2s response had been decoded.
-const SKILL_BROAD_SEARCH_TIMEOUT_MS = 3500
+const SKILL_EXACT_SEARCH_TIMEOUT_MS = 7000
+const SKILL_BROAD_SEARCH_TIMEOUT_MS = 7000
+const SKILL_SEARCH_RESULT_TIMEOUT_MS = 8000
 // Sitemap refreshes run off the interactive navigation path. Give a cold
 // registry shard enough time to return the complete URL set, then let the
 // shared and edge caches keep that work away from visitors.
@@ -1069,7 +1070,7 @@ async function searchSkillsWithLegacyFilter(
   searchTerms: string[],
   limit: number
 ): Promise<SkillRecord[]> {
-  const supabase = createPublicClient({ requestTimeoutMs: SKILL_BROAD_SEARCH_TIMEOUT_MS })
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_BROAD_SEARCH_TIMEOUT_MS, circuitScope: 'skill-search-broad' })
   const fields = ['slug', 'name', 'description', 'long_description', 'tagline', 'category', 'github_repo', 'repository']
   const filter = searchTerms
     .flatMap((term) => fields.map((field) => `${field}.ilike.%${term}%`))
@@ -1088,7 +1089,7 @@ async function searchSkillsWithLegacyFilter(
 
 async function fetchSearchSkills(normalizedQuery: string, limit: number): Promise<SkillRecord[]> {
   const searchTerms = getSearchTerms(normalizedQuery)
-  const supabase = createPublicClient({ requestTimeoutMs: SKILL_BROAD_SEARCH_TIMEOUT_MS })
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_BROAD_SEARCH_TIMEOUT_MS, circuitScope: 'skill-search-broad' })
   const fullTextQuery = searchTerms.map((term) => term.replace(/[^a-z0-9-]/g, '')).filter(Boolean).join(' OR ')
 
   let { data, error } = await supabase
@@ -1120,13 +1121,13 @@ async function fetchSearchSkills(normalizedQuery: string, limit: number): Promis
 }
 
 const getCachedSearchSkills = unstable_cache(
-  async (normalizedQuery: string, limit: number) => fetchSearchSkills(normalizedQuery, limit),
+  coalesceCacheLoader(async (normalizedQuery: string, limit: number) => fetchSearchSkills(normalizedQuery, limit)),
   ['public-skill-search-v6-indexed-matches'],
   { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
 
 const getCachedExactSearchPart = unstable_cache(
-  async (field: 'slug' | 'name', exactQuery: string): Promise<string> => {
+  coalesceCacheLoader(async (field: 'slug' | 'name', exactQuery: string): Promise<string> => {
     const supabase = createPublicClient({ requestTimeoutMs: SKILL_EXACT_SEARCH_TIMEOUT_MS, circuitScope: 'skill-search' })
     let { data, error } = await (field === 'slug'
       ? supabase.from('skills').select(SKILL_DIRECTORY_SELECT).or(PUBLIC_SKILL_FILTER).eq('slug', exactQuery).limit(4)
@@ -1138,7 +1139,7 @@ const getCachedExactSearchPart = unstable_cache(
     }
     if (error) throw error
     return packCacheJson(data || [])
-  },
+  }),
   ['public-exact-search-parts-v2-public-name'],
   { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
@@ -1193,12 +1194,12 @@ async function fetchSearchSkillsWithStatus(query: string, limit = 120) {
   const results = await Promise.allSettled([
     withTimeout(
       fetchExactSearchSkills(normalizedQuery),
-      SKILL_EXACT_SEARCH_TIMEOUT_MS,
+      SKILL_SEARCH_RESULT_TIMEOUT_MS,
       'exact skill search'
     ),
     withTimeout(
       getCachedSearchSkills(normalizedQuery.toLowerCase(), rowLimit),
-      SKILL_BROAD_SEARCH_TIMEOUT_MS,
+      SKILL_SEARCH_RESULT_TIMEOUT_MS,
       'broad skill search'
     ),
   ])
@@ -1227,8 +1228,8 @@ function applyTaxonomyFilters<T extends { eq: (column: string, value: string) =>
 // Apply discoverability filters BEFORE limiting the pool. Otherwise the top
 // 96 generic repositories can hide valid source-recorded skills entirely.
 const getCachedBrowseCandidates = unstable_cache(
-  async (sort: SkillSortMode, category: string, limit: number, sourceOnly: boolean, minStars: number, pricing: PriceFilter, pricingSlugs: string[], topic: string, output: string) => {
-    const supabase = createPublicClient({ requestTimeoutMs: SKILL_DIRECTORY_REQUEST_TIMEOUT_MS })
+  coalesceCacheLoader(async (sort: SkillSortMode, category: string, limit: number, sourceOnly: boolean, minStars: number, pricing: PriceFilter, pricingSlugs: string[], topic: string, output: string) => {
+    const supabase = createPublicClient({ requestTimeoutMs: SKILL_DIRECTORY_REQUEST_TIMEOUT_MS, circuitScope: 'public-catalog' })
     let query = supabase.from('skills').select(SKILL_TAXONOMY_SELECT).or(PUBLIC_SKILL_FILTER)
     if (pricing !== 'all' && pricing !== 'unknown') {
       if (!pricingSlugs.length) return packCacheJson([])
@@ -1243,7 +1244,7 @@ const getCachedBrowseCandidates = unstable_cache(
       .order('github_stars', { ascending: false }).order('slug', { ascending: true }).limit(limit)
     if (error) throw error
     return packCacheJson(filterSkillOnly((data || []) as unknown as SkillRecord[]))
-  },
+  }),
   ['skills-browse-candidates-v4-taxonomy'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
@@ -1272,8 +1273,15 @@ function applyCatalogFilters<T extends {
   return applyTaxonomyFilters(query, category, topic, output)
 }
 
+// Deduplicate inside the shared cache, including background revalidation.
+// No local value TTL: tag invalidation must immediately reach the database.
+function coalesceCacheLoader<A extends unknown[], T>(read: (...args: A) => Promise<T>) {
+  const inflight = createCoalescedCache<T>({ ttlMs: 0, maxEntries: 128, cacheWhen: () => false })
+  return (...args: A): Promise<T> => inflight(JSON.stringify(args), () => read(...args))
+}
+
 const getCachedCatalogCount = unstable_cache(
-  async (category: string, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null, topic: string, output: string) => {
+  coalesceCacheLoader(async (category: string, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null, topic: string, output: string) => {
     if ((pricing !== 'all' && pricing !== 'unknown' && !pricingSlugs.length) || (exampleSlugs !== null && !exampleSlugs.length)) return 0
     const supabase = createPublicClient({ requestTimeoutMs: 8000, circuitScope: 'public-catalog' })
     const post = mediaSlugsNeedPost(exampleSlugs)
@@ -1285,13 +1293,13 @@ const getCachedCatalogCount = unstable_cache(
     if (error) throw error
     if (count === null) throw new Error('Catalog count unavailable')
     return count
-  },
+  }),
   ['public-catalog-count-v2-canonical-sources'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 
 const getCachedCatalogPage = unstable_cache(
-  async (sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null, topic: string, output: string, windowOffset?: number, windowLimit = CATALOG_PAGE_SIZE, providerCount = 0, providerPrefix = 0) => {
+  coalesceCacheLoader(async (sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null, topic: string, output: string, windowOffset?: number, windowLimit: number = CATALOG_PAGE_SIZE, providerCount: number = 0, providerPrefix: number = 0) => {
     const total = await getCachedCatalogCount(category, minStars, pricing, pricingSlugs, exampleSlugs, topic, output)
     const effectivePage = clampResultPage(page, total + providerCount, CATALOG_PAGE_SIZE)
     const offset = (effectivePage - 1) * CATALOG_PAGE_SIZE
@@ -1311,7 +1319,7 @@ const getCachedCatalogPage = unstable_cache(
       .order('slug', { ascending: true }).range(from, from + limit - 1)
     if (error) throw error
     return { records: (data || []) as unknown as SkillRecord[], total, hasMore: from + limit < total, page: effectivePage }
-  },
+  }),
   ['public-catalog-pages-v8-canonical-sources'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
@@ -1338,7 +1346,7 @@ export async function searchSkills(query: string, limit = 120): Promise<SkillRec
     console.warn('Exact skill search fallback:', error)
     const broadMatches = await withTimeout(
       getCachedSearchSkills(normalizedQuery.toLowerCase(), rowLimit),
-      SKILL_BROAD_SEARCH_TIMEOUT_MS,
+      SKILL_SEARCH_RESULT_TIMEOUT_MS,
       'broad skill search fallback'
     ).catch(() => [] as SkillRecord[])
     return mergeSearchMatches([], broadMatches, rowLimit)

@@ -11,7 +11,7 @@ export const revalidate = 300
 
 const SEARCH_CANDIDATE_LIMIT = 750
 const SEARCH_QUERY_TIMEOUT_MS = 1000
-const SEARCH_EXACT_QUERY_TIMEOUT_MS = 8000
+const SEARCH_EXACT_QUERY_TIMEOUT_MS = 9000
 const SEARCH_CACHE_HEADERS = {
   'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600',
 }

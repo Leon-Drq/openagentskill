@@ -20,7 +20,7 @@ try {
   await assert.rejects(() => createResilientTimeoutFetch(100)(url), /circuit is temporarily open/)
   assert.equal(calls, 3, 'Warm invocations in the same workload share protection')
   globalThis.fetch = good
-  for (const scope of ['public-catalog', 'skill-lookup', 'skill-search', 'skill-support', 'sitemap', 'telemetry', 'admin']) {
+  for (const scope of ['public-catalog', 'skill-lookup', 'skill-search', 'skill-search-broad', 'skill-support', 'sitemap', 'telemetry', 'admin']) {
     assert.equal((await createResilientTimeoutFetch(100, scope)(url)).status, 200, 'Bulk read failures cannot disable critical work')
   }
   now += 15_001
@@ -32,6 +32,15 @@ try {
   await probe
   globalThis.fetch = good
   assert.equal((await bulk(url)).status, 200, 'Successful half-open probe closes circuit')
+
+  reset()
+  const broadSearch = createResilientTimeoutFetch(100, 'skill-search-broad')
+  globalThis.fetch = fail
+  for (let i = 0; i < 3; i++) await broadSearch(url)
+  await assert.rejects(() => broadSearch(url), /circuit is temporarily open/)
+  globalThis.fetch = good
+  assert.equal((await createResilientTimeoutFetch(100, 'skill-search')(url)).status, 200, 'Broad search failures cannot disable exact matches')
+  assert.equal((await createResilientTimeoutFetch(100, 'public-catalog')(url)).status, 200, 'Broad search failures cannot disable browsing')
 
   reset()
   let finishOld

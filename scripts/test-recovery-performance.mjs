@@ -26,27 +26,32 @@ assert.equal(scheduleSourceSync({ ...queues, requested: [manual] }).filter(x => 
 assert.equal(scheduleSourceSync({ ...queues, claimed: [], stale: [], now: 6 * 3600000, limit: 1 })[0].discoverySource, 'd2', 'Seeds rotate rather than repeatedly consuming the same slot')
 assert.deepEqual(scheduleSourceSync({ ...queues, claimed: [], stale: [], seeds: [], limit: 2 }), [])
 
-function searchFixture() {
+function searchFixture({ delay = 0, cacheValues = true } = {}) {
   const calls = { slug: 0, name: 0, rpc: 0, fallback: 0 }
+  const options = []
   let nameFailed = true, rpcError = null
   const row = slug => ({ slug, name: slug, ai_review_approved: true, category: 'development' })
-  function query(kind = 'fallback') {
+  function query(kind = 'fallback', timeoutMs) {
     const q = {
       select() { return q }, or() { return q }, order() { return q }, limit() { return q },
       eq() { kind = 'slug'; return q }, ilike() { kind = 'name'; return q }, textSearch() { kind = 'fallback'; return q },
       then(resolve, reject) {
         calls[kind]++
         const error = kind === 'name' && nameFailed ? { code: '57014', message: 'timeout' } : kind === 'rpc' ? rpcError : null
-        return Promise.resolve({ error, data: error ? null : kind === 'name' ? [] : [row(kind === 'slug' ? 'alpha' : 'broad')] }).then(resolve, reject)
+        const result = { error, data: error ? null : kind === 'name' ? [] : [row(kind === 'slug' ? 'alpha' : 'broad')] }
+        return (delay ? withTimeout(new Promise(done => setTimeout(() => done(result), delay)), timeoutMs, 'transport') : Promise.resolve(result)).then(resolve, reject)
       },
     }
     return q
   }
-  const client = { from: () => query(), rpc: name => query(name === 'lookup_public_skill_name' ? 'name' : 'rpc') }
+  const client = opts => {
+    options.push(opts)
+    return { from: () => query('fallback', opts.requestTimeoutMs), rpc: name => query(name === 'lookup_public_skill_name' ? 'name' : 'rpc', opts.requestTimeoutMs) }
+  }
   const names = [...readFileSync(new URL('../lib/db/skills.ts', import.meta.url), 'utf8').matchAll(/from '([^']+)'/g)].map(x => x[1])
   const deps = Object.fromEntries(names.map(x => [x, {}]))
   Object.assign(deps, {
-    '@/lib/supabase/public': { createPublicClient: () => client }, '@/lib/skills/publication': { PUBLIC_SKILL_FILTER: 'ai_review_approved.eq.true' },
+    '@/lib/supabase/public': { createPublicClient: client }, '@/lib/skills/publication': { PUBLIC_SKILL_FILTER: 'ai_review_approved.eq.true' },
     '@/lib/skills/registry-scope': { isMcpOnlySkillRecord: () => false }, '@/lib/async': { withTimeout },
     '@/lib/search-query': searchQuery, '@/lib/search-results': searchResults, '@/lib/cache/packed-json': packed, '@/lib/cache/coalesced': coalesced,
     'next/cache': { unstable_cache: (fn, keys) => {
@@ -54,11 +59,11 @@ function searchFixture() {
       return async (...args) => {
         const key = JSON.stringify([keys, args])
         if (cache.has(key)) return cache.get(key)
-        const result = await fn(...args); cache.set(key, result); return result
+        const result = await fn(...args); if (cacheValues) cache.set(key, result); return result
       }
     } },
   })
-  return { db: compile('lib/db/skills.ts', deps), calls, recoverName: () => { nameFailed = false }, errorRpc: error => { rpcError = error } }
+  return { db: compile('lib/db/skills.ts', deps), calls, options, recoverName: () => { nameFailed = false }, errorRpc: error => { rpcError = error } }
 }
 const f = searchFixture()
 const partial = await f.db.searchSkillsWithStatus('alpha')
@@ -78,6 +83,23 @@ assert.equal((await oldDb.db.searchSkillsWithStatus('alpha')).degraded, false)
 assert.equal(oldDb.calls.fallback, 1, 'An older schema retains a bounded compatibility path')
 assert.equal(searchQuery.normalizeExactSearchQuery('*%_'), '')
 assert.deepEqual(await f.db.searchSkillsWithStatus('*%_'), { records: [], degraded: false })
+
+// A real cold read may take longer than the old 2.5/3.5s transport budgets.
+// Simulate the transport deadline too, so relaxing only the outer guard fails.
+const cold = searchFixture({ delay: 3800 }); cold.recoverName()
+assert.equal((await cold.db.searchSkillsWithStatus('cold')).degraded, false)
+assert.ok(cold.options.some(option => option.circuitScope === 'skill-search-broad'))
+assert.ok(cold.options.every(option => option.circuitScope !== 'public-read'))
+
+// Simulate concurrent cache misses/background revalidation (the shared cache
+// intentionally stores no values). Different result limits share exact reads.
+const concurrent = searchFixture({ delay: 15, cacheValues: false }); concurrent.recoverName()
+const results = await Promise.all(Array.from({ length: 8 }, (_, i) => concurrent.db.searchSkillsWithStatus('shared', 120 + i)))
+assert.ok(results.every(result => !result.degraded))
+assert.deepEqual(concurrent.calls, { slug: 1, name: 1, rpc: 8, fallback: 0 })
+await concurrent.db.searchSkillsWithStatus('shared', 140)
+assert.equal(concurrent.calls.slug, 2, 'Completed in-flight reads cannot shadow shared-cache invalidation')
+assert.equal(concurrent.calls.name, 2)
 
 // Aggregate cache excludes cookies, user IDs and personal votes. Mutation
 // invalidation immediately refreshes aggregates; failures cannot cache a zero.
