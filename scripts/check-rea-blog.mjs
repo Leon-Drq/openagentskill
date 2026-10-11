@@ -40,6 +40,7 @@ for (const locale of locales) {
     assert.ok(text(element).length > 200, 'Render full text, not headings alone')
   }
   assert.doesNotMatch(rendered, /\{\{\w+\}\}/)
+  assert.doesNotMatch(rendered, /\*\*/, 'No unrendered Markdown emphasis in translated prose')
   assert.ok(rendered.includes('npx rea-agents@6.4.0 setup --client codex --dry-run --json'))
   assert.ok(rendered.includes('23d50ea3bec186b4459d36c04854a92276accdf1'))
   assert.deepEqual(articleNodes.filter(n => n.tagName === 'nav').map(n => attr(n)['aria-label']), [copy.contentsLabel], 'Language selection stays in shared header')

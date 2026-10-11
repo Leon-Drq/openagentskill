@@ -49,7 +49,7 @@
     }
   ],
   "methodTitle": "资料来源与编辑范围",
-  "method": "本文于 **2026 年 10 月 12 日（Asia/Shanghai）**核查仓库提交 `23d50ea3bec186b4459d36c04854a92276accdf1`，并确认 npm 已发布的 6.4.0 元数据。核查时 GitHub 约有 9.4 万 stars，这反映关注度，不代表分析质量。\n\n主要依据：[项目介绍]({{README}})、[官方 Skill]({{SKILL}})、[安装与版本说明]({{INSTALL}})、[CLI 与 Evidence]({{CLI}})，以及文中链接的上游案例。本文是独立撰写的采用指南，基于资料核查；本次没有执行 REA，也未复现案例。本站通过所有者渠道收录该 Skill，不等同于运行验证通过。",
+  "method": "本文于 **2026 年 10 月 12 日**（Asia/Shanghai）核查仓库提交 `23d50ea3bec186b4459d36c04854a92276accdf1`，并确认 npm 已发布的 6.4.0 元数据。核查时 GitHub 约有 9.4 万 stars，这反映关注度，不代表分析质量。\n\n主要依据：[项目介绍]({{README}})、[官方 Skill]({{SKILL}})、[安装与版本说明]({{INSTALL}})、[CLI 与 Evidence]({{CLI}})，以及文中链接的上游案例。本文是独立撰写的采用指南，基于资料核查；本次没有执行 REA，也未复现案例。本站通过所有者渠道收录该 Skill，不等同于运行验证通过。",
   "nextTitle": "查看已收录的 REA Skill",
   "nextText": "先核对仓库、记录的 Skill 来源与发布状态，再选择自己的第一个分析目标。",
   "cta": "查看 REA Skill"
