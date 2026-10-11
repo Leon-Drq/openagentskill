@@ -11,6 +11,7 @@ import { clampResultPage, requestedDirectoryPage } from '@/lib/skills/pagination
 import { catalogPageNumber, catalogStars, directoryDiscoveryFilters, canShowCatalogSnapshot, selectCatalogSnapshot } from '@/lib/skills/catalog-query'
 import { getDirectoryProfiles } from '@/lib/skills/directory-profiles'
 import { projectDirectoryWindow } from '@/lib/skills/directory-window'
+import { isChronologicalSort, chronologicalDirectoryPage } from '@/lib/skills/chronological-directory'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsWithStatus } from '@/lib/db/skills'
 import { getShowcasesForSkill, getShowcaseCardData, SHOWCASE_SKILL_SLUGS } from '@/lib/showcase'
@@ -939,7 +940,8 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
   // Rich profile filters use one bounded, cached candidate pool across pages,
   // keeping their ranked total stable instead of widening it on every jump.
   const candidateLimit = MAX_SKILL_CANDIDATE_LIMIT
-  const catalogWindow = providerCatalogWindow(requestedPageOffset, providerSkills.length, sort)
+  const catalogWindow = { ...providerCatalogWindow(requestedPageOffset, providerSkills.length, sort),
+    providers: isChronologicalSort(sort) ? providerSkills.map(skill => ({ slug: skill.slug, timestamp: skill.createdAt })) : undefined }
   const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured] = await Promise.all([
     restrictedRegistry || query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
       : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, featured, minStars, pricing, topic, output), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
@@ -961,7 +963,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
             getFallbackSkills(sort, undefined, FALLBACK_SKILLS.length + CURATED_SKILL_SNAPSHOT.length),
             examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : null,
           ) : [] as SkillRecord[],
-        total: 0, hasMore: false, degraded: true, page,
+        total: 0, hasMore: false, degraded: true, page, orderedSlugs: undefined,
         }
       }) : Promise.resolve(null),
     !includeRegistry ? Promise.resolve([] as SkillRecord[]) : getSkillsBySlugs(access === 'paid' ? paidSlugs : [...new Set([...(selectedUseCase?.featuredSlugs || []), ...(!catalogMode && examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
@@ -1060,7 +1062,20 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     return { ...toSkillsPageSkill(item), exampleCount: examples.length, sourcePreview: getSkillPreviewCardData(item.record.slug), sourceGalleryHref: SOURCE_GALLERY_LINKS[item.record.slug], preview: examples[0] ? getShowcaseCardData(examples[0]) : null }
   }
   let skills: DirectorySkillCard[]
-  if (catalogMode) {
+  if (isChronologicalSort(sort)) {
+    resultCount = (catalogMode && !degraded ? catalogResult!.total : filteredRecords.length) + providerSkills.length
+    if (catalogMode && catalogResult!.orderedSlugs) {
+      const cards = new Map([...providerSkills, ...visibleRecords.map(projectCard)].map(card => [card.slug, card]))
+      skills = catalogResult!.orderedSlugs.flatMap(slug => cards.has(slug) ? [cards.get(slug)!] : [])
+    } else {
+      const entries = [
+        ...filteredRecords.map(item => ({ slug: item.record.slug, timestamp: sort === 'new' ? item.record.created_at : item.record.github_last_pushed_at, project: () => projectCard(item) })),
+        ...providerSkills.map(card => ({ slug: card.slug, timestamp: card.createdAt, project: () => card })),
+      ]
+      skills = chronologicalDirectoryPage(entries, [], pageOffset, 0, VISIBLE_SKILL_LIMIT).map(entry => entry.project())
+    }
+    hasMoreResults = !degraded && pageOffset + VISIBLE_SKILL_LIMIT < resultCount
+  } else if (catalogMode) {
     const cards = visibleRecords.map(projectCard)
     const merged = mergeProviderCatalogPage(cards, providerSkills, degraded ? cards.length : catalogResult!.total, pageOffset, sort)
     skills = merged.items; resultCount = merged.total; hasMoreResults = !degraded && merged.hasMore

@@ -68,7 +68,7 @@ export function toProviderDirectorySkill(entry: ExternalSkill, locale: string): 
 
 // Local editorial rows share the same 16-card window. They are not assigned
 // repository scores. Numeric repository sorts keep rows without metrics last.
-export function providerRowsFirst(sort: string) { return !['stars', 'downloads', 'trending'].includes(sort) }
+export function providerRowsFirst(sort: string) { return sort === 'quality' }
 export function providerCatalogWindow(offset: number, providerCount: number, sort: string, size = 16) {
   const first = providerRowsFirst(sort)
   const prefix = first ? Math.min(8, providerCount) : 0

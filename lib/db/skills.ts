@@ -9,6 +9,7 @@ import { directoryCategoryTerms } from '@/lib/skills/directory'
 import { normalizeSkillCategory, normalizeTopic, normalizeOutput, type SkillTaxonomy } from '@/lib/skills/taxonomy'
 import { clampResultPage } from '@/lib/skills/pagination'
 import { CATALOG_PAGE_SIZE, catalogPageNumber, catalogSortColumn, catalogStars } from '@/lib/skills/catalog-query'
+import { isChronologicalSort, chronologicalRegistryWindow, chronologicalDirectoryPage, type DatedDirectoryEntry } from '@/lib/skills/chronological-directory'
 import { mediaSlugsNeedPost, slugQueryBatches } from '@/lib/skills/media-query'
 import { isMcpOnlyCategory, isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
 import { unstable_cache } from 'next/cache'
@@ -1311,10 +1312,38 @@ const getCachedCatalogCount = unstable_cache(
 )
 
 const getCachedCatalogPage = unstable_cache(
-  coalesceCacheLoader(async (sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null, topic: string, output: string, windowOffset?: number, windowLimit: number = CATALOG_PAGE_SIZE, providerCount: number = 0, providerPrefix: number = 0) => {
+  coalesceCacheLoader(async (sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter, pricingSlugs: string[], exampleSlugs: string[] | null, topic: string, output: string, windowOffset?: number, windowLimit: number = CATALOG_PAGE_SIZE, providerCount: number = 0, providerPrefix: number = 0, providers: DatedDirectoryEntry[] | null = null) => {
     const total = await getCachedCatalogCount(category, minStars, pricing, pricingSlugs, exampleSlugs, topic, output)
     const effectivePage = clampResultPage(page, total + providerCount, CATALOG_PAGE_SIZE)
     const offset = (effectivePage - 1) * CATALOG_PAGE_SIZE
+    if (isChronologicalSort(sort) && providers !== null) {
+      const window = chronologicalRegistryWindow(offset, providers.length, CATALOG_PAGE_SIZE)
+      const supabase = createPublicClient({ requestTimeoutMs: 8000, circuitScope: 'public-catalog' })
+      const post = mediaSlugsNeedPost(exampleSlugs)
+      const select = (columns: string) => applyCatalogFilters((post
+        ? supabase.rpc('skill_directory_by_slugs', { p_slugs: exampleSlugs }).select(columns)
+        : supabase.from('skill_directory_entries').select(columns)).or(PUBLIC_SKILL_FILTER),
+        category, minStars, pricing, pricingSlugs, post ? null : exampleSlugs, topic, output)
+      let keys: DatedDirectoryEntry[] = []
+      if (total > window.offset) {
+        const { data, error } = await select('slug,created_at,github_last_pushed_at')
+          .order(catalogSortColumn(sort), { ascending: false, nullsFirst: false })
+          .order('slug', { ascending: true }).range(window.offset, window.offset + window.limit - 1)
+        if (error) throw error
+        keys = ((data || []) as unknown as Pick<SkillRecord, 'slug' | 'created_at' | 'github_last_pushed_at'>[])
+          .map(row => ({ slug: row.slug, timestamp: sort === 'new' ? row.created_at : row.github_last_pushed_at }))
+      }
+      const orderedSlugs = chronologicalDirectoryPage(keys, providers, offset, window.offset, CATALOG_PAGE_SIZE).map(row => row.slug)
+      const registrySlugs = orderedSlugs.filter(slug => keys.some(row => row.slug === slug))
+      let records: SkillRecord[] = []
+      if (registrySlugs.length) {
+        // Read full metadata only for the <=16 cards actually rendered.
+        const { data, error } = await select(SKILL_TAXONOMY_SELECT).in('slug', registrySlugs)
+        if (error) throw error
+        records = (data || []) as unknown as SkillRecord[]
+      }
+      return { records, orderedSlugs, total, hasMore: offset + CATALOG_PAGE_SIZE < total + providers.length, page: effectivePage }
+    }
     const from = effectivePage === page ? windowOffset ?? offset : Math.max(0, offset - providerPrefix)
     const limit = effectivePage === page ? windowLimit : CATALOG_PAGE_SIZE - Math.min(CATALOG_PAGE_SIZE, Math.max(0, providerPrefix - offset))
     // Provider-only tail pages and empty selections need no registry row query.
@@ -1332,15 +1361,15 @@ const getCachedCatalogPage = unstable_cache(
     if (error) throw error
     return { records: (data || []) as unknown as SkillRecord[], total, hasMore: from + limit < total, page: effectivePage }
   }),
-  ['public-catalog-pages-v8-canonical-sources'],
+  ['public-catalog-pages-v9-chronological'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 
-export function getSkillCatalogPage(sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter = 'all', exampleSlugs: string[] | null = null, topic = 'all', output = 'all', window?: { offset: number; limit: number; providerCount: number; prefix: number }) {
+export function getSkillCatalogPage(sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter = 'all', exampleSlugs: string[] | null = null, topic = 'all', output = 'all', window?: { offset: number; limit: number; providerCount: number; prefix: number; providers?: DatedDirectoryEntry[] }) {
   return getCachedCatalogPage(sort, category.slice(0, 80), catalogPageNumber(String(page)), catalogStars(minStars), pricing, commerceFilterSlugs(pricing), exampleSlugs, normalizeTopic(topic), normalizeOutput(output),
     window ? Math.max(0, Math.min(1_600_000, Math.floor(window.offset))) : undefined,
     window ? Math.max(1, Math.min(CATALOG_PAGE_SIZE, Math.floor(window.limit))) : CATALOG_PAGE_SIZE,
-    window ? window.providerCount : 0, window ? window.prefix : 0)
+    window ? window.providerCount : 0, window ? window.prefix : 0, window?.providers ?? null)
 }
 
 export async function searchSkillsStrict(query: string, limit = 120): Promise<SkillRecord[]> {

@@ -16,6 +16,12 @@ const db = {
   getSkillCatalogPage: async (_sort, _category, page, _stars, _pricing, _slugs, _topic, _output, window) => {
     reads++
     if (unavailable) throw new Error('database unavailable')
+    if (window.providers) {
+      const { chronologicalDirectoryPage } = load('lib/skills/chronological-directory.ts')
+      const keys = records.map(row => ({ slug: row.slug, timestamp: _sort === 'new' ? row.created_at : row.github_last_pushed_at }))
+      const orderedSlugs = chronologicalDirectoryPage(keys, window.providers, (page-1)*16).map(row => row.slug)
+      return { records: records.filter(row => orderedSlugs.includes(row.slug)).reverse(), orderedSlugs, total: records.length, page }
+    }
     return { records: records.slice(window.offset, window.offset + window.limit), total: records.length, hasMore: true, page }
   },
   getSkillStats: async () => stats,
@@ -148,6 +154,19 @@ for (const kind of ['audit', 'evals']) {
   await assert.rejects(() => report.default(props), /^Error: 404$/)
 }
 console.log('Render cost: eight bounded model keys, request isolation, query bypass, invalidation, outage recovery and lazy card projection passed.')
+
+const previousRecords = records
+records = Array.from({length:32},(_,i)=>({...previousRecords[0], id:`new-${i}`, slug:i===12?'morluto-rea-reverse-engineer-anything':`new-${i}`, created_at:new Date(Date.UTC(2027,0,1,0,0,100-i)).toISOString(), github_last_pushed_at:new Date(Date.UTC(2027,0,1,0,0,100-i)).toISOString()}))
+for (const sort of ['new','fresh']) for (const lang of ['en','zh']) {
+  const first = await renderProps({sort,lang})
+  const second = await renderProps({sort,lang,page:'2'})
+  assert.deepEqual(first.skills.map(card=>card.slug), records.slice(0,16).map(row=>row.slug), 'Actual page renderer honors merged SQL order even when hydration returns unordered rows')
+  assert.deepEqual(second.skills.map(card=>card.slug), records.slice(16).map(row=>row.slug))
+  assert.equal(first.degraded,false)
+  assert.ok(!first.skills.some(card=>card.provider),'Older providers are never pinned ahead of new records')
+}
+records = previousRecords
+console.log('New arrival renderer: REA stays on page one, EN/ZH order and second-page continuity passed.')
 
 if (process.argv.includes('--benchmark')) {
   // Same deterministic inputs and output. The extra ignored key exercises the
