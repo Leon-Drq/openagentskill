@@ -74,5 +74,5 @@ fallback language behavior and do not advertise nonexistent translations.
 - Full repository regression tests, typecheck, repository links and production
   build passed. ESLint reports no errors; 25 existing warnings remain.
 - Owner archive: `artifacts/motion-studio-v1/openagentskill-motion-studio-1.0.0.zip`
-  (3,249,038 bytes). SHA-256:
-  `11c1330a88a5eabd562f1fb7942b9aee603c7c22b8d7cd6abfcaf6046cf1d1b7`.
+  (3,249,391 bytes). SHA-256:
+  `ed39ce93dd1c26f6f198a0284112893d7bd87dc02d66f31cfbe485cb1317389b`.
