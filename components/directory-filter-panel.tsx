@@ -38,13 +38,14 @@ function FilterChoice({ children, selected, disabled, href, onClick, compact = f
 export function DirectoryFilterPanel({ locale, value, onChange, disabled, href, categories, useCases, platformOptions }: Props) {
   const c = directoryCopy(locale), f = directoryFilterCopy(locale), d = discoveryCopy(locale), prices = commerceCopy(locale)
   const label = (key: string) => directoryLabel(locale, key)
-  const primaryCategories = SKILL_CATEGORIES.slice(0, 6).map(item => item[0] as string)
-  const otherCategories = categories.filter(key => !primaryCategories.includes(key) && key !== MOTION_CATEGORY)
+  const primaryCategories: string[] = SKILL_CATEGORIES.slice(0, 6).flatMap(([key]) => key === 'video-creation' ? [key, MOTION_CATEGORY] : [key])
+  const otherCategories = categories.filter(key => !primaryCategories.includes(key))
   const choice = (key: keyof DirectoryFilterDraft, option: string, title: string, compact = false, icon?: LucideIcon) => {
     const updates = { [key]: option }
     return <FilterChoice key={option} selected={value[key] === option} disabled={disabled} href={href?.(updates)} onClick={() => onChange(updates)} compact={compact} icon={icon}>{title}</FilterChoice>
   }
   const categoryChoice = (key: string) => {
+    if (key === MOTION_CATEGORY) return choice('category', key, motionCategoryLabel(locale), false, Film)
     const item = SKILL_CATEGORIES.find(item => item[0] === key)
     return choice('category', key, key === 'all' ? label('allCategories') : item ? categoryLabel(key, locale) : label(key), false, item ? discoveryIcons[item[3]] : Search)
   }
@@ -73,9 +74,6 @@ export function DirectoryFilterPanel({ locale, value, onChange, disabled, href, 
         <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between px-2.5 text-xs text-secondary [&::-webkit-details-marker]:hidden">{f.moreCategories}<ChevronDown size={14} aria-hidden="true" className="transition-transform group-open:rotate-180" /></summary>
         {otherCategories.map(categoryChoice)}
       </details>
-      <div className="mt-2 border-t border-border pt-2" data-motion-category>
-        {choice('category', MOTION_CATEGORY, motionCategoryLabel(locale), false, Film)}
-      </div>
     </nav>
     <details key={String(advancedActive)} open={advancedActive || undefined} className="group border-t border-border pt-3" data-directory-advanced>
       <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between text-xs font-medium text-secondary [&::-webkit-details-marker]:hidden">{f.advanced}<ChevronDown size={14} aria-hidden="true" className="transition-transform group-open:rotate-180" /></summary>
