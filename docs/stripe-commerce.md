@@ -12,6 +12,7 @@ Set these in the **openagentskill** Vercel project, never in client variables:
 | `STRIPE_WEBHOOK_SECRET` | Signing secret for this deployment's webhook endpoint. |
 | `STRIPE_PRICE_PRO_MONTHLY` | Active USD 9.99 monthly recurring price, interval count 1. |
 | `STRIPE_PRICE_PRO_YEARLY` | Active USD 79 yearly recurring price, interval count 1. |
+| `STRIPE_BILLING_PORTAL_CONFIGURATION` | OpenAgentSkill's dedicated customer portal configuration; required before checkout can open. Other applications can keep their own portal settings. |
 | `COMMERCE_SITE_URL` | `https://www.openagentskill.com` in production. |
 | `COMMERCE_CHECKOUT_ENABLED` | Set `true` only after sandbox checkout, webhook and download verification. Set `false` to stop new purchases; existing downloads and billing remain available. |
 | `SUPABASE_SECRET_KEY` | Existing server-side Supabase credential. |
@@ -38,7 +39,7 @@ charge.dispute.created
 charge.dispute.closed
 ```
 
-Configure the customer portal to show invoices, update payment methods and cancel at period end. Do not enable plan changes, trials or discounts without adding and testing their entitlement rules. Payment methods use Stripe's dynamic Dashboard configuration. Automatic tax is not enabled; it requires an active tax registration and a separate explicit configuration.
+Configure the dedicated customer portal to show invoices, update payment methods and cancel at period end. Do not enable plan changes, trials or discounts without adding and testing their entitlement rules. Payment methods use Stripe's dynamic Dashboard configuration. Automatic tax is not enabled; it requires an active tax registration and a separate explicit configuration.
 
 ## Packages
 

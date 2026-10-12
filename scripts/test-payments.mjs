@@ -33,6 +33,12 @@ for (const args of [['past_due', 200, true], ['canceled', 200, true], ['trialing
 assert.equal(safeStripeRedirect('https://checkout.stripe.com/c/pay/cs_1', 'checkout'), 'https://checkout.stripe.com/c/pay/cs_1')
 for (const url of ['javascript:alert(1)', 'https://checkout.stripe.com.evil.com', 'https://user@checkout.stripe.com', 'http://checkout.stripe.com']) assert.equal(safeStripeRedirect(url, 'checkout'), null)
 assert.equal(checkoutConfigured(), false, 'checkout defaults off even with credentials')
+process.env.COMMERCE_CHECKOUT_ENABLED = 'true'
+delete process.env.STRIPE_BILLING_PORTAL_CONFIGURATION
+assert.equal(checkoutConfigured(), false, 'checkout requires the dedicated billing portal, not the shared merchant default')
+process.env.STRIPE_BILLING_PORTAL_CONFIGURATION = 'bpc_unit_fixture'
+assert.equal(checkoutConfigured(), true)
+delete process.env.COMMERCE_CHECKOUT_ENABLED
 
 const charge = { paid: true, disputed: false, refunded: false, amount: 499, amount_refunded: 0 }
 const intent = { id: 'pi_1', status: 'succeeded', livemode: false, amount_received: 499, currency: 'usd', metadata: { integration: 'openagentskill', order_id: order.id }, latest_charge: charge }

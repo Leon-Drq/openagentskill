@@ -10,10 +10,12 @@ export async function POST(request: NextRequest) {
     const parsed = z.object({ locale: z.enum(['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr', 'id']).default('en') }).strict().safeParse(await paymentBody(request))
     if (!parsed.success) throw new PaymentError('invalid_body')
     const user = await buyer()
+    const configuration = process.env.STRIPE_BILLING_PORTAL_CONFIGURATION
+    if (!configuration) throw new PaymentError('checkout_unavailable', 503)
     const { data, error } = await paymentDb().from('commerce_customers').select('stripe_customer_id').eq('user_id', user.id).eq('livemode', paymentMode() === true).maybeSingle()
     if (error) throw error
     if (!data) throw new PaymentError('no_billing_account', 404)
-    const session = await stripeClient().billingPortal.sessions.create({ customer: data.stripe_customer_id,
+    const session = await stripeClient().billingPortal.sessions.create({ customer: data.stripe_customer_id, configuration,
       return_url: `${paymentSite()}/profile?tab=purchases&lang=${parsed.data.locale}` })
     const url = safeStripeRedirect(session.url, 'portal')
     if (!url) throw new Error('invalid_portal_url')

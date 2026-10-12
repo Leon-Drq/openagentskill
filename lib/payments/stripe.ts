@@ -17,7 +17,7 @@ export function stripeClient() {
 }
 export function checkoutConfigured() {
   return process.env.COMMERCE_CHECKOUT_ENABLED === 'true' && paymentMode() !== null
-    && Boolean(process.env.STRIPE_WEBHOOK_SECRET)
+    && Boolean(process.env.STRIPE_WEBHOOK_SECRET) && Boolean(process.env.STRIPE_BILLING_PORTAL_CONFIGURATION)
     && (process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV !== 'production' || paymentMode() === true)
 }
 export const stripeId = (value: string | { id: string } | null | undefined) => typeof value === 'string' ? value : value?.id || null
