@@ -69,3 +69,11 @@ This flag records the operator's responsibility; the command does not claim to v
 `pnpm test:payments` covers real policy/handler code using deterministic Stripe and database adapters: ownership, server price binding, mode isolation, original-version access, update cutoff, subscription expiry, refunds/disputes, async settlement, replay, partial failure retries, late events, CSRF, redirects and Stripe signature validation. `pnpm test`, typecheck, lint and production build remain required.
 
 Before enabling production checkout, run a real sandbox purchase and inspect the webhook and private download with two accounts; test asynchronous failure, replay, full refund, subscription cancellation/renewal and expiry. Adapter tests are not a claim that a real Stripe transaction has succeeded.
+
+### Sandbox verification, 2026-10-13
+
+The isolated `OpenAgentSkill QA` Stripe sandbox completed hosted single-purchase and monthly-subscription checkouts. Real signed events reached the application's webhook through the official Stripe CLI. Verification used two dedicated application accounts and the private Launch Card Studio 1.1.0 ZIP, whose renderer output matches all three public SVG previews.
+
+Verified against the actual Stripe and Supabase APIs: declined-card access denial, checkout retry idempotency, paid fulfillment, private download SHA-256, cross-account denial, full-refund revocation, older completion-event replay, billing portal creation, cancellation at period end, paid renewal with a Stripe test clock, and download revocation when the paid period ended. Asynchronous settlement/failure remains covered by the regression adapters; no real delayed-payment transaction is claimed. Production validation must not submit a real charge merely to test the integration.
+
+The merchant selected by the owner is `qudongqi.ai` (`acct_1STM522WEAq3tdU2`). Production uses a dedicated restricted server key, webhook and portal. Launch Card Studio is the only published downloadable package at this point; the 233 motion references remain unavailable for purchase until their matching packages are completed.
