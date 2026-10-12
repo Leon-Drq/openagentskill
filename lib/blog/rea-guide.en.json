@@ -1,0 +1,56 @@
+{
+  "title": "REA reverse engineering: Skill, MCP setup and first workflow",
+  "summary": "Use REA with Codex, Claude Code or Cursor: understand Skill versus MCP, choose analysis tools, set up version 6.4.0 and plan an evidence-based first investigation.",
+  "eyebrow": "Developer workflows",
+  "byline": "OpenAgentSkill editorial",
+  "dateLabel": "Sources checked",
+  "backLabel": "Back to Blog",
+  "blogLabel": "Blog",
+  "contentsLabel": "In this guide",
+  "intro": [
+    "REA (Reverse Engineer Anything) connects an AI agent to tools for investigating shipped software: application packages, native binaries and selected runtime behavior. Its reverse-engineer-anything Skill guides the investigation; an MCP server or CLI supplies the actual analysis tools.",
+    "A useful first question is small: where does an installed app transform a CSV field, or which process writes an exported file? This guide shows how to choose that target, connect the tools and ask for evidence you can inspect."
+  ],
+  "sections": [
+    {
+      "id": "what-is-rea",
+      "title": "When REA is useful",
+      "body": "Use REA when the answer depends on a built artifact or behavior you cannot establish from the available source. Examples include inspecting an Electron ASAR, following a native function or comparing two packaged releases. If you have the complete source repository and only need its architecture explained, the [official Skill]({{SKILL}}) recommends ordinary repository tools.\n\nOur selection rule: name the artifact, one behavior and the evidence needed to explain it. “Explain this app” gives an agent too little direction; “identify which function normalizes this exported field” creates a question you can check."
+    },
+    {
+      "id": "skill-mcp-cli",
+      "title": "Skill, MCP and CLI have different jobs",
+      "body": "| Component | What it contributes | What installing it does not establish |\n| --- | --- | --- |\n| `reverse-engineer-anything` Skill | Instructions for choosing a target, collecting evidence and reporting unknowns | That the agent can call REA tools |\n| REA MCP server | Analysis tools callable from a compatible agent | That every analysis engine is installed |\n| `rea-agents` CLI | Terminal access to REA workflows | That your current agent session is connected |\n\nGuided setup registers the server and installs matching instructions. A Skill-only install supplies instructions and references. That distinction explains a common failure: the Skill is visible, but no REA tool is available in the active session. See the [installation guide]({{INSTALL}}#skill-only-installation)."
+    },
+    {
+      "id": "choose-target",
+      "title": "Choose the target before the engine",
+      "body": "| Target | Useful starting output | Extra requirements |\n| --- | --- | --- |\n| JavaScript / Electron directory or ASAR | Modules, imports and process boundaries | Supported Node.js and npm; no native engine |\n| Native executable | Assembly, pseudocode, callers and references | A supported Hopper, Ghidra or IDA configuration |\n| Website behavior | Page, script and network observations | A Chrome-family browser and the relevant permissions |\n| Android APK code | Classes, methods and references | JADX and a full JDK; check host support |\n\nThis is a shortlist, not a claim that all formats work on all machines. Check the [target matrix]({{README}}#what-you-can-analyze) and your installed release. Static JavaScript inspection reads the supplied application files without running that application. Runtime capture can execute or interact with a target, so scope it separately.\n\nLocal analysis also does not make the entire agent conversation offline: tool results may be sent to the agent's model provider. Use software and data you are authorized to inspect, and choose a model configuration appropriate for that material."
+    },
+    {
+      "id": "setup",
+      "title": "Set up REA for Codex, Claude Code or Cursor",
+      "body": "At this source check, npm's published version was **6.4.0**. It requires Node.js **22.19+ within 22.x, 24.11+ within 24.x, or 26+**. The Skill's metadata version **39** is a separate version number. Repository main can describe features newer than the npm release. [Package]({{NPM}}) · [Release boundary]({{INSTALL}}#released-package-and-main).\n\nFor a scoped Codex setup, first inspect the proposed configuration changes:\n\n```sh\nnpx rea-agents@6.4.0 setup --client codex --dry-run --json\n```\n\n`npx` may download and execute the REA package even for a dry run; the dry run plans configuration changes. Review the destinations, backups and Skill replacement. Apply that plan when appropriate:\n\n```sh\nnpx rea-agents@6.4.0 setup --client codex\n```\n\nReplace `codex` with `claude_code` or `cursor` for those clients, then restart or reconnect the selected agent. If tools are missing, inspect that client with `npx rea-agents@6.4.0 doctor --client codex --json`. Doctor checks configuration and prerequisites; confirm tool availability in the live agent session too. Working connections do not need setup repeated before every task.\n\nFor a direct static JavaScript inspection, replace the path with your own extracted directory or ASAR and save the result:\n\n```sh\nnpx rea-agents@6.4.0 analyze-javascript-application /absolute/path/to/app --json > app-evidence.json\n```\n\nOn Windows, a path such as `\"D:/apps/example\"` is suitable. Large results can be substantial: keep the Evidence file and read focused views instead of pasting everything into a model context. The [CLI guide]({{CLI}}) explains those views."
+    },
+    {
+      "id": "first-investigation",
+      "title": "A first investigation you can review",
+      "body": "Start with your own packaged Electron app and a single export feature. Keep a copy of the target and record its version or hash so another person can inspect the same bytes. Here is an original task template, not a report of a run we performed:\n\n```text\nTarget: [absolute path to my application package]\nQuestion: where is the exported CSV field “status” normalized?\nStart with static inspection. Trace the relevant entry point,\nIPC handoff, if present, and writer. Cite file locations or\nfunction addresses for each conclusion. Separate observed\nfacts, inferences and unresolved questions. Do not run the\napplication or change files without asking first.\nDeliver: a short call path, an evidence table and a proposed\ntest using an empty value, an unknown value and Unicode text.\n```\n\nReview three deliverables: **the path** from input to output, **the evidence** supporting each step, and **the test** that could disprove the explanation. A plausible narrative without locations is unfinished. A static path without an execution observation should remain labeled as a static inference.\n\nIf you later implement the behavior in your own project, test that implementation separately. Understanding an algorithm does not demonstrate that a generated replacement reproduces every edge case."
+    },
+    {
+      "id": "evidence",
+      "title": "What the published examples demonstrate",
+      "body": "REA's [Notion case study]({{NOTION}}) traces a clipboard request across Electron process boundaries. Its [DX-Ball example]({{DXBALL}}) investigates a sound-panning calculation and links the reconstruction's checks.\n\nThe practical lesson is to ask for the handoffs and testable calculation behind a feature. These are upstream examples with specific targets and versions, not OpenAgentSkill runtime tests or a success rate for arbitrary applications. Pseudocode is a starting point for investigation; callers, instructions and observed outputs can reveal what it misses."
+    },
+    {
+      "id": "faq",
+      "title": "Questions before you adopt REA",
+      "body": "### Is REA free?\n\nThe repository uses the MIT license. Agent model usage and some analysis providers can have their own costs. An open-source license is not a promise that every configured workflow is free.\n\n### Does it work on Windows?\n\nCheck the target and provider combination. JavaScript analysis and a native Ghidra workflow have different prerequisites; the upstream documentation explicitly describes Windows Ghidra support as experimental. Do not infer universal support from a successful package install.\n\n### Can it recover the original source code?\n\nNative analysis can produce pseudocode and assembly. Those do not necessarily preserve original identifiers, comments or project structure. Have the agent explain what is recovered and what is inferred.\n\n### Why is the Skill installed but its tools missing?\n\nSkill installation, MCP registration and an active agent connection are separate states. Check the selected client's registration, restart the session and inspect its advertised tools. Install an additional engine only when the chosen target needs it."
+    }
+  ],
+  "methodTitle": "Sources and editorial scope",
+  "method": "Checked on **12 October 2026 (Asia/Shanghai)** against repository commit `23d50ea3bec186b4459d36c04854a92276accdf1` and the published npm 6.4.0 metadata. GitHub showed approximately 94,000 stars at the check; that indicates attention, not analysis quality.\n\nPrimary references: [project overview]({{README}}), [official Skill]({{SKILL}}), [installation and release notes]({{INSTALL}}), [CLI and Evidence]({{CLI}}), and the linked upstream case studies. This is an independently written adoption guide based on source review. We did not execute REA or reproduce the examples for this article. The site's owner-published listing is not a runtime verification badge.",
+  "nextTitle": "Inspect the listed Skill",
+  "nextText": "Review the repository, the recorded Skill source and its publication status before choosing your first target.",
+  "cta": "View the REA Skill"
+}

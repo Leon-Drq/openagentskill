@@ -12,7 +12,8 @@ import { getBlogHubData, getBlogPosts, type BlogSkillPreview } from '@/lib/blog/
 import { SKILL_STACKS } from '@/lib/collections'
 import { CORE_RANKINGS, getRankingDefinitions } from '@/lib/rankings'
 import { USE_CASES } from '@/lib/use-cases'
-import { type BlogLocale } from '@/lib/blog/routes'
+import { REA_BLOG_SLUG, type BlogLocale } from '@/lib/blog/routes'
+import { REA_ARTICLE_COPY } from '@/lib/blog/rea-guide'
 import { CREATOR_ARTICLE_COPY } from '@/lib/blog/creator-workflows'
 import { CreatorGuideFeature } from '@/components/blog/creator-guide-feature'
 
@@ -96,6 +97,9 @@ export default async function BlogPage() {
       />
 
       <div className="mx-auto max-w-6xl px-6">
+        <CreatorGuideFeature slug={REA_BLOG_SLUG} copy={Object.fromEntries(Object.entries(REA_ARTICLE_COPY).map(([locale, copy]) =>
+          [locale, { title: copy.title, summary: copy.summary, eyebrow: copy.eyebrow }]
+        )) as Record<BlogLocale, { title: string; summary: string; eyebrow: string }>} />
         <CreatorGuideFeature copy={Object.fromEntries(Object.entries(CREATOR_ARTICLE_COPY).map(([locale, copy]) =>
           [locale, { title: copy.title, summary: copy.summary, eyebrow: copy.eyebrow }]
         )) as Record<BlogLocale, { title: string; summary: string; eyebrow: string }>} />

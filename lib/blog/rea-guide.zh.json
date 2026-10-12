@@ -1,0 +1,56 @@
+{
+  "title": "REA 逆向工程 Skill：让 Codex、Claude Code 读懂应用",
+  "summary": "REA 是什么，Skill 与 MCP 有何区别？了解 Codex、Claude Code、Cursor 的配置方法、分析引擎依赖，以及可复核的首次应用逆向分析流程。",
+  "eyebrow": "开发者工作流",
+  "byline": "OpenAgentSkill 编辑部",
+  "dateLabel": "来源核查日期",
+  "backLabel": "返回博客",
+  "blogLabel": "博客",
+  "contentsLabel": "本文目录",
+  "intro": [
+    "REA（Reverse Engineer Anything）把 AI Agent 接到一组逆向分析工具上，用来研究已经构建好的应用包、原生二进制和指定的运行行为。它的 reverse-engineer-anything Skill 负责指导调查，MCP 服务或 CLI 负责提供实际分析能力。",
+    "第一次使用，可以从一个小问题开始：某个已安装应用在哪里转换 CSV 字段，或者由哪个进程写入导出文件？本文说明怎样选定目标、连接工具，并要求 Agent 给出能逐项核对的证据。"
+  ],
+  "sections": [
+    {
+      "id": "what-is-rea",
+      "title": "什么情况下值得用 REA",
+      "body": "当答案依赖已经发布的二进制、安装包，或现有源码无法解释的行为时，REA 才有明确的用武之地。例如查看 Electron 的 ASAR 包、追踪一个原生函数，或比较两个打包版本。如果手头有完整源码，只想理解项目架构，[官方 Skill]({{SKILL}}) 建议直接使用普通仓库分析工具。\n\n我们的选题规则是：明确一个文件、一种行为，以及解释它所需要的证据。“解释整个应用”范围太大；“定位导出字段在哪里被标准化”更容易得到可核对的答案。"
+    },
+    {
+      "id": "skill-mcp-cli",
+      "title": "Skill、MCP 和 CLI 各做什么",
+      "body": "| 组成部分 | 提供什么 | 仅安装它还不能证明什么 |\n| --- | --- | --- |\n| `reverse-engineer-anything` Skill | 选择目标、收集证据、报告未知项的工作指令 | Agent 已经能调用 REA 工具 |\n| REA MCP 服务 | 让兼容的 Agent 调用分析工具 | 所有分析引擎都已安装 |\n| `rea-agents` CLI | 从终端调用 REA 工作流 | 当前 Agent 会话已连接服务 |\n\n引导式 setup 会注册服务并安装匹配的指令。单独安装 Skill 只会获得指令和参考文件。这就解释了一个常见现象：Skill 已出现在列表里，当前会话却没有 REA 工具可用。详见[安装说明]({{INSTALL}}#skill-only-installation)。"
+    },
+    {
+      "id": "choose-target",
+      "title": "先选分析对象，再选引擎",
+      "body": "| 分析对象 | 适合先查看的结果 | 额外条件 |\n| --- | --- | --- |\n| JavaScript / Electron 目录或 ASAR | 模块、导入关系、进程边界 | 支持的 Node.js 与 npm；无需原生引擎 |\n| 原生可执行文件 | 汇编、伪代码、调用方和引用 | 可用的 Hopper、Ghidra 或 IDA 配置 |\n| 网页行为 | 页面、脚本和网络观察记录 | Chrome 系浏览器及相应权限 |\n| Android APK 代码 | 类、方法与引用关系 | JADX、完整 JDK；需核对主机支持 |\n\n这是一份起步清单。具体格式、主机系统和版本应以[官方支持表]({{README}}#what-you-can-analyze)为准。静态 JavaScript 检查读取目标应用文件，不运行该应用；运行时采集可能启动或操作目标，应另行确定范围。\n\n分析在本地发生，也不意味着整个 Agent 对话都离线：工具结果仍可能被发送给模型服务商。应使用有权检查的软件和数据，并选择适合这些资料的模型配置。"
+    },
+    {
+      "id": "setup",
+      "title": "配置 Codex、Claude Code 或 Cursor",
+      "body": "本次核查时，npm 正式发布版本为 **6.4.0**，要求 Node.js **22.x 中的 22.19 及以上、24.x 中的 24.11 及以上，或 26 及以上**。Skill 元数据中的版本 **39** 是另一套版本号。仓库 main 可能包含正式包尚未发布的能力。[软件包]({{NPM}}) · [版本边界]({{INSTALL}}#released-package-and-main)。\n\n以只配置 Codex 为例，先查看将要发生的配置变化：\n\n```sh\nnpx rea-agents@6.4.0 setup --client codex --dry-run --json\n```\n\n即使使用 dry-run，`npx` 仍可能下载并执行 REA 软件包；dry-run 的作用是生成配置修改计划。检查目标路径、备份和 Skill 替换内容，确认适合自己的环境后再应用：\n\n```sh\nnpx rea-agents@6.4.0 setup --client codex\n```\n\n使用 Claude Code 时把 `codex` 换成 `claude_code`，Cursor 则换成 `cursor`，之后重启或重新连接对应 Agent。如果工具仍未出现，用 `npx rea-agents@6.4.0 doctor --client codex --json` 检查这个客户端。Doctor 检查的是配置和依赖，还应在实际 Agent 会话中确认工具可用。连接正常时，无需每次调查前重复 setup。\n\n如果只想从终端做静态 JavaScript 检查，可以把路径替换成自己的解包目录或 ASAR，并保存结果：\n\n```sh\nnpx rea-agents@6.4.0 analyze-javascript-application /absolute/path/to/app --json > app-evidence.json\n```\n\nWindows 可使用 `\"D:/apps/example\"` 这样的路径。大型应用的 Evidence 结果可能很大，建议保存文件、查看摘要或局部视图，避免整份塞进模型上下文。[CLI 文档]({{CLI}})说明了视图用法。"
+    },
+    {
+      "id": "first-investigation",
+      "title": "第一次调查，交付什么才算有用",
+      "body": "选择自己打包的 Electron 应用，把范围缩到一个导出功能。保留目标副本并记录版本或哈希，方便他人核对同一份文件。下面是我们编写的任务模板，并非本站已经运行过的结果：\n\n```text\n目标：[我自己的应用包绝对路径]\n问题：导出的 CSV 字段“status”在哪里被标准化？\n先进行静态检查，追踪相关入口、可能存在的 IPC\n交接点和写入函数。每个结论都给出文件位置或\n函数地址，区分观察到的事实、推断和未解决问题。\n运行应用或修改文件前，先征求我的同意。\n交付：简短调用路径、证据表，以及一组覆盖空值、\n未知值和 Unicode 文本的测试方案。\n```\n\n验收时看三件事：从输入到输出的**路径**、支撑每一步的**证据**，以及能推翻错误解释的**测试**。只有合理叙述、没有具体位置的结果还不完整。仅靠静态代码推断出的路径，应明确标注为静态推断。\n\n如果之后要在自己的项目中实现相同行为，应独立测试新实现。理解了算法，并不能证明生成的代码已经覆盖所有边界情况。"
+    },
+    {
+      "id": "evidence",
+      "title": "官方案例可以说明什么",
+      "body": "REA 的 [Notion 案例]({{NOTION}})追踪了跨 Electron 进程的剪贴板请求；[DX-Ball 案例]({{DXBALL}})研究了声像计算，并提供重建项目的检查记录。\n\n值得学习的是：把一个功能拆成能追踪的交接点和能测试的计算过程。这些是上游针对特定目标、特定版本发布的案例，不是 OpenAgentSkill 的运行测试，也不是对任意应用都有效的成功率。伪代码可作为起点，调用方、指令和观察到的输出能帮助发现其中遗漏的信息。"
+    },
+    {
+      "id": "faq",
+      "title": "采用前的常见问题",
+      "body": "### REA 免费吗？\n\n仓库采用 MIT 许可证。Agent 的模型调用和部分分析引擎可能另行收费；开源不代表每一种配置下的完整工作流都没有成本。\n\n### Windows 能用吗？\n\n要按目标和引擎组合判断。JavaScript 分析与原生 Ghidra 工作流的前提不同，上游明确把 Windows Ghidra 支持标为实验性。软件包能安装，不代表所有功能都支持这台机器。\n\n### 能恢复原始源码吗？\n\n原生分析可以返回伪代码和汇编，但不一定保留原来的变量名、注释和工程结构。应让 Agent 说明哪些信息被恢复，哪些属于推断。\n\n### Skill 装好了，为什么还没有工具？\n\nSkill 安装、MCP 注册和当前会话连接是三种状态。先核对所选客户端的注册，重启会话，再检查实际暴露的工具；只有目标确实需要时才补充安装相应引擎。"
+    }
+  ],
+  "methodTitle": "资料来源与编辑范围",
+  "method": "本文于 **2026 年 10 月 12 日**（Asia/Shanghai）核查仓库提交 `23d50ea3bec186b4459d36c04854a92276accdf1`，并确认 npm 已发布的 6.4.0 元数据。核查时 GitHub 约有 9.4 万 stars，这反映关注度，不代表分析质量。\n\n主要依据：[项目介绍]({{README}})、[官方 Skill]({{SKILL}})、[安装与版本说明]({{INSTALL}})、[CLI 与 Evidence]({{CLI}})，以及文中链接的上游案例。本文是独立撰写的采用指南，基于资料核查；本次没有执行 REA，也未复现案例。本站通过所有者渠道收录该 Skill，不等同于运行验证通过。",
+  "nextTitle": "查看已收录的 REA Skill",
+  "nextText": "先核对仓库、记录的 Skill 来源与发布状态，再选择自己的第一个分析目标。",
+  "cta": "查看 REA Skill"
+}
