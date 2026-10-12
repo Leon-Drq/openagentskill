@@ -1,11 +1,11 @@
-.preview { position: relative; overflow: hidden; border-radius: 8px; }
-.preview img { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: contain; }
+.preview { position: relative; overflow: hidden; border-radius: 8px; background: #0b0b0b; }
+.preview video { display: block; width: 100%; height: auto; max-height: 65dvh; object-fit: contain; }
 .compact { border-radius: 0; }
-.previewControls { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.previewControls button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; min-width: 44px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--foreground); font-size: 12px; cursor: pointer; }
+.compact video { aspect-ratio: 8 / 5; max-height: none; object-fit: contain; }
+.previewControls { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; align-items: center; gap: 8px; pointer-events: none; }
+.previewControls button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; min-width: 44px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--foreground); font-size: 12px; cursor: pointer; pointer-events: auto; }
 .previewControls button:hover { background: var(--background); }
 .previewControls button:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
-.previewControls button:disabled { opacity: .6; cursor: default; }
-.runtime { margin-left: auto; border-radius: 6px; padding: 7px 9px; background: var(--card); color: var(--secondary); font-size: 11px; }
-.reducedNote { margin: 0; padding: 10px 12px; background: var(--background); color: var(--secondary); font-size: 12px; }
-.preview:has(.reducedNote) .previewControls { bottom: 52px; }
+.notice { margin: 0; padding: 10px 12px; background: var(--background); color: var(--secondary); font-size: 12px; line-height: 1.7; }
+.notice a { text-decoration: underline; text-underline-offset: 3px; }
+.preview:has(.notice) .previewControls { position: static; padding: 10px 12px; background: var(--background); }

@@ -1,6 +1,6 @@
 import catalog from "./catalog.json";
 import { motionFamily } from './shared';
-export { MOTION_FAMILIES, motionAsset, motionFamily } from './shared';
+export { MOTION_FAMILIES, motionFamily } from './shared';
 export type { MotionEntry, MotionFamily, MotionLocale } from './shared';
 
 export const MOTION_ENTRIES = catalog.entries;

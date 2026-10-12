@@ -397,13 +397,11 @@ export function SkillsPageClient(props: Props) {
             </div>
           )}
           <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${degraded ? visibleCount : resultCount}`}</p>
-          {isMotionCategory && <p className="mt-4 text-xs leading-6 text-secondary" data-motion-scope>{locale === 'zh' ? '233 个动效 Skill 起始工作流，配套 12 类原创基础样板。点击卡片查看预览、用途与参考来源。' : '233 motion Skill starters with 12 original visual-family samples. Open a card for its preview, workflow and reference.'}</p>}
+          {(isMotionCategory || Boolean(props.motionEntries?.length)) && <p className="mt-4 text-xs leading-6 text-secondary" data-motion-scope>{locale === 'zh' ? '付费动效 Skill · 逐条展示原作者视频，保留原效果。Skill 制作与交付状态见详情。' : 'Paid motion Skills with each creator’s original video, unchanged. See details for production and delivery status.'}</p>}
           {props.access !== 'paid' && (props.access !== 'all' || props.pricing !== 'all') && <p className="my-4 text-xs leading-6 text-secondary">{props.access === 'free' ? filterCopy.freeNote : props.access === 'third-party' ? filterCopy.thirdPartyNote : prices.caveat}</p>}
           {degraded && <DirectoryRecovery key={`${pathname}?${queryString}`} locale={locale} empty={props.catalogMode && skills.length === 0} />}
 
-          {props.motionEntries && props.motionEntries.length > 0 ? <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
-            {props.motionEntries.map(entry => <DirectoryMotionCard key={entry.id} entry={entry} locale={locale} />)}
-          </div> : skills.length === 0 ? (
+          {visibleCount === 0 ? (
             <div className="border-y border-border py-14 text-center">
               <p className="text-secondary">{degraded ? label('catalogUnavailable') : props.access === 'paid' ? filterCopy.paidNote : props.pricing !== 'all' ? prices.empty : props.catalogMode && hasMoreResults ? label('excludedResources') : c.empty}</p>
               {props.pricing !== 'all' && props.access !== 'paid' && <Link href={`/contact${locale === 'en' ? '' : '?lang=' + locale}`} className="mt-4 block text-sm text-[#006b4f] underline underline-offset-4">{prices.contribute} →</Link>}
@@ -411,6 +409,7 @@ export function SkillsPageClient(props: Props) {
               {props.access === 'paid' && !degraded && !isMotionCategory && <DirectoryStudioPreview locale={locale} />}
             </div>
           ) : <SkillEngagementProvider key={skills.map(skill => skill.slug).join(',')} slugs={skills.filter(skill => !skill.provider?.resource).map(skill => skill.slug)} untrackedSlugs={skills.filter(skill => skill.provider && !skill.provider.resource).map(skill => skill.slug)}><div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
+            {props.motionEntries?.map(entry => <DirectoryMotionCard key={entry.id} entry={entry} locale={locale} />)}
             {skills.map(skill => (
               <article key={skill.id} className="group flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-border bg-card transition-colors hover:border-[#006b4f]/50" data-directory-skill>
                 <div className="flex min-h-12 items-center justify-between gap-2 border-b border-border px-4 py-1">

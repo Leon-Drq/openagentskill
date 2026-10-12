@@ -31,8 +31,8 @@ import { getSearchMetadataCopy } from '@/lib/seo/search-metadata'
 import { getGitHubOwner } from '@/lib/github-owner'
 import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
 import { directoryCategoryOptions, matchesDirectoryCategory, isDirectorySnapshot, sortDirectoryCandidates } from '@/lib/skills/directory'
-import { MOTION_CATEGORY } from '@/lib/motion/shared'
-import { selectMotionDirectoryEntries } from '@/lib/motion/directory'
+import { MOTION_CATEGORY, type MotionEntry } from '@/lib/motion/shared'
+import { selectMotionDirectoryEntries, paidMotionWindow } from '@/lib/motion/directory'
 
 // Shared renderer. Public routes supply fixed inputs; query routes supply request inputs.
 
@@ -931,11 +931,14 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
   const supplyTrack = firstSearchValue(params.track) || 'all'
   const minStars = catalogStars(Number(firstSearchValue(params.minStars) || 0))
   const query = firstSearchValue(params.q)?.trim().slice(0, 180)
+  const motionFilters = { query, access, pricing, topic, output, featured, platform, minStars,
+    quality, trust, safety, supplyTrack, useCase }
+  const paidMotionEntries = category === 'all' && (access === 'paid' || pricing === 'paid')
+    ? selectMotionDirectoryEntries(motionFilters) : []
   // Motion is a category of this directory, using its existing shell and URL
   // state. Preview records remain separate from reviewed registry inventory.
   if (category === MOTION_CATEGORY) {
-    const entries = selectMotionDirectoryEntries({ query, access, pricing, topic, output, featured,
-      platform, minStars, quality, trust, safety, supplyTrack, useCase })
+    const entries = selectMotionDirectoryEntries(motionFilters)
     const resultCount = entries.length
     if (requestedPage > Math.max(1, Math.ceil(resultCount / VISIBLE_SKILL_LIMIT))) notFound()
     const offset = (requestedPage - 1) * VISIBLE_SKILL_LIMIT
@@ -957,7 +960,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
   const providerOnlyQuery = query?.toLocaleLowerCase() === 'skillry'
   const includeRegistry = registryAccess && !providerOnlyQuery
   const restrictedRegistry = !includeRegistry || access === 'paid'
-  const catalogMode = !featured && !query && !restrictedRegistry && [useCase, platform, quality, trust, safety, supplyTrack].every(value => value === 'all')
+  const catalogMode = !featured && !query && !restrictedRegistry && paidMotionEntries.length === 0 && [useCase, platform, quality, trust, safety, supplyTrack].every(value => value === 'all')
   const page = catalogMode ? catalogPageNumber(firstSearchValue(params.page)) : clampPage(firstSearchValue(params.page), providerSkills.length)
   const requestedPageOffset = (page - 1) * VISIBLE_SKILL_LIMIT
   // Rich profile filters use one bounded, cached candidate pool across pages,
@@ -1067,7 +1070,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     filteredRecords = sortDirectoryCandidates(filteredRecords, sort)
   }
 
-  if (!catalogMode) effectivePage = clampResultPage(page, filteredRecords.length + providerSkills.length, VISIBLE_SKILL_LIMIT)
+  if (!catalogMode) effectivePage = clampResultPage(page, filteredRecords.length + providerSkills.length + paidMotionEntries.length, VISIBLE_SKILL_LIMIT)
   const pageOffset = (effectivePage - 1) * VISIBLE_SKILL_LIMIT
   let resultCount = catalogMode ? catalogResult!.total : filteredRecords.length
   const visibleRecords = catalogMode ? filteredRecords : filteredRecords.slice(pageOffset, pageOffset + VISIBLE_SKILL_LIMIT)
@@ -1085,7 +1088,16 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     return { ...toSkillsPageSkill(item), exampleCount: examples.length, sourcePreview: getSkillPreviewCardData(item.record.slug), sourceGalleryHref: SOURCE_GALLERY_LINKS[item.record.slug], preview: examples[0] ? getShowcaseCardData(examples[0]) : null }
   }
   let skills: DirectorySkillCard[]
-  if (isChronologicalSort(sort)) {
+  let motionEntries: MotionEntry[] | undefined
+  if (paidMotionEntries.length > 0 && !catalogMode) {
+    const registryCards = filteredRecords.map(projectCard)
+    const existingCards = providerRowsFirst(sort) ? [...providerSkills, ...registryCards] : [...registryCards, ...providerSkills]
+    const merged = paidMotionWindow(paidMotionEntries, existingCards, pageOffset, VISIBLE_SKILL_LIMIT)
+    motionEntries = merged.motionEntries
+    skills = merged.registryEntries
+    resultCount = merged.total
+    hasMoreResults = pageOffset + VISIBLE_SKILL_LIMIT < resultCount
+  } else if (isChronologicalSort(sort)) {
     resultCount = (catalogMode && !degraded ? catalogResult!.total : filteredRecords.length) + providerSkills.length
     if (catalogMode && catalogResult!.orderedSlugs) {
       const cards = new Map([...providerSkills, ...visibleRecords.map(projectCard)].map(card => [card.slug, card]))
@@ -1119,7 +1131,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
 
   const clientProps: Omit<ComponentProps<typeof SkillsPageClient>, 'queryString'> = {
     pathname: locale === defaultLocale ? '/skills' : `/${locale}/skills`,
-    skills, query, sort, featured, examplesOnly, catalogMode, category, topic, output,
+    skills, motionEntries, query, sort, featured, examplesOnly, catalogMode, category, topic, output,
     pricing, access, categories: categoryOptions, useCase,
     useCases: USE_CASES.map(({ slug, shortTitle }) => ({ slug, shortTitle })),
     platform, platformOptions, quality, trust, safety, supplyTrack, supplyTracks,

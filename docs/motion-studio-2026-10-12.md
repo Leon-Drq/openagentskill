@@ -1,21 +1,19 @@
-# Motion Skills in the existing directory
+# Motion Skills: original references and paid classification
 
-The owner requested all motion Skills inside the existing Skills directory, with a new category below the existing sidebar categories. The shared header, footer, hero, search, normal category results and directory grid are retained.
+Owner correction on 2026-10-12: retain each original animation without replacing it with a generic sample, and list these Skills under Paid.
 
-- Entry: /skills?category=motion-design and /zh/skills?category=motion-design.
-- 233 owner-authored starter workflow packages, 12 original visual families.
-- 16 cards per page, existing search and pagination. Card details and animated samples open in the shared accessible dialog without leaving the directory.
-- 233 animated SVG samples and 233 static posters. Reduced motion preferences are respected. Source authors and references remain credited.
-- These are original family starters, not 233 reproductions of the source films. Full narrative, photographic and 3D work needs further production.
-- Full package download and checkout are not open. Preview records do not invent stars, reviews, installation counts or paid inventory.
-- The rejected standalone Motion Studio routes, navigation links and sitemap entries have been removed. Public SVG asset paths are retained as static files only.
+- `/skills?access=paid` and `/skills?category=motion-design&access=paid` include the motion collection, with existing directory search, mobile filters and pagination. Free and third-party filters exclude it.
+- Every one of the 233 entries uses the exact original video URL and poster URL from its source page. Original title, author, dimensions and source links are retained. Video frames are contained without cropping; no recolouring, regeneration or speed changes.
+- Visible cards play muted with native video media; offscreen cards pause. Reduced-motion preferences prevent automatic playback but allow explicit manual playback. Detail dialogs include native playback, seeking, sound and fullscreen controls.
+- No upstream media is mirrored, and no prompt text is republished. `scripts/sync-motion-source.mjs` verifies each source VideoObject against its actual video tag and imports public metadata only.
+- Paid is the owner's catalog classification. Checkout and full package delivery remain unavailable. No in-stock offers, review scores or completed reproduction claims are invented.
 
-## Private owner delivery
+## Withdrawn packages
 
-The complete independent Skill folders and ZIPs are in the ignored artifacts/motion-studio-v1 directory. No upstream films, prompts, music or source code are included.
+The former 1.0.0 generic-family starter packages do not satisfy the owner's fidelity requirement. All 466 substitute SVG assets and their download controls have been removed from the public site. The private `artifacts/motion-studio-v1` directory contains a WITHDRAWN notice and must not be sold or delivered as a faithful reproduction.
 
-Archive: openagentskill-motion-studio-1.0.0.zip
-Bytes: 3249391
-SHA256: ed39ce93dd1c26f6f198a0284112893d7bd87dc02d66f31cfbe485cb1317389b
+Source review found 230 prompt entries and 3 Skill-only entries (one prompt entry also links a Skill repository). The source films are reference previews, not evidence that a local generated project matches them. Full reproduction remains unverified and depends on obtaining the original project or rebuilding and comparing each reference. Source ownership remains with each original creator.
 
-All 233 Skill definitions were validated and all independent renderers executed. The 12 visual families passed HyperFrames checks. Directory integration is covered by the regression suite and browser checks for desktop/mobile category selection, search, pagination, preview, downloads, keyboard close and reduced motion.
+## Verification
+
+Regression coverage checks paid/free/provider classification, combined pagination with existing paid registry records, unique original media, source identity, and unavailable checkout. Browser checks cover both Paid entry points, exact remote source playback, uncropped media, search, pagination, reduced motion, error fallback and desktop/mobile layouts. Full regressions, typecheck and production build are required before deployment.
