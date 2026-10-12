@@ -77,3 +77,11 @@ The isolated `OpenAgentSkill QA` Stripe sandbox completed hosted single-purchase
 Verified against the actual Stripe and Supabase APIs: declined-card access denial, checkout retry idempotency, paid fulfillment, private download SHA-256, cross-account denial, full-refund revocation, older completion-event replay, billing portal creation, cancellation at period end, paid renewal with a Stripe test clock, and download revocation when the paid period ended. Asynchronous settlement/failure remains covered by the regression adapters; no real delayed-payment transaction is claimed. Production validation must not submit a real charge merely to test the integration.
 
 The merchant selected by the owner is `qudongqi.ai` (`acct_1STM522WEAq3tdU2`). Production uses a dedicated restricted server key, webhook and portal. Launch Card Studio is the only published downloadable package at this point; the 233 motion references remain unavailable for purchase until their matching packages are completed.
+
+### Storefront branding and catalog coverage
+
+Every new single-purchase and Pro Checkout Session sets `branding_settings.display_name` to `OpenAgentSkill`, with the site's warm background and green button. This changes the Checkout storefront, not the shared merchant's legal identity, bank account, receipts or other applications. Previously created sessions retain their original appearance.
+
+All 234 first-party product slugs (Launch Card Studio and the 233 motion Skills) are registered with the shared checkout, fulfillment, purchase library and private download endpoints. Regression tests cover the complete catalog's product binding and download isolation. Registering a product does not publish a file: each motion package still needs its own completed, verified release. Publishing that release enables its existing purchase actions automatically; no separate per-Skill Stripe integration is required.
+
+On 2026-10-13, all 234 production `/api/payments/status?slug=...` responses returned HTTP 200: 1 ready package and 233 awaiting packages, with no unregistered products or endpoint errors. This audit checks integration coverage, not completion of the motion reproductions.

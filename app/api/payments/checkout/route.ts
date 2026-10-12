@@ -1,10 +1,9 @@
-import { createHash } from 'node:crypto'
-import type Stripe from 'stripe'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import { buyer, membershipFor, paidOrders, paymentBody, paymentDb, paymentError, PaymentError, paymentJson, paymentSite, productDefinition, releases, verifyPackage } from '@/lib/payments/server'
 import { checkoutConfigured, membershipPrice, paymentMode, stripeClient, stripeId } from '@/lib/payments/stripe'
 import { PLAN_AMOUNTS, safeStripeRedirect, type PaidOrder } from '@/lib/payments/policy'
+import { checkoutSessionParams } from '@/lib/payments/checkout'
 
 export const runtime = 'nodejs'
 const input = z.object({ plan: z.enum(['single', 'monthly', 'yearly']), slug: z.string().max(200).optional(), locale: z.enum(['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr', 'id']).default('en') }).strict()
@@ -59,18 +58,7 @@ export async function POST(request: NextRequest) {
     }
     // An immutable order snapshot controls price and package. No client amounts,
     // Stripe IDs, user IDs, file paths or return URLs are accepted.
-    const metadata = { order_id: order.id, user_id: user.id, integration: 'openagentskill' }
-    const returnPath = `/profile?tab=purchases&lang=${encodeURIComponent(order.checkout_locale)}`
-    // Derived from a random order UUID so retries send identical parameters.
-    const suffix = [...createHash('sha256').update(order.id).digest().subarray(0, 8)].map(value => String.fromCharCode(97 + value % 26)).join('')
-    const session = await stripe.checkout.sessions.create({
-      mode: plan === 'single' ? 'payment' : 'subscription', customer, client_reference_id: order.id, metadata,
-      line_items: [{ quantity: 1, ...(order.stripe_price_id ? { price: order.stripe_price_id } : { price_data: { currency: 'usd', unit_amount: order.amount_cents, product_data: { name: order.product_name, metadata: { skill_slug: order.skill_slug! } } } }) }],
-      ...(plan === 'single' ? { payment_intent_data: { metadata } } : { subscription_data: { metadata } }),
-      success_url: `${paymentSite()}${returnPath}&checkout=processing`,
-      cancel_url: `${paymentSite()}${returnPath}&checkout=canceled`,
-      integration_identifier: `openagentskill-${suffix}`, locale: (order.checkout_locale === 'id' ? 'auto' : order.checkout_locale) as Stripe.Checkout.SessionCreateParams.Locale,
-    }, { idempotencyKey: `oas-checkout-${order.id}` })
+    const session = await stripe.checkout.sessions.create(checkoutSessionParams(order, paymentSite()), { idempotencyKey: `oas-checkout-${order.id}` })
     const linked = await db.from('commerce_orders').update({ stripe_session_id: session.id }).eq('id', order.id).or(`stripe_session_id.is.null,stripe_session_id.eq.${session.id}`)
     if (linked.error) throw linked.error
     if (stripeId(session.customer) !== customer) throw new Error('customer_mismatch')

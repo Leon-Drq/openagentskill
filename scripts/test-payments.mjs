@@ -7,6 +7,10 @@ import { assertSessionOrder, processStripeEvent } from '../lib/payments/webhook.
 import { POST as checkoutPost } from '../app/api/payments/checkout/route.ts'
 import { POST as downloadPost } from '../app/api/payments/download/route.ts'
 import { POST as webhookPost } from '../app/api/payments/webhook/route.ts'
+import { checkoutSessionParams } from '../lib/payments/checkout.ts'
+import { productDefinition } from '../lib/payments/server.ts'
+import { MOTION_ENTRIES } from '../lib/motion/catalog.ts'
+import { STUDIO_SKILL } from '../lib/studio/catalog.ts'
 
 // No real credentials or network requests. Exercise the real policy and webhook
 // handler with a deterministic Stripe transport and database adapter.
@@ -127,4 +131,43 @@ const signature = sdk.webhooks.generateTestHeaderString({ payload, secret })
 assert.equal(sdk.webhooks.constructEvent(payload, signature, secret).id, event.id)
 assert.throws(() => sdk.webhooks.constructEvent(payload + ' ', signature, secret))
 assert.throws(() => sdk.webhooks.constructEvent(payload, sdk.webhooks.generateTestHeaderString({ payload, secret, timestamp: 1 }), secret))
+
+// Every first-party paid Skill uses the same checkout and private-delivery
+// contract. These are synthetic releases, never actual published packages.
+const products = [STUDIO_SKILL.slug, ...MOTION_ENTRIES.map(entry => entry.id)]
+assert.equal(new Set(products).size, products.length)
+assert.equal(productDefinition('unregistered-paid-skill'), null)
+for (const slug of products) {
+  const product = productDefinition(slug)
+  assert.ok(product?.name, `Paid product must be registered: ${slug}`)
+  const productRelease = { ...release, id: `release-${slug}`, skill_slug: slug, object_path: `${slug}/1.1.0/${release.sha256}.zip` }
+  const productOrder = { ...owned, id: `order-${slug}`, skill_slug: slug, release_id: productRelease.id,
+    product_name: product.name, checkout_locale: 'zh', stripe_price_id: null }
+  const params = checkoutSessionParams(productOrder, 'https://www.openagentskill.com')
+  assert.equal(params.branding_settings.display_name, 'OpenAgentSkill')
+  assert.equal(params.branding_settings.button_color, '#006B4F')
+  assert.equal(params.customer, productOrder.stripe_customer_id)
+  assert.equal(params.mode, 'payment')
+  assert.equal(params.line_items[0].price_data.unit_amount, 499)
+  assert.equal(params.line_items[0].price_data.product_data.name, product.name)
+  assert.equal(params.line_items[0].price_data.product_data.metadata.skill_slug, slug)
+  assert.equal(params.payment_intent_data.metadata.order_id, productOrder.id)
+  assert.match(params.integration_identifier, /^openagentskill-[a-z]{8}$/)
+  assert.deepEqual(params, checkoutSessionParams(productOrder, 'https://www.openagentskill.com'), 'retry parameters must be stable')
+  assert.ok(singleReleaseAllowed(productOrder, productRelease, 'buyer-1', false), `Paid download must support ${slug}`)
+  assert.equal(singleReleaseAllowed({ ...productOrder, status: 'pending' }, productRelease, 'buyer-1', false), false)
+  assert.equal(singleReleaseAllowed(productOrder, { ...productRelease, withdrawn: true }, 'buyer-1', false), false)
+  assert.equal(singleReleaseAllowed(productOrder, productRelease, 'buyer-2', false), false)
+  assert.equal(singleReleaseAllowed({ ...productOrder, skill_slug: 'a-different-skill' }, productRelease, 'buyer-1', false), false)
+}
+for (const [plan, amount, price] of [['monthly', 999, 'price_month'], ['yearly', 7900, 'price_year']]) {
+  const params = checkoutSessionParams({ ...owned, plan, amount_cents: amount, product_name: 'OpenAgentSkill Pro',
+    skill_slug: null, stripe_price_id: price, checkout_locale: 'en' }, 'https://www.openagentskill.com')
+  assert.equal(params.branding_settings.display_name, 'OpenAgentSkill')
+  assert.equal(params.mode, 'subscription')
+  assert.deepEqual(params.line_items, [{ quantity: 1, price }])
+  assert.equal(params.subscription_data.metadata.user_id, 'buyer-1')
+  assert.equal(params.payment_intent_data, undefined)
+}
+console.log(`Paid catalog: all ${products.length} products support branded Checkout and isolated downloads; both Pro billing cycles use the same storefront.`)
 console.log('Payments: ownership, release/update rights, mode separation, server amount binding, async settlement, duplicate/retried/stale webhooks, refunds, membership expiry, CSRF, URL allowlist and Stripe signatures passed.')
