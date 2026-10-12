@@ -6,6 +6,7 @@ import { SITE_NAVIGATION, getPartnershipLabels, isNavigationSectionActive } from
 import * as channels from '../lib/partnerships.ts'
 import * as config from '../lib/i18n/config.ts'
 import * as blogRoutes from '../lib/blog/routes.ts'
+import * as motionRoutes from '../lib/motion/routes.ts'
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
 function compile(path, dependencies) {
@@ -17,7 +18,7 @@ function compile(path, dependencies) {
   })
   return exports
 }
-const routing = compile('lib/i18n/market-routing.ts', { '@/lib/i18n/config': config, '@/lib/blog/routes': blogRoutes })
+const routing = compile('lib/i18n/market-routing.ts', { '@/lib/i18n/config': config, '@/lib/blog/routes': blogRoutes, '@/lib/motion/routes': motionRoutes })
 const { partnershipPageData } = compile('lib/seo/partnerships.ts', {
   '@/lib/i18n/market-routing': routing,
   '@/lib/i18n/partnership-copy': { getPartnershipCopy },

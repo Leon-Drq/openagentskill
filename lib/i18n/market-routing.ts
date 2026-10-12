@@ -1,5 +1,6 @@
 import { defaultLocale, isLocale, localePaths, type Locale } from '@/lib/i18n/config'
 import { isLocalizedBlogPath } from '@/lib/blog/routes'
+import { isLocalizedMotionPath } from '@/lib/motion/routes'
 
 // These languages have dedicated versions of the core discovery routes. Keep
 // this in one place so the switcher, sitemap, and static route generation all
@@ -36,6 +37,7 @@ function isLocalizedDeepRoute(page: string) {
 
 function hasDedicatedLocalizedRoute(page: string, locale: Locale) {
   return isMarketLocale(locale) && (
+    isLocalizedMotionPath(page, locale) ||
     isLocalizedCorePageSlug(page) ||
     LOCALIZED_EXPERIENCE_PAGE_SLUGS.includes(page as (typeof LOCALIZED_EXPERIENCE_PAGE_SLUGS)[number]) ||
     isLocalizedDeepRoute(page)

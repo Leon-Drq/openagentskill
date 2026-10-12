@@ -1,0 +1,58 @@
+import type { MotionLocale } from './shared'
+
+const en = {
+  skills: 'Skills', details: 'View details', original: 'Original by',
+  lead: 'A motion Skill in development, based on this original reference. Explore the film, the planned package and the ways to get it.',
+  preview: 'Preview', about: 'About this Skill', included: 'Planned package', use: 'Using the Skill',
+  aboutBody: 'This Skill is being prepared around “{title}”. The original film defines the visual direction: its composition, typography, colour and motion rhythm.',
+  tags: 'Visual elements', previewNote: 'Original creator video. The completed Skill output will be verified against this reference before release.',
+  packageNote: 'These are the planned deliverables. The installable package is still in production.',
+  deliverables: [
+    ['Skill instructions', 'A SKILL.md workflow for creating and checking the animation with your agent.'],
+    ['Editable project', 'Animation source and the assets needed to adapt the film to your own brief.'],
+    ['Render workflow', 'Preview and export instructions, with an example verified against this reference.'],
+    ['Setup guide', 'Dependencies, installation steps and any model or service costs stated before purchase.'],
+  ],
+  workflowTitle: 'From your brief to a finished film',
+  steps: ['Prepare your text, brand assets and intended output.', 'Install the released Skill and follow its setup guide.', 'Preview the animation, refine it and export the finished film.'],
+  requirements: 'Requirements & running costs',
+  requirementsBody: 'Supported agents, dependencies and export formats will be confirmed with the finished package. Model and external service fees are separate from the Skill price.',
+  source: 'Creator & reference', sourceBody: 'Explore the original creator’s film, prompt and creative context through the source links below.',
+  sourceLink: 'View original case', post: 'Creator’s post', repository: 'Source repository',
+  purchase: 'Get this Skill', single: 'Buy this Skill', membership: 'Pro membership',
+  singleBenefit: 'Planned: the released Skill, editable project and 12 months of updates.',
+  memberBenefit: 'Planned: our paid Skill library and new releases while your membership is active.',
+  singleAction: 'Buy this Skill · coming soon', memberAction: 'Subscribe · coming soon',
+  purchaseNote: 'Checkout is not open yet. No payment is collected; installation and downloads open with the finished package.',
+  download: 'Download ZIP', install: 'Copy install prompt',
+  related: 'More motion Skills', all: 'View the collection', back: 'Back to motion Skills',
+}
+export type MotionDetailCopy = typeof en
+const zh: MotionDetailCopy = {
+  skills: '技能', details: '查看详情', original: '原作作者',
+  lead: '以这条原作为参考制作的动效 Skill。先看完整效果，再了解计划交付的内容与获取方式。',
+  preview: '效果预览', about: '关于这个 Skill', included: '计划交付内容', use: '使用与交付',
+  aboutBody: '这个 Skill 围绕「{title}」制作，以原片的构图、字体、配色和运动节奏作为效果标准。',
+  tags: '视觉元素', previewNote: '此处为原作者视频。完整 Skill 的生成效果将在上线前与原片对照核验。',
+  packageNote: '以下为计划交付内容，可安装的完整包仍在制作中。',
+  deliverables: [
+    ['Skill 指令', '用 SKILL.md 描述生成与检查动效的流程，让 Agent 按步骤执行。'],
+    ['可编辑工程', '提供动效源文件及所需素材，便于根据自己的内容调整。'],
+    ['预览与导出流程', '提供预览、导出说明，以及与原片对照核验后的输出示例。'],
+    ['安装与使用说明', '列明依赖、安装步骤，以及模型或外部服务可能产生的费用。'],
+  ],
+  workflowTitle: '从你的内容，到完整动效',
+  steps: ['准备文案、品牌素材和希望输出的内容。', '安装正式发布的 Skill，按指引完成环境配置。', '预览动效，调整内容，导出最终成片。'],
+  requirements: '运行要求与额外费用',
+  requirementsBody: '支持的 Agent、运行依赖和导出格式，将随完整包确认。模型和外部服务费用另计，不包含在 Skill 价格内。',
+  source: '作者与原始参考', sourceBody: '保留原作者署名与原始案例链接，便于查看视频、提示词和创作背景。',
+  sourceLink: '查看原始案例', post: '作者发布页', repository: '原始仓库',
+  purchase: '获取这个 Skill', single: '单独购买', membership: 'Pro 会员',
+  singleBenefit: '计划包含：正式版 Skill、可编辑工程，以及 12 个月更新。',
+  memberBenefit: '计划包含：会员有效期内的自有付费 Skill、新品和更新。',
+  singleAction: '购买此 Skill · 即将开放', memberAction: '订阅会员 · 即将开放',
+  purchaseNote: '购买暂未开放，本页不会收取费用。完整包准备好后，将开放安装与下载。',
+  download: '下载 ZIP', install: '复制安装提示词',
+  related: '更多动效 Skill', all: '查看全部', back: '返回动效分类',
+}
+export const motionDetailCopy = (locale: MotionLocale): MotionDetailCopy => locale === 'zh' ? zh : en

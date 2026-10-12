@@ -6,6 +6,7 @@ import ts from 'typescript'
 import { publicQueryRoute, hasContentQuery } from '../lib/public-page-routing.ts'
 import { createBoundedContentMemo } from '../lib/bounded-content-memo.ts'
 import { isLocalizedBlogPath, CREATOR_BLOG_SLUG, BLOG_LOCALES } from '../lib/blog/routes.ts'
+import { isLocalizedMotionPath } from '../lib/motion/routes.ts'
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
 const detailWrapper = read('app/skills/[slug]/page.tsx')
@@ -44,6 +45,7 @@ const deps = {
   '@/lib/skills/external-catalog': { isMissingExternalSkillPath: () => false },
   '@/lib/public-page-routing': { publicQueryRoute, hasContentQuery },
   '@/lib/blog/routes': { isLocalizedBlogPath },
+  '@/lib/motion/routes': { isLocalizedMotionPath },
 }
 new Function('exports', 'require', ts.transpileModule(read('proxy.ts'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
@@ -66,6 +68,8 @@ for (const locale of BLOG_LOCALES.filter(code => code !== 'en')) {
   assert.equal((await exports.proxy(request(`/${locale}/blog/${CREATOR_BLOG_SLUG}?lang=fr`))).headers.get('location'), null, 'Path language remains authoritative')
 }
 assert.equal((await exports.proxy(request('/blog/introducing-addyosmani-agent-skills?lang=zh'))).headers.get('location'), null, 'No nonexistent translated legacy article')
+assert.equal((await exports.proxy(request('/skills/motion-stephanlivera-df17a2?lang=zh&utm_source=directory'))).headers.get('location'), 'https://www.openagentskill.com/zh/skills/motion-stephanlivera-df17a2?utm_source=directory')
+assert.equal((await exports.proxy(request('/zh/skills/motion-stephanlivera-df17a2?lang=en'))).headers.get('location'), null, 'Chinese motion path remains authoritative')
 const result = await exports.proxy(request('/skills?q=design&sort=stars&page=2'))
 assert.equal(result.headers.get('x-middleware-rewrite'), null, 'filtered directory keeps the unfiltered route segment')
 assert.equal((await exports.proxy(request('/zh/skills?category=design-creative'))).headers.get('x-middleware-rewrite'), null)

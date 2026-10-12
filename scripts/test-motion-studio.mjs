@@ -4,6 +4,9 @@ import { selectMotionDirectoryEntries, paidMotionWindow } from '../lib/motion/di
 import { MOTION_CATEGORY, motionCategoryLabel } from '../lib/motion/shared.ts'
 import { directoryHref } from '../lib/skills/directory.ts'
 import { motionCopy } from '../lib/motion/copy.ts'
+import { motionSkillHref, isLocalizedMotionPath } from '../lib/motion/routes.ts'
+import { motionDetailMetadata, motionSitemapEntries, relatedMotionEntries } from '../lib/motion/detail.ts'
+import { getLanguageSwitchHref } from '../lib/i18n/market-routing.ts'
 
 assert.equal(MOTION_ENTRIES.length,233)
 for(const key of ['id','sourceUrl','videoUrl','posterUrl']) assert.equal(new Set(MOTION_ENTRIES.map(e=>e[key])).size,233,key)
@@ -51,3 +54,29 @@ for(const entry of MOTION_ENTRIES){
  assert.ok(!Object.hasOwn(entry,'duration')) // Never advertise the old invented 8-second duration.
 }
 console.log('Motion sources: 233 distinct original films, paid category/filter composition, pagination boundaries and honest delivery status passed.')
+
+// Every paid entry has a real, locale-stable product destination and share metadata.
+const sitemap = motionSitemapEntries()
+assert.equal(sitemap.length, 466)
+assert.equal(new Set(sitemap.map(item => item.url)).size, 466)
+for (const entry of MOTION_ENTRIES) {
+  for (const locale of ['en', 'zh']) {
+    const path = motionSkillHref(entry.id, locale)
+    const metadata = motionDetailMetadata(entry, locale)
+    assert.equal(metadata.alternates.canonical, 'https://www.openagentskill.com' + path)
+    assert.ok(sitemap.some(item => item.url === metadata.alternates.canonical))
+    assert.equal(metadata.openGraph.images[0].url, entry.posterUrl)
+    assert.equal(metadata.openGraph.url, metadata.alternates.canonical)
+    assert.equal(getLanguageSwitchHref(path, locale === 'zh' ? 'en' : 'zh'), motionSkillHref(entry.id, locale === 'zh' ? 'en' : 'zh'))
+    assert.equal(Object.keys(metadata.alternates.languages).length, 3)
+  }
+  const related = relatedMotionEntries(entry)
+  assert.equal(related.length, 3)
+  assert.ok(related.every(item => item.id !== entry.id))
+}
+assert.equal(isLocalizedMotionPath('/skills/motion-unknown', 'zh'), true)
+assert.equal(isLocalizedMotionPath('/skills/anthropic-frontend-design', 'zh'), false)
+assert.equal(isLocalizedMotionPath('/skills/motion-unknown/audit', 'zh'), false)
+assert.equal(isLocalizedMotionPath('/skills/motion-unknown', 'ja'), false)
+assert.equal(getLanguageSwitchHref('/skills/anthropic-frontend-design', 'zh'), '/skills/anthropic-frontend-design?lang=zh')
+console.log('Motion product routes, language switching, original sharing images, related items and sitemap coverage passed.')

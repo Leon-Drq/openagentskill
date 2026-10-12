@@ -7,6 +7,7 @@ import { isMissingRankingPath } from '@/lib/rankings'
 import { isMissingExternalSkillPath } from '@/lib/skills/external-catalog'
 import { publicQueryRoute, hasContentQuery } from '@/lib/public-page-routing'
 import { isLocalizedBlogPath } from '@/lib/blog/routes'
+import { isLocalizedMotionPath } from '@/lib/motion/routes'
 
 const MARKET_LOCALE_CODES = new Set(['zh', 'ja', 'ko', 'es', 'de', 'fr', 'id'])
 const DOCUMENT_LANG_BY_LOCALE: Record<string, string> = {
@@ -36,6 +37,7 @@ const LOCALIZED_DEEP_ROUTE_ROOTS = new Set(['/skill-packs', '/collections'])
 const SESSION_REFRESH_PATH_PREFIXES = ['/profile', '/api/claims', '/api/points']
 
 function getLocalizedDeepPath(pathname: string, locale: string) {
+  if (isLocalizedMotionPath(pathname, locale)) return `/${locale}${pathname}`
   if (pathname === '/studio/launch-card-studio') return `/${locale}${pathname}`
   if (isLocalizedBlogPath(pathname)) return `/${locale}${pathname}`
   const segments = pathname.split('/').filter(Boolean)

@@ -6,6 +6,7 @@ export type MotionEntry = (typeof catalog.entries)[number]
 export type MotionFamily = keyof typeof families
 export type MotionLocale = 'en' | 'zh'
 export const MOTION_CATEGORY = 'motion-design'
+export const MOTION_PLANNED_PRICE_CENTS = 499
 export const MOTION_FAMILIES = families
 export const motionCategoryLabel = (locale: Locale) => ({
   en: 'Motion design', zh: '动效设计', ja: 'モーションデザイン', ko: '모션 디자인',

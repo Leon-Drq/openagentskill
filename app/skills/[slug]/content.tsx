@@ -58,6 +58,9 @@ import { getExternalSkill } from '@/lib/skills/external-catalog'
 import { ScenarioSkillLinks } from '@/components/scenario-topic'
 import { SCENARIO_SOURCES } from '@/lib/seo/scenario-pages'
 import { getSkillGrowthProfile, growthProfileSource } from '@/lib/seo/skill-growth-profiles'
+import { getMotionEntry } from '@/lib/motion/catalog'
+import { motionDetailMetadata } from '@/lib/motion/detail'
+import { MotionSkillPage } from '@/components/motion/skill-page'
 
 // Shared renderer; cache policy belongs to the public/query route wrappers.
 const SKILL_DETAIL_SUPPORT_TIMEOUT_MS = 1200
@@ -111,6 +114,11 @@ export async function generateMetadata({
   searchParams?: Promise<Record<string, string | string[] | undefined>>
 }): Promise<Metadata> {
   const { slug } = await params
+  const motion = getMotionEntry(slug)
+  if (motion) {
+    const query = await searchParams || {}
+    return motionDetailMetadata(motion, getLocaleFromSearchParam(query.lang) === 'zh' ? 'zh' : 'en')
+  }
   if (getExternalSkill(slug)) return buildCatalogSkillMetadata({ params: Promise.resolve({ slug }), searchParams: searchParams || Promise.resolve({}) })
   const dbSkill = await getCachedSkillBySlug(slug)
   const skill = dbSkill ? convertSkillRecordToManifest(dbSkill) : null
@@ -192,6 +200,8 @@ export default async function SkillDetailPage({ params, searchParams }: {
   const { slug } = await params
   const { lang } = await searchParams
   const initialLocale = getLocaleFromSearchParam(lang) || undefined
+  const motion = getMotionEntry(slug)
+  if (motion) return <MotionSkillPage entry={motion} locale={initialLocale || defaultLocale} />
   if (getExternalSkill(slug)) return <CatalogSkillContent params={Promise.resolve({ slug })} searchParams={Promise.resolve({ lang })} />
   const dbSkill = await getCachedSkillBySlug(slug)
   if (!dbSkill) notFound()
