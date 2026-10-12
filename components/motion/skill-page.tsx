@@ -55,7 +55,7 @@ export function MotionSkillPage({ entry, locale }: { entry: MotionEntry; locale:
           <a className={styles.author} href={entry.sourcePost || entry.sourceUrl} target="_blank" rel="noopener noreferrer"><span className={styles.avatar} aria-hidden="true">{entry.sourceCreatorName.slice(0, 1)}</span><span><small>{c.original}</small>{entry.sourceCreatorName} <span className={styles.handle}>@{entry.sourceAuthor}</span></span><ArrowUpRight size={15} aria-hidden="true" /></a>
           <ul className={styles.tags} aria-label={c.tags}>{entry.tags.map(tag => <li key={tag}>{motionTagLabel(tag, language)}</li>)}</ul>
         </header>
-        <MotionPurchaseOptions locale={language} />
+        <MotionPurchaseOptions locale={language} slug={entry.id} />
       </div>
       <div className={styles.description}>
         <section id="about" className={styles.section}>

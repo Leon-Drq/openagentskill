@@ -8,6 +8,7 @@ import { AccountPublicCard } from '@/components/account-public-card'
 import { AccountSettingsForm } from '@/components/account-settings-form'
 import { AccountCopyLink } from '@/components/account-copy-link'
 import { AccountRetry } from '@/components/account-retry'
+import { PurchasesLibrary } from '@/components/payments/purchases-library'
 import { CreatorIdentityConnections } from '@/components/creator-identity-connections'
 import { accountCopy, type AccountCopyKey } from '@/lib/i18n/account-copy'
 import { getLocaleFromSearchParam } from '@/lib/i18n/config'
@@ -21,7 +22,7 @@ import { updateAccountProfile } from './actions'
 export const metadata: Metadata = { title: 'My Workspace', robots: { index: false, follow: false } }
 export const dynamic = 'force-dynamic'
 
-export default async function ProfilePage({ searchParams }: { searchParams: Promise<{ tab?: string; lang?: string; after?: string; saved?: string; connected?: string; error?: string }> }) {
+export default async function ProfilePage({ searchParams }: { searchParams: Promise<{ tab?: string; lang?: string; after?: string; saved?: string; connected?: string; error?: string; checkout?: string }> }) {
   const params = await searchParams
   const locale = getLocaleFromSearchParam(params.lang) || 'en'
   const tab = accountTab(params.tab)
@@ -45,7 +46,8 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   const inviteUrl = profile?.invite_code ? `https://www.openagentskill.com/ref/${encodeURIComponent(profile.invite_code)}?lang=${locale}` : null
   const unavailable = <div role="alert" className={styles.notice}>{c('unavailable')} <AccountRetry locale={locale} /></div>
   return <AccountWorkspaceShell locale={locale} active={tab} name={name} avatarUrl={profile?.avatar_url}>
-    <header><p className={styles.eyebrow}>OpenAgentSkill / Workspace</p><h1 className={styles.heading}>{c(tab === 'overview' ? 'workspace' : tab)}</h1><p className={styles.intro}>{c(tab === 'overview' ? 'intro' : tab === 'bookmarks' ? 'savedIntro' : tab === 'settings' ? 'settingsIntro' : 'pointsIntro')}</p></header>
+    <header><p className={styles.eyebrow}>OpenAgentSkill / Workspace</p><h1 className={styles.heading}>{c(tab === 'overview' ? 'workspace' : tab)}</h1><p className={styles.intro}>{c(tab === 'overview' ? 'intro' : tab === 'bookmarks' ? 'savedIntro' : tab === 'settings' ? 'settingsIntro' : tab === 'purchases' ? 'purchasesIntro' : 'pointsIntro')}</p></header>
+    {tab === 'purchases' && <PurchasesLibrary locale={locale} checkout={params.checkout} />}
     {profileError ? unavailable : null}
     {params.saved === '1' && <p role="status" className={styles.notice}>{c('saved')}</p>}
     {params.connected === 'github' && profile?.github_verified_at && <p role="status" className={styles.notice}>{c('verified')}</p>}

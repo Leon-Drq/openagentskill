@@ -47,7 +47,7 @@
     "test:links": "node scripts/check-repository-links.mjs",
     "test:links:external": "node scripts/check-repository-links.mjs --external",
     "test:review-cost-controls": "node scripts/test-review-cost-controls.mjs",
-    "test": "pnpm test:source-identity && pnpm test:taxonomy && pnpm run test:automation-reliability && pnpm run test:review-cost-controls && pnpm run test:owner-publish && pnpm run test:submission && pnpm run test:submission-discovery && pnpm run test:submission-flow && pnpm run test:skill-issue-ingest && pnpm run test:supabase-circuit && pnpm run test:security && pnpm run test:x-automation && pnpm run test:x-editorial && pnpm run test:github-owner && pnpm run test:performance && pnpm run test:candidate-intake && pnpm run test:creator-growth && pnpm run test:creator-directory && pnpm run test:marketplace-foundation && pnpm run test:registry-layers && pnpm run test:og-social-cards && pnpm run test:showcase && pnpm run test:localization && pnpm run test:navigation && pnpm run test:form-controls && pnpm run test:seo && pnpm run test:skill-detail && pnpm run test:cli && pnpm run test:sdk && pnpm run test:account && pnpm test:video-workflows",
+    "test": "pnpm test:source-identity && pnpm test:taxonomy && pnpm run test:automation-reliability && pnpm run test:review-cost-controls && pnpm run test:owner-publish && pnpm run test:submission && pnpm run test:submission-discovery && pnpm run test:submission-flow && pnpm run test:skill-issue-ingest && pnpm run test:supabase-circuit && pnpm run test:security && pnpm run test:x-automation && pnpm run test:x-editorial && pnpm run test:github-owner && pnpm run test:performance && pnpm run test:candidate-intake && pnpm run test:creator-growth && pnpm run test:creator-directory && pnpm run test:marketplace-foundation && pnpm run test:registry-layers && pnpm run test:og-social-cards && pnpm run test:showcase && pnpm run test:localization && pnpm run test:navigation && pnpm run test:form-controls && pnpm run test:seo && pnpm run test:skill-detail && pnpm run test:cli && pnpm run test:sdk && pnpm run test:account && pnpm test:video-workflows && pnpm test:payments",
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint .",
     "skillry:sync": "node scripts/sync-skillry.mjs",
@@ -70,7 +70,8 @@
     "test:resource-pages": "node --import ./scripts/test-typescript-register.mjs scripts/test-resource-pages.mjs && pnpm test:studio && pnpm test:motion-studio",
     "test:studio": "node --import ./scripts/test-typescript-register.mjs scripts/test-studio-membership.mjs",
     "check:resource-pages": "node scripts/check-resource-pages.mjs",
-    "test:motion-studio": "node --import ./scripts/test-typescript-register.mjs scripts/test-motion-studio.mjs"
+    "test:motion-studio": "node --import ./scripts/test-typescript-register.mjs scripts/test-motion-studio.mjs",
+    "test:payments": "node --import ./scripts/test-payments-register.mjs scripts/test-payments.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -127,6 +128,7 @@
     "rehype-sanitize": "6.0.0",
     "remark-gfm": "4.0.1",
     "sonner": "^1.7.1",
+    "stripe": "23.0.0",
     "tailwind-merge": "^3.3.1",
     "vaul": "^1.1.2",
     "zod": "^3.24.1"

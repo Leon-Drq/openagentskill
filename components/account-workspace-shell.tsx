@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import Image from 'next/image'
 import Link from '@/components/crawl-link'
-import { Bookmark, LayoutDashboard, Settings2, Sparkles, CircleUserRound, ArrowUpRight } from 'lucide-react'
+import { Bookmark, LayoutDashboard, Settings2, Sparkles, CircleUserRound, ArrowUpRight, ShoppingBag } from 'lucide-react'
 import { I18nProvider } from '@/lib/i18n/context'
 import type { Locale } from '@/lib/i18n/config'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
@@ -18,6 +18,7 @@ export function AccountWorkspaceShell({ children, locale, active, name, avatarUr
   const links = [
     { key: 'overview' as const, icon: LayoutDashboard, href: accountHref('overview', locale) },
     { key: 'bookmarks' as const, icon: Bookmark, href: accountHref('bookmarks', locale) },
+    { key: 'purchases' as const, icon: ShoppingBag, href: accountHref('purchases', locale) },
     { key: 'points' as const, icon: Sparkles, href: accountHref('points', locale) },
     { key: 'settings' as const, icon: Settings2, href: accountHref('settings', locale) },
     { key: 'creator' as const, icon: CircleUserRound, href: getLocalizedNavigationHref('/creator', locale) },

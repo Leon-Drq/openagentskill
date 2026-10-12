@@ -1,6 +1,6 @@
 import type { Locale } from './i18n/config'
 
-export const accountTabs = ['overview', 'bookmarks', 'points', 'settings'] as const
+export const accountTabs = ['overview', 'bookmarks', 'purchases', 'points', 'settings'] as const
 export type AccountTab = typeof accountTabs[number]
 export const accountTab = (value: unknown): AccountTab => accountTabs.find(tab => tab === value) || 'overview'
 export function accountHref(tab: AccountTab, locale: Locale, after?: string | null) {

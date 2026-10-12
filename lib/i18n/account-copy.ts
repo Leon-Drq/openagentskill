@@ -1,6 +1,8 @@
 import { locales, type Locale } from './config'
 
 const rows = {
+  purchases: ['My purchases', '我的购买', '購入履歴', '구매 내역', 'Mis compras', 'Meine Käufe', 'Mes achats', 'Pembelian saya'],
+  purchasesIntro: ['Your paid Skills, downloads and subscription.', '管理付费 Skill、下载和会员订阅。', '有料スキル、ダウンロード、サブスクリプション。', '유료 스킬, 다운로드 및 구독을 관리하세요.', 'Tus skills de pago, descargas y suscripción.', 'Bezahlte Skills, Downloads und Abonnement.', 'Vos skills payants, téléchargements et abonnement.', 'Skill berbayar, unduhan, dan langganan Anda.'],
   workspace: ['My workspace', '我的工作台', 'マイワークスペース', '내 작업 공간', 'Mi espacio', 'Mein Arbeitsbereich', 'Mon espace', 'Ruang kerja saya'],
   overview: ['Overview', '账户概览', '概要', '개요', 'Resumen', 'Übersicht', 'Vue d’ensemble', 'Ringkasan'],
   bookmarks: ['Saved skills', '我的收藏', '保存したスキル', '저장한 스킬', 'Skills guardados', 'Gespeicherte Skills', 'Skills enregistrés', 'Skill tersimpan'],

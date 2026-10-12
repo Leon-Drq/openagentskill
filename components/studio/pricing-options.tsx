@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowRight, Check, Layers, LockKeyhole } from 'lucide-react'
+import { ArrowRight, Check, Layers } from 'lucide-react'
+import { PurchaseActions } from '@/components/payments/purchase-actions'
 import Link from '@/components/crawl-link'
 import type { Locale } from '@/lib/i18n/config'
 import { studioCopy } from '@/lib/i18n/studio-copy'
@@ -36,8 +37,7 @@ export function PurchaseOptions({ locale }: { locale: Locale }) {
     <p className={styles.price} aria-live="polite"><strong>{studioPrice(amount, locale)}</strong><span>{membership ? yearly ? c.year : c.month : c.once}</span></p>
     <p className={styles.body}>{membership ? c.memberBenefit : c.singleBenefit}</p>
     {membership && <p className={styles.notice}>{yearly ? c.annually : c.monthlyNote}</p>}
-    <button type="button" className={`${styles.button} ${styles.full}`} disabled aria-describedby="purchase-status"><LockKeyhole size={15} aria-hidden="true" />{c.soon}</button>
-    <p id="purchase-status" className={styles.notice}>{c.launchNote}</p>
+    <PurchaseActions slug={STUDIO_SKILL.slug} plan={membership ? yearly ? 'yearly' : 'monthly' : 'single'} locale={locale} />
     <Link href={studioHref('/membership', locale)} className={styles.membershipLink}><Layers size={22} strokeWidth={1.5} aria-hidden="true" /><span><strong>{c.membership}</strong><small>{c.compare}</small></span><ArrowRight size={17} aria-hidden="true" /></Link>
   </aside>
 }
@@ -59,7 +59,7 @@ export function MembershipPlans({ locale }: { locale: Locale }) {
         <div className={styles.planPrice}><p className={styles.price} aria-live="polite"><strong>{studioPrice(yearly ? MEMBERSHIP.yearlyCents : MEMBERSHIP.monthlyCents, locale)}</strong><span>{yearly ? c.year : c.month}</span></p><p className={styles.priceNote}>{c.planned}</p></div>
         <FeatureList items={c.proFeatures} />
         <div className={styles.planAction}><p className={styles.notice}>{yearly ? c.annually : c.monthlyNote}</p>
-        <button type="button" className={`${styles.button} ${styles.full}`} disabled aria-describedby="membership-status">{c.soon}</button></div>
+        <PurchaseActions plan={yearly ? 'yearly' : 'monthly'} locale={locale} /></div>
       </article>
       <article className={styles.plan}>
         <div className={styles.planTop}><h2>{ui.singlePlan}</h2></div><p className={styles.body}>{c.singleLead}</p>
