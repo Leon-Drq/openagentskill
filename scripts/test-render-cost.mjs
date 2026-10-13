@@ -59,6 +59,7 @@ function load(path) {
     if (name === 'next/navigation') return { notFound: () => { throw new Error('404') }, permanentRedirect: path => { throw new Error('redirect:' + path) } }
     if (name === 'react/jsx-runtime') return { jsx, jsxs: jsx, Fragment: 'fragment' }
     if (name === '@/lib/db/skills') return db
+    if (name === '@/lib/skills/downloads') return { getDownloadTotals: async () => ({}) }
     if (name.startsWith('@/components/')) return new Proxy({}, { get: (_target, key) => key })
     if (name.startsWith('@/') || name.startsWith('.')) {
       const base = name.startsWith('@/') ? resolve(name.slice(2)) : resolve(dirname(absolute), name)

@@ -1,4 +1,5 @@
 'use client'
+import { downloadFile } from '@/lib/download-file'
 
 import { useCallback, useEffect, useState } from 'react'
 import { Download, CreditCard, RefreshCw, ArrowUpRight } from 'lucide-react'
@@ -40,6 +41,7 @@ export function PurchasesLibrary({ locale, checkout }: { locale: Locale; checkou
   async function act(kind: 'download' | 'portal' | 'cancel', slug?: string) {
     setBusy(slug || kind); setError('')
     try {
+      if (kind === 'download' && slug) { await downloadFile('/api/payments/download', { slug }); return }
       const data = await paymentAction(kind, kind === 'download' ? { slug } : kind === 'cancel' ? { orderId: slug } : { locale })
       if (data.url) window.location.assign(data.url)
       else await load()

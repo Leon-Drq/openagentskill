@@ -42,6 +42,9 @@ import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { SkillActionLink } from '@/components/skill-action-link'
 import { SkillEventTracker } from '@/components/skill-event-tracker'
 import { SkillInstallTargets } from '@/components/skill-install-targets'
+import { SkillDocumentDownload } from '@/components/skill-document-download'
+import { downloadableDocument } from '@/lib/skills/download-policy'
+import { productDefinition } from '@/lib/payments/server'
 import { SkillCommercePanel, SkillPrice } from '@/components/skill-commerce'
 import { getSkillCommerce } from '@/lib/skills/commerce'
 import { SkillShareButton } from '@/components/skill-share-button'
@@ -321,6 +324,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
                   {warnings.length > 0 && <ul className="mt-3 list-disc space-y-1 pl-5">{warnings.map(warning => <li key={warning}><Value value={warning} /></li>)}</ul>}
                 </div>
                 {!safety.blocked && <SkillInstallTargets skillSlug={skill.slug} targets={installTargets} compact />}
+                {!safety.blocked && !productDefinition(skill.slug) && !['paid', 'freemium'].includes(getSkillCommerce(skill.slug).type) && downloadableDocument(dbSkill) && <SkillDocumentDownload slug={skill.slug} />}
                 {safety.blocked && <Link href={auditHref} className={actionClass}><Text id="openFullAudit" /></Link>}
                 <p className="mt-4 text-xs leading-relaxed text-secondary"><ProfileText id="compatibilityNote" /></p>
                 <h3 className="mt-9 font-display text-2xl"><ProfileText id="workflow" /></h3>

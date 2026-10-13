@@ -15,6 +15,8 @@ import { directoryFilterUpdates, emptyDirectoryFilters, updateDirectoryFilters, 
 import { SkillPrice } from '@/components/skill-commerce'
 
 import { SkillCardPreview } from './skill-card-preview'
+import { SkillDownloadCount } from './skill-download-count'
+import { downloadCopy } from '@/lib/i18n/download-copy'
 import { discoveryCopy } from '@/lib/discovery'
 import type { ShowcaseCardData } from '@/lib/showcase-shared'
 import { previewCopy, type SkillPreviewCardData } from '@/lib/skill-preview-shared'
@@ -125,6 +127,7 @@ export interface DirectorySkillCard {
   taxonomyTags: string[]
   stats: {
     downloads: number
+    siteDownloads?: number | null
     stars: number
     rating: number
     qualityScore?: number
@@ -187,6 +190,7 @@ interface Props {
   queryString: string
   skills: DirectorySkillCard[]
   motionEntries?: MotionEntry[]
+  motionDownloads?: Record<string, number> | null
   query?: string
   sort: string
   featured: boolean
@@ -297,10 +301,10 @@ export function SkillsPageClient(props: Props) {
   const selectedCategory = category === 'all' ? 'all' : directoryCategories(category)[0]
   const activeFilters = Object.entries({ access: props.access, featured: props.featured ? 'featured' : 'all', examples: props.examplesOnly ? 'withExamples' : 'all', pricing: props.access === 'free' || props.access === 'paid' ? 'all' : props.pricing, category, tag: props.topic, output: props.output, useCase, platform, quality, trust, safety, track: supplyTrack, minStars: minStars ? String(minStars) : 'all' })
     .filter(([, value]) => value && value !== 'all')
-  const sortOptions = isMotionCategory ? [['quality', locale === 'zh' ? '目录顺序' : 'Collection order']] : [
+  const sortOptions = isMotionCategory ? [['quality', locale === 'zh' ? '目录顺序' : 'Collection order'], ['downloads', downloadCopy(locale).sort]] : [
     ['quality', query ? c.relevance : props.catalogMode ? c.quality : c.recommended], ['stars', c.stars],
-    ['fresh', c.fresh], ['new', c.new], ['trending', c.trending],
-    ...(sort === 'downloads' ? [['downloads', c.trending]] : []),
+    ['fresh', c.fresh], ['new', c.new], ['downloads', downloadCopy(locale).sort],
+    ...(sort === 'trending' ? [['trending', c.trending]] : []),
   ]
   const filterValues: DirectoryFilterDraft = {
     access: props.access, category: selectedCategory, tag: props.topic, output: props.output,
@@ -400,6 +404,7 @@ export function SkillsPageClient(props: Props) {
           {(isMotionCategory || Boolean(props.motionEntries?.length)) && <p className="mt-4 text-xs leading-6 text-secondary" data-motion-scope>{locale === 'zh' ? '233 项动效创作指令 · 原作视频预览。单独购买或开通 Pro，解锁完整提示词与 Skill 指令，一键复制使用。' : '233 motion prompts and Skill instructions with original video previews. Purchase individually or join Pro to unlock, read and copy the full text.'}</p>}
           {props.access !== 'paid' && (props.access !== 'all' || props.pricing !== 'all') && <p className="my-4 text-xs leading-6 text-secondary">{props.access === 'free' ? filterCopy.freeNote : props.access === 'third-party' ? filterCopy.thirdPartyNote : prices.caveat}</p>}
           {degraded && <DirectoryRecovery key={`${pathname}?${queryString}`} locale={locale} empty={props.catalogMode && skills.length === 0} />}
+          <details className="mt-3 text-xs leading-6 text-secondary" data-download-count-policy><summary className="w-fit cursor-pointer underline decoration-border underline-offset-4">{downloadCopy(locale).label}</summary><p className="mt-1 max-w-3xl">{downloadCopy(locale).note}</p></details>
 
           {visibleCount === 0 ? (
             <div className="border-y border-border py-14 text-center">
@@ -409,8 +414,11 @@ export function SkillsPageClient(props: Props) {
               {props.access === 'paid' && !degraded && !isMotionCategory && <DirectoryStudioPreview locale={locale} />}
             </div>
           ) : <SkillEngagementProvider key={skills.map(skill => skill.slug).join(',')} slugs={skills.filter(skill => !skill.provider?.resource).map(skill => skill.slug)} untrackedSlugs={skills.filter(skill => skill.provider && !skill.provider.resource).map(skill => skill.slug)}><div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-skill-list>
-            {props.motionEntries?.map(entry => <DirectoryMotionCard key={entry.id} entry={entry} locale={locale} />)}
-            {skills.map(skill => (
+            {[...(props.motionEntries || []).map(entry => ({ kind: 'motion' as const, entry, count: props.motionDownloads?.[entry.id] || 0 })), ...skills.map(skill => ({ kind: 'registry' as const, skill, count: skill.stats.siteDownloads || 0 }))]
+              .sort((a, b) => sort === 'downloads' ? b.count - a.count : 0).map(item => {
+              if (item.kind === 'motion') return <DirectoryMotionCard key={item.entry.id} entry={item.entry} locale={locale} downloads={props.motionDownloads ? props.motionDownloads[item.entry.id] ?? 0 : null} />
+              const skill = item.skill
+              return (
               <article key={skill.id} className="group flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-border bg-card transition-colors hover:border-[#006b4f]/50" data-directory-skill>
                 <div className="flex min-h-12 items-center justify-between gap-2 border-b border-border px-4 py-1">
                   <span className="min-w-0 text-[10px] font-medium text-[#006b4f]">{directoryCategories(skill.category).map(label).join(' · ')}</span>
@@ -444,16 +452,18 @@ export function SkillsPageClient(props: Props) {
                 </div>
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border bg-background/45 px-5 py-3">
                   {skill.provider ? <a aria-label={`${skill.provider.label}: ${skill.name}`} href={skill.provider.sourceHref} target="_blank" rel={skill.provider.sourceRel} className="inline-flex min-h-10 items-center gap-1 text-xs text-[#006b4f]">{skill.provider.resource ? (locale === 'zh' ? '获取字体' : 'Get fonts') : (locale === 'zh' ? '获取技能' : 'Get skill')} ↗</a> : <span title={c.repoStars} className="inline-flex items-center gap-1.5 font-mono text-sm"><Star size={14} aria-hidden="true" />{stars(skill.stats.stars)}<span className="text-[10px] text-secondary">GitHub</span></span>}
-                  <div className="flex items-center gap-4 text-xs">
+                  <div className="flex flex-wrap items-center justify-end gap-3 text-xs">
                     {!skill.provider && <button type="button" aria-pressed={compareSlugs.includes(skill.slug)} onClick={() => toggleCompare(skill.slug)}
                       className="min-h-10 text-secondary hover:text-[#006b4f]">{compareSlugs.includes(skill.slug) ? c.selected : c.compare}</button>}
                     <Link prefetch={false} href={`/skills/${skill.slug}${locale === 'en' ? '' : '?lang=' + locale}`}
                       onClick={() => trackAnalyticsEvent('directory_skill_open', { skill_slug: skill.slug, mode: props.catalogMode ? 'catalog' : query ? 'search' : 'selected', position: rankOffset + skills.indexOf(skill) + 1 })}
                       aria-label={`${c.details}: ${skill.name}`} className="inline-flex min-h-10 items-center gap-1 text-[#006b4f]">{c.details}<ArrowRight size={14} aria-hidden="true" /></Link>
+                    <SkillDownloadCount count={skill.stats.siteDownloads} locale={locale} />
                   </div>
                 </div>
               </article>
-            ))}
+              )
+            })}
           </div></SkillEngagementProvider>}
           {(visibleCount > 0 || hasPreviousResults || hasMoreResults) && <DirectoryPagination
             page={page} totalPages={degraded ? null : pageCount(resultCount)} previous={hasPreviousResults} next={hasMoreResults}

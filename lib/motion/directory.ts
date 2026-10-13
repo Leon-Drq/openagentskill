@@ -30,7 +30,14 @@ export function selectMotionDirectoryEntries(filters: MotionDirectoryFilters) {
 }
 
 /** Keep paid catalog pagination correct when completed registry offers coexist. */
-export function paidMotionWindow<T, U>(motion: T[], registry: U[], offset: number, size = 16) {
+export function paidMotionWindow<T, U>(motion: T[], registry: U[], offset: number, size = 16, counts?: { motion: (entry: T) => number; registry: (entry: U) => number }) {
+  if (counts) {
+    const ranked = [...motion.map(entry => ({ kind: 'motion' as const, entry, count: counts.motion(entry) })),
+      ...registry.map(entry => ({ kind: 'registry' as const, entry, count: counts.registry(entry) }))]
+      .sort((a, b) => b.count - a.count).slice(offset, offset + size)
+    return { motionEntries: ranked.flatMap(row => row.kind === 'motion' ? [row.entry] : []),
+      registryEntries: ranked.flatMap(row => row.kind === 'registry' ? [row.entry] : []), total: motion.length + registry.length }
+  }
   const entries = motion.slice(offset, offset + size)
   const registryOffset = Math.max(0, offset - motion.length)
   return { motionEntries: entries, registryEntries: registry.slice(registryOffset, registryOffset + size - entries.length), total: motion.length + registry.length }

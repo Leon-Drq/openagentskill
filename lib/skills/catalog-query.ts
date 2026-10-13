@@ -8,7 +8,8 @@ export function catalogPageNumber(value: string | undefined) {
 export function catalogSortColumn(sort: string) {
   if (sort === 'new') return 'created_at'
   if (sort === 'fresh') return 'github_last_pushed_at'
-  if (sort === 'trending' || sort === 'downloads') return 'downloads'
+  if (sort === 'downloads') return 'site_downloads'
+  if (sort === 'trending') return 'downloads'
   if (sort === 'quality') return 'quality_score'
   return 'github_stars'
 }

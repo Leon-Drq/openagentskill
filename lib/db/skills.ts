@@ -54,6 +54,7 @@ export interface SkillRecord extends Partial<SkillTaxonomy> {
   ai_review_issues: string[]
   ai_review_suggestions: string[]
   downloads: number
+  site_downloads?: number | null
   used_by: number
   rating: number
   review_count: number
@@ -147,7 +148,7 @@ const SKILL_DIRECTORY_SELECT = [
   'updated_at',
 ].join(',')
 
-const SKILL_TAXONOMY_SELECT = `${SKILL_DIRECTORY_SELECT},primary_category,taxonomy_tags,output_types,taxonomy_version`
+const SKILL_TAXONOMY_SELECT = `${SKILL_DIRECTORY_SELECT},site_downloads,primary_category,taxonomy_tags,output_types,taxonomy_version`
 
 export type SkillDirectoryResult = {
   records: SkillRecord[]
@@ -203,7 +204,8 @@ function sortDirectorySkills(records: SkillRecord[], sort: SkillSortMode) {
   return records.slice().sort((left, right) => {
     if (sort === 'stars') return Number(right.github_stars || 0) - Number(left.github_stars || 0)
     if (sort === 'downloads' || sort === 'trending') {
-      const downloadDifference = Number(right.downloads || 0) - Number(left.downloads || 0)
+      const key = sort === 'downloads' ? 'site_downloads' : 'downloads'
+      const downloadDifference = Number(right[key] || 0) - Number(left[key] || 0)
       return downloadDifference || Date.parse(right.created_at) - Date.parse(left.created_at)
     }
     if (sort === 'new') return Date.parse(right.created_at) - Date.parse(left.created_at)
@@ -238,7 +240,7 @@ const getSharedAllSkills = unstable_cache(
     // throw so Next retains its last good entry, not a smaller fallback.
     return packCacheJson(await fetchAllSkills(sort, category || undefined, maxRows))
   },
-  ['public-skill-directory-v6-packed'],
+  ['public-skill-directory-v7-site-downloads'],
   {
     revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS,
     tags: ['public-skill-directory'],
@@ -354,7 +356,7 @@ async function fetchAllSkills(
     } else if (sort === 'fresh') {
       query = query.order('github_last_pushed_at', { ascending: false, nullsFirst: false }).order('quality_score', { ascending: false })
     } else if (sort === 'downloads' || sort === 'trending') {
-      query = query.order('downloads', { ascending: false }).order('created_at', { ascending: false })
+      query = query.order(sort === 'downloads' ? 'site_downloads' : 'downloads', { ascending: false }).order('created_at', { ascending: false })
     } else {
       query = query.order('quality_score', { ascending: false }).order('github_stars', { ascending: false })
     }
@@ -1252,13 +1254,13 @@ const getCachedBrowseCandidates = unstable_cache(
     if (minStars > 0) query = query.gte('github_stars', minStars)
     query = applyTaxonomyFilters(query, category, topic, output)
     const order = sort === 'stars' ? 'github_stars' : sort === 'new' ? 'created_at'
-      : sort === 'fresh' ? 'github_last_pushed_at' : sort === 'downloads' || sort === 'trending' ? 'downloads' : 'quality_score'
+      : sort === 'fresh' ? 'github_last_pushed_at' : sort === 'downloads' ? 'site_downloads' : sort === 'trending' ? 'downloads' : 'quality_score'
     const { data, error } = await query.order(order, { ascending: false, nullsFirst: false })
       .order('github_stars', { ascending: false }).order('slug', { ascending: true }).limit(limit)
     if (error) throw error
     return packCacheJson(filterSkillOnly((data || []) as unknown as SkillRecord[]))
   }),
-  ['skills-browse-candidates-v4-taxonomy'],
+  ['skills-browse-candidates-v5-site-downloads'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 
@@ -1361,7 +1363,7 @@ const getCachedCatalogPage = unstable_cache(
     if (error) throw error
     return { records: (data || []) as unknown as SkillRecord[], total, hasMore: from + limit < total, page: effectivePage }
   }),
-  ['public-catalog-pages-v9-chronological'],
+  ['public-catalog-pages-v10-site-downloads'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 

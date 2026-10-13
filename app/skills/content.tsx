@@ -33,6 +33,7 @@ import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
 import { directoryCategoryOptions, matchesDirectoryCategory, isDirectorySnapshot, sortDirectoryCandidates } from '@/lib/skills/directory'
 import { MOTION_CATEGORY, type MotionEntry } from '@/lib/motion/shared'
 import { selectMotionDirectoryEntries, paidMotionWindow } from '@/lib/motion/directory'
+import { getDownloadTotals } from '@/lib/skills/downloads'
 
 // Shared renderer. Public routes supply fixed inputs; query routes supply request inputs.
 
@@ -538,7 +539,8 @@ function getFallbackSkills(sort: SkillSortMode, category: string | undefined, li
     if (sort === 'new' || sort === 'fresh') {
       return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
     }
-    if (sort === 'downloads' || sort === 'trending') return Number(b.downloads || 0) - Number(a.downloads || 0)
+    if (sort === 'downloads') return Number(b.site_downloads || 0) - Number(a.site_downloads || 0)
+    if (sort === 'trending') return Number(b.downloads || 0) - Number(a.downloads || 0)
     return Number(b.quality_score || 0) - Number(a.quality_score || 0)
   })
 
@@ -615,6 +617,7 @@ function toSkillsPageSkill({
     taxonomyTags: skillTaxonomy(record).taxonomy_tags,
     stats: {
       downloads: Number(record.downloads || 0),
+      siteDownloads: record.site_downloads ?? null,
       stars: Number(record.github_stars || 0),
       rating: Number(record.rating || 0),
       qualityScore: Number(record.quality_score || 0),
@@ -935,17 +938,21 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     quality, trust, safety, supplyTrack, useCase }
   const paidMotionEntries = category === 'all' && (access === 'paid' || pricing === 'paid')
     ? selectMotionDirectoryEntries(motionFilters) : []
+  const downloadTotalsPromise = getDownloadTotals().catch(() => null)
   // Motion is a category of this directory, using its existing shell and URL
   // state. Preview records remain separate from reviewed registry inventory.
   if (category === MOTION_CATEGORY) {
+    const motionDownloads = await downloadTotalsPromise
     const entries = selectMotionDirectoryEntries(motionFilters)
+    if (sort === 'downloads' && motionDownloads) entries.sort((a, b) => (motionDownloads[b.id] || 0) - (motionDownloads[a.id] || 0) || a.id.localeCompare(b.id))
     const resultCount = entries.length
     if (requestedPage > Math.max(1, Math.ceil(resultCount / VISIBLE_SKILL_LIMIT))) notFound()
     const offset = (requestedPage - 1) * VISIBLE_SKILL_LIMIT
     const clientProps: Omit<ComponentProps<typeof SkillsPageClient>, 'queryString'> = {
       pathname: locale === defaultLocale ? '/skills' : `/${locale}/skills`,
       skills: [], motionEntries: entries.slice(offset, offset + VISIBLE_SKILL_LIMIT),
-      query, sort: 'quality', featured, examplesOnly, catalogMode: true, category, topic, output,
+      motionDownloads: motionDownloads ? Object.fromEntries(entries.slice(offset, offset + VISIBLE_SKILL_LIMIT).map(entry => [entry.id, motionDownloads[entry.id] || 0])) : null,
+      query, sort: sort === 'downloads' ? 'downloads' : 'quality', featured, examplesOnly, catalogMode: true, category, topic, output,
       pricing, access, categories: SKILL_CATEGORIES.map(c => c[0]), useCase,
       useCases: USE_CASES.map(({ slug, shortTitle }) => ({ slug, shortTitle })),
       platform, platformOptions: ['Codex', 'Claude Code', 'Cursor'], quality, trust, safety,
@@ -968,7 +975,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
   const candidateLimit = MAX_SKILL_CANDIDATE_LIMIT
   const catalogWindow = { ...providerCatalogWindow(requestedPageOffset, providerSkills.length, sort),
     providers: isChronologicalSort(sort) ? providerSkills.map(skill => ({ slug: skill.slug, timestamp: skill.createdAt })) : undefined }
-  const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured] = await Promise.all([
+  const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured, siteDownloads] = await Promise.all([
     restrictedRegistry || query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
       : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, featured, minStars, pricing, topic, output), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
         .catch((error: unknown) => {
@@ -993,7 +1000,9 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
         }
       }) : Promise.resolve(null),
     !includeRegistry ? Promise.resolve([] as SkillRecord[]) : getSkillsBySlugs(access === 'paid' ? paidSlugs : [...new Set([...(selectedUseCase?.featuredSlugs || []), ...(!catalogMode && examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
+    downloadTotalsPromise,
   ])
+  const motionDownloads = siteDownloads
   const records = !includeRegistry ? [] : access === 'paid' ? useCaseFeatured.filter(record => paidSlugs.includes(record.slug)) : catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, useCaseFeatured, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
   const degraded = Boolean(catalogResult?.degraded || recordsResult.degraded || searchAugmentRecords.degraded)
   let effectivePage = catalogMode ? catalogResult!.page : page
@@ -1013,7 +1022,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     const agentStats = statsMap[record.slug] || null
     return {
       sourceCategory: record.category,
-      record: { ...record, ...skillTaxonomy(record), category: skillPresentationCategory(record) },
+      record: { ...record, ...skillTaxonomy(record), category: skillPresentationCategory(record), site_downloads: siteDownloads ? siteDownloads[record.slug] ?? 0 : null },
       agentStats,
       ...getDirectoryProfiles(record, agentStats),
     }
@@ -1092,7 +1101,9 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
   if (paidMotionEntries.length > 0 && !catalogMode) {
     const registryCards = filteredRecords.map(projectCard)
     const existingCards = providerRowsFirst(sort) ? [...providerSkills, ...registryCards] : [...registryCards, ...providerSkills]
-    const merged = paidMotionWindow(paidMotionEntries, existingCards, pageOffset, VISIBLE_SKILL_LIMIT)
+    const merged = paidMotionWindow(paidMotionEntries, existingCards, pageOffset, VISIBLE_SKILL_LIMIT, sort === 'downloads' ? {
+      motion: entry => motionDownloads?.[entry.id] || 0, registry: card => card.stats.siteDownloads || 0,
+    } : undefined)
     motionEntries = merged.motionEntries
     skills = merged.registryEntries
     resultCount = merged.total
@@ -1131,7 +1142,9 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
 
   const clientProps: Omit<ComponentProps<typeof SkillsPageClient>, 'queryString'> = {
     pathname: locale === defaultLocale ? '/skills' : `/${locale}/skills`,
-    skills, motionEntries, query, sort, featured, examplesOnly, catalogMode, category, topic, output,
+    skills, motionEntries,
+    motionDownloads: motionEntries && motionDownloads ? Object.fromEntries(motionEntries.map(entry => [entry.id, motionDownloads[entry.id] || 0])) : null,
+    query, sort, featured, examplesOnly, catalogMode, category, topic, output,
     pricing, access, categories: categoryOptions, useCase,
     useCases: USE_CASES.map(({ slug, shortTitle }) => ({ slug, shortTitle })),
     platform, platformOptions, quality, trust, safety, supplyTrack, supplyTracks,
@@ -1156,7 +1169,7 @@ const getDefaultDirectory = unstable_cache(async (locale: Locale) => {
   const model = await prepareDirectory({ lang: locale })
   if (model.clientProps.degraded) throw new DegradedDirectory(model)
   return model
-}, ['public-directory-model-v1'], {
+}, ['public-directory-model-v2-site-downloads'], {
   revalidate: 300, tags: ['public-skill-directory', 'public-skill-stats'],
 })
 

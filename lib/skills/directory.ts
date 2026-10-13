@@ -45,14 +45,15 @@ export function isDirectorySnapshot(record: { id: string; submission_source?: st
   return /^(fallback|snapshot)-/.test(record.id) || record.submission_source === 'fallback'
 }
 
-export function sortDirectoryCandidates<T extends { record: { slug: string; github_repo?: string | null; source_path?: string | null; source_sync_status?: SkillRecord['source_sync_status']; github_stars?: number | null; downloads?: number | null; quality_score?: number | null; created_at: string; updated_at: string; github_last_pushed_at?: string | null } }>(items: T[], sort: string) {
+export function sortDirectoryCandidates<T extends { record: { slug: string; github_repo?: string | null; source_path?: string | null; source_sync_status?: SkillRecord['source_sync_status']; github_stars?: number | null; downloads?: number | null; site_downloads?: number | null; quality_score?: number | null; created_at: string; updated_at: string; github_last_pushed_at?: string | null } }>(items: T[], sort: string) {
   const timestamp = (value: string) => Date.parse(value) || 0
   const sorted = items.slice().sort((a, b) => {
     const l = a.record, r = b.record
     const delta = sort === 'stars' ? Number(r.github_stars || 0) - Number(l.github_stars || 0)
       : sort === 'new' ? timestamp(r.created_at) - timestamp(l.created_at)
       : sort === 'fresh' ? timestamp(r.github_last_pushed_at || r.updated_at) - timestamp(l.github_last_pushed_at || l.updated_at)
-      : sort === 'trending' || sort === 'downloads' ? Number(r.downloads || 0) - Number(l.downloads || 0)
+      : sort === 'downloads' ? Number(r.site_downloads || 0) - Number(l.site_downloads || 0)
+      : sort === 'trending' ? Number(r.downloads || 0) - Number(l.downloads || 0)
       : Number(r.quality_score || 0) - Number(l.quality_score || 0)
     return delta || Number(r.github_stars || 0) - Number(l.github_stars || 0) || l.slug.localeCompare(r.slug)
   })

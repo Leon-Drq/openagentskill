@@ -8,6 +8,7 @@ import type { Locale } from '@/lib/i18n/config'
 import type { PurchasePlan, DeliveryKind } from '@/lib/payments/policy'
 import { paymentMessage } from '@/lib/payments/copy'
 import styles from './payments.module.css'
+import { downloadFile } from '@/lib/download-file'
 
 export async function paymentAction(path: string, body: unknown) {
   const response = await fetch(`/api/payments/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -42,6 +43,7 @@ export function PurchaseActions({ slug, plan, locale, delivery = 'package', onAv
   async function act(download = false) {
     setBusy(true); setError('')
     try {
+      if (download && slug) { await downloadFile('/api/payments/download', { slug }); return }
       const data = await paymentAction(download ? 'download' : 'checkout', download ? { slug } : { slug, plan, locale })
       window.location.assign(data.url)
     } catch (error) {

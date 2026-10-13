@@ -8,8 +8,9 @@ import { motionDetailCopy } from '@/lib/motion/detail-copy'
 import { motionSkillHref } from '@/lib/motion/routes'
 import { motionTagLabel, type MotionEntry } from '@/lib/motion/shared'
 import type { Locale } from '@/lib/i18n/config'
+import { SkillDownloadCount } from '@/components/skill-download-count'
 
-export function DirectoryMotionCard({ entry, locale }: { entry: MotionEntry; locale: Locale }) {
+export function DirectoryMotionCard({ entry, locale, downloads }: { entry: MotionEntry; locale: Locale; downloads?: number | null }) {
   const language = locale === 'zh' ? 'zh' : 'en'
   const c = motionCopy(language)
   const tags = entry.tags.map(tag => motionTagLabel(tag, language))
@@ -34,6 +35,7 @@ export function DirectoryMotionCard({ entry, locale }: { entry: MotionEntry; loc
     <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-background/45 px-5 py-3">
       <span className="inline-flex items-center gap-1.5 text-xs text-secondary"><Film size={14} aria-hidden="true" />{c.preview}</span>
       <Link href={href} prefetch={false} aria-label={`${details}: ${entry.title}`} className="inline-flex min-h-10 items-center gap-1 text-xs text-[#006b4f] focus-visible:outline-2 focus-visible:outline-offset-4">{details}<ArrowUpRight size={14} aria-hidden="true" /></Link>
+      <SkillDownloadCount count={downloads} locale={locale} />
     </div>
   </article>
 }
