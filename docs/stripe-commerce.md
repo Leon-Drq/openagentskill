@@ -51,7 +51,23 @@ After reviewing a completed package's output against its public preview, publish
 node --env-file=.env.commerce.local scripts/publish-commerce-package.mjs --slug launch-card-studio --version 1.1.0 --file /absolute/path/finished.zip --verified-output
 ```
 
-This flag records the operator's responsibility; the command does not claim to visually verify an animation. It checks archive shape, known slug, withdrawal marker, private bucket, immutable version and uploaded checksum. Never use `artifacts/motion-studio-v1`: it is explicitly withdrawn. The 233 motion references are still marked `not-verified`; none become purchasable just because the payment integration is configured. A fresh faithfully reproduced package is required for each.
+This flag records the operator's responsibility for ZIP products; the command does not claim to visually verify an animation. It checks archive shape, known slug, withdrawal marker, private bucket, immutable version and uploaded checksum. Never use `artifacts/motion-studio-v1`: it is explicitly withdrawn.
+
+## Motion text delivery (2026-10-13)
+
+The owner changed the motion offer to paid access to original text, replacing the planned animation-project package. The 233 entries deliver 230 original prompts and 3 original SKILL.md instruction texts with attribution and their repository licenses. Previews remain the original creator videos; generation fidelity is not guaranteed. Referenced dependencies for the three Skill cases remain available in their linked source repositories.
+
+`20261013033749_commerce_text_releases.sql` adds `delivery_kind` and permits immutable `.txt` objects in the existing private bucket. ZIP releases retain their original behavior. No browser role can read Storage directly. The public catalog contains delivery metadata and hashes, never paid text.
+
+```sh
+node --env-file=.env.commerce.local scripts/publish-motion-text.mjs --archive /absolute/private/source-archive --version 3.0.0 --publish
+```
+
+Without `--publish`, this validates all 233 local sources. Publication verifies each prompt against the source archive and catalog hashes, uploads privately, re-downloads to verify the checksum, and only then records an immutable release. No third-party instructions are executed. The source archive and credentials must not be committed.
+
+`POST /api/payments/content` authenticates the buyer, checks the current Stripe payment or active paid subscription, then reads and hashes the private text. Responses are `private, no-store`; unauthenticated, unpaid, cross-account, fully refunded and canceled membership requests are denied. Clipboard text is rendered as a read-only textarea, never HTML. The text download uses the same entitlement checks. A motion single purchase returns directly to its detail page; the return URL is never proof of payment.
+
+The 2026-10-13 text rollout verified all 233 uploaded checksums (230 prompts, 3 licensed Skill instruction texts). Real hosted checkouts in the separate Stripe QA sandbox verified single-purchase and Pro unlocks, signed webhook fulfillment, exact original text/TXT delivery, no prompt in public server-rendered HTML, cross-user and different-item denial, full-refund revocation and canceled-subscription denial. The browser displayed the unlocked text and successful copy state. Pro's library included 233 text releases plus the existing Launch Card Studio ZIP. No live payment was submitted for testing.
 
 ## Fulfillment and access
 
@@ -76,12 +92,12 @@ The isolated `OpenAgentSkill QA` Stripe sandbox completed hosted single-purchase
 
 Verified against the actual Stripe and Supabase APIs: declined-card access denial, checkout retry idempotency, paid fulfillment, private download SHA-256, cross-account denial, full-refund revocation, older completion-event replay, billing portal creation, cancellation at period end, paid renewal with a Stripe test clock, and download revocation when the paid period ended. Asynchronous settlement/failure remains covered by the regression adapters; no real delayed-payment transaction is claimed. Production validation must not submit a real charge merely to test the integration.
 
-The merchant selected by the owner is `qudongqi.ai` (`acct_1STM522WEAq3tdU2`). Production uses a dedicated restricted server key, webhook and portal. Launch Card Studio is the only published downloadable package at this point; the 233 motion references remain unavailable for purchase until their matching packages are completed.
+The merchant selected by the owner is `qudongqi.ai` (`acct_1STM522WEAq3tdU2`). Production uses a dedicated restricted server key, webhook and portal. At that initial verification, only Launch Card Studio had a delivery release. Motion text publication is described above.
 
 ### Storefront branding and catalog coverage
 
 Every new single-purchase and Pro Checkout Session sets `branding_settings.display_name` to `OpenAgentSkill`, with the site's warm background and green button. This changes the Checkout storefront, not the shared merchant's legal identity, bank account, receipts or other applications. Previously created sessions retain their original appearance.
 
-All 234 first-party product slugs (Launch Card Studio and the 233 motion Skills) are registered with the shared checkout, fulfillment, purchase library and private download endpoints. Regression tests cover the complete catalog's product binding and download isolation. Registering a product does not publish a file: each motion package still needs its own completed, verified release. Publishing that release enables its existing purchase actions automatically; no separate per-Skill Stripe integration is required.
+All 234 storefront product slugs (Launch Card Studio and the 233 motion entries) share checkout, fulfillment, purchase library and private delivery endpoints. Regression tests cover product binding and access isolation for ZIP and text releases. Runtime availability comes from a verified private release, not a catalog flag.
 
-On 2026-10-13, all 234 production `/api/payments/status?slug=...` responses returned HTTP 200: 1 ready package and 233 awaiting packages, with no unregistered products or endpoint errors. This audit checks integration coverage, not completion of the motion reproductions.
+The initial 2026-10-13 status audit found one ZIP release and 233 unavailable motion entries. This is historical; the text-delivery rollout replaces the motion package requirement without claiming animation reproduction.

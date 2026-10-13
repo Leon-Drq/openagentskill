@@ -16,8 +16,8 @@ export interface MotionDirectoryFilters {
   useCase?: string
 }
 
-// The owner explicitly classified these planned Skills as paid. Classification
-// does not imply checkout, verified reproduction or a completed delivery package.
+// Paid text offers use the existing directory. Runtime checkout availability is
+// backed by an actual private release, independently of visual reproduction.
 export function selectMotionDirectoryEntries(filters: MotionDirectoryFilters) {
   if (filters.access && !['all', 'paid'].includes(filters.access)) return []
   if (filters.pricing && !['all', 'paid'].includes(filters.pricing)) return []

@@ -1,6 +1,6 @@
 import { buyer, membershipFor, paymentDb, paymentError, paymentJson, productDefinition, releases } from '@/lib/payments/server'
 import { paymentMode } from '@/lib/payments/stripe'
-import { singleReleaseAllowed, type PaidOrder } from '@/lib/payments/policy'
+import { singleReleaseAllowed, type PaidOrder, type DeliveryKind } from '@/lib/payments/policy'
 import { NextRequest } from 'next/server'
 
 export const runtime = 'nodejs'
@@ -23,11 +23,11 @@ export async function GET(request: NextRequest) {
     if (result.error) throw result.error
     if (customer.error) throw customer.error
     const all = result.data as PaidOrder[], orders = all.slice(0, 50)
-    const packages = new Map<string, { slug: string; name: string; version: string; path: string }>()
+    const packages = new Map<string, { slug: string; name: string; version: string; path: string; kind: DeliveryKind }>()
     for (const release of available) {
       if (!packages.has(release.skill_slug) && (membership || orders.some(order => singleReleaseAllowed(order, release, user.id, paymentMode() === true)))) {
         const product = productDefinition(release.skill_slug)!
-        packages.set(release.skill_slug, { ...product, version: release.version })
+        packages.set(release.skill_slug, { ...product, version: release.version, kind: release.delivery_kind || 'package' })
       }
     }
     return paymentJson({ configured: true, billing: Boolean(customer.data),

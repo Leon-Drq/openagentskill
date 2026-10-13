@@ -10,7 +10,7 @@ import { MOTION_PLANNED_PRICE_CENTS, type MotionLocale } from '@/lib/motion/shar
 import { motionDetailCopy } from '@/lib/motion/detail-copy'
 import styles from './detail.module.css'
 
-export function MotionPurchaseOptions({ locale, slug }: { locale: MotionLocale; slug: string }) {
+export function MotionPurchaseOptions({ locale, slug, sourceKind }: { locale: MotionLocale; slug: string; sourceKind: string }) {
   const c = motionDetailCopy(locale), prices = studioCopy(locale)
   const [plan, setPlan] = useState<'single' | 'membership'>('single')
   const [yearly, setYearly] = useState(false)
@@ -37,7 +37,7 @@ export function MotionPurchaseOptions({ locale, slug }: { locale: MotionLocale; 
       <p className={styles.benefit}>{membership ? c.memberBenefit : c.singleBenefit}</p>
       {membership && <p className={styles.billing}>{yearly ? prices.annually : prices.monthlyNote}</p>}
     </div>
-    <PurchaseActions slug={slug} plan={membership ? yearly ? 'yearly' : 'monthly' : 'single'} locale={locale} onAvailability={setReady} />
+    <PurchaseActions slug={slug} plan={membership ? yearly ? 'yearly' : 'monthly' : 'single'} delivery={sourceKind === 'skill' ? 'skill-instructions' : 'prompt'} locale={locale} onAvailability={setReady} />
     <Link href={studioHref('/membership', locale)} className={styles.compare}>{prices.compare}<ArrowRight size={15} aria-hidden="true" /></Link>
   </section>
 }

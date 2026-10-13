@@ -397,7 +397,7 @@ export function SkillsPageClient(props: Props) {
             </div>
           )}
           <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${degraded ? visibleCount : resultCount}`}</p>
-          {(isMotionCategory || Boolean(props.motionEntries?.length)) && <p className="mt-4 text-xs leading-6 text-secondary" data-motion-scope>{locale === 'zh' ? '付费动效 Skill · 逐条展示原作者视频，保留原效果。Skill 制作与交付状态见详情。' : 'Paid motion Skills with each creator’s original video, unchanged. See details for production and delivery status.'}</p>}
+          {(isMotionCategory || Boolean(props.motionEntries?.length)) && <p className="mt-4 text-xs leading-6 text-secondary" data-motion-scope>{locale === 'zh' ? '233 项动效创作指令 · 原作视频预览。单独购买或开通 Pro，解锁完整提示词与 Skill 指令，一键复制使用。' : '233 motion prompts and Skill instructions with original video previews. Purchase individually or join Pro to unlock, read and copy the full text.'}</p>}
           {props.access !== 'paid' && (props.access !== 'all' || props.pricing !== 'all') && <p className="my-4 text-xs leading-6 text-secondary">{props.access === 'free' ? filterCopy.freeNote : props.access === 'third-party' ? filterCopy.thirdPartyNote : prices.caveat}</p>}
           {degraded && <DirectoryRecovery key={`${pathname}?${queryString}`} locale={locale} empty={props.catalogMode && skills.length === 0} />}
 

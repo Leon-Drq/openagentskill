@@ -1,4 +1,8 @@
 .actions { display: grid; gap: 12px; margin-top: 20px; }
+.promptBox { display: grid; gap: 14px; padding: 18px; border: 1px solid var(--border); border-radius: 10px; background: var(--background); font-size: 13px; min-width: 0; }
+.unlocked { color: var(--brand); font-size: 12px; }
+.promptText { width: 100%; min-height: 240px; max-height: 420px; resize: vertical; border: 1px solid var(--border); border-radius: 6px; padding: 12px; background: var(--card); color: var(--foreground); font-family: var(--font-mono, monospace); font-size: 12px; line-height: 1.8; }
+.promptText:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .primary, .secondary { min-height: 44px; display: inline-flex; justify-content: center; align-items: center; gap: 8px; border: 1px solid var(--brand); border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: 600; cursor: pointer; }
 .primary { color: white; background: var(--brand); }
 .secondary { color: var(--foreground); background: var(--card); border-color: var(--border); }

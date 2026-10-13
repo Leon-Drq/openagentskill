@@ -7,7 +7,7 @@ export const MOTION_ENTRIES = catalog.entries;
 export const MOTION_VERSION = catalog.version;
 export const MOTION_SOURCE_COUNT = catalog.sourceCount;
 export const MOTION_LOCALES = ["en", "zh"] as const;
-export const MOTION_PUBLISHED_AT = "2026-10-12";
+export const MOTION_PUBLISHED_AT = "2026-10-13";
 export const getMotionEntry = (id: string) =>
   MOTION_ENTRIES.find((entry) => entry.id === id);
 export function filterMotionEntries(query = "", family = "all") {

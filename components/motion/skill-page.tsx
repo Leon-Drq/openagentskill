@@ -55,14 +55,14 @@ export function MotionSkillPage({ entry, locale }: { entry: MotionEntry; locale:
           <a className={styles.author} href={entry.sourcePost || entry.sourceUrl} target="_blank" rel="noopener noreferrer"><span className={styles.avatar} aria-hidden="true">{entry.sourceCreatorName.slice(0, 1)}</span><span><small>{c.original}</small>{entry.sourceCreatorName} <span className={styles.handle}>@{entry.sourceAuthor}</span></span><ArrowUpRight size={15} aria-hidden="true" /></a>
           <ul className={styles.tags} aria-label={c.tags}>{entry.tags.map(tag => <li key={tag}>{motionTagLabel(tag, language)}</li>)}</ul>
         </header>
-        <MotionPurchaseOptions locale={language} slug={entry.id} />
+        <MotionPurchaseOptions locale={language} slug={entry.id} sourceKind={entry.sourceKind} />
       </div>
       <div className={styles.description}>
         <section id="about" className={styles.section}>
           <h2>{c.about}</h2><p>{motionDetailDescription(entry, language)}</p>
         </section>
         <section id="included" className={styles.section}>
-          <h2>{c.included}</h2><p>{c.packageNote}</p>
+          <h2>{c.included}</h2><p>{entry.sourceKind === 'skill' ? c.skillNote : c.packageNote}</p>
           <div className={styles.packageGrid}>{c.deliverables.map(([title, description], index) => {
             const Icon = packageIcons[index]
             return <div className={styles.packageItem} key={title}><Icon size={21} strokeWidth={1.5} aria-hidden="true" /><h3>{title}</h3><p>{description}</p></div>

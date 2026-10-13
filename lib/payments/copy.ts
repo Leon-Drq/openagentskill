@@ -1,8 +1,9 @@
 import type { Locale } from '@/lib/i18n/config'
 
 const messages: Record<string, [string, string]> = {
+  copy_manually: ['Clipboard access is unavailable. Select and copy the text above.', '浏览器未允许自动复制，请选中上方正文手动复制。'],
   checkout_unavailable: ['Checkout is being connected. No payment is collected yet.', '支付接入中，目前不会收取费用。'],
-  package_unavailable: ['The complete Skill package is still being prepared. Purchase opens when it is ready.', '完整 Skill 包仍在准备中，文件就绪后开放购买。'],
+  package_unavailable: ['Delivery is temporarily unavailable. Please try again shortly.', '交付内容暂时不可用，请稍后重试。'],
   temporarily_unavailable: ['This service is temporarily unavailable. Please try again shortly.', '服务暂时不可用，请稍后重试。'],
   already_purchased: ['You already have access. Open your purchases to download.', '你已拥有访问权限，请前往我的购买下载。'],
   purchase_required: ['No active purchase was found for this Skill. Check your purchases or membership.', '当前账号没有此 Skill 的有效购买权限，请检查订单或会员状态。'],

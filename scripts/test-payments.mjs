@@ -6,6 +6,7 @@ import { inspectPayment, inspectMembership, checkoutConfigured } from '../lib/pa
 import { assertSessionOrder, processStripeEvent } from '../lib/payments/webhook.ts'
 import { POST as checkoutPost } from '../app/api/payments/checkout/route.ts'
 import { POST as downloadPost } from '../app/api/payments/download/route.ts'
+import { POST as contentPost } from '../app/api/payments/content/route.ts'
 import { POST as webhookPost } from '../app/api/payments/webhook/route.ts'
 import { checkoutSessionParams } from '../lib/payments/checkout.ts'
 import { productDefinition } from '../lib/payments/server.ts'
@@ -24,6 +25,13 @@ const release = { id: 'release-1', skill_slug: 'launch-card-studio', version: '1
 const order = { id: 'order-1', user_id: 'buyer-1', skill_slug: 'launch-card-studio', plan: 'single', livemode: false, currency: 'usd', amount_cents: 499,
   status: 'pending', release_id: release.id, stripe_customer_id: 'cus_1', stripe_session_id: 'cs_1', stripe_payment_intent_id: null }
 assert.ok(validRelease(release, release.skill_slug))
+for (const kind of ['prompt', 'skill-instructions']) {
+  const textRelease = { ...release, delivery_kind: kind, object_path: release.object_path.replace('.zip','.txt') }
+  assert.ok(validRelease(textRelease, release.skill_slug))
+  assert.equal(validRelease({ ...textRelease, object_path: release.object_path }, release.skill_slug), false)
+  assert.equal(validRelease({ ...textRelease, size_bytes: 1048577 }, release.skill_slug), false)
+}
+assert.equal(validRelease({ ...release, delivery_kind: 'anything' }, release.skill_slug), false)
 for (const bad of [{ withdrawn: true }, { sha256: 'x' }, { size_bytes: 0 }, { object_path: '../private.zip' }, { released_at: '2999-01-01' }]) assert.equal(validRelease({ ...release, ...bad }, release.skill_slug), false)
 const owned = { ...order, status: 'paid', updates_until: '2027-01-01T00:00:00Z' }
 assert.ok(singleReleaseAllowed(owned, release, 'buyer-1', false))
@@ -124,6 +132,9 @@ assert.equal((await checkoutPost(request('checkout', { plan: 'single', slug: 'la
 assert.equal((await checkoutPost(request('checkout', { plan: 'single', slug: 'launch-card-studio', amount: 1 }))).status, 400)
 assert.equal((await downloadPost(request('download', { slug: '../private' }))).status, 400)
 assert.equal((await downloadPost(request('download', { slug: 'launch-card-studio' }, 'https://evil.example'))).status, 403)
+assert.equal((await contentPost(request('content', { slug: 'motion-stephanlivera-df17a2' }, 'https://evil.example'))).status, 403)
+assert.equal((await contentPost(request('content', { slug: '../private' }))).status, 400)
+assert.equal((await contentPost(request('content', { slug: 'motion-stephanlivera-df17a2', userId:'another-buyer' }))).status, 400)
 assert.equal((await webhookPost(request('webhook', event))).status, 400)
 const sdk = new Stripe(process.env.STRIPE_SECRET_KEY)
 const payload = JSON.stringify(event)
@@ -140,7 +151,8 @@ assert.equal(productDefinition('unregistered-paid-skill'), null)
 for (const slug of products) {
   const product = productDefinition(slug)
   assert.ok(product?.name, `Paid product must be registered: ${slug}`)
-  const productRelease = { ...release, id: `release-${slug}`, skill_slug: slug, object_path: `${slug}/1.1.0/${release.sha256}.zip` }
+  const delivery_kind = MOTION_ENTRIES.find(e=>e.id===slug)?.deliveryKind || 'package'
+  const productRelease = { ...release, delivery_kind, id: `release-${slug}`, skill_slug: slug, object_path: `${slug}/1.1.0/${release.sha256}.${delivery_kind==='package'?'zip':'txt'}` }
   const productOrder = { ...owned, id: `order-${slug}`, skill_slug: slug, release_id: productRelease.id,
     product_name: product.name, checkout_locale: 'zh', stripe_price_id: null }
   const params = checkoutSessionParams(productOrder, 'https://www.openagentskill.com')
@@ -152,6 +164,10 @@ for (const slug of products) {
   assert.equal(params.line_items[0].price_data.product_data.name, product.name)
   assert.equal(params.line_items[0].price_data.product_data.metadata.skill_slug, slug)
   assert.equal(params.payment_intent_data.metadata.order_id, productOrder.id)
+  if (slug.startsWith('motion-')) {
+    assert.ok(params.success_url.includes(`/zh/skills/${slug}?`), 'Motion payment returns directly to copyable content')
+    assert.ok(params.line_items[0].price_data.product_data.description.includes('TXT'))
+  }
   assert.match(params.integration_identifier, /^openagentskill-[a-z]{8}$/)
   assert.deepEqual(params, checkoutSessionParams(productOrder, 'https://www.openagentskill.com'), 'retry parameters must be stable')
   assert.ok(singleReleaseAllowed(productOrder, productRelease, 'buyer-1', false), `Paid download must support ${slug}`)

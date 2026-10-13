@@ -1,4 +1,5 @@
 import 'server-only'
+import { createHash } from 'node:crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -54,6 +55,16 @@ export async function releases(slug?: string) {
 export async function verifyPackage(release: PackageRelease) {
   const { data, error } = await paymentDb().storage.from(PACKAGE_BUCKET).info(release.object_path)
   if (error || !data || Number(data.size) !== release.size_bytes) throw new PaymentError('package_unavailable', 409)
+}
+// Called only after entitlement checks (or by checkout to validate delivery).
+// Plain text stays in private Storage, never in the public motion catalog.
+export async function releaseText(release: PackageRelease) {
+  if (!validRelease(release, release.skill_slug) || !['prompt', 'skill-instructions'].includes(release.delivery_kind || '')) throw new PaymentError('package_unavailable', 409)
+  const { data, error } = await paymentDb().storage.from(PACKAGE_BUCKET).download(release.object_path)
+  if (error || !data) throw new PaymentError('package_unavailable', 409)
+  const bytes = Buffer.from(await data.arrayBuffer())
+  if (bytes.length !== release.size_bytes || createHash('sha256').update(bytes).digest('hex') !== release.sha256) throw new PaymentError('package_unavailable', 409)
+  return new TextDecoder('utf-8', { fatal: true }).decode(bytes)
 }
 export async function paidOrders(userId: string) {
   const { data, error } = await paymentDb().from('commerce_orders').select('*').eq('user_id', userId)

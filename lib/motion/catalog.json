@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "3.0.0",
   "capturedAt": "2026-10-12T01:02:24.943Z",
   "sourceCount": 233,
   "entries": [
@@ -26,10 +26,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-twoclipping-5cba86",
@@ -54,10 +55,11 @@
       "sourceKind": "prompt",
       "promptSha256": "85434958ccdc0c246f5b0b73a6977c6bede956be6e107d19c771285d0f4bf134",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-shneural-2abdfa",
@@ -82,10 +84,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ajith-io-b5626e",
@@ -110,10 +113,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-twoclipping-221cab",
@@ -139,10 +143,11 @@
       "sourceKind": "prompt",
       "promptSha256": "08f7f65fd5fcecd9bde6ed30490e18115e55482f985acc83291197195fcb2b70",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-himanshutwtxs-5f4b43",
@@ -167,10 +172,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b877dbfab23d65d772ace22c81cf885730dad86aadc9a46c0c05c8b42321e350",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-gabrielbuzziv-4ff0c6",
@@ -194,10 +200,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-lexnlin-038035",
@@ -221,10 +228,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b0382301404e516e215e3ea11aaa81d0fbd487d15f0997ffe6ea440440a1d14c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ror-fly-9950f1",
@@ -247,10 +255,11 @@
       "sourceKind": "prompt",
       "promptSha256": "3baf7bd56c13c9a744a61d918a1dc2b1c4b30b74b9bd1a03b2160470cebc0a34",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-notdwd-c2037d",
@@ -275,10 +284,11 @@
       "sourceKind": "prompt",
       "promptSha256": "d396320a1c9cb68dabc1482038a2d48da0ca5da9486b22759a97e338f12eea88",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-thismacapital-dfba20",
@@ -303,10 +313,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ajith-io-c52e09",
@@ -329,10 +340,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b916f7728eb1667fc6cd781acfcea5821261fbf62d13770e41fade00cb559407",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-twoclipping-6dd14e",
@@ -358,10 +370,11 @@
       "sourceKind": "prompt",
       "promptSha256": "66575c7ef58781ce359da17bd86bf8da0ba44d14985bc3b02f3f817e7db172a1",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-samuel-yostt-891f87",
@@ -386,10 +399,11 @@
       "sourceKind": "prompt",
       "promptSha256": "c4a3faf728007c9bbdf63ce2ed52f8f55bc84b537a239f7f72dd0454aa47b70a",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-emollick-8661a8",
@@ -413,10 +427,11 @@
       "sourceKind": "prompt",
       "promptSha256": "07e2ed1b2cfc63257d58ba56ba82dd0315e836fd977a4a7dbc999920af47333c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-lexnlin-6161a6",
@@ -440,10 +455,11 @@
       "sourceKind": "skill",
       "promptSha256": null,
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "skill-instructions"
     },
     {
       "id": "motion-steventey-0d20e4",
@@ -467,10 +483,11 @@
       "sourceKind": "prompt",
       "promptSha256": "f2afcb38904ec9fd77b25ce44028117bc640a44f1523abb9a2d88ffcb65d8d34",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-alex-prompter-1ea044",
@@ -493,10 +510,11 @@
       "sourceKind": "prompt",
       "promptSha256": "615d134af75472ea0b903e7128c51bf1c42e3c63e98b2ac263c14a1c8799cfcc",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-majin-appsheet-2d3c1a",
@@ -519,10 +537,11 @@
       "sourceKind": "prompt",
       "promptSha256": "8e96cd5ee444884dc80c5107fb7ddcbcec56dd45f0c65f69bf2d5c51b5865993",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-tdinh-me-815acb",
@@ -545,10 +564,11 @@
       "sourceKind": "prompt",
       "promptSha256": "9abcb4bce39f5b42a9b93d1a27bc4a9345a09a0f7ec3a8c02b49f4e89d9b82e5",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-thayto-dev-44b911",
@@ -571,10 +591,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-sab8a-364a5a",
@@ -597,10 +618,11 @@
       "sourceKind": "prompt",
       "promptSha256": "445e468c63eb504d37610368a6ba87a7f42a418f07fd9b8e59c3438a789eb118",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-anthonyriera-9b1b2a",
@@ -624,10 +646,11 @@
       "sourceKind": "skill",
       "promptSha256": null,
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "skill-instructions"
     },
     {
       "id": "motion-davidmarcus-a28a60",
@@ -651,10 +674,11 @@
       "sourceKind": "prompt",
       "promptSha256": "aaade63f480e75cf8733138b465ccfe0ef549f362c394f29fef97c807069e09d",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ultimaxbt-bbebf5",
@@ -679,10 +703,11 @@
       "sourceKind": "prompt",
       "promptSha256": "4b8ae66dc4900c9bf39720831a23154225797c7d5002c35e80267bca188285bc",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-itsolelehmann-e47532",
@@ -703,10 +728,11 @@
       "sourceKind": "prompt",
       "promptSha256": "7fdc1c4ef5338675cc182debb994bd40e1c7b1ef10104c8f7536e2de4d932f79",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-linearuncle-5d2bae",
@@ -730,10 +756,11 @@
       "sourceKind": "prompt",
       "promptSha256": "278fe380efed8f7fee91c89837553a218a28bf7a6435ea44c5acdbea2fedf047",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-jacksonfall-54b2ac",
@@ -757,10 +784,11 @@
       "sourceKind": "prompt",
       "promptSha256": "11917d03084eafdf602ba085bd93a8b0c06ac18251e90fca2c3986c4eb01275d",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-kloss-xyz-fe0c31",
@@ -785,10 +813,11 @@
       "sourceKind": "prompt",
       "promptSha256": "d95c1ace0d58448f6d25e8eef4ccdc007f5b7f2497ceac48a5940eae532ffe8b",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-jasonzhou1993-8595e0",
@@ -813,10 +842,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-robj3d3-b18fad",
@@ -839,10 +869,11 @@
       "sourceKind": "prompt",
       "promptSha256": "fa09e433c86c020f2382f7163ac996115f67eadd1d68d12f23dc6e78da21b52f",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ho-ba-f3f0e9",
@@ -866,10 +897,11 @@
       "sourceKind": "prompt",
       "promptSha256": "f0edb016744ffdf5a0b3050ad01378ba6bf92c26dcc32f48b127bb6f0497ec6b",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-itisrazak-3ad902",
@@ -895,10 +927,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b916f7728eb1667fc6cd781acfcea5821261fbf62d13770e41fade00cb559407",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-notdwd-7de38a",
@@ -922,10 +955,11 @@
       "sourceKind": "prompt",
       "promptSha256": "f10bf8176dabc43664dca69e7028c035f083d3f58d4c822c8adfee1eba056ba2",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-viktoroddy-98c1d8",
@@ -950,10 +984,11 @@
       "sourceKind": "prompt",
       "promptSha256": "771a59321bcbae1be6dd9e673612e6a347748fc1839554a04d4373ec1c59dd94",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ismailfahmi-557268",
@@ -977,10 +1012,11 @@
       "sourceKind": "prompt",
       "promptSha256": "da377353010a72e5990e65bbc71375cfef1144ba355af5f875d096688bc168f2",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-melvynx-6cde6c",
@@ -1004,10 +1040,11 @@
       "sourceKind": "prompt",
       "promptSha256": "0b130b2b008173542ae495ecbf1a503c94c9b417684f0ce475c1593e8e919010",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-rossaxbt-3085b7",
@@ -1032,10 +1069,11 @@
       "sourceKind": "prompt",
       "promptSha256": "be13ae3b246f05686a7c2e69ccf9e138c0e86ac5a9d7de6440dd20a7a8248a6c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-tequilafunks-97f6c9",
@@ -1061,10 +1099,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b877dbfab23d65d772ace22c81cf885730dad86aadc9a46c0c05c8b42321e350",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-sudo-kiran-49176d",
@@ -1089,10 +1128,11 @@
       "sourceKind": "prompt",
       "promptSha256": "704366db651527be43ec9144b1650208aead3aa7dd885aa2608660658ce0cd59",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-lukasersil-0ed38e",
@@ -1117,10 +1157,11 @@
       "sourceKind": "prompt",
       "promptSha256": "881f479772812f12a88264461b470dc681ba108304f0fa98a573b8e703ad4c0a",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-nft-chen-5f8bb0",
@@ -1141,10 +1182,11 @@
       "sourceKind": "prompt",
       "promptSha256": "d29c515a341322df8f100af628c2e481bee3dfe231210f13fb859f6eba42f7a1",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-axtonliu-0b861d",
@@ -1167,10 +1209,11 @@
       "sourceKind": "prompt",
       "promptSha256": "fa61721e87a60572057180ff67083338f558ecb260770cffbe1b85ff50c5f0c7",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-gizakdag-cf4ae6",
@@ -1193,10 +1236,11 @@
       "sourceKind": "prompt",
       "promptSha256": "6f478cc2b8721c32591d226f13fbe52688d2c5cf410b16497d4662e1ded4a268",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-mandelduck-95fd08",
@@ -1219,10 +1263,11 @@
       "sourceKind": "prompt",
       "promptSha256": "5e6ddf5dd440fd706d92b00271333fe13ccb2092b5cbf34f86d65d58b7c22987",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-gorden-sun-041f56",
@@ -1245,10 +1290,11 @@
       "sourceKind": "prompt",
       "promptSha256": "fd3ba4f86c5af896b972d0f40f6a3d0af4ec26223f0c8b00812aa93b062afd3f",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ajith-io-4c248f",
@@ -1271,10 +1317,11 @@
       "sourceKind": "prompt",
       "promptSha256": "08ec560b8c3497434a77159519343e11eab667cd70869e2832a74736560c1fad",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-polydao-7a572b",
@@ -1299,10 +1346,11 @@
       "sourceKind": "prompt",
       "promptSha256": "ef7109f9165e6f61abe8fa670aa727e92c7dfbee26b1c6f117bf5883b092546e",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ajith-io-ea7f2d",
@@ -1326,10 +1374,11 @@
       "sourceKind": "prompt",
       "promptSha256": "dd003ba73a3a67952c2cd40e99e9ed40ae3e51250539a54625365c78c59cc764",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ayushunleashed-ece3e3",
@@ -1355,10 +1404,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b877dbfab23d65d772ace22c81cf885730dad86aadc9a46c0c05c8b42321e350",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-chatgptastra-0d95c7",
@@ -1383,10 +1433,11 @@
       "sourceKind": "prompt",
       "promptSha256": "d86d335b4020ef3b12bc5986c0dc2dce8dc3e0d1e3f15f2c53cedca33840e476",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ultimaxbt-2ddf1e",
@@ -1412,10 +1463,11 @@
       "sourceKind": "prompt",
       "promptSha256": "1aceded512adb1aa43c86abdf8064d0cb179c43de493b9a9de228bfdd6ba00de",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-monokern-ade5b6",
@@ -1438,10 +1490,11 @@
       "sourceKind": "prompt",
       "promptSha256": "24c6aa0bfcad75774e09a2778f8240d0b50973ead4aaf58c6f8004e5da2e96f2",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-kloss-xyz-15182a",
@@ -1465,10 +1518,11 @@
       "sourceKind": "prompt",
       "promptSha256": "aebbe45e903e96994b4bb9ab4cc3de1ffb0080438a89c39547487938ce0f6195",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-0xnfrith-5be616",
@@ -1491,10 +1545,11 @@
       "sourceKind": "prompt",
       "promptSha256": "5490cf6e08167a72cd4f610ac871dbfa7551789affa263d5d6d03a697e24cf94",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-math-files-39c9d0",
@@ -1518,10 +1573,11 @@
       "sourceKind": "prompt",
       "promptSha256": "9638fdaa78615a2db12f863236766c11eeb399a15468764e12ecde4717646b63",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-hanifproduktif-54bdee",
@@ -1545,10 +1601,11 @@
       "sourceKind": "prompt",
       "promptSha256": "13b2ad300f74b063754f11049a3427fadda9c58cafa8bcbc9e96b63b34190ea6",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-nikolajankovic-ce4ff4",
@@ -1572,10 +1629,11 @@
       "sourceKind": "prompt",
       "promptSha256": "93a0471303a9492b769b6e057882ba7733e6b59e62d95bad641ac6fefc94cfed",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ddryo-loos-300829",
@@ -1599,10 +1657,11 @@
       "sourceKind": "prompt",
       "promptSha256": "7d7f8dbba00d3d6b0b6b56014a7600ea1c1f2d7b80ddf1516c7cf118a234045f",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-eyishazyer-af035b",
@@ -1628,10 +1687,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-blue-clarity-ef56d0",
@@ -1655,10 +1715,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-roundtablespace-d3a1be",
@@ -1683,10 +1744,11 @@
       "sourceKind": "prompt",
       "promptSha256": "63b45a590da2db2a050cf4a4a668a473db8514d4d6415b95657c4359e4ef4ef5",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-1littlecoder-9fef89",
@@ -1710,10 +1772,11 @@
       "sourceKind": "prompt",
       "promptSha256": "7bd7ddf6ff03c0a36187b6a32b7e3f1c8bfbf3f7780526a48767873203810d54",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-sayan-shanky-f850d8",
@@ -1736,10 +1799,11 @@
       "sourceKind": "prompt",
       "promptSha256": "8b4d67b3800190d5e57958f9a2cbe13cb9bbf92eab3383e2f50a3b490cc49980",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-yunn260414-60d996",
@@ -1763,10 +1827,11 @@
       "sourceKind": "prompt",
       "promptSha256": "a1f773e3d0c57077251cd1128cf437656e10a7d512826d0b7d7f94ae6042c5e6",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-brainextends-e19ac3",
@@ -1790,10 +1855,11 @@
       "sourceKind": "prompt",
       "promptSha256": "ea2c862aff38c8dc3bdaf05c56ee2c42822ac1d86102a78086df8187ba0046bb",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-pankajkumar-dev-0bee87",
@@ -1818,10 +1884,11 @@
       "sourceKind": "prompt",
       "promptSha256": "377456abdd2323de281743bb9ea0d3efde800eb8c353dbdef3684ee39e7a6b93",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-sudo-kiran-b055de",
@@ -1845,10 +1912,11 @@
       "sourceKind": "prompt",
       "promptSha256": "606aaf72a3eaa3be256a9b41a43219ee2423d59cae31ea0cd8d2122b10de9aa1",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-raphaelaubryy-4b137e",
@@ -1872,10 +1940,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-jake11moran-a269c4",
@@ -1898,10 +1967,11 @@
       "sourceKind": "skill",
       "promptSha256": null,
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "skill-instructions"
     },
     {
       "id": "motion-arjunsh1607-93005d",
@@ -1925,10 +1995,11 @@
       "sourceKind": "prompt",
       "promptSha256": "644362b82821644cb5e13fcd82d2ee4567bcafbf66c359af5976222a2d3c687a",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-codestackr-c071bf",
@@ -1952,10 +2023,11 @@
       "sourceKind": "prompt",
       "promptSha256": "f510787da77b308adb20128291a8d7e2bb4e32422e5c275d38f2ece74ae20e63",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-hqmank-7c61f1",
@@ -1980,10 +2052,11 @@
       "sourceKind": "prompt",
       "promptSha256": "a51e0724654f36d03f00c0820c090b048be36af1f39622f57789ea6baa6cc070",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ratheejaisal-1f4538",
@@ -2007,10 +2080,11 @@
       "sourceKind": "prompt",
       "promptSha256": "a65463cfb7945cf6c44c08291c17ec34f51b9c243e1c4bb320bc228d14500150",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-tankazunori0914-0fc886",
@@ -2034,10 +2108,11 @@
       "sourceKind": "prompt",
       "promptSha256": "153c396d3ebd1665ca40432909546c0930f8cbcb7c6ec23f85edf305e50f4e04",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-prasad-pilla-2c0cba",
@@ -2061,10 +2136,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b1b0fcf063db2fb4eb75285e2fcbfc0d0e2ac978482dc24d4b7740d26ff2ee63",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-dale-vaz-cc612a",
@@ -2090,10 +2166,11 @@
       "sourceKind": "prompt",
       "promptSha256": "fc2ed324069315206837584534905d680ae610100d62b760d6faf70d952a4d61",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-sarut0bisasuke-cefa43",
@@ -2116,10 +2193,11 @@
       "sourceKind": "prompt",
       "promptSha256": "50986e7a7480e319182c9f7b539224c7faae059ac2867d98c0b9412e93920bf4",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-maxalexweber-67688b",
@@ -2143,10 +2221,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b20cb6b57728f743a4b7cdc7d5906e488d709c467499b6a40f8be48360e936cf",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ezshine-c90d73",
@@ -2170,10 +2249,11 @@
       "sourceKind": "prompt",
       "promptSha256": "1709ac09cfa0f5bb9f03f84b275340c70c79d33fb69e77a966b040b0128e13c5",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-samuel-spitz-974923",
@@ -2197,10 +2277,11 @@
       "sourceKind": "prompt",
       "promptSha256": "1dca5bb9bcca5d2648429a2edb4ae0ad43144c3a725954fb69995cf05065bc8a",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-tak3sh8-be5012",
@@ -2223,10 +2304,11 @@
       "sourceKind": "prompt",
       "promptSha256": "34157e0cbb591c397b924801179c7983056ab1fbd6bf0f7eefa3895cce62aa6a",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-hbcoop-de365c",
@@ -2250,10 +2332,11 @@
       "sourceKind": "prompt",
       "promptSha256": "4a7f05415457d22d09a9efd6fc36fd6bc26c100495bf630aed10e602fc32002c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-aistocksavvy-3fb9f5",
@@ -2277,10 +2360,11 @@
       "sourceKind": "prompt",
       "promptSha256": "52860a25c2c2022752f965c395546dc618c313f622dfa89f16e013fe0acad2de",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-techyoutbe-945b56",
@@ -2305,10 +2389,11 @@
       "sourceKind": "prompt",
       "promptSha256": "e29d7e00ddc912e849054630ef807184d4f83af05ac4dc26803f668c08d161ea",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-micheleharmonic-77628e",
@@ -2331,10 +2416,11 @@
       "sourceKind": "prompt",
       "promptSha256": "71f7400c46eda32623c251df8f8fc16791f64480d16618287f39875f2c1b6be1",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-lemomo-ai-0d9cff",
@@ -2358,10 +2444,11 @@
       "sourceKind": "prompt",
       "promptSha256": "39eac429984399906f7db33d0e004dca80cf062a8f661b31bec49c060d8f0ac3",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-triglyceee-bd5b08",
@@ -2385,10 +2472,11 @@
       "sourceKind": "prompt",
       "promptSha256": "c5ee6f0198f68a9eafc21c5d10a02039b1a147ee68e96e70a279645493ae37b2",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-zheke-38deff",
@@ -2412,10 +2500,11 @@
       "sourceKind": "prompt",
       "promptSha256": "605b0e4f49a2be084982cc146eb569fd99577b2a495d6800e4e16e4b10252996",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-deifosv-04e4d3",
@@ -2439,10 +2528,11 @@
       "sourceKind": "prompt",
       "promptSha256": "133ad5c056d43e3cd8b85388cc27ef5c93e3e156839c08ef09b038672a85d988",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-sudeepsd-1a3485",
@@ -2466,10 +2556,11 @@
       "sourceKind": "prompt",
       "promptSha256": "5c30d37dd46c671c6debdbb65f97223f1de61fff167c428bb5598f4d4a0289e5",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-visheshbaghell-3aba37",
@@ -2493,10 +2584,11 @@
       "sourceKind": "prompt",
       "promptSha256": "72f71d443ac8591dacbc0b4faef10812cd52994c41303059f69963f744e2b9e1",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-imthatcarlos-e04bfe",
@@ -2521,10 +2613,11 @@
       "sourceKind": "prompt",
       "promptSha256": "ded07a30d1d43fbf7a76ab82d8e1f6ce5e0bf990bddd0dab48c1e47d324c1a3e",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-paulo-kombucha-96431c",
@@ -2548,10 +2641,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b048901cb5579baed55f176004f0e5f59d0f626682f58de668ab8c73c3415f39",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-gigabit-million-16b3a0",
@@ -2574,10 +2668,11 @@
       "sourceKind": "prompt",
       "promptSha256": "544b2b8a3ff5e4168c5efc489d1e44d0433f7fbee4a779f82284fc24c42f6879",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-sudo-kiran-6609ed",
@@ -2601,10 +2696,11 @@
       "sourceKind": "prompt",
       "promptSha256": "c88754c5c31118a67cb10ca7c485fca3094a1456787f72632e8f781023f16417",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-demonugc-4c5753",
@@ -2628,10 +2724,11 @@
       "sourceKind": "prompt",
       "promptSha256": "85434958ccdc0c246f5b0b73a6977c6bede956be6e107d19c771285d0f4bf134",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-jhylee95-e1152f",
@@ -2656,10 +2753,11 @@
       "sourceKind": "prompt",
       "promptSha256": "d8ed350455f9f66b8dcbb50844608643fc2f359702d8f1b0eeefb6cb3e3f419c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-sachaarbonel-8f14f4",
@@ -2682,10 +2780,11 @@
       "sourceKind": "prompt",
       "promptSha256": "f105e450a691dd056df9bfca2fa4c195d3919fbf25f9d4a8d2fcd35ab5b56dd3",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-gdgtify-287ddf",
@@ -2708,10 +2807,11 @@
       "sourceKind": "prompt",
       "promptSha256": "bee3a9a688b7c4acb917a8098e68efb4843583e3e3df540b62f194469ea3d882",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ercankeskinx-ec2568",
@@ -2735,10 +2835,11 @@
       "sourceKind": "prompt",
       "promptSha256": "de324f31f0a76ed5476d054c9a59839b286d6fd791a25ab69718564f972e1eb5",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-influencer-seo-ce8c33",
@@ -2762,10 +2863,11 @@
       "sourceKind": "prompt",
       "promptSha256": "7b69abd1db92145400e1220313f05861a845a8790f12eed47e185dc1ad789f50",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-agonaliu-466a8f",
@@ -2789,10 +2891,11 @@
       "sourceKind": "prompt",
       "promptSha256": "e1c2e49c4a18b7969075722f871c3ee6f0c57f1f16e9cf1da76835b830054c95",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-daniel-haida-8691d4",
@@ -2816,10 +2919,11 @@
       "sourceKind": "prompt",
       "promptSha256": "8b80bfdb8d91c3f9eb1ad36519af0937c3f6a118de93bf28e7246617eec3d80a",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-bthreeagency-b9b8d9",
@@ -2844,10 +2948,11 @@
       "sourceKind": "prompt",
       "promptSha256": "d801603a8d27aabbe6a80545f3ff825d8fdddde72cedd0c37c8c9de1a61b284b",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-henkvaness-0e06af",
@@ -2870,10 +2975,11 @@
       "sourceKind": "prompt",
       "promptSha256": "c3fbced6f1fa555e357ec07e448c45efca4958ac46c7c84514ffad3dbfd26ff2",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ndhabarde11-f155b4",
@@ -2898,10 +3004,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b7b5bf5d69370ce9c417908ec4f173c4eb8a3f822487a1a74197a69e60c3a499",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-topi-003-9ca6b5",
@@ -2925,10 +3032,11 @@
       "sourceKind": "prompt",
       "promptSha256": "acb99c457c1ae0335dcce047eb83f8f8845caaab4945bde845dd0caad1d0b46a",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-rendesr-86be44",
@@ -2952,10 +3060,11 @@
       "sourceKind": "prompt",
       "promptSha256": "23a2dd84db9721f66b86b32a2d6ab9643c09643ec370fa1db0e02c9ad9f788a5",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-bogdandragomir-35e024",
@@ -2980,10 +3089,11 @@
       "sourceKind": "prompt",
       "promptSha256": "cb239411724d3c1f19ff12f84a20aeab327b9191fdd3f72c4c1e2505511acb94",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-en-ra-81c6dd",
@@ -3006,10 +3116,11 @@
       "sourceKind": "prompt",
       "promptSha256": "8c4da8bb59a7c54edc06f54be23e884ba22efb32b3e07a3edbc356c97e85611d",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-jesscaroline7-1ff7cb",
@@ -3035,10 +3146,11 @@
       "sourceKind": "prompt",
       "promptSha256": "93cbba5e01c29a8169c8dee723852d6736010c58f04e739e4c5bbe6d9828ab4a",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-theviableedge-9065be",
@@ -3062,10 +3174,11 @@
       "sourceKind": "prompt",
       "promptSha256": "148354f42c0ac285408d91a92871648b382d1e56780a7efd44c0fe1de78fd0f7",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-0xfemyn-e114d3",
@@ -3088,10 +3201,11 @@
       "sourceKind": "prompt",
       "promptSha256": "d72f27d2d91f78494663be567cfcac7390e2feba09057627f1b3903aa3e5cd3d",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-misbahsy-80eaec",
@@ -3116,10 +3230,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-reyzostyle-b55864",
@@ -3143,10 +3258,11 @@
       "sourceKind": "prompt",
       "promptSha256": "3fe537dc1faed950f271fa34584fb2882494fe61da5d80120eca581caba0cd1f",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-mdaman010-e7226a",
@@ -3169,10 +3285,11 @@
       "sourceKind": "prompt",
       "promptSha256": "0bd0e2c658d69654e51ce584d7b51c44006255eee95c0f6a9d7ad4b82e071124",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-motiondsgnr-9dcfa6",
@@ -3197,10 +3314,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b10fa25a346e86348ece8bdc5de4a8408fd3f86e86404828fa61e57c52df6dc2",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-astrodevil-3f2054",
@@ -3224,10 +3342,11 @@
       "sourceKind": "prompt",
       "promptSha256": "a3de70e339476878377fbc07e553d59d697a42cd1d68a7791cb1c7c2df9ac586",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-hoyoyoda-3a5c08",
@@ -3250,10 +3369,11 @@
       "sourceKind": "prompt",
       "promptSha256": "8b67684797af73f4df30add1eb447d8db026245cb37f8f06b8bc2bbe2c5aef46",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-macrohou-33959d",
@@ -3278,10 +3398,11 @@
       "sourceKind": "prompt",
       "promptSha256": "fcb2fee4a286be0fa3d2feaaceeffae0088edde62c96858dc471e308c1786903",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-madhav-xo-f97f20",
@@ -3306,10 +3427,11 @@
       "sourceKind": "prompt",
       "promptSha256": "1ef313f7535cd07ea4cb67070e1daf31d44f558acb89eb5d4597116e24bc3e3f",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-buildfastwithai-ed9447",
@@ -3332,10 +3454,11 @@
       "sourceKind": "prompt",
       "promptSha256": "eaddcf71852c18fd413c7e0083f77f82f4708d8c82a0cca8c2b1d4566dce9246",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-rames-jusso-589f80",
@@ -3359,10 +3482,11 @@
       "sourceKind": "prompt",
       "promptSha256": "05202d1f31b321010519c3f9e0365407b23ca13b65d06f5da40244c126e17de5",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-topi-003-b0e12c",
@@ -3387,10 +3511,11 @@
       "sourceKind": "prompt",
       "promptSha256": "413f9d2af3d6735684c851fc4ca6d8ba0993c0a8d4f10f7693b3d801a219fdc3",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ik-builds-b8bdcf",
@@ -3415,10 +3540,11 @@
       "sourceKind": "prompt",
       "promptSha256": "7f16614ae3863b6f02d9f62dd2a31604a253ef8410c98a3c87b8b876b5670db3",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-wani-shola-16ca7a",
@@ -3442,10 +3568,11 @@
       "sourceKind": "prompt",
       "promptSha256": "7f7a2995dd20705e3e134a11a07d551692d235fad24a9c832a81dfc25c13f311",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-manuelogomigo-f33ca9",
@@ -3469,10 +3596,11 @@
       "sourceKind": "prompt",
       "promptSha256": "2f2ab8226feb455d084dfd64f4d5634668df33aade7eb709cc02fcd3d1285e97",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-mrtanviir-132457",
@@ -3497,10 +3625,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-0xevinho-3777d8",
@@ -3523,10 +3652,11 @@
       "sourceKind": "prompt",
       "promptSha256": "1fc62db506749db63276d1d45709585688abd67f34852d6a15e896c1cac81ed0",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-chrisjdimarco-f068db",
@@ -3550,10 +3680,11 @@
       "sourceKind": "prompt",
       "promptSha256": "f5c94b9784cf90fb983c07d445486911eb73e11eee68ef08004525b433168c03",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-jayscambler-3f8889",
@@ -3577,10 +3708,11 @@
       "sourceKind": "prompt",
       "promptSha256": "f800af6fdb9857f2322d89489666323f66d7e808a9fffd0e37620bbf6695b17f",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-utopyaszx-1b2f94",
@@ -3605,10 +3737,11 @@
       "sourceKind": "prompt",
       "promptSha256": "9ba1891c07e762cf8adb0ca4cf7a0ae0f5789fe6d6ce9ee34723b5605eab6add",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-aschapmann-131210",
@@ -3632,10 +3765,11 @@
       "sourceKind": "prompt",
       "promptSha256": "a91597a4deeff574eaf983c028d0a4aa80d746de69ec446ec2df68ce0612ab58",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-marklaunches-3b9492",
@@ -3658,10 +3792,11 @@
       "sourceKind": "prompt",
       "promptSha256": "e9cc14dbe8e06440f110b25217c7ffd85a1303ac30a45108f42165df7cf49d7e",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-web3wesley-7bb108",
@@ -3685,10 +3820,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-reflex-cloud-72ffe5",
@@ -3712,10 +3848,11 @@
       "sourceKind": "prompt",
       "promptSha256": "adbe6cb0967445104443f07dc315d8f995136163f046bf335d6ea296c88817be",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-1stnoel-c20a89",
@@ -3739,10 +3876,11 @@
       "sourceKind": "prompt",
       "promptSha256": "c69cee04600bc5f1e6686ccca56ecd1dcf20057363005223630b5c3e6c3cf1a4",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ryzoft-4f85bd",
@@ -3765,10 +3903,11 @@
       "sourceKind": "prompt",
       "promptSha256": "0c5cd90ce0f8882f4e665cfba6de35caa5eb3c9a657c9cd6db14721f7549f37c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-kamstudiolabs-c9bb28",
@@ -3792,10 +3931,11 @@
       "sourceKind": "prompt",
       "promptSha256": "967227b0f847220fd9339e92b62fbde24591c3b10fcd5476cce94fae1576c74b",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-devius-maximus-beab45",
@@ -3821,10 +3961,11 @@
       "sourceKind": "prompt",
       "promptSha256": "56dd38acd354228866486f5a6aac41b70ade95a903b6c2ba40666e1b1ba25ef1",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-elliot-garreffa-f334bc",
@@ -3847,10 +3988,11 @@
       "sourceKind": "prompt",
       "promptSha256": "72a0612af393604ae3b1c3608a26ea1a5cecd8ac4f1b7f6aba6f53c1e2618216",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-adamdesgns-478d6d",
@@ -3875,10 +4017,11 @@
       "sourceKind": "prompt",
       "promptSha256": "c5afb926986926f2460c55340a271c49a7c20b304fba08b58868aeacb6d0b113",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-andginja-333d32",
@@ -3902,10 +4045,11 @@
       "sourceKind": "prompt",
       "promptSha256": "84430ca1e3750f02da011c32518f74629a8c78e85fe71fc8c4a0de48219befd3",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-l3d1c-0e35a3",
@@ -3929,10 +4073,11 @@
       "sourceKind": "prompt",
       "promptSha256": "f6b7924d8359243c9608a907ab1d6ea1d8587deced98eb709735ced018b7ca30",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-wozu-co-242285",
@@ -3955,10 +4100,11 @@
       "sourceKind": "prompt",
       "promptSha256": "e6a08dedad366c9e77038a476acc46466ea9b20b9e590c0d244050c95e1beb4a",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-buildfastwithai-53234e",
@@ -3981,10 +4127,11 @@
       "sourceKind": "prompt",
       "promptSha256": "612a39c2e58232384c0f1887ba5e97cb13973f100c1bfd728c257e25186d6f0a",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-allforbigfire-86ff3c",
@@ -4007,10 +4154,11 @@
       "sourceKind": "prompt",
       "promptSha256": "6ddef160c8a4d24098d3ad30da4e9de27f25b3de668680d6d0405ec452897803",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-tstfully-0aa6b4",
@@ -4034,10 +4182,11 @@
       "sourceKind": "prompt",
       "promptSha256": "0663d6b321b03fa8d085a153eb9562fc354107918721507ffb32319822c7005f",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-bizibeast-10f264",
@@ -4061,10 +4210,11 @@
       "sourceKind": "prompt",
       "promptSha256": "dfb11817ba4cd96171be9ec1a01712cce6d3dac97c412d586d29c7fe3b4e5ff3",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-heyiammallik-e72d17",
@@ -4089,10 +4239,11 @@
       "sourceKind": "prompt",
       "promptSha256": "770445570030a1187f2e77d03e2a11eedbb29f58593f65bef1094043e83ed2d9",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-sudiyasa-f48ac9",
@@ -4117,10 +4268,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b36f2ac192cf5f3e6a1e2162e7d4569ef59e4db265df0f980b4f3f0ddb50cbdc",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-davidshulmanfl-371638",
@@ -4144,10 +4296,11 @@
       "sourceKind": "prompt",
       "promptSha256": "015556543999f6e72ef7bb2f784fcd6cf4992552bb94fb91a3b0d25d6a0d08c9",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-demitiyageekzen-7770ad",
@@ -4168,10 +4321,11 @@
       "sourceKind": "prompt",
       "promptSha256": "489690c27fe69be19ca523699dd6c7b1a330c7b5a8b064c8a3c81fdccd32f43f",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-faroukzy-9ff23e",
@@ -4194,10 +4348,11 @@
       "sourceKind": "prompt",
       "promptSha256": "904668b5d0fc36435e444582cc08096b83c70a9283658703d64448f6e4f6d872",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-m1n9-k7-ff9ab9",
@@ -4222,10 +4377,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b877dbfab23d65d772ace22c81cf885730dad86aadc9a46c0c05c8b42321e350",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-quickdesignio-dd93d0",
@@ -4250,10 +4406,11 @@
       "sourceKind": "prompt",
       "promptSha256": "a8434d6daba3ead702dfc83ed819450e3cf9e12dc456cfeee40acae98d9b5d86",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-rebutonepress-810f78",
@@ -4274,10 +4431,11 @@
       "sourceKind": "prompt",
       "promptSha256": "d1d90efdf3cc8778031b1fa1b96dac9e2c7144e05f66c02ae8425e9db5ec9575",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-slvdev-64c45a",
@@ -4302,10 +4460,11 @@
       "sourceKind": "prompt",
       "promptSha256": "41640b0155139f2b2ddde3477355b28f0612cdd5e3973663b2696e1fd1b0a44d",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-sudo-kiran-4f8b59",
@@ -4328,10 +4487,11 @@
       "sourceKind": "prompt",
       "promptSha256": "ceb9e07c58f0ddde6ef25d370633ffd4afa1542ed4925bddc59177bc52630ebd",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-xelandre-363f00",
@@ -4354,10 +4514,11 @@
       "sourceKind": "prompt",
       "promptSha256": "4a0e1bf932053a9dd2205cd5d8fc0c617e9623635fcf6fc3d48dbd3656495a34",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-justincooperman-e7bbc4",
@@ -4381,10 +4542,11 @@
       "sourceKind": "prompt",
       "promptSha256": "425bb32972f5362a34794b7a09af3a95792f6fe8b0430871e934405c1da94606",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-henkpoley-3d3407",
@@ -4407,10 +4569,11 @@
       "sourceKind": "prompt",
       "promptSha256": "7bb24e22c9b702bbf46cf6745d8c8e1154e2757527530f32c7e6f86ea94eff48",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-fractadev-149adc",
@@ -4434,10 +4597,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b62f513bbeabc875d47ea9d1d640ffb0c2cf8d476a0f8d8e0e074709293a4f7f",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-gautam-mer1-2ae354",
@@ -4462,10 +4626,11 @@
       "sourceKind": "prompt",
       "promptSha256": "610a27c255160b761962ee6dbee3fb2354b5f5c39eff212d6dd56748aa9f94ad",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-levabashidze-2d713a",
@@ -4489,10 +4654,11 @@
       "sourceKind": "prompt",
       "promptSha256": "72a81b40cd9315a5a2817dbc04d37ca6f671cee065b97f65b4fb413a92bdb292",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-miskinho-443898",
@@ -4516,10 +4682,11 @@
       "sourceKind": "prompt",
       "promptSha256": "966c092acf538cd85b31bc24b185663569a3e17db7faa78a590d5f9eb3ad76ac",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-zaqailo-212ad3",
@@ -4545,10 +4712,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-crazyalphaaa-bc7e75",
@@ -4572,10 +4740,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-fionntobin-97b7af",
@@ -4600,10 +4769,11 @@
       "sourceKind": "prompt",
       "promptSha256": "ff52c37afd8fbd506c08e220328075bbb3604da30ac0e60ffad1f9f3a3fcf540",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-francoxavier33-d2dfd2",
@@ -4628,10 +4798,11 @@
       "sourceKind": "prompt",
       "promptSha256": "5b5750f844a8b5f8a6cfc27fa36c35f2f9232ba48def1f0ebb2e7f529cef2338",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-itsuki-dev-10942d",
@@ -4656,10 +4827,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-kangaroohere-b10f8d",
@@ -4685,10 +4857,11 @@
       "sourceKind": "prompt",
       "promptSha256": "090ef6574129102ef10b07fd45c5d11ffcfa93a281981287b61b3c1b8875fc04",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-kyonax-on-tech-aabc1d",
@@ -4712,10 +4885,11 @@
       "sourceKind": "prompt",
       "promptSha256": "db2948125d361ef577c2c49075a8d1e1b9cc8220439f4763cdbb7adb6fe4bd16",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-loicrambo-ad6830",
@@ -4738,10 +4912,11 @@
       "sourceKind": "prompt",
       "promptSha256": "521b90c53c9401f506e5d88527d3d59d73f0131425ef1cbaf22a43b96cf2548a",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-madebyjmayala-b9204d",
@@ -4764,10 +4939,11 @@
       "sourceKind": "prompt",
       "promptSha256": "92e55180307e6d2448d52db51a8717323bd84ddad52ad6028eca23b509f24e45",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-tolgayhickiran-e90799",
@@ -4793,10 +4969,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-antonio-kodheli-490109",
@@ -4820,10 +4997,11 @@
       "sourceKind": "prompt",
       "promptSha256": "8c2b3d1b30b1bd9c78734436bd30bb9d26c837932c0aa99e8d2b3f6eb8448c76",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-oliahmed205-3e31c4",
@@ -4847,10 +5025,11 @@
       "sourceKind": "prompt",
       "promptSha256": "ed370f81b24e7a63ac9800e53c2ad5b19655cfae614ac02e754031e0e3a57ad1",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-aisongman-71ffac",
@@ -4873,10 +5052,11 @@
       "sourceKind": "prompt",
       "promptSha256": "27ee54955bfeb127cb084975f210cc78f5f8af8e0af27885d62b3271728043ae",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-danilowm-d3720d",
@@ -4901,10 +5081,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b3e3a9c3062389404ff8d9c6d6c3bca2d38f0058c05e5c2cbe4a4f833791592b",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-kmasiff-cc72cb",
@@ -4927,10 +5108,11 @@
       "sourceKind": "prompt",
       "promptSha256": "f9ba83ffca2fe29df23183671ce114a1285f74775cc5cc626b9af2814b0908ee",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-pluginplay-3d4006",
@@ -4954,10 +5136,11 @@
       "sourceKind": "prompt",
       "promptSha256": "a3facd57746a247f81033e2fa5cb6e75e1f3431af68cbc6585a91f7d91260479",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-rammanq-f5a90f",
@@ -4982,10 +5165,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b8de7a133a35c5535b13d64b9eaf8549303922f24ee2407f377e52e7abead478",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-robvjourney-ce3e1a",
@@ -5010,10 +5194,11 @@
       "sourceKind": "prompt",
       "promptSha256": "649e5fce3a598c8fb0442ae0b61e0022bdef85935cb43839162c34e644128568",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-vanshwtfff-db0466",
@@ -5038,10 +5223,11 @@
       "sourceKind": "prompt",
       "promptSha256": "e9eb2da3c3cd4d649fcee43a52976b2d28ba3f72dcced5813e9b9a613357f5d5",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-3xtihor-0f6911",
@@ -5067,10 +5253,11 @@
       "sourceKind": "prompt",
       "promptSha256": "d81272e4d265e5038a49d215f19ec4cc3b64591f1beeab279209ba79da761e53",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-amol909s-27533e",
@@ -5095,10 +5282,11 @@
       "sourceKind": "prompt",
       "promptSha256": "daad703e1405862fb4016a7f2c6261ae1197efd4db68807bc636033ed7f0fa0e",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-cansincengiz-me-cf68dd",
@@ -5121,10 +5309,11 @@
       "sourceKind": "prompt",
       "promptSha256": "5283590fb33ea7506ebe53e3dc0e9aa84e1ea38330289db72758a02d187ebd42",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ghinaiya-nirmal-5d8fec",
@@ -5149,10 +5338,11 @@
       "sourceKind": "prompt",
       "promptSha256": "6811d65dd80e5aa9c750337e0abc0899dd1b2827de16fef8cbf97d8e3f7e14d3",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-johnsavage-ai-b091c0",
@@ -5176,10 +5366,11 @@
       "sourceKind": "prompt",
       "promptSha256": "ac4ee14706de8cd728c6267eaeab4f6eee8921f72e58ac0854cceaeeb68c7a65",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-leonkohli-6dc01b",
@@ -5203,10 +5394,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-marouanegazouzi-6071d5",
@@ -5232,10 +5424,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-mehul4795-4a7007",
@@ -5258,10 +5451,11 @@
       "sourceKind": "prompt",
       "promptSha256": "1c6a73f3ccebd4cf43c5fc25cb1e829dd4ab5b981b2392a1d7d999f31a9be4df",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-safarkhanshuvo-ffd52d",
@@ -5286,10 +5480,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b877dbfab23d65d772ace22c81cf885730dad86aadc9a46c0c05c8b42321e350",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-sahildesigner23-ee3155",
@@ -5314,10 +5509,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-abderrahmen-g-9e8ed0",
@@ -5340,10 +5536,11 @@
       "sourceKind": "prompt",
       "promptSha256": "3c9a7a50e7d62c4cd0d9c2a2f6c3343f8842ba9a905d0185d585e7113ff658b0",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-palashbagchi11-0a4b6b",
@@ -5367,10 +5564,11 @@
       "sourceKind": "prompt",
       "promptSha256": "f063555ddcf3206d6cce9c8b720ba623e26e71195409a601d92f2f0a49fab7e3",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-x4b47x-9cc84f",
@@ -5393,10 +5591,11 @@
       "sourceKind": "prompt",
       "promptSha256": "aedabc1258691d10898eeb8a3ac76e06ea0f88ce907d18d7a228238262cdc959",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-kamstudiolabs-447565",
@@ -5420,10 +5619,11 @@
       "sourceKind": "prompt",
       "promptSha256": "de2f31e6c14641404fa9b7fd878920f99ffb741c5fb82bd1971c6508ca51b009",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-grace-sunnyy-29bc61",
@@ -5448,10 +5648,11 @@
       "sourceKind": "prompt",
       "promptSha256": "97aa2bc337c109190a6bb860ee6fa3b2077dc371ef32f8c41bd83f926daa885d",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-blueoctopusai-dd17bd",
@@ -5474,10 +5675,11 @@
       "sourceKind": "prompt",
       "promptSha256": "726701cd4f4bc322ca36188338bcfdceff5115e007e1d9c7ccf51c2249f4509f",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-apoorvjain25-d24184",
@@ -5501,10 +5703,11 @@
       "sourceKind": "prompt",
       "promptSha256": "a507a7d4f69f60031a2907522b42385e9cbcaa4c5502743ab5d861cd9c139030",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-deebeeeff-50fcd0",
@@ -5527,10 +5730,11 @@
       "sourceKind": "prompt",
       "promptSha256": "4fc484052396d3503a97ebea0c4de9b6877e93163e1a341bd4904c0fea29b6fd",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-listudio-820c7b",
@@ -5554,10 +5758,11 @@
       "sourceKind": "prompt",
       "promptSha256": "da41a1a12294ba11ed07762ae15f53fde07b7cfbc2847a82e37fc561496b96a7",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-thilina-a-891c09",
@@ -5582,10 +5787,11 @@
       "sourceKind": "prompt",
       "promptSha256": "254a18f0dce25047e79fa90cf7a2a0dc0f2c95d4e9d8a21546ef3359fd79ae3c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-amitsingha89-150378",
@@ -5609,10 +5815,11 @@
       "sourceKind": "prompt",
       "promptSha256": "76df3ddef561a8c86441bd39ace31e71e3e23516da691f53267f6540066bc765",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-blushpetal795-0c85c2",
@@ -5637,10 +5844,11 @@
       "sourceKind": "prompt",
       "promptSha256": "cbce3b0f0ef273ea4a173cb9b256cf23242f1d40c17fd05c4746c03a6101a77f",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ceowinkz-7c776b",
@@ -5664,10 +5872,11 @@
       "sourceKind": "prompt",
       "promptSha256": "d1d7a44f48f081199661244a41eaf274b66a531958a0922251158e3755dddb79",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ibrahimwasim240-809370",
@@ -5692,10 +5901,11 @@
       "sourceKind": "prompt",
       "promptSha256": "957575c23ddd3d62125853fe1d22e52eada3a6d8da968d90f770ed11b6d16fbf",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-jazzen-chen-4542ae",
@@ -5719,10 +5929,11 @@
       "sourceKind": "prompt",
       "promptSha256": "d6741eacce34c460b4a530e2431ffecf9bdbca682232e0a647b7e853fb63200e",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-lester-tyy-f897f7",
@@ -5746,10 +5957,11 @@
       "sourceKind": "prompt",
       "promptSha256": "38e39075bf7ef53b44399fdb45b3848638a5526f90109184dca06237a7be89c7",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-majorbaguette-fb11d7",
@@ -5772,10 +5984,11 @@
       "sourceKind": "prompt",
       "promptSha256": "6a4c04c3887819823ae3d31512c956f6cc82c47e06665499db6e503afa914769",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-nolkeeg-bf062e",
@@ -5799,10 +6012,11 @@
       "sourceKind": "prompt",
       "promptSha256": "dddd9d716a1b23ef650d1c10a60f67a75e47d1cad934031aea66289d484e1952",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-souravbhar871-61f424",
@@ -5825,10 +6039,11 @@
       "sourceKind": "prompt",
       "promptSha256": "7bd7ddf6ff03c0a36187b6a32b7e3f1c8bfbf3f7780526a48767873203810d54",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-spearwtf-3c1fd1",
@@ -5851,10 +6066,11 @@
       "sourceKind": "prompt",
       "promptSha256": "d2fe4b05d5c74731872d464cd3076e08d26cce01aacb954a57b98624feaa82ae",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-teslachartz-c58b32",
@@ -5879,10 +6095,11 @@
       "sourceKind": "prompt",
       "promptSha256": "b877dbfab23d65d772ace22c81cf885730dad86aadc9a46c0c05c8b42321e350",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-ai-baymax-0ef9dd",
@@ -5905,10 +6122,11 @@
       "sourceKind": "prompt",
       "promptSha256": "1a6d7817feb4c1d4e2a51e11bc9851fc77b2f222df0ec17245595c057bceed0d",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-anas0ra-e57aea",
@@ -5931,10 +6149,11 @@
       "sourceKind": "prompt",
       "promptSha256": "d69670357f71a16a090dd35c7d5e6edcfbc19edbbb432f1eae18ea6283b9e6ab",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-iammxfschr-d68f90",
@@ -5958,10 +6177,11 @@
       "sourceKind": "prompt",
       "promptSha256": "32d352fb7d07699b0fc56b68e6cc0deac7f527a9a8f0c1381437f855ade206ef",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-kikelopezdesign-7cc9e8",
@@ -5985,10 +6205,11 @@
       "sourceKind": "prompt",
       "promptSha256": "f90c9d08e77b73abc9808b9904b6d98b6b9025c5109b7cd7553f29b90f510377",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-leadnotifi-e83f94",
@@ -6013,10 +6234,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-rneayan-474bcf",
@@ -6040,10 +6262,11 @@
       "sourceKind": "prompt",
       "promptSha256": "8de7938020b0f65ef1aaa66dce5744d261dee5d9b1717e16a4a493fffbdbbbbb",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-rneayan-ea6129",
@@ -6067,10 +6290,11 @@
       "sourceKind": "prompt",
       "promptSha256": "0de5f93bd9ca02cac1df0a0286f5244410fb6cc8e6b70dda7f1e4cc808f45251",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-samaote-5e2fc2",
@@ -6094,10 +6318,11 @@
       "sourceKind": "prompt",
       "promptSha256": "4759ebc61f72ca94f112faad73c26ce53ef8ea8795967e275294daa62c9fe96c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-shinskinakamoto-20190b",
@@ -6122,10 +6347,11 @@
       "sourceKind": "prompt",
       "promptSha256": "ba0b26946e872531f8be546d5622a1e1a7ace67bd660d257a6e53abbd7fc6fa9",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-umangratani-57f86a",
@@ -6150,10 +6376,11 @@
       "sourceKind": "prompt",
       "promptSha256": "037a3e48d03f3f3c28d160383edf98b33dae8babbfb5ae30d95ae3c2e802058c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-anilraok-eff262",
@@ -6176,10 +6403,11 @@
       "sourceKind": "prompt",
       "promptSha256": "c952f934abdb9889d4e8a1b761c351ce91feb4c107919aa760760e652409a74c",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-kantamk-61f410",
@@ -6203,10 +6431,11 @@
       "sourceKind": "prompt",
       "promptSha256": "7924109adda0f7a5ca918187817b53cc4d96a862f8faa7f1389ba23eb0649deb",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-parkerrex-1a54fe",
@@ -6230,10 +6459,11 @@
       "sourceKind": "prompt",
       "promptSha256": "ac9bd5b367baebc6fc2f6e6ffad4b34856e932bcb991839d15e18b4a73bcc53d",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-charlesmendez-73b6e4",
@@ -6258,10 +6488,11 @@
       "sourceKind": "prompt",
       "promptSha256": "3bcb6533d0e62e472d6bcfb680930b56b4abe3695db055e88eecfe99d065d16f",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-gonzalomacagno-2de1a9",
@@ -6284,10 +6515,11 @@
       "sourceKind": "prompt",
       "promptSha256": "66609e3599c1c68791788d9f97a3078bf733dbb19873aaed245f26032e7d3fe3",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     },
     {
       "id": "motion-kamstudiolabs-0b0824",
@@ -6310,10 +6542,11 @@
       "sourceKind": "prompt",
       "promptSha256": "69037f0b6a899d3923b0001ce31d9aa0af50f6004b70b711222ca37978c60f74",
       "access": "paid",
-      "checkout": "unavailable",
-      "status": "source-preview",
+      "checkout": "release-gated",
+      "status": "text-delivery",
       "reproductionStatus": "not-verified",
-      "version": "2.0.0"
+      "version": "3.0.0",
+      "deliveryKind": "prompt"
     }
   ]
 }

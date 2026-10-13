@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Download, CreditCard, RefreshCw } from 'lucide-react'
+import { Download, CreditCard, RefreshCw, ArrowUpRight } from 'lucide-react'
 import Link from '@/components/crawl-link'
 import type { Locale } from '@/lib/i18n/config'
 import { studioPrice } from '@/lib/studio/catalog'
@@ -12,7 +12,7 @@ import styles from './payments.module.css'
 interface Library {
   configured: boolean
   billing: boolean
-  packages: { slug: string; name: string; version: string; path: string }[]
+  packages: { slug: string; name: string; version: string; path: string; kind: string }[]
   orders: { id: string; name: string; slug: string | null; plan: string; amount: number; status: string; createdAt: string }[]
   membership: { until: string; cancelAtPeriodEnd: boolean } | null
   next: string | null
@@ -51,7 +51,7 @@ export function PurchasesLibrary({ locale, checkout }: { locale: Locale; checkou
     : { pending: 'Awaiting payment / confirmation', paid: 'Paid', expired: 'Closed', failed: 'Payment failed', refunded: 'Refunded', disputed: 'Payment disputed' }
   return <div className={styles.library} data-purchases-library>
     <div className={styles.toolbar}>
-      <p className={styles.note}>{zh ? '付款确认后，Skill 包会出现在这里。' : 'Your Skill packages appear here after payment is confirmed.'}</p>
+      <p className={styles.note}>{zh ? '付款确认后，可在这里打开提示词或下载 Skill。' : 'Read your prompts and download Skills here after payment is confirmed.'}</p>
       <button className={styles.secondary} disabled={Boolean(busy)} onClick={async () => { setBusy('refresh'); try { await load() } catch { setError('temporarily_unavailable') } finally { setBusy('') } }}><RefreshCw size={15} aria-hidden="true" />{zh ? '刷新状态' : 'Refresh'}</button>
     </div>
     {error && <p role="alert" className={styles.error}>{paymentMessage(error, locale)}</p>}
@@ -62,10 +62,11 @@ export function PurchasesLibrary({ locale, checkout }: { locale: Locale; checkou
       {library.membership && <div className={styles.notice}><strong>Pro {zh ? '会员' : 'membership'}</strong><p>{zh ? '有效期至' : 'Access until'} {date(library.membership.until)} · {library.membership.cancelAtPeriodEnd ? (zh ? '已取消自动续费' : 'Renewal canceled') : (zh ? '自动续费' : 'Renews automatically')}</p></div>}
       {library.billing && <div><button className={styles.secondary} disabled={Boolean(busy)} onClick={() => act('portal')}><CreditCard size={16} aria-hidden="true" />{zh ? '管理订阅与账单' : 'Manage subscription & billing'}</button></div>}
       <section className={styles.section}>
-        <h2 className={styles.heading}>{zh ? '可下载的 Skill' : 'Your Skill downloads'}</h2>
+        <h2 className={styles.heading}>{zh ? '已解锁的内容' : 'Your unlocked content'}</h2>
         {library.packages.length ? <div className={styles.packages}>{library.packages.map(item => <article key={item.slug} className={styles.package}>
-          <div><Link href={locale === 'zh' ? `/zh${item.path}` : item.path}><h3>{item.name}</h3></Link><small>v{item.version} · ZIP</small></div>
-          <button className={styles.primary} disabled={Boolean(busy)} onClick={() => act('download', item.slug)}><Download size={16} aria-hidden="true" />{busy === item.slug ? (zh ? '正在准备…' : 'Preparing…') : (zh ? '下载 ZIP' : 'Download ZIP')}</button>
+          <div><Link href={locale === 'zh' ? `/zh${item.path}` : item.path}><h3>{item.name}</h3></Link><small>v{item.version} · {item.kind === 'package' ? 'ZIP' : item.kind === 'skill-instructions' ? 'SKILL.md · TXT' : 'Prompt · TXT'}</small></div>
+          {item.kind !== 'package' && <Link className={styles.primary} href={locale === 'zh' ? `/zh${item.path}` : item.path}>{zh ? '查看与复制' : 'Read & copy'}<ArrowUpRight size={16} aria-hidden="true" /></Link>}
+          <button className={item.kind === 'package' ? styles.primary : styles.secondary} disabled={Boolean(busy)} onClick={() => act('download', item.slug)}><Download size={16} aria-hidden="true" />{busy === item.slug ? (zh ? '正在准备…' : 'Preparing…') : `${zh ? '下载' : 'Download'} ${item.kind === 'package' ? 'ZIP' : 'TXT'}`}</button>
         </article>)}</div> : <div className={styles.empty}><p>{zh ? '这里还没有可下载的 Skill。' : 'No Skill downloads on this page yet.'}</p><Link className={styles.link} href={locale === 'zh' ? '/zh/skills?access=paid' : '/skills?access=paid'}>{zh ? '浏览付费 Skill' : 'Browse paid Skills'}</Link></div>}
       </section>
       <section className={styles.section}>

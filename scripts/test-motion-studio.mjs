@@ -39,8 +39,10 @@ assert.equal(MOTION_ENTRIES[1].videoUrl,'https://media.prompt-motion.com/twoclip
 assert.equal(MOTION_ENTRIES[2].videoUrl,'https://media.prompt-motion.com/shneural-after-opus-5-5-it/video.2ab38476.mp4')
 for(const entry of MOTION_ENTRIES){
  assert.equal(entry.access,'paid')
- assert.equal(entry.status,'source-preview')
- assert.equal(entry.checkout,'unavailable')
+ assert.equal(entry.status,'text-delivery')
+ assert.equal(entry.checkout,'release-gated')
+ assert.equal(entry.deliveryKind,entry.sourceKind==='prompt'?'prompt':'skill-instructions')
+ for(const field of ['prompt','promptText','text','body','instructions']) assert.ok(!Object.hasOwn(entry,field), 'Paid text never ships in public catalog')
  assert.equal(entry.reproductionStatus,'not-verified')
  assert.ok(entry.width>0&&entry.height>0)
  assert.ok(entry.sourceAuthor&&entry.sourceCreatorName)

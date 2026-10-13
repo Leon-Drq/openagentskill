@@ -48,8 +48,8 @@ await Promise.all(Array.from({ length: 4 }, async () => {
       sourceRepo: entry.sourceRepo, tags: entry.tags, videoUrl, posterUrl,
       width: Number(attr(video, 'width')), height: Number(attr(video, 'height')),
       sourcePublishedAt: schema.uploadDate, sourceKind: promptText ? 'prompt' : 'skill',
-      promptSha256, access: 'paid', checkout: 'unavailable',
-      status: 'source-preview', reproductionStatus: 'not-verified', version: '2.0.0',
+      promptSha256, access: 'paid', checkout: 'release-gated',
+      status: 'text-delivery', deliveryKind: promptText ? 'prompt' : 'skill-instructions', reproductionStatus: 'not-verified', version: '3.0.0',
     }
     assert.ok(record.width > 0 && record.height > 0)
     assert.ok(record.sourceKind === 'prompt' || record.sourceRepo, entry.id)
@@ -59,5 +59,5 @@ await Promise.all(Array.from({ length: 4 }, async () => {
 }))
 sourceRecords.sort((a,b) => a.number - b.number)
 assert.equal(sourceRecords.length, 233)
-await writeFile(path, JSON.stringify({ version: '2.0.0', capturedAt: new Date().toISOString(), sourceCount: sourceRecords.length, entries: sourceRecords }, null, 2)+'\n')
+await writeFile(path, JSON.stringify({ version: '3.0.0', capturedAt: new Date().toISOString(), sourceCount: sourceRecords.length, entries: sourceRecords }, null, 2)+'\n')
 console.log(`Matched ${sourceRecords.length} original videos and posters; ${sourceRecords.filter(e=>e.sourceKind==='prompt').length} prompt references, ${sourceRecords.filter(e=>e.sourceKind==='skill').length} Skill references.`)

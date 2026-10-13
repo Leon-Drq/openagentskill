@@ -7,11 +7,11 @@ const en = {
   source: 'Original creator & source',
   sourceLead: 'The video and source prompt belong to the credited creator. This preview is the reference for the paid Skill; it is not presented as a verified Skill-generated result.',
   reference: 'View original case', repository: 'Original Skill repository',
-  includes: 'Skill production requirements',
-  deliverables: ['Follow the exact original case and its published prompt or Skill.', 'Preserve its composition, typography, colours, transitions and timing.', 'Compare the rendered result with the original before accepting delivery.'],
-  access: 'Paid Skill', accessBody: 'Listed in the paid collection. Delivery must match the original reference. Reproduction and verification are not completed; checkout and package delivery are not yet open.',
-  accessDisabled: 'Paid delivery not yet available',
-  reproduction: 'Delivery in preparation',
+  includes: 'Text delivery',
+  deliverables: ['Read the complete original prompt or Skill instructions.', 'Copy the text into your AI tool.', 'Download a text copy from My purchases.'],
+  access: 'Paid Skill', accessBody: 'Purchase this item or join Pro to unlock its original text instructions. The creator’s original video remains available as a preview.',
+  accessDisabled: 'Sign in and purchase to unlock',
+  reproduction: 'Unlock & copy instructions',
 }
 export type MotionCopy = typeof en
 const zh: MotionCopy = {
@@ -22,10 +22,10 @@ const zh: MotionCopy = {
   source: '原作者与来源',
   sourceLead: '视频和原始提示词属于署名作者。此处展示付费 Skill 的制作参考，不将原片标为已验证的 Skill 生成结果。',
   reference: '查看原始案例', repository: '原作者的 Skill 仓库',
-  includes: 'Skill 制作要求',
-  deliverables: ['严格对照这一条原始案例及其公开提示词或 Skill。', '保留原片构图、字体、配色、转场与时间节奏。', '生成结果须与原片对照核验后，才能作为交付。'],
-  access: '付费 Skill', accessBody: '已归入付费目录，以原片效果作为交付标准。复现与核验尚未完成，购买与完整包交付暂未开放。',
-  accessDisabled: '付费交付暂未开放',
-  reproduction: '交付待完成',
+  includes: '文字交付',
+  deliverables: ['阅读完整原始提示词或 Skill 指令。', '一键复制到你的 AI 工具。', '在「我的购买」中下载文本副本。'],
+  access: '付费 Skill', accessBody: '单独购买或开通 Pro，解锁本项原始文字指令。原作者视频继续作为预览展示。',
+  accessDisabled: '登录并购买后解锁',
+  reproduction: '付费解锁 · 一键复制',
 }
 export const motionCopy = (locale: MotionLocale): MotionCopy => locale === 'zh' ? zh : en
