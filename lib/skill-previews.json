@@ -397,5 +397,67 @@
         }
       }
     ]
+  },
+  {
+    "skillSlug": "threerocks-sweety-handdraw-video-sweety-handdraw-video",
+    "repository": "threerocks/sweety-handdraw-video",
+    "revision": "5206ec0d17f9b353e400b64b9c51ad69e721e02a",
+    "sourceUrl": "https://github.com/threerocks/sweety-handdraw-video/blob/5206ec0d17f9b353e400b64b9c51ad69e721e02a/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/threerocks-sweety-handdraw-video-sweety-handdraw-video/LICENSE-c56704c3fd6b.txt",
+    "format": {
+      "en": "Narrated hand-drawn video · MP4",
+      "zh": "手绘讲解有声样片 · MP4"
+    },
+    "note": {
+      "en": "Two complete Chinese-language examples published by threerocks (@leo_xiaolei): a 49-second snake fable and a 1-minute-52-second wolf story. Original subtitles, audio and author watermarks are preserved. Creating new videos requires an agent with image generation, Python, FFmpeg and a working narration setup; the bundled VoxCPM2 adapter targets Apple Silicon/MLX. Model and compute costs are separate. OpenAgentSkill has not independently reproduced these results.",
+      "zh": "两段完整中文样片由 threerocks（@leo_xiaolei）发布：《那条死于愤怒的蛇》约 49 秒，《快乐囚禁你的方式》约 1 分 52 秒。保留原片字幕、声音与作者水印。制作新视频需要具备生图能力的 Agent、Python、FFmpeg 和可用配音环境；内置 VoxCPM2 适配器面向 Apple Silicon / MLX。模型和算力成本另计。本站未独立复现这些结果。"
+    },
+    "media": [
+      {
+        "src": "/skill-previews/threerocks-sweety-handdraw-video-sweety-handdraw-video/aebf93b8f0255cf1bf40b96bbb3fa1cc3ab88e3aa554120fa1217d9c9840635d.preview.webp",
+        "previewSrc": "/skill-previews/threerocks-sweety-handdraw-video-sweety-handdraw-video/aebf93b8f0255cf1bf40b96bbb3fa1cc3ab88e3aa554120fa1217d9c9840635d.preview.webp",
+        "cardSrc": "/skill-previews/threerocks-sweety-handdraw-video-sweety-handdraw-video/aebf93b8f0255cf1bf40b96bbb3fa1cc3ab88e3aa554120fa1217d9c9840635d.card.webp",
+        "width": 960,
+        "height": 540,
+        "sha256": "8cf10dbc14e69e14625a432ce4521b6c9cf1d1809a608f8fcc0768475a662ce8",
+        "videoSrc": "/skill-previews/threerocks-sweety-handdraw-video-sweety-handdraw-video/8cf10dbc14e69e14625a432ce4521b6c9cf1d1809a608f8fcc0768475a662ce8.mp4",
+        "posterOriginalSrc": "/skill-previews/threerocks-sweety-handdraw-video-sweety-handdraw-video/aebf93b8f0255cf1bf40b96bbb3fa1cc3ab88e3aa554120fa1217d9c9840635d.jpg",
+        "posterSourceUrl": "https://github.com/threerocks/sweety-handdraw-video/releases/download/v1.2/docs--media--snake-cover.jpg",
+        "posterSha256": "aebf93b8f0255cf1bf40b96bbb3fa1cc3ab88e3aa554120fa1217d9c9840635d",
+        "sourceUrl": "https://github.com/threerocks/sweety-handdraw-video/releases/download/v1.2/docs--media--snake-story.mp4",
+        "kind": "example",
+        "title": {
+          "en": "The snake that died of anger · 49 sec",
+          "zh": "那条死于愤怒的蛇 · 49 秒"
+        },
+        "alt": {
+          "en": "A hand-drawn snake and saw fable in soft watercolor, with Chinese narration and subtitles.",
+          "zh": "淡彩手绘的蛇与锯子寓言，配有中文旁白和字幕。"
+        }
+      },
+      {
+        "src": "/skill-previews/threerocks-sweety-handdraw-video-sweety-handdraw-video/fcedefa31732b5aa354f23dfd973a2bda17f1d78ef7132d01c0f8b56c740fd04.preview.webp",
+        "previewSrc": "/skill-previews/threerocks-sweety-handdraw-video-sweety-handdraw-video/fcedefa31732b5aa354f23dfd973a2bda17f1d78ef7132d01c0f8b56c740fd04.preview.webp",
+        "cardSrc": "/skill-previews/threerocks-sweety-handdraw-video-sweety-handdraw-video/fcedefa31732b5aa354f23dfd973a2bda17f1d78ef7132d01c0f8b56c740fd04.card.webp",
+        "width": 960,
+        "height": 540,
+        "sha256": "fbfea3f01676eb1f1b617f301689236afee9ec7dffaed8a1b52d336a72b6d902",
+        "videoSrc": "/skill-previews/threerocks-sweety-handdraw-video-sweety-handdraw-video/fbfea3f01676eb1f1b617f301689236afee9ec7dffaed8a1b52d336a72b6d902.mp4",
+        "posterOriginalSrc": "/skill-previews/threerocks-sweety-handdraw-video-sweety-handdraw-video/fcedefa31732b5aa354f23dfd973a2bda17f1d78ef7132d01c0f8b56c740fd04.jpg",
+        "posterSourceUrl": "https://github.com/threerocks/sweety-handdraw-video/releases/download/v1.2/docs--media--wolf-cover.jpg",
+        "posterSha256": "fcedefa31732b5aa354f23dfd973a2bda17f1d78ef7132d01c0f8b56c740fd04",
+        "sourceUrl": "https://github.com/threerocks/sweety-handdraw-video/releases/download/v1.2/docs--media--wolf-story.mp4",
+        "kind": "example",
+        "title": {
+          "en": "How pleasure keeps you captive · 1 min 52 sec",
+          "zh": "快乐囚禁你的方式 · 1 分 52 秒"
+        },
+        "alt": {
+          "en": "An illustrated wolf story in cool angular colors, with a drawing hand and Chinese narration and subtitles.",
+          "zh": "冷色棱角插画呈现狼的故事，配有逐笔绘制的手部、中文旁白和字幕。"
+        }
+      }
+    ]
   }
 ]

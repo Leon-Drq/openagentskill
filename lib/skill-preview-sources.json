@@ -326,5 +326,63 @@
         }
       }
     ]
+  },
+  {
+    "skillSlug": "threerocks-sweety-handdraw-video-sweety-handdraw-video",
+    "repository": "threerocks/sweety-handdraw-video",
+    "revision": "5206ec0d17f9b353e400b64b9c51ad69e721e02a",
+    "sourcePath": "README.md",
+    "documentSha256": "14ea2b84da65aefef2286b7fea64731f45dfc88f0150dd06497147fec2ec6c3c",
+    "license": "MIT",
+    "licensePath": "LICENSE",
+    "licenseSha256": "c56704c3fd6b99de34c7e9d2e5dea8e19a18e1978f3614a3f830f1bdbb93f46c",
+    "format": {
+      "en": "Narrated hand-drawn video · MP4",
+      "zh": "手绘讲解有声样片 · MP4"
+    },
+    "note": {
+      "en": "Two complete Chinese-language examples published by threerocks (@leo_xiaolei): a 49-second snake fable and a 1-minute-52-second wolf story. Original subtitles, audio and author watermarks are preserved. Creating new videos requires an agent with image generation, Python, FFmpeg and a working narration setup; the bundled VoxCPM2 adapter targets Apple Silicon/MLX. Model and compute costs are separate. OpenAgentSkill has not independently reproduced these results.",
+      "zh": "两段完整中文样片由 threerocks（@leo_xiaolei）发布：《那条死于愤怒的蛇》约 49 秒，《快乐囚禁你的方式》约 1 分 52 秒。保留原片字幕、声音与作者水印。制作新视频需要具备生图能力的 Agent、Python、FFmpeg 和可用配音环境；内置 VoxCPM2 适配器面向 Apple Silicon / MLX。模型和算力成本另计。本站未独立复现这些结果。"
+    },
+    "media": [
+      {
+        "path": "docs--media--snake-story.mp4",
+        "releaseTag": "v1.2",
+        "sha256": "8cf10dbc14e69e14625a432ce4521b6c9cf1d1809a608f8fcc0768475a662ce8",
+        "kind": "example",
+        "title": {
+          "en": "The snake that died of anger · 49 sec",
+          "zh": "那条死于愤怒的蛇 · 49 秒"
+        },
+        "alt": {
+          "en": "A hand-drawn snake and saw fable in soft watercolor, with Chinese narration and subtitles.",
+          "zh": "淡彩手绘的蛇与锯子寓言，配有中文旁白和字幕。"
+        },
+        "poster": {
+          "path": "docs--media--snake-cover.jpg",
+          "releaseTag": "v1.2",
+          "sha256": "aebf93b8f0255cf1bf40b96bbb3fa1cc3ab88e3aa554120fa1217d9c9840635d"
+        }
+      },
+      {
+        "path": "docs--media--wolf-story.mp4",
+        "releaseTag": "v1.2",
+        "sha256": "fbfea3f01676eb1f1b617f301689236afee9ec7dffaed8a1b52d336a72b6d902",
+        "kind": "example",
+        "title": {
+          "en": "How pleasure keeps you captive · 1 min 52 sec",
+          "zh": "快乐囚禁你的方式 · 1 分 52 秒"
+        },
+        "alt": {
+          "en": "An illustrated wolf story in cool angular colors, with a drawing hand and Chinese narration and subtitles.",
+          "zh": "冷色棱角插画呈现狼的故事，配有逐笔绘制的手部、中文旁白和字幕。"
+        },
+        "poster": {
+          "path": "docs--media--wolf-cover.jpg",
+          "releaseTag": "v1.2",
+          "sha256": "fcedefa31732b5aa354f23dfd973a2bda17f1d78ef7132d01c0f8b56c740fd04"
+        }
+      }
+    ]
   }
 ]

@@ -2,6 +2,28 @@
 
 ## Curated video examples
 
+On 2026-10-13 the owner requested `threerocks/sweety-handdraw-video` from
+https://x.com/leo_xiaolei/status/2109982650199060818. The exact Skill document is
+`skills/sweety-handdraw-video/SKILL.md` at
+`5206ec0d17f9b353e400b64b9c51ad69e721e02a`. Two complete Chinese-narrated author
+examples, the snake fable and wolf story, are linked from that pinned README.
+Their original audio, subtitles and watermarks are preserved. The root MIT
+license and `THIRD_PARTY_NOTICES.md` were inspected; bundled dependency notices
+do not override these author documentation examples. Voice references and
+third-party character assets are not separately redistributed.
+
+Reviewed media may live in a GitHub Release of the same repository. Set
+`releaseTag` and the exact asset filename on the media entry, and record
+`documentSha256` on its source. The importer checks that the hash-pinned source
+document links the exact release URL, follows only HTTPS GitHub asset-CDN
+redirects without credentials, and verifies the original asset SHA-256 and
+size before decoding. A replaced release asset fails import. This does not
+enable arbitrary URLs or automatic release crawling.
+An optional `poster` uses the author's separately hash-pinned PNG/JPEG/WebP cover
+when the opening frames are still blank. It has its own original, source URL and
+hash; the video itself is unchanged. Sweety uses the two covers linked beside
+the corresponding complete videos in its README.
+
 The pinned source importer also accepts MP4/WebM files up to 20 MiB, using the
 existing bounded FFmpeg decoder to extract real posters. Originals remain
 byte-identical with source SHA-256 verification; curated assets stay under the

@@ -9,6 +9,8 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import * as icons from 'lucide-react'
 import { parse } from 'parse5'
 import ts from 'typescript'
+import { curatedSourceUrls } from './skill-media/curated-source.mjs'
+import './test-curated-media-source.mjs'
 
 register('./test-owner-publication-loader.mjs', import.meta.url)
 const { getSkillSourcePreview, getSkillPreviewCardData, SOURCE_EXAMPLE_SKILL_SLUGS, SOURCE_GALLERY_LINKS } = await import('../lib/skill-previews.ts')
@@ -32,7 +34,8 @@ for (const preview of previews) {
   assert.equal(preview.media.length, source.media.length)
   assert.deepEqual(getSkillPreviewCardData(preview.skillSlug), { media: preview.media[0], imageCount: preview.media.length, format: preview.format })
   for (const [index, media] of preview.media.entries()) {
-    assert.equal(media.sourceUrl, `https://github.com/${source.repository}/blob/${source.revision}/${source.media[index].path}`)
+    assert.equal(media.sourceUrl, curatedSourceUrls(source, source.media[index].path, source.media[index].releaseTag).sourceUrl)
+    if (source.media[index].releaseTag) assert.match(source.documentSha256, /^[a-f0-9]{64}$/, 'Release examples retain the pinned documentation identity')
     assert.equal(digest(readFileSync(file(media.videoSrc || media.src))), source.media[index].sha256)
     if (media.videoSrc) {
       const signature = readFileSync(file(media.videoSrc)).subarray(0, 8)
@@ -40,6 +43,12 @@ for (const preview of previews) {
       assert.ok(media.videoSrc.startsWith(`/skill-previews/${preview.skillSlug}/`), 'Curated video is outside automatic pruning')
     }
     assert.equal(media.sha256, source.media[index].sha256)
+    const poster = source.media[index].poster
+    if (poster) {
+      assert.equal(digest(readFileSync(file(media.posterOriginalSrc))), poster.sha256)
+      assert.equal(media.posterSourceUrl, curatedSourceUrls(source, poster.path, poster.releaseTag).sourceUrl)
+      assert.equal(media.posterSha256, poster.sha256)
+    }
     const metadata = await sharp(file(media.src)).metadata()
     assert.equal(media.width, metadata.width); assert.equal(media.height, metadata.height)
     for (const [url, width] of [[media.cardSrc, 720], [media.previewSrc, 1600]]) {
@@ -58,6 +67,10 @@ const stickmanSlug = 'kaomei-stickman-video-director-directing-stickman-videos'
 assert.ok(SOURCE_EXAMPLE_SKILL_SLUGS.includes(stickmanSlug), 'Author videos participate in With examples filtering')
 assert.equal(getSkillSourcePreview(stickmanSlug).media.filter(media => media.videoSrc).length, 3)
 assert.match(getSkillPreviewCardData(stickmanSlug).media.sourceUrl, /style-3-demo\.mp4$/, 'New prehistoric style leads the directory preview')
+const sweetySlug = 'threerocks-sweety-handdraw-video-sweety-handdraw-video'
+assert.ok(SOURCE_EXAMPLE_SKILL_SLUGS.includes(sweetySlug), 'Hand-drawn author videos participate in With examples')
+assert.equal(getSkillSourcePreview(sweetySlug).media.filter(media => media.videoSrc).length, 2)
+assert.match(getSkillPreviewCardData(sweetySlug).media.sourceUrl, /snake-story\.mp4$/, 'The short snake fable leads the card preview')
 assert.ok(!SOURCE_EXAMPLE_SKILL_SLUGS.includes('enricoros-big-agi'), 'Interface screenshots alone do not satisfy With examples')
 assert.ok(!SOURCE_EXAMPLE_SKILL_SLUGS.includes('adobe-research-custom-diffusion'), 'A source-gallery link is not a locally collected example')
 assert.ok(SOURCE_GALLERY_LINKS['adobe-research-custom-diffusion'])
