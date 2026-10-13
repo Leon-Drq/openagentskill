@@ -33,7 +33,12 @@ for (const preview of previews) {
   assert.deepEqual(getSkillPreviewCardData(preview.skillSlug), { media: preview.media[0], imageCount: preview.media.length, format: preview.format })
   for (const [index, media] of preview.media.entries()) {
     assert.equal(media.sourceUrl, `https://github.com/${source.repository}/blob/${source.revision}/${source.media[index].path}`)
-    assert.equal(digest(readFileSync(file(media.src))), source.media[index].sha256)
+    assert.equal(digest(readFileSync(file(media.videoSrc || media.src))), source.media[index].sha256)
+    if (media.videoSrc) {
+      const signature = readFileSync(file(media.videoSrc)).subarray(0, 8)
+      assert.ok(signature.subarray(4).toString() === 'ftyp' || signature.subarray(0, 4).equals(Buffer.from([0x1a, 0x45, 0xdf, 0xa3])), 'Preserve the actual video, not an image pretending to be video')
+      assert.ok(media.videoSrc.startsWith(`/skill-previews/${preview.skillSlug}/`), 'Curated video is outside automatic pruning')
+    }
     assert.equal(media.sha256, source.media[index].sha256)
     const metadata = await sharp(file(media.src)).metadata()
     assert.equal(media.width, metadata.width); assert.equal(media.height, metadata.height)
@@ -49,6 +54,10 @@ for (const preview of previews) {
 }
 assert.equal(getSkillSourcePreview('unrelated-ppt-master-fork'), null, 'Never attach a preview by name or broad repository similarity')
 assert.ok(SOURCE_EXAMPLE_SKILL_SLUGS.includes('hugohe3-ppt-master'))
+const stickmanSlug = 'kaomei-stickman-video-director-directing-stickman-videos'
+assert.ok(SOURCE_EXAMPLE_SKILL_SLUGS.includes(stickmanSlug), 'Author videos participate in With examples filtering')
+assert.equal(getSkillSourcePreview(stickmanSlug).media.filter(media => media.videoSrc).length, 3)
+assert.match(getSkillPreviewCardData(stickmanSlug).media.sourceUrl, /style-3-demo\.mp4$/, 'New prehistoric style leads the directory preview')
 assert.ok(!SOURCE_EXAMPLE_SKILL_SLUGS.includes('enricoros-big-agi'), 'Interface screenshots alone do not satisfy With examples')
 assert.ok(!SOURCE_EXAMPLE_SKILL_SLUGS.includes('adobe-research-custom-diffusion'), 'A source-gallery link is not a locally collected example')
 assert.ok(SOURCE_GALLERY_LINKS['adobe-research-custom-diffusion'])
@@ -79,6 +88,9 @@ const nodes = node => [node, ...(node.childNodes || []).flatMap(nodes)]
 const attr = (node, name) => node.attrs?.find(item => item.name === name)?.value
 const text = node => node.nodeName === '#text' ? node.value : (node.childNodes || []).map(text).join('')
 const render = (Component, props) => nodes(parse(renderToStaticMarkup(createElement(Component, props))))
+const stickmanCard = getSkillPreviewCardData(stickmanSlug)
+assert.ok(render(SkillCardPreview, { slug: stickmanSlug, name: 'Stickman Video Director', locale: 'en', category: 'Video & audio', sourcePreview: stickmanCard })
+  .some(node => attr(node, 'data-provider-video') === stickmanCard.media.videoSrc), 'Directory card retains the author video')
 const props = { slug: 'hugohe3-ppt-master', name: 'PPT Master', locale: 'zh', category: '演示文稿', sourcePreview: getSkillPreviewCardData('hugohe3-ppt-master') }
 let all = render(SkillCardPreview, props)
 assert.ok(all.some(node => node.tagName === 'img' && attr(node, 'alt') === props.sourcePreview.media.alt.zh && attr(node, 'class').includes('object-contain')))
@@ -122,13 +134,14 @@ for (const binding of bindings) {
 }
 for (const preview of previews) {
   all = render(SkillSourcePreviews, { preview, locale: 'en' })
-  assert.equal(all.filter(node => node.tagName === 'img').length, preview.media.length)
+  assert.equal(all.filter(node => node.tagName === 'img').length, preview.media.filter(media => !media.videoSrc).length)
   assert.ok(all.some(node => attr(node, 'id') === 'visual-previews'))
   assert.ok(all.some(node => node.tagName === 'p' && text(node) === preview.note.en))
   for (const media of preview.media) {
     assert.ok(all.some(node => node.tagName === 'a' && attr(node, 'href') === media.sourceUrl))
-    assert.ok(all.some(node => node.tagName === 'a' && attr(node, 'href') === media.src))
+    if (media.videoSrc) assert.ok(all.some(node => attr(node, 'data-provider-video') === media.videoSrc), 'Detail keeps a playable video')
+    else assert.ok(all.some(node => node.tagName === 'a' && attr(node, 'href') === media.src))
     assert.ok(all.some(node => node.tagName === 'h3' && text(node) === media.title.en))
   }
 }
-console.log(`Skill previews: ${previews.length} exact skill bindings, ${previews.reduce((n, p) => n + p.media.length, 0)} source-checked images, licenses, thumbnails, SSR links, media priority, complete-slide framing and missing/broken-image fallbacks passed.`)
+console.log(`Skill previews: ${previews.length} exact skill bindings, ${previews.reduce((n, p) => n + p.media.length, 0)} source-checked previews, licenses, thumbnails, SSR links, video playback, media priority, complete-slide framing and missing/broken-image fallbacks passed.`)

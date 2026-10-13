@@ -1,5 +1,26 @@
 # Skill directory previews
 
+## Curated video examples
+
+The pinned source importer also accepts MP4/WebM files up to 20 MiB, using the
+existing bounded FFmpeg decoder to extract real posters. Originals remain
+byte-identical with source SHA-256 verification; curated assets stay under the
+exact Skill slug, outside automatic collection pruning. The existing card and
+detail players load videos only after a click.
+
+On 2026-10-13 the owner requested `kaomei/stickman-video-director` from
+https://x.com/CrazyKaomei/status/2109570770682925323. Three author examples from
+commit `544254ddf6430c7d0c35aca4c42211586e39efb0` cover prehistoric comedy,
+classic monochrome and modern technology. The first is the directory preview.
+The root MIT license is retained; no nested license or notice was present in
+the inspected tree. The separately credited community fire example is excluded.
+These are source examples, not OpenAgentSkill executions. The Skill outputs
+proposals and prompts; rendering/editing and any provider charges are separate.
+
+Use `FFMPEG_BIN` to select an installed decoder when running `pnpm previews:import`.
+CI checks the checked-in original hashes, posters, license and player wiring;
+it does not need FFmpeg or run the upstream Skill.
+
 The directory uses existing provider examples first, then Gallery cases, then
 the explicit source-preview registry. The same source previews appear at
 `/skills/[slug]#visual-previews`, with complete images, bilingual captions,

@@ -1,4 +1,4 @@
-// Import only explicitly reviewed, pinned documentation images. Never execute
+// Import only explicitly reviewed, pinned documentation media. Never execute
 // repository code, crawl arbitrary URLs, or infer permission from a file suffix.
 import { readFile, mkdir, writeFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
@@ -6,6 +6,7 @@ import { createRequire } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
+import { renderAsset } from './skill-media/render.mjs'
 
 const root = fileURLToPath(new URL('../', import.meta.url))
 const require = createRequire(import.meta.url)
@@ -45,7 +46,20 @@ for (const source of sources) {
   pending.push([licenseUrl, license])
   const media = []
   for (const image of source.media) {
-    const bytes = await checkedFile(source, image.path, image.sha256, 10 * 1024 * 1024)
+    const video = /\.(mp4|webm)$/i.test(image.path)
+    const bytes = await checkedFile(source, image.path, image.sha256, (video ? 20 : 10) * 1024 * 1024)
+    if (video) {
+      const rendered = await renderAsset(bytes, image.path)
+      // Keep curated files separate from automatic collection and its pruning.
+      const relocate = url => url.replace('/skill-previews/auto/', `${base}/`)
+      for (const [url, content] of rendered.files) pending.push([relocate(url), content])
+      const item = rendered.media
+      media.push({ ...item, src: relocate(item.src), cardSrc: relocate(item.cardSrc),
+        previewSrc: relocate(item.previewSrc), videoSrc: relocate(item.videoSrc),
+        sourceUrl: `https://github.com/${source.repository}/blob/${source.revision}/${image.path}`,
+        kind: image.kind, title: image.title, alt: image.alt })
+      continue
+    }
     const metadata = await sharp(bytes, { limitInputPixels: 40_000_000 }).metadata()
     if (!['png', 'jpeg', 'webp'].includes(metadata.format) || (metadata.pages || 1) !== 1 || metadata.width < 240 || metadata.height < 160) throw new Error(`Invalid image: ${image.path}`)
     const stem = `${base}/${image.sha256.slice(0, 24)}`

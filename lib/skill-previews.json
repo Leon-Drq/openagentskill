@@ -322,5 +322,80 @@
         }
       }
     ]
+  },
+  {
+    "skillSlug": "kaomei-stickman-video-director-directing-stickman-videos",
+    "repository": "kaomei/stickman-video-director",
+    "revision": "544254ddf6430c7d0c35aca4c42211586e39efb0",
+    "sourceUrl": "https://github.com/kaomei/stickman-video-director/blob/544254ddf6430c7d0c35aca4c42211586e39efb0/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/kaomei-stickman-video-director-directing-stickman-videos/LICENSE-39db520f9483.txt",
+    "format": {
+      "en": "Author video examples · MP4",
+      "zh": "作者视频样片 · MP4"
+    },
+    "note": {
+      "en": "Three videos published by kaomei (CrazyKaomei) in the source repository: prehistoric comedy, classic monochrome and modern technology. The Skill produces a director’s proposal and video prompts; rendering and editing happen in a separate video tool. OpenAgentSkill has not independently reproduced these results.",
+      "zh": "三段样片由烤妹儿（kaomei / CrazyKaomei）在源仓库发布，分别展示史前洞穴、基础黑白和现代科技风。Skill 产出导演提案与视频提示词，生成和剪辑需在视频工具中完成。本站未独立复现这些结果。"
+    },
+    "media": [
+      {
+        "src": "/skill-previews/kaomei-stickman-video-director-directing-stickman-videos/d780d63893e30bb0c292a88e7844d95593a52992fcd8827bc77c7c179577b54c.preview.webp",
+        "previewSrc": "/skill-previews/kaomei-stickman-video-director-directing-stickman-videos/d780d63893e30bb0c292a88e7844d95593a52992fcd8827bc77c7c179577b54c.preview.webp",
+        "cardSrc": "/skill-previews/kaomei-stickman-video-director-directing-stickman-videos/d780d63893e30bb0c292a88e7844d95593a52992fcd8827bc77c7c179577b54c.card.webp",
+        "width": 1280,
+        "height": 720,
+        "sha256": "d780d63893e30bb0c292a88e7844d95593a52992fcd8827bc77c7c179577b54c",
+        "videoSrc": "/skill-previews/kaomei-stickman-video-director-directing-stickman-videos/d780d63893e30bb0c292a88e7844d95593a52992fcd8827bc77c7c179577b54c.mp4",
+        "sourceUrl": "https://github.com/kaomei/stickman-video-director/blob/544254ddf6430c7d0c35aca4c42211586e39efb0/assets/readme/style-3-demo.mp4",
+        "kind": "example",
+        "title": {
+          "en": "Prehistoric comedy: humanity’s first job",
+          "zh": "史前洞穴风：人类的第一份工作"
+        },
+        "alt": {
+          "en": "Hand-drawn stick figures in animal-hide clothing in an earthy prehistoric landscape.",
+          "zh": "土色史前场景中，身穿兽皮的手绘火柴人演绎故事。"
+        }
+      },
+      {
+        "src": "/skill-previews/kaomei-stickman-video-director-directing-stickman-videos/1685de37cd695c3c2c53840fefa95b09f20b0e406fbae864d747e6dc018cb8d4.preview.webp",
+        "previewSrc": "/skill-previews/kaomei-stickman-video-director-directing-stickman-videos/1685de37cd695c3c2c53840fefa95b09f20b0e406fbae864d747e6dc018cb8d4.preview.webp",
+        "cardSrc": "/skill-previews/kaomei-stickman-video-director-directing-stickman-videos/1685de37cd695c3c2c53840fefa95b09f20b0e406fbae864d747e6dc018cb8d4.card.webp",
+        "width": 1280,
+        "height": 720,
+        "sha256": "1685de37cd695c3c2c53840fefa95b09f20b0e406fbae864d747e6dc018cb8d4",
+        "videoSrc": "/skill-previews/kaomei-stickman-video-director-directing-stickman-videos/1685de37cd695c3c2c53840fefa95b09f20b0e406fbae864d747e6dc018cb8d4.mp4",
+        "sourceUrl": "https://github.com/kaomei/stickman-video-director/blob/544254ddf6430c7d0c35aca4c42211586e39efb0/assets/readme/light-theme-demo.mp4",
+        "kind": "example",
+        "title": {
+          "en": "Classic style: black figures on white",
+          "zh": "基础黑白风：白底黑火柴人"
+        },
+        "alt": {
+          "en": "Black stick figures and colorful visual metaphors on a clean white canvas.",
+          "zh": "纯白画面上的黑色火柴人，配合彩色道具和视觉隐喻。"
+        }
+      },
+      {
+        "src": "/skill-previews/kaomei-stickman-video-director-directing-stickman-videos/6794a7c06c0d97e781339186d44f993e855a4b64f8ae7583892ba4a259f7f8e9.preview.webp",
+        "previewSrc": "/skill-previews/kaomei-stickman-video-director-directing-stickman-videos/6794a7c06c0d97e781339186d44f993e855a4b64f8ae7583892ba4a259f7f8e9.preview.webp",
+        "cardSrc": "/skill-previews/kaomei-stickman-video-director-directing-stickman-videos/6794a7c06c0d97e781339186d44f993e855a4b64f8ae7583892ba4a259f7f8e9.card.webp",
+        "width": 1280,
+        "height": 720,
+        "sha256": "6794a7c06c0d97e781339186d44f993e855a4b64f8ae7583892ba4a259f7f8e9",
+        "videoSrc": "/skill-previews/kaomei-stickman-video-director-directing-stickman-videos/6794a7c06c0d97e781339186d44f993e855a4b64f8ae7583892ba4a259f7f8e9.mp4",
+        "sourceUrl": "https://github.com/kaomei/stickman-video-director/blob/544254ddf6430c7d0c35aca4c42211586e39efb0/assets/readme/style-2a-demo.mp4",
+        "kind": "example",
+        "title": {
+          "en": "Modern style: minimalist technology",
+          "zh": "现代潮酷风：极简科技"
+        },
+        "alt": {
+          "en": "A red-beanie, yellow-shirt stick figure in a bright minimalist technology setting.",
+          "zh": "戴红帽、穿黄衣的火柴人，在明亮极简的科技场景中活动。"
+        }
+      }
+    ]
   }
 ]
