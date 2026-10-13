@@ -28,8 +28,9 @@ export function PurchaseActions({ slug, plan, locale, delivery = 'package', onAv
     let attempts = 0
     const refresh = () => fetch(`/api/payments/status${slug ? `?slug=${encodeURIComponent(slug)}` : ''}`, { signal: controller.signal, cache: 'no-store' })
       .then(async response => { if (!response.ok) throw new Error('temporarily_unavailable'); return response.json() })
-      .then(setState).catch(error => { if (error.name !== 'AbortError') setError('temporarily_unavailable') })
-    const onFocus = () => { setContent(''); setCopied(false); void refresh() }
+      .then(next => { setState(next); if (!next.owned) { setContent(''); setCopied(false) } })
+      .catch(error => { if (error.name !== 'AbortError') setError('temporarily_unavailable') })
+    const onFocus = () => { void refresh() }
     void refresh()
     const interval = new URLSearchParams(window.location.search).get('checkout') === 'processing'
       ? setInterval(() => { if (++attempts < 12) void refresh(); else clearInterval(interval) }, 5000) : undefined
