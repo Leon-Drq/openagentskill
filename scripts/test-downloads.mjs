@@ -143,7 +143,7 @@ const { SkillDownloadCount }=load('components/skill-download-count.tsx')
 for(const locale of ['en','zh','ja','ko','es','de','fr','id']) {
   const html=renderToStaticMarkup(React.createElement(SkillDownloadCount,{locale,count:26}))
   assert.match(html,/data-site-downloads="26"/)
-  assert.equal(html.replace(/<[^>]*>/g,''),'26','counter displays only its number, with an accessible label in attributes')
+  assert.deepEqual(html.match(/>[^<]+</g),['>26<'],'counter displays only its number, with an accessible label in attributes')
   const unknown=renderToStaticMarkup(React.createElement(SkillDownloadCount,{locale,count:null}))
   assert.match(unknown,/data-site-downloads="unknown"/); assert.match(unknown,/—/)
 }
