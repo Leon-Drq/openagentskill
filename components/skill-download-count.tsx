@@ -9,6 +9,6 @@ export function SkillDownloadCount({ count, locale }: { count?: number | null; l
   return <span data-site-downloads={known ? count : 'unknown'} title={known ? c.note : c.unknown}
     aria-label={`${c.label}: ${value}. ${known ? c.note : c.unknown}`}
     className="inline-flex shrink-0 items-center gap-1 text-xs text-secondary">
-    <Download size={14} aria-hidden="true" /><span className="tabular-nums">{value}</span><span className="sr-only">{c.label}</span>
+    <Download size={14} aria-hidden="true" /><span className="text-[10px]">{c.label}</span><span className="tabular-nums">{value}</span>
   </span>
 }

@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { trackAnalyticsEvent, type AnalyticsEventName, type AnalyticsParameterValue } from '@/lib/analytics'
 import { getActiveXAttribution } from '@/lib/x/attribution-client'
+import { downloadSessionId, trackDownloadAction } from '@/lib/skills/download-actions-client'
 
 export type SkillEventType =
   | 'view'
@@ -44,12 +45,7 @@ function analyticsMetadata(metadata: Record<string, unknown>) {
 }
 
 function getSessionId() {
-  const key = 'openagentskill.sessionId'
-  const existing = window.localStorage.getItem(key)
-  if (existing) return existing
-  const created = crypto.randomUUID()
-  window.localStorage.setItem(key, created)
-  return created
+  return downloadSessionId()
 }
 
 export async function trackSkillEvent(
@@ -58,6 +54,9 @@ export async function trackSkillEvent(
   metadata: Record<string, unknown> = {}
 ) {
   if (typeof window === 'undefined') return
+
+  if (eventType === 'install_copy' && metadata.kind !== 'agent-prompt') void trackDownloadAction(skillSlug, 'command-copy')
+  if (eventType === 'outbound_github' || eventType === 'outbound_docs') void trackDownloadAction(skillSlug, 'external-open')
 
   const attribution = getActiveXAttribution()
   const existingAttribution =
@@ -82,6 +81,9 @@ export async function trackSkillEvent(
     ...analyticsMetadata(eventMetadata),
     ...(attribution ? { source: 'x', campaign: attribution.campaign } : {}),
   })
+
+  // Provider catalog entries have no registry foreign key for skill_events.
+  if (metadata.source === 'external-catalog') return
 
   try {
     const response = await fetch('/api/events/skill', {

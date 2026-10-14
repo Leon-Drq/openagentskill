@@ -11,6 +11,7 @@ interface SkillActionLinkProps {
   children: ReactNode
   className?: string
   external?: boolean
+  rel?: string
   metadata?: Record<string, unknown>
 }
 
@@ -21,6 +22,7 @@ export function SkillActionLink({
   children,
   className,
   external,
+  rel,
   metadata,
 }: SkillActionLinkProps) {
   if (!external) {
@@ -39,9 +41,10 @@ export function SkillActionLink({
     <a
       href={href}
       target="_blank"
-      rel="noopener noreferrer"
+      rel={rel || 'noopener noreferrer'}
       className={className}
       onClick={() => trackSkillEvent(skillSlug, eventType, metadata)}
+      onAuxClick={event => { if (event.button === 1) void trackSkillEvent(skillSlug, eventType, metadata) }}
     >
       {children}
     </a>

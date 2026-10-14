@@ -16,6 +16,7 @@ import { SkillPrice } from '@/components/skill-commerce'
 
 import { SkillCardPreview } from './skill-card-preview'
 import { SkillDownloadCount } from './skill-download-count'
+import { SkillActionLink } from './skill-action-link'
 import { downloadCopy } from '@/lib/i18n/download-copy'
 import { discoveryCopy } from '@/lib/discovery'
 import type { ShowcaseCardData } from '@/lib/showcase-shared'
@@ -451,7 +452,7 @@ export function SkillsPageClient(props: Props) {
                   {skill.sourcePreview && !skill.preview && <Link prefetch={false} href={getLocalizedNavigationHref(`/skills/${skill.slug}#visual-previews`, locale)} className="mt-3 inline-flex min-h-10 items-center gap-2 text-xs font-medium text-[#006b4f]" data-source-previews>{previewCopy('view', locale)} · {skill.sourcePreview.imageCount}<ArrowRight size={12} aria-hidden="true" /></Link>}
                 </div>
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border bg-background/45 px-5 py-3">
-                  {skill.provider ? <a aria-label={`${skill.provider.label}: ${skill.name}`} href={skill.provider.sourceHref} target="_blank" rel={skill.provider.sourceRel} className="inline-flex min-h-10 items-center gap-1 text-xs text-[#006b4f]">{skill.provider.resource ? (locale === 'zh' ? '获取字体' : 'Get fonts') : (locale === 'zh' ? '获取技能' : 'Get skill')} ↗</a> : <span title={c.repoStars} className="inline-flex items-center gap-1.5 font-mono text-sm"><Star size={14} aria-hidden="true" />{stars(skill.stats.stars)}<span className="text-[10px] text-secondary">GitHub</span></span>}
+                  {skill.provider ? <SkillActionLink skillSlug={skill.slug} metadata={{ source: 'external-catalog' }} eventType="outbound_docs" href={skill.provider.sourceHref} external rel={skill.provider.sourceRel} className="inline-flex min-h-10 items-center gap-1 text-xs text-[#006b4f]">{skill.provider.resource ? (locale === 'zh' ? '获取字体' : 'Get fonts') : (locale === 'zh' ? '获取技能' : 'Get skill')} ↗</SkillActionLink> : <span title={c.repoStars} className="inline-flex items-center gap-1.5 font-mono text-sm"><Star size={14} aria-hidden="true" />{stars(skill.stats.stars)}<span className="text-[10px] text-secondary">GitHub</span></span>}
                   <div className="flex flex-wrap items-center justify-end gap-3 text-xs">
                     {!skill.provider && <button type="button" aria-pressed={compareSlugs.includes(skill.slug)} onClick={() => toggleCompare(skill.slug)}
                       className="min-h-10 text-secondary hover:text-[#006b4f]">{compareSlugs.includes(skill.slug) ? c.selected : c.compare}</button>}

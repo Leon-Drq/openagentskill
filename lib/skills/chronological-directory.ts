@@ -1,4 +1,4 @@
-export type DatedDirectoryEntry = { slug: string; timestamp: string | null }
+export type DatedDirectoryEntry = { slug: string; timestamp: string | null; downloads?: number }
 
 export function isChronologicalSort(sort: string) {
   return sort === 'new' || sort === 'fresh'
@@ -18,6 +18,10 @@ export function compareDirectoryDates(a: DatedDirectoryEntry, b: DatedDirectoryE
   return timestamp(b.timestamp) - timestamp(a.timestamp) || (a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0)
 }
 
+export function compareDirectoryDownloads(a: DatedDirectoryEntry, b: DatedDirectoryEntry) {
+  return (b.downloads || 0) - (a.downloads || 0) || (a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0)
+}
+
 export function chronologicalRegistryWindow(offset: number, providerCount: number, size = 16) {
   const from = Math.max(0, offset - providerCount)
   return { offset: from, limit: offset + size - from }
@@ -30,7 +34,8 @@ export function chronologicalRegistryWindow(offset: number, providerCount: numbe
  */
 export function chronologicalDirectoryPage<T extends DatedDirectoryEntry>(
   registry: T[], providers: T[], offset: number, registryOffset = 0, size = 16,
+  compare = compareDirectoryDates,
 ): T[] {
-  return [...registry, ...providers].sort(compareDirectoryDates)
+  return [...registry, ...providers].sort(compare)
     .slice(offset - registryOffset, offset - registryOffset + size)
 }

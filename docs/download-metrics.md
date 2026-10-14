@@ -1,39 +1,54 @@
 # On-site downloads
 
-The Skills card footer and `sort=downloads` use **site downloads**, starting on
-14 October 2026. The legacy `skills.downloads` field and source-site statistics
-are not reliable evidence for this metric and are never backfilled into it.
+The Skills card footer and `sort=downloads` show the owner's **site download
+ actions** metric, starting on 14 October 2026. It includes:
 
-A counted download is a successful first-party file response to an authenticated,
-non-anonymous account. The server reads the complete artifact, checks byte length
-and SHA-256, and atomically records a receipt before returning the attachment.
-The same account and Skill count once per UTC day, across versions and retries.
-This measures file delivery requests, not unique people, a confirmed disk save,
-successful installation or successful execution. A connection can still break
-after the response starts. Counts can lag by up to five minutes.
+- Verified file responses from the existing SKILL.md and paid download routes.
+- Successful copies of an installation command on this site.
+- Explicit clicks (including middle-click) to a Skill's repository, documentation
+  or source-platform acquisition link, including external catalog entries.
 
-Included paths:
+These actions share one receipt per account/Skill/UTC day. Guests' command
+copies and outbound clicks count per browser identifier/Skill/UTC day. The
+existing browser identifier is hashed on the server before ledger storage.
+Logging in, clearing browser storage, different browsers or multiple accounts
+can affect deduplication; this is not a count of unique people.
 
-- `POST /api/skills/{slug}/download`: the recorded, hash-matching SKILL.md, only
-  while the listing remains public and its source/install policy allows it.
-  This is the instruction file, not an export of repository dependencies.
-- `POST /api/payments/download` with `Accept: application/octet-stream`: a
-  private release after the existing purchase/membership entitlement checks.
+The label remains “Site downloads” (“本站下载量”). The visible expandable note and
+counter tooltip explain that copies and source clicks are included. These are
+acquisition actions, not verified downloads on the external site, confirmed disk
+saves, successful installations or successful executions. No legacy estimates
+or source-site totals are backfilled. Existing recorded file receipts remain.
+Counts can lag by up to five minutes. A healthy empty aggregate shows `0` for
+registry and provider entries; an unavailable aggregate shows `—`.
 
-Creating legacy signed URLs, reading/copying prompts or install commands, CLI
-installs, previews and external-site links do not increment this metric.
-Third-party-only listings show `—`, not an invented zero. A metrics outage also
-shows `—`; a confirmed empty ledger shows `0`. Motion cards use the same ledger
-and support download ordering in their category and paid results.
+## Collection and access
 
-`skill_download_receipts` is private; public clients cannot read identities or
-write counts. Only the service role can execute `record_skill_download`, which
-deduplicates receipts and updates totals in one transaction. The directory reads
-aggregate totals; SQL pagination uses the indexed `skills.site_downloads` column.
-No IP addresses, emails, credentials, or downloaded file contents are stored in
-the ledger. Account deletion cascades receipts but retains anonymous aggregates.
+`POST /api/skills/{slug}/download-action` accepts only `command-copy` or
+`external-open` with a browser UUID. It requires same-origin JSON, a bounded
+payload and a current public registry or active provider listing. Command copies
+also require recorded installable source evidence. The server resolves account
+identity from authenticated session data, never from the supplied body. It calls
+the service-only `record_skill_download_action` function. Public clients cannot
+read the private receipt ledger or write aggregate counts directly.
 
-Validation: `pnpm test:downloads`, full regressions, typecheck, production build,
-and a transaction/rollback SQL check for deduplication and database privileges.
-Do not generate test traffic against production download endpoints: this would
-be indistinguishable from a real delivery request.
+File responses still require authenticated, non-anonymous accounts, fresh
+listing or purchase entitlement checks, a full artifact read, byte length and
+SHA-256 verification. The original `record_skill_download` function shares the
+same receipt primary key and remains backward compatible. Existing signed URL
+creation, views, general site links, failed clipboard writes, read-only review
+prompts and installation reports do not independently increment this metric.
+Tracking is best-effort and never blocks a clipboard action or external link.
+Client-reported interaction events are not proof of human activity.
+
+Only aggregate counts leave the server. The ledger contains no commands, URLs,
+IP addresses, email addresses or file contents. Account deletion cascades its
+receipts while preserving anonymous totals. Catalog download sorting merges
+registry and provider counts before pagination, with stable slug tie-breaking.
+
+## Verification
+
+Run `pnpm test:downloads`, full regressions, typecheck and production build.
+Exercise database deduplication across file/copy/external actions and service
+privileges in a transaction, then roll it back. Keep UI interaction tests on
+local mocked endpoints; never create artificial production download counts.

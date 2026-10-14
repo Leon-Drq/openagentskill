@@ -10,6 +10,7 @@ import { ProviderVideoPreview } from './provider-video-preview'
 import { SkillryLogo } from './skillry-logo'
 import { SkillActions, SkillEngagementProvider } from '@/components/skill-engagement'
 import { FontResourceContent } from './font-resource-content'
+import { SkillActionLink } from './skill-action-link'
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ lang?: string | string[] }> }
 const base = 'https://www.openagentskill.com'
@@ -80,14 +81,14 @@ export default async function CatalogSkillContent({ params, searchParams }: Prop
         <div className="mt-5 flex items-center gap-3 text-sm">{skillry && <SkillryLogo size={32} />}<p>{skillry ? (zh ? '发布平台' : 'Published on') : (zh ? '作者' : 'By')} <a href={externalSourceHref(entry.author.url)} target="_blank" rel={externalSourceRel(entry.author.url)} className="underline underline-offset-4">{entry.author.name} ↗</a></p></div>
         <div className="mt-6 flex flex-wrap items-center gap-4">
           <SkillEngagementProvider slugs={[entry.slug]} untrackedSlugs={[entry.slug]}><SkillActions slug={entry.slug} name={entry.title[lang]} /></SkillEngagementProvider>
-          <a href={externalSourceHref(entry.sourceUrl)} target="_blank" rel={externalSourceRel(entry.sourceUrl)} className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white hover:bg-[#00533d]">{skillry ? (zh ? '获取技能' : 'Get skill') : (zh ? '打开作者原帖' : 'Open the author’s post')} ↗</a>
+          <SkillActionLink skillSlug={entry.slug} metadata={{ source: 'external-catalog' }} eventType="outbound_docs" href={externalSourceHref(entry.sourceUrl)} external rel={externalSourceRel(entry.sourceUrl)} className="inline-flex min-h-12 items-center justify-center rounded-lg bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white hover:bg-[#00533d]">{skillry ? (zh ? '获取技能' : 'Get skill') : (zh ? '打开作者原帖' : 'Open the author’s post')} ↗</SkillActionLink>
           <p className="text-xs text-secondary">{skillry ? `${price} · ${zh ? '在 Skillry 获取' : 'Available on Skillry'}` : demo ? (zh ? '仅限非商业用途 · 附本地实测录像' : 'Noncommercial use only · Local runtime recording') : (zh ? '仅限非商业用途 · 未运行验证' : 'Noncommercial use only · Not runtime-verified')}</p>
         </div>
       </header>
       {skillry && <section id="showcase" className="scroll-mt-24 border-b border-border py-10" aria-labelledby="source-examples">
         <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
           <h2 id="source-examples" className="font-display text-3xl">{zh ? '案例预览' : 'Example previews'}</h2>
-          <a href={externalSourceHref(entry.sourceUrl)} target="_blank" rel={externalSourceRel(entry.sourceUrl)} className="inline-flex min-h-11 items-center text-sm text-[#006b4f] underline underline-offset-4">{zh ? '在 Skillry 查看案例' : 'View examples on Skillry'} ↗</a>
+          <SkillActionLink skillSlug={entry.slug} metadata={{ source: 'external-catalog' }} eventType="outbound_docs" href={externalSourceHref(entry.sourceUrl)} external rel={externalSourceRel(entry.sourceUrl)} className="inline-flex min-h-11 items-center text-sm text-[#006b4f] underline underline-offset-4">{zh ? '在 Skillry 查看案例' : 'View examples on Skillry'} ↗</SkillActionLink>
         </div>
         <p className="mb-6 text-sm leading-7 text-secondary">{zh ? 'Skillry 原站公开案例，图片从原站加载。本站未执行技能，原始提示词、模型和制作耗时未核实。' : 'Public examples from Skillry, loaded from the source. We have not run the skill or verified the original prompts, model or production time.'}</p>
         {entry.previewVideo && <div className="mb-6"><ProviderVideoPreview key={entry.previewVideo} src={entry.previewVideo} poster={entry.previewImages[0]} title={entry.skillName} zh={zh} /><p className="mt-3 text-xs text-secondary">{zh ? '原站案例视频 · 点击后加载' : 'Source video example · Loads when played'}</p></div>}

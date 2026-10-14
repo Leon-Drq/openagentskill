@@ -1,4 +1,5 @@
 import Link from '@/components/crawl-link'
+import { SkillActionLink } from './skill-action-link'
 import { SiteHeader } from './site-header'
 import { SiteFooter } from './site-footer'
 import { SkillPreviewImage } from './skill-preview-image'
@@ -30,7 +31,7 @@ export function FontResourceContent({ entry, zh }: { entry: Extract<ExternalSkil
         <p className="mt-6 max-w-3xl text-lg leading-8 text-secondary">{entry.description[lang]}</p>
         <p className="mt-4 text-sm text-secondary">{zh ? '整理者' : 'Curated by'} <a className="underline underline-offset-4" href={entry.author.url} rel="noopener noreferrer" target="_blank">{entry.author.name} ↗</a></p>
         <div className="mt-7 flex flex-wrap gap-3">
-          <a href={entry.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded-lg bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white hover:bg-[#00533d]">{zh ? '在 GitHub 获取字库' : 'Get fonts on GitHub'} ↗</a>
+          <SkillActionLink skillSlug={entry.slug} eventType="outbound_github" metadata={{ source: 'external-catalog' }} href={entry.sourceUrl} external className="inline-flex min-h-11 items-center rounded-lg bg-[#006b4f] px-5 py-3 text-sm font-semibold text-white hover:bg-[#00533d]">{zh ? '在 GitHub 获取字库' : 'Get fonts on GitHub'} ↗</SkillActionLink>
           <Link href={entry.articlePath} className="inline-flex min-h-11 items-center rounded-lg border border-border px-5 py-3 text-sm hover:bg-muted">{zh ? '阅读配图与视频使用教程（英文）' : 'Read the image & video guide'} →</Link>
         </div>
       </header>

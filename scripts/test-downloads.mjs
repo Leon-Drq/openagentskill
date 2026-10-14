@@ -7,6 +7,7 @@ import { createRequire } from 'node:module'
 import { createHash } from 'node:crypto'
 import ts from 'typescript'
 const require = createRequire(import.meta.url)
+process.env.SUPABASE_SERVICE_ROLE_KEY = 'download-action-test-only-not-a-credential'
 const { NextRequest } = require('next/server')
 const modules = new Map()
 const sha = text => createHash('sha256').update(text).digest('hex')
@@ -16,12 +17,13 @@ let row = { slug: 'test-skill', source_path: 'SKILL.md', source_commit_sha: 'a'.
 let bytes = new TextEncoder().encode('paid instructions')
 let release = { skill_slug: 'launch-card-studio', version: '1.0.0', object_path: 'fixture', size_bytes: bytes.length, sha256: sha(bytes), delivery_kind: 'skill-instructions' }
 const receipts = new Set(), totals = new Map()
-let writes = 0, lastFilter = ''
+let writes = 0, lastFilter = '', lastReceipt = null
 const admin = {
   rpc: async (_name, args) => {
     if (ledgerFailure) return { error: new Error('ledger unavailable') }
     writes++
-    const key = args.p_user_id + ':' + args.p_slug
+    lastReceipt = args
+    const key = (args.p_user_id || args.p_visitor_key) + ':' + args.p_slug
     if (!receipts.has(key)) { receipts.add(key); totals.set(args.p_slug, (totals.get(args.p_slug) || 0) + 1) }
     return { data: totals.get(args.p_slug), error: null }
   },
@@ -35,6 +37,8 @@ function load(path) {
   const source = ts.transpileModule(readFileSync(absolute,'utf8'), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true } }).outputText
   new Function('exports','require',source)(output, name => {
     if (name === 'server-only') return {}
+    if (name === '@/lib/analytics') return { trackAnalyticsEvent: () => {} }
+    if (name === '@/lib/x/attribution-client') return { getActiveXAttribution: () => null }
     if (name === 'next/cache') return { unstable_cache: fn => fn }
     if (name === '@/lib/supabase/admin') return { createAdminClient: () => admin }
     if (name === '@/lib/supabase/public') return { createPublicClient: () => publicDb }
@@ -56,6 +60,7 @@ function load(path) {
 }
 const free = load('app/api/skills/[slug]/download/route.ts').POST
 const paid = load('app/api/payments/download/route.ts').POST
+const action = load('app/api/skills/[slug]/download-action/route.ts').POST
 const request = (body = {}, origin='https://www.openagentskill.com', accept='application/octet-stream') => new NextRequest('https://www.openagentskill.com/api/download', { method:'POST', headers:{ origin, 'content-type':'application/json', accept }, body:JSON.stringify(body) })
 const download = (req=request(), slug='test-skill') => free(req,{ params:Promise.resolve({slug}) })
 assert.equal((await download(request({},'https://evil.example'))).status,403)
@@ -88,6 +93,38 @@ response=await paid(request({slug:release.skill_slug})); assert.equal(response.s
 assert.equal(await response.text(),'paid instructions'); assert.equal(totals.get(release.skill_slug),1)
 await paid(request({slug:release.skill_slug},undefined,'application/json'))
 assert.equal(totals.get(release.skill_slug),1,'legacy signed-link creation is not a download')
+const actionBody = { action: 'command-copy', sessionId: 'af1651c4-2281-4cd7-b8fe-9c9a6c0027cb' }
+const act = (body=actionBody, slug='test-skill', origin) => action(request(body,origin), { params:Promise.resolve({slug}) })
+assert.equal((await act(actionBody,undefined,'https://evil.example')).status,403)
+assert.equal((await act({...actionBody, count:500})).status,400)
+assert.equal((await act({...actionBody, sessionId:'arbitrary'})).status,400)
+assert.equal((await act({...actionBody, action:'view'})).status,400)
+visible=false; assert.equal((await act()).status,404); visible=true
+row.source_sync_status='changed'; assert.equal((await act()).status,409); row.source_sync_status='current'
+const beforeActions=totals.get('test-skill')
+await act(); assert.equal(totals.get('test-skill'),beforeActions,'file and command share account/day dedupe')
+await act({...actionBody, action:'external-open'}); assert.equal(totals.get('test-skill'),beforeActions)
+user=null
+assert.equal((await act()).status,200,'guests can count without signing in')
+assert.equal(lastReceipt.p_user_id,null); assert.match(lastReceipt.p_visitor_key,/^[a-f0-9]{64}$/)
+assert.ok(!JSON.stringify(lastReceipt).includes(actionBody.sessionId),'raw guest ID is not in the ledger')
+await Promise.all([act(),act({...actionBody,action:'external-open'})])
+assert.equal(totals.get('test-skill'),beforeActions+1,'guest copies and redirects share daily dedupe')
+const provider=load('lib/skills/external-catalog.ts').EXTERNAL_SKILLS.find(e=>e.provider==='skillry' && e.active)
+assert.equal((await act({...actionBody,action:'external-open'},provider.slug)).status,200)
+assert.equal((await act(actionBody,provider.slug)).status,409,'provider cards cannot report unsupported command copies')
+assert.equal(totals.get(provider.slug),1)
+ledgerFailure=true; assert.equal((await act()).status,503); ledgerFailure=false
+const {chronologicalDirectoryPage, chronologicalRegistryWindow,compareDirectoryDownloads} = load('lib/skills/chronological-directory.ts')
+const registry=Array.from({length:80},(_,i)=>({slug:`registry-${String(i).padStart(3,'0')}`,timestamp:null,downloads:80-i}))
+const providers=Array.from({length:21},(_,i)=>({slug:`provider-${i}`,timestamp:null,downloads:i*5}))
+const expected=[...registry,...providers].sort(compareDirectoryDownloads)
+const actual=[]
+for(let offset=0;offset<expected.length;offset+=16) {
+ const window=chronologicalRegistryWindow(offset,providers.length,16)
+ actual.push(...chronologicalDirectoryPage(registry.slice(window.offset,window.offset+window.limit),providers,offset,window.offset,16,compareDirectoryDownloads))
+}
+assert.deepEqual(actual.map(e=>e.slug),expected.map(e=>e.slug),'downloads merge provider/registry pages without gaps or duplicates')
 const { verifiedDownloadBytes } = load('lib/skills/download-policy.ts')
 assert.equal(verifiedDownloadBytes(bytes,0,sha(bytes)),false)
 assert.equal(verifiedDownloadBytes(bytes,21*1024*1024,sha(bytes)),false)
@@ -110,4 +147,24 @@ for(const locale of ['en','zh','ja','ko','es','de','fr','id']) {
   const unknown=renderToStaticMarkup(React.createElement(SkillDownloadCount,{locale,count:null}))
   assert.match(unknown,/data-site-downloads="unknown"/); assert.match(unknown,/—/)
 }
-console.log('Site downloads: actual bytes/hash, authenticated access, visibility, paid entitlement gate, CSRF, failed writes/transfers, duplicate requests, real-count sorting and 8-locale badges passed.')
+const sent = [], saved = new Map()
+globalThis.window={ localStorage:{getItem:k=>saved.get(k),setItem:(k,v)=>saved.set(k,v)}, location:{pathname:'/skills/test-skill'} }
+globalThis.document={ referrer:'' }
+globalThis.fetch=async (url,init)=>{sent.push({url,...init,body:JSON.parse(init.body)}); return {ok:true} }
+const {trackSkillEvent}=load('components/skill-event-tracker.tsx')
+await trackSkillEvent('test-skill','view')
+await trackSkillEvent('test-skill','install_copy',{kind:'agent-prompt'})
+assert.equal(sent.filter(e=>e.url.endsWith('/download-action')).length,0,'views and review/agent prompts are not command downloads')
+await trackSkillEvent('test-skill','install_copy',{kind:'command'})
+await trackSkillEvent(provider.slug,'outbound_docs',{source:'external-catalog'})
+const counted=sent.filter(e=>e.url.endsWith('/download-action'))
+assert.deepEqual(counted.map(e=>e.body.action),['command-copy','external-open'])
+assert.equal(counted[0].body.sessionId,counted[1].body.sessionId,'one stable browser ID across Skills')
+assert.ok(counted.every(e=>e.keepalive && e.method==='POST'))
+assert.equal(sent.filter(e=>e.url==='/api/events/skill').length,3,'providers do not submit invalid registry foreign keys')
+window.localStorage.getItem=()=>{throw Error('storage denied')}
+await trackSkillEvent('test-skill','outbound_github')
+assert.equal(sent.filter(e=>e.url.endsWith('/download-action')).length,3,'storage denial does not block tracking or actions')
+globalThis.fetch=async()=>{throw Error('offline')}
+await trackSkillEvent('test-skill','install_copy',{kind:'command'})
+console.log('Site downloads: files, command copies, outbound clicks, guest/account dedupe, public listing and entitlement checks, CSRF, failed requests, cross-page provider ranking and 8-locale badges passed.')

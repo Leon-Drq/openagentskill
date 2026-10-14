@@ -1,5 +1,7 @@
 'use client'
 
+import { trackDownloadAction } from '@/lib/skills/download-actions-client'
+
 import { copyText } from '@/lib/copy-text'
 
 import Link from '@/components/crawl-link'
@@ -226,6 +228,7 @@ export function LocalizedResolveWorkbench({
                       const success = await copyText(recommendation.install.command).catch(() => false)
                       setCopied(success)
                       if (!success) return
+                      void trackDownloadAction(recommendation.best_skill.slug, 'command-copy')
                       trackAnalyticsEvent('localized_resolve_copy_install', {
                         locale,
                         skill_slug: recommendation.best_skill.slug,

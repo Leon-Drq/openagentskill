@@ -9,7 +9,7 @@ import { directoryCategoryTerms } from '@/lib/skills/directory'
 import { normalizeSkillCategory, normalizeTopic, normalizeOutput, type SkillTaxonomy } from '@/lib/skills/taxonomy'
 import { clampResultPage } from '@/lib/skills/pagination'
 import { CATALOG_PAGE_SIZE, catalogPageNumber, catalogSortColumn, catalogStars } from '@/lib/skills/catalog-query'
-import { isChronologicalSort, chronologicalRegistryWindow, chronologicalDirectoryPage, type DatedDirectoryEntry } from '@/lib/skills/chronological-directory'
+import { isChronologicalSort, chronologicalRegistryWindow, chronologicalDirectoryPage, compareDirectoryDownloads, type DatedDirectoryEntry } from '@/lib/skills/chronological-directory'
 import { mediaSlugsNeedPost, slugQueryBatches } from '@/lib/skills/media-query'
 import { isMcpOnlyCategory, isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
 import { unstable_cache } from 'next/cache'
@@ -1318,7 +1318,7 @@ const getCachedCatalogPage = unstable_cache(
     const total = await getCachedCatalogCount(category, minStars, pricing, pricingSlugs, exampleSlugs, topic, output)
     const effectivePage = clampResultPage(page, total + providerCount, CATALOG_PAGE_SIZE)
     const offset = (effectivePage - 1) * CATALOG_PAGE_SIZE
-    if (isChronologicalSort(sort) && providers !== null) {
+    if ((isChronologicalSort(sort) || sort === 'downloads') && providers !== null) {
       const window = chronologicalRegistryWindow(offset, providers.length, CATALOG_PAGE_SIZE)
       const supabase = createPublicClient({ requestTimeoutMs: 8000, circuitScope: 'public-catalog' })
       const post = mediaSlugsNeedPost(exampleSlugs)
@@ -1328,14 +1328,14 @@ const getCachedCatalogPage = unstable_cache(
         category, minStars, pricing, pricingSlugs, post ? null : exampleSlugs, topic, output)
       let keys: DatedDirectoryEntry[] = []
       if (total > window.offset) {
-        const { data, error } = await select('slug,created_at,github_last_pushed_at')
+        const { data, error } = await select(sort === 'downloads' ? 'slug,created_at,github_last_pushed_at,site_downloads' : 'slug,created_at,github_last_pushed_at')
           .order(catalogSortColumn(sort), { ascending: false, nullsFirst: false })
           .order('slug', { ascending: true }).range(window.offset, window.offset + window.limit - 1)
         if (error) throw error
-        keys = ((data || []) as unknown as Pick<SkillRecord, 'slug' | 'created_at' | 'github_last_pushed_at'>[])
-          .map(row => ({ slug: row.slug, timestamp: sort === 'new' ? row.created_at : row.github_last_pushed_at }))
+        keys = ((data || []) as unknown as Pick<SkillRecord, 'slug' | 'created_at' | 'github_last_pushed_at' | 'site_downloads'>[])
+          .map(row => ({ slug: row.slug, timestamp: sort === 'new' ? row.created_at : row.github_last_pushed_at, downloads: row.site_downloads || 0 }))
       }
-      const orderedSlugs = chronologicalDirectoryPage(keys, providers, offset, window.offset, CATALOG_PAGE_SIZE).map(row => row.slug)
+      const orderedSlugs = chronologicalDirectoryPage(keys, providers, offset, window.offset, CATALOG_PAGE_SIZE, sort === 'downloads' ? compareDirectoryDownloads : undefined).map(row => row.slug)
       const registrySlugs = orderedSlugs.filter(slug => keys.some(row => row.slug === slug))
       let records: SkillRecord[] = []
       if (registrySlugs.length) {
@@ -1363,7 +1363,7 @@ const getCachedCatalogPage = unstable_cache(
     if (error) throw error
     return { records: (data || []) as unknown as SkillRecord[], total, hasMore: from + limit < total, page: effectivePage }
   }),
-  ['public-catalog-pages-v10-site-downloads'],
+  ['public-catalog-pages-v11-download-actions'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 

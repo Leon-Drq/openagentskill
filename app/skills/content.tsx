@@ -11,7 +11,7 @@ import { clampResultPage, requestedDirectoryPage } from '@/lib/skills/pagination
 import { catalogPageNumber, catalogStars, directoryDiscoveryFilters, canShowCatalogSnapshot, selectCatalogSnapshot } from '@/lib/skills/catalog-query'
 import { getDirectoryProfiles } from '@/lib/skills/directory-profiles'
 import { projectDirectoryWindow } from '@/lib/skills/directory-window'
-import { isChronologicalSort, chronologicalDirectoryPage } from '@/lib/skills/chronological-directory'
+import { isChronologicalSort, chronologicalDirectoryPage, compareDirectoryDownloads } from '@/lib/skills/chronological-directory'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { type SkillAgentStats, type SkillRecord, type SkillSortMode, getSkillStats, searchSkillsWithStatus } from '@/lib/db/skills'
 import { getShowcasesForSkill, getShowcaseCardData, SHOWCASE_SKILL_SLUGS } from '@/lib/showcase'
@@ -965,6 +965,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
   const providerSkills = (includeProviders ? selectProviderSkills({ query, category, topic, output, pricing, examplesOnly,
     platform, quality, trust, safety, supplyTrack, minStars, useCase, featured, sort }) : []).map(entry => toProviderDirectorySkill(entry, locale))
   const providerOnlyQuery = query?.toLocaleLowerCase() === 'skillry'
+  const providerDownloads = sort === 'downloads' ? await downloadTotalsPromise : null
   const includeRegistry = registryAccess && !providerOnlyQuery
   const restrictedRegistry = !includeRegistry || access === 'paid'
   const catalogMode = !featured && !query && !restrictedRegistry && paidMotionEntries.length === 0 && [useCase, platform, quality, trust, safety, supplyTrack].every(value => value === 'all')
@@ -974,7 +975,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
   // keeping their ranked total stable instead of widening it on every jump.
   const candidateLimit = MAX_SKILL_CANDIDATE_LIMIT
   const catalogWindow = { ...providerCatalogWindow(requestedPageOffset, providerSkills.length, sort),
-    providers: isChronologicalSort(sort) ? providerSkills.map(skill => ({ slug: skill.slug, timestamp: skill.createdAt })) : undefined }
+    providers: isChronologicalSort(sort) || sort === 'downloads' ? providerSkills.map(skill => ({ slug: skill.slug, timestamp: skill.createdAt, downloads: providerDownloads?.[skill.slug] || 0 })) : undefined }
   const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured, siteDownloads] = await Promise.all([
     restrictedRegistry || query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
       : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, featured, minStars, pricing, topic, output), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
@@ -1003,6 +1004,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     downloadTotalsPromise,
   ])
   const motionDownloads = siteDownloads
+  for (const skill of providerSkills) skill.stats.siteDownloads = siteDownloads ? siteDownloads[skill.slug] || 0 : null
   const records = !includeRegistry ? [] : access === 'paid' ? useCaseFeatured.filter(record => paidSlugs.includes(record.slug)) : catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, useCaseFeatured, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
   const degraded = Boolean(catalogResult?.degraded || recordsResult.degraded || searchAugmentRecords.degraded)
   let effectivePage = catalogMode ? catalogResult!.page : page
@@ -1108,17 +1110,17 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     skills = merged.registryEntries
     resultCount = merged.total
     hasMoreResults = pageOffset + VISIBLE_SKILL_LIMIT < resultCount
-  } else if (isChronologicalSort(sort)) {
+  } else if (isChronologicalSort(sort) || sort === 'downloads') {
     resultCount = (catalogMode && !degraded ? catalogResult!.total : filteredRecords.length) + providerSkills.length
     if (catalogMode && catalogResult!.orderedSlugs) {
       const cards = new Map([...providerSkills, ...visibleRecords.map(projectCard)].map(card => [card.slug, card]))
       skills = catalogResult!.orderedSlugs.flatMap(slug => cards.has(slug) ? [cards.get(slug)!] : [])
     } else {
       const entries = [
-        ...filteredRecords.map(item => ({ slug: item.record.slug, timestamp: sort === 'new' ? item.record.created_at : item.record.github_last_pushed_at, project: () => projectCard(item) })),
-        ...providerSkills.map(card => ({ slug: card.slug, timestamp: card.createdAt, project: () => card })),
+        ...filteredRecords.map(item => ({ slug: item.record.slug, timestamp: sort === 'new' ? item.record.created_at : item.record.github_last_pushed_at, downloads: item.record.site_downloads || 0, project: () => projectCard(item) })),
+        ...providerSkills.map(card => ({ slug: card.slug, timestamp: card.createdAt, downloads: card.stats.siteDownloads || 0, project: () => card })),
       ]
-      skills = chronologicalDirectoryPage(entries, [], pageOffset, 0, VISIBLE_SKILL_LIMIT).map(entry => entry.project())
+      skills = chronologicalDirectoryPage(entries, [], pageOffset, 0, VISIBLE_SKILL_LIMIT, sort === 'downloads' ? compareDirectoryDownloads : undefined).map(entry => entry.project())
     }
     hasMoreResults = !degraded && pageOffset + VISIBLE_SKILL_LIMIT < resultCount
   } else if (catalogMode) {
@@ -1169,7 +1171,7 @@ const getDefaultDirectory = unstable_cache(async (locale: Locale) => {
   const model = await prepareDirectory({ lang: locale })
   if (model.clientProps.degraded) throw new DegradedDirectory(model)
   return model
-}, ['public-directory-model-v2-site-downloads'], {
+}, ['public-directory-model-v3-download-actions'], {
   revalidate: 300, tags: ['public-skill-directory', 'public-skill-stats'],
 })
 
