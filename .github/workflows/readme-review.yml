@@ -1,0 +1,15 @@
+name: README Review
+on:
+  pull_request:
+    paths:
+      - 'README.md'
+
+permissions:
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: iteebz/readme-review@v1
