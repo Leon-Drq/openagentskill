@@ -46,7 +46,7 @@ assert.equal(meetsAutomaticDiscoveryStarFloor(19), false)
 assert.equal(meetsAutomaticDiscoveryStarFloor(20), true)
 assert.equal(SKILL_SUBMISSION_MIN_STARS, 0, 'direct user submissions must remain zero-star eligible')
 assert.equal(PUBLICATION_DAILY_TARGET, 1_000)
-assert.equal(PUBLICATION_RUNS_PER_DAY, 144)
+assert.equal(PUBLICATION_RUNS_PER_DAY, 96)
 assert.ok(automaticPublicationCapacityPerDay() > PUBLICATION_DAILY_TARGET)
 assert.equal(SEARCH_INDEX_MIN_QUALITY_SCORE, 50)
 assert.equal(SEARCH_INDEX_MIN_GITHUB_STARS, 3)
@@ -105,7 +105,7 @@ const vercelConfig = JSON.parse(readFileSync(new URL('../vercel.json', import.me
 }
 assert.equal(
   vercelConfig.crons.find((cron) => cron.path === '/api/cron/skill-candidates-publish')?.schedule,
-  '0,10,25,30,40,55 * * * *'
+  '0,15,30,45 * * * *'
 )
 assert.equal(
   vercelConfig.crons.find((cron) => cron.path === '/api/indexer/refresh-stars')?.schedule,
@@ -117,7 +117,7 @@ assert.equal(
 )
 
 const discoveryStatusRoute = readFileSync(new URL('../app/api/agent/discovery/route.ts', import.meta.url), 'utf8')
-assert.ok(discoveryStatusRoute.includes('schedule: `${SKILL_RADAR_CRON_MINUTE_UTC} * * * *`'))
+assert.ok(discoveryStatusRoute.includes('schedule: `${SKILL_RADAR_CRON_MINUTE_UTC} */3 * * *`'))
 assert.ok(!discoveryStatusRoute.includes('at least 10 GitHub stars'))
 assert.ok(discoveryStatusRoute.includes("star_refresh_cron: '30 2 * * *'"))
 assert.ok(discoveryStatusRoute.includes("indexnow_cron: '10 3 * * *'"))
@@ -142,7 +142,7 @@ for (const [route, mode] of [
 }
 
 const xStatusRoute = readFileSync(new URL('../app/api/x/status/route.ts', import.meta.url), 'utf8')
-assert.ok(xStatusRoute.includes("skillRadarCron: '45 * * * *'"))
+assert.ok(xStatusRoute.includes("skillRadarCron: '45 */3 * * *'"))
 
 const openSubmission = readFileSync(new URL('../lib/skills/open-submission.ts', import.meta.url), 'utf8')
 assert.ok(openSubmission.includes('source_content_hash: sourceContentHash'))

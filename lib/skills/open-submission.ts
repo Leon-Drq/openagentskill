@@ -462,6 +462,7 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
 
     try {
       revalidateTag('public-skill-directory', 'max')
+      revalidateTag(`public-skill:${slug}`, { expire: 0 })
       revalidatePath('/skills')
       revalidatePath('/api/skills/search')
     } catch (cacheError) {

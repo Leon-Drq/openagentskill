@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
       postDailyCron: '30 15,19,23 * * *',
       creatorReplyCron: '35 15,19,23 * * *',
       growthRunCron: '30 14 * * *',
-      skillRadarCron: '45 * * * *',
+      skillRadarCron: '45 */3 * * *',
       postQueueBuildLimit: 3,
       growthQueueLimit: numberFromEnv('X_DAILY_SCENARIO_POSTS', 3),
       metricsSyncLimit: numberFromEnv('X_METRICS_SYNC_LIMIT', 12),

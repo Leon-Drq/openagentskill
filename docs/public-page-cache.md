@@ -2,40 +2,39 @@
 
 ## Scope
 
-The English and localized `/skills` directories render at request time, after
-`connection()` prevents database work during the build. Their filtered and
-unfiltered URLs now share the same public route segment. Data-layer caches and
-existing `public-skill-directory` tags still limit repeated database reads.
-Default directories also share a 300-second public view-model cache (exactly
-eight locale keys), covering reads, ranking, profiles and card/JSON-LD preparation.
-The wrapper still waits for a request, so builds do not query the directory.
-Search and other content queries bypass this model cache. Attribution and RSC
-parameters cannot grow its key space; each request constructs its own query links.
-Directory HTML remains request-time, so this reduces computation but does not
-eliminate directory function invocations or claim a directory CDN HIT.
+Default English and seven localized `/skills` directories are rewritten to
+on-demand ISR routes under `/cached-public/{locale}/skills`, with a 900-second
+window. The eight default public models use the same window. Their public URLs,
+SSR cards, canonicals, language navigation and existing directory layout remain.
+No registry-wide build is performed: internal cache routes return an empty
+`generateStaticParams` and generate only when requested.
 
-Skill detail, audit and eval pages and other fixed localized pages use 300-second
-ISR. The three skill routes generate on demand instead of prebuilding the registry.
+Search and filters stay on the existing request-time `/skills` route. The URL
+continues to own all filter state; complex and unknown parameters never enter
+an unbounded shared HTML cache. Attribution and `_rsc` parameters do not enlarge
+internal response keys. HTML and RSC transport remain separate framework variants.
 
-The directory client receives URL state as server props rather than reading
-`useSearchParams`, so its heading, cards, links and relocated search toolbar are
-server-rendered. Filter links keep real hrefs, use `scroll: false` transitions
-and show loading only in the right-hand results region while retaining cards.
-Back/forward navigation and copied filter URLs use the same server renderer.
+Skill detail/audit/eval pages and finite `?lang=` variants use 900-second ISR.
+Contact and sponsor content use finite locale variants with a one-day window.
+Proxy blocks direct requests to `/cached-public` and `/render-query` with a
+noindex 404; internal paths are absent from navigation and sitemaps. Public
+metadata preserves canonical/noindex policies and actual translated content.
 
-The existing renderers and metadata live in adjacent `content.tsx` files. Proxy
-still rewrites query variants of skill details, audit/eval reports and other localized pages to
-`/render-query/...` wrappers. Direct requests to those internal routes return a
-noindex 404. `_rsc` transport state does not change route or indexing policy.
-Reserved `/skills/new` remains untouched. Legacy `/skills/external` URLs permanently redirect to the unified directory and detail routes.
+Public display lookups use their own 900-second cache tier; install and Agent
+interfaces retain the original 300-second lookup tier and no-store responses.
+Both tiers carry `public-skill:{slug}`. Publication expires that exact tag
+immediately, plus the directory and affected public paths. Source batches carry
+only their member tags and cap batches at 100, so an unrelated publication does
+not invalidate every detail or featured batch. Directory aggregates keep their
+existing roll-up tags.
 
-This is not a public CDN header override on an authenticated response. Public
-pages do not read sessions. `/profile`, claim and points session refresh remain
-intact. Query pages deliberately remain private/no-store; high-cardinality search
-is not put into an unbounded HTML cache.
+Public report analysis caches complete source/statistics/options inputs for an
+hour. Stored computation timestamps remain the actual calculation time and do
+not change merely because a page was requested again. These display snapshots
+never authorize an installation, payment, review approval or private access.
 
-Proxy now matches only routes needing locale, alias, missing-page or session
-logic. Other pages with `?lang=` still match to preserve Content-Language behavior.
+Public pages do not read sessions. Authentication, purchases, personal votes,
+claims and private APIs retain their existing cookie/authentication boundaries.
 
 ## Repeated computation
 
@@ -56,13 +55,13 @@ it is separate from the process-local profile memo described above.
 
 ## Freshness and safety
 
-Existing `public-skill-directory` data tags and owner publication path/tag
-invalidation are preserved. Default models carry both `public-skill-directory`
+Directory roll-up tags and owner publication path/tag invalidation are preserved;
+individual source reads additionally use immediate per-Skill invalidation. Default models carry both `public-skill-directory`
 and `public-skill-stats`, so publication and statistics invalidation also refresh
 derived display data. Degraded directory models throw before the cache write:
 the current request can render the labelled fallback without persisting it;
 failed background revalidation retains the last good shared model.
-ISR refreshes on traffic, not on a five-minute timer;
+ISR refreshes on traffic, not on a fifteen-minute timer;
 data-layer revalidation, regeneration time and failures affect observed freshness.
 Optional support-data timeouts can leave a conservative empty state in rendered
 HTML until successful regeneration. Do not promise immediate statistics updates.
@@ -88,8 +87,8 @@ Run `node scripts/check-public-cache.mjs`; set `BASE_URL` for a deployed target.
 Run `node scripts/test-render-cost.mjs --benchmark` for the optional offline
 view-model comparison. Its fixture timings exclude real database latency,
 React HTML rendering and CDN behavior, and are not production savings estimates.
-The smoke test checks detail/audit/eval HIT headers, server-rendered headings/canonicals,
-uncached query variants, redirects and internal route blocking. Regression tests
+The smoke test checks directory/detail/audit/eval HIT headers, server-rendered headings/canonicals,
+uncached filter variants, cached language variants, redirects and internal route blocking. Regression tests
 also cover proxy matching, reserved routes, RSC handling, auth scope, LRU/TTL,
 mutation isolation and identical safety/score outputs across record variants.
 
@@ -103,7 +102,16 @@ After rollout, compare production-only CPU per request, function invocations,
 ISR writes, cache HIT rate, errors and SEO responses over comparable 24–48-hour
 traffic windows. A cache HIT is not a measured billing reduction. Unchanged query
 traffic, bots, cron, builds and other projects still cost money. Do not disable
-projects, paid features or legitimate crawlers as part of this code change.
+projects or legitimate search/user-directed crawlers as part of this code change.
+
+## Background cadence
+
+Candidate publication batches run four times per hour (96/day) with 14 fast-track
+and eight AI-review slots per run. The 1,000/day ceiling and all review gates
+remain. Discovery/radar run every three hours and validation runs hourly;
+user submission processing retains its five-minute cadence. Configured cron
+invocations fall from 551 to 447/day. Discovery status reports the same cadence.
+Newly discovered candidates can wait up to three hours plus queue processing.
 
 Rollback by reverting the release commit and redeploying the prior revision;
 there is no database migration, URL migration or new credential to undo.

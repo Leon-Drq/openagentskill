@@ -43,9 +43,12 @@ export async function POST(request: NextRequest) {
       // a successful publish into an ambiguous error for the caller.
       try {
         revalidateTag('public-skill-directory', { expire: 0 })
+        revalidateTag(`public-skill:${result.slug}`, { expire: 0 })
         revalidateTag('approved-sitemap-count', { expire: 0 })
         revalidateTag('approved-sitemap-records', { expire: 0 })
         revalidatePath(`/skills/${result.slug}`)
+        revalidatePath(`/skills/${result.slug}/audit`)
+        revalidatePath(`/skills/${result.slug}/evals`)
         revalidatePath('/skills')
       } catch {
         console.warn('[owner-publish] Cache invalidation deferred after publication.')

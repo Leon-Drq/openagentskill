@@ -13,7 +13,7 @@ Every separate operation counts, including repeats by the same account, browser
 or Agent on the same day. Receipts use generated UUIDs rather than a daily actor
 primary key. Counts are operations, not unique people, confirmed installations
 or guaranteed successful executions. Client-reported interactions and Agent
-reports do not prove human activity. Counts can lag by five minutes. A healthy
+reports do not prove human activity. Counts can lag by fifteen minutes. A healthy
 empty aggregate shows `0`; an unavailable aggregate shows `—`.
 
 ## Historical evidence and Agent usage

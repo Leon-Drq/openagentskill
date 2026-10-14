@@ -1172,7 +1172,7 @@ const getDefaultDirectory = unstable_cache(async (locale: Locale) => {
   if (model.clientProps.degraded) throw new DegradedDirectory(model)
   return model
 }, ['public-directory-model-v4-download-operations'], {
-  revalidate: 300, tags: ['public-skill-directory', 'public-skill-stats'],
+  revalidate: 900, tags: ['public-skill-directory', 'public-skill-stats'],
 })
 
 export default async function SkillsPage({

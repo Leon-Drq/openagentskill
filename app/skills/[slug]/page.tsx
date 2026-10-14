@@ -1,6 +1,6 @@
 import SkillContent, { generateMetadata as buildMetadata } from './content'
 
-export const revalidate = 300
+export const revalidate = 900
 
 // On-demand ISR avoids prebuilding the entire registry on every deployment.
 export function generateStaticParams() { return [] }

@@ -9,7 +9,7 @@ export function slugQueryBatches(slugs: string[]) {
   let batch: string[] = [], length = 0
   for (const slug of slugs) {
     const size = encodeURIComponent(slug).length + 3
-    if (length + size > 2400 && batch.length) { batches.push(batch); batch = []; length = 0 }
+    if ((length + size > 2400 || batch.length >= 100) && batch.length) { batches.push(batch); batch = []; length = 0 }
     batch.push(slug); length += size
   }
   if (batch.length) batches.push(batch)

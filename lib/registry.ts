@@ -748,6 +748,13 @@ export function rankSkillsForQuery(
   const isFinanceQueryIntent = /\b(finance|financial|quant|quantitative|trade|trades|trader|trading|invest|investing|investment|portfolio|markets?|stocks?|equity|crypto|filings?|edgar|sec filings?|investor|earnings|10-k|10-q|alpha|factor|backtest|backtesting|risk model)\b/.test(normalizedQuery) ||
     queryTokens.some((token) => ['trade', 'trades', 'trader', 'trading', 'invest', 'investing', 'investment', 'market', 'markets', 'stock', 'stocks', 'equity', 'quant', 'backtest'].includes(token))
 
+  const isGenericWebTask = /\b(websites?|web pages?|pages?|html|crawl|crawler|scrape|scraper|web scraping|pricing|competitor)\b/.test(normalizedQuery)
+  const isContentTask = /\b(content|blog|post|posts|newsletter|social|copy|copywriting|writing|publish|publishing|product updates?|launch notes?)\b/.test(normalizedQuery)
+  const isSportsTask = /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(normalizedQuery)
+  const isDesignTask = /\b(design|designer|creative|motion|animation|lottie|gsap|figma|ui|ux|shadcn|component|design system|three|3d|map|dashboard|visual|svg)\b/.test(normalizedQuery)
+  const isPresentationTask = /\b(presentation|presentations|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides|visual story)\b/.test(normalizedQuery)
+  const matchingUseCases = USE_CASES.filter(useCase => normalizedQuery.includes(useCase.slug.replace(/-/g, ' ')) || useCase.keywords.some(keyword => normalizedQuery.includes(keyword.toLowerCase())))
+
   return skills
     .map((skill) => {
       const text = skillSearchText(skill)
@@ -788,29 +795,21 @@ export function rankSkillsForQuery(
           if (text.includes(token)) score += 8 * multiplier
         }
 
-        for (const useCase of USE_CASES) {
-          const useCaseHit =
-            normalizedQuery.includes(useCase.slug.replace(/-/g, ' ')) ||
-            useCase.keywords.some((keyword) => normalizedQuery.includes(keyword.toLowerCase()))
-          if (useCaseHit) score += Math.min(45, scoreSkillForUseCase(skill, useCase) * 4)
+        for (const useCase of matchingUseCases) {
+          score += Math.min(45, scoreSkillForUseCase(skill, useCase) * 4)
         }
 
-        const isGenericWebTask = /\b(websites?|web pages?|pages?|html|crawl|crawler|scrape|scraper|web scraping|pricing|competitor)\b/.test(normalizedQuery)
         const isGenericWebSkill = /\b(web-crawling|crawler|crawl|scraper|scrape|browser|playwright|puppeteer|html|markdown|extraction)\b/.test(text)
         const isLLMReadyWebSkill = /\b(llm-friendly|llm friendly|markdown|structured data|extract structured|web crawler|web scraper)\b/.test(text)
         const isPlatformSpecificExtractor = /\b(google maps|app store|google play|youtube|twitter|x.com|reddit|spotify|instagram|tiktok|linkedin|amazon|ebay|walmart|shopify store)\b/.test(text)
-        const isContentTask = /\b(content|blog|post|posts|newsletter|social|copy|copywriting|writing|publish|publishing|product updates?|launch notes?)\b/.test(normalizedQuery)
         const isContentSkill = /\b(content|copywriting|writing|blog|markdown|newsletter|social|summary|summarize|publishing|content-generation|content automation)\b/.test(text)
         const isUnrelatedContentTool = /\b(data-analysis|database|security|scanner|vulnerability|browser-automation|web-automation|testing|qa)\b/.test(text)
         const isFinanceTask = isFinanceQueryIntent
         const isFinanceCategory = /\b(finance|financial|quant|trading|market|stock|investment|portfolio|fintech|crypto|defi)\b/.test(category)
         const isFinanceSkill = /\b(finance|financial|quant|quantitative|trade|trades|trader|trading|portfolio|market-data|markets?|stocks?|stock[-_\s]?analysis|equity|crypto|filings?|edgar|sec filing|investor|investment|earnings|10-k|10-q|alpha|factor|backtest|backtesting|risk model|openbb|vectorbt|freqtrade|yfinance|zipline|backtrader)\b/.test(text) || isFinanceCategory
         const isSecurityOnlySkill = /\b(security|vulnerability|scanner|nuclei|pentest|cve|sast|exploit|secret scanning)\b/.test(text) && !isFinanceSkill
-        const isSportsTask = /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(normalizedQuery)
         const isSportsSkill = /\b(sports?|football|soccer|world cup|fifa|matches?|players?|teams?|statsbomb|expected goals|xg|soccernet|scouting|prediction|transfermarkt)\b/.test(text)
-        const isDesignTask = /\b(design|designer|creative|motion|animation|lottie|gsap|figma|ui|ux|shadcn|component|design system|three|3d|map|dashboard|visual|svg)\b/.test(normalizedQuery)
         const isDesignSkill = /\b(design|creative|motion|animation|lottie|gsap|figma|ui|ux|shadcn|component|design system|three|3d|map|dashboard|visual|svg)\b/.test(text)
-        const isPresentationTask = /\b(presentation|presentations|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides|visual story)\b/.test(normalizedQuery)
         const isPresentationSkill = /\b(presentation|presentations|ppt|pptx|powerpoint|slides?|slide deck|deck|pitch deck|keynote|speaker notes|html slides|visual story|notebooklm|guizang|baoyu)\b/.test(text)
         const isDocumentOnlySkill = /\b(pdf|document|docx|markdown|ocr|converter|convert|parser|parse)\b/.test(text) && !isPresentationSkill
 

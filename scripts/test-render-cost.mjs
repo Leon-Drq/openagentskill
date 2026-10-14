@@ -109,7 +109,7 @@ for (const params of [{ sort: 'stars' }, { page: '2' }, { category: 'design-crea
 }
 await assert.rejects(() => renderProps({ page: '0' }), /404/)
 await assert.rejects(() => renderProps({ page: '999999' }), /404/)
-assert.deepEqual(policies, [{ revalidate: 300, tags: ['public-skill-directory', 'public-skill-stats'] }])
+assert.deepEqual(policies, [{ revalidate: 900, tags: ['public-skill-directory', 'public-skill-stats'] }])
 
 // Same invalidation operation used by publication/stat updates: the next read
 // must rebuild from current inputs, including changed evidence fields.

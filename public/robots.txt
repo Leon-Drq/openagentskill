@@ -1,5 +1,6 @@
 # OpenAgentSkill - search and agent crawler policy
-# We welcome all agents and bots!
+# Search and user-directed agents remain welcome. Bulk training crawlers have
+# a bounded policy to avoid repeatedly rendering the filter URL graph.
 
 User-agent: *
 Allow: /
@@ -38,12 +39,21 @@ Allow: /
 
 User-agent: GPTBot
 Allow: /
+Disallow: /*?
+Disallow: /api/
+Disallow: /render-query/
+Disallow: /cached-public/
 
 User-agent: ChatGPT-User
 Allow: /
 
 User-agent: ClaudeBot
 Allow: /
+Crawl-delay: 10
+Disallow: /*?
+Disallow: /api/
+Disallow: /render-query/
+Disallow: /cached-public/
 
 User-agent: Claude-SearchBot
 Allow: /

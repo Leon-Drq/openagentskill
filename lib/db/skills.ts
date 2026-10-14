@@ -942,32 +942,32 @@ function normalizeSkillLookupSlug(slug: string) {
 // Detail pages, badges, manifests, and social crawlers all resolve skills by
 // slug. Cache matches and genuine misses, but let transient errors escape so
 // they are never stored as a false missing record.
-const getCachedSkillBySlug = unstable_cache(
-  coalesceCacheLoader(async (slug: string): Promise<SkillRecord | null> => {
-    const supabase = createPublicClient({ requestTimeoutMs: SKILL_LOOKUP_TIMEOUT_MS, circuitScope: 'skill-lookup' })
-    const { data, error } = await supabase
-      .from('skills')
-      .select('*')
-      .eq('slug', slug)
-      .or(PUBLIC_SKILL_FILTER)
-      .maybeSingle()
+const loadSkillBySlug = coalesceCacheLoader(async (slug: string): Promise<SkillRecord | null> => {
+  const supabase = createPublicClient({ requestTimeoutMs: SKILL_LOOKUP_TIMEOUT_MS, circuitScope: 'skill-lookup' })
+  const { data, error } = await supabase
+    .from('skills')
+    .select('*')
+    .eq('slug', slug)
+    .or(PUBLIC_SKILL_FILTER)
+    .maybeSingle()
 
-    if (error) throw error
-    if (!data || isMcpOnlySkillRecord(data)) return null
-    return data as SkillRecord
-  }),
-  ['public-skill-by-slug-v3'],
-  {
-    revalidate: SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS,
-    tags: ['public-skill-directory'],
-  }
-)
+  if (error) throw error
+  if (!data || isMcpOnlySkillRecord(data)) return null
+  return data as SkillRecord
+})
 
-export async function getSkillBySlugStrict(slug: string): Promise<SkillRecord | null> {
+function getCachedSkillBySlug(slug: string, cacheSeconds: number) {
+  const revalidate = cacheSeconds === 900 ? 900 : SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS
+  return unstable_cache(loadSkillBySlug, ['public-skill-by-slug-v4', String(revalidate)], {
+    revalidate, tags: [`public-skill:${slug}`],
+  })(slug)
+}
+
+export async function getSkillBySlugStrict(slug: string, cacheSeconds = SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS): Promise<SkillRecord | null> {
   const normalized = normalizeSkillLookupSlug(slug)
   if (!normalized) return null
 
-  return getCachedSkillBySlug(normalized)
+  return getCachedSkillBySlug(normalized, cacheSeconds)
 }
 
 export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> {
@@ -982,18 +982,19 @@ export async function getSkillBySlug(slug: string): Promise<SkillRecord | null> 
 
 // Rich filters and guide pages reuse the same featured source sets across
 // languages. Cache successful batches, not the caller's outage fallback.
-const getCachedSkillBatch = unstable_cache(
-  coalesceCacheLoader(async (slugs: string[], timeoutMs: number): Promise<string> => {
-    const supabase = createPublicClient({ requestTimeoutMs: timeoutMs, circuitScope: 'skill-lookup' })
-    const { data, error } = await supabase.from('skills').select('*')
-      .or(PUBLIC_SKILL_FILTER).in('slug', slugs)
-    if (error) throw error
-    if (!data) throw new Error('Skill batch lookup unavailable')
-    return packCacheJson(filterSkillOnly(data as SkillRecord[]))
-  }),
-  ['public-skill-batches-v1-packed'],
-  { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
-)
+const loadSkillBatch = coalesceCacheLoader(async (slugs: string[], timeoutMs: number): Promise<string> => {
+  const supabase = createPublicClient({ requestTimeoutMs: timeoutMs, circuitScope: 'skill-lookup' })
+  const { data, error } = await supabase.from('skills').select('*')
+    .or(PUBLIC_SKILL_FILTER).in('slug', slugs)
+  if (error) throw error
+  if (!data) throw new Error('Skill batch lookup unavailable')
+  return packCacheJson(filterSkillOnly(data as SkillRecord[]))
+})
+
+const getCachedSkillBatch = (slugs: string[], timeoutMs: number) => unstable_cache(
+  loadSkillBatch, ['public-skill-batches-v2-packed'],
+  { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: slugs.map(slug => `public-skill:${slug}`) }
+)(slugs, timeoutMs)
 
 export async function getSkillsBySlugs(
   slugs: string[],

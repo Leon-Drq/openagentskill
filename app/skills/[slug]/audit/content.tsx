@@ -13,7 +13,6 @@ import { getLocaleFromSearchParam } from '@/lib/i18n/config'
 import { buildAgentReadableSkillMetadata } from '@/lib/agent-readable'
 import {
   auditRiskLabel,
-  buildSkillAudit,
   normalizeAuditRecord,
   type ComputedSkillAudit,
   type SkillAuditCheck,
@@ -23,10 +22,11 @@ import { withTimeout } from '@/lib/async'
 import { getRelatedSkills, getSkillAuditBySlug, getSkillEventStats } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
 import { getSkillBySlugOrFallbackStrict, isCuratedSkillFallback } from '@/lib/skill-fallbacks'
+import { getPublicAudit } from '@/lib/skills/public-analysis'
 import { getSkillTrustProfile, type TrustCheckStatus } from '@/lib/trust'
 
 // Deduplicate metadata/page lookups without caching a transient lookup failure.
-const getSkill = cache(getSkillBySlugOrFallbackStrict)
+const getSkill = cache((slug: string) => getSkillBySlugOrFallbackStrict(slug, 900))
 const SKILL_AUDIT_SUPPORT_TIMEOUT_MS = 1200
 
 export async function generateMetadata({
@@ -116,7 +116,7 @@ export default async function SkillAuditPage({
         withTimeout(getSkillEventStats(skill.slug), SKILL_AUDIT_SUPPORT_TIMEOUT_MS, 'audit event stats query').catch(() => null),
         withTimeout(getRelatedSkills(skill.id, skill.category, 3), SKILL_AUDIT_SUPPORT_TIMEOUT_MS, 'audit related skills query').catch(() => []),
       ])
-  const audit = storedAudit ? normalizeAuditRecord(storedAudit) : buildSkillAudit(skill, eventStats)
+  const audit = storedAudit ? normalizeAuditRecord(storedAudit) : await getPublicAudit(skill, eventStats)
   const trust = getSkillTrustProfile(skill, false, eventStats)
   const safety = getAgentSafetyProfile(skill, audit, { max_risk: 'medium', needs_install_command: true })
   const installCommand = getPrimaryInstallCommand(skill)

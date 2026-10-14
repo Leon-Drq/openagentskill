@@ -9,11 +9,12 @@ import { SiteHeader } from '@/components/site-header'
 import { I18nProvider } from '@/lib/i18n/context'
 import { getLocaleFromSearchParam } from '@/lib/i18n/config'
 import { getRelatedSkills, getSkillEventStats } from '@/lib/db/skills'
-import { buildSkillEvalProfile, type SkillEvalCheckStatus, type SkillEvalStatus } from '@/lib/skill-evals'
+import { type SkillEvalCheckStatus, type SkillEvalStatus } from '@/lib/skill-evals'
 import { getSkillBySlugOrFallbackStrict, isCuratedSkillFallback } from '@/lib/skill-fallbacks'
+import { getPublicEval } from '@/lib/skills/public-analysis'
 
 // Deduplicate metadata/page lookups without caching a transient lookup failure.
-const getSkill = cache(getSkillBySlugOrFallbackStrict)
+const getSkill = cache((slug: string) => getSkillBySlugOrFallbackStrict(slug, 900))
 
 export async function generateMetadata({
   params,
@@ -86,7 +87,7 @@ export default async function SkillEvalPage({
         getSkillEventStats(skill.slug).catch(() => null),
         getRelatedSkills(skill.id, skill.category, 4).catch(() => []),
       ])
-  const evalProfile = buildSkillEvalProfile(skill, {
+  const evalProfile = await getPublicEval(skill, {
     eventStats,
     alternatives: relatedSkills,
     task: `Evaluate ${skill.name} before installing it in an agent workflow`,

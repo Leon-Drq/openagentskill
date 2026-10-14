@@ -119,20 +119,20 @@ export function isCuratedSkillFallback(skill: SkillRecord) {
   return skill.submission_source === 'curated_snapshot' || skill.id.startsWith('snapshot-')
 }
 
-export async function getSkillBySlugOrFallbackStrict(slug: string): Promise<SkillRecord | null> {
+export async function getSkillBySlugOrFallbackStrict(slug: string, cacheSeconds = 300): Promise<SkillRecord | null> {
   const normalized = normalizeSkillSlug(slug)
   const fallback = getCuratedSkillFallback(normalized)
 
   if (fallback) {
     const dbSkill = await withTimeout(
-      getSkillBySlugStrict(normalized),
+      getSkillBySlugStrict(normalized, cacheSeconds),
       1800,
       `curated skill lookup ${normalized}`
     ).catch(() => null)
     return dbSkill || fallback
   }
 
-  return getSkillBySlugStrict(normalized)
+  return getSkillBySlugStrict(normalized, cacheSeconds)
 }
 
 export async function getSkillBySlugOrFallback(slug: string): Promise<SkillRecord | null> {

@@ -1,12 +1,11 @@
 export const AUTOMATIC_DISCOVERY_MIN_STARS = 20
 export const PUBLICATION_DAILY_TARGET = 1_000
-export const PUBLICATION_FAST_TRACK_PER_RUN = 8
+export const PUBLICATION_FAST_TRACK_PER_RUN = 14
 export const PUBLICATION_AI_REVIEW_PER_RUN = 8
-// Six windows per hour provide enough retry headroom to reach the rolling
-// 1,000/day target when some AI-reviewed candidates time out or are rejected.
-// The publication worker still stops at PUBLICATION_DAILY_TARGET, so this
-// increases resilience rather than raising the public release ceiling.
-export const PUBLICATION_RUNS_PER_DAY = 144
+// Four batched windows per hour reduce idle invocations. A larger fast-track
+// batch retains 2,112 daily candidate slots for the unchanged 1,000/day ceiling.
+// AI review gates and the per-run AI limit remain unchanged.
+export const PUBLICATION_RUNS_PER_DAY = 96
 
 export function meetsAutomaticDiscoveryStarFloor(stars: number | null | undefined) {
   return Number(stars || 0) >= AUTOMATIC_DISCOVERY_MIN_STARS

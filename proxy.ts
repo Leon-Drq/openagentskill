@@ -6,6 +6,7 @@ import { isMissingFeaturedCreatorPath } from '@/lib/creator-directory'
 import { isMissingRankingPath } from '@/lib/rankings'
 import { isMissingExternalSkillPath } from '@/lib/skills/external-catalog'
 import { publicQueryRoute, hasContentQuery } from '@/lib/public-page-routing'
+import { publicCachedRoute } from '@/lib/public-cached-routing'
 import { isLocalizedBlogPath } from '@/lib/blog/routes'
 import { isLocalizedMotionPath } from '@/lib/motion/routes'
 
@@ -101,7 +102,7 @@ export async function proxy(request: NextRequest) {
   const noindex = isSkillDetailVariant(pathname, searchParams)
 
   // Internal rewrite targets are not extra public/SEO URLs.
-  if (pathname === '/render-query' || pathname.startsWith('/render-query/')) {
+  if (pathname === '/render-query' || pathname.startsWith('/render-query/') || pathname === '/cached-public' || pathname.startsWith('/cached-public/')) {
     return NextResponse.rewrite(new URL('/404', request.url), {
       status: 404, headers: { 'X-Robots-Tag': 'noindex, follow' },
     })
@@ -134,6 +135,19 @@ export async function proxy(request: NextRequest) {
       url.searchParams.delete('lang')
       return NextResponse.redirect(url, 308)
     }
+  }
+
+  const cachedRoute = publicCachedRoute(pathname, searchParams)
+  if (cachedRoute) {
+    const url = request.nextUrl.clone()
+    url.pathname = cachedRoute
+    // Transport and attribution parameters never enlarge the response cache key.
+    // Locale/content are encoded in the internal path; browser URL is unchanged.
+    url.search = ''
+    const response = NextResponse.rewrite(url)
+    if (locale) response.headers.set('Content-Language', DOCUMENT_LANG_BY_LOCALE[locale] || locale)
+    if (noindex) response.headers.set('X-Robots-Tag', 'noindex, follow')
+    return response
   }
 
   const queryRoute = publicQueryRoute(pathname, searchParams)
@@ -186,7 +200,8 @@ export const config = {
     // Only routes with locale, alias, missing-page or auth behavior need proxy.
     '/',
     '/(zh|ja|ko|es|de|fr|id)/:path*',
-    '/(skills|showcase|creators|rankings|profile|render-query)/:path*',
+    '/(skills|showcase|creators|rankings|profile|render-query|cached-public)/:path*',
+    '/(contact|sponsor)',
     '/(resolve|tasks|skill-packs|compare|api-docs|agent-skill|agent-skills-registry|docs|submit)',
     '/(skill-packs|collections)/:path*',
     { source: '/((?!api(?:/|$)|_next/|favicon.ico|robots.txt|sitemap.xml|sitemaps/).*)', has: [{ type: 'query', key: 'lang' }] },

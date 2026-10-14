@@ -33,10 +33,6 @@ export const dynamic = 'force-dynamic'
 const DISCOVERY_QUERY_TIMEOUT_MS = 2500
 const SKILL_RADAR_CRON_MINUTE_UTC = 45
 
-function getImportCronMinutesUtc() {
-  return [SKILL_RADAR_CRON_MINUTE_UTC]
-}
-
 function parsePositiveNumber(value: unknown, fallback: number) {
   const parsed = Number(value)
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
@@ -68,17 +64,9 @@ function metadataValue(run: Record<string, unknown>, key: string) {
 }
 
 function getNextImportCronIso(now: Date) {
-  const minutes = getImportCronMinutesUtc()
   const next = new Date(now)
-
-  for (const minute of minutes) {
-    next.setTime(now.getTime())
-    next.setUTCMinutes(minute, 0, 0)
-    if (next > now) return next.toISOString()
-  }
-
-  next.setTime(now.getTime())
-  next.setUTCHours(next.getUTCHours() + 1, minutes[0] || 0, 0, 0)
+  next.setUTCHours(Math.floor(now.getUTCHours() / 3) * 3, SKILL_RADAR_CRON_MINUTE_UTC, 0, 0)
+  if (next <= now) next.setUTCHours(next.getUTCHours() + 3)
   return next.toISOString()
 }
 
@@ -142,7 +130,7 @@ function buildIndexerHealth({
     latestTargetNew === 0
 
   let status = 'active'
-  let action = 'No action needed. Continue hourly imports toward the 20k coverage target.'
+  let action = 'No action needed. Continue scheduled imports toward the 20k coverage target.'
 
   if (approvedSkillCount === null || remainingToTarget === null) {
     status = 'unknown'
@@ -151,7 +139,7 @@ function buildIndexerHealth({
     status = latestStatus === 'completed_with_errors'
       ? 'maintenance_with_warnings'
       : 'maintenance_active'
-    action = 'Coverage target reached. The hourly quality radar continues to evaluate rotating GitHub queries and periodic X signals; only relevant skills that pass the quality gates are added.'
+    action = 'Coverage target reached. The quality radar runs every three hours to evaluate rotating GitHub queries and periodic X signals; only relevant skills that pass the quality gates are added.'
   } else if (lastRunUsedOldLowerTarget) {
     status = 'awaiting_next_guarded_run'
     action = 'Recent runs used the old lower target and stopped early; the deployed target guard should resume imports on the next cron.'
@@ -187,7 +175,7 @@ function buildIndexerHealth({
   } else if (latestStatus?.includes('error') || (latestErrors || 0) > 0) {
     status = 'degraded'
     action = 'Inspect private indexer logs before relying on automated growth.'
-  } else if (minutesSinceLatestRun !== null && minutesSinceLatestRun > 90) {
+  } else if (minutesSinceLatestRun !== null && minutesSinceLatestRun > 210) {
     status = 'stale'
     action = 'No recent import run detected. Check Vercel Cron delivery and route authorization.'
   } else if ((latestImported || 0) > 0) {
@@ -476,7 +464,7 @@ export async function GET() {
     (total, profile) => total + profile.targetNew,
     0
   )
-  const scheduledHourlyTargetNew = maintenanceTargetNew
+  const scheduledHourlyTargetNew = maintenanceTargetNew / 3
   const effectiveCoverageTarget = resolveHighStarCoverageTarget(
     parsePositiveNumber(process.env.INDEXER_TARGET_TOTAL, HIGH_STAR_SKILL_COVERAGE_TARGET)
   )
@@ -511,12 +499,12 @@ export async function GET() {
     estimated_daily_capacity: scheduledHourlyTargetNew * 24,
     max_search_requests_per_run: maxSearchRequests,
     query_pool_size: HIGH_STAR_QUERY_POOL_SIZE,
-    domain_rotation: 'hourly rotating query windows',
+    domain_rotation: 'rotating query windows every three hours',
     excludes: ['mcp-only projects', 'archived repositories', 'forks', 'low-relevance repositories'],
   }
   const schedule = {
-    import_cron: '45 * * * *',
-    import_frequency: 'hourly quality maintenance radar with rotating GitHub query windows; X signals use a separately budgeted schedule.',
+    import_cron: '45 */3 * * *',
+    import_frequency: 'quality maintenance radar every three hours with rotating GitHub query windows; X signals use a separately budgeted schedule.',
     profile_crons: INDEXER_RUN_PROFILES.map((profile) => ({
       profile: profile.key,
       path: profile.path,
@@ -532,15 +520,15 @@ export async function GET() {
     })),
     star_refresh_cron: '30 2 * * *',
     star_refresh_frequency: 'daily at 02:30 UTC',
-    skill_radar_cron: '45 * * * *',
+    skill_radar_cron: '45 */3 * * *',
     skill_radar_frequency: skillRadarXMaxQueries > 0
-      ? `hourly GitHub scan; X hotspot scan every ${skillRadarXScanIntervalHours} hours`
-      : 'hourly GitHub scan; X hotspot scan is disabled until an X search budget is configured',
+      ? `GitHub scan every three hours; X hotspot scan every ${skillRadarXScanIntervalHours} hours`
+      : 'GitHub scan every three hours; X hotspot scan is disabled until an X search budget is configured',
     indexnow_cron: '10 3 * * *',
     indexnow_frequency: 'daily baseline submission plus automatic submission after new skill imports',
-    candidate_discovery_cron: '15 * * * *',
-    candidate_validation_cron: '20,50 * * * *',
-    candidate_publication_cron: '0,10,25,30,40,55 * * * *',
+    candidate_discovery_cron: '0 */3 * * *',
+    candidate_validation_cron: '10 * * * *',
+    candidate_publication_cron: '0,15,30,45 * * * *',
   }
   const estimatedDailyCapacity = scheduledHourlyTargetNew * 24
   const remainingToTarget =
@@ -584,7 +572,7 @@ export async function GET() {
       estimated_daily_capacity: estimatedDailyCapacity,
       estimated_days_to_target_at_current_target: estimatedDaysToTarget,
       strategy:
-        'Maintain a 20k+ skill registry with rotating, scenario-specific GitHub discovery, periodic social signals, MCP exclusion, trust metadata, eval metadata, and small high-quality hourly imports.',
+        'Maintain a 20k+ skill registry with rotating, scenario-specific GitHub discovery, periodic social signals, MCP exclusion, trust metadata, eval metadata, and small high-quality scheduled imports.',
       quality_gates: [
         'Automatic discovery requires at least 20 GitHub stars; direct user submissions remain zero-star eligible',
         'archived and fork exclusion',
@@ -734,7 +722,7 @@ export async function GET() {
     skill_radar: {
       status: 'active',
       private_endpoint: '/api/cron/skill-radar',
-      schedule: `${SKILL_RADAR_CRON_MINUTE_UTC} * * * *`,
+      schedule: `${SKILL_RADAR_CRON_MINUTE_UTC} */3 * * *`,
       sources: ['X posts with GitHub links', 'GitHub hot skill search'],
       strategy:
         'Use social and GitHub freshness as candidate signals only; every repo still passes GitHub metadata checks, MCP exclusion, AI review, Trust/Audit surfaces, SEO drip, IndexNow, and X queue guards.',

@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import { register, createRequire } from 'node:module'
 import ts from 'typescript'
 import { publicQueryRoute, hasContentQuery } from '../lib/public-page-routing.ts'
+import { publicCachedRoute } from '../lib/public-cached-routing.ts'
 import { createBoundedContentMemo } from '../lib/bounded-content-memo.ts'
 import { isLocalizedBlogPath, CREATOR_BLOG_SLUG, BLOG_LOCALES } from '../lib/blog/routes.ts'
 import { isLocalizedMotionPath } from '../lib/motion/routes.ts'
@@ -11,7 +12,7 @@ import { isLocalizedMotionPath } from '../lib/motion/routes.ts'
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
 const detailWrapper = read('app/skills/[slug]/page.tsx')
 assert.doesNotMatch(detailWrapper, /await.*searchParams|props\.searchParams|searchParams:\s*Promise</)
-assert.match(detailWrapper, /revalidate = 300/)
+assert.match(detailWrapper, /revalidate = 900/)
 assert.match(detailWrapper, /searchParams=\{Promise.resolve\(\{\}\)\}/)
 assert.match(read('app/skills/[slug]/page.tsx'), /generateStaticParams\(\) \{ return \[\] \}/)
 assert.doesNotMatch(read('components/skills-page-client.tsx'), /const .* = useSearchParams\(/, 'cached directory must keep SSR content, not a loading bailout')
@@ -44,6 +45,7 @@ const deps = {
   '@/lib/rankings': { isMissingRankingPath: () => false },
   '@/lib/skills/external-catalog': { isMissingExternalSkillPath: () => false },
   '@/lib/public-page-routing': { publicQueryRoute, hasContentQuery },
+  '@/lib/public-cached-routing': { publicCachedRoute },
   '@/lib/blog/routes': { isLocalizedBlogPath },
   '@/lib/motion/routes': { isLocalizedMotionPath },
 }
@@ -55,7 +57,7 @@ for (const url of ['/privacy', '/blog', '/showcase/a.card.webp', '/robots.txt', 
   if (url.startsWith('/showcase/')) continue
   assert.equal(unstable_doesProxyMatch({ config: exports.config, nextConfig: {}, url }), false, url)
 }
-for (const url of ['/skills', '/skills/a', '/es/docs', '/profile', '/api/claims', '/contact?lang=zh', '/render-query/skills']) {
+for (const url of ['/cached-public/en/skills', '/contact', '/sponsor', '/skills', '/skills/a', '/es/docs', '/profile', '/api/claims', '/contact?lang=zh', '/render-query/skills']) {
   assert.equal(unstable_doesProxyMatch({ config: exports.config, nextConfig: {}, url }), true, url)
 }
 const request = path => new NextRequest('https://www.openagentskill.com' + path)
@@ -74,7 +76,7 @@ const result = await exports.proxy(request('/skills?q=design&sort=stars&page=2')
 assert.equal(result.headers.get('x-middleware-rewrite'), null, 'filtered directory keeps the unfiltered route segment')
 assert.equal((await exports.proxy(request('/zh/skills?category=design-creative'))).headers.get('x-middleware-rewrite'), null)
 assert.equal((await exports.proxy(request('/ja/docs?q=test'))).headers.get('x-middleware-rewrite'), 'https://www.openagentskill.com/render-query/ja/docs?q=test')
-assert.equal((await exports.proxy(request('/skills?_rsc=abc'))).headers.get('x-middleware-rewrite'), null)
+assert.equal((await exports.proxy(request('/skills?_rsc=abc'))).headers.get('x-middleware-rewrite'), 'https://www.openagentskill.com/cached-public/en/skills')
 assert.equal((await exports.proxy(request('/skills?lang=zh&q=test'))).headers.get('location'), 'https://www.openagentskill.com/zh/skills?q=test')
 assert.equal((await exports.proxy(request('/skills/alias?q=test'))).headers.get('location'), 'https://www.openagentskill.com/skills/canonical?q=test')
 assert.equal((await exports.proxy(request('/skills/a?lang=zh'))).headers.get('x-robots-tag'), 'noindex, follow')
@@ -85,7 +87,7 @@ assert.equal((await exports.proxy(request('/render-query/skills'))).status, 404)
 for (const kind of ['audit', 'evals']) {
   const report = `/skills/example/${kind}`
   assert.equal((await exports.proxy(request(report))).headers.get('x-middleware-rewrite'), null)
-  assert.equal((await exports.proxy(request(report + '?lang=zh'))).headers.get('x-middleware-rewrite'), `https://www.openagentskill.com/render-query${report}?lang=zh`)
+  assert.equal((await exports.proxy(request(report + '?lang=zh'))).headers.get('x-middleware-rewrite'), `https://www.openagentskill.com/cached-public/zh${report}`)
   assert.equal((await exports.proxy(request('/render-query' + report))).status, 404)
   const wrapper = read(`app/skills/[slug]/${kind}/page.tsx`)
   assert.match(wrapper, /generateStaticParams\(\) \{ return \[\] \}/)
