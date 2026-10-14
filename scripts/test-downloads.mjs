@@ -13,18 +13,17 @@ const modules = new Map()
 const sha = text => createHash('sha256').update(text).digest('hex')
 const raw = '---\nname: test-skill\ndescription: Write a plain text summary.\n---\n# Summary\nRead the provided text and summarize it.\n'
 let user = { id: 'account-a', is_anonymous: false }, blocked = false, ledgerFailure = false, visible = true, storageFailure = false, entitled = true
-let row = { slug: 'test-skill', source_path: 'SKILL.md', source_commit_sha: 'a'.repeat(40), source_sync_status: 'current', source_content_hash: sha(raw), long_description: raw, install_command: 'npx skills add example/repo', listing_status: 'owner_published' }
+let row = { slug: 'test-skill', github_repo: 'example/repo', source_path: 'SKILL.md', source_commit_sha: 'a'.repeat(40), source_sync_status: 'current', source_content_hash: sha(raw), long_description: raw, install_command: 'npx skills add example/repo', listing_status: 'owner_published' }
 let bytes = new TextEncoder().encode('paid instructions')
 let release = { skill_slug: 'launch-card-studio', version: '1.0.0', object_path: 'fixture', size_bytes: bytes.length, sha256: sha(bytes), delivery_kind: 'skill-instructions' }
-const receipts = new Set(), totals = new Map()
+const totals = new Map()
 let writes = 0, lastFilter = '', lastReceipt = null
 const admin = {
   rpc: async (_name, args) => {
     if (ledgerFailure) return { error: new Error('ledger unavailable') }
     writes++
     lastReceipt = args
-    const key = (args.p_user_id || args.p_visitor_key) + ':' + args.p_slug
-    if (!receipts.has(key)) { receipts.add(key); totals.set(args.p_slug, (totals.get(args.p_slug) || 0) + 1) }
+    totals.set(args.p_slug, (totals.get(args.p_slug) || 0) + 1)
     return { data: totals.get(args.p_slug), error: null }
   },
   storage: { from: () => ({ info: async () => ({ data: { size: release.size_bytes } }), download: async () => storageFailure ? { error: new Error('storage') } : { data: new Blob([bytes]) }, createSignedUrl: async () => ({ data: { signedUrl: 'https://storage.example/file' } }) }) },
@@ -81,8 +80,8 @@ assert.match(response.headers.get('cache-control'),/private, no-store/)
 assert.equal(response.headers.get('x-content-type-options'),'nosniff')
 assert.equal(lastFilter,load('lib/skills/publication.ts').PUBLIC_SKILL_FILTER)
 assert.equal(totals.get('test-skill'),1)
-await download(); assert.equal(totals.get('test-skill'),1)
-user.id='account-b'; await download(); assert.equal(totals.get('test-skill'),2)
+await download(); assert.equal(totals.get('test-skill'),2,'repeat file download counts again')
+user.id='account-b'; await download(); assert.equal(totals.get('test-skill'),3)
 ledgerFailure=true; assert.equal((await download()).status,503); ledgerFailure=false
 const before = writes
 entitled=false; assert.equal((await paid(request({slug:release.skill_slug}))).status,403); entitled=true
@@ -102,14 +101,14 @@ assert.equal((await act({...actionBody, action:'view'})).status,400)
 visible=false; assert.equal((await act()).status,404); visible=true
 row.source_sync_status='changed'; assert.equal((await act()).status,409); row.source_sync_status='current'
 const beforeActions=totals.get('test-skill')
-await act(); assert.equal(totals.get('test-skill'),beforeActions,'file and command share account/day dedupe')
-await act({...actionBody, action:'external-open'}); assert.equal(totals.get('test-skill'),beforeActions)
+await act(); assert.equal(totals.get('test-skill'),beforeActions+1,'command counts independently of file downloads')
+assert.equal((await act({...actionBody, action:'external-open'})).status,200); assert.equal(totals.get('test-skill'),beforeActions+2)
 user=null
 assert.equal((await act()).status,200,'guests can count without signing in')
 assert.equal(lastReceipt.p_user_id,null); assert.match(lastReceipt.p_visitor_key,/^[a-f0-9]{64}$/)
 assert.ok(!JSON.stringify(lastReceipt).includes(actionBody.sessionId),'raw guest ID is not in the ledger')
 await Promise.all([act(),act({...actionBody,action:'external-open'})])
-assert.equal(totals.get('test-skill'),beforeActions+1,'guest copies and redirects share daily dedupe')
+assert.equal(totals.get('test-skill'),beforeActions+5,'every guest copy and redirect counts, including concurrent repeats')
 const provider=load('lib/skills/external-catalog.ts').EXTERNAL_SKILLS.find(e=>e.provider==='skillry' && e.active)
 assert.equal((await act({...actionBody,action:'external-open'},provider.slug)).status,200)
 assert.equal((await act(actionBody,provider.slug)).status,409,'provider cards cannot report unsupported command copies')
@@ -144,6 +143,7 @@ const { SkillDownloadCount }=load('components/skill-download-count.tsx')
 for(const locale of ['en','zh','ja','ko','es','de','fr','id']) {
   const html=renderToStaticMarkup(React.createElement(SkillDownloadCount,{locale,count:26}))
   assert.match(html,/data-site-downloads="26"/)
+  assert.equal(html.replace(/<[^>]*>/g,''),'26','counter displays only its number, with an accessible label in attributes')
   const unknown=renderToStaticMarkup(React.createElement(SkillDownloadCount,{locale,count:null}))
   assert.match(unknown,/data-site-downloads="unknown"/); assert.match(unknown,/—/)
 }
@@ -167,4 +167,4 @@ await trackSkillEvent('test-skill','outbound_github')
 assert.equal(sent.filter(e=>e.url.endsWith('/download-action')).length,3,'storage denial does not block tracking or actions')
 globalThis.fetch=async()=>{throw Error('offline')}
 await trackSkillEvent('test-skill','install_copy',{kind:'command'})
-console.log('Site downloads: files, command copies, outbound clicks, guest/account dedupe, public listing and entitlement checks, CSRF, failed requests, cross-page provider ranking and 8-locale badges passed.')
+console.log('Site downloads: repeated files/copies/exits, public listing and entitlement checks, CSRF, failed requests, cross-page provider ranking and 8-locale icon-only counters passed.')

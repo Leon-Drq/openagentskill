@@ -18,7 +18,7 @@ export const getDownloadTotals = unstable_cache(async () => {
     after = data[data.length - 1].skill_slug
   }
   return result
-}, ['site-download-totals-v1'], { revalidate: 60, tags: ['site-download-totals'] })
+}, ['site-download-totals-v2-operations'], { revalidate: 60, tags: ['site-download-totals'] })
 
 export async function downloadResponse(input: {
   userId: string; slug: string; bytes: Uint8Array; size: number; sha256: string;

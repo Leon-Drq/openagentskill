@@ -1363,7 +1363,7 @@ const getCachedCatalogPage = unstable_cache(
     if (error) throw error
     return { records: (data || []) as unknown as SkillRecord[], total, hasMore: from + limit < total, page: effectivePage }
   }),
-  ['public-catalog-pages-v11-download-actions'],
+  ['public-catalog-pages-v12-download-operations'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 

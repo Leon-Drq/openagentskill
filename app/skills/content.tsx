@@ -1171,7 +1171,7 @@ const getDefaultDirectory = unstable_cache(async (locale: Locale) => {
   const model = await prepareDirectory({ lang: locale })
   if (model.clientProps.degraded) throw new DegradedDirectory(model)
   return model
-}, ['public-directory-model-v3-download-actions'], {
+}, ['public-directory-model-v4-download-operations'], {
   revalidate: 300, tags: ['public-skill-directory', 'public-skill-stats'],
 })
 

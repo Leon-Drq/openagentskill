@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from '@/components/crawl-link'
 import { notFound } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
+import { SkillDownloadCount } from '@/components/skill-download-count'
+import { getDownloadTotals } from '@/lib/skills/downloads'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { getAllSkills, getSkillsBySlugs, type SkillRecord } from '@/lib/db/skills'
@@ -60,11 +62,13 @@ export default async function CollectionDetailPage({
   const localizedHref = (href: string) => getLocalizedNavigationHref(href, locale)
 
   const sourceSlugs = stack.featuredSlugs || []
+  const downloadTotalsPromise = getDownloadTotals().catch(() => null)
   const sourceRows = stack.curatedOnly ? await getSkillsBySlugs(sourceSlugs, 2500).catch(() => []) : []
   const allSkills = stack.curatedOnly
     ? sourceSlugs.map(slug => sourceRows.find(skill => skill.slug === slug) || getCuratedSkillFallback(slug)).filter((skill): skill is SkillRecord => Boolean(skill))
     : await getAllSkills('quality', undefined, 1200).catch(() => [])
   const picks = selectSkillsForStack(allSkills, stack, 8)
+  const downloadTotals = await downloadTotalsPromise
   const compareUrl = `/compare?skills=${encodeURIComponent(picks.slice(0, 4).map((skill) => skill.slug).join(','))}`
 
   return (
@@ -181,6 +185,9 @@ export default async function CollectionDetailPage({
                       />
                     </div>
                   )}
+                  <div className="mt-3 flex justify-end">
+                    <SkillDownloadCount count={downloadTotals ? downloadTotals[skill.slug] || 0 : null} locale={locale} />
+                  </div>
                 </article>
               )
             })}
