@@ -25,7 +25,7 @@ export async function readSavedPage(client: SupabaseClient, userId: string, loca
   const bySlug = new Map((details.data || []).map(row => [row.slug, row]))
   const items: SavedSkill[] = page.slugs.map(slug => {
     const external = getExternalSkill(slug)
-    if (external) return { slug, name: external.provider === 'skillry' ? external.skillName : external.title[locale === 'zh' ? 'zh' : 'en'], description: external.description[locale === 'zh' ? 'zh' : 'en'], category: null, source: external.provider === 'skillry' ? 'Skillry' : 'RedSkill', available: true }
+    if (external) return { slug, name: external.provider === 'skillry' ? external.skillName : external.title[locale === 'zh' ? 'zh' : 'en'], description: external.description[locale === 'zh' ? 'zh' : 'en'], category: null, source: external.provider === 'scenario' ? 'Scenario' : external.provider === 'skillry' ? 'Skillry' : 'RedSkill', available: true }
     const skill = bySlug.get(slug)
     return { slug, name: skill?.name || slug, description: skill?.description || '', category: skill?.category || null, source: 'GitHub', available: Boolean(skill) }
   })

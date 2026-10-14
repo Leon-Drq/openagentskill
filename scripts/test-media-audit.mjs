@@ -8,6 +8,8 @@ import * as icons from 'lucide-react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 for (const url of ['http://skillry.dev/a', 'https://localhost/a', 'https://127.0.0.1/a', 'https://skillry.dev.evil.example/a', 'https://user:password@skillry.dev/a', 'https://skillry.dev:8443/a', 'https://arbitrary-bucket.s3.amazonaws.com/a']) assert.throws(() => publicMediaUrl(url))
+assert.equal(publicMediaUrl('https://www.scenario.com/explorations/auto-edit/media/ai-edit.mp4').hostname, 'www.scenario.com')
+for (const url of ['https://www.scenario.com/private.mp4', 'https://www.scenario.com/explorations/auto-edit/media/ai-edit.mp4?token=secret', 'https://www.scenario.com.evil.example/exploration-covers/auto-edit.webp']) assert.throws(() => publicMediaUrl(url))
 const png = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 0, 0, 0, 0, 0])
 const mp4 = Buffer.from('\0\0\0\x20ftypisom')
 assert.equal(mediaSignature(png, 'image'), true)

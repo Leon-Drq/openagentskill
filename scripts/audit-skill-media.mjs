@@ -6,9 +6,11 @@ import path from 'node:path'
 register('./test-owner-publication-loader.mjs', import.meta.url)
 
 const hosts = new Set(['skillry.dev', 'raw.githubusercontent.com', 'github.com', 'storage.googleapis.com', 'release-assets.githubusercontent.com', 'objects.githubusercontent.com', 'github-production-user-asset-6210df.s3.amazonaws.com'])
+const scenarioMediaPaths = new Set(['/exploration-covers/auto-edit.webp', ...['raw.mp4', 'ai-edit.mp4', 'raw-poster.webp', 'ai-edit-poster.webp'].map(name => '/explorations/auto-edit/media/' + name)])
 export function publicMediaUrl(value) {
   const url = new URL(value)
-  if (url.protocol !== 'https:' || url.username || url.password || url.port || !hosts.has(url.hostname)) throw Error('Unapproved media host')
+  const scenarioSource = url.hostname === 'www.scenario.com' && scenarioMediaPaths.has(url.pathname) && !url.search && !url.hash
+  if (url.protocol !== 'https:' || url.username || url.password || url.port || (!hosts.has(url.hostname) && !scenarioSource)) throw Error('Unapproved media host')
   return url
 }
 export function mediaSignature(bytes, type) {
@@ -87,7 +89,11 @@ export async function auditMedia({ catalog, remote = false, fetcher = fetch, out
     if (entry.provider !== 'resource' || card.provider.image) add(card.provider.image, 'image', entry.slug)
     if (entry.provider === 'resource') for (const preview of entry.sourcePreviews) add(preview.src, 'image', entry.slug)
     if (entry.provider === 'skillry') for (const src of entry.previewImages) add(src, 'image', entry.slug)
-    const video = entry.provider === 'skillry' ? entry.previewVideo : entry.runtimeDemo?.video
+    if (entry.provider === 'scenario') {
+      for (const src of [entry.sourceDemo.poster, entry.sourceDemo.rawPoster]) add(src, 'image', entry.slug)
+      add(entry.sourceDemo.rawVideo, 'video', entry.slug)
+    }
+    const video = entry.provider === 'scenario' ? entry.sourceDemo.video : entry.provider === 'skillry' ? entry.previewVideo : entry.runtimeDemo?.video
     if (video) {
       add(video, 'video', entry.slug)
       if (card.provider.video !== video) errors.push({ slug: entry.slug, error: 'Directory dropped the source video' })
@@ -137,7 +143,7 @@ export async function auditMedia({ catalog, remote = false, fetcher = fetch, out
   const report = { checkedAt: new Date().toISOString(), summary: {
     galleryCases: SHOWCASE_CASES.length, galleryVideos: SHOWCASE_CASES.filter(item => item.videoUrl).length,
     sourcePreviewSkills: SKILL_SOURCE_PREVIEWS.length, boundSkills: bindings.length,
-    externalSkills: providers.length, externalVideos: providers.filter(item => item.previewVideo || item.runtimeDemo).length,
+    externalSkills: providers.length, externalVideos: providers.filter(item => item.previewVideo || item.runtimeDemo || item.sourceDemo).length,
     localAssets: results.filter(item => item.url.startsWith('/')).length, remoteAssets: results.filter(item => !item.url.startsWith('/')).length,
     checked: results.filter(item => item.state === 'ok').length, failed: errors.length,
   }, coverage, errors, assets: results.sort((a, b) => a.url.localeCompare(b.url)) }

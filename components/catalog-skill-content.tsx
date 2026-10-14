@@ -11,6 +11,7 @@ import { SkillryLogo } from './skillry-logo'
 import { SkillActions, SkillEngagementProvider } from '@/components/skill-engagement'
 import { FontResourceContent } from './font-resource-content'
 import { SkillActionLink } from './skill-action-link'
+import { ScenarioSkillContent } from './scenario-skill-content'
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ lang?: string | string[] }> }
 const base = 'https://www.openagentskill.com'
@@ -21,7 +22,7 @@ export async function buildCatalogSkillMetadata({ params, searchParams }: Props)
   const query = await searchParams
   const lang = query.lang === 'zh' ? 'zh' : 'en'
   const url = base + externalSkillHref(entry.slug)
-  const socialImage = entry.provider === 'resource' ? entry.sourcePreviews[0]?.src : entry.provider === 'skillry' ? entry.previewImages[0] : entry.runtimeDemo ? base + entry.runtimeDemo.poster : null
+  const socialImage = entry.provider === 'scenario' ? entry.sourceDemo.cover : entry.provider === 'resource' ? entry.sourcePreviews[0]?.src : entry.provider === 'skillry' ? entry.previewImages[0] : entry.runtimeDemo ? base + entry.runtimeDemo.poster : null
   return {
     title: entry.title[lang], description: entry.description[lang],
     alternates: { canonical: url }, robots: { index: Object.keys(query).length === 0 && (entry.provider !== 'skillry' || (entry.active && entry.seoIndexable)), follow: true },
@@ -36,6 +37,7 @@ export default async function CatalogSkillContent({ params, searchParams }: Prop
   if (!entry) notFound()
   const zh = (await searchParams).lang === 'zh'
   if (entry.provider === 'resource') return <FontResourceContent entry={entry} zh={zh} />
+  if (entry.provider === 'scenario') return <ScenarioSkillContent entry={entry} zh={zh} />
   const lang = zh ? 'zh' : 'en'
   const url = base + externalSkillHref(entry.slug)
   const demo = entry.runtimeDemo

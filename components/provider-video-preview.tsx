@@ -4,11 +4,11 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { Play } from 'lucide-react'
 
-export function ProviderVideoPreview({ src, poster, title, zh, compact = false }: { src: string; poster: string; title: string; zh: boolean; compact?: boolean }) {
+export function ProviderVideoPreview({ src, poster, title, zh, compact = false, aspect = 'landscape' }: { src: string; poster: string; title: string; zh: boolean; compact?: boolean; aspect?: 'landscape' | 'portrait' }) {
   const [started, setStarted] = useState(false)
   const [failed, setFailed] = useState(false)
   const [posterFailed, setPosterFailed] = useState(false)
-  return <div className={`relative overflow-hidden bg-[#1d1b18] ${compact ? 'aspect-[16/10]' : 'aspect-video rounded-xl border border-border'}`} data-provider-video>
+  return <div className={`relative overflow-hidden bg-[#1d1b18] ${compact ? 'aspect-[16/10]' : `${aspect === 'portrait' ? 'aspect-[9/16] mx-auto w-full max-w-sm' : 'aspect-video'} rounded-xl border border-border`}`} data-provider-video>
     {started && !failed ? <video src={src} poster={posterFailed ? undefined : poster} controls playsInline autoPlay preload="none" aria-label={title} className="h-full w-full object-contain" onError={() => setFailed(true)} onPlay={event => {
       document.querySelectorAll('video').forEach(video => { if (video !== event.currentTarget) video.pause() })
     }} /> : <>

@@ -104,6 +104,43 @@ Do not republish code or create Gallery previews without addressing usage rights
 
 ## Verification
 
+### Scenario Auto Edit: official ZIP
+
+Owner requested `https://www.scenario.com/explorations/auto-edit/` on 2026-10-14.
+`scenario-auto-edit` is an official downloadable Claude Code Skill, published
+through this external lane because no matching directory was present in the
+linked `scenario-labs/skills` main tree at commit
+`a7e3f2bfb0aa26556ac13fd770d6eb940aff1a2f`.
+
+The official ZIP contains SKILL.md, four references, eight Python scripts and two
+Swift helpers. Its observed SHA-256 is
+`ab415d3ebeeb9e41889f9b130f8536c13e8ec5f5644567bf9747d742c1c6a0be`.
+No release version or separate LICENSE file is present; SKILL.md declares MIT.
+Do not infer a license for the promotional footage from that declaration.
+Source links, EN/ZH editorial copy, package hash and observation date are recorded
+in `lib/skills/scenario-catalog.ts`, with strict provider-specific validation.
+
+Static inspection covered the archive manifest, Skill instructions and script
+network/process/file operations. The font downloader pins google/fonts files and
+hashes; subprocess calls invoke local media tools. Scripts create and replace
+generated project directories. The prescribed workflow downloads transcription
+models and uploads footage to Scenario for cloud editing. No Skill code was run,
+no account connected, and no cloud generation performed. This is neither an AI
+review approval nor a security/runtime certification.
+
+The promotional before/after videos and cover are embedded from Scenario's public
+first-party page with attribution and a link to the synchronized original. They
+are source examples, not our runtime recordings; no media or bundle is mirrored
+and no claim of redistribution rights is made. Video loads only after a play
+click. The raw comparison is already cut to match the finished video, not the
+complete untouched input. This pair counts as one example in the directory.
+
+The free filter describes package acquisition. Detail copy separately explains
+paid cloud generation, Apple Silicon/macOS requirements, English-only upstream
+end-to-end testing and footage uploads. API discovery remains read-only and has
+no auto-install command. One additive provider identity enables existing vote/save
+operations without changing user data, review states or access policies.
+
 `node --experimental-strip-types scripts/test-external-skills.mjs` is included in
 the existing SEO regression suite. Also run the complete regression suite,
 typecheck and production build. Check English/Chinese detail pages, directory

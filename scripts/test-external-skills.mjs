@@ -76,6 +76,33 @@ assert.equal(getExternalSkill('missing'), undefined)
 for (const path of ['/skills', '/skills/external', `/skills/external/${entry.slug}`, `/skills/external/${entry.slug}/`]) assert.equal(isMissingExternalSkillPath(path), false)
 for (const path of ['/skills/skillry-missing', '/skills/redskill-missing', '/skills/external/missing', '/skills/external/%GG']) assert.equal(isMissingExternalSkillPath(path), true)
 assert.equal(searchExternalSkills('').length, EXTERNAL_SKILLS.length)
+const scenario = getExternalSkill('scenario-auto-edit')
+assert.ok(scenario)
+assert.equal(searchExternalSkills('Scenario Auto Edit')[0], scenario)
+assert.equal(searchExternalSkills('口播')[0], scenario)
+assert.equal(isMissingExternalSkillPath('/skills/scenario-missing'), true)
+const scenarioData = externalSkillDiscoveryRecord(scenario)
+assert.equal(scenarioData.version, null)
+assert.equal(scenarioData.publisher.name, 'Scenario')
+assert.equal(scenarioData.author, null)
+assert.equal(scenarioData.install_command, null)
+assert.equal(scenarioData.runtime_demo, null)
+assert.equal(scenarioData.runtime_verified, false)
+assert.equal(scenarioData.ai_reviewed, false)
+assert.equal(scenarioData.auto_install_allowed, false)
+assert.equal(scenarioData.license, 'MIT-declared')
+assert.equal(scenarioData.runtime_cost, 'paid-cloud-services')
+assert.equal(scenarioData.examples.length, 2)
+assert.equal(scenarioData.examples[0].role, 'raw-comparison')
+assert.equal(scenarioData.examples[1].role, 'edited-result')
+assert.ok(scenarioData.version_source.includes(scenario.versionObservedAt))
+for (const changes of [
+  { aiReviewed: true }, { runtimeVerified: true }, { autoInstallAllowed: true },
+  { version: '1.0.0' }, { license: 'MIT' }, { bundleSha256: null }, { runtimeDemo: {} },
+  { sourceUrl: 'https://github.com/scenario-labs/skills' },
+  { downloadUrl: 'https://example.com/package.zip' },
+  { sourceDemo: { ...scenario.sourceDemo, video: 'https://example.com/demo.mp4' } },
+]) assert.equal(ExternalSkillSchema.safeParse({ ...scenario, ...changes }).success, false)
 assert.throws(() => validateExternalCatalog([entry, entry]), /Duplicate/)
 for (const changes of [
   { aiReviewed: true }, { runtimeVerified: true }, { autoInstallAllowed: true },

@@ -10,9 +10,10 @@ const { selectProviderSkills, providerCatalogWindow, mergeProviderCatalogPage, t
 const { chronologicalRegistryWindow, chronologicalDirectoryPage, compareDirectoryDates } = await import('../lib/skills/chronological-directory.ts')
 const defaults = {category:'all',topic:'all',output:'all',pricing:'all',examplesOnly:true,platform:'all',quality:'all',trust:'all',safety:'all',supplyTrack:'all',minStars:0,useCase:'all'}
 const skillry = EXTERNAL_SKILLS.filter(e=>e.provider==='skillry'&&e.active)
-assert.equal(selectProviderSkills(defaults).length,skillry.length+2)
+assert.equal(selectProviderSkills(defaults).length,skillry.length+3)
 assert.equal(selectProviderSkills({...defaults,query:'Skillry'}).length,skillry.length)
-assert.equal(selectProviderSkills({...defaults,pricing:'free'}).length,skillry.filter(e=>e.listingEvidence.priceUsdCents===0).length+1)
+for (const sort of ['new', 'fresh']) assert.equal(selectProviderSkills({...defaults,query:'Scenario Auto Edit',pricing:'free',category:'video-creation',sort})[0]?.slug,'scenario-auto-edit')
+assert.equal(selectProviderSkills({...defaults,pricing:'free'}).length,skillry.filter(e=>e.listingEvidence.priceUsdCents===0).length+2)
 assert.equal(selectProviderSkills({...defaults,pricing:'paid'}).length,skillry.filter(e=>e.listingEvidence.priceUsdCents>0).length)
 assert.ok(selectProviderSkills({...defaults,category:'video-creation'}).length>0)
 assert.ok(selectProviderSkills({...defaults,featured:true}).every(e=>e.provider==='skillry'&&e.listingEvidence.featured))
@@ -25,6 +26,18 @@ for (const filter of ['platform','quality','trust','safety','supplyTrack','useCa
 assert.equal(selectProviderSkills({...defaults,minStars:1}).length,0)
 for (const entry of EXTERNAL_SKILLS) {
   const card = toProviderDirectorySkill(entry,'zh')
+  if (entry.provider === 'scenario') {
+    assert.equal(card.category, 'video-creation')
+    assert.equal(card.provider.video, entry.sourceDemo.video)
+    assert.equal(card.provider.image, entry.sourceDemo.cover)
+    assert.equal(card.provider.exampleLabel, '官方样片 · Scenario')
+    assert.equal(card.exampleCount, 1, 'The before/after pair is one editing example')
+    assert.equal(card.commerce.type, 'free')
+    assert.equal(card.commerce.runtime, 'model', 'Free package does not mean free cloud generation')
+    assert.equal(card.verified, false)
+    assert.equal(card.technical.installCommand, undefined)
+    continue
+  }
   if (entry.provider === 'resource') {
     assert.equal(card.provider.resource, true)
     assert.equal(card.commerce.type, 'free')

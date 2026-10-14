@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { SKILLRY_LISTINGS } from './skillry-catalog'
+import { SCENARIO_AUTO_EDIT } from './scenario-catalog'
 import { externalSourceHref } from './external-outbound'
 
 // Editorial metadata only. Never mirror bundles or turn these records into
@@ -93,7 +94,27 @@ const ResourceSchema = RedSkillSchema.extend({
   runtimeDemo: z.undefined().optional(),
   examples: z.array(z.object({ title: localized, description: localized }).strict()).length(0),
 }).strict()
-export const ExternalSkillSchema = z.discriminatedUnion('provider', [RedSkillSchema, SkillrySchema, ResourceSchema])
+const ScenarioSchema = RedSkillSchema.extend({
+  provider: z.literal('scenario'), identifier: z.literal('scenario-auto-edit'), slug: z.literal('scenario-auto-edit'),
+  author: z.object({ name: z.literal('Scenario'), url: z.literal('https://www.scenario.com') }).strict(),
+  sourceUrl: z.literal('https://www.scenario.com/explorations/auto-edit/'),
+  sourcePostUrl: z.literal('https://www.scenario.com/explorations/auto-edit/'),
+  downloadUrl: z.literal('https://www.scenario.com/explorations/auto-edit/downloads/scenario-auto-edit-skill.zip'),
+  version: z.null(), versionObservedAt: z.string().datetime(),
+  license: z.literal('MIT-declared'), licenseUrl: z.literal('https://www.scenario.com/explorations/auto-edit/'),
+  commercialUse: z.literal('check-package-and-service-terms'),
+  examples: z.array(z.object({ title: localized, description: localized }).strict()).length(0),
+  runtimeDemo: z.undefined().optional(),
+  sourceDemo: z.object({
+    video: z.literal('https://www.scenario.com/explorations/auto-edit/media/ai-edit.mp4'),
+    poster: z.literal('https://www.scenario.com/explorations/auto-edit/media/ai-edit-poster.webp'),
+    rawVideo: z.literal('https://www.scenario.com/explorations/auto-edit/media/raw.mp4'),
+    rawPoster: z.literal('https://www.scenario.com/explorations/auto-edit/media/raw-poster.webp'),
+    cover: z.literal('https://www.scenario.com/exploration-covers/auto-edit.webp'),
+    attribution: z.literal('Scenario'),
+  }).strict(),
+}).strict()
+export const ExternalSkillSchema = z.discriminatedUnion('provider', [RedSkillSchema, SkillrySchema, ResourceSchema, ScenarioSchema])
 export type ExternalSkill = z.infer<typeof ExternalSkillSchema>
 
 export function validateExternalCatalog(input: unknown): ExternalSkill[] {
@@ -116,6 +137,7 @@ export function validateExternalCatalog(input: unknown): ExternalSkill[] {
 }
 
 export const EXTERNAL_SKILLS = validateExternalCatalog([
+  SCENARIO_AUTO_EDIT,
   {
     slug: 'resource-qiaomu-cover-fonts', provider: 'resource', resourceType: 'font-library',
     identifier: 'github:joeseesun/qiaomu-cover-fonts', skillName: 'Qiaomu Cover Fonts',
@@ -217,7 +239,7 @@ export function externalSkillHref(slug: string) { return `/skills/${slug}` }
 export function getExternalSkill(slug: string) { return EXTERNAL_SKILLS.find(entry => entry.slug === slug) }
 // Reject unknown external pages before streaming starts, preserving a real 404.
 export function isMissingExternalSkillPath(pathname: string) {
-  const match = pathname.match(/^\/skills\/(?:external\/)?((?:skillry-|redskill-|resource-)[^/]+)\/?$/) || pathname.match(/^\/skills\/external\/([^/]+)\/?$/)
+  const match = pathname.match(/^\/skills\/(?:external\/)?((?:skillry-|redskill-|resource-|scenario-)[^/]+)\/?$/) || pathname.match(/^\/skills\/external\/([^/]+)\/?$/)
   if (!match) return false
   try { return !getExternalSkill(decodeURIComponent(match[1])) } catch { return true }
 }
@@ -236,16 +258,22 @@ export function externalSkillDiscoveryRecord(entry: ExternalSkill) {
     description: entry.description.en, provider: entry.provider, identifier: entry.identifier,
     url: `https://www.openagentskill.com${externalSkillHref(entry.slug)}`,
     source_url: entry.sourceUrl, acquisition_url: externalSourceHref(entry.sourceUrl),
-    author: entry.provider === 'skillry' ? null : entry.author,
-    publisher: entry.provider === 'skillry' ? entry.author : null, version: entry.version,
+    author: entry.provider === 'skillry' || entry.provider === 'scenario' ? null : entry.author,
+    publisher: entry.provider === 'skillry' || entry.provider === 'scenario' ? entry.author : null, version: entry.version,
     ...(entry.provider === 'resource' ? { resource_type: entry.resourceType, source_commit: entry.sourceCommit, manifest_url: entry.manifestUrl, article_url: `https://www.openagentskill.com${entry.articlePath}`,
       examples: entry.sourcePreviews.map(preview => ({ image_url: preview.src, source_url: preview.sourceUrl, attribution: entry.author.name, runtime_verified: false })) } : {}),
-    version_source: entry.provider === 'resource' ? 'Versioned GitHub manifest; not automatically synchronized' : entry.provider === 'skillry'
+    version_source: entry.provider === 'scenario' ? `Unversioned official ZIP observed at ${entry.versionObservedAt}; checksum identifies the inspected bytes` : entry.provider === 'resource' ? 'Versioned GitHub manifest; not automatically synchronized' : entry.provider === 'skillry'
       ? entry.versionObservedAt ? `Skillry public product page observed at ${entry.versionObservedAt}` : 'Version not recorded; check Skillry for the current package version'
       : 'RedSkill bundle manifest observed at publication; not automatically synchronized',
     ...(entry.provider === 'skillry' ? { output_type: entry.outputType, listing_evidence: entry.listingEvidence, active: entry.active,
       source_video_url: entry.previewVideo,
       examples: entry.previewImages.map(src => ({ image_url: src, source_url: entry.sourceUrl, attribution: 'Skillry', runtime_verified: false })) } : {}),
+    ...(entry.provider === 'scenario' ? { download_url: entry.downloadUrl, output_type: 'video', requirements: entry.limitations.en,
+      acquisition_price: 'free', runtime_cost: 'paid-cloud-services',
+      examples: [
+        { video_url: entry.sourceDemo.rawVideo, image_url: entry.sourceDemo.rawPoster, role: 'raw-comparison' },
+        { video_url: entry.sourceDemo.video, image_url: entry.sourceDemo.poster, role: 'edited-result' },
+      ].map(example => ({ ...example, source_url: entry.sourceUrl, attribution: entry.sourceDemo.attribution, runtime_verified: false })) } : {}),
     bundle_sha256: entry.bundleSha256, license: entry.license, license_note: entry.licenseNote.en,
     commercial_use: entry.commercialUse, publication_channel: entry.publication.channel,
     ai_reviewed: false, runtime_verified: false, auto_install_allowed: false,

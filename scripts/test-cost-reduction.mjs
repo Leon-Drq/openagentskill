@@ -66,7 +66,7 @@ await mod.getPublicAudit({ ...record, source_content_hash: 'error' }, null)
 assert.equal(record.ai_review_approved, false, 'Display caching cannot approve a review')
 assert.ok(policies.every(policy => policy.tags.includes('public-skill:example') && policy.revalidate === 3600))
 
-const robots = readFileSync('public/robots.txt', 'utf8')
+const robots = readFileSync('public/robots.txt', 'utf8').replace(/\r\n/g, '\n')
 const group = bot => robots.split('User-agent: ' + bot + '\n')[1].split('\nUser-agent: ')[0]
 assert.match(group('ClaudeBot'), /Crawl-delay: 10/)
 for (const bot of ['ClaudeBot', 'GPTBot']) assert.match(group(bot), /Disallow: \/\*\?/)
