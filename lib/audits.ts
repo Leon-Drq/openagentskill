@@ -1,3 +1,4 @@
+import { isFinancialDomainSkill } from '@/lib/security/financial-domain'
 import { needsOwnerPublicationReview } from '@/lib/skills/publication'
 import type { SkillAuditRecord, SkillEventStats, SkillRecord } from '@/lib/db/skills'
 import { formatCompactNumber, getFreshnessDays, getSkillQualityProfile } from '@/lib/quality'
@@ -82,18 +83,6 @@ function hasEnoughDocumentation(skill: SkillRecord) {
   return text.length >= 260
 }
 
-function isFinancialDomainSkill(skill: SkillRecord) {
-  const text = [
-    skill.name,
-    skill.category,
-    skill.description,
-    skill.long_description,
-    skill.install_command,
-    ...(skill.tags || []),
-  ].join(' ').toLowerCase()
-
-  return /\b(finance|financial|quant|quantitative|market|markets|stock|stocks|equity|portfolio|investment|investor|earnings|valuation|macro|economic|economy|fund|funds|options?|trading|broker|exchange|crypto|defi)\b/.test(text)
-}
 
 function hasFinancialExecutionRisk(skill: SkillRecord) {
   return hasSkillRiskHint(skill, FINANCIAL_EXECUTION_PATTERN)

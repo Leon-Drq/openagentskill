@@ -250,7 +250,7 @@ export function SkillsPageClient(props: Props) {
     trackAnalyticsEvent('directory_results', {
       mode: props.catalogMode ? 'catalog' : query ? 'search' : 'selected',
       result_count: resultCount, visible_count: visibleCount, page, degraded,
-      has_query: Boolean(query), locale,
+      has_query: Boolean(query), query_length: query?.length || 0, zero_results: !degraded && resultCount === 0, locale,
     })
   }, [query, sort, category, page, resultCount, degraded, props.featured, props.examplesOnly, props.catalogMode, visibleCount, locale])
   // Server-provided URL state preserves SSR on cached pages. Reading
@@ -273,7 +273,17 @@ export function SkillsPageClient(props: Props) {
     if (Array.isArray(stored)) compareSlugs = [...new Set(stored.filter((v): v is string => typeof v === 'string'))].slice(0, 4)
   } catch { /* Invalid saved data must not break the directory. */ }
   const href = (updates: Record<string, string | undefined>) => directoryHref(pathname, queryString, updates)
-  const navigateTo = (destination: string) => startTransition(() => router.push(destination, { scroll: false }))
+  const navigateTo = (destination: string) => {
+    const next = new URL(destination, window.location.origin).searchParams
+    const previous = new URLSearchParams(queryString)
+    // Report changed filter keys, never user-entered values or search text.
+    const filterKeys = ['access', 'category', 'tag', 'output', 'pricing', 'featured', 'examples', 'useCase', 'platform', 'minStars', 'quality', 'trust', 'safety', 'track', 'sort']
+    const changed = filterKeys.filter(key => next.get(key) !== previous.get(key))
+    if (changed.length) trackAnalyticsEvent('directory_filter', {
+      changed_filters: changed.join(','), filter_count: filterKeys.filter(key => next.has(key) && next.get(key) !== 'all').length, locale,
+    })
+    startTransition(() => router.push(destination, { scroll: false }))
+  }
   const navigate = (updates: Record<string, string | undefined>) => navigateTo(href(updates))
   // onNavigate only handles same-tab client navigation. Real hrefs remain
   // available to crawlers, no-JS browsers and Cmd/Ctrl-click.

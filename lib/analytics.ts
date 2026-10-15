@@ -8,6 +8,8 @@ export type AnalyticsParameterValue = string | number | boolean
 export type AnalyticsEventName =
   | 'growth_activation'
   | 'partner_outbound'
+  | 'outbound_link_click'
+  | 'directory_filter'
   | 'directory_search'
   | 'directory_results'
   | 'directory_skill_open'

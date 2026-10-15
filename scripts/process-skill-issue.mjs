@@ -26,7 +26,7 @@ export function reviewAttemptDecision(comments, { repository, path, commit }, no
 
 function sectionBody(markdown, heading) {
   const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const match = markdown.match(new RegExp(`^##\\s+${escaped}\\s*$([\\s\\S]*?)(?=^##\\s+|(?![\\s\\S]))`, 'im'))
+  const match = markdown.match(new RegExp(`^#{2,3}[\\t ]+${escaped}[\\t ]*\\r?$([\\s\\S]*?)(?=^#{1,3}[\\t ]+|(?![\\s\\S]))`, 'im'))
   return match?.[1]?.trim() || ''
 }
 
@@ -56,7 +56,7 @@ export function extractSuggestedTags(markdown) {
 
 export function isNewSkillRequest(markdown) {
   const section = sectionBody(markdown, 'Request type')
-  return /^\s*-\s*(?:\[[x ]\]\s*)?New Skill\s*$/im.test(section)
+  return section.split(/\r?\n|,/).some(value => /^\s*(?:-\s*)?(?:\[x\]\s*)?New Skill\s*$/i.test(value))
 }
 
 export function chooseSkillCandidate(skills, sourceUrl) {

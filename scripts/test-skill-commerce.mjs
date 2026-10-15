@@ -4,7 +4,7 @@ import { register } from 'node:module'
 register('./test-owner-publication-loader.mjs', import.meta.url)
 const { acquisitionTypes, getSkillCommerce, validSkillOffer, reviewedSkillOffers, commerceFilterSlugs, normalizePriceFilter, matchesCommerce, safeCommerceUrl } = await import('../lib/skills/commerce.ts')
 const { commerceCopy } = await import('../lib/i18n/commerce-copy.ts')
-const now = Date.parse('2026-10-06T12:00:00Z')
+const now = Date.parse('2026-10-15T12:00:00Z')
 for (const slug of ['unknown-repo', '__proto__', 'constructor']) {
   const result = getSkillCommerce(slug, now)
   assert.equal(result.type, 'unknown')
@@ -18,6 +18,7 @@ for (const [slug, offer] of Object.entries(reviewedSkillOffers)) {
   assert.equal(getSkillCommerce(slug, now).type, offer.type)
   assert.equal(getSkillCommerce(slug, now + 91 * 86400000).type, 'unknown')
 }
+assert.equal(getSkillCommerce('ullrai-diplay-helper-diplay-helper', now).type, 'free')
 assert.equal(getSkillCommerce('hypit-ai-hypit-hypit', now).runtime, 'optional-services')
 assert.equal(normalizePriceFilter('not.in.(anything)'), 'all')
 assert.ok(matchesCommerce('missing', 'unknown'))

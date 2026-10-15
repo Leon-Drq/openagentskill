@@ -1,3 +1,4 @@
+import { isFinancialDomainSkill } from '@/lib/security/financial-domain'
 import { needsOwnerPublicationReview, OWNER_PUBLICATION_NOTICE } from '@/lib/skills/publication'
 import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
 import { FINANCIAL_EXECUTION_PATTERN, SECRET_ACCESS_PATTERN, hasSkillRiskHint } from '@/lib/security/risk-context'
@@ -555,11 +556,6 @@ function trustSignalText(skill: SkillRecord) {
     .toLowerCase()
 }
 
-function isFinancialDomainSkill(skill: SkillRecord) {
-  return /\b(finance|financial|quant|quantitative|market|markets|stock|stocks|equity|portfolio|investment|investor|earnings|valuation|macro|economic|economy|fund|funds|options?|trading|broker|exchange|crypto|defi)\b/.test(
-    trustSignalText(skill)
-  )
-}
 
 function hasFinancialExecutionRisk(skill: SkillRecord) {
   return hasSkillRiskHint(skill, FINANCIAL_EXECUTION_PATTERN)

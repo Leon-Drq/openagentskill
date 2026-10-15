@@ -1,4 +1,6 @@
 export const SKILL_SLUG_ALIASES: Record<string, string> = {
+  // Retain the original record and history after the creator renamed GitHub.
+  'ammarbalkhi-owners-vision-owners-vision': 'ammaralbalkhi-owners-vision-owners-vision',
   crawl4ai: 'crawl4ai',
   'crawl-4-ai': 'crawl4ai',
   serenity: 'serenity-skill',

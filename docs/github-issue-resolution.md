@@ -97,3 +97,38 @@ JSON Schema is preferable), verify the runtime extra against the pinned release,
 and add fixtures for mismatched IDs, moving branches, missing licenses, shell
 injection in install metadata and regression-free Markdown submission behavior.
 Keep #151 open until the submission-to-catalog path is implemented and deployed.
+
+## 2026-10-15 intake, metadata and analytics follow-up
+
+GitHub YAML issue forms render H3 headings and plain or comma-separated dropdown
+values. Intake now accepts those alongside the previous H2/bullet format. Only
+an explicitly selected New Skill enters ordinary submission review; unchecked
+boxes, metadata corrections and request text in other sections do not. Reconcile
+remains read-only with respect to paid review, and #100 stays in manual review.
+
+#255: DiPlay Helper is package selection, installation and troubleshooting
+research. An exact repository/path taxonomy correction removes video/audio
+production facets without changing source, review or publication state. Free
+acquisition evidence is the pinned MIT source README, including independent
+Skill installation and an optional self-hosted MCP; it is not a promise of free
+model or service usage.
+
+#203: Financial domain inference is shared between trust and audit. Generic CLI
+options, sponsorship market research and designer portfolios no longer trigger
+investment advice warnings. Explicit finance, investment, stock, foreign
+exchange and trading contexts remain detected; financial execution checks and
+historical review evidence are unchanged.
+
+#220: The owner publishing lane can refresh a GitHub-confirmed canonical rename,
+updating creator/source links while preserving the original record and URL.
+The new-handle slug redirects to that established URL. Refresh through the
+owner CLI after production rollout, verify source commit and append-only audit,
+and close only after the public metadata matches. No ad-hoc approval SQL.
+
+#256: See [analytics-instrumentation.md](analytics-instrumentation.md). Keep
+consent denied by default. Add uniform privacy-filtered outbound clicks, filter
+usage and zero-result metrics; confirm the production measurement ID and browser
+behavior. GA property ingestion needs separate authenticated evidence.
+
+#151 remains an enhancement backlog item; no implementation or paid review is
+started by this release. Close resolved issues only after production verification.

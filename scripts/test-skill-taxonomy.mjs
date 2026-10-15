@@ -61,8 +61,16 @@ try {
  assert.match(generated, /"primary_category":"image-generation","taxonomy_tags":\["image-editing"\],"output_types":\["image"\]/)
  assert.match(generated, /where lower\(coalesce\(github_repo,''\)\) \|\| ':' \|\| coalesce\(source_path,''\) in \('chengyi-ai\/native-subtitle-quote-image:skills\/native-subtitle-quote-image\/SKILL.md'\)/)
  assert.match(generated, /if before_original is distinct from after_original then/)
- assert.equal(generated, readFileSync('supabase/migrations/20261007015508_native_subtitle_image_taxonomy.sql', 'utf8'), 'the checked-in migration matches the classifier used for new imports')
+ const historic = readFileSync('supabase/migrations/20261007015508_native_subtitle_image_taxonomy.sql', 'utf8')
+ assert.equal(generated.slice(generated.indexOf('-- Only derived')), historic.slice(historic.indexOf('-- Only derived')), 'the prior bounded backfill remains identical as vocabulary grows')
+ execFileSync(process.execPath, ['--experimental-strip-types', 'scripts/build-skill-taxonomy-migration.mjs', '--exact-source-output', output, '--source', 'ullrai/diplay-helper:skills/diplay-helper/SKILL.md'])
+ assert.equal(readFileSync(output, 'utf8'), readFileSync('supabase/migrations/20261015081351_diplay_helper_taxonomy.sql', 'utf8'), 'the new migration matches the classifier used for imports')
 } finally {
  rmSync(temp, { recursive: true, force: true })
 }
 console.log('Taxonomy: per-package task classification, separate automation/RAG, immutable source metadata, source allowlist and bounded discovery passed.')
+
+const diplay = classifySkill({ github_repo: 'UllrAI/diplay-helper', source_path: 'skills/diplay-helper/SKILL.md', name: 'diplay-helper', description: 'CarPlay installation and Siri audio troubleshooting', category: 'automation' })
+assert.equal(diplay.primary_category, 'research')
+assert.deepEqual(diplay.output_types, [])
+assert.deepEqual(diplay.taxonomy_tags, ['web-research'])

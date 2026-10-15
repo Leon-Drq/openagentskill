@@ -35,6 +35,10 @@ const freeSource = (sourceUrl: string, runtime: SkillOffer['runtime'] = 'model')
 })
 
 export const reviewedSkillOffers: Readonly<Record<string, SkillOffer>> = {
+  'ullrai-diplay-helper-diplay-helper': {
+    type: 'free', billing: 'free', runtime: 'optional-services', checkedAt: '2026-10-15',
+    sourceUrl: 'https://github.com/UllrAI/diplay-helper/blob/a0d39208be06370bd7b515745cb38884c97fa5ea/README.md#use-the-skill',
+  },
   'chengyi-ai-native-subtitle-quote-image': {
     type: 'free', billing: 'free', runtime: 'unknown', checkedAt: '2026-10-06',
     sourceUrl: 'https://github.com/chengyi-ai/native-subtitle-quote-image/tree/f9485e20f03fc0b9e5dfd77d03d5be24f7cebdcd',

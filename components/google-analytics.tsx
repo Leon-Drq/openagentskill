@@ -1,5 +1,6 @@
 'use client'
 
+import { mountOutboundLinkTracker } from '@/lib/outbound-analytics'
 import Link from '@/components/crawl-link'
 import Script from 'next/script'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -21,6 +22,8 @@ export function GoogleAnalytics({ measurementId }: { measurementId: string }) {
   const locale = getLocaleFromRoute(pathname, searchParams.get('lang'))
   const search = searchParams.toString()
   const [consent, setConsent] = useState<AnalyticsConsent | null | undefined>(undefined)
+
+  useEffect(() => mountOutboundLinkTracker(), [])
 
   useEffect(() => {
     const onConsentChange = (event: Event) => {

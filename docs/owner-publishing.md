@@ -97,3 +97,11 @@ pnpm build
 `scripts/test-owner-publication.sql` exercises the publication transaction,
 idempotency, permissions and audit preservation using fixtures, then rolls back
 all fixture rows. It does not publish a real Skill or edit an existing review.
+
+GitHub account/repository renames are resolved through GitHub's canonical
+repository response. To refresh an existing record after a rename, pass its
+**previous** repository identity to `owner:publish`; the server resolves the new
+identity, pins current source, and supplies the old identity only internally.
+Public request JSON cannot provide a replacement identity or review fields.
+The RPC retains the original record/slug and archives prior creator/source/review
+metadata. A new revision remains an owner publication, not an inherited AI approval.

@@ -67,6 +67,18 @@ begin
   result := public.publish_owner_skill(gen_random_uuid(),source || jsonb_build_object('github_repo','duplicate/' || test_slug,'slug','duplicate-' || test_slug),'Owner existing hash verification','{}');
   assert result->>'status' = 'duplicate';
   assert result->>'slug' = test_slug;
+  -- A confirmed repository rename keeps the original record, URL and review.
+  source := source || jsonb_build_object('previous_github_repo',test_repo,'github_repo',test_repo || '-renamed',
+    'author_name','Renamed Creator','author_url','https://github.com/renamed-creator');
+  result := public.publish_owner_skill(gen_random_uuid(),source,'Owner confirmed repository rename verification','{}');
+  assert result->>'slug' = test_slug;
+  assert result->>'status' = 'updated';
+  assert exists(select 1 from skills where slug=test_slug and github_repo=test_repo || '-renamed'
+    and author_name='Renamed Creator' and author_url='https://github.com/renamed-creator'
+    and ai_review_approved and ai_review_score->>'security'='41');
+  assert exists(select 1 from owner_skill_publications where skill_slug=test_slug and previous_review->>'github_repo'=test_repo);
+  result := public.publish_owner_skill(gen_random_uuid(),source,'Owner renamed source retry verification','{}');
+  assert result->>'status' = 'unchanged';
   assert not has_function_privilege('anon','public.publish_owner_skill(uuid,jsonb,text,jsonb)','execute');
   assert not has_function_privilege('authenticated','public.publish_owner_skill(uuid,jsonb,text,jsonb)','execute');
   assert not has_table_privilege('anon','public.owner_skill_publications','select');

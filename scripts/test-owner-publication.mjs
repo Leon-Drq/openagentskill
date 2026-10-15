@@ -40,7 +40,7 @@ globalThis.fetch = async (url) => {
   calls.push(target.href)
   assert.equal(target.origin, 'https://api.github.com', 'dry-run must not publish or call an AI provider')
   if (rateLimited) return new Response('', { status: 429 })
-  if (target.pathname === '/repos/fixture/owner-skill') return Response.json({
+  if (target.pathname === '/repos/fixture/owner-skill' || target.pathname === '/repos/old-fixture/owner-skill') return Response.json({
     private: privateRepo, full_name: 'fixture/owner-skill', stargazers_count: 0, forks_count: 0,
     updated_at: new Date().toISOString(), pushed_at: new Date().toISOString(), default_branch: 'main', license: { spdx_id: 'MIT' },
   })
@@ -70,6 +70,12 @@ try {
   name = 'Bad $(command) name'
   assert.doesNotMatch((await prepareOwnerPublication(input)).skill.install_command, /\$\(|command/)
   name = 'Fixture Skill'
+  const renamed = await prepareOwnerPublication({ ...input, repository: 'old-fixture/owner-skill' })
+  assert.equal(renamed.skill.previous_github_repo, 'old-fixture/owner-skill')
+  assert.equal(renamed.skill.github_repo, 'fixture/owner-skill')
+  assert.equal(renamed.skill.author_url, 'https://github.com/fixture')
+  assert.equal(prepared.skill.previous_github_repo, undefined)
+  assert.equal(OwnerPublicationSchema.safeParse({ ...input, previous_github_repo: 'victim/repo' }).success, false)
   paths = ['SKILL.md', 'nested/SKILL.md']
   await assert.rejects(prepareOwnerPublication(input), error => error.status === 422)
   paths = ['SKILL.md']
@@ -92,6 +98,22 @@ for (const getTrust of [getSkillTrustProfile, getSkillTrustProfileV5]) {
   assert.equal(trust.autoInstall.allowed, false)
   assert.notEqual(trust.installReadiness.policy, 'agent_install_candidate')
   assert.ok(['review', 'risk'].includes(trust.tier), 'popularity must not imply owner publication is reviewed')
+}
+for (const description of [
+  'Research sponsors and market fit for creator outreach. CLI options: --format json.',
+  'Research API options and build an indexed knowledge base for business market research.',
+  'Create a designer portfolio and compare video export options.',
+]) {
+  const ordinary = { ...skill, name: 'Research helper', category: 'research', description, long_description: description }
+  for (const profile of [buildSkillAudit(ordinary), getSkillTrustProfile(ordinary), getSkillTrustProfileV5(ordinary)]) {
+    assert.doesNotMatch(profile.warnings.join(' '), /financial advice|live investment/i, description)
+  }
+}
+for (const description of ['Research stock options and earnings.', 'Analyze foreign exchange pricing.', 'Compare investment funds.', 'Financial research for crypto trading.']) {
+  const financial = { ...skill, name: 'Research helper', description, long_description: description }
+  for (const profile of [buildSkillAudit(financial), getSkillTrustProfile(financial), getSkillTrustProfileV5(financial)]) {
+    assert.match(profile.warnings.join(' '), /financial advice|live investment/i, description)
+  }
 }
 const audit = buildSkillAudit(skill)
 assert.equal(getSkillDecisionProfile(skill).readinessLabel, 'Needs manual review')

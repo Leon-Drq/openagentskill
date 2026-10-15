@@ -281,9 +281,13 @@ export const EXACT_SOURCE_CATEGORIES: Record<string, SkillCategory> = {
  'obra/superpowers:skills/verification-before-completion/SKILL.md': 'coding-agents',
  'tt-a1i/archify:archify/SKILL.md': 'design-creative',
  'chengyi-ai/native-subtitle-quote-image:skills/native-subtitle-quote-image/SKILL.md': 'image-generation',
+ 'ullrai/diplay-helper:skills/diplay-helper/SKILL.md': 'research',
 }
 // This package consumes video frames but delivers JPG quote cards, not video.
 export const EXACT_SOURCE_FACETS: Record<string, Pick<SkillTaxonomy, 'taxonomy_tags' | 'output_types'>> = {
+ 'ullrai/diplay-helper:skills/diplay-helper/SKILL.md': {
+   taxonomy_tags: ['web-research'], output_types: [],
+ },
  'chengyi-ai/native-subtitle-quote-image:skills/native-subtitle-quote-image/SKILL.md': {
    taxonomy_tags: ['image-editing'], output_types: ['image'],
  },

@@ -20,10 +20,14 @@ export async function prepareOwnerPublication(input: OwnerPublicationInput) {
   if (!reference) throw new OwnerPublicationError('Enter a public GitHub repository or SKILL.md URL.', 400)
   const repository = await validateGitHubRepo(`${reference.owner}/${reference.repo}`, { checkReadme: false, checkSkillJson: false })
   if (repository.isPrivate) throw new OwnerPublicationError('Only public repositories can be listed.', 422)
+  const requestedRepository = `${reference.owner}/${reference.repo}`
+  const [canonicalOwner, canonicalRepo] = repository.fullName.split('/')
+  const canonicalReference = { ...reference, owner: canonicalOwner, repo: canonicalRepo }
+  const previousRepository = requestedRepository.toLowerCase() !== repository.fullName.toLowerCase() ? requestedRepository : undefined
   const ref = input.sourceRef || reference.ref || repository.defaultBranch
-  const commit = await fetchRepositoryCommitSha(reference.owner, reference.repo, ref)
+  const commit = await fetchRepositoryCommitSha(canonicalOwner, canonicalRepo, ref)
   if (!commit) throw new OwnerPublicationError('Could not resolve the source revision. Retry after GitHub is available.', 503)
-  const discovery = await discoverGitHubSkills({ ...reference, ref: commit, path: input.skillPath || reference.path }, repository)
+  const discovery = await discoverGitHubSkills({ ...canonicalReference, ref: commit, path: input.skillPath || reference.path }, repository)
   if (discovery.skills.length !== 1 || discovery.truncated) {
     throw new OwnerPublicationError('Select exactly one valid SKILL.md using skillPath.', 422,
       { paths: discovery.skills.map(skill => skill.path) })
@@ -35,7 +39,7 @@ export async function prepareOwnerPublication(input: OwnerPublicationInput) {
   const versionEvidence = await fetchSkillVersionEvidence(skill, discovery.tree)
   const hash = createHash('sha256').update(skill.document).digest('hex')
   const slugPart = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
-  const base = `${slugPart(repository.owner)}-${slugPart(repository.repo)}`
+  const base = `${slugPart(canonicalOwner)}-${slugPart(canonicalRepo)}`
   const slug = (skill.directory ? `${base}-${slugPart(skill.frontmatter.name)}` : base).slice(0, 150).replace(/-+$/, '')
   if (!slug) throw new OwnerPublicationError('Could not create a stable skill identifier.', 422)
   const encodedDirectory = skill.directory.split('/').map(part => encodeURIComponent(part).replace(/[!'()*]/g, char => `%${char.charCodeAt(0).toString(16)}`)).join('/')
@@ -47,10 +51,11 @@ export async function prepareOwnerPublication(input: OwnerPublicationInput) {
     name: skill.frontmatter.name,
     description: skill.frontmatter.description,
     long_description: skill.document.slice(0, 12000),
-    author_name: skill.frontmatter.author || repository.owner,
-    author_url: `https://github.com/${repository.owner}`,
+    author_name: skill.frontmatter.author || (repository.fullName.toLowerCase() === 'ammarbalkhi/owners-vision' && skill.path === 'owners-vision/SKILL.md' ? 'Ammar Al Balkhi' : canonicalOwner),
+    author_url: `https://github.com/${canonicalOwner}`,
     repository: skill.sourceUrl,
     github_repo: repository.fullName,
+    ...(previousRepository ? { previous_github_repo: previousRepository } : {}),
     github_stars: repository.stars,
     github_forks: repository.forks,
     github_language: repository.language || null,
@@ -71,6 +76,7 @@ export async function prepareOwnerPublication(input: OwnerPublicationInput) {
   return {
     skill: metadata,
     scan: {
+      repository_identity: { requested: requestedRepository, canonical: repository.fullName, github_id: repository.id ?? null },
       version_evidence: versionEvidence,
       ...staticAnalysis,
       advisory: true,

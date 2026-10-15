@@ -38,6 +38,18 @@ assert.equal(extractGitHubSource('## Public repository, subdirectory, or SKILL.m
 const currentTemplateBody = issueBody.replace('## Requested metadata', '## Requested metadata or safety correction')
 assert.deepEqual(extractSuggestedTags(currentTemplateBody), ['frontend', 'scroll-animation', 'video'])
 
+// GitHub YAML forms render H3 headings and plain dropdown values, unlike the
+// old hand-written H2/bullet template. Both must enter the same review pipeline.
+const yamlFormBody = issueBody.replace(/^## /gm, '### ').replace('- New Skill', 'New Skill, Creator claim or attribution')
+assert.equal(extractGitHubSource(yamlFormBody), extractGitHubSource(issueBody))
+assert.equal(isNewSkillRequest(yamlFormBody), true)
+assert.deepEqual(extractSuggestedTags(yamlFormBody), ['frontend', 'scroll-animation', 'video'])
+assert.equal(isNewSkillRequest('### Request type\r\n\r\nNew Skill\r\n\r\n### Agent workflow\r\nRead docs'), true)
+for (const request of ['Wrong name, description, category, or tags', 'Not New Skill', '- [ ] New Skill']) {
+  assert.equal(isNewSkillRequest(`### Request type\n\n${request}\n\n### Agent workflow\n- New Skill`), false)
+}
+assert.equal(isNewSkillRequest('### Request type\n\n- [x] New Skill'), true)
+
 const skills = [
   { path: 'one/SKILL.md', sourceUrl: 'https://github.com/example/repo/tree/main/one' },
   { path: 'two/SKILL.md', sourceUrl: 'https://github.com/example/repo/tree/main/two' },
@@ -108,6 +120,10 @@ try {
   assert.equal((await processSkillIssue({ event, repository: 'Leon-Drq/openagentskill', githubToken: 'fixture-token' })).skipped, true)
   assert.equal(calls.length, 1, 'untrusted comments must not validate, submit or write comments')
   permission = 'write'; calls = []
+  const yamlEvent = { ...event, issue: { ...event.issue, body: yamlFormBody } }
+  assert.equal((await processSkillIssue({ event: yamlEvent, repository: 'Leon-Drq/openagentskill', githubToken: 'fixture-token' })).status, 'reviewed')
+  assert.equal(calls.filter(c => c.url.endsWith('/api/skills/submit')).length, 1, 'current YAML form reaches normal review pipeline')
+  publicSkill = null; calls = []
   assert.equal((await processSkillIssue({ event, repository: 'Leon-Drq/openagentskill', githubToken: 'fixture-token' })).status, 'reviewed')
   assert.equal(calls.filter(c => c.url.endsWith('/api/skills/submit')).length, 1)
   assert.equal(calls.filter(c => c.method === 'PATCH').length, 1, 'close only after confirmed publication')

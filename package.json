@@ -64,7 +64,7 @@
     "test:media-audit": "node scripts/test-media-audit.mjs",
     "media:collect": "node scripts/collect-skill-media.mjs",
     "test:media-collection": "node --experimental-strip-types scripts/test-skill-media-collection.mjs",
-    "test:growth-upgrade": "node --experimental-strip-types scripts/test-growth-upgrade.mjs",
+    "test:growth-upgrade": "node --experimental-strip-types scripts/test-growth-upgrade.mjs && node scripts/test-outbound-analytics.mjs",
     "test:creator-blog": "node --import ./scripts/test-typescript-register.mjs scripts/test-creator-blog.mjs && node --import ./scripts/test-typescript-register.mjs scripts/test-rea-blog.mjs",
     "check:rea-blog": "node scripts/check-rea-blog.mjs",
     "test:resource-pages": "node --import ./scripts/test-typescript-register.mjs scripts/test-resource-pages.mjs && pnpm test:studio && pnpm test:motion-studio",
