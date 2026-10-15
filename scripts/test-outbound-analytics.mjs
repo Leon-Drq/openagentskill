@@ -13,6 +13,7 @@ for (const [href, type] of [
   ['https://docs.example.com/private', 'docs'],
   ['https://remotion.dev/docs/test', 'docs'],
   ['https://skills.sh/private', 'marketplace'],
+  ['https://skillry.dev/?utm_source=private', 'marketplace'],
   ['https://github.com.evil.example/private', 'other'],
   ['https://example.com/private', 'other'],
 ]) {

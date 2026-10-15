@@ -1,7 +1,7 @@
 import { trackAnalyticsEvent } from './analytics'
 
 const socialHosts = ['x.com', 'twitter.com', 'linkedin.com', 'youtube.com', 'youtu.be', 'discord.com', 'discord.gg', 't.me', 'bsky.app']
-const marketplaceHosts = ['skillry.app', 'skillry.ai', 'skills.sh', 'clawhub.ai', 'skillsmp.com', 'lobehub.com']
+const marketplaceHosts = ['skillry.dev', 'skillry.app', 'skillry.ai', 'skills.sh', 'clawhub.ai', 'skillsmp.com', 'lobehub.com']
 const docsHosts = ['remotion.dev', 'mcp.scenario.com', 'vercel.com', 'nextjs.org', 'modelcontextprotocol.io']
 const belongsTo = (host: string, domains: string[]) => domains.some(domain => host === domain || host.endsWith(`.${domain}`))
 const siteHost = (host: string) => host.toLowerCase().replace(/^www\./, '')
