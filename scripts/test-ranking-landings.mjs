@@ -80,6 +80,6 @@ assert.ok(page.indexOf('data-ranking-results')<page.indexOf('data-ranking-method
 assert.doesNotMatch(page,/InstallCommand|rankMovement|getRankingSnapshotHistory|Daily snapshot|Top score|npx skills add/)
 assert.match(page,/getRankingCompareHref/); assert.match(page,/history\?days=30/)
 assert.match(page,/source === 'saved-directory'/); assert.match(page,/source === 'unavailable'/)
-const og=readFileSync('app/rankings/[slug]/opengraph-image.tsx','utf8')
+const og=readFileSync('lib/og/renderers.tsx','utf8')
 assert.match(og,/getRankingLanding/); assert.doesNotMatch(og,/getLatestRankingSnapshot|Updated daily/)
 console.log(`Ranking landings: ${getRankingDefinitions().length} definitions, 36 shared routes, 8 locales, genuine seven-day eligibility, saved-data labeling, failed reads, SEO and shared layout passed.`)

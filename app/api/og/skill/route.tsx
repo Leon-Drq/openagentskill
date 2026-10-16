@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og'
 import { NextRequest } from 'next/server'
 import { SkillSocialCard } from '@/components/skill-social-card'
+import { renderOgOrCached } from '@/lib/og/response'
 
 export const runtime = 'nodejs'
 
@@ -26,16 +27,22 @@ export async function GET(request: NextRequest) {
   const name = truncate(params.get('name') || 'AI Agent Skill', 46)
   const slug = (params.get('slug') || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'agent-skill').slice(0, 60)
   const description = params.get('description') || 'Discover practical skills for AI agents.'
-  const stars = Number(params.get('stars') || '0')
-  const score = Number(params.get('score') || '0')
+  const numeric = (key: string, max: number) => {
+    const value = Number(params.get(key) || '0')
+    return Number.isFinite(value) ? Math.min(max, Math.max(0, value)) : 0
+  }
+  const stars = numeric('stars', Number.MAX_SAFE_INTEGER)
+  const score = numeric('score', 100)
   const safety = truncate(params.get('safety') || 'Review first', 24)
   const starLabel = stars > 0 ? `${compactNumber(stars)} stars` : 'Open registry'
 
-  return new ImageResponse(
+  const scenario = truncate(description, 82)
+  // Legacy free-form images remain compatible, but cannot grow durable storage.
+  return renderOgOrCached('preview', [name, slug, scenario, score, safety, starLabel], () => new ImageResponse(
     <SkillSocialCard
       name={name}
       slug={slug}
-      scenario={truncate(description, 82)}
+      scenario={scenario}
       score={score}
       safety={safety}
       stars={starLabel}
@@ -46,11 +53,6 @@ export async function GET(request: NextRequest) {
       creator="openagentskill"
       repository="openagentskill.com"
     />,
-    {
-      ...size,
-      headers: {
-        'Cache-Control': 'public, max-age=31536000, immutable',
-      },
-    }
-  )
+    size
+  ), false)
 }

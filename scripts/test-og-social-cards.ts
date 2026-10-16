@@ -63,7 +63,7 @@ assert.equal(getSkillSocialProvenance(record({ publisher_verified: true })).labe
 assert.equal(getSkillGitHubOwner(record()), 'owner')
 
 const card = readFileSync(new URL('../components/skill-social-card.tsx', import.meta.url), 'utf8')
-const skillImage = readFileSync(new URL('../app/skills/[slug]/opengraph-image.tsx', import.meta.url), 'utf8')
+const skillImage = readFileSync(new URL('../lib/og/skill.tsx', import.meta.url), 'utf8')
 const metadata = readFileSync(new URL('../app/skills/[slug]/content.tsx', import.meta.url), 'utf8')
 
 assert.doesNotMatch(card, /VERIFIED SKILL MANIFEST/, 'unverified skills must not receive a verified label')
