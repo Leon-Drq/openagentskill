@@ -1,16 +1,17 @@
 import type { Metadata } from 'next'
+import { cache } from 'react'
+import { getAlternativeCandidates, rankAlternatives } from '@/lib/skills/alternatives'
 import Link from '@/components/crawl-link'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { InstallCommand } from '@/components/install-command'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
-import { convertSkillRecordToManifest, getAllSkills, type SkillRecord } from '@/lib/db/skills'
-import { formatCompactNumber, getPlatformHints, getSkillQualityProfile } from '@/lib/quality'
-import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
-import { getSkillBySlugOrFallback } from '@/lib/skill-fallbacks'
+import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
+import { getSkillBySlugOrFallbackStrict } from '@/lib/skill-fallbacks'
 import { getSkillTrustProfile } from '@/lib/trust'
 
-export const revalidate = 300
+export const revalidate = 900
+const getTarget = cache((slug: string) => getSkillBySlugOrFallbackStrict(slug, 900))
 
 export function generateStaticParams() {
   return []
@@ -22,7 +23,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const skill = await getSkillBySlugOrFallback(slug)
+  const skill = await getTarget(slug)
   if (!skill) return { title: 'Alternatives Not Found' }
 
   return {
@@ -44,50 +45,6 @@ export async function generateMetadata({
   }
 }
 
-function scoreAlternative(target: SkillRecord, candidate: SkillRecord) {
-  const targetTags = new Set((target.tags || []).map((tag) => tag.toLowerCase()))
-  const targetFrameworks = new Set((target.frameworks || []).map((framework) => framework.toLowerCase()))
-  const candidateTags = (candidate.tags || []).map((tag) => tag.toLowerCase())
-  const candidateFrameworks = (candidate.frameworks || []).map((framework) => framework.toLowerCase())
-  const quality = getSkillQualityProfile(candidate)
-  const trust = getSkillTrustProfile(candidate)
-
-  let score = 0
-  if (candidate.category === target.category) score += 28
-  score += candidateTags.filter((tag) => targetTags.has(tag)).length * 8
-  score += candidateFrameworks.filter((framework) => targetFrameworks.has(framework)).length * 6
-  score += Math.min(18, Math.log10(Math.max(1, candidate.github_stars || 1)) * 4)
-  score += quality.score / 5
-  score += trust.score / 6
-  if (candidate.install_command || candidate.github_repo) score += 5
-  if (candidate.github_last_pushed_at) score += 3
-
-  return score
-}
-
-function getAlternatives(target: SkillRecord, skills: SkillRecord[], limit = 12) {
-  return skills
-    .filter((skill) => skill.slug !== target.slug)
-    .map((skill) => ({ skill, score: scoreAlternative(target, skill) }))
-    .filter((item) => item.score >= 32)
-    .sort((a, b) => b.score - a.score || b.skill.github_stars - a.skill.github_stars)
-    .slice(0, limit)
-}
-
-function mergeSkillCatalog(skills: SkillRecord[]) {
-  const bySlug = new Map<string, SkillRecord>()
-
-  for (const skill of CURATED_SKILL_SNAPSHOT) {
-    bySlug.set(skill.slug, skill)
-  }
-
-  for (const skill of skills) {
-    bySlug.set(skill.slug, skill)
-  }
-
-  return Array.from(bySlug.values())
-}
-
 function formatDate(value: string | null | undefined) {
   if (!value) return 'Unknown'
   return new Date(value).toLocaleDateString('en-US', {
@@ -103,18 +60,14 @@ export default async function AlternativesPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const [target, dbSkills] = await Promise.all([
-    getSkillBySlugOrFallback(slug),
-    getAllSkills('quality', undefined, 1200).catch(() => []),
-  ])
+  const target = await getTarget(slug)
   if (!target) notFound()
 
   if (slug !== target.slug) {
     permanentRedirect(`/alternatives/${target.slug}`)
   }
 
-  const skills = mergeSkillCatalog(dbSkills)
-  const alternatives = getAlternatives(target, skills, 16)
+  const alternatives = rankAlternatives(target, await getAlternativeCandidates(), 16)
   const targetQuality = getSkillQualityProfile(target)
   const targetTrust = getSkillTrustProfile(target)
   const compareHref = `/compare?skills=${encodeURIComponent([target.slug, ...alternatives.slice(0, 3).map((item) => item.skill.slug)].join(','))}`
@@ -211,10 +164,7 @@ export default async function AlternativesPage({
             <div className="divide-y divide-border border-y border-border">
               {alternatives.map((item, index) => {
                 const skill = item.skill
-                const manifest = convertSkillRecordToManifest(skill)
-                const quality = getSkillQualityProfile(skill)
-                const trust = getSkillTrustProfile(skill)
-                const platforms = [...new Set([...(skill.frameworks || []), ...getPlatformHints(skill)])]
+                const { quality, trust, platforms } = item
 
                 return (
                   <article key={skill.slug} className="grid gap-5 py-7 lg:grid-cols-[auto_1fr_280px]">
@@ -246,7 +196,7 @@ export default async function AlternativesPage({
                     </div>
                     <div className="min-w-0">
                       <InstallCommand
-                        command={manifest.technical.installCommand || `npx skills add ${skill.github_repo}`}
+                        command={item.installCommand}
                         skillSlug={skill.slug}
                         compact
                       />

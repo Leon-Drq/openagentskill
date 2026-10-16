@@ -103,13 +103,27 @@ for (const lang of ['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr', 'id']) {
 assert.equal(shared.size, 8)
 await renderProps({ lang: 'invented' })
 assert.equal(shared.size, 8, 'invalid locales normalize before keying')
-for (const params of [{ sort: 'stars' }, { page: '2' }, { category: 'design-creative' }, { q: 'design' }, { unknown: 'value' }]) {
+for (const params of [{ category: 'design-creative', access: 'free' }, { q: 'design' }, { unknown: 'value' }]) {
   await renderProps(params)
   assert.equal(shared.size, 8, 'query variants bypass the default model cache')
 }
 await assert.rejects(() => renderProps({ page: '0' }), /404/)
 await assert.rejects(() => renderProps({ page: '999999' }), /404/)
-assert.deepEqual(policies, [{ revalidate: 900, tags: ['public-skill-directory', 'public-skill-stats'] }])
+assert.deepEqual(policies, Array.from({length: 2}, () => ({ revalidate: 900, tags: ['public-skill-directory', 'public-skill-stats'] })))
+
+for (const params of [{ sort: 'stars' }, { page: '2' }, { category: 'design-creative' }]) {
+  const first = await renderProps(params)
+  const before = reads
+  assert.deepEqual(await renderProps(params), normalize(first))
+  assert.equal(reads, before, 'Repeated common browse states skip database reads and projection')
+  const attributed = await renderProps({ ...params, utm_source: 'test' })
+  assert.deepEqual(attributed.skills, first.skills)
+  assert.equal(reads, before, 'Attribution cannot duplicate browse models')
+}
+shared.clear(); unavailable = true
+await assert.rejects(() => renderProps({ sort: 'stars' }, { requireHealthy: true }), /do not cache|refusing to cache/)
+assert.equal(shared.size, 0, 'Unhealthy browse models are never cached')
+unavailable = false
 
 // Same invalidation operation used by publication/stat updates: the next read
 // must rebuild from current inputs, including changed evidence fields.

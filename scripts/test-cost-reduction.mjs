@@ -10,7 +10,7 @@ for (const locale of locales) {
   for (const query of ['', '_rsc=one', 'utm_source=newsletter&ref=source', '_rsc=two&utm_campaign=a']) {
     assert.equal(publicCachedRoute(path, new URLSearchParams(query)), `/cached-public/${locale}/skills`)
   }
-  for (const query of ['q=code', 'category=finance', 'page=2', 'view=all', 'unknown=random']) {
+  for (const query of ['q=code', 'category=finance&access=free', 'page=11', 'unknown=random']) {
     assert.equal(publicCachedRoute(path, new URLSearchParams(query)), null, 'Unbounded filters must never enter the public page cache')
   }
   for (const suffix of ['', '/audit', '/evals']) {

@@ -34,6 +34,7 @@ import { directoryCategoryOptions, matchesDirectoryCategory, isDirectorySnapshot
 import { MOTION_CATEGORY, type MotionEntry } from '@/lib/motion/shared'
 import { selectMotionDirectoryEntries, paidMotionWindow } from '@/lib/motion/directory'
 import { getDownloadTotals } from '@/lib/skills/downloads'
+import { directoryBrowseVariant, parseDirectoryBrowseVariant } from '@/lib/skills/browse-cache'
 
 // Shared renderer. Public routes supply fixed inputs; query routes supply request inputs.
 
@@ -1175,6 +1176,16 @@ const getDefaultDirectory = unstable_cache(async (locale: Locale) => {
   revalidate: 900, tags: ['public-skill-directory', 'public-skill-stats'],
 })
 
+const getBrowseDirectory = unstable_cache(async (locale: Locale, key: string) => {
+  const variant = parseDirectoryBrowseVariant(key)
+  if (!variant) throw new Error('Invalid public browse key')
+  const model = await prepareDirectory({ ...variant.params, lang: locale })
+  if (model.clientProps.degraded) throw new DegradedDirectory(model)
+  return model
+}, ['public-browse-model-v1'], {
+  revalidate: 900, tags: ['public-skill-directory', 'public-skill-stats'],
+})
+
 export default async function SkillsPage({
   searchParams, requireHealthy = false,
 }: {
@@ -1184,8 +1195,12 @@ export default async function SkillsPage({
   const params = await searchParams
   const locale = getLocaleFromSearchParam(params.lang) || defaultLocale
   const isDefault = Object.keys(params).every(key => key === 'lang' || !isContentQueryKey(key))
-  const model = isDefault
-    ? await getDefaultDirectory(locale).catch(error => {
+  const browseQuery = new URLSearchParams(Object.entries(params).flatMap(([key, value]): [string, string][] =>
+    key === 'lang' || value === undefined ? [] : (Array.isArray(value) ? value : [value]).map(item => [key, item])))
+  const browseVariant = isDefault ? null : directoryBrowseVariant(browseQuery)
+  const cachedModel = isDefault ? getDefaultDirectory(locale) : browseVariant ? getBrowseDirectory(locale, browseVariant.key) : null
+  const model = cachedModel
+    ? await cachedModel.catch(error => {
         // The current request can show its labelled fallback; failures never
         // replace a healthy shared model or turn into an empty cached directory.
         if (error instanceof DegradedDirectory && !requireHealthy) return error.model

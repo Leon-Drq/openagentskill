@@ -55,8 +55,8 @@ for (const path of [detail, detail + '/audit', detail + '/evals']) {
   assert.ok(hit, `${path}: expected an actual route/CDN HIT, not just a revalidate export`)
 }
 for (const [path, canonical] of [
-  ['/skills?q=design', '/skills'], ['/skills?view=all', '/skills'],
-  ['/zh/skills?category=design-creative&sort=stars', '/zh/skills'],
+  ['/skills?q=design', '/skills'], ['/skills?category=design-creative&access=free', '/skills'],
+  ['/zh/skills?category=design-creative&sort=stars&q=design', '/zh/skills'],
 ]) {
   const { response, html } = await read(path)
   assert.equal(response.status, 200, path)

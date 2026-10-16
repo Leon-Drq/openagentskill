@@ -74,7 +74,7 @@ assert.equal((await exports.proxy(request('/skills/motion-stephanlivera-df17a2?l
 assert.equal((await exports.proxy(request('/zh/skills/motion-stephanlivera-df17a2?lang=en'))).headers.get('location'), null, 'Chinese motion path remains authoritative')
 const result = await exports.proxy(request('/skills?q=design&sort=stars&page=2'))
 assert.equal(result.headers.get('x-middleware-rewrite'), null, 'filtered directory keeps the unfiltered route segment')
-assert.equal((await exports.proxy(request('/zh/skills?category=design-creative'))).headers.get('x-middleware-rewrite'), null)
+assert.equal((await exports.proxy(request('/zh/skills?category=design-creative'))).headers.get('x-middleware-rewrite'), 'https://www.openagentskill.com/cached-public/zh/directory/quality~1~category~design-creative')
 assert.equal((await exports.proxy(request('/ja/docs?q=test'))).headers.get('x-middleware-rewrite'), 'https://www.openagentskill.com/render-query/ja/docs?q=test')
 assert.equal((await exports.proxy(request('/skills?_rsc=abc'))).headers.get('x-middleware-rewrite'), 'https://www.openagentskill.com/cached-public/en/skills')
 assert.equal((await exports.proxy(request('/skills?lang=zh&q=test'))).headers.get('location'), 'https://www.openagentskill.com/zh/skills?q=test')
