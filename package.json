@@ -109,7 +109,7 @@
     "@vercel/analytics": "1.6.1",
     "@vercel/blob": "2.8.2",
     "@vercel/speed-insights": "2.0.0",
-    "ai": "^6.0.94",
+    "ai": "^7.0.137",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
