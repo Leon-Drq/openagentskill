@@ -5,6 +5,7 @@ import { validateGitHubRepo } from '@/lib/github/api'
 import { discoverGitHubSkills, fetchSkillPackageSnapshot, parseGitHubSkillReference } from '@/lib/github/skill-source'
 import { reviewOpenSubmission } from '@/lib/skills/open-submission'
 import { SUBMISSION_LEASE_MS, SUBMISSION_MAX_ATTEMPTS, submissionJobEligible } from '@/lib/skills/submission-contract'
+import { readProductMetadata } from '@/lib/skills/product-metadata'
 
 /** Existing private submission rows are the durable queue. Claim with compare-and-swap. */
 export async function processSubmissionJob(id: string) {
@@ -55,6 +56,7 @@ export async function processSubmissionJob(id: string) {
       submissionSource: row.submission_source === 'agent' ? 'agent' : row.submission_source === 'api' ? 'api' : 'web',
       submittedByAgent: row.submitted_by_agent || undefined,
       makerGithub: row.submitter_github || undefined, makerX: row.submitter_x || undefined,
+      productMetadata: readProductMetadata(validation.product_metadata),
       requestFingerprint: row.request_fingerprint || '', codeFiles: snapshot.files,
       packageFingerprint: snapshot.fingerprint,
       packageComplete: !discovery.truncated && !snapshot.truncated && !snapshot.hasUnreviewedFiles,

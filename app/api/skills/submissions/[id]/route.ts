@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { submissionTokenMatches } from '@/lib/skills/open-submission'
 import { submissionJobEligible } from '@/lib/skills/submission-contract'
+import { readProductMetadata } from '@/lib/skills/product-metadata'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -70,6 +71,7 @@ export async function GET(
         slug: publicSkill ? relatedSkill.slug : null,
       },
       identityVerified: Boolean(data.identity_verified),
+      productMetadata: readProductMetadata(data.validation_result?.product_metadata),
       queue: {
         attempts: Number(data.validation_result?.queue?.attempts) || 0,
         stalled: data.status === 'processing' && submissionJobEligible(data),

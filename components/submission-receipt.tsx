@@ -5,6 +5,7 @@ import Link from '@/components/crawl-link'
 import { ArrowUpRight, Check, Copy, X } from 'lucide-react'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { useI18n } from '@/lib/i18n/context'
+import { SkillProductDetails } from '@/components/skill-product-details'
 import { submissionCopy } from '@/lib/i18n/submission-copy'
 import { submissionFlowCopy } from '@/lib/i18n/submission-flow-copy'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
@@ -82,6 +83,7 @@ export function SubmissionReceiptPanel({ receipt, celebrate, onClose }: { receip
       </div>
       {!!state.review?.issues?.length && <div className="mt-6 border-t pt-5"><h3 className="font-semibold">{submissionCopy(locale, 'Review notes', '发现的问题')}</h3><ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-6 text-secondary">{state.review.issues.map((issue, i) => <li key={i}>{issue}</li>)}</ul></div>}
       {!!state.review?.suggestions?.length && <div className="mt-4"><h3 className="font-semibold">{submissionCopy(locale, 'Suggestions', '改进建议')}</h3><ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-6 text-secondary">{state.review.suggestions.map((suggestion, i) => <li key={i}>{suggestion}</li>)}</ul></div>}
+      {state.productMetadata && <SkillProductDetails metadata={state.productMetadata} />}
       <div className="mt-6 flex flex-wrap gap-2">
         <button ref={refreshButton} type="button" disabled={loading} onClick={() => setRefresh(value => value + 1)} className="border px-4 py-2.5 text-sm disabled:opacity-50">{c('retry')}</button>
         {share?.published && state.skill.slug && <Link href={getLocalizedNavigationHref(`/skills/${state.skill.slug}`, locale)} className="border px-4 py-2.5 text-sm">{submissionCopy(locale, 'View skill', '查看 Skill')}</Link>}

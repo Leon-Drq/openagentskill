@@ -1,4 +1,5 @@
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
+import { readProductMetadata } from '@/lib/skills/product-metadata'
 import { getAgentProvenProfile, type AgentProvenProfile } from '@/lib/agent-proven'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import type { SkillEventStats, SkillOutcomeStats, SkillRecord } from '@/lib/db/skills'
@@ -18,6 +19,7 @@ const SITE_URL = 'https://www.openagentskill.com'
 import { skillPresentationCategory } from '@/lib/skills/presentation-category'
 
 export interface AgentReadableSkillMetadata {
+  product: ReturnType<typeof readProductMetadata>
   commerce: ReturnType<typeof getSkillCommerce>
   review_evidence: ReturnType<typeof getReviewEvidence>
   version: 'openagentskill-agent-metadata-v2'
@@ -276,6 +278,7 @@ export function buildAgentReadableSkillMetadata(
 
   return {
     version: 'openagentskill-agent-metadata-v2',
+    product: readProductMetadata(skill.product_metadata),
     review_evidence: getReviewEvidence(skill),
     commerce: getSkillCommerce(skill.slug),
     skill: {

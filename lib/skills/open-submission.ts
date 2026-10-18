@@ -11,6 +11,7 @@ import { evaluateSkillSubmissionPolicy } from '@/lib/skills/submission-policy'
 import { estimateSubmissionQuality } from '@/lib/skills/submission-quality'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { PUBLIC_SKILL_FILTER } from '@/lib/skills/publication'
+import { readProductMetadata, type SkillProductMetadata } from '@/lib/skills/product-metadata'
 
 export const SUBMISSION_RATE_LIMIT = 5
 export const SUBMISSION_RATE_WINDOW_HOURS = 24
@@ -41,6 +42,7 @@ export interface OpenSubmissionInput {
   receiptToken?: string
   authenticatedUserId?: string | null
   freeAcquisition?: boolean
+  productMetadata?: SkillProductMetadata
 }
 
 export interface OpenSubmissionReceipt {
@@ -243,6 +245,7 @@ export async function createOpenSubmission(input: OpenSubmissionInput): Promise<
         declared_at: new Date().toISOString(), source_ref: input.skill.ref,
       } : null,
       repository_snapshot: input.repository,
+      product_metadata: readProductMetadata(input.productMetadata),
       repository_owner: input.repository.owner,
       submitter: { user_id: input.authenticatedUserId || null, identity_source: input.authenticatedUserId ? 'authenticated' : 'anonymous', handles: 'self_declared', channel: input.submissionSource },
       queue: { attempts: 0 },
@@ -370,6 +373,7 @@ export async function reviewOpenSubmission(input: OpenSubmissionInput, submissio
       long_description: input.skill.document.slice(0, 12_000),
       tagline: input.skill.frontmatter.description.slice(0, 280),
       author_name: authorName,
+      product_metadata: readProductMetadata(input.productMetadata),
       author_url: `https://github.com/${input.repository.owner}`,
       repository: input.skill.sourceUrl,
       github_repo: input.repository.fullName,

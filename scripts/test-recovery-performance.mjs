@@ -128,9 +128,11 @@ console.log('Recovery performance: fair source scheduling, seed rotation, indexe
 // Security/performance contracts of the final DB API: the caller must not be
 // able to widen the projection or turn the definer into arbitrary SQL access.
 const files = (await import('node:fs')).readdirSync(new URL('../supabase/migrations/', import.meta.url))
-const projectedFields = [...readFileSync(new URL('../lib/db/skills.ts', import.meta.url), 'utf8').split('const SKILL_DIRECTORY_SELECT = [')[1].split('].join')[0].matchAll(/'([^']+)'/g)].map(x => x[1])
+const projectedFields = [...readFileSync(new URL('../lib/db/skills.ts', import.meta.url), 'utf8').split('const SKILL_DIRECTORY_SELECT = [')[1].split('].join')[0].matchAll(/'([^']+)'/g)].map(x => x[1].includes(':') ? x[1].split(':')[1].split('->')[0] : x[1])
 for (const suffix of ['public_search_rls_index_plan.sql', 'public_exact_name_lookup.sql']) {
-  const migration = readFileSync(new URL('../supabase/migrations/' + files.find(x => x.endsWith(suffix)), import.meta.url), 'utf8')
+  const functionName = suffix.startsWith('public_search_rls') ? 'search_public_skills' : 'lookup_public_skill_name'
+  const latest = [...files].sort().reverse().map(file => readFileSync(new URL('../supabase/migrations/' + file, import.meta.url), 'utf8').replace(/\r\n/g, '\n')).find(sql => new RegExp(`create (?:or replace )?function public\\.${functionName}\\(`).test(sql))
+  const migration = latest.slice(latest.search(new RegExp(`create (?:or replace )?function public\\.${functionName}\\(`))).split('notify pgrst')[0]
   const returned = migration.split('returns table (')[1].split(')\nlanguage')[0].trim().split(/,\n/).map(line => line.trim().split(' ')[0])
   assert.deepEqual(returned, projectedFields, 'RPC has precisely the public directory projection')
   assert.match(migration, /stable security definer/)
@@ -139,6 +141,7 @@ for (const suffix of ['public_search_rls_index_plan.sql', 'public_exact_name_loo
   assert.match(migration, /revoke all on function[\s\S]*from public/)
   assert.match(migration, /s\.ai_review_approved=true or s\.listing_status in \('owner_published','static_checked'\)/)
   assert.doesNotMatch(migration, /select\s+s\.\*|returns setof public\.skills|execute\s+format\(/i)
+  assert.match(migration, /jsonb_build_object\('logoUrl',s\.product_metadata->>'logoUrl'\)/, 'Search returns only the small logo projection, not runtime notes')
   if (suffix.startsWith('public_search_rls')) {
     assert.match(migration, /force_custom_plan/)
     assert.match(migration, /left\(p_query,512\)/)

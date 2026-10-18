@@ -15,6 +15,7 @@ export interface SubmissionReceipt {
   skill: { name: string; description?: string; path: string; sourceUrl: string }
 }
 export interface SubmissionState {
+  productMetadata?: import('./product-metadata').SkillProductMetadata
   id: string
   status: SubmissionStatus
   skill: { name: string; path?: string; slug?: string | null; sourceUrl?: string }

@@ -39,6 +39,9 @@ import { SkillDetailText as Text, SkillDetailDate as DateText, SkillDetailValue 
 import { SkillProfileText as ProfileText } from '@/components/skill-profile-text'
 import { SkillDocument } from '@/components/skill-document'
 import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
+import { SkillProductLogo } from '@/components/skill-product-logo'
+import { SkillProductDetails } from '@/components/skill-product-details'
+import { readProductMetadata } from '@/lib/skills/product-metadata'
 import { SkillActionLink } from '@/components/skill-action-link'
 import { SkillEventTracker } from '@/components/skill-event-tracker'
 import { SkillInstallTargets } from '@/components/skill-install-targets'
@@ -209,6 +212,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
   const dbSkill = await getCachedSkillBySlug(slug)
   if (!dbSkill) notFound()
   const skill = { ...convertSkillRecordToManifest(dbSkill), category: skillPresentationCategory(dbSkill) }
+  const product = readProductMetadata(dbSkill.product_metadata)
   const editorial = getEditorialSearchProfile(dbSkill)
   const editorialLocale = initialLocale === 'zh' ? 'zh' : 'en'
   const growth = getSkillGrowthProfile(dbSkill, initialLocale || defaultLocale)
@@ -270,7 +274,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
                 </div>
               </div>
             </div>
-            <h1 className="max-w-5xl break-words font-display text-4xl font-normal leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl [overflow-wrap:anywhere]">{skill.name}</h1>
+            <div className="flex items-start gap-4">{product.logoUrl && <SkillProductLogo url={product.logoUrl} name={skill.name} size="lg" />}<h1 className="min-w-0 max-w-5xl break-words font-display text-4xl font-normal leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl [overflow-wrap:anywhere]">{skill.name}</h1></div>
             <p className="mt-5 max-w-3xl text-lg leading-relaxed text-secondary sm:text-xl">{skill.tagline || skill.description}</p>
             <div className="mt-7 flex flex-wrap gap-2 sm:gap-3">
               <Link href="#install-options" className={`${actionClass} border-[#006b4f] bg-[#006b4f] text-white hover:bg-[#005841]`}>
@@ -315,6 +319,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
 
               <section id="install-options" className={sectionClass}>
                 <h2 className={headingClass}><ProfileText id={source.canOfferInstall && !safety.blocked ? 'useAgent' : 'reviewSource'} /></h2>
+                <SkillProductDetails metadata={product} skillSlug={skill.slug} />
                 <SkillCommercePanel commerce={getSkillCommerce(skill.slug)} license={dbSkill.license || 'Unknown'} blocked={safety.blocked} />
                 <div className={`my-6 border-l-2 p-4 text-sm leading-relaxed ${source.canOfferInstall && !safety.human_review_required ? 'border-[#006b4f] bg-[#eef5f0]' : 'border-amber-600 bg-amber-50/60'}`} data-source-state={source.status}>
                   <p className="font-semibold"><ProfileText id={sourceStatus} /></p>

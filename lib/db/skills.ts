@@ -19,8 +19,11 @@ import { getSearchTerms, normalizeExactSearchQuery, repositorySearchQuery } from
 import { packCacheJson, unpackCacheJson } from '@/lib/cache/packed-json'
 import { buildLegacySearchIndexFilter, buildEditorialSearchIndexFilter, matchesLegacySearchIndex } from '@/lib/seo/search-indexability'
 import type { VideoWorkflowListing } from '@/lib/video-workflows'
+import type { SkillProductMetadata } from '@/lib/skills/product-metadata'
 
 export interface SkillRecord extends Partial<SkillTaxonomy> {
+  product_metadata?: SkillProductMetadata | null
+  product_logo_url?: string | null
   id: string
   slug: string
   name: string
@@ -111,6 +114,7 @@ const SKILL_DIRECTORY_SELECT = [
   'tagline',
   'author_name',
   'author_url',
+  'product_logo_url:product_metadata->>logoUrl',
   'repository',
   'github_repo',
   'github_stars',
