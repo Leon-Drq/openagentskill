@@ -145,9 +145,13 @@ await processStripeEvent(stripe, { ...event, id: 'evt_lifetime_paid', type: 'che
 assert.equal(lifetime.status, 'paid')
 assert.ok(await inspectLifetime(stripe, lifetime, lifetime.user_id))
 assert.equal(await inspectLifetime(stripe, lifetime, 'other-user'), false)
-for (const invalid of [{ livemode: true }, { status: 'pending' }, { status: 'refunded' }, { status: 'disputed' }, { amount_cents: 499 }, { currency: 'eur' }, { plan: 'single' }, { stripe_subscription_id: 'sub_1' }, { skill_slug: 'launch-card-studio' }, { release_id: 'release-1' }]) {
+for (const invalid of [{ livemode: true }, { status: 'pending' }, { status: 'refunded' }, { status: 'disputed' }, { amount_cents: 0 }, { amount_cents: -1 }, { amount_cents: 16900.5 }, { currency: 'eur' }, { plan: 'single' }, { stripe_subscription_id: 'sub_1' }, { skill_slug: 'launch-card-studio' }, { release_id: 'release-1' }]) {
   assert.equal(lifetimeOrderAllowed({ ...lifetime, ...invalid }, lifetime.user_id, false), false)
 }
+intent.amount_received = 12900
+assert.ok(await inspectLifetime(stripe, { ...lifetime, amount_cents: 12900 }, lifetime.user_id), 'A settled historical price remains valid when catalog prices change')
+assert.equal(await inspectLifetime(stripe, lifetime, lifetime.user_id), false, 'The actual Stripe payment must still match the immutable order amount')
+intent.amount_received = 16900
 const lifetimeParams = checkoutSessionParams(lifetime, 'https://www.openagentskill.com')
 assert.equal(lifetimeParams.mode, 'payment')
 assert.equal(lifetimeParams.line_items[0].price_data.unit_amount, 16900)

@@ -8,7 +8,9 @@ export function recurringPlan(plan: PurchasePlan): plan is 'monthly' | 'yearly' 
 export function lifetimeOrderAllowed(order: PaidOrder, userId: string, livemode: boolean) {
   return order.user_id === userId && order.livemode === livemode && order.plan === 'lifetime'
     && order.status === 'paid' && order.skill_slug === null && order.release_id === null
-    && order.currency === PAYMENT_CURRENCY && order.amount_cents === PLAN_AMOUNTS.lifetime
+    // Honor the immutable purchase price if the founding offer changes later.
+    // Delivery also verifies the Stripe payment against this order snapshot.
+    && order.currency === PAYMENT_CURRENCY && Number.isSafeInteger(order.amount_cents) && order.amount_cents > 0
     && Boolean(order.stripe_payment_intent_id) && order.stripe_subscription_id === null
 }
 export const DOWNLOAD_TTL_SECONDS = 60
