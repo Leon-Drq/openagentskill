@@ -19,7 +19,8 @@ export async function GET(request: NextRequest) {
     const orders = user ? await paidOrders(user.id) : []
     const membership = user ? await membershipFor(user.id) : null
     return paymentJson({ ready, membershipReady: ready && Boolean(membershipPrice('monthly') && membershipPrice('yearly')),
-      signedIn: Boolean(user), owned: Boolean(available.length && (membership || orders.some(order => available.some(release => singleReleaseAllowed(order, release, user!.id, paymentMode() === true))))),
+      signedIn: Boolean(user), membership: membership?.kind || null,
+      owned: Boolean(available.length && (membership || orders.some(order => available.some(release => singleReleaseAllowed(order, release, user!.id, paymentMode() === true))))),
       reason: available.length ? 'checkout_unavailable' : 'package_unavailable' })
   } catch (error) { return paymentError(error) }
 }

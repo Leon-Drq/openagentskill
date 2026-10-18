@@ -2,11 +2,11 @@ import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import { buyer, membershipFor, paidOrders, paymentBody, paymentDb, paymentError, PaymentError, paymentJson, paymentSite, productDefinition, releases, verifyPackage } from '@/lib/payments/server'
 import { checkoutConfigured, membershipPrice, paymentMode, stripeClient, stripeId } from '@/lib/payments/stripe'
-import { PLAN_AMOUNTS, safeStripeRedirect, type PaidOrder } from '@/lib/payments/policy'
+import { PLAN_AMOUNTS, recurringPlan, safeStripeRedirect, type PaidOrder } from '@/lib/payments/policy'
 import { checkoutSessionParams } from '@/lib/payments/checkout'
 
 export const runtime = 'nodejs'
-const input = z.object({ plan: z.enum(['single', 'monthly', 'yearly']), slug: z.string().max(200).optional(), locale: z.enum(['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr', 'id']).default('en') }).strict()
+const input = z.object({ plan: z.enum(['single', 'monthly', 'yearly', 'lifetime']), slug: z.string().max(200).optional(), locale: z.enum(['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr', 'id']).default('en') }).strict()
 export async function POST(request: NextRequest) {
   try {
     const parsed = input.safeParse(await paymentBody(request))
@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
     const [orders, membership] = await Promise.all([paidOrders(user.id), membershipFor(user.id)])
     if (membership || (product && orders.some(row => row.plan === 'single' && row.skill_slug === product.slug))) throw new PaymentError('already_purchased', 409)
     const stripe = stripeClient(), db = paymentDb(), live = paymentMode() === true
-    const priceId = plan === 'single' ? null : membershipPrice(plan)
-    if (plan !== 'single') {
+    const priceId = recurringPlan(plan) ? membershipPrice(plan) : null
+    if (recurringPlan(plan)) {
       if (!priceId) throw new PaymentError('checkout_unavailable', 503)
       const price = await stripe.prices.retrieve(priceId)
       if (!price.active || price.livemode !== live || price.currency !== 'usd' || price.unit_amount !== PLAN_AMOUNTS[plan]
@@ -46,9 +46,10 @@ export async function POST(request: NextRequest) {
     }
     const reserved = await db.rpc('commerce_reserve_order', { p_user: user.id, p_live: live, p_plan: plan,
       p_slug: product?.slug || null, p_release: product ? release.id : null, p_amount: PLAN_AMOUNTS[plan], p_customer: customer,
-      p_locale: locale, p_name: product?.name || 'OpenAgentSkill Pro', p_price: priceId })
+      p_locale: locale, p_name: product?.name || (plan === 'lifetime' ? 'OpenAgentSkill Pro — Lifetime' : 'OpenAgentSkill Pro'), p_price: priceId })
     if (reserved.error) throw reserved.error
     const order = reserved.data as PaidOrder
+    if (order.status === 'paid') throw new PaymentError('already_purchased', 409)
     if (order.plan !== plan) throw new PaymentError('other_checkout_pending', 409)
     if (order.stripe_session_id) {
       const existing = await stripe.checkout.sessions.retrieve(order.stripe_session_id)

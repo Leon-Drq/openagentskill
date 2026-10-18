@@ -7,7 +7,7 @@ import { withTimeout } from '@/lib/async'
 import { getMotionEntry } from '@/lib/motion/catalog'
 import { STUDIO_SKILL } from '@/lib/studio/catalog'
 import { validRelease, type PackageRelease, type PaidOrder, PACKAGE_BUCKET, singleReleaseAllowed } from './policy'
-import { inspectMembership, inspectPayment, paymentMode, stripeClient } from './stripe'
+import { inspectLifetime, inspectMembership, inspectPayment, paymentMode, stripeClient } from './stripe'
 
 export const privateHeaders = { 'Cache-Control': 'private, no-store, max-age=0', Vary: 'Cookie', 'Referrer-Policy': 'no-referrer' }
 export const paymentJson = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: privateHeaders })
@@ -73,15 +73,23 @@ export async function paidOrders(userId: string) {
   return data as PaidOrder[]
 }
 export async function membershipFor(userId: string) {
+  if (paymentMode() === null) return null
+  const db = paymentDb(), stripe = stripeClient()
+  const lifetime = await db.from('commerce_orders').select('*').eq('user_id', userId)
+    .eq('livemode', paymentMode() === true).eq('plan', 'lifetime').eq('status', 'paid')
+    .order('created_at', { ascending: false }).limit(10)
+  if (lifetime.error) throw lifetime.error
+  for (const order of lifetime.data as PaidOrder[]) {
+    if (await inspectLifetime(stripe, order, userId)) return { kind: 'lifetime' as const, orderId: order.id }
+  }
   const { data, error } = await paymentDb().from('commerce_subscriptions').select('stripe_subscription_id')
     .eq('user_id', userId).eq('livemode', paymentMode() === true).order('updated_at', { ascending: false }).limit(10)
   if (error) throw error
   if (!data.length || paymentMode() === null) return null
-  const stripe = stripeClient()
   for (const row of data) {
     const result = await inspectMembership(stripe, row.stripe_subscription_id)
     if (result.subscription.metadata.user_id !== userId) continue
-    if (result.active) return result
+    if (result.active) return { ...result, kind: 'subscription' as const }
   }
   return null
 }

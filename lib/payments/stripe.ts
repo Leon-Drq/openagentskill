@@ -1,6 +1,6 @@
 import 'server-only'
 import Stripe from 'stripe'
-import { activeMembership, PLAN_AMOUNTS } from './policy'
+import { activeMembership, lifetimeOrderAllowed, PLAN_AMOUNTS, type PaidOrder } from './policy'
 
 export function paymentMode() {
   const key = process.env.STRIPE_SECRET_KEY || ''
@@ -58,4 +58,14 @@ export async function inspectMembership(stripe: Stripe, subscriptionId: string) 
   }
   return { subscription, periodEnd: item?.current_period_end || 0,
     active: Boolean(eligible && activeMembership(subscription.status, item?.current_period_end || 0, paid)) }
+}
+
+export async function inspectLifetime(stripe: Stripe, order: PaidOrder, userId: string) {
+  if (!lifetimeOrderAllowed(order, userId, paymentMode() === true) || paymentMode() === null) return false
+  const state = await inspectPayment(stripe, order.stripe_payment_intent_id!)
+  const intent = state.intent
+  return Boolean(state.paid && intent && intent.metadata.integration === 'openagentskill'
+    && intent.metadata.order_id === order.id && intent.metadata.user_id === userId
+    && stripeId(intent.customer) === order.stripe_customer_id
+    && intent.amount_received === order.amount_cents && intent.currency === order.currency)
 }

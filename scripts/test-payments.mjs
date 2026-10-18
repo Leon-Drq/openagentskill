@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import Stripe from 'stripe'
 import { NextRequest } from 'next/server'
-import { activeMembership, singleReleaseAllowed, validRelease, safeStripeRedirect } from '../lib/payments/policy.ts'
-import { inspectPayment, inspectMembership, checkoutConfigured } from '../lib/payments/stripe.ts'
+import { activeMembership, singleReleaseAllowed, lifetimeOrderAllowed, validRelease, safeStripeRedirect } from '../lib/payments/policy.ts'
+import { inspectPayment, inspectMembership, inspectLifetime, checkoutConfigured } from '../lib/payments/stripe.ts'
 import { assertSessionOrder, processStripeEvent } from '../lib/payments/webhook.ts'
 import { POST as checkoutPost } from '../app/api/payments/checkout/route.ts'
 import { POST as downloadPost } from '../app/api/payments/download/route.ts'
@@ -53,7 +53,7 @@ assert.equal(checkoutConfigured(), true)
 delete process.env.COMMERCE_CHECKOUT_ENABLED
 
 const charge = { paid: true, disputed: false, refunded: false, amount: 499, amount_refunded: 0 }
-const intent = { id: 'pi_1', status: 'succeeded', livemode: false, amount_received: 499, currency: 'usd', metadata: { integration: 'openagentskill', order_id: order.id }, latest_charge: charge }
+const intent = { id: 'pi_1', customer: 'cus_1', status: 'succeeded', livemode: false, amount_received: 499, currency: 'usd', metadata: { integration: 'openagentskill', order_id: order.id, user_id: order.user_id }, latest_charge: charge }
 const session = { id: 'cs_1', metadata: { order_id: order.id, user_id: order.user_id, integration: 'openagentskill' }, client_reference_id: order.id,
   customer: 'cus_1', currency: 'usd', amount_total: 499, mode: 'payment', livemode: false, status: 'complete', payment_status: 'paid', payment_intent: 'pi_1' }
 const subscription = { id: 'sub_1', livemode: false, metadata: { integration: 'openagentskill', user_id: 'buyer-1' }, status: 'active', pause_collection: null,
@@ -127,9 +127,51 @@ await processStripeEvent(stripe, { ...event, id: 'evt_stale' }, db)
 assert.equal(order.status, 'refunded', 'late payment event cannot restore a refunded purchase')
 await assert.rejects(processStripeEvent(stripe, { ...event, id: 'evt_live', livemode: true }, db))
 
+const lifetime = { ...order, id: 'lifetime-1', plan: 'lifetime', skill_slug: null, release_id: null,
+  amount_cents: 16900, status: 'pending', stripe_subscription_id: null, stripe_price_id: null,
+  checkout_locale: 'en', product_name: 'OpenAgentSkill Pro — Lifetime' }
+orders.set(lifetime.id, lifetime)
+Object.assign(session, { metadata: { ...session.metadata, order_id: lifetime.id }, client_reference_id: lifetime.id, amount_total: 16900, payment_status: 'unpaid' })
+Object.assign(intent, { amount_received: 16900, metadata: { ...intent.metadata, order_id: lifetime.id } })
+Object.assign(charge, { refunded: false, amount: 16900, amount_refunded: 0 })
+await processStripeEvent(stripe, { ...event, id: 'evt_lifetime_unpaid' }, db)
+assert.equal(lifetime.status, 'pending', 'Lifetime waits for settled payment')
+assert.equal(await inspectLifetime(stripe, lifetime, lifetime.user_id), false)
+session.payment_status = 'paid'
+intent.customer = 'cus_other'
+await assert.rejects(processStripeEvent(stripe, { ...event, id: 'evt_lifetime_wrong_customer' }, db), /payment_binding_mismatch/)
+intent.customer = 'cus_1'
+await processStripeEvent(stripe, { ...event, id: 'evt_lifetime_paid', type: 'checkout.session.async_payment_succeeded' }, db)
+assert.equal(lifetime.status, 'paid')
+assert.ok(await inspectLifetime(stripe, lifetime, lifetime.user_id))
+assert.equal(await inspectLifetime(stripe, lifetime, 'other-user'), false)
+for (const invalid of [{ livemode: true }, { status: 'pending' }, { status: 'refunded' }, { status: 'disputed' }, { amount_cents: 499 }, { currency: 'eur' }, { plan: 'single' }, { stripe_subscription_id: 'sub_1' }, { skill_slug: 'launch-card-studio' }, { release_id: 'release-1' }]) {
+  assert.equal(lifetimeOrderAllowed({ ...lifetime, ...invalid }, lifetime.user_id, false), false)
+}
+const lifetimeParams = checkoutSessionParams(lifetime, 'https://www.openagentskill.com')
+assert.equal(lifetimeParams.mode, 'payment')
+assert.equal(lifetimeParams.line_items[0].price_data.unit_amount, 16900)
+assert.equal(lifetimeParams.line_items[0].price_data.product_data.metadata.plan, 'lifetime')
+assert.equal(lifetimeParams.subscription_data, undefined)
+assert.equal(lifetimeParams.payment_intent_data.metadata.user_id, lifetime.user_id)
+assertSessionOrder(session, lifetime)
+assert.throws(() => assertSessionOrder({ ...session, mode: 'subscription' }, lifetime))
+charge.amount_refunded = 100
+assert.ok(await inspectLifetime(stripe, lifetime, lifetime.user_id), 'Partial refunds retain access')
+charge.disputed = true
+assert.equal(await inspectLifetime(stripe, lifetime, lifetime.user_id), false, 'Dispute revokes lifetime before webhook arrives')
+charge.disputed = false; charge.refunded = true
+assert.equal(await inspectLifetime(stripe, lifetime, lifetime.user_id), false, 'Full refund revokes lifetime before webhook arrives')
+await processStripeEvent(stripe, { ...event, id: 'evt_lifetime_refund', type: 'charge.refunded', data: { object: { id: 'ch_1' } } }, db)
+assert.equal(lifetime.status, 'refunded')
+await processStripeEvent(stripe, { ...event, id: 'evt_lifetime_late_payment' }, db)
+assert.equal(lifetime.status, 'refunded', 'A late event cannot resurrect lifetime access')
+
 const request = (path, body, origin = 'https://www.openagentskill.com') => new NextRequest(`https://www.openagentskill.com/api/payments/${path}`, { method: 'POST', headers: { origin, 'content-type': 'application/json' }, body: JSON.stringify(body) })
 assert.equal((await checkoutPost(request('checkout', { plan: 'single', slug: 'launch-card-studio' }, 'https://evil.example'))).status, 403)
 assert.equal((await checkoutPost(request('checkout', { plan: 'single', slug: 'launch-card-studio', amount: 1 }))).status, 400)
+assert.equal((await checkoutPost(request('checkout', { plan: 'lifetime', amount: 1 }))).status, 400)
+assert.equal((await checkoutPost(request('checkout', { plan: 'lifetime' }, 'https://evil.example'))).status, 403)
 assert.equal((await downloadPost(request('download', { slug: '../private' }))).status, 400)
 assert.equal((await downloadPost(request('download', { slug: 'launch-card-studio' }, 'https://evil.example'))).status, 403)
 assert.equal((await contentPost(request('content', { slug: 'motion-stephanlivera-df17a2' }, 'https://evil.example'))).status, 403)

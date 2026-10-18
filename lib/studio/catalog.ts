@@ -1,4 +1,5 @@
 import type { Locale } from '@/lib/i18n/config'
+import { PLAN_AMOUNTS } from '@/lib/payments/policy'
 
 export const STUDIO_SKILL = {
   slug: 'launch-card-studio', name: 'Launch Card Studio', version: '1.1.0',
@@ -13,7 +14,7 @@ export const STUDIO_SKILL = {
 
 // A preview is never a sale, paid entitlement or registry review approval.
 // Enable commerce only through a separate, verified payment/fulfilment release.
-export const MEMBERSHIP = { status: 'preview', monthlyCents: 999, yearlyCents: 7900, currency: 'USD', purchasableSkills: 0 } as const
+export const MEMBERSHIP = { status: 'preview', monthlyCents: PLAN_AMOUNTS.monthly, yearlyCents: PLAN_AMOUNTS.yearly, lifetimeCents: PLAN_AMOUNTS.lifetime, currency: 'USD', purchasableSkills: 0 } as const
 export function studioHref(path: string, locale: Locale) { return locale === 'en' ? path : `/${locale}${path}` }
 export function studioImage(format: string) {
   return `/studio/launch-card-studio/v${STUDIO_SKILL.version}/${STUDIO_SKILL.formats.some(item => item.id === format) ? format : 'wide'}.svg`

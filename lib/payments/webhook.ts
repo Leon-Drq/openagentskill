@@ -2,14 +2,14 @@ import 'server-only'
 import type Stripe from 'stripe'
 import { paymentDb } from './server'
 import { inspectMembership, inspectPayment, paymentMode, stripeId } from './stripe'
-import type { PaidOrder } from './policy'
+import { recurringPlan, type PaidOrder } from './policy'
 
 export function assertSessionOrder(session: Stripe.Checkout.Session, order: PaidOrder) {
   if (session.metadata?.integration !== 'openagentskill' || session.metadata.order_id !== order.id
     || session.metadata.user_id !== order.user_id || session.client_reference_id !== order.id
     || session.livemode !== order.livemode || stripeId(session.customer) !== order.stripe_customer_id
     || session.currency !== order.currency || session.amount_total !== order.amount_cents
-    || session.mode !== (order.plan === 'single' ? 'payment' : 'subscription')
+    || session.mode !== (recurringPlan(order.plan) ? 'subscription' : 'payment')
     || (order.stripe_session_id && order.stripe_session_id !== session.id)) throw new Error('order_binding_mismatch')
 }
 
@@ -19,7 +19,7 @@ async function syncSubscription(stripe: Stripe, subscriptionId: string, db: Retu
   if (subscription.metadata.integration !== 'openagentskill') return
   const { data: order, error } = await db.from('commerce_orders').select('*').eq('id', subscription.metadata.order_id).maybeSingle()
   if (error) throw error
-  if (!order || order.plan === 'single' || subscription.metadata.user_id !== order.user_id
+  if (!order || !recurringPlan(order.plan) || subscription.metadata.user_id !== order.user_id
     || stripeId(subscription.customer) !== order.stripe_customer_id || subscription.livemode !== order.livemode) throw new Error('subscription_binding_mismatch')
   const result = await db.from('commerce_subscriptions').upsert({ stripe_subscription_id: subscription.id,
     user_id: order.user_id, livemode: subscription.livemode, status: subscription.status,
@@ -49,7 +49,8 @@ async function checkout(stripe: Stripe, sessionId: string, event: Stripe.Event, 
     }
     return
   }
-  if (order.plan === 'single') {
+  if (!recurringPlan(order.plan)) {
+    if (subscriptionId) throw new Error('unexpected_subscription')
     if (!intentId) throw new Error('payment_not_found')
     const state = await inspectPayment(stripe, intentId)
     if (!state.paid) {
@@ -59,7 +60,9 @@ async function checkout(stripe: Stripe, sessionId: string, event: Stripe.Event, 
       }
       return
     }
-    if (!state.intent || state.intent.metadata.order_id !== order.id || state.intent.amount_received !== order.amount_cents || state.intent.currency !== order.currency) throw new Error('payment_binding_mismatch')
+    if (!state.intent || state.intent.metadata.integration !== 'openagentskill' || state.intent.metadata.user_id !== order.user_id
+      || stripeId(state.intent.customer) !== order.stripe_customer_id || state.intent.metadata.order_id !== order.id
+      || state.intent.amount_received !== order.amount_cents || state.intent.currency !== order.currency) throw new Error('payment_binding_mismatch')
   } else if (!subscriptionId) throw new Error('subscription_missing')
   const result = await db.rpc('commerce_complete_order', { p_order: order.id, p_session: session.id,
     p_intent: intentId, p_subscription: subscriptionId, p_paid_at: new Date(event.created * 1000).toISOString() })

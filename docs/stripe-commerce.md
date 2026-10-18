@@ -2,6 +2,37 @@
 
 This release adds hosted Stripe Checkout, a signed webhook, a private purchase library at `/profile?tab=purchases`, a billing portal, and short-lived private downloads. It does not sell unfinished reference previews. Community submissions and review scores are unchanged.
 
+## Four membership options (2026-10-18)
+
+The pricing page now has Free ($0), Monthly ($9.99), Yearly ($79) and Founding
+Lifetime ($169) cards in all eight languages. Individual Skills remain $4.99.
+All paid memberships cover the released first-party library and future releases;
+third-party purchases and model fees are excluded. Lifetime lasts for the
+operation of this service and has no renewal or invented subscription end date.
+
+Apply `20261018132105_lifetime_membership.sql` before deploying this version.
+It extends the order plan constraint and the existing membership reservation
+lock; existing orders, RLS policies and subscription prices remain intact.
+Lifetime uses Stripe Checkout `mode: payment`, server-selected inline pricing,
+and the existing signed payment webhook. No new recurring Stripe price or
+environment variable is needed. Full refunds and disputes revoke lifetime
+access; private downloads/content re-read Stripe payment state even before a
+delayed webhook. Active members are directed to their purchase library rather
+than charged again. Switching from an existing recurring subscription to
+lifetime is not automatic: the subscription must end first to prevent overlap.
+
+The three pricing buttons share one status request. Neither the pricing page
+nor a checkout return URL grants access; checkout may be unavailable independently
+of existing purchase access.
+
+Verification: the isolated Stripe QA sandbox completed a real hosted $169 test
+card payment. Replaying the signed completion event twice granted one lifetime
+order and access to all 234 published products, including ZIP and text delivery.
+Another account and unpaid users were denied. A full sandbox refund immediately
+blocked both delivery formats before its webhook; replaying the old payment event
+did not restore access. All eight locales passed 320/390/768/1440px layout checks.
+No live payment was submitted for testing.
+
 ## Server configuration
 
 Set these in the **openagentskill** Vercel project, never in client variables:

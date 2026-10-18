@@ -33,7 +33,9 @@ export async function GET(request: NextRequest) {
     return paymentJson({ configured: true, billing: Boolean(customer.data),
       orders: orders.map(order => ({ id: order.id, name: order.skill_slug ? productDefinition(order.skill_slug)?.name || order.skill_slug : 'Pro membership',
         slug: order.skill_slug, plan: order.plan, amount: order.amount_cents, status: order.status, createdAt: order.created_at })),
-      packages: [...packages.values()], membership: membership ? { until: new Date(membership.periodEnd * 1000).toISOString(), cancelAtPeriodEnd: membership.subscription.cancel_at_period_end } : null,
+      packages: [...packages.values()], membership: membership ? membership.kind === 'lifetime'
+        ? { kind: 'lifetime', until: null, cancelAtPeriodEnd: false }
+        : { kind: 'subscription', until: new Date(membership.periodEnd * 1000).toISOString(), cancelAtPeriodEnd: membership.subscription.cancel_at_period_end } : null,
       next: all.length > 50 ? orders[49].id : null })
   } catch (error) { return paymentError(error) }
 }

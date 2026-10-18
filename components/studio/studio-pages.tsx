@@ -5,6 +5,7 @@ import { jsonLd } from '@/lib/seo/resource-pages'
 import { studioPageData } from '@/lib/studio/seo'
 import { studioCopy } from '@/lib/i18n/studio-copy'
 import { studioUiCopy } from '@/lib/i18n/studio-ui-copy'
+import { membershipCopy } from '@/lib/i18n/membership-copy'
 import { type Locale } from '@/lib/i18n/config'
 import { STUDIO_SKILL, studioHref } from '@/lib/studio/catalog'
 import { PreviewGallery } from './preview-gallery'
@@ -63,7 +64,7 @@ export function MembershipPage({ locale }: { locale: Locale }) {
     </header>
     <div className={styles.plansSection} id="plans"><MembershipPlans locale={locale} /></div>
     <section className={styles.scope}><h2>{c.scopeTitle}</h2><p className={styles.body}>{c.scopeBody}</p></section>
-    <section className={styles.faq}><h2>{c.faq}</h2>{c.questions.map(([question, answer]) => <details key={question}><summary>{question}</summary><p className={styles.body}>{answer}</p></details>)}</section>
+    <section className={styles.faq}><h2>{c.faq}</h2>{[...c.questions, [membershipCopy(locale).lifetimeQuestion, membershipCopy(locale).lifetimeAnswer]].map(([question, answer]) => <details key={question}><summary>{question}</summary><p className={styles.body}>{answer}</p></details>)}</section>
     <Closing locale={locale} membership />
   </MarketingPageShell>
 }

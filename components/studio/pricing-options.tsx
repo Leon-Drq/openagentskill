@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { ArrowRight, Check, Layers } from 'lucide-react'
-import { PurchaseActions } from '@/components/payments/purchase-actions'
+import { PurchaseActions, usePurchaseStatus } from '@/components/payments/purchase-actions'
+import { membershipCopy } from '@/lib/i18n/membership-copy'
+import { paymentMessage } from '@/lib/payments/copy'
 import Link from '@/components/crawl-link'
 import type { Locale } from '@/lib/i18n/config'
 import { studioCopy } from '@/lib/i18n/studio-copy'
@@ -44,30 +46,33 @@ export function PurchaseOptions({ locale }: { locale: Locale }) {
 export function MembershipPlans({ locale }: { locale: Locale }) {
   const c = studioCopy(locale)
   const ui = studioUiCopy(locale)
-  const [yearly, setYearly] = useState(false)
+  const m = membershipCopy(locale)
+  const { state, error } = usePurchaseStatus()
+  const plans = [
+    { id: 'monthly', title: c.monthly, eyebrow: m.flexible, lead: m.monthlyLead, amount: MEMBERSHIP.monthlyCents, unit: c.month, note: m.monthlyNote, action: m.monthlyAction },
+    { id: 'yearly', title: c.yearly, eyebrow: ui.annualSaving, lead: m.yearlyLead, amount: MEMBERSHIP.yearlyCents, unit: c.year, note: m.yearlyNote, action: m.yearlyAction },
+    { id: 'lifetime', title: m.lifetime, eyebrow: m.founding, lead: m.lifetimeLead, amount: MEMBERSHIP.lifetimeCents, unit: c.once, note: m.lifetimeNote, action: m.lifetimeAction },
+  ] as const
   return <section aria-label={c.compare}>
-    <div className={styles.billing}><Cycle yearly={yearly} setYearly={setYearly} locale={locale} /><span>{ui.annualSaving}</span></div>
     <div className={styles.plans}>
-      <article className={styles.plan}>
+      <article className={styles.plan} data-plan="free">
+        <p className={styles.planEyebrow}>{ui.freePriceNote}</p>
         <div className={styles.planTop}><h2>{c.free}</h2></div><p className={styles.body}>{c.freeLead}</p>
-        <div className={styles.planPrice}><p className={styles.price}><strong>{studioPrice(0, locale)}</strong></p><p className={styles.priceNote}>{ui.freePriceNote}</p></div>
+        <div className={styles.planPrice}><p className={styles.price}><strong>{studioPrice(0, locale)}</strong></p></div>
         <FeatureList items={c.freeFeatures} />
         <div className={styles.planAction}><Link href={getLocalizedNavigationHref('/skills?access=free', locale)} className={`${styles.button} ${styles.secondary} ${styles.full}`}>{c.freeAction}</Link></div>
       </article>
-      <article className={`${styles.plan} ${styles.proPlan}`}>
-        <div className={styles.planTop}><h2>{c.pro}</h2><span className={styles.badge}>{c.preview}</span></div><p className={styles.body}>{c.proLead}</p>
-        <div className={styles.planPrice}><p className={styles.price} aria-live="polite"><strong>{studioPrice(yearly ? MEMBERSHIP.yearlyCents : MEMBERSHIP.monthlyCents, locale)}</strong><span>{yearly ? c.year : c.month}</span></p><p className={styles.priceNote}>{c.planned}</p></div>
-        <FeatureList items={c.proFeatures} />
-        <div className={styles.planAction}><p className={styles.notice}>{yearly ? c.annually : c.monthlyNote}</p>
-        <PurchaseActions plan={yearly ? 'yearly' : 'monthly'} locale={locale} /></div>
-      </article>
-      <article className={styles.plan}>
-        <div className={styles.planTop}><h2>{ui.singlePlan}</h2></div><p className={styles.body}>{c.singleLead}</p>
-        <div className={styles.planPrice}><p className={styles.price}><strong>{studioPrice(STUDIO_SKILL.plannedPriceCents, locale)}</strong><span>{c.once}</span></p><p className={styles.priceNote}>{c.planned} · {STUDIO_SKILL.name}</p></div>
-        <FeatureList items={c.singleFeatures} />
-        <div className={styles.planAction}><Link href={studioHref(STUDIO_SKILL.path, locale)} className={`${styles.button} ${styles.secondary} ${styles.full}`}>{c.singleAction}<ArrowRight size={15} aria-hidden="true" /></Link></div>
-      </article>
+      {plans.map(plan => <article key={plan.id} className={`${styles.plan} ${plan.id === 'yearly' ? styles.proPlan : ''}`} data-plan={plan.id}>
+        <p className={styles.planEyebrow}>{plan.eyebrow}</p>
+        <div className={styles.planTop}><h2>{plan.title}</h2></div><p className={styles.body}>{plan.lead}</p>
+        <div className={styles.planPrice}><p className={styles.price}><strong>{studioPrice(plan.amount, locale)}</strong><span>{plan.unit}</span></p></div>
+        <FeatureList items={m.paidFeatures} />
+        <div className={styles.planAction}><p className={styles.priceNote}>{plan.note}</p>
+          <PurchaseActions plan={plan.id} locale={locale} status={state} compact label={plan.action} />
+        </div>
+      </article>)}
     </div>
-    <p id="membership-status" className={styles.memberNotice}>{c.previewNotice} {c.launchNote}</p>
+    <p id="membership-status" className={styles.memberNotice}>{error ? <span role="alert">{paymentMessage(error, locale)}</span> : m.secure}</p>
+    <p className={styles.singlePurchase}><Link href={studioHref(STUDIO_SKILL.path, locale)}>{m.singleNote}<ArrowRight size={16} aria-hidden="true" /></Link></p>
   </section>
 }

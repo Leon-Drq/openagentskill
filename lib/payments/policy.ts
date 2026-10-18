@@ -1,6 +1,16 @@
-export type PurchasePlan = 'single' | 'monthly' | 'yearly'
+export type PurchasePlan = 'single' | 'monthly' | 'yearly' | 'lifetime'
 export const PAYMENT_CURRENCY = 'usd'
-export const PLAN_AMOUNTS = { single: 499, monthly: 999, yearly: 7900 } as const
+export const PLAN_AMOUNTS = { single: 499, monthly: 999, yearly: 7900, lifetime: 16900 } as const
+export function recurringPlan(plan: PurchasePlan): plan is 'monthly' | 'yearly' {
+  return plan === 'monthly' || plan === 'yearly'
+}
+
+export function lifetimeOrderAllowed(order: PaidOrder, userId: string, livemode: boolean) {
+  return order.user_id === userId && order.livemode === livemode && order.plan === 'lifetime'
+    && order.status === 'paid' && order.skill_slug === null && order.release_id === null
+    && order.currency === PAYMENT_CURRENCY && order.amount_cents === PLAN_AMOUNTS.lifetime
+    && Boolean(order.stripe_payment_intent_id) && order.stripe_subscription_id === null
+}
 export const DOWNLOAD_TTL_SECONDS = 60
 export const PACKAGE_BUCKET = 'skill-packages'
 export type DeliveryKind = 'package' | 'prompt' | 'skill-instructions'
