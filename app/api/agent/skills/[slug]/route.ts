@@ -147,7 +147,10 @@ Attribution:
 - Note: ${attribution.trustNote}
 
 Install:
-${skill.install_command || `npx skills add ${skill.github_repo}`}
+${Object.entries(agentReadableMetadata.product).length ? `Product setup (author-supplied information, not runtime verification):
+${Object.entries(agentReadableMetadata.product).map(([key, value]) => `- ${key}: ${value}`).join('\n')}
+
+` : ''}${skill.install_command || `npx skills add ${skill.github_repo}`}
 
 Agent install targets:
 ${installTargets.map((target) => `- ${target.title}: ${target.value}`).join('\n')}
