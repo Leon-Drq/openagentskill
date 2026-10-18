@@ -14,6 +14,7 @@ import {
 import { processSubmissionJob } from '@/lib/skills/submission-worker'
 import { normalizeSocialHandle, validSocialHandle } from '@/lib/skills/submission-contract'
 import { createClient } from '@/lib/supabase/server'
+import { ProductMetadataSchema } from '@/lib/skills/product-metadata-schema'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -33,6 +34,7 @@ const SkillSubmitRequestSchema = z.object({
   submittedByAgent: z.string().trim().min(1).max(200).optional(),
   receiptToken: z.string().regex(/^[a-f0-9]{48}$/).optional(),
   freeAcquisition: z.boolean().optional(),
+  productMetadata: ProductMetadataSchema.optional(),
 })
 
 function accepted(receipt: Awaited<ReturnType<typeof createOpenSubmission>>) {
@@ -123,6 +125,7 @@ export async function POST(request: NextRequest) {
       receiptToken: body.receiptToken,
       authenticatedUserId,
       freeAcquisition: body.freeAcquisition,
+      productMetadata: body.productMetadata,
     }
     const receipt = await createOpenSubmission(submissionInput)
 

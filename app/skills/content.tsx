@@ -611,6 +611,7 @@ function toSkillsPageSkill({
 }) {
   return {
     id: record.id,
+    productLogoUrl: record.product_logo_url || record.product_metadata?.logoUrl,
     slug: record.slug,
     name: record.name,
     tagline: clampText(record.tagline || record.description, 170),

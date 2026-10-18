@@ -7,10 +7,14 @@ import { submissionFlowCopy } from '@/lib/i18n/submission-flow-copy'
 import { freeIntakeCopy } from '@/lib/i18n/free-intake-copy'
 import { useI18n } from '@/lib/i18n/context'
 import { normalizeSocialHandle, validSocialHandle, SUBMISSION_BATCH_LIMIT } from '@/lib/skills/submission-contract'
+import { SkillProductFields } from '@/components/skill-product-fields'
+import { productMetadataCopy } from '@/lib/i18n/product-metadata-copy'
+import { productMetadataErrors, readProductMetadata, type SkillProductMetadata } from '@/lib/skills/product-metadata'
 
 export interface SubmitFormData {
   repository: string; skillPath: string; sourceRef?: string; category?: string; tags: string[]
   makerGithub?: string; makerX?: string; submissionSource: 'web'; freeAcquisition: true
+  productMetadata?: SkillProductMetadata
 }
 interface SkillCandidate { name: string; description: string; path: string; ref: string; sourceUrl: string }
 const DRAFT_KEY = 'openagentskill.submitDraft.v2'
@@ -25,6 +29,7 @@ export function SkillSubmitForm({ onSubmit }: { onSubmit: (data: SubmitFormData[
   const [tagInput, setTagInput] = useState('')
   const [makerGithub, setMakerGithub] = useState('')
   const [makerX, setMakerX] = useState('')
+  const [products, setProducts] = useState<Record<string, SkillProductMetadata>>({})
   const [candidates, setCandidates] = useState<SkillCandidate[]>([])
   const [selected, setSelected] = useState<string[]>([])
   const [query, setQuery] = useState('')
@@ -49,6 +54,7 @@ export function SkillSubmitForm({ onSubmit }: { onSubmit: (data: SubmitFormData[
         if (Array.isArray(draft.tags)) setTags(draft.tags.filter((tag: unknown) => typeof tag === 'string').slice(0, 10))
         if (typeof draft.makerGithub === 'string') setMakerGithub(draft.makerGithub)
         if (typeof draft.makerX === 'string') setMakerX(draft.makerX)
+        if (draft.products && typeof draft.products === 'object' && !Array.isArray(draft.products)) setProducts(Object.fromEntries(Object.entries(draft.products).slice(0, 100).map(([path, value]) => [path, readProductMetadata(value)])))
       } catch { /* Storage is optional. */ }
       setDraftLoaded(true)
     }, 0)
@@ -56,14 +62,15 @@ export function SkillSubmitForm({ onSubmit }: { onSubmit: (data: SubmitFormData[
   }, [])
   useEffect(() => {
     if (!draftLoaded) return
-    try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ repository, category, tags, makerGithub, makerX })) } catch { /* Private browsing. */ }
-  }, [draftLoaded, repository, category, tags, makerGithub, makerX])
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ repository, category, tags, makerGithub, makerX, products })) } catch { /* Private browsing. */ }
+  }, [draftLoaded, repository, category, tags, makerGithub, makerX, products])
 
   function resetSource(value: string) {
     generation.current++
     request.current?.abort()
     setRepository(value); setCandidates([]); setSelected([]); setError(''); setValidating(false)
     setFreeAcquisition(false)
+    setProducts({}); setFields({})
     setQuery(''); setAppliedQuery('')
     setPagination({ hasMore: false, nextOffset: 0, truncated: false, total: 0 })
   }
@@ -110,6 +117,12 @@ export function SkillSubmitForm({ onSubmit }: { onSubmit: (data: SubmitFormData[
     setFields(previous => ({ ...previous, tags: '' }))
   }
 
+  function updateProduct(path: string, value: SkillProductMetadata) {
+    setProducts(previous => ({ ...previous, [path]: value }))
+    const invalid = new Set(productMetadataErrors(value).map(key => `${path}:${key}`))
+    setFields(previous => Object.fromEntries(Object.entries(previous).filter(([key]) => !key.startsWith(`${path}:`) || invalid.has(key))))
+  }
+
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
     if (submitting) return
@@ -121,6 +134,7 @@ export function SkillSubmitForm({ onSubmit }: { onSubmit: (data: SubmitFormData[
     if (!validSocialHandle(github, 'github')) errors.makerGithub = c('githubError')
     if (!validSocialHandle(x, 'x')) errors.makerX = c('xError')
     if (allTags.length > 10 || allTags.some(tag => tag.length > 40)) errors.tags = c('tagsError')
+    for (const path of selected) for (const key of productMetadataErrors(products[path] || {})) errors[`${path}:${key}`] = productMetadataCopy(locale, key === 'logoUrl' ? 'logoError' : key.endsWith('Url') ? 'urlError' : 'textError')
     setFields(errors)
     if (Object.keys(errors).length) {
       const details = formRef.current?.querySelector('details')
@@ -133,7 +147,7 @@ export function SkillSubmitForm({ onSubmit }: { onSubmit: (data: SubmitFormData[
     setSubmitting(true); setError('')
     try {
       await onSubmit(chosen.map(candidate => ({ repository, skillPath: candidate.path, sourceRef: candidate.ref,
-        category: category || undefined, tags: allTags, makerGithub: github || undefined, makerX: x || undefined, submissionSource: 'web', freeAcquisition: true })))
+        category: category || undefined, tags: allTags, makerGithub: github || undefined, makerX: x || undefined, productMetadata: readProductMetadata(products[candidate.path]), submissionSource: 'web', freeAcquisition: true })))
       try { localStorage.removeItem(DRAFT_KEY) } catch { /* Storage is optional. */ }
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : c('failed'))
@@ -165,6 +179,7 @@ export function SkillSubmitForm({ onSubmit }: { onSubmit: (data: SubmitFormData[
       {pagination.hasMore && <button type="button" onClick={() => validateRepo(true)} disabled={validating || submitting} className="border px-4 py-2.5 text-sm">{c('more')}</button>}
       {(pagination.hasMore || pagination.truncated) && <p className="text-xs leading-5 text-secondary">{c('capped')}</p>}
     </section>}
+    {candidates.filter(candidate => selected.includes(candidate.path)).map(candidate => <SkillProductFields key={candidate.path} name={candidate.name} path={candidate.path} value={products[candidate.path] || {}} onChange={value => updateProduct(candidate.path, value)} errors={fields} disabled={submitting} inputClass={inputClass} />)}
     <details className="border-y border-border py-4">
       <summary className="cursor-pointer text-sm font-semibold">{c('optional')}</summary>
       <fieldset disabled={submitting} className="mt-5 space-y-5">

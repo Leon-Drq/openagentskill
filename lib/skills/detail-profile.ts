@@ -1,6 +1,7 @@
 import type { SkillRecord } from '@/lib/db/skills'
 import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
 import { skillPresentationCategory } from '@/lib/skills/presentation-category'
+import { readProductMetadata } from './product-metadata'
 
 const generic = new Set(['skill', 'skills', 'agent', 'agents', 'code', 'coding', 'with', 'from', 'that', 'this', 'your', 'github', 'repository', 'tool', 'tools', 'workflow', 'workflows', 'claude', 'codex', 'cursor', 'open', 'source', 'using', 'support', 'supports', 'create'])
 function words(skill: SkillRecord) {
@@ -21,6 +22,7 @@ export function selectDetailAlternatives(skill: SkillRecord, candidates: SkillRe
 export function buildDetailStructuredData(skill: SkillRecord, editorial?: { description: string; citation: string }) {
   const category = skillPresentationCategory(skill)
   const evidence = getSkillSourceEvidence(skill)
+  const product = readProductMetadata(skill.product_metadata)
   const url = `https://www.openagentskill.com/skills/${skill.slug}`
   const validDate = (value: string | null | undefined) => value && Number.isFinite(Date.parse(value)) ? value : undefined
   const publicUrl = (value: string | null | undefined) => value && /^https:\/\//i.test(value) ? value : undefined
@@ -36,7 +38,8 @@ export function buildDetailStructuredData(skill: SkillRecord, editorial?: { desc
         datePublished: validDate(skill.created_at), dateModified: validDate(skill.updated_at),
         license: skill.license && !/^(unknown|missing|none|n\/a)$/i.test(skill.license) ? skill.license : undefined,
         creator: { '@type': 'Thing', name: skill.author_name, url: publicUrl(skill.author_url) },
-        sameAs: [publicUrl(skill.repository)].filter(Boolean),
+        sameAs: [publicUrl(skill.repository), product.websiteUrl].filter(Boolean),
+        ...(product.logoUrl ? { image: product.logoUrl } : {}),
         isPartOf: { '@type': 'WebSite', '@id': 'https://www.openagentskill.com/#website' },
       },
       {

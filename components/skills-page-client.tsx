@@ -115,6 +115,7 @@ interface DirectoryLink {
 }
 
 export interface DirectorySkillCard {
+  productLogoUrl?: string
   exampleCount: number
   preview?: ShowcaseCardData | null
   sourcePreview?: SkillPreviewCardData | null
@@ -156,6 +157,7 @@ export interface DirectorySkillCard {
 
 import { GitHubOwnerAvatar } from './github-owner-avatar'
 import { SkillryLogo } from './skillry-logo'
+import { SkillProductLogo } from './skill-product-logo'
 import { useI18n } from '@/lib/i18n/context'
 import { directoryCopy, directoryLabel } from '@/lib/i18n/directory-copy'
 import { directoryCategories, directoryCategoryOptions, directoryHref } from '@/lib/skills/directory'
@@ -437,7 +439,7 @@ export function SkillsPageClient(props: Props) {
                 </div>
                 <SkillCardPreview slug={skill.slug} name={skill.name} locale={locale} category={directoryCategories(skill.category).map(label).join(' · ')} showcase={skill.preview} sourcePreview={skill.sourcePreview} sourceGalleryHref={skill.sourceGalleryHref} provider={skill.provider} />
                 <div className="flex min-w-0 items-start gap-3 p-5 pb-0">
-                <div className="shrink-0">{skill.provider?.label === 'Skillry' ? <SkillryLogo /> : <GitHubOwnerAvatar owner={skill.author.owner} label={skill.author.name} size="md" />}</div>
+                <div className="shrink-0">{skill.productLogoUrl ? <SkillProductLogo url={skill.productLogoUrl} name={skill.name} /> : skill.provider?.label === 'Skillry' ? <SkillryLogo /> : <GitHubOwnerAvatar owner={skill.author.owner} label={skill.author.name} size="md" />}</div>
                 <div className="min-w-0 flex-1">
                   <h3 className="break-words text-base font-semibold leading-snug [overflow-wrap:anywhere]">
                     <Link prefetch={false} href={`/skills/${skill.slug}${locale === 'en' ? '' : '?lang=' + locale}`}

@@ -11,6 +11,10 @@ to Skill submission review and follows the normal Git/CI/deployment workflow.
 
 ## Usage
 
+To correct product websites, original logos or prerequisites on an existing
+listing or pending submission without publication, use the documented
+[metadata-only mode](skill-product-metadata.md#correct-existing-records).
+
 The local CLI reads `OWNER_PUBLISH_TOKEN` from the environment or ignored
 `.env.owner.local`. The matching token is configured only on the production server.
 It is separate from GitHub, Supabase, cron and indexer credentials. There is no

@@ -92,7 +92,8 @@ const { processSubmissionJob, runSubmissionQueue } = await import('../lib/skills
 const { POST } = await import('../app/api/skills/submit/route.ts')
 const { GET } = await import('../app/api/skills/submissions/[id]/route.ts')
 const { NextRequest } = await import('next/server')
-const input = { repository: repo, skill, submissionSource: 'web', requestFingerprint: 'test', codeFiles: [], receiptToken: 'b'.repeat(48), makerGithub: 'curator', freeAcquisition: true }
+const productMetadata = { websiteUrl: 'https://example.com/product', documentationUrl: 'https://example.com/setup', logoUrl: 'https://example.com/logo.svg', exampleUrl: 'https://example.com/demo', prerequisites: 'Node.js 20+ and connected MCP', runtimeNotes: 'SKILL.md alone is not a complete runtime.' }
+const input = { repository: repo, skill, submissionSource: 'web', requestFingerprint: 'test', codeFiles: [], receiptToken: 'b'.repeat(48), makerGithub: 'curator', freeAcquisition: true, productMetadata }
 for (const [value, provider, expected] of [['https://github.com/octocat','github','octocat'], ['@maker','x','maker'], ['https://x.com/maker?s=20','x','maker'], ['twitter.com/maker','x','maker']]) assert.equal(contract.normalizeSocialHandle(value, provider), expected)
 for (const [value, provider] of [['https://evil.com/maker','github'], ['https://github.com/a/b','github'], ['https://x.com/maker','github'], ['a b','x']]) assert.equal(contract.validSocialHandle(contract.normalizeSocialHandle(value, provider), provider), false)
 assert.equal(contract.validSocialHandle('', 'github'), true)
@@ -102,6 +103,7 @@ assert.equal(rows.size, 1)
 assert.equal(rows.get(receipt.id).submitter_github, 'curator')
 assert.equal(rows.get(receipt.id).validation_result.repository_owner, 'fixture')
 assert.equal(rows.get(receipt.id).identity_verified, false)
+assert.deepEqual(rows.get(receipt.id).validation_result.product_metadata, productMetadata)
 assert.equal(rows.get(receipt.id).validation_result.acquisition_declaration.type, 'free')
 assert.equal(rows.get(receipt.id).validation_result.acquisition_declaration.verified, false)
 assert.equal(rows.get(receipt.id).validation_result.acquisition_declaration.source_ref, commit)
@@ -118,6 +120,7 @@ assert.equal(skills.size, 1)
 assert.equal([...skills.values()][0].author_name, 'fixture', 'Curator must not become repository author')
 assert.equal([...skills.values()][0].ai_review_approved, false, 'Static checks are not AI review')
 assert.equal([...skills.values()][0].listing_status, 'static_checked')
+assert.deepEqual([...skills.values()][0].product_metadata, productMetadata, 'Queue reconstruction must retain product details')
 
 async function status(id = receipt.id, token = receipt.token) {
   const response = await GET(new NextRequest(`http://localhost/api/skills/submissions/${id}`, { headers: { Authorization: `Bearer ${token}` } }), { params: Promise.resolve({ id }) })
@@ -126,6 +129,7 @@ async function status(id = receipt.id, token = receipt.token) {
 const publicStatus = await status()
 assert.match(publicStatus.response.headers.get('cache-control'), /no-store/)
 assert.ok(publicStatus.body.submission.skill.slug)
+assert.deepEqual(publicStatus.body.submission.productMetadata, productMetadata, 'Receipt must expose saved details only after token authentication')
 assert.ok(!JSON.stringify(publicStatus.body).includes(receipt.token))
 assert.ok(!JSON.stringify(publicStatus.body).includes('status_token_hash'))
 assert.equal((await status(receipt.id, 'f'.repeat(48))).response.status, 404)
@@ -162,6 +166,7 @@ rows.clear(); failure = false; denyReview = true
 await createOpenSubmission(input)
 assert.equal(await processSubmissionJob(receipt.id), 'processed')
 assert.equal(rows.get(receipt.id).status, 'listed', 'Rejected review cannot publish')
+assert.deepEqual(rows.get(receipt.id).validation_result.product_metadata, productMetadata, 'Manual review must retain product details')
 assert.equal(skills.size, 0)
 rows.clear(); denyReview = false; staticFailure = true
 assert.equal((await createOpenSubmission(input)).status, 'quarantined')
@@ -181,6 +186,13 @@ assert.equal(calls.filter(x => x === 'github' || x === 'discover').length, befor
 const invalid = await POST(new NextRequest('http://localhost/api/skills/submit', { method:'POST', body:JSON.stringify({...replayBody,makerGithub:'https://evil.com/a'}) }))
 assert.equal(invalid.status, 400)
 assert.equal((await invalid.json()).issues[0].path, 'makerGithub')
+const beforeInvalidMetadata = calls.length
+for (const productMetadata of [{ websiteUrl: 'javascript:alert(1)' }, { logoUrl: 'https://example.com/not-an-image' }, { websiteUrl: 'https://user:password@example.com' }, { websiteUrl: 'https://127.0.0.1/a' }, { websiteUrl: 'https://[::1]/a' }, { prerequisites: 'x'.repeat(2001) }, { ai_review_approved: true }]) {
+  const response = await POST(new NextRequest('http://localhost/api/skills/submit', { method: 'POST', body: JSON.stringify({ ...replayBody, productMetadata }) }))
+  assert.equal(response.status, 400)
+  assert.ok((await response.json()).issues[0].path.startsWith('productMetadata'))
+}
+assert.equal(calls.length, beforeInvalidMetadata, 'Invalid metadata cannot call upstream services')
 const malformed = await POST(new NextRequest('http://localhost/api/skills/submit', { method:'POST', body:'{' }))
 assert.equal(malformed.status, 400)
 const beforeFreeGate = calls.length
@@ -217,10 +229,11 @@ for (const body of [
   { submissionSource: 'api' },
   { submissionSource: 'agent' },
 ]) {
-  const accepted = await POST(new NextRequest('http://localhost/api/skills/submit', {method:'POST',body:JSON.stringify({repository:repo.fullName,skillPath:skill.path,...body})}))
+  const accepted = await POST(new NextRequest('http://localhost/api/skills/submit', {method:'POST',body:JSON.stringify({repository:repo.fullName,skillPath:skill.path,productMetadata,...body})}))
   assert.equal(accepted.status, 202)
   const saved = rows.get((await accepted.json()).submission.id)
   assert.equal(saved.status, 'submitted', 'Declaration is not approval')
+  assert.deepEqual(saved.validation_result.product_metadata, productMetadata, 'Web, API and agent intake must all save product details')
   assert.equal(saved.validation_result.acquisition_declaration?.type ?? null, body.freeAcquisition ? 'free' : null)
   assert.equal(saved.validation_result.acquisition_declaration?.verified ?? false, false)
 }
@@ -238,4 +251,28 @@ rows.clear(); skill.path = 'skills/other/SKILL.md'; skill.directory = 'skills/ot
 await createOpenSubmission(input)
 assert.equal(await processSubmissionJob(receipt.id), 'processed')
 assert.equal(skills.size, 2, 'Distinct Skill paths in one repository remain separate listings')
-console.log('Submission flow passed: idempotency, atomic claims, bounded retry, immutable source, unchanged review gates, attribution, authenticated receipts, safe sharing and API validation. No external requests.')
+const { POST: updateProduct } = await import('../app/api/admin/skills/product-metadata/route.ts')
+const metadataRequest = { repository: repo.fullName, skillPath: 'SKILL.md', requestId: '01234567-89ab-4cde-8fab-0123456789ab', reason: 'Owner requested product correction', productMetadata }
+const ownerSecret = 'test-only-owner-token-'.repeat(3)
+process.env.OWNER_PUBLISH_TOKEN = ownerSecret
+let metadataRpcCalls = 0
+globalThis.__submissionTest.db.rpc = async (name, params) => {
+  metadataRpcCalls++
+  assert.equal(name, 'update_skill_product_metadata')
+  assert.deepEqual(params.p_metadata, productMetadata)
+  assert.equal(params.p_path, 'SKILL.md')
+  return { data: { slug: null, submission_status: 'listed', metadata_only: true }, error: null }
+}
+async function metadataCall(body, authorized = true) {
+  return updateProduct(new NextRequest('http://localhost/api/admin/skills/product-metadata', { method: 'POST', headers: authorized ? { Authorization: `Bearer ${ownerSecret}` } : {}, body: JSON.stringify(body) }))
+}
+assert.equal((await metadataCall(metadataRequest, false)).status, 401)
+for (const body of [{ ...metadataRequest, ai_review_approved: true }, { ...metadataRequest, productMetadata: { logoUrl: 'data:image/svg+xml,<svg/>' } }, { ...metadataRequest, sourceRef: 'main' }]) assert.equal((await metadataCall(body)).status, 400)
+assert.equal(metadataRpcCalls, 0, 'Unauthorized or unsafe correction cannot reach database')
+const metadataResult = await metadataCall(metadataRequest)
+assert.equal(metadataResult.status, 200)
+const metadataBody = await metadataResult.json()
+assert.equal(metadataBody.url, null, 'Pending metadata correction cannot fabricate a public URL')
+assert.equal(metadataBody.submission_status, 'listed')
+assert.equal(metadataRpcCalls, 1)
+console.log('Submission flow passed: product metadata persistence, protected corrections, unchanged review gates, idempotency, atomic claims, bounded retry, immutable source, attribution, receipts and API validation. No external requests.')
