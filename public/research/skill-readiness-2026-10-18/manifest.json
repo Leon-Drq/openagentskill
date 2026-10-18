@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "sourceUrl": "https://www.openagentskill.com/reports/state-of-agent-skills-2026.json",
+  "capturedAt": "2026-10-18T14:52:25.132Z",
+  "sourceSha256": "3b63a11f01969da621bae4555e5828339b3c309ca63f75695918dbee7a78a786",
+  "sourceBytes": 589052,
+  "sourceGeneratedAt": "2026-10-18T14:50:46.144Z",
+  "outputs": {
+    "dataset.json": "b2d6f3f2f784eabeb3ae9b08de242de7c84952f3be8233d719100d60585fa5cc",
+    "records.csv": "b792d02602d39dc988ad542fc112cafe8efbe83c84b45bc10969015f1437ae6c",
+    "readiness-chart.svg": "b7211e1b04add981284fe90aac7d9736a1c3b7c8ccdb9a759c21f296acc7e2e4",
+    "methods.md": "cddc134d4b8bb3183b148bea53bb5b0055edae906a6b880b754447d22a94c150",
+    "reproduce.mjs": "c18055e5041a2ea4b4c8b4f9c01cebb4f2ea78a8c27f698b6ea7ba22996a8659"
+  }
+}

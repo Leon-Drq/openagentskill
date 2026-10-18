@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780" role="img" aria-labelledby="title description">
+<title id="title">Readiness metadata in a quality-ranked registry snapshot</title>
+<desc id="description">A non-random sample. Install-path flags do not establish successful installation. Exact counts and denominators are written beside each bar.</desc>
+<rect width="1200" height="780" fill="#F8F7F3"/>
+<g font-family="Arial, sans-serif" fill="#171717">
+<text x="48" y="57" font-size="31">What readiness metadata is actually recorded?</text>
+<text x="48" y="91" font-size="17" fill="#626262">Frozen 2026-10-18 · Non-random, quality-ranked sample · Records, not unique repositories</text>
+<text x="48" y="142" font-size="21">Quality-ranked source sample (n = 1000)</text>
+<text x="48" y="190" font-size="16">License value recorded</text>
+<rect x="335" y="172" width="570" height="25" rx="3" fill="#DDDBD4"/>
+<rect x="335" y="172" width="468.54" height="25" rx="3" fill="#006B4F"/>
+<text x="925" y="190" font-size="16">822/1000 (82.2%)</text>
+<text x="48" y="232" font-size="16">Timestamp within 180 days</text>
+<rect x="335" y="214" width="570" height="25" rx="3" fill="#DDDBD4"/>
+<rect x="335" y="214" width="561.45" height="25" rx="3" fill="#006B4F"/>
+<text x="925" y="232" font-size="16">985/1000 (98.5%)</text>
+<text x="48" y="274" font-size="16">Install-path flag present</text>
+<rect x="335" y="256" width="570" height="25" rx="3" fill="#DDDBD4"/>
+<rect x="335" y="256" width="18.24" height="25" rx="3" fill="#006B4F"/>
+<text x="925" y="274" font-size="16">32/1000 (3.2%)</text>
+<text x="48" y="316" font-size="16">All three metadata signals</text>
+<rect x="335" y="298" width="570" height="25" rx="3" fill="#DDDBD4"/>
+<rect x="335" y="298" width="17.67" height="25" rx="3" fill="#006B4F"/>
+<text x="925" y="316" font-size="16">31/1000 (3.1%)</text>
+<text x="48" y="394" font-size="21">Source-classified agent-skill subset (n = 97)</text>
+<text x="48" y="442" font-size="16">License value recorded</text>
+<rect x="335" y="424" width="570" height="25" rx="3" fill="#DDDBD4"/>
+<rect x="335" y="424" width="523.26" height="25" rx="3" fill="#006B4F"/>
+<text x="925" y="442" font-size="16">89/97 (91.8%)</text>
+<text x="48" y="484" font-size="16">Timestamp within 180 days</text>
+<rect x="335" y="466" width="570" height="25" rx="3" fill="#DDDBD4"/>
+<rect x="335" y="466" width="564.3" height="25" rx="3" fill="#006B4F"/>
+<text x="925" y="484" font-size="16">96/97 (99%)</text>
+<text x="48" y="526" font-size="16">Install-path flag present</text>
+<rect x="335" y="508" width="570" height="25" rx="3" fill="#DDDBD4"/>
+<rect x="335" y="508" width="170.43" height="25" rx="3" fill="#006B4F"/>
+<text x="925" y="526" font-size="16">29/97 (29.9%)</text>
+<text x="48" y="568" font-size="16">All three metadata signals</text>
+<rect x="335" y="550" width="570" height="25" rx="3" fill="#DDDBD4"/>
+<rect x="335" y="550" width="164.73" height="25" rx="3" fill="#006B4F"/>
+<text x="925" y="568" font-size="16">28/97 (28.9%)</text>
+<text x="48" y="665" font-size="17">Install-path flag ≠ tested installation. A recent timestamp may reflect a registry edit.</text>
+<text x="48" y="697" font-size="16" fill="#626262">Source: OpenAgentSkill public report JSON. No Skill execution or license-text verification.</text>
+<text x="48" y="735" font-size="16" fill="#006B4F">https://www.openagentskill.com/reports/skill-readiness-2026-10-18</text>
+</g></svg>

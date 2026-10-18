@@ -1,0 +1,155 @@
+{
+  "userSuppliedMetricSnapshot": {
+    "source": "AITDK screenshot supplied by the user",
+    "receivedOn": "2026-10-18",
+    "screenshotCapturedAt": null,
+    "underlyingMetricProvider": null,
+    "providerVerified": false,
+    "displayedDomain": "www.openagentskill.com",
+    "domainRating": 6,
+    "backlinksDisplayed": "1.08K",
+    "backlinksApproximate": 1080,
+    "referringDomainsDisplayed": 670,
+    "backlinksDofollowPercentDisplayed": 63,
+    "referringDomainsDofollowPercentDisplayed": 55,
+    "completeExportAvailable": false,
+    "note": "Screenshot values are an unverified intake baseline, not an independently verified Ahrefs report. Domain/subdomain scope and snapshot date are unknown. No DR change or complete 670-domain audit is claimed."
+  },
+  "manualBrowserVerification": {
+    "method": "Read-only Codex in-app browser DOM inspection of a[href], rel attributes, and robots meta tags. Independent of the automatic HTTP audit below.",
+    "recordedAt": "2026-10-18T14:57:56.000Z",
+    "summary": {
+      "sourcePagesInspected": 4,
+      "sourcePagesWithSiteAnchors": 3,
+      "uniqueExternalSourceHostsWithSiteAnchors": 2,
+      "siteAnchorsObserved": 10,
+      "unqualifiedRelAnchorsObserved": 6,
+      "nofollowRelAnchorsObserved": 4,
+      "note": "Existing observations only; none was obtained through new outreach. No source/target HTTP statuses, response-header robots directives, provider indexing, or DR credit were verified by this DOM-only inspection."
+    },
+    "sources": [
+      {
+        "sourceUrl": "https://claudeatlas.com/skills/Leon-Drq/find-skills/",
+        "state": "no_site_anchor_in_rendered_dom",
+        "brandMention": true,
+        "siteAnchors": [],
+        "otherRelevantAnchor": { "href": "https://github.com/Leon-Drq/openagentskill", "rel": "noopener", "text": "View on GitHub" },
+        "robotsMeta": [],
+        "action": "Potential existing-mention link request; the visible API URL is text, not an observed site anchor."
+      },
+      {
+        "sourceUrl": "https://kaino.dev/discover/skills/7c1b309e-863d-4136-b43e-4fd2b9d5c1f7-openagentskill-ai-agent-skills-library",
+        "state": "site_anchors_observed_in_rendered_dom",
+        "siteAnchors": [
+          { "href": "https://www.openagentskill.com/", "rel": "noreferrer", "text": "Visit Website" },
+          { "href": "https://www.openagentskill.com/docs", "rel": "noreferrer", "text": "Documentation" }
+        ],
+        "robotsMeta": [],
+        "action": "Already links to the site and documentation; do not count as a new link win or request an already-existing homepage link."
+      },
+      {
+        "sourceUrl": "https://inite.ai/en/atlas/openagentskill.com",
+        "state": "site_anchors_observed_in_rendered_dom",
+        "siteAnchors": [
+          { "href": "https://openagentskill.com", "rel": "noopener noreferrer", "text": "openagentskill.com ↗" },
+          { "href": "https://openagentskill.com", "rel": "noopener noreferrer", "text": "Open openagentskill.com" },
+          { "href": "https://openagentskill.com/llms.txt", "rel": "noopener noreferrer nofollow", "text": "openagentskill.com ↗" },
+          { "href": "https://openagentskill.com", "rel": "noopener noreferrer nofollow", "text": "per their site ↗" },
+          { "href": "https://openagentskill.com/openapi.json", "rel": "noopener noreferrer nofollow", "text": "the spec ↗" },
+          { "href": "https://openagentskill.com/api-docs", "rel": "noopener noreferrer nofollow", "text": "the vendor's page ↗" }
+        ],
+        "robotsMeta": ["index, follow", "index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1"],
+        "action": "Existing mixed-rel links. Preserve editorial independence; do not ask to remove nofollow for ranking."
+      },
+      {
+        "sourceUrl": "https://inite.ai/en/atlas/openagentskill.com/visibility",
+        "state": "site_anchors_observed_in_rendered_dom",
+        "siteAnchors": [
+          { "href": "https://openagentskill.com/robots.txt", "rel": "noopener noreferrer", "text": "verify" },
+          { "href": "https://openagentskill.com/llms.txt", "rel": "noopener noreferrer", "text": "verify" }
+        ],
+        "robotsMeta": ["noindex, follow"],
+        "action": "Same source host as the atlas card; not an additional referring domain. noindex is a visible page directive, not evidence of current search-index status."
+      }
+    ]
+  },
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-18T14:54:58.718Z",
+  "scope": "User-supplied public source URLs only; fetched HTML is not rendered. This is not a complete backlink index or a DR estimate.",
+  "settings": {
+    "timeoutMs": 15000,
+    "maxBytes": 1500000,
+    "maxRedirects": 5,
+    "concurrency": 2,
+    "maxTargetChecks": 20,
+    "robotsPolicy": "Respect disallow; unavailable/blocked robots stops page fetch; no automatic retries",
+    "transport": "HTTP(S) GET; public DNS checked and pinned on every hop"
+  },
+  "summary": {
+    "sourcePagesChecked": 4,
+    "sourcePagesWithAnchors": 0,
+    "sourcePagesWithoutAnchorsInFetchedHtml": 0,
+    "unknownSourcePages": 4,
+    "uniqueExternalSourceHostsWithAnchors": 0,
+    "observedAnchors": 0,
+    "note": "Unique hosts collapse www only; this is not provider referring-domain (registrable-domain) counting. Repeated links/pages on one host are counted once. Unqualified rel is an observation, not a guarantee of indexing or ranking credit."
+  },
+  "sources": [
+    {
+      "sourceUrl": "https://claudeatlas.com/skills/Leon-Drq/find-skills/",
+      "expectedTargets": [
+        "https://www.openagentskill.com/"
+      ],
+      "note": "Known public mention; homepage link is an expectation to check not a verified backlink",
+      "firstCheckedAt": "2026-10-18T14:54:58.718Z",
+      "checkedAt": "2026-10-18T14:54:58.718Z",
+      "state": "unknown",
+      "links": [],
+      "reason": "unsafe_address",
+      "detail": "DNS returned a non-public or reserved address",
+      "redirectChain": []
+    },
+    {
+      "sourceUrl": "https://kaino.dev/discover/skills/7c1b309e-863d-4136-b43e-4fd2b9d5c1f7-openagentskill-ai-agent-skills-library",
+      "expectedTargets": [
+        "https://www.openagentskill.com/"
+      ],
+      "note": "Known public listing; verify actual anchor and rel",
+      "firstCheckedAt": "2026-10-18T14:54:58.718Z",
+      "checkedAt": "2026-10-18T14:54:58.718Z",
+      "state": "unknown",
+      "links": [],
+      "reason": "unsafe_address",
+      "detail": "DNS returned a non-public or reserved address",
+      "redirectChain": []
+    },
+    {
+      "sourceUrl": "https://inite.ai/en/atlas/openagentskill.com",
+      "expectedTargets": [
+        "https://www.openagentskill.com/"
+      ],
+      "note": "Known public atlas entry; verify actual anchor and rel",
+      "firstCheckedAt": "2026-10-18T14:54:58.718Z",
+      "checkedAt": "2026-10-18T14:54:58.718Z",
+      "state": "unknown",
+      "links": [],
+      "reason": "unsafe_address",
+      "detail": "DNS returned a non-public or reserved address",
+      "redirectChain": []
+    },
+    {
+      "sourceUrl": "https://inite.ai/en/atlas/openagentskill.com/visibility",
+      "expectedTargets": [
+        "https://www.openagentskill.com/"
+      ],
+      "note": "Same INITE host; do not count as another referring domain",
+      "firstCheckedAt": "2026-10-18T14:54:58.718Z",
+      "checkedAt": "2026-10-18T14:54:58.718Z",
+      "state": "unknown",
+      "links": [],
+      "reason": "unsafe_address",
+      "detail": "DNS returned a non-public or reserved address",
+      "redirectChain": []
+    }
+  ]
+}

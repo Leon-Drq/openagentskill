@@ -1,0 +1,3 @@
+# Preserve the frozen research response and downloadable reproduction files.
+public/research/skill-readiness-2026-10-18/* -text
+scripts/build-skill-readiness-snapshot.mjs text eol=lf

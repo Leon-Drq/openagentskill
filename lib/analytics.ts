@@ -45,6 +45,7 @@ export type AnalyticsEventName =
   | 'creator_github_connected'
   | 'creator_profile_published'
   | 'creator_badge_copy'
+  | 'creator_citation_copy'
   | 'creator_share_open'
   | 'resolve_request'
   | 'resolve_success'

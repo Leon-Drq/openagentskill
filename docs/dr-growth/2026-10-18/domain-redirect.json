@@ -1,0 +1,18 @@
+{
+  "changedAt": "2026-10-18T14:51:52.115563+00:00",
+  "before": {
+    "name": "openagentskill.com",
+    "redirect": "www.openagentskill.com",
+    "redirectStatusCode": null,
+    "observedHttpStatus": 307
+  },
+  "after": {
+    "name": "openagentskill.com",
+    "projectId": "prj_3RbYdE1vcNYYpXqdV0zNyurZiUfF",
+    "redirect": "www.openagentskill.com",
+    "redirectStatusCode": 308,
+    "verified": true,
+    "updatedAt": 1792335159904
+  },
+  "scope": "Permanent redirect to the existing www host. No DNS or app deployment changed. API requires redirect target to be included with status update."
+}

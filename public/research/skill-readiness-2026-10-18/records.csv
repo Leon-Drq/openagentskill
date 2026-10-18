@@ -1,0 +1,1001 @@
+sourcePosition,slug,name,repository,sourceClassification,licenseValue,licenseRecorded,sourceLastPushedAt,maintenanceState,installPathFlag,canonicalUrl
+1,anthropic-frontend-design,Frontend Design,anthropics/skills,agent-skill,Source terms (see LICENSE.txt),true,2026-10-09T18:45:52+00:00,within-180-days,true,https://www.openagentskill.com/skills/anthropic-frontend-design
+2,design-taste-frontend,Taste Skill: Anti-Slop Frontend,Leonxlnx/taste-skill,agent-skill,MIT,true,2026-10-14T15:00:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/design-taste-frontend
+3,op7418-guizang-ppt-skill,Guizang Ppt Skill,op7418/guizang-ppt-skill,agent-skill,AGPL-3.0,true,2026-08-26T13:12:20+00:00,within-180-days,true,https://www.openagentskill.com/skills/op7418-guizang-ppt-skill
+4,anthropic-webapp-testing,Webapp Testing,anthropics/skills,agent-skill,Source terms (see LICENSE.txt),true,2026-10-09T18:45:52+00:00,within-180-days,true,https://www.openagentskill.com/skills/anthropic-webapp-testing
+5,anthropic-canvas-design,Canvas Design,anthropics/skills,agent-skill,Source terms (see LICENSE.txt),true,2026-10-09T18:45:52+00:00,within-180-days,true,https://www.openagentskill.com/skills/anthropic-canvas-design
+6,addyosmani-agent-skills,Agent Skills,addyosmani/agent-skills,agent-skill,MIT,true,2026-08-14T18:51:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/addyosmani-agent-skills
+7,nexu-io-open-design,Open Design,nexu-io/open-design,agent-skill,Apache-2.0,true,2026-08-17T13:14:54+00:00,within-180-days,false,https://www.openagentskill.com/skills/nexu-io-open-design
+8,vercel-web-design-guidelines,Web Design Guidelines,vercel-labs/agent-skills,agent-skill,Source terms (see source),true,2026-10-14T17:58:45+00:00,within-180-days,true,https://www.openagentskill.com/skills/vercel-web-design-guidelines
+9,obra-superpowers,Superpowers,obra/superpowers,agent-skill,MIT,true,2026-07-17T00:52:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/obra-superpowers
+10,vox-director,Vox Director,Alisa0808/vox-director,agent-skill,MIT,true,2026-10-05T16:15:11+00:00,within-180-days,true,https://www.openagentskill.com/skills/vox-director
+11,emilkowalski-apple-design,Apple Design,emilkowalski/skills,agent-skill,MIT,true,2026-08-21T09:32:33+00:00,within-180-days,true,https://www.openagentskill.com/skills/emilkowalski-apple-design
+12,apify-crawlee,Crawlee,apify/crawlee,agent-workflow,Apache-2.0,true,2026-09-10T12:55:19+00:00,within-180-days,false,https://www.openagentskill.com/skills/apify-crawlee
+13,multica-ai-andrej-karpathy-skills,Andrej Karpathy Skills,multica-ai/andrej-karpathy-skills,agent-skill,Unknown,false,2026-04-20T10:05:04+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/multica-ai-andrej-karpathy-skills
+14,juliusbrussee-caveman,Caveman,JuliusBrussee/caveman,agent-skill,MIT,true,2026-08-11T13:11:16+00:00,within-180-days,false,https://www.openagentskill.com/skills/juliusbrussee-caveman
+15,anthropic-brand-guidelines,Anthropic Brand Guidelines,anthropics/skills,agent-skill,Source terms (see LICENSE.txt),true,2026-10-09T18:45:52+00:00,within-180-days,true,https://www.openagentskill.com/skills/anthropic-brand-guidelines
+16,nextlevelbuilder-ui-ux-pro-max-skill,Ui Ux Pro Max Skill,nextlevelbuilder/ui-ux-pro-max-skill,agent-skill,MIT,true,2026-07-14T18:32:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/nextlevelbuilder-ui-ux-pro-max-skill
+17,apache-echarts,Echarts,apache/echarts,domain-tool,Apache-2.0,true,2026-08-04T09:07:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-echarts
+18,blader-humanizer,Humanizer,blader/humanizer,agent-skill,MIT,true,2026-10-16T19:12:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/blader-humanizer
+19,mattpocock-code-review,Code Review,mattpocock/skills,agent-skill,MIT,true,2026-07-13T13:39:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/mattpocock-code-review
+20,nuwa-skill,女娲.Skill,alchaincyf/nuwa-skill,agent-skill,MIT,true,2026-07-02T03:11:38+00:00,within-180-days,false,https://www.openagentskill.com/skills/nuwa-skill
+21,appsmithorg-appsmith,Appsmith,appsmithorg/appsmith,agent-workflow,Apache-2.0,true,2026-09-11T22:04:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/appsmithorg-appsmith
+22,vercel-react-best-practices,Vercel React Best Practices,vercel-labs/agent-skills,agent-skill,MIT,true,2026-10-14T17:58:45+00:00,within-180-days,false,https://www.openagentskill.com/skills/vercel-react-best-practices
+23,thealgorithms-python,Python,TheAlgorithms/Python,generic,MIT,true,2026-06-01T19:33:28+00:00,within-180-days,false,https://www.openagentskill.com/skills/thealgorithms-python
+24,mattpocock-implement,Implement,mattpocock/skills,agent-skill,MIT,true,2026-07-17T09:51:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/mattpocock-implement
+25,firecrawl-firecrawl,Firecrawl,firecrawl/firecrawl,domain-tool,AGPL-3.0,true,2026-06-26T00:49:57+00:00,within-180-days,false,https://www.openagentskill.com/skills/firecrawl-firecrawl
+26,d3-d3,D3,d3/d3,domain-tool,ISC,true,2026-05-28T14:43:01+00:00,within-180-days,false,https://www.openagentskill.com/skills/d3-d3
+27,mui-material-ui,Material Ui,mui/material-ui,domain-tool,MIT,true,2026-06-16T08:57:32+00:00,within-180-days,false,https://www.openagentskill.com/skills/mui-material-ui
+28,voltagent-awesome-agent-skills,Awesome Agent Skills,VoltAgent/awesome-agent-skills,collection,MIT,true,2026-10-12T13:14:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/voltagent-awesome-agent-skills
+29,openai-codex,Codex,openai/codex,agent-workflow,Apache-2.0,true,2026-06-16T08:45:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/openai-codex
+30,k-dense-ai-scientific-agent-skills,Scientific Agent Skills,K-Dense-AI/scientific-agent-skills,agent-skill,MIT,true,2026-08-13T20:07:26+00:00,within-180-days,false,https://www.openagentskill.com/skills/k-dense-ai-scientific-agent-skills
+31,tauricresearch-tradingagents,TradingAgents,TauricResearch/TradingAgents,generic,Apache-2.0,true,2026-06-22T02:05:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/tauricresearch-tradingagents
+32,paddlepaddle-paddleocr,PaddleOCR,PaddlePaddle/PaddleOCR,domain-tool,Apache-2.0,true,2026-06-16T08:16:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/paddlepaddle-paddleocr
+33,graphify-labs-graphify,Graphify,Graphify-Labs/graphify,generic,MIT,true,2026-07-20T13:04:45+00:00,within-180-days,false,https://www.openagentskill.com/skills/graphify-labs-graphify
+34,egonex-ai-understand-anything,Understand Anything,Egonex-AI/Understand-Anything,agent-skill,MIT,true,2026-07-18T14:04:28+00:00,within-180-days,false,https://www.openagentskill.com/skills/egonex-ai-understand-anything
+35,caddyserver-caddy,Caddy,caddyserver/caddy,generic,Apache-2.0,true,2026-06-15T15:01:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/caddyserver-caddy
+36,yanliudesign-mono-color-skill,mono-color,yanliudesign/mono-color-skill,agent-skill,MIT,true,2026-09-01T00:50:13+00:00,within-180-days,true,https://www.openagentskill.com/skills/yanliudesign-mono-color-skill
+37,daytonaio-daytona,Daytona,daytonaio/daytona,agent-workflow,AGPL-3.0,true,2026-06-30T11:51:26+00:00,within-180-days,false,https://www.openagentskill.com/skills/daytonaio-daytona
+38,anthropic-earnings-analysis,Equity Research Earnings Analysis,anthropics/financial-services,agent-skill,Apache-2.0,true,2026-09-21T21:10:41+00:00,within-180-days,true,https://www.openagentskill.com/skills/anthropic-earnings-analysis
+39,rtk-ai-rtk,Rtk,rtk-ai/rtk,agent-workflow,Apache-2.0,true,2026-06-19T18:02:06+00:00,within-180-days,false,https://www.openagentskill.com/skills/rtk-ai-rtk
+40,rvc-boss-gpt-sovits,GPT SoVITS,RVC-Boss/GPT-SoVITS,generic,MIT,true,2026-06-20T07:45:00+00:00,within-180-days,false,https://www.openagentskill.com/skills/rvc-boss-gpt-sovits
+41,hardikpandya-stop-slop,stop-slop,hardikpandya/stop-slop,agent-skill,MIT,true,2026-10-12T20:29:11.356773+00:00,within-180-days,true,https://www.openagentskill.com/skills/hardikpandya-stop-slop
+42,tt-a1i-archify,Archify,tt-a1i/archify,agent-skill,MIT,true,2026-09-04T13:17:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/tt-a1i-archify
+43,zarazhangrui-frontend-slides,Frontend Slides,zarazhangrui/frontend-slides,agent-skill,MIT,true,2026-06-23T20:08:19+00:00,within-180-days,true,https://www.openagentskill.com/skills/zarazhangrui-frontend-slides
+44,colbymchenry-codegraph,Codegraph,colbymchenry/codegraph,domain-tool,MIT,true,2026-06-24T22:20:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/colbymchenry-codegraph
+45,anomalyco-opencode,Opencode,anomalyco/opencode,agent-workflow,MIT,true,2026-08-24T02:26:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/anomalyco-opencode
+46,anthropics-skills,Skills,anthropics/skills,agent-skill,Unknown,false,2026-08-21T17:10:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/anthropics-skills
+47,eternityspring-shuohao-skills,Shuohao Skills,eternityspring/shuohao-skills,collection,Apache-2.0,true,2026-08-16T13:07:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/eternityspring-shuohao-skills
+48,virgiliojr94-book-to-skill,Book To Skill,virgiliojr94/book-to-skill,agent-skill,MIT,true,2026-09-01T14:51:58+00:00,within-180-days,false,https://www.openagentskill.com/skills/virgiliojr94-book-to-skill
+49,logseq-logseq,Logseq,logseq/logseq,domain-tool,AGPL-3.0,true,2026-06-25T15:00:26+00:00,within-180-days,false,https://www.openagentskill.com/skills/logseq-logseq
+50,bytedance-ui-tars-desktop,UI-TARS Desktop,bytedance/UI-TARS-desktop,agent-workflow,Unknown,false,2026-06-18T03:47:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/bytedance-ui-tars-desktop
+51,coreyhaines31-marketingskills,Marketingskills,coreyhaines31/marketingskills,agent-skill,MIT,true,2026-07-16T19:07:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/coreyhaines31-marketingskills
+52,mvanhorn-last30days-skill,Last30days Skill,mvanhorn/last30days-skill,agent-skill,MIT,true,2026-10-07T01:48:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/mvanhorn-last30days-skill
+53,appflowy-io-appflowy,AppFlowy,AppFlowy-IO/AppFlowy,generic,AGPL-3.0,true,2026-09-10T07:05:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/appflowy-io-appflowy
+54,cursor-unslop,unslop,cursor/plugins,agent-skill,Unknown,false,2026-10-15T07:54:50.158281+00:00,within-180-days,true,https://www.openagentskill.com/skills/cursor-unslop
+55,apache-superset,Superset,apache/superset,domain-tool,Apache-2.0,true,2026-09-10T02:18:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-superset
+56,imbad0202-academic-research-skills,Academic Research Skills,Imbad0202/academic-research-skills,agent-skill,Unknown,false,2026-07-18T07:39:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/imbad0202-academic-research-skills
+57,hugohe3-ppt-master,Ppt Master,hugohe3/ppt-master,domain-tool,MIT,true,2026-07-05T12:37:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/hugohe3-ppt-master
+58,666ghj-mirofish,MiroFish,666ghj/MiroFish,domain-tool,AGPL-3.0,true,2026-08-03T10:19:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/666ghj-mirofish
+59,dokploy-dokploy,Dokploy,Dokploy/dokploy,generic,Unknown,false,2026-07-15T05:44:01+00:00,within-180-days,false,https://www.openagentskill.com/skills/dokploy-dokploy
+60,google-ai-edge-mediapipe,Mediapipe,google-ai-edge/mediapipe,generic,Apache-2.0,true,2026-06-15T22:31:52+00:00,within-180-days,false,https://www.openagentskill.com/skills/google-ai-edge-mediapipe
+61,microsoft-data-science-for-beginners,Data Science For Beginners,microsoft/Data-Science-For-Beginners,domain-tool,MIT,true,2026-06-10T10:44:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-data-science-for-beginners
+62,k-dense-ai-claude-scientific-skills,Claude Scientific Skills,K-Dense-AI/claude-scientific-skills,collection,Unknown,false,2026-07-15T17:44:16+00:00,within-180-days,false,https://www.openagentskill.com/skills/k-dense-ai-claude-scientific-skills
+63,figma-implement-design,Figma Implement Design,openai/skills,agent-skill,Source terms (see source),true,2026-09-08T20:35:26+00:00,within-180-days,true,https://www.openagentskill.com/skills/figma-implement-design
+64,googlechrome-lighthouse,Lighthouse,GoogleChrome/lighthouse,agent-workflow,Apache-2.0,true,2026-06-18T19:19:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/googlechrome-lighthouse
+65,sequelize-sequelize,Sequelize,sequelize/sequelize,domain-tool,MIT,true,2026-06-20T14:39:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/sequelize-sequelize
+66,crawl4ai,Crawl4AI,unclecode/crawl4ai,domain-tool,Apache-2.0,true,2026-07-15T08:41:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/crawl4ai
+67,getredash-redash,Redash,getredash/redash,domain-tool,BSD-2-Clause,true,2026-06-14T09:39:01+00:00,within-180-days,false,https://www.openagentskill.com/skills/getredash-redash
+68,werwolv-imhex,ImHex,WerWolv/ImHex,generic,GPL-2.0,true,2026-07-27T00:53:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/werwolv-imhex
+69,keepassxreboot-keepassxc,Keepassxc,keepassxreboot/keepassxc,generic,Unknown,false,2026-06-04T17:11:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/keepassxreboot-keepassxc
+70,parthjadhav-tkinter-designer,Tkinter Designer,ParthJadhav/Tkinter-Designer,domain-tool,BSD-3-Clause,true,2026-05-11T16:04:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/parthjadhav-tkinter-designer
+71,voltagent-awesome-openclaw-skills,Awesome Openclaw Skills,VoltAgent/awesome-openclaw-skills,collection,MIT,true,2026-09-21T08:22:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/voltagent-awesome-openclaw-skills
+72,scrapegraphai-scrapegraph-ai,Scrapegraph AI,ScrapeGraphAI/Scrapegraph-ai,domain-tool,MIT,true,2026-06-15T14:03:01+00:00,within-180-days,false,https://www.openagentskill.com/skills/scrapegraphai-scrapegraph-ai
+73,microsoft-markitdown,Markitdown,microsoft/markitdown,domain-tool,MIT,true,2026-05-26T22:41:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-markitdown
+74,cherryhq-cherry-studio,Cherry Studio,CherryHQ/cherry-studio,agent-skill,AGPL-3.0,true,2026-08-13T13:05:50+00:00,within-180-days,false,https://www.openagentskill.com/skills/cherryhq-cherry-studio
+75,mattpocock-grill-with-docs,Grill With Docs,mattpocock/skills,agent-skill,MIT,true,2026-07-10T13:15:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/mattpocock-grill-with-docs
+76,astral-sh-ruff,Ruff,astral-sh/ruff,generic,MIT,true,2026-09-22T00:09:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/astral-sh-ruff
+77,hkuds-deeptutor,DeepTutor,HKUDS/DeepTutor,agent-workflow,Apache-2.0,true,2026-06-17T16:25:11+00:00,within-180-days,false,https://www.openagentskill.com/skills/hkuds-deeptutor
+78,ranaroussi-yfinance,Yfinance,ranaroussi/yfinance,domain-tool,Apache-2.0,true,2026-07-05T18:36:28+00:00,within-180-days,false,https://www.openagentskill.com/skills/ranaroussi-yfinance
+79,apache-airflow,Airflow,apache/airflow,domain-tool,Apache-2.0,true,2026-08-25T22:11:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-airflow
+80,jimliu-baoyu-skills,Baoyu Skills,JimLiu/baoyu-skills,agent-skill,Unknown,false,2026-07-04T16:25:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/jimliu-baoyu-skills
+81,apache-spark,Spark,apache/spark,domain-tool,Apache-2.0,true,2026-09-09T22:56:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-spark
+82,mattpocock-to-spec,To Spec,mattpocock/skills,agent-skill,MIT,true,2026-07-10T13:15:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/mattpocock-to-spec
+83,chartdb-chartdb,Chartdb,chartdb/chartdb,domain-tool,AGPL-3.0,true,2026-06-20T07:22:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/chartdb-chartdb
+84,goauthentik-authentik,Authentik,goauthentik/authentik,generic,Unknown,false,2026-06-16T09:25:54+00:00,within-180-days,false,https://www.openagentskill.com/skills/goauthentik-authentik
+85,666ghj-bettafish,BettaFish,666ghj/BettaFish,agent-workflow,GPL-2.0,true,2026-07-21T06:13:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/666ghj-bettafish
+86,agno-agi-agno,Agno,agno-agi/agno,agent-workflow,Apache-2.0,true,2026-08-10T01:58:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/agno-agi-agno
+87,n8n-io-n8n,n8n,n8n-io/n8n,agent-workflow,Unknown,false,2026-06-26T00:54:16+00:00,within-180-days,false,https://www.openagentskill.com/skills/n8n-io-n8n
+88,significant-gravitas-autogpt,AutoGPT,Significant-Gravitas/AutoGPT,agent-workflow,Unknown,false,2026-07-19T02:53:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/significant-gravitas-autogpt
+89,mattpocock-to-tickets,To Tickets,mattpocock/skills,agent-skill,MIT,true,2026-07-17T09:51:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/mattpocock-to-tickets
+90,google-gemini-gemini-cli,Gemini CLI,google-gemini/gemini-cli,agent-workflow,Unknown,false,2026-07-19T01:32:54+00:00,within-180-days,false,https://www.openagentskill.com/skills/google-gemini-gemini-cli
+91,elastic-kibana,Kibana,elastic/kibana,generic,Unknown,false,2026-06-16T09:59:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/elastic-kibana
+92,emilkowalski-animation-vocabulary,Animation Vocabulary,emilkowalski/skills,agent-skill,MIT,true,2026-07-15T14:51:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/emilkowalski-animation-vocabulary
+93,aquasecurity-trivy,Trivy,aquasecurity/trivy,generic,Apache-2.0,true,2026-09-11T10:39:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/aquasecurity-trivy
+94,freecodecamp-freecodecamp,FreeCodeCamp,freeCodeCamp/freeCodeCamp,generic,BSD-3-Clause,true,2026-06-16T10:01:17+00:00,within-180-days,false,https://www.openagentskill.com/skills/freecodecamp-freecodecamp
+95,ebookfoundation-free-programming-books,Free Programming Books,EbookFoundation/free-programming-books,generic,CC-BY-4.0,true,2026-06-13T19:32:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/ebookfoundation-free-programming-books
+96,nousresearch-hermes-agent,Hermes Agent,NousResearch/hermes-agent,generic,MIT,true,2026-07-11T02:38:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/nousresearch-hermes-agent
+97,tensorflow-tensorflow,Tensorflow,tensorflow/tensorflow,generic,Apache-2.0,true,2026-06-16T10:01:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/tensorflow-tensorflow
+98,ohmyzsh-ohmyzsh,Ohmyzsh,ohmyzsh/ohmyzsh,generic,MIT,true,2026-06-15T10:22:59+00:00,within-180-days,false,https://www.openagentskill.com/skills/ohmyzsh-ohmyzsh
+99,huggingface-transformers,Transformers,huggingface/transformers,generic,Apache-2.0,true,2026-06-16T09:38:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/huggingface-transformers
+100,x1xhlol-system-prompts-and-models-of-ai-tools,System Prompts And Models Of AI Tools,x1xhlol/system-prompts-and-models-of-ai-tools,generic,GPL-3.0,true,2026-06-12T08:45:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/x1xhlol-system-prompts-and-models-of-ai-tools
+101,langchain-ai-langchain,Langchain,langchain-ai/langchain,generic,MIT,true,2026-07-01T19:01:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/langchain-ai-langchain
+102,chalarangelo-30-seconds-of-code,30 Seconds Of Code,Chalarangelo/30-seconds-of-code,generic,CC-BY-4.0,true,2026-06-16T09:48:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/chalarangelo-30-seconds-of-code
+103,excalidraw-excalidraw,Excalidraw,excalidraw/excalidraw,generic,MIT,true,2026-06-16T08:45:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/excalidraw-excalidraw
+104,kubernetes-kubernetes,Kubernetes,kubernetes/kubernetes,generic,Apache-2.0,true,2026-06-16T09:07:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/kubernetes-kubernetes
+105,shubhamsaboo-awesome-llm-apps,Awesome Llm Apps,Shubhamsaboo/awesome-llm-apps,collection,Apache-2.0,true,2026-06-13T04:52:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/shubhamsaboo-awesome-llm-apps
+106,microsoft-generative-ai-for-beginners,Generative AI For Beginners,microsoft/generative-ai-for-beginners,domain-tool,MIT,true,2026-06-21T18:47:35+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-generative-ai-for-beginners
+107,pytorch-pytorch,Pytorch,pytorch/pytorch,generic,Unknown,false,2026-06-16T09:36:30+00:00,within-180-days,false,https://www.openagentskill.com/skills/pytorch-pytorch
+108,browser-use-browser-use,Browser Use,browser-use/browser-use,agent-workflow,MIT,true,2026-06-13T21:08:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/browser-use-browser-use
+109,rasbt-llms-from-scratch,LLMs From Scratch,rasbt/LLMs-from-scratch,generic,Unknown,false,2026-06-02T14:14:19+00:00,within-180-days,false,https://www.openagentskill.com/skills/rasbt-llms-from-scratch
+110,adguardteam-adguardhome,AdGuardHome,AdguardTeam/AdGuardHome,generic,GPL-3.0,true,2026-08-06T05:28:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/adguardteam-adguardhome
+111,microsoft-web-dev-for-beginners,Web Dev For Beginners,microsoft/Web-Dev-For-Beginners,generic,MIT,true,2026-06-14T06:40:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-web-dev-for-beginners
+112,lightgbm-org-lightgbm,LightGBM,lightgbm-org/LightGBM,generic,MIT,true,2026-06-09T03:51:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/lightgbm-org-lightgbm
+113,puppeteer-puppeteer,Puppeteer,puppeteer/puppeteer,agent-workflow,Apache-2.0,true,2026-06-15T12:12:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/puppeteer-puppeteer
+114,esengine-deepseek-reasonix,DeepSeek Reasonix,esengine/DeepSeek-Reasonix,agent-workflow,MIT,true,2026-08-14T13:13:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/esengine-deepseek-reasonix
+115,leonxlnx-taste-skill,Taste Skill,Leonxlnx/taste-skill,agent-skill,MIT,true,2026-07-18T17:16:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/leonxlnx-taste-skill
+116,pytorch-vision,Vision,pytorch/vision,generic,BSD-3-Clause,true,2026-06-15T13:32:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/pytorch-vision
+117,microsoft-playwright,Playwright,microsoft/playwright,agent-workflow,Apache-2.0,true,2026-06-19T21:15:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-playwright
+118,safishamsi-graphify,Graphify,safishamsi/graphify,generic,MIT,true,2026-07-18T21:29:17+00:00,within-180-days,false,https://www.openagentskill.com/skills/safishamsi-graphify
+119,googleworkspace-cli,Cli,googleworkspace/cli,agent-skill,Unknown,false,2026-08-01T02:19:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/googleworkspace-cli
+120,harry0703-moneyprinterturbo,MoneyPrinterTurbo,harry0703/MoneyPrinterTurbo,generic,MIT,true,2026-06-15T09:35:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/harry0703-moneyprinterturbo
+121,nutlope-hallmark,Hallmark,Nutlope/hallmark,agent-skill,MIT,true,2026-08-06T16:19:18+00:00,within-180-days,true,https://www.openagentskill.com/skills/nutlope-hallmark
+122,vercel-deploy-to-vercel,Deploy to Vercel,vercel-labs/agent-skills,agent-skill,Source terms (see source),true,2026-10-14T17:58:45+00:00,within-180-days,true,https://www.openagentskill.com/skills/vercel-deploy-to-vercel
+123,assafelovic-gpt-researcher,GPT Researcher,assafelovic/gpt-researcher,agent-workflow,Unknown,false,2026-08-27T19:34:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/assafelovic-gpt-researcher
+124,microsoft-ml-for-beginners,ML For Beginners,microsoft/ML-For-Beginners,generic,MIT,true,2026-06-09T14:40:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-ml-for-beginners
+125,agentscope-ai-agentscope,AgentScope,agentscope-ai/agentscope,generic,Unknown,false,2026-08-07T10:39:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/agentscope-ai-agentscope
+126,alibaba-page-agent,Page Agent,alibaba/page-agent,agent-workflow,Unknown,false,2026-08-12T20:19:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/alibaba-page-agent
+127,thedotmack-claude-mem,Claude Mem,thedotmack/claude-mem,generic,Apache-2.0,true,2026-06-24T23:34:38+00:00,within-180-days,false,https://www.openagentskill.com/skills/thedotmack-claude-mem
+128,getmaxun-maxun,Maxun,getmaxun/maxun,agent-workflow,AGPL-3.0,true,2026-07-02T14:24:35+00:00,within-180-days,false,https://www.openagentskill.com/skills/getmaxun-maxun
+129,infiniflow-ragflow,Ragflow,infiniflow/ragflow,domain-tool,Apache-2.0,true,2026-06-13T03:01:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/infiniflow-ragflow
+130,developer-y-cs-video-courses,Cs Video Courses,Developer-Y/cs-video-courses,generic,Unknown,false,2026-06-15T12:07:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/developer-y-cs-video-courses
+131,stirling-tools-stirling-pdf,Stirling PDF,Stirling-Tools/Stirling-PDF,domain-tool,Unknown,false,2026-06-18T00:52:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/stirling-tools-stirling-pdf
+132,abiosoft-colima,Colima,abiosoft/colima,generic,MIT,true,2026-07-24T14:13:00+00:00,within-180-days,false,https://www.openagentskill.com/skills/abiosoft-colima
+133,topoteretes-cognee,Cognee,topoteretes/cognee,agent-skill,Apache-2.0,true,2026-08-23T13:19:32+00:00,within-180-days,false,https://www.openagentskill.com/skills/topoteretes-cognee
+134,zhaoxuya520-reverse-skill,Reverse Skill,zhaoxuya520/reverse-skill,agent-skill,MIT,true,2026-08-16T12:41:00+00:00,within-180-days,false,https://www.openagentskill.com/skills/zhaoxuya520-reverse-skill
+135,apify-crawlee-python,Crawlee Python,apify/crawlee-python,agent-workflow,Apache-2.0,true,2026-09-10T06:18:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/apify-crawlee-python
+136,iamgio-quarkdown,Quarkdown,iamgio/quarkdown,domain-tool,GPL-3.0,true,2026-06-17T06:46:00+00:00,within-180-days,false,https://www.openagentskill.com/skills/iamgio-quarkdown
+137,hoppscotch-hoppscotch,Hoppscotch,hoppscotch/hoppscotch,agent-workflow,MIT,true,2026-06-17T18:02:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/hoppscotch-hoppscotch
+138,calesthio-openmontage,OpenMontage,calesthio/OpenMontage,agent-skill,AGPL-3.0,true,2026-08-14T00:23:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/calesthio-openmontage
+139,authelia-authelia,Authelia,authelia/authelia,generic,Apache-2.0,true,2026-09-24T23:13:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/authelia-authelia
+140,openhands-openhands,OpenHands,OpenHands/OpenHands,agent-workflow,Unknown,false,2026-06-18T02:58:32+00:00,within-180-days,false,https://www.openagentskill.com/skills/openhands-openhands
+141,d4vinci-scrapling,Scrapling,D4Vinci/Scrapling,domain-tool,Unknown,false,2026-07-15T15:21:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/d4vinci-scrapling
+142,elastic-elasticsearch,Elasticsearch,elastic/elasticsearch,domain-tool,Unknown,false,2026-06-16T10:01:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/elastic-elasticsearch
+143,affaan-m-ecc-agent-introspection-debugging,agent-introspection-debugging,affaan-m/ECC,agent-skill,MIT,true,2026-09-03T01:05:37+00:00,within-180-days,true,https://www.openagentskill.com/skills/affaan-m-ecc-agent-introspection-debugging
+144,bloopai-vibe-kanban,Vibe Kanban,BloopAI/vibe-kanban,agent-workflow,Apache-2.0,true,2026-09-19T06:52:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/bloopai-vibe-kanban
+145,bagisto-bagisto,Bagisto,bagisto/bagisto,generic,MIT,true,2026-10-01T09:52:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/bagisto-bagisto
+146,actualbudget-actual,Actual,actualbudget/actual,generic,MIT,true,2026-08-07T02:27:04+00:00,within-180-days,false,https://www.openagentskill.com/skills/actualbudget-actual
+147,tesseract-ocr-tesseract,Tesseract,tesseract-ocr/tesseract,domain-tool,Apache-2.0,true,2026-06-13T14:33:54+00:00,within-180-days,false,https://www.openagentskill.com/skills/tesseract-ocr-tesseract
+148,grafana-grafana,Grafana,grafana/grafana,domain-tool,AGPL-3.0,true,2026-06-15T02:43:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/grafana-grafana
+149,unionlabs-union,Union,unionlabs/union,generic,Apache-2.0,true,2026-06-22T13:20:52+00:00,within-180-days,false,https://www.openagentskill.com/skills/unionlabs-union
+150,thedaviddias-front-end-checklist,Front End Checklist,thedaviddias/Front-End-Checklist,generic,Unknown,false,2026-06-18T03:46:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/thedaviddias-front-end-checklist
+151,othmanadi-planning-with-files,Planning With Files,OthmanAdi/planning-with-files,agent-skill,MIT,true,2026-09-07T08:19:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/othmanadi-planning-with-files
+152,bytedance-deer-flow,Deer Flow,bytedance/deer-flow,agent-workflow,MIT,true,2026-06-14T03:56:41+00:00,within-180-days,false,https://www.openagentskill.com/skills/bytedance-deer-flow
+153,nektos-act,Act,nektos/act,generic,MIT,true,2026-06-01T03:30:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/nektos-act
+154,apache-flink,Flink,apache/flink,domain-tool,Apache-2.0,true,2026-08-26T10:45:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-flink
+155,activepieces-activepieces,Activepieces,activepieces/activepieces,agent-workflow,Unknown,false,2026-08-06T22:00:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/activepieces-activepieces
+156,openbb-finance-openbb,OpenBB,OpenBB-finance/OpenBB,domain-tool,Unknown,false,2026-06-21T03:23:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/openbb-finance-openbb
+157,toeverything-affine,AFFiNE,toeverything/AFFiNE,domain-tool,Unknown,false,2026-06-15T11:42:28+00:00,within-180-days,false,https://www.openagentskill.com/skills/toeverything-affine
+158,argotorg-solidity,Solidity,argotorg/solidity,generic,GPL-3.0,true,2026-09-16T22:46:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/argotorg-solidity
+159,opendatalab-mineru,MinerU,opendatalab/MinerU,domain-tool,Unknown,false,2026-06-17T12:16:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/opendatalab-mineru
+160,shareai-lab-learn-claude-code,Learn Claude Code,shareAI-lab/learn-claude-code,generic,MIT,true,2026-06-15T16:16:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/shareai-lab-learn-claude-code
+161,microsoft-ai-agents-for-beginners,AI Agents For Beginners,microsoft/ai-agents-for-beginners,domain-tool,MIT,true,2026-05-25T17:28:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-ai-agents-for-beginners
+162,unslothai-unsloth,Unsloth,unslothai/unsloth,generic,Apache-2.0,true,2026-06-20T14:58:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/unslothai-unsloth
+163,apache-skywalking,Skywalking,apache/skywalking,generic,Apache-2.0,true,2026-09-10T02:11:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-skywalking
+164,arendst-tasmota,Tasmota,arendst/Tasmota,generic,GPL-3.0,true,2026-09-13T13:53:26+00:00,within-180-days,false,https://www.openagentskill.com/skills/arendst-tasmota
+165,scikit-learn-scikit-learn,Scikit Learn,scikit-learn/scikit-learn,domain-tool,BSD-3-Clause,true,2026-06-17T14:46:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/scikit-learn-scikit-learn
+166,xtekky-gpt4free,Gpt4free,xtekky/gpt4free,collection,GPL-3.0,true,2026-06-14T21:41:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/xtekky-gpt4free
+167,alirezarezvani-claude-skills,Claude Skills,alirezarezvani/claude-skills,agent-skill,MIT,true,2026-08-17T02:43:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/alirezarezvani-claude-skills
+168,argoproj-argo-cd,Argo Cd,argoproj/argo-cd,generic,Apache-2.0,true,2026-09-16T17:26:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/argoproj-argo-cd
+169,agentskills-agentskills,Agentskills,agentskills/agentskills,agent-skill,Apache-2.0,true,2026-08-09T20:36:04+00:00,within-180-days,false,https://www.openagentskill.com/skills/agentskills-agentskills
+170,keras-team-keras,Keras,keras-team/keras,generic,Apache-2.0,true,2026-06-12T19:49:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/keras-team-keras
+171,openinterpreter-openinterpreter,Openinterpreter,openinterpreter/openinterpreter,agent-workflow,Apache-2.0,true,2026-06-15T22:39:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/openinterpreter-openinterpreter
+172,insforge-insforge,InsForge,InsForge/InsForge,agent-workflow,Apache-2.0,true,2026-07-18T18:10:57+00:00,within-180-days,false,https://www.openagentskill.com/skills/insforge-insforge
+173,traefik-traefik,Traefik,traefik/traefik,generic,MIT,true,2026-06-16T07:32:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/traefik-traefik
+174,docling-project-docling,Docling,docling-project/docling,domain-tool,MIT,true,2026-07-17T15:50:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/docling-project-docling
+175,beekeeper-studio-beekeeper-studio,Beekeeper Studio,beekeeper-studio/beekeeper-studio,domain-tool,Unknown,false,2026-10-08T02:17:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/beekeeper-studio-beekeeper-studio
+176,cline-cline,Cline,cline/cline,agent-workflow,Apache-2.0,true,2026-06-16T06:19:30+00:00,within-180-days,false,https://www.openagentskill.com/skills/cline-cline
+177,mintplex-labs-anything-llm,Anything Llm,Mintplex-Labs/anything-llm,domain-tool,MIT,true,2026-07-13T17:07:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/mintplex-labs-anything-llm
+178,seedance-prompt-en,Seedance 2.0 Prompt Writing,dexhunter/seedance2-skill,agent-skill,MIT,true,2026-09-19T18:18:50+00:00,within-180-days,true,https://www.openagentskill.com/skills/seedance-prompt-en
+179,earendil-works-pi,Pi,earendil-works/pi,agent-workflow,MIT,true,2026-06-16T07:37:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/earendil-works-pi
+180,pathwaycom-pathway,Pathway,pathwaycom/pathway,domain-tool,Unknown,false,2026-07-02T23:07:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/pathwaycom-pathway
+181,code-yeongyu-oh-my-openagent,Oh My Openagent,code-yeongyu/oh-my-openagent,agent-skill,Unknown,false,2026-06-19T02:56:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/code-yeongyu-oh-my-openagent
+182,scrapy-scrapy,Scrapy,scrapy/scrapy,domain-tool,BSD-3-Clause,true,2026-06-25T11:44:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/scrapy-scrapy
+183,agents365-ai-drawio-skill,Drawio Skill,Agents365-ai/drawio-skill,agent-skill,MIT,true,2026-08-05T10:18:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/agents365-ai-drawio-skill
+184,sickn33-antigravity-awesome-skills,Antigravity Awesome Skills,sickn33/antigravity-awesome-skills,collection,Unknown,false,2026-07-18T17:36:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/sickn33-antigravity-awesome-skills
+185,mem0ai-mem0,Mem0,mem0ai/mem0,generic,Apache-2.0,true,2026-07-18T11:00:06+00:00,within-180-days,false,https://www.openagentskill.com/skills/mem0ai-mem0
+186,crossplane-crossplane,Crossplane,crossplane/crossplane,generic,Apache-2.0,true,2026-06-16T10:01:41+00:00,within-180-days,false,https://www.openagentskill.com/skills/crossplane-crossplane
+187,usememos-memos,Memos,usememos/memos,domain-tool,MIT,true,2026-06-15T15:23:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/usememos-memos
+188,shanraisshan-claude-code-best-practice,Claude Code Best Practice,shanraisshan/claude-code-best-practice,agent-workflow,MIT,true,2026-06-25T06:35:30+00:00,within-180-days,false,https://www.openagentskill.com/skills/shanraisshan-claude-code-best-practice
+189,santifer-career-ops,Career Ops,santifer/career-ops,agent-skill,MIT,true,2026-07-13T11:24:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/santifer-career-ops
+190,datawhalechina-hello-agents,Hello Agents,datawhalechina/hello-agents,domain-tool,Unknown,false,2026-06-11T10:28:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/datawhalechina-hello-agents
+191,pathwaycom-llm-app,Llm App,pathwaycom/llm-app,domain-tool,MIT,true,2026-06-10T12:49:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/pathwaycom-llm-app
+192,akfamily-akshare,Akshare,akfamily/akshare,domain-tool,MIT,true,2026-08-13T18:01:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/akfamily-akshare
+193,appium-appium,Appium,appium/appium,agent-workflow,Apache-2.0,true,2026-09-11T16:57:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/appium-appium
+194,meilisearch-meilisearch,Meilisearch,meilisearch/meilisearch,domain-tool,Unknown,false,2026-07-18T08:10:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/meilisearch-meilisearch
+195,airbytehq-airbyte,Airbyte,airbytehq/airbyte,domain-tool,Unknown,false,2026-08-12T02:01:04+00:00,within-180-days,false,https://www.openagentskill.com/skills/airbytehq-airbyte
+196,ultralytics-ultralytics,Ultralytics,ultralytics/ultralytics,generic,AGPL-3.0,true,2026-06-16T09:44:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/ultralytics-ultralytics
+197,simplex-chat-simplex-chat,Simplex Chat,simplex-chat/simplex-chat,generic,AGPL-3.0,true,2026-06-20T21:50:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/simplex-chat-simplex-chat
+198,elie222-inbox-zero,Inbox Zero,elie222/inbox-zero,generic,Unknown,false,2026-06-15T23:49:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/elie222-inbox-zero
+199,kkkkhazix-khazix-skills,Khazix Skills,KKKKhazix/khazix-skills,collection,MIT,true,2026-08-13T12:59:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/kkkkhazix-khazix-skills
+200,atlas-os-atlas,Atlas,Atlas-OS/Atlas,generic,GPL-3.0,true,2026-09-20T14:34:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/atlas-os-atlas
+201,simonw-datasette,Datasette,simonw/datasette,domain-tool,Apache-2.0,true,2026-06-15T03:30:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/simonw-datasette
+202,ultralytics-yolov5,Yolov5,ultralytics/yolov5,generic,AGPL-3.0,true,2026-06-12T21:10:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/ultralytics-yolov5
+203,marktext-marktext,Marktext,marktext/marktext,domain-tool,MIT,true,2026-06-16T09:46:19+00:00,within-180-days,false,https://www.openagentskill.com/skills/marktext-marktext
+204,trycua-cua,Cua,trycua/cua,agent-workflow,MIT,true,2026-08-15T13:03:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/trycua-cua
+205,browser-use,Browser Use,browser-use/browser-use,agent-workflow,MIT,true,2026-06-20T18:21:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/browser-use
+206,fuellabs-fuel-core,Fuel Core,FuelLabs/fuel-core,generic,Unknown,false,2026-06-28T00:52:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/fuellabs-fuel-core
+207,composiohq-awesome-claude-skills,Awesome Claude Skills,ComposioHQ/awesome-claude-skills,collection,Unknown,false,2026-05-22T03:17:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/composiohq-awesome-claude-skills
+208,ageitgey-face-recognition,Face Recognition,ageitgey/face_recognition,generic,MIT,true,2026-06-25T11:12:50+00:00,within-180-days,false,https://www.openagentskill.com/skills/ageitgey-face-recognition
+209,textualize-rich,Rich,Textualize/rich,domain-tool,MIT,true,2026-06-15T13:38:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/textualize-rich
+210,ai4finance-foundation-fingpt,FinGPT,AI4Finance-Foundation/FinGPT,generic,MIT,true,2026-08-02T03:23:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/ai4finance-foundation-fingpt
+211,go-gitea-gitea,Gitea,go-gitea/gitea,generic,MIT,true,2026-06-16T08:21:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/go-gitea-gitea
+212,vxcontrol-pentagi,Pentagi,vxcontrol/pentagi,generic,MIT,true,2026-07-20T22:04:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/vxcontrol-pentagi
+213,kedro-org-kedro,Kedro,kedro-org/kedro,generic,Apache-2.0,true,2026-06-16T05:39:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/kedro-org-kedro
+214,allinurl-goaccess,Goaccess,allinurl/goaccess,domain-tool,MIT,true,2026-08-05T01:20:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/allinurl-goaccess
+215,apache-shardingsphere,Shardingsphere,apache/shardingsphere,domain-tool,Apache-2.0,true,2026-09-09T17:57:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-shardingsphere
+216,crewaiinc-crewai,CrewAI,crewAIInc/crewAI,generic,MIT,true,2026-07-18T10:13:42+00:00,within-180-days,false,https://www.openagentskill.com/skills/crewaiinc-crewai
+217,deepfakes-faceswap,Faceswap,deepfakes/faceswap,generic,GPL-3.0,true,2026-05-29T10:41:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/deepfakes-faceswap
+218,siderolabs-talos,Talos,siderolabs/talos,generic,MPL-2.0,true,2026-06-15T18:45:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/siderolabs-talos
+219,bitwarden-server,Server,bitwarden/server,domain-tool,Unknown,false,2026-10-15T00:19:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/bitwarden-server
+220,flowiseai-flowise,Flowise,FlowiseAI/Flowise,agent-workflow,Unknown,false,2026-06-10T07:32:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/flowiseai-flowise
+221,ahmetb-kubectx,Kubectx,ahmetb/kubectx,generic,Apache-2.0,true,2026-08-02T01:42:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/ahmetb-kubectx
+222,dietrichgebert-ponytail,Ponytail,DietrichGebert/ponytail,agent-skill,MIT,true,2026-07-15T21:32:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/dietrichgebert-ponytail
+223,prettier-prettier,Prettier,prettier/prettier,domain-tool,MIT,true,2026-06-16T07:05:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/prettier-prettier
+224,zhulinsen-daily-stock-analysis,Daily Stock Analysis,ZhuLinsen/daily_stock_analysis,domain-tool,MIT,true,2026-06-29T16:58:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/zhulinsen-daily-stock-analysis
+225,etcd-io-etcd,Etcd,etcd-io/etcd,generic,Apache-2.0,true,2026-06-15T14:09:01+00:00,within-180-days,false,https://www.openagentskill.com/skills/etcd-io-etcd
+226,freqtrade-freqtrade,Freqtrade,freqtrade/freqtrade,domain-tool,GPL-3.0,true,2026-06-17T04:48:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/freqtrade-freqtrade
+227,ethereum-go-ethereum,Go Ethereum,ethereum/go-ethereum,generic,LGPL-3.0,true,2026-06-29T12:59:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/ethereum-go-ethereum
+228,ggml-org-whisper-cpp,Whisper.Cpp,ggml-org/whisper.cpp,generic,MIT,true,2026-06-22T10:06:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/ggml-org-whisper-cpp
+229,dbeaver-dbeaver,Dbeaver,dbeaver/dbeaver,domain-tool,Apache-2.0,true,2026-06-20T05:39:06+00:00,within-180-days,false,https://www.openagentskill.com/skills/dbeaver-dbeaver
+230,run-llama-llama-index,Llama Index,run-llama/llama_index,domain-tool,MIT,true,2026-06-17T19:25:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/run-llama-llama-index
+231,twentyhq-twenty,Twenty,twentyhq/twenty,domain-tool,Unknown,false,2026-06-16T10:02:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/twentyhq-twenty
+232,teng-lin-notebooklm-py,Notebooklm Py,teng-lin/notebooklm-py,agent-skill,MIT,true,2026-08-13T13:14:26+00:00,within-180-days,false,https://www.openagentskill.com/skills/teng-lin-notebooklm-py
+233,hesreallyhim-awesome-claude-code,Awesome Claude Code,hesreallyhim/awesome-claude-code,collection,Unknown,false,2026-07-11T00:32:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/hesreallyhim-awesome-claude-code
+234,activitywatch-activitywatch,Activitywatch,ActivityWatch/activitywatch,generic,MPL-2.0,true,2026-08-06T13:30:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/activitywatch-activitywatch
+235,alyssaxuu-screenity,Screenity,alyssaxuu/screenity,generic,GPL-3.0,true,2026-08-18T17:39:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/alyssaxuu-screenity
+236,huginn-huginn,Huginn,huginn/huginn,agent-workflow,MIT,true,2026-06-13T00:57:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/huginn-huginn
+237,pandas-dev-pandas,Pandas,pandas-dev/pandas,domain-tool,BSD-3-Clause,true,2026-06-14T05:49:01+00:00,within-180-days,false,https://www.openagentskill.com/skills/pandas-dev-pandas
+238,arc53-docsgpt,DocsGPT,arc53/DocsGPT,agent-workflow,MIT,true,2026-09-14T21:49:38+00:00,within-180-days,false,https://www.openagentskill.com/skills/arc53-docsgpt
+239,larksuite-cli,Cli,larksuite/cli,agent-skill,MIT,true,2026-08-18T13:16:54+00:00,within-180-days,false,https://www.openagentskill.com/skills/larksuite-cli
+240,julialang-julia,Julia,JuliaLang/julia,generic,MIT,true,2026-06-16T09:37:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/julialang-julia
+241,hashicorp-terraform,Terraform,hashicorp/terraform,generic,Unknown,false,2026-06-16T09:56:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/hashicorp-terraform
+242,vuejs-vitepress,Vitepress,vuejs/vitepress,domain-tool,MIT,true,2026-07-19T19:17:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/vuejs-vitepress
+243,raphire-win11debloat,Win11Debloat,Raphire/Win11Debloat,generic,MIT,true,2026-06-14T20:11:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/raphire-win11debloat
+244,microsoft-ai-for-beginners,AI For Beginners,microsoft/AI-For-Beginners,generic,MIT,true,2026-06-11T01:06:57+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-ai-for-beginners
+245,clickhouse-clickhouse,ClickHouse,ClickHouse/ClickHouse,domain-tool,Apache-2.0,true,2026-06-21T00:01:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/clickhouse-clickhouse
+246,metabase-metabase,Metabase,metabase/metabase,domain-tool,Unknown,false,2026-06-30T01:22:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/metabase-metabase
+247,pixijs-pixijs,Pixijs,pixijs/pixijs,domain-tool,MIT,true,2026-06-16T07:48:50+00:00,within-180-days,false,https://www.openagentskill.com/skills/pixijs-pixijs
+248,slidevjs-slidev,Slidev,slidevjs/slidev,domain-tool,MIT,true,2026-06-03T08:47:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/slidevjs-slidev
+249,browser-use-browser-harness,Browser Harness,browser-use/browser-harness,agent-workflow,MIT,true,2026-08-31T20:05:12+00:00,within-180-days,true,https://www.openagentskill.com/skills/browser-use-browser-harness
+250,hkuds-nanobot,Nanobot,HKUDS/nanobot,generic,MIT,true,2026-07-18T18:00:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/hkuds-nanobot
+251,apache-apisix,Apisix,apache/apisix,generic,Apache-2.0,true,2026-08-24T08:34:19+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-apisix
+252,argoproj-argo-workflows,Argo Workflows,argoproj/argo-workflows,generic,Apache-2.0,true,2026-09-15T15:14:50+00:00,within-180-days,false,https://www.openagentskill.com/skills/argoproj-argo-workflows
+253,aaronfeng753-waifu2x-extension-gui,Waifu2x Extension GUI,AaronFeng753/Waifu2x-Extension-GUI,generic,Unknown,false,2026-08-02T10:01:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/aaronfeng753-waifu2x-extension-gui
+254,usebruno-bruno,Bruno,usebruno/bruno,agent-workflow,MIT,true,2026-06-19T20:47:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/usebruno-bruno
+255,streamlit-streamlit,Streamlit,streamlit/streamlit,domain-tool,Apache-2.0,true,2026-06-14T12:47:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/streamlit-streamlit
+256,milvus-io-milvus,Milvus,milvus-io/milvus,domain-tool,Apache-2.0,true,2026-06-19T19:36:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/milvus-io-milvus
+257,jgm-pandoc,Pandoc,jgm/pandoc,domain-tool,GPL-2.0,true,2026-06-13T21:44:32+00:00,within-180-days,false,https://www.openagentskill.com/skills/jgm-pandoc
+258,weaviate-weaviate,Weaviate,weaviate/weaviate,domain-tool,BSD-3-Clause,true,2026-07-24T18:37:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/weaviate-weaviate
+259,siyuan-note-siyuan,Siyuan,siyuan-note/siyuan,generic,AGPL-3.0,true,2026-06-15T01:56:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/siyuan-note-siyuan
+260,roboflow-supervision,Supervision,roboflow/supervision,generic,MIT,true,2026-06-16T09:13:58+00:00,within-180-days,false,https://www.openagentskill.com/skills/roboflow-supervision
+261,ai-shifu-chatall,ChatALL,ai-shifu/ChatALL,generic,Apache-2.0,true,2026-08-09T04:42:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/ai-shifu-chatall
+262,getsentry-sentry,Sentry,getsentry/sentry,generic,Unknown,false,2026-06-20T22:15:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/getsentry-sentry
+263,aykutsarac-jsoncrack-com,Jsoncrack.Com,AykutSarac/jsoncrack.com,domain-tool,Apache-2.0,true,2026-06-15T16:37:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/aykutsarac-jsoncrack-com
+264,naibowang-easyspider,EasySpider,NaiboWang/EasySpider,domain-tool,AGPL-3.0,true,2026-05-22T11:59:59+00:00,within-180-days,false,https://www.openagentskill.com/skills/naibowang-easyspider
+265,files-community-files,Files,files-community/Files,agent-workflow,MIT,true,2026-06-19T16:18:26+00:00,within-180-days,false,https://www.openagentskill.com/skills/files-community-files
+266,wazuh-wazuh,Wazuh,wazuh/wazuh,generic,Unknown,false,2026-07-24T02:24:31+00:00,within-180-days,false,https://www.openagentskill.com/skills/wazuh-wazuh
+267,ccxt-ccxt,Ccxt,ccxt/ccxt,generic,MIT,true,2026-07-18T13:46:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/ccxt-ccxt
+268,juspay-hyperswitch,Hyperswitch,juspay/hyperswitch,generic,Apache-2.0,true,2026-06-30T01:06:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/juspay-hyperswitch
+269,gradio-app-gradio,Gradio,gradio-app/gradio,domain-tool,Apache-2.0,true,2026-06-17T19:17:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/gradio-app-gradio
+270,ray-project-ray,Ray,ray-project/ray,generic,Apache-2.0,true,2026-06-16T07:57:00+00:00,within-180-days,false,https://www.openagentskill.com/skills/ray-project-ray
+271,ast-grep-ast-grep,Ast Grep,ast-grep/ast-grep,generic,MIT,true,2026-09-20T04:53:38+00:00,within-180-days,false,https://www.openagentskill.com/skills/ast-grep-ast-grep
+272,automattic-harper,Harper,Automattic/harper,agent-workflow,Apache-2.0,true,2026-09-25T16:06:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/automattic-harper
+273,alibaba-mnn,MNN,alibaba/MNN,generic,Apache-2.0,true,2026-08-14T15:31:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/alibaba-mnn
+274,deepspeedai-deepspeed,DeepSpeed,deepspeedai/DeepSpeed,generic,Apache-2.0,true,2026-06-16T02:06:04+00:00,within-180-days,false,https://www.openagentskill.com/skills/deepspeedai-deepspeed
+275,apache-doris,Doris,apache/doris,generic,Apache-2.0,true,2026-08-27T02:02:57+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-doris
+276,paperless-ngx-paperless-ngx,Paperless Ngx,paperless-ngx/paperless-ngx,domain-tool,GPL-3.0,true,2026-06-20T01:16:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/paperless-ngx-paperless-ngx
+277,fastlane-fastlane,Fastlane,fastlane/fastlane,generic,MIT,true,2026-06-15T19:09:42+00:00,within-180-days,false,https://www.openagentskill.com/skills/fastlane-fastlane
+278,ansible-awx,Awx,ansible/awx,generic,Unknown,false,2026-08-24T00:03:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/ansible-awx
+279,firecrawl,Firecrawl,firecrawl/firecrawl,domain-tool,AGPL-3.0,true,2026-06-17T23:53:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/firecrawl
+280,saadeghi-daisyui,Daisyui,saadeghi/daisyui,domain-tool,MIT,true,2026-06-15T18:44:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/saadeghi-daisyui
+281,bash-it-bash-it,Bash It,Bash-it/bash-it,generic,MIT,true,2026-10-06T20:50:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/bash-it-bash-it
+282,ag-ui-protocol-ag-ui,Ag Ui,ag-ui-protocol/ag-ui,agent-workflow,MIT,true,2026-08-08T17:11:42+00:00,within-180-days,false,https://www.openagentskill.com/skills/ag-ui-protocol-ag-ui
+283,github-awesome-copilot,Awesome Copilot,github/awesome-copilot,collection,Unknown,false,2026-07-18T20:59:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/github-awesome-copilot
+284,apexcharts-apexcharts-js,Apexcharts.Js,apexcharts/apexcharts.js,domain-tool,Unknown,false,2026-09-09T08:02:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/apexcharts-apexcharts-js
+285,chatboxai-chatbox,Chatbox,chatboxai/chatbox,generic,GPL-3.0,true,2026-06-12T08:17:17+00:00,within-180-days,false,https://www.openagentskill.com/skills/chatboxai-chatbox
+286,chakra-ui-chakra-ui,Chakra Ui,chakra-ui/chakra-ui,domain-tool,MIT,true,2026-06-11T18:49:28+00:00,within-180-days,false,https://www.openagentskill.com/skills/chakra-ui-chakra-ui
+287,alphacep-vosk-api,Vosk API,alphacep/vosk-api,generic,Apache-2.0,true,2026-08-09T13:35:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/alphacep-vosk-api
+288,pingcap-tidb,Tidb,pingcap/tidb,domain-tool,Apache-2.0,true,2026-06-20T13:04:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/pingcap-tidb
+289,photoprism-photoprism,Photoprism,photoprism/photoprism,generic,Unknown,false,2026-06-16T09:57:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/photoprism-photoprism
+290,koalaman-shellcheck,Shellcheck,koalaman/shellcheck,generic,GPL-3.0,true,2026-06-11T03:17:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/koalaman-shellcheck
+291,sxyazi-yazi,Yazi,sxyazi/yazi,agent-workflow,MIT,true,2026-06-20T02:55:00+00:00,within-180-days,false,https://www.openagentskill.com/skills/sxyazi-yazi
+292,aaron-he-zhu-aaron-marketing-skills,Aaron Marketing Skills,aaron-he-zhu/aaron-marketing-skills,agent-skill,Apache-2.0,true,2026-08-13T12:57:52+00:00,within-180-days,false,https://www.openagentskill.com/skills/aaron-he-zhu-aaron-marketing-skills
+293,corentinth-it-tools,It Tools,CorentinTh/it-tools,collection,GPL-3.0,true,2026-06-13T15:55:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/corentinth-it-tools
+294,novuhq-novu,Novu,novuhq/novu,generic,Unknown,false,2026-06-16T09:51:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/novuhq-novu
+295,alam00000-bentopdf,Bentopdf,alam00000/bentopdf,domain-tool,AGPL-3.0,true,2026-08-12T02:03:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/alam00000-bentopdf
+296,freecodecamp-devdocs,Devdocs,freeCodeCamp/devdocs,agent-workflow,MPL-2.0,true,2026-06-18T22:00:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/freecodecamp-devdocs
+297,duckdb-duckdb,Duckdb,duckdb/duckdb,domain-tool,MIT,true,2026-06-20T09:30:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/duckdb-duckdb
+298,lapce-lapce,Lapce,lapce/lapce,agent-workflow,Apache-2.0,true,2026-06-10T01:13:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/lapce-lapce
+299,lsdefine-genericagent,GenericAgent,lsdefine/GenericAgent,generic,MIT,true,2026-10-18T05:26:32+00:00,within-180-days,false,https://www.openagentskill.com/skills/lsdefine-genericagent
+300,istio-istio,Istio,istio/istio,generic,Apache-2.0,true,2026-06-16T01:04:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/istio-istio
+301,sharex-sharex,ShareX,ShareX/ShareX,domain-tool,GPL-3.0,true,2026-06-19T11:43:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/sharex-sharex
+302,google-research-google-research,Google Research,google-research/google-research,generic,Apache-2.0,true,2026-06-16T01:37:19+00:00,within-180-days,false,https://www.openagentskill.com/skills/google-research-google-research
+303,tooljet-tooljet,ToolJet,ToolJet/ToolJet,agent-workflow,AGPL-3.0,true,2026-06-14T08:15:26+00:00,within-180-days,false,https://www.openagentskill.com/skills/tooljet-tooljet
+304,web-infra-dev-midscene,Midscene,web-infra-dev/midscene,agent-workflow,MIT,true,2026-07-24T11:01:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/web-infra-dev-midscene
+305,ashishpatel26-500-ai-agents-projects,500 AI Agents Projects,ashishpatel26/500-AI-Agents-Projects,collection,MIT,true,2026-07-27T05:40:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/ashishpatel26-500-ai-agents-projects
+306,portainer-portainer,Portainer,portainer/portainer,generic,Zlib,true,2026-06-15T15:00:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/portainer-portainer
+307,alibaba-opensandbox,OpenSandbox,alibaba/OpenSandbox,generic,Apache-2.0,true,2026-08-17T02:15:04+00:00,within-180-days,false,https://www.openagentskill.com/skills/alibaba-opensandbox
+308,drawdb-io-drawdb,Drawdb,drawdb-io/drawdb,domain-tool,AGPL-3.0,true,2026-06-20T14:14:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/drawdb-io-drawdb
+309,openbmb-chatdev,ChatDev,OpenBMB/ChatDev,agent-workflow,Unknown,false,2026-06-29T08:25:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/openbmb-chatdev
+310,umami-software-umami,Umami,umami-software/umami,generic,MIT,true,2026-06-16T08:27:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/umami-software-umami
+311,yeachan-heo-oh-my-claudecode,Oh My Claudecode,Yeachan-Heo/oh-my-claudecode,agent-workflow,MIT,true,2026-06-25T20:56:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/yeachan-heo-oh-my-claudecode
+312,markedjs-marked,Marked,markedjs/marked,domain-tool,Unknown,false,2026-06-16T01:37:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/markedjs-marked
+313,multica-ai-multica,Multica,multica-ai/multica,agent-workflow,Unknown,false,2026-06-16T08:43:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/multica-ai-multica
+314,harness-harness,Harness,harness/harness,generic,Apache-2.0,true,2026-06-15T12:24:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/harness-harness
+315,hkuds-lightrag,LightRAG,HKUDS/LightRAG,domain-tool,MIT,true,2026-06-18T18:05:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/hkuds-lightrag
+316,apache-tvm,Tvm,apache/tvm,generic,Apache-2.0,true,2026-09-10T01:46:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-tvm
+317,triliumnext-trilium,Trilium,TriliumNext/Trilium,domain-tool,AGPL-3.0,true,2026-06-21T00:28:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/triliumnext-trilium
+318,eugeniughelbur-obsidian-second-brain,Obsidian Second Brain,eugeniughelbur/obsidian-second-brain,generic,MIT,true,2026-09-01T15:29:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/eugeniughelbur-obsidian-second-brain
+319,directus-directus,Directus,directus/directus,domain-tool,Unknown,false,2026-06-16T07:53:35+00:00,within-180-days,false,https://www.openagentskill.com/skills/directus-directus
+320,frappe-erpnext,Erpnext,frappe/erpnext,domain-tool,GPL-3.0,true,2026-06-16T10:01:11+00:00,within-180-days,false,https://www.openagentskill.com/skills/frappe-erpnext
+321,waooai-waoowaoo,Waoowaoo,waooAI/waoowaoo,agent-workflow,Unknown,false,2026-07-22T23:18:41+00:00,within-180-days,false,https://www.openagentskill.com/skills/waooai-waoowaoo
+322,kepano-obsidian-skills,Obsidian Skills,kepano/obsidian-skills,agent-skill,MIT,true,2026-06-08T16:12:01+00:00,within-180-days,false,https://www.openagentskill.com/skills/kepano-obsidian-skills
+323,khoj-ai-khoj,Khoj,khoj-ai/khoj,agent-workflow,AGPL-3.0,true,2026-06-24T21:17:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/khoj-ai-khoj
+324,autohotkey-autohotkey,AutoHotkey,AutoHotkey/AutoHotkey,generic,GPL-2.0,true,2026-09-24T23:56:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/autohotkey-autohotkey
+325,langchain-ai-langgraph,Langgraph,langchain-ai/langgraph,generic,MIT,true,2026-06-21T01:21:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/langchain-ai-langgraph
+326,copilotkit-copilotkit,CopilotKit,CopilotKit/CopilotKit,generic,MIT,true,2026-06-19T02:57:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/copilotkit-copilotkit
+327,gchq-cyberchef,CyberChef,gchq/CyberChef,domain-tool,Apache-2.0,true,2026-06-13T08:43:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/gchq-cyberchef
+328,posthog-posthog,Posthog,PostHog/posthog,generic,Unknown,false,2026-06-16T10:04:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/posthog-posthog
+329,refinedev-refine,Refine,refinedev/refine,agent-workflow,MIT,true,2026-06-05T15:19:38+00:00,within-180-days,false,https://www.openagentskill.com/skills/refinedev-refine
+330,drizzle-team-drizzle-orm,Drizzle Orm,drizzle-team/drizzle-orm,domain-tool,Apache-2.0,true,2026-06-20T14:56:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/drizzle-team-drizzle-orm
+331,alicevision-meshroom,Meshroom,alicevision/Meshroom,agent-workflow,Unknown,false,2026-08-14T16:15:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/alicevision-meshroom
+332,medusajs-medusa,Medusa,medusajs/medusa,generic,MIT,true,2026-06-16T10:16:06+00:00,within-180-days,false,https://www.openagentskill.com/skills/medusajs-medusa
+333,vectifyai-pageindex,PageIndex,VectifyAI/PageIndex,domain-tool,MIT,true,2026-07-18T23:09:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/vectifyai-pageindex
+334,aprilnea-openlogi,OpenLogi,AprilNEA/OpenLogi,generic,Apache-2.0,true,2026-09-10T06:25:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/aprilnea-openlogi
+335,derailed-k9s,K9s,derailed/k9s,generic,Apache-2.0,true,2026-06-16T09:50:38+00:00,within-180-days,false,https://www.openagentskill.com/skills/derailed-k9s
+336,ocrmypdf-ocrmypdf,OCRmyPDF,ocrmypdf/OCRmyPDF,domain-tool,MPL-2.0,true,2026-06-12T22:10:31+00:00,within-180-days,false,https://www.openagentskill.com/skills/ocrmypdf-ocrmypdf
+337,huggingface-diffusers,Diffusers,huggingface/diffusers,domain-tool,Apache-2.0,true,2026-06-16T08:59:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/huggingface-diffusers
+338,microsoft-graphrag,Graphrag,microsoft/graphrag,domain-tool,MIT,true,2026-06-18T21:34:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-graphrag
+339,conorbronsdon-avoid-ai-writing,Avoid AI Writing,conorbronsdon/avoid-ai-writing,agent-skill,MIT,true,2026-08-30T07:26:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/conorbronsdon-avoid-ai-writing
+340,pythagora-io-gpt-pilot,Gpt Pilot,Pythagora-io/gpt-pilot,agent-workflow,Unknown,false,2026-06-18T18:38:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/pythagora-io-gpt-pilot
+341,lissy93-web-check,Web Check,lissy93/web-check,generic,MIT,true,2026-06-15T20:55:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/lissy93-web-check
+342,continuedev-continue,Continue,continuedev/continue,agent-workflow,Apache-2.0,true,2026-06-16T07:54:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/continuedev-continue
+343,anoma-anoma,Anoma,anoma/anoma,generic,MIT,true,2026-06-15T14:56:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/anoma-anoma
+344,bentoml-openllm,OpenLLM,bentoml/OpenLLM,generic,Apache-2.0,true,2026-10-05T17:17:59+00:00,within-180-days,false,https://www.openagentskill.com/skills/bentoml-openllm
+345,qdrant-qdrant,Qdrant,qdrant/qdrant,domain-tool,Apache-2.0,true,2026-07-18T19:41:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/qdrant-qdrant
+346,k3s-io-k3s,K3s,k3s-io/k3s,generic,Apache-2.0,true,2026-06-15T20:01:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/k3s-io-k3s
+347,lutzroeder-netron,Netron,lutzroeder/netron,generic,MIT,true,2026-06-14T15:58:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/lutzroeder-netron
+348,anthropic-portfolio-monitoring,Portfolio Monitoring,anthropics/financial-services,agent-skill,Apache-2.0,true,2026-09-21T21:10:41+00:00,within-180-days,true,https://www.openagentskill.com/skills/anthropic-portfolio-monitoring
+349,chuspeeism-dashi-ppt-skill,Dashi Ppt Skill,chuspeeism/dashi-ppt-skill,agent-skill,AGPL-3.0,true,2026-07-30T14:02:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/chuspeeism-dashi-ppt-skill
+350,seaweedfs-seaweedfs,Seaweedfs,seaweedfs/seaweedfs,generic,Apache-2.0,true,2026-06-16T09:00:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/seaweedfs-seaweedfs
+351,soxoj-maigret,Maigret,soxoj/maigret,generic,MIT,true,2026-06-11T12:48:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/soxoj-maigret
+352,assistant-ui-assistant-ui,Assistant Ui,assistant-ui/assistant-ui,generic,MIT,true,2026-09-21T02:25:45+00:00,within-180-days,false,https://www.openagentskill.com/skills/assistant-ui-assistant-ui
+353,surrealdb-surrealdb,Surrealdb,surrealdb/surrealdb,agent-workflow,Unknown,false,2026-06-17T17:21:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/surrealdb-surrealdb
+354,akashsingh3031-the-complete-faang-preparation,The Complete FAANG Preparation,AkashSingh3031/The-Complete-FAANG-Preparation,domain-tool,MIT,true,2026-08-11T00:13:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/akashsingh3031-the-complete-faang-preparation
+355,cockroachdb-cockroach,Cockroach,cockroachdb/cockroach,domain-tool,Unknown,false,2026-06-16T15:41:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/cockroachdb-cockroach
+356,adnanh-webhook,Webhook,adnanh/webhook,generic,MIT,true,2026-08-05T20:05:30+00:00,within-180-days,false,https://www.openagentskill.com/skills/adnanh-webhook
+357,searxng-searxng,Searxng,searxng/searxng,domain-tool,AGPL-3.0,true,2026-06-16T08:35:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/searxng-searxng
+358,aureuserp-aureuserp,Aureuserp,aureuserp/aureuserp,domain-tool,MIT,true,2026-09-22T04:15:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/aureuserp-aureuserp
+359,linera-io-linera-protocol,Linera Protocol,linera-io/linera-protocol,generic,Apache-2.0,true,2026-06-29T03:05:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/linera-io-linera-protocol
+360,lfnovo-open-notebook,Open Notebook,lfnovo/open-notebook,domain-tool,MIT,true,2026-06-18T13:26:00+00:00,within-180-days,false,https://www.openagentskill.com/skills/lfnovo-open-notebook
+361,podman-container-tools-podman,Podman,podman-container-tools/podman,generic,Apache-2.0,true,2026-06-16T09:16:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/podman-container-tools-podman
+362,dayuanjiang-next-ai-draw-io,Next AI Draw Io,DayuanJiang/next-ai-draw-io,generic,Apache-2.0,true,2026-06-16T00:17:59+00:00,within-180-days,false,https://www.openagentskill.com/skills/dayuanjiang-next-ai-draw-io
+363,dgtlmoon-changedetection-io,Changedetection.Io,dgtlmoon/changedetection.io,domain-tool,Apache-2.0,true,2026-06-03T11:26:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/dgtlmoon-changedetection-io
+364,conductor-oss-conductor,Conductor,conductor-oss/conductor,agent-workflow,Apache-2.0,true,2026-06-13T03:57:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/conductor-oss-conductor
+365,dokku-dokku,Dokku,dokku/dokku,generic,MIT,true,2026-06-15T13:54:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/dokku-dokku
+366,chatwoot-chatwoot,Chatwoot,chatwoot/chatwoot,generic,Unknown,false,2026-06-16T09:59:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/chatwoot-chatwoot
+367,kubernetes-minikube,Minikube,kubernetes/minikube,generic,Apache-2.0,true,2026-06-15T22:06:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/kubernetes-minikube
+368,m-bain-whisperx,WhisperX,m-bain/whisperX,generic,BSD-2-Clause,true,2026-06-03T07:41:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/m-bain-whisperx
+369,docsifyjs-docsify,Docsify,docsifyjs/docsify,domain-tool,MIT,true,2026-06-14T08:12:54+00:00,within-180-days,false,https://www.openagentskill.com/skills/docsifyjs-docsify
+370,devexpress-testcafe,Testcafe,DevExpress/testcafe,agent-workflow,MIT,true,2026-06-16T14:10:57+00:00,within-180-days,false,https://www.openagentskill.com/skills/devexpress-testcafe
+371,lightpanda-io-browser,Browser,lightpanda-io/browser,agent-workflow,AGPL-3.0,true,2026-06-19T02:14:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/lightpanda-io-browser
+372,lightning-ai-pytorch-lightning,Pytorch Lightning,Lightning-AI/pytorch-lightning,generic,Apache-2.0,true,2026-06-10T12:56:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/lightning-ai-pytorch-lightning
+373,openbmb-voxcpm,VoxCPM,OpenBMB/VoxCPM,generic,Apache-2.0,true,2026-06-10T07:23:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/openbmb-voxcpm
+374,ankidroid-anki-android,Anki Android,ankidroid/Anki-Android,generic,GPL-3.0,true,2026-08-23T22:58:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/ankidroid-anki-android
+375,microsoft-semantic-kernel,Semantic Kernel,microsoft/semantic-kernel,generic,Unknown,false,2026-06-12T22:35:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-semantic-kernel
+376,fujiwarachoki-moneyprinterv2,MoneyPrinterV2,FujiwaraChoki/MoneyPrinterV2,generic,AGPL-3.0,true,2026-06-14T08:36:16+00:00,within-180-days,false,https://www.openagentskill.com/skills/fujiwarachoki-moneyprinterv2
+377,arize-ai-phoenix,Phoenix,Arize-ai/phoenix,generic,Unknown,false,2026-09-17T00:47:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/arize-ai-phoenix
+378,stevenblack-hosts,Hosts,StevenBlack/hosts,generic,MIT,true,2026-06-11T16:55:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/stevenblack-hosts
+379,onyx-dot-app-onyx,Onyx,onyx-dot-app/onyx,domain-tool,Unknown,false,2026-06-13T03:01:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/onyx-dot-app-onyx
+380,nanocoai-nanoclaw,Nanoclaw,nanocoai/nanoclaw,agent-skill,MIT,true,2026-07-18T22:20:41+00:00,within-180-days,false,https://www.openagentskill.com/skills/nanocoai-nanoclaw
+381,joshbuchea-head,HEAD,joshbuchea/HEAD,generic,Unknown,false,2026-05-28T02:33:42+00:00,within-180-days,false,https://www.openagentskill.com/skills/joshbuchea-head
+382,petergyang-no-ai-slop,no-ai-slop,petergyang/no-ai-slop,agent-skill,MIT,true,2026-10-14T06:47:24.583046+00:00,within-180-days,true,https://www.openagentskill.com/skills/petergyang-no-ai-slop
+383,iofficeai-aionui,AionUi,iOfficeAI/AionUi,generic,Apache-2.0,true,2026-07-14T12:34:28+00:00,within-180-days,false,https://www.openagentskill.com/skills/iofficeai-aionui
+384,wandb-wandb,Wandb,wandb/wandb,generic,MIT,true,2026-07-23T01:59:11+00:00,within-180-days,false,https://www.openagentskill.com/skills/wandb-wandb
+385,anthropic-three-statement-model,3-Statement Financial Model,anthropics/financial-services,agent-skill,Apache-2.0,true,2026-09-21T21:10:41+00:00,within-180-days,true,https://www.openagentskill.com/skills/anthropic-three-statement-model
+386,hashicorp-consul,Consul,hashicorp/consul,generic,Unknown,false,2026-06-16T08:47:04+00:00,within-180-days,false,https://www.openagentskill.com/skills/hashicorp-consul
+387,helm-helm,Helm,helm/helm,generic,Apache-2.0,true,2026-06-15T21:35:52+00:00,within-180-days,false,https://www.openagentskill.com/skills/helm-helm
+388,wojtekmaj-react-pdf,React Pdf,wojtekmaj/react-pdf,domain-tool,MIT,true,2026-07-29T08:16:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/wojtekmaj-react-pdf
+389,gitlawb-openclaude,Openclaude,Gitlawb/openclaude,generic,Unknown,false,2026-07-03T00:05:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/gitlawb-openclaude
+390,langfuse-langfuse,Langfuse,langfuse/langfuse,generic,Unknown,false,2026-06-20T09:29:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/langfuse-langfuse
+391,python-telegram-bot-python-telegram-bot,Python Telegram Bot,python-telegram-bot/python-telegram-bot,generic,GPL-3.0,true,2026-06-16T07:08:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/python-telegram-bot-python-telegram-bot
+392,vercel-labs-agent-skills,Agent Skills,vercel-labs/agent-skills,collection,Unknown,false,2026-07-07T14:05:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/vercel-labs-agent-skills
+393,projectdiscovery-nuclei,Nuclei,projectdiscovery/nuclei,generic,MIT,true,2026-06-13T15:43:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/projectdiscovery-nuclei
+394,simstudioai-sim,Sim,simstudioai/sim,agent-workflow,Apache-2.0,true,2026-07-18T02:52:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/simstudioai-sim
+395,carbon-design-system-carbon,Carbon,carbon-design-system/carbon,domain-tool,Apache-2.0,true,2026-06-16T09:47:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/carbon-design-system-carbon
+396,gitbookio-gitbook,Gitbook,GitbookIO/gitbook,domain-tool,GPL-3.0,true,2026-06-16T07:47:57+00:00,within-180-days,false,https://www.openagentskill.com/skills/gitbookio-gitbook
+397,any4ai-anycrawl,AnyCrawl,any4ai/AnyCrawl,domain-tool,MIT,true,2026-08-11T18:32:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/any4ai-anycrawl
+398,autogluon-autogluon,Autogluon,autogluon/autogluon,generic,Apache-2.0,true,2026-09-24T22:36:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/autogluon-autogluon
+399,goharbor-harbor,Harbor,goharbor/harbor,generic,Apache-2.0,true,2026-06-16T06:15:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/goharbor-harbor
+400,wasmedge-wasmedge,WasmEdge,WasmEdge/WasmEdge,generic,Apache-2.0,true,2026-07-22T12:39:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/wasmedge-wasmedge
+401,wppconnect-team-wppconnect,Wppconnect,wppconnect-team/wppconnect,agent-workflow,Unknown,false,2026-07-30T18:25:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/wppconnect-team-wppconnect
+402,reflex-dev-reflex,Reflex,reflex-dev/reflex,domain-tool,Apache-2.0,true,2026-06-13T00:32:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/reflex-dev-reflex
+403,chroma-core-chroma,Chroma,chroma-core/chroma,generic,Apache-2.0,true,2026-06-19T00:23:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/chroma-core-chroma
+404,dmlc-xgboost,Xgboost,dmlc/xgboost,generic,Apache-2.0,true,2026-06-16T09:30:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/dmlc-xgboost
+405,requarks-wiki,Wiki,requarks/wiki,domain-tool,AGPL-3.0,true,2026-06-14T05:45:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/requarks-wiki
+406,alibaba-spring-ai-alibaba,Spring AI Alibaba,alibaba/spring-ai-alibaba,generic,Apache-2.0,true,2026-08-15T07:59:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/alibaba-spring-ai-alibaba
+407,cloudnative-pg-cloudnative-pg,Cloudnative Pg,cloudnative-pg/cloudnative-pg,generic,Apache-2.0,true,2026-07-15T00:58:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/cloudnative-pg-cloudnative-pg
+408,baptistearno-typebot-io,Typebot.Io,baptisteArno/typebot.io,generic,Unknown,false,2026-09-30T16:39:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/baptistearno-typebot-io
+409,openai-playwright,Playwright Browser Skill,openai/skills,agent-skill,Source terms (see source),true,2026-09-08T20:35:26+00:00,within-180-days,true,https://www.openagentskill.com/skills/openai-playwright
+410,nirdiamant-rag-techniques,RAG Techniques,NirDiamant/RAG_Techniques,domain-tool,Unknown,false,2026-06-17T20:54:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/nirdiamant-rag-techniques
+411,budibase-budibase,Budibase,Budibase/budibase,agent-workflow,Unknown,false,2026-06-20T19:11:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/budibase-budibase
+412,hwdsl2-setup-ipsec-vpn,Setup Ipsec Vpn,hwdsl2/setup-ipsec-vpn,generic,Unknown,false,2026-06-16T06:00:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/hwdsl2-setup-ipsec-vpn
+413,fastai-fastai,Fastai,fastai/fastai,generic,Apache-2.0,true,2026-05-20T23:30:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/fastai-fastai
+414,woocommerce-woocommerce,Woocommerce,woocommerce/woocommerce,generic,Unknown,false,2026-07-31T00:22:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/woocommerce-woocommerce
+415,gitleaks-gitleaks,Gitleaks,gitleaks/gitleaks,generic,MIT,true,2026-06-13T17:33:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/gitleaks-gitleaks
+416,getzep-graphiti,Graphiti,getzep/graphiti,domain-tool,Apache-2.0,true,2026-06-20T09:08:19+00:00,within-180-days,false,https://www.openagentskill.com/skills/getzep-graphiti
+417,humansignal-label-studio,Label Studio,HumanSignal/label-studio,generic,Apache-2.0,true,2026-06-16T07:59:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/humansignal-label-studio
+418,infisical-infisical,Infisical,Infisical/infisical,generic,Unknown,false,2026-06-20T04:54:50+00:00,within-180-days,false,https://www.openagentskill.com/skills/infisical-infisical
+419,invoke-ai-invokeai,InvokeAI,invoke-ai/InvokeAI,domain-tool,Apache-2.0,true,2026-06-16T02:20:58+00:00,within-180-days,false,https://www.openagentskill.com/skills/invoke-ai-invokeai
+420,koodo-reader-koodo-reader,Koodo Reader,koodo-reader/koodo-reader,domain-tool,AGPL-3.0,true,2026-07-09T10:33:30+00:00,within-180-days,false,https://www.openagentskill.com/skills/koodo-reader-koodo-reader
+421,koreader-koreader,Koreader,koreader/koreader,domain-tool,AGPL-3.0,true,2026-06-24T23:04:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/koreader-koreader
+422,srbhr-resume-matcher,Resume Matcher,srbhr/Resume-Matcher,generic,Apache-2.0,true,2026-06-14T11:55:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/srbhr-resume-matcher
+423,ente-ente,Ente,ente/ente,generic,AGPL-3.0,true,2026-06-29T13:01:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/ente-ente
+424,signoz-signoz,Signoz,SigNoz/signoz,generic,Unknown,false,2026-06-16T09:46:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/signoz-signoz
+425,funaudiollm-sensevoice,SenseVoice,FunAudioLLM/SenseVoice,generic,Unknown,false,2026-06-22T02:47:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/funaudiollm-sensevoice
+426,postgrest-postgrest,Postgrest,PostgREST/postgrest,domain-tool,MIT,true,2026-06-20T22:16:52+00:00,within-180-days,false,https://www.openagentskill.com/skills/postgrest-postgrest
+427,fincept-corporation-finceptterminal,FinceptTerminal,Fincept-Corporation/FinceptTerminal,domain-tool,Unknown,false,2026-06-13T06:53:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/fincept-corporation-finceptterminal
+428,plausible-analytics,Analytics,plausible/analytics,generic,AGPL-3.0,true,2026-06-16T09:58:35+00:00,within-180-days,false,https://www.openagentskill.com/skills/plausible-analytics
+429,hashicorp-vagrant,Vagrant,hashicorp/vagrant,generic,Unknown,false,2026-06-15T07:06:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/hashicorp-vagrant
+430,ente-io-ente,Ente,ente-io/ente,generic,AGPL-3.0,true,2026-06-16T10:01:30+00:00,within-180-days,false,https://www.openagentskill.com/skills/ente-io-ente
+431,kestra-io-kestra,Kestra,kestra-io/kestra,generic,Apache-2.0,true,2026-06-17T20:14:38+00:00,within-180-days,false,https://www.openagentskill.com/skills/kestra-io-kestra
+432,ungoogled-software-ungoogled-chromium,Ungoogled Chromium,ungoogled-software/ungoogled-chromium,generic,BSD-3-Clause,true,2026-06-12T14:55:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/ungoogled-software-ungoogled-chromium
+433,donnemartin-system-design-primer,System Design Primer,donnemartin/system-design-primer,domain-tool,Unknown,false,2026-03-20T01:52:19+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/donnemartin-system-design-primer
+434,krahets-hello-algo,Hello Algo,krahets/hello-algo,generic,Unknown,false,2026-04-18T18:23:33+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/krahets-hello-algo
+435,mlflow-mlflow,Mlflow,mlflow/mlflow,generic,Apache-2.0,true,2026-06-25T01:58:52+00:00,within-180-days,false,https://www.openagentskill.com/skills/mlflow-mlflow
+436,aidc-ai-pixelle-video,Pixelle Video,AIDC-AI/Pixelle-Video,domain-tool,Apache-2.0,true,2026-06-14T12:40:58+00:00,within-180-days,false,https://www.openagentskill.com/skills/aidc-ai-pixelle-video
+437,cloakhq-cloakbrowser,CloakBrowser,CloakHQ/CloakBrowser,agent-workflow,MIT,true,2026-06-20T01:20:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/cloakhq-cloakbrowser
+438,jackwener-opencli,OpenCLI,jackwener/OpenCLI,agent-workflow,Apache-2.0,true,2026-07-12T19:23:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/jackwener-opencli
+439,jarrodwatts-claude-hud,Claude Hud,jarrodwatts/claude-hud,generic,MIT,true,2026-07-16T23:30:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/jarrodwatts-claude-hud
+440,modular-modular,Modular,modular/modular,generic,Unknown,false,2026-06-16T08:13:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/modular-modular
+441,graphiteeditor-graphite,Graphite,GraphiteEditor/Graphite,generic,Apache-2.0,true,2026-06-16T05:25:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/graphiteeditor-graphite
+442,hcengineering-platform,Platform,hcengineering/platform,domain-tool,EPL-2.0,true,2026-06-16T08:20:50+00:00,within-180-days,false,https://www.openagentskill.com/skills/hcengineering-platform
+443,alibaba-zvec,Zvec,alibaba/zvec,agent-skill,Apache-2.0,true,2026-09-21T08:47:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/alibaba-zvec
+444,yeasy-docker-practice,Docker Practice,yeasy/docker_practice,generic,Unknown,false,2026-06-12T06:17:59+00:00,within-180-days,false,https://www.openagentskill.com/skills/yeasy-docker-practice
+445,fluxcd-flux2,Flux2,fluxcd/flux2,generic,Apache-2.0,true,2026-07-13T14:23:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/fluxcd-flux2
+446,typesense-typesense,Typesense,typesense/typesense,domain-tool,GPL-3.0,true,2026-06-19T06:53:50+00:00,within-180-days,false,https://www.openagentskill.com/skills/typesense-typesense
+447,vercel-labs-skills,Skills,vercel-labs/skills,agent-skill,Unknown,false,2026-07-13T16:18:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/vercel-labs-skills
+448,onlook-dev-onlook,Onlook,onlook-dev/onlook,domain-tool,Apache-2.0,true,2026-06-09T23:18:58+00:00,within-180-days,false,https://www.openagentskill.com/skills/onlook-dev-onlook
+449,browserbase-stagehand,Stagehand,browserbase/stagehand,generic,Unknown,false,2026-07-17T21:28:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/browserbase-stagehand
+450,volcengine-openviking,OpenViking,volcengine/OpenViking,domain-tool,AGPL-3.0,true,2026-06-19T22:04:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/volcengine-openviking
+451,dapr-dapr,Dapr,dapr/dapr,generic,Apache-2.0,true,2026-06-15T22:23:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/dapr-dapr
+452,opendataloader-project-opendataloader-pdf,Opendataloader Pdf,opendataloader-project/opendataloader-pdf,domain-tool,Apache-2.0,true,2026-06-22T17:05:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/opendataloader-project-opendataloader-pdf
+453,rancher-rancher,Rancher,rancher/rancher,generic,Apache-2.0,true,2026-06-16T08:49:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/rancher-rancher
+454,deepset-ai-haystack,Haystack,deepset-ai/haystack,domain-tool,Apache-2.0,true,2026-06-12T15:45:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/deepset-ai-haystack
+455,shap-shap,Shap,shap/shap,generic,MIT,true,2026-06-15T09:47:01+00:00,within-180-days,false,https://www.openagentskill.com/skills/shap-shap
+456,jenkinsci-jenkins,Jenkins,jenkinsci/jenkins,generic,MIT,true,2026-06-20T15:40:26+00:00,within-180-days,false,https://www.openagentskill.com/skills/jenkinsci-jenkins
+457,cinnamon-kotaemon,Kotaemon,Cinnamon/kotaemon,domain-tool,Apache-2.0,true,2026-06-09T09:55:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/cinnamon-kotaemon
+458,gocolly-colly,Colly,gocolly/colly,domain-tool,Apache-2.0,true,2026-06-18T13:36:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/gocolly-colly
+459,pulumi-pulumi,Pulumi,pulumi/pulumi,generic,Apache-2.0,true,2026-06-16T09:56:31+00:00,within-180-days,false,https://www.openagentskill.com/skills/pulumi-pulumi
+460,qwenlm-qwen-code,Qwen Code,QwenLM/qwen-code,agent-workflow,Apache-2.0,true,2026-06-16T08:37:30+00:00,within-180-days,false,https://www.openagentskill.com/skills/qwenlm-qwen-code
+461,zama-ai-fhevm,Fhevm,zama-ai/fhevm,generic,Unknown,false,2026-06-16T10:03:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/zama-ai-fhevm
+462,harvard-edge-cs249r-book,Cs249r Book,harvard-edge/cs249r_book,generic,Unknown,false,2026-06-16T01:27:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/harvard-edge-cs249r-book
+463,taosdata-tdengine,TDengine,taosdata/TDengine,domain-tool,AGPL-3.0,true,2026-06-20T15:29:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/taosdata-tdengine
+464,sphinx-doc-sphinx,Sphinx,sphinx-doc/sphinx,domain-tool,Unknown,false,2026-06-21T23:52:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/sphinx-doc-sphinx
+465,skyvern-ai-skyvern,Skyvern,Skyvern-AI/skyvern,agent-workflow,Unknown,false,2026-07-19T00:58:36+00:00,within-180-days,false,https://www.openagentskill.com/skills/skyvern-ai-skyvern
+466,longhorn-longhorn,Longhorn,longhorn/longhorn,generic,Apache-2.0,true,2026-06-17T10:10:58+00:00,within-180-days,false,https://www.openagentskill.com/skills/longhorn-longhorn
+467,gastownhall-beads,Beads,gastownhall/beads,agent-workflow,MIT,true,2026-06-16T08:20:57+00:00,within-180-days,false,https://www.openagentskill.com/skills/gastownhall-beads
+468,cilium-cilium,Cilium,cilium/cilium,generic,Apache-2.0,true,2026-06-16T09:58:11+00:00,within-180-days,false,https://www.openagentskill.com/skills/cilium-cilium
+469,plotly-dash,Dash,plotly/dash,domain-tool,MIT,true,2026-07-17T13:33:19+00:00,within-180-days,false,https://www.openagentskill.com/skills/plotly-dash
+470,browser-use-video-use,Video Use,browser-use/video-use,agent-workflow,MIT,true,2026-07-01T00:33:52+00:00,within-180-days,false,https://www.openagentskill.com/skills/browser-use-video-use
+471,dataease-dataease,Dataease,dataease/dataease,domain-tool,GPL-3.0,true,2026-06-16T02:43:11+00:00,within-180-days,false,https://www.openagentskill.com/skills/dataease-dataease
+472,paddlepaddle-paddle,Paddle,PaddlePaddle/Paddle,generic,Apache-2.0,true,2026-06-16T03:57:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/paddlepaddle-paddle
+473,dolthub-dolt,Dolt,dolthub/dolt,generic,Apache-2.0,true,2026-07-17T23:59:50+00:00,within-180-days,false,https://www.openagentskill.com/skills/dolthub-dolt
+474,narcooo-inkos,Inkos,Narcooo/inkos,generic,AGPL-3.0,true,2026-06-25T17:19:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/narcooo-inkos
+475,techiescamp-kubernetes-learning-path,Kubernetes Learning Path,techiescamp/kubernetes-learning-path,generic,Unknown,false,2026-05-28T07:23:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/techiescamp-kubernetes-learning-path
+476,firefly-iii-firefly-iii,Firefly Iii,firefly-iii/firefly-iii,generic,AGPL-3.0,true,2026-06-29T19:18:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/firefly-iii-firefly-iii
+477,hagezi-dns-blocklists,Dns Blocklists,hagezi/dns-blocklists,generic,GPL-3.0,true,2026-06-16T07:56:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/hagezi-dns-blocklists
+478,semantic-release-semantic-release,Semantic Release,semantic-release/semantic-release,generic,MIT,true,2026-06-16T06:53:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/semantic-release-semantic-release
+479,processing-p5-js,P5.Js,processing/p5.js,generic,LGPL-2.1,true,2026-06-14T21:21:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/processing-p5-js
+480,lukasmasuch-best-of-ml-python,Best Of Ml Python,lukasmasuch/best-of-ml-python,collection,CC-BY-SA-4.0,true,2026-06-11T15:15:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/lukasmasuch-best-of-ml-python
+481,emilkowalski-review-animations,Review Animations,emilkowalski/skills,agent-skill,MIT,true,2026-07-15T14:51:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/emilkowalski-review-animations
+482,nautechsystems-nautilus-trader,Nautilus Trader,nautechsystems/nautilus_trader,generic,LGPL-3.0,true,2026-06-14T12:26:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/nautechsystems-nautilus-trader
+483,jhao104-proxy-pool,Proxy Pool,jhao104/proxy_pool,domain-tool,MIT,true,2026-06-09T13:04:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/jhao104-proxy-pool
+484,rohitg00-agentmemory,Agentmemory,rohitg00/agentmemory,agent-workflow,Apache-2.0,true,2026-06-15T06:20:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/rohitg00-agentmemory
+485,osquery-osquery,Osquery,osquery/osquery,domain-tool,Unknown,false,2026-06-19T05:36:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/osquery-osquery
+486,nocobase-nocobase,Nocobase,nocobase/nocobase,domain-tool,Unknown,false,2026-07-03T02:49:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/nocobase-nocobase
+487,accumulatemore-cv,CV,AccumulateMore/CV,domain-tool,Unknown,false,2026-06-30T14:36:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/accumulatemore-cv
+488,lucide-icons-lucide,Lucide,lucide-icons/lucide,domain-tool,Unknown,false,2026-06-16T06:41:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/lucide-icons-lucide
+489,krayin-laravel-crm,Laravel Crm,krayin/laravel-crm,domain-tool,MIT,true,2026-06-10T10:15:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/krayin-laravel-crm
+490,saleor-saleor,Saleor,saleor/saleor,generic,BSD-3-Clause,true,2026-06-16T08:56:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/saleor-saleor
+491,enescingoz-awesome-n8n-templates,Awesome N8n Templates,enescingoz/awesome-n8n-templates,collection,Unknown,false,2026-06-01T14:52:26+00:00,within-180-days,false,https://www.openagentskill.com/skills/enescingoz-awesome-n8n-templates
+492,timescale-timescaledb,Timescaledb,timescale/timescaledb,domain-tool,Unknown,false,2026-06-20T05:43:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/timescale-timescaledb
+493,serengil-deepface,Deepface,serengil/deepface,generic,MIT,true,2026-06-10T09:05:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/serengil-deepface
+494,jaegertracing-jaeger,Jaeger,jaegertracing/jaeger,generic,Apache-2.0,true,2026-06-16T02:02:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/jaegertracing-jaeger
+495,matplotlib-matplotlib,Matplotlib,matplotlib/matplotlib,domain-tool,Unknown,false,2026-06-16T02:01:57+00:00,within-180-days,false,https://www.openagentskill.com/skills/matplotlib-matplotlib
+496,nirdiamant-genai-agents,GenAI Agents,NirDiamant/GenAI_Agents,generic,Unknown,false,2026-06-17T20:54:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/nirdiamant-genai-agents
+497,nvidia-skillspector,SkillSpector,NVIDIA/SkillSpector,agent-skill,Apache-2.0,true,2026-07-27T04:00:26+00:00,within-180-days,false,https://www.openagentskill.com/skills/nvidia-skillspector
+498,agricidaniel-claude-seo,Claude Seo,AgriciDaniel/claude-seo,agent-skill,MIT,true,2026-07-27T06:09:54+00:00,within-180-days,false,https://www.openagentskill.com/skills/agricidaniel-claude-seo
+499,prefecthq-prefect,Prefect,PrefectHQ/prefect,generic,Apache-2.0,true,2026-06-15T22:50:36+00:00,within-180-days,false,https://www.openagentskill.com/skills/prefecthq-prefect
+500,oneuptime-oneuptime,Oneuptime,OneUptime/oneuptime,generic,Apache-2.0,true,2026-06-16T05:39:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/oneuptime-oneuptime
+501,coleam00-archon,Archon,coleam00/Archon,agent-workflow,MIT,true,2026-06-15T11:20:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/coleam00-archon
+502,jhipster-generator-jhipster,Generator Jhipster,jhipster/generator-jhipster,generic,Apache-2.0,true,2026-06-16T08:03:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/jhipster-generator-jhipster
+503,voltagent-awesome-claude-code-subagents,Awesome Claude Code Subagents,VoltAgent/awesome-claude-code-subagents,collection,MIT,true,2026-06-24T06:28:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/voltagent-awesome-claude-code-subagents
+504,phuryn-pm-skills,Pm Skills,phuryn/pm-skills,agent-skill,MIT,true,2026-07-03T11:34:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/phuryn-pm-skills
+505,promptfoo-promptfoo,Promptfoo,promptfoo/promptfoo,agent-workflow,MIT,true,2026-06-15T02:34:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/promptfoo-promptfoo
+506,phpmailer-phpmailer,PHPMailer,PHPMailer/PHPMailer,generic,LGPL-2.1,true,2026-06-06T14:09:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/phpmailer-phpmailer
+507,manaflow-ai-cmux,Cmux,manaflow-ai/cmux,agent-workflow,Unknown,false,2026-06-16T08:44:50+00:00,within-180-days,false,https://www.openagentskill.com/skills/manaflow-ai-cmux
+508,getsops-sops,Sops,getsops/sops,generic,MPL-2.0,true,2026-06-20T20:54:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/getsops-sops
+509,beercss-beercss,Beercss,beercss/beercss,domain-tool,MIT,true,2026-10-04T14:43:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/beercss-beercss
+510,vectordotdev-vector,Vector,vectordotdev/vector,domain-tool,MPL-2.0,true,2026-06-16T08:35:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/vectordotdev-vector
+511,recommenders-team-recommenders,Recommenders,recommenders-team/recommenders,generic,MIT,true,2026-06-14T07:01:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/recommenders-team-recommenders
+512,wavetermdev-waveterm,Waveterm,wavetermdev/waveterm,agent-workflow,Apache-2.0,true,2026-07-16T01:43:32+00:00,within-180-days,false,https://www.openagentskill.com/skills/wavetermdev-waveterm
+513,dgraph-io-dgraph,Dgraph,dgraph-io/dgraph,domain-tool,Apache-2.0,true,2026-06-19T20:35:59+00:00,within-180-days,false,https://www.openagentskill.com/skills/dgraph-io-dgraph
+514,readest-readest,Readest,readest/readest,domain-tool,AGPL-3.0,true,2026-06-22T02:57:04+00:00,within-180-days,false,https://www.openagentskill.com/skills/readest-readest
+515,funaudiollm-cosyvoice,CosyVoice,FunAudioLLM/CosyVoice,generic,Apache-2.0,true,2026-05-25T18:15:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/funaudiollm-cosyvoice
+516,jarun-nnn,Nnn,jarun/nnn,agent-workflow,BSD-2-Clause,true,2026-06-24T12:35:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/jarun-nnn
+517,huggingface-datasets,Datasets,huggingface/datasets,generic,Apache-2.0,true,2026-06-12T18:08:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/huggingface-datasets
+518,donchitos-claude-code-game-studios,Claude Code Game Studios,Donchitos/Claude-Code-Game-Studios,agent-skill,MIT,true,2026-05-21T23:33:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/donchitos-claude-code-game-studios
+519,matomo-org-matomo,Matomo,matomo-org/matomo,generic,GPL-3.0,true,2026-06-16T09:53:59+00:00,within-180-days,false,https://www.openagentskill.com/skills/matomo-org-matomo
+520,markdown-it-markdown-it,Markdown It,markdown-it/markdown-it,domain-tool,MIT,true,2026-05-26T02:45:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/markdown-it-markdown-it
+521,marimo-team-marimo,Marimo,marimo-team/marimo,agent-workflow,Apache-2.0,true,2026-06-16T08:15:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/marimo-team-marimo
+522,index-tts-index-tts,Index Tts,index-tts/index-tts,generic,Unknown,false,2026-06-16T06:53:35+00:00,within-180-days,false,https://www.openagentskill.com/skills/index-tts-index-tts
+523,valeriansaliou-sonic,Sonic,valeriansaliou/sonic,domain-tool,MPL-2.0,true,2026-06-12T17:23:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/valeriansaliou-sonic
+524,freetubeapp-freetube,FreeTube,FreeTubeApp/FreeTube,generic,AGPL-3.0,true,2026-06-16T04:01:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/freetubeapp-freetube
+525,rasahq-rasa,Rasa,RasaHQ/rasa,generic,Apache-2.0,true,2026-05-22T13:47:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/rasahq-rasa
+526,nvidia-nemoclaw,NemoClaw,NVIDIA/NemoClaw,agent-workflow,Apache-2.0,true,2026-06-14T02:54:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/nvidia-nemoclaw
+527,vitessio-vitess,Vitess,vitessio/vitess,generic,Apache-2.0,true,2026-06-16T09:53:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/vitessio-vitess
+528,onnx-onnx,Onnx,onnx/onnx,generic,Apache-2.0,true,2026-06-16T05:01:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/onnx-onnx
+529,airbnb-visx,Visx,airbnb/visx,domain-tool,MIT,true,2026-06-22T14:25:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/airbnb-visx
+530,temporalio-temporal,Temporal,temporalio/temporal,agent-workflow,MIT,true,2026-06-16T02:41:52+00:00,within-180-days,false,https://www.openagentskill.com/skills/temporalio-temporal
+531,containerd-containerd,Containerd,containerd/containerd,generic,Apache-2.0,true,2026-06-16T06:24:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/containerd-containerd
+532,microsoft-onnxruntime,Onnxruntime,microsoft/onnxruntime,generic,MIT,true,2026-06-16T08:18:04+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-onnxruntime
+533,nirdiamant-agents-towards-production,Agents Towards Production,NirDiamant/agents-towards-production,generic,Unknown,false,2026-06-17T20:54:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/nirdiamant-agents-towards-production
+534,liamgvchi-gc-minimal-zine-poster,Gc Minimal Zine Poster,LiamGvchi/gc-minimal-zine-poster,agent-skill,MIT,true,2026-08-13T15:12:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/liamgvchi-gc-minimal-zine-poster
+535,gravitational-teleport,Teleport,gravitational/teleport,generic,AGPL-3.0,true,2026-06-16T09:57:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/gravitational-teleport
+536,dair-ai-prompt-engineering-guide,Prompt Engineering Guide,dair-ai/Prompt-Engineering-Guide,generic,MIT,true,2026-03-11T20:09:13+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/dair-ai-prompt-engineering-guide
+537,googlecloudplatform-microservices-demo,Microservices Demo,GoogleCloudPlatform/microservices-demo,generic,Apache-2.0,true,2026-06-11T14:25:45+00:00,within-180-days,false,https://www.openagentskill.com/skills/googlecloudplatform-microservices-demo
+538,mybatis-mybatis-3,Mybatis 3,mybatis/mybatis-3,domain-tool,Apache-2.0,true,2026-06-19T15:29:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/mybatis-mybatis-3
+539,tursodatabase-turso,Turso,tursodatabase/turso,domain-tool,MIT,true,2026-06-20T13:18:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/tursodatabase-turso
+540,knex-knex,Knex,knex/knex,domain-tool,MIT,true,2026-06-17T09:12:57+00:00,within-180-days,false,https://www.openagentskill.com/skills/knex-knex
+541,cube-js-cube,Cube,cube-js/cube,domain-tool,Unknown,false,2026-06-20T15:41:30+00:00,within-180-days,false,https://www.openagentskill.com/skills/cube-js-cube
+542,quantconnect-lean,Lean,QuantConnect/Lean,domain-tool,Apache-2.0,true,2026-06-26T20:55:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/quantconnect-lean
+543,kilo-org-kilocode,Kilocode,Kilo-Org/kilocode,agent-workflow,MIT,true,2026-06-16T08:44:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/kilo-org-kilocode
+544,super-productivity-super-productivity,Super Productivity,super-productivity/super-productivity,generic,MIT,true,2026-06-16T09:55:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/super-productivity-super-productivity
+545,google-adk-python,Adk Python,google/adk-python,generic,Apache-2.0,true,2026-06-13T07:26:50+00:00,within-180-days,false,https://www.openagentskill.com/skills/google-adk-python
+546,kortix-ai-suna,Suna,kortix-ai/suna,generic,Unknown,false,2026-06-15T01:23:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/kortix-ai-suna
+547,comet-ml-opik,Opik,comet-ml/opik,domain-tool,Apache-2.0,true,2026-06-25T01:25:11+00:00,within-180-days,false,https://www.openagentskill.com/skills/comet-ml-opik
+548,pydantic-pydantic-ai,Pydantic AI,pydantic/pydantic-ai,generic,Unknown,false,2026-06-17T09:44:19+00:00,within-180-days,false,https://www.openagentskill.com/skills/pydantic-pydantic-ai
+549,milanm-devops-roadmap,DevOps Roadmap,milanm/DevOps-Roadmap,generic,Apache-2.0,true,2026-06-13T06:35:41+00:00,within-180-days,false,https://www.openagentskill.com/skills/milanm-devops-roadmap
+550,realm-swiftlint,SwiftLint,realm/SwiftLint,generic,MIT,true,2026-06-20T21:13:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/realm-swiftlint
+551,mdx-js-mdx,Mdx,mdx-js/mdx,domain-tool,MIT,true,2026-06-13T16:10:01+00:00,within-180-days,false,https://www.openagentskill.com/skills/mdx-js-mdx
+552,swe-agent-swe-agent,SWE Agent,SWE-agent/SWE-agent,agent-workflow,MIT,true,2026-06-15T21:50:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/swe-agent-swe-agent
+553,unity-technologies-ml-agents,Ml Agents,Unity-Technologies/ml-agents,generic,Unknown,false,2026-06-12T20:47:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/unity-technologies-ml-agents
+554,avaiga-taipy,Taipy,Avaiga/taipy,agent-workflow,Apache-2.0,true,2026-08-10T02:47:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/avaiga-taipy
+555,resend-react-email,React Email,resend/react-email,generic,MIT,true,2026-06-12T23:09:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/resend-react-email
+556,screenpipe-screenpipe,Screenpipe,screenpipe/screenpipe,generic,Unknown,false,2026-06-16T02:07:28+00:00,within-180-days,false,https://www.openagentskill.com/skills/screenpipe-screenpipe
+557,openobserve-openobserve,Openobserve,openobserve/openobserve,generic,AGPL-3.0,true,2026-06-16T09:52:35+00:00,within-180-days,false,https://www.openagentskill.com/skills/openobserve-openobserve
+558,stefan-jansen-machine-learning-for-trading,Machine Learning For Trading,stefan-jansen/machine-learning-for-trading,generic,Unknown,false,2026-06-23T02:10:54+00:00,within-180-days,false,https://www.openagentskill.com/skills/stefan-jansen-machine-learning-for-trading
+559,hummingbot-hummingbot,Hummingbot,hummingbot/hummingbot,domain-tool,Apache-2.0,true,2026-07-17T23:59:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/hummingbot-hummingbot
+560,tensorflow-tfjs,Tfjs,tensorflow/tfjs,generic,Apache-2.0,true,2026-06-15T18:57:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/tensorflow-tfjs
+561,emilkowalski-emil-design-eng,Emil Design Engineering,emilkowalski/skills,agent-skill,MIT,true,2026-07-11T15:35:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/emilkowalski-emil-design-eng
+562,eosphoros-ai-db-gpt,DB GPT,eosphoros-ai/DB-GPT,domain-tool,MIT,true,2026-06-18T02:15:04+00:00,within-180-days,false,https://www.openagentskill.com/skills/eosphoros-ai-db-gpt
+563,nndl-nndl,Nndl,nndl/nndl,generic,Unknown,false,2026-06-01T16:59:06+00:00,within-180-days,false,https://www.openagentskill.com/skills/nndl-nndl
+564,openclaw-skills,OpenClaw Core Skills,anthropics/anthropic-cookbook,agent-skill,MIT,true,2026-06-09T20:53:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/openclaw-skills
+565,pot-app-pot-desktop,Pot Desktop,pot-app/pot-desktop,domain-tool,GPL-3.0,true,2026-06-16T16:01:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/pot-app-pot-desktop
+566,obsidianmd-obsidian-releases,Obsidian Releases,obsidianmd/obsidian-releases,domain-tool,Unknown,false,2026-06-16T08:21:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/obsidianmd-obsidian-releases
+567,fujiwarachoki-moneyprinter,MoneyPrinter,FujiwaraChoki/MoneyPrinter,generic,MIT,true,2026-03-26T22:17:17+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/fujiwarachoki-moneyprinter
+568,simonlin1212-a-stock-data,A Stock Data,simonlin1212/a-stock-data,agent-skill,Apache-2.0,true,2026-07-30T22:41:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/simonlin1212-a-stock-data
+569,kubesphere-kubesphere,Kubesphere,kubesphere/kubesphere,generic,Unknown,false,2026-06-04T06:32:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/kubesphere-kubesphere
+570,charliedream1-ai-quant-trade,AI Quant Trade,charliedream1/ai_quant_trade,domain-tool,Apache-2.0,true,2026-07-03T02:34:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/charliedream1-ai-quant-trade
+571,elizaos-eliza,Eliza,elizaOS/eliza,domain-tool,MIT,true,2026-06-25T13:14:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/elizaos-eliza
+572,permify-permify,Permify,Permify/permify,generic,AGPL-3.0,true,2026-06-15T05:04:31+00:00,within-180-days,false,https://www.openagentskill.com/skills/permify-permify
+573,klingairesearch-liveportrait,LivePortrait,KlingAIResearch/LivePortrait,domain-tool,Unknown,false,2026-06-01T17:25:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/klingairesearch-liveportrait
+574,kubernetes-sigs-kubespray,Kubespray,kubernetes-sigs/kubespray,generic,Apache-2.0,true,2026-06-16T08:27:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/kubernetes-sigs-kubespray
+575,google-gvisor,Gvisor,google/gvisor,generic,Apache-2.0,true,2026-06-16T04:02:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/google-gvisor
+576,bigbodycobain-shadowbroker,Shadowbroker,BigBodyCobain/Shadowbroker,generic,AGPL-3.0,true,2026-10-10T14:33:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/bigbodycobain-shadowbroker
+577,docker-mailserver-docker-mailserver,Docker Mailserver,docker-mailserver/docker-mailserver,generic,MIT,true,2026-06-10T21:18:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/docker-mailserver-docker-mailserver
+578,plotly-plotly-js,Plotly.Js,plotly/plotly.js,domain-tool,MIT,true,2026-06-16T01:47:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/plotly-plotly-js
+579,pranshuparmar-witr,Witr,pranshuparmar/witr,generic,Apache-2.0,true,2026-07-06T06:29:04+00:00,within-180-days,false,https://www.openagentskill.com/skills/pranshuparmar-witr
+580,iii-hq-iii,Iii,iii-hq/iii,agent-workflow,Unknown,false,2026-06-16T01:24:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/iii-hq-iii
+581,fastapi-sqlmodel,Sqlmodel,fastapi/sqlmodel,domain-tool,MIT,true,2026-06-18T08:24:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/fastapi-sqlmodel
+582,emcie-co-parlant,Parlant,emcie-co/parlant,generic,Apache-2.0,true,2026-06-12T10:50:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/emcie-co-parlant
+583,mjmlio-mjml,Mjml,mjmlio/mjml,generic,MIT,true,2026-06-12T13:49:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/mjmlio-mjml
+584,jianchang512-pyvideotrans,Pyvideotrans,jianchang512/pyvideotrans,generic,GPL-3.0,true,2026-06-19T05:46:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/jianchang512-pyvideotrans
+585,labring-sealos,Sealos,labring/sealos,generic,Unknown,false,2026-06-16T06:06:41+00:00,within-180-days,false,https://www.openagentskill.com/skills/labring-sealos
+586,media-crawler,MediaCrawler,NanmiCoder/MediaCrawler,domain-tool,Apache-2.0,true,2026-07-16T09:36:01+00:00,within-180-days,false,https://www.openagentskill.com/skills/media-crawler
+587,sqlc-dev-sqlc,Sqlc,sqlc-dev/sqlc,domain-tool,MIT,true,2026-06-19T10:02:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/sqlc-dev-sqlc
+588,verdaccio-verdaccio,Verdaccio,verdaccio/verdaccio,generic,MIT,true,2026-06-13T15:11:31+00:00,within-180-days,false,https://www.openagentskill.com/skills/verdaccio-verdaccio
+589,foundry376-mailspring,Mailspring,Foundry376/Mailspring,generic,GPL-3.0,true,2026-06-15T14:07:42+00:00,within-180-days,false,https://www.openagentskill.com/skills/foundry376-mailspring
+590,keploy-keploy,Keploy,keploy/keploy,agent-workflow,Apache-2.0,true,2026-06-14T10:03:54+00:00,within-180-days,false,https://www.openagentskill.com/skills/keploy-keploy
+591,rqlite-rqlite,Rqlite,rqlite/rqlite,domain-tool,MIT,true,2026-06-21T00:10:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/rqlite-rqlite
+592,nodemailer-nodemailer,Nodemailer,nodemailer/nodemailer,generic,Unknown,false,2026-06-15T17:27:17+00:00,within-180-days,false,https://www.openagentskill.com/skills/nodemailer-nodemailer
+593,imputnet-helium,Helium,imputnet/helium,generic,GPL-3.0,true,2026-06-20T14:57:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/imputnet-helium
+594,blacklanternsecurity-bbot,Bbot,blacklanternsecurity/bbot,generic,AGPL-3.0,true,2026-10-15T19:33:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/blacklanternsecurity-bbot
+595,agricidaniel-claude-obsidian,Claude Obsidian,AgriciDaniel/claude-obsidian,agent-skill,MIT,true,2026-08-01T12:03:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/agricidaniel-claude-obsidian
+596,decolua-9router,9router,decolua/9router,generic,MIT,true,2026-06-13T02:29:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/decolua-9router
+597,leon-ai-leon,Leon,leon-ai/leon,generic,MIT,true,2026-06-18T21:53:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/leon-ai-leon
+598,muratcankoylan-agent-skills-for-context-engineering,Agent Skills For Context Engineering,muratcankoylan/Agent-Skills-for-Context-Engineering,collection,MIT,true,2026-07-14T05:15:52+00:00,within-180-days,false,https://www.openagentskill.com/skills/muratcankoylan-agent-skills-for-context-engineering
+599,camel-ai-camel,Camel,camel-ai/camel,generic,Apache-2.0,true,2026-06-17T07:53:19+00:00,within-180-days,false,https://www.openagentskill.com/skills/camel-ai-camel
+600,foambubble-foam,Foam,foambubble/foam,domain-tool,Unknown,false,2026-06-14T07:34:16+00:00,within-180-days,false,https://www.openagentskill.com/skills/foambubble-foam
+601,docusealco-docuseal,Docuseal,docusealco/docuseal,domain-tool,AGPL-3.0,true,2026-06-15T11:17:45+00:00,within-180-days,false,https://www.openagentskill.com/skills/docusealco-docuseal
+602,questdb-questdb,Questdb,questdb/questdb,domain-tool,Apache-2.0,true,2026-07-19T01:22:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/questdb-questdb
+603,getzola-zola,Zola,getzola/zola,domain-tool,EUPL-1.2,true,2026-06-15T11:38:32+00:00,within-180-days,false,https://www.openagentskill.com/skills/getzola-zola
+604,transact-rs-sqlx,Sqlx,transact-rs/sqlx,domain-tool,Apache-2.0,true,2026-06-11T16:40:58+00:00,within-180-days,false,https://www.openagentskill.com/skills/transact-rs-sqlx
+605,victoriametrics-victoriametrics,VictoriaMetrics,VictoriaMetrics/VictoriaMetrics,generic,Apache-2.0,true,2026-06-16T09:37:26+00:00,within-180-days,false,https://www.openagentskill.com/skills/victoriametrics-victoriametrics
+606,projectdiscovery-katana,Katana,projectdiscovery/katana,domain-tool,MIT,true,2026-06-22T12:23:00+00:00,within-180-days,false,https://www.openagentskill.com/skills/projectdiscovery-katana
+607,wtfutil-wtf,Wtf,wtfutil/wtf,generic,MPL-2.0,true,2026-06-18T23:32:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/wtfutil-wtf
+608,sumatrapdfreader-sumatrapdf,Sumatrapdf,sumatrapdfreader/sumatrapdf,domain-tool,GPL-3.0,true,2026-06-20T23:41:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/sumatrapdfreader-sumatrapdf
+609,jcodesmore-ai-website-cloner-template,AI Website Cloner Template,JCodesMore/ai-website-cloner-template,agent-workflow,MIT,true,2026-06-01T04:09:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/jcodesmore-ai-website-cloner-template
+610,lowlighter-metrics,Metrics,lowlighter/metrics,generic,MIT,true,2026-05-29T21:41:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/lowlighter-metrics
+611,ipython-ipython,Ipython,ipython/ipython,domain-tool,BSD-3-Clause,true,2026-06-15T05:27:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/ipython-ipython
+612,ceph-ceph,Ceph,ceph/ceph,generic,Unknown,false,2026-06-16T04:24:11+00:00,within-180-days,false,https://www.openagentskill.com/skills/ceph-ceph
+613,prestodb-presto,Presto,prestodb/presto,domain-tool,Apache-2.0,true,2026-06-20T13:40:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/prestodb-presto
+614,diem-diem,Diem,diem/diem,generic,Apache-2.0,true,2026-06-23T05:52:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/diem-diem
+615,pinchtab-pinchtab,Pinchtab,pinchtab/pinchtab,agent-workflow,MIT,true,2026-09-01T10:29:07+00:00,within-180-days,true,https://www.openagentskill.com/skills/pinchtab-pinchtab
+616,hyperledger-fabric,Fabric,hyperledger/fabric,generic,Apache-2.0,true,2026-06-18T08:15:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/hyperledger-fabric
+617,diegomura-react-pdf,React Pdf,diegomura/react-pdf,domain-tool,MIT,true,2026-06-09T01:37:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/diegomura-react-pdf
+618,kubernetes-kops,Kops,kubernetes/kops,generic,Apache-2.0,true,2026-06-15T18:51:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/kubernetes-kops
+619,cursor-rules,Cursor Rules,PatrickJS/awesome-cursorrules,collection,MIT,true,2026-05-30T18:01:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/cursor-rules
+620,tencent-weknora,WeKnora,Tencent/WeKnora,domain-tool,Unknown,false,2026-06-18T10:50:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/tencent-weknora
+621,akaunting-akaunting,Akaunting,akaunting/akaunting,domain-tool,Unknown,false,2026-08-13T21:49:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/akaunting-akaunting
+622,tradingview-lightweight-charts,Lightweight Charts,tradingview/lightweight-charts,generic,Apache-2.0,true,2026-06-22T11:25:38+00:00,within-180-days,false,https://www.openagentskill.com/skills/tradingview-lightweight-charts
+623,langbot-app-langbot,LangBot,langbot-app/LangBot,domain-tool,Apache-2.0,true,2026-06-16T02:56:54+00:00,within-180-days,false,https://www.openagentskill.com/skills/langbot-app-langbot
+624,cft0808-edict,Edict,cft0808/edict,agent-workflow,MIT,true,2026-06-04T16:30:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/cft0808-edict
+625,danielmiessler-lifeos,LifeOS,danielmiessler/LifeOS,generic,MIT,true,2026-05-20T21:33:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/danielmiessler-lifeos
+626,webdriverio-webdriverio,Webdriverio,webdriverio/webdriverio,generic,MIT,true,2026-07-24T15:17:19+00:00,within-180-days,false,https://www.openagentskill.com/skills/webdriverio-webdriverio
+627,angristan-openvpn-install,Openvpn Install,angristan/openvpn-install,generic,MIT,true,2026-06-18T18:34:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/angristan-openvpn-install
+628,ahrm-sioyek,Sioyek,ahrm/sioyek,domain-tool,GPL-3.0,true,2026-08-05T06:13:19+00:00,within-180-days,false,https://www.openagentskill.com/skills/ahrm-sioyek
+629,ai4finance-foundation-finrl,FinRL,AI4Finance-Foundation/FinRL,generic,MIT,true,2026-07-13T23:02:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/ai4finance-foundation-finrl
+630,h4ckf0r0day-obscura,Obscura,h4ckf0r0day/obscura,agent-workflow,Apache-2.0,true,2026-06-18T19:30:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/h4ckf0r0day-obscura
+631,dagger-dagger,Dagger,dagger/dagger,agent-workflow,Apache-2.0,true,2026-06-16T08:45:32+00:00,within-180-days,false,https://www.openagentskill.com/skills/dagger-dagger
+632,danielmiessler-personal-ai-infrastructure,Personal AI Infrastructure,danielmiessler/Personal_AI_Infrastructure,generic,MIT,true,2026-05-20T21:33:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/danielmiessler-personal-ai-infrastructure
+633,kanaries-pygwalker,Pygwalker,Kanaries/pygwalker,domain-tool,Apache-2.0,true,2026-06-20T16:33:11+00:00,within-180-days,false,https://www.openagentskill.com/skills/kanaries-pygwalker
+634,wpscanteam-wpscan,Wpscan,wpscanteam/wpscan,generic,Unknown,false,2026-07-23T15:18:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/wpscanteam-wpscan
+635,goreleaser-goreleaser,Goreleaser,goreleaser/goreleaser,generic,MIT,true,2026-06-13T07:30:38+00:00,within-180-days,false,https://www.openagentskill.com/skills/goreleaser-goreleaser
+636,google-labs-code-design-md,Design.Md,google-labs-code/design.md,agent-workflow,Apache-2.0,true,2026-06-15T22:22:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/google-labs-code-design-md
+637,googlecontainertools-skaffold,Skaffold,GoogleContainerTools/skaffold,agent-workflow,Apache-2.0,true,2026-06-15T12:44:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/googlecontainertools-skaffold
+638,microsoft-autogen,Autogen,microsoft/autogen,generic,CC-BY-4.0,true,2026-04-15T11:59:09+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/microsoft-autogen
+639,go-task-task,Task,go-task/task,generic,MIT,true,2026-06-20T00:56:28+00:00,within-180-days,false,https://www.openagentskill.com/skills/go-task-task
+640,kubeflow-kubeflow,Kubeflow,kubeflow/kubeflow,generic,Apache-2.0,true,2026-06-11T16:32:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/kubeflow-kubeflow
+641,quarkusio-quarkus,Quarkus,quarkusio/quarkus,generic,Apache-2.0,true,2026-06-16T09:34:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/quarkusio-quarkus
+642,nicobailon-visual-explainer,Visual Explainer,nicobailon/visual-explainer,agent-skill,MIT,true,2026-08-28T22:24:35+00:00,within-180-days,true,https://www.openagentskill.com/skills/nicobailon-visual-explainer
+643,dagster-io-dagster,Dagster,dagster-io/dagster,agent-workflow,Apache-2.0,true,2026-06-12T19:19:16+00:00,within-180-days,false,https://www.openagentskill.com/skills/dagster-io-dagster
+644,treeverse-dvc,Dvc,treeverse/dvc,agent-workflow,Apache-2.0,true,2026-06-15T18:38:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/treeverse-dvc
+645,memvid-memvid,Memvid,memvid/memvid,domain-tool,Apache-2.0,true,2026-05-27T19:31:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/memvid-memvid
+646,apache-seatunnel,Seatunnel,apache/seatunnel,domain-tool,Apache-2.0,true,2026-08-27T16:25:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-seatunnel
+647,facebook-infer,Infer,facebook/infer,generic,MIT,true,2026-06-13T02:38:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/facebook-infer
+648,semgrep-semgrep,Semgrep,semgrep/semgrep,generic,LGPL-2.1,true,2026-06-22T00:29:54+00:00,within-180-days,false,https://www.openagentskill.com/skills/semgrep-semgrep
+649,mikefarah-yq,Yq,mikefarah/yq,generic,MIT,true,2026-06-16T06:46:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/mikefarah-yq
+650,getgrav-grav,Grav,getgrav/grav,domain-tool,MIT,true,2026-06-16T00:50:58+00:00,within-180-days,false,https://www.openagentskill.com/skills/getgrav-grav
+651,canner-wrenai,WrenAI,Canner/WrenAI,domain-tool,Unknown,false,2026-06-12T03:20:58+00:00,within-180-days,false,https://www.openagentskill.com/skills/canner-wrenai
+652,spree-spree,Spree,spree/spree,generic,BSD-3-Clause,true,2026-06-16T09:48:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/spree-spree
+653,cryptomator-cryptomator,Cryptomator,cryptomator/cryptomator,generic,GPL-3.0,true,2026-06-19T19:14:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/cryptomator-cryptomator
+654,mockito-mockito,Mockito,mockito/mockito,generic,MIT,true,2026-06-08T19:53:30+00:00,within-180-days,false,https://www.openagentskill.com/skills/mockito-mockito
+655,tracel-ai-burn,Burn,tracel-ai/burn,generic,Apache-2.0,true,2026-06-15T21:31:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/tracel-ai-burn
+656,quickwit-oss-tantivy,Tantivy,quickwit-oss/tantivy,domain-tool,MIT,true,2026-06-16T07:47:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/quickwit-oss-tantivy
+657,cesiumgs-cesium,Cesium,CesiumGS/cesium,generic,Apache-2.0,true,2026-06-21T00:35:06+00:00,within-180-days,false,https://www.openagentskill.com/skills/cesiumgs-cesium
+658,mail-in-a-box-mailinabox,Mailinabox,mail-in-a-box/mailinabox,generic,CC0-1.0,true,2026-05-24T17:19:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/mail-in-a-box-mailinabox
+659,kubernetes-sigs-kind,Kind,kubernetes-sigs/kind,generic,Apache-2.0,true,2026-06-15T23:59:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/kubernetes-sigs-kind
+660,zaproxy-zaproxy,Zaproxy,zaproxy/zaproxy,generic,Apache-2.0,true,2026-06-11T09:00:42+00:00,within-180-days,false,https://www.openagentskill.com/skills/zaproxy-zaproxy
+661,budtmo-docker-android,Docker Android,budtmo/docker-android,generic,Unknown,false,2026-06-14T23:02:50+00:00,within-180-days,false,https://www.openagentskill.com/skills/budtmo-docker-android
+662,go-sql-driver-mysql,Mysql,go-sql-driver/mysql,domain-tool,MPL-2.0,true,2026-06-13T07:41:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/go-sql-driver-mysql
+663,bitnami-labs-sealed-secrets,Sealed Secrets,bitnami-labs/sealed-secrets,generic,Apache-2.0,true,2026-10-14T18:34:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/bitnami-labs-sealed-secrets
+664,bitnami-sealed-secrets,Sealed Secrets,bitnami/sealed-secrets,generic,Apache-2.0,true,2026-10-14T18:34:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/bitnami-sealed-secrets
+665,gotify-server,Server,gotify/server,generic,Unknown,false,2026-06-20T13:34:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/gotify-server
+666,modsetter-surfsense,SurfSense,MODSetter/SurfSense,domain-tool,Apache-2.0,true,2026-06-27T02:55:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/modsetter-surfsense
+667,codelucas-newspaper,Newspaper,codelucas/newspaper,domain-tool,MIT,true,2026-07-08T18:34:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/codelucas-newspaper
+668,apache-datafusion,Datafusion,apache/datafusion,domain-tool,Apache-2.0,true,2026-08-27T01:44:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-datafusion
+669,theonedev-onedev,Onedev,theonedev/onedev,generic,MIT,true,2026-06-15T15:24:26+00:00,within-180-days,false,https://www.openagentskill.com/skills/theonedev-onedev
+670,rowboatlabs-rowboat,Rowboat,rowboatlabs/rowboat,generic,Apache-2.0,true,2026-06-14T20:08:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/rowboatlabs-rowboat
+671,unstructured-io-unstructured,Unstructured,Unstructured-IO/unstructured,domain-tool,Apache-2.0,true,2026-06-18T17:16:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/unstructured-io-unstructured
+672,flow-launcher-flow-launcher,Flow.Launcher,Flow-Launcher/Flow.Launcher,generic,MIT,true,2026-06-15T22:47:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/flow-launcher-flow-launcher
+673,google-skills,Skills,google/skills,agent-skill,Apache-2.0,true,2026-07-18T23:03:58+00:00,within-180-days,false,https://www.openagentskill.com/skills/google-skills
+674,backnotprop-plannotator,Plannotator,backnotprop/plannotator,generic,Apache-2.0,true,2026-10-02T19:45:52+00:00,within-180-days,false,https://www.openagentskill.com/skills/backnotprop-plannotator
+675,xournalpp-xournalpp,Xournalpp,xournalpp/xournalpp,domain-tool,GPL-2.0,true,2026-06-15T08:09:59+00:00,within-180-days,false,https://www.openagentskill.com/skills/xournalpp-xournalpp
+676,nesquena-hermes-webui,Hermes Webui,nesquena/hermes-webui,agent-workflow,MIT,true,2026-06-23T03:02:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/nesquena-hermes-webui
+677,agentwrapper-agent-orchestrator,Agent Orchestrator,AgentWrapper/agent-orchestrator,agent-workflow,MIT,true,2026-08-10T01:40:36+00:00,within-180-days,false,https://www.openagentskill.com/skills/agentwrapper-agent-orchestrator
+678,haiwen-seafile,Seafile,haiwen/seafile,domain-tool,Unknown,false,2026-06-12T02:41:16+00:00,within-180-days,false,https://www.openagentskill.com/skills/haiwen-seafile
+679,jnmetacode-agency-agents-zh,Agency Agents Zh,jnMetaCode/agency-agents-zh,generic,MIT,true,2026-06-12T23:20:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/jnmetacode-agency-agents-zh
+680,microsoft-playwright-python,Playwright Python,microsoft/playwright-python,agent-workflow,Apache-2.0,true,2026-07-17T14:05:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-playwright-python
+681,ggml-org-ggml,Ggml,ggml-org/ggml,generic,MIT,true,2026-06-15T11:33:17+00:00,within-180-days,false,https://www.openagentskill.com/skills/ggml-org-ggml
+682,artilleryio-artillery,Artillery,artilleryio/artillery,agent-workflow,MPL-2.0,true,2026-08-26T14:24:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/artilleryio-artillery
+683,datatalksclub-mlops-zoomcamp,Mlops Zoomcamp,DataTalksClub/mlops-zoomcamp,generic,Unknown,false,2026-06-10T11:14:57+00:00,within-180-days,false,https://www.openagentskill.com/skills/datatalksclub-mlops-zoomcamp
+684,joeanamier-tiktokdownloader,TikTokDownloader,JoeanAmier/TikTokDownloader,domain-tool,GPL-3.0,true,2026-06-14T08:06:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/joeanamier-tiktokdownloader
+685,winmerge-winmerge,Winmerge,WinMerge/winmerge,domain-tool,GPL-2.0,true,2026-07-28T22:07:45+00:00,within-180-days,false,https://www.openagentskill.com/skills/winmerge-winmerge
+686,botpress-botpress,Botpress,botpress/botpress,generic,MIT,true,2026-06-15T19:30:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/botpress-botpress
+687,nltk-nltk,Nltk,nltk/nltk,generic,Apache-2.0,true,2026-06-11T20:55:28+00:00,within-180-days,false,https://www.openagentskill.com/skills/nltk-nltk
+688,nisrulz-app-privacy-policy-generator,App Privacy Policy Generator,nisrulz/app-privacy-policy-generator,generic,AGPL-3.0,true,2026-06-02T14:56:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/nisrulz-app-privacy-policy-generator
+689,effect-ts-effect,Effect,Effect-TS/effect,generic,MIT,true,2026-06-12T02:30:30+00:00,within-180-days,false,https://www.openagentskill.com/skills/effect-ts-effect
+690,eigent-ai-eigent,Eigent,eigent-ai/eigent,agent-skill,Apache-2.0,true,2026-07-18T16:29:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/eigent-ai-eigent
+691,midday-ai-midday,Midday,midday-ai/midday,generic,AGPL-3.0,true,2026-06-13T13:40:35+00:00,within-180-days,false,https://www.openagentskill.com/skills/midday-ai-midday
+692,bentoml-bentoml,BentoML,bentoml/BentoML,generic,Apache-2.0,true,2026-10-05T17:17:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/bentoml-bentoml
+693,flaresolverr-flaresolverr,FlareSolverr,FlareSolverr/FlareSolverr,agent-workflow,MIT,true,2026-06-05T16:50:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/flaresolverr-flaresolverr
+694,microsoft-skill-recorder,Skill Recorder,microsoft/skill-recorder,agent-skill,MIT,true,2026-08-12T13:17:31+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-skill-recorder
+695,e2b-dev-e2b,E2B,e2b-dev/E2B,agent-workflow,Unknown,false,2026-07-17T16:20:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/e2b-dev-e2b
+696,alirezadir-machine-learning-interviews,Machine Learning Interviews,alirezadir/Machine-Learning-Interviews,generic,MIT,true,2026-08-17T00:34:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/alirezadir-machine-learning-interviews
+697,organicmaps-organicmaps,Organicmaps,organicmaps/organicmaps,generic,Unknown,false,2026-06-20T20:51:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/organicmaps-organicmaps
+698,optuna-optuna,Optuna,optuna/optuna,generic,MIT,true,2026-06-12T04:15:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/optuna-optuna
+699,omnigent-ai-omnigent,Omnigent,omnigent-ai/omnigent,agent-workflow,Apache-2.0,true,2026-08-13T13:12:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/omnigent-ai-omnigent
+700,floci-io-floci,Floci,floci-io/floci,generic,MIT,true,2026-06-20T18:03:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/floci-io-floci
+701,visgl-deck-gl,Deck.Gl,visgl/deck.gl,domain-tool,MIT,true,2026-06-16T00:24:11+00:00,within-180-days,false,https://www.openagentskill.com/skills/visgl-deck-gl
+702,anyproto-anytype-ts,Anytype Ts,anyproto/anytype-ts,generic,Unknown,false,2026-08-25T10:09:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/anyproto-anytype-ts
+703,kekingcn-kkfileview,KkFileView,kekingcn/kkFileView,domain-tool,Unknown,false,2026-06-11T02:16:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/kekingcn-kkfileview
+704,xpipe-io-xpipe,Xpipe,xpipe-io/xpipe,generic,Apache-2.0,true,2026-06-16T09:10:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/xpipe-io-xpipe
+705,aimeos-aimeos-laravel,Aimeos Laravel,aimeos/aimeos-laravel,generic,MIT,true,2026-07-23T11:08:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/aimeos-aimeos-laravel
+706,apache-solr,Solr,apache/solr,domain-tool,Apache-2.0,true,2026-09-10T00:38:31+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-solr
+707,streetwriters-notesnook,Notesnook,streetwriters/notesnook,generic,GPL-3.0,true,2026-06-16T09:04:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/streetwriters-notesnook
+708,apache-beam,Beam,apache/beam,domain-tool,Apache-2.0,true,2026-08-26T01:33:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-beam
+709,thanos-io-thanos,Thanos,thanos-io/thanos,generic,Apache-2.0,true,2026-06-15T16:39:41+00:00,within-180-days,false,https://www.openagentskill.com/skills/thanos-io-thanos
+710,vercel-commerce,Commerce,vercel/commerce,generic,MIT,true,2026-06-10T20:55:31+00:00,within-180-days,false,https://www.openagentskill.com/skills/vercel-commerce
+711,questpdf-questpdf,QuestPDF,QuestPDF/QuestPDF,domain-tool,Unknown,false,2026-06-10T15:09:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/questpdf-questpdf
+712,plait-board-drawnix,Drawnix,plait-board/drawnix,generic,MIT,true,2026-06-16T07:04:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/plait-board-drawnix
+713,phpstan-phpstan,Phpstan,phpstan/phpstan,generic,MIT,true,2026-06-24T14:34:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/phpstan-phpstan
+714,prowler-cloud-prowler,Prowler,prowler-cloud/prowler,generic,Apache-2.0,true,2026-06-17T19:02:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/prowler-cloud-prowler
+715,amazingang-wtf-solidity,WTF Solidity,AmazingAng/WTF-Solidity,generic,Unknown,false,2026-06-27T19:33:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/amazingang-wtf-solidity
+716,kysely-org-kysely,Kysely,kysely-org/kysely,domain-tool,MIT,true,2026-06-19T07:44:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/kysely-org-kysely
+717,espanso-espanso,Espanso,espanso/espanso,generic,GPL-3.0,true,2026-06-14T00:47:28+00:00,within-180-days,false,https://www.openagentskill.com/skills/espanso-espanso
+718,cert-manager-cert-manager,Cert Manager,cert-manager/cert-manager,generic,Apache-2.0,true,2026-06-16T09:24:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/cert-manager-cert-manager
+719,builderio-mitosis,Mitosis,BuilderIO/mitosis,domain-tool,MIT,true,2026-06-05T14:01:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/builderio-mitosis
+720,shuding-nextra,Nextra,shuding/nextra,domain-tool,MIT,true,2026-06-08T23:31:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/shuding-nextra
+721,jekyll-jekyll,Jekyll,jekyll/jekyll,domain-tool,MIT,true,2026-04-22T14:50:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/jekyll-jekyll
+722,greydgl-pentestgpt,PentestGPT,GreyDGL/PentestGPT,generic,MIT,true,2026-06-07T07:25:45+00:00,within-180-days,false,https://www.openagentskill.com/skills/greydgl-pentestgpt
+723,babysor-mockingbird,MockingBird,babysor/MockingBird,generic,Unknown,false,2026-03-03T14:59:58+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/babysor-mockingbird
+724,semaphoreui-semaphore,Semaphore,semaphoreui/semaphore,generic,MIT,true,2026-06-15T16:04:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/semaphoreui-semaphore
+725,ikatyang-emoji-cheat-sheet,Emoji Cheat Sheet,ikatyang/emoji-cheat-sheet,domain-tool,MIT,true,2026-06-16T01:08:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/ikatyang-emoji-cheat-sheet
+726,nextapps-de-flexsearch,Flexsearch,nextapps-de/flexsearch,domain-tool,Apache-2.0,true,2026-05-29T08:35:32+00:00,within-180-days,false,https://www.openagentskill.com/skills/nextapps-de-flexsearch
+727,gitpod-io-gitpod,Gitpod,gitpod-io/gitpod,generic,AGPL-3.0,true,2026-06-12T14:16:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/gitpod-io-gitpod
+728,isl-org-open3d,Open3D,isl-org/Open3D,generic,Unknown,false,2026-06-16T07:30:38+00:00,within-180-days,false,https://www.openagentskill.com/skills/isl-org-open3d
+729,wiltodelta-remove-ai-watermarks,Remove AI Watermarks,wiltodelta/remove-ai-watermarks,generic,Apache-2.0,true,2026-07-28T19:14:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/wiltodelta-remove-ai-watermarks
+730,thunderbird-thunderbird-android,Thunderbird Android,thunderbird/thunderbird-android,generic,Apache-2.0,true,2026-06-16T03:58:17+00:00,within-180-days,false,https://www.openagentskill.com/skills/thunderbird-thunderbird-android
+731,tisfeng-easydict,Easydict,tisfeng/Easydict,domain-tool,GPL-3.0,true,2026-06-21T16:07:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/tisfeng-easydict
+732,unleash-unleash,Unleash,Unleash/unleash,generic,AGPL-3.0,true,2026-06-20T21:52:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/unleash-unleash
+733,rook-rook,Rook,rook/rook,generic,Apache-2.0,true,2026-06-16T09:58:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/rook-rook
+734,vercel-satori,Satori,vercel/satori,domain-tool,MPL-2.0,true,2026-05-22T20:25:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/vercel-satori
+735,php-cs-fixer-php-cs-fixer,PHP CS Fixer,PHP-CS-Fixer/PHP-CS-Fixer,generic,MIT,true,2026-06-18T13:26:36+00:00,within-180-days,false,https://www.openagentskill.com/skills/php-cs-fixer-php-cs-fixer
+736,coder-coder,Coder,coder/coder,generic,AGPL-3.0,true,2026-06-16T09:58:36+00:00,within-180-days,false,https://www.openagentskill.com/skills/coder-coder
+737,shikijs-shiki,Shiki,shikijs/shiki,domain-tool,MIT,true,2026-06-04T04:57:42+00:00,within-180-days,false,https://www.openagentskill.com/skills/shikijs-shiki
+738,microsoft-rd-agent,RD Agent,microsoft/RD-Agent,agent-workflow,MIT,true,2026-06-15T18:03:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-rd-agent
+739,dlr-rm-stable-baselines3,Stable Baselines3,DLR-RM/stable-baselines3,generic,MIT,true,2026-06-15T16:59:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/dlr-rm-stable-baselines3
+740,radzenhq-radzen-blazor,Radzen Blazor,radzenhq/radzen-blazor,domain-tool,MIT,true,2026-06-15T15:54:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/radzenhq-radzen-blazor
+741,tinacms-tinacms,Tinacms,tinacms/tinacms,domain-tool,Apache-2.0,true,2026-06-16T07:56:17+00:00,within-180-days,false,https://www.openagentskill.com/skills/tinacms-tinacms
+742,justarchinet-archisteamfarm,ArchiSteamFarm,JustArchiNET/ArchiSteamFarm,generic,Apache-2.0,true,2026-06-16T01:51:16+00:00,within-180-days,false,https://www.openagentskill.com/skills/justarchinet-archisteamfarm
+743,xixu-me-xget,Xget,xixu-me/xget,agent-skill,AGPL-3.0,true,2026-10-16T10:08:57+00:00,within-180-days,false,https://www.openagentskill.com/skills/xixu-me-xget
+744,aquasecurity-kube-bench,Kube Bench,aquasecurity/kube-bench,generic,Apache-2.0,true,2026-09-07T19:32:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/aquasecurity-kube-bench
+745,browserless-browserless,Browserless,browserless/browserless,agent-workflow,Unknown,false,2026-06-18T21:24:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/browserless-browserless
+746,documenso-documenso,Documenso,documenso/documenso,domain-tool,AGPL-3.0,true,2026-06-14T10:58:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/documenso-documenso
+747,open-compass-vlmevalkit,VLMEvalKit,open-compass/VLMEvalKit,generic,Apache-2.0,true,2026-06-17T18:07:35+00:00,within-180-days,false,https://www.openagentskill.com/skills/open-compass-vlmevalkit
+748,open-dev-society-openstock,OpenStock,Open-Dev-Society/OpenStock,domain-tool,AGPL-3.0,true,2026-05-28T18:56:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/open-dev-society-openstock
+749,0xplaygrounds-rig,Rig,0xPlaygrounds/rig,generic,MIT,true,2026-08-02T01:37:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/0xplaygrounds-rig
+750,metersphere-metersphere,Metersphere,metersphere/metersphere,agent-workflow,Unknown,false,2026-06-12T07:28:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/metersphere-metersphere
+751,datatalksclub-machine-learning-zoomcamp,Machine Learning Zoomcamp,DataTalksClub/machine-learning-zoomcamp,generic,Unknown,false,2026-06-10T09:34:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/datatalksclub-machine-learning-zoomcamp
+752,jupyter-notebook,Notebook,jupyter/notebook,domain-tool,BSD-3-Clause,true,2026-06-19T05:49:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/jupyter-notebook
+753,freeplane-freeplane,Freeplane,freeplane/freeplane,domain-tool,GPL-2.0,true,2026-06-18T22:58:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/freeplane-freeplane
+754,t8rin-imagetoolbox,ImageToolbox,T8RIN/ImageToolbox,domain-tool,Apache-2.0,true,2026-06-18T00:42:32+00:00,within-180-days,false,https://www.openagentskill.com/skills/t8rin-imagetoolbox
+755,opensearch-project-opensearch,OpenSearch,opensearch-project/OpenSearch,domain-tool,Apache-2.0,true,2026-06-16T08:30:38+00:00,within-180-days,false,https://www.openagentskill.com/skills/opensearch-project-opensearch
+756,gogf-gf,Gf,gogf/gf,generic,MIT,true,2026-06-05T07:10:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/gogf-gf
+757,blaizzy-mlx-audio,Mlx Audio,Blaizzy/mlx-audio,generic,MIT,true,2026-10-16T21:52:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/blaizzy-mlx-audio
+758,zedeus-nitter,Nitter,zedeus/nitter,generic,AGPL-3.0,true,2026-06-21T01:22:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/zedeus-nitter
+759,stenciljs-core,Core,stenciljs/core,domain-tool,Unknown,false,2026-06-14T02:19:45+00:00,within-180-days,false,https://www.openagentskill.com/skills/stenciljs-core
+760,zettlr-zettlr,Zettlr,Zettlr/Zettlr,domain-tool,GPL-3.0,true,2026-06-14T09:56:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/zettlr-zettlr
+761,ccfos-nightingale,Nightingale,ccfos/nightingale,generic,Apache-2.0,true,2026-06-16T09:35:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/ccfos-nightingale
+762,k2-fsa-sherpa-onnx,Sherpa Onnx,k2-fsa/sherpa-onnx,generic,Apache-2.0,true,2026-06-18T09:15:41+00:00,within-180-days,false,https://www.openagentskill.com/skills/k2-fsa-sherpa-onnx
+763,nmap-nmap,Nmap,nmap/nmap,generic,Unknown,false,2026-06-15T16:30:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/nmap-nmap
+764,adongwanai-agentguide,AgentGuide,adongwanai/AgentGuide,generic,Unknown,false,2026-08-04T06:02:35+00:00,within-180-days,false,https://www.openagentskill.com/skills/adongwanai-agentguide
+765,davidondrej-skills,Skills,davidondrej/skills,agent-skill,MIT,true,2026-07-25T13:03:00+00:00,within-180-days,false,https://www.openagentskill.com/skills/davidondrej-skills
+766,mattpocock-grill-me,grill-me,mattpocock/skills,agent-skill,MIT,true,2026-10-13T08:46:40+00:00,within-180-days,true,https://www.openagentskill.com/skills/mattpocock-grill-me
+767,safing-portmaster,Portmaster,safing/portmaster,generic,GPL-3.0,true,2026-06-16T08:34:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/safing-portmaster
+768,dbt-labs-dbt-core,Dbt Core,dbt-labs/dbt-core,domain-tool,Apache-2.0,true,2026-06-18T01:09:06+00:00,within-180-days,false,https://www.openagentskill.com/skills/dbt-labs-dbt-core
+769,macrozheng-mall-swarm,Mall Swarm,macrozheng/mall-swarm,generic,Apache-2.0,true,2026-05-21T08:03:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/macrozheng-mall-swarm
+770,owasp-mastg,Mastg,OWASP/mastg,generic,CC-BY-SA-4.0,true,2026-06-20T13:58:52+00:00,within-180-days,false,https://www.openagentskill.com/skills/owasp-mastg
+771,primer-css,Css,primer/css,domain-tool,MIT,true,2026-06-15T05:32:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/primer-css
+772,gokumohandas-made-with-ml,Made With ML,GokuMohandas/Made-With-ML,generic,MIT,true,2026-03-04T23:44:21+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/gokumohandas-made-with-ml
+773,trinodb-trino,Trino,trinodb/trino,domain-tool,Apache-2.0,true,2026-06-20T20:10:04+00:00,within-180-days,false,https://www.openagentskill.com/skills/trinodb-trino
+774,kubernetes-community,Community,kubernetes/community,generic,Apache-2.0,true,2026-06-16T09:51:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/kubernetes-community
+775,jacobgil-pytorch-grad-cam,Pytorch Grad Cam,jacobgil/pytorch-grad-cam,generic,MIT,true,2026-06-14T03:41:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/jacobgil-pytorch-grad-cam
+776,alirezamika-autoscraper,Autoscraper,alirezamika/autoscraper,domain-tool,MIT,true,2026-07-29T17:17:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/alirezamika-autoscraper
+777,yishentu-claudian,Claudian,YishenTu/claudian,generic,MIT,true,2026-06-12T06:18:28+00:00,within-180-days,false,https://www.openagentskill.com/skills/yishentu-claudian
+778,doocs-md,Md,doocs/md,domain-tool,WTFPL,true,2026-06-16T08:48:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/doocs-md
+779,vnotex-vnote,Vnote,vnotex/vnote,domain-tool,LGPL-3.0,true,2026-06-16T07:12:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/vnotex-vnote
+780,debezium-debezium,Debezium,debezium/debezium,domain-tool,Apache-2.0,true,2026-06-12T15:14:17+00:00,within-180-days,false,https://www.openagentskill.com/skills/debezium-debezium
+781,seleniumbase-seleniumbase,SeleniumBase,seleniumbase/SeleniumBase,domain-tool,MIT,true,2026-06-13T13:07:50+00:00,within-180-days,false,https://www.openagentskill.com/skills/seleniumbase-seleniumbase
+782,fathah-hermes-desktop,Hermes Desktop,fathah/hermes-desktop,generic,MIT,true,2026-06-26T13:12:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/fathah-hermes-desktop
+783,ai4finance-foundation-finrobot,FinRobot,AI4Finance-Foundation/FinRobot,generic,Apache-2.0,true,2026-07-27T07:06:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/ai4finance-foundation-finrobot
+784,terrastruct-d2,D2,terrastruct/d2,agent-workflow,MPL-2.0,true,2026-04-24T22:40:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/terrastruct-d2
+785,millionco-react-doctor,React Doctor,millionco/react-doctor,generic,MIT,true,2026-06-14T23:10:30+00:00,within-180-days,false,https://www.openagentskill.com/skills/millionco-react-doctor
+786,neuml-txtai,Txtai,neuml/txtai,domain-tool,Apache-2.0,true,2026-06-22T17:06:32+00:00,within-180-days,false,https://www.openagentskill.com/skills/neuml-txtai
+787,spartnernl-laravel-excel,Laravel Excel,SpartnerNL/Laravel-Excel,domain-tool,MIT,true,2026-06-09T12:17:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/spartnernl-laravel-excel
+788,yichuan-w-leann,LEANN,yichuan-w/LEANN,domain-tool,MIT,true,2026-07-03T02:43:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/yichuan-w-leann
+789,zealdocs-zeal,Zeal,zealdocs/zeal,agent-workflow,GPL-3.0,true,2026-06-11T11:06:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/zealdocs-zeal
+790,2fastlabs-agent-squad,Agent Squad,2FastLabs/agent-squad,generic,Apache-2.0,true,2026-07-29T13:18:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/2fastlabs-agent-squad
+791,paddlepaddle-paddlespeech,PaddleSpeech,PaddlePaddle/PaddleSpeech,generic,Apache-2.0,true,2026-06-21T19:56:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/paddlepaddle-paddlespeech
+792,ryancodrai-turbovec,Turbovec,RyanCodrai/turbovec,domain-tool,MIT,true,2026-06-10T18:07:32+00:00,within-180-days,false,https://www.openagentskill.com/skills/ryancodrai-turbovec
+793,wmjordan-pdfpatcher,PDFPatcher,wmjordan/PDFPatcher,domain-tool,Unknown,false,2026-07-08T13:10:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/wmjordan-pdfpatcher
+794,anchore-grype,Grype,anchore/grype,generic,Apache-2.0,true,2026-07-17T16:20:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/anchore-grype
+795,nofxaios-nofx,Nofx,NoFxAiOS/nofx,generic,AGPL-3.0,true,2026-07-16T02:00:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/nofxaios-nofx
+796,citusdata-citus,Citus,citusdata/citus,domain-tool,AGPL-3.0,true,2026-06-18T21:43:19+00:00,within-180-days,false,https://www.openagentskill.com/skills/citusdata-citus
+797,dair-ai-ai-papers-of-the-week,AI Papers Of The Week,dair-ai/AI-Papers-of-the-Week,generic,Unknown,false,2026-06-15T15:02:57+00:00,within-180-days,false,https://www.openagentskill.com/skills/dair-ai-ai-papers-of-the-week
+798,alteryx-featuretools,Featuretools,alteryx/featuretools,generic,BSD-3-Clause,true,2026-07-27T13:04:38+00:00,within-180-days,false,https://www.openagentskill.com/skills/alteryx-featuretools
+799,supertone-inc-supertonic,Supertonic,supertone-inc/supertonic,generic,MIT,true,2026-05-22T05:05:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/supertone-inc-supertonic
+800,chenhg5-cc-connect,Cc Connect,chenhg5/cc-connect,agent-workflow,Unknown,false,2026-06-16T08:21:26+00:00,within-180-days,false,https://www.openagentskill.com/skills/chenhg5-cc-connect
+801,woodpecker-ci-woodpecker,Woodpecker,woodpecker-ci/woodpecker,generic,Apache-2.0,true,2026-07-30T02:10:16+00:00,within-180-days,false,https://www.openagentskill.com/skills/woodpecker-ci-woodpecker
+802,agronholm-apscheduler,Apscheduler,agronholm/apscheduler,generic,MIT,true,2026-08-01T18:35:28+00:00,within-180-days,false,https://www.openagentskill.com/skills/agronholm-apscheduler
+803,gotenberg-gotenberg,Gotenberg,gotenberg/gotenberg,domain-tool,MIT,true,2026-06-19T07:17:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/gotenberg-gotenberg
+804,the-pocket-pocketflow-tutorial-codebase-knowledge,PocketFlow Tutorial Codebase Knowledge,The-Pocket/PocketFlow-Tutorial-Codebase-Knowledge,generic,MIT,true,2026-05-31T01:26:41+00:00,within-180-days,false,https://www.openagentskill.com/skills/the-pocket-pocketflow-tutorial-codebase-knowledge
+805,typecho-typecho,Typecho,typecho/typecho,domain-tool,GPL-2.0,true,2026-06-03T15:08:01+00:00,within-180-days,false,https://www.openagentskill.com/skills/typecho-typecho
+806,infracost-infracost,Infracost,infracost/infracost,agent-workflow,Apache-2.0,true,2026-06-03T14:55:27+00:00,within-180-days,false,https://www.openagentskill.com/skills/infracost-infracost
+807,rzashakeri-beautify-github-profile,Beautify Github Profile,rzashakeri/beautify-github-profile,domain-tool,CC0-1.0,true,2026-06-10T19:32:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/rzashakeri-beautify-github-profile
+808,rybbit-io-rybbit,Rybbit,rybbit-io/rybbit,generic,AGPL-3.0,true,2026-06-15T17:40:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/rybbit-io-rybbit
+809,antvis-g6,G6,antvis/G6,domain-tool,MIT,true,2026-07-15T06:02:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/antvis-g6
+810,illacloud-illa-builder,Illa Builder,illacloud/illa-builder,agent-workflow,Apache-2.0,true,2026-05-27T02:22:32+00:00,within-180-days,false,https://www.openagentskill.com/skills/illacloud-illa-builder
+811,withastro-flue,Flue,withastro/flue,generic,Apache-2.0,true,2026-07-24T08:29:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/withastro-flue
+812,hadolint-hadolint,Hadolint,hadolint/hadolint,generic,GPL-3.0,true,2026-06-11T07:29:04+00:00,within-180-days,false,https://www.openagentskill.com/skills/hadolint-hadolint
+813,redpanda-data-redpanda,Redpanda,redpanda-data/redpanda,generic,Unknown,false,2026-06-16T08:44:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/redpanda-data-redpanda
+814,primer-react,React,primer/react,domain-tool,MIT,true,2026-06-16T02:34:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/primer-react
+815,future-architect-vuls,Vuls,future-architect/vuls,generic,GPL-3.0,true,2026-06-12T04:28:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/future-architect-vuls
+816,libre-tube-libretube,LibreTube,libre-tube/LibreTube,generic,GPL-3.0,true,2026-06-15T14:15:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/libre-tube-libretube
+817,imbad0202-academic-research-skills-codex,Academic Research Skills Codex,Imbad0202/academic-research-skills-codex,generic,Unknown,false,2026-06-14T03:12:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/imbad0202-academic-research-skills-codex
+818,logto-io-logto,Logto,logto-io/logto,generic,MPL-2.0,true,2026-06-16T09:32:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/logto-io-logto
+819,magento-magento2,Magento2,magento/magento2,generic,OSL-3.0,true,2026-06-15T15:18:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/magento-magento2
+820,ubicloud-ubicloud,Ubicloud,ubicloud/ubicloud,generic,AGPL-3.0,true,2026-06-16T08:42:24+00:00,within-180-days,false,https://www.openagentskill.com/skills/ubicloud-ubicloud
+821,zoicware-removewindowsai,RemoveWindowsAI,zoicware/RemoveWindowsAI,generic,MIT,true,2026-06-19T06:55:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/zoicware-removewindowsai
+822,wiselibs-better-sqlite3,Better Sqlite3,WiseLibs/better-sqlite3,domain-tool,MIT,true,2026-07-29T01:03:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/wiselibs-better-sqlite3
+823,warp-tech-warpgate,Warpgate,warp-tech/warpgate,generic,Apache-2.0,true,2026-07-22T23:40:06+00:00,within-180-days,false,https://www.openagentskill.com/skills/warp-tech-warpgate
+824,apache-hertzbeat,Hertzbeat,apache/hertzbeat,generic,Apache-2.0,true,2026-08-27T01:59:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-hertzbeat
+825,jacomyal-sigma-js,Sigma.Js,jacomyal/sigma.js,domain-tool,MIT,true,2026-06-09T08:05:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/jacomyal-sigma-js
+826,encoredev-encore,Encore,encoredev/encore,generic,MPL-2.0,true,2026-06-17T14:18:00+00:00,within-180-days,false,https://www.openagentskill.com/skills/encoredev-encore
+827,abus-aikorea-voice-pro,Voice Pro,abus-aikorea/voice-pro,generic,GPL-3.0,true,2026-07-13T01:28:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/abus-aikorea-voice-pro
+828,wuyoscar-gpt-image2-skill,GPT Image2 Skill,wuyoscar/GPT-Image2-Skill,agent-skill,MIT,true,2026-07-01T07:31:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/wuyoscar-gpt-image2-skill
+829,composio,Composio,ComposioHQ/composio,generic,MIT,true,2026-07-10T01:14:41+00:00,within-180-days,false,https://www.openagentskill.com/skills/composio
+830,wix-detox,Detox,wix/Detox,agent-workflow,MIT,true,2026-06-16T16:59:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/wix-detox
+831,sqlalchemy-sqlalchemy,Sqlalchemy,sqlalchemy/sqlalchemy,domain-tool,MIT,true,2026-06-18T18:13:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/sqlalchemy-sqlalchemy
+832,microsoft-qlib,Qlib,microsoft/qlib,agent-workflow,MIT,true,2026-04-22T07:08:01+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-qlib
+833,startrail-org-leann,LEANN,StarTrail-org/LEANN,domain-tool,MIT,true,2026-06-09T03:12:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/startrail-org-leann
+834,keephq-keep,Keep,keephq/keep,agent-workflow,Unknown,false,2026-06-11T09:42:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/keephq-keep
+835,microsoft-playwright-cli,Playwright Cli,microsoft/playwright-cli,agent-workflow,Apache-2.0,true,2026-07-09T19:10:58+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-playwright-cli
+836,hillya51-lunatranslator,LunaTranslator,HIllya51/LunaTranslator,domain-tool,GPL-3.0,true,2026-06-14T03:44:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/hillya51-lunatranslator
+837,sonic-pi-net-sonic-pi,Sonic Pi,sonic-pi-net/sonic-pi,generic,Unknown,false,2026-06-12T22:04:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/sonic-pi-net-sonic-pi
+838,keplergl-kepler-gl,Kepler.Gl,keplergl/kepler.gl,domain-tool,MIT,true,2026-06-16T02:01:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/keplergl-kepler-gl
+839,openrefine-openrefine,OpenRefine,OpenRefine/OpenRefine,domain-tool,BSD-3-Clause,true,2026-06-12T18:53:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/openrefine-openrefine
+840,open-policy-agent-opa,Opa,open-policy-agent/opa,generic,Apache-2.0,true,2026-06-12T09:58:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/open-policy-agent-opa
+841,manticoresoftware-manticoresearch,Manticoresearch,manticoresoftware/manticoresearch,domain-tool,GPL-3.0,true,2026-06-16T09:45:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/manticoresoftware-manticoresearch
+842,starrocks-starrocks,Starrocks,StarRocks/starrocks,domain-tool,Apache-2.0,true,2026-06-20T23:17:35+00:00,within-180-days,false,https://www.openagentskill.com/skills/starrocks-starrocks
+843,hicccc77-weflow,WeFlow,hicccc77/WeFlow,domain-tool,Unknown,false,2026-06-19T06:59:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/hicccc77-weflow
+844,ludwig-ai-ludwig,Ludwig,ludwig-ai/ludwig,generic,Apache-2.0,true,2026-06-15T21:11:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/ludwig-ai-ludwig
+845,robotframework-robotframework,Robotframework,robotframework/robotframework,agent-workflow,Apache-2.0,true,2026-06-09T15:00:54+00:00,within-180-days,false,https://www.openagentskill.com/skills/robotframework-robotframework
+846,johanneskaufmann-html-to-markdown,Html To Markdown,JohannesKaufmann/html-to-markdown,domain-tool,MIT,true,2026-06-15T10:14:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/johanneskaufmann-html-to-markdown
+847,bleachbit-bleachbit,Bleachbit,bleachbit/bleachbit,generic,GPL-3.0,true,2026-10-17T00:48:42+00:00,within-180-days,false,https://www.openagentskill.com/skills/bleachbit-bleachbit
+848,speechbrain-speechbrain,Speechbrain,speechbrain/speechbrain,generic,Apache-2.0,true,2026-06-15T11:24:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/speechbrain-speechbrain
+849,gravitl-netmaker,Netmaker,gravitl/netmaker,generic,Unknown,false,2026-06-15T18:07:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/gravitl-netmaker
+850,piebald-ai-claude-code-system-prompts,Claude Code System Prompts,Piebald-AI/claude-code-system-prompts,generic,MIT,true,2026-07-06T21:21:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/piebald-ai-claude-code-system-prompts
+851,autoscrape-labs-pydoll,Pydoll,autoscrape-labs/pydoll,agent-workflow,MIT,true,2026-09-16T18:29:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/autoscrape-labs-pydoll
+852,authzed-spicedb,Spicedb,authzed/spicedb,generic,Apache-2.0,true,2026-09-24T21:13:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/authzed-spicedb
+853,the-pr-agent-pr-agent,Pr Agent,The-PR-Agent/pr-agent,generic,Apache-2.0,true,2026-06-06T16:49:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/the-pr-agent-pr-agent
+854,milkdown-milkdown,Milkdown,Milkdown/milkdown,domain-tool,MIT,true,2026-06-15T20:47:30+00:00,within-180-days,false,https://www.openagentskill.com/skills/milkdown-milkdown
+855,benbusby-whoogle-search,Whoogle Search,benbusby/whoogle-search,domain-tool,MIT,true,2026-08-14T14:12:30+00:00,within-180-days,false,https://www.openagentskill.com/skills/benbusby-whoogle-search
+856,fivetran-great-expectations,Great Expectations,fivetran/great_expectations,generic,Apache-2.0,true,2026-06-13T02:48:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/fivetran-great-expectations
+857,brycewang-stanford-auto-empirical-research-skills,Auto Empirical Research Skills,brycewang-stanford/Auto-Empirical-Research-Skills,collection,CC-BY-SA-4.0,true,2026-09-01T14:28:11+00:00,within-180-days,true,https://www.openagentskill.com/skills/brycewang-stanford-auto-empirical-research-skills
+858,goldmansachs-gs-quant,Gs Quant,goldmansachs/gs-quant,domain-tool,Apache-2.0,true,2026-07-15T15:53:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/goldmansachs-gs-quant
+859,grafana-pyroscope,Pyroscope,grafana/pyroscope,agent-workflow,AGPL-3.0,true,2026-06-16T02:08:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/grafana-pyroscope
+860,opensandbox-group-opensandbox,OpenSandbox,opensandbox-group/OpenSandbox,generic,Apache-2.0,true,2026-06-12T15:35:36+00:00,within-180-days,false,https://www.openagentskill.com/skills/opensandbox-group-opensandbox
+861,kubescape-kubescape,Kubescape,kubescape/kubescape,generic,Apache-2.0,true,2026-06-15T15:56:54+00:00,within-180-days,false,https://www.openagentskill.com/skills/kubescape-kubescape
+862,dataelement-bisheng,Bisheng,dataelement/bisheng,domain-tool,Apache-2.0,true,2026-06-29T03:00:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/dataelement-bisheng
+863,pipedreamhq-pipedream,Pipedream,PipedreamHQ/pipedream,generic,Unknown,false,2026-06-16T07:53:46+00:00,within-180-days,false,https://www.openagentskill.com/skills/pipedreamhq-pipedream
+864,statsmodels-statsmodels,Statsmodels,statsmodels/statsmodels,domain-tool,BSD-3-Clause,true,2026-06-12T12:38:47+00:00,within-180-days,false,https://www.openagentskill.com/skills/statsmodels-statsmodels
+865,windingwind-zotero-pdf-translate,Zotero Pdf Translate,windingwind/zotero-pdf-translate,domain-tool,AGPL-3.0,true,2026-06-10T11:11:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/windingwind-zotero-pdf-translate
+866,linkerd-linkerd2,Linkerd2,linkerd/linkerd2,generic,Apache-2.0,true,2026-06-16T05:57:59+00:00,within-180-days,false,https://www.openagentskill.com/skills/linkerd-linkerd2
+867,libvips-libvips,Libvips,libvips/libvips,domain-tool,LGPL-2.1,true,2026-06-15T13:26:31+00:00,within-180-days,false,https://www.openagentskill.com/skills/libvips-libvips
+868,agones-dev-agones,Agones,agones-dev/agones,generic,Apache-2.0,true,2026-08-09T04:39:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/agones-dev-agones
+869,flxzt-rnote,Rnote,flxzt/rnote,domain-tool,GPL-3.0,true,2026-06-01T20:13:42+00:00,within-180-days,false,https://www.openagentskill.com/skills/flxzt-rnote
+870,garden-io-garden,Garden,garden-io/garden,generic,MPL-2.0,true,2026-06-11T14:45:30+00:00,within-180-days,false,https://www.openagentskill.com/skills/garden-io-garden
+871,microsoft-agent-framework,Agent Framework,microsoft/agent-framework,generic,MIT,true,2026-06-14T06:27:56+00:00,within-180-days,false,https://www.openagentskill.com/skills/microsoft-agent-framework
+872,quickwit-oss-quickwit,Quickwit,quickwit-oss/quickwit,domain-tool,Apache-2.0,true,2026-06-16T09:53:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/quickwit-oss-quickwit
+873,vnpy-vnpy,Vnpy,vnpy/vnpy,domain-tool,MIT,true,2026-05-17T08:05:41+00:00,within-180-days,false,https://www.openagentskill.com/skills/vnpy-vnpy
+874,twin-gatus,Gatus,TwiN/gatus,generic,Apache-2.0,true,2026-06-19T06:22:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/twin-gatus
+875,kornia-kornia,Kornia,kornia/kornia,generic,Apache-2.0,true,2026-06-15T20:03:17+00:00,within-180-days,false,https://www.openagentskill.com/skills/kornia-kornia
+876,maillab-cloud-mail,Cloud Mail,maillab/cloud-mail,generic,MIT,true,2026-06-09T11:55:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/maillab-cloud-mail
+877,horsicq-detect-it-easy,Detect It Easy,horsicq/Detect-It-Easy,generic,MIT,true,2026-07-18T22:43:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/horsicq-detect-it-easy
+878,loft-sh-vcluster,Vcluster,loft-sh/vcluster,generic,Apache-2.0,true,2026-06-16T07:24:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/loft-sh-vcluster
+879,memstechtips-winhance,Winhance,memstechtips/Winhance,generic,Unknown,false,2026-06-20T06:15:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/memstechtips-winhance
+880,apache-openwhisk,Openwhisk,apache/openwhisk,generic,Apache-2.0,true,2026-08-24T21:14:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-openwhisk
+881,blinkospace-blinko,Blinko,blinkospace/blinko,domain-tool,GPL-3.0,true,2026-08-27T05:11:11+00:00,within-180-days,false,https://www.openagentskill.com/skills/blinkospace-blinko
+882,mengto-skills,Skills,MengTo/Skills,collection,MIT,true,2026-08-14T06:13:14+00:00,within-180-days,false,https://www.openagentskill.com/skills/mengto-skills
+883,humanlayer-humanlayer,Humanlayer,humanlayer/humanlayer,agent-workflow,Unknown,false,2026-06-19T03:27:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/humanlayer-humanlayer
+884,quay-clair,Clair,quay/clair,generic,Apache-2.0,true,2026-07-17T18:23:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/quay-clair
+885,material-components-material-web,Material Web,material-components/material-web,domain-tool,Apache-2.0,true,2026-06-15T16:32:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/material-components-material-web
+886,ogulcancelik-herdr,Herdr,ogulcancelik/herdr,agent-workflow,Unknown,false,2026-07-19T01:50:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/ogulcancelik-herdr
+887,openspug-spug,Spug,openspug/spug,generic,AGPL-3.0,true,2026-06-12T04:03:45+00:00,within-180-days,false,https://www.openagentskill.com/skills/openspug-spug
+888,leandromoreira-ffmpeg-libav-tutorial,Ffmpeg Libav Tutorial,leandromoreira/ffmpeg-libav-tutorial,generic,BSD-3-Clause,true,2026-06-18T14:18:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/leandromoreira-ffmpeg-libav-tutorial
+889,sirmalloc-ccstatusline,Ccstatusline,sirmalloc/ccstatusline,agent-workflow,MIT,true,2026-06-19T17:57:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/sirmalloc-ccstatusline
+890,perspective-dev-perspective,Perspective,perspective-dev/perspective,domain-tool,Apache-2.0,true,2026-06-05T03:56:50+00:00,within-180-days,false,https://www.openagentskill.com/skills/perspective-dev-perspective
+891,kareadita-kavita,Kavita,Kareadita/Kavita,domain-tool,GPL-3.0,true,2026-06-19T19:43:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/kareadita-kavita
+892,mrkai77-loop,Loop,mrkai77/Loop,generic,GPL-3.0,true,2026-06-13T07:17:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/mrkai77-loop
+893,hashicorp-terraform-provider-aws,Terraform Provider Aws,hashicorp/terraform-provider-aws,generic,MPL-2.0,true,2026-06-16T07:21:00+00:00,within-180-days,false,https://www.openagentskill.com/skills/hashicorp-terraform-provider-aws
+894,vuestorefront-vue-storefront,Vue Storefront,vuestorefront/vue-storefront,generic,Unknown,false,2026-06-09T12:03:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/vuestorefront-vue-storefront
+895,pressly-goose,Goose,pressly/goose,domain-tool,Unknown,false,2026-06-20T00:22:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/pressly-goose
+896,shuvonsec-claude-bug-bounty,Claude Bug Bounty,shuvonsec/claude-bug-bounty,generic,MIT,true,2026-06-18T15:41:06+00:00,within-180-days,false,https://www.openagentskill.com/skills/shuvonsec-claude-bug-bounty
+897,adobe-spectrum-css,Spectrum Css,adobe/spectrum-css,domain-tool,Apache-2.0,true,2026-08-07T19:54:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/adobe-spectrum-css
+898,dexidp-dex,Dex,dexidp/dex,generic,Apache-2.0,true,2026-06-11T04:03:03+00:00,within-180-days,false,https://www.openagentskill.com/skills/dexidp-dex
+899,aden-hive-hive,Hive,aden-hive/hive,agent-skill,Apache-2.0,true,2026-05-29T21:55:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/aden-hive-hive
+900,prql-prql,Prql,PRQL/prql,domain-tool,Apache-2.0,true,2026-06-20T08:03:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/prql-prql
+901,blockrunai-clawrouter,ClawRouter,BlockRunAI/ClawRouter,generic,MIT,true,2026-10-16T21:15:00+00:00,within-180-days,false,https://www.openagentskill.com/skills/blockrunai-clawrouter
+902,chia-network-chia-blockchain,Chia Blockchain,Chia-Network/chia-blockchain,generic,Apache-2.0,true,2026-06-29T05:55:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/chia-network-chia-blockchain
+903,sonarsource-sonarqube,Sonarqube,SonarSource/sonarqube,generic,LGPL-3.0,true,2026-07-17T10:07:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/sonarsource-sonarqube
+904,github-copilot-cli,Copilot Cli,github/copilot-cli,agent-workflow,Unknown,false,2026-06-16T00:47:11+00:00,within-180-days,false,https://www.openagentskill.com/skills/github-copilot-cli
+905,voxel51-fiftyone,Fiftyone,voxel51/fiftyone,agent-workflow,Apache-2.0,true,2026-06-16T03:25:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/voxel51-fiftyone
+906,trailofbits-skills,Skills,trailofbits/skills,agent-skill,CC-BY-SA-4.0,true,2026-08-14T13:15:37+00:00,within-180-days,false,https://www.openagentskill.com/skills/trailofbits-skills
+907,triton-inference-server-server,Server,triton-inference-server/server,generic,BSD-3-Clause,true,2026-06-16T08:45:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/triton-inference-server-server
+908,tyktechnologies-tyk,Tyk,TykTechnologies/tyk,generic,Unknown,false,2026-06-16T08:39:35+00:00,within-180-days,false,https://www.openagentskill.com/skills/tyktechnologies-tyk
+909,go-vgo-robotgo,Robotgo,go-vgo/robotgo,agent-workflow,Apache-2.0,true,2026-06-06T08:37:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/go-vgo-robotgo
+910,meshery-meshery,Meshery,meshery/meshery,generic,Apache-2.0,true,2026-06-16T06:24:34+00:00,within-180-days,false,https://www.openagentskill.com/skills/meshery-meshery
+911,2noise-chattts,ChatTTS,2noise/ChatTTS,generic,AGPL-3.0,true,2026-04-10T16:33:48+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/2noise-chattts
+912,monero-project-monero,Monero,monero-project/monero,generic,Unknown,false,2026-06-20T20:10:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/monero-project-monero
+913,mail-0-zero,Zero,Mail-0/Zero,generic,MIT,true,2026-05-26T20:27:28+00:00,within-180-days,false,https://www.openagentskill.com/skills/mail-0-zero
+914,bunkerity-bunkerweb,Bunkerweb,bunkerity/bunkerweb,generic,AGPL-3.0,true,2026-06-16T07:42:59+00:00,within-180-days,false,https://www.openagentskill.com/skills/bunkerity-bunkerweb
+915,lancedb-lancedb,Lancedb,lancedb/lancedb,domain-tool,Apache-2.0,true,2026-06-15T22:07:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/lancedb-lancedb
+916,apache-flink-cdc,Flink Cdc,apache/flink-cdc,domain-tool,Apache-2.0,true,2026-08-25T02:21:45+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-flink-cdc
+917,fechin-reference,Reference,Fechin/reference,domain-tool,GPL-3.0,true,2026-06-05T07:08:54+00:00,within-180-days,false,https://www.openagentskill.com/skills/fechin-reference
+918,ultralytics-yolov3,Yolov3,ultralytics/yolov3,generic,AGPL-3.0,true,2026-06-15T19:30:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/ultralytics-yolov3
+919,yokoffing-betterfox,Betterfox,yokoffing/Betterfox,generic,MIT,true,2026-06-19T14:14:05+00:00,within-180-days,false,https://www.openagentskill.com/skills/yokoffing-betterfox
+920,google-osv-scanner,Osv Scanner,google/osv-scanner,generic,Apache-2.0,true,2026-06-20T21:19:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/google-osv-scanner
+921,kubernetes-kompose,Kompose,kubernetes/kompose,generic,Apache-2.0,true,2026-06-15T21:07:52+00:00,within-180-days,false,https://www.openagentskill.com/skills/kubernetes-kompose
+922,aptos-labs-aptos-core,Aptos Core,aptos-labs/aptos-core,generic,Unknown,false,2026-09-13T00:02:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/aptos-labs-aptos-core
+923,aistra0528-hail,Hail,aistra0528/Hail,generic,GPL-3.0,true,2026-08-12T09:51:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/aistra0528-hail
+924,adbar-trafilatura,Trafilatura,adbar/trafilatura,domain-tool,Apache-2.0,true,2026-08-04T15:33:35+00:00,within-180-days,false,https://www.openagentskill.com/skills/adbar-trafilatura
+925,actions-actions-runner-controller,Actions Runner Controller,actions/actions-runner-controller,generic,Apache-2.0,true,2026-08-03T22:16:29+00:00,within-180-days,false,https://www.openagentskill.com/skills/actions-actions-runner-controller
+926,oramasearch-orama,Orama,oramasearch/orama,domain-tool,Unknown,false,2026-06-30T15:48:53+00:00,within-180-days,false,https://www.openagentskill.com/skills/oramasearch-orama
+927,foundry-rs-foundry,Foundry,foundry-rs/foundry,generic,Apache-2.0,true,2026-06-29T13:12:25+00:00,within-180-days,false,https://www.openagentskill.com/skills/foundry-rs-foundry
+928,cocoindex-io-cocoindex,Cocoindex,cocoindex-io/cocoindex,domain-tool,Apache-2.0,true,2026-06-19T23:45:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/cocoindex-io-cocoindex
+929,openvinotoolkit-openvino,Openvino,openvinotoolkit/openvino,generic,Apache-2.0,true,2026-06-23T01:12:52+00:00,within-180-days,false,https://www.openagentskill.com/skills/openvinotoolkit-openvino
+930,openframeworks-openframeworks,OpenFrameworks,openframeworks/openFrameworks,generic,Unknown,false,2026-06-13T04:04:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/openframeworks-openframeworks
+931,linq2db-linq2db,Linq2db,linq2db/linq2db,domain-tool,MIT,true,2026-06-17T23:30:42+00:00,within-180-days,false,https://www.openagentskill.com/skills/linq2db-linq2db
+932,turfjs-turf,Turf,Turfjs/turf,generic,MIT,true,2026-06-20T21:34:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/turfjs-turf
+933,run-llama-liteparse,Liteparse,run-llama/liteparse,domain-tool,Apache-2.0,true,2026-06-19T19:09:42+00:00,within-180-days,false,https://www.openagentskill.com/skills/run-llama-liteparse
+934,yugabyte-yugabyte-db,Yugabyte Db,yugabyte/yugabyte-db,generic,Unknown,false,2026-06-16T09:41:36+00:00,within-180-days,false,https://www.openagentskill.com/skills/yugabyte-yugabyte-db
+935,kedacore-keda,Keda,kedacore/keda,generic,Apache-2.0,true,2026-06-16T08:31:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/kedacore-keda
+936,frappe-frappe,Frappe,frappe/frappe,generic,MIT,true,2026-06-16T10:06:31+00:00,within-180-days,false,https://www.openagentskill.com/skills/frappe-frappe
+937,naptha-tesseract-js,Tesseract.Js,naptha/tesseract.js,domain-tool,Apache-2.0,true,2026-05-17T04:19:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/naptha-tesseract-js
+938,hkuds-vimax,ViMax,HKUDS/ViMax,domain-tool,MIT,true,2026-06-13T03:50:00+00:00,within-180-days,false,https://www.openagentskill.com/skills/hkuds-vimax
+939,aimhubio-aim,Aim,aimhubio/aim,domain-tool,Apache-2.0,true,2026-08-11T20:35:08+00:00,within-180-days,false,https://www.openagentskill.com/skills/aimhubio-aim
+940,satellite-image-deep-learning-techniques,Techniques,satellite-image-deep-learning/techniques,generic,Apache-2.0,true,2026-06-07T05:04:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/satellite-image-deep-learning-techniques
+941,skypilot-org-skypilot,Skypilot,skypilot-org/skypilot,generic,Apache-2.0,true,2026-06-16T06:56:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/skypilot-org-skypilot
+942,oceanbase-oceanbase,Oceanbase,oceanbase/oceanbase,domain-tool,Unknown,false,2026-06-19T01:00:50+00:00,within-180-days,false,https://www.openagentskill.com/skills/oceanbase-oceanbase
+943,ikaijua-awesome-aitools,Awesome AITools,ikaijua/Awesome-AITools,collection,Unknown,false,2026-10-07T08:05:57+00:00,within-180-days,false,https://www.openagentskill.com/skills/ikaijua-awesome-aitools
+944,alipay-solopi,SoloPi,alipay/SoloPi,agent-workflow,Apache-2.0,true,2026-08-15T03:50:31+00:00,within-180-days,false,https://www.openagentskill.com/skills/alipay-solopi
+945,appleboy-ssh-action,Ssh Action,appleboy/ssh-action,generic,MIT,true,2026-08-16T12:07:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/appleboy-ssh-action
+946,stakater-reloader,Reloader,stakater/Reloader,generic,Apache-2.0,true,2026-06-16T06:09:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/stakater-reloader
+947,evershopcommerce-evershop,Evershop,evershopcommerce/evershop,generic,GPL-3.0,true,2026-06-16T08:10:45+00:00,within-180-days,false,https://www.openagentskill.com/skills/evershopcommerce-evershop
+948,netflix-metaflow,Metaflow,Netflix/metaflow,generic,Apache-2.0,true,2026-06-13T13:01:02+00:00,within-180-days,false,https://www.openagentskill.com/skills/netflix-metaflow
+949,stocksharp-stocksharp,StockSharp,StockSharp/StockSharp,domain-tool,Apache-2.0,true,2026-06-13T07:28:33+00:00,within-180-days,false,https://www.openagentskill.com/skills/stocksharp-stocksharp
+950,alexeygrigorev-data-science-interviews,Data Science Interviews,alexeygrigorev/data-science-interviews,generic,CC-BY-4.0,true,2026-06-01T07:56:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/alexeygrigorev-data-science-interviews
+951,healthchecks-healthchecks,Healthchecks,healthchecks/healthchecks,generic,BSD-3-Clause,true,2026-06-19T13:55:04+00:00,within-180-days,false,https://www.openagentskill.com/skills/healthchecks-healthchecks
+952,nopsolutions-nopcommerce,NopCommerce,nopSolutions/nopCommerce,generic,Unknown,false,2026-06-15T16:45:35+00:00,within-180-days,false,https://www.openagentskill.com/skills/nopsolutions-nopcommerce
+953,apache-fesod,Fesod,apache/fesod,domain-tool,Apache-2.0,true,2026-08-27T02:12:36+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-fesod
+954,velero-io-velero,Velero,velero-io/velero,generic,Apache-2.0,true,2026-06-16T09:57:40+00:00,within-180-days,false,https://www.openagentskill.com/skills/velero-io-velero
+955,py-pdf-pypdf,Pypdf,py-pdf/pypdf,domain-tool,Unknown,false,2026-06-11T14:42:21+00:00,within-180-days,false,https://www.openagentskill.com/skills/py-pdf-pypdf
+956,teampiped-piped,Piped,TeamPiped/Piped,generic,AGPL-3.0,true,2026-06-20T16:47:42+00:00,within-180-days,false,https://www.openagentskill.com/skills/teampiped-piped
+957,leantime-leantime,Leantime,Leantime/leantime,generic,AGPL-3.0,true,2026-06-14T19:12:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/leantime-leantime
+958,zyddnys-manga-image-translator,Manga Image Translator,zyddnys/manga-image-translator,domain-tool,GPL-3.0,true,2026-05-24T09:50:15+00:00,within-180-days,false,https://www.openagentskill.com/skills/zyddnys-manga-image-translator
+959,douyinfe-semi-design,Semi Design,DouyinFE/semi-design,domain-tool,Unknown,false,2026-06-09T08:41:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/douyinfe-semi-design
+960,xo-usql,Usql,xo/usql,domain-tool,MIT,true,2026-06-19T14:42:20+00:00,within-180-days,false,https://www.openagentskill.com/skills/xo-usql
+961,hbai-ltd-toonflow-app,Toonflow App,HBAI-Ltd/Toonflow-app,domain-tool,Apache-2.0,true,2026-06-08T12:50:49+00:00,within-180-days,false,https://www.openagentskill.com/skills/hbai-ltd-toonflow-app
+962,apache-hive,Hive,apache/hive,domain-tool,Apache-2.0,true,2026-08-26T13:30:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-hive
+963,web-platform-tests-wpt,Wpt,web-platform-tests/wpt,generic,Unknown,false,2026-07-25T00:44:12+00:00,within-180-days,false,https://www.openagentskill.com/skills/web-platform-tests-wpt
+964,uditgoenka-autoresearch,Autoresearch,uditgoenka/autoresearch,agent-skill,MIT,true,2026-08-12T22:28:18+00:00,within-180-days,false,https://www.openagentskill.com/skills/uditgoenka-autoresearch
+965,ankitpokhrel-jira-cli,Jira Cli,ankitpokhrel/jira-cli,generic,MIT,true,2026-08-19T11:07:22+00:00,within-180-days,false,https://www.openagentskill.com/skills/ankitpokhrel-jira-cli
+966,alchaincyf-darwin-skill,Darwin Skill,alchaincyf/darwin-skill,agent-skill,MIT,true,2026-08-25T03:01:10+00:00,within-180-days,true,https://www.openagentskill.com/skills/alchaincyf-darwin-skill
+967,itzcrazykns-vane,Vane,ItzCrazyKns/Vane,domain-tool,MIT,true,2026-04-11T14:33:06+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/itzcrazykns-vane
+968,areal-project-areal,AReaL,areal-project/AReaL,generic,Apache-2.0,true,2026-09-15T12:21:48+00:00,within-180-days,false,https://www.openagentskill.com/skills/areal-project-areal
+969,biolab-orange3,Orange3,biolab/orange3,domain-tool,Unknown,false,2026-10-13T11:42:17+00:00,within-180-days,false,https://www.openagentskill.com/skills/biolab-orange3
+970,gosom-google-maps-scraper,Google Maps Scraper,gosom/google-maps-scraper,agent-skill,MIT,true,2026-08-22T15:04:51+00:00,within-180-days,true,https://www.openagentskill.com/skills/gosom-google-maps-scraper
+971,yuan1z0825-nature-skills-nature-writing,nature-writing,Yuan1z0825/nature-skills,agent-skill,Apache-2.0,true,2026-09-02T14:57:03+00:00,within-180-days,true,https://www.openagentskill.com/skills/yuan1z0825-nature-skills-nature-writing
+972,arco-design-arco-design,Arco Design,arco-design/arco-design,domain-tool,MIT,true,2026-08-24T11:27:07+00:00,within-180-days,false,https://www.openagentskill.com/skills/arco-design-arco-design
+973,antiwork-shortest,Shortest,antiwork/shortest,agent-workflow,MIT,true,2026-08-06T15:23:13+00:00,within-180-days,false,https://www.openagentskill.com/skills/antiwork-shortest
+974,gnipbao-story-to-handdrawn-video,Story To Handdrawn Video,gnipbao/story-to-handdrawn-video,agent-skill,MIT,true,2026-08-08T09:31:37+00:00,within-180-days,true,https://www.openagentskill.com/skills/gnipbao-story-to-handdrawn-video
+975,helloianneo-ian-xiaohei-illustrations,Ian Xiaohei Illustrations,helloianneo/ian-xiaohei-illustrations,agent-skill,MIT,true,2026-06-03T11:35:43+00:00,within-180-days,false,https://www.openagentskill.com/skills/helloianneo-ian-xiaohei-illustrations
+976,oxylabs-how-to-scrape-amazon-product-data,How To Scrape Amazon Product Data,oxylabs/how-to-scrape-amazon-product-data,domain-tool,Unknown,false,2026-06-08T10:54:01+00:00,within-180-days,false,https://www.openagentskill.com/skills/oxylabs-how-to-scrape-amazon-product-data
+977,alainm23-planify,Planify,alainm23/planify,generic,GPL-3.0,true,2026-08-14T00:33:01+00:00,within-180-days,false,https://www.openagentskill.com/skills/alainm23-planify
+978,openai-clip,CLIP,openai/CLIP,generic,MIT,true,2026-03-25T18:46:40+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/openai-clip
+979,explosion-spacy,SpaCy,explosion/spaCy,generic,MIT,true,2026-05-19T06:48:57+00:00,within-180-days,false,https://www.openagentskill.com/skills/explosion-spacy
+980,tabbyml-tabby,Tabby,TabbyML/tabby,agent-workflow,Unknown,false,2026-03-02T20:08:28+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/tabbyml-tabby
+981,aimeos-aimeos,Aimeos,aimeos/aimeos,generic,MIT,true,2026-07-29T07:44:19+00:00,within-180-days,false,https://www.openagentskill.com/skills/aimeos-aimeos
+982,apple-coremltools,Coremltools,apple/coremltools,generic,BSD-3-Clause,true,2026-09-12T00:07:16+00:00,within-180-days,false,https://www.openagentskill.com/skills/apple-coremltools
+983,sokrypton-colabfold,ColabFold,sokrypton/ColabFold,generic,MIT,true,2026-06-15T13:49:55+00:00,within-180-days,false,https://www.openagentskill.com/skills/sokrypton-colabfold
+984,omkarcloud-google-maps-scraper,Google Maps Scraper,omkarcloud/google-maps-scraper,domain-tool,MIT,true,2026-06-03T08:10:39+00:00,within-180-days,false,https://www.openagentskill.com/skills/omkarcloud-google-maps-scraper
+985,answerdotai-nbdev,Nbdev,AnswerDotAI/nbdev,agent-workflow,Apache-2.0,true,2026-08-25T01:26:45+00:00,within-180-days,false,https://www.openagentskill.com/skills/answerdotai-nbdev
+986,metalbear-co-mirrord,Mirrord,metalbear-co/mirrord,agent-skill,MIT,true,2026-09-05T06:10:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/metalbear-co-mirrord
+987,datawhalechina-happy-llm,Happy Llm,datawhalechina/happy-llm,domain-tool,Unknown,false,2026-05-06T16:17:10+00:00,within-180-days,false,https://www.openagentskill.com/skills/datawhalechina-happy-llm
+988,achristmascarl-rainfrog,Rainfrog,achristmascarl/rainfrog,domain-tool,MIT,true,2026-07-28T15:44:58+00:00,within-180-days,false,https://www.openagentskill.com/skills/achristmascarl-rainfrog
+989,apachecn-sklearn-doc-zh,Sklearn Doc Zh,apachecn/sklearn-doc-zh,generic,Unknown,false,2026-08-27T10:41:41+00:00,within-180-days,false,https://www.openagentskill.com/skills/apachecn-sklearn-doc-zh
+990,biopython-biopython,Biopython,biopython/biopython,generic,Unknown,false,2026-10-11T16:03:51+00:00,within-180-days,false,https://www.openagentskill.com/skills/biopython-biopython
+991,wechaty-wechaty,Wechaty,wechaty/wechaty,generic,Apache-2.0,true,2025-12-21T19:49:52+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/wechaty-wechaty
+992,writefreely-writefreely,Writefreely,writefreely/writefreely,domain-tool,AGPL-3.0,true,2026-07-29T22:22:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/writefreely-writefreely
+993,devtoys-app-devtoys,DevToys,DevToys-app/DevToys,agent-workflow,MIT,true,2026-02-25T11:53:38+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/devtoys-app-devtoys
+994,apache-calcite,Calcite,apache/calcite,domain-tool,Apache-2.0,true,2026-08-27T00:27:44+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-calcite
+995,iawia002-lux,Lux,iawia002/lux,domain-tool,MIT,true,2026-03-29T18:18:56+00:00,older-than-180-days,false,https://www.openagentskill.com/skills/iawia002-lux
+996,0xnyk-awesome-hermes-agent,Awesome Hermes Agent,0xNyk/awesome-hermes-agent,collection,Unknown,false,2026-07-29T13:07:23+00:00,within-180-days,false,https://www.openagentskill.com/skills/0xnyk-awesome-hermes-agent
+997,argilla-io-argilla,Argilla,argilla-io/argilla,generic,Apache-2.0,true,2026-09-14T22:23:52+00:00,within-180-days,false,https://www.openagentskill.com/skills/argilla-io-argilla
+998,apache-ignite,Ignite,apache/ignite,domain-tool,Apache-2.0,true,2026-08-26T20:57:09+00:00,within-180-days,false,https://www.openagentskill.com/skills/apache-ignite
+999,alisa0808-vox-director,Vox Director,Alisa0808/vox-director,agent-skill,MIT,true,2026-08-11T15:39:41+00:00,within-180-days,true,https://www.openagentskill.com/skills/alisa0808-vox-director
+1000,arroyosystems-arroyo,Arroyo,ArroyoSystems/arroyo,domain-tool,Apache-2.0,true,2026-08-31T18:14:11+00:00,within-180-days,false,https://www.openagentskill.com/skills/arroyosystems-arroyo
