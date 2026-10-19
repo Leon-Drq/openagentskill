@@ -333,6 +333,12 @@ export default async function StateOfAgentSkillsPage() {
 
       <section className="px-6 py-12">
         <div className="mx-auto max-w-6xl rounded-[8px] border border-border bg-card p-6 sm:p-8">
+          <p className="mb-6 text-sm leading-7 text-secondary">
+            For a fixed dataset and reproducible comparison of declared license and install-path fields, read the{' '}
+            <Link href="/reports/skill-readiness-2026-10-18" className="text-foreground underline underline-offset-4">
+              October 18, 2026 readiness snapshot
+            </Link>. The snapshot preserves the source response and documents its sample limitations.
+          </p>
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary">Cite this report</p>
           <blockquote className="mt-4 max-w-4xl text-base leading-7 text-secondary">
             OpenAgentSkill. “State of Agent Skills 2026.” Published July 10, 2026. Dataset and methodology available at{' '}

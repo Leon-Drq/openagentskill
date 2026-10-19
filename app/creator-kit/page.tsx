@@ -11,6 +11,7 @@ import { getAgentProvenProfile } from '@/lib/agent-proven'
 import { getAgentOutcomeStatsMap, getAllSkills } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
+import { CreatorCitationBuilder } from '@/components/creator-citation-builder'
 
 export const revalidate = 300
 
@@ -109,6 +110,36 @@ export default async function CreatorKitPage() {
       <section className="border-b border-border bg-card/35">
         <div className="mx-auto max-w-6xl px-6 py-10">
           <MarketingFeatureGrid items={features} />
+        </div>
+      </section>
+
+      <section id="cite-your-listing" className="scroll-mt-24 border-b border-border">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-2">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.22em] text-secondary">For your website and documentation</p>
+            <h2 className="mt-3 font-display text-3xl font-normal leading-tight">Give readers a useful next step.</h2>
+            <p className="mt-4 text-base leading-7 text-secondary">
+              Cite your listing next to a tutorial, installation note, or real output example. A plain text link lets
+              readers inspect the source and installation context without adding another badge.
+            </p>
+            <p className="mt-4 text-sm leading-7 text-secondary">
+              Sharing is optional. You choose the wording, placement, and link attributes. Links never affect listing
+              eligibility, review scores, or access. A listing is not a certification or proof of a successful run.
+            </p>
+            <p className="mt-6 text-sm leading-7 text-secondary">
+              Publishing a case study? Record the source version, environment, input, output, and failures so another
+              person can reproduce it. Keep author-reported results distinct from independent testing.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <a href="/creator-resources/skill-case-study-template.md" download className="inline-flex min-h-11 items-center rounded-[8px] border border-border px-4 py-2 text-sm font-semibold hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
+                Download case study template
+              </a>
+              <MarketingButtonLink href="/reports/skill-readiness-2026-10-18" variant="text">
+                Read the reproducible registry snapshot
+              </MarketingButtonLink>
+            </div>
+          </div>
+          <CreatorCitationBuilder />
         </div>
       </section>
 

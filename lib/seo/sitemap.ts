@@ -112,6 +112,7 @@ export function getCoreSitemapEntries(): SitemapEntry[] {
     { url: `${SITEMAP_BASE_URL}/reports/weekly`, changeFrequency: 'daily', priority: 0.85 },
     { url: `${SITEMAP_BASE_URL}/reports/monthly`, changeFrequency: 'weekly', priority: 0.86 },
     { url: `${SITEMAP_BASE_URL}/reports/state-of-agent-skills-2026`, changeFrequency: 'daily', priority: 0.92 },
+    { url: `${SITEMAP_BASE_URL}/reports/skill-readiness-2026-10-18`, lastModified: '2026-10-18', changeFrequency: 'yearly', priority: 0.8 },
     { url: `${SITEMAP_BASE_URL}/collections`, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${SITEMAP_BASE_URL}/skill-packs`, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${SITEMAP_BASE_URL}/compare`, changeFrequency: 'monthly', priority: 0.6 },
