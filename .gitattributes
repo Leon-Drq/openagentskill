@@ -1,0 +1,2 @@
+# License evidence is SHA-256 pinned; preserve upstream bytes on Windows too.
+public/skill-previews/**/LICENSE-*.txt -text

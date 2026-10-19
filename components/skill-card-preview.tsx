@@ -10,6 +10,8 @@ import { getShowcaseEvidenceLabel, getShowcaseImageSrc, localizeShowcase, type S
 import { previewCopy, previewText, type SkillPreviewCardData } from '@/lib/skill-preview-shared'
 import { ShowcaseVideoPlayer } from '@/components/showcase-video-player'
 import { ProviderVideoPreview } from '@/components/provider-video-preview'
+import { isPublicProductUrl } from '@/lib/skills/product-metadata'
+import { handoffCopy } from '@/lib/i18n/handoff-copy'
 
 interface Props {
   slug: string
@@ -19,10 +21,11 @@ interface Props {
   showcase?: ShowcaseCardData | null
   sourcePreview?: SkillPreviewCardData | null
   sourceGalleryHref?: string
+  exampleUrl?: string | null
   provider?: { image?: string; video?: string; exampleLabel: string }
 }
 
-export function SkillCardPreview({ slug, name, locale, category, showcase, sourcePreview, sourceGalleryHref, provider }: Props) {
+export function SkillCardPreview({ slug, name, locale, category, showcase, sourcePreview, sourceGalleryHref, exampleUrl, provider }: Props) {
   const [failedSources, setFailedSources] = useState<string[]>([])
   const candidates = [provider?.image ? {
     src: provider.image, alt: `${name} — ${provider.exampleLabel}`, label: provider.exampleLabel,
@@ -36,6 +39,7 @@ export function SkillCardPreview({ slug, name, locale, category, showcase, sourc
     label: previewCopy(sourcePreview.media.kind, locale), href: `/skills/${slug}#visual-previews`, contain: true, origin: 'source',
   } : null].filter(candidate => candidate !== null)
   const media = candidates.find(candidate => !failedSources.includes(candidate.src))
+  const exampleHref = exampleUrl && isPublicProductUrl(exampleUrl) ? exampleUrl : undefined
 
   // Playback is independent of poster loading. No video URL is attached to a
   // player until the visitor clicks; the caption remains a crawlable detail link.
@@ -51,7 +55,8 @@ export function SkillCardPreview({ slug, name, locale, category, showcase, sourc
 
   if (!media) return (
     <div className="border-b border-border bg-[#eeece5]/35 px-5 py-4" data-skill-capability>
-      <p className="flex items-center gap-2 text-xs text-secondary"><ImageOff size={14} aria-hidden="true" />{previewCopy(candidates.length ? 'unavailable' : 'empty', locale)}</p>
+      <p className="flex items-center gap-2 text-xs text-secondary">{exampleHref ? <ArrowUpRight size={14} aria-hidden="true" /> : <ImageOff size={14} aria-hidden="true" />}{exampleHref ? handoffCopy(locale, 'exampleNote') : previewCopy(candidates.length ? 'unavailable' : 'empty', locale)}</p>
+      {exampleHref && <a href={exampleHref} target="_blank" rel="noopener noreferrer" className="mt-1 flex min-h-11 items-center gap-2 text-sm font-medium text-[#006b4f]" aria-label={`${handoffCopy(locale, 'example')}: ${name}`} data-product-example>{handoffCopy(locale, 'example')}<ArrowUpRight size={14} aria-hidden="true" /></a>}
       <Link href={getLocalizedNavigationHref(`/skills/${slug}`, locale)} prefetch={false} className="mt-1 inline-flex min-h-10 items-center gap-2 text-sm font-medium text-[#006b4f]" aria-label={`${previewCopy('guide', locale)}: ${name}`}>
         {previewCopy('guide', locale)}<ArrowRight size={14} aria-hidden="true" />
       </Link>

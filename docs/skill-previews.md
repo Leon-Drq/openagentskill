@@ -1,5 +1,20 @@
 # Skill directory previews
 
+On 2026-10-19 the huashu-motion listing gained the author's hash-pinned
+`docs/media/deepseek-flash.gif` README example. Its code/documentation MIT license
+and `THIRD_PARTY.md` were inspected; the restricted bean Huashu character is not
+included. The directory uses a compressed still, with the original animation
+linked from the detail page. This is an author example, not a platform execution.
+The curated importer accepts GIFs using the same bounded decoder as automatic
+collection. `--skill <exact-slug>` refreshes only that source and preserves other
+manifest entries; run the full preview regression suite afterwards.
+
+Product `exampleUrl` links are now selected in the lean directory query and shown
+when no visual asset exists. They remain links, not visual examples or runtime
+verification, and do not join the `With examples` filter. This includes the
+video-link-downloader workflow article, for which no authorized output video has
+been collected. Invalid/non-public URLs are discarded before rendering.
+
 ## Curated video examples
 
 On 2026-10-13 the owner requested `threerocks/sweety-handdraw-video` from

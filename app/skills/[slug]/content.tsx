@@ -22,7 +22,9 @@ import { getSkillTrustProfileV5 } from '@/lib/trust'
 import { auditRiskLabel, buildSkillAudit } from '@/lib/audits'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
 import { buildAgentReadableSkillMetadata } from '@/lib/agent-readable'
-import { getSkillInstallTargets } from '@/lib/install-targets'
+import { getSkillInstallTargets, getSkillReviewTargets } from '@/lib/install-targets'
+import { SkillAgentCopy } from '@/components/skill-agent-copy'
+import { handoffCopy } from '@/lib/i18n/handoff-copy'
 import { getGitHubOwner } from '@/lib/github-owner'
 import { FEATURED_CREATORS, creatorHref } from '@/lib/creator-directory'
 import { getSkillAttribution } from '@/lib/skill-attribution'
@@ -226,7 +228,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
   const safety = getAgentSafetyProfile(dbSkill, audit, { max_risk: 'medium', needs_install_command: true })
   const source = getSkillSourceEvidence(dbSkill)
   const attribution = getSkillAttribution(dbSkill, approvedClaim)
-  const targets = getSkillInstallTargets(dbSkill)
+  const targets = safety.blocked ? getSkillReviewTargets(dbSkill) : getSkillInstallTargets(dbSkill)
   const installTargets = (['codex', 'claude-code', 'cursor', 'openagentskill-cli'] as const)
     .map(id => targets.find(target => target.id === id)).filter((target): target is NonNullable<typeof target> => Boolean(target))
   const hasShowcase = getShowcasesForSkill(skill.slug).length > 0
@@ -277,9 +279,8 @@ export default async function SkillDetailPage({ params, searchParams }: {
             <div className="flex items-start gap-4">{product.logoUrl && <SkillProductLogo url={product.logoUrl} name={skill.name} size="lg" />}<h1 className="min-w-0 max-w-5xl break-words font-display text-4xl font-normal leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl [overflow-wrap:anywhere]">{skill.name}</h1></div>
             <p className="mt-5 max-w-3xl text-lg leading-relaxed text-secondary sm:text-xl">{skill.tagline || skill.description}</p>
             <div className="mt-7 flex flex-wrap gap-2 sm:gap-3">
-              <Link href="#install-options" className={`${actionClass} border-[#006b4f] bg-[#006b4f] text-white hover:bg-[#005841]`}>
-                <ProfileText id={source.canOfferInstall && !safety.blocked ? 'useAgent' : 'reviewSource'} /><ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
+              <SkillAgentCopy skillSlug={skill.slug} target={installTargets.find(target => target.id === 'codex')} className={`${actionClass} border-[#006b4f] bg-[#006b4f] text-white hover:bg-[#005841]`} />
+              {product.exampleUrl && !sourcePreview && <a href={product.exampleUrl} target="_blank" rel="noopener noreferrer" className={actionClass}>{handoffCopy(initialLocale || defaultLocale, 'example')}<ArrowUpRight size={16} aria-hidden="true" /></a>}
               {skill.technical.repository && <SkillActionLink href={skill.technical.repository} skillSlug={skill.slug} eventType="outbound_github" external className={actionClass}><Text id="viewGitHub" /><ArrowUpRight className="h-4 w-4" aria-hidden="true" /></SkillActionLink>}
               <SkillEngagementProvider slugs={[skill.slug]}><SkillActions slug={skill.slug} name={skill.name} /></SkillEngagementProvider>
               <SkillShareButton skillSlug={skill.slug} skillName={skill.name} />
@@ -328,7 +329,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
                   <p className="mt-2"><Text id="license" />: <Value value={dbSkill.license || 'Unknown'} /></p>
                   {warnings.length > 0 && <ul className="mt-3 list-disc space-y-1 pl-5">{warnings.map(warning => <li key={warning}><Value value={warning} /></li>)}</ul>}
                 </div>
-                {!safety.blocked && <SkillInstallTargets skillSlug={skill.slug} targets={installTargets} compact />}
+                <SkillInstallTargets skillSlug={skill.slug} targets={installTargets} compact />
                 {!safety.blocked && !productDefinition(skill.slug) && !['paid', 'freemium'].includes(getSkillCommerce(skill.slug).type) && downloadableDocument(dbSkill) && <SkillDocumentDownload slug={skill.slug} />}
                 {safety.blocked && <Link href={auditHref} className={actionClass}><Text id="openFullAudit" /></Link>}
                 <p className="mt-4 text-xs leading-relaxed text-secondary"><ProfileText id="compatibilityNote" /></p>

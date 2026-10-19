@@ -1,5 +1,26 @@
 [
   {
+    "skillSlug": "alchaincyf-huashu-motion-huashu-motion",
+    "repository": "alchaincyf/huashu-motion",
+    "revision": "3e927801e78b587878fb7dbb65d616326df00c21",
+    "sourcePath": "README.md",
+    "license": "MIT",
+    "licensePath": "LICENSE",
+    "licenseSha256": "b8fa8ecfc57cf8339ecdab05e62e811a5d00d1e1f9373ff1de64cc9f261e2d3e",
+    "format": { "en": "Author motion example · GIF excerpt", "zh": "作者动效样片 · GIF 片段" },
+    "note": {
+      "en": "An excerpt of the author's DeepSeek motion specimen, published in the repository README. View the original GIF for animation; complete videos are linked from the README release page. This is a source example, not a platform runtime test. The separately restricted bean Huashu character is not included.",
+      "zh": "来自作者 README 的 DeepSeek 动效样片片段。点击原始 GIF 查看动画，完整视频见 README 中的发布页链接。这是作者示例，不是本站运行验证；未收录另有限制的「豆子花叔」角色素材。"
+    },
+    "media": [{
+      "path": "docs/media/deepseek-flash.gif",
+      "sha256": "150985ad5ec1863c8bbd9d32bf330d62f228705f9d016c93e7793a8c3256552d",
+      "kind": "example",
+      "title": { "en": "DeepSeek motion specimen", "zh": "DeepSeek 动效样片" },
+      "alt": { "en": "Author motion specimen with oversized lime typography on a black background.", "zh": "作者动效样片，黑色背景搭配荧光黄绿色大字。" }
+    }]
+  },
+  {
     "skillSlug": "hugohe3-ppt-master",
     "repository": "hugohe3/ppt-master",
     "revision": "2d72da616cf9fa40d4dcaf59fd4c980ecf534b7d",

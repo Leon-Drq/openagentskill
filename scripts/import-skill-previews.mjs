@@ -13,7 +13,9 @@ const root = fileURLToPath(new URL('../', import.meta.url))
 const require = createRequire(import.meta.url)
 const sharp = require(require.resolve('sharp', { paths: [require.resolve('next/package.json')] }))
 const sources = JSON.parse(await readFile(path.join(root, 'lib/skill-preview-sources.json'), 'utf8'))
-const { values } = parseArgs({ options: { 'cache-dir': { type: 'string' } } })
+const { values } = parseArgs({ options: { 'cache-dir': { type: 'string' }, skill: { type: 'string' } } })
+if (values.skill && !sources.some(source => source.skillSlug === values.skill)) throw new Error('Unknown curated skill')
+const existing = values.skill ? JSON.parse(await readFile(path.join(root, 'lib/skill-previews.json'), 'utf8')) : []
 const digest = bytes => createHash('sha256').update(bytes).digest('hex')
 const pending = []
 const registry = []
@@ -28,6 +30,12 @@ async function checkedFile(source, file, expectedHash, limit, releaseTag) {
   return fetchCuratedBytes(download, expectedHash, limit)
 }
 for (const source of sources) {
+  if (values.skill && source.skillSlug !== values.skill) {
+    const previous = existing.find(item => item.skillSlug === source.skillSlug)
+    if (!previous) throw new Error('Run the complete importer before a scoped import')
+    registry.push(previous)
+    continue
+  }
   if (!/^[a-z0-9-]+$/.test(source.skillSlug) || source.license !== 'MIT' || !source.media.length) throw new Error('Unsupported source definition')
   const base = `/skill-previews/${source.skillSlug}`
   const license = await checkedFile(source, source.licensePath, source.licenseSha256, 100000)
@@ -41,6 +49,16 @@ for (const source of sources) {
     if (image.releaseTag !== undefined && !document.includes(sourceUrl)) throw new Error('Release asset is not linked by pinned source document')
     const video = /\.(mp4|webm)$/i.test(image.path)
     const bytes = await checkedFile(source, image.path, image.sha256, (video ? 20 : 10) * 1024 * 1024, image.releaseTag)
+    if (/\.gif$/i.test(image.path)) {
+      const rendered = await renderAsset(bytes, image.path)
+      const relocate = url => url.replace('/skill-previews/auto/', `${base}/`)
+      for (const [url, content] of rendered.files) pending.push([relocate(url), content])
+      const item = rendered.media
+      media.push({ ...item, src: relocate(item.src), cardSrc: relocate(item.cardSrc),
+        previewSrc: relocate(item.previewSrc), originalSrc: relocate(item.originalSrc),
+        sourceUrl, kind: image.kind, title: image.title, alt: image.alt })
+      continue
+    }
     if (video) {
       const rendered = await renderAsset(bytes, image.path)
       // Keep curated files separate from automatic collection and its pruning.

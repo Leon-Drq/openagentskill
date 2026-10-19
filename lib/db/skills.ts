@@ -24,6 +24,7 @@ import type { SkillProductMetadata } from '@/lib/skills/product-metadata'
 export interface SkillRecord extends Partial<SkillTaxonomy> {
   product_metadata?: SkillProductMetadata | null
   product_logo_url?: string | null
+  product_example_url?: string | null
   id: string
   slug: string
   name: string
@@ -115,6 +116,7 @@ const SKILL_DIRECTORY_SELECT = [
   'author_name',
   'author_url',
   'product_logo_url:product_metadata->>logoUrl',
+  'product_example_url:product_metadata->>exampleUrl',
   'repository',
   'github_repo',
   'github_stars',
@@ -244,7 +246,7 @@ const getSharedAllSkills = unstable_cache(
     // throw so Next retains its last good entry, not a smaller fallback.
     return packCacheJson(await fetchAllSkills(sort, category || undefined, maxRows))
   },
-  ['public-skill-directory-v7-site-downloads'],
+  ['public-skill-directory-v8-product-examples'],
   {
     revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS,
     tags: ['public-skill-directory'],
@@ -1265,7 +1267,7 @@ const getCachedBrowseCandidates = unstable_cache(
     if (error) throw error
     return packCacheJson(filterSkillOnly((data || []) as unknown as SkillRecord[]))
   }),
-  ['skills-browse-candidates-v5-site-downloads'],
+  ['skills-browse-candidates-v6-product-examples'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 
@@ -1368,7 +1370,7 @@ const getCachedCatalogPage = unstable_cache(
     if (error) throw error
     return { records: (data || []) as unknown as SkillRecord[], total, hasMore: from + limit < total, page: effectivePage }
   }),
-  ['public-catalog-pages-v12-download-operations'],
+  ['public-catalog-pages-v13-product-examples'],
   { revalidate: 300, tags: ['public-skill-directory'] }
 )
 

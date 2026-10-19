@@ -64,7 +64,7 @@ try {
  const historic = readFileSync('supabase/migrations/20261007015508_native_subtitle_image_taxonomy.sql', 'utf8')
  assert.equal(generated.slice(generated.indexOf('-- Only derived')), historic.slice(historic.indexOf('-- Only derived')), 'the prior bounded backfill remains identical as vocabulary grows')
  execFileSync(process.execPath, ['--experimental-strip-types', 'scripts/build-skill-taxonomy-migration.mjs', '--exact-source-output', output, '--source', 'ullrai/diplay-helper:skills/diplay-helper/SKILL.md'])
- assert.equal(readFileSync(output, 'utf8'), readFileSync('supabase/migrations/20261015081351_diplay_helper_taxonomy.sql', 'utf8'), 'the new migration matches the classifier used for imports')
+ assert.equal(readFileSync(output, 'utf8').replaceAll('\r\n', '\n'), readFileSync('supabase/migrations/20261015081351_diplay_helper_taxonomy.sql', 'utf8').replaceAll('\r\n', '\n'), 'the new migration matches the classifier used for imports regardless of checkout line endings')
 } finally {
  rmSync(temp, { recursive: true, force: true })
 }

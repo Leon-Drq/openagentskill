@@ -612,6 +612,7 @@ function toSkillsPageSkill({
   return {
     id: record.id,
     productLogoUrl: record.product_logo_url || record.product_metadata?.logoUrl,
+    productExampleUrl: record.product_example_url || record.product_metadata?.exampleUrl,
     slug: record.slug,
     name: record.name,
     tagline: clampText(record.tagline || record.description, 170),
@@ -1173,7 +1174,7 @@ const getDefaultDirectory = unstable_cache(async (locale: Locale) => {
   const model = await prepareDirectory({ lang: locale })
   if (model.clientProps.degraded) throw new DegradedDirectory(model)
   return model
-}, ['public-directory-model-v4-download-operations'], {
+}, ['public-directory-model-v5-product-examples'], {
   revalidate: 900, tags: ['public-skill-directory', 'public-skill-stats'],
 })
 
@@ -1183,7 +1184,7 @@ const getBrowseDirectory = unstable_cache(async (locale: Locale, key: string) =>
   const model = await prepareDirectory({ ...variant.params, lang: locale })
   if (model.clientProps.degraded) throw new DegradedDirectory(model)
   return model
-}, ['public-browse-model-v1'], {
+}, ['public-browse-model-v2-product-examples'], {
   revalidate: 900, tags: ['public-skill-directory', 'public-skill-stats'],
 })
 

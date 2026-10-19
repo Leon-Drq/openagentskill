@@ -36,7 +36,7 @@ for (const preview of previews) {
   for (const [index, media] of preview.media.entries()) {
     assert.equal(media.sourceUrl, curatedSourceUrls(source, source.media[index].path, source.media[index].releaseTag).sourceUrl)
     if (source.media[index].releaseTag) assert.match(source.documentSha256, /^[a-f0-9]{64}$/, 'Release examples retain the pinned documentation identity')
-    assert.equal(digest(readFileSync(file(media.videoSrc || media.src))), source.media[index].sha256)
+    assert.equal(digest(readFileSync(file(media.videoSrc || media.originalSrc || media.src))), source.media[index].sha256)
     if (media.videoSrc) {
       const signature = readFileSync(file(media.videoSrc)).subarray(0, 8)
       assert.ok(signature.subarray(4).toString() === 'ftyp' || signature.subarray(0, 4).equals(Buffer.from([0x1a, 0x45, 0xdf, 0xa3])), 'Preserve the actual video, not an image pretending to be video')
@@ -80,6 +80,8 @@ assert.equal(showcase.getShowcasesForSkill('unrelated-gc-minimal-zine-poster').l
 
 let failedSrc = []
 const dependencies = {
+  '@/lib/skills/product-metadata': await import('../lib/skills/product-metadata.ts'),
+  '@/lib/i18n/handoff-copy': await import('../lib/i18n/handoff-copy.ts'),
   react: { ...react, useState: () => [failedSrc, () => {}] }, 'react/jsx-runtime': jsx, 'lucide-react': icons,
   'next/image': { default: ({ fill, sizes, onError, ...props }) => { void fill; void sizes; void onError; return createElement('img', props) } },
   '@/components/crawl-link': { default: ({ children, prefetch, ...props }) => { void prefetch; return createElement('a', props, children) } },
@@ -116,6 +118,17 @@ failedSrc = []
 all = render(SkillCardPreview, { ...props, sourcePreview: null })
 assert.ok(all.some(node => node.tagName === 'p' && text(node).includes('暂未收录效果图')))
 assert.ok(!all.some(node => /aspect-|min-h-52/.test(attr(node, 'class') || '')), 'Missing media must not reserve a giant empty cover')
+all = render(SkillCardPreview, { ...props, sourcePreview: null, exampleUrl: 'https://www.openagentskill.com/blog/video-link-downloader-douyin-archive-workflow' })
+assert.ok(all.some(node => node.tagName === 'a' && attr(node, 'data-product-example') !== undefined && text(node).includes('查看示例')))
+assert.ok(!all.some(node => node.tagName === 'p' && text(node).includes('暂未收录效果图')), 'A real example link must not be presented as missing')
+for (const exampleUrl of ['javascript:alert(1)', 'http://localhost/private', 'https://user:password@github.com/private']) {
+  all = render(SkillCardPreview, { ...props, sourcePreview: null, exampleUrl })
+  assert.ok(!all.some(node => attr(node, 'data-product-example') !== undefined), 'Reject unsafe example links')
+}
+const motionPreview = getSkillSourcePreview('alchaincyf-huashu-motion-huashu-motion')
+assert.ok(SOURCE_EXAMPLE_SKILL_SLUGS.includes(motionPreview.skillSlug))
+assert.match(motionPreview.media[0].originalSrc, /\.gif$/)
+assert.equal(motionPreview.media[0].videoSrc, undefined, 'A GIF excerpt is not a complete playable video')
 const slide = showcase.SHOWCASE_CASES.find(item => item.category === 'slides')
 all = render(SkillCardPreview, { ...props, showcase: showcase.getShowcaseCardData(slide) })
 assert.ok(all.some(node => node.tagName === 'img' && attr(node, 'src').includes(showcase.getShowcaseImageSrc(slide.media[0].src, 'card')) && attr(node, 'class').includes('object-contain')))

@@ -134,7 +134,7 @@ for (const suffix of ['public_search_rls_index_plan.sql', 'public_exact_name_loo
   const latest = [...files].sort().reverse().map(file => readFileSync(new URL('../supabase/migrations/' + file, import.meta.url), 'utf8').replace(/\r\n/g, '\n')).find(sql => new RegExp(`create (?:or replace )?function public\\.${functionName}\\(`).test(sql))
   const migration = latest.slice(latest.search(new RegExp(`create (?:or replace )?function public\\.${functionName}\\(`))).split('notify pgrst')[0]
   const returned = migration.split('returns table (')[1].split(')\nlanguage')[0].trim().split(/,\n/).map(line => line.trim().split(' ')[0])
-  assert.deepEqual(returned, projectedFields, 'RPC has precisely the public directory projection')
+  assert.deepEqual(returned, [...new Set(projectedFields)], 'RPC has precisely the public directory projection (JSON subfield aliases share one parent column)')
   assert.match(migration, /stable security definer/)
   assert.match(migration, /set search_path = ''/)
   assert.match(migration, /set statement_timeout = '3s'/)

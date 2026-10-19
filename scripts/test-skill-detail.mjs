@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { register } from 'node:module'
+import './test-skill-agent-copy.mjs'
 register('./test-owner-publication-loader.mjs', import.meta.url)
 const { getSkillSourceEvidence } = await import('../lib/skills/source-evidence.ts')
-const { getSkillInstallTargets, getPrimaryInstallCommand } = await import('../lib/install-targets.ts')
+const { getSkillInstallTargets, getSkillReviewTargets, getPrimaryInstallCommand } = await import('../lib/install-targets.ts')
 const { buildInstallHandoff, toRegistrySkill } = await import('../lib/registry.ts')
 const { buildAgentReadableSkillMetadata } = await import('../lib/agent-readable.ts')
 const { buildDetailStructuredData, serializeDetailJson, selectDetailAlternatives } = await import('../lib/skills/detail-profile.ts')
@@ -30,6 +31,14 @@ assert.equal(getPrimaryInstallCommand(skill), '')
 assert.equal(getPrimaryInstallCommand(recorded), recorded.install_command)
 assert.ok(getSkillInstallTargets(skill).every(t => t.kind === 'agent-prompt' && t.value.includes('Do not install or execute')))
 assert.ok(getSkillInstallTargets(recorded).some(t => t.kind === 'command'))
+for (const target of getSkillReviewTargets(recorded)) {
+  assert.equal(target.kind, 'agent-prompt')
+  assert.equal(target.title, 'Source review prompt')
+  assert.match(target.value, /Do not install or execute/)
+  assert.ok(target.value.includes(recorded.source_commit_sha))
+  assert.ok(target.value.includes(recorded.source_path))
+  assert.ok(!target.value.includes('/api/agent/outcome'), 'Review-only copying cannot report installation')
+}
 
 const handoff = buildInstallHandoff(skill)
 assert.equal(handoff.recommended_command, '')
@@ -66,6 +75,9 @@ for (const [locale, values] of Object.entries(skillProfileLocales)) {
   for (const key of skillProfileCopyKeys) assert.ok(skillProfileCopy(locale,key)?.trim(),locale+key)
 }
 const page = readFileSync(new URL('../app/skills/[slug]/content.tsx',import.meta.url),'utf8')
+assert.match(page, /safety\.blocked \? getSkillReviewTargets\(dbSkill\) : getSkillInstallTargets\(dbSkill\)/)
+assert.match(page, /<SkillAgentCopy/)
+assert.ok(!page.includes('!safety.blocked && <SkillInstallTargets'), 'Blocked installs still expose read-only review prompts')
 for (const id of ['overview','install-options','source-trust','agent-access','related-skills','creator-tools']) assert.ok(page.includes(`id="${id}"`),id)
 assert.match(page,/source=\{skill\.longDescription\}/, 'retain full original descriptive content in the document renderer')
 assert.equal((page.match(/<h1\b/g)||[]).length,1)

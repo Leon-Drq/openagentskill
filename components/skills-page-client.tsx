@@ -120,6 +120,7 @@ export interface DirectorySkillCard {
   preview?: ShowcaseCardData | null
   sourcePreview?: SkillPreviewCardData | null
   sourceGalleryHref?: string
+  productExampleUrl?: string | null
   commerce: SkillCommerce
   id: string
   slug: string
@@ -437,7 +438,7 @@ export function SkillsPageClient(props: Props) {
                   <span className="min-w-0 text-[10px] font-medium text-[#006b4f]">{directoryCategories(skill.category).map(label).join(' · ')}</span>
                   {!skill.provider?.resource && <SkillActions slug={skill.slug} name={skill.name} compact />}
                 </div>
-                <SkillCardPreview slug={skill.slug} name={skill.name} locale={locale} category={directoryCategories(skill.category).map(label).join(' · ')} showcase={skill.preview} sourcePreview={skill.sourcePreview} sourceGalleryHref={skill.sourceGalleryHref} provider={skill.provider} />
+                <SkillCardPreview slug={skill.slug} name={skill.name} locale={locale} category={directoryCategories(skill.category).map(label).join(' · ')} showcase={skill.preview} sourcePreview={skill.sourcePreview} sourceGalleryHref={skill.sourceGalleryHref} exampleUrl={skill.productExampleUrl} provider={skill.provider} />
                 <div className="flex min-w-0 items-start gap-3 p-5 pb-0">
                 <div className="shrink-0">{skill.productLogoUrl ? <SkillProductLogo url={skill.productLogoUrl} name={skill.name} /> : skill.provider?.label === 'Skillry' ? <SkillryLogo /> : <GitHubOwnerAvatar owner={skill.author.owner} label={skill.author.name} size="md" />}</div>
                 <div className="min-w-0 flex-1">
