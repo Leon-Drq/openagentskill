@@ -18,7 +18,7 @@
     "seed:popular": "node scripts/seed-popular-skills.ts",
     "indexer:backfill": "node scripts/backfill-high-star-skills.mjs",
     "test:submission": "node --experimental-strip-types scripts/test-skill-source.ts",
-    "test:submission-discovery": "node --experimental-strip-types scripts/test-submission-discovery.ts",
+    "test:submission-discovery": "node --experimental-strip-types scripts/test-submission-discovery.ts && node scripts/test-name-search.mjs",
     "test:submission-flow": "node scripts/test-submission-flow.mjs && node scripts/test-submission-pagination.mjs",
     "test:skill-issue-ingest": "node scripts/test-skill-issue-ingest.mjs",
     "test:supabase-circuit": "node --experimental-strip-types scripts/test-supabase-circuit.ts",

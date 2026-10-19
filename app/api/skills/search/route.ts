@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const [candidatePool, exactResult, outcomeStatsMap] = await Promise.all([
-      withTimeout(
+      lookupIntent ? Promise.resolve([] as SkillRecord[]) : withTimeout(
         getSearchCandidatePool(),
         SEARCH_QUERY_TIMEOUT_MS,
         'public skill search candidate query'
@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
       )
     }
     const exactPool = exactResult.records
-    const skills = mergeSkillPools(exactPool, candidatePool, CURATED_SKILL_SNAPSHOT)
+    const skills = lookupIntent ? exactPool : mergeSkillPools(exactPool, candidatePool, CURATED_SKILL_SNAPSHOT)
     const responseCacheHeaders = lookupIntent ? DIRECT_LOOKUP_CACHE_HEADERS : SEARCH_CACHE_HEADERS
     const rankedCandidates = dedupeRankedSkills(rankSkillsForQuery(skills, query, outcomeStatsMap))
       .filter(({ skill }) => {

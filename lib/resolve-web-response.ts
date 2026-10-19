@@ -7,6 +7,7 @@ type Candidate = NonNullable<Result['selected']>
 // recompute eligibility or strip the source/risk decisions to save bytes.
 function webCandidate(candidate: Candidate) {
   return {
+    match_type: candidate.match_type,
     skill: {
       slug: candidate.skill.slug,
       name: candidate.skill.name,
@@ -26,9 +27,10 @@ export function toResolveWebResponse(result: Result) {
   return {
     selected: result.selected ? webCandidate(result.selected) : null,
     alternatives: result.alternatives.map(webCandidate),
+    lookup_matches: (result.lookup_matches || []).map(webCandidate),
     review_candidates: result.review_candidates.map(({ skill }) => ({ skill: { slug: skill.slug, name: skill.name } })),
     policy_decision: result.policy_decision,
-    meta: { registry_status: result.meta.registry_status },
+    meta: { registry_status: result.meta.registry_status, lookup_intent: result.meta.lookup_intent, exact_match_found: result.meta.exact_match_found },
   }
 }
 

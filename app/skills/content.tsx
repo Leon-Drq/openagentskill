@@ -23,6 +23,7 @@ import { getSkillSupplyProfile, getSupplyTrackSummaries } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCaseBySlug, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
 import { dedupeRankedSkills, rankSkillsForQuery } from '@/lib/registry'
+import { isDirectSkillLookup } from '@/lib/search-match'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { skillPresentationCategory } from '@/lib/skills/presentation-category'
 import { defaultLocale, getLocaleFromSearchParam, type Locale } from '@/lib/i18n/config'
@@ -1074,6 +1075,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     )
 
     filteredRecords = ranked
+      .filter(item => !isDirectSkillLookup(query) || item.matchType !== 'related')
       .map((item) => enrichedBySlug.get(item.skill.slug))
       .filter((item): item is (typeof enrichedRecords)[number] => Boolean(item))
   }

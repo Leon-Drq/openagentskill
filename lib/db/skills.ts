@@ -16,6 +16,7 @@ import { unstable_cache } from 'next/cache'
 import type { Skill } from '@/lib/types'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getSearchTerms, normalizeExactSearchQuery, repositorySearchQuery } from '@/lib/search-query'
+import { classifySearchMatch, nameLookupPatterns } from '@/lib/search-match'
 import { packCacheJson, unpackCacheJson } from '@/lib/cache/packed-json'
 import { buildLegacySearchIndexFilter, buildEditorialSearchIndexFilter, matchesLegacySearchIndex } from '@/lib/seo/search-indexability'
 import type { VideoWorkflowListing } from '@/lib/video-workflows'
@@ -1213,25 +1214,42 @@ async function fetchSearchSkillsWithStatus(query: string, limit = 120) {
     if (error) throw error
     return { records: filterSkillOnly((data || []) as unknown as SkillRecord[]), degraded: false }
   }
+  const exactRead = withTimeout(fetchExactSearchSkills(normalizedQuery), SKILL_SEARCH_RESULT_TIMEOUT_MS, 'exact skill search')
   const results = await Promise.allSettled([
-    withTimeout(
-      fetchExactSearchSkills(normalizedQuery),
-      SKILL_SEARCH_RESULT_TIMEOUT_MS,
-      'exact skill search'
-    ),
+    exactRead,
     withTimeout(
       getCachedSearchSkills(normalizedQuery.toLowerCase(), rowLimit),
       SKILL_SEARCH_RESULT_TIMEOUT_MS,
       'broad skill search'
     ),
+    exactRead.then(exact => !exact.degraded && !exact.records.length ? getCachedNearNameSearch(normalizedQuery) : []),
   ])
-  const [exact, broad] = results
+  const [exact, broad, near] = results
   const collected = collectSearchResults([
     exact.status === 'fulfilled' ? { status: 'fulfilled', value: exact.value.records } : exact,
+    near,
     broad,
   ], rowLimit)
   return { ...collected, degraded: collected.degraded || (exact.status === 'fulfilled' && exact.value.degraded) }
 }
+
+const getCachedNearNameSearch = unstable_cache(
+  coalesceCacheLoader(async (query: string): Promise<SkillRecord[]> => {
+    const patterns = nameLookupPatterns(query)
+    if (!patterns.length) return []
+    const supabase = createPublicClient({ requestTimeoutMs: SKILL_EXACT_SEARCH_TIMEOUT_MS, circuitScope: 'skill-search' })
+    const results = await Promise.all(patterns.map(async pattern => {
+      const { data, error } = await supabase.from('skills').select(SKILL_DIRECTORY_SELECT)
+        .or(PUBLIC_SKILL_FILTER).ilike('name', pattern).order('name').limit(24)
+      if (error) throw error
+      return filterSkillOnly((data || []) as unknown as SkillRecord[])
+        .filter(skill => classifySearchMatch(skill, query) !== 'related')
+    }))
+    return [...new Map(results.flat().map(skill => [skill.slug, skill])).values()]
+  }),
+  ['public-near-name-search-v1'],
+  { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
+)
 
 function applyTaxonomyFilters<T extends { eq: (column: string, value: string) => T; contains: (column: string, value: string[]) => T; or: (filters: string) => T }>(query: T, category: string, topic: string, output: string): T {
   const primary = normalizeSkillCategory(category)

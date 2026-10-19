@@ -16,25 +16,27 @@ import {
   getAllSkills,
   getSkillEventStatsMap,
   searchSkills,
+  searchSkillsWithStatus,
   type SkillEventStats,
   type SkillOutcomeStats,
   type SkillRecord,
 } from '@/lib/db/skills'
 import { getPrimaryInstallCommand, getSkillInstallTargets, type InstallTargetId } from '@/lib/install-targets'
 import { getSkillQualityProfile } from '@/lib/quality'
-import { augmentQueryForIntent, dedupeRankedSkills, getRecommendationReasons, normalizeMatchScore, rankSkillsForQuery } from '@/lib/registry'
+import { dedupeRankedSkills, getRecommendationReasons, normalizeMatchScore, rankSkillsForQuery } from '@/lib/registry'
 import { getSkillSupplyProfile, type SkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile, getSkillTrustProfileV5, type SkillTrustProfile, type SkillTrustProfileV5 } from '@/lib/trust'
 import { getUseCasesForSkill } from '@/lib/use-cases'
 import { TRUSTED_RESOLVE_FALLBACKS } from '@/lib/resolve-fallbacks'
 import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
 import { isInstallRecommendationEligible } from '@/lib/resolve-eligibility'
+import { classifySearchMatch, isDirectSkillLookup } from '@/lib/search-match'
 
 const SITE_URL = 'https://www.openagentskill.com'
 const RESOLVE_CANDIDATE_POOL_SIZE = 750
 const RESOLVE_CACHE_REVALIDATE = 300
 const RESOLVE_QUERY_TIMEOUT_MS = 1800
-const RESOLVE_EXACT_QUERY_TIMEOUT_MS = 2200
+const RESOLVE_EXACT_QUERY_TIMEOUT_MS = 9000
 async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   let timeout: ReturnType<typeof setTimeout> | undefined
   const timeoutPromise = new Promise<T>((_, reject) => {
@@ -479,7 +481,7 @@ function buildResolverRecommendation(
 export async function resolveAgentSkill(input: AgentResolveInput) {
   const task = input.task.trim()
   if (!task) throw new Error('Missing required field: task')
-  const rankingTask = augmentQueryForIntent(task)
+  const directLookup = isDirectSkillLookup(task)
 
   const agent = normalizeAgent(input.agent)
   const limit = normalizeLimit(input.limit)
@@ -491,13 +493,19 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
   const useLiveRegistry = input.live !== false
   const [qualityPool, queryPool, eventStatsMap, outcomeStatsMap] = useLiveRegistry
     ? await Promise.all([
-        withTimeout(getResolveCandidatePool(), RESOLVE_QUERY_TIMEOUT_MS, 'agent resolve candidate query')
+        directLookup ? Promise.resolve([] as SkillRecord[]) : withTimeout(getResolveCandidatePool(), RESOLVE_QUERY_TIMEOUT_MS, 'agent resolve candidate query')
           .catch((error) => {
             console.warn('Agent resolve candidate fallback:', error)
             return TRUSTED_RESOLVE_FALLBACKS
           }),
-        withTimeout(searchSkills(rankingTask, 160), RESOLVE_EXACT_QUERY_TIMEOUT_MS, 'agent resolve exact query')
+        withTimeout(directLookup ? searchSkillsWithStatus(task, 160).then(result => {
+          if (result.degraded && !result.records.some(skill => classifySearchMatch(skill, task) === 'exact')) {
+            throw new Error('Live name search is temporarily unavailable. Please retry.')
+          }
+          return result.records
+        }) : searchSkills(task, 160), directLookup ? 9000 : RESOLVE_EXACT_QUERY_TIMEOUT_MS, 'agent resolve exact query')
           .catch((error) => {
+            if (directLookup) throw error
             console.warn('Agent resolve exact query fallback:', error)
             return [] as SkillRecord[]
           }),
@@ -513,16 +521,23 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
         {} as Record<string, SkillOutcomeStats>,
       ]
   const skills = mergeResolveSkillPools(queryPool, qualityPool, TRUSTED_RESOLVE_FALLBACKS)
-
-  const ranked = dedupeRankedSkills(rankSkillsForQuery(skills, rankingTask, outcomeStatsMap))
+  // Name lookups use live search results, never a stale quality fallback.
+  // Spaced names establish intent through actual identity evidence, not a
+  // heuristic that would mistake ordinary tasks like "data analysis" for names.
+  const lookupIntent = directLookup || queryPool.some(skill => {
+    const match = classifySearchMatch(skill, task)
+    return match === 'exact' || (/\s/.test(task) && match === 'near')
+  })
+  const ranked = dedupeRankedSkills(rankSkillsForQuery(lookupIntent ? queryPool : skills, task, outcomeStatsMap))
     .filter(({ skill }) => candidateAllowed(skill, constraints))
+    .filter(candidate => !lookupIntent || candidate.matchType !== 'related')
     // Keep relevance order within each group, but do not let unverified libraries
     // exhaust the shortlist before source-backed Skills reach the safety gate.
-    .sort((a, b) => Number(getSkillSourceEvidence(b.skill).canOfferInstall) - Number(getSkillSourceEvidence(a.skill).canOfferInstall))
+    .sort((a, b) => lookupIntent ? 0 : Number(getSkillSourceEvidence(b.skill).canOfferInstall) - Number(getSkillSourceEvidence(a.skill).canOfferInstall))
     .slice(0, Math.max(limit * 3, 10))
   const topMatchScore = Math.max(0, ...ranked.map((candidate) => candidate.score))
 
-  const candidates = ranked.map(({ skill, score, semanticRelevance }, index) => {
+  const candidates = ranked.map(({ skill, score, semanticRelevance, matchType }, index) => {
     const isFallbackSnapshot = skill.submission_source === 'curated_snapshot'
     const eventStats = eventStatsMap[skill.slug] || null
     const outcomeStats = outcomeStatsMap[skill.slug] || null
@@ -558,6 +573,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
 
     return {
       rank: index + 1,
+      match_type: matchType,
       match_score: matchScore,
       raw_match_score: score,
       source_evidence: getSkillSourceEvidence(skill),
@@ -650,10 +666,13 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
   const safeCandidates = eligibleCandidates.filter((candidate) =>
     candidate.safety.safety_tier.tier === 'verified' || candidate.safety.safety_tier.tier === 'reviewed'
   )
-  const selected =
-    safeCandidates[0] ||
-    eligibleCandidates[0] ||
-    null
+  // Discovery is distinct from install eligibility. An exact but blocked hit
+  // stays visible in lookup_matches; it cannot become an install recommendation.
+  const lookupMatches = lookupIntent ? candidates.slice(0, limit) : []
+  const exactIdentityFound = lookupMatches.some(candidate => candidate.match_type === 'exact')
+  const selected = lookupIntent
+    ? eligibleCandidates.find(candidate => !exactIdentityFound || candidate.match_type === 'exact') || null
+    : safeCandidates[0] || eligibleCandidates[0] || null
   const alternatives = eligibleCandidates
     .filter((candidate) => candidate.skill.slug !== selected?.skill.slug)
     .slice(0, Math.max(0, limit - 1))
@@ -962,6 +981,7 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
     selected,
     alternatives,
     blocked_candidates: blockedCandidates,
+    lookup_matches: lookupMatches,
     review_candidates: reviewCandidates,
     agent_workflow: agentWorkflow,
     agent_handoff: agentHandoff,
@@ -978,9 +998,11 @@ export async function resolveAgentSkill(input: AgentResolveInput) {
       note: 'Use the evals endpoint to regression-test recommendation quality before changing ranking logic.',
     },
     meta: {
+      lookup_intent: lookupIntent,
+      exact_match_found: exactIdentityFound,
       endpoint: '/api/agent/resolve',
       api_version: '2.0',
-      registry_status: useLiveRegistry && ![...qualityPool, ...queryPool].some((skill) => skill.submission_source !== 'curated_snapshot')
+      registry_status: useLiveRegistry && directLookup ? 'live_pool' : useLiveRegistry && ![...qualityPool, ...queryPool].some((skill) => skill.submission_source !== 'curated_snapshot')
         ? 'snapshot_only' : useLiveRegistry ? 'live_pool' : 'offline_snapshot',
       generated_at: generatedAt,
       total_skills_searched: skills.length,

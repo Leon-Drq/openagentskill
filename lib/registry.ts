@@ -11,6 +11,7 @@ import { getSkillAttribution } from '@/lib/skill-attribution'
 import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCasesForSkill, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
+import { classifySearchMatch, searchMatchPriority } from '@/lib/search-match'
 
 const SITE_URL = 'https://www.openagentskill.com'
 
@@ -847,12 +848,14 @@ export function rankSkillsForQuery(
       const verifiedBoost = skill.verified ? 6 : 0
       score += verifiedBoost
 
-      const semanticRelevance = hasRequiredIntentEvidence(queryIntent, normalizedQuery, category, evidenceText)
+      const matchType = classifySearchMatch(skill, query)
+      const semanticRelevance = matchType === 'exact' ? 99 : matchType === 'near' ? 75 : hasRequiredIntentEvidence(queryIntent, normalizedQuery, category, evidenceText)
         ? getSkillQueryRelevance(skill, query)
         : 0
 
       return {
         skill,
+        matchType,
         score: Math.round(score * 10) / 10,
         semanticRelevance,
         rankingSignals: {
@@ -865,8 +868,8 @@ export function rankSkillsForQuery(
         },
       }
     })
-    .filter((item) => !query.trim() || (item.score > 18 && item.semanticRelevance >= 30))
-    .sort((a, b) => b.score - a.score)
+    .filter((item) => !query.trim() || item.matchType !== 'related' || (item.score > 18 && item.semanticRelevance >= 30))
+    .sort((a, b) => searchMatchPriority(b.matchType) - searchMatchPriority(a.matchType) || b.score - a.score)
 }
 
 export function dedupeRankedSkills<T extends { skill: SkillRecord; score?: number }>(items: T[]) {

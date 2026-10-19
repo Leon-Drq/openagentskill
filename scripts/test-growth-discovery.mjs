@@ -118,6 +118,7 @@ const client = { from(table) {
   return query
 } }
 const db = compile('lib/db/skills.ts', {
+  '@/lib/search-match': {},
   '@/lib/cache/coalesced': coalesced,
   '@/lib/skills/publication': { PUBLIC_SKILL_FILTER: 'PUBLIC_TEST_GATE' },
   '@/lib/supabase/public': { createPublicClient: () => client },

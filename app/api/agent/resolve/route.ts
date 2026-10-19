@@ -230,16 +230,21 @@ export async function GET(request: NextRequest) {
       live: searchParams.get('live') !== 'false',
     })
 
-    if (format === 'text') return textResponse(payload)
-    if (format === 'lockfile') {
-      return NextResponse.json(buildResolveLockfile(payload), { headers: RESOLVE_CACHE_HEADERS })
+    const cacheHeaders = payload.meta.lookup_intent ? { 'Cache-Control': 'no-store' } : RESOLVE_CACHE_HEADERS
+    if (format === 'text') {
+      const response = textResponse(payload)
+      if (payload.meta.lookup_intent) response.headers.set('Cache-Control', 'no-store')
+      return response
     }
-    return NextResponse.json(payload, { headers: RESOLVE_CACHE_HEADERS })
+    if (format === 'lockfile') {
+      return NextResponse.json(buildResolveLockfile(payload), { headers: cacheHeaders })
+    }
+    return NextResponse.json(payload, { headers: cacheHeaders })
   } catch (error) {
     console.error('Agent resolve API error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to resolve skill' },
-      { status: 500 }
+      { status: 503, headers: { 'Cache-Control': 'no-store', 'Retry-After': '15' } }
     )
   }
 }
@@ -257,7 +262,7 @@ export async function POST(request: NextRequest) {
     console.error('Agent resolve API error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to resolve skill' },
-      { status: 500 }
+      { status: 503, headers: { 'Cache-Control': 'no-store', 'Retry-After': '15' } }
     )
   }
 }

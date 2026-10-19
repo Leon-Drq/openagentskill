@@ -55,6 +55,7 @@ const dbDependencies=Object.fromEntries([
 ])
 dbDependencies['@/lib/skills/media-query'] = mediaQuery
 dbDependencies['@/lib/skills/chronological-directory'] = chronological
+dbDependencies['@/lib/search-match'] = {}
 const db=compile('lib/db/skills.ts',dbDependencies)
 assert.equal(await db.getApprovedSkillSitemapCount(3,50),3,'An eligible canonical listing is counted once')
 assert.deepEqual((await db.getApprovedSkillSitemapRecords({offset:2,limit:2,minStars:3,minQualityScore:50})).map(x=>x.slug),[overlap.slug])
