@@ -11,7 +11,12 @@ const AUTO_RETRY_DELAY_MS = 65_000
 
 // Only mounted for a failed directory response. A healthy response removes
 // this notice; a failed retry keeps the fallback and never starts a poll loop.
-export function DirectoryRecovery({ locale, empty }: { locale: Locale; empty: boolean }) {
+export function DirectoryRecovery({ locale, empty, onRetry, pageError = false }: {
+  locale: Locale
+  empty: boolean
+  onRetry?: () => void
+  pageError?: boolean
+}) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
   const [coolingDown, setCoolingDown] = useState(false)
@@ -23,8 +28,8 @@ export function DirectoryRecovery({ locale, empty }: { locale: Locale; empty: bo
     nextRetryAt.current = Date.now() + RETRY_COOLDOWN_MS
     setCoolingDown(true)
     // Re-fetch the current route, preserving filters, language and scroll.
-    startTransition(() => router.refresh())
-  }, [router])
+    startTransition(() => onRetry ? onRetry() : router.refresh())
+  }, [onRetry, router])
 
   useEffect(() => {
     if (!coolingDown) return
@@ -51,7 +56,7 @@ export function DirectoryRecovery({ locale, empty }: { locale: Locale; empty: bo
 
   return (
     <div data-directory-recovery className="my-5 flex flex-col items-start gap-3 border-l-2 border-amber-600 bg-amber-50 p-4 text-sm text-amber-950 sm:flex-row sm:items-center sm:justify-between">
-      <p role="status">{directoryLabel(locale, empty ? 'catalogUnavailable' : 'dataUnavailable')}</p>
+      <p role="status">{directoryLabel(locale, pageError ? 'pageUnavailable' : empty ? 'catalogUnavailable' : 'dataUnavailable')}</p>
       <button type="button" onClick={retry} disabled={pending || coolingDown}
         className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-[8px] border border-amber-800/30 px-3 py-2 font-medium hover:bg-amber-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-800 disabled:opacity-60">
         {pending ? <LoaderCircle size={16} className="animate-spin" aria-hidden="true" /> : <RefreshCw size={16} aria-hidden="true" />}

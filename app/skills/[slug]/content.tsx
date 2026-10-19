@@ -278,13 +278,15 @@ export default async function SkillDetailPage({ params, searchParams }: {
             </div>
             <div className="flex items-start gap-4">{product.logoUrl && <SkillProductLogo url={product.logoUrl} name={skill.name} size="lg" />}<h1 className="min-w-0 max-w-5xl break-words font-display text-4xl font-normal leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl [overflow-wrap:anywhere]">{skill.name}</h1></div>
             <p className="mt-5 max-w-3xl text-lg leading-relaxed text-secondary sm:text-xl">{skill.tagline || skill.description}</p>
-            <div className="mt-7 flex flex-wrap gap-2 sm:gap-3">
+            <div data-skill-primary-actions className="mt-7 flex flex-wrap items-start gap-2 sm:gap-3">
               <SkillAgentCopy skillSlug={skill.slug} target={installTargets.find(target => target.id === 'codex')} className={`${actionClass} border-[#006b4f] bg-[#006b4f] text-white hover:bg-[#005841]`} />
               {product.exampleUrl && !sourcePreview && <a href={product.exampleUrl} target="_blank" rel="noopener noreferrer" className={actionClass}>{handoffCopy(initialLocale || defaultLocale, 'example')}<ArrowUpRight size={16} aria-hidden="true" /></a>}
               {skill.technical.repository && <SkillActionLink href={skill.technical.repository} skillSlug={skill.slug} eventType="outbound_github" external className={actionClass}><Text id="viewGitHub" /><ArrowUpRight className="h-4 w-4" aria-hidden="true" /></SkillActionLink>}
-              <SkillEngagementProvider slugs={[skill.slug]}><SkillActions slug={skill.slug} name={skill.name} /></SkillEngagementProvider>
-              <SkillShareButton skillSlug={skill.slug} skillName={skill.name} />
               {sourcePreview && <Link href="#visual-previews" className={actionClass}>{previewCopy('view', initialLocale || defaultLocale)}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
+            </div>
+            <div data-skill-secondary-actions className="mt-3 flex flex-wrap items-start gap-2">
+              <SkillEngagementProvider slugs={[skill.slug]}><SkillActions slug={skill.slug} name={skill.name} /></SkillEngagementProvider>
+              <SkillShareButton skillSlug={skill.slug} skillName={skill.name} className="min-h-11 rounded-md px-2.5 text-xs font-normal" />
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-secondary">
               <SkillPrice commerce={getSkillCommerce(skill.slug)} />

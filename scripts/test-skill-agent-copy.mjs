@@ -26,14 +26,23 @@ const render = target => exports.SkillAgentCopy({ skillSlug: 'test-skill', targe
 const target = { id: 'codex', title: 'Source review prompt', kind: 'agent-prompt', value: 'Read only. Do not execute.' }
 assert.equal(render(undefined), null)
 let tree = render(target)
+const idleButton = tree.props.children[0]
+assert.equal(tree.props.children[1].props.className, 'sr-only', 'Idle copy status does not create an empty layout row')
+assert.equal(idleButton.props.children.props.className, 'inline-grid text-center', 'Reserve both icon-and-label widths in a shared grid cell')
+assert.ok(idleButton.props.children.props.children.every(label => label.props.className.includes('justify-center')), 'Keep each icon and label centered together')
 await tree.props.children[0].props.onClick()
 assert.equal(copied, target.value)
 assert.equal(status, 'copied')
 assert.equal(events.length, 0, 'Source review copies never count as installations')
 assert.equal(render(target).props.children[1].props.role, 'status')
+assert.equal(render(target).props.children[1].props.className, 'sr-only', 'Success feedback cannot stretch the action bar')
+const copiedLabels = render(target).props.children[0].props.children.props.children
+assert.equal(copiedLabels[0].props['aria-hidden'], true)
+assert.equal(copiedLabels[1].props['aria-hidden'], false)
 clipboardWorks = false
 await render(target).props.children[0].props.onClick()
 assert.equal(status, 'failed')
+assert.notEqual(render(target).props.children[1].props.className, 'sr-only', 'Copy failures remain visible')
 assert.equal(render(target).props.children[2].props.value, target.value, 'Clipboard failure exposes selectable text')
 assert.equal(events.length, 0)
 clipboardWorks = true

@@ -61,6 +61,7 @@ id: {"title":"AI Agent Skills","intro":"Temukan skill untuk tugas berikutnya den
 export const directoryCopy = (locale: Locale) => copies[locale]
 
 const terms: Record<string, readonly string[]> = {
+ pageUnavailable: ['This page could not be loaded. Try again; your URL and filters are preserved.', '页面暂时无法加载。请重试，当前网址与筛选条件会保留。', 'ページを読み込めませんでした。URL とフィルターを保持したまま再試行できます。', '페이지를 불러오지 못했습니다. URL과 필터를 유지한 채 다시 시도하세요.', 'No se pudo cargar esta página. Reinténtalo; se conservan la URL y los filtros.', 'Diese Seite konnte nicht geladen werden. Erneut versuchen; URL und Filter bleiben erhalten.', 'Cette page n’a pas pu être chargée. Réessayez ; l’URL et les filtres sont conservés.', 'Halaman ini tidak dapat dimuat. Coba lagi; URL dan filter tetap tersimpan.'],
  retry: ['Try again', '重新加载', '再試行', '다시 시도', 'Reintentar', 'Erneut versuchen', 'Réessayer', 'Coba lagi'],
  retryLater: ['Try again shortly', '请稍后重试', '少し待って再試行', '잠시 후 다시 시도', 'Reintenta en breve', 'In Kürze erneut versuchen', 'Réessayez dans un instant', 'Coba lagi sebentar lagi'],
  pagination: ['Skill pages', '技能分页', 'スキルのページ', '스킬 페이지', 'Páginas de skills', 'Skill-Seiten', 'Pages des skills', 'Halaman skill'],
