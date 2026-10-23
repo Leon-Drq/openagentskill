@@ -21,7 +21,7 @@
     "test:submission-discovery": "node --experimental-strip-types scripts/test-submission-discovery.ts && node scripts/test-name-search.mjs",
     "test:submission-flow": "node scripts/test-submission-flow.mjs && node scripts/test-submission-pagination.mjs",
     "test:skill-issue-ingest": "node scripts/test-skill-issue-ingest.mjs",
-    "test:supabase-circuit": "node --experimental-strip-types scripts/test-supabase-circuit.ts && node --experimental-strip-types scripts/test-quota-fallback.mjs",
+    "test:supabase-circuit": "node --experimental-strip-types scripts/test-supabase-circuit.ts && node --experimental-strip-types scripts/test-quota-fallback.mjs && node scripts/test-maintenance.mjs",
     "snapshot:refresh": "node --experimental-strip-types scripts/refresh-public-directory-saved.mjs",
     "test:security": "node --experimental-strip-types scripts/test-security-regressions.ts",
     "test:x-automation": "node --experimental-strip-types scripts/test-x-automation-regressions.ts",

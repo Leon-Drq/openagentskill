@@ -686,6 +686,7 @@ const getCachedSkillStats = unstable_cache(
 )
 
 export async function getSkillStats(): Promise<Record<string, SkillAgentStats>> {
+  if (process.env.SUPABASE_DATA_PAUSED === '1') return {}
   return getCachedSkillStats().catch(() => ({}))
 }
 
@@ -735,10 +736,12 @@ const getCachedAgentOutcomeStatsMap = unstable_cache(
 )
 
 export async function getAgentOutcomeStatsMap(): Promise<Record<string, SkillOutcomeStats>> {
+  if (process.env.SUPABASE_DATA_PAUSED === '1') return {}
   return getCachedAgentOutcomeStatsMap().catch(() => ({}))
 }
 
 export async function getAgentOutcomeStatsMapStrict(): Promise<Record<string, SkillOutcomeStats>> {
+  if (process.env.SUPABASE_DATA_PAUSED === '1') throw new Error('Live outcome evidence is temporarily unavailable')
   return getCachedAgentOutcomeStatsMap()
 }
 

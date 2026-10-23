@@ -3,8 +3,9 @@ import { unstable_cache } from 'next/cache'
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { verifiedDownloadBytes } from './download-policy'
+import { isDataPaused } from '@/lib/data-maintenance'
 
-export const getDownloadTotals = unstable_cache(async () => {
+const getCachedDownloadTotals = unstable_cache(async () => {
   const db = createAdminClient({ requestTimeoutMs: 3000 })
   const result: Record<string, number> = {}
   // Keyset pagination: never silently truncate a growing ledger at 1000 rows.
@@ -18,7 +19,13 @@ export const getDownloadTotals = unstable_cache(async () => {
     after = data[data.length - 1].skill_slug
   }
   return result
-}, ['site-download-totals-v2-operations'], { revalidate: 60, tags: ['site-download-totals'] })
+}, ['site-download-totals-v2-operations'], { revalidate: 900, tags: ['site-download-totals'] })
+
+export async function getDownloadTotals() {
+  // Missing counts are not zero downloads; callers already display null safely.
+  if (isDataPaused()) return null
+  return getCachedDownloadTotals()
+}
 
 export async function downloadResponse(input: {
   userId: string; slug: string; bytes: Uint8Array; size: number; sha256: string;

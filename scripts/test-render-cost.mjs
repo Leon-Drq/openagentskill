@@ -11,6 +11,7 @@ const modules = new Map(), shared = new Map(), policies = []
 let reads = 0, unavailable = false, records, stats = {}
 let lookupError = false
 let searchDelay = 0, searchUnavailable = false
+let downloadReads = 0, pausedLiveReads = 0
 const db = {
   getSkillBySlugStrict: async () => { if (lookupError) throw new Error('lookup unavailable'); return null },
   getSkillCatalogPage: async (_sort, _category, page, _stars, _pricing, _slugs, _topic, _output, window) => {
@@ -59,7 +60,7 @@ function load(path) {
     if (name === 'next/navigation') return { notFound: () => { throw new Error('404') }, permanentRedirect: path => { throw new Error('redirect:' + path) } }
     if (name === 'react/jsx-runtime') return { jsx, jsxs: jsx, Fragment: 'fragment' }
     if (name === '@/lib/db/skills') return db
-    if (name === '@/lib/skills/downloads') return { getDownloadTotals: async () => ({}) }
+    if (name === '@/lib/skills/downloads') return { getDownloadTotals: async () => { downloadReads++; return {} } }
     if (name.startsWith('@/components/')) return new Proxy({}, { get: (_target, key) => key })
     if (name.startsWith('@/') || name.startsWith('.')) {
       const base = name.startsWith('@/') ? resolve(name.slice(2)) : resolve(dirname(absolute), name)
@@ -109,7 +110,7 @@ for (const params of [{ category: 'design-creative', access: 'free' }, { q: 'des
 }
 await assert.rejects(() => renderProps({ page: '0' }), /404/)
 await assert.rejects(() => renderProps({ page: '999999' }), /404/)
-assert.deepEqual(policies, Array.from({length: 2}, () => ({ revalidate: 900, tags: ['public-skill-directory', 'public-skill-stats'] })))
+assert.deepEqual(policies, [...Array.from({length: 2}, () => ({ revalidate: 900, tags: ['public-skill-directory', 'public-skill-stats'] })), { revalidate: 3600 }])
 
 for (const params of [{ sort: 'stars' }, { page: '2' }, { category: 'design-creative' }]) {
   const first = await renderProps(params)
@@ -182,6 +183,31 @@ for (const sort of ['new','fresh']) for (const lang of ['en','zh']) {
 }
 records = previousRecords
 console.log('New arrival renderer: REA stays on page one, EN/ZH order and second-page continuity passed.')
+
+// Execute the actual paused renderer with every live dependency booby-trapped.
+// A stale live cache must not be touched or revalidated while data is paused.
+const pauseBefore = process.env.SUPABASE_DATA_PAUSED
+const originalReaders = { ...db }
+try {
+  downloadReads = 0
+  process.env.SUPABASE_DATA_PAUSED = '1'
+  for (const name of Object.keys(db)) db[name] = async () => { pausedLiveReads++; throw new Error('Unexpected paused data read: ' + name) }
+  const liveCache = new Map(shared)
+  for (const params of [{}, { lang: 'zh', sort: 'new' }, { category: 'design-creative' }, { page: '2' }, { access: 'paid' }, { category: 'motion-design' }]) {
+    const props = await renderProps(params, { requireHealthy: true })
+    assert.ok(props.skills.length <= 16)
+    assert.ok(props.category === 'motion-design' || props.savedDirectory)
+    assert.ok(!props.skills.some(card => card.stats.siteDownloads !== null), 'No fabricated live download counts')
+    assert.deepEqual(await renderProps(params, { requireHealthy: true }), normalize(props), 'Paused variants reuse stable models')
+  }
+  for (const [key, value] of liveCache) assert.equal(shared.get(key), value, 'Live cache is never overwritten by saved metadata')
+  assert.equal(downloadReads, 0)
+  assert.equal(pausedLiveReads, 0)
+} finally {
+  Object.assign(db, originalReaders)
+  if (pauseBefore === undefined) delete process.env.SUPABASE_DATA_PAUSED; else process.env.SUPABASE_DATA_PAUSED = pauseBefore
+}
+console.log('Paused directory: zero live reads, isolated stable models, bounded cards and missing metrics passed.')
 
 if (process.argv.includes('--benchmark')) {
   // Same deterministic inputs and output. The extra ignored key exercises the

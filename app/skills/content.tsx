@@ -36,7 +36,8 @@ import { MOTION_CATEGORY, type MotionEntry } from '@/lib/motion/shared'
 import { selectMotionDirectoryEntries, paidMotionWindow } from '@/lib/motion/directory'
 import { getDownloadTotals } from '@/lib/skills/downloads'
 import { directoryBrowseVariant, parseDirectoryBrowseVariant } from '@/lib/skills/browse-cache'
-import { getSavedDirectory } from '@/lib/skills/saved-directory'
+import { getSavedDirectory, getSavedDirectoryInfo } from '@/lib/skills/saved-directory'
+import { isDataPaused } from '@/lib/data-maintenance'
 
 // Shared renderer. Public routes supply fixed inputs; query routes supply request inputs.
 
@@ -915,6 +916,7 @@ function buildSkillsPageJsonLd(
 const DIRECTORY_EXAMPLE_SKILL_SLUGS = [...new Set([...SHOWCASE_SKILL_SLUGS, ...SOURCE_EXAMPLE_SKILL_SLUGS])]
 
 async function prepareDirectory(params: SkillsSearchParams, requireHealthy = false) {
+  const paused = isDataPaused()
   const requestedPage = requestedDirectoryPage(params.page)
   if (requestedPage === null) notFound()
   const locale = getLocaleFromSearchParam(params.lang) || defaultLocale
@@ -943,7 +945,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     quality, trust, safety, supplyTrack, useCase }
   const paidMotionEntries = category === 'all' && (access === 'paid' || pricing === 'paid')
     ? selectMotionDirectoryEntries(motionFilters) : []
-  const downloadTotalsPromise = getDownloadTotals().catch(() => null)
+  const downloadTotalsPromise = paused ? Promise.resolve(null) : getDownloadTotals().catch(() => null)
   // Motion is a category of this directory, using its existing shell and URL
   // state. Preview records remain separate from reviewed registry inventory.
   if (category === MOTION_CATEGORY) {
@@ -973,24 +975,27 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
   const providerDownloads = sort === 'downloads' ? await downloadTotalsPromise : null
   const includeRegistry = registryAccess && !providerOnlyQuery
   const restrictedRegistry = !includeRegistry || access === 'paid'
-  const catalogMode = !featured && !query && !restrictedRegistry && paidMotionEntries.length === 0 && [useCase, platform, quality, trust, safety, supplyTrack].every(value => value === 'all')
+  const catalogMode = !paused && !featured && !query && !restrictedRegistry && paidMotionEntries.length === 0 && [useCase, platform, quality, trust, safety, supplyTrack].every(value => value === 'all')
   const page = catalogMode ? catalogPageNumber(firstSearchValue(params.page)) : clampPage(firstSearchValue(params.page), providerSkills.length)
   const requestedPageOffset = (page - 1) * VISIBLE_SKILL_LIMIT
   // Rich profile filters use one bounded, cached candidate pool across pages,
   // keeping their ranked total stable instead of widening it on every jump.
   const candidateLimit = MAX_SKILL_CANDIDATE_LIMIT
+  // A deliberate pause uses only the labelled public archive. Do not enter
+  // live caches: even their stale hits can schedule failing revalidations.
+  const saved = paused && includeRegistry ? getSavedDirectory(sort, candidateLimit) : null
   const catalogWindow = { ...providerCatalogWindow(requestedPageOffset, providerSkills.length, sort),
     providers: isChronologicalSort(sort) || sort === 'downloads' ? providerSkills.map(skill => ({ slug: skill.slug, timestamp: skill.createdAt, downloads: providerDownloads?.[skill.slug] || 0 })) : undefined }
   const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured, siteDownloads] = await Promise.all([
-    restrictedRegistry || query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
+    paused || restrictedRegistry || query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
       : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, featured, minStars, pricing, topic, output), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
         .catch((error: unknown) => {
           console.warn('Skills directory candidates unavailable:', error)
           return { records: getFallbackSkills(sort, undefined, candidateLimit), degraded: true }
         }),
-    restrictedRegistry ? Promise.resolve({ records: [] as SkillRecord[], degraded: false }) : getSearchAugmentRecords(firstSearchValue(params.q)),
+    paused || restrictedRegistry ? Promise.resolve({ records: [] as SkillRecord[], degraded: false }) : getSearchAugmentRecords(firstSearchValue(params.q)),
     Promise.resolve(SKILL_CATEGORIES.map(c => c[0])),
-    restrictedRegistry ? Promise.resolve({} as Record<string, SkillAgentStats>) : withTimeout(getCachedSkillStats(), SKILLS_PAGE_STATS_TIMEOUT_MS, 'skills stats query')
+    paused || restrictedRegistry ? Promise.resolve({} as Record<string, SkillAgentStats>) : withTimeout(getCachedSkillStats(), SKILLS_PAGE_STATS_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
     catalogMode ? getSkillCatalogPage(sort, category, page, minStars, pricing, examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : null, topic, output, catalogWindow)
       .then(result => ({ ...result, degraded: false, savedDirectory: undefined as { savedFrom: string; savedThrough: string } | undefined }))
@@ -1008,13 +1013,13 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
         total: 0, hasMore: false, degraded: true, page, orderedSlugs: undefined,
         }
       }) : Promise.resolve(null),
-    !includeRegistry ? Promise.resolve([] as SkillRecord[]) : getSkillsBySlugs(access === 'paid' ? paidSlugs : [...new Set([...(selectedUseCase?.featuredSlugs || []), ...(!catalogMode && examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
+    paused || !includeRegistry ? Promise.resolve([] as SkillRecord[]) : getSkillsBySlugs(access === 'paid' ? paidSlugs : [...new Set([...(selectedUseCase?.featuredSlugs || []), ...(!catalogMode && examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
     downloadTotalsPromise,
   ])
   const motionDownloads = siteDownloads
   for (const skill of providerSkills) skill.stats.siteDownloads = siteDownloads ? siteDownloads[skill.slug] || 0 : null
-  const records = !includeRegistry ? [] : access === 'paid' ? useCaseFeatured.filter(record => paidSlugs.includes(record.slug)) : catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, useCaseFeatured, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
-  const degraded = Boolean(catalogResult?.degraded || recordsResult.degraded || searchAugmentRecords.degraded)
+  const records = !includeRegistry ? [] : paused ? (saved?.records || []).filter(record => access !== 'paid' || paidSlugs.includes(record.slug)) : access === 'paid' ? useCaseFeatured.filter(record => paidSlugs.includes(record.slug)) : catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, useCaseFeatured, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
+  const degraded = Boolean((paused && includeRegistry) || catalogResult?.degraded || recordsResult.degraded || searchAugmentRecords.degraded)
   let effectivePage = catalogMode ? catalogResult!.page : page
   const rawCategoryOptions = categories.length > 0
     ? categories
@@ -1090,14 +1095,14 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     filteredRecords = sortDirectoryCandidates(filteredRecords, sort)
   }
 
-  if (!catalogMode) effectivePage = clampResultPage(page, filteredRecords.length + providerSkills.length + paidMotionEntries.length, VISIBLE_SKILL_LIMIT)
+  if (!catalogMode && !paused) effectivePage = clampResultPage(page, filteredRecords.length + providerSkills.length + paidMotionEntries.length, VISIBLE_SKILL_LIMIT)
   const pageOffset = (effectivePage - 1) * VISIBLE_SKILL_LIMIT
   let resultCount = catalogMode ? catalogResult!.total : filteredRecords.length
   const visibleRecords = catalogMode ? filteredRecords : filteredRecords.slice(pageOffset, pageOffset + VISIBLE_SKILL_LIMIT)
   // Never replace a healthy ISR directory with an empty outage fallback. A
   // regeneration error retains the previous page; a cold build must retry/fail.
   // Interactive query routes retain their explicit, uncached degraded state.
-  if (requireHealthy && degraded && visibleRecords.length === 0) {
+  if (requireHealthy && degraded && visibleRecords.length === 0 && !saved) {
     throw new Error('Public directory temporarily unavailable; refusing to cache an empty fallback')
   }
   const hasPreviousResults = effectivePage > 1
@@ -1131,7 +1136,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
       ]
       skills = chronologicalDirectoryPage(entries, [], pageOffset, 0, VISIBLE_SKILL_LIMIT, sort === 'downloads' ? compareDirectoryDownloads : undefined).map(entry => entry.project())
     }
-    hasMoreResults = !degraded && pageOffset + VISIBLE_SKILL_LIMIT < resultCount
+    hasMoreResults = (!degraded || Boolean(saved)) && pageOffset + VISIBLE_SKILL_LIMIT < resultCount
   } else if (catalogMode) {
     const cards = visibleRecords.map(projectCard)
     const merged = mergeProviderCatalogPage(cards, providerSkills, degraded ? cards.length : catalogResult!.total, pageOffset, sort)
@@ -1142,7 +1147,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     skills = projectDirectoryWindow(filteredRecords, providerSkills, pageOffset, prefix, projectCard, VISIBLE_SKILL_LIMIT)
     hasMoreResults = pageOffset + VISIBLE_SKILL_LIMIT < resultCount
   }
-  const directorySections = catalogMode ? [] : buildDirectorySections(
+  const directorySections = catalogMode || paused ? [] : buildDirectorySections(
     enrichedRecords.slice(0, DIRECTORY_SECTION_SOURCE_LIMIT)
   )
   const directoryLinks: DirectoryLink[] = POPULAR_DIRECTORY_LINKS.map((link) => ({ ...link }))
@@ -1161,7 +1166,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     platform, platformOptions, quality, trust, safety, supplyTrack, supplyTracks,
     minStars: Number.isFinite(minStars) ? minStars : 0,
     resultCount, page: effectivePage, rankOffset: pageOffset, hasPreviousResults,
-    hasMoreResults, degraded, savedDirectory: catalogResult?.savedDirectory, directorySections, directoryLinks,
+    hasMoreResults, degraded, savedDirectory: saved ? { savedFrom: saved.savedFrom, savedThrough: saved.savedThrough } : catalogResult?.savedDirectory, directorySections, directoryLinks,
   }
   return { jsonLd, clientProps }
 }
@@ -1194,6 +1199,16 @@ const getBrowseDirectory = unstable_cache(async (locale: Locale, key: string) =>
   revalidate: 900, tags: ['public-skill-directory', 'public-skill-stats'],
 })
 
+// Separate, finite keys for the deliberate maintenance state. Never replace a
+// healthy live cache with archived evidence, or persist arbitrary search text.
+const getPausedDirectory = unstable_cache(async (locale: Locale, key: string, savedVersion: string) => {
+  const variant = parseDirectoryBrowseVariant(key)
+  if (!variant) throw new Error('Invalid saved browse key')
+  const saved = getSavedDirectoryInfo()
+  if (!saved || saved.savedThrough !== savedVersion) throw new Error('Saved directory expired or changed')
+  return prepareDirectory({ ...variant.params, lang: locale })
+}, ['paused-public-directory-v1'], { revalidate: 3600 })
+
 export default async function SkillsPage({
   searchParams, requireHealthy = false,
 }: {
@@ -1206,12 +1221,17 @@ export default async function SkillsPage({
   const browseQuery = new URLSearchParams(Object.entries(params).flatMap(([key, value]): [string, string][] =>
     key === 'lang' || value === undefined ? [] : (Array.isArray(value) ? value : [value]).map(item => [key, item])))
   const browseVariant = isDefault ? null : directoryBrowseVariant(browseQuery)
-  const cachedModel = isDefault ? getDefaultDirectory(locale) : browseVariant ? getBrowseDirectory(locale, browseVariant.key) : null
+  const paused = isDataPaused()
+  const saved = paused ? getSavedDirectoryInfo() : null
+  const pausedKey = isDefault ? 'quality~1~all~all' : browseVariant?.key
+  const cachedModel = paused
+    ? saved && pausedKey ? getPausedDirectory(locale, pausedKey, saved.savedThrough) : null
+    : isDefault ? getDefaultDirectory(locale) : browseVariant ? getBrowseDirectory(locale, browseVariant.key) : null
   const model = cachedModel
     ? await cachedModel.catch(error => {
         // The current request can show its labelled fallback; failures never
         // replace a healthy shared model or turn into an empty cached directory.
-        if (error instanceof DegradedDirectory && (!requireHealthy || (process.env.SUPABASE_DATA_PAUSED === '1' && error.model.clientProps.savedDirectory))) return error.model
+        if (error instanceof DegradedDirectory && !requireHealthy) return error.model
         throw error
       })
     : await prepareDirectory(params, requireHealthy)

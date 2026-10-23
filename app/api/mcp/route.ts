@@ -10,6 +10,7 @@ import { SHOWCASE_AGENT_TARGETS } from '@/lib/showcase-task'
 import { locales } from '@/lib/i18n/config'
 import { getSkillSourceEvidence } from '@/lib/skills/source-evidence'
 import { getReviewEvidence } from '@/lib/skills/review-evidence'
+import { isDataPaused, DATA_UNAVAILABLE, dataUnavailableHeaders } from '@/lib/data-maintenance'
 
 export const dynamic = 'force-dynamic'
 
@@ -101,6 +102,11 @@ export async function POST(request: NextRequest) {
   if (body.method === 'tools/call') {
     const parsed = CallSchema.safeParse(body.params)
     if (!parsed.success) return error(body.id, -32602, 'Invalid tool call parameters')
+    if (isDataPaused() && TOOLS.some(tool => tool.name === parsed.data.name) && !['find_workflows', 'get_workflow'].includes(parsed.data.name)) {
+      return NextResponse.json({ jsonrpc: '2.0', id: body.id ?? null,
+        error: { code: -32001, message: DATA_UNAVAILABLE.error, data: DATA_UNAVAILABLE },
+      }, { status: 503, headers: dataUnavailableHeaders() })
+    }
     try { return result(body.id, toolResult(await callTool(request, parsed.data.name, parsed.data.arguments))) }
     catch (cause) { return result(body.id, { content: [{ type: 'text', text: cause instanceof Error ? cause.message : 'Tool call failed' }], isError: true }) }
   }

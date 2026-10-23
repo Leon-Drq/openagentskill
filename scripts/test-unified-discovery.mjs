@@ -98,7 +98,7 @@ const clamped = await getPage('quality','design-creative',9999,0,'all',[],null,'
 assert.equal(clamped.page, 3)
 assert.deepEqual(calls.find(c=>c[0]==='range'),['range',31,46], 'Clamped registry pages recompute their offset after the provider prefix')
 const server = readFileSync('app/skills/content.tsx', 'utf8')
-assert.match(server, /const catalogMode = !featured/)
+assert.match(server, /const catalogMode = !paused && !featured/)
 assert.match(server, /examplesOnly && !DIRECTORY_EXAMPLE_SKILL_SLUGS.includes/)
 const client = readFileSync('components/skills-page-client.tsx', 'utf8')
 assert.doesNotMatch(client, /DiscoveryTabs/)
