@@ -12,6 +12,7 @@ const loaderDependencies={
   'server-only': {}, 'next/cache': {unstable_cache:fn=>fn}, '@/lib/db/skills': {},
   '@/lib/rankings': {getRankingDefinition,rankSkillsForDefinition},
   '@/lib/ranking-landing': {rankingCandidates}, '@/lib/skills/directory': {isDirectorySnapshot},
+  '@/lib/skills/saved-directory': {getSavedDirectory: () => null},
 }
 new Function('exports','require',ts.transpileModule(readFileSync('lib/ranking-landing-data.ts','utf8'),{
   compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022},
@@ -27,7 +28,7 @@ assert.deepEqual(rankingCandidates(fixtures,recent,now).map(s=>s.slug),['new','b
 assert.equal(rankingCandidates(fixtures,getRankingDefinition('most-starred-agent-skills'),now),fixtures)
 assert.ok(validRankingDate(date(1))); assert.ok(!validRankingDate('invalid')); assert.ok(!validRankingDate(null))
 const calls=[]
-const readers={skills:async(...args)=>{calls.push(args);return [skill('new'),skill('old',8)]},stats:async()=>({}),outcomes:async()=>({})}
+const readers={skills:async(...args)=>{calls.push(args);return [skill('new'),skill('old',8)]},stats:async()=>{throw new Error('Basic ranking must not fetch unrelated event stats')},outcomes:async()=>({})}
 const loaded=await loadRankingLanding(recent,readers,now)
 assert.equal(loaded.source,'directory')
 assert.equal(loaded.candidateCount,1)

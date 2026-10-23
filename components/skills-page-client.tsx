@@ -30,6 +30,7 @@ import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
 import { DirectoryPagination } from './directory-pagination'
 import { DirectoryRecovery } from './directory-recovery'
+import { SavedDirectoryNotice, type SavedDirectoryNoticeData } from './saved-directory-notice'
 import { pageCount } from '@/lib/skills/pagination'
 import { SkillActions, SkillEngagementProvider } from './skill-engagement'
 import type { SupplyTrackSummary } from '@/lib/supply'
@@ -220,6 +221,7 @@ interface Props {
   hasPreviousResults: boolean
   hasMoreResults: boolean
   degraded: boolean
+  savedDirectory?: SavedDirectoryNoticeData
   directorySections: DirectorySection[]
   directoryLinks: DirectoryLink[]
 }
@@ -417,7 +419,9 @@ export function SkillsPageClient(props: Props) {
           <p role="status" className="sr-only">{pending ? c.loading : `${c.results}: ${degraded ? visibleCount : resultCount}`}</p>
           {(isMotionCategory || Boolean(props.motionEntries?.length)) && <p className="mt-4 text-xs leading-6 text-secondary" data-motion-scope>{locale === 'zh' ? '233 项动效创作指令 · 原作视频预览。单独购买或开通 Pro，解锁完整提示词与 Skill 指令，一键复制使用。' : '233 motion prompts and Skill instructions with original video previews. Purchase individually or join Pro to unlock, read and copy the full text.'}</p>}
           {props.access !== 'paid' && (props.access !== 'all' || props.pricing !== 'all') && <p className="my-4 text-xs leading-6 text-secondary">{props.access === 'free' ? filterCopy.freeNote : props.access === 'third-party' ? filterCopy.thirdPartyNote : prices.caveat}</p>}
-          {degraded && <DirectoryRecovery key={`${pathname}?${queryString}`} locale={locale} empty={props.catalogMode && skills.length === 0} />}
+          {degraded && (props.savedDirectory
+            ? <SavedDirectoryNotice locale={locale} saved={props.savedDirectory} />
+            : <DirectoryRecovery key={`${pathname}?${queryString}`} locale={locale} empty={props.catalogMode && skills.length === 0} />)}
           <details className="mt-3 text-xs leading-6 text-secondary" data-download-count-policy><summary className="min-h-11 w-fit cursor-pointer py-2.5 underline decoration-border underline-offset-4">{downloadCopy(locale).label}</summary><p className="mt-1 max-w-3xl">{downloadCopy(locale).note}</p></details>
 
           {visibleCount === 0 ? (
