@@ -27,9 +27,12 @@ export function createAdminClient(options: AdminClientOptions = {}) {
 
   const requestTimeoutMs = Number(options.requestTimeoutMs)
 
-  const boundedFetch = Number.isFinite(requestTimeoutMs) && requestTimeoutMs > 0
-    ? createResilientTimeoutFetch(Math.floor(requestTimeoutMs), options.circuitScope || 'admin')
-    : fetch
+  // Default callers must also honor project quota cooldown / the maintenance
+  // switch; an omitted timeout is not an unguarded route around that boundary.
+  const boundedFetch = createResilientTimeoutFetch(
+    Number.isFinite(requestTimeoutMs) && requestTimeoutMs > 0 ? Math.floor(requestTimeoutMs) : 30_000,
+    options.circuitScope || 'admin',
+  )
   const deadline = options.deadlineMs
   const deadlineFetch: typeof fetch = (input, init) => {
     if (!deadline) return boundedFetch(input, init)

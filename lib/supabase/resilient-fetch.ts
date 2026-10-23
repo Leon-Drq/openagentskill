@@ -9,12 +9,27 @@ export type SupabaseCircuitScope = 'public-read' | 'public-catalog' | 'skill-loo
 
 type CircuitGlobal = typeof globalThis & {
   __openagentskillSupabaseCircuits?: Partial<Record<SupabaseCircuitScope, CircuitState>>
+  __openagentskillSupabaseQuotas?: Map<string, CircuitState>
 }
 
 const FAILURE_THRESHOLD = 3
 const OPEN_INTERVAL_MS = 15_000
 const QUOTA_INTERVAL_MS = 60_000
 const MAX_RETRY_AFTER_MS = 300_000
+const EGRESS_QUOTA_INTERVAL_MS = 10 * 60_000
+
+function quotaCircuit(input: RequestInfo | URL): CircuitState | null {
+  const url = new URL(input instanceof Request ? input.url : String(input))
+  if (!url.pathname.startsWith('/rest/v1/')) return null
+  if (process.env.SUPABASE_DATA_PAUSED === '1') throw new Error('Supabase data reads and writes are paused; saved public browsing only')
+  const shared = globalThis as CircuitGlobal
+  const quotas = shared.__openagentskillSupabaseQuotas ??= new Map()
+  if (!quotas.has(url.origin)) {
+    if (quotas.size >= 4) quotas.delete(quotas.keys().next().value!)
+    quotas.set(url.origin, { consecutiveFailures: 0, openUntil: 0, probeInFlight: false, generation: 0 })
+  }
+  return quotas.get(url.origin)!
+}
 
 function getCircuitState(scope: SupabaseCircuitScope): CircuitState {
   const shared = globalThis as CircuitGlobal
@@ -69,16 +84,32 @@ export function createResilientTimeoutFetch(timeoutMs: number, scope: SupabaseCi
   return async (input, init) => {
     const externalSignal = init?.signal ?? (input instanceof Request ? input.signal : undefined)
     externalSignal?.throwIfAborted()
+    // Egress restriction is project-wide, unlike a query timeout or 429.
+    // Share its cooldown across catalog, search, stats, sitemap and admin
+    // scopes. Auth/Storage routes and other projects are not affected.
+    const quota = quotaCircuit(input)
+    let ownsQuotaProbe = false
+    if (quota) {
+      if (quota.openUntil > Date.now()) throw new Error('Supabase project egress quota is temporarily restricted')
+      if (quota.consecutiveFailures >= FAILURE_THRESHOLD) {
+        if (quota.probeInFlight) throw new Error('Supabase quota recovery probe is already running')
+        quota.probeInFlight = true
+        ownsQuotaProbe = true
+      }
+    }
+    const quotaGeneration = quota?.generation
     const state = getCircuitState(scope)
     const now = Date.now()
     let ownsProbe = false
 
     if (state.openUntil > now) {
+      if (ownsQuotaProbe && quota) quota.probeInFlight = false
       throw new Error('Supabase data circuit is temporarily open')
     }
 
     if (state.consecutiveFailures >= FAILURE_THRESHOLD) {
       if (state.probeInFlight) {
+        if (ownsQuotaProbe && quota) quota.probeInFlight = false
         throw new Error('Supabase recovery probe is already running')
       }
       state.probeInFlight = true
@@ -109,6 +140,14 @@ export function createResilientTimeoutFetch(timeoutMs: number, scope: SupabaseCi
       }
       // Also bound wrappers that do not promptly observe the AbortSignal.
       const { response, body } = await Promise.race([readResponse(), aborted])
+      if (quota && quota.generation === quotaGeneration) {
+        if (response.status === 402 && body && new TextDecoder().decode(body.slice(0, 65536)).includes('exceed_egress_quota')) {
+          recordFailure(quota, EGRESS_QUOTA_INTERVAL_MS)
+        } else if (ownsQuotaProbe) {
+          if (response.ok) recordSuccess(quota)
+          else recordFailure(quota, EGRESS_QUOTA_INTERVAL_MS)
+        }
+      }
       // Requests started before a circuit opened cannot close it late or
       // extend its cooldown. Only the recovery probe can change that state.
       if (state.generation === generation) {
@@ -120,11 +159,13 @@ export function createResilientTimeoutFetch(timeoutMs: number, scope: SupabaseCi
     } catch (error) {
       // A caller navigating away/cancelling work is not a database outage.
       if (!externalSignal?.aborted && state.generation === generation) recordFailure(state)
+      if (ownsQuotaProbe && quota && quota.generation === quotaGeneration && !externalSignal?.aborted) recordFailure(quota, EGRESS_QUOTA_INTERVAL_MS)
       throw error
     } finally {
       clearTimeout(timeout)
       signal.removeEventListener('abort', onAbort)
       if (ownsProbe && state.generation === generation) state.probeInFlight = false
+      if (ownsQuotaProbe && quota && quota.generation === quotaGeneration) quota.probeInFlight = false
     }
   }
 }

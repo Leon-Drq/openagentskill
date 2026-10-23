@@ -8,6 +8,7 @@ import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { getGitHubOwner } from '@/lib/github-owner'
 import { getRankingCompareHref, getRankingDefinition, getRankingDefinitions, normalizeRankingText } from '@/lib/rankings'
 import { getRankingLanding } from '@/lib/ranking-landing-data'
+import { SavedDirectoryNotice } from '@/components/saved-directory-notice'
 import { rankingLandingJsonLd, validRankingDate } from '@/lib/ranking-landing'
 import { directoryCopy, directoryLabel } from '@/lib/i18n/directory-copy'
 import { rankingCopy, localizedRanking } from '@/lib/i18n/ranking-copy'
@@ -49,7 +50,7 @@ export default async function RankingDetailPage({ params, searchParams }: Props)
   const t = trendingCopy(locale)
   const copy = localizedRanking(ranking, locale)
   const href = (path: string) => getLocalizedNavigationHref(path, locale)
-  const { items, candidateCount, source } = await getRankingLanding(slug)
+  const { items, candidateCount, source, savedFrom, savedThrough } = await getRankingLanding(slug)
   const number = new Intl.NumberFormat(locale)
   const date = new Intl.DateTimeFormat(locale, { timeZone: 'UTC', year: 'numeric', month: 'short', day: 'numeric' })
   const dateText = (value: string | null | undefined) => validRankingDate(value) ? date.format(new Date(value!)) : c.unknown
@@ -91,7 +92,9 @@ export default async function RankingDetailPage({ params, searchParams }: Props)
           <p>{c.scope.replace('{shown}', number.format(items.length)).replace('{count}', number.format(candidateCount))}</p>
           {items.length > 1 ? <Link href={href(getRankingCompareHref(items))} className="inline-flex min-h-8 items-center gap-2 text-[#006C52]">{c.compare}<ArrowRight size={14} aria-hidden="true" /></Link> : null}
         </div>
-        {source === 'saved-directory' ? <p role="status" className="mb-6 border-l-2 border-amber-600 pl-4 text-sm leading-6 text-secondary">{c.saved}</p> : null}
+        {source === 'saved-directory' ? savedFrom && savedThrough
+          ? <SavedDirectoryNotice locale={locale} saved={{ savedFrom, savedThrough }} />
+          : <p role="status" className="mb-6 border-l-2 border-amber-600 pl-4 text-sm leading-6 text-secondary">{c.saved}</p> : null}
 
         <section aria-label={copy.title} data-ranking-results data-ranking-source={source}>
           {!items.length ? <div role="status" className="border-t border-border py-12 text-sm leading-7 text-secondary"><p>{source === 'unavailable' ? c.unavailable : c.empty}</p><Link href={href('/skills')} className="mt-4 inline-block text-[#006C52] underline underline-offset-4">{d.all}</Link></div> : (
@@ -120,13 +123,13 @@ export default async function RankingDetailPage({ params, searchParams }: Props)
                     {showDate ? <div><p className="font-mono text-sm">{validRankingDate(recordDate) ? <time dateTime={recordDate!}>{dateText(recordDate)}</time> : c.unknown}</p><p className="mt-1 text-[11px] text-secondary">{dateLabel}</p></div> : null}
                     <Link href={href(`/skills/${skill.slug}`)} className="inline-flex min-h-11 items-center gap-2 text-sm text-[#006C52] sm:mt-3">{d.details}<ArrowRight size={15} aria-hidden="true" /></Link>
                   </div>
-                  <details className="col-start-2 col-end-[-1] mt-3 text-xs text-secondary sm:col-start-3">
+                  {source === 'directory' && <details className="col-start-2 col-end-[-1] mt-3 text-xs text-secondary sm:col-start-3">
                     <summary className="flex min-h-8 w-fit cursor-pointer list-none items-center gap-2 hover:text-foreground">{c.evidence}<ChevronDown size={12} aria-hidden="true" /></summary>
                     <p className="mt-2 max-w-2xl leading-6">{c.signalsNote}</p>
                     <dl className="mt-3 grid grid-cols-2 gap-x-5 gap-y-3 border-l border-border pl-4 sm:grid-cols-3">
                       {Object.entries(item.dimensions).filter(([, value]) => value !== null).map(([key, value]) => <div key={key}><dt>{c[key as keyof typeof item.dimensions]}</dt><dd className="mt-1 font-mono text-foreground">{number.format(Math.max(0, Math.min(100, Math.round(value!))))}/100</dd></div>)}
                     </dl>
-                  </details>
+                  </details>}
                 </li>
               })}
             </ol>

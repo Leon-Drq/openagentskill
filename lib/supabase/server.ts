@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { createResilientTimeoutFetch } from '@/lib/supabase/resilient-fetch'
 
 const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -21,11 +22,19 @@ const SUPABASE_ANON_KEY =
  */
 export async function createClient() {
   const cookieStore = await cookies()
+  const dataFetch = createResilientTimeoutFetch(8000, 'skill-support')
 
   return createServerClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY,
     {
+      db: { retry: false },
+      global: { fetch: (input, init) => {
+        const url = new URL(input instanceof Request ? input.url : String(input))
+        // Quota restrictions concern data requests; login/refresh keep their
+        // own Auth service behavior and must not inherit a data circuit.
+        return url.pathname.startsWith('/rest/v1/') ? dataFetch(input, init) : fetch(input, init)
+      } },
       cookies: {
         getAll() {
           return cookieStore.getAll()

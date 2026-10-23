@@ -36,6 +36,7 @@ import { MOTION_CATEGORY, type MotionEntry } from '@/lib/motion/shared'
 import { selectMotionDirectoryEntries, paidMotionWindow } from '@/lib/motion/directory'
 import { getDownloadTotals } from '@/lib/skills/downloads'
 import { directoryBrowseVariant, parseDirectoryBrowseVariant } from '@/lib/skills/browse-cache'
+import { getSavedDirectory } from '@/lib/skills/saved-directory'
 
 // Shared renderer. Public routes supply fixed inputs; query routes supply request inputs.
 
@@ -992,15 +993,18 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     restrictedRegistry ? Promise.resolve({} as Record<string, SkillAgentStats>) : withTimeout(getCachedSkillStats(), SKILLS_PAGE_STATS_TIMEOUT_MS, 'skills stats query')
       .catch((): Record<string, SkillAgentStats> => ({})),
     catalogMode ? getSkillCatalogPage(sort, category, page, minStars, pricing, examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : null, topic, output, catalogWindow)
-      .then(result => ({ ...result, degraded: false }))
+      .then(result => ({ ...result, degraded: false, savedDirectory: undefined as { savedFrom: string; savedThrough: string } | undefined }))
       .catch((error: unknown) => {
         console.warn('Skills directory catalog unavailable:', error)
+        const canUseSaved = canShowCatalogSnapshot(page, category, minStars, pricing) && topic === 'all' && output === 'all'
+        const saved = canUseSaved ? getSavedDirectory(sort) : null
         return {
-        records: canShowCatalogSnapshot(page, category, minStars, pricing) && topic === 'all' && output === 'all'
+        records: canUseSaved
           ? selectCatalogSnapshot(
-            getFallbackSkills(sort, undefined, FALLBACK_SKILLS.length + CURATED_SKILL_SNAPSHOT.length),
+            saved?.records || getFallbackSkills(sort, undefined, FALLBACK_SKILLS.length + CURATED_SKILL_SNAPSHOT.length),
             examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : null,
           ) : [] as SkillRecord[],
+        savedDirectory: saved ? { savedFrom: saved.savedFrom, savedThrough: saved.savedThrough } : undefined,
         total: 0, hasMore: false, degraded: true, page, orderedSlugs: undefined,
         }
       }) : Promise.resolve(null),
@@ -1157,7 +1161,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     platform, platformOptions, quality, trust, safety, supplyTrack, supplyTracks,
     minStars: Number.isFinite(minStars) ? minStars : 0,
     resultCount, page: effectivePage, rankOffset: pageOffset, hasPreviousResults,
-    hasMoreResults, degraded, directorySections, directoryLinks,
+    hasMoreResults, degraded, savedDirectory: catalogResult?.savedDirectory, directorySections, directoryLinks,
   }
   return { jsonLd, clientProps }
 }
@@ -1207,7 +1211,7 @@ export default async function SkillsPage({
     ? await cachedModel.catch(error => {
         // The current request can show its labelled fallback; failures never
         // replace a healthy shared model or turn into an empty cached directory.
-        if (error instanceof DegradedDirectory && !requireHealthy) return error.model
+        if (error instanceof DegradedDirectory && (!requireHealthy || (process.env.SUPABASE_DATA_PAUSED === '1' && error.model.clientProps.savedDirectory))) return error.model
         throw error
       })
     : await prepareDirectory(params, requireHealthy)
