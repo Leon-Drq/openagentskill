@@ -274,6 +274,11 @@ export async function getSkillDirectory(
     ? Math.min(MAX_SKILL_QUERY_LIMIT, Math.max(1, Math.floor(maxRows)))
     : DEFAULT_SKILL_QUERY_LIMIT
   const normalizedCategory = category && category !== 'all' ? category : null
+  // Legacy task/collection callers also reach this shared reader. Stop before
+  // the live cache, whose stale hits would otherwise launch failed refreshes.
+  if (process.env.SUPABASE_DATA_PAUSED === '1') {
+    return { records: getDirectoryFallback(sort, normalizedCategory || undefined, rowLimit), degraded: true, source: 'curated-snapshot' }
+  }
   // Interactive pages usually render fewer than 100 records. Do not make
   // those navigations wait for a 1,200-row directory read. Small, medium, and
   // full consumers share bounded cache tiers instead.
@@ -805,6 +810,7 @@ const getCachedSkillEventStatsMap = unstable_cache(
 )
 
 export async function getSkillEventStatsMap(): Promise<Record<string, SkillEventStats>> {
+  if (process.env.SUPABASE_DATA_PAUSED === '1') return {}
   return getCachedSkillEventStatsMap().catch(() => ({}))
 }
 
@@ -1012,6 +1018,7 @@ export async function getSkillsBySlugs(
 ): Promise<SkillRecord[]> {
   const normalizedSlugs = Array.from(new Set(slugs.map((slug) => slug.trim()).filter(Boolean)))
   if (!normalizedSlugs.length) return []
+  if (process.env.SUPABASE_DATA_PAUSED === '1') throw new Error('Live skill lookup is temporarily unavailable')
 
   const timeoutMs = Math.max(SKILL_LOOKUP_TIMEOUT_MS, requestTimeoutMs)
   // Canonical keys share reads even when callers order the same sources

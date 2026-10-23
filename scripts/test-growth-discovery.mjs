@@ -167,6 +167,26 @@ const recovered = await db.getSkillDirectory('stars', undefined, 20)
 assert.equal(recovered.degraded, false)
 assert.deepEqual(await db.getAllSkills('stars', undefined, 20), live, 'Existing consumers retain their array contract')
 assert.equal(live[0].ai_review_approved, false, 'Caching cannot change review state')
+const pauseBefore = process.env.SUPABASE_DATA_PAUSED
+const readsBeforePause = reads, writesBeforePause = sharedWrites.length
+try {
+  process.env.SUPABASE_DATA_PAUSED = '1'
+  const pausedDirectory = await db.getSkillDirectory('stars', undefined, 1)
+  assert.equal(pausedDirectory.source, 'curated-snapshot')
+  assert.equal(pausedDirectory.degraded, true)
+  assert.ok(pausedDirectory.records.length <= 1)
+  assert.deepEqual(await db.getSkillStats(), {})
+  assert.deepEqual(await db.getSkillEventStatsMap(), {})
+  assert.deepEqual(await db.getAgentOutcomeStatsMap(), {})
+  await assert.rejects(db.getAgentOutcomeStatsMapStrict(), /temporarily unavailable/)
+  await assert.rejects(db.getSkillsBySlugs(['live']), /temporarily unavailable/)
+  assert.deepEqual(await db.getSkillsBySlugs([]), [])
+  assert.equal(reads, readsBeforePause, 'Shared task/collection reads stop before the database')
+  assert.equal(sharedWrites.length, writesBeforePause, 'Pause never revalidates or overwrites live caches')
+} finally {
+  if (pauseBefore === undefined) delete process.env.SUPABASE_DATA_PAUSED; else process.env.SUPABASE_DATA_PAUSED = pauseBefore
+}
+assert.equal((await db.getSkillDirectory('stars', undefined, 20)).degraded, false, 'Pause did not overwrite the prior healthy model')
 rows = []
 assert.deepEqual((await db.getSkillDirectory('new', 'empty', 20)).records, [], 'A successful empty query is not replaced by a snapshot')
 

@@ -26,6 +26,10 @@ newly rendered pages.
   explicitly inexact/unavailable; no current safety or outcome evidence is
   inferred from saved metadata. Download totals are null while paused; normal
   mode refreshes them every 15 minutes instead of every minute.
+- Shared directory readers used by older task/collection pages also skip live
+  caches and return their existing explicitly degraded curated selection.
+  Batch skill lookups fail before cache access; missing event totals remain
+  unavailable. These guards cover callers beyond the public routing gate.
 - Authentication, payment/webhook transactions, owner publication and existing
   installation/review policies retain their original authorization rules. The
   saved metadata is never an install, download, payment or approval credential.
