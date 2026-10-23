@@ -9,6 +9,7 @@
 .primary:hover:not(:disabled) { filter: brightness(.92); }
 .secondary:hover:not(:disabled) { border-color: var(--brand); color: var(--brand); }
 .primary:disabled, .secondary:disabled { opacity: .5; cursor: not-allowed; }
+.primary.maintenance:disabled { opacity: 1; background: var(--background); border-color: var(--border); color: var(--secondary); white-space: normal; }
 .primary:focus-visible, .secondary:focus-visible, .link:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
 .note { color: var(--secondary); font-size: 13px; line-height: 1.8; }
 .error { color: var(--destructive); font-size: 14px; line-height: 1.8; }

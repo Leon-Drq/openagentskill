@@ -73,7 +73,7 @@
     "test:studio": "node --import ./scripts/test-typescript-register.mjs scripts/test-studio-membership.mjs",
     "check:resource-pages": "node scripts/check-resource-pages.mjs",
     "test:motion-studio": "node --import ./scripts/test-typescript-register.mjs scripts/test-motion-studio.mjs",
-    "test:payments": "node --import ./scripts/test-payments-register.mjs scripts/test-payments.mjs",
+    "test:payments": "node --import ./scripts/test-payments-register.mjs scripts/test-payments.mjs && node scripts/test-purchase-status.mjs",
     "test:downloads": "node scripts/test-downloads.mjs",
     "test:cost-reduction": "node --import ./scripts/test-typescript-register.mjs scripts/test-cost-reduction.mjs && node --import ./scripts/test-typescript-register.mjs scripts/test-browse-cache.mjs && node --import ./scripts/test-typescript-register.mjs scripts/test-alternatives-cache.mjs"
   },
