@@ -7,6 +7,7 @@ import { getAgentOutcomeStatsMapStrict } from '@/lib/db/skills'
 import { getLatestRankingSnapshot } from '@/lib/ranking-snapshots'
 import { getGitHubOwner } from '@/lib/github-owner'
 import { getRegistryCoverageStats } from '@/lib/registry-coverage'
+import { isDataPaused } from '@/lib/data-maintenance'
 
 const HOME_STATS_SNAPSHOT = {
   // The last exact count observed before the registry stats cache was added.
@@ -41,6 +42,7 @@ const getCachedExactApprovedSkillCount = unstable_cache(
 )
 
 async function getStableApprovedSkillCount(): Promise<HomeSkillCount> {
+  if (isDataPaused()) return { value: HOME_STATS_SNAPSHOT.totalSkills, exact: false }
   try {
     return await getCachedExactApprovedSkillCount()
   } catch {
@@ -75,6 +77,7 @@ const getCachedEvidenceStats = unstable_cache(
 )
 
 export function getRegistryEvidenceStats() {
+  if (isDataPaused()) return Promise.resolve({ totalVerifiedInstalls: 0, totalOutcomes: 0, provenSkills: 0, evidenceExact: false })
   // A failed refresh must not replace a healthy cache entry with zeroes.
   return getCachedEvidenceStats().catch(() => ({
     totalVerifiedInstalls: 0,
@@ -85,12 +88,13 @@ export function getRegistryEvidenceStats() {
 }
 
 export async function getHomePageData() {
+  const paused = isDataPaused()
   const [totalSkills, evidence, coverage, popularitySnapshot, trendingSnapshot] = await Promise.all([
     getStableApprovedSkillCount(),
     getRegistryEvidenceStats(),
-    getRegistryCoverageStats(),
-    getLatestRankingSnapshot('most-starred-agent-skills'),
-    getLatestRankingSnapshot('trending'),
+    paused ? Promise.resolve(null) : getRegistryCoverageStats(),
+    paused ? Promise.resolve(null) : getLatestRankingSnapshot('most-starred-agent-skills'),
+    paused ? Promise.resolve(null) : getLatestRankingSnapshot('trending'),
   ])
   const leaderboardSnapshot = popularitySnapshot || trendingSnapshot
 

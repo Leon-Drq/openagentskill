@@ -10,11 +10,18 @@ import { publicSavedRow, usableSavedDirectory, type SavedDirectory } from './sav
 const data = snapshot as SavedDirectory
 const records = data.rows.map(publicSavedRow).filter(row => row !== null) as unknown as SkillRecord[]
 
+export function getSavedDirectoryInfo(now = Date.now()) {
+  return usableSavedDirectory(data, now)
+    ? { savedFrom: data.savedFrom, savedThrough: data.savedThrough, coverage: 'partial' as const }
+    : null
+}
+
 export function getSavedDirectory(sort: SkillSortMode = 'quality', limit = 480, now = Date.now()) {
-  if (!usableSavedDirectory(data, now)) return null
+  const info = getSavedDirectoryInfo(now)
+  if (!info) return null
   const size = Number.isFinite(limit) ? Math.min(480, Math.max(1, Math.floor(limit))) : 480
   return {
     records: sortDirectoryCandidates(records.map(record => ({ record })), sort).slice(0, size).map(item => item.record),
-    savedFrom: data.savedFrom, savedThrough: data.savedThrough, coverage: 'partial' as const,
+    ...info,
   }
 }

@@ -12,7 +12,8 @@ const loaderDependencies={
   'server-only': {}, 'next/cache': {unstable_cache:fn=>fn}, '@/lib/db/skills': {},
   '@/lib/rankings': {getRankingDefinition,rankSkillsForDefinition},
   '@/lib/ranking-landing': {rankingCandidates}, '@/lib/skills/directory': {isDirectorySnapshot},
-  '@/lib/skills/saved-directory': {getSavedDirectory: () => null},
+  '@/lib/skills/saved-directory': {getSavedDirectory: () => null, getSavedDirectoryInfo: () => null},
+  '@/lib/data-maintenance': {isDataPaused: () => false},
 }
 new Function('exports','require',ts.transpileModule(readFileSync('lib/ranking-landing-data.ts','utf8'),{
   compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022},

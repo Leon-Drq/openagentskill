@@ -270,6 +270,7 @@ assert.deepEqual(await (await detail()).json(), discovery.getShowcaseTaskPackage
 
 const NextResponse = class extends Response { static json(value, options) { return Response.json(value, options) } }
 const mcp = compile('app/api/mcp/route.ts', {
+  '@/lib/data-maintenance': { isDataPaused: () => false },
   'next/server': { NextResponse }, zod: { z },
   '@/lib/agent-resolve': { resolveAgentSkill: forbidden }, '@/lib/db/skills': { searchSkills: async () => live },
   '@/lib/registry': { buildInstallHandoff: forbidden }, '@/lib/skill-fallbacks': { getSkillBySlugOrFallbackStrict: async () => live[0] },

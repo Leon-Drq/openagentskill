@@ -49,7 +49,8 @@ const dependencies = {
   '@/lib/rankings': { getRankingDefinition: slug => ({ ...fakeRanking, kind: slug === 'outcomes' ? 'agent-usage' : fakeRanking.kind }), rankSkillsForDefinition: rows => rows.map(skill => ({ skill })) },
   '@/lib/ranking-landing': { rankingCandidates: rows => rows },
   '@/lib/skills/directory': { isDirectorySnapshot: () => false },
-  '@/lib/skills/saved-directory': { getSavedDirectory: () => { fallbackCalls++; return { records: [candidate], savedFrom: snapshot.savedFrom, savedThrough: snapshot.savedThrough } } },
+  '@/lib/data-maintenance': { isDataPaused: () => process.env.SUPABASE_DATA_PAUSED === '1' },
+  '@/lib/skills/saved-directory': { getSavedDirectoryInfo: () => ({ savedFrom: snapshot.savedFrom, savedThrough: snapshot.savedThrough }), getSavedDirectory: () => { fallbackCalls++; return { records: [candidate], savedFrom: snapshot.savedFrom, savedThrough: snapshot.savedThrough } } },
 }
 const loader = compile('lib/ranking-landing-data.ts', dependencies)
 const fallback = await loader.getRankingLanding('new')
@@ -68,6 +69,10 @@ assert.equal(reads, readCount, 'Successful rankings reuse shared cache')
 
 const originalFetch = globalThis.fetch, originalNow = Date.now, paused = process.env.SUPABASE_DATA_PAUSED
 try {
+  process.env.SUPABASE_DATA_PAUSED = '1'
+  assert.equal((await loader.getRankingLanding('new')).source, 'saved-directory')
+  assert.equal((await loader.getRankingLanding('outcomes')).source, 'unavailable')
+  assert.equal(reads, readCount, 'Pause bypasses live ranking and outcome caches even when a healthy cache exists')
   delete process.env.SUPABASE_DATA_PAUSED
   globalThis.__openagentskillSupabaseCircuits = undefined
   globalThis.__openagentskillSupabaseQuotas = undefined

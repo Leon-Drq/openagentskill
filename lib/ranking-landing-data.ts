@@ -4,7 +4,8 @@ import { getSkillDirectory, getAgentOutcomeStatsMapStrict } from '@/lib/db/skill
 import { getRankingDefinition, rankSkillsForDefinition, type RankingDefinition } from '@/lib/rankings'
 import { rankingCandidates } from '@/lib/ranking-landing'
 import { isDirectorySnapshot } from '@/lib/skills/directory'
-import { getSavedDirectory } from '@/lib/skills/saved-directory'
+import { getSavedDirectory, getSavedDirectoryInfo } from '@/lib/skills/saved-directory'
+import { isDataPaused } from '@/lib/data-maintenance'
 
 const defaultReaders = {
   skills: async (...args: Parameters<typeof getSkillDirectory>) => {
@@ -66,14 +67,15 @@ const getSavedRankingLanding = unstable_cache(async (slug: string, savedVersion:
 export async function getRankingLanding(slug: string): Promise<Landing> {
   const ranking = getRankingDefinition(slug)
   if (!ranking) throw new Error('Unknown ranking')
-  try { return await getCachedRankingLanding(slug) } catch {
-    // Never infer current agent outcomes/safety from an archived metadata pool.
-    if (['most-starred', 'new-this-week', 'recently-updated', 'use-case'].includes(ranking.kind)) {
-      const saved = getSavedDirectory('new', 1)
-      if (saved) {
-        try { return await getSavedRankingLanding(slug, saved.savedThrough) } catch { /* Not a current list. */ }
-      }
-    }
-    return { items: [], candidateCount: 0, source: 'unavailable' }
+  if (!isDataPaused()) {
+    try { return await getCachedRankingLanding(slug) } catch { /* Use only eligible saved metadata below. */ }
   }
+  // Never infer current agent outcomes/safety from an archived metadata pool.
+  if (['most-starred', 'new-this-week', 'recently-updated', 'use-case'].includes(ranking.kind)) {
+    const saved = getSavedDirectoryInfo()
+    if (saved) {
+      try { return await getSavedRankingLanding(slug, saved.savedThrough) } catch { /* Not a current list. */ }
+    }
+  }
+  return { items: [], candidateCount: 0, source: 'unavailable' }
 }

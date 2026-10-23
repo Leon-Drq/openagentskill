@@ -9,6 +9,8 @@ import { publicQueryRoute, hasContentQuery } from '@/lib/public-page-routing'
 import { publicCachedRoute } from '@/lib/public-cached-routing'
 import { isLocalizedBlogPath } from '@/lib/blog/routes'
 import { isLocalizedMotionPath } from '@/lib/motion/routes'
+import { isDataPaused, DATA_UNAVAILABLE, dataUnavailableHeaders } from '@/lib/data-maintenance'
+import { maintenanceRoute } from '@/lib/maintenance-routing'
 
 const MARKET_LOCALE_CODES = new Set(['zh', 'ja', 'ko', 'es', 'de', 'fr', 'id'])
 const DOCUMENT_LANG_BY_LOCALE: Record<string, string> = {
@@ -102,7 +104,7 @@ export async function proxy(request: NextRequest) {
   const noindex = isSkillDetailVariant(pathname, searchParams)
 
   // Internal rewrite targets are not extra public/SEO URLs.
-  if (pathname === '/render-query' || pathname.startsWith('/render-query/') || pathname === '/cached-public' || pathname.startsWith('/cached-public/')) {
+  if (pathname === '/render-query' || pathname.startsWith('/render-query/') || pathname === '/cached-public' || pathname.startsWith('/cached-public/') || pathname === '/data-unavailable' || pathname.startsWith('/data-unavailable/')) {
     return NextResponse.rewrite(new URL('/404', request.url), {
       status: 404, headers: { 'X-Robots-Tag': 'noindex, follow' },
     })
@@ -135,6 +137,20 @@ export async function proxy(request: NextRequest) {
       url.searchParams.delete('lang')
       return NextResponse.redirect(url, 308)
     }
+  }
+
+  // Stop before data caches, model preparation, rendering and auth refresh.
+  // The page target is prebuilt for eight locales, so arbitrary query strings
+  // and unknown slugs cannot create new ISR entries during the outage.
+  const maintenance = isDataPaused() ? maintenanceRoute(pathname, searchParams) : null
+  if (maintenance) {
+    const headers = dataUnavailableHeaders()
+    if (maintenance === 'api' || !['GET', 'HEAD'].includes(request.method)) {
+      return NextResponse.json(DATA_UNAVAILABLE, { status: 503, headers })
+    }
+    return NextResponse.rewrite(new URL(`/data-unavailable/${locale || 'en'}`, request.url), {
+      status: 503, headers: { ...headers, 'Content-Language': DOCUMENT_LANG_BY_LOCALE[locale || 'en'] || 'en' },
+    })
   }
 
   const cachedRoute = publicCachedRoute(pathname, searchParams)
@@ -200,12 +216,14 @@ export const config = {
     // Only routes with locale, alias, missing-page or auth behavior need proxy.
     '/',
     '/(zh|ja|ko|es|de|fr|id)/:path*',
-    '/(skills|showcase|creators|rankings|profile|render-query|cached-public)/:path*',
+    '/(skills|showcase|creators|rankings|profile|render-query|cached-public|alternatives|data-unavailable)/:path*',
     '/(contact|sponsor)',
     '/(resolve|tasks|skill-packs|compare|api-docs|agent-skill|agent-skills-registry|docs|submit)',
     '/(skill-packs|collections)/:path*',
     { source: '/((?!api(?:/|$)|_next/|favicon.ico|robots.txt|sitemap.xml|sitemaps/).*)', has: [{ type: 'query', key: 'lang' }] },
     '/api/claims/:path*',
     '/api/points/:path*',
+    '/api/(registry|skills|agent|audits|badge|events|showcase|cron|indexer)/:path*',
+    '/api/activity',
   ],
 }

@@ -8,6 +8,8 @@ import { publicCachedRoute } from '../lib/public-cached-routing.ts'
 import { createBoundedContentMemo } from '../lib/bounded-content-memo.ts'
 import { isLocalizedBlogPath, CREATOR_BLOG_SLUG, BLOG_LOCALES } from '../lib/blog/routes.ts'
 import { isLocalizedMotionPath } from '../lib/motion/routes.ts'
+import { maintenanceRoute } from '../lib/maintenance-routing.ts'
+import * as maintenance from '../lib/data-maintenance.ts'
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
 const detailWrapper = read('app/skills/[slug]/page.tsx')
@@ -18,7 +20,7 @@ assert.match(read('app/skills/[slug]/page.tsx'), /generateStaticParams\(\) \{ re
 assert.doesNotMatch(read('components/skills-page-client.tsx'), /const .* = useSearchParams\(/, 'cached directory must keep SSR content, not a loading bailout')
 assert.match(read('components/skills-page-client.tsx'), /directoryHref\(pathname, queryString,/)
 assert.match(read('app/skills/content.tsx'), /key === 'lang' && locale !== defaultLocale/, 'localized reset must return to the cacheable path without an injected lang query')
-assert.match(read('app/skills/content.tsx'), /if \(requireHealthy && degraded && visibleRecords.length === 0\) \{\s*throw new Error/, 'do not persist an empty outage page')
+assert.match(read('app/skills/content.tsx'), /if \(requireHealthy && degraded && visibleRecords.length === 0 && !saved\) \{\s*throw new Error/, 'unplanned outages must not persist an empty fallback; a labelled partial saved selection has separate keys')
 for (const path of ['/skills/example', '/skills/example/audit', '/skills/example/evals', '/ja/docs']) {
   assert.equal(publicQueryRoute(path, new URLSearchParams()), null)
   assert.equal(publicQueryRoute(path, new URLSearchParams('_rsc=prefetch')), null)
@@ -48,6 +50,8 @@ const deps = {
   '@/lib/public-cached-routing': { publicCachedRoute },
   '@/lib/blog/routes': { isLocalizedBlogPath },
   '@/lib/motion/routes': { isLocalizedMotionPath },
+  '@/lib/maintenance-routing': { maintenanceRoute },
+  '@/lib/data-maintenance': maintenance,
 }
 new Function('exports', 'require', ts.transpileModule(read('proxy.ts'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
@@ -96,6 +100,37 @@ for (const kind of ['audit', 'evals']) {
 assert.equal(authCalls, 0)
 await exports.proxy(request('/profile'))
 assert.equal(authCalls, 1)
+
+const priorPause = process.env.SUPABASE_DATA_PAUSED
+try {
+  process.env.SUPABASE_DATA_PAUSED = '1'
+  for (const path of ['/skills?q=video', '/zh/skills?q=video', '/skills/federicodeponte-opendraft', '/skills/example/audit?lang=zh', '/ja/skills/example/evals', '/alternatives/example', '/resolve?task=video', '/zh/compare?q=test']) {
+    assert.ok(unstable_doesProxyMatch({ config: exports.config, nextConfig: {}, url: path }), path)
+    const response = await exports.proxy(request(path))
+    assert.equal(response.status, 503, path)
+    assert.equal(response.headers.get('retry-after'), '600')
+    assert.match(response.headers.get('cache-control'), /private, no-store/)
+    assert.match(response.headers.get('x-middleware-rewrite'), /\/data-unavailable\/(en|zh|ja)$/)
+    assert.ok(!response.headers.has('set-cookie'))
+  }
+  for (const path of ['/api/agent/resolve', '/api/skills/search', '/api/registry/install/example', '/api/cron/rankings-daily', '/api/skills/example/download', '/api/agent/outcome']) {
+    assert.ok(unstable_doesProxyMatch({ config: exports.config, nextConfig: {}, url: path }))
+    const response = await exports.proxy(request(path))
+    assert.equal(response.status, 503, path)
+    assert.equal((await response.json()).code, 'data_temporarily_unavailable')
+    assert.ok(!response.headers.has('x-middleware-rewrite'))
+  }
+  for (const path of ['/skills', '/skills?sort=new', '/zh/skills?category=design-creative', '/skills/motion-stephanlivera-df17a2', '/contact', '/api/payments/webhook', '/api/payments/download', '/api/github/repo', '/api/agent/showcase', '/api/mcp', '/api/admin/skills/publish']) {
+    assert.notEqual((await exports.proxy(request(path))).status, 503, path)
+  }
+  assert.equal((await exports.proxy(request('/skills/motion-invented-product'))).status, 503, 'Invented prefix is not a static product')
+  assert.equal((await exports.proxy(request('/data-unavailable/en'))).status, 404, 'Internal target is not a duplicate public URL')
+  assert.equal(authCalls, 1, 'Maintenance does not perform auth or change cookies')
+  delete process.env.SUPABASE_DATA_PAUSED
+  assert.equal((await exports.proxy(request('/skills/federicodeponte-opendraft'))).status, 200, 'Recovery returns to live rendering')
+} finally {
+  if (priorPause === undefined) delete process.env.SUPABASE_DATA_PAUSED; else process.env.SUPABASE_DATA_PAUSED = priorPause
+}
 
 let now = 0, calls = 0
 const memo = createBoundedContentMemo({ version: 'test', ttlMs: 60, maxEntries: 2, maxBytes: 1000, now: () => now })
