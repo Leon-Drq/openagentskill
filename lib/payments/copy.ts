@@ -1,4 +1,5 @@
 import type { Locale } from '@/lib/i18n/config'
+import { membershipCopy } from '@/lib/i18n/membership-copy'
 
 const messages: Record<string, [string, string]> = {
   copy_manually: ['Clipboard access is unavailable. Select and copy the text above.', '浏览器未允许自动复制，请选中上方正文手动复制。'],
@@ -15,5 +16,6 @@ const messages: Record<string, [string, string]> = {
   no_billing_account: ['No billing account was found. It is created when you start checkout.', '尚无付款账户，发起结算后将自动创建。'],
 }
 export function paymentMessage(code: string, locale: Locale) {
+  if (code === 'payment_maintenance') return membershipCopy(locale).maintenanceNote
   return (messages[code] || messages.temporarily_unavailable)[locale === 'zh' ? 1 : 0]
 }

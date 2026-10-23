@@ -11,6 +11,7 @@ import { membershipCopy } from '@/lib/i18n/membership-copy'
 import { recurringPlan } from '@/lib/payments/policy'
 import styles from './payments.module.css'
 import { downloadFile } from '@/lib/download-file'
+import { readPurchaseStatus, type PurchaseStatus } from '@/lib/payments/purchase-status'
 
 export async function paymentAction(path: string, body: unknown) {
   const response = await fetch(`/api/payments/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -18,20 +19,25 @@ export async function paymentAction(path: string, body: unknown) {
   if (!response.ok) throw new Error(data.error || 'temporarily_unavailable')
   return data
 }
-export interface PurchaseStatus { ready: boolean; membershipReady: boolean; owned: boolean; membership?: 'lifetime' | 'subscription' | null; reason?: string }
+export type { PurchaseStatus } from '@/lib/payments/purchase-status'
 
 // The pricing grid shares one status request across its three paid options.
 export function usePurchaseStatus(slug?: string, enabled = true) {
   const [state, setState] = useState<PurchaseStatus | null>(null)
-  const [error, setError] = useState('')
   useEffect(() => {
     if (!enabled) return
     const controller = new AbortController()
     let attempts = 0
-    const refresh = () => fetch(`/api/payments/status${slug ? `?slug=${encodeURIComponent(slug)}` : ''}`, { signal: controller.signal, cache: 'no-store' })
-      .then(async response => { if (!response.ok) throw new Error('temporarily_unavailable'); return response.json() })
-      .then(next => { setState(next); setError('') })
-      .catch(error => { if (error.name !== 'AbortError') setError('temporarily_unavailable') })
+    let inFlight = false
+    const refresh = async () => {
+      if (inFlight || controller.signal.aborted) return
+      inFlight = true
+      try {
+        const next = await readPurchaseStatus(slug, controller.signal)
+        if (!controller.signal.aborted) setState(next)
+      } catch { /* Effect cleanup cancelled this read. */ }
+      finally { inFlight = false }
+    }
     const onFocus = () => { void refresh() }
     void refresh()
     const interval = new URLSearchParams(window.location.search).get('checkout') === 'processing'
@@ -39,7 +45,7 @@ export function usePurchaseStatus(slug?: string, enabled = true) {
     window.addEventListener('focus', onFocus)
     return () => { controller.abort(); clearInterval(interval); window.removeEventListener('focus', onFocus) }
   }, [slug, enabled])
-  return { state, error }
+  return { state, error: state?.reason === 'payment_maintenance' ? 'payment_maintenance' : '' }
 }
 export function PurchaseActions({ slug, plan, locale, delivery = 'package', onAvailability, status, compact = false, label }: {
   slug?: string; plan: PurchasePlan; locale: Locale; delivery?: DeliveryKind; onAvailability?: (ready: boolean) => void;
@@ -53,7 +59,8 @@ export function PurchaseActions({ slug, plan, locale, delivery = 'package', onAv
   const state = status === undefined ? ownStatus.state : status
   const [busy, setBusy] = useState(false), [error, setError] = useState('')
   const [content, setContent] = useState(''), [copied, setCopied] = useState(false)
-  const ready = Boolean(recurringPlan(plan) ? state?.membershipReady : state?.ready)
+  const maintenance = state?.reason === 'payment_maintenance'
+  const ready = !maintenance && Boolean(recurringPlan(plan) ? state?.membershipReady : state?.ready)
   useEffect(() => { onAvailability?.(ready) }, [ready, onAvailability])
   async function act(download = false) {
     setBusy(true); setError('')
@@ -85,9 +92,9 @@ export function PurchaseActions({ slug, plan, locale, delivery = 'package', onAv
     </div>}
     {!slug && state?.membership ? <Link href={`/profile?tab=purchases&lang=${locale}`} className={styles.primary} prefetch={false}>{m.current}</Link>
       : state?.owned && slug ? <button type="button" className={styles.primary} disabled={busy} onClick={() => isText ? copyContent() : act(true)}>{isText ? (copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />) : <Download size={16} aria-hidden="true" />}{busy ? (zh ? '正在读取…' : 'Loading…') : isText ? (copied ? (zh ? '已复制' : 'Copied') : (zh ? `查看并复制${contentLabel}` : `Read & copy ${contentLabel.toLowerCase()}`)) : (zh ? '下载 Skill ZIP' : 'Download Skill ZIP')}</button>
-      : <button type="button" className={styles.primary} disabled={!ready || busy} onClick={() => act()}>{!compact && <ShoppingBag size={16} aria-hidden="true" />}{busy ? m.opening : ready ? (label || (plan === 'single' ? (isText ? (zh ? '购买并解锁' : 'Buy & unlock') : (zh ? '购买此 Skill' : 'Buy this Skill')) : plan === 'lifetime' ? m.lifetimeAction : (zh ? '订阅 Pro 会员' : 'Subscribe to Pro'))) : !state ? m.checking : m.unavailable}</button>}
-    {!compact && <p className={styles.note}>{!state ? (zh ? '正在读取安全购买状态…' : 'Checking secure purchase status…') : state.owned ? (zh ? '已获得访问权限，可在我的购买中管理。' : 'Access is available in your purchases.') : ready ? (isText ? (zh ? '在 Stripe 安全结算。付款确认后返回本页，即可读取与复制。' : 'Secure checkout with Stripe. Return here after payment to read and copy.') : m.secure) : paymentMessage(state.reason || 'checkout_unavailable', locale)}</p>}
-    {(error || ownStatus.error) && <p className={styles.error} role="alert">{paymentMessage(error || ownStatus.error, locale)}</p>}
+      : <button type="button" className={`${styles.primary}${maintenance ? ` ${styles.maintenance}` : ''}`} disabled={!ready || busy} aria-busy={!state || busy} onClick={() => act()}>{!compact && <ShoppingBag size={16} aria-hidden="true" />}{busy ? m.opening : maintenance ? m.maintenance : ready ? (label || (plan === 'single' ? (isText ? (zh ? '购买并解锁' : 'Buy & unlock') : (zh ? '购买此 Skill' : 'Buy this Skill')) : plan === 'lifetime' ? m.lifetimeAction : (zh ? '订阅 Pro 会员' : 'Subscribe to Pro'))) : !state ? m.checking : m.unavailable}</button>}
+    {!compact && <p className={styles.note} role={maintenance ? 'status' : undefined}>{maintenance ? m.maintenanceNote : !state ? (zh ? '正在读取安全购买状态…' : 'Checking secure purchase status…') : state.owned ? (zh ? '已获得访问权限，可在我的购买中管理。' : 'Access is available in your purchases.') : ready ? (isText ? (zh ? '在 Stripe 安全结算。付款确认后返回本页，即可读取与复制。' : 'Secure checkout with Stripe. Return here after payment to read and copy.') : m.secure) : paymentMessage(state.reason || 'checkout_unavailable', locale)}</p>}
+    {error && <p className={styles.error} role="alert">{paymentMessage(error, locale)}</p>}
     {!compact && <Link href={`/profile?tab=purchases&lang=${locale}`} className={styles.link} prefetch={false}>{m.library}<ArrowUpRight size={14} aria-hidden="true" /></Link>}
   </div>
 }
