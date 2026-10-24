@@ -21,3 +21,77 @@ export const HOME_SEARCH_COPY: Record<Locale, { placeholder: string; browse: str
   fr: { placeholder: 'Décrivez une tâche ou un skill…', browse: 'Explorer tous les skills', connect: 'Connecter mon IA', indexed: 'Skills indexés' },
   id: { placeholder: 'Masukkan tugas atau nama skill…', browse: 'Jelajahi semua skill', connect: 'Hubungkan AI saya', indexed: 'Skill terindeks' },
 }
+
+export const HOME_STATS_COPY: Record<Locale, {
+  recordedSkills: string
+  recordedOn: string
+  statisticsPaused: string
+  statisticsUnavailable: string
+  agentApi: string
+  paused: string
+}> = {
+  en: {
+    recordedSkills: 'Last recorded skills',
+    recordedOn: 'Recorded on {date}.',
+    statisticsPaused: 'Live statistics are paused.',
+    statisticsUnavailable: 'Current statistics are temporarily unavailable.',
+    agentApi: 'Agent API',
+    paused: 'Paused',
+  },
+  zh: {
+    recordedSkills: '历史收录数量',
+    recordedOn: '统计于 {date}。',
+    statisticsPaused: '实时统计已暂停。',
+    statisticsUnavailable: '当前统计暂不可用。',
+    agentApi: 'Agent API',
+    paused: '已暂停',
+  },
+  ja: {
+    recordedSkills: '前回記録したスキル数',
+    recordedOn: '記録日：{date}。',
+    statisticsPaused: 'リアルタイム統計は一時停止中です。',
+    statisticsUnavailable: '現在の統計は一時的に利用できません。',
+    agentApi: 'エージェント API',
+    paused: '一時停止中',
+  },
+  ko: {
+    recordedSkills: '최근 기록된 스킬 수',
+    recordedOn: '기록일: {date}.',
+    statisticsPaused: '실시간 통계가 일시 중지되었습니다.',
+    statisticsUnavailable: '현재 통계를 일시적으로 사용할 수 없습니다.',
+    agentApi: '에이전트 API',
+    paused: '일시 중지',
+  },
+  es: {
+    recordedSkills: 'Último recuento de skills',
+    recordedOn: 'Registrado el {date}.',
+    statisticsPaused: 'Las estadísticas en tiempo real están en pausa.',
+    statisticsUnavailable: 'Las estadísticas actuales no están disponibles temporalmente.',
+    agentApi: 'API para agentes',
+    paused: 'En pausa',
+  },
+  de: {
+    recordedSkills: 'Zuletzt erfasste Skills',
+    recordedOn: 'Stand: {date}.',
+    statisticsPaused: 'Die Live-Statistik ist pausiert.',
+    statisticsUnavailable: 'Aktuelle Statistiken sind vorübergehend nicht verfügbar.',
+    agentApi: 'Agenten-API',
+    paused: 'Pausiert',
+  },
+  fr: {
+    recordedSkills: 'Dernier total de skills',
+    recordedOn: 'Relevé du {date}.',
+    statisticsPaused: 'Les statistiques en temps réel sont en pause.',
+    statisticsUnavailable: 'Les statistiques actuelles sont temporairement indisponibles.',
+    agentApi: 'API pour agents',
+    paused: 'En pause',
+  },
+  id: {
+    recordedSkills: 'Jumlah skill terakhir',
+    recordedOn: 'Dicatat pada {date}.',
+    statisticsPaused: 'Statistik langsung sedang dijeda.',
+    statisticsUnavailable: 'Statistik terkini sementara tidak tersedia.',
+    agentApi: 'API agen',
+    paused: 'Dijeda',
+  },
+}
