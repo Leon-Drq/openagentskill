@@ -14,6 +14,7 @@ const row = slug => ({ slug, name: slug, version: String(revision), ai_review_ap
 Object.assign(deps, {
   '@/lib/cache/packed-json': packed, '@/lib/cache/coalesced': coalesced,
   '@/lib/skills/media-query': mediaQuery, '@/lib/async': { withTimeout },
+  '@/lib/search-query': { normalizeExactSearchQuery: query => query.trim() },
   '@/lib/skills/publication': { PUBLIC_SKILL_FILTER: 'publication-gate' },
   '@/lib/skills/registry-scope': { isMcpOnlySkillRecord: value => value.slug === 'mcp-only' },
   'next/cache': { unstable_cache: (fn, keys, options) => async (...args) => {
@@ -93,3 +94,21 @@ assert.equal((await db.getSkillBySlugStrict('other')).version, '2', 'Unrelated d
 assert.ok([...cacheTags.values()].filter(tags => tags.includes('public-skill:detail')).every(tags => !tags.includes('public-skill-directory')), 'A directory refresh cannot invalidate every detail')
 assert.ok(reads.every(batch => batch.length <= 100), 'Per-source tags stay below the framework tag limit')
 console.log('Public source batches: canonical keys, 8-way coalescing, packed cache, invalidation, failure recovery, source evidence, ordering and bounded concurrency passed.')
+
+const oldPause = process.env.SUPABASE_DATA_PAUSED
+try {
+  process.env.SUPABASE_DATA_PAUSED = '1'
+  const beforePause = { reads: reads.length, caches: shared.size }
+  for (const read of [
+    () => db.getSkillBySlugStrict('detail'),
+    () => db.searchSkillsWithStatus('video'), () => db.searchSkills('video'),
+    () => db.getBrowseSkillCandidates('quality', 'all', 96, false, 0),
+    () => db.getSkillCatalogPage('quality', 'all', 1, 0),
+    () => db.getPublishedVideoWorkflowSources(['owner/repo']),
+  ]) await assert.rejects(read, /temporarily unavailable/)
+  assert.deepEqual({ reads: reads.length, caches: shared.size }, beforePause)
+} finally {
+  if (oldPause === undefined) delete process.env.SUPABASE_DATA_PAUSED
+  else process.env.SUPABASE_DATA_PAUSED = oldPause
+}
+assert.equal((await db.getSkillBySlugStrict('detail')).version, '3', 'Recovery reuses the unmodified healthy cache')

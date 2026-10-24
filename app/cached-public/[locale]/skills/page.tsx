@@ -5,7 +5,7 @@ import { isPublicCacheLocale } from '@/lib/public-cached-routing'
 import { I18nProvider } from '@/lib/i18n/context'
 import type { Locale } from '@/lib/i18n/config'
 
-export const revalidate = 900
+export const revalidate = 3600
 export function generateStaticParams() { return [] }
 type Props = { params: Promise<{ locale: string }> }
 

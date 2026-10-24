@@ -19,7 +19,7 @@ those reusable browse responses rather than changing the directory UI.
   three access choices, featured or examples) share public ISR responses.
   There are at most 1,560 variants per locale / 12,480 across eight locales.
   They are generated only on demand, not during builds or by a warming cron.
-- Variants use fixed, validated internal path keys and a 900-second freshness
+- Variants use fixed, validated internal path keys and a 3,600-second freshness
   window. The public URL, canonical URL, query noindex policy, server-rendered
   cards, controls and original sorting semantics remain intact.
 - Free text, compound filters, unknown inputs, duplicate content parameters
@@ -41,7 +41,7 @@ A shared, compressed candidate projection replaces per-target quality/trust
 analysis of up to 1,200 rows. Candidate evidence is calculated once per cache
 refresh; each target still uses the original similarity formula and tie order.
 Only ranking/display fields are retained, not full source documents. Its tag
-is `public-skill-directory`, freshness 900 seconds. Metadata and page share
+is `public-skill-directory`, freshness 3,600 seconds. Metadata and page share
 their target lookup. Missing targets avoid the candidate read entirely;
 transient lookup/candidate failures do not become cached 404s or empty lists.
 

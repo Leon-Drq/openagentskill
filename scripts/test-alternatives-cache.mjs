@@ -56,5 +56,5 @@ await assert.rejects(()=>mod.getAlternativeCandidates(),/temporarily unavailable
 assert.equal(shared.size,0)
 degraded=false;records=records.map(row=>({...row,description:'Changed source'}))
 assert.equal((await mod.getAlternativeCandidates())[0].skill.description,'Changed source')
-assert.deepEqual(policies,[{revalidate:900,tags:['public-skill-directory']}])
+assert.deepEqual(policies,[{revalidate:3600,tags:['public-skill-directory']}])
 console.log('Alternatives cache: identical ranking/scores, one candidate analysis across targets, invalidation and outage recovery passed.')

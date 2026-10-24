@@ -36,7 +36,7 @@ const getPackedCandidates = unstable_cache(async () => {
   // Never replace a healthy cached page with outage-induced empty/fallback data.
   if (result.degraded) throw new Error('Alternative candidates temporarily unavailable')
   return packCacheJson(projectAlternativeCandidates(result.records))
-}, ['alternative-candidates-v1'], { revalidate: 900, tags: ['public-skill-directory'] })
+}, ['alternative-candidates-v1'], { revalidate: 3600, tags: ['public-skill-directory'] })
 
 export async function getAlternativeCandidates(): Promise<Candidates> {
   return unpackCacheJson<Candidates>(await getPackedCandidates())

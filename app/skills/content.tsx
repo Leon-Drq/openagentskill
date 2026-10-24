@@ -945,16 +945,17 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     quality, trust, safety, supplyTrack, useCase }
   const paidMotionEntries = category === 'all' && (access === 'paid' || pricing === 'paid')
     ? selectMotionDirectoryEntries(motionFilters) : []
-  const downloadTotalsPromise = paused ? Promise.resolve(null) : getDownloadTotals().catch(() => null)
   // Motion is a category of this directory, using its existing shell and URL
   // state. Preview records remain separate from reviewed registry inventory.
   if (category === MOTION_CATEGORY) {
-    const motionDownloads = await downloadTotalsPromise
     const entries = selectMotionDirectoryEntries(motionFilters)
+    const offset = (requestedPage - 1) * VISIBLE_SKILL_LIMIT
+    const motionDownloads = paused ? null : await getDownloadTotals(
+      (sort === 'downloads' ? entries : entries.slice(offset, offset + VISIBLE_SKILL_LIMIT)).map(entry => entry.id)
+    ).catch(() => null)
     if (sort === 'downloads' && motionDownloads) entries.sort((a, b) => (motionDownloads[b.id] || 0) - (motionDownloads[a.id] || 0) || a.id.localeCompare(b.id))
     const resultCount = entries.length
     if (requestedPage > Math.max(1, Math.ceil(resultCount / VISIBLE_SKILL_LIMIT))) notFound()
-    const offset = (requestedPage - 1) * VISIBLE_SKILL_LIMIT
     const clientProps: Omit<ComponentProps<typeof SkillsPageClient>, 'queryString'> = {
       pathname: locale === defaultLocale ? '/skills' : `/${locale}/skills`,
       skills: [], motionEntries: entries.slice(offset, offset + VISIBLE_SKILL_LIMIT),
@@ -972,7 +973,8 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
   const providerSkills = (includeProviders ? selectProviderSkills({ query, category, topic, output, pricing, examplesOnly,
     platform, quality, trust, safety, supplyTrack, minStars, useCase, featured, sort }) : []).map(entry => toProviderDirectorySkill(entry, locale))
   const providerOnlyQuery = query?.toLocaleLowerCase() === 'skillry'
-  const providerDownloads = sort === 'downloads' ? await downloadTotalsPromise : null
+  const providerDownloads = !paused && sort === 'downloads'
+    ? await getDownloadTotals(providerSkills.map(skill => skill.slug)).catch(() => null) : null
   const includeRegistry = registryAccess && !providerOnlyQuery
   const restrictedRegistry = !includeRegistry || access === 'paid'
   const catalogMode = !paused && !featured && !query && !restrictedRegistry && paidMotionEntries.length === 0 && [useCase, platform, quality, trust, safety, supplyTrack].every(value => value === 'all')
@@ -986,7 +988,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
   const saved = paused && includeRegistry ? getSavedDirectory(sort, candidateLimit) : null
   const catalogWindow = { ...providerCatalogWindow(requestedPageOffset, providerSkills.length, sort),
     providers: isChronologicalSort(sort) || sort === 'downloads' ? providerSkills.map(skill => ({ slug: skill.slug, timestamp: skill.createdAt, downloads: providerDownloads?.[skill.slug] || 0 })) : undefined }
-  const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured, siteDownloads] = await Promise.all([
+  const [recordsResult, searchAugmentRecords, categories, statsMap, catalogResult, useCaseFeatured] = await Promise.all([
     paused || restrictedRegistry || query?.trim() || catalogMode ? Promise.resolve({ records: [] as SkillRecord[], degraded: false })
       : withTimeout(getBrowseSkillCandidates(sort, category, candidateLimit, featured, minStars, pricing, topic, output), SKILLS_PAGE_QUERY_TIMEOUT_MS, 'filtered skill candidates')
         .catch((error: unknown) => {
@@ -1014,11 +1016,15 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
         }
       }) : Promise.resolve(null),
     paused || !includeRegistry ? Promise.resolve([] as SkillRecord[]) : getSkillsBySlugs(access === 'paid' ? paidSlugs : [...new Set([...(selectedUseCase?.featuredSlugs || []), ...(!catalogMode && examplesOnly ? DIRECTORY_EXAMPLE_SKILL_SLUGS : []), ...(query && pricing !== 'all' && pricing !== 'unknown' ? commerceFilterSlugs(pricing) : [])])]).catch(() => []),
-    downloadTotalsPromise,
   ])
-  const motionDownloads = siteDownloads
-  for (const skill of providerSkills) skill.stats.siteDownloads = siteDownloads ? siteDownloads[skill.slug] || 0 : null
   const records = !includeRegistry ? [] : paused ? (saved?.records || []).filter(record => access !== 'paid' || paidSlugs.includes(record.slug)) : access === 'paid' ? useCaseFeatured.filter(record => paidSlugs.includes(record.slug)) : catalogMode ? catalogResult!.records : mergeSkillRecords(searchAugmentRecords.records, useCaseFeatured, recordsResult.records, FALLBACK_SKILLS, CURATED_SKILL_SNAPSHOT)
+  // Only download sorting needs counts for every candidate before pagination.
+  // Other sorts defer counter reads until the visible cards have been chosen.
+  const candidateDownloads = !paused && sort === 'downloads'
+    ? await getDownloadTotals([...records.map(record => record.slug), ...paidMotionEntries.map(entry => entry.id)]).catch(() => null) : null
+  const siteDownloads = candidateDownloads && providerDownloads ? { ...candidateDownloads, ...providerDownloads } : null
+  let motionDownloads = siteDownloads
+  for (const skill of providerSkills) skill.stats.siteDownloads = siteDownloads ? siteDownloads[skill.slug] || 0 : null
   const degraded = Boolean((paused && includeRegistry) || catalogResult?.degraded || recordsResult.degraded || searchAugmentRecords.degraded)
   let effectivePage = catalogMode ? catalogResult!.page : page
   const rawCategoryOptions = categories.length > 0
@@ -1151,6 +1157,15 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     enrichedRecords.slice(0, DIRECTORY_SECTION_SOURCE_LIMIT)
   )
   const directoryLinks: DirectoryLink[] = POPULAR_DIRECTORY_LINKS.map((link) => ({ ...link }))
+  if (!paused && sort !== 'downloads') {
+    const visibleDownloads = await getDownloadTotals([
+      ...skills.map(skill => skill.slug), ...(motionEntries || []).map(entry => entry.id),
+    ]).catch(() => null)
+    skills = skills.map(skill => ({ ...skill, stats: { ...skill.stats,
+      siteDownloads: visibleDownloads ? visibleDownloads[skill.slug] || 0 : null,
+    } }))
+    motionDownloads = visibleDownloads
+  }
   // Clamping is useful inside the UI, but a requested nonexistent page must
   // not become a duplicate of the last page (or a false 404 during an outage).
   if (!degraded && requestedPage > Math.max(1, Math.ceil(resultCount / VISIBLE_SKILL_LIMIT))) notFound()
@@ -1186,7 +1201,7 @@ const getDefaultDirectory = unstable_cache(async (locale: Locale) => {
   if (model.clientProps.degraded) throw new DegradedDirectory(model)
   return model
 }, ['public-directory-model-v5-product-examples'], {
-  revalidate: 900, tags: ['public-skill-directory', 'public-skill-stats'],
+  revalidate: 3600, tags: ['public-skill-directory', 'public-skill-stats'],
 })
 
 const getBrowseDirectory = unstable_cache(async (locale: Locale, key: string) => {
@@ -1196,7 +1211,7 @@ const getBrowseDirectory = unstable_cache(async (locale: Locale, key: string) =>
   if (model.clientProps.degraded) throw new DegradedDirectory(model)
   return model
 }, ['public-browse-model-v2-product-examples'], {
-  revalidate: 900, tags: ['public-skill-directory', 'public-skill-stats'],
+  revalidate: 3600, tags: ['public-skill-directory', 'public-skill-stats'],
 })
 
 // Separate, finite keys for the deliberate maintenance state. Never replace a
@@ -1207,7 +1222,7 @@ const getPausedDirectory = unstable_cache(async (locale: Locale, key: string, sa
   const saved = getSavedDirectoryInfo()
   if (!saved || saved.savedThrough !== savedVersion) throw new Error('Saved directory expired or changed')
   return prepareDirectory({ ...variant.params, lang: locale })
-}, ['paused-public-directory-v1'], { revalidate: 3600 })
+}, ['paused-public-directory-v1'], { revalidate: 21600 })
 
 export default async function SkillsPage({
   searchParams, requireHealthy = false,

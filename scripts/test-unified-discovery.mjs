@@ -30,7 +30,8 @@ assert.deepEqual(selectCatalogSnapshot(saved, []), [])
 const db = readFileSync('lib/db/skills.ts', 'utf8')
 const part = db.slice(db.indexOf('function applyCatalogFilters'), db.indexOf('export function getSkillCatalogPage'))
 const helper = db.slice(db.indexOf('function applyTaxonomyFilters'), db.indexOf('// Apply discoverability'))
-const code = ts.transpileModule(helper + part, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText
+const cachePolicy = db.match(/^const DIRECTORY_CACHE_REVALIDATE_SECONDS = \d+/m)[0]
+const code = ts.transpileModule(cachePolicy + '\n' + helper + part, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText
 const calls = []
 const cached = fn => {
   const cache = new Map()

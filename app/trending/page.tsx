@@ -11,7 +11,7 @@ import { directoryCopy, directoryLabel } from '@/lib/i18n/directory-copy'
 import { getLocaleFromSearchParam, getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
 import { directoryCategoryOptions, matchesDirectoryCategory } from '@/lib/skills/directory'
 
-export const revalidate = 300
+export const revalidate = 21600
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> }
 const canonical = 'https://www.openagentskill.com/trending'
 

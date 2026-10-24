@@ -14,7 +14,7 @@ import { CORE_RANKINGS, getRankingDefinitions, getUniqueProjectStarTotal, normal
 import { getLatestRankingSnapshot, RANKING_METHODOLOGY_VERSION } from '@/lib/ranking-snapshots'
 import { GitHubPopularityList } from '@/components/github-popularity-list'
 
-export const revalidate = 300
+export const revalidate = 3600
 
 export const metadata: Metadata = {
   title: 'AI Agent Skill Rankings',

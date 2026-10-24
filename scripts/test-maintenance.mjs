@@ -32,6 +32,7 @@ const downloads = compile('lib/skills/downloads.ts', {
   'server-only': {}, 'next/server': { NextResponse },
   'next/cache': { unstable_cache: () => async () => { cacheCalls++; return { example: 7 } } },
   '@/lib/data-maintenance': policy, '@/lib/supabase/admin': { createAdminClient: forbidden }, './download-policy': {},
+  './media-query': compile('lib/skills/media-query.ts', {}),
 })
 const home = compile('lib/home-page-data.ts', {
   'next/cache': { unstable_cache: fn => async (...args) => { cacheCalls++; return fn(...args) } },
@@ -60,7 +61,7 @@ try {
     assert.equal(body.error.data.code, 'data_temporarily_unavailable')
     assert.ok(!('result' in body), 'No successful install/review/outcome is fabricated')
   }
-  assert.equal(await downloads.getDownloadTotals(), null)
+  assert.equal(await downloads.getDownloadTotals(['example']), null)
   const landing = await home.getHomePageData()
   assert.equal(landing.stats.evidenceExact, false)
   assert.equal(landing.stats.totalSkillsExact, false)
@@ -68,7 +69,7 @@ try {
   assert.equal(cacheCalls, 0, 'Even a stale cache lookup can cause background work: skip it')
   assert.equal(dataCalls, 0)
   delete process.env.SUPABASE_DATA_PAUSED
-  assert.deepEqual(await downloads.getDownloadTotals(), { example: 7 })
+  assert.deepEqual(await downloads.getDownloadTotals(['example']), { example: 7 })
   assert.equal(cacheCalls, 1)
 } finally {
   if (before === undefined) delete process.env.SUPABASE_DATA_PAUSED; else process.env.SUPABASE_DATA_PAUSED = before

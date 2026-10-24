@@ -12,6 +12,8 @@ let reads = 0, unavailable = false, records, stats = {}
 let lookupError = false
 let searchDelay = 0, searchUnavailable = false
 let downloadReads = 0, pausedLiveReads = 0
+const downloadScopes = []
+let downloadCounts = {}
 const db = {
   getSkillBySlugStrict: async () => { if (lookupError) throw new Error('lookup unavailable'); return null },
   getSkillCatalogPage: async (_sort, _category, page, _stars, _pricing, _slugs, _topic, _output, window) => {
@@ -60,7 +62,11 @@ function load(path) {
     if (name === 'next/navigation') return { notFound: () => { throw new Error('404') }, permanentRedirect: path => { throw new Error('redirect:' + path) } }
     if (name === 'react/jsx-runtime') return { jsx, jsxs: jsx, Fragment: 'fragment' }
     if (name === '@/lib/db/skills') return db
-    if (name === '@/lib/skills/downloads') return { getDownloadTotals: async () => { downloadReads++; return {} } }
+    if (name === '@/lib/skills/downloads') return { getDownloadTotals: async slugs => {
+      assert.ok(Array.isArray(slugs), 'Download queries require an explicit scope')
+      downloadReads++; downloadScopes.push(slugs)
+      return Object.fromEntries(slugs.filter(slug => slug in downloadCounts).map(slug => [slug, downloadCounts[slug]]))
+    } }
     if (name.startsWith('@/components/')) return new Proxy({}, { get: (_target, key) => key })
     if (name.startsWith('@/') || name.startsWith('.')) {
       const base = name.startsWith('@/') ? resolve(name.slice(2)) : resolve(dirname(absolute), name)
@@ -88,6 +94,7 @@ searchUnavailable = false
 assert.equal((await renderProps({ q: 'recoverable' })).degraded, false, 'Refreshing an unavailable search must recover without a stale error flag')
 const defaultProps = await renderProps({})
 assert.equal(defaultProps.skills.length, 16)
+assert.deepEqual(downloadScopes.at(-1), defaultProps.skills.map(card => card.slug), 'Normal browsing queries only visible counters')
 assert.equal(reads, 1)
 assert.equal(shared.size, 1)
 assert.deepEqual(await renderProps({}), normalize(defaultProps))
@@ -110,7 +117,7 @@ for (const params of [{ category: 'design-creative', access: 'free' }, { q: 'des
 }
 await assert.rejects(() => renderProps({ page: '0' }), /404/)
 await assert.rejects(() => renderProps({ page: '999999' }), /404/)
-assert.deepEqual(policies, [...Array.from({length: 2}, () => ({ revalidate: 900, tags: ['public-skill-directory', 'public-skill-stats'] })), { revalidate: 3600 }])
+assert.deepEqual(policies, [...Array.from({length: 2}, () => ({ revalidate: 3600, tags: ['public-skill-directory', 'public-skill-stats'] })), { revalidate: 21600 }])
 
 for (const params of [{ sort: 'stars' }, { page: '2' }, { category: 'design-creative' }]) {
   const first = await renderProps(params)
@@ -183,6 +190,23 @@ for (const sort of ['new','fresh']) for (const lang of ['en','zh']) {
 }
 records = previousRecords
 console.log('New arrival renderer: REA stays on page one, EN/ZH order and second-page continuity passed.')
+
+// A leader outside the first candidate page must still rank first. Only
+// non-download sorts can postpone counter reads until after pagination.
+const beforeDownloadRecords = records
+records = Array.from({ length: 36 }, (_, i) => ({ ...beforeDownloadRecords[0],
+  slug: `video-download-fixture-${i}`, name: `Video editor ${i}`, description: 'video editing workflow',
+  id: `download-fixture-${i}`, github_repo: `download-fixture/repo-${i}`, source_path: 'SKILL.md',
+  tags: ['video'], github_stars: 100, site_downloads: i + 1,
+}))
+downloadCounts = Object.fromEntries(records.map(row => [row.slug, row.site_downloads]))
+const sortedFirst = await renderProps({ q: 'video', sort: 'downloads' })
+const sortedSecond = await renderProps({ q: 'video', sort: 'downloads', page: '2' })
+const expectedDownloads = [...records].reverse().slice(0, 32).map(row => row.slug)
+assert.deepEqual([...sortedFirst.skills, ...sortedSecond.skills].map(card => card.slug), expectedDownloads)
+assert.equal(sortedFirst.skills[0].stats.siteDownloads, 36)
+records = beforeDownloadRecords; downloadCounts = {}
+console.log('Download renderer: visible-only counts, full-candidate sorting and two-page continuity passed.')
 
 // Execute the actual paused renderer with every live dependency booby-trapped.
 // A stale live cache must not be touched or revalidated while data is paused.

@@ -8,7 +8,7 @@ newly rendered pages.
 ## Request behavior
 
 - Default Skills directories and finite browse variants use an isolated saved
-  model cache (`paused-public-directory-v1`, one hour). They skip live directory,
+  model cache (`paused-public-directory-v1`, six hours). They skip live directory,
   search augmentation, agent statistics and download-total caches. Only visible
   cards are sent to the browser. The original dates and partial coverage remain
   visible; the saved count is not the current registry total.
@@ -25,11 +25,16 @@ newly rendered pages.
 - Home statistics and rankings skip live refreshes. Unknown evidence remains
   explicitly inexact/unavailable; no current safety or outcome evidence is
   inferred from saved metadata. Download totals are null while paused; normal
-  mode refreshes them every 15 minutes instead of every minute.
+  mode caches explicitly requested download totals for one hour. Ordinary
+  browsing reads only visible counters; download sorting reads all candidates
+  before pagination, using bounded batches rather than scanning the ledger.
 - Shared directory readers used by older task/collection pages also skip live
   caches and return their existing explicitly degraded curated selection.
   Batch skill lookups fail before cache access; missing event totals remain
   unavailable. These guards cover callers beyond the public routing gate.
+- Search (including its broad fallback), catalog readers, individual source
+  lookups, video workflow sources and ranking snapshots also stop before cache
+  access while paused. This covers use-case and ranking-page refresh failures.
 - Authentication, payment/webhook transactions, owner publication and existing
   installation/review policies retain their original authorization rules. The
   saved metadata is never an install, download, payment or approval credential.
@@ -43,8 +48,14 @@ entry points; it is not a promise of zero database-related errors on every route
 Temporary failures use `private, no-store`. They must not enter a healthy live
 cache or persist after recovery. The maintenance HTML itself is prebuilt and
 reused on the origin; do not interpret its Next.js HIT as a CDN-cached 503.
-Public directory HTML still uses the existing 15-minute ISR routes. Successful
+Public directory HTML and live models use one-hour ISR/cache windows. Successful
 saved models do not trigger failing background data revalidations.
+
+Daily ranking snapshots use a six-hour fallback refresh interval and retain the
+`ranking-snapshots` tag. The authorized daily publisher still invalidates the
+tag and dependent pages after successful generation. Directory publication
+retains its existing tags. Installation, payment, session and safety-evidence
+freshness rules are not extended. See `docs/cost-reduction-2026-10-24.md`.
 
 The snapshot retains its existing 30-day validity limit. Restore normal data
 service or refresh it through `pnpm snapshot:refresh` before expiry; run the
