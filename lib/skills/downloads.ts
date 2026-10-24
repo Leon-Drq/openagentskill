@@ -4,27 +4,28 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { verifiedDownloadBytes } from './download-policy'
 import { isDataPaused } from '@/lib/data-maintenance'
+import { slugQueryBatches } from './media-query'
 
-const getCachedDownloadTotals = unstable_cache(async () => {
+const DOWNLOAD_BATCH_SIZE = 100
+const getCachedDownloadTotals = unstable_cache(async (slugs: string[]) => {
   const db = createAdminClient({ requestTimeoutMs: 3000 })
-  const result: Record<string, number> = {}
-  // Keyset pagination: never silently truncate a growing ledger at 1000 rows.
-  let after = ''
-  for (;;) {
-    const { data, error } = await db.from('skill_download_totals').select('skill_slug,downloads')
-      .gt('skill_slug', after).order('skill_slug').limit(1000)
-    if (error) throw error
-    for (const row of data || []) result[row.skill_slug] = Number(row.downloads)
-    if (!data || data.length < 1000) break
-    after = data[data.length - 1].skill_slug
-  }
-  return result
-}, ['site-download-totals-v2-operations'], { revalidate: 900, tags: ['site-download-totals'] })
+  const { data, error } = await db.from('skill_download_totals').select('skill_slug,downloads')
+    .in('skill_slug', slugs).limit(DOWNLOAD_BATCH_SIZE)
+  if (error) throw error
+  return Object.fromEntries((data || []).map(row => [row.skill_slug, Number(row.downloads)])) as Record<string, number>
+}, ['site-download-totals-v3-scoped'], { revalidate: 3600, tags: ['site-download-totals'] })
 
-export async function getDownloadTotals() {
+export async function getDownloadTotals(slugs: readonly string[]) {
   // Missing counts are not zero downloads; callers already display null safely.
   if (isDataPaused()) return null
-  return getCachedDownloadTotals()
+  const normalized = [...new Set(slugs.map(slug => slug.trim()).filter(Boolean))].sort()
+  const result: Record<string, number> = {}
+  // Required scope prevents accidental whole-ledger reads. Batch without
+  // truncating a ranking's candidates; reordered callers share the same keys.
+  for (const batch of slugQueryBatches(normalized)) {
+    Object.assign(result, await getCachedDownloadTotals(batch))
+  }
+  return result
 }
 
 export async function downloadResponse(input: {

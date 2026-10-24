@@ -224,10 +224,11 @@ const getCachedLatestRankingSnapshot = unstable_cache(
     return data as RankingSnapshot | null
   },
   ['latest-ranking-snapshot-v2'],
-  { revalidate: 300, tags: ['ranking-snapshots'] }
+  { revalidate: 21600, tags: ['ranking-snapshots'] }
 )
 
 export async function getLatestRankingSnapshot(rankingSlug: string) {
+  if (process.env.SUPABASE_DATA_PAUSED === '1') return null
   const snapshot = await getCachedLatestRankingSnapshot(rankingSlug).catch(() => null)
   if (!snapshot) return null
   return { ...snapshot, items: snapshot.items.map(item => ({
@@ -237,6 +238,7 @@ export async function getLatestRankingSnapshot(rankingSlug: string) {
 }
 
 export async function getRankingSnapshotHistory(rankingSlug: string, days = 30) {
+  if (process.env.SUPABASE_DATA_PAUSED === '1') throw new Error('Live ranking history is temporarily unavailable')
   const supabase = createPublicClient({ requestTimeoutMs: 4_000 })
   const since = utcDate(new Date(Date.now() - Math.min(Math.max(days, 1), 90) * 86_400_000))
   const { data, error } = await supabase

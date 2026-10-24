@@ -62,13 +62,12 @@ export default async function CollectionDetailPage({
   const localizedHref = (href: string) => getLocalizedNavigationHref(href, locale)
 
   const sourceSlugs = stack.featuredSlugs || []
-  const downloadTotalsPromise = getDownloadTotals().catch(() => null)
   const sourceRows = stack.curatedOnly ? await getSkillsBySlugs(sourceSlugs, 2500).catch(() => []) : []
   const allSkills = stack.curatedOnly
     ? sourceSlugs.map(slug => sourceRows.find(skill => skill.slug === slug) || getCuratedSkillFallback(slug)).filter((skill): skill is SkillRecord => Boolean(skill))
     : await getAllSkills('quality', undefined, 1200).catch(() => [])
   const picks = selectSkillsForStack(allSkills, stack, 8)
-  const downloadTotals = await downloadTotalsPromise
+  const downloadTotals = await getDownloadTotals(picks.map(skill => skill.slug)).catch(() => null)
   const compareUrl = `/compare?skills=${encodeURIComponent(picks.slice(0, 4).map((skill) => skill.slug).join(','))}`
 
   return (

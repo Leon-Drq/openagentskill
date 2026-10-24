@@ -86,6 +86,7 @@ const DEFAULT_SKILL_QUERY_LIMIT = 1200
 const MAX_SKILL_QUERY_LIMIT = 4000
 const ALL_SKILLS_CACHE_TTL_MS = 30 * 1000
 const SHARED_SKILL_CACHE_REVALIDATE_SECONDS = 300
+const DIRECTORY_CACHE_REVALIDATE_SECONDS = 3600
 const CATEGORY_CACHE_REVALIDATE_SECONDS = 3600
 // SQL can use its full 3s statement budget, before network and body decoding.
 // Shorter transport deadlines incorrectly open the circuit on healthy reads.
@@ -249,7 +250,7 @@ const getSharedAllSkills = unstable_cache(
   },
   ['public-skill-directory-v8-product-examples'],
   {
-    revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS,
+    revalidate: DIRECTORY_CACHE_REVALIDATE_SECONDS,
     tags: ['public-skill-directory'],
   }
 )
@@ -982,6 +983,7 @@ function getCachedSkillBySlug(slug: string, cacheSeconds: number) {
 export async function getSkillBySlugStrict(slug: string, cacheSeconds = SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS): Promise<SkillRecord | null> {
   const normalized = normalizeSkillLookupSlug(slug)
   if (!normalized) return null
+  if (process.env.SUPABASE_DATA_PAUSED === '1') throw new Error('Live skill lookup is temporarily unavailable')
 
   return getCachedSkillBySlug(normalized, cacheSeconds)
 }
@@ -1050,6 +1052,7 @@ export async function getSkillsBySlugs(
 export async function getPublishedVideoWorkflowSources(repositories: string[]): Promise<VideoWorkflowListing[]> {
   const names = Array.from(new Set(repositories)).filter(Boolean)
   if (!names.length) return []
+  if (process.env.SUPABASE_DATA_PAUSED === '1') throw new Error('Live workflow sources are temporarily unavailable')
   const supabase = createPublicClient({ requestTimeoutMs: SKILL_LOOKUP_TIMEOUT_MS })
   const { data, error } = await supabase.from('skills')
     .select('slug,github_repo,source_path,source_commit_sha,source_content_hash,listing_status,ai_review_approved')
@@ -1204,6 +1207,7 @@ const readCoalescedSearch = createCoalescedCache<{ records: SkillRecord[]; degra
 export async function searchSkillsWithStatus(query: string, limit = 120) {
   const normalized = normalizeExactSearchQuery(query).toLowerCase()
   if (!normalized) return { records: [] as SkillRecord[], degraded: false }
+  if (process.env.SUPABASE_DATA_PAUSED === '1') throw new Error('Live skill search is temporarily unavailable')
   const rowLimit = Math.min(Math.max(Math.floor(limit) || 1, 1), 200)
   return readCoalescedSearch(JSON.stringify([normalized, rowLimit]), () => fetchSearchSkillsWithStatus(normalized, rowLimit))
 }
@@ -1296,10 +1300,11 @@ const getCachedBrowseCandidates = unstable_cache(
     return packCacheJson(filterSkillOnly((data || []) as unknown as SkillRecord[]))
   }),
   ['skills-browse-candidates-v6-product-examples'],
-  { revalidate: 300, tags: ['public-skill-directory'] }
+  { revalidate: DIRECTORY_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
 
 export async function getBrowseSkillCandidates(sort: SkillSortMode, category: string, limit: number, sourceOnly: boolean, minStars: number, pricing: PriceFilter = 'all', topic = 'all', output = 'all') {
+  if (process.env.SUPABASE_DATA_PAUSED === '1') throw new Error('Live skill directory is temporarily unavailable')
   const size = Math.min(480, Math.max(96, Math.ceil(limit / 96) * 96))
   const stars = Number.isFinite(minStars) ? Math.min(1_000_000_000, Math.max(0, Math.floor(minStars))) : 0
   const packed = await getCachedBrowseCandidates(sort, category, size, sourceOnly, stars, pricing, commerceFilterSlugs(pricing), normalizeTopic(topic), normalizeOutput(output))
@@ -1345,7 +1350,7 @@ const getCachedCatalogCount = unstable_cache(
     return count
   }),
   ['public-catalog-count-v2-canonical-sources'],
-  { revalidate: 300, tags: ['public-skill-directory'] }
+  { revalidate: DIRECTORY_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
 
 const getCachedCatalogPage = unstable_cache(
@@ -1399,10 +1404,11 @@ const getCachedCatalogPage = unstable_cache(
     return { records: (data || []) as unknown as SkillRecord[], total, hasMore: from + limit < total, page: effectivePage }
   }),
   ['public-catalog-pages-v13-product-examples'],
-  { revalidate: 300, tags: ['public-skill-directory'] }
+  { revalidate: DIRECTORY_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
 
 export function getSkillCatalogPage(sort: SkillSortMode, category: string, page: number, minStars: number, pricing: PriceFilter = 'all', exampleSlugs: string[] | null = null, topic = 'all', output = 'all', window?: { offset: number; limit: number; providerCount: number; prefix: number; providers?: DatedDirectoryEntry[] }) {
+  if (process.env.SUPABASE_DATA_PAUSED === '1') return Promise.reject(new Error('Live skill directory is temporarily unavailable'))
   return getCachedCatalogPage(sort, category.slice(0, 80), catalogPageNumber(String(page)), catalogStars(minStars), pricing, commerceFilterSlugs(pricing), exampleSlugs, normalizeTopic(topic), normalizeOutput(output),
     window ? Math.max(0, Math.min(1_600_000, Math.floor(window.offset))) : undefined,
     window ? Math.max(1, Math.min(CATALOG_PAGE_SIZE, Math.floor(window.limit))) : CATALOG_PAGE_SIZE,
@@ -1416,6 +1422,8 @@ export async function searchSkillsStrict(query: string, limit = 120): Promise<Sk
 export async function searchSkills(query: string, limit = 120): Promise<SkillRecord[]> {
   const normalizedQuery = normalizeExactSearchQuery(query)
   if (!normalizedQuery) return []
+  // Do not enter the broad-search fallback cache during a deliberate pause.
+  if (process.env.SUPABASE_DATA_PAUSED === '1') throw new Error('Live skill search is temporarily unavailable')
   const rowLimit = Math.min(Math.max(Math.floor(limit) || 1, 1), 200)
 
   try {
