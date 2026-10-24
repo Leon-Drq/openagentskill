@@ -24,7 +24,12 @@ newly rendered pages.
   data-dependent calls return a JSON-RPC error with HTTP 503 and the request ID.
 - Home statistics and rankings skip live refreshes. Unknown evidence remains
   explicitly inexact/unavailable; no current safety or outcome evidence is
-  inferred from saved metadata. Download totals are null while paused; normal
+  inferred from saved metadata. The homepage's historical count is 35,296,
+  recorded on 2026-10-11 (see `directory-recovery-2026-10-11.md`), with a visible
+  date and pause notice in all eight languages. It is not a current count or a
+  minimum. API and source-refresh indicators show paused; successful live
+  count reads replace the historical value and remove its notice after recovery.
+  Download totals are null while paused; normal
   mode caches explicitly requested download totals for one hour. Ordinary
   browsing reads only visible counters; download sorting reads all candidates
   before pagination, using bounded batches rather than scanning the ledger.

@@ -37,7 +37,7 @@ const downloads = compile('lib/skills/downloads.ts', {
 const home = compile('lib/home-page-data.ts', {
   'next/cache': { unstable_cache: fn => async (...args) => { cacheCalls++; return fn(...args) } },
   '@/lib/data-maintenance': policy,
-  '@/lib/registry-stats': { LAST_VERIFIED_APPROVED_SKILL_COUNT: 123, getApprovedRegistrySkillCount: forbidden },
+  '@/lib/registry-stats': { getApprovedRegistrySkillCount: forbidden },
   '@/lib/db/skills': { getAgentOutcomeStatsMapStrict: forbidden },
   '@/lib/ranking-snapshots': { getLatestRankingSnapshot: forbidden },
   '@/lib/github-owner': { getGitHubOwner: forbidden },
@@ -65,12 +65,44 @@ try {
   const landing = await home.getHomePageData()
   assert.equal(landing.stats.evidenceExact, false)
   assert.equal(landing.stats.totalSkillsExact, false)
+  assert.equal(landing.stats.totalSkills, 35_296)
+  assert.equal(landing.stats.totalSkillsAsOf, '2026-10-11')
+  assert.equal(landing.stats.dataPaused, true)
   assert.deepEqual(landing.featuredSkills, [])
   assert.equal(cacheCalls, 0, 'Even a stale cache lookup can cause background work: skip it')
   assert.equal(dataCalls, 0)
   delete process.env.SUPABASE_DATA_PAUSED
   assert.deepEqual(await downloads.getDownloadTotals(['example']), { example: 7 })
   assert.equal(cacheCalls, 1)
+
+  // A cold-cache failure stays dated; successful reads replace it, even when
+  // the live count is lower. Historical metadata must never become a floor.
+  let countResult = null
+  const recoveringHome = compile('lib/home-page-data.ts', {
+    'next/cache': { unstable_cache: fn => fn },
+    '@/lib/data-maintenance': policy,
+    '@/lib/registry-stats': { getApprovedRegistrySkillCount: async () => countResult },
+    '@/lib/db/skills': { getAgentOutcomeStatsMapStrict: async () => ({}) },
+    '@/lib/ranking-snapshots': { getLatestRankingSnapshot: async () => null },
+    '@/lib/github-owner': { getGitHubOwner: forbidden },
+    '@/lib/registry-coverage': { getRegistryCoverageStats: async () => null },
+  })
+  for (const unavailable of [null, { count: 99_999, exact: false }]) {
+    countResult = unavailable
+    const { stats } = await recoveringHome.getHomePageData()
+    assert.equal(stats.totalSkills, 35_296)
+    assert.equal(stats.totalSkillsExact, false)
+    assert.equal(stats.totalSkillsAsOf, '2026-10-11')
+    assert.equal(stats.dataPaused, false)
+  }
+  for (const count of [36_000, 0]) {
+    countResult = { count, exact: true }
+    const { stats } = await recoveringHome.getHomePageData()
+    assert.equal(stats.totalSkills, count)
+    assert.equal(stats.totalSkillsExact, true)
+    assert.equal(stats.totalSkillsAsOf, null)
+    assert.equal(stats.dataPaused, false)
+  }
 } finally {
   if (before === undefined) delete process.env.SUPABASE_DATA_PAUSED; else process.env.SUPABASE_DATA_PAUSED = before
 }

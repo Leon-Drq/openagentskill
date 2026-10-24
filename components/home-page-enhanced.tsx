@@ -6,7 +6,7 @@ import { useState, useTransition, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from '@/components/crawl-link'
 import { ArrowRight, Search } from 'lucide-react'
-import { HOME_SEARCH_COPY, HOME_SEARCH_EXAMPLES } from '@/lib/i18n/home-search-copy'
+import { HOME_SEARCH_COPY, HOME_SEARCH_EXAMPLES, HOME_STATS_COPY } from '@/lib/i18n/home-search-copy'
 import { AnimatedSearchHint } from './animated-search-hint'
 import { ConnectAiInline } from './connect-ai-inline'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
@@ -23,6 +23,8 @@ export interface HomePageEnhancedProps {
   stats: {
     totalSkills: number
     totalSkillsExact: boolean
+    totalSkillsAsOf: string | null
+    dataPaused: boolean
     totalVerifiedInstalls: number
     totalOutcomes: number
     provenSkills: number
@@ -720,18 +722,22 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
   const router = useRouter()
   const copy = HOME_COPY[activeLocale] || HOME_COPY.en
   const searchCopy = HOME_SEARCH_COPY[activeLocale]
+  const statsCopy = HOME_STATS_COPY[activeLocale]
   const discoveryCopy = DISCOVERY_COPY[activeLocale] || DISCOVERY_COPY.en
-  const totalSkillsLabel = `${stats.totalSkills.toLocaleString()}${stats.totalSkillsExact ? '' : '+'}`
+  const totalSkillsLabel = stats.totalSkills.toLocaleString(activeLocale)
+  const skillCountNote = !stats.totalSkillsExact && stats.totalSkillsAsOf
+    ? `${statsCopy.recordedOn.replace('{date}', stats.totalSkillsAsOf)} ${stats.dataPaused ? statsCopy.statisticsPaused : statsCopy.statisticsUnavailable}`
+    : null
   const discoveredProjectsLabel = stats.coverageExact && stats.discoveredProjects !== null
     ? stats.discoveredProjects.toLocaleString()
-    : 'Live'
+    : '—'
   const validatedSkillsLabel = stats.coverageExact && stats.validatedSkills !== null
     ? stats.validatedSkills.toLocaleString()
-    : 'Live'
+    : '—'
   const statItems = [
-    [totalSkillsLabel, searchCopy.indexed],
-    [stats.evidenceExact ? stats.totalVerifiedInstalls.toLocaleString() : 'Live', stats.evidenceExact ? copy.stats[1] : discoveryCopy.liveApi],
-    [stats.evidenceExact ? stats.totalOutcomes.toLocaleString() : '6h', stats.evidenceExact ? copy.stats[2] : discoveryCopy.sourceRefresh],
+    [totalSkillsLabel, stats.totalSkillsExact ? searchCopy.indexed : statsCopy.recordedSkills],
+    [stats.evidenceExact ? stats.totalVerifiedInstalls.toLocaleString() : stats.dataPaused ? statsCopy.paused : 'OpenAPI', stats.evidenceExact ? copy.stats[1] : statsCopy.agentApi],
+    [stats.evidenceExact ? stats.totalOutcomes.toLocaleString() : stats.dataPaused ? statsCopy.paused : '6h', stats.evidenceExact ? copy.stats[2] : discoveryCopy.sourceRefresh],
     [stats.evidenceExact ? stats.provenSkills.toLocaleString() : 'OpenAPI', stats.evidenceExact ? copy.stats[3] : discoveryCopy.machineContract],
   ]
 
@@ -818,17 +824,18 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
 
           <div className="mt-14 grid grid-cols-2 gap-x-4 gap-y-6 border-t border-[#d8d2c6] pt-8 md:grid-cols-4">
             {statItems.map(([value, label], index) => (
-              <div key={label} className="flex flex-col gap-1">
+              <div key={label} className="flex min-w-0 flex-col gap-1 break-words">
                 <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#6d675e]">{label}</span>
                 <span
                   className="text-2xl tracking-normal"
                   style={{ fontFamily: value === 'API' ? 'var(--font-mono)' : 'Georgia, "Times New Roman", serif' }}
                 >
-                  {index === 0 ? <Link href={getLocalizedNavigationHref('/skills', activeLocale)} className="underline decoration-transparent underline-offset-4 hover:decoration-current" aria-label={`${label}: ${value}`}>{value}</Link> : value}
+                  {index === 0 ? <Link href={getLocalizedNavigationHref('/skills', activeLocale)} className="underline decoration-transparent underline-offset-4 hover:decoration-current" aria-label={`${label}: ${value}`} aria-describedby={skillCountNote ? 'home-skill-count-note' : undefined}>{value}</Link> : value}
                 </span>
               </div>
             ))}
           </div>
+          {skillCountNote && <p id="home-skill-count-note" className="mt-4 text-sm leading-relaxed text-[#6d675e]">{skillCountNote}</p>}
         </div>
       </section>
 
@@ -992,7 +999,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                 {[
                   [discoveryCopy.discoveredProjects, discoveredProjectsLabel],
                   [discoveryCopy.validatedSkills, validatedSkillsLabel],
-                  [discoveryCopy.installableSkills, totalSkillsLabel],
+                  [stats.totalSkillsExact ? discoveryCopy.installableSkills : statsCopy.recordedSkills, totalSkillsLabel],
                 ].map(([label, value]) => (
                   <div key={label} className="border-b border-[#e4e0d8] px-4 py-3 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
                     <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6d675e]">{label}</p>
@@ -1000,6 +1007,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                   </div>
                 ))}
               </div>
+              {skillCountNote && <p className="mt-3 text-sm leading-relaxed text-[#6d675e]">{skillCountNote}</p>}
             </div>
           </div>
 

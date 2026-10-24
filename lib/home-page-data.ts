@@ -1,8 +1,5 @@
 import { unstable_cache } from 'next/cache'
-import {
-  LAST_VERIFIED_APPROVED_SKILL_COUNT,
-  getApprovedRegistrySkillCount,
-} from '@/lib/registry-stats'
+import { getApprovedRegistrySkillCount } from '@/lib/registry-stats'
 import { getAgentOutcomeStatsMapStrict } from '@/lib/db/skills'
 import { getLatestRankingSnapshot } from '@/lib/ranking-snapshots'
 import { getGitHubOwner } from '@/lib/github-owner'
@@ -10,10 +7,11 @@ import { getRegistryCoverageStats } from '@/lib/registry-coverage'
 import { isDataPaused } from '@/lib/data-maintenance'
 
 const HOME_STATS_SNAPSHOT = {
-  // The last exact count observed before the registry stats cache was added.
-  // Keep this deploy-time safety net close to the latest verified production
-  // value. It is used only on a cold cache when the counter is unavailable.
-  totalSkills: LAST_VERIFIED_APPROVED_SKILL_COUNT,
+  // Last recorded public directory count: docs/directory-recovery-2026-10-11.md.
+  // This is dated historical metadata, not a current count or a lower bound.
+  // Keep it outside the live cache and separate from approved-only API fallbacks.
+  totalSkills: 35_296,
+  totalSkillsAsOf: '2026-10-11',
 }
 
 const HOME_STATS_QUERY_TIMEOUT_MS = 2_000
@@ -104,6 +102,8 @@ export async function getHomePageData() {
       ...evidence,
       totalSkills: totalSkills.value,
       totalSkillsExact: totalSkills.exact,
+      totalSkillsAsOf: totalSkills.exact ? null : HOME_STATS_SNAPSHOT.totalSkillsAsOf,
+      dataPaused: paused,
       discoveredProjects: coverage?.discoveredProjects ?? null,
       validatedSkills: coverage?.validatedSkills ?? null,
       coverageExact: Boolean(coverage?.exact),
