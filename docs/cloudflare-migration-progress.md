@@ -2,9 +2,64 @@
 
 Source: `5bd3323`, branch `codex/cloudflare-migration`. Started 2026-11-02.
 
-This branch prepares a read-only Cloudflare staging deployment. Production DNS
-has not moved to Cloudflare. The existing Vercel/Supabase site was separately
-restored as described below. This is not a completed production migration.
+Production now serves from Cloudflare Workers, D1 and private R2. The earlier
+sections below are historical migration notes, not the current activation state.
+
+## Production cutover — November 3, 2026 (Asia/Shanghai)
+
+- Both `www.openagentskill.com` and `openagentskill.com` are Worker custom
+  domains. The apex preserves paths and queries with a 308 redirect to `www`.
+  HTTPS, Google verification, mail DNS and existing canonical URLs are retained.
+  The workers.dev endpoint and preview URLs are disabled in production.
+- Application commit `77d3ebad8f65e6fada393e49c29c483e253515f1` passed the complete
+  Linux validation workflow, including lint, typecheck, regressions, native
+  workerd/D1 authentication and business tests, production build and route smoke.
+  Accepted Worker version: `50ae4858-27b4-4640-8d13-f65fd8e154ea`.
+- The source was frozen at the database level across 49 tables. The final
+  lossless snapshot matches every source table's count and row checksum:
+  1,481,925 rows including 1,481,551 business rows across 46 tables, 70 auth users,
+  70 login methods and 234 storage objects. Three skills whose contents changed
+  without an updated timestamp were found by per-row checksums and reconciled.
+- All final changed D1 rows were read back field by field. Foreign-key checks
+  report zero violations, integrity is `ok`, FTS integrity passes and all 39
+  application triggers are restored. Authentication reconciliation preserves
+  legitimate QA sessions/provider updates and the most recent update timestamp.
+  Historical review and publication audit states were not changed.
+- The final source snapshot is privately archived in R2 and was downloaded in
+  full to verify SHA-256 `ea3237668d68d0f26c57702771f93b6ffd21fbcb28e3df0bdab3f33801ea17ca`.
+  Private export data and credentials remain outside Git and build artifacts.
+  All 234 package objects had already passed content-hash verification in R2.
+- Real GitHub login succeeds on the production domain with the existing account,
+  saved skill and claimed skills. Existing purchase history loads from D1.
+  A live $9.99 checkout opened successfully and was explicitly expired unpaid;
+  the real Stripe expiry webhook updated D1 successfully. No charge was made.
+  Successful-payment/refund handling was tested with isolated fixtures.
+- Thirteen production HTTP checks, four static assets and the canonical redirect
+  pass using normal DNS. SEO checks pass on 12 page variants and four sitemap
+  files, retaining nine skill sitemap shards, canonical/hreflang metadata,
+  structured data and the intended indexability. Search rankings are not a
+  release assertion. A 235-event runtime sample had no exceptions or HTTP 5xx.
+- Cloudflare has the 20 existing schedule expressions enabled. Vercel cron is
+  disabled and its Git connection is removed, preventing duplicate scheduling
+  and new Vercel builds.
+
+### Remaining account-level cleanup
+
+- Vercel's project-pause command requires a human confirmation and rejected
+  non-interactive confirmation. The owner has been asked to pause the old
+  `openagentskill` project; do not describe it as paused until verified.
+- The old Supabase project remains frozen as a rollback source. Its paid plan
+  cannot be paused, and its organization contains other projects. Deletion needs
+  the owner's explicit decision; idle compute charges may continue until then.
+  Do not cancel the shared organization or restore its Spend Cap blindly.
+- Cloudflare's GitHub integration installation is prepared for only this
+  repository but still awaits the requested permission confirmation. Manual
+  production deployment works via `pnpm cf:build` and
+  `pnpm cf:deploy:production`; validation runs on both main and the migration
+  branch. Do not claim automatic deployments are connected yet.
+- After this cutover, D1 is authoritative. Roll back application code against
+  the current D1 data if needed. Returning traffic to the frozen PostgreSQL
+  source requires reconciling post-cutover writes first.
 
 On November 3 (Asia/Shanghai), the owner explicitly selected D1 for the full
 database migration after evaluating a PostgreSQL/Neon alternative. See
