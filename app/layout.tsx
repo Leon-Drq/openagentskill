@@ -162,6 +162,7 @@ export default async function RootLayout({
         </I18nProvider>
         {cloudflareAnalyticsEnabled && (
           <Script
+            type="module"
             src="https://static.cloudflareinsights.com/beacon.min.js"
             data-cf-beacon={JSON.stringify({ token: cloudflareToken })}
             strategy="afterInteractive"

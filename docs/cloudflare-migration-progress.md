@@ -31,6 +31,15 @@ production migration.
 - `pnpm cf:preview` starts the Workers runtime with local resource emulation.
 - `pnpm cf:deploy:staging` targets staging only. No production deploy script or
   domain binding is enabled in this branch yet.
+- Cloudflare Web Analytics is configured for `www.openagentskill.com`, site
+  `34d914c5fab84e9f9062a600df2f7943`. The public beacon token is in `wrangler.jsonc`;
+  the layout follows the dashboard's module-script snippet. Staging still omits
+  the beacon, so validation traffic does not enter production visitor statistics.
+- Four new, independent migration secrets are installed in the Worker secret
+  store: cron, indexer, indexer trigger and private-download signing. Values are
+  excluded from Git/logs. Existing Vercel credentials are unchanged. These do not
+  authorize old PostgreSQL RPCs, whose expected hash must be handled as part of
+  the replacement data layer. Schedules and writes remain disabled.
 
 ## Isolation
 
