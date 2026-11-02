@@ -47,7 +47,7 @@ for (const missingParent of [false,true]) test(`SQLite rehearsal preserves exact
     assert.ok(!JSON.stringify(report).includes('order-1'))
     const db=new DatabaseSync(target,{readOnly:true})
     try {
-      assert.deepEqual(db.prepare('SELECT id,payload FROM public__users ORDER BY rowid').all().map(r=>[r.id,r.payload]),data.users.rows)
+      assert.deepEqual(db.prepare('SELECT id,CAST(payload AS BLOB) AS payload FROM public__users ORDER BY rowid').all().map(r=>[r.id,r.payload===null?null:new TextDecoder().decode(r.payload)]),data.users.rows)
       assert.equal(db.prepare('SELECT amount FROM public__orders').get().amount,'9999999999999999.99')
     } finally { db.close() }
     await assert.rejects(rehearseExport(directory,target),/EEXIST/)

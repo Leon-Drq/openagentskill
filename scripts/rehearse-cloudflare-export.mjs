@@ -92,8 +92,12 @@ export async function rehearseExport(source, destination) {
       db.exec('COMMIT'); transaction = false
       const targetHash = createHash('sha256')
       let imported = 0
-      for (const row of db.prepare(`SELECT ${list} FROM ${identifier(name)} ORDER BY rowid`).iterate()) {
-        digestRow(targetHash,cols.map(c=>row[c.column_name])); imported++
+      // Node 22's SQLite TEXT reader truncates at embedded NULs. Read stored
+      // UTF-8 bytes explicitly so verification is independent of that reader.
+      const byteColumns = cols.map(c=>`CAST(${identifier(c.column_name)} AS BLOB) AS ${identifier(c.column_name)}`).join(',')
+      const decoder = new TextDecoder('utf-8',{fatal:true})
+      for (const row of db.prepare(`SELECT ${byteColumns} FROM ${identifier(name)} ORDER BY rowid`).iterate()) {
+        digestRow(targetHash,cols.map(c=>row[c.column_name]===null?null:decoder.decode(row[c.column_name]))); imported++
       }
       const expected = sourceHash.digest('hex'), actual = targetHash.digest('hex')
       if (count!==inspection.tables.find(t=>t.table===key).rows||imported!==count||expected!==actual) {
