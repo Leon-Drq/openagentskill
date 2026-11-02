@@ -22,7 +22,7 @@ writeFileSync(configPath,JSON.stringify({name:'openagentskill-auth-local-test',m
     AUTH_ORIGIN:'https://www.openagentskill.com',BETTER_AUTH_SECRET:crypto.randomUUID()+crypto.randomUUID(),
     GITHUB_OAUTH_CLIENT_ID:'synthetic-client-id',GITHUB_OAUTH_CLIENT_SECRET:'synthetic-client-secret'},
 },null,2),{mode:0o600})
-for(const file of ['0001_commerce.sql','0002_auth.sql']) {
+for(const file of ['0001_commerce.sql','0002_auth.sql','0003_business.sql','0005_account_profile.sql']) {
   try {
     await promisify(execFile)(process.execPath,[resolve('node_modules/wrangler/bin/wrangler.js'),
       'd1','execute','APP_DB','--local','--config',configPath,'--persist-to',persistTo,
@@ -46,6 +46,9 @@ try {
   assert.ok(authorization.searchParams.get('state'))
   assert.ok(social.headers.getSetCookie().some(cookie=>/HttpOnly/i.test(cookie)&&/Secure/i.test(cookie)))
   assert.equal((await call('/test-seed',{legacyHash:await hash('native-synthetic-password',10)})).status,200)
+  const githubProfile=await call('/test-github-profile',{})
+  assert.equal(githubProfile.status,200,await githubProfile.clone().text())
+  assert.deepEqual(await githubProfile.json(),{updated:true,username:'native-fixture'})
   const login = await call('/api/auth/sign-in/email',{email:'native@example.invalid',password:'native-synthetic-password'})
   assert.equal(login.status,200,await login.clone().text())
   const cookie = login.headers.getSetCookie().map(c=>c.split(';')[0]).join('; ')
@@ -61,7 +64,7 @@ try {
   assert.equal(attempts.filter(r=>r.status===429).length,7)
   const report = {at:new Date().toISOString(),runtime:'workerd',database:'local D1 binding',
     legacyPasswordLogin:true,scryptPasswordLogin:true,sessionRead:true,atomicPasswordRevocation:true,
-    concurrentRateLimit:true,githubAuthorizationStart:true,existingGithubScopesOnly:true,externalRequests:0,syntheticOnly:true}
+    concurrentRateLimit:true,githubAuthorizationStart:true,githubProfileSync:true,existingGithubScopesOnly:true,externalRequests:0,syntheticOnly:true}
   writeFileSync(resolve(directory,'report.json'),JSON.stringify(report,null,2))
   console.log(JSON.stringify(report))
 } finally { await worker?.stop() }

@@ -2,7 +2,7 @@ name: Cloudflare migration validation
 
 on:
   push:
-    branches: [codex/cloudflare-migration]
+    branches: [main, codex/cloudflare-migration]
   workflow_dispatch:
 
 permissions:

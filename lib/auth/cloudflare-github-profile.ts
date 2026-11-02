@@ -8,7 +8,9 @@ export async function syncCloudflareGitHubProfile(database: AuthDatabase,userId:
   // Use the provider's stable ID, never a caller's username or user_metadata.
   const response = await fetcher(`https://api.github.com/user/${subject}`,{
     headers:{Accept:'application/vnd.github+json','User-Agent':'OpenAgentSkill-Account/1.0','X-GitHub-Api-Version':'2022-11-28',...(token?{Authorization:`Bearer ${token}`}:{})},
-    redirect:'error',cache:'no-store',signal:AbortSignal.timeout(8000),
+    // Workers rejects redirect:'error' before sending the request. Manual mode
+    // preserves the no-redirect policy; the status check below rejects 3xx.
+    redirect:'manual',cache:'no-store',signal:AbortSignal.timeout(8000),
   })
   if (!response.ok || Number(response.headers.get('content-length') || 0)>100_000) throw new Error('Provider identity unavailable')
   const text = await response.text()

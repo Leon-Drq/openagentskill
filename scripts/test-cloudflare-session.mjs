@@ -31,10 +31,11 @@ try{
  user=await readCloudflareUser(headers,env)
  assert.equal(user.identities[0].identity_data.sub,'12345')
  assert.equal(user.identities[0].identity_data.user_name,'fixture-verified')
- const fetchProfile=async url=>{assert.equal(url,'https://api.github.com/user/12345');return Response.json({id:12345,login:'renamed-fixture',type:'User',avatar_url:'https://avatars.githubusercontent.com/u/12345'})}
+ const fetchProfile=async (url,options)=>{assert.equal(url,'https://api.github.com/user/12345');assert.equal(options.redirect,'manual');return Response.json({id:12345,login:'renamed-fixture',type:'User',avatar_url:'https://avatars.githubusercontent.com/u/12345'})}
  assert.equal(await syncCloudflareGitHubProfile(database,userId,undefined,fetchProfile),true)
  assert.equal((await readCloudflareUser(headers,env)).identities[0].identity_data.user_name,'renamed-fixture')
  await assert.rejects(()=>syncCloudflareGitHubProfile(database,userId,undefined,async()=>Response.json({id:99999,login:'forged',type:'User'})),/mismatch/)
+ await assert.rejects(()=>syncCloudflareGitHubProfile(database,userId,undefined,async()=>new Response(null,{status:302,headers:{Location:'https://example.invalid'}})),/unavailable/)
  sqlite.prepare('UPDATE profiles SET github_user_id=99999 WHERE id=?').run(userId)
  assert.deepEqual((await readCloudflareUser(headers,env)).identities,[],'Provider subjects must match the trusted login method')
  assert.equal(await readCloudflareUser(new Headers({cookie:'oas.session_token=forged.'+'a'.repeat(64)}),env),null)
