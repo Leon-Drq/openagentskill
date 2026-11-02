@@ -29,6 +29,12 @@
       "database_name": "openagentskill-migration-analysis",
       "database_id": "01039261-9108-4742-9899-2c3253ed28ee",
       "migrations_dir": "cloudflare/migrations/analysis"
+    },
+    {
+      "binding": "APP_DB",
+      "database_name": "openagentskill-migration-data",
+      "database_id": "06665221-3754-4024-b6e5-6c6fa4026ba2",
+      "migrations_dir": "cloudflare/migrations/data"
     }
   ],
   "durable_objects": {

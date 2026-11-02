@@ -26,6 +26,17 @@ production migration.
   rows were removed. One completed native-binding inference probe remains in
   the ledger with its $0.005 reservation; actual inference audit is retained.
   No production reviews were rewritten.
+- The private application database `openagentskill-migration-data`
+  (`06665221-3754-4024-b6e5-6c6fa4026ba2`, WNAM) now has its first commerce schema.
+  Its `APP_DB` binding is prepared in this branch; public application routes
+  still use their existing data/auth layer and are not switched to this database.
+  The archive rehearsal contains 70 identity IDs, 234 release records, two
+  customer mappings, six orders and 30 processed webhook records, 342 rows in
+  total. These are October 30 records, not a current production snapshot.
+  Every transformed row was read back from actual D1 with matching semantic
+  hashes; foreign-key checks report zero violations and `quick_check` is `ok`.
+  Identity rows contain only IDs and confer no authentication or access rights.
+  No passwords, active sessions, emails or private auth attributes were imported.
 - Workers Paid and R2 are activated. Four private R2 buckets are created:
   `openagentskill-migration-cache`, `openagentskill-migration-images`, and
   `openagentskill-migration-packages` and `openagentskill-migration-backups`.
@@ -148,9 +159,32 @@ Activation and replacing scanned IP records with verified final targets remain p
   session and owner MFA completed Stripe login. The correct production merchant
   is selected and a dedicated restricted key is prepared with checkout/customer/
   portal write access and payment/invoice/price/subscription read access. Stripe
-  additionally requires an authenticator check for key creation, after its email
-  verification. That second check is pending; no production key has been created
-  or installed yet and the existing Vercel key is unchanged.
+  additionally required an authenticator check for key creation, after its email
+  verification. The owner completed that check. The dedicated restricted live
+  key was created and captured directly into Windows user-encrypted storage,
+  without appearing in logs, Git, build artifacts or chat. Ten read-only Stripe
+  API checks passed, including invoice-payment access, both existing membership
+  prices and the billing portal. The existing Vercel key is unchanged. The live
+  key is prepared locally, not installed into the read-only staging Worker.
+  The existing production webhook signing secret was also captured into encrypted
+  storage without rotating it or creating a duplicate endpoint. Its 15 subscribed
+  events and API version match the application handler. No charge or new checkout
+  session was created. Verified nonsecret production configuration is:
+  `STRIPE_PRICE_PRO_MONTHLY=price_1UPlbc2WEAq3tdU2mq3pTRe4` ($9.99/month),
+  `STRIPE_PRICE_PRO_YEARLY=price_1UPlbe2WEAq3tdU2qbQTaizf` ($79/year), and
+  `STRIPE_BILLING_PORTAL_CONFIGURATION=bpc_1UPlbq2WEAq3tdU2OKJdYW9Z`.
+- The D1 order-transaction adapter implements atomic reservation and completion.
+  Real D1 tests confirmed that 12 concurrent checkout reservations share one
+  order, membership plans share a reservation, and a late completion cannot
+  reactivate a refunded order. Synthetic rows were removed by their own IDs;
+  archived business records were preserved. Local tests additionally cover
+  ownership/payment-mode isolation, payment uniqueness, immutable payment binding,
+  paid-lifetime deduplication, expiry, transaction rollback, invalid inputs and
+  calendar-month clamping for February 29. The local typed rehearsal preserves
+  microsecond timestamps and refuses unsafe number/boolean conversion.
+  This is a server-private primitive, not an exposed data API or a complete
+  payment migration: route reads/writes, login and webhook orchestration still
+  require integration and end-to-end validation before cutover.
 - Cloudflare inference uses the fixed Workers AI model
   `@cf/deepseek-ai/deepseek-v4-flash-0731`, without a Vercel Gateway fallback.
   Official pricing checked November 2 is $0.44/M input and $1.32/M output,
@@ -219,4 +253,6 @@ Activation and replacing scanned IP records with verified final targets remain p
 
 References: [OpenNext setup](https://opennext.js.org/cloudflare/get-started),
 [caching](https://opennext.js.org/cloudflare/caching),
-[custom Workers](https://opennext.js.org/cloudflare/howtos/custom-worker).
+[custom Workers](https://opennext.js.org/cloudflare/howtos/custom-worker),
+[D1 atomic batches](https://developers.cloudflare.com/d1/worker-api/d1-database/),
+[D1 consistency checks](https://developers.cloudflare.com/d1/sql-api/sql-statements/).
