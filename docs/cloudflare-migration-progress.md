@@ -38,6 +38,37 @@ authentication implementation. Neon is not being provisioned.
 
 ## Resources and build
 
+### Business database continuation — November 3 (Asia/Shanghai)
+
+- Added the 41 remaining business tables in `0003_business.sql`, preserving
+  explicit source CHECK, primary/unique and foreign-key constraints. Commerce
+  remains in its existing five tables; account ownership references the same
+  identity anchors. A closed schema converter refuses unknown PostgreSQL types,
+  defaults and expressions instead of silently dropping them. This schema does
+  not claim to replace PostgreSQL business triggers/RPCs or row authorization.
+- The private typed local rehearsal imported all 46 business tables and
+  1,479,842 historical rows. Every converted row was read back with matching
+  per-table semantic hashes; integrity is `ok` and foreign-key violations are
+  zero. Integers outside JavaScript's safe range are refused; JSON/text arrays,
+  embedded NUL text, binary values and six-digit UTC timestamps are handled
+  explicitly. This is still the October 30 archive, not a fresh cutover snapshot.
+- Added FTS5 search, catalog indexes and a directory view retaining publication,
+  MCP-only exclusion and oldest-source deduplication. The local archive produces
+  36,098 public directory entries, with an independent in-memory deduplication
+  comparison. Catalog identity edits remove eligibility until the write adapter
+  updates it atomically; production writes are not enabled by this change.
+- Added a server-only D1 read transport behind `CLOUDFLARE_DATA_ENABLED=1`.
+  Existing query builders can read D1 without an outbound Supabase request.
+  Publication and authenticated ownership predicates are applied independently
+  of caller filters. Private tables and all mutations/unported RPCs fail closed.
+  There is no generic browser SQL endpoint. The feature flag is not yet enabled.
+- Local tests use the actual query builder and SQLite/D1 dialect, including
+  private-table rejection, cross-account reads, search, arrays/JSON, pagination,
+  counts, injection attempts and long repository identities beyond D1's 50-byte
+  LIKE limit. A separate native workerd/D1 test passed all ten checks. Full Linux
+  validation and remote data read-back remain required before deployment.
+
+
 - Account: `113e589daada01e37bfd43cfb4763aab`.
 - Read-only staging: https://openagentskill-migration.qudongqi2023.workers.dev.
   Commit `85385e6`, Worker version `3f80d04e-1329-47f8-9af3-a0a727d3aecf`.
