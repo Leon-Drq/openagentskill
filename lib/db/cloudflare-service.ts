@@ -10,6 +10,7 @@ import {encodeD1Value as encode,decodeD1Row as decode} from './cloudflare-values
 import {executeD1BackgroundRPC} from './cloudflare-background'
 import {executeD1SkillChanges,skillDerivedInputs} from './cloudflare-skill-write'
 import {executeD1IndexerRPC} from './cloudflare-indexer'
+import {executeD1PublishingRPC} from './cloudflare-publishing'
 
 type Database = ReadDatabase & CommerceDatabase
 const service = {userId:null,service:true} as const
@@ -42,6 +43,8 @@ export function createD1ServiceFetch(db: Database): typeof fetch {
       const name=path[2]
       if(path[1]){
         if(method==='POST'){
+          const published=await executeD1PublishingRPC(db,name,body||{})
+          if(published.handled)return Response.json(published.data,{headers})
           const background=await executeD1BackgroundRPC(db,name,body||{})
           if(background.handled)return Response.json(background.data,{headers})
           const indexed=await executeD1IndexerRPC(db,name,body||{})

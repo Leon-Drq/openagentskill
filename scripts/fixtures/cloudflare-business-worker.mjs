@@ -56,6 +56,10 @@ const worker = {
       const assertions=(await db.prepare('SELECT count(*) n FROM d1_write_guards').all()).results[0]?.n
       const indexed=await service.rpc('upsert_indexed_skill',{p_server_secret:env.INDEXER_SECRET,p_skill:{slug:'native-indexed',name:'Video fixture skill',description:'Video',author_name:'Fixture',github_repo:'fixture/indexed',repository:'https://example.invalid',category:'video'},p_activity:{metadata:{test:true}}})
       const version=await service.rpc('record_skill_source_version',{p_server_secret:env.INDEXER_SECRET,p_skill_slug:'native-indexed',p_source_content_hash:'a'.repeat(64),p_source_path:'skills/video/SKILL.md',p_license:'MIT',p_metadata:{test:true}})
+      const ownerArgs={p_request_id:crypto.randomUUID(),p_skill:{slug:'native-owner',name:'Native owner fixture',description:'A video skill fixture',author_name:'Fixture',repository:'https://github.com/fixture/owner',github_repo:'fixture/owner',category:'video',license:'MIT',source_path:'SKILL.md',source_commit_sha:'c'.repeat(40),source_content_hash:'d'.repeat(64)},p_reason:'Owner requested local fixture',p_scan:{advisory:true,executed:false}}
+      const ownerPublished=await service.rpc('publish_owner_skill',ownerArgs)
+      const ownerReplay=await service.rpc('publish_owner_skill',ownerArgs)
+      const metadata=await service.rpc('update_skill_product_metadata',{p_request_id:crypto.randomUUID(),p_repository:'fixture/owner',p_path:'SKILL.md',p_metadata:{logoUrl:'https://example.invalid/logo.svg'},p_reason:'Update local fixture logo'})
       const checks={login:login.status===200,session:state.user?.id===id,profileCreated:(await db.prepare('SELECT id FROM profiles WHERE id=?').bind(id).all()).results.length===1,
         bookmark:save.status===204&&Array.isArray(rows)&&rows.length===1&&rows[0].user_id===id,
         profileSave:!profile.error&&locked.error?.code==='HANDLE_LOCKED',vote:!vote.error&&!counts.error&&counts.data.length===1&&counts.data[0].likes===1,
@@ -67,6 +71,7 @@ const worker = {
         background:!run.error&&run.data?.metadata?.test===true&&!coverage.error&&coverage.data?.installable_skills===1&&!trending.error&&trending.data?.[0]?.activity?.views===10,
         catalogWrite:!insertedSkill.error&&!changedSkill.error&&insertedSkill.data?.id===changedSkill.data?.id&&changedSkill.data?.primary_category==='document-processing'&&assertions===0,
         indexer:!indexed.error&&indexed.data?.created===true&&!version.error&&version.data?.changed===false&&version.data?.license_status==='detected',
+        publishing:!ownerPublished.error&&ownerPublished.data?.ai_review_approved===false&&!ownerReplay.error&&ownerReplay.data?.replayed===true&&!metadata.error&&metadata.data?.metadata_only===true,
         renewal:renewal.headers.getSetCookie().some(c=>c.includes('oas.session_token=')),privateCache:renewal.headers.get('cache-control')==='private, no-store'}
       return Response.json({passed:Object.values(checks).every(Boolean),checks},{status:Object.values(checks).every(Boolean)?200:500})
     }
