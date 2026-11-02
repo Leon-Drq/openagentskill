@@ -5,6 +5,7 @@ import { compileRead, createD1ReadFetch, type ReadDatabase } from './cloudflare-
 import { createD1OrderTransactions, type CommerceDatabase } from '@/lib/payments/cloudflare-orders'
 import schema from './cloudflare-schema.json'
 import {recordD1Download} from './cloudflare-downloads'
+import {recordD1Outcome} from './cloudflare-outcomes'
 
 type Database = ReadDatabase & CommerceDatabase
 const service = {userId:null,service:true} as const
@@ -56,6 +57,10 @@ export function createD1ServiceFetch(db: Database): typeof fetch {
       if(!path)return failure(404)
       const name=path[2]
       if(path[1]){
+        if(name==='record_agent_outcome'){
+          if(method!=='POST')return failure(405)
+          return Response.json(await recordD1Outcome(db,body||{}),{headers})
+        }
         if(['record_skill_download','record_skill_download_action'].includes(name)){
           if(method!=='POST')return failure(405)
           return Response.json(await recordD1Download(db,name,body||{}),{headers})

@@ -177,15 +177,23 @@ export function compileRead(input: { url: URL; method: string; headers: Headers;
     if (['select','order','limit','offset'].includes(key)) continue
     clauses.push(filter(key,value))
   }
-  // SELECT column paths must not add parameters before WHERE parameters. JSON
-  // projections are unnecessary here and deliberately not accepted.
+  // JSON projection paths are identifier-only literals, so SELECT adds no
+  // parameters ahead of the already compiled WHERE/count parameters.
   const selected = query.get('select') || '*'
   const projection: Record<string,string> = {}
   const selection = selected === '*' ? 't.*' : split(selected).map(part => {
     const pieces = part.split(':')
     if (pieces.length > 2) throw new QueryError('Invalid projection')
     const [alias,key] = pieces.length === 2 ? pieces : [pieces[0],pieces[0]]
-    if (!Object.hasOwn(codecs,key) || Object.hasOwn(projection,alias)) throw new QueryError('Invalid projection column')
+    const json=/^([a-z_][a-zA-Z0-9_]*)->>([a-zA-Z0-9_]+)$/.exec(key)
+    if (Object.hasOwn(projection,alias)) throw new QueryError('Invalid projection column')
+    if(json){
+      if(codecs[json[1]]!=='jsonb')throw new QueryError('Invalid JSON projection')
+      projection[alias]='text'
+      const field=`t.${identifier(json[1])}`,path=`'$.${json[2]}'`
+      return `CASE json_type(${field},${path}) WHEN 'true' THEN 'true' WHEN 'false' THEN 'false' ELSE cast(json_extract(${field},${path}) AS TEXT) END AS ${identifier(alias)}`
+    }
+    if (!Object.hasOwn(codecs,key)) throw new QueryError('Invalid projection column')
     projection[alias] = codecs[key]
     return `t.${identifier(key)} AS ${identifier(alias)}`
   }).join(',')

@@ -43,12 +43,17 @@ const worker = {
       const receipt=await service.rpc('record_skill_download',{p_user_id:id,p_slug:'native-public',p_sha256:'a'.repeat(64),p_kind:'paid-file'})
       const feedback=await publicWriter.rpc('record_agent_feedback',{p_skill_slug:'native-public',p_agent_id:'fixture-native',p_success:true,p_latency_ms:250})
       const score=(await db.prepare("SELECT quality_score FROM skills WHERE slug='native-public'").all()).results[0]
+      const outcome=await service.rpc('record_agent_outcome',{p_event_id:'smoke-native-outcome',p_skill_slug:'native-public',p_task:'Local runtime fixture',p_agent:'fixture-native',p_outcome:'success',p_install_used:true,p_metadata:{output_quality:4,used_in_production:true}})
+      const outcomeStats=(await db.prepare("SELECT total_outcomes,verified_installs,avg_output_quality FROM agent_outcome_stats WHERE skill_slug='native-public'").all()).results[0]
+      const projection=await publicWriter.from('skill_directory_entries').select('slug,logo:product_metadata->>logoUrl',{count:'exact'}).eq('slug','native-public').single()
       const checks={login:login.status===200,session:state.user?.id===id,profileCreated:(await db.prepare('SELECT id FROM profiles WHERE id=?').bind(id).all()).results.length===1,
         bookmark:save.status===204&&Array.isArray(rows)&&rows.length===1&&rows[0].user_id===id,
         profileSave:!profile.error&&locked.error?.code==='HANDLE_LOCKED',vote:!vote.error&&!counts.error&&counts.data.length===1&&counts.data[0].likes===1,
         commerce:!reserved.error&&!linked?.error&&linked?.data?.livemode===false&&!completed?.error&&paid?.data?.status==='paid',
         telemetry:!event.error&&eventStats?.views===1,download:!receipt.error&&receipt.data===1,
         feedback:!feedback.error&&feedback.data.success===true&&score?.quality_score===33.5,
+        outcome:!outcome.error&&outcomeStats?.total_outcomes===1&&outcomeStats?.verified_installs===1&&outcomeStats?.avg_output_quality===4,
+        projection:!projection.error&&projection.data?.slug==='native-public'&&projection.data?.logo===null&&projection.count===1,
         renewal:renewal.headers.getSetCookie().some(c=>c.includes('oas.session_token=')),privateCache:renewal.headers.get('cache-control')==='private, no-store'}
       return Response.json({passed:Object.values(checks).every(Boolean),checks},{status:Object.values(checks).every(Boolean)?200:500})
     }

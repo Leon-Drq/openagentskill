@@ -12,6 +12,8 @@ test('apex redirect preserves path and query parameters', () => {
 })
 
 test('preview prevents writes, auth callbacks, cron GETs, and indexing', async () => {
+  const config=JSON.parse(readFileSync(new URL('../wrangler.jsonc',import.meta.url)))
+  assert.ok(config.assets.run_worker_first.includes('/robots.txt'),'Static robots.txt must pass through the preview isolation gate')
   const env = { MIGRATION_READ_ONLY: '1' }
   for (const path of ['/api/payments/webhook', '/api/x/post-daily', '/auth/callback?code=example', '/profile', '/creator']) {
     const result = migrationResponse(new Request(`https://preview.workers.dev${path}`), env)

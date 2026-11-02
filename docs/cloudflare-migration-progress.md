@@ -401,3 +401,5 @@ References: [OpenNext setup](https://opennext.js.org/cloudflare/get-started),
 [custom Workers](https://opennext.js.org/cloudflare/howtos/custom-worker),
 [D1 atomic batches](https://developers.cloudflare.com/d1/worker-api/d1-database/),
 [D1 consistency checks](https://developers.cloudflare.com/d1/sql-api/sql-statements/).
+
+D1 outcome transport and migration 0008 now preserve result correction, aggregate scoring, verified installs and download receipt idempotency. Native D1 and SQLite rollback tests pass. Deployed read-only 2a4522b uncovered JSON text projections in the actual directory; fixed in the adapter with parameter-safe paths and regression coverage. Robots is routed through the Worker before static assets to preserve preview noindex. Authoritative DNS moved to Cloudflare with Vercel website targets preserved; zone active. Production application/data cutover, fresh data reconciliation and remaining background RPCs are still pending.
