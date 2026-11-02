@@ -26,6 +26,7 @@ try {
   }).createPublicClient
   const adminClient = compile('lib/supabase/admin.ts', {
     'server-only': {}, '@supabase/supabase-js': { createClient }, '@/lib/supabase/resilient-fetch': { createResilientTimeoutFetch },
+    '@/lib/db/cloudflare-service': { createCloudflareServiceClient: () => assert.fail('Legacy Supabase test must not choose the Cloudflare transport') },
   }).createAdminClient
   process.env.SUPABASE_SECRET_KEY = 'test-only-key'
   for (const client of [publicClient(), publicClient({requestTimeoutMs: 100}), adminClient({requestTimeoutMs: 100})]) {

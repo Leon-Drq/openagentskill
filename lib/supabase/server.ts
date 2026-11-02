@@ -21,6 +21,10 @@ const SUPABASE_ANON_KEY =
  * it.
  */
 export async function createClient() {
+  if (process.env.HOSTING_PROVIDER === 'cloudflare' && process.env.CLOUDFLARE_AUTH_ENABLED === '1') {
+    const { createCloudflareSessionClient } = await import('@/lib/db/cloudflare-session')
+    return createCloudflareSessionClient()
+  }
   const cookieStore = await cookies()
   const dataFetch = createResilientTimeoutFetch(8000, 'skill-support')
 

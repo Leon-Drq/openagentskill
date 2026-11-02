@@ -1,0 +1,8 @@
+# Local preview only. Never put production credentials into this file.
+NEXTJS_ENV=production
+MIGRATION_READ_ONLY=1
+CRON_ENABLED=0
+SUPABASE_DATA_PAUSED=1
+COMMERCE_CHECKOUT_ENABLED=0
+OG_STORAGE_ENABLED=0
+WORKERS_AI_ENABLED=0

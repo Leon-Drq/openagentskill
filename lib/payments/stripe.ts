@@ -4,9 +4,17 @@ import { activeMembership, lifetimeOrderAllowed, PLAN_AMOUNTS, type PaidOrder } 
 
 export function paymentMode() {
   const key = process.env.STRIPE_SECRET_KEY || ''
-  if (/^(rk|sk)_live_/.test(key)) return true
-  if (/^(rk|sk)_test_/.test(key)) return false
-  return null
+  const live = /^(rk|sk)_live_/.test(key) ? true : /^(rk|sk)_test_/.test(key) ? false : null
+  if (live === null || process.env.HOSTING_PROVIDER !== 'cloudflare') return live
+  // Vercel's production marker is absent on Workers. Fail closed there unless
+  // live keys are used, or sandbox mode explicitly targets an isolated QA host.
+  if (process.env.COMMERCE_ENVIRONMENT !== 'sandbox') return live ? true : null
+  try {
+    const site = new URL(process.env.COMMERCE_SITE_URL || '')
+    if (site.protocol !== 'https:' || site.username || site.password || site.port
+      || !/^openagentskill-(?:migration|qa)\.[a-z0-9-]+\.workers\.dev$/.test(site.hostname)) return null
+  } catch { return null }
+  return live ? null : false
 }
 export function stripeClient() {
   if (paymentMode() === null) throw new Error('stripe_not_configured')

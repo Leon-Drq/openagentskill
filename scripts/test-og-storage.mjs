@@ -2,6 +2,9 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import ts from 'typescript'
 import * as core from '../lib/og/cache.ts'
+import { register } from 'node:module'
+register('./test-owner-publication-loader.mjs', import.meta.url)
+const { createR2OgStorage } = await import('../lib/og/r2-storage.ts')
 
 let calls = [], uploadedAt = Date.now(), cancelled = false
 const png = new Uint8Array(40); png.set([137,80,78,71,13,10,26,10])
@@ -20,6 +23,7 @@ new Function('exports', 'require', compiled)(output, name => {
   if (name === 'server-only') return {}
   if (name === '@vercel/blob') return sdk
   if (name === './og/cache') return core
+  if (name === './og/r2-storage') return { createR2OgStorage }
   throw new Error(`Unexpected import ${name}`)
 })
 const { createOgStorage } = output

@@ -1,10 +1,20 @@
 import 'server-only'
 import { get, put } from '@vercel/blob'
 import { OG_TTL_SECONDS, OG_MAX_BYTES, readOgBytes, type OgStorage } from './og/cache'
+import { createR2OgStorage, type OgR2Bucket } from './og/r2-storage'
 
 /** Only server-owned public cards use durable storage. Free-form previews do not. */
 export function createOgStorage(env = process.env): OgStorage | undefined {
   if (env.OG_STORAGE_ENABLED === '0' || env.OG_STORAGE_ENABLED === 'false') return undefined
+  if (env.HOSTING_PROVIDER === 'cloudflare') {
+    return createR2OgStorage(async () => {
+      // Resolve the binding in request context, never during static generation.
+      const { getCloudflareContext } = await import('@opennextjs/cloudflare')
+      const bindings = getCloudflareContext().env as { OG_IMAGES?: OgR2Bucket }
+      if (!bindings.OG_IMAGES) throw new Error('OG_IMAGES binding unavailable')
+      return bindings.OG_IMAGES
+    })
+  }
   // Preview branches must not overwrite production cards with unreleased templates.
   if (env.VERCEL_ENV === 'preview') return undefined
   // The SDK can obtain OIDC from Vercel's request context, not only process.env.

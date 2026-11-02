@@ -29,7 +29,7 @@ export function extractLobeHubSources(html: string, limit = 5): string[] {
 export async function discoverLobeHubSources(limit = 5) {
   const response = await fetch(LOBEHUB_DISCOVERY_URL, {
     headers: { 'User-Agent': 'OpenAgentSkill-Discovery/1.0 (+https://www.openagentskill.com)' },
-    signal: AbortSignal.timeout(12_000), cache: 'no-store', redirect: 'error',
+    signal: AbortSignal.timeout(12_000), cache: 'no-store', redirect: 'manual',
   })
   if (!response.ok) throw new Error(`LobeHub discovery unavailable (${response.status})`)
   if (Number(response.headers.get('content-length') || 0) > MAX_BYTES) throw new Error('LobeHub discovery response too large')

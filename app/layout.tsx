@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { Suspense } from 'react'
 import { Geist_Mono, Inter } from 'next/font/google'
-import { SpeedInsights } from '@vercel/speed-insights/next'
 import { GoogleAnalytics } from '@/components/google-analytics'
 import { StructuredData } from '@/components/structured-data'
 import { I18nProvider } from '@/lib/i18n/context'
@@ -135,6 +135,9 @@ export default async function RootLayout({
       : 'en'
   const initialLocale = isLocale(locale) ? locale : defaultLocale
   const configuredMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim()
+  const cloudflareToken = process.env.NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN?.trim()
+  const cloudflareAnalyticsEnabled = process.env.MIGRATION_READ_ONLY !== '1'
+    && Boolean(cloudflareToken && /^[a-f0-9]{32}$/i.test(cloudflareToken))
   const measurementId =
     configuredMeasurementId && /^G-[A-Z0-9]+$/i.test(configuredMeasurementId)
       ? configuredMeasurementId
@@ -157,12 +160,19 @@ export default async function RootLayout({
         <I18nProvider initialLocale={initialLocale}>
           {children}
         </I18nProvider>
+        {cloudflareAnalyticsEnabled && (
+          <Script
+            type="module"
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={JSON.stringify({ token: cloudflareToken })}
+            strategy="afterInteractive"
+          />
+        )}
         {measurementId && (
           <Suspense fallback={null}>
             <GoogleAnalytics measurementId={measurementId} />
           </Suspense>
         )}
-        <SpeedInsights />
       </body>
     </html>
   )

@@ -27,6 +27,19 @@ export interface PublicClientOptions {
  * Does NOT depend on cookies() — works in any server context.
  */
 export function createPublicClient(options: PublicClientOptions = {}) {
+  if (process.env.HOSTING_PROVIDER === 'cloudflare' && process.env.CLOUDFLARE_DATA_ENABLED === '1') {
+    // Reuse the query builder, never the remote Supabase transport. The private
+    // D1 adapter applies publication/ownership rules before compiling a read.
+    // No browser-facing generic SQL endpoint or service credential is involved.
+    return createSupabaseClient('https://d1.internal', 'local-query-builder', {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+      db: { retry: false },
+      global: { fetch: async (input, init) => {
+        const { cloudflarePublicFetch } = await import('@/lib/db/cloudflare-public')
+        return cloudflarePublicFetch(input, init)
+      } },
+    })
+  }
   const requested = Number(options.requestTimeoutMs)
   const requestTimeoutMs = Number.isFinite(requested) && requested > 0 ? Math.floor(requested) : 8000
   return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
