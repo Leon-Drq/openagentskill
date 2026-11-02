@@ -60,6 +60,10 @@ const worker = {
       const ownerPublished=await service.rpc('publish_owner_skill',ownerArgs)
       const ownerReplay=await service.rpc('publish_owner_skill',ownerArgs)
       const metadata=await service.rpc('update_skill_product_metadata',{p_request_id:crypto.randomUUID(),p_repository:'fixture/owner',p_path:'SKILL.md',p_metadata:{logoUrl:'https://example.invalid/logo.svg'},p_reason:'Update local fixture logo'})
+      const xConnection=await service.rpc('upsert_x_oauth_connection',{p_server_secret:env.INDEXER_SECRET,p_connection:{x_user_id:'native-fixture',username:'fixture',scope:'tweet.read',access_token:'local-fixture-access',refresh_token:'local-fixture-refresh'}})
+      const xRead=await service.rpc('get_x_oauth_connection',{p_server_secret:env.INDEXER_SECRET})
+      const xQueue=await service.rpc('enqueue_x_content_queue_item',{p_server_secret:env.INDEXER_SECRET,p_item:{skill_slug:'native-owner',post_text:'Local runtime fixture only'}})
+      const xClaim=await service.rpc('claim_x_content_queue_item',{p_server_secret:env.INDEXER_SECRET})
       const checks={login:login.status===200,session:state.user?.id===id,profileCreated:(await db.prepare('SELECT id FROM profiles WHERE id=?').bind(id).all()).results.length===1,
         bookmark:save.status===204&&Array.isArray(rows)&&rows.length===1&&rows[0].user_id===id,
         profileSave:!profile.error&&locked.error?.code==='HANDLE_LOCKED',vote:!vote.error&&!counts.error&&counts.data.length===1&&counts.data[0].likes===1,
@@ -72,6 +76,7 @@ const worker = {
         catalogWrite:!insertedSkill.error&&!changedSkill.error&&insertedSkill.data?.id===changedSkill.data?.id&&changedSkill.data?.primary_category==='document-processing'&&assertions===0,
         indexer:!indexed.error&&indexed.data?.created===true&&!version.error&&version.data?.changed===false&&version.data?.license_status==='detected',
         publishing:!ownerPublished.error&&ownerPublished.data?.ai_review_approved===false&&!ownerReplay.error&&ownerReplay.data?.replayed===true&&!metadata.error&&metadata.data?.metadata_only===true,
+        xAutomation:!xConnection.error&&!xRead.error&&xRead.data?.access_token==='local-fixture-access'&&!xQueue.error&&!xClaim.error&&xClaim.data?.id===xQueue.data?.id,
         renewal:renewal.headers.getSetCookie().some(c=>c.includes('oas.session_token=')),privateCache:renewal.headers.get('cache-control')==='private, no-store'}
       return Response.json({passed:Object.values(checks).every(Boolean),checks},{status:Object.values(checks).every(Boolean)?200:500})
     }

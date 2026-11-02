@@ -11,6 +11,7 @@ import {executeD1BackgroundRPC} from './cloudflare-background'
 import {executeD1SkillChanges,skillDerivedInputs} from './cloudflare-skill-write'
 import {executeD1IndexerRPC} from './cloudflare-indexer'
 import {executeD1PublishingRPC} from './cloudflare-publishing'
+import {executeD1XRPC} from './cloudflare-x'
 
 type Database = ReadDatabase & CommerceDatabase
 const service = {userId:null,service:true} as const
@@ -43,6 +44,8 @@ export function createD1ServiceFetch(db: Database): typeof fetch {
       const name=path[2]
       if(path[1]){
         if(method==='POST'){
+          const x=await executeD1XRPC(db,name,body||{})
+          if(x.handled)return Response.json(x.data,{headers})
           const published=await executeD1PublishingRPC(db,name,body||{})
           if(published.handled)return Response.json(published.data,{headers})
           const background=await executeD1BackgroundRPC(db,name,body||{})
