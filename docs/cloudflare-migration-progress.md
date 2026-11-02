@@ -40,6 +40,14 @@ production migration.
   excluded from Git/logs. Existing Vercel credentials are unchanged. These do not
   authorize old PostgreSQL RPCs, whose expected hash must be handled as part of
   the replacement data layer. Schedules and writes remain disabled.
+- A separate GitHub fine-grained token is installed as `GITHUB_TOKEN`. It has
+  public-repository read-only access and no additional account permissions,
+  expires 2027-11-02, and passed repository and code-search API checks. The
+  existing deployment/production GitHub credentials are unchanged. The local
+  copy and other recovered/generated credentials use Windows user encryption.
+- Cache lifecycle rules expire ISR cache objects after 30 days and generated
+  image cache objects after seven days. Packages and source backups have no
+  expiry rule. The existing incomplete-upload cleanup rules are preserved.
 
 ## Isolation
 
@@ -62,6 +70,12 @@ Activation and replacing scanned IP records with verified final targets remain p
   complete regression suite, Cloudflare tests, build, packaging and all 11
   workerd runtime cases. The smoke harness uses `localhost`: NextURL normalizes
   loopback IPs to that hostname, otherwise OpenNext interprets rewrites as external.
+- Run `41455988910` for `74a5f17` also passed the full application checks and 14
+  workerd cases, including localized account isolation. PR dependency review
+  separately found vulnerable transitive glob/undici versions in the migration
+  tools. Same-major patched versions are now pinned by narrow pnpm overrides:
+  glob 10.5.0, undici 6.29.1/7.30.1. Rebuild and dependency-review confirmation
+  are required before deploying the next artifact.
 - Compatibility date is `2026-10-01`, supported by the installed workerd binary.
 - All 234 private release files have been recovered from existing local archives
   and SHA-256/size matched to the exported release records. Three Skill text files
@@ -97,8 +111,9 @@ Activation and replacing scanned IP records with verified final targets remain p
   across the existing worktrees. Windows-encrypted database and Stripe sandbox
   credentials were recovered without printing values. The sandbox key returns
   the expected QA account. No production Stripe key was found; the authenticated
-  Vercel export contains `[SENSITIVE]` placeholders. Stripe browser/plugin login
-  is required before provisioning an additional production restricted key.
+  Vercel export contains `[SENSITIVE]` placeholders. The browser's existing Google
+  session advanced Stripe login to its authenticator challenge; the owner must
+  complete that challenge before provisioning a production restricted key.
 - The normal source Data API still returns 402 with the recovered server key.
   The shared Supabase organization's billing cycle is October 10–November 10;
   its spending cap remains on. Five projects share the integration, so do not
