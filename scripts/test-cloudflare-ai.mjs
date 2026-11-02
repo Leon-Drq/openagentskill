@@ -30,6 +30,7 @@ function load(path) {
     if (name === 'server-only') return {}
     if (name === 'ai') return { generateText: () => assert.fail('Cloudflare must never fall back to Vercel AI Gateway') }
     if (name === '@/lib/supabase/admin') return { createAdminClient: () => db }
+    if (name === '@/lib/ai/cloudflare-ledger') return { cloudflareAnalysisLedger: async () => db }
     if (name === '@opennextjs/cloudflare') return { getCloudflareContext: () => ({ env: bindingMissing ? {} : { AI: binding } }) }
     if (name.startsWith('@/')) return load(name.slice(2))
     return require(name)

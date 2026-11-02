@@ -8,7 +8,7 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "workers_dev": true,
   "preview_urls": false,
-  "ai": { "binding": "AI" },
+  "ai": { "binding": "AI", "remote": false },
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "services": [
     { "binding": "WORKER_SELF_REFERENCE", "service": "openagentskill-migration" }
@@ -23,6 +23,12 @@
       "binding": "NEXT_TAG_CACHE_D1",
       "database_name": "openagentskill-migration-tags",
       "database_id": "5edf8538-ca0a-44b3-ba6b-2ce8c26e000c"
+    },
+    {
+      "binding": "ANALYSIS_DB",
+      "database_name": "openagentskill-migration-analysis",
+      "database_id": "01039261-9108-4742-9899-2c3253ed28ee",
+      "migrations_dir": "cloudflare/migrations/analysis"
     }
   ],
   "durable_objects": {

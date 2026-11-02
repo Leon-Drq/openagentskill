@@ -3,6 +3,7 @@ import { generateText } from 'ai'
 import { createHash } from 'node:crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { CLOUDFLARE_REVIEW_MODEL, cloudflareGeneration } from '@/lib/ai/cloudflare-generation'
+import { cloudflareAnalysisLedger } from '@/lib/ai/cloudflare-ledger'
 
 import { DeferredAnalysisError } from '@/lib/ai/deferred-analysis'
 export { DeferredAnalysisError } from '@/lib/ai/deferred-analysis'
@@ -24,7 +25,9 @@ export async function controlledGeneration(input: {
   const reservationUsd = ((bytes + (cloudflare ? 128 : 0)) * 0.5 + maxOutputTokens * 2) / 1_000_000
   const providerModel = cloudflare ? CLOUDFLARE_REVIEW_MODEL : input.model
   const requestKey = createHash('sha256').update(`${input.feature}:${providerModel}:${input.fingerprint}`).digest('hex')
-  const db = createAdminClient({ requestTimeoutMs: 12_000 })
+  const db = cloudflare
+    ? await cloudflareAnalysisLedger().catch(() => { throw new DeferredAnalysisError('Analysis ledger unavailable; queued without calling model', 'database_unavailable') })
+    : createAdminClient({ requestTimeoutMs: 12_000 })
   const { data: reservation, error } = await db.rpc('reserve_skill_analysis', {
     p_key: requestKey, p_feature: input.feature, p_model: providerModel, p_reserved_usd: reservationUsd,
   })

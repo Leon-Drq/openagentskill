@@ -17,6 +17,13 @@ production migration.
 - D1 cache metadata database created: `openagentskill-migration-tags`, ID
   `5edf8538-ca0a-44b3-ba6b-2ce8c26e000c`. This contains cache invalidation metadata,
   not migrated business records.
+- A separate private AI budget database, `openagentskill-migration-analysis`
+  (`01039261-9108-4742-9899-2c3253ed28ee`), has its first schema migration applied.
+  It uses atomic conditional reservations and integer microdollars, retaining
+  the rolling 100-call/$2 caps, failure cooldown and seven-day cache. Real D1
+  concurrent tests verified one reservation for 12 identical requests and the
+  shared spend ceiling under 30 different concurrent requests. Synthetic rows
+  were removed and the ledger is empty; no production reviews were rewritten.
 - Workers Paid and R2 are activated. Four private R2 buckets are created:
   `openagentskill-migration-cache`, `openagentskill-migration-images`, and
   `openagentskill-migration-packages` and `openagentskill-migration-backups`.
@@ -129,7 +136,11 @@ Activation and replacing scanned IP records with verified final targets remain p
   Two synthetic API probes used 20 input and 62 output tokens in total. The
   first 32-token cap truncated; the bounded follow-up returned the exact requested
   text with a normal stop. No source/user data was sent. Staging keeps
-  `WORKERS_AI_ENABLED=0`; business inference still requires the replacement ledger.
+  `WORKERS_AI_ENABLED=0`; the native D1 ledger adapter is implemented and tested.
+  Local AI remote access is disabled so public CI requires no account credentials
+  and cannot incur inference costs. Before production activation, stop the old
+  writer and reconcile the preceding 24 hours of reservations (or wait a full
+  24-hour blackout); an empty ledger must not reset an existing daily budget.
 - The normal source Data API still returns 402 with the recovered server key.
   The shared Supabase organization's billing cycle is October 10–November 10;
   its spending cap remains on. Five projects share the integration, so do not
