@@ -11,7 +11,7 @@ production migration.
 
 - Account: `113e589daada01e37bfd43cfb4763aab`.
 - Read-only staging: https://openagentskill-migration.qudongqi2023.workers.dev.
-  Commit `8fb04a8`, Worker version `cd9bf72d-8e78-449e-bdf3-8ee3b002e14f`.
+  Commit `df5a861`, Worker version `2fd07d3a-ed41-4a08-b567-5bb463e9eb79`.
   No custom domain attached. All 14 remote routing/isolation checks pass; the
   actual homepage also loads in Chrome.
 - D1 cache metadata database created: `openagentskill-migration-tags`, ID
@@ -28,7 +28,7 @@ production migration.
   No production reviews were rewritten.
 - The private application database `openagentskill-migration-data`
   (`06665221-3754-4024-b6e5-6c6fa4026ba2`, WNAM) now has its first commerce schema.
-  Its `APP_DB` binding is prepared in this branch; public application routes
+  Its `APP_DB` binding is deployed to the read-only Worker; application routes
   still use their existing data/auth layer and are not switched to this database.
   The archive rehearsal contains 70 identity IDs, 234 release records, two
   customer mappings, six orders and 30 processed webhook records, 342 rows in
@@ -94,6 +94,14 @@ Activation and replacing scanned IP records with verified final targets remain p
 
 ## Verified migration rehearsal
 
+- Linux run `41471971932` for `df5a861` passed the complete migration workflow:
+  lint, typecheck, links, application regressions, Cloudflare tests, production
+  build, portable packaging and 14 workerd cases. PR dependency review, CodeQL
+  and ordinary application CI also passed. The exact artifact is now deployed
+  with `APP_DB` bound; 423 cache entries were populated, all 14 remote checks
+  passed, and all six migration-only secrets remain installed. The new order
+  primitive is not yet wired into payment routes. Production payment/OAuth
+  credentials stay in encrypted local storage until their integration is ready.
 - Linux run `41462806365` for deployed commit `8fb04a8` passed lint, typecheck,
   links, all regression suites, Cloudflare tests, production build, Worker
   packaging and all 14 workerd cases. Dependency review and CodeQL also passed.
@@ -185,6 +193,23 @@ Activation and replacing scanned IP records with verified final targets remain p
   This is a server-private primitive, not an exposed data API or a complete
   payment migration: route reads/writes, login and webhook orchestration still
   require integration and end-to-end validation before cutover.
+- Auth inventory from the authorized archive contains 34 password accounts
+  (bcrypt cost 10), 36 GitHub accounts, 64 confirmed emails and six unconfirmed
+  emails, with no anonymous/deleted/banned accounts or duplicate normalized
+  emails. All 70 have profile rows. These counts do not make the auth migration
+  complete; no password verifiers or existing sessions were loaded into D1.
+  The existing GitHub OAuth application (`3830141`, public client ID
+  `Ov23liPXVXYpDfcfw3yI`) retains its Supabase callback and original secret.
+  Two exact, non-wildcard callbacks were added for the future auth adapter:
+  `https://www.openagentskill.com/api/auth/callback/github` and
+  `https://openagentskill-migration.qudongqi2023.workers.dev/api/auth/callback/github`.
+  A separate client secret was generated and saved with Windows user encryption;
+  it is not yet installed in the Worker. Existing user tokens were not revoked.
+  The callback routes, password verification, account mapping, session lifecycle
+  and email confirmation still need implementation and end-to-end validation.
+  Cloudflare Email Sending can provide transactional auth email, but its
+  [domain setup requires Cloudflare DNS](https://developers.cloudflare.com/email-service/get-started/send-emails/);
+  that prerequisite is not activated yet. No email was sent by this preparation.
 - Cloudflare inference uses the fixed Workers AI model
   `@cf/deepseek-ai/deepseek-v4-flash-0731`, without a Vercel Gateway fallback.
   Official pricing checked November 2 is $0.44/M input and $1.32/M output,
@@ -206,7 +231,7 @@ Activation and replacing scanned IP records with verified final targets remain p
   writer and reconcile the preceding 24 hours of reservations (or wait a full
   24-hour blackout); an empty ledger must not reset an existing daily budget.
 - The normal source Data API still returns 402 with the recovered server key.
-  A fresh normal public read also returned 402 at 2026-11-02T14:38Z. Authoritative
+  A fresh normal public read also returned 402 at 2026-11-02T15:37Z. Authoritative
   DNS still reports `ns1.vercel-dns.com` and `ns2.vercel-dns.com`.
   The shared Supabase organization's billing cycle is October 10–November 10;
   its spending cap remains on. Five projects share the integration, so do not
