@@ -7,7 +7,8 @@ export function migrationResponse(request, env) {
     return Response.redirect(url.toString(), 308)
   }
   if (env.MIGRATION_READ_ONLY !== '1') return null
-  const path = url.pathname
+  // Apply isolation before Next's locale rewrites can reach account handlers.
+  const path = url.pathname.replace(/^\/(?:en|zh|ja|ko|es|de|fr|id)(?=\/|$)/, '') || '/'
   if (path === '/robots.txt') {
     return new Response('User-agent: *\nDisallow: /\n', {
       headers: { 'Content-Type': 'text/plain', 'Cache-Control': 'private, no-store' },

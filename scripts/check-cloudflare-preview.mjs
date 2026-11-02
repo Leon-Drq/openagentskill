@@ -43,6 +43,7 @@ try {
     ['/skills?q=video', 503], ['/zh/skills?q=video', 503],
     ['/agentskill', 308], ['/api/cron/skill-submissions', 503],
     ['/auth/callback?code=test-only', 503], ['/', 503, 'POST'],
+    ['/zh/profile', 503], ['/ja/auth/callback?code=test-only', 503], ['/de/creator', 503],
     ['/favicon-48x48.png', 200], ['/robots.txt', 200],
   ]) {
     const response = await fetch(base + path, { method, redirect: 'manual', signal: AbortSignal.timeout(30_000) })

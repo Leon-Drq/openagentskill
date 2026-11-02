@@ -18,6 +18,12 @@ test('preview prevents writes, auth callbacks, cron GETs, and indexing', async (
     assert.equal(result.status, 503, path)
     assert.equal(result.headers.get('Cache-Control'), 'private, no-store')
   }
+  for (const locale of ['en', 'zh', 'ja', 'ko', 'es', 'de', 'fr', 'id']) {
+    for (const path of ['/auth/callback?code=example', '/profile', '/creator', '/api/payments/webhook']) {
+      assert.equal(migrationResponse(new Request(`https://preview.workers.dev/${locale}${path}`), env).status, 503)
+    }
+    assert.equal(migrationResponse(new Request(`https://preview.workers.dev/${locale}/skills`), env), null)
+  }
   assert.equal(migrationResponse(new Request('https://preview.workers.dev/', { method: 'POST' }), env).status, 503)
   assert.equal(migrationResponse(new Request('https://preview.workers.dev/skills'), env), null)
   assert.match(await migrationResponse(new Request('https://preview.workers.dev/robots.txt'), env).text(), /Disallow: \//)
