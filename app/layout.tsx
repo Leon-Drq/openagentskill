@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { Geist_Mono, Inter } from 'next/font/google'
-import { SpeedInsights } from '@vercel/speed-insights/next'
 import { GoogleAnalytics } from '@/components/google-analytics'
 import { StructuredData } from '@/components/structured-data'
 import { I18nProvider } from '@/lib/i18n/context'
@@ -162,7 +161,6 @@ export default async function RootLayout({
             <GoogleAnalytics measurementId={measurementId} />
           </Suspense>
         )}
-        <SpeedInsights />
       </body>
     </html>
   )

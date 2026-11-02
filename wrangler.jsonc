@@ -26,6 +26,7 @@
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DOQueueHandler"] }],
   "vars": {
+    "HOSTING_PROVIDER": "cloudflare",
     "MIGRATION_READ_ONLY": "1",
     "CRON_ENABLED": "0",
     "SUPABASE_DATA_PAUSED": "1",

@@ -47,12 +47,23 @@ The current authoritative nameservers are Vercel nameservers; none are changed.
    permission; the already-authenticated CLI can list production configuration.
    Do not put secrets into artifacts, logs or Git. `.env.owner.local` is not an
    infrastructure export; retain the owner publishing authorization boundary.
-4. Move Vercel Blob card caching to R2, replace Vercel-only analytics, and configure
+4. R2 card-cache adapter is implemented with expiry, size and abort checks; the
+   Vercel speed-insights component is removed from this branch. Bind the isolated
+   image bucket and test it before production. Configure
    an explicit AI provider before retiring the Vercel AI Gateway dependency.
-5. Full Supabase replacement requires a lawful complete export: public data, auth
-   identities/password verifiers and private Storage objects. Its normal Data API
-   currently returns HTTP 402. Do not bypass provider restrictions with privileged
-   SQL, remove spending limits or mistake the partial saved directory for a backup.
+5. A prior authorized export was found locally at
+   `artifacts/database-export-2026-10-30` in the original checkout. Its source ZIP
+   SHA-256 matches the recorded checksum. A fresh read-only local inspection
+   verified all 209 chunks, 86 tables and 1,480,974 rows against byte counts,
+   SHA-256, row counts and source row hashes. It includes 36,123 skills, 70 users
+   and six orders. Raw JSONL size is 774,459,426 bytes. No row exceeds D1's 2 MB
+   value-byte limit; one row requires bound-parameter import because an inline
+   SQL INSERT would exceed 100 KB. Maximum column count is 66 (D1 limit 100).
+   This is an October 30 per-table archive, not a current transaction snapshot.
+   It includes 234 Storage metadata records but no file payloads. Keep all private
+   archives outside Git and build artifacts. The normal source Data API still
+   returns HTTP 402. Final reconciliation and file transfer need service recovery
+   or an approved backup path; do not bypass provider restrictions or remove limits.
 6. Port and validate database/auth/payment semantics, reconcile row/object counts,
    checksums, relationships and ownership. Existing PostgreSQL RPCs, RLS and
    transactions cannot be copied unchanged into SQLite/D1.
