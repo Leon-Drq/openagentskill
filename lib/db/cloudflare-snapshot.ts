@@ -7,9 +7,13 @@ import {decodeD1Row} from './cloudflare-values'
 // Changes to a row or to the matching set cause an atomic rollback and retry.
 export async function snapshotD1Rows(db:ReadDatabase,table:keyof typeof schema,where:string,params:unknown[],order='rowid') {
  const columns=Object.keys(schema[table])
- const query=`SELECT json_group_array(json_array(${columns.map(k=>`"${k}"`).join(',')})) value FROM (SELECT * FROM "${table}" WHERE ${where} ORDER BY ${order})`
+ const groups=[]
+ // Native D1 limits each SQL function to 32 arguments, even though a table
+ // may contain 100 columns. Nest bounded groups to preserve every field.
+ for(let i=0;i<columns.length;i+=32)groups.push(`json_array(${columns.slice(i,i+32).map(k=>`"${k}"`).join(',')})`)
+ const query=`SELECT json_group_array(json_array(${groups.join(',')})) value FROM (SELECT * FROM "${table}" WHERE ${where} ORDER BY ${order})`
  const value=String((await db.prepare(query).bind(...params).all()).results[0].value)
- const rows=(JSON.parse(value) as unknown[][]).map(values=>decodeD1Row(Object.fromEntries(columns.map((k,i)=>[k,values[i]])),schema[table]))
+ const rows=(JSON.parse(value) as unknown[][][]).map(groups=>{const values=groups.flat();return decodeD1Row(Object.fromEntries(columns.map((k,i)=>[k,values[i]])),schema[table])})
  const id=crypto.randomUUID()
  return {rows,check:db.prepare(`INSERT INTO d1_write_guards(id,valid) SELECT ?,CASE WHEN (${query})=? THEN 1 ELSE 0 END`).bind(id,...params,value),
   cleanup:db.prepare('DELETE FROM d1_write_guards WHERE id=?').bind(id)}
