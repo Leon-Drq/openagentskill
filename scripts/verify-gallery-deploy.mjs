@@ -23,4 +23,4 @@ for (let attempt=0; attempt<60; attempt++) {
   } catch (error) { console.log(`Deployment not ready: ${error.message}`) }
   await new Promise((resolve)=>setTimeout(resolve,15000))
 }
-throw new Error('Production did not serve the tested Gallery commit within 15 minutes; inspect the Vercel deployment before retrying')
+throw new Error('Production did not serve the tested Gallery commit within 15 minutes; inspect the hosting deployment before retrying')

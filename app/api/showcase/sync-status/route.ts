@@ -8,7 +8,7 @@ export function GET() {
   return NextResponse.json({
     checkedAt: status.checkedAt, updatedAt: status.updatedAt,
     cases: SHOWCASE_CASES.length, sources: status.sources.length,
-    commit: process.env.VERCEL_GIT_COMMIT_SHA || null,
+    commit: process.env.NEXT_PUBLIC_BUILD_COMMIT_SHA || process.env.VERCEL_GIT_COMMIT_SHA || null,
     media: { checkedAt: mediaStatus.checkedAt, collectedSkills: previews.length,
       ...('summary' in mediaStatus ? { summary: mediaStatus.summary } : {}) },
   }, { headers: { 'Cache-Control': 'no-store' } })
