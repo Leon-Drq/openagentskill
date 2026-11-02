@@ -16,7 +16,7 @@ authentication implementation. Neon is not being provisioned.
 
 - Account: `113e589daada01e37bfd43cfb4763aab`.
 - Read-only staging: https://openagentskill-migration.qudongqi2023.workers.dev.
-  Commit `df5a861`, Worker version `2fd07d3a-ed41-4a08-b567-5bb463e9eb79`.
+  Commit `85385e6`, Worker version `3f80d04e-1329-47f8-9af3-a0a727d3aecf`.
   No custom domain attached. All 14 remote routing/isolation checks pass; the
   actual homepage also loads in Chrome.
 - D1 cache metadata database created: `openagentskill-migration-tags`, ID
@@ -42,6 +42,14 @@ authentication implementation. Neon is not being provisioned.
   hashes; foreign-key checks report zero violations and `quick_check` is `ok`.
   Identity rows contain only IDs and confer no authentication or access rights.
   No passwords, active sessions, emails or private auth attributes were imported.
+  That statement describes the initial commerce rehearsal. The subsequent
+  `0002_auth.sql` migration now also contains 70 archived user records and 70
+  login-method records, including preserved password verifiers and stable GitHub
+  IDs. Their private D1 read-back hashes match, foreign-key checks are clean and
+  `quick_check` passes. A synthetic remote login/session/rate-limit/logout probe
+  passed and was cleaned up without changing archived rows. No source sessions
+  or provider tokens were imported. Auth activation stays disabled pending the
+  remaining integration and current source-data reconciliation.
 - Workers Paid and R2 are activated. Four private R2 buckets are created:
   `openagentskill-migration-cache`, `openagentskill-migration-images`, and
   `openagentskill-migration-packages` and `openagentskill-migration-backups`.
@@ -99,6 +107,16 @@ Activation and replacing scanned IP records with verified final targets remain p
 
 ## Verified migration rehearsal
 
+- Linux run `41478608665` for `85385e6` passed lint, typecheck, repository links,
+  all application and Cloudflare regressions, isolated native D1/workerd auth
+  checks, production build, portable packaging and 14 runtime routing cases.
+  Dependency review, CodeQL and ordinary CI passed. The exact artifact is now
+  deployed, with 423 cache entries populated. All 14 remote cases passed, plus
+  GET `/api/auth/get-session` and POST `/api/auth/sign-in/email` both returned
+  private/no-store 503 responses without cookies. All six migration-only secrets
+  remain installed; `CLOUDFLARE_AUTH_ENABLED=0` and the read-only guard remain set.
+  The compressed Worker is about 8.1 MiB; track bundle growth against the paid
+  Worker upload limit as the remaining migration is implemented.
 - Linux run `41471971932` for `df5a861` passed the complete migration workflow:
   lint, typecheck, links, application regressions, Cloudflare tests, production
   build, portable packaging and 14 workerd cases. PR dependency review, CodeQL
@@ -210,8 +228,13 @@ Activation and replacing scanned IP records with verified final targets remain p
   `https://openagentskill-migration.qudongqi2023.workers.dev/api/auth/callback/github`.
   A separate client secret was generated and saved with Windows user encryption;
   it is not yet installed in the Worker. Existing user tokens were not revoked.
-  The callback routes, password verification, account mapping, session lifecycle
-  and email confirmation still need implementation and end-to-end validation.
+  The gated Better Auth callback route, password verification, account mapping,
+  session lifecycle and email-confirmation/reset logic are now implemented and
+  covered by isolated handler tests. Native workerd/D1 tests and a remote D1 API
+  probe pass. A dedicated auth signing/encryption secret is stored with Windows
+  user encryption, not installed into the read-only Worker. Frontend/business
+  route integration, actual GitHub login and delivered email still need end-to-end
+  validation before activation.
   Cloudflare Email Sending can provide transactional auth email, but its
   [domain setup requires Cloudflare DNS](https://developers.cloudflare.com/email-service/get-started/send-emails/);
   that prerequisite is not activated yet. No email was sent by this preparation.
@@ -236,7 +259,7 @@ Activation and replacing scanned IP records with verified final targets remain p
   writer and reconcile the preceding 24 hours of reservations (or wait a full
   24-hour blackout); an empty ledger must not reset an existing daily budget.
 - The normal source Data API still returns 402 with the recovered server key.
-  A fresh normal public read also returned 402 at 2026-11-02T15:37Z. Authoritative
+  A fresh normal public read also returned 402 at 2026-11-02T16:12Z. Authoritative
   DNS still reports `ns1.vercel-dns.com` and `ns2.vercel-dns.com`.
   The shared Supabase organization's billing cycle is October 10–November 10;
   its spending cap remains on. Five projects share the integration, so do not

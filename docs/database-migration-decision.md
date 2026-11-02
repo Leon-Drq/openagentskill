@@ -57,6 +57,15 @@ do not disable payment/session freshness checks to reduce cost.
   numeric GitHub subject cannot take over that account using the same email.
   OAuth tokens are stored encrypted. Real provider login/email delivery is
   still a separate production prerequisite.
+- Applied `0002_auth.sql` to the private application D1 database. All 70 archived
+  users and 70 login-method rows were imported and read back with matching
+  semantic hashes. `quick_check` is `ok`; no foreign-key violations, old sessions
+  or provider tokens were imported. A separate synthetic auth-handler probe
+  against actual Cloudflare D1 through its authenticated API passed login,
+  session lookup, concurrent rate limiting and logout. Its exact user/anchor and
+  rate-limit rows were removed; the 70 users, 70 methods and six archived orders
+  remain intact, with zero sessions. This remote D1 API test and the local native
+  workerd binding test are distinct; neither proves real GitHub/email delivery.
 
 This is an authentication migration foundation, not a production cutover.
 Business routes and UI still use their old auth/data clients. Transactional
@@ -67,3 +76,8 @@ remain required. Registration stays disabled until those prerequisites pass.
 The source archive is dated October 30 and is not a current globally consistent
 snapshot. Never activate these archived accounts/orders as the authoritative
 production state without a final consistent export and single-writer cutover.
+
+The gated implementation from `85385e6` is deployed to the read-only staging
+Worker after [full CI run 41478608665](https://github.com/Leon-Drq/openagentskill/actions/runs/41478608665).
+All 14 remote route checks and two explicit auth-isolation probes passed. No
+production DNS, Supabase spending cap, auth provider or Vercel billing changed.
