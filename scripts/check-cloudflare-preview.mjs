@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process'
-import { mkdirSync, openSync, closeSync, writeFileSync } from 'node:fs'
+import { mkdirSync, openSync, closeSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { resolve } from 'node:path'
 import assert from 'node:assert/strict'
 
 // Linux CI runs the real workerd runtime with local R2/D1/DO emulation and no
@@ -13,7 +14,20 @@ if (!remote && process.platform === 'win32') throw new Error('Run the local smok
 mkdirSync('.codex-tmp', { recursive: true })
 const log = remote ? null : openSync('.codex-tmp/cloudflare-preview.log', 'w')
 const cli = fileURLToPath(new URL('../node_modules/@opennextjs/cloudflare/dist/cli/index.js', import.meta.url))
-const child = remote ? null : spawn(process.execPath, [cli, 'preview', '--port', '8788', '--ip', '127.0.0.1'], {
+const previewConfig = resolve('.codex-tmp/cloudflare-preview.jsonc')
+if (!remote) {
+  const config = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'))
+  assert.equal(config.vars.MIGRATION_READ_ONLY, '1')
+  assert.equal(config.vars.WORKERS_AI_ENABLED, '0')
+  // Wrangler 4.152 treats AI as remote-only even with ai.remote=false.
+  // Public CI must not authenticate or make paid calls. This preview exercises
+  // the disabled AI path; the real binding is verified separately on Cloudflare.
+  delete config.ai
+  config.main = resolve(config.main)
+  config.assets.directory = resolve(config.assets.directory)
+  writeFileSync(previewConfig, JSON.stringify(config, null, 2))
+}
+const child = remote ? null : spawn(process.execPath, [cli, 'preview', '--config', previewConfig, '--port', '8788', '--ip', '127.0.0.1'], {
   env: { ...process.env, BROWSER: 'none', WRANGLER_SEND_METRICS: 'false' },
   stdio: ['ignore', log, log], detached: true,
 })
