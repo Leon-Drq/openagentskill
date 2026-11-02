@@ -1,0 +1,39 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "openagentskill-migration",
+  "account_id": "113e589daada01e37bfd43cfb4763aab",
+  "main": "cloudflare/worker.mjs",
+  "compatibility_date": "2026-11-02",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "services": [
+    { "binding": "WORKER_SELF_REFERENCE", "service": "openagentskill-migration" }
+  ],
+  "r2_buckets": [
+    { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "openagentskill-migration-cache" }
+  ],
+  "d1_databases": [
+    {
+      "binding": "NEXT_TAG_CACHE_D1",
+      "database_name": "openagentskill-migration-tags",
+      "database_id": "5edf8538-ca0a-44b3-ba6b-2ce8c26e000c"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "NEXT_CACHE_DO_QUEUE", "class_name": "DOQueueHandler" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DOQueueHandler"] }],
+  "vars": {
+    "MIGRATION_READ_ONLY": "1",
+    "CRON_ENABLED": "0",
+    "SUPABASE_DATA_PAUSED": "1",
+    "COMMERCE_CHECKOUT_ENABLED": "0",
+    "OG_STORAGE_ENABLED": "0",
+    "NEXT_CACHE_DO_QUEUE_MAX_REVALIDATION": "2",
+    "NEXT_CACHE_DO_QUEUE_MAX_RETRIES": "2"
+  },
+  "triggers": { "crons": [] },
+  "observability": { "enabled": true, "head_sampling_rate": 0.01 }
+}

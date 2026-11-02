@@ -1,0 +1,48 @@
+name: Cloudflare migration validation
+
+on:
+  push:
+    branches: [codex/cloudflare-migration]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-migration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: true
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Setup pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.2 --activate
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test:links
+      - run: pnpm test
+      - run: pnpm test:cloudflare
+      - run: node --experimental-strip-types scripts/test-agent-connection.mjs
+      - name: Build Cloudflare application without production credentials
+        run: pnpm cf:build
+      - name: Validate Worker packaging without deploying
+        run: pnpm exec wrangler deploy --dry-run --outdir .codex-tmp/worker-dry-run
+      - name: Package portable build output
+        run: tar --exclude='*/node_modules' --exclude='.open-next/.build' -czf cloudflare-build.tar.gz .open-next
+      - name: Upload tested build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cloudflare-build-${{ github.sha }}
+          path: cloudflare-build.tar.gz
+          retention-days: 3

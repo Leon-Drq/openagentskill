@@ -14,3 +14,7 @@ tsconfig.tsbuildinfo
 artifacts/
 .vercel
 supabase/.temp/
+.open-next/
+.wrangler/
+.dev.vars*
+!.dev.vars.example
