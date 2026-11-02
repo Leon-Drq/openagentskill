@@ -8,6 +8,8 @@ import { getMotionEntry } from '@/lib/motion/catalog'
 import { STUDIO_SKILL } from '@/lib/studio/catalog'
 import { validRelease, type PackageRelease, type PaidOrder, PACKAGE_BUCKET, singleReleaseAllowed } from './policy'
 import { inspectLifetime, inspectMembership, inspectPayment, paymentMode, stripeClient } from './stripe'
+import { cloudflarePackageStorage } from './r2-packages'
+import { verifiedDownloadBytes } from '@/lib/skills/download-policy'
 
 export const privateHeaders = { 'Cache-Control': 'private, no-store, max-age=0', Vary: 'Cookie', 'Referrer-Policy': 'no-referrer' }
 export const paymentJson = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: privateHeaders })
@@ -53,16 +55,28 @@ export async function releases(slug?: string) {
   return (data as PackageRelease[]).filter(row => Boolean(productDefinition(row.skill_slug)) && validRelease(row, row.skill_slug))
 }
 export async function verifyPackage(release: PackageRelease) {
+  if (process.env.HOSTING_PROVIDER === 'cloudflare') {
+    try { await cloudflarePackageStorage().verify(release); return }
+    catch { throw new PaymentError('package_unavailable', 409) }
+  }
   const { data, error } = await paymentDb().storage.from(PACKAGE_BUCKET).info(release.object_path)
   if (error || !data || Number(data.size) !== release.size_bytes) throw new PaymentError('package_unavailable', 409)
+}
+export async function releaseBytes(release: PackageRelease) {
+  if (!validRelease(release, release.skill_slug)) throw new Error('package_unavailable')
+  if (process.env.HOSTING_PROVIDER === 'cloudflare') return cloudflarePackageStorage().read(release)
+  const { data, error } = await paymentDb().storage.from(PACKAGE_BUCKET).download(release.object_path)
+  if (error || !data) throw new Error('download_unavailable')
+  const bytes = new Uint8Array(await data.arrayBuffer())
+  if (!verifiedDownloadBytes(bytes, release.size_bytes, release.sha256)) throw new Error('package_unavailable')
+  return bytes
 }
 // Called only after entitlement checks (or by checkout to validate delivery).
 // Plain text stays in private Storage, never in the public motion catalog.
 export async function releaseText(release: PackageRelease) {
   if (!validRelease(release, release.skill_slug) || !['prompt', 'skill-instructions'].includes(release.delivery_kind || '')) throw new PaymentError('package_unavailable', 409)
-  const { data, error } = await paymentDb().storage.from(PACKAGE_BUCKET).download(release.object_path)
-  if (error || !data) throw new PaymentError('package_unavailable', 409)
-  const bytes = Buffer.from(await data.arrayBuffer())
+  let bytes: Uint8Array
+  try { bytes = await releaseBytes(release) } catch { throw new PaymentError('package_unavailable', 409) }
   if (bytes.length !== release.size_bytes || createHash('sha256').update(bytes).digest('hex') !== release.sha256) throw new PaymentError('package_unavailable', 409)
   return new TextDecoder('utf-8', { fatal: true }).decode(bytes)
 }

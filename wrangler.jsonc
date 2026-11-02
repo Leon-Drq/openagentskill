@@ -14,7 +14,8 @@
   ],
   "r2_buckets": [
     { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "openagentskill-migration-cache" },
-    { "binding": "OG_IMAGES", "bucket_name": "openagentskill-migration-images" }
+    { "binding": "OG_IMAGES", "bucket_name": "openagentskill-migration-images" },
+    { "binding": "SKILL_PACKAGES", "bucket_name": "openagentskill-migration-packages" }
   ],
   "d1_databases": [
     {

@@ -15,7 +15,7 @@ const raw = '---\nname: test-skill\ndescription: Write a plain text summary.\n--
 let user = { id: 'account-a', is_anonymous: false }, blocked = false, ledgerFailure = false, visible = true, storageFailure = false, entitled = true
 let row = { slug: 'test-skill', github_repo: 'example/repo', source_path: 'SKILL.md', source_commit_sha: 'a'.repeat(40), source_sync_status: 'current', source_content_hash: sha(raw), long_description: raw, install_command: 'npx skills add example/repo', listing_status: 'owner_published' }
 let bytes = new TextEncoder().encode('paid instructions')
-let release = { skill_slug: 'launch-card-studio', version: '1.0.0', object_path: 'fixture', size_bytes: bytes.length, sha256: sha(bytes), delivery_kind: 'skill-instructions' }
+let release = { id: 'release-1', skill_slug: 'launch-card-studio', version: '1.0.0', object_path: `launch-card-studio/1.0.0/${sha(bytes)}.txt`, size_bytes: bytes.length, sha256: sha(bytes), delivery_kind: 'skill-instructions', released_at:'2026-01-01T00:00:00Z', withdrawn:false }
 const totals = new Map()
 let writes = 0, lastFilter = '', lastReceipt = null
 const admin = {
@@ -36,6 +36,10 @@ function load(path) {
   const source = ts.transpileModule(readFileSync(absolute,'utf8'), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true } }).outputText
   new Function('exports','require',source)(output, name => {
     if (name === 'server-only') return {}
+    if (name === '@opennextjs/cloudflare') return { getCloudflareContext: () => ({ env: { SKILL_PACKAGES: {
+      head: async () => ({ size: release.size_bytes }),
+      get: async () => storageFailure ? null : ({ size: bytes.length, body: new Blob([bytes]).stream() }),
+    } } }) }
     if (name === '@/lib/analytics') return { trackAnalyticsEvent: () => {} }
     if (name === '@/lib/x/attribution-client') return { getActiveXAttribution: () => null }
     if (name === 'next/cache') return { unstable_cache: fn => fn }
@@ -58,7 +62,8 @@ function load(path) {
   return output
 }
 const free = load('app/api/skills/[slug]/download/route.ts').POST
-const paid = load('app/api/payments/download/route.ts').POST
+const paidRoute = load('app/api/payments/download/route.ts')
+const paid = paidRoute.POST
 const action = load('app/api/skills/[slug]/download-action/route.ts').POST
 const request = (body = {}, origin='https://www.openagentskill.com', accept='application/octet-stream') => new NextRequest('https://www.openagentskill.com/api/download', { method:'POST', headers:{ origin, 'content-type':'application/json', accept }, body:JSON.stringify(body) })
 const download = (req=request(), slug='test-skill') => free(req,{ params:Promise.resolve({slug}) })
@@ -92,6 +97,37 @@ response=await paid(request({slug:release.skill_slug})); assert.equal(response.s
 assert.equal(await response.text(),'paid instructions'); assert.equal(totals.get(release.skill_slug),1)
 await paid(request({slug:release.skill_slug},undefined,'application/json'))
 assert.equal(totals.get(release.skill_slug),1,'legacy signed-link creation is not a download')
+process.env.HOSTING_PROVIDER='cloudflare'
+process.env.PACKAGE_DOWNLOAD_SECRET='migration-download-test-secret-32-characters-only'
+response=await paid(request({slug:release.skill_slug},undefined,'application/json'))
+assert.equal(response.status,200)
+const grantBody=await response.json()
+assert.equal(new URL(grantBody.url).origin,'https://www.openagentskill.com')
+assert.equal(grantBody.expiresIn,60)
+assert.equal(totals.get(release.skill_slug),1,'R2 link creation does not record a file transfer')
+const grantRequest=()=>new NextRequest(grantBody.url)
+assert.equal((await paidRoute.HEAD()).status,405)
+assert.equal((await paidRoute.GET(new NextRequest('https://www.openagentskill.com/api/payments/download'))).status,403)
+user.id='other-account'
+assert.equal((await paidRoute.GET(grantRequest())).status,403,'a signed grant cannot be used by another buyer')
+user.id='account-b'
+entitled=false
+assert.equal((await paidRoute.GET(grantRequest())).status,403,'revocation after grant creation prevents delivery')
+entitled=true
+const oldReleaseId=release.id; release.id='replacement-release'
+assert.equal((await paidRoute.GET(grantRequest())).status,409,'a grant binds the immutable release')
+release.id=oldReleaseId
+storageFailure=true
+assert.equal((await paidRoute.GET(grantRequest())).status,503); storageFailure=false
+assert.equal(totals.get(release.skill_slug),1,'denied and failed R2 requests never count')
+response=await paidRoute.GET(grantRequest())
+assert.equal(response.status,200); assert.equal(await response.text(),'paid instructions')
+assert.equal(totals.get(release.skill_slug),2,'authenticated R2 file receipt counts once')
+assert.match(response.headers.get('cache-control'),/private, no-store/)
+response=await paid(request({slug:release.skill_slug}))
+assert.equal(response.status,200); assert.equal(await response.text(),'paid instructions')
+assert.equal(totals.get(release.skill_slug),3,'direct R2 downloads share the verified receipt path')
+delete process.env.HOSTING_PROVIDER; delete process.env.PACKAGE_DOWNLOAD_SECRET
 const actionBody = { action: 'command-copy', sessionId: 'af1651c4-2281-4cd7-b8fe-9c9a6c0027cb' }
 const act = (body=actionBody, slug='test-skill', origin) => action(request(body,origin), { params:Promise.resolve({slug}) })
 assert.equal((await act(actionBody,undefined,'https://evil.example')).status,403)

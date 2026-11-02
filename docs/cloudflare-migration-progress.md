@@ -10,14 +10,18 @@ production migration.
 ## Resources and build
 
 - Account: `113e589daada01e37bfd43cfb4763aab`.
-- Worker target: `openagentskill-migration`, no custom domain attached.
+- Read-only staging: https://openagentskill-migration.qudongqi2023.workers.dev.
+  Commit `7ef7c69`, Worker version `104c276b-1e7d-41a0-9054-64f519f060c0`.
+  No custom domain attached. All 11 remote routing/isolation checks pass; the
+  actual homepage also loads in Chrome.
 - D1 cache metadata database created: `openagentskill-migration-tags`, ID
   `5edf8538-ca0a-44b3-ba6b-2ce8c26e000c`. This contains cache invalidation metadata,
   not migrated business records.
-- Workers Paid and R2 are activated. Three private R2 buckets are created:
+- Workers Paid and R2 are activated. Four private R2 buckets are created:
   `openagentskill-migration-cache`, `openagentskill-migration-images`, and
-  `openagentskill-migration-packages`. ISR uses R2, a Durable Object queue and
-  D1 tag invalidation. The package bucket has no public URL or custom domain.
+  `openagentskill-migration-packages` and `openagentskill-migration-backups`.
+  ISR uses R2, a Durable Object queue and D1 tag invalidation. The package and
+  backup buckets have no public URL or custom domain.
 - Next.js 16.3.5 and OpenNext 1.20.15. The installed adapter implements experimental
   Node middleware/proxy support; routing must be tested in workerd before cutover.
 - Linux CI builds the Worker, runs regression checks and exports the tested
@@ -45,7 +49,7 @@ Activation and replacing scanned IP records with verified final targets remain p
 
 ## Verified migration rehearsal
 
-- Linux run `41449777982` for commit `dc1ed54` passed lint, typecheck, links, the
+- Linux run `41451477946` for commit `7ef7c69` passed lint, typecheck, links, the
   complete regression suite, Cloudflare tests, build, packaging and all 11
   workerd runtime cases. The smoke harness uses `localhost`: NextURL normalizes
   loopback IPs to that hostname, otherwise OpenNext interprets rewrites as external.
@@ -54,7 +58,11 @@ Activation and replacing scanned IP records with verified final targets remain p
   and SHA-256/size matched to the exported release records. Three Skill text files
   were reconstructed using the original publisher's formatting and archived
   instructions/licenses. Total payload is 209,925 bytes. No release, publication
-  or review record was changed. Remote R2 verification is separate and ongoing.
+  or review record was changed. All 234 R2 objects were downloaded again and
+  matched byte-for-byte by SHA-256 and size (234/234).
+- The existing authorized source ZIP (232,762,936 bytes) is also stored in the
+  private backup bucket. A full remote download matched SHA-256
+  `2ac7d596d5f2d863a243d053e36a056af542e07b855f44f2521bfbe7c1b32432`.
 - A local lossless SQLite rehearsal imported 86 tables and 1,480,974 records;
   per-table semantic hashes match after reading every value back. SQLite integrity
   is `ok`, 86 primary keys, 35 unique constraints and 73 foreign keys were checked,
@@ -65,14 +73,34 @@ Activation and replacing scanned IP records with verified final targets remain p
 - Uploading OpenNext's intermediate Linux output directly from Windows exposed
   absolute binary paths. CI now packages the already-validated Wrangler bundle,
   allowing deployment without rebundling Linux intermediate paths on Windows.
+- The paid-file adapter uses a private R2 binding, validates immutable release
+  paths and checks actual byte counts and SHA-256 before delivery. JSON download
+  clients receive a 60-second first-party grant bound to their account. Using
+  the grant checks login and current payment again; it cannot survive a refund
+  or be transferred to another account. Only an actual verified file transfer
+  records a download. These changes pass local payment/download regression tests
+  and await the next Linux build/deployment.
+- Project-scoped credential discovery checked 38 local configuration/setup files
+  across the existing worktrees. Windows-encrypted database and Stripe sandbox
+  credentials were recovered without printing values. The sandbox key returns
+  the expected QA account. No production Stripe key was found; the authenticated
+  Vercel export contains `[SENSITIVE]` placeholders. Stripe browser/plugin login
+  is required before provisioning an additional production restricted key.
+- The normal source Data API still returns 402 with the recovered server key.
+  The shared Supabase organization's billing cycle is October 10–November 10;
+  its spending cap remains on. Five projects share the integration, so do not
+  cancel the organization or Vercel Marketplace integration as a site cleanup.
 
 ## Pending before production
 
-1. Deploy the validated staging bundle and verify its actual Cloudflare URL.
-2. Complete real Worker routing/cache validation, including proxy rewrites,
-   localized maintenance responses, static assets, SSR and cache invalidation.
+1. Build/deploy the private R2 delivery adapter, then validate against isolated
+   test accounts and payment data once the replacement data/auth layer is ready.
+2. Complete cache invalidation and business-flow validation. Public routing,
+   localized maintenance responses, static assets and isolation already pass
+   at the actual staging URL.
 3. Transfer server configuration securely. Vercel connector lacks environment-read
-   permission; the already-authenticated CLI can list production configuration.
+   permission; the CLI export redacts production secrets. Recover original
+   credentials or provision dedicated replacement credentials at each provider.
    Do not put secrets into artifacts, logs or Git. `.env.owner.local` is not an
    infrastructure export; retain the owner publishing authorization boundary.
 4. R2 card-cache adapter is implemented with expiry, size and abort checks; the
