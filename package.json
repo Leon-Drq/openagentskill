@@ -17,6 +17,7 @@
     "cf:build": "node scripts/build-cloudflare.mjs",
     "cf:preview": "opennextjs-cloudflare preview",
     "cf:deploy:staging": "opennextjs-cloudflare deploy",
+    "cf:deploy:production": "opennextjs-cloudflare deploy --config wrangler.production.jsonc",
     "test:cloudflare": "node --experimental-strip-types --test scripts/test-cloudflare.mjs scripts/test-r2-og-storage.mjs scripts/test-cloudflare-export.mjs scripts/test-cloudflare-rehearsal.mjs && node scripts/test-cloudflare-ai.mjs && node --experimental-strip-types scripts/test-cloudflare-analysis-ledger.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-orders.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-auth.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-business.mjs && pnpm test:cloudflare-account && pnpm test:cloudflare-telemetry",
     "start": "next start",
     "seed:popular": "node scripts/seed-popular-skills.ts",

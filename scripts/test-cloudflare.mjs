@@ -5,6 +5,30 @@ import { dispatchScheduled, migrationResponse, previewHeaders, stagingResponse }
 
 const schedules = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url))).crons
 
+test('production deployment restores account and data services while retiring the preview hostname', () => {
+  const preview = JSON.parse(readFileSync(new URL('../wrangler.jsonc', import.meta.url)))
+  const production = JSON.parse(readFileSync(new URL('../wrangler.production.jsonc', import.meta.url)))
+  assert.equal(production.name, preview.name)
+  for (const binding of ['d1_databases', 'r2_buckets', 'durable_objects', 'send_email']) {
+    assert.deepEqual(production[binding], preview[binding])
+  }
+  assert.equal(production.workers_dev, false)
+  assert.equal(production.preview_urls, false)
+  assert.deepEqual(production.routes.map(route => route.pattern).sort(), ['openagentskill.com', 'www.openagentskill.com'])
+  assert.ok(production.routes.every(route => route.custom_domain === true))
+  assert.equal(production.vars.MIGRATION_READ_ONLY, '0')
+  assert.equal(production.vars.STAGING_PRIVATE, '0')
+  assert.equal(production.vars.SUPABASE_DATA_PAUSED, '0')
+  assert.equal(production.vars.CLOUDFLARE_DATA_ENABLED, '1')
+  assert.equal(production.vars.CLOUDFLARE_AUTH_ENABLED, '1')
+  assert.equal(production.vars.NEXT_PUBLIC_GITHUB_OAUTH_ENABLED, 'true')
+  assert.equal(production.vars.AUTH_ORIGIN, 'https://www.openagentskill.com')
+  assert.equal(production.vars.COMMERCE_SITE_URL, production.vars.AUTH_ORIGIN)
+  assert.match(production.vars.NEXT_PUBLIC_GA_MEASUREMENT_ID, /^G-[A-Z0-9]+$/)
+  assert.deepEqual(production.triggers.crons.sort(), [...new Set(schedules.map(job => job.schedule))].sort())
+  assert.equal(previewHeaders(new Response('public'), production.vars).headers.get('X-Robots-Tag'), null)
+})
+
 test('private account rehearsal requires a secret, blocks cron and remains noindex',async()=>{
   const secret='b'.repeat(64),env={STAGING_PRIVATE:'1',MIGRATION_ACCESS_SECRET:secret,MIGRATION_READ_ONLY:'0',CRON_ENABLED:'1'}
   const base='https://openagentskill-migration.example.workers.dev'

@@ -1,0 +1,149 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "openagentskill-migration",
+  "account_id": "113e589daada01e37bfd43cfb4763aab",
+  "main": "cloudflare/worker.mjs",
+  "minify": true,
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "workers_dev": false,
+  "preview_urls": false,
+  "ai": {
+    "binding": "AI",
+    "remote": true
+  },
+  "send_email": [
+    {
+      "name": "AUTH_EMAIL",
+      "allowed_sender_addresses": [
+        "noreply@openagentskill.com"
+      ]
+    }
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/robots.txt"
+    ]
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "openagentskill-migration"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "openagentskill-migration-cache"
+    },
+    {
+      "binding": "OG_IMAGES",
+      "bucket_name": "openagentskill-migration-images"
+    },
+    {
+      "binding": "SKILL_PACKAGES",
+      "bucket_name": "openagentskill-migration-packages"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "NEXT_TAG_CACHE_D1",
+      "database_name": "openagentskill-migration-tags",
+      "database_id": "5edf8538-ca0a-44b3-ba6b-2ce8c26e000c"
+    },
+    {
+      "binding": "ANALYSIS_DB",
+      "database_name": "openagentskill-migration-analysis",
+      "database_id": "01039261-9108-4742-9899-2c3253ed28ee",
+      "migrations_dir": "cloudflare/migrations/analysis"
+    },
+    {
+      "binding": "APP_DB",
+      "database_name": "openagentskill-migration-data",
+      "database_id": "06665221-3754-4024-b6e5-6c6fa4026ba2",
+      "migrations_dir": "cloudflare/migrations/data"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "NEXT_CACHE_DO_QUEUE",
+        "class_name": "DOQueueHandler"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "DOQueueHandler"
+      ]
+    }
+  ],
+  "vars": {
+    "HOSTING_PROVIDER": "cloudflare",
+    "NEXT_PUBLIC_HOSTING_PROVIDER": "cloudflare",
+    "NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN": "8632bbbce8c243bda81d1a2f4649265c",
+    "MIGRATION_READ_ONLY": "0",
+    "CLOUDFLARE_AUTH_ENABLED": "1",
+    "AUTH_EMAIL_ENABLED": "1",
+    "AUTH_REGISTRATION_ENABLED": "1",
+    "CRON_ENABLED": "1",
+    "SUPABASE_DATA_PAUSED": "0",
+    "COMMERCE_CHECKOUT_ENABLED": "true",
+    "COMMERCE_ENVIRONMENT": "production",
+    "OG_STORAGE_ENABLED": "1",
+    "WORKERS_AI_ENABLED": "1",
+    "NEXT_CACHE_DO_QUEUE_MAX_REVALIDATION": "2",
+    "NEXT_CACHE_DO_QUEUE_MAX_RETRIES": "2",
+    "NEXT_PUBLIC_GA_MEASUREMENT_ID": "G-ZQQ5P0FPDF",
+    "NEXT_PUBLIC_GITHUB_OAUTH_ENABLED": "true",
+    "STAGING_PRIVATE": "0",
+    "CLOUDFLARE_DATA_ENABLED": "1",
+    "AUTH_ORIGIN": "https://www.openagentskill.com",
+    "COMMERCE_SITE_URL": "https://www.openagentskill.com"
+  },
+  "triggers": {
+    "crons": [
+      "*/5 * * * *",
+      "30 2 * * *",
+      "55 2 * * *",
+      "10 3 * * *",
+      "5 0 * * *",
+      "0 */3 * * *",
+      "10 * * * *",
+      "45 */3 * * *",
+      "0,15,30,45 * * * *",
+      "5 */6 * * *",
+      "15 4 * * *",
+      "30 4 * * *",
+      "45 4 * * *",
+      "0 5 * * *",
+      "20 13 * * *",
+      "30 15,19,23 * * *",
+      "30 14 * * *",
+      "15 */12 * * *",
+      "35 15,19,23 * * *",
+      "45 18 * * *"
+    ]
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.01
+  },
+  "routes": [
+    {
+      "pattern": "www.openagentskill.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "openagentskill.com",
+      "custom_domain": true
+    }
+  ]
+}

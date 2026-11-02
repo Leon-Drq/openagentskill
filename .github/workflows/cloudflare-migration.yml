@@ -42,6 +42,8 @@ jobs:
         run: pnpm cf:build
       - name: Validate Worker packaging without deploying
         run: pnpm exec wrangler deploy --dry-run --outdir .codex-tmp/worker-dry-run
+      - name: Validate production bindings and packaging without deploying
+        run: pnpm exec wrangler deploy --config wrangler.production.jsonc --dry-run
       - name: Exercise public routes in the Workers runtime
         run: node scripts/check-cloudflare-preview.mjs
       - name: Package portable build output
