@@ -38,11 +38,28 @@ jobs:
         run: pnpm cf:build
       - name: Validate Worker packaging without deploying
         run: pnpm exec wrangler deploy --dry-run --outdir .codex-tmp/worker-dry-run
+      - name: Exercise public routes in the Workers runtime
+        run: node scripts/check-cloudflare-preview.mjs
       - name: Package portable build output
-        run: tar --exclude='*/node_modules' --exclude='.open-next/.build' -czf cloudflare-build.tar.gz .open-next
+        run: |
+          tar --exclude='*/node_modules' --exclude='.open-next/assets' -czf cloudflare-runtime.tar.gz .open-next
+          tar -czf cloudflare-static.tar.gz .open-next/assets/_next
+          git rev-parse HEAD > cloudflare-build-commit.txt
       - name: Upload tested build
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: cloudflare-build-${{ github.sha }}
-          path: cloudflare-build.tar.gz
+          path: |
+            cloudflare-runtime.tar.gz
+            cloudflare-static.tar.gz
+            cloudflare-build-commit.txt
+          retention-days: 3
+      - name: Upload runtime check results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cloudflare-smoke-${{ github.sha }}
+          path: |
+            .codex-tmp/cloudflare-preview.log
+            .codex-tmp/cloudflare-smoke.json
           retention-days: 3

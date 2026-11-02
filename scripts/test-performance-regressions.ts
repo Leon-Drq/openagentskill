@@ -61,7 +61,10 @@ assert.match(loadingBoundary, /role="progressbar"/, 'route transitions need imme
 assert.match(loadingBoundary, /aria-live="polite"/, 'route loading feedback must be announced accessibly')
 
 const rootLayout = read('app/layout.tsx')
-assert.match(rootLayout, /<SpeedInsights \/>/, 'real-user Core Web Vitals monitoring must stay enabled')
+assert.match(rootLayout, /static\.cloudflareinsights\.com\/beacon\.min\.js/, 'Core Web Vitals monitoring moves to Cloudflare')
+assert.match(rootLayout, /NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN/, 'monitoring uses the configured site token')
+assert.match(rootLayout, /MIGRATION_READ_ONLY !== '1'/, 'preview visits must not contaminate production monitoring')
+assert.doesNotMatch(rootLayout, /SpeedInsights/, 'Cloudflare must not send metrics to the retired Vercel endpoint')
 
 const siteHeader = read('components/site-header.tsx')
 assert.match(siteHeader, /onPointerDown=\{\(\) => warmRoute\(href\)\}/, 'touch navigation should warm primary routes before transition')
