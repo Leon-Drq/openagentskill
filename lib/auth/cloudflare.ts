@@ -103,7 +103,9 @@ export function createCloudflareAuth(options: CloudflareAuthOptions) {
       sendVerificationEmail: ({ user, url }) => sendMail({ to: user.email, url, purpose: 'verify-email' }),
     },
     socialProviders: options.github ? {
-      github: { ...options.github, scope: ['read:user', 'user:email'], disableSignUp: !options.registrationEnabled },
+      // Match the existing sign-in grant. Public profile data needs no extra
+      // scope; email access is sufficient to retain the verified identity.
+      github: { ...options.github, disableDefaultScope: true, scope: ['user:email'], disableSignUp: !options.registrationEnabled },
     } : {},
   })
 }

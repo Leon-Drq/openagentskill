@@ -19,7 +19,8 @@ writeFileSync(configPath,JSON.stringify({name:'openagentskill-auth-local-test',m
   alias:{'server-only':resolve('scripts/fixtures/server-only-empty.mjs')},
   d1_databases:[{binding:'APP_DB',database_name:'auth-local-test',database_id:'00000000-0000-4000-8000-000000000000'}],
   vars:{AUTH_TEST_ONLY:'1',HOSTING_PROVIDER:'cloudflare',MIGRATION_READ_ONLY:'0',CLOUDFLARE_AUTH_ENABLED:'1',
-    AUTH_ORIGIN:'https://www.openagentskill.com',BETTER_AUTH_SECRET:crypto.randomUUID()+crypto.randomUUID()},
+    AUTH_ORIGIN:'https://www.openagentskill.com',BETTER_AUTH_SECRET:crypto.randomUUID()+crypto.randomUUID(),
+    GITHUB_OAUTH_CLIENT_ID:'synthetic-client-id',GITHUB_OAUTH_CLIENT_SECRET:'synthetic-client-secret'},
 },null,2),{mode:0o600})
 for(const file of ['0001_commerce.sql','0002_auth.sql']) {
   try {
@@ -35,6 +36,15 @@ try {
   const call = (path,body,headers={}) => worker.fetch('http://localhost'+path,{
     method:body?'POST':'GET',headers:{origin:'https://www.openagentskill.com','content-type':'application/json',
       'cf-connecting-ip':'192.0.2.10',...headers},...(body?{body:JSON.stringify(body)}:{})})
+  const social = await call('/api/auth/sign-in/social',{provider:'github',callbackURL:'https://www.openagentskill.com/auth/complete?next=%2Fprofile'})
+  assert.equal(social.status,200)
+  const authorization = new URL((await social.json()).url)
+  assert.equal(authorization.origin,'https://github.com')
+  assert.equal(authorization.searchParams.get('scope'),'user:email')
+  assert.equal(authorization.searchParams.get('redirect_uri'),'https://www.openagentskill.com/api/auth/callback/github')
+  assert.equal(authorization.searchParams.get('code_challenge_method'),'S256')
+  assert.ok(authorization.searchParams.get('state'))
+  assert.ok(social.headers.getSetCookie().some(cookie=>/HttpOnly/i.test(cookie)&&/Secure/i.test(cookie)))
   assert.equal((await call('/test-seed',{legacyHash:await hash('native-synthetic-password',10)})).status,200)
   const login = await call('/api/auth/sign-in/email',{email:'native@example.invalid',password:'native-synthetic-password'})
   assert.equal(login.status,200,await login.clone().text())
@@ -51,7 +61,7 @@ try {
   assert.equal(attempts.filter(r=>r.status===429).length,7)
   const report = {at:new Date().toISOString(),runtime:'workerd',database:'local D1 binding',
     legacyPasswordLogin:true,scryptPasswordLogin:true,sessionRead:true,atomicPasswordRevocation:true,
-    concurrentRateLimit:true,externalRequests:0,syntheticOnly:true}
+    concurrentRateLimit:true,githubAuthorizationStart:true,existingGithubScopesOnly:true,externalRequests:0,syntheticOnly:true}
   writeFileSync(resolve(directory,'report.json'),JSON.stringify(report,null,2))
   console.log(JSON.stringify(report))
 } finally { await worker?.stop() }
