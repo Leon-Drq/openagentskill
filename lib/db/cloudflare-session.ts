@@ -1,6 +1,6 @@
 import 'server-only'
 import { headers } from 'next/headers'
-import { createClient, AuthError } from '@supabase/supabase-js'
+import { createClient, AuthSessionMissingError } from '@supabase/supabase-js'
 import { readCloudflareUser } from '@/lib/auth/cloudflare-session'
 import type { AuthEnvironment } from '@/lib/auth/cloudflare-handler'
 import { type ReadDatabase } from './cloudflare-read'
@@ -16,6 +16,6 @@ export async function createCloudflareSessionClient() {
     global:{fetch:createD1UserFetch(env.APP_DB,user?.id || null)},
   })
   client.auth.getUser = async () => user ? { data:{user}, error:null }
-    : { data:{user:null}, error:new AuthError('Sign in required',401,'session_missing') }
+    : { data:{user:null}, error:new AuthSessionMissingError() }
   return client
 }

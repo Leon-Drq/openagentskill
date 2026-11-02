@@ -4,12 +4,14 @@ import { getCloudflareContext } from '@opennextjs/cloudflare'
 import { compileRead, createD1ReadFetch, type ReadDatabase } from './cloudflare-read'
 import { createD1OrderTransactions, type CommerceDatabase } from '@/lib/payments/cloudflare-orders'
 import schema from './cloudflare-schema.json'
+import {recordD1Download} from './cloudflare-downloads'
 
 type Database = ReadDatabase & CommerceDatabase
 const service = {userId:null,service:true} as const
 const writable: Record<string,string[]> = {
   commerce_customers:['user_id','livemode'],commerce_orders:['id'],commerce_subscriptions:['stripe_subscription_id'],
   commerce_webhook_events:['id'],commerce_releases:['id'],showcase_entries:['slug'],
+  skill_events:['id'],
 }
 const fields=schema as Record<string,Record<string,string>>
 const quoted=(name:string)=>{if(!/^[a-z_][a-z0-9_]*$/.test(name))throw new Error('invalid_identifier');return `"${name}"`}
@@ -54,6 +56,10 @@ export function createD1ServiceFetch(db: Database): typeof fetch {
       if(!path)return failure(404)
       const name=path[2]
       if(path[1]){
+        if(['record_skill_download','record_skill_download_action'].includes(name)){
+          if(method!=='POST')return failure(405)
+          return Response.json(await recordD1Download(db,name,body||{}),{headers})
+        }
         if(name.startsWith('commerce_')){
           if(method!=='POST')return failure(405)
           const result=await orders.rpc(name,body||{})

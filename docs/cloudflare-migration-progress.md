@@ -66,6 +66,14 @@ authentication implementation. Neon is not being provisioned.
   reconciliation, remaining background/publication transactions and full deployed
   business-flow checks must be completed before production DNS moves. Passing
   isolated tests is not evidence of a completed production migration.
+- Telemetry migration 0006 ports atomic browser-event aggregates and the download
+  receipt ledger. Corrections, deletions, UTC day boundaries, failed-batch rollback
+  and execution receipt uniqueness are covered by real SQLite and native D1
+  checks. Migration 0007 ports feedback aggregates, source quality scoring,
+  publication counters and immutable owner-publication history. Public feedback
+  can award only the existing author's fixed reward; callers cannot select the
+  recipient or amount. Test/browser feedback remains excluded from execution
+  download counts. Both migrations are applied only after historical import.
 
 ### Business database continuation — November 3 (Asia/Shanghai)
 

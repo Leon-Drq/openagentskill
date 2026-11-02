@@ -41,7 +41,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     // writing the private ledger; do not store URLs, commands or IP addresses.
     if (authError && authError.name !== 'AuthSessionMissingError') throw authError
     const userId = user && !user.is_anonymous ? user.id : null
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
+    const secret = process.env.HOSTING_PROVIDER === 'cloudflare' ? process.env.PACKAGE_DOWNLOAD_SECRET
+      : process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
     if (!secret) throw new Error('download_metrics_unavailable')
     const visitorKey = userId ? null : createHmac('sha256', secret).update(`skill-download:${parsed.data.sessionId}`).digest('hex')
     const { error } = await createAdminClient({ requestTimeoutMs: 3000, circuitScope: 'telemetry' }).rpc('record_skill_download_action', {

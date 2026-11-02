@@ -17,7 +17,7 @@
     "cf:build": "node scripts/build-cloudflare.mjs",
     "cf:preview": "opennextjs-cloudflare preview",
     "cf:deploy:staging": "opennextjs-cloudflare deploy",
-    "test:cloudflare": "node --experimental-strip-types --test scripts/test-cloudflare.mjs scripts/test-r2-og-storage.mjs scripts/test-cloudflare-export.mjs scripts/test-cloudflare-rehearsal.mjs && node scripts/test-cloudflare-ai.mjs && node --experimental-strip-types scripts/test-cloudflare-analysis-ledger.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-orders.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-auth.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-business.mjs && pnpm test:cloudflare-account",
+    "test:cloudflare": "node --experimental-strip-types --test scripts/test-cloudflare.mjs scripts/test-r2-og-storage.mjs scripts/test-cloudflare-export.mjs scripts/test-cloudflare-rehearsal.mjs && node scripts/test-cloudflare-ai.mjs && node --experimental-strip-types scripts/test-cloudflare-analysis-ledger.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-orders.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-auth.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-business.mjs && pnpm test:cloudflare-account && pnpm test:cloudflare-telemetry",
     "start": "next start",
     "seed:popular": "node scripts/seed-popular-skills.ts",
     "indexer:backfill": "node scripts/backfill-high-star-skills.mjs",
@@ -81,7 +81,8 @@
     "test:downloads": "node scripts/test-downloads.mjs",
     "test:cost-reduction": "node --import ./scripts/test-typescript-register.mjs scripts/test-cost-reduction.mjs && node --import ./scripts/test-typescript-register.mjs scripts/test-browse-cache.mjs && node --import ./scripts/test-typescript-register.mjs scripts/test-alternatives-cache.mjs",
     "test:cloudflare-business": "node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-business.mjs",
-    "test:cloudflare-account": "node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-session.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-browser.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-writes.mjs"
+    "test:cloudflare-account": "node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-session.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-browser.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-writes.mjs",
+    "test:cloudflare-telemetry": "node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-telemetry.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

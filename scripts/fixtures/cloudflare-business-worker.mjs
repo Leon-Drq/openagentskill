@@ -5,6 +5,7 @@ import { cloudflareAccountData, cloudflareAccountSession } from '../../lib/auth/
 import { hashPassword } from 'better-auth/crypto'
 import { createD1ServiceFetch } from '../../lib/db/cloudflare-service.ts'
 import { createD1UserFetch } from '../../lib/db/cloudflare-user-write.ts'
+import { createD1PublicFetch } from '../../lib/db/cloudflare-public-write.ts'
 
 const worker = {
   async fetch(request, env) {
@@ -36,10 +37,18 @@ const worker = {
       const linked=order?await service.from('commerce_orders').update({stripe_session_id:'cs_native'}).eq('id',order.id).or('stripe_session_id.is.null,stripe_session_id.eq.cs_native').select('id,stripe_session_id,livemode').single():null
       const completed=order?await service.rpc('commerce_complete_order',{p_order:order.id,p_session:'cs_native',p_intent:'pi_native',p_subscription:null,p_paid_at:now}):null
       const paid=order?await service.from('commerce_orders').select('status').eq('id',order.id).single():null
+      const publicWriter=client(createD1PublicFetch(db))
+      const event=await publicWriter.from('skill_events').insert({skill_slug:'native-public',event_type:'view',metadata:{},source:'web',is_verified:false})
+      const eventStats=(await db.prepare("SELECT views FROM skill_event_stats WHERE skill_slug='native-public'").all()).results[0]
+      const receipt=await service.rpc('record_skill_download',{p_user_id:id,p_slug:'native-public',p_sha256:'a'.repeat(64),p_kind:'paid-file'})
+      const feedback=await publicWriter.rpc('record_agent_feedback',{p_skill_slug:'native-public',p_agent_id:'fixture-native',p_success:true,p_latency_ms:250})
+      const score=(await db.prepare("SELECT quality_score FROM skills WHERE slug='native-public'").all()).results[0]
       const checks={login:login.status===200,session:state.user?.id===id,profileCreated:(await db.prepare('SELECT id FROM profiles WHERE id=?').bind(id).all()).results.length===1,
         bookmark:save.status===204&&Array.isArray(rows)&&rows.length===1&&rows[0].user_id===id,
         profileSave:!profile.error&&locked.error?.code==='HANDLE_LOCKED',vote:!vote.error&&!counts.error&&counts.data.length===1&&counts.data[0].likes===1,
         commerce:!reserved.error&&!linked?.error&&linked?.data?.livemode===false&&!completed?.error&&paid?.data?.status==='paid',
+        telemetry:!event.error&&eventStats?.views===1,download:!receipt.error&&receipt.data===1,
+        feedback:!feedback.error&&feedback.data.success===true&&score?.quality_score===33.5,
         renewal:renewal.headers.getSetCookie().some(c=>c.includes('oas.session_token=')),privateCache:renewal.headers.get('cache-control')==='private, no-store'}
       return Response.json({passed:Object.values(checks).every(Boolean),checks},{status:Object.values(checks).every(Boolean)?200:500})
     }
