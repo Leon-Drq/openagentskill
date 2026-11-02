@@ -11,8 +11,8 @@ production migration.
 
 - Account: `113e589daada01e37bfd43cfb4763aab`.
 - Read-only staging: https://openagentskill-migration.qudongqi2023.workers.dev.
-  Commit `7ef7c69`, Worker version `104c276b-1e7d-41a0-9054-64f519f060c0`.
-  No custom domain attached. All 11 remote routing/isolation checks pass; the
+  Commit `8fb04a8`, Worker version `cd9bf72d-8e78-449e-bdf3-8ee3b002e14f`.
+  No custom domain attached. All 14 remote routing/isolation checks pass; the
   actual homepage also loads in Chrome.
 - D1 cache metadata database created: `openagentskill-migration-tags`, ID
   `5edf8538-ca0a-44b3-ba6b-2ce8c26e000c`. This contains cache invalidation metadata,
@@ -22,8 +22,10 @@ production migration.
   It uses atomic conditional reservations and integer microdollars, retaining
   the rolling 100-call/$2 caps, failure cooldown and seven-day cache. Real D1
   concurrent tests verified one reservation for 12 identical requests and the
-  shared spend ceiling under 30 different concurrent requests. Synthetic rows
-  were removed and the ledger is empty; no production reviews were rewritten.
+  shared spend ceiling under 30 different concurrent requests. Those synthetic
+  rows were removed. One completed native-binding inference probe remains in
+  the ledger with its $0.005 reservation; actual inference audit is retained.
+  No production reviews were rewritten.
 - Workers Paid and R2 are activated. Four private R2 buckets are created:
   `openagentskill-migration-cache`, `openagentskill-migration-images`, and
   `openagentskill-migration-packages` and `openagentskill-migration-backups`.
@@ -37,7 +39,9 @@ production migration.
   artifact. Windows OpenNext packaging encounters copied symlink access errors.
 - `pnpm cf:build` uses the same maintenance flags as the staging Worker, so static
   pages and runtime routes agree about the database outage.
-- `pnpm cf:preview` starts the Workers runtime with local resource emulation.
+- `pnpm cf:preview` starts the Workers runtime with local cache emulation; the
+  AI binding requires Cloudflare authentication, even while the app keeps AI off.
+  Public CI uses the credential-free config described below.
 - `pnpm cf:deploy:staging` targets staging only. No production deploy script or
   domain binding is enabled in this branch yet.
 - Cloudflare Web Analytics is configured for `www.openagentskill.com`, site
@@ -54,6 +58,10 @@ production migration.
   expires 2027-11-02, and passed repository and code-search API checks. The
   existing deployment/production GitHub credentials are unchanged. The local
   copy and other recovered/generated credentials use Windows user encryption.
+- A new independent `OWNER_PUBLISH_TOKEN` is installed for the future Cloudflare
+  owner endpoint, bringing staging to six migration-only secrets. The original
+  `.env.owner.local` was not read, copied, exported or changed. Updating the owner
+  client belongs to cutover; no publication was performed by this migration.
 - Cache lifecycle rules expire ISR cache objects after 30 days and generated
   image cache objects after seven days. Packages and source backups have no
   expiry rule. The existing incomplete-upload cleanup rules are preserved.
@@ -75,6 +83,17 @@ Activation and replacing scanned IP records with verified final targets remain p
 
 ## Verified migration rehearsal
 
+- Linux run `41462806365` for deployed commit `8fb04a8` passed lint, typecheck,
+  links, all regression suites, Cloudflare tests, production build, Worker
+  packaging and all 14 workerd cases. Dependency review and CodeQL also passed.
+  The exact portable artifact was deployed without rebundling on Windows;
+  423 cache entries were populated. All 14 cases passed against the real
+  staging URL, and Chrome confirmed the homepage and dated pause notice.
+  All six migration secrets survived deployment. Runtime bindings include
+  private R2, D1, AI and the self-reference service; paid/review writes and
+  schedules remain off. A project-local Corepack pnpm shim was used for OpenNext
+  cache population because the desktop's fallback pnpm wrapper attempted to
+  reinstall dependencies. It changes no global installation or user settings.
 - Linux run `41451477946` for commit `7ef7c69` passed lint, typecheck, links, the
   complete regression suite, Cloudflare tests, build, packaging and all 11
   workerd runtime cases. The smoke harness uses `localhost`: NextURL normalizes
@@ -84,7 +103,8 @@ Activation and replacing scanned IP records with verified final targets remain p
   separately found vulnerable transitive glob/undici versions in the migration
   tools. Same-major patched versions are now pinned by narrow pnpm overrides:
   glob 10.5.0, undici 6.29.1/7.30.1. Dependency review passed for `c63c8bf` and
-  `7a2ed1c`; the next deployed artifact must still pass its complete build checks.
+  `7a2ed1c`, and the final deployed `8fb04a8` passed both dependency review and
+  its complete build checks.
 - Compatibility date is `2026-10-01`, supported by the installed workerd binary.
 - All 234 private release files have been recovered from existing local archives
   and SHA-256/size matched to the exported release records. Three Skill text files
@@ -110,8 +130,12 @@ Activation and replacing scanned IP records with verified final targets remain p
   clients receive a 60-second first-party grant bound to their account. Using
   the grant checks login and current payment again; it cannot survive a refund
   or be transferred to another account. Only an actual verified file transfer
-  records a download. These changes pass local payment/download regression tests
-  and await the next Linux build/deployment.
+  records a download. Payment/download regression tests pass. A private remote
+  Worker preview also verified the actual R2 binding with one archived release
+  of each delivery kind (package, prompt, skill instructions): all matched
+  size/hash, and invalid size, invalid hash and withdrawn releases were blocked.
+  It returned only check results, never file contents; no order/download records
+  were created. The temporary preview was stopped after verification.
 - Payment mode validation no longer depends on Vercel's environment marker:
   Cloudflare defaults to live keys only. Test keys require explicit sandbox mode
   and an isolated migration/QA workers.dev commerce origin; live keys are refused
@@ -135,21 +159,29 @@ Activation and replacing scanned IP records with verified final targets remain p
   no retries, bounded responses and rejection of incomplete output are tested.
   Two synthetic API probes used 20 input and 62 output tokens in total. The
   first 32-token cap truncated; the bounded follow-up returned the exact requested
-  text with a normal stop. No source/user data was sent. Staging keeps
-  `WORKERS_AI_ENABLED=0`; the native D1 ledger adapter is implemented and tested.
-  Local AI remote access is disabled so public CI requires no account credentials
-  and cannot incur inference costs. Before production activation, stop the old
+  text with a normal stop. A third probe used the actual Worker AI binding,
+  application adapter and D1 reservation/completion path, returning the expected
+  text with 10 input and 39 output tokens. Its audit record is retained. No
+  source/user data was sent. Staging keeps `WORKERS_AI_ENABLED=0`.
+  Wrangler 4.152 requires a remote AI binding; `ai.remote=false` cannot create a
+  local simulator. The actual config now explicitly uses `remote=true`. Public
+  runtime CI therefore derives a temporary config without the disabled AI
+  binding, asserting both AI-off and read-only flags first. Real AI binding
+  verification is separate; public CI requires no account credentials or paid
+  inference. Before production activation, stop the old
   writer and reconcile the preceding 24 hours of reservations (or wait a full
   24-hour blackout); an empty ledger must not reset an existing daily budget.
 - The normal source Data API still returns 402 with the recovered server key.
+  A fresh normal public read also returned 402 at 2026-11-02T14:38Z. Authoritative
+  DNS still reports `ns1.vercel-dns.com` and `ns2.vercel-dns.com`.
   The shared Supabase organization's billing cycle is October 10–November 10;
   its spending cap remains on. Five projects share the integration, so do not
   cancel the organization or Vercel Marketplace integration as a site cleanup.
 
 ## Pending before production
 
-1. Build/deploy the private R2 delivery adapter, then validate against isolated
-   test accounts and payment data once the replacement data/auth layer is ready.
+1. Validate the deployed private R2 delivery adapter against isolated test
+   accounts and payment data once the replacement data/auth layer is ready.
 2. Complete cache invalidation and business-flow validation. Public routing,
    localized maintenance responses, static assets and isolation already pass
    at the actual staging URL.
@@ -160,9 +192,9 @@ Activation and replacing scanned IP records with verified final targets remain p
    infrastructure export; retain the owner publishing authorization boundary.
 4. R2 card-cache adapter is implemented with expiry, size and abort checks; the
    Vercel speed-insights component is removed from this branch. Bind the isolated
-   image bucket and test it before production. Workers AI is implemented and
-   the account/model API is verified; validate the native binding and durable
-   business ledger before enabling actual reviews.
+   image bucket and test it before production. Workers AI, its native binding
+   and D1 budget ledger are verified. Port the surrounding review/publication
+   transactions and reconcile the prior 24-hour budget before enabling reviews.
 5. A prior authorized export was found locally at
    `artifacts/database-export-2026-10-30` in the original checkout. Its source ZIP
    SHA-256 matches the recorded checksum. A fresh read-only local inspection
