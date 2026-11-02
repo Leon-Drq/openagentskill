@@ -8,6 +8,8 @@ import {recordD1Download} from './cloudflare-downloads'
 import {recordD1Outcome} from './cloudflare-outcomes'
 import {encodeD1Value as encode,decodeD1Row as decode} from './cloudflare-values'
 import {executeD1BackgroundRPC} from './cloudflare-background'
+import {executeD1SkillChanges,skillDerivedInputs} from './cloudflare-skill-write'
+import {executeD1IndexerRPC} from './cloudflare-indexer'
 
 type Database = ReadDatabase & CommerceDatabase
 const service = {userId:null,service:true} as const
@@ -15,6 +17,9 @@ const writable: Record<string,string[]> = {
   commerce_customers:['user_id','livemode'],commerce_orders:['id'],commerce_subscriptions:['stripe_subscription_id'],
   commerce_webhook_events:['id'],commerce_releases:['id'],showcase_entries:['slug'],
   skill_events:['id'],
+  activity_feed:['id'],blog_posts:['id'],newsletter_subscribers:['id'],point_events:['id'],profiles:['id'],ranking_snapshots:['id'],
+  seo_editorial_queue:['id'],skill_audits:['skill_slug'],skill_candidates:['id'],skill_claims:['id'],skill_submissions:['id'],
+  skills:['id'],submission_validation_events:['id'],x_content_queue:['id'],
 }
 const fields=schema as Record<string,Record<string,string>>
 const quoted=(name:string)=>{if(!/^[a-z_][a-z0-9_]*$/.test(name))throw new Error('invalid_identifier');return `"${name}"`}
@@ -39,6 +44,8 @@ export function createD1ServiceFetch(db: Database): typeof fetch {
         if(method==='POST'){
           const background=await executeD1BackgroundRPC(db,name,body||{})
           if(background.handled)return Response.json(background.data,{headers})
+          const indexed=await executeD1IndexerRPC(db,name,body||{})
+          if(indexed.handled)return Response.json(indexed.data,{headers})
         }
         if(name==='record_agent_outcome'){
           if(method!=='POST')return failure(405)
@@ -75,10 +82,28 @@ export function createD1ServiceFetch(db: Database): typeof fetch {
       const projection=query.searchParams.get('select')||'*'
       if(projection!=='*'&&projection.split(',').some(k=>!Object.hasOwn(types,k)))return failure(400)
       const returning=representation?` RETURNING ${projection==='*'?'*':projection.split(',').map(quoted).join(',')}`:''
+      if(name==='skills'&&(method==='POST'||(method==='PATCH'&&body&&Object.keys(body).some(k=>skillDerivedInputs.has(k))))){
+        if(method==='PATCH'&&(![...query.searchParams.keys()].some(k=>!['select','order','limit','offset'].includes(k))||['order','limit','offset'].some(k=>query.searchParams.has(k))))return failure(400)
+        const prefer=requestHeaders.get('prefer')||'',upsert=/resolution=(merge|ignore)-duplicates/.test(prefer)
+        const conflict=url.searchParams.get('on_conflict')||'id'
+        if(!['id','slug'].includes(conflict))return failure(400)
+        let inputs=Array.isArray(body)?body:[body]
+        if(method==='PATCH'){
+          if(!body||Array.isArray(body)||Object.hasOwn(body,'id'))return failure(400)
+          const targets=await db.prepare(`SELECT id FROM skills t WHERE ${plan.where} LIMIT 51`).bind(...plan.params).all()
+          if(targets.results.length>50)return failure(400)
+          inputs=targets.results.map(r=>({...body,id:r.id}))
+        }
+        const key=method==='PATCH'?'id':conflict as 'id'|'slug'
+        const rows=inputs.length?await executeD1SkillChanges(db,inputs,method==='PATCH'?'update':upsert?'upsert':'insert',key,prefer.includes('resolution=ignore-duplicates'),method==='PATCH'?{where:plan.where,params:plan.params}:undefined):[]
+        const selected=projection==='*'?rows:rows.map(row=>Object.fromEntries(projection.split(',').map(k=>[k,row[k]])))
+        if(plan.singular&&selected.length!==1)return failure(406,'PGRST116')
+        return representation?Response.json(plan.singular?selected[0]:selected,{status:method==='POST'?201:200,headers}):new Response(null,{status:method==='POST'?201:204,headers})
+      }
       const statements=[]
       if(method==='POST'){
         const rows=Array.isArray(body)?body:[body]
-        if(!rows.length||rows.length>100)return failure(400)
+        if(!rows.length||rows.length>500)return failure(400)
         const prefer=requestHeaders.get('prefer')||'',upsert=/resolution=(merge|ignore)-duplicates/.test(prefer)
         const conflict=(url.searchParams.get('on_conflict')||primary.join(',')).split(',')
         if(conflict.some(k=>!Object.hasOwn(types,k)))return failure(400)
@@ -106,7 +131,10 @@ export function createD1ServiceFetch(db: Database): typeof fetch {
       const rows=results.flatMap(r=>r.results||[]).map(row=>decode(row,types))
       if(plan.singular&&rows.length!==1)return failure(406,'PGRST116')
       return representation?Response.json(plan.singular?rows[0]:rows,{status:method==='POST'?201:200,headers}):new Response(null,{status:method==='POST'?201:204,headers})
-    }catch{return failure()}
+    }catch(error){
+      if(error instanceof Error&&/UNIQUE constraint failed|skills_public_source_identity_key/.test(error.message))return failure(409,'23505')
+      return failure()
+    }
   }
 }
 

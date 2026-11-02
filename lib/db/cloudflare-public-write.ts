@@ -2,6 +2,7 @@ import 'server-only'
 import {createD1ReadFetch,type ReadDatabase} from './cloudflare-read'
 import {recordD1Feedback} from './cloudflare-feedback'
 import {secretBackgroundRPCs,executeD1BackgroundRPC,validIndexerSecret} from './cloudflare-background'
+import {executeD1IndexerRPC} from './cloudflare-indexer'
 
 const headers={'Cache-Control':'private, no-store'}
 const failure=(status=403,code='42501')=>Response.json({code,message:'Public operation unavailable',details:null,hint:null},{status,headers})
@@ -20,7 +21,9 @@ export function createD1PublicFetch(db:ReadDatabase):typeof fetch {
     if(typeof init?.body!=='string'||init.body.length>500000)return failure(400)
     const args=JSON.parse(init.body)
     if(!validIndexerSecret(args.p_server_secret))return failure()
-    const result=await executeD1BackgroundRPC(db,rpc,args)
+    let result=await executeD1BackgroundRPC(db,rpc,args)
+    if(!result.handled)result=await executeD1IndexerRPC(db,rpc,args)
+    if(!result.handled)return failure(503,'D1_RPC_NOT_MIGRATED')
     return Response.json(result.data,{headers})
    }catch{return failure(503,'D1_BACKGROUND_FAILED')}
   }

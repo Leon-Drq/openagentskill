@@ -51,6 +51,11 @@ const worker = {
       const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10)
       await db.prepare("INSERT INTO skill_events_daily(skill_slug,event_date,views) VALUES ('native-public',?,10)").bind(yesterday).all()
       const trending=await service.rpc('get_trending_activity_candidates',{window_end:new Date().toISOString().slice(0,10)})
+      const insertedSkill=await service.from('skills').insert({slug:'native-write',name:'Image generation skill',description:'Generate an image',author_name:'Fixture',repository:'https://example.invalid',github_repo:'fixture/native-write',category:'image',license:'MIT',ai_review_approved:true}).select('id,primary_category').single()
+      const changedSkill=await service.from('skills').update({name:'Document processing skill',category:'document-processing'}).eq('slug','native-write').select('id,primary_category').single()
+      const assertions=(await db.prepare('SELECT count(*) n FROM d1_write_guards').all()).results[0]?.n
+      const indexed=await service.rpc('upsert_indexed_skill',{p_server_secret:env.INDEXER_SECRET,p_skill:{slug:'native-indexed',name:'Video fixture skill',description:'Video',author_name:'Fixture',github_repo:'fixture/indexed',repository:'https://example.invalid',category:'video'},p_activity:{metadata:{test:true}}})
+      const version=await service.rpc('record_skill_source_version',{p_server_secret:env.INDEXER_SECRET,p_skill_slug:'native-indexed',p_source_content_hash:'a'.repeat(64),p_source_path:'skills/video/SKILL.md',p_license:'MIT',p_metadata:{test:true}})
       const checks={login:login.status===200,session:state.user?.id===id,profileCreated:(await db.prepare('SELECT id FROM profiles WHERE id=?').bind(id).all()).results.length===1,
         bookmark:save.status===204&&Array.isArray(rows)&&rows.length===1&&rows[0].user_id===id,
         profileSave:!profile.error&&locked.error?.code==='HANDLE_LOCKED',vote:!vote.error&&!counts.error&&counts.data.length===1&&counts.data[0].likes===1,
@@ -60,6 +65,8 @@ const worker = {
         outcome:!outcome.error&&outcomeStats?.total_outcomes===1&&outcomeStats?.verified_installs===1&&outcomeStats?.avg_output_quality===4,
         projection:!projection.error&&projection.data?.slug==='native-public'&&projection.data?.logo===null&&projection.count===1,
         background:!run.error&&run.data?.metadata?.test===true&&!coverage.error&&coverage.data?.installable_skills===1&&!trending.error&&trending.data?.[0]?.activity?.views===10,
+        catalogWrite:!insertedSkill.error&&!changedSkill.error&&insertedSkill.data?.id===changedSkill.data?.id&&changedSkill.data?.primary_category==='document-processing'&&assertions===0,
+        indexer:!indexed.error&&indexed.data?.created===true&&!version.error&&version.data?.changed===false&&version.data?.license_status==='detected',
         renewal:renewal.headers.getSetCookie().some(c=>c.includes('oas.session_token=')),privateCache:renewal.headers.get('cache-control')==='private, no-store'}
       return Response.json({passed:Object.values(checks).every(Boolean),checks},{status:Object.values(checks).every(Boolean)?200:500})
     }

@@ -82,7 +82,7 @@
     "test:cost-reduction": "node --import ./scripts/test-typescript-register.mjs scripts/test-cost-reduction.mjs && node --import ./scripts/test-typescript-register.mjs scripts/test-browse-cache.mjs && node --import ./scripts/test-typescript-register.mjs scripts/test-alternatives-cache.mjs",
     "test:cloudflare-business": "node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-business.mjs",
     "test:cloudflare-account": "node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-session.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-browser.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-writes.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-mail.mjs",
-    "test:cloudflare-telemetry": "node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-telemetry.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-outcomes.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-background.mjs"
+    "test:cloudflare-telemetry": "node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-telemetry.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-outcomes.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-background.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-skill-write.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-cloudflare-indexer.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

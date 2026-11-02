@@ -4,7 +4,7 @@ import type {ReadDatabase} from './cloudflare-read'
 import schema from './cloudflare-schema.json'
 import {encodeD1Value,decodeD1Row} from './cloudflare-values'
 
-export const secretBackgroundRPCs=new Set(['record_indexer_run','list_indexer_runs','update_skill_github_metadata'])
+export const secretBackgroundRPCs=new Set(['record_indexer_run','list_indexer_runs','update_skill_github_metadata','upsert_indexed_skill','record_skill_source_version'])
 export function validIndexerSecret(value:unknown) {
  const expected=process.env.INDEXER_SECRET
  if(!expected||typeof value!=='string'||value.length>1024)return false
