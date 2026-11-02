@@ -51,6 +51,12 @@ do not disable payment/session freshness checks to reduce cost.
   seven rate limited). A separate workerd run with a native local D1 binding
   passed legacy/scrypt login, session lookup, atomic revocation and concurrency.
   The runtime test sends no external email/OAuth request and uses synthetic data.
+- Additional handler tests capture email in memory, verify confirmation and
+  one-time password reset, and simulate GitHub's token/profile responses.
+  A renamed GitHub account still resolves to its archived UUID; a different
+  numeric GitHub subject cannot take over that account using the same email.
+  OAuth tokens are stored encrypted. Real provider login/email delivery is
+  still a separate production prerequisite.
 
 This is an authentication migration foundation, not a production cutover.
 Business routes and UI still use their old auth/data clients. Transactional

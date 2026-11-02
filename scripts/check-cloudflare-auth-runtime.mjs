@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { mkdtempSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
@@ -9,6 +9,7 @@ import { unstable_dev } from 'wrangler'
 // No account ID, remote binding, real email delivery or production secrets.
 // Each run owns a new persistent directory; completed evidence is retained.
 process.env.WRANGLER_SEND_METRICS = 'false'
+mkdirSync(resolve('.codex-tmp'),{recursive:true})
 const directory = mkdtempSync(resolve('.codex-tmp/auth-runtime-'))
 const configPath = resolve(directory,'wrangler.json')
 const persistTo = resolve(directory,'state')
