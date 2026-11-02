@@ -14,7 +14,7 @@ Official prices checked November 2 UTC:
 | --- | --- | --- |
 | Cloudflare D1 with Workers Paid | 5 GB total storage, 25 billion rows read and 50 million rows written per month included; excess storage $0.75/GB-month, reads $0.001/million and writes $1/million | Selected. Database incremental charge is zero within these account-level allowances. Workers compute is billed separately. Index maintenance also counts as writes. |
 | Neon Launch | $0.106/CU-hour, $0.35/GB-month storage | Preserves PostgreSQL semantics with less rewriting. A continuously active 0.25–1 CU compute for 730 hours is $19.35–$77.38, before storage/history/extra services. Autosuspend can lower this, higher load can increase it. |
-| Supabase Pro | From $25/month, first project included; 250 GB uncached egress then $0.09/GB | Current service is quota-restricted; retaining it would not meet the owner's complete Cloudflare preference. Other projects share the organization, which must not be cancelled as site cleanup. |
+| Supabase Pro | From $25/month, first project included; 250 GB uncached egress then $0.09/GB | Temporarily restored with owner-authorized overage billing while migration continues. Retaining it permanently would not meet the owner's complete Cloudflare preference. Other projects share the organization, which must not be cancelled as site cleanup. |
 
 Sources: [D1 pricing](https://developers.cloudflare.com/d1/platform/pricing/),
 [Neon pricing](https://neon.com/pricing),
@@ -79,5 +79,8 @@ production state without a final consistent export and single-writer cutover.
 
 The gated implementation from `85385e6` is deployed to the read-only staging
 Worker after [full CI run 41478608665](https://github.com/Leon-Drq/openagentskill/actions/runs/41478608665).
-All 14 remote route checks and two explicit auth-isolation probes passed. No
-production DNS, Supabase spending cap, auth provider or Vercel billing changed.
+All 14 remote route checks and two explicit auth-isolation probes passed. That
+staging deployment did not change production DNS, the spending cap or auth.
+The owner subsequently authorized temporarily disabling the Supabase spending
+cap and restoring the existing Vercel site. See the production-recovery section
+in `docs/cloudflare-migration-progress.md`; the full D1 cutover remains pending.

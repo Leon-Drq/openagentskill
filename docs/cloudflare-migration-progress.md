@@ -2,15 +2,39 @@
 
 Source: `5bd3323`, branch `codex/cloudflare-migration`. Started 2026-11-02.
 
-This branch prepares a read-only Cloudflare staging deployment. Production DNS,
-Vercel deployments, billing, cron schedules, database and authentication remain
-unchanged until the corresponding cutover checks pass. This is not a completed
-production migration.
+This branch prepares a read-only Cloudflare staging deployment. Production DNS
+has not moved to Cloudflare. The existing Vercel/Supabase site was separately
+restored as described below. This is not a completed production migration.
 
 On November 3 (Asia/Shanghai), the owner explicitly selected D1 for the full
 database migration after evaluating a PostgreSQL/Neon alternative. See
 `docs/database-migration-decision.md` for pricing assumptions and the new gated
 authentication implementation. Neon is not being provisioned.
+
+## Existing production service restored — November 3 (Asia/Shanghai)
+
+- The owner explicitly authorized temporarily disabling the shared Supabase
+  organization's Spend Cap to restore the existing site. The billing UI confirms
+  it is disabled. Normal source Data API reads recovered to HTTP 200 at
+  2026-11-02T16:31Z. Revisit the temporary billing exception after migration or
+  quota renewal; do not assume a fixed overage bill or automatically re-enable a
+  cap while the source still needs above-quota service.
+- Removed only the Production `SUPABASE_DATA_PAUSED` environment variable and
+  rebuilt the existing production commit `5bd3323265dd049a15b3d4689e2d782fb010e004`.
+  Deployment `dpl_9ZwKG7sQKXN55gTvWBS8rw9gtk9G` is READY and serves the real
+  custom domain. The Cloudflare staging isolation flags remain unchanged.
+- Twelve production checks passed: home, directory, English/Chinese searches,
+  a live database skill detail, login/membership pages, exact registry lookup,
+  purchase readiness and anonymous/signature protections. GitHub login completed
+  with `connected=github`; the private workspace, saved skills and existing
+  purchase records loaded in the browser. No live payment was initiated.
+- The exact production commit already passed full CI; the new deployment build
+  also passed. Targeted maintenance, payments and download regressions passed.
+  A bounded error/fatal log query for the new deployment returned no groups.
+  This is point-in-time recovery evidence, not a long-term cost measurement.
+- The October 30 migration archive is still historical. Production writes have
+  resumed on Supabase, so a fresh consistent export and final reconciliation are
+  required before D1 becomes authoritative. Keep the single-writer cutover gate.
 
 ## Resources and build
 
@@ -258,11 +282,11 @@ Activation and replacing scanned IP records with verified final targets remain p
   inference. Before production activation, stop the old
   writer and reconcile the preceding 24 hours of reservations (or wait a full
   24-hour blackout); an empty ledger must not reset an existing daily budget.
-- The normal source Data API still returns 402 with the recovered server key.
+- Before the recovery above, the normal source Data API returned 402 with the recovered server key.
   A fresh normal public read also returned 402 at 2026-11-02T16:12Z. Authoritative
   DNS still reports `ns1.vercel-dns.com` and `ns2.vercel-dns.com`.
   The shared Supabase organization's billing cycle is October 10–November 10;
-  its spending cap remains on. Five projects share the integration, so do not
+  its spending cap was on before the owner-authorized recovery. Five projects share the integration, so do not
   cancel the organization or Vercel Marketplace integration as a site cleanup.
 
 ## Pending before production
@@ -292,9 +316,9 @@ Activation and replacing scanned IP records with verified final targets remain p
    SQL INSERT would exceed 100 KB. Maximum column count is 66 (D1 limit 100).
    This is an October 30 per-table archive, not a current transaction snapshot.
    It includes 234 Storage metadata records but no file payloads. Keep all private
-   archives outside Git and build artifacts. The normal source Data API still
-   returns HTTP 402. Final reconciliation and file transfer need service recovery
-   or an approved backup path; do not bypass provider restrictions or remove limits.
+   archives outside Git and build artifacts. The normal source Data API has now
+   recovered. Final reconciliation still needs a fresh consistent export; do not
+   treat the historical per-table archive as current production state.
 6. Port and validate database/auth/payment semantics, reconcile row/object counts,
    checksums, relationships and ownership. Existing PostgreSQL RPCs, RLS and
    transactions cannot be copied unchanged into SQLite/D1.
