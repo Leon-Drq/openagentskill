@@ -14,10 +14,11 @@ writeFileSync(configPath,JSON.stringify({name:'openagentskill-business-local-tes
   compatibility_date:'2026-10-01',compatibility_flags:['nodejs_compat'],workers_dev:false,
   alias:{'server-only':resolve('scripts/fixtures/server-only-empty.mjs')},
   d1_databases:[{binding:'APP_DB',database_name:'business-local-test',database_id:'00000000-0000-4000-8000-000000000000'}],
-  vars:{BUSINESS_TEST_ONLY:'1'},
+  vars:{BUSINESS_TEST_ONLY:'1',HOSTING_PROVIDER:'cloudflare',MIGRATION_READ_ONLY:'0',CLOUDFLARE_AUTH_ENABLED:'1',
+    AUTH_ORIGIN:'https://www.openagentskill.com',BETTER_AUTH_SECRET:crypto.randomUUID()+crypto.randomUUID()},
 },null,2),{mode:0o600})
 const sqlPath = resolve(directory,'schema.sql')
-writeFileSync(sqlPath,['0001_commerce','0002_auth','0003_business','0004_catalog'].map(n=>readFileSync(resolve('cloudflare/migrations/data',`${n}.sql`),'utf8')).join('\n'))
+writeFileSync(sqlPath,['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile'].map(n=>readFileSync(resolve('cloudflare/migrations/data',`${n}.sql`),'utf8')).join('\n'))
 try {
   await promisify(execFile)(process.execPath,[resolve('node_modules/wrangler/bin/wrangler.js'),'d1','execute','APP_DB','--local','--config',configPath,'--persist-to',persistTo,'--file',sqlPath],{windowsHide:true,env:process.env})
 } catch { throw new Error('Local business schema initialization failed') }
@@ -29,6 +30,10 @@ try {
   const report = await response.json()
   assert.equal(response.status,200,JSON.stringify(report))
   assert.equal(report.passed,true)
+  const accountResponse = await worker.fetch('http://localhost/account-check',{method:'POST'})
+  const accountReport = await accountResponse.json()
+  assert.equal(accountResponse.status,200,JSON.stringify(accountReport));assert.equal(accountReport.passed,true)
+  report.account = accountReport
   writeFileSync(resolve(directory,'report.json'),JSON.stringify({at:new Date().toISOString(),runtime:'workerd',database:'local native D1 binding',...report},null,2))
   console.log(JSON.stringify(report))
 } finally { await worker?.stop() }

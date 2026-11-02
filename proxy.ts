@@ -180,7 +180,7 @@ export async function proxy(request: NextRequest) {
 
   // Public discovery pages do not need an auth lookup on every navigation.
   // Keeping this proxy lightweight makes language changes and deep links fast.
-  if (!needsSessionRefresh(pathname)) {
+  if (!needsSessionRefresh(pathname) || process.env.HOSTING_PROVIDER === 'cloudflare') {
     return initialResponse
   }
 

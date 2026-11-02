@@ -1,10 +1,48 @@
 import { createClient } from '@supabase/supabase-js'
 import { createD1ReadFetch } from '../../lib/db/cloudflare-read.ts'
+import { cloudflareAuthHandler } from '../../lib/auth/cloudflare-handler.ts'
+import { cloudflareAccountData, cloudflareAccountSession } from '../../lib/auth/cloudflare-account-api.ts'
+import { hashPassword } from 'better-auth/crypto'
+import { createD1ServiceFetch } from '../../lib/db/cloudflare-service.ts'
+import { createD1UserFetch } from '../../lib/db/cloudflare-user-write.ts'
 
 const worker = {
   async fetch(request, env) {
     if (env.BUSINESS_TEST_ONLY !== '1' || !['localhost','127.0.0.1'].includes(new URL(request.url).hostname) || request.method !== 'POST') return new Response('Unavailable',{status:503})
     const db = env.APP_DB
+    if (new URL(request.url).pathname==='/account-check') {
+      const id='80000000-0000-4000-8000-000000000001',now=new Date().toISOString(),origin=env.AUTH_ORIGIN
+      await db.batch([
+        db.prepare('INSERT INTO auth_users(id,name,email,emailVerified,createdAt,updatedAt) VALUES (?,?,?,1,?,?)').bind(id,'Native account','native-account@example.invalid',now,now),
+        db.prepare("INSERT INTO auth_accounts(id,accountId,providerId,userId,password,createdAt,updatedAt) VALUES (?,?,'credential',?,?,?,?)").bind(crypto.randomUUID(),id,id,await hashPassword('native-account-fixture-password'),now,now),
+      ])
+      const login=await cloudflareAuthHandler(new Request(origin+'/api/auth/sign-in/email',{method:'POST',headers:{origin,'content-type':'application/json','cf-connecting-ip':'192.0.2.23'},body:JSON.stringify({email:'native-account@example.invalid',password:'native-account-fixture-password'})}),env)
+      const cookie=login.headers.getSetCookie().map(c=>c.split(';')[0]).join('; ')
+      const session=await cloudflareAccountSession(new Request(origin+'/api/account/session',{headers:{cookie}}),env)
+      const state=await session.json()
+      const save=await cloudflareAccountData(new Request(origin+'/api/account/data/bookmarks',{method:'POST',headers:{origin,cookie,'content-type':'application/json'},body:JSON.stringify({user_id:id,skill_slug:'native-public'})}),'bookmarks',env)
+      const bookmarks=await cloudflareAccountData(new Request(origin+'/api/account/data/bookmarks?select=user_id,skill_slug',{headers:{cookie}}),'bookmarks',env)
+      const rows=await bookmarks.json()
+      await db.prepare('UPDATE auth_sessions SET expiresAt=? WHERE userId=?').bind(new Date(Date.now()+5*86_400_000).toISOString(),id).all()
+      const renewal=await cloudflareAccountSession(new Request(origin+'/api/account/session',{headers:{cookie}}),env)
+      const client=transport=>createClient('https://d1.internal','fixture',{auth:{persistSession:false,autoRefreshToken:false},global:{fetch:transport}})
+      const account=client(createD1UserFetch(db,id)),service=client(createD1ServiceFetch(db))
+      const profile=await account.from('profiles').upsert({id,display_name:'Native updated',username:'native-stable'})
+      const locked=await account.from('profiles').upsert({id,username:'native-renamed'})
+      const vote=await account.rpc('set_skill_vote',{target_slug:'native-public',direction:1})
+      const counts=await service.rpc('skill_vote_counts',{skill_slugs:['native-public','native-private']})
+      const reserved=await service.rpc('commerce_reserve_order',{p_user:id,p_live:false,p_plan:'lifetime',p_slug:null,p_release:null,p_amount:16900,p_customer:'cus_native',p_locale:'en',p_name:'Native fixture',p_price:null})
+      const order=reserved.data
+      const linked=order?await service.from('commerce_orders').update({stripe_session_id:'cs_native'}).eq('id',order.id).or('stripe_session_id.is.null,stripe_session_id.eq.cs_native').select('id,stripe_session_id,livemode').single():null
+      const completed=order?await service.rpc('commerce_complete_order',{p_order:order.id,p_session:'cs_native',p_intent:'pi_native',p_subscription:null,p_paid_at:now}):null
+      const paid=order?await service.from('commerce_orders').select('status').eq('id',order.id).single():null
+      const checks={login:login.status===200,session:state.user?.id===id,profileCreated:(await db.prepare('SELECT id FROM profiles WHERE id=?').bind(id).all()).results.length===1,
+        bookmark:save.status===204&&Array.isArray(rows)&&rows.length===1&&rows[0].user_id===id,
+        profileSave:!profile.error&&locked.error?.code==='HANDLE_LOCKED',vote:!vote.error&&!counts.error&&counts.data.length===1&&counts.data[0].likes===1,
+        commerce:!reserved.error&&!linked?.error&&linked?.data?.livemode===false&&!completed?.error&&paid?.data?.status==='paid',
+        renewal:renewal.headers.getSetCookie().some(c=>c.includes('oas.session_token=')),privateCache:renewal.headers.get('cache-control')==='private, no-store'}
+      return Response.json({passed:Object.values(checks).every(Boolean),checks},{status:Object.values(checks).every(Boolean)?200:500})
+    }
     const owner = '50000000-0000-4000-8000-000000000001', other = '50000000-0000-4000-8000-000000000002'
     await db.batch([
       db.prepare('INSERT INTO account_identities(id) VALUES (?),(?)').bind(owner,other),

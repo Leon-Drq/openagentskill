@@ -2,6 +2,7 @@ import 'server-only'
 
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { createResilientTimeoutFetch, type SupabaseCircuitScope } from '@/lib/supabase/resilient-fetch'
+import { createCloudflareServiceClient } from '@/lib/db/cloudflare-service'
 
 const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -15,6 +16,7 @@ export interface AdminClientOptions {
 }
 
 export function createAdminClient(options: AdminClientOptions = {}) {
+  if (process.env.HOSTING_PROVIDER === 'cloudflare' && process.env.CLOUDFLARE_DATA_ENABLED === '1') return createCloudflareServiceClient()
   const serviceKey =
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
     process.env.SUPABASE_SECRET_KEY

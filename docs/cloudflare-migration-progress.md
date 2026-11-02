@@ -38,6 +38,35 @@ authentication implementation. Neon is not being provisioned.
 
 ## Resources and build
 
+### D1 business import and account integration — November 3 (Asia/Shanghai)
+
+- The October 30 business archive is imported into the isolated APP_DB: 46
+  business tables and 1,479,842 rows. Every table was read back in full and its
+  typed semantic SHA-256 matched the local rehearsal. Foreign-key check is empty
+  and quick integrity check is `ok`. This remains historical data; it is not the
+  final production snapshot.
+- Catalog migration 0004 is applied remotely. Eligibility has 36,104 members;
+  deduplicated published directory has 36,098 rows. Search index integrity passes
+  and the same `video` query matches 1,593 rows locally and remotely. Private
+  inspection files and data exports remain ignored and outside build artifacts.
+- Account browser/server integration now uses validated Better Auth cookies and
+  first-party endpoints on the Cloudflare path. Own profile edits, bookmarks,
+  votes and session renewal are implemented. Stable public handles and verified
+  GitHub/X identities cannot be changed by profile edits. Profile creation is
+  attached to new auth users by migration 0005.
+- Private D1 service transport supports commerce reads/writes and the existing
+  order transaction implementation. The actual payment webhook processor was
+  tested with isolated D1 data and mocked Stripe responses: duplicate delivery,
+  payment completion, refunds and delayed-success protection pass. No real
+  purchase or charge was made.
+- Native workerd/D1 checks pass for catalog authorization/search plus actual
+  signed login, profile save, vote, bookmark, payment reservation/completion and
+  session renewal. Full Cloudflare regressions and TypeScript validation pass.
+- Activation flags remain disabled. Signup email delivery, final source data
+  reconciliation, remaining background/publication transactions and full deployed
+  business-flow checks must be completed before production DNS moves. Passing
+  isolated tests is not evidence of a completed production migration.
+
 ### Business database continuation — November 3 (Asia/Shanghai)
 
 - Added the 41 remaining business tables in `0003_business.sql`, preserving

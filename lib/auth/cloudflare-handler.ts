@@ -18,6 +18,24 @@ const unavailable = () => Response.json({ error: 'Authentication is temporarily 
   status: 503, headers: { 'Cache-Control': 'private, no-store', 'Retry-After': '600' },
 })
 
+export function configuredCloudflareAuth(env: AuthEnvironment) {
+  if (env.HOSTING_PROVIDER !== 'cloudflare' || env.MIGRATION_READ_ONLY === '1'
+    || env.CLOUDFLARE_AUTH_ENABLED !== '1' || !env.APP_DB || !env.AUTH_ORIGIN || !env.BETTER_AUTH_SECRET) {
+    throw new Error('Cloudflare authentication is unavailable')
+  }
+  let auth = instances.get(env)
+  if (!auth) {
+    auth = createCloudflareAuth({
+      database: env.APP_DB, origin: env.AUTH_ORIGIN, secret: env.BETTER_AUTH_SECRET,
+      github: env.GITHUB_OAUTH_CLIENT_ID && env.GITHUB_OAUTH_CLIENT_SECRET
+        ? { clientId: env.GITHUB_OAUTH_CLIENT_ID, clientSecret: env.GITHUB_OAUTH_CLIENT_SECRET } : undefined,
+      registrationEnabled: false,
+    })
+    instances.set(env, auth)
+  }
+  return auth
+}
+
 export async function cloudflareAuthHandler(request: Request, env: AuthEnvironment) {
   if (env.HOSTING_PROVIDER !== 'cloudflare' || env.MIGRATION_READ_ONLY === '1'
     || env.CLOUDFLARE_AUTH_ENABLED !== '1' || !env.APP_DB || !env.AUTH_ORIGIN || !env.BETTER_AUTH_SECRET) {
@@ -27,18 +45,9 @@ export async function cloudflareAuthHandler(request: Request, env: AuthEnvironme
   // x-forwarded-host to choose an OAuth redirect or email destination origin.
   if (new URL(request.url).origin !== env.AUTH_ORIGIN) return unavailable()
   try {
-    let auth = instances.get(env)
-    if (!auth) {
-      auth = createCloudflareAuth({
-        database: env.APP_DB, origin: env.AUTH_ORIGIN, secret: env.BETTER_AUTH_SECRET,
-        github: env.GITHUB_OAUTH_CLIENT_ID && env.GITHUB_OAUTH_CLIENT_SECRET
-          ? { clientId: env.GITHUB_OAUTH_CLIENT_ID, clientSecret: env.GITHUB_OAUTH_CLIENT_SECRET } : undefined,
-        // Signup stays disabled until transactional email and profile creation
-        // are integrated and verified. Existing confirmed accounts can sign in.
-        registrationEnabled: false,
-      })
-      instances.set(env, auth)
-    }
+    // Signup stays disabled until transactional email and profile creation
+    // are integrated and verified. Existing confirmed accounts can sign in.
+    const auth = configuredCloudflareAuth(env)
     const response = await auth.handler(request)
     response.headers.set('Cache-Control', 'private, no-store')
     return response

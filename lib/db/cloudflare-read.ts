@@ -5,7 +5,8 @@ export interface ReadDatabase {
   prepare(sql: string): { bind(...values: unknown[]): { all(): Promise<{ results: Record<string, unknown>[] }> } }
   batch(statements: unknown[]): Promise<{ results: Record<string, unknown>[] }[]>
 }
-export type ReadPrincipal = { userId: string | null }
+// service is set only by the private server factory, never from request data.
+export type ReadPrincipal = { userId: string | null; service?: boolean }
 type Codecs = Record<string, string>
 const tables: Record<string, Codecs> = { ...schema, skill_directory_entries: schema.skills, user_points: { user_id: 'uuid', total_points: 'int4' } }
 const publicTables = new Set(['activity_feed','blog_posts','skill_relations','skill_stats','ranking_snapshots','profiles',
@@ -42,6 +43,7 @@ function split(source: string, separator = ','): string[] {
 }
 const unquote = (text: string) => text.startsWith('"') ? JSON.parse(text) as string : text
 function readPolicy(table: string, user: ReadPrincipal, bind: (value: unknown) => string) {
+  if (user.service) return '1'
   if (table === 'skills' || table === 'skill_directory_entries') return publication
   if (publicTables.has(table)) return '1'
   if (ownTables.has(table)) return user.userId ? `t.user_id = ${bind(user.userId)}` : '0'
@@ -77,11 +79,13 @@ export function compileRead(input: { url: URL; method: string; headers: Headers;
       defaultLimit = Math.min(200, Math.max(1, Math.floor(Number(args.p_limit) || 120)))
       clauses.push(search ? `t.rowid IN (SELECT rowid FROM skills_fts WHERE skills_fts MATCH ${bind(search)})` : '0')
       defaultOrder = 't.quality_score DESC NULLS FIRST,t.slug ASC'
+      clauses.push(publication)
       table = 'skills'
     } else if (table === 'lookup_public_skill_name') {
       if (typeof args.p_name !== 'string') throw new QueryError('Invalid lookup name')
       const name = args.p_name.trim().slice(0,180)
       clauses.push(name ? `lower(t.name) = lower(${bind(name)})` : '0')
+      clauses.push(publication)
       defaultLimit = 8; defaultOrder = 't.slug ASC'; table = 'skills'
     } else if (table === 'skill_directory_by_slugs') {
       const slugs = typeof args.p_slugs === 'string' ? JSON.parse(args.p_slugs) : args.p_slugs
@@ -200,6 +204,7 @@ export function compileRead(input: { url: URL; method: string; headers: Headers;
   const offset = integer(query.get('offset'),0,1_600_000)
   const from = `FROM ${identifier(table)} t WHERE ${clauses.map(c => `(${c})`).join(' AND ')}`
   return {
+    where: clauses.map(c => `(${c})`).join(' AND '), table,
     sql: `SELECT ${selection} ${from}${ordering ? ` ORDER BY ${ordering}` : ''} LIMIT ${limit} OFFSET ${offset}`,
     countSql: `SELECT count(*) AS count ${from}`, params, offset,
     codecs: selected === '*' ? codecs : projection,
