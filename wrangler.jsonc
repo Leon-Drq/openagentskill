@@ -8,6 +8,7 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "workers_dev": true,
   "preview_urls": false,
+  "ai": { "binding": "AI" },
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "services": [
     { "binding": "WORKER_SELF_REFERENCE", "service": "openagentskill-migration" }
@@ -37,6 +38,7 @@
     "COMMERCE_CHECKOUT_ENABLED": "0",
     "COMMERCE_ENVIRONMENT": "production",
     "OG_STORAGE_ENABLED": "0",
+    "WORKERS_AI_ENABLED": "0",
     "NEXT_CACHE_DO_QUEUE_MAX_REVALIDATION": "2",
     "NEXT_CACHE_DO_QUEUE_MAX_RETRIES": "2"
   },

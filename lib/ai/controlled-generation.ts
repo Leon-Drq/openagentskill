@@ -2,6 +2,7 @@ import 'server-only'
 import { generateText } from 'ai'
 import { createHash } from 'node:crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { CLOUDFLARE_REVIEW_MODEL, cloudflareGeneration } from '@/lib/ai/cloudflare-generation'
 
 import { DeferredAnalysisError } from '@/lib/ai/deferred-analysis'
 export { DeferredAnalysisError } from '@/lib/ai/deferred-analysis'
@@ -12,15 +13,20 @@ export async function controlledGeneration(input: {
 }) {
   // Do not silently route a cost-controlled job to an unpriced premium model.
   if (input.model !== 'deepseek/deepseek-v4-flash') throw new DeferredAnalysisError('Model requires an explicit reviewed price envelope', 'model_not_priced')
+  const cloudflare = process.env.HOSTING_PROVIDER === 'cloudflare'
+  if (cloudflare && (process.env.WORKERS_AI_ENABLED !== '1' || process.env.MIGRATION_READ_ONLY === '1')) {
+    throw new DeferredAnalysisError('Cloudflare inference is not enabled', 'provider_unavailable')
+  }
   const bytes = Buffer.byteLength(input.prompt, 'utf8')
   if (bytes > 30_000) throw new DeferredAnalysisError('Analysis input exceeds the bounded context', 'input_limit')
   const maxOutputTokens = 2048
   // Conservative price envelope, NOT a supplier invoice or a supplier-side spending limit.
-  const reservationUsd = (bytes * 0.5 + maxOutputTokens * 2) / 1_000_000
-  const requestKey = createHash('sha256').update(`${input.feature}:${input.model}:${input.fingerprint}`).digest('hex')
+  const reservationUsd = ((bytes + (cloudflare ? 128 : 0)) * 0.5 + maxOutputTokens * 2) / 1_000_000
+  const providerModel = cloudflare ? CLOUDFLARE_REVIEW_MODEL : input.model
+  const requestKey = createHash('sha256').update(`${input.feature}:${providerModel}:${input.fingerprint}`).digest('hex')
   const db = createAdminClient({ requestTimeoutMs: 12_000 })
   const { data: reservation, error } = await db.rpc('reserve_skill_analysis', {
-    p_key: requestKey, p_feature: input.feature, p_model: input.model, p_reserved_usd: reservationUsd,
+    p_key: requestKey, p_feature: input.feature, p_model: providerModel, p_reserved_usd: reservationUsd,
   })
   if (error || !reservation || typeof reservation.status !== 'string') throw new DeferredAnalysisError('Analysis ledger unavailable; queued without calling model', 'database_unavailable')
   if (reservation.status === 'cached') {
@@ -32,7 +38,7 @@ export async function controlledGeneration(input: {
   }
   if (reservation.status !== 'reserved') throw new DeferredAnalysisError(`Analysis deferred: ${reservation.status}`, reservation.status === 'budget_exhausted' ? 'budget_exhausted' : 'cooldown')
   try {
-    const result = await generateText({
+    const result = cloudflare ? await cloudflareGeneration(input.prompt) : await generateText({
       model: input.model, prompt: input.prompt, temperature: 0.2,
       maxOutputTokens, maxRetries: 0, abortSignal: AbortSignal.timeout(30_000),
       providerOptions: { gateway: { tags: [`feature:${input.feature}`, 'policy:risk-first-v1'] } },

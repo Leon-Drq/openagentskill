@@ -22,7 +22,9 @@ production migration.
   `openagentskill-migration-packages` and `openagentskill-migration-backups`.
   ISR uses R2, a Durable Object queue and D1 tag invalidation. The package and
   backup buckets have no public URL or custom domain.
-- Next.js 16.3.5 and OpenNext 1.20.15. The installed adapter implements experimental
+- Next.js 16.4.3 and OpenNext 1.20.15. Next.js was upgraded from 16.3.5 to meet
+  the adapter's patched-version requirement and the October security advisory.
+  The installed adapter implements experimental
   Node middleware/proxy support; routing must be tested in workerd before cutover.
 - Linux CI builds the Worker, runs regression checks and exports the tested
   artifact. Windows OpenNext packaging encounters copied symlink access errors.
@@ -74,8 +76,8 @@ Activation and replacing scanned IP records with verified final targets remain p
   workerd cases, including localized account isolation. PR dependency review
   separately found vulnerable transitive glob/undici versions in the migration
   tools. Same-major patched versions are now pinned by narrow pnpm overrides:
-  glob 10.5.0, undici 6.29.1/7.30.1. Rebuild and dependency-review confirmation
-  are required before deploying the next artifact.
+  glob 10.5.0, undici 6.29.1/7.30.1. Dependency review passed for `c63c8bf` and
+  `7a2ed1c`; the next deployed artifact must still pass its complete build checks.
 - Compatibility date is `2026-10-01`, supported by the installed workerd binary.
 - All 234 private release files have been recovered from existing local archives
   and SHA-256/size matched to the exported release records. Three Skill text files
@@ -112,8 +114,22 @@ Activation and replacing scanned IP records with verified final targets remain p
   credentials were recovered without printing values. The sandbox key returns
   the expected QA account. No production Stripe key was found; the authenticated
   Vercel export contains `[SENSITIVE]` placeholders. The browser's existing Google
-  session advanced Stripe login to its authenticator challenge; the owner must
-  complete that challenge before provisioning a production restricted key.
+  session and owner MFA completed Stripe login. The correct production merchant
+  is selected and a dedicated restricted key is prepared with checkout/customer/
+  portal write access and payment/invoice/price/subscription read access. Stripe
+  additionally requires an authenticator check for key creation, after its email
+  verification. That second check is pending; no production key has been created
+  or installed yet and the existing Vercel key is unchanged.
+- Cloudflare inference uses the fixed Workers AI model
+  `@cf/deepseek-ai/deepseek-v4-flash-0731`, without a Vercel Gateway fallback.
+  Official pricing checked November 2 is $0.44/M input and $1.32/M output,
+  below the existing conservative reservation envelope. Provider-specific cache
+  keys, durable reservation-before-call, 2048 output tokens, 30-second abort,
+  no retries, bounded responses and rejection of incomplete output are tested.
+  Two synthetic API probes used 20 input and 62 output tokens in total. The
+  first 32-token cap truncated; the bounded follow-up returned the exact requested
+  text with a normal stop. No source/user data was sent. Staging keeps
+  `WORKERS_AI_ENABLED=0`; business inference still requires the replacement ledger.
 - The normal source Data API still returns 402 with the recovered server key.
   The shared Supabase organization's billing cycle is October 10–November 10;
   its spending cap remains on. Five projects share the integration, so do not
@@ -133,8 +149,9 @@ Activation and replacing scanned IP records with verified final targets remain p
    infrastructure export; retain the owner publishing authorization boundary.
 4. R2 card-cache adapter is implemented with expiry, size and abort checks; the
    Vercel speed-insights component is removed from this branch. Bind the isolated
-   image bucket and test it before production. Configure
-   an explicit AI provider before retiring the Vercel AI Gateway dependency.
+   image bucket and test it before production. Workers AI is implemented and
+   the account/model API is verified; validate the native binding and durable
+   business ledger before enabling actual reviews.
 5. A prior authorized export was found locally at
    `artifacts/database-export-2026-10-30` in the original checkout. Its source ZIP
    SHA-256 matches the recorded checksum. A fresh read-only local inspection
