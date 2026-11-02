@@ -43,7 +43,7 @@ jobs:
       - name: Package portable build output
         run: |
           tar --exclude='*/node_modules' --exclude='.open-next/assets' -czf cloudflare-runtime.tar.gz .open-next
-          tar -czf cloudflare-static.tar.gz .open-next/assets/_next
+          tar -czf cloudflare-static.tar.gz .open-next/assets/_next .open-next/assets/BUILD_ID
           git rev-parse HEAD > cloudflare-build-commit.txt
       - name: Upload tested build
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

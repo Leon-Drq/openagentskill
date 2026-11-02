@@ -16,7 +16,9 @@ const child = spawn(process.execPath, [cli, 'preview', '--port', '8788', '--ip',
 let exited = false
 child.on('exit', () => { exited = true })
 child.on('error', () => { exited = true })
-const base = 'http://127.0.0.1:8788'
+// NextURL canonicalizes loopback addresses to localhost. Using 127.0.0.1 in
+// Host makes OpenNext mistake same-origin rewrites for external fetches.
+const base = 'http://localhost:8788'
 const report = []
 try {
   const deadline = Date.now() + 180_000
@@ -39,6 +41,8 @@ try {
     ['/favicon-48x48.png', 200], ['/robots.txt', 200],
   ]) {
     const response = await fetch(base + path, { method, redirect: 'manual', signal: AbortSignal.timeout(30_000) })
+    report.push({ path, method, status: response.status, cache: response.headers.get('x-nextjs-cache') })
+    writeFileSync('.codex-tmp/cloudflare-smoke.json', JSON.stringify(report, null, 2))
     assert.equal(response.status, status, `${method} ${path}`)
     assert.equal(response.headers.get('Set-Cookie'), null, `No session mutation: ${path}`)
     const text = path.endsWith('.png') ? '' : await response.text()
@@ -50,7 +54,6 @@ try {
       assert.match(response.headers.get('X-Robots-Tag') || '', /noindex/)
     }
     await response.body?.cancel().catch(() => {})
-    report.push({ path, method, status, cache: response.headers.get('x-nextjs-cache') })
   }
   writeFileSync('.codex-tmp/cloudflare-smoke.json', JSON.stringify(report, null, 2))
   console.log(`Cloudflare workerd smoke checks passed: ${report.length} public/isolation cases`)
