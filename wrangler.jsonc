@@ -9,6 +9,7 @@
   "workers_dev": true,
   "preview_urls": false,
   "ai": { "binding": "AI", "remote": true },
+  "send_email": [{"name":"AUTH_EMAIL","allowed_sender_addresses":["noreply@openagentskill.com"]}],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS", "run_worker_first": ["/robots.txt"] },
   "services": [
     { "binding": "WORKER_SELF_REFERENCE", "service": "openagentskill-migration" }
@@ -47,6 +48,8 @@
     "NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN": "8632bbbce8c243bda81d1a2f4649265c",
     "MIGRATION_READ_ONLY": "1",
     "CLOUDFLARE_AUTH_ENABLED": "0",
+    "AUTH_EMAIL_ENABLED": "0",
+    "AUTH_REGISTRATION_ENABLED": "0",
     "CRON_ENABLED": "0",
     "SUPABASE_DATA_PAUSED": "1",
     "COMMERCE_CHECKOUT_ENABLED": "0",

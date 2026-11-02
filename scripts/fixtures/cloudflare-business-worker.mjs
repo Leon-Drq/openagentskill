@@ -46,6 +46,11 @@ const worker = {
       const outcome=await service.rpc('record_agent_outcome',{p_event_id:'smoke-native-outcome',p_skill_slug:'native-public',p_task:'Local runtime fixture',p_agent:'fixture-native',p_outcome:'success',p_install_used:true,p_metadata:{output_quality:4,used_in_production:true}})
       const outcomeStats=(await db.prepare("SELECT total_outcomes,verified_installs,avg_output_quality FROM agent_outcome_stats WHERE skill_slug='native-public'").all()).results[0]
       const projection=await publicWriter.from('skill_directory_entries').select('slug,logo:product_metadata->>logoUrl',{count:'exact'}).eq('slug','native-public').single()
+      const run=await service.rpc('record_indexer_run',{p_server_secret:env.INDEXER_SECRET,p_run:{mode:'native-fixture',metadata:{test:true}}})
+      const coverage=await service.rpc('refresh_registry_coverage_stats',{})
+      const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10)
+      await db.prepare("INSERT INTO skill_events_daily(skill_slug,event_date,views) VALUES ('native-public',?,10)").bind(yesterday).all()
+      const trending=await service.rpc('get_trending_activity_candidates',{window_end:new Date().toISOString().slice(0,10)})
       const checks={login:login.status===200,session:state.user?.id===id,profileCreated:(await db.prepare('SELECT id FROM profiles WHERE id=?').bind(id).all()).results.length===1,
         bookmark:save.status===204&&Array.isArray(rows)&&rows.length===1&&rows[0].user_id===id,
         profileSave:!profile.error&&locked.error?.code==='HANDLE_LOCKED',vote:!vote.error&&!counts.error&&counts.data.length===1&&counts.data[0].likes===1,
@@ -54,6 +59,7 @@ const worker = {
         feedback:!feedback.error&&feedback.data.success===true&&score?.quality_score===33.5,
         outcome:!outcome.error&&outcomeStats?.total_outcomes===1&&outcomeStats?.verified_installs===1&&outcomeStats?.avg_output_quality===4,
         projection:!projection.error&&projection.data?.slug==='native-public'&&projection.data?.logo===null&&projection.count===1,
+        background:!run.error&&run.data?.metadata?.test===true&&!coverage.error&&coverage.data?.installable_skills===1&&!trending.error&&trending.data?.[0]?.activity?.views===10,
         renewal:renewal.headers.getSetCookie().some(c=>c.includes('oas.session_token=')),privateCache:renewal.headers.get('cache-control')==='private, no-store'}
       return Response.json({passed:Object.values(checks).every(Boolean),checks},{status:Object.values(checks).every(Boolean)?200:500})
     }

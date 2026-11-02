@@ -15,7 +15,7 @@ writeFileSync(configPath,JSON.stringify({name:'openagentskill-business-local-tes
   alias:{'server-only':resolve('scripts/fixtures/server-only-empty.mjs')},
   d1_databases:[{binding:'APP_DB',database_name:'business-local-test',database_id:'00000000-0000-4000-8000-000000000000'}],
   vars:{BUSINESS_TEST_ONLY:'1',HOSTING_PROVIDER:'cloudflare',MIGRATION_READ_ONLY:'0',CLOUDFLARE_AUTH_ENABLED:'1',
-    AUTH_ORIGIN:'https://www.openagentskill.com',BETTER_AUTH_SECRET:crypto.randomUUID()+crypto.randomUUID()},
+    AUTH_ORIGIN:'https://www.openagentskill.com',BETTER_AUTH_SECRET:crypto.randomUUID()+crypto.randomUUID(),INDEXER_SECRET:'native-local-fixture-indexer-secret-only'},
 },null,2),{mode:0o600})
 const sqlPath = resolve(directory,'schema.sql')
 writeFileSync(sqlPath,['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0006_telemetry','0007_quality','0008_outcomes'].map(n=>readFileSync(resolve('cloudflare/migrations/data',`${n}.sql`),'utf8')).join('\n'))

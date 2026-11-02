@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { createCloudflareAuth, type AuthDatabase } from './cloudflare'
+import {createCloudflareAuthMailer,type AuthEmailBinding} from './cloudflare-mail'
 
 export interface AuthEnvironment {
   HOSTING_PROVIDER?: string
@@ -11,6 +12,9 @@ export interface AuthEnvironment {
   APP_DB?: AuthDatabase
   GITHUB_OAUTH_CLIENT_ID?: string
   GITHUB_OAUTH_CLIENT_SECRET?: string
+  AUTH_EMAIL_ENABLED?: string
+  AUTH_REGISTRATION_ENABLED?: string
+  AUTH_EMAIL?: AuthEmailBinding
 }
 
 const instances = new WeakMap<object, ReturnType<typeof createCloudflareAuth>>()
@@ -29,7 +33,8 @@ export function configuredCloudflareAuth(env: AuthEnvironment) {
       database: env.APP_DB, origin: env.AUTH_ORIGIN, secret: env.BETTER_AUTH_SECRET,
       github: env.GITHUB_OAUTH_CLIENT_ID && env.GITHUB_OAUTH_CLIENT_SECRET
         ? { clientId: env.GITHUB_OAUTH_CLIENT_ID, clientSecret: env.GITHUB_OAUTH_CLIENT_SECRET } : undefined,
-      registrationEnabled: false,
+      sendMail:env.AUTH_EMAIL_ENABLED==='1'&&env.AUTH_EMAIL?createCloudflareAuthMailer(env.AUTH_EMAIL,env.AUTH_ORIGIN):undefined,
+      registrationEnabled:env.AUTH_REGISTRATION_ENABLED==='1',
     })
     instances.set(env, auth)
   }
@@ -45,8 +50,7 @@ export async function cloudflareAuthHandler(request: Request, env: AuthEnvironme
   // x-forwarded-host to choose an OAuth redirect or email destination origin.
   if (new URL(request.url).origin !== env.AUTH_ORIGIN) return unavailable()
   try {
-    // Signup stays disabled until transactional email and profile creation
-    // are integrated and verified. Existing confirmed accounts can sign in.
+    // Registration has its own activation gate and requires a mail binding.
     const auth = configuredCloudflareAuth(env)
     const response = await auth.handler(request)
     response.headers.set('Cache-Control', 'private, no-store')

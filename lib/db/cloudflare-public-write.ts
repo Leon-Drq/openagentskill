@@ -1,6 +1,7 @@
 import 'server-only'
 import {createD1ReadFetch,type ReadDatabase} from './cloudflare-read'
 import {recordD1Feedback} from './cloudflare-feedback'
+import {secretBackgroundRPCs,executeD1BackgroundRPC,validIndexerSecret} from './cloudflare-background'
 
 const headers={'Cache-Control':'private, no-store'}
 const failure=(status=403,code='42501')=>Response.json({code,message:'Public operation unavailable',details:null,hint:null},{status,headers})
@@ -13,6 +14,16 @@ export function createD1PublicFetch(db:ReadDatabase):typeof fetch {
  return async(input,init)=>{
   const url=new URL(typeof input==='string'||input instanceof URL?input:input.url)
   const method=init?.method||(input instanceof Request?input.method:'GET')
+  const rpc=/^\/rest\/v1\/rpc\/([a-z_]+)$/.exec(url.pathname)?.[1]
+  if(method==='POST'&&rpc&&secretBackgroundRPCs.has(rpc)){
+   try{
+    if(typeof init?.body!=='string'||init.body.length>500000)return failure(400)
+    const args=JSON.parse(init.body)
+    if(!validIndexerSecret(args.p_server_secret))return failure()
+    const result=await executeD1BackgroundRPC(db,rpc,args)
+    return Response.json(result.data,{headers})
+   }catch{return failure(503,'D1_BACKGROUND_FAILED')}
+  }
   if(method==='POST'&&url.pathname==='/rest/v1/rpc/record_agent_feedback'){
    try{
     if(typeof init?.body!=='string'||init.body.length>20_000)return failure(400)

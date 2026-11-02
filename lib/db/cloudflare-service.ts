@@ -6,6 +6,8 @@ import { createD1OrderTransactions, type CommerceDatabase } from '@/lib/payments
 import schema from './cloudflare-schema.json'
 import {recordD1Download} from './cloudflare-downloads'
 import {recordD1Outcome} from './cloudflare-outcomes'
+import {encodeD1Value as encode,decodeD1Row as decode} from './cloudflare-values'
+import {executeD1BackgroundRPC} from './cloudflare-background'
 
 type Database = ReadDatabase & CommerceDatabase
 const service = {userId:null,service:true} as const
@@ -18,29 +20,6 @@ const fields=schema as Record<string,Record<string,string>>
 const quoted=(name:string)=>{if(!/^[a-z_][a-z0-9_]*$/.test(name))throw new Error('invalid_identifier');return `"${name}"`}
 const headers={'Cache-Control':'private, no-store'}
 const failure=(status=503,code='D1_SERVICE_UNAVAILABLE')=>Response.json({code,message:'Database operation unavailable',details:null,hint:null},{status,headers})
-function encode(value:unknown,type:string) {
-  if(value===null)return null
-  if(type==='bool'){if(typeof value!=='boolean')throw new Error('invalid_boolean');return Number(value)}
-  if(['int2','int4','int8','numeric'].includes(type)){
-    if(typeof value!=='number'||!Number.isFinite(value)||(type!=='numeric'&&!Number.isSafeInteger(value))
-      ||(type==='int2'&&(value< -32768||value>32767))||(type==='int4'&&(value< -2147483648||value>2147483647)))throw new Error('invalid_number')
-    return value
-  }
-  if(type==='jsonb'||type==='_text'){
-    if(type==='_text'&&(!Array.isArray(value)||value.some(v=>typeof v!=='string')))throw new Error('invalid_array')
-    return JSON.stringify(value)
-  }
-  if(typeof value!=='string'||value.includes('\0'))throw new Error('invalid_text')
-  if(type==='uuid'&&!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value))throw new Error('invalid_id')
-  if(type==='timestamptz'){
-    if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z$/.test(value)||!Number.isFinite(new Date(value).getTime()))throw new Error('invalid_date')
-    return value.replace(/(?:\.(\d+))?Z$/,(_,digits='')=>`.${digits.padEnd(6,'0')}Z`)
-  }
-  return value
-}
-function decode(row:Record<string,unknown>,types:Record<string,string>) {
-  return Object.fromEntries(Object.entries(row).map(([k,v])=>[k,v===null?null:types[k]==='bool'?v===1:['jsonb','_text'].includes(types[k])?JSON.parse(String(v)):v]))
-}
 
 /** Only the server's authenticated business services receive this transport.
  * Its privilege is never selectable by a browser or generic HTTP endpoint. */
@@ -57,6 +36,10 @@ export function createD1ServiceFetch(db: Database): typeof fetch {
       if(!path)return failure(404)
       const name=path[2]
       if(path[1]){
+        if(method==='POST'){
+          const background=await executeD1BackgroundRPC(db,name,body||{})
+          if(background.handled)return Response.json(background.data,{headers})
+        }
         if(name==='record_agent_outcome'){
           if(method!=='POST')return failure(405)
           return Response.json(await recordD1Outcome(db,body||{}),{headers})
