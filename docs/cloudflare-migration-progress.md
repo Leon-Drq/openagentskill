@@ -89,6 +89,10 @@ Activation and replacing scanned IP records with verified final targets remain p
   or be transferred to another account. Only an actual verified file transfer
   records a download. These changes pass local payment/download regression tests
   and await the next Linux build/deployment.
+- Payment mode validation no longer depends on Vercel's environment marker:
+  Cloudflare defaults to live keys only. Test keys require explicit sandbox mode
+  and an isolated migration/QA workers.dev commerce origin; live keys are refused
+  in that sandbox mode. No live charge is created by migration tests.
 - Project-scoped credential discovery checked 38 local configuration/setup files
   across the existing worktrees. Windows-encrypted database and Stripe sandbox
   credentials were recovered without printing values. The sandbox key returns

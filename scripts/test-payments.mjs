@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import Stripe from 'stripe'
 import { NextRequest } from 'next/server'
 import { activeMembership, singleReleaseAllowed, lifetimeOrderAllowed, validRelease, safeStripeRedirect } from '../lib/payments/policy.ts'
-import { inspectPayment, inspectMembership, inspectLifetime, checkoutConfigured } from '../lib/payments/stripe.ts'
+import { inspectPayment, inspectMembership, inspectLifetime, checkoutConfigured, paymentMode } from '../lib/payments/stripe.ts'
 import { assertSessionOrder, processStripeEvent } from '../lib/payments/webhook.ts'
 import { POST as checkoutPost } from '../app/api/payments/checkout/route.ts'
 import { POST as downloadPost } from '../app/api/payments/download/route.ts'
@@ -51,6 +51,20 @@ assert.equal(checkoutConfigured(), false, 'checkout requires the dedicated billi
 process.env.STRIPE_BILLING_PORTAL_CONFIGURATION = 'bpc_unit_fixture'
 assert.equal(checkoutConfigured(), true)
 delete process.env.COMMERCE_CHECKOUT_ENABLED
+process.env.HOSTING_PROVIDER='cloudflare'
+assert.equal(paymentMode(),null,'Cloudflare production must reject test keys without Vercel environment markers')
+process.env.STRIPE_SECRET_KEY='rk_live_unit_fixture_not_a_key'
+assert.equal(paymentMode(),true)
+process.env.COMMERCE_ENVIRONMENT='sandbox'
+process.env.COMMERCE_SITE_URL='https://openagentskill-qa.fixture.workers.dev'
+assert.equal(paymentMode(),null,'isolated QA must reject live payment keys')
+process.env.STRIPE_SECRET_KEY='sk_test_unit_fixture_not_a_key'
+assert.equal(paymentMode(),false)
+for(const site of ['https://www.openagentskill.com','http://openagentskill-qa.fixture.workers.dev','https://openagentskill-qa.fixture.workers.dev.evil.example']) {
+  process.env.COMMERCE_SITE_URL=site
+  assert.equal(paymentMode(),null,'sandbox payment mode is restricted to the isolated Cloudflare QA host')
+}
+delete process.env.HOSTING_PROVIDER; delete process.env.COMMERCE_ENVIRONMENT; delete process.env.COMMERCE_SITE_URL
 
 const charge = { paid: true, disputed: false, refunded: false, amount: 499, amount_refunded: 0 }
 const intent = { id: 'pi_1', customer: 'cus_1', status: 'succeeded', livemode: false, amount_received: 499, currency: 'usd', metadata: { integration: 'openagentskill', order_id: order.id, user_id: order.user_id }, latest_charge: charge }
