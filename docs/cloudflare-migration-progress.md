@@ -7,6 +7,11 @@ Vercel deployments, billing, cron schedules, database and authentication remain
 unchanged until the corresponding cutover checks pass. This is not a completed
 production migration.
 
+On November 3 (Asia/Shanghai), the owner explicitly selected D1 for the full
+database migration after evaluating a PostgreSQL/Neon alternative. See
+`docs/database-migration-decision.md` for pricing assumptions and the new gated
+authentication implementation. Neon is not being provisioned.
+
 ## Resources and build
 
 - Account: `113e589daada01e37bfd43cfb4763aab`.

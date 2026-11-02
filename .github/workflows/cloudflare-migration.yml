@@ -33,6 +33,8 @@ jobs:
       - run: pnpm test:links
       - run: pnpm test
       - run: pnpm test:cloudflare
+      - name: Validate authentication in workerd with an isolated local D1 database
+        run: node scripts/check-cloudflare-auth-runtime.mjs
       - run: node --experimental-strip-types scripts/test-agent-connection.mjs
       - name: Build Cloudflare application without production credentials
         run: pnpm cf:build

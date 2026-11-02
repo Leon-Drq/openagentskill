@@ -3,6 +3,11 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
   workerd: true
+packageExtensions:
+  "better-call@1.4.4":
+    dependencies:
+      zod: 4.6.7
+
 overrides:
   browserslist: 4.28.9
   "@babel/core@7.29.0": 7.29.6
