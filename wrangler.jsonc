@@ -13,7 +13,8 @@
     { "binding": "WORKER_SELF_REFERENCE", "service": "openagentskill-migration" }
   ],
   "r2_buckets": [
-    { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "openagentskill-migration-cache" }
+    { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "openagentskill-migration-cache" },
+    { "binding": "OG_IMAGES", "bucket_name": "openagentskill-migration-images" }
   ],
   "d1_databases": [
     {

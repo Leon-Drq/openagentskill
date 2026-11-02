@@ -14,8 +14,10 @@ production migration.
 - D1 cache metadata database created: `openagentskill-migration-tags`, ID
   `5edf8538-ca0a-44b3-ba6b-2ce8c26e000c`. This contains cache invalidation metadata,
   not migrated business records.
-- R2 target: `openagentskill-migration-cache`. Requires account activation before
-  creation. ISR uses R2, a Durable Object queue and D1 tag invalidation.
+- Workers Paid and R2 are activated. Three private R2 buckets are created:
+  `openagentskill-migration-cache`, `openagentskill-migration-images`, and
+  `openagentskill-migration-packages`. ISR uses R2, a Durable Object queue and
+  D1 tag invalidation. The package bucket has no public URL or custom domain.
 - Next.js 16.3.5 and OpenNext 1.20.15. The installed adapter implements experimental
   Node middleware/proxy support; routing must be tested in workerd before cutover.
 - Linux CI builds the Worker, runs regression checks and exports the tested
@@ -37,11 +39,37 @@ the dispatcher does not add retries to payment/publication side effects.
 The apex must retain its existing 308 redirect to `www.openagentskill.com`, with
 the path and query intact. Existing TXT and CAA records must survive DNS transfer.
 The current authoritative nameservers are Vercel nameservers; none are changed.
+The Cloudflare Free zone is prepared with the scanned DNS records, all DNS-only.
+Assigned nameservers are `anastasia.ns.cloudflare.com` and `rob.ns.cloudflare.com`.
+Activation and replacing scanned IP records with verified final targets remain pending.
+
+## Verified migration rehearsal
+
+- Linux run `41449777982` for commit `dc1ed54` passed lint, typecheck, links, the
+  complete regression suite, Cloudflare tests, build, packaging and all 11
+  workerd runtime cases. The smoke harness uses `localhost`: NextURL normalizes
+  loopback IPs to that hostname, otherwise OpenNext interprets rewrites as external.
+- Compatibility date is `2026-10-01`, supported by the installed workerd binary.
+- All 234 private release files have been recovered from existing local archives
+  and SHA-256/size matched to the exported release records. Three Skill text files
+  were reconstructed using the original publisher's formatting and archived
+  instructions/licenses. Total payload is 209,925 bytes. No release, publication
+  or review record was changed. Remote R2 verification is separate and ongoing.
+- A local lossless SQLite rehearsal imported 86 tables and 1,480,974 records;
+  per-table semantic hashes match after reading every value back. SQLite integrity
+  is `ok`, 86 primary keys, 35 unique constraints and 73 foreign keys were checked,
+  with zero orphan groups. The resulting file is 866,000,896 bytes. This preserves
+  archive strings exactly; it is NOT the application D1 schema or a completed
+  authentication migration. 127 PostgreSQL checks and application behavior still
+  require explicit implementation. Private data and reports remain ignored.
+- Uploading OpenNext's intermediate Linux output directly from Windows exposed
+  absolute binary paths. CI now packages the already-validated Wrangler bundle,
+  allowing deployment without rebundling Linux intermediate paths on Windows.
 
 ## Pending before production
 
-1. Workers Paid and R2 activation; the owner is adding a payment method.
-2. Linux build and real Worker routing/cache validation, including proxy rewrites,
+1. Deploy the validated staging bundle and verify its actual Cloudflare URL.
+2. Complete real Worker routing/cache validation, including proxy rewrites,
    localized maintenance responses, static assets, SSR and cache invalidation.
 3. Transfer server configuration securely. Vercel connector lacks environment-read
    permission; the already-authenticated CLI can list production configuration.

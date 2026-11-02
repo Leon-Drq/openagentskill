@@ -22,7 +22,7 @@ export async function inspectExport(directory) {
     inspectedAt: new Date().toISOString(),
     mode: 'local inspection; no cloud writes',
     limits: { d1Columns: 100, d1Parameters: 100, d1RowBytes: 2_000_000, d1StatementBytes: 100_000 },
-    tables: [], totalRows: 0, verifiedChunks: 0, rawBytes: 0,
+    tables: [], chunks: [], totalRows: 0, verifiedChunks: 0, rawBytes: 0,
     cautions: [
       'This archive is not a current globally consistent production snapshot.',
       'Storage metadata does not include file contents.',
@@ -75,6 +75,7 @@ export async function inspectExport(directory) {
         throw new Error(`Source chunk integrity mismatch: ${key}`)
       }
       tableHash += chunkHash
+      report.chunks.push({ file, sha256: meta.sha256, rows: chunkRows, bytes: chunkBytes })
       stats.rows += chunkRows
       stats.rawBytes += chunkBytes
       report.verifiedChunks++

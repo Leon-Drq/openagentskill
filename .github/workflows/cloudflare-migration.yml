@@ -44,6 +44,7 @@ jobs:
         run: |
           tar --exclude='*/node_modules' --exclude='.open-next/assets' -czf cloudflare-runtime.tar.gz .open-next
           tar -czf cloudflare-static.tar.gz .open-next/assets/_next .open-next/assets/BUILD_ID
+          tar -czf cloudflare-worker.tar.gz .codex-tmp/worker-dry-run
           git rev-parse HEAD > cloudflare-build-commit.txt
       - name: Upload tested build
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -52,6 +53,7 @@ jobs:
           path: |
             cloudflare-runtime.tar.gz
             cloudflare-static.tar.gz
+            cloudflare-worker.tar.gz
             cloudflare-build-commit.txt
           retention-days: 3
       - name: Upload runtime check results
