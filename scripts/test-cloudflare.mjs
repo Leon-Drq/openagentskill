@@ -1,9 +1,23 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { dispatchScheduled, migrationResponse, previewHeaders } from '../cloudflare/runtime.mjs'
+import { dispatchScheduled, migrationResponse, previewHeaders, stagingResponse } from '../cloudflare/runtime.mjs'
 
 const schedules = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url))).crons
+
+test('private account rehearsal requires a secret, blocks cron and remains noindex',async()=>{
+  const secret='b'.repeat(64),env={STAGING_PRIVATE:'1',MIGRATION_ACCESS_SECRET:secret,MIGRATION_READ_ONLY:'0',CRON_ENABLED:'1'}
+  const base='https://openagentskill-migration.example.workers.dev'
+  for(const path of ['/','/api/auth/get-session','/api/payments/checkout'])assert.equal((await stagingResponse(new Request(base+path),env)).status,404)
+  assert.equal((await stagingResponse(new Request(base+'/'),{...env,MIGRATION_ACCESS_SECRET:undefined})).status,503)
+  assert.equal(await stagingResponse(new Request(base+'/api/auth/get-session',{headers:{'x-oas-migration':secret}}),env),null)
+  const entered=await stagingResponse(new Request(base+'/__migration/access',{method:'POST',body:new URLSearchParams({access_key:secret})}),env)
+  assert.equal(entered.status,303);assert.match(entered.headers.get('set-cookie'),/Secure; HttpOnly; SameSite=Lax/)
+  assert.equal(await stagingResponse(new Request(base+'/profile',{headers:{cookie:entered.headers.get('set-cookie').split(';')[0]}}),env),null)
+  assert.match(await (await stagingResponse(new Request(base+'/robots.txt'),env)).text(),/Disallow: \//)
+  assert.equal(previewHeaders(new Response('private rehearsal'),env).headers.get('X-Robots-Tag'),'noindex, nofollow')
+  await dispatchScheduled({cron:schedules[0].schedule},{...env,WORKER_SELF_REFERENCE:{fetch(){assert.fail('Staging must not run production tasks')}}},schedules)
+})
 
 test('apex redirect preserves path and query parameters', () => {
   const response = migrationResponse(new Request('https://openagentskill.com/zh/skills?q=video'), {})
