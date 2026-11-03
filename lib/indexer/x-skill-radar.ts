@@ -1,3 +1,5 @@
+import { GITHUB_USER_AGENT } from '@/lib/github/http'
+import { fetchX } from '@/lib/x/request'
 import { isGenericFoundationRepoName } from '@/lib/x/candidates'
 import { evaluateSkillCandidate } from './skill-filter'
 import { parseSkillSourceUrl } from './skill-source-url'
@@ -86,7 +88,8 @@ export interface XSkillRadarOptions {
 }
 
 export interface XSkillRadarResult {
-  status: 'ready' | 'skipped'
+  status: 'ready' | 'skipped' | 'error'
+  failedQueries?: number
   reason?: string
   candidates: XSkillRadarCandidate[]
   searchedQueries: number
@@ -127,6 +130,7 @@ function xBearerToken() {
 
 function githubHeaders() {
   return {
+    'User-Agent': GITHUB_USER_AGENT,
     Accept: 'application/vnd.github.v3+json',
     ...(process.env.GITHUB_TOKEN
       ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
@@ -200,15 +204,14 @@ async function searchXRecent(query: string, maxResults: number, token: string) {
   url.searchParams.set('expansions', 'author_id')
   url.searchParams.set('user.fields', 'username,name')
 
-  const response = await fetch(url, {
+  const response = await fetchX(url.toString(), {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   })
 
   if (!response.ok) {
-    const body = await response.text().catch(() => '')
-    throw new Error(`X recent search failed: ${response.status} ${body}`)
+    throw new Error(`X recent search failed: ${response.status}`)
   }
 
   return (await response.json()) as XRecentSearchResponse
@@ -217,6 +220,7 @@ async function searchXRecent(query: string, maxResults: number, token: string) {
 async function fetchGitHubRepo(owner: string, repo: string) {
   const response = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}`, {
     headers: githubHeaders(),
+    signal: AbortSignal.timeout(12_000),
   } as RequestInit)
 
   if (!response.ok) return null
@@ -296,6 +300,8 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
   let inspectedTweets = 0
   let extractedRepos = 0
   let searchedQueries = 0
+  let failedQueries = 0
+  let lastFailure: string | undefined
 
   for (const query of rotatedWindow(X_SKILL_RADAR_QUERIES, maxQueries, queryOffset)) {
     searchedQueries += 1
@@ -348,7 +354,12 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
         if (candidates.size >= limit * 2) break
       }
     } catch (error) {
-      console.warn('[x-skill-radar] query skipped:', error)
+      failedQueries += 1
+      lastFailure = error instanceof Error && /^X recent search failed: \d+$/.test(error.message) ? error.message : 'X radar request failed'
+      console.warn('[x-skill-radar]', { error: lastFailure })
+      // Stop this window after a provider failure; repeated paid requests do
+      // not fix exhausted credits, invalid credentials or rate limiting.
+      break
     }
 
     if (candidates.size >= limit * 2) break
@@ -359,8 +370,9 @@ export async function searchXSkillRadarRepos(options: XSkillRadarOptions = {}): 
     .slice(0, limit)
 
   return {
-    status: sortedCandidates.length ? 'ready' : 'skipped',
-    reason: sortedCandidates.length ? undefined : 'No X-linked skill repositories passed quality gates',
+    status: failedQueries ? 'error' : sortedCandidates.length ? 'ready' : 'skipped',
+    reason: failedQueries ? lastFailure : sortedCandidates.length ? undefined : 'No X-linked skill repositories passed quality gates',
+    failedQueries,
     candidates: sortedCandidates,
     searchedQueries,
     queryOffset,

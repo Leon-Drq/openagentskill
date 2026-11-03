@@ -3,6 +3,7 @@ import {timingSafeEqual} from 'node:crypto'
 import type {ReadDatabase} from './cloudflare-read'
 import schema from './cloudflare-schema.json'
 import {encodeD1Value,decodeD1Row} from './cloudflare-values'
+import {retryIdempotentD1} from './cloudflare-reliability'
 
 export const secretBackgroundRPCs=new Set(['record_indexer_run','list_indexer_runs','update_skill_github_metadata','upsert_indexed_skill','record_skill_source_version'])
 export function validIndexerSecret(value:unknown) {
@@ -38,11 +39,17 @@ export async function executeD1BackgroundRPC(db:ReadDatabase,name:string,args:Re
  if(name==='claim_skill_candidates'){
   const statuses=args.p_statuses,worker=args.p_worker_id
   if(!Array.isArray(statuses)||statuses.length>30||statuses.some(s=>typeof s!=='string'||s.length>80)||typeof worker!=='string'||worker.trim().length<8||worker.length>200)throw new Error('invalid_lease')
-  const results=await db.prepare(`UPDATE skill_candidates SET lease_owner=?,lease_expires_at=(strftime('%Y-%m-%dT%H:%M:%f','now',?)||'000Z'),
+  // A worker ID is unique to one claim request. On an ambiguous network
+  // failure, recover that request's lease instead of claiming another batch.
+  const statements=[db.prepare(`UPDATE skill_candidates SET lease_owner=?,lease_expires_at=(strftime('%Y-%m-%dT%H:%M:%f','now',?)||'000Z'),
    attempt_count=attempt_count+1,updated_at=${now} WHERE id IN (SELECT id FROM skill_candidates WHERE status IN (SELECT value FROM json_each(?))
-   AND next_attempt_at<=${now} AND (lease_expires_at IS NULL OR lease_expires_at<=${now}) ORDER BY github_stars DESC,discovered_at ASC LIMIT ?) RETURNING *`)
-   .bind(worker.trim(),`+${clamp(args.p_lease_seconds,240,60,900)} seconds`,JSON.stringify(statuses),clamp(args.p_limit,1,1,250)).all()
-  return {handled:true,data:results.results.map(r=>decode('skill_candidates',r))}
+   AND next_attempt_at<=${now} AND (lease_expires_at IS NULL OR lease_expires_at<=${now}) ORDER BY github_stars DESC,discovered_at ASC LIMIT ?)
+   AND NOT EXISTS(SELECT 1 FROM skill_candidates WHERE lease_owner=? AND lease_expires_at>${now})`)
+   .bind(worker.trim(),`+${clamp(args.p_lease_seconds,240,60,900)} seconds`,JSON.stringify(statuses),clamp(args.p_limit,1,1,250),worker.trim()),
+   db.prepare(`SELECT * FROM skill_candidates WHERE lease_owner=? AND lease_expires_at>${now} ORDER BY github_stars DESC,discovered_at ASC LIMIT ?`)
+    .bind(worker.trim(),clamp(args.p_limit,1,1,250))]
+  const results=await retryIdempotentD1(()=>db.batch(statements),'candidate-claim')
+  return {handled:true,data:results[1].results.map(r=>decode('skill_candidates',r))}
  }
  if(name==='update_skill_github_metadata'){
   const slug=encodeD1Value(args.p_slug,'text'),stars=args.p_github_stars==null?null:encodeD1Value(args.p_github_stars,'int4')

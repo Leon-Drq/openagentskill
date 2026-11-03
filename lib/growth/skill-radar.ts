@@ -436,7 +436,7 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
 
   await recordSkillRadarRun({
     mode: 'skill-radar',
-    status: summary.errors > 0 ? 'completed_with_errors' : 'completed',
+    status: summary.errors > 0 || xRadar.status === 'error' ? 'completed_with_errors' : 'completed',
     filter_mode: 'skills-only',
     started_at: startedAt,
     completed_at: new Date().toISOString(),
@@ -450,7 +450,7 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
     skipped_low_relevance: summary.rejected,
     imported: summary.indexed,
     updated: 0,
-    errors: summary.errors,
+    errors: summary.errors + ('failedQueries' in xRadar ? xRadar.failedQueries || 0 : 0),
     metadata: {
       automation: 'skill-radar',
       maintenance_mode: true,
@@ -476,6 +476,7 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
         active_max_queries: xRadarSchedule.activeMaxQueries,
         interval_hours: xRadarSchedule.intervalHours,
         searched_queries: xRadar.searchedQueries,
+        failed_queries: 'failedQueries' in xRadar ? xRadar.failedQueries : 0,
         query_offset: xRadar.queryOffset,
         inspected_tweets: xRadar.inspectedTweets,
         extracted_repos: xRadar.extractedRepos,

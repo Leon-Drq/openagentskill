@@ -1,3 +1,4 @@
+import { githubResponseError } from './http'
 import { createHash } from 'node:crypto'
 import type { GitHubRepo } from '@/lib/schema/skill-schema'
 import { resolveSkillVersion } from '@/lib/skills/version-evidence'
@@ -261,7 +262,7 @@ async function fetchRepositoryTree(owner: string, repo: string, ref: string) {
     { headers: githubHeaders(), signal: AbortSignal.timeout(15_000) }
   )
 
-  if (!response.ok) throw new Error(`Unable to read repository tree (${response.status}).`)
+  if (!response.ok) throw await githubResponseError(response)
 
   const payload = await response.json() as { tree?: GitHubTreeItem[]; truncated?: boolean }
   return { tree: payload.tree || [], truncated: Boolean(payload.truncated) }
@@ -276,7 +277,7 @@ async function fetchRepositoryFile(owner: string, repo: string, ref: string, pat
     }
   )
 
-  if (!response.ok) throw new Error(`Unable to read ${path} (${response.status}).`)
+  if (!response.ok) throw await githubResponseError(response)
 
   const content = await response.text()
   if (content.length > MAX_FILE_BYTES) throw new Error(`${path} is too large to review safely.`)

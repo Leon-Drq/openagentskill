@@ -1,3 +1,4 @@
+import { parseOptionalNonNegative } from '@/lib/automation/parameters'
 import { NextRequest, NextResponse } from 'next/server'
 import { runSkillRadarAutomation } from '@/lib/growth/skill-radar'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
@@ -10,16 +11,6 @@ function parseOptionalPositive(searchValue: string | null, bodyValue: unknown) {
 
   const bodyParsed = Number(bodyValue)
   if (Number.isFinite(bodyParsed) && bodyParsed > 0) return bodyParsed
-
-  return undefined
-}
-
-function parseOptionalNonNegative(searchValue: string | null, bodyValue: unknown) {
-  const searchParsed = Number(searchValue)
-  if (Number.isFinite(searchParsed) && searchParsed >= 0) return searchParsed
-
-  const bodyParsed = Number(bodyValue)
-  if (Number.isFinite(bodyParsed) && bodyParsed >= 0) return bodyParsed
 
   return undefined
 }

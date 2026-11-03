@@ -1,12 +1,8 @@
 import { GitHubRepo, SkillManifest, SkillManifestSchema } from '../schema/skill-schema'
 import { parseGitHubSkillReference } from './skill-source'
 
-export class GitHubAPIError extends Error {
-  constructor(message: string, public statusCode?: number) {
-    super(message)
-    this.name = 'GitHubAPIError'
-  }
-}
+import { GITHUB_USER_AGENT, GitHubAPIError, githubResponseError } from './http'
+export { GitHubAPIError } from './http'
 
 // Parse GitHub URL to owner/repo format
 export function parseGitHubUrl(url: string): { owner: string; repo: string } | null {
@@ -29,6 +25,7 @@ export async function validateGitHubRepo(
   // Fetch repo info from GitHub API
   const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
     headers: {
+      'User-Agent': GITHUB_USER_AGENT,
       'Accept': 'application/vnd.github.v3+json',
       // Add GitHub token if available for higher rate limits
       ...(process.env.GITHUB_TOKEN && {
@@ -42,13 +39,14 @@ export async function validateGitHubRepo(
     if (response.status === 404) {
       throw new GitHubAPIError('Repository not found', 404)
     }
-    throw new GitHubAPIError(`GitHub API error: ${response.statusText}`, response.status)
+    throw await githubResponseError(response)
   }
 
   const data = await response.json()
 
   const optionalHeaders = {
-    'Accept': 'application/vnd.github.v3+json',
+    'User-Agent': GITHUB_USER_AGENT,
+      'Accept': 'application/vnd.github.v3+json',
     ...(process.env.GITHUB_TOKEN && {
       'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
     }),
@@ -92,7 +90,8 @@ export async function fetchRepositoryCommitSha(owner: string, repo: string, ref:
     `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/commits/${encodeURIComponent(ref)}`,
     {
       headers: {
-        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': GITHUB_USER_AGENT,
+      'Accept': 'application/vnd.github.v3+json',
         ...(process.env.GITHUB_TOKEN && {
           'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
         }),
@@ -112,7 +111,8 @@ export async function fetchReadme(owner: string, repo: string): Promise<string> 
     `https://api.github.com/repos/${owner}/${repo}/readme`,
     {
       headers: {
-        'Accept': 'application/vnd.github.v3.raw',
+        'User-Agent': GITHUB_USER_AGENT,
+      'Accept': 'application/vnd.github.v3.raw',
         ...(process.env.GITHUB_TOKEN && {
           'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
         }),
@@ -136,7 +136,8 @@ export async function fetchSkillManifest(
     `https://api.github.com/repos/${owner}/${repo}/contents/skill.json`,
     {
       headers: {
-        'Accept': 'application/vnd.github.v3.raw',
+        'User-Agent': GITHUB_USER_AGENT,
+      'Accept': 'application/vnd.github.v3.raw',
         ...(process.env.GITHUB_TOKEN && {
           'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
         }),
@@ -171,7 +172,8 @@ export async function fetchCodeFiles(
     `https://api.github.com/repos/${owner}/${repo}/git/trees/main?recursive=1`,
     {
       headers: {
-        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': GITHUB_USER_AGENT,
+      'Accept': 'application/vnd.github.v3+json',
         ...(process.env.GITHUB_TOKEN && {
           'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
         }),
@@ -204,7 +206,8 @@ export async function fetchCodeFiles(
         `https://api.github.com/repos/${owner}/${repo}/contents/${file.path}`,
         {
           headers: {
-            'Accept': 'application/vnd.github.v3.raw',
+            'User-Agent': GITHUB_USER_AGENT,
+      'Accept': 'application/vnd.github.v3.raw',
             ...(process.env.GITHUB_TOKEN && {
               'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
             }),
