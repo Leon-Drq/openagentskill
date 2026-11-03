@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs'
 import {createClient} from '@supabase/supabase-js'
 import {parseOptionalNonNegative} from '../lib/automation/parameters.ts'
 import {validateGitHubRepo} from '../lib/github/api.ts'
+import {fetchSkillVersionEvidence} from '../lib/github/skill-source.ts'
 import {githubResponseError,isGitHubRateLimitError} from '../lib/github/http.ts'
 import {searchXSkillRadarRepos} from '../lib/indexer/x-skill-radar.ts'
 import {createD1ServiceFetch} from '../lib/db/cloudflare-service.ts'
@@ -29,6 +30,11 @@ try{
  globalThis.fetch=async(_url,init)=>{requests++;assert.match(new Headers(init.headers).get('user-agent'),/OpenAgentSkill/);return Response.json({full_name:'example/skill',default_branch:'main',stargazers_count:30})}
  assert.equal((await validateGitHubRepo('example/skill',{checkReadme:false,checkSkillJson:false})).stars,30)
  assert.equal(requests,1)
+ const skill={owner:'example',repo:'skill',ref:'main',path:'SKILL.md',directory:'',document:'# A skill',frontmatter:{name:'fixture-skill'}}
+ globalThis.fetch=async()=>new Response('Missing optional plugin manifest',{status:404})
+ assert.equal((await fetchSkillVersionEvidence(skill)).source,'unknown','optional missing version metadata must not block publication')
+ globalThis.fetch=async()=>new Response('Permission denied',{status:403})
+ await assert.rejects(()=>fetchSkillVersionEvidence(skill),error=>error.statusCode===403,'provider failures must still stop source preparation')
  requests=0;process.env.X_BEARER_TOKEN='fixture-only'
  globalThis.fetch=async()=>{requests++;return new Response('private provider detail',{status:402})}
  const radar=await searchXSkillRadarRepos({maxQueries:3})

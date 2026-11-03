@@ -1,4 +1,4 @@
-import { githubResponseError } from './http'
+import { GitHubAPIError, githubResponseError } from './http'
 import { createHash } from 'node:crypto'
 import type { GitHubRepo } from '@/lib/schema/skill-schema'
 import { resolveSkillVersion } from '@/lib/skills/version-evidence'
@@ -477,7 +477,7 @@ export async function fetchSkillVersionEvidence(skill: DiscoveredGitHubSkill, re
       pluginManifests.push({ path, content: await fetchRepositoryFile(skill.owner, skill.repo, skill.ref, path) })
     } catch (error) {
       // Only absence is optional; rate limits/network errors must stop source preparation.
-      if (!(error instanceof Error) || !error.message.includes('(404)')) throw error
+      if (!(error instanceof GitHubAPIError) || error.statusCode !== 404) throw error
     }
   }
   return resolveSkillVersion({ ...input, pluginManifests, document: skill.document })
