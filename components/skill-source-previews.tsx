@@ -18,6 +18,7 @@ export function SkillSourcePreviews({ preview, locale }: { preview: SkillSourceP
             <figcaption className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 text-sm">
               <div><p className="text-[10px] text-secondary">{previewCopy(media.kind, locale)}</p><h3 className="mt-1 font-medium">{previewText(media.title, locale)}</h3></div>
               <div className="flex flex-wrap gap-4">
+                {media.caseUrl && <a href={locale === 'zh' ? `${media.caseUrl}?lang=zh` : media.caseUrl} className="inline-flex min-h-11 items-center gap-1 text-xs text-[#006b4f] underline underline-offset-4">{previewCopy('case', locale)}<ArrowUpRight size={14} aria-hidden="true" /></a>}
                 {media.originalSrc && <a href={media.originalSrc} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-1 text-xs text-[#006b4f]">{previewCopy('original', locale)}<ArrowUpRight size={14} aria-hidden="true" /></a>}
                 <a href={media.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-1 text-xs text-[#006b4f]">{previewCopy('source', locale)}<ArrowUpRight size={14} aria-hidden="true" /></a>
               </div>

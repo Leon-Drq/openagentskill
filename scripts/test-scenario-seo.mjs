@@ -38,7 +38,7 @@ const { getBestSitemapEntries, getGuideSitemapEntries }=compile('lib/seo/sitemap
   '@/lib/i18n/market-routing':{MARKET_LOCALES:[],LOCALIZED_CORE_PAGE_SLUGS:[]},
   '@/lib/seo/localized-pages':{LOCALIZED_LANDING_PAGES:{}},'@/lib/seo/skill-clusters':{SKILL_CLUSTERS:[]},
   '@/lib/skill-packs':{SKILL_PACKS:[]},'@/lib/use-cases':{USE_CASES:[]},
-  '@/lib/showcase':{SHOWCASE_CASES:[],SHOWCASE_UPDATED_AT:'2026-10-07'},
+  '@/lib/showcase':{SHOWCASE_CASES:[],SHOWCASE_UPDATED_AT:'2026-10-07',isShowcaseIndexEligible:()=>true},
   '@/lib/skills/external-catalog':{EXTERNAL_SKILLS:[]},'@/lib/supabase/public':{},
   '@/lib/creator-directory':{FEATURED_CREATORS:[]},
   '@/lib/seo/search-indexability':{SEARCH_INDEX_MIN_GITHUB_STARS:3,SEARCH_INDEX_MIN_QUALITY_SCORE:50},

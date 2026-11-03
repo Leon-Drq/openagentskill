@@ -11,6 +11,8 @@ export interface SkillPreviewMedia {
   videoSrc?: string
   originalSrc?: string
   sourceUrl: string
+  /** Existing case URL for a source preview; not an independent execution claim. */
+  caseUrl?: string
   kind: PreviewKind
   title: PreviewText
   alt: PreviewText
@@ -43,6 +45,7 @@ const labels = {
   source: ['Original source', '原始来源'], full: ['Open full image', '查看原图'], original: ['Open original file', '打开原始文件'],
   title: ['A closer look', '先看看实际效果'], license: ['Media license', '媒体许可'],
   binding: ['Referenced by this skill', '此技能的来源引用'],
+  case: ['View example details', '查看示例详情'],
   note: ['Examples published by the source author. OpenAgentSkill has not independently reproduced these results.', '样例由来源作者发布，OpenAgentSkill 未独立复现这些结果。'],
 } as const
 export const previewCopy = (key: keyof typeof labels, locale: string) => labels[key][locale === 'zh' ? 1 : 0]

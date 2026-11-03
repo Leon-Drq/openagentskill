@@ -2,7 +2,7 @@ import 'server-only'
 import previews from './skill-previews.json'
 import bindings from './skill-preview-bindings.json'
 import automatic from './skill-previews-auto.json'
-import { getShowcaseCase, getShowcaseImageSrc } from './showcase'
+import { SHOWCASE_CASES, getShowcaseCase, getShowcaseImageSrc } from './showcase'
 import type { SkillPreviewCardData, SkillSourcePreview } from './skill-preview-shared'
 
 const registry = new Map((previews as SkillSourcePreview[]).map(preview => [preview.skillSlug, preview]))
@@ -37,6 +37,31 @@ for (const binding of bindings) {
 for (const preview of automatic as SkillSourcePreview[]) {
   if (!registry.has(preview.skillSlug)) registry.set(preview.skillSlug, preview)
 }
+// The pinned Gallery source rules already establish the exact Skill identity.
+// Reuse those assets as a bounded preview set; never copy media or match by repo name.
+const galleryPreviews = new Map<string, SkillSourcePreview>()
+for (const item of SHOWCASE_CASES) {
+  if (item.discoveryKind !== 'source-preview' || registry.has(item.skillSlug)) continue
+  const preview: SkillSourcePreview = galleryPreviews.get(item.skillSlug) || {
+    skillSlug: item.skillSlug,
+    repository: new URL(item.sourceUrl).pathname.split('/').slice(1, 3).join('/'),
+    revision: item.sourceRevision, sourceUrl: item.sourceUrl,
+    license: item.license, licenseUrl: item.licenseUrl,
+    format: { en: 'Author visual references', zh: '作者视觉参考' },
+    note: item.productionNote, media: [],
+  }
+  if (preview.media.length >= 6) continue
+  for (const media of item.media) {
+    if (preview.media.length >= 6 || preview.media.some(existingMedia => existingMedia.src === media.src)) continue
+    preview.media.push({
+      ...media, cardSrc: getShowcaseImageSrc(media.src, 'card'), previewSrc: getShowcaseImageSrc(media.src, 'preview'),
+      kind: item.evidenceKind === 'template' ? 'template' : 'style', title: item.title,
+      sourceUrl: item.sourceUrl, caseUrl: `/showcase/${item.slug}`,
+    })
+  }
+  galleryPreviews.set(item.skillSlug, preview)
+}
+for (const preview of galleryPreviews.values()) registry.set(preview.skillSlug, preview)
 export const SKILL_SOURCE_PREVIEWS = [...registry.values()]
 // An interface or an input image alone is not an output example.
 export const SOURCE_EXAMPLE_SKILL_SLUGS = [...registry.values()]

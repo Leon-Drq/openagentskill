@@ -1,7 +1,6 @@
 name: CI
 
 on:
-  deployment_status:
   workflow_dispatch:
   pull_request:
     branches: [main]
@@ -9,10 +8,10 @@ on:
     branches: [main]
 
 concurrency:
-  # A later Vercel event for the same commit replaces the earlier run. Every
+  # A later run for the same commit replaces the earlier run. Every
   # event runs real checks with fixed names; skipped deployment jobs must never
   # shadow the checks required by main's branch protection.
-  group: ci-${{ github.workflow }}-${{ github.event.deployment.sha || github.sha }}
+  group: ci-${{ github.workflow }}-${{ github.sha }}
   cancel-in-progress: true
 
 permissions:
@@ -29,7 +28,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
-          ref: ${{ github.event.deployment.sha || github.sha }}
+          ref: ${{ github.sha }}
       - name: Setup pnpm
         run: corepack enable && corepack prepare pnpm@10.28.2 --activate
       - name: Setup Node.js
@@ -53,7 +52,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
-          ref: ${{ github.event.deployment.sha || github.sha }}
+          ref: ${{ github.sha }}
       - name: Setup pnpm
         run: corepack enable && corepack prepare pnpm@10.28.2 --activate
       - name: Setup Node.js
@@ -76,7 +75,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
-          ref: ${{ github.event.deployment.sha || github.sha }}
+          ref: ${{ github.sha }}
       - name: Setup pnpm
         run: corepack enable && corepack prepare pnpm@10.28.2 --activate
       - name: Setup Node.js
