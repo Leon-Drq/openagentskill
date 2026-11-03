@@ -4,6 +4,7 @@ import {
   getBaselineIndexNowUrls,
   normalizeIndexNowUrl,
   submitIndexNowUrls,
+  flushIndexNowQueue,
 } from '@/lib/indexnow'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
 
@@ -21,7 +22,7 @@ function parseUrls(body: Record<string, unknown>) {
     urls.push(...buildIndexNowUrlsForSkill(slug))
   }
 
-  if (body.includeBaseline !== false) {
+  if (body.includeBaseline === true) {
     urls.push(...getBaselineIndexNowUrls())
   }
 
@@ -39,8 +40,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const result = await submitIndexNowUrls(getBaselineIndexNowUrls())
-  return NextResponse.json({ success: result.success, result })
+  const result = await flushIndexNowQueue()
+  return NextResponse.json({ success: result.success, result }, {
+    status: result.success ? 200 : result.queued != null ? 202 : 503,
+    headers: { 'Cache-Control': 'private, no-store' },
+  })
 }
 
 export async function POST(request: NextRequest) {
@@ -52,5 +56,7 @@ export async function POST(request: NextRequest) {
   const urls = parseUrls(body)
   const result = await submitIndexNowUrls(urls)
 
-  return NextResponse.json({ success: result.success, result }, { status: result.success ? 200 : 502 })
+  return NextResponse.json({ success: result.success, result }, {
+    status: result.success ? 202 : 503, headers: { 'Cache-Control': 'private, no-store' },
+  })
 }

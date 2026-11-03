@@ -113,14 +113,14 @@ assert.equal(
 )
 assert.equal(
   vercelConfig.crons.find((cron) => cron.path === '/api/indexnow/submit')?.schedule,
-  '10 3 * * *'
+  '20 * * * *'
 )
 
 const discoveryStatusRoute = readFileSync(new URL('../app/api/agent/discovery/route.ts', import.meta.url), 'utf8')
 assert.ok(discoveryStatusRoute.includes('schedule: `${SKILL_RADAR_CRON_MINUTE_UTC} */3 * * *`'))
 assert.ok(!discoveryStatusRoute.includes('at least 10 GitHub stars'))
 assert.ok(discoveryStatusRoute.includes("star_refresh_cron: '30 2 * * *'"))
-assert.ok(discoveryStatusRoute.includes("indexnow_cron: '10 3 * * *'"))
+assert.ok(discoveryStatusRoute.includes("indexnow_cron: '20 * * * *'"))
 assert.ok(discoveryStatusRoute.includes('observed_health: candidatePipelineHealth'))
 assert.ok(discoveryStatusRoute.includes('search_index_coverage:'))
 assert.ok(discoveryStatusRoute.includes("count: 'exact'"))

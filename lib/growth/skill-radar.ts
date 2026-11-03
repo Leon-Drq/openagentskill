@@ -399,8 +399,7 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
       .filter((result) => result.success && result.slug)
       .map((result) => normalizeIndexNowUrl(`/blog/${result.slug}`))
       .filter((url): url is string => Boolean(url)),
-    normalizeIndexNowUrl('/skills'),
-    normalizeIndexNowUrl('/trending'),
+    ...(seo.results.some(result => result.success && result.slug) ? [normalizeIndexNowUrl('/blog')] : []),
   ].filter((url): url is string => Boolean(url))
   const indexing = await submitIndexNowUrls(Array.from(new Set(indexingUrls)))
 

@@ -524,8 +524,8 @@ export async function GET() {
     skill_radar_frequency: skillRadarXMaxQueries > 0
       ? `GitHub scan every three hours; X hotspot scan every ${skillRadarXScanIntervalHours} hours`
       : 'GitHub scan every three hours; X hotspot scan is disabled until an X search budget is configured',
-    indexnow_cron: '10 3 * * *',
-    indexnow_frequency: 'daily baseline submission plus automatic submission after new skill imports',
+    indexnow_cron: '20 * * * *',
+    indexnow_frequency: 'hourly batches of changed URLs from a durable queue, with shared cooldown and automatic retry',
     candidate_discovery_cron: '0 */3 * * *',
     candidate_validation_cron: '10 * * * *',
     candidate_publication_cron: '0,15,30,45 * * * *',
