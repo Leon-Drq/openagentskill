@@ -4,22 +4,48 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { createRequire } from 'node:module'
 import { syncGallery } from './sync-gallery.mjs'
-import { candidateCIState } from './validate-gallery-candidate.mjs'
+import { candidateCIState, validateGalleryCandidate } from './validate-gallery-candidate.mjs'
 import { boundedFetch, candidates, digest, planItem, safePath, slugFor } from './gallery/core.mjs'
 
 for (const bad of ['../secret','/etc/passwd','images/../../a.png','a\\b.png','a/%2e%2e/b','https://evil/a.png']) assert.equal(safePath(bad),false)
 const rule = {source:'test',group:'cover',prefix:'screenshots/'}
 const candidateSha = 'a'.repeat(40)
-const passedRun = { id: 1, head_sha: candidateSha, event: 'deployment_status', status: 'completed', conclusion: 'success' }
+const candidateBranch = 'codex/gallery-sync-123-1'
+const passedRun = { id: 1, head_sha: candidateSha, head_branch: candidateBranch, path: '.github/workflows/ci.yml', event: 'workflow_dispatch', status: 'completed', conclusion: 'success' }
 const passedJobs = ['Lint and typecheck', 'Regression tests', 'Production build'].map(name => ({name, conclusion:'success'}))
 assert.equal(candidateCIState([passedRun], passedJobs, candidateSha), 'passed')
-assert.equal(candidateCIState([{...passedRun, event:'workflow_dispatch'}], passedJobs, candidateSha), 'waiting')
+assert.equal(candidateCIState([{...passedRun, event:'deployment_status'}], passedJobs, candidateSha), 'waiting')
 assert.equal(candidateCIState([{...passedRun, head_sha:'b'.repeat(40)}], passedJobs, candidateSha), 'waiting')
 assert.equal(candidateCIState([passedRun, {...passedRun, id:2, status:'in_progress', conclusion:null}], passedJobs, candidateSha), 'waiting', 'Older success cannot mask a newer in-progress run')
 assert.equal(candidateCIState([passedRun, {...passedRun, id:2, conclusion:'cancelled'}], passedJobs, candidateSha), 'waiting')
 assert.equal(candidateCIState([passedRun, {...passedRun, id:2, conclusion:'failure'}], passedJobs, candidateSha), 'failed')
 assert.equal(candidateCIState([passedRun], passedJobs.map(job => ({...job, conclusion:'skipped'})), candidateSha), 'failed', 'Skipped checks must never publish media')
 assert.equal(candidateCIState([passedRun], passedJobs.slice(0,2), candidateSha), 'failed', 'All three real checks are required')
+assert.equal(candidateCIState([passedRun], passedJobs, candidateSha, { afterId: 1 }), 'waiting', 'Pre-dispatch success cannot publish a new candidate run')
+assert.equal(candidateCIState([passedRun], passedJobs, candidateSha, { branch: 'other' }), 'waiting')
+const dispatched = []
+await validateGalleryCandidate({
+  repository: 'Leon-Drq/openagentskill', branch: candidateBranch, sha: candidateSha, token: 'fixture-only', attempts: 1, sleep: async () => {},
+  fetcher: async (url, options) => {
+    assert.equal(options.redirect, 'error')
+    assert.equal(options.headers['User-Agent'], 'OpenAgentSkill-Gallery-CI')
+    if (options.method === 'POST') {
+      assert.deepEqual(JSON.parse(options.body), { ref: candidateBranch })
+      dispatched.push(url.includes('cloudflare-migration.yml') ? 'cloudflare-migration.yml' : 'ci.yml')
+      return new Response(null, { status: 204 })
+    }
+    if (url.includes('/jobs?')) return Response.json({ jobs: [...passedJobs, { name: 'validate', conclusion: 'success' }] })
+    const workflow = url.includes('cloudflare-migration.yml') ? 'cloudflare-migration.yml' : 'ci.yml'
+    return Response.json({ workflow_runs: [{ ...passedRun, id: dispatched.includes(workflow) ? 2 : 1, path: `.github/workflows/${workflow}` }] })
+  },
+})
+assert.deepEqual(dispatched.sort(), ['ci.yml', 'cloudflare-migration.yml'])
+let mutations = 0
+await assert.rejects(validateGalleryCandidate({
+  repository: 'Leon-Drq/openagentskill', branch: candidateBranch, sha: candidateSha, token: 'fixture-only', workflows: ['ci.yml'],
+  fetcher: async (_url, options) => options.method === 'POST' ? (mutations++, new Response(null, { status: 503 })) : Response.json({ workflow_runs: [] }),
+}), /503/)
+assert.equal(mutations, 1, 'Ambiguous dispatch must never replay automatically')
 const blob = (path) => ({path,type:'blob',mode:'100644'})
 const tree = { tree:[blob('screenshots/a.png'),blob('screenshots/b.svg'),blob('screenshots/nested/c.png'),{...blob('screenshots/link.png'),mode:'120000'},blob('outside/a.png')] }
 assert.deepEqual(candidates(tree,[rule]).map(x=>x.path),['screenshots/a.png'])

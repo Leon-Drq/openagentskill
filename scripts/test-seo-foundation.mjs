@@ -59,7 +59,7 @@ const mocks = {
   '@/lib/seo/localized-pages': { LOCALIZED_LANDING_PAGES: {} },
   '@/lib/seo/skill-clusters': { SKILL_CLUSTERS: [] }, '@/lib/skill-packs': { SKILL_PACKS: [] },
   '@/lib/use-cases': { USE_CASES: [] },
-  '@/lib/showcase': { SHOWCASE_CASES: [{ slug: 'example', updatedAt: '2026-09-01' }], SHOWCASE_UPDATED_AT: '2026-09-02' },
+  '@/lib/showcase': { SHOWCASE_CASES: [{ slug: 'example', updatedAt: '2026-09-01', media: [{ src: '/showcase/example.png' }] }, { slug: 'automatic-reference', discoveryKind: 'source-preview', media: [] }], SHOWCASE_UPDATED_AT: '2026-09-02', isShowcaseIndexEligible: item => item.discoveryKind !== 'source-preview' },
   '@/lib/supabase/public': {}, '@/lib/creator-directory': { FEATURED_CREATORS: [] },
   '@/lib/seo/search-indexability': { SEARCH_INDEX_MIN_GITHUB_STARS: 3, SEARCH_INDEX_MIN_QUALITY_SCORE: 50 },
 }
@@ -73,9 +73,15 @@ for (const entry of externalCatalog.EXTERNAL_SKILLS.filter(e => e.provider === '
 assert.equal(core.filter(p => p.url.endsWith('/skills/redskill-curtain-branch-swallow')).length, 1)
 assert.equal(core.find(p => p.url.endsWith('/about')).lastModified, undefined)
 assert.equal(core.find(p => p.url.endsWith('/showcase/example')).lastModified, '2026-09-01')
+assert.equal(core.some(p => p.url.endsWith('/showcase/automatic-reference')), false, 'Source previews stay available without entering the crawl queue')
+assert.deepEqual(core.find(p => p.url.endsWith('/showcase/example')).images, ['https://www.openagentskill.com/showcase/example.png'])
 assert.equal(sitemap.getGuideSitemapEntries().find(p => p.url.endsWith(videoGuide.slug)).lastModified, videoGuide.updatedAt)
 const xml = sitemap.renderUrlSet([{ url: 'https://example.com/?a=1&b=2', lastModified: 'invalid' }])
 assert.ok(xml.includes('&amp;') && !xml.includes('<lastmod>'))
+const imageXml = sitemap.renderUrlSet([{ url: 'https://example.com/case', images: ['https://example.com/a.webp?a=1&b=2', 'https://example.com/a.webp?a=1&b=2'] }])
+assert.ok(imageXml.includes('xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"'))
+assert.equal((imageXml.match(/<image:image>/g) || []).length, 1)
+assert.ok(imageXml.includes('a.webp?a=1&amp;b=2'))
 assert.equal((await sitemap.getSitemapIndexEntries()).filter(p => p.loc.includes('skills-')).length, 3)
 assert.ok((await sitemap.getSitemapIndexEntries()).some(p => p.loc.endsWith('/sitemaps/blog.xml')))
 mocks['@/lib/seo/skill-sitemap-data'].getSkillSitemapSnapshot = async () => { throw new Error('No complete snapshot available') }

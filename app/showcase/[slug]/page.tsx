@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { ShowcaseDetail } from '@/components/showcase-detail'
 import { I18nProvider } from '@/lib/i18n/context'
 import { getLocaleFromSearchParam } from '@/lib/i18n/config'
-import { getShowcaseCase, getShowcaseCreator, getShowcaseSkill, localizeShowcase, SHOWCASE_CASES } from '@/lib/showcase'
+import { getShowcaseCase, getShowcaseCreator, getShowcaseSkill, isShowcaseIndexEligible, localizeShowcase, SHOWCASE_CASES } from '@/lib/showcase'
 
 const BASE_URL = 'https://www.openagentskill.com'
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }
@@ -22,7 +22,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const title = `${localizeShowcase(item.title, locale)} — ${getShowcaseSkill(item.skillSlug).name} | OpenAgentSkill`
   const description = localizeShowcase(item.description, locale)
   const url = `${BASE_URL}/showcase/${item.slug}`
-  return { title: { absolute: title }, description, alternates: { canonical: url }, robots: { index: !query.lang, follow: true },
+  return { title: { absolute: title }, description, alternates: { canonical: url }, robots: { index: !query.lang && isShowcaseIndexEligible(item), follow: true },
     twitter: { card: 'summary_large_image', title, description, images: [`${BASE_URL}${item.media[0].src}`] },
     openGraph: { title, description, url, type: 'article', images: [{ url: `${BASE_URL}${item.media[0].src}`, width: item.media[0].width, height: item.media[0].height, alt: item.media[0].alt.en }] },
   }
@@ -36,14 +36,14 @@ export default async function ShowcaseCasePage({ params, searchParams }: Props) 
   const skill = getShowcaseSkill(item.skillSlug)
   const creator = getShowcaseCreator(skill.creatorId)
   const schema = {
-    '@context': 'https://schema.org', '@type': 'Article', headline: localizeShowcase(item.title, locale), description: localizeShowcase(item.description, locale), inLanguage: locale,
+    '@context': 'https://schema.org', '@type': isShowcaseIndexEligible(item) ? 'Article' : 'CreativeWork', headline: localizeShowcase(item.title, locale), name: localizeShowcase(item.title, locale), description: localizeShowcase(item.description, locale), inLanguage: locale,
     url: `${BASE_URL}/showcase/${item.slug}`, mainEntityOfPage: `${BASE_URL}/showcase/${item.slug}`,
     image: `${BASE_URL}${item.media[0].src}`, author: { '@type': 'Organization', name: 'OpenAgentSkill', url: BASE_URL },
     datePublished: `${item.updatedAt}T00:00:00+08:00`, dateModified: `${item.updatedAt}T00:00:00+08:00`,
     creditText: `Skill by ${creator.name}. Example by ${getShowcaseCreator(item.creatorId).name}.`,
     citation: item.sourceUrl, about: { '@type': 'CreativeWork', name: skill.name, url: `${BASE_URL}/skills/${item.skillSlug}` },
   }
-  const related = SHOWCASE_CASES.filter(entry => entry.slug !== item.slug).sort((a, b) => Number(b.category === item.category) - Number(a.category === item.category)).slice(0, 3).map(getShowcaseCardData)
+  const related = SHOWCASE_CASES.filter(entry => entry.slug !== item.slug).sort((a, b) => Number(b.skillSlug === item.skillSlug) - Number(a.skillSlug === item.skillSlug) || Number(b.category === item.category) - Number(a.category === item.category)).slice(0, 3).map(getShowcaseCardData)
   return <I18nProvider initialLocale={locale}><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} /><ShowcaseDetail key={item.slug} item={item} related={related} /></I18nProvider>
 }
 import { getShowcaseCardData } from '@/lib/showcase-shared'

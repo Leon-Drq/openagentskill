@@ -231,7 +231,8 @@ export default async function SkillDetailPage({ params, searchParams }: {
   const targets = safety.blocked ? getSkillReviewTargets(dbSkill) : getSkillInstallTargets(dbSkill)
   const installTargets = (['codex', 'claude-code', 'cursor', 'openagentskill-cli'] as const)
     .map(id => targets.find(target => target.id === id)).filter((target): target is NonNullable<typeof target> => Boolean(target))
-  const hasShowcase = getShowcasesForSkill(skill.slug).length > 0
+  const caseStudies = getShowcasesForSkill(skill.slug).filter(item => item.discoveryKind !== 'source-preview')
+  const hasShowcase = caseStudies.length > 0
   const sourcePreview = getSkillSourcePreview(skill.slug)
   const githubOwner = getGitHubOwner(dbSkill)
   const featuredCreator = FEATURED_CREATORS.find(creator => creator.owner.toLowerCase() === githubOwner.toLowerCase())
@@ -300,7 +301,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
           <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-14">
             <div className="min-w-0">
               {sourcePreview && <SkillSourcePreviews preview={sourcePreview} locale={initialLocale || defaultLocale} />}
-              {hasShowcase && <SkillShowcase skillSlug={skill.slug} cases={getShowcasesForSkill(skill.slug).slice(0, 2).map(getShowcaseCardData)} profile />}
+              {hasShowcase && <SkillShowcase skillSlug={skill.slug} cases={caseStudies.slice(0, 2).map(getShowcaseCardData)} profile />}
               {getShowcasesForSkill(skill.slug).filter(example => example.reproduction).map(example => <ExampleReproduction key={example.slug} example={example} locale={initialLocale || defaultLocale} />)}
               <section id="overview" className={sectionClass}>
                 <h2 className={headingClass}><Text id="overview" /></h2>

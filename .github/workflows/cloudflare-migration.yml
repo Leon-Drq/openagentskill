@@ -4,6 +4,8 @@ on:
   push:
     branches: [main, codex/cloudflare-migration, codex/repair-cloudflare-ingestion, codex/fix-indexnow-delivery, codex/fix-indexnow-worker-request]
   workflow_dispatch:
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read

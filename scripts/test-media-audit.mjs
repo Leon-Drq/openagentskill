@@ -9,12 +9,16 @@ import { renderToStaticMarkup } from 'react-dom/server'
 
 for (const url of ['http://skillry.dev/a', 'https://localhost/a', 'https://127.0.0.1/a', 'https://skillry.dev.evil.example/a', 'https://user:password@skillry.dev/a', 'https://skillry.dev:8443/a', 'https://arbitrary-bucket.s3.amazonaws.com/a']) assert.throws(() => publicMediaUrl(url))
 assert.equal(publicMediaUrl('https://www.scenario.com/explorations/auto-edit/media/ai-edit.mp4').hostname, 'www.scenario.com')
+const scenarioStorage = `https://iieqkinwjorxrzjp.public.blob.vercel-storage.com/explorations/${'a'.repeat(64)}/raw.mp4`
+assert.equal(publicMediaUrl(scenarioStorage).pathname.endsWith('/raw.mp4'), true)
+for (const url of [scenarioStorage.replace('iieqkinwjorxrzjp', 'other-bucket'), scenarioStorage.replace('/raw.mp4', '/secret.txt'), `${scenarioStorage}?token=private`]) assert.throws(() => publicMediaUrl(url))
 for (const url of ['https://www.scenario.com/private.mp4', 'https://www.scenario.com/explorations/auto-edit/media/ai-edit.mp4?token=secret', 'https://www.scenario.com.evil.example/exploration-covers/auto-edit.webp']) assert.throws(() => publicMediaUrl(url))
 const png = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 0, 0, 0, 0, 0])
 const mp4 = Buffer.from('\0\0\0\x20ftypisom')
 assert.equal(mediaSignature(png, 'image'), true)
 assert.equal(mediaSignature(mp4, 'video'), true)
 assert.equal(mediaSignature(png, 'video'), false)
+await probeMedia('https://www.scenario.com/explorations/auto-edit/media/raw.mp4', 'video', async url => url === scenarioStorage ? new Response(mp4, { status: 206 }) : new Response(null, { status: 307, headers: { location: scenarioStorage } }))
 assert.equal(mediaSignature(Buffer.from('<html>Unavailable</html>'), 'image'), false)
 const calls = []
 await probeMedia('https://skillry.dev/preview.webp', 'image', async (url, options) => { calls.push({ url, options }); return new Response(png, { status: 206 }) })

@@ -1,0 +1,36 @@
+name: External media health
+
+on:
+  schedule:
+    - cron: '50 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: external-media-health
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - run: corepack enable && corepack prepare pnpm@10.28.2 --activate
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Audit all published remote images and videos
+        run: pnpm media:audit --remote
+      - name: Preserve media health report, including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: skill-media-audit
+          path: artifacts/skill-media-audit.json
+          if-no-files-found: error
+          retention-days: 30

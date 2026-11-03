@@ -131,8 +131,9 @@ another available source before showing the compact unavailable state.
 - `pnpm media:audit --remote`: also probe every remote image/video with a bounded
   range GET, verify its file signature (an HTTP 200 HTML error is a failure),
   and cancel the response stream. No Skill code is executed. Only approved
-  public hosts/redirect hosts are accepted. This runs in the existing daily
-  Gallery workflow, with the full report retained as a GitHub Actions artifact.
+  public hosts/redirect hosts are accepted. This runs in the independent daily
+  External media health workflow, with failures visible and the full report retained
+  as a GitHub Actions artifact. Gallery publication validates its local assets separately.
 - `pnpm media:audit --catalog <public-registry-export.json>`: optionally join
   the whole registry, check exact binding identities and produce per-category
   coverage plus a missing-visuals work queue. Input is an array of public

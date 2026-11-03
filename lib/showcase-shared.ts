@@ -144,6 +144,8 @@ export interface ShowcaseCase {
   provenance: 'platform' | 'author'
   /** Template and style references are not completed customer projects. */
   evidenceKind?: 'work' | 'template' | 'style-study'
+  /** Automatically collected media stays browseable without becoming an editorial search page. */
+  discoveryKind?: 'source-preview'
   /** Creator of this particular artwork; may differ from the skill's author. */
   creatorId: string
   sourceUrl: string
@@ -161,6 +163,10 @@ export interface ShowcaseCase {
   }
   cardFit?: 'cover' | 'contain'
   updatedAt: string
+}
+
+export function isShowcaseIndexEligible(item: Pick<ShowcaseCase, 'discoveryKind'>) {
+  return item.discoveryKind !== 'source-preview'
 }
 
 export type ShowcaseCardData = Pick<ShowcaseCase, 'slug' | 'skillSlug' | 'category' | 'title' | 'description' | 'provenance' | 'evidenceKind' | 'media' | 'videoUrl' | 'cardFit'>

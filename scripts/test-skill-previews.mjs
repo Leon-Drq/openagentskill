@@ -86,6 +86,11 @@ const dependencies = {
   'next/image': { default: ({ fill, sizes, onError, ...props }) => { void fill; void sizes; void onError; return createElement('img', props) } },
   '@/components/crawl-link': { default: ({ children, prefetch, ...props }) => { void prefetch; return createElement('a', props, children) } },
   '@/lib/skill-preview-shared': shared, '@/lib/showcase-shared': showcase, '@/lib/i18n/market-routing': routing,
+  '@/lib/showcase': showcase,
+  '@/lib/i18n/config': await import('../lib/i18n/config.ts'),
+  '@/lib/i18n/context': { I18nProvider: ({ children }) => children },
+  '@/components/showcase-detail': { ShowcaseDetail: () => null },
+  'next/navigation': { notFound: () => { throw Error('404') } },
   '@/components/skill-preview-image': { SkillPreviewImage: ({ locale, ...props }) => { void locale; return createElement(dependencies['next/image'].default, props) } },
   '@/components/showcase-video-player': { ShowcaseVideoPlayer: ({ item }) => createElement('button', { 'data-gallery-video': item.videoUrl }, 'Play preview') },
   '@/components/provider-video-preview': { ProviderVideoPreview: ({ src }) => createElement('button', { 'data-provider-video': src }, 'Play preview') },
@@ -96,6 +101,31 @@ function component(path) {
     assert.ok(name in dependencies, `Unexpected dependency: ${name}`); return dependencies[name]
   })
   return exports
+}
+
+const detailPage = component('app/showcase/[slug]/page.tsx')
+const automaticCases = showcase.SHOWCASE_CASES.filter(item => item.discoveryKind === 'source-preview')
+assert.ok(automaticCases.length > 0)
+for (const item of [automaticCases[0], showcase.getShowcaseCase('room-to-grow-poster')]) {
+  const metadata = await detailPage.generateMetadata({ params: Promise.resolve({ slug: item.slug }), searchParams: Promise.resolve({}) })
+  assert.equal(metadata.robots.index, showcase.isShowcaseIndexEligible(item))
+  assert.equal(metadata.alternates.canonical, `https://www.openagentskill.com/showcase/${item.slug}`, 'Independent previews must not pretend to duplicate the Skill detail')
+  const translated = await detailPage.generateMetadata({ params: Promise.resolve({ slug: item.slug }), searchParams: Promise.resolve({ lang: 'zh' }) })
+  assert.equal(translated.robots.index, false)
+}
+for (const slug of new Set(automaticCases.map(item => item.skillSlug))) {
+  const preview = getSkillSourcePreview(slug)
+  assert.ok(preview, 'Gallery references should enrich the exact Skill')
+  const reused = preview.media.filter(media => media.caseUrl)
+  if (!reused.length) continue // Explicit author previews retain precedence.
+  assert.ok(preview.media.length <= 6, 'Keep the Skill page and browser payload bounded')
+  assert.equal(new Set(reused.map(media => media.src)).size, reused.length)
+  for (const media of reused) {
+    const item = showcase.getShowcaseCase(media.caseUrl.split('/').pop())
+    assert.equal(item.skillSlug, slug)
+    assert.ok(item.media.some(original => original.src === media.src), 'Reuse the licensed original instead of duplicating assets')
+    assert.equal(media.sourceUrl, item.sourceUrl)
+  }
 }
 const { SkillCardPreview } = component('components/skill-card-preview.tsx')
 const { SkillSourcePreviews } = component('components/skill-source-previews.tsx')

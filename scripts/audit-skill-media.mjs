@@ -10,7 +10,11 @@ const scenarioMediaPaths = new Set(['/exploration-covers/auto-edit.webp', ...['r
 export function publicMediaUrl(value) {
   const url = new URL(value)
   const scenarioSource = url.hostname === 'www.scenario.com' && scenarioMediaPaths.has(url.pathname) && !url.search && !url.hash
-  if (url.protocol !== 'https:' || url.username || url.password || url.port || (!hosts.has(url.hostname) && !scenarioSource)) throw Error('Unapproved media host')
+  // Scenario's published media redirects to this specific, public storage host.
+  // Keep the hash-addressed path and filename boundary; other buckets stay blocked.
+  const scenarioStorage = url.hostname === 'iieqkinwjorxrzjp.public.blob.vercel-storage.com'
+    && /^\/explorations\/[a-f0-9]{64}\/(?:raw|ai-edit)(?:\.mp4|-poster\.webp)$/.test(url.pathname) && !url.search && !url.hash
+  if (url.protocol !== 'https:' || url.username || url.password || url.port || (!hosts.has(url.hostname) && !scenarioSource && !scenarioStorage)) throw Error('Unapproved media host')
   return url
 }
 export function mediaSignature(bytes, type) {

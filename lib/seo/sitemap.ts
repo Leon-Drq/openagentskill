@@ -19,7 +19,7 @@ import {
 import { SKILL_CLUSTERS } from '@/lib/seo/skill-clusters'
 import { SKILL_PACKS } from '@/lib/skill-packs'
 import { USE_CASES } from '@/lib/use-cases'
-import { SHOWCASE_CASES, SHOWCASE_UPDATED_AT } from '@/lib/showcase'
+import { SHOWCASE_CASES, SHOWCASE_UPDATED_AT, isShowcaseIndexEligible } from '@/lib/showcase'
 import { EXTERNAL_SKILLS, externalSkillHref } from '@/lib/skills/external-catalog'
 import { createPublicClient } from '@/lib/supabase/public'
 import { FEATURED_CREATORS, creatorHref } from '@/lib/creator-directory'
@@ -39,6 +39,7 @@ export const SITEMAP_MIN_GITHUB_STARS = SEARCH_INDEX_MIN_GITHUB_STARS
 
 export interface SitemapEntry {
   url: string
+  images?: string[]
   lastModified?: Date | string
   changeFrequency?: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never'
   priority?: number
@@ -85,7 +86,7 @@ export function getCoreSitemapEntries(): SitemapEntry[] {
   const staticPages: SitemapEntry[] = [
     ...EXTERNAL_SKILLS.filter(entry => entry.provider !== 'skillry' || (entry.active && entry.seoIndexable)).map((entry): SitemapEntry => ({ url: `${SITEMAP_BASE_URL}${externalSkillHref(entry.slug)}`, lastModified: entry.provider === 'skillry' ? entry.listingEvidence.observedAt : entry.runtimeDemo?.publishedAt ?? entry.publishedAt, changeFrequency: 'monthly', priority: 0.6 })),
     { url: `${SITEMAP_BASE_URL}/showcase`, lastModified: SHOWCASE_UPDATED_AT, changeFrequency: 'weekly', priority: 0.9 },
-    ...SHOWCASE_CASES.map((item): SitemapEntry => ({ url: `${SITEMAP_BASE_URL}/showcase/${item.slug}`, lastModified: item.updatedAt, changeFrequency: 'monthly', priority: 0.8 })),
+    ...SHOWCASE_CASES.filter(isShowcaseIndexEligible).map((item): SitemapEntry => ({ url: `${SITEMAP_BASE_URL}/showcase/${item.slug}`, lastModified: item.updatedAt, changeFrequency: 'monthly', priority: 0.8, images: item.media.map(media => `${SITEMAP_BASE_URL}${media.src}`) })),
     { url: SITEMAP_BASE_URL, changeFrequency: 'daily', priority: 1 },
     { url: `${SITEMAP_BASE_URL}/resolve`, changeFrequency: 'daily', priority: 0.95 },
     { url: `${SITEMAP_BASE_URL}/skills`, changeFrequency: 'hourly', priority: 0.9 },
@@ -334,10 +335,11 @@ export function renderUrlSet(
         entry.changeFrequency ? `    <changefreq>${entry.changeFrequency}</changefreq>` : '',
         typeof entry.priority === 'number' ? `    <priority>${entry.priority.toFixed(2)}</priority>` : '',
         alternates,
+        ...[...new Set(entry.images || [])].map(src => `    <image:image><image:loc>${escapeXml(src)}</image:loc></image:image>`),
         '  </url>',
       ].filter(Boolean).join('\n')
     })
     .join('\n')
 
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${body}\n</urlset>\n`
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${body}\n</urlset>\n`
 }
