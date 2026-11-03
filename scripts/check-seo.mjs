@@ -19,6 +19,8 @@ const paths = [
   ['/showcase/silicon-valley-explainer', '/showcase/silicon-valley-explainer', true],
   ['/showcase/silicon-valley-explainer?lang=ja', '/showcase/silicon-valley-explainer', false],
   ['/creators', '/creators', true],
+  ['/blog/introducing-paidax01-website-to-design-md', '/blog/introducing-paidax01-website-to-design-md', true],
+  ['/blog/introducing-nuwa-skill', '/blog/introducing-nuwa-skill', true],
   ['/guides/agent-skills-for-product-videos', '/guides/agent-skills-for-product-videos', true],
   ['/guides/best-agent-skills-for-rag', '/guides/best-agent-skills-for-rag', true],
   ['/zh/skills', '/zh/skills', true], ['/ja/skills', '/ja/skills', true],
@@ -40,7 +42,11 @@ for (const [path, expectedCanonical, indexable] of paths) {
   assert.equal(/noindex/i.test(robots), !indexable, `${path}: indexability`)
   for (const block of body.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script\b[^>]*>/gi)) JSON.parse(block[1])
   if (path === '/guides/agent-skills-for-product-videos') {
-    assert.ok(body.includes('Sources and examples') && body.includes('2026-09-08'))
+    const { body: guidesXml } = await get('/sitemaps/guides.xml')
+    const entry = [...guidesXml.matchAll(/<url>([\s\S]*?)<\/url>/g)].find(m => m[1].includes(`<loc>${canonicalOrigin + path}</loc>`))?.[1]
+    const sourceDate = entry?.match(/<lastmod>(\d{4}-\d{2}-\d{2})T/)?.[1]
+    assert.ok(sourceDate && body.includes(sourceDate), `${path}: page and sitemap share the current content date`)
+    assert.ok(body.includes('Sources and examples'))
     assert.ok(body.includes('source-based planning guide'))
   }
   if (path === '/zh/skills' || path === '/ja/skills') {
@@ -54,7 +60,7 @@ const locations = [...index.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => decode(m[
 assert.equal(new Set(locations).size, locations.length)
 const shards = locations.filter(l => /\/skills-\d+\.xml$/.test(l))
 assert.ok(shards.length > 0)
-const checks = [...new Set(['/sitemaps/core.xml', '/sitemaps/guides.xml', new URL(shards[0]).pathname, new URL(shards.at(-1)).pathname])]
+const checks = [...new Set(['/sitemaps/core.xml', '/sitemaps/guides.xml', '/sitemaps/blog.xml', new URL(shards[0]).pathname, new URL(shards.at(-1)).pathname])]
 for (const path of checks) {
   const { body } = await get(path)
   const urls = [...body.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => decode(m[1]))

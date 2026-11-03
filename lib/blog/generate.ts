@@ -8,6 +8,7 @@
 import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { STATIC_BLOG_POSTS, getStaticBlogPostBySlug } from '@/lib/blog/static-posts'
+import { readPublishedBlogPost, readPublishedBlogPosts } from '@/lib/blog/read'
 import { isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
 
 export interface BlogGenerateResult {
@@ -183,17 +184,9 @@ export async function generateBlogPostForSkill(skillId: string): Promise<BlogGen
 // ─── Fetch helpers for pages ──────────────────────────────────────────────────
 
 export async function getBlogPosts(limit = 20) {
-  const supabase = createPublicClient()
-  const { data, error } = await supabase
-    .from('blog_posts')
-    .select(`
-      id, slug, title, summary, published_at,
-      skills ( slug, name, category, github_stars, author_name )
-    `)
-    .order('published_at', { ascending: false })
-    .limit(limit)
-
-  const dynamicPosts = error ? [] : (data || [])
+  // The hub can still show the checked-in editorial articles during a build
+  // without database credentials. Detail reads below never mask an outage.
+  const dynamicPosts = await readPublishedBlogPosts(createPublicClient(), limit).catch(() => [])
   const seen = new Set(dynamicPosts.map((post) => post.slug))
   const mergedPosts = [
     ...STATIC_BLOG_POSTS.filter((post) => !seen.has(post.slug)),
@@ -204,18 +197,9 @@ export async function getBlogPosts(limit = 20) {
 }
 
 export async function getBlogPostBySlug(slug: string) {
-  const supabase = createPublicClient()
-  const { data, error } = await supabase
-    .from('blog_posts')
-    .select(`
-      id, slug, title, summary, content, published_at,
-      skills ( slug, name, category, github_stars, author_name, github_repo, install_command, tags )
-    `)
-    .eq('slug', slug)
-    .single()
-
-  if (error) return getStaticBlogPostBySlug(slug)
-  return data
+  const saved = getStaticBlogPostBySlug(slug)
+  if (saved) return saved
+  return readPublishedBlogPost(createPublicClient(), slug)
 }
 
 export async function getBlogHubData(): Promise<BlogHubData> {

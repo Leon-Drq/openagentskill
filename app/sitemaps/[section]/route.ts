@@ -3,6 +3,7 @@ import { sitemapUnavailableResponse } from '@/lib/seo/sitemap-response'
 import { getSkillSitemapSnapshot } from '@/lib/seo/skill-sitemap-data'
 import {
   getBestSitemapEntries,
+  getBlogSitemapEntries,
   getCoreSitemapEntries,
   getGuideSitemapEntries,
   getCreatorSitemapEntries,
@@ -34,6 +35,8 @@ async function staticEntriesFor(section: string) {
       return getGuideSitemapEntries()
     case 'creators.xml':
       return getCreatorSitemapEntries()
+    case 'blog.xml':
+      return getBlogSitemapEntries()
     default:
       return null
   }
@@ -77,18 +80,19 @@ export async function GET(
     const entries = await getSkillSitemapEntries(sitemapSection, index, snapshot)
     if (entries.length === 0) notFound()
 
-    return xmlResponse(renderUrlSet(entries), snapshot.generatedAt)
+    return xmlResponse(renderUrlSet(entries), snapshot.generatedAt, snapshot.policy.split(':')[0])
   }
 
   notFound()
 }
 
-function xmlResponse(body: string, generatedAt?: string) {
+function xmlResponse(body: string, generatedAt?: string, scope?: string) {
   return new Response(body, {
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',
       'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
       ...(generatedAt ? { 'X-Sitemap-Snapshot': generatedAt } : {}),
+      ...(scope ? { 'X-Sitemap-Scope': scope } : {}),
     },
   })
 }

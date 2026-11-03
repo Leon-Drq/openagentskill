@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import {writeFile,rename} from 'node:fs/promises'
 import {packCacheJson} from '../lib/cache/packed-json.ts'
 import {validateSkillSitemapSnapshot} from '../lib/seo/sitemap-snapshot.ts'
-import {buildSearchIndexFilter} from '../lib/seo/search-indexability.ts'
+import {buildSkillSitemapPolicy} from '../lib/seo/search-indexability.ts'
 const origin=new URL(process.argv[2]||'https://www.openagentskill.com').origin
 const canonical='https://www.openagentskill.com'
 const decode=s=>s.replace(/&(amp|lt|gt|quot|apos);/g,(_,key)=>({amp:'&',lt:'<',gt:'>',quot:'"',apos:"'"}[key]))
@@ -14,6 +14,7 @@ async function get(path){
   assert.match(response.headers.get('content-type')||'',/xml/)
   const generation=response.headers.get('x-sitemap-snapshot')
   assert.ok(generation&&Number.isFinite(Date.parse(generation)),'A verified complete generation is required')
+  assert.equal(response.headers.get('x-sitemap-scope'),buildSkillSitemapPolicy().split(':')[0],'Only the current registry scope may be captured as a backup')
   return {body:await response.text(),generation}
 }
 const index=await get('/sitemap.xml')
@@ -32,7 +33,7 @@ for(let i=0;i<shards.length;i++){
   if(i<shards.length-1)assert.equal(rows.length,1000,'Incomplete intermediate shard')
   entries.push(...rows);console.log(`Verified shard ${i+1}/${shards.length}: ${rows.length} URLs`)
 }
-const snapshot=validateSkillSitemapSnapshot({version:1,policy:buildSearchIndexFilter(),generatedAt:index.generation,count:entries.length,entries},buildSearchIndexFilter())
+const snapshot=validateSkillSitemapSnapshot({version:1,policy:buildSkillSitemapPolicy(),generatedAt:index.generation,count:entries.length,entries},buildSkillSitemapPolicy())
 const target=new URL('../lib/seo/sitemap-backup.json',import.meta.url),temporary=new URL('../.codex-tmp/sitemap-backup.pending.json',import.meta.url)
 await writeFile(temporary,JSON.stringify({packed:await packCacheJson(snapshot)})+'\n');await rename(temporary,target)
 console.log(`Saved complete snapshot: ${snapshot.count} URLs, ${snapshot.generatedAt}`)

@@ -38,6 +38,10 @@ try {
   const indexnowReport = await indexnowResponse.json()
   assert.equal(indexnowResponse.status,200,JSON.stringify(indexnowReport));assert.equal(indexnowReport.passed,true)
   report.indexnow = indexnowReport
+  const blogResponse = await worker.fetch('http://localhost/blog-check',{method:'POST'})
+  const blogReport = await blogResponse.json()
+  assert.equal(blogResponse.status,200,JSON.stringify(blogReport));assert.equal(blogReport.passed,true)
+  report.blog = blogReport
   writeFileSync(resolve(directory,'report.json'),JSON.stringify({at:new Date().toISOString(),runtime:'workerd',database:'local native D1 binding',...report},null,2))
   console.log(JSON.stringify(report))
 } finally { await worker?.stop() }
