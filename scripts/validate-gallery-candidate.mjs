@@ -2,7 +2,7 @@ import { pathToFileURL } from 'node:url'
 
 const requiredJobs = ['Lint and typecheck', 'Regression tests', 'Production build']
 const eligibleRuns = (runs, sha, workflow, afterId, branch) => runs
-  .filter(run => run.head_sha === sha && run.event === 'workflow_dispatch'
+  .filter(run => run.head_sha === sha && run.event === 'push'
     && run.path === `.github/workflows/${workflow}` && run.id > afterId
     && (!branch || run.head_branch === branch))
   .sort((a, b) => b.id - a.id)
@@ -16,23 +16,20 @@ export function candidateCIState(runs, jobs, sha, { workflow = 'ci.yml', afterId
 
 export async function validateGalleryCandidate({ repository, branch, sha, token, fetcher = fetch, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), attempts = 120, workflows = ['ci.yml', 'cloudflare-migration.yml'] }) {
   if (repository !== 'Leon-Drq/openagentskill' || !/^codex\/gallery-sync-\d+-\d+$/.test(branch || '') || !/^[a-f0-9]{40}$/.test(sha || '') || !token) throw new Error('Invalid Gallery CI context')
-  const api = async (endpoint, body) => {
+  const api = async endpoint => {
     const response = await fetcher(`https://api.github.com/repos/${repository}/${endpoint}`, {
       redirect: 'error', signal: AbortSignal.timeout(30000),
-      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'User-Agent': 'OpenAgentSkill-Gallery-CI', ...(body ? { 'Content-Type': 'application/json' } : {}) },
-      ...(body ? { method: 'POST', body: JSON.stringify(body) } : {}),
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'User-Agent': 'OpenAgentSkill-Gallery-CI' },
     })
     if (!response.ok) throw new Error(`GitHub CI API returned ${response.status}`)
-    return response.status === 204 ? null : response.json()
+    return response.json()
   }
-  // Explicit dispatch runs on the candidate ref/SHA even with GITHUB_TOKEN.
-  // No Vercel event or synthetic check is needed. Dispatch mutations never replay.
+  // The repository-scoped publisher token triggers normal push checks.
+  // The built-in token is used only for reads; no synthetic checks or retired hosting events.
   await Promise.all(workflows.map(async workflow => {
     if (!['ci.yml', 'cloudflare-migration.yml'].includes(workflow)) throw new Error('Invalid Gallery workflow')
-    const endpoint = `actions/workflows/${workflow}/runs?event=workflow_dispatch&head_sha=${sha}&per_page=50`
-    const before = await api(endpoint)
-    const afterId = Math.max(0, ...before.workflow_runs.map(run => run.id))
-    await api(`actions/workflows/${workflow}/dispatches`, { ref: branch })
+    const endpoint = `actions/workflows/${workflow}/runs?event=push&head_sha=${sha}&per_page=50`
+    const afterId = 0
     const required = workflow === 'ci.yml' ? requiredJobs : ['validate']
     for (let attempt = 0; attempt < attempts; attempt++) {
       const {workflow_runs: runs} = await api(endpoint)

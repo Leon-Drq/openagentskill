@@ -109,6 +109,7 @@ assert.ok(automaticCases.length > 0)
 for (const item of [automaticCases[0], showcase.getShowcaseCase('room-to-grow-poster')]) {
   const metadata = await detailPage.generateMetadata({ params: Promise.resolve({ slug: item.slug }), searchParams: Promise.resolve({}) })
   assert.equal(metadata.robots.index, showcase.isShowcaseIndexEligible(item))
+  assert.equal(metadata.title.absolute.split(showcase.getShowcaseSkill(item.skillSlug).name).length - 1, 1, 'Do not repeat the Skill name in preview search titles')
   assert.equal(metadata.alternates.canonical, `https://www.openagentskill.com/showcase/${item.slug}`, 'Independent previews must not pretend to duplicate the Skill detail')
   const translated = await detailPage.generateMetadata({ params: Promise.resolve({ slug: item.slug }), searchParams: Promise.resolve({ lang: 'zh' }) })
   assert.equal(translated.robots.index, false)
