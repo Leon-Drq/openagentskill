@@ -172,21 +172,7 @@ export async function flushIndexNowQueue(): Promise<IndexNowSubmitResult> {
   try {
     const db = await queueDatabase()
     const result = await drainIndexNowQueue(db, async urlList => {
-      const response = await fetch(INDEXNOW_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'User-Agent': 'OpenAgentSkill-IndexNow/1.0 (+https://www.openagentskill.com)',
-        },
-        body: JSON.stringify({
-          host: SITE_HOST,
-          key: INDEXNOW_KEY,
-          keyLocation: INDEXNOW_KEY_LOCATION,
-          urlList,
-        }),
-        signal: AbortSignal.timeout(INDEXNOW_REQUEST_TIMEOUT_MS),
-        redirect: 'error',
-      })
+      const response = await fetch(createIndexNowRequest(urlList))
       await response.body?.cancel().catch(() => {})
       return { success: response.status === 200 || response.status === 202, status: response.status, retryAfter: response.headers.get('retry-after') }
     })
@@ -200,4 +186,19 @@ export async function flushIndexNowQueue(): Promise<IndexNowSubmitResult> {
     return { skipped: false, success: false, status: null, submitted: [], delivered: false,
       message: 'IndexNow queue unavailable; delivery was not acknowledged.' }
   }
+}
+
+/** Workers supports manual/follow, but rejects redirect:error before sending.
+ * Manual mode also prevents redirecting the notification to another host. */
+export function createIndexNowRequest(urlList: string[]) {
+  return new Request(INDEXNOW_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'User-Agent': 'OpenAgentSkill-IndexNow/1.0 (+https://www.openagentskill.com)',
+    },
+    body: JSON.stringify({ host: SITE_HOST, key: INDEXNOW_KEY, keyLocation: INDEXNOW_KEY_LOCATION, urlList }),
+    signal: AbortSignal.timeout(INDEXNOW_REQUEST_TIMEOUT_MS),
+    redirect: 'manual',
+  })
 }

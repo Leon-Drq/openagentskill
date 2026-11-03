@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { sqliteD1 } from './fixtures/sqlite-d1.mjs'
 import { enqueueIndexNowUrls, drainIndexNowQueue, getIndexNowQueueStatus, indexNowRetryDelay, INDEXNOW_MIN_INTERVAL_MS as HOUR } from '../lib/indexnow-queue.ts'
-import { normalizeIndexNowUrl, buildIndexNowUrlsForSkill, eligibleIndexNowUrls } from '../lib/indexnow.ts'
+import { normalizeIndexNowUrl, buildIndexNowUrlsForSkill, eligibleIndexNowUrls, createIndexNowRequest } from '../lib/indexnow.ts'
 
 const now = Date.UTC(2026, 10, 3)
 const url = 'https://www.openagentskill.com/skills/example'
@@ -13,6 +13,17 @@ const fixture = () => {
   return result
 }
 const accepted = async () => ({ success: true, status: 200 })
+
+test('the production request preserves the JSON body and uses Workers-compatible redirect handling', async () => {
+  const request=createIndexNowRequest([url])
+  assert.equal(request.url,'https://api.indexnow.org/indexnow')
+  assert.equal(request.method,'POST')
+  assert.equal(request.redirect,'manual')
+  const body=await request.json()
+  assert.equal(body.host,'www.openagentskill.com')
+  assert.deepEqual(body.urlList,[url])
+  assert.ok(request.headers.get('User-Agent').startsWith('OpenAgentSkill-IndexNow/'))
+})
 
 test('canonical URLs reject foreign origins, credentials, API/audit/sitemap and remove tracking variants', () => {
   assert.equal(normalizeIndexNowUrl('http://openagentskill.com/skills/example?utm_source=x#install'), url)
