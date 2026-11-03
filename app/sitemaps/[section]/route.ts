@@ -3,6 +3,7 @@ import { sitemapUnavailableResponse } from '@/lib/seo/sitemap-response'
 import { getSkillSitemapSnapshot } from '@/lib/seo/skill-sitemap-data'
 import {
   getBestSitemapEntries,
+  getBlogSitemapEntries,
   getCoreSitemapEntries,
   getGuideSitemapEntries,
   getCreatorSitemapEntries,
@@ -34,6 +35,8 @@ async function staticEntriesFor(section: string) {
       return getGuideSitemapEntries()
     case 'creators.xml':
       return getCreatorSitemapEntries()
+    case 'blog.xml':
+      return getBlogSitemapEntries()
     default:
       return null
   }

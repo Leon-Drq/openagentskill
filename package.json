@@ -74,7 +74,7 @@
     "test:growth-upgrade": "node --experimental-strip-types scripts/test-growth-upgrade.mjs && node scripts/test-outbound-analytics.mjs",
     "test:creator-blog": "node --import ./scripts/test-typescript-register.mjs scripts/test-creator-blog.mjs && node --import ./scripts/test-typescript-register.mjs scripts/test-rea-blog.mjs",
     "check:rea-blog": "node scripts/check-rea-blog.mjs",
-    "test:resource-pages": "node --import ./scripts/test-typescript-register.mjs scripts/test-resource-pages.mjs && pnpm test:studio && pnpm test:motion-studio",
+    "test:resource-pages": "node --import ./scripts/test-typescript-register.mjs scripts/test-resource-pages.mjs && node --import ./scripts/test-payments-register.mjs scripts/test-blog-read.mjs && pnpm test:studio && pnpm test:motion-studio",
     "test:studio": "node --import ./scripts/test-typescript-register.mjs scripts/test-studio-membership.mjs",
     "check:resource-pages": "node scripts/check-resource-pages.mjs",
     "test:motion-studio": "node --import ./scripts/test-typescript-register.mjs scripts/test-motion-studio.mjs",

@@ -8,11 +8,24 @@ import { createD1UserFetch } from '../../lib/db/cloudflare-user-write.ts'
 import { createD1PublicFetch } from '../../lib/db/cloudflare-public-write.ts'
 import { enqueueIndexNowUrls, drainIndexNowQueue } from '../../lib/indexnow-queue.ts'
 import { createIndexNowRequest } from '../../lib/indexnow.ts'
+import { readPublishedBlogPost, readPublishedBlogPosts, readPublishedBlogSitemap } from '../../lib/blog/read.ts'
 
 const worker = {
   async fetch(request, env) {
     if (env.BUSINESS_TEST_ONLY !== '1' || !['localhost','127.0.0.1'].includes(new URL(request.url).hostname) || request.method !== 'POST') return new Response('Unavailable',{status:503})
     const db = env.APP_DB
+    if (new URL(request.url).pathname==='/blog-check') {
+      const client=createClient('https://d1.internal','fixture',{auth:{persistSession:false,autoRefreshToken:false},db:{retry:false},global:{fetch:createD1ReadFetch(db)}})
+      await db.batch([
+        db.prepare("INSERT INTO blog_posts(slug,skill_id,title,summary,content,published_at) VALUES ('native-article','native-public','Preserved title','Summary','Preserved article body','2026-10-01T00:00:00Z')"),
+        db.prepare("INSERT INTO blog_posts(slug,skill_id,title,summary,content,published_at) VALUES ('native-independent','native-private','Independent article','Summary','Public article, private reference','2026-10-02T00:00:00Z')"),
+      ])
+      const article=await readPublishedBlogPost(client,'native-article'),independent=await readPublishedBlogPost(client,'native-independent')
+      const missing=await readPublishedBlogPost(client,'native-missing'),list=await readPublishedBlogPosts(client,2),sitemap=await readPublishedBlogSitemap(client)
+      const checks={originalContent:article?.content==='Preserved article body',publicReference:article?.skills?.slug==='native-public',privateReference:independent?.skills===null,missing:missing===null,list:list.length===2,sitemap:sitemap.some(row=>row.slug==='native-article')}
+      const passed=Object.values(checks).every(Boolean)
+      return Response.json({passed,checks},{status:passed?200:500})
+    }
     if (new URL(request.url).pathname==='/indexnow-check') {
       const now=Date.now(),hour=3_600_000,urls=Array.from({length:105},(_,i)=>`https://www.openagentskill.com/skills/native-${i}`)
       const notification=createIndexNowRequest(urls.slice(0,100)),payload=await notification.json()

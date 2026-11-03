@@ -14,6 +14,11 @@ for (const path of ['/skills?q=test&tag=pdf', '/zh/skills?category=finance', '/s
   assert.equal(crawlLinkRel(path, 'nofollow'), 'nofollow')
 }
 for (const path of ['/skills', '/zh/skills', '/skills/example', '/skills/example?utm_source=github&ref=github', '/use-cases/pdf', 'https://github.com/acme/skills?q=x', '/sitemap.xml']) assert.equal(crawlLinkRel(path), undefined, path)
+for (const path of ['/showcase?q=agent-governance&category=image', '/showcase?page=2&tag=pdf', '/showcase?page=2&page=3', '/showcase?page=01', '/showcase?page=-1', '/best/codex-skills?lang=zh', '/use-cases/presentation-generation?lang=id', '/skills/example/audit?lang=zh', '/skills/example/evals', '/alternatives/example', '/auth/login?next=%2Fprofile', '/cached-public/en/skills']) {
+  assert.equal(crawlLinkRel(path), 'nofollow', path)
+  assert.equal(crawlLinkRel(path, 'noopener'), 'noopener nofollow', path)
+}
+for (const path of ['/showcase?page=2', '/showcase?page=2&utm_source=github', '/showcase', '/zh/skills', '/zh/blog/real-translation', '/skills/example#install', '/alternatives/agentskills-io', '/alternatives/skills-sh', '/guides/example?utm_source=newsletter']) assert.equal(crawlLinkRel(path), undefined, path)
 for (const query of ['utm_source=github&ref=github', '_rsc=abc', 'gclid=123', '']) {
   assert.equal(hasContentQuery(new URLSearchParams(query)), false)
   assert.equal(publicQueryRoute('/skills/example', new URLSearchParams(query)), null)

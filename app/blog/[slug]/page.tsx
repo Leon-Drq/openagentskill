@@ -10,7 +10,7 @@ import { breadcrumbData, jsonLd, resourceMetadata, RESOURCE_SITE } from '@/lib/s
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const post = await getBlogPostBySlug(slug)
-  if (!post) return { title: 'Post Not Found', robots: { index: false, follow: true } }
+  if (!post) notFound()
   return resourceMetadata({ title: post.title, description: post.summary, path: `/blog/${slug}`, article: true, publishedTime: post.published_at })
 }
 

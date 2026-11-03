@@ -40,6 +40,10 @@ function compile(path, dependencies) {
   return exports
 }
 const mocks = {
+  '@/lib/seo/blog-sitemap-data': { getPublishedBlogSitemap: async () => [
+    {slug:'restored-article',published_at:'2026-08-01T00:00:00Z',updated_at:'2026-09-01T00:00:00Z'},
+    {slug:'introducing-addyosmani-agent-skills',published_at:'2026-06-17T00:00:00Z'},
+  ] },
   '@/lib/studio/seo': studioSeo,
   '@/lib/motion/detail': motionDetail,
   '@/lib/blog/routes': blogRoutes,
@@ -73,6 +77,7 @@ assert.equal(sitemap.getGuideSitemapEntries().find(p => p.url.endsWith(videoGuid
 const xml = sitemap.renderUrlSet([{ url: 'https://example.com/?a=1&b=2', lastModified: 'invalid' }])
 assert.ok(xml.includes('&amp;') && !xml.includes('<lastmod>'))
 assert.equal((await sitemap.getSitemapIndexEntries()).filter(p => p.loc.includes('skills-')).length, 3)
+assert.ok((await sitemap.getSitemapIndexEntries()).some(p => p.loc.endsWith('/sitemaps/blog.xml')))
 mocks['@/lib/seo/skill-sitemap-data'].getSkillSitemapSnapshot = async () => { throw new Error('No complete snapshot available') }
 await assert.rejects(sitemap.getSitemapIndexEntries())
 await assert.rejects(sitemap.getSkillSitemapEntries('skills', 4))
@@ -93,6 +98,16 @@ const shard = compile('app/sitemaps/[section]/route.ts', routeDeps)
 const get = section => shard.GET(new Request('https://example.com'), { params: Promise.resolve({ section }) })
 assert.equal((await get('skills-0.xml')).status, 503)
 assert.equal((await get('core.xml')).status, 200)
+const blogResponse = await get('blog.xml')
+assert.equal(blogResponse.status, 200)
+const blogXml = await blogResponse.text()
+assert.ok(blogXml.includes('/blog/restored-article') && blogXml.includes('<lastmod>2026-09-01T00:00:00.000Z</lastmod>'))
+assert.ok(!blogXml.includes('/blog/introducing-addyosmani-agent-skills'), 'Core sitemap owns existing static article URLs')
+mocks['@/lib/seo/blog-sitemap-data'].getPublishedBlogSitemap = async () => { throw new Error('Database unavailable') }
+const blogFailure = await get('blog.xml')
+assert.equal(blogFailure.status, 503)
+assert.equal(blogFailure.headers.get('cache-control'), 'no-store')
+assert.equal(blogFailure.headers.get('x-robots-tag'), null)
 assert.ok((await (await get('core.xml')).text()).includes('<lastmod>2026-09-01'))
 assert.equal((await get('skill-audits-0.xml')).status, 410)
 await assert.rejects(get('skills-01.xml'), /404/)

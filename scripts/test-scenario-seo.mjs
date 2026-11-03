@@ -27,6 +27,7 @@ function compile(path, dependencies) {
 }
 const forbidden=()=>{throw new Error('Editorial scenario pages cannot depend on catalog ranking or runtime outcomes')}
 const { getBestSitemapEntries, getGuideSitemapEntries }=compile('lib/seo/sitemap.ts',{
+  '@/lib/seo/blog-sitemap-data':{getPublishedBlogSitemap:forbidden},
   '@/lib/studio/seo': await import('../lib/studio/seo.ts'),
   '@/lib/motion/detail': await import('../lib/motion/detail.ts'),
   '@/lib/blog/routes': await import('../lib/blog/routes.ts'),

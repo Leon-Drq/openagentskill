@@ -4,6 +4,7 @@ import { motionSitemapEntries } from '@/lib/motion/detail'
 import { creatorBlogSitemapEntries, reaBlogSitemapEntries } from '@/lib/blog/routes'
 import { SKILL_STACKS } from '@/lib/collections'
 import { getSkillSitemapSnapshot } from '@/lib/seo/skill-sitemap-data'
+import { getPublishedBlogSitemap } from '@/lib/seo/blog-sitemap-data'
 import type { SkillSitemapSnapshot } from '@/lib/seo/sitemap-snapshot'
 import { getRankingDefinitions } from '@/lib/rankings'
 import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
@@ -68,6 +69,7 @@ export async function getSitemapIndexEntries(snapshot?: SkillSitemapSnapshot) {
     { loc: `${SITEMAP_BASE_URL}/sitemaps/rankings.xml` },
     { loc: `${SITEMAP_BASE_URL}/sitemaps/guides.xml` },
     { loc: `${SITEMAP_BASE_URL}/sitemaps/creators.xml` },
+    { loc: `${SITEMAP_BASE_URL}/sitemaps/blog.xml` },
   ]
 
   const skillSections = [
@@ -267,6 +269,18 @@ export async function getCreatorSitemapEntries(): Promise<SitemapEntry[]> {
 export async function getSkillSitemapEntries(_section: SitemapSection, index = 0, snapshot?: SkillSitemapSnapshot): Promise<SitemapEntry[]> {
   const complete = snapshot || await getSkillSitemapSnapshot()
   return complete.entries.slice(index * SITEMAP_CHUNK_SIZE, (index + 1) * SITEMAP_CHUNK_SIZE)
+}
+
+export async function getBlogSitemapEntries(): Promise<SitemapEntry[]> {
+  const coreUrls = new Set(getCoreSitemapEntries().map(entry => entry.url))
+  const posts = await getPublishedBlogSitemap()
+  return posts.map(post => ({
+    url: `${SITEMAP_BASE_URL}/blog/${encodeURIComponent(post.slug)}`,
+    lastModified: post.updated_at && Date.parse(post.updated_at) > Date.parse(post.published_at)
+      ? post.updated_at : post.published_at,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  })).filter(entry => !coreUrls.has(entry.url))
 }
 
 function escapeXml(value: string) {
