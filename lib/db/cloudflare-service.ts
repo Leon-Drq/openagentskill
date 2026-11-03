@@ -12,6 +12,7 @@ import {executeD1SkillChanges,skillDerivedInputs} from './cloudflare-skill-write
 import {executeD1IndexerRPC} from './cloudflare-indexer'
 import {executeD1PublishingRPC} from './cloudflare-publishing'
 import {executeD1XRPC} from './cloudflare-x'
+import {retryIdempotentD1,logD1Failure} from './cloudflare-reliability'
 
 type Database = ReadDatabase & CommerceDatabase
 const service = {userId:null,service:true} as const
@@ -106,7 +107,7 @@ export function createD1ServiceFetch(db: Database): typeof fetch {
         if(plan.singular&&selected.length!==1)return failure(406,'PGRST116')
         return representation?Response.json(plan.singular?selected[0]:selected,{status:method==='POST'?201:200,headers}):new Response(null,{status:method==='POST'?201:204,headers})
       }
-      const statements=[]
+      const statements: ReturnType<ReturnType<ReadDatabase['prepare']>['bind']>[]=[]
       if(method==='POST'){
         const rows=Array.isArray(body)?body:[body]
         if(!rows.length||rows.length>500)return failure(400)
@@ -133,13 +134,16 @@ export function createD1ServiceFetch(db: Database): typeof fetch {
           statements.push(db.prepare(`UPDATE ${quoted(name)} AS t SET ${keys.map(k=>`${quoted(k)}=?`).join(',')} WHERE ${plan.where}${returning}`).bind(...keys.map(k=>encode(body[k],types[k])),...plan.params))
         }
       }
-      const results=await db.batch(statements)
+      // Duplicate-ignore candidate enqueue is safe even if the first commit's
+      // response was lost. Other mutations must not be replayed automatically.
+      const results=name==='skill_candidates'&&method==='POST'&&(requestHeaders.get('prefer')||'').includes('resolution=ignore-duplicates')
+        ?await retryIdempotentD1(()=>db.batch(statements),'candidate-enqueue'):await db.batch(statements)
       const rows=results.flatMap(r=>r.results||[]).map(row=>decode(row,types))
       if(plan.singular&&rows.length!==1)return failure(406,'PGRST116')
       return representation?Response.json(plan.singular?rows[0]:rows,{status:method==='POST'?201:200,headers}):new Response(null,{status:method==='POST'?201:204,headers})
     }catch(error){
       if(error instanceof Error&&/UNIQUE constraint failed|skills_public_source_identity_key/.test(error.message))return failure(409,'23505')
-      return failure()
+      return failure(503,logD1Failure(error,'service'))
     }
   }
 }

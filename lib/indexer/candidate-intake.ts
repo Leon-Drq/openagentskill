@@ -1,3 +1,4 @@
+import { isGitHubRateLimitError, GitHubAPIError } from '@/lib/github/http'
 import { analysisRetryDelayMs } from '@/lib/ai/deferred-analysis'
 import { PUBLIC_SKILL_FILTER } from '@/lib/skills/publication'
 import 'server-only'
@@ -170,13 +171,15 @@ export async function enqueueRepositoryCandidates(
     return { attempted: candidates.length, inserted: 0, duplicates: 0, belowStarFloor }
   }
 
-  const { data, error } = await admin()
-    .from('skill_candidates')
-    .upsert(rows, { onConflict: 'source_key', ignoreDuplicates: true })
-    .select('id')
-  if (error) throw new Error(`Candidate enqueue failed: ${error.message}`)
-
-  const inserted = data?.length || 0
+  let inserted = 0
+  for (let offset = 0; offset < rows.length; offset += 100) {
+    const { data, error } = await admin()
+      .from('skill_candidates')
+      .upsert(rows.slice(offset, offset + 100), { onConflict: 'source_key', ignoreDuplicates: true })
+      .select('id')
+    if (error) throw new Error(`Candidate enqueue failed: ${error.code || 'unknown'} ${error.message}`)
+    inserted += data?.length || 0
+  }
   return {
     attempted: candidates.length,
     inserted,
@@ -193,7 +196,7 @@ async function claimCandidates(statuses: SkillCandidateStatus[], limit: number, 
     p_worker_id: workerId,
     p_lease_seconds: CANDIDATE_LEASE_SECONDS,
   })
-  if (error) throw new Error(`Candidate claim failed: ${error.message}`)
+  if (error) throw new Error(`Candidate claim failed: ${error.code || 'unknown'} ${error.message}`)
   return (data || []) as SkillCandidateRow[]
 }
 
@@ -212,11 +215,6 @@ async function releaseCandidates(ids: string[]) {
     .update({ lease_owner: null, lease_expires_at: null })
     .in('id', ids)
   if (error) console.warn('[candidate-intake] failed to release unused leases:', error.message)
-}
-
-function isGitHubRateLimitError(error: unknown) {
-  const message = error instanceof Error ? error.message : String(error || '')
-  return /GitHub.*(?:403|429|rate.?limit)|API error:\s*(?:Forbidden|Too Many Requests)|Unable to read.*\((?:403|429)\)/i.test(message)
 }
 
 async function findDuplicateContent(sourceKey: string, hash: string, sourceUrl: string) {
@@ -447,7 +445,7 @@ async function validateRepositoryCandidate(candidate: SkillCandidateRow) {
     const delayMinutes = rateLimited ? 60 : Math.min(360, 5 * 2 ** Math.min(candidate.attempt_count, 6))
     await updateCandidate(candidate.id, {
       status: !rateLimited && candidate.attempt_count >= 4 ? 'rejected' : 'validation_error',
-      next_attempt_at: new Date(Date.now() + (!rateLimited && candidate.attempt_count >= 4 ? analysisRetryDelayMs('cooldown') : delayMinutes * 60_000)).toISOString(),
+      next_attempt_at: new Date(Date.now() + Math.max(error instanceof GitHubAPIError ? error.retryAfterMs || 0 : 0, !rateLimited && candidate.attempt_count >= 4 ? analysisRetryDelayMs('cooldown') : delayMinutes * 60_000)).toISOString(),
       last_error: error instanceof Error ? error.message.slice(0, 1000) : 'Candidate validation failed',
     })
     return { expanded: 0, fastTrack: 0, reviewRequired: 0, duplicates: 0, rejected: 0, errors: 1, rateLimited }
@@ -536,7 +534,7 @@ async function publishCandidate(candidate: SkillCandidateRow) {
     await updateCandidate(candidate.id, {
       // Transport/database failures are not a negative review decision.
       status: !rateLimited && candidate.attempt_count >= 4 ? 'review_required' : 'publication_error',
-      next_attempt_at: new Date(Date.now() + (!rateLimited && candidate.attempt_count >= 4 ? analysisRetryDelayMs('cooldown') : delayMinutes * 60_000)).toISOString(),
+      next_attempt_at: new Date(Date.now() + Math.max(error instanceof GitHubAPIError ? error.retryAfterMs || 0 : 0, !rateLimited && candidate.attempt_count >= 4 ? analysisRetryDelayMs('cooldown') : delayMinutes * 60_000)).toISOString(),
       last_error: error instanceof Error ? error.message.slice(0, 1000) : 'Candidate publication failed',
     })
     return { status: 'error' as const, slug: null, rateLimited }

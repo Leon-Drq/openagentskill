@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createPublicClient } from '@/lib/supabase/public'
 import { isAutomationAuthorized } from '@/lib/security/route-auth'
+import { GITHUB_USER_AGENT } from '@/lib/github/http'
 
 export const maxDuration = 120
 
@@ -118,6 +119,7 @@ async function refreshAllStars(): Promise<{ updated: number; unchanged: number; 
   if (!skills.length) return { updated: 0, unchanged: 0, errors: 0, scanned: 0, offset }
 
   const headers: Record<string, string> = {
+    'User-Agent': GITHUB_USER_AGENT,
     Accept: 'application/vnd.github.v3+json',
     ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
   }

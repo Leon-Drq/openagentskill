@@ -1,4 +1,5 @@
 import { createPublicClient } from '@/lib/supabase/public'
+import { GITHUB_USER_AGENT } from '@/lib/github/http'
 import { evaluateSkillCandidate, type SkillCandidateEvaluation } from './skill-filter'
 
 type SearchSort = 'stars' | 'updated'
@@ -1673,6 +1674,7 @@ function getQueryPoolForDomains(domains: string[]) {
 
 function githubHeaders() {
   return {
+    'User-Agent': GITHUB_USER_AGENT,
     Accept: 'application/vnd.github+json',
     'X-GitHub-Api-Version': '2022-11-28',
     ...(process.env.GITHUB_TOKEN

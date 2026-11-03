@@ -1,3 +1,4 @@
+import { GITHUB_USER_AGENT } from '@/lib/github/http'
 /**
  * GitHub Search Module for Skill Auto-Indexer
  *
@@ -11,6 +12,7 @@ const GITHUB_API_BASE = 'https://api.github.com'
 
 function githubHeaders() {
   return {
+    'User-Agent': GITHUB_USER_AGENT,
     Accept: 'application/vnd.github.v3+json',
     ...(process.env.GITHUB_TOKEN
       ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }

@@ -1,5 +1,6 @@
 import 'server-only'
 import schema from './cloudflare-schema.json'
+import { retryIdempotentD1, logD1Failure } from './cloudflare-reliability'
 
 export interface ReadDatabase {
   prepare(sql: string): { bind(...values: unknown[]): { all(): Promise<{ results: Record<string, unknown>[] }> } }
@@ -234,7 +235,7 @@ export function createD1ReadFetch(database: ReadDatabase, principal: ReadPrincip
       const sql = plan.head ? [plan.countSql] : plan.count ? [plan.sql,plan.countSql] : [plan.sql]
       const statements = sql.map(s => database.prepare(s).bind(...plan.params))
       // Batch makes count + page observe the same D1 snapshot.
-      const result = statements.length > 1 ? await database.batch(statements) : [await statements[0].all()]
+      const result = await retryIdempotentD1(() => statements.length > 1 ? database.batch(statements) : statements[0].all().then(row => [row]), 'read')
       signal?.throwIfAborted()
       const rows = plan.head ? [] : result[0].results.map(row => Object.fromEntries(Object.entries(row).map(([key,value]) => [key,
         value === null ? null : plan.codecs[key] === 'bool' ? value === 1 : ['jsonb','_text'].includes(plan.codecs[key]) ? JSON.parse(String(value)) : value])))
@@ -245,7 +246,7 @@ export function createD1ReadFetch(database: ReadDatabase, principal: ReadPrincip
     } catch (error) {
       if (error instanceof Error && ['AbortError','TimeoutError'].includes(error.name)) throw error
       // SQL errors can embed private values. Return a fixed message only.
-      return Response.json({ code: error instanceof QueryError ? error.code : 'D1_READ_FAILED', message: error instanceof QueryError ? error.message : 'Database read unavailable', details: null, hint: null },
+      return Response.json({ code: error instanceof QueryError ? error.code : logD1Failure(error, 'read'), message: error instanceof QueryError ? error.message : 'Database read unavailable', details: null, hint: null },
         { status: error instanceof QueryError ? error.status : 503, headers: { 'Cache-Control':'private, no-store' } })
     }
   }

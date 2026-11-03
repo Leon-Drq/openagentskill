@@ -61,7 +61,7 @@
     "test:skillry-sync": "node scripts/test-skillry-sync.mjs",
     "gallery:sync": "node scripts/sync-gallery.mjs",
     "test:gallery-sync": "node scripts/test-gallery-sync.mjs",
-    "test:automation-reliability": "node --experimental-strip-types scripts/test-automation-reliability.ts",
+    "test:automation-reliability": "node --experimental-strip-types scripts/test-automation-reliability.ts && node --import ./scripts/test-payments-register.mjs scripts/test-ingestion-recovery.mjs",
     "taxonomy:migration": "node --experimental-strip-types scripts/build-skill-taxonomy-migration.mjs",
     "test:taxonomy": "node --experimental-strip-types scripts/test-skill-taxonomy.mjs",
     "test:x-editorial": "node --experimental-strip-types scripts/test-x-editorial.mjs",
