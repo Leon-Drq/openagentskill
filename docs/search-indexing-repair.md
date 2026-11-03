@@ -14,6 +14,14 @@ sitemap, uses stored publication/update dates, and caches successful complete re
 A cold read failure returns retryable 503 rather than an incomplete XML document.
 No article, review, publication state, or Skill search eligibility is changed.
 
+Skill sitemap captures also apply the detail page's existing registry scope rule.
+Pure MCP products previously returned intentional 404s while still being advertised
+in the sitemap. Full source pages are validated before filtering, and the filtered
+count drives shard boundaries. A versioned scope, cache key and refreshed complete
+backup prevent an old generation from restoring those excluded URLs. The backup
+capture command verifies the scope header as well as the generation timestamp.
+Agent Skills that merely mention MCP retain their existing eligibility.
+
 The shared link policy now covers query states across the whole site, including
 Gallery search, language preferences, report utilities, generic alternatives and
 account links. These remain clickable; `nofollow` stops recommending them as new

@@ -1,12 +1,13 @@
 import { unstable_cache } from 'next/cache'
 import { getApprovedSkillSitemapCount, getApprovedSkillSitemapSource } from '@/lib/db/skills'
-import { buildSearchIndexFilter, SEARCH_INDEX_MIN_GITHUB_STARS, SEARCH_INDEX_MIN_QUALITY_SCORE } from '@/lib/seo/search-indexability'
+import { buildSkillSitemapPolicy, SEARCH_INDEX_MIN_GITHUB_STARS, SEARCH_INDEX_MIN_QUALITY_SCORE } from '@/lib/seo/search-indexability'
+import { isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
 import { validateSkillSitemapSnapshot, type SkillSitemapSnapshot } from '@/lib/seo/sitemap-snapshot'
 import { packCacheJson, unpackCacheJson } from '@/lib/cache/packed-json'
 import { createCoalescedCache } from '@/lib/cache/coalesced'
 import saved from './sitemap-backup.json'
 
-const policy = buildSearchIndexFilter()
+const policy = buildSkillSitemapPolicy()
 const readSource = createCoalescedCache<string>({ttlMs:30_000,maxEntries:1,cacheWhen:()=>true})
 
 async function captureCompleteSnapshot(): Promise<string> {
@@ -17,7 +18,9 @@ async function captureCompleteSnapshot(): Promise<string> {
   for (let offset = 0; offset < count; offset += 1000) {
     if (Date.now() >= deadline) throw new Error('Sitemap capture exceeded its budget')
     const rows = await source.read(offset, Math.min(1000,count-offset))
+    if (rows.length !== Math.min(1000, count-offset)) throw new Error('Incomplete sitemap source page')
     for (const row of rows) {
+      if (isMcpOnlySkillRecord(row)) continue
       const date = row.github_last_pushed_at || row.created_at
       const lastModified = date && Number.isFinite(Date.parse(date)) ? new Date(date).toISOString() : undefined
       entries.push({url:`https://www.openagentskill.com/skills/${row.slug}`,lastModified,changeFrequency:'weekly',priority:Number(row.github_stars || 0)>=500 ? 0.82 : 0.76})
@@ -25,7 +28,7 @@ async function captureCompleteSnapshot(): Promise<string> {
   }
   const finalCount = await getApprovedSkillSitemapCount(SEARCH_INDEX_MIN_GITHUB_STARS, SEARCH_INDEX_MIN_QUALITY_SCORE, true)
   if (count !== finalCount) throw new Error('Sitemap source changed during capture')
-  const snapshot = validateSkillSitemapSnapshot({version:1,policy,generatedAt:new Date().toISOString(),count,entries},policy)
+  const snapshot = validateSkillSitemapSnapshot({version:1,policy,generatedAt:new Date().toISOString(),count:entries.length,entries},policy)
   return packCacheJson(snapshot)
 }
 
@@ -33,7 +36,7 @@ async function captureCompleteSnapshot(): Promise<string> {
 // share a URL set; a failed refresh cannot replace it with a partial capture.
 const getCachedCompleteSnapshot = unstable_cache(
   () => readSource(policy, captureCompleteSnapshot),
-  ['complete-skill-sitemap-v2-consistent-source',policy],
+  ['complete-skill-sitemap-v3-registry-scope',policy],
   {revalidate:3600,tags:['approved-sitemap-count','approved-sitemap-records']}
 )
 

@@ -6,13 +6,14 @@ import ts from 'typescript'
 import * as packed from '../lib/cache/packed-json.ts'
 import * as coalesced from '../lib/cache/coalesced.ts'
 import * as policy from '../lib/seo/search-indexability.ts'
+import * as scope from '../lib/skills/registry-scope.ts'
 import * as validation from '../lib/seo/sitemap-snapshot.ts'
 import * as pagination from '../lib/skills/pagination.ts'
 const compile = (path,deps) => {
   const output=ts.transpileModule(readFileSync(new URL('../'+path,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText
   const exports={};new Function('exports','require',output)(exports,name=>{assert.ok(name in deps,name);return deps[name]});return exports
 }
-const snapshot={version:1,policy:policy.buildSearchIndexFilter(),generatedAt:'2026-10-02T00:00:00.000Z',count:2001,entries:Array.from({length:2001},(_,i)=>({url:`https://www.openagentskill.com/skills/test-${i}`,lastModified:'2026-01-01T00:00:00.000Z',changeFrequency:'weekly',priority:0.76}))}
+const snapshot={version:1,policy:policy.buildSkillSitemapPolicy(),generatedAt:'2026-10-02T00:00:00.000Z',count:2001,entries:Array.from({length:2001},(_,i)=>({url:`https://www.openagentskill.com/skills/test-${i}`,lastModified:'2026-01-01T00:00:00.000Z',changeFrequency:'weekly',priority:0.76}))}
 const validate=value=>validation.validateSkillSitemapSnapshot(value,snapshot.policy)
 assert.equal(validate(snapshot),snapshot)
 for(const value of [{...snapshot,count:2002},{...snapshot,policy:'old policy'},{...snapshot,entries:[snapshot.entries[0],...snapshot.entries.slice(0,2000)]},{...snapshot,entries:[{...snapshot.entries[0],url:'https://evil.test/'},...snapshot.entries.slice(1)]}]) assert.throws(()=>validate(value))
@@ -23,9 +24,9 @@ function manager(mode,saved={packed:backup}) {
     'next/cache':{unstable_cache:fn=>async()=>{const value=await fn();writes++;return value}},
     '@/lib/db/skills':{
       getApprovedSkillSitemapCount:async()=>mode==='changed'?2002:2001,
-      getApprovedSkillSitemapSource:async()=>{if(mode==='outage')throw new Error('database timeout');return {count:2001,read:async(offset,limit)=>{reads++;if(mode==='partial'&&offset===1000)throw new Error('database timeout');return snapshot.entries.slice(offset,offset+limit-(mode==='truncated'?1:0)).map(entry=>({slug:entry.url.split('/').at(-1),created_at:entry.lastModified,github_stars:10}))}}},
+      getApprovedSkillSitemapSource:async()=>{if(mode==='outage')throw new Error('database timeout');return {count:2001,read:async(offset,limit)=>{reads++;if(mode==='partial'&&offset===1000)throw new Error('database timeout');return snapshot.entries.slice(offset,offset+limit-(mode==='truncated'?1:0)).map((entry,index)=>({slug:entry.url.split('/').at(-1),created_at:entry.lastModified,github_stars:10,...(mode==='scope'&&offset+index===1000?{name:'Example MCP Server'}:{}),...(mode==='scope'&&offset+index===1001?{name:'MCP security Skill',description:'Inspect MCP servers',tags:['security']}:{})}))}}},
     },
-    '@/lib/seo/search-indexability':policy,'@/lib/seo/sitemap-snapshot':validation,
+    '@/lib/seo/search-indexability':policy,'@/lib/skills/registry-scope':scope,'@/lib/seo/sitemap-snapshot':validation,
     '@/lib/cache/packed-json':packed,'@/lib/cache/coalesced':coalesced,'./sitemap-backup.json':{default:saved},
   })
   return {read:result.getSkillSitemapSnapshot,stats:()=>({writes,reads})}
@@ -40,6 +41,10 @@ await assert.rejects(manager('outage',{packed:'bad'}).read())
 const healthy=manager('healthy');const [a,b]=await Promise.all([healthy.read(),healthy.read()])
 assert.equal(a.count,2001);assert.deepEqual(a,b);assert.equal(healthy.stats().reads,3,'Concurrent snapshots share one complete source capture');assert.equal(healthy.stats().writes,2)
 assert.deepEqual(a.entries,snapshot.entries)
+const scoped=await manager('scope').read()
+assert.equal(scoped.count,2000,'Excluded source rows do not truncate the last sitemap shard')
+assert.deepEqual(scoped.entries,snapshot.entries.filter((_,i)=>i!==1000),'Use the detail page scope predicate; Skills mentioning MCP remain included')
+await assert.rejects(manager('outage',{packed:await packed.packCacheJson({...snapshot,policy:policy.buildSearchIndexFilter()})}).read(),/incompatible/i,'An old unfiltered backup must not reintroduce excluded URLs')
 
 // Exercise the real partition queries, including overlap and a shard boundary.
 const editorial=JSON.parse(readFileSync(new URL('../lib/seo/editorial-index.json',import.meta.url),'utf8'))

@@ -182,6 +182,11 @@ export type SkillSitemapRecord = Pick<
   | 'updated_at'
   | 'quality_score'
   | 'publisher_verified'
+  | 'name'
+  | 'category'
+  | 'tags'
+  | 'frameworks'
+  | 'github_repo'
 >
 
 export interface SkillSitemapQueryOptions {
@@ -421,7 +426,7 @@ const getCachedApprovedSkillSitemapCount = unstable_cache(
   }
 )
 
-const SITEMAP_RECORD_SELECT = 'slug,github_stars,github_last_pushed_at,created_at,updated_at,quality_score,publisher_verified'
+const SITEMAP_RECORD_SELECT = 'slug,github_stars,github_last_pushed_at,created_at,updated_at,quality_score,publisher_verified,name,category,tags,frameworks,github_repo'
 
 const getCachedLegacySitemapCount = unstable_cache(
   fetchApprovedSkillSitemapCount,

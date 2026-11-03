@@ -112,6 +112,13 @@ assert.ok((await (await get('core.xml')).text()).includes('<lastmod>2026-09-01')
 assert.equal((await get('skill-audits-0.xml')).status, 410)
 await assert.rejects(get('skills-01.xml'), /404/)
 await assert.rejects(get('skills-9007199254740992.xml'), /404/)
+const scopedSnapshot = {count:1,policy:'registry-scope-v1:test',generatedAt:'2026-11-03T08:00:00Z',entries:[{url:'https://www.openagentskill.com/skills/test-0'}]}
+mocks['@/lib/seo/skill-sitemap-data'].getSkillSitemapSnapshot = async () => scopedSnapshot
+for (const response of [await compile('app/sitemap.xml/route.ts',routeDeps).GET(),await get('skills-0.xml')]) {
+  assert.equal(response.status,200)
+  assert.equal(response.headers.get('x-sitemap-scope'),'registry-scope-v1')
+  assert.equal(response.headers.get('x-sitemap-snapshot'),scopedSnapshot.generatedAt)
+}
 // Ensure exceptions reach the persistent cache instead of poisoning it with a tiny snapshot.
 const db = read('lib/db/skills.ts')
 assert.ok(!db.includes('getSitemapFallbackRecords'))
