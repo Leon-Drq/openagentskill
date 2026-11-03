@@ -18,7 +18,7 @@ writeFileSync(configPath,JSON.stringify({name:'openagentskill-business-local-tes
     AUTH_ORIGIN:'https://www.openagentskill.com',BETTER_AUTH_SECRET:crypto.randomUUID()+crypto.randomUUID(),INDEXER_SECRET:'native-local-fixture-indexer-secret-only'},
 },null,2),{mode:0o600})
 const sqlPath = resolve(directory,'schema.sql')
-writeFileSync(sqlPath,['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0006_telemetry','0007_quality','0008_outcomes','0009_skill_writes'].map(n=>readFileSync(resolve('cloudflare/migrations/data',`${n}.sql`),'utf8')).join('\n'))
+writeFileSync(sqlPath,['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0006_telemetry','0007_quality','0008_outcomes','0009_skill_writes','0010_indexnow'].map(n=>readFileSync(resolve('cloudflare/migrations/data',`${n}.sql`),'utf8')).join('\n'))
 try {
   await promisify(execFile)(process.execPath,[resolve('node_modules/wrangler/bin/wrangler.js'),'d1','execute','APP_DB','--local','--config',configPath,'--persist-to',persistTo,'--file',sqlPath],{windowsHide:true,env:process.env})
 } catch { throw new Error('Local business schema initialization failed') }
@@ -34,6 +34,10 @@ try {
   const accountReport = await accountResponse.json()
   assert.equal(accountResponse.status,200,JSON.stringify(accountReport));assert.equal(accountReport.passed,true)
   report.account = accountReport
+  const indexnowResponse = await worker.fetch('http://localhost/indexnow-check',{method:'POST'})
+  const indexnowReport = await indexnowResponse.json()
+  assert.equal(indexnowResponse.status,200,JSON.stringify(indexnowReport));assert.equal(indexnowReport.passed,true)
+  report.indexnow = indexnowReport
   writeFileSync(resolve(directory,'report.json'),JSON.stringify({at:new Date().toISOString(),runtime:'workerd',database:'local native D1 binding',...report},null,2))
   console.log(JSON.stringify(report))
 } finally { await worker?.stop() }

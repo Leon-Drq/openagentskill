@@ -221,7 +221,7 @@ export async function runDailyGrowthAutomation(
       .filter((result) => result.success && result.slug)
       .map((result) => normalizeIndexNowUrl(`/blog/${result.slug}`))
       .filter((url): url is string => Boolean(url)),
-    normalizeIndexNowUrl('/blog'),
+    ...(seo.results.some(result => result.success && result.slug) ? [normalizeIndexNowUrl('/blog')] : []),
   ].filter((url): url is string => Boolean(url)))
   const indexing = await submitIndexNowUrls(Array.from(indexingUrls))
 

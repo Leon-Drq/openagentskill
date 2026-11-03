@@ -2,7 +2,7 @@ name: Cloudflare migration validation
 
 on:
   push:
-    branches: [main, codex/cloudflare-migration, codex/repair-cloudflare-ingestion]
+    branches: [main, codex/cloudflare-migration, codex/repair-cloudflare-ingestion, codex/fix-indexnow-delivery]
   workflow_dispatch:
 
 permissions:

@@ -6,11 +6,24 @@ import { hashPassword } from 'better-auth/crypto'
 import { createD1ServiceFetch } from '../../lib/db/cloudflare-service.ts'
 import { createD1UserFetch } from '../../lib/db/cloudflare-user-write.ts'
 import { createD1PublicFetch } from '../../lib/db/cloudflare-public-write.ts'
+import { enqueueIndexNowUrls, drainIndexNowQueue } from '../../lib/indexnow-queue.ts'
 
 const worker = {
   async fetch(request, env) {
     if (env.BUSINESS_TEST_ONLY !== '1' || !['localhost','127.0.0.1'].includes(new URL(request.url).hostname) || request.method !== 'POST') return new Response('Unavailable',{status:503})
     const db = env.APP_DB
+    if (new URL(request.url).pathname==='/indexnow-check') {
+      const now=Date.now(),hour=3_600_000,urls=Array.from({length:105},(_,i)=>`https://www.openagentskill.com/skills/native-${i}`)
+      await enqueueIndexNowUrls(db,urls,now)
+      let calls=0
+      const failure=async()=>{calls++;return {success:false,status:429,retryAfter:'7200'}}
+      const first=await drainIndexNowQueue(db,failure,now)
+      const deferred=await drainIndexNowQueue(db,failure,now+hour)
+      const recovered=await drainIndexNowQueue(db,async()=>({success:true,status:202}),now+2*hour)
+      const final=await drainIndexNowQueue(db,async()=>({success:true,status:200}),now+3*hour)
+      const passed=calls===1&&first.pending===105&&!deferred.attempted&&recovered.submitted.length===100&&recovered.pending===5&&final.pending===0
+      return Response.json({passed,calls,retained:first.pending,batch:recovered.submitted.length,remaining:final.pending},{status:passed?200:500})
+    }
     if (new URL(request.url).pathname==='/account-check') {
       const id='80000000-0000-4000-8000-000000000001',now=new Date().toISOString(),origin=env.AUTH_ORIGIN
       await db.batch([

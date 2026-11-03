@@ -15,7 +15,7 @@
     },
     {
       "path": "/api/indexnow/submit",
-      "schedule": "10 3 * * *"
+      "schedule": "20 * * * *"
     },
     {
       "path": "/api/cron/seo-hourly",
