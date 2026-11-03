@@ -20,7 +20,7 @@ for (const path of ['/', '/skills', '/zh/skills', '/skills/anthropics-skills', '
   const facets = nodes(dom, 'a').filter(n => /^\/(?:(?:zh|ja|ko|es|de|fr|id)\/)?skills\?/.test(attr(n, 'href') || ''))
   assert.ok(facets.every(n => attr(n, 'rel')?.split(' ').includes('nofollow')), `Followed faceted link on ${path}`)
 }
-for (const path of ['/skills/seo-crawl-check-missing-20261009', '/skills?page=999999', '/skills?page=-1', '/skills?q=no-such-skill-20261009&page=9999']) {
+for (const path of ['/skills/seo-crawl-check-missing-20261009', '/skills/__proto__', '/api/agent/skills/__proto__', '/skills?page=999999', '/skills?page=-1', '/skills?q=no-such-skill-20261009&page=9999']) {
   assert.equal((await get(path)).response.status, 404, path)
 }
 assert.equal((await get('/skills/seo-crawl-check-missing-20261009', { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' })).response.status, 404)

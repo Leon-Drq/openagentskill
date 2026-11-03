@@ -1,4 +1,6 @@
 export const SKILL_SLUG_ALIASES: Record<string, string> = {
+  'socai-io-jev-social-jev-social': 'socai-io-jev-social',
+  'liamgvchi-gc-minimal-zine-poster': 'liamgvchi-gc-minimal-zine-poster-v0-3',
   // Retain the original record and history after the creator renamed GitHub.
   'ammarbalkhi-owners-vision-owners-vision': 'ammaralbalkhi-owners-vision-owners-vision',
   crawl4ai: 'crawl4ai',
@@ -12,12 +14,16 @@ export const SKILL_SLUG_ALIASES: Record<string, string> = {
   'agent-skills': 'addyosmani-agent-skills',
   'addy-agent-skills': 'addyosmani-agent-skills',
   'addyosmani-agent-skills': 'addyosmani-agent-skills',
+  'addyosmani/agent-skills': 'addyosmani-agent-skills',
   'davidondrej-skills': 'davidondrej-skills',
   'david-ondrej-skills': 'davidondrej-skills',
+  'davidondrej/skills': 'davidondrej-skills',
+  'david-ondrej/skills': 'davidondrej-skills',
   openbb: 'openbb',
   'openbb-finance': 'openbb',
   'aaron-marketing': 'aaron-he-zhu-aaron-marketing-skills',
   'aaron-marketing-skills': 'aaron-he-zhu-aaron-marketing-skills',
+  'aaron-he-zhu/aaron-marketing-skills': 'aaron-he-zhu-aaron-marketing-skills',
   markitdown: 'markitdown',
   'mark-it-down': 'markitdown',
   'frontend-skill': 'design-taste-frontend',
@@ -56,9 +62,11 @@ export function normalizeRequestedSkillSlug(slug: string) {
 
 export function getCanonicalSkillSlug(slug: string) {
   const normalized = normalizeRequestedSkillSlug(slug)
-  return SKILL_SLUG_ALIASES[normalized] || normalized
+  return Object.hasOwn(SKILL_SLUG_ALIASES, normalized) ? SKILL_SLUG_ALIASES[normalized] : normalized
 }
 
 export function isCanonicalSkillSlug(slug: string) {
-  return normalizeRequestedSkillSlug(slug) === getCanonicalSkillSlug(slug)
+  // Lookups accept normalized aliases; sitemap entries must already be the
+  // exact URL slug accepted by the public registry lookup.
+  return /^[a-z0-9][a-z0-9-]{0,159}$/.test(slug) && slug === getCanonicalSkillSlug(slug)
 }

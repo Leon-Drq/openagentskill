@@ -10,6 +10,7 @@ import { isLocalizedBlogPath, CREATOR_BLOG_SLUG, BLOG_LOCALES } from '../lib/blo
 import { isLocalizedMotionPath } from '../lib/motion/routes.ts'
 import { maintenanceRoute } from '../lib/maintenance-routing.ts'
 import * as maintenance from '../lib/data-maintenance.ts'
+import { getCanonicalSkillSlug } from '../lib/skill-slug-aliases.ts'
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
 const detailWrapper = read('app/skills/[slug]/page.tsx')
@@ -41,7 +42,7 @@ let authCalls = 0
 const deps = {
   '@supabase/ssr': { createServerClient: () => ({ auth: { getUser: async () => { authCalls++ } } }) },
   'next/server': { NextResponse },
-  '@/lib/skill-slug-aliases': { getCanonicalSkillSlug: slug => slug === 'alias' ? 'canonical' : slug },
+  '@/lib/skill-slug-aliases': { getCanonicalSkillSlug: slug => slug === 'alias' ? 'canonical' : getCanonicalSkillSlug(slug) },
   '@/lib/showcase': { isMissingShowcasePath: () => false },
   '@/lib/creator-directory': { isMissingFeaturedCreatorPath: () => false },
   '@/lib/rankings': { isMissingRankingPath: () => false },
@@ -65,6 +66,12 @@ for (const url of ['/cached-public/en/skills', '/contact', '/sponsor', '/skills'
   assert.equal(unstable_doesProxyMatch({ config: exports.config, nextConfig: {}, url }), true, url)
 }
 const request = path => new NextRequest('https://www.openagentskill.com' + path)
+for (const slug of ['constructor', '__proto__', 'tostring']) {
+  assert.equal((await exports.proxy(request(`/skills/${slug}`))).headers.get('location'), null, 'Missing documents must not redirect to JavaScript object properties')
+}
+const renamed = await exports.proxy(request('/skills/ammarbalkhi-owners-vision-owners-vision?utm_source=github'))
+assert.equal(renamed.status, 308)
+assert.equal(renamed.headers.get('location'), 'https://www.openagentskill.com/skills/ammaralbalkhi-owners-vision-owners-vision?utm_source=github')
 for (const locale of BLOG_LOCALES.filter(code => code !== 'en')) {
   const path = `/blog/${CREATOR_BLOG_SLUG}?lang=${locale}&utm_source=newsletter`
   assert.ok(unstable_doesProxyMatch({ config: exports.config, nextConfig: {}, url: path }))
