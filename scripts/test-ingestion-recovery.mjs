@@ -43,10 +43,10 @@ try{
  for(let i=1;i<=3;i++)sqlite.prepare("INSERT INTO skill_candidates(id,source_key,github_full_name,github_owner,github_repo,canonical_source_url,github_stars,status,next_attempt_at) VALUES (?,?,?,'fixture',?,?,?,'discovered','2000-01-01T00:00:00.000000Z')").run('c'+i,'source'+i,'fixture/c'+i,'c'+i,'https://github.com/fixture/c'+i,i*100)
  let calls=0
  const lostAck={prepare:database.prepare.bind(database),async batch(statements){const result=await database.batch(statements);if(calls++===0)throw new Error('Network connection lost.');return result}}
- const args={p_statuses:['discovered'],p_limit:1,p_worker_id:'worker-lost-response',p_lease_seconds:120}
+ const args={p_statuses:['discovered'],p_limit:2,p_worker_id:'worker-lost-response',p_lease_seconds:120}
  const claim=await client(lostAck).rpc('claim_skill_candidates',args)
- assert.equal(claim.error,null);assert.equal(claim.data.length,1);assert.equal(claim.data[0].id,'c3');assert.equal(claim.data[0].attempt_count,1)
- assert.equal(sqlite.prepare('SELECT count(*) n FROM skill_candidates WHERE lease_owner IS NOT NULL').get().n,1,'lost acknowledgement must not claim two batches')
+ assert.equal(claim.error,null);assert.deepEqual(claim.data.map(row=>row.id),['c3','c2']);assert.ok(claim.data.every(row=>row.attempt_count===1))
+ assert.equal(sqlite.prepare('SELECT count(*) n FROM skill_candidates WHERE lease_owner IS NOT NULL').get().n,2,'lost acknowledgement must not claim two batches')
  const again=await client(database).rpc('claim_skill_candidates',args)
  assert.equal(again.data[0].id,'c3');assert.equal(again.data[0].attempt_count,1)
  let readCalls=0
