@@ -3,6 +3,7 @@ import { register, registerHooks } from 'node:module'
 import { readFileSync } from 'node:fs'
 import { createClient } from '@supabase/supabase-js'
 import { sqliteD1 } from './fixtures/sqlite-d1.mjs'
+import { createHash } from 'node:crypto'
 
 // Only replace the request-context factory. Queries, token checks, the status
 // route and the D1 transport are real; there is no model or production access.
@@ -17,6 +18,7 @@ registerHooks({
 register('./test-payments-loader.mjs', import.meta.url)
 const { createD1ServiceFetch } = await import('../lib/db/cloudflare-service.ts')
 const { createOpenSubmission } = await import('../lib/skills/open-submission.ts')
+const { processSubmissionJob } = await import('../lib/skills/submission-worker.ts')
 const { GET } = await import('../app/api/skills/submissions/[id]/route.ts')
 const { NextRequest } = await import('next/server')
 const { sqlite, database } = sqliteD1()
@@ -32,6 +34,7 @@ globalThis.__submissionD1Client = client
 const originalFetch = globalThis.fetch
 globalThis.fetch = () => { throw Error('External network forbidden') }
 const token = 'b'.repeat(48), source = 'a'.repeat(40)
+const document = '---\nname: fixture-skill\ndescription: Summarize supplied text.\nversion: 1.0.0\nlicense: MIT\n---\nRead the supplied text and summarize it.'
 const check = async (id, receiptToken = token) => {
   const response = await GET(new NextRequest(`https://www.openagentskill.com/api/skills/submissions/${id}`, { headers: { Authorization: `Bearer ${receiptToken}` } }), { params: Promise.resolve({ id }) })
   const body = await response.json()
@@ -43,8 +46,8 @@ const check = async (id, receiptToken = token) => {
 }
 try {
   const input = {
-    repository: { owner: 'fixture', repo: 'nested', fullName: 'fixture/nested', stars: 0, forks: 0, defaultBranch: 'main', hasReadme: false, hasSkillJson: false },
-    skill: { owner: 'fixture', repo: 'nested', ref: source, path: 'skills/example/SKILL.md', directory: 'skills/example', sourceUrl: `https://github.com/fixture/nested/tree/${source}/skills/example`, document: 'Read the supplied text and summarize it.', frontmatter: { name: 'Fixture', description: 'Summarize supplied text.', tags: [], frameworks: [] } },
+    repository: { owner: 'fixture', repo: 'nested', fullName: 'fixture/nested', stars: 0, forks: 0, defaultBranch: 'main', hasReadme: false, hasSkillJson: false, updatedAt: new Date().toISOString(), license: 'MIT' },
+    skill: { owner: 'fixture', repo: 'nested', ref: source, path: 'skills/example/SKILL.md', directory: 'skills/example', sourceUrl: `https://github.com/fixture/nested/tree/${source}/skills/example`, document, frontmatter: { name: 'Fixture', description: 'Summarize supplied text.', tags: [], frameworks: [], version: '1.0.0', license: 'MIT' } },
     submissionSource: 'api', requestFingerprint: 'native-d1-fixture', receiptToken: token, codeFiles: [],
   }
   const receipt = await createOpenSubmission(input)
@@ -54,6 +57,32 @@ try {
   assert.equal(pending.response.status, 200, 'A durable D1 submission must have a readable receipt')
   assert.equal(pending.body.submission.status, 'submitted')
   assert.equal(pending.body.submission.skill.slug, null)
+  globalThis.fetch = async url => {
+    const request = new URL(url)
+    assert.equal(request.origin, 'https://api.github.com', 'Never access an external provider or model')
+    if (request.pathname.includes('/git/trees/')) return Response.json({ truncated: false, tree: [{ path: input.skill.path, type: 'blob', size: document.length, sha: createHash('sha1').update(`blob ${Buffer.byteLength(document)}\0${document}`).digest('hex') }] })
+    assert.ok(request.pathname.endsWith('/contents/' + input.skill.path))
+    return new Response(document)
+  }
+  assert.equal(await processSubmissionJob(receipt.id), 'processed')
+  const completed = await check(receipt.id)
+  assert.equal(completed.body.submission.status, 'listed', 'A completed manual review must not remain processing because timestamp precision differs')
+  assert.equal(completed.body.submission.queue.attempts, 1)
+  assert.equal(completed.body.submission.review.method, 'manual')
+  assert.equal(await processSubmissionJob(receipt.id), 'skipped', 'Completed reviews must not be reprocessed')
+  const leaseTime = sqlite.prepare('SELECT review_started_at FROM skill_submissions WHERE id=?').get(receipt.id).review_started_at
+  const milliseconds = leaseTime.replace(/000Z$/, 'Z')
+  const equalInstant = await client.from('skill_submissions').select('id').eq('review_started_at', milliseconds).maybeSingle()
+  assert.equal(equalInstant.data.id, receipt.id)
+  const afterInstant = await client.from('skill_submissions').select('id').gt('review_started_at', milliseconds)
+  assert.deepEqual(afterInstant.data, [], 'Equal instants must not differ under range comparison either')
+  const differentInstant = await client.from('skill_submissions').select('id').eq('review_started_at', leaseTime.replace(/000Z$/, '001Z')).maybeSingle()
+  assert.equal(differentInstant.data, null, 'Preserve real microsecond differences')
+  const invalidTime = await client.from('skill_submissions').select('id').eq('review_started_at', 'not-a-timestamp')
+  assert.equal(invalidTime.status, 400)
+  const stale = await client.from('skill_submissions').update({ status: 'quarantined' })
+    .eq('id', receipt.id).eq('review_started_at', '2000-01-01T00:00:00.000Z').select('id').maybeSingle()
+  assert.equal(stale.data, null, 'A different worker lease must still be fenced out')
   sqlite.prepare("INSERT INTO skills(id,slug,name,description,author_name,repository,github_repo,category,license,ai_review_approved,listing_status) VALUES ('fixture-listing','fixture-public','Fixture','Fixture','fixture','https://github.com/fixture/nested','fixture/nested','developer-tools','MIT',0,'static_checked')").run()
   sqlite.prepare("UPDATE skill_submissions SET skill_id='fixture-listing',status='reviewed' WHERE id=?").run(receipt.id)
   const published = await check(receipt.id)
@@ -70,7 +99,7 @@ try {
   const unavailable = await check(receipt.id)
   assert.equal(unavailable.response.status, 503)
   assert.ok(!JSON.stringify(unavailable.body).includes('private database'))
-  console.log('Native D1 submission receipt passed: durable nested intake, idempotent retry, pending/public/private listings, authenticated lookup and private error handling.')
+  console.log('Native D1 submission passed: durable intake/receipts, real worker completion, canonical timestamp comparisons, stale lease fencing, unchanged review gates, authenticated lookup and private failures.')
 } finally {
   globalThis.fetch = originalFetch
   delete globalThis.__submissionD1Client
