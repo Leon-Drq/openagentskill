@@ -1,11 +1,11 @@
 {
-  "checkedAt": "2026-10-21T06:06:12.754Z",
+  "checkedAt": "2026-11-03T13:26:16.354Z",
   "updatedAt": "2026-09-27",
   "sources": [
     {
       "source": "baoyu",
       "repository": "JimLiu/baoyu-skills",
-      "revision": "1567581c26ec29f4216c6e6835415bf30343b0e3",
+      "revision": "5792c7dc8d09a28d6969e8970166c5eb090ce6ad",
       "candidates": 89,
       "missing": [],
       "skips": [],
@@ -23,7 +23,7 @@
     {
       "source": "huashu",
       "repository": "alchaincyf/huashu-design",
-      "revision": "798c4235ebff03d5c45e3c8affdf5e9d18f9dfa7",
+      "revision": "9b01ee8751679724dd43d855a532944aaa2c2b59",
       "candidates": 6,
       "missing": [],
       "skips": [],
