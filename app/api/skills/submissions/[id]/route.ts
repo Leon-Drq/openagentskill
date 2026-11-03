@@ -28,6 +28,7 @@ export async function GET(
     .from('skill_submissions')
     .select(`
       id,
+      skill_id,
       status,
       skill_name,
       skill_description,
@@ -40,8 +41,7 @@ export async function GET(
       reviewed_at,
       review_started_at,
       validation_result,
-      status_token_hash,
-      skills ( slug, ai_review_approved, listing_status )
+      status_token_hash
     `)
     .eq('id', id)
     .maybeSingle()
@@ -56,8 +56,17 @@ export async function GET(
   const review = data.ai_review_result && typeof data.ai_review_result === 'object'
     ? data.ai_review_result as Record<string, unknown>
     : {}
-  const relatedSkill = Array.isArray(data.skills) ? data.skills[0] : data.skills
-  const publicSkill = relatedSkill && (relatedSkill.ai_review_approved === true || ['owner_published', 'static_checked'].includes(relatedSkill.listing_status))
+  // Authenticate the receipt before resolving its listing. D1 supports these
+  // bounded reads, rather than PostgREST's embedded relationship projection.
+  let relatedSkill: { slug: string; ai_review_approved: boolean; listing_status: string } | null = null
+  if (data.skill_id) {
+    const { data: skill, error: skillError } = await supabase.from('skills')
+      .select('slug,ai_review_approved,listing_status').eq('id', data.skill_id).maybeSingle()
+    if (skillError) throw skillError
+    relatedSkill = skill
+  }
+  const publicSlug = relatedSkill && (relatedSkill.ai_review_approved === true || ['owner_published', 'static_checked'].includes(relatedSkill.listing_status))
+    ? relatedSkill.slug : null
 
   return NextResponse.json({
     submission: {
@@ -68,7 +77,7 @@ export async function GET(
         description: data.skill_description,
         path: data.skill_path,
         sourceUrl: data.repository_url,
-        slug: publicSkill ? relatedSkill.slug : null,
+        slug: publicSlug,
       },
       identityVerified: Boolean(data.identity_verified),
       productMetadata: readProductMetadata(data.validation_result?.product_metadata),

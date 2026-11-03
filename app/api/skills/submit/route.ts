@@ -1,6 +1,6 @@
 import { after, NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { validateGitHubRepo, fetchRepositoryCommitSha, GitHubAPIError } from '@/lib/github/api'
+import { validateGitHubRepo, fetchRepositoryCommitSha } from '@/lib/github/api'
 import {
   discoverGitHubSkills,
   parseGitHubSkillReference,
@@ -15,6 +15,7 @@ import { processSubmissionJob } from '@/lib/skills/submission-worker'
 import { normalizeSocialHandle, validSocialHandle } from '@/lib/skills/submission-contract'
 import { createClient } from '@/lib/supabase/server'
 import { ProductMetadataSchema } from '@/lib/skills/product-metadata-schema'
+import { submissionSourceFailure } from '@/lib/skills/source-errors'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -136,12 +137,8 @@ export async function POST(request: NextRequest) {
     return accepted(receipt)
   } catch (error) {
     console.error('[skill-submission] failed', { kind: error instanceof Error ? error.name : 'SubmissionError' })
-    if (error instanceof GitHubAPIError) {
-      return NextResponse.json(
-        { code: 'GITHUB_ERROR', error: error.message },
-        { status: error.statusCode || 400 }
-      )
-    }
+    const sourceFailure = submissionSourceFailure(error)
+    if (sourceFailure) return NextResponse.json(sourceFailure.body, { status: sourceFailure.status, headers: sourceFailure.headers })
     if (error instanceof Error && error.name === 'SubmissionRateLimitError') {
       return NextResponse.json(
         { code: 'RATE_LIMITED', error: error.message },

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { validateGitHubRepo, fetchRepositoryCommitSha, GitHubAPIError } from '@/lib/github/api'
+import { validateGitHubRepo, fetchRepositoryCommitSha } from '@/lib/github/api'
 import { discoverGitHubSkills, parseGitHubSkillReference } from '@/lib/github/skill-source'
 import { buildRequestFingerprint, enforceValidationRateLimit } from '@/lib/skills/open-submission'
+import { submissionSourceFailure } from '@/lib/skills/source-errors'
 
 export const runtime = 'nodejs'
 
@@ -86,13 +87,9 @@ export async function POST(request: NextRequest) {
       })),
     })
   } catch (error) {
-    console.error('[skill-validation] error:', error)
-    if (error instanceof GitHubAPIError) {
-      return NextResponse.json(
-        { valid: false, code: 'GITHUB_ERROR', error: error.message },
-        { status: error.statusCode || 400 }
-      )
-    }
+    console.error('[skill-validation] unavailable', { kind: error instanceof Error ? error.name : 'ValidationError' })
+    const sourceFailure = submissionSourceFailure(error)
+    if (sourceFailure) return NextResponse.json({ valid: false, ...sourceFailure.body }, { status: sourceFailure.status, headers: sourceFailure.headers })
     if (error instanceof Error && error.name === 'ValidationRateLimitError') {
       return NextResponse.json(
         { valid: false, code: 'RATE_LIMITED', error: error.message },
@@ -100,8 +97,8 @@ export async function POST(request: NextRequest) {
       )
     }
     return NextResponse.json(
-      { valid: false, code: 'VALIDATION_FAILED', error: error instanceof Error ? error.message : 'Validation failed.' },
-      { status: 500 }
+      { valid: false, code: 'VALIDATION_UNAVAILABLE', error: 'Validation is temporarily unavailable. Your Skill has not been submitted by this check. Please retry later.' },
+      { status: 503, headers: { 'Retry-After': '60' } }
     )
   }
 }
