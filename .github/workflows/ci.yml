@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, codex/gallery-sync-*]
 
 concurrency:
   # A later run for the same commit replaces the earlier run. Every

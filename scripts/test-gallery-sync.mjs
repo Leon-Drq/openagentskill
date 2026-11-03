@@ -11,7 +11,7 @@ for (const bad of ['../secret','/etc/passwd','images/../../a.png','a\\b.png','a/
 const rule = {source:'test',group:'cover',prefix:'screenshots/'}
 const candidateSha = 'a'.repeat(40)
 const candidateBranch = 'codex/gallery-sync-123-1'
-const passedRun = { id: 1, head_sha: candidateSha, head_branch: candidateBranch, path: '.github/workflows/ci.yml', event: 'workflow_dispatch', status: 'completed', conclusion: 'success' }
+const passedRun = { id: 1, head_sha: candidateSha, head_branch: candidateBranch, path: '.github/workflows/ci.yml', event: 'push', status: 'completed', conclusion: 'success' }
 const passedJobs = ['Lint and typecheck', 'Regression tests', 'Production build'].map(name => ({name, conclusion:'success'}))
 assert.equal(candidateCIState([passedRun], passedJobs, candidateSha), 'passed')
 assert.equal(candidateCIState([{...passedRun, event:'deployment_status'}], passedJobs, candidateSha), 'waiting')
@@ -23,29 +23,27 @@ assert.equal(candidateCIState([passedRun], passedJobs.map(job => ({...job, concl
 assert.equal(candidateCIState([passedRun], passedJobs.slice(0,2), candidateSha), 'failed', 'All three real checks are required')
 assert.equal(candidateCIState([passedRun], passedJobs, candidateSha, { afterId: 1 }), 'waiting', 'Pre-dispatch success cannot publish a new candidate run')
 assert.equal(candidateCIState([passedRun], passedJobs, candidateSha, { branch: 'other' }), 'waiting')
-const dispatched = []
+const apiReads = []
+assert.equal(candidateCIState([{...passedRun, event:'workflow_dispatch'}], passedJobs, candidateSha), 'waiting', 'Dispatch checks are not publication checks')
 await validateGalleryCandidate({
   repository: 'Leon-Drq/openagentskill', branch: candidateBranch, sha: candidateSha, token: 'fixture-only', attempts: 1, sleep: async () => {},
   fetcher: async (url, options) => {
     assert.equal(options.redirect, 'error')
     assert.equal(options.headers['User-Agent'], 'OpenAgentSkill-Gallery-CI')
-    if (options.method === 'POST') {
-      assert.deepEqual(JSON.parse(options.body), { ref: candidateBranch })
-      dispatched.push(url.includes('cloudflare-migration.yml') ? 'cloudflare-migration.yml' : 'ci.yml')
-      return new Response(null, { status: 204 })
-    }
+    assert.equal(options.method, undefined, 'CI verification must remain read-only')
+    assert.equal(options.body, undefined)
+    apiReads.push(url)
     if (url.includes('/jobs?')) return Response.json({ jobs: [...passedJobs, { name: 'validate', conclusion: 'success' }] })
+    assert.ok(url.includes('event=push'))
     const workflow = url.includes('cloudflare-migration.yml') ? 'cloudflare-migration.yml' : 'ci.yml'
-    return Response.json({ workflow_runs: [{ ...passedRun, id: dispatched.includes(workflow) ? 2 : 1, path: `.github/workflows/${workflow}` }] })
+    return Response.json({ workflow_runs: [{ ...passedRun, id: 2, path: `.github/workflows/${workflow}` }] })
   },
 })
-assert.deepEqual(dispatched.sort(), ['ci.yml', 'cloudflare-migration.yml'])
-let mutations = 0
+assert.ok(apiReads.some(url => url.includes('cloudflare-migration.yml')))
 await assert.rejects(validateGalleryCandidate({
   repository: 'Leon-Drq/openagentskill', branch: candidateBranch, sha: candidateSha, token: 'fixture-only', workflows: ['ci.yml'],
-  fetcher: async (_url, options) => options.method === 'POST' ? (mutations++, new Response(null, { status: 503 })) : Response.json({ workflow_runs: [] }),
+  fetcher: async () => new Response(null, { status: 503 }),
 }), /503/)
-assert.equal(mutations, 1, 'Ambiguous dispatch must never replay automatically')
 const blob = (path) => ({path,type:'blob',mode:'100644'})
 const tree = { tree:[blob('screenshots/a.png'),blob('screenshots/b.svg'),blob('screenshots/nested/c.png'),{...blob('screenshots/link.png'),mode:'120000'},blob('outside/a.png')] }
 assert.deepEqual(candidates(tree,[rule]).map(x=>x.path),['screenshots/a.png'])

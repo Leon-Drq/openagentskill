@@ -19,7 +19,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const item = getShowcaseCase(slug)
   if (!item) notFound()
   const locale = getLocaleFromSearchParam(query.lang) || 'en'
-  const title = `${localizeShowcase(item.title, locale)} — ${getShowcaseSkill(item.skillSlug).name} | OpenAgentSkill`
+  const title = `${localizeShowcase(item.title, locale)}${item.discoveryKind === 'source-preview' ? '' : ` — ${getShowcaseSkill(item.skillSlug).name}`} | OpenAgentSkill`
   const description = localizeShowcase(item.description, locale)
   const url = `${BASE_URL}/showcase/${item.slug}`
   return { title: { absolute: title }, description, alternates: { canonical: url }, robots: { index: !query.lang && isShowcaseIndexEligible(item), follow: true },
