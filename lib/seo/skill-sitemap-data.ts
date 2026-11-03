@@ -29,7 +29,7 @@ async function captureCompleteSnapshot(): Promise<string> {
   }
   const finalCount = await getApprovedSkillSitemapCount(SEARCH_INDEX_MIN_GITHUB_STARS, SEARCH_INDEX_MIN_QUALITY_SCORE, true)
   if (count !== finalCount) throw new Error('Sitemap source changed during capture')
-  const snapshot = validateSkillSitemapSnapshot({version:1,policy,generatedAt:new Date().toISOString(),count:entries.length,entries},policy)
+  const snapshot = validateSkillSitemapSnapshot({version:1,policy,generatedAt:new Date().toISOString(),count:entries.length,entries},policy,isCanonicalSkillSlug)
   return packCacheJson(snapshot)
 }
 
@@ -43,11 +43,11 @@ const getCachedCompleteSnapshot = unstable_cache(
 
 export async function getSkillSitemapSnapshot(): Promise<SkillSitemapSnapshot> {
   try {
-    return validateSkillSitemapSnapshot(await unpackCacheJson(await getCachedCompleteSnapshot()),policy)
+    return validateSkillSitemapSnapshot(await unpackCacheJson(await getCachedCompleteSnapshot()),policy,isCanonicalSkillSlug)
   } catch (error) {
     // A checked-in, complete public URL backup also survives a cold process,
     // deployment or Data Cache loss. Never persist it as a fresh live read.
     if (typeof saved.packed !== 'string') throw error
-    return validateSkillSitemapSnapshot(await unpackCacheJson(saved.packed),policy)
+    return validateSkillSitemapSnapshot(await unpackCacheJson(saved.packed),policy,isCanonicalSkillSlug)
   }
 }

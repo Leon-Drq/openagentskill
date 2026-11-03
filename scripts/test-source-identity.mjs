@@ -7,6 +7,7 @@ import * as searchQuery from '../lib/search-query.ts'
 import * as searchResults from '../lib/search-results.ts'
 import { withTimeout } from '../lib/async.ts'
 import nextConfig from '../next.config.mjs'
+import * as sharedAliases from '../lib/skill-slug-aliases.ts'
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
 function compile(path, deps) {
@@ -62,7 +63,7 @@ const ranked = registry.dedupeRankedSkills([
   { skill: { ...canonical, created_at: '2026-09-21' }, score: 80 },
 ])
 assert.equal(ranked[0].skill.slug, canonical.slug, 'A higher-ranking duplicate cannot replace the established URL')
-const fallback = compile('lib/skill-fallbacks.ts', {})
+const fallback = compile('lib/skill-fallbacks.ts', {'@/lib/skill-slug-aliases': sharedAliases})
 assert.equal(fallback.getCanonicalSkillSlug('socai-io-jev-social-jev-social'), canonical.slug)
 const redirects = await nextConfig.redirects()
 for (const slug of [canonical.slug, 'socai-io-jev-social-jev-social']) {

@@ -211,7 +211,8 @@ for (const entry of editorialEntries) {
   for (const alias of entry.aliases) {
     assert.match(alias, /^[a-z0-9-]+$/)
     assert.equal(indexPolicy.isSearchIndexEligible(item(alias)), false, 'Redirecting aliases must not be in the sitemap')
-    assert.ok(read('lib/skill-fallbacks.ts').includes(`'${alias}': '${entry.slug}'`))
+    const aliases = await import('../lib/skill-slug-aliases.ts')
+    assert.equal(aliases.getCanonicalSkillSlug(alias), entry.slug, 'Editorial aliases share the proxy and lookup canonical URL')
     assert.ok(redirects.some(rule => rule.source === `/skills/${alias}` && rule.destination === `/skills/${entry.slug}` && rule.permanent), 'Canonical aliases redirect before streaming')
   }
   for (const field of ['slug', 'repository', 'path', 'license']) assert.match(entry[field], /^[\w./-]+$/, 'Filter values must not contain PostgREST operators')

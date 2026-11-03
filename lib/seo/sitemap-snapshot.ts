@@ -11,7 +11,9 @@ export type SkillSitemapSnapshot = {
   count: number
   entries: SkillSitemapEntry[]
 }
-export function validateSkillSitemapSnapshot(value: unknown, policy: string): SkillSitemapSnapshot {
+// Keep the structural reader usable by the native Node backup CLI. Its caller
+// supplies the same pure URL policy used by proxy redirects and public lookup.
+export function validateSkillSitemapSnapshot(value: unknown, policy: string, isCanonicalSkillSlug: (slug: string) => boolean): SkillSitemapSnapshot {
   if (!value || typeof value !== 'object') throw new Error('Invalid sitemap snapshot')
   const s = value as SkillSitemapSnapshot
   if (s.version !== 1 || s.policy !== policy || !Number.isFinite(Date.parse(s.generatedAt)) ||
@@ -24,6 +26,9 @@ export function validateSkillSitemapSnapshot(value: unknown, policy: string): Sk
       urls.has(e.url) || e.changeFrequency !== 'weekly' || ![0.76,0.82].includes(e.priority) ||
       (e.lastModified !== undefined && !Number.isFinite(Date.parse(e.lastModified)))) {
       throw new Error('Invalid or duplicate sitemap URL')
+    }
+    if (!isCanonicalSkillSlug(e.url.slice('https://www.openagentskill.com/skills/'.length))) {
+      throw new Error('Noncanonical sitemap URL')
     }
     urls.add(e.url)
   }

@@ -9,14 +9,27 @@ import * as policy from '../lib/seo/search-indexability.ts'
 import * as scope from '../lib/skills/registry-scope.ts'
 import * as validation from '../lib/seo/sitemap-snapshot.ts'
 import * as pagination from '../lib/skills/pagination.ts'
+import * as sharedAliases from '../lib/skill-slug-aliases.ts'
 const compile = (path,deps) => {
   const output=ts.transpileModule(readFileSync(new URL('../'+path,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText
   const exports={};new Function('exports','require',output)(exports,name=>{assert.ok(name in deps,name);return deps[name]});return exports
 }
-const aliases=compile('lib/skill-fallbacks.ts',{'@/lib/db/skills':{},'@/lib/async':{},'@/lib/seo/curated-skill-snapshot':{}})
+const aliases=compile('lib/skill-fallbacks.ts',{'@/lib/db/skills':{},'@/lib/async':{},'@/lib/seo/curated-skill-snapshot':{},'@/lib/skill-slug-aliases':sharedAliases})
+for(const [input,canonical] of Object.entries(sharedAliases.SKILL_SLUG_ALIASES)) {
+  assert.equal(aliases.getCanonicalSkillSlug(input),canonical,'Lookup and proxy redirects must choose the same URL')
+  assert.equal(aliases.isCanonicalSkillSlug(input),input===canonical)
+}
+assert.equal(aliases.getCanonicalSkillSlug(' AMMARBALKHI-OWNERS-VISION-OWNERS-VISION '),'ammaralbalkhi-owners-vision-owners-vision','Renamed creator links resolve on API and HTML surfaces')
+for(const slug of ['constructor','__proto__','tostring'])assert.equal(aliases.getCanonicalSkillSlug(slug),slug,'Unknown slugs must not resolve to inherited object properties')
+for(const slug of ['Test-1',' test-1','/test-1','test_1','test-1?lang=de','x'.repeat(161)])assert.equal(aliases.isCanonicalSkillSlug(slug),false,'Sitemaps must not submit invalid or normalized lookup variants')
 const snapshot={version:1,policy:policy.buildSkillSitemapPolicy(),generatedAt:'2026-10-02T00:00:00.000Z',count:2001,entries:Array.from({length:2001},(_,i)=>({url:`https://www.openagentskill.com/skills/test-${i}`,lastModified:'2026-01-01T00:00:00.000Z',changeFrequency:'weekly',priority:0.76}))}
-const validate=value=>validation.validateSkillSitemapSnapshot(value,snapshot.policy)
+const validate=value=>validation.validateSkillSitemapSnapshot(value,snapshot.policy,sharedAliases.isCanonicalSkillSlug)
 assert.equal(validate(snapshot),snapshot)
+const checkedInBackup=await packed.unpackCacheJson(JSON.parse(readFileSync(new URL('../lib/seo/sitemap-backup.json',import.meta.url),'utf8')).packed)
+assert.equal(validate(checkedInBackup),checkedInBackup,'The deployable outage backup must pass the same canonical URL rules')
+for(const slug of ['muxuuu-serenity-skill','ammarbalkhi-owners-vision-owners-vision','Test-0','test_0','x'.repeat(161)]) {
+  assert.throws(()=>validate({...snapshot,entries:[{...snapshot.entries[0],url:`https://www.openagentskill.com/skills/${slug}`},...snapshot.entries.slice(1)]}),/sitemap URL/,'A historical backup cannot reintroduce redirects or unresolvable slugs')
+}
 for(const value of [{...snapshot,count:2002},{...snapshot,policy:'old policy'},{...snapshot,entries:[snapshot.entries[0],...snapshot.entries.slice(0,2000)]},{...snapshot,entries:[{...snapshot.entries[0],url:'https://evil.test/'},...snapshot.entries.slice(1)]}]) assert.throws(()=>validate(value))
 const backup=await packed.packCacheJson(snapshot)
 function manager(mode,saved={packed:backup}) {

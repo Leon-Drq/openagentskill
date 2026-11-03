@@ -23,6 +23,14 @@ with its original generation date in `X-Sitemap-Snapshot`. It does not claim a
 fresh database read. A missing or incompatible backup returns a retryable 503
 rather than publishing a partial list. Live snapshots refresh every hour.
 
+Proxy redirects, public Skill lookups, manifests and sitemap capture share the
+alias policy in `lib/skill-slug-aliases.ts`. Snapshot validation also checks that
+every URL is already canonical and accepted by the registry slug parser. This
+applies to cached generations and deployment backups as well as fresh captures;
+an old backup cannot reintroduce renamed aliases or invalid document addresses.
+Unknown names such as `constructor` are ordinary lookup strings, never inherited
+JavaScript object properties or redirect targets.
+
 Refresh the deployment backup after a successful source capture:
 
 ```sh
