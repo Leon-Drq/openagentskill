@@ -1,6 +1,7 @@
 import 'server-only'
 import schema from './cloudflare-schema.json'
 import { retryIdempotentD1, logD1Failure } from './cloudflare-reliability'
+import { encodeD1Value } from './cloudflare-values'
 
 export interface ReadDatabase {
   prepare(sql: string): { bind(...values: unknown[]): { all(): Promise<{ results: Record<string, unknown>[] }> } }
@@ -136,6 +137,12 @@ export function compileRead(input: { url: URL; method: string; headers: Headers;
       if (['int2','int4','int8','numeric'].includes(field.type)) {
         if (!/^-?\d+(?:\.\d+)?$/.test(text) || !Number.isFinite(Number(text))) throw new QueryError('Invalid numeric filter')
         return Number(text)
+      }
+      if (field.type === 'timestamptz') {
+        // Writes store six fractional digits. Match the same instant on reads
+        // and compare-and-swap updates, including Date.toISOString() leases.
+        try { return encodeD1Value(text, field.type) }
+        catch { throw new QueryError('Invalid timestamp filter') }
       }
       return text
     }

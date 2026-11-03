@@ -38,3 +38,18 @@ This is not an owner publication or a review override. No rejected review,
 approval score, identity claim or execution result is changed. Receipt secrets
 stay private; no source code from the submitted repository is executed and no
 message is sent to its author.
+
+Live receipt verification then revealed a second D1 migration issue: reviews
+remained `processing` after completion. Writes normalize timestamps to six
+fractional digits, while query filters compared the original three-digit
+`Date.toISOString()` lease literally. The conditional completion update matched
+no rows. Timestamp filter values now use the same validated normalization as
+writes; different worker leases still do not match. A regression runs the actual
+submission worker, review policy and D1 transport through a deterministic manual
+review, proving that the terminal state is saved and will not be reviewed again.
+No production submission counter, approval or score is edited to recover it.
+
+The affected immutable package includes two CPU data JSON files larger than the
+existing 120,000-byte review limit. Incomplete package coverage requires human
+review under the existing policy. Restoring queue completion must not turn this
+into automatic approval or claim that the Skill has been executed.
