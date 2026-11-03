@@ -42,7 +42,11 @@ for (const [path, expectedCanonical, indexable] of paths) {
   assert.equal(/noindex/i.test(robots), !indexable, `${path}: indexability`)
   for (const block of body.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script\b[^>]*>/gi)) JSON.parse(block[1])
   if (path === '/guides/agent-skills-for-product-videos') {
-    assert.ok(body.includes('Sources and examples') && body.includes('2026-09-08'))
+    const { body: guidesXml } = await get('/sitemaps/guides.xml')
+    const entry = [...guidesXml.matchAll(/<url>([\s\S]*?)<\/url>/g)].find(m => m[1].includes(`<loc>${canonicalOrigin + path}</loc>`))?.[1]
+    const sourceDate = entry?.match(/<lastmod>(\d{4}-\d{2}-\d{2})T/)?.[1]
+    assert.ok(sourceDate && body.includes(sourceDate), `${path}: page and sitemap share the current content date`)
+    assert.ok(body.includes('Sources and examples'))
     assert.ok(body.includes('source-based planning guide'))
   }
   if (path === '/zh/skills' || path === '/ja/skills') {
