@@ -56,7 +56,7 @@ export function buildSearchIndexFilter(minStars = SEARCH_INDEX_MIN_GITHUB_STARS,
 // SQL selects candidates. Sitemap captures additionally apply the same
 // registry-scope predicate as detail pages, which reject MCP-only products.
 export function buildSkillSitemapPolicy() {
-  return `registry-scope-v1:${buildSearchIndexFilter()}`
+  return `registry-scope-v2-canonical:${buildSearchIndexFilter()}`
 }
 
 export interface SearchEvidenceProfile {

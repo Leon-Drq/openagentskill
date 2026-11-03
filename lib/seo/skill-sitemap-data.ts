@@ -2,6 +2,7 @@ import { unstable_cache } from 'next/cache'
 import { getApprovedSkillSitemapCount, getApprovedSkillSitemapSource } from '@/lib/db/skills'
 import { buildSkillSitemapPolicy, SEARCH_INDEX_MIN_GITHUB_STARS, SEARCH_INDEX_MIN_QUALITY_SCORE } from '@/lib/seo/search-indexability'
 import { isMcpOnlySkillRecord } from '@/lib/skills/registry-scope'
+import { isCanonicalSkillSlug } from '@/lib/skill-fallbacks'
 import { validateSkillSitemapSnapshot, type SkillSitemapSnapshot } from '@/lib/seo/sitemap-snapshot'
 import { packCacheJson, unpackCacheJson } from '@/lib/cache/packed-json'
 import { createCoalescedCache } from '@/lib/cache/coalesced'
@@ -20,7 +21,7 @@ async function captureCompleteSnapshot(): Promise<string> {
     const rows = await source.read(offset, Math.min(1000,count-offset))
     if (rows.length !== Math.min(1000, count-offset)) throw new Error('Incomplete sitemap source page')
     for (const row of rows) {
-      if (isMcpOnlySkillRecord(row)) continue
+      if (isMcpOnlySkillRecord(row) || !isCanonicalSkillSlug(row.slug)) continue
       const date = row.github_last_pushed_at || row.created_at
       const lastModified = date && Number.isFinite(Date.parse(date)) ? new Date(date).toISOString() : undefined
       entries.push({url:`https://www.openagentskill.com/skills/${row.slug}`,lastModified,changeFrequency:'weekly',priority:Number(row.github_stars || 0)>=500 ? 0.82 : 0.76})
@@ -36,7 +37,7 @@ async function captureCompleteSnapshot(): Promise<string> {
 // share a URL set; a failed refresh cannot replace it with a partial capture.
 const getCachedCompleteSnapshot = unstable_cache(
   () => readSource(policy, captureCompleteSnapshot),
-  ['complete-skill-sitemap-v3-registry-scope',policy],
+  ['complete-skill-sitemap-v4-canonical-scope',policy],
   {revalidate:3600,tags:['approved-sitemap-count','approved-sitemap-records']}
 )
 

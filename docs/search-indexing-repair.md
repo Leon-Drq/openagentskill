@@ -21,6 +21,8 @@ count drives shard boundaries. A versioned scope, cache key and refreshed comple
 backup prevent an old generation from restoring those excluded URLs. The backup
 capture command verifies the scope header as well as the generation timestamp.
 Agent Skills that merely mention MCP retain their existing eligibility.
+The existing canonical-slug resolver also excludes redirecting aliases; destination
+records must qualify independently, rather than inheriting an alias review score.
 
 The shared link policy now covers query states across the whole site, including
 Gallery search, language preferences, report utilities, generic alternatives and
