@@ -413,7 +413,7 @@ export async function runSkillRadarAutomation(options: SkillRadarOptions = {}): 
   }
 
   const result: SkillRadarResult = {
-    success: true,
+    success: summary.errors === 0 && xRadar.status !== 'error' && !githubHot.rateLimited,
     runKey,
     source: 'x_and_github',
     xRadarSchedule,
