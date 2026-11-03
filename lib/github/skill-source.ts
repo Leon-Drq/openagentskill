@@ -8,6 +8,7 @@ const MAX_DISCOVERED_SKILLS = 50
 const MAX_PACKAGE_FILES = 30
 const MAX_FILE_BYTES = 120_000
 const GITHUB_READ_DELAY_MS = 100
+class SkillDocumentTooLargeError extends Error {}
 
 export interface GitHubSkillReference {
   owner: string
@@ -280,7 +281,7 @@ async function fetchRepositoryFile(owner: string, repo: string, ref: string, pat
   if (!response.ok) throw await githubResponseError(response)
 
   const content = await response.text()
-  if (content.length > MAX_FILE_BYTES) throw new Error(`${path} is too large to review safely.`)
+  if (content.length > MAX_FILE_BYTES) throw new SkillDocumentTooLargeError(`${path} is too large to review safely.`)
   return content
 }
 
@@ -340,8 +341,11 @@ export async function discoverGitHubSkills(
           document,
           frontmatter,
         } satisfies DiscoveredGitHubSkill
-      } catch {
-        return null
+      } catch (error) {
+        if ((error instanceof GitHubAPIError && error.statusCode === 404) || error instanceof SkillDocumentTooLargeError) return null
+        // A failed read must not turn a valid source into MISSING_SKILL_FILE,
+        // or silently return an incomplete page of selectable Skills.
+        throw error
       }
     })
   ).filter((skill): skill is DiscoveredGitHubSkill => Boolean(skill))

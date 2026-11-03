@@ -14,7 +14,7 @@ const output = '.codex-tmp/submission-qa'
 mkdirSync(output, { recursive: true })
 const errors = []
 const accepted = new Map(), submitCalls = [], validations = []
-let mode = 'pending', partialFailure = false
+let mode = 'pending', partialFailure = false, validationFailure = null
 const candidates = Array.from({length:12}, (_,i)=>({ name: `Fixture Skill ${i+1}`, description: 'A sample writing skill for browser-only verification.', path: `skills/example-${i+1}/SKILL.md`, ref: 'a'.repeat(40), sourceUrl: 'https://github.com/fixture/skills' }))
 const context = await browser.newContext({ viewport: {width:1280,height:900} })
 await context.route('**/*', async route => {
@@ -23,6 +23,7 @@ await context.route('**/*', async route => {
   const json = (value,status=200)=>route.fulfill({status,contentType:'application/json',body:JSON.stringify(value)})
   if (url.pathname === '/api/skills/validate') {
     const body=req.postDataJSON(); validations.push(body)
+    if (validationFailure) return json({ valid: false, code: validationFailure.code }, validationFailure.status)
     const start=body.offset||0, list=body.query ? candidates.filter(x=>x.path.includes(body.query)) : candidates
     return json({valid:true,skills:list.slice(start,start+10),hasMore:start+10<list.length,nextOffset:Math.min(start+10,list.length),totalPaths:list.length})
   }
@@ -55,12 +56,22 @@ try {
   await page.getByLabel('GitHub repository or SKILL.md URL',{exact:true}).waitFor()
   assert.equal(await page.locator('h1').count(),1)
   await page.getByLabel('GitHub repository or SKILL.md URL',{exact:true}).fill('https://github.com/fixture/skills')
+  validationFailure = { code: 'SOURCE_RATE_LIMITED', status: 503 }
+  await page.getByRole('button',{name:'Find Skills',exact:true}).first().click()
+  await page.getByRole('alert').getByText(/not your daily submission limit/).waitFor()
+  assert.equal(await page.locator('#repository').inputValue(), 'https://github.com/fixture/skills')
+  assert.equal(submitCalls.length, 0)
+  validationFailure = { code: 'SOURCE_UNAVAILABLE', status: 503 }
+  await page.getByRole('button',{name:'Find Skills',exact:true}).first().click()
+  await page.getByRole('alert').getByText(/This check has not submitted a Skill/).waitFor()
+  assert.equal(await page.locator('#repository').inputValue(), 'https://github.com/fixture/skills')
+  validationFailure = null
   await page.getByRole('button',{name:'Find Skills',exact:true}).first().click()
   await page.getByRole('checkbox').first().waitFor()
   assert.equal(await page.getByRole('checkbox').count(),11)
   await page.getByRole('button',{name:'Load more paths'}).click()
   await page.getByRole('checkbox').nth(11).waitFor()
-  assert.equal(validations[1].offset,10)
+  assert.equal(validations.at(-1).offset,10)
   // Filling a filter without applying it must not corrupt pagination requests.
   await page.getByText('Optional details',{exact:true}).click()
   assert.equal(await page.locator('#makerGithub').inputValue(),'','Repository owner must not be auto-assigned as submitter')

@@ -90,10 +90,12 @@ export function SkillSubmitForm({ onSubmit }: { onSubmit: (data: SubmitFormData[
       const data = await response.json()
       if (version !== generation.current) return
       if (!response.ok || !data.valid) {
-        setError(response.status === 429 ? c('rate') : data.code === 'MISSING_SKILL_FILE'
+        setError(data.code === 'SOURCE_RATE_LIMITED' ? c('sourceLimited')
+          : response.status === 429 ? c('rate') : data.code === 'MISSING_SKILL_FILE'
           ? submissionCopy(locale, 'No valid SKILL.md with name and description was found. You can paste a skill directory or SKILL.md URL.', '没有找到包含 name 和 description 的有效 SKILL.md。也可以直接粘贴 Skill 目录或 SKILL.md 链接。')
           : data.code === 'INVALID_REPOSITORY' ? submissionCopy(locale, 'Enter a GitHub repository, skill directory, or SKILL.md URL.', '请输入 GitHub 仓库、Skill 目录或 SKILL.md 链接。')
-          : submissionCopy(locale, 'Validation failed. Please try again.', '验证失败，请稍后重试。'))
+          : ['SOURCE_NOT_FOUND', 'PRIVATE_REPOSITORY'].includes(data.code) || response.status === 404 ? c('sourceMissing')
+          : c('sourceUnavailable'))
         return
       }
       const found = (data.skills || []) as SkillCandidate[]
@@ -102,7 +104,7 @@ export function SkillSubmitForm({ onSubmit }: { onSubmit: (data: SubmitFormData[
       if (!loadMore && found.length) setSelected([found[0].path])
       setPagination({ hasMore: Boolean(data.hasMore), nextOffset: data.nextOffset || 0, truncated: Boolean(data.treeTruncated), total: data.totalPaths || found.length })
     } catch {
-      if (version === generation.current) setError(submissionCopy(locale, 'Validation failed. Please try again.', '验证失败，请稍后重试。'))
+      if (version === generation.current) setError(controller.signal.aborted ? c('validationTimeout') : c('validationConnection'))
     } finally {
       clearTimeout(timeout)
       if (version === generation.current) setValidating(false)

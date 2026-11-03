@@ -3,6 +3,8 @@ import { register } from 'node:module'
 register('./test-owner-publication-loader.mjs', import.meta.url)
 const { discoverGitHubSkills } = await import('../lib/github/skill-source.ts')
 const { submissionFlowCopy } = await import('../lib/i18n/submission-flow-copy.ts')
+const { submissionSourceFailure } = await import('../lib/skills/source-errors.ts')
+const { GitHubAPIError } = await import('../lib/github/http.ts')
 const paths = Array.from({ length: 65 }, (_, i) => `skills/item-${String(i).padStart(2, '0')}/SKILL.md`)
 const calls = []
 const originalFetch = globalThis.fetch
@@ -32,10 +34,34 @@ try {
   const exact = await discoverGitHubSkills({ ...reference, path: paths[64] }, { defaultBranch: 'main' })
   assert.equal(exact.skills.length, 1)
   assert.ok(calls.filter(url => url.pathname.includes('/contents/')).every(url => url.searchParams.get('ref') === reference.ref))
-  for (const locale of ['en','zh','ja','ko','es','de','fr','id']) for (const key of ['saved','pending','published','manual','share','support','copyError','limits','statusError']) {
+  for (const locale of ['en','zh','ja','ko','es','de','fr','id']) for (const key of ['saved','pending','published','manual','share','support','copyError','limits','statusError','sourceUnavailable','sourceLimited','sourceMissing','validationTimeout','validationConnection']) {
     const text = submissionFlowCopy(locale, key)
     assert.ok(text?.length)
     assert.ok(!text.includes('\ufffd'))
   }
+  const direct = { ...reference, path: paths[0] }
+  for (const status of [403, 429, 500]) {
+    globalThis.fetch = async () => new Response('private provider body', { status })
+    await assert.rejects(() => discoverGitHubSkills(direct, { defaultBranch: 'main' }), error => error instanceof GitHubAPIError && error.statusCode === status, 'Source failures must not become a missing SKILL.md')
+  }
+  globalThis.fetch = async () => { throw new DOMException('Timed out', 'TimeoutError') }
+  await assert.rejects(() => discoverGitHubSkills(direct, { defaultBranch: 'main' }), { name: 'TimeoutError' })
+  globalThis.fetch = async () => new Response('Missing document', { status: 404 })
+  assert.equal((await discoverGitHubSkills(direct, { defaultBranch: 'main' })).skills.length, 0)
+  globalThis.fetch = async () => new Response('x'.repeat(120_001))
+  assert.equal((await discoverGitHubSkills(direct, { defaultBranch: 'main' })).skills.length, 0, 'Oversized source documents remain ineligible')
+  for (const status of [401, 403, 500]) {
+    const failure = submissionSourceFailure(new GitHubAPIError('private provider body', status))
+    assert.equal(failure.status, 503)
+    assert.equal(failure.body.code, 'SOURCE_UNAVAILABLE')
+    assert.ok(!JSON.stringify(failure).includes('private provider body'))
+  }
+  const limited = submissionSourceFailure(new GitHubAPIError('private provider body', 403, true, 120_000))
+  assert.equal(limited.status, 503, 'Upstream throttling is not the visitor\'s 429 daily limit')
+  assert.equal(limited.body.code, 'SOURCE_RATE_LIMITED')
+  assert.equal(limited.headers['Retry-After'], '120')
+  assert.equal(submissionSourceFailure(new GitHubAPIError('missing', 404)).status, 404)
+  assert.equal(submissionSourceFailure(new DOMException('timeout', 'TimeoutError')).status, 503)
+  assert.equal(submissionSourceFailure(new Error('database failure')), null)
 } finally { globalThis.fetch = originalFetch }
 console.log('Submission pagination passed: 65 paths, bounded pages, no overlap, exact links, path search and eight-language receipt copy.')
