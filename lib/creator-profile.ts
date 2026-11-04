@@ -29,6 +29,17 @@ export function creatorDateWindow(now = new Date()) {
 
 export const serializeCreatorSchema = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c')
 
+/** Leave room for date and visibility filters within D1's bind budget. */
+export async function readCreatorClaimBatches<T>(slugs: string[], fetchBatch: (batch: string[]) => PromiseLike<{ data: T[] | null; error?: unknown }>) {
+  const rows: T[] = []
+  for (let offset = 0; offset < slugs.length; offset += 50) {
+    const { data, error } = await fetchBatch(slugs.slice(offset, offset + 50))
+    if (error || !data) return { data: null }
+    rows.push(...data)
+  }
+  return { data: rows }
+}
+
 /** PostgREST caps result pages. Never present a truncated or failed read as a total. */
 export async function readCreatorDailyPages<T>(fetchPage: (offset: number) => PromiseLike<{ data: T[] | null; error?: unknown }>) {
   const rows: T[] = []

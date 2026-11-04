@@ -9,6 +9,7 @@ import {
   parseSkillRepository,
 } from '@/lib/creator-ownership'
 import { validateGitHubRepo } from '@/lib/github/api'
+import { syncVerifiedClaimListings } from '@/lib/creator-claims'
 
 const VerifySchema = z.object({
   skill_slug: z.string().trim().min(1).max(200).regex(/^[a-z0-9][a-z0-9-]*$/),
@@ -23,14 +24,22 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const admin = createAdminClient({ requestTimeoutMs: 15_000 })
-  const { data: claim } = await admin
+  const { data: claim, error: claimError } = await admin
     .from('skill_claims')
     .select('id,skill_slug,user_id,status,github_username,x_username,challenge_token_hash,challenge_expires_at')
     .eq('skill_slug', parsed.data.skill_slug)
     .eq('user_id', user.id)
     .maybeSingle()
+  if (claimError) return NextResponse.json({ error: 'Could not load claim. Please retry.' }, { status: 503 })
   if (!claim) return NextResponse.json({ error: 'Claim not found' }, { status: 404 })
-  if (claim.status === 'approved') return NextResponse.json({ ok: true, alreadyVerified: true })
+  if (claim.status === 'approved') {
+    try {
+      await syncVerifiedClaimListings(admin, [claim.skill_slug], { userId: user.id, githubUsername: claim.github_username, xUsername: claim.x_username })
+    } catch {
+      return NextResponse.json({ error: 'Ownership verified, but listing sync failed. Retry to finish syncing.' }, { status: 503 })
+    }
+    return NextResponse.json({ ok: true, alreadyVerified: true })
+  }
   if (!claim.challenge_token_hash || !claim.challenge_expires_at) {
     return NextResponse.json({ error: 'Create a fresh repository challenge first.' }, { status: 409 })
   }
@@ -56,9 +65,11 @@ export async function POST(request: NextRequest) {
   const value = await fetchRepositoryChallenge({
     owner: repository.owner,
     repo: repository.repo,
-    ref: repository.ref || repo.defaultBranch,
+    // Ownership is proved on the current repository, not an old pinned Skill
+    // revision, where a newly created challenge file cannot exist.
+    ref: repo.defaultBranch,
     path: challengePath,
-  })
+  }).catch(() => null)
   if (!value || !challengeMatches(value, claim.challenge_token_hash)) {
     return NextResponse.json({
       error: `Verification file not found or token mismatch at ${challengePath}.`,
@@ -66,7 +77,7 @@ export async function POST(request: NextRequest) {
   }
 
   const verifiedAt = new Date().toISOString()
-  const { error } = await admin.from('skill_claims').update({
+  const { data: approvedClaim, error } = await admin.from('skill_claims').update({
     status: 'approved',
     verification_method: 'repository_file',
     verification_tier: 'maintainer',
@@ -75,15 +86,14 @@ export async function POST(request: NextRequest) {
     challenge_expires_at: null,
     reviewer_note: 'Repository ownership challenge verified automatically.',
     updated_at: verifiedAt,
-  }).eq('id', claim.id).eq('user_id', user.id).eq('status', 'pending')
-  if (error) return NextResponse.json({ error: 'Could not approve the claim.' }, { status: 500 })
+  }).eq('id', claim.id).eq('user_id', user.id).eq('status', 'pending').select('id').maybeSingle()
+  if (error || !approvedClaim) return NextResponse.json({ error: 'Could not approve the claim. Please retry.' }, { status: 503 })
 
-  await admin.from('skills').update({
-    author_user_id: user.id,
-    publisher_github: claim.github_username || repository.owner,
-    publisher_x: claim.x_username,
-    publisher_verified: true,
-  }).eq('slug', claim.skill_slug)
+  try {
+    await syncVerifiedClaimListings(admin, [claim.skill_slug], { userId: user.id, githubUsername: claim.github_username || repository.owner, xUsername: claim.x_username })
+  } catch {
+    return NextResponse.json({ error: 'Ownership verified, but listing sync failed. Retry to finish syncing.' }, { status: 503 })
+  }
 
   return NextResponse.json({ ok: true, status: 'approved', verified_at: verifiedAt })
 }

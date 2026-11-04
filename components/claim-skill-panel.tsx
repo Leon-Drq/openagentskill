@@ -18,6 +18,7 @@ interface ClaimSkillPanelProps {
   repository?: string
   creatorName?: string
   sourceLabel?: string
+  listingSynced?: boolean
   approvedClaim?: {
     github_username: string | null
     x_username?: string | null
@@ -71,6 +72,7 @@ export function ClaimSkillPanel({
   creatorName,
   sourceLabel = 'community-indexed',
   approvedClaim,
+  listingSynced = true,
 }: ClaimSkillPanelProps) {
   const { locale } = useI18n()
   const router = useRouter()
@@ -89,7 +91,7 @@ export function ClaimSkillPanel({
   const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
-    if (approvedClaim) return
+    if (approvedClaim && listingSynced) return
     let active = true
     const controller = new AbortController()
 
@@ -118,7 +120,7 @@ export function ClaimSkillPanel({
       active = false
       controller.abort()
     }
-  }, [skillSlug, repository, approvedClaim, accountRetry])
+  }, [skillSlug, repository, approvedClaim, listingSynced, accountRetry])
 
   useEffect(() => {
     if (!hasUser || typeof window === 'undefined') return
@@ -267,6 +269,14 @@ export function ClaimSkillPanel({
             {formatSkillDetailCopy(locale, 'verificationEvidence')}
           </a>
         )}
+        {!listingSynced && existingClaim?.status === 'approved' ? (
+          <div className="mt-4 space-y-2">
+            <button type="button" onClick={verifyChallenge} disabled={verificationStatus === 'checking' || verificationStatus === 'verified'} className="min-h-11 w-full border border-border px-3 py-2 text-sm disabled:opacity-50">
+              {verificationStatus === 'checking' ? 'Syncing ownership…' : verificationStatus === 'verified' ? 'Ownership display synced' : 'Sync ownership display'}
+            </button>
+            {errorMessage ? <p role="alert" className="text-xs text-red-700">{errorMessage}</p> : null}
+          </div>
+        ) : null}
       </div>
     )
   }

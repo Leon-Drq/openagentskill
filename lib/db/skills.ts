@@ -50,6 +50,7 @@ export interface SkillRecord extends Partial<SkillTaxonomy> {
   publisher_github?: string | null
   publisher_x?: string | null
   publisher_verified?: boolean
+  author_user_id?: string | null
   submission_source: string
   submitted_by_agent: string | null
   ai_review_score: any

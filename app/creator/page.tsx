@@ -10,7 +10,7 @@ import { accountCopy } from '@/lib/i18n/account-copy'
 import { AccountPublicCard } from '@/components/account-public-card'
 import type { Metadata } from 'next'
 import { CreatorProfileEditor } from '@/components/creator-profile-editor'
-import { creatorDateWindow, readCreatorDailyPages } from '@/lib/creator-profile'
+import { creatorDateWindow, readCreatorDailyPages, readCreatorClaimBatches } from '@/lib/creator-profile'
 import { studioCopy, type StudioKey } from '@/lib/i18n/creator-studio-copy'
 import { getLocaleFromSearchParam } from '@/lib/i18n/config'
 import { SHOWCASE_CASES } from '@/lib/showcase'
@@ -75,19 +75,19 @@ export default async function CreatorDashboard({
   const approvedSlugs = (claims || []).filter((claim) => claim.status === 'approved').map((claim) => claim.skill_slug)
   const [{ data: skills }, { data: events }, { data: outcomes }, { data: dailyEvents }, { data: versions }] = await Promise.all([
     approvedSlugs.length
-      ? supabase.from('skills').select('slug,name,category,repository,github_repo,version,license,license_source,license_status,source_commit_sha,source_sync_status,last_synced_at').in('slug', approvedSlugs)
+      ? readCreatorClaimBatches(approvedSlugs, batch => supabase.from('skills').select('slug,name,category,repository,github_repo,version,license,license_source,license_status,source_commit_sha,source_sync_status,last_synced_at,author_user_id,publisher_verified').in('slug', batch))
       : Promise.resolve({ data: [] }),
     approvedSlugs.length && needsAnalytics
-      ? supabase.from('skill_event_stats').select('*').in('skill_slug', approvedSlugs)
+      ? readCreatorClaimBatches(approvedSlugs, batch => supabase.from('skill_event_stats').select('*').in('skill_slug', batch))
       : Promise.resolve({ data: [] }),
     approvedSlugs.length && needsAnalytics
-      ? supabase.from('agent_outcome_stats').select('*').in('skill_slug', approvedSlugs)
+      ? readCreatorClaimBatches(approvedSlugs, batch => supabase.from('agent_outcome_stats').select('*').in('skill_slug', batch))
       : Promise.resolve({ data: [] }),
     approvedSlugs.length && (tab === 'overview' || tab === 'analytics')
-      ? readCreatorDailyPages(offset => supabase.from('skill_events_daily').select('skill_slug,event_date,views,install_starts,install_successes,outcome_successes').in('skill_slug', approvedSlugs).gte('event_date', dateWindow.start).lte('event_date', dateWindow.end).order('event_date', { ascending: false }).order('skill_slug').range(offset, offset + 999))
+      ? readCreatorClaimBatches(approvedSlugs, batch => readCreatorDailyPages(offset => supabase.from('skill_events_daily').select('skill_slug,event_date,views,install_starts,install_successes,outcome_successes').in('skill_slug', batch).gte('event_date', dateWindow.start).lte('event_date', dateWindow.end).order('event_date', { ascending: false }).order('skill_slug').range(offset, offset + 999)))
       : Promise.resolve({ data: [] }),
     approvedSlugs.length && (tab === 'overview' || tab === 'skills')
-      ? supabase.from('skill_versions').select('skill_slug,source_content_hash,detected_at').in('skill_slug', approvedSlugs).order('detected_at', { ascending: false })
+      ? readCreatorClaimBatches(approvedSlugs, batch => supabase.from('skill_versions').select('skill_slug,source_content_hash,detected_at').in('skill_slug', batch).order('detected_at', { ascending: false }))
       : Promise.resolve({ data: [] }),
   ])
 
@@ -96,7 +96,7 @@ export default async function CreatorDashboard({
   const versionCounts = new Map<string, number>()
   for (const row of versions || []) versionCounts.set(row.skill_slug, (versionCounts.get(row.skill_slug) || 0) + 1)
   const approvedMatchingGitHubCount = verifiedGitHubUsername && (tab === 'overview' || tab === 'skills')
-    ? (skills || []).filter((skill) => String(skill.github_repo || '').toLowerCase().startsWith(`${verifiedGitHubUsername}/`)).length
+    ? (skills || []).filter((skill) => skill.author_user_id === user.id && skill.publisher_verified && String(skill.github_repo || '').toLowerCase().startsWith(`${verifiedGitHubUsername}/`)).length
     : 0
   const totals = (skills || []).reduce(
     (sum, skill) => {

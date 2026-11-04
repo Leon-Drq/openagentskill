@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getGitHubIdentity, parseSkillRepository } from '@/lib/creator-ownership'
+import { syncVerifiedClaimListings } from '@/lib/creator-claims'
 
 const MAX_BATCH_CLAIMS = 250
 
@@ -25,6 +26,7 @@ export async function POST() {
     .select('slug,name,repository,github_repo,author_user_id,publisher_verified')
     .or('ai_review_approved.eq.true,listing_status.in.(owner_published,static_checked)')
     .ilike('github_repo', `${githubUsername}/%`)
+    .or('author_user_id.is.null,publisher_verified.eq.false')
     .order('github_stars', { ascending: false })
     .limit(MAX_BATCH_CLAIMS)
 
@@ -83,16 +85,11 @@ export async function POST() {
   if (claimError) return NextResponse.json({ error: 'Failed to claim the selected skills.' }, { status: 500 })
 
   const slugs = eligible.map((skill) => skill.slug)
-  const { error: updateError } = await admin
-    .from('skills')
-    .update({
-      author_user_id: user.id,
-      publisher_github: githubUsername,
-      publisher_verified: true,
-      updated_at: now,
-    })
-    .in('slug', slugs)
-  if (updateError) return NextResponse.json({ error: 'Claims were saved, but listings could not be updated.' }, { status: 500 })
+  try {
+    await syncVerifiedClaimListings(admin, slugs, { userId: user.id, githubUsername })
+  } catch {
+    return NextResponse.json({ error: 'Ownership verified, but listing sync failed. Retry to finish syncing.' }, { status: 503 })
+  }
 
   await admin.from('skill_events').insert(slugs.map((skillSlug) => ({
     skill_slug: skillSlug,

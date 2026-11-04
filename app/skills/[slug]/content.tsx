@@ -405,7 +405,7 @@ export default async function SkillDetailPage({ params, searchParams }: {
               <section id="creator-tools" className={sectionClass}>
                 <h2 className={headingClass}><ProfileText id="creatorTools" /></h2>
                 <div className="mt-6"><SkillAttributionPanel attribution={attribution} /></div>
-                <ClaimSkillPanel skillSlug={skill.slug} repository={skill.technical.repository} creatorName={attribution.creatorName} sourceLabel={attribution.statusLabel.toLowerCase()} approvedClaim={approvedClaim ? { github_username: approvedClaim.github_username, x_username: approvedClaim.x_username, evidence_url: approvedClaim.evidence_url, verification_tier: approvedClaim.verification_tier, verified_at: approvedClaim.verified_at } : null} />
+                <ClaimSkillPanel skillSlug={skill.slug} repository={skill.technical.repository} creatorName={attribution.creatorName} sourceLabel={attribution.statusLabel.toLowerCase()} listingSynced={Boolean(dbSkill.publisher_verified && dbSkill.author_user_id)} approvedClaim={approvedClaim ? { github_username: approvedClaim.github_username, x_username: approvedClaim.x_username, evidence_url: approvedClaim.evidence_url, verification_tier: approvedClaim.verification_tier, verified_at: approvedClaim.verified_at } : null} />
                 <details className="my-5"><summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold"><Text id="shareKit" /></summary><CreatorBadgeKit skillSlug={skill.slug} /></details>
                 <SkillFeedbackPanel skillSlug={skill.slug} />
               </section>

@@ -66,7 +66,7 @@ assert.match(githubWebhookRoute, /trustedRepository/, 'outbound sync must use th
 const batchClaimRoute = readFileSync(new URL('../app/api/claims/batch/route.ts', import.meta.url), 'utf8')
 assert.match(batchClaimRoute, /getGitHubIdentity\(user\)/, 'batch claims must use the authenticated GitHub identity')
 assert.match(batchClaimRoute, /repository\?\.owner\.toLowerCase\(\) === githubUsername/, 'batch claims must verify exact repository ownership')
-assert.match(batchClaimRoute, /publisher_verified: true/, 'batch claims must publish verified ownership to the listing')
+assert.match(batchClaimRoute, /syncVerifiedClaimListings/, 'batch claims must finish syncing verified ownership to listings')
 
 const batchClaimPanel = readFileSync(new URL('../components/creator-batch-claim.tsx', import.meta.url), 'utf8')
 assert.match(batchClaimPanel, /\/api\/claims\/batch/, 'creator dashboard must expose batch ownership verification')

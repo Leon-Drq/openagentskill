@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { syncVerifiedClaimListings } from '@/lib/creator-claims'
 import {
   CLAIM_CHALLENGE_TTL_MS,
   createClaimChallenge,
@@ -19,11 +20,7 @@ const ClaimSchema = z.object({
   evidence_note: z.string().trim().max(2000).nullable().optional(),
 })
 
-const CLAIM_SELECT = [
-  'id', 'skill_slug', 'github_username', 'x_username', 'repo_url',
-  'evidence_url', 'evidence_note', 'verification_method', 'verification_tier',
-  'verified_at', 'challenge_expires_at', 'status', 'created_at', 'updated_at',
-].join(',')
+const CLAIM_SELECT = 'id,skill_slug,github_username,x_username,repo_url,evidence_url,evidence_note,verification_method,verification_tier,verified_at,challenge_expires_at,status,created_at,updated_at'
 
 export async function GET(request: NextRequest) {
   const skillSlug = request.nextUrl.searchParams.get('skill_slug')
@@ -93,14 +90,21 @@ export async function POST(request: NextRequest) {
   const { error: profileError } = await admin.from('profiles').upsert(profilePayload)
   if (profileError) return NextResponse.json({ error: 'Failed to prepare creator profile' }, { status: 500 })
 
-  const { data: existing } = await admin
+  const { data: existing, error: existingError } = await admin
     .from('skill_claims')
     .select('id,status')
     .eq('skill_slug', skill.slug)
     .eq('user_id', user.id)
     .maybeSingle()
+  if (existingError) return NextResponse.json({ error: 'Could not load claim. Please retry.' }, { status: 503 })
   if (existing?.status === 'approved') {
-    const { data: approvedClaim } = await admin.from('skill_claims').select(CLAIM_SELECT).eq('id', existing.id).single()
+    const { data: approvedClaim, error } = await admin.from('skill_claims').select(CLAIM_SELECT).eq('id', existing.id).single()
+    if (error || !approvedClaim) return NextResponse.json({ error: 'Failed to load verified claim' }, { status: 503 })
+    try {
+      await syncVerifiedClaimListings(admin, [skill.slug], { userId: user.id, githubUsername: approvedClaim.github_username || repository.owner, xUsername: approvedClaim.x_username })
+    } catch {
+      return NextResponse.json({ error: 'Ownership verified, but listing sync failed. Retry to finish syncing.' }, { status: 503 })
+    }
     return NextResponse.json({ ok: true, claim: approvedClaim, alreadyVerified: true })
   }
 
@@ -136,12 +140,11 @@ export async function POST(request: NextRequest) {
   if (claimError) return NextResponse.json({ error: 'Failed to submit claim' }, { status: 500 })
 
   if (status === 'approved') {
-    await admin.from('skills').update({
-      author_user_id: user.id,
-      publisher_github: githubUsername,
-      publisher_x: xUsername,
-      publisher_verified: true,
-    }).eq('slug', skill.slug)
+    try {
+      await syncVerifiedClaimListings(admin, [skill.slug], { userId: user.id, githubUsername, xUsername })
+    } catch {
+      return NextResponse.json({ error: 'Ownership verified, but listing sync failed. Retry to finish syncing.' }, { status: 503 })
+    }
   }
 
   await admin.from('skill_events').insert({
