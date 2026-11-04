@@ -161,7 +161,13 @@ export function compileRead(input: { url: URL; method: string; headers: Headers;
       // SQLite LIKE is ASCII case-insensitive. Case-sensitive LIKE is not used
       // by this application's public queries; reject it rather than widening it.
       if (op === 'like') throw new QueryError('Case-sensitive LIKE is not supported')
-      if (new TextEncoder().encode(pattern).length <= 50) clause = `${field.sql} LIKE ${bind(pattern)} ESCAPE '\\'`
+      // Exact repository identities must use the existing lower(github_repo),
+      // source_path index. LIKE otherwise scans the public catalog in date
+      // order, including for a missing source during submission reconciliation.
+      const exactRepository = table === 'skills' && key === 'github_repo'
+        && !/[%_\\]/.test(pattern.replace(/\\[\s\S]/g, ''))
+      if (exactRepository) clause = `lower(${field.sql}) = lower(${bind(pattern.replace(/\\([\s\S])/g, '$1'))})`
+      else if (new TextEncoder().encode(pattern).length <= 50) clause = `${field.sql} LIKE ${bind(pattern)} ESCAPE '\\'`
       else {
         // D1 limits LIKE patterns to 50 bytes. Long repository identities and
         // literal prefix/suffix searches retain their meaning without LIKE.
