@@ -33,8 +33,17 @@ try {
   const outage = client(async()=>Response.json({code:'DB_UNAVAILABLE',message:'Unavailable'},{status:503}))
   await assert.rejects(readPublishedBlogPost(outage,'restored-article'),/temporarily unavailable/)
   await assert.rejects(readPublishedBlogSitemap(outage),/temporarily unavailable/)
+  const referencesOutage = client(async(input,init)=>new URL(String(input)).pathname.endsWith('/skills')
+    ? Response.json({code:'D1_OVERLOADED',message:'Unavailable'},{status:503})
+    : createD1ReadFetch(database)(input,init))
+  const duringReferenceOutage = await readPublishedBlogPost(referencesOutage,'restored-article')
+  assert.equal(duringReferenceOutage.content,'Original full content', 'Optional cards cannot hide a published article')
+  assert.equal(duringReferenceOutage.skills,null)
+  const listDuringReferenceOutage = await readPublishedBlogPosts(referencesOutage,1000)
+  assert.ok(listDuringReferenceOutage.length > 0)
+  assert.ok(listDuringReferenceOutage.every(post=>post.skills===null), 'Failed references expose no unchecked Skill data')
   let reads=0
   const partial = client(async(input,init)=>++reads===1?createD1ReadFetch(database)(input,init):Response.json({message:'Unavailable'},{status:503}))
   await assert.rejects(readPublishedBlogSitemap(partial),/temporarily unavailable/, 'Never publish a partial sitemap on second-page failure')
-  console.log('Blog recovery passed: D1 detail/list, original content, null/private references, true missing vs outage, 1,053 sitemap rows and partial-read failure.')
+  console.log('Blog recovery passed: D1 detail/list, original content, optional reference outage, null/private references, true missing vs outage, 1,053 sitemap rows and partial-read failure.')
 } finally { sqlite.close() }

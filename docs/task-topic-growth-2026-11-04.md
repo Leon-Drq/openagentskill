@@ -79,6 +79,13 @@ before consolidation or further expansion. The output never overwrites a file.
 
 ## Acceptance
 
+The pre-deployment baseline also reproduced an existing intermittent blog error:
+D1 overload during optional related-Skill reads discarded an otherwise published
+article. Reference lookup failures now omit those cards while retaining the
+article. Main article and sitemap read failures still surface errors, and failed
+lookups never display unchecked Skill data. Regression coverage includes both
+detail and list behavior during a reference outage.
+
 Run `pnpm test`, `pnpm typecheck`, `pnpm lint`, production build and Cloudflare
 runtime checks. `node --experimental-strip-types scripts/check-topic-growth.mjs
 <origin>` checks seven destinations, canonical/robots, visible briefs, anchors,
