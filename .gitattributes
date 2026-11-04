@@ -5,3 +5,5 @@ public/research/skill-readiness-2026-10-18/* -text
 scripts/build-skill-readiness-snapshot.mjs text eol=lf
 # Downloadable task examples are SHA-256 pinned; preserve their exact bytes.
 public/examples/topic-growth/* -text
+public/examples/topic-growth/*.pdf binary
+public/examples/topic-growth/*.png binary

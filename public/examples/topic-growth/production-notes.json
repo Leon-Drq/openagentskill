@@ -31,32 +31,32 @@
   "scope": "Editorial examples. No upstream Skill, agent compatibility, production data or runtime certification is claimed. PNG previews must also be visually inspected before publication.",
   "files": {
     "architecture-input.json": {
-      "bytes": 820,
-      "sha256": "1a6d154b8fbe14f02f29bae8f949db30d06efa7aed66d7af47ec29ba03e7e59d"
+      "bytes": 777,
+      "sha256": "e809975868d5b7ee2567ebb9fb8b6d9bfbc0fe50013ad6744c2b10f63b868cf1"
     },
     "architecture-preview.png": {
       "bytes": 50013,
       "sha256": "1d0d061eca408a6bf4f7f7f689b7a2ab9e1511116961133c89348e8a2d1b602d"
     },
     "architecture.mmd": {
-      "bytes": 190,
-      "sha256": "8348c16f78e2a6e44332869e92652ef0073f7b7b283b52206f42a0ee762683e2"
+      "bytes": 182,
+      "sha256": "23548122740bf9dc0bd8e473d94f3f21578841088e82396d24423747db820bd0"
     },
     "architecture.svg": {
-      "bytes": 3046,
-      "sha256": "15e724a794b46ccf29ff00074b553edabd50c1ce69c25fdcfba087406615e372"
+      "bytes": 3026,
+      "sha256": "29e1a350f3dcec66e763b88419a37ebb701aedd283b9d77cd5dd84cce89acc76"
     },
     "service-usage-preview.png": {
       "bytes": 89316,
       "sha256": "5ce14dcca807b22215dfbbac1447a1f0c1aa6cb8e9380a9e10811c160e94fbe5"
     },
     "service-usage.csv": {
-      "bytes": 86,
-      "sha256": "257c2522642f8fa38149e1f4bee6c37d7ad4d67dba432f4e5b21dcf9514d072c"
+      "bytes": 82,
+      "sha256": "16a2fb9e331fce03503357424dad006bf725cfb3757fe2bba1a2edf99991447e"
     },
     "service-usage.json": {
-      "bytes": 443,
-      "sha256": "b5fb1e51a96be9a92ad654b660dbbcb35b21b55ef8a4ce665bb6ff5e0e94741e"
+      "bytes": 416,
+      "sha256": "626baec3fef97b71d2f085456adb3dd09c85690065e46f9341104953cb14a24e"
     },
     "service-usage.pdf": {
       "bytes": 2729,

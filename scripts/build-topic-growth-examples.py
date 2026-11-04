@@ -24,7 +24,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 
 def write_json(name, data):
-    (OUT / name).write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    (OUT / name).write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 rows = [["Search", "1200", "2"], ["Export", "240", "4"], ["Preview", "60", "1"]]
@@ -85,7 +85,7 @@ totals = dict(requests=sum(r["requests"] for r in records), errors=sum(r["errors
 assert totals == {"requests": 1500, "errors": 7}
 write_json("service-usage.json", dict(synthetic=True, records=records, totals=totals))
 with (OUT / "service-usage.csv").open("w", newline="", encoding="utf-8") as f:
-    writer = csv.DictWriter(f, fieldnames=["service", "requests", "errors", "source_page"])
+    writer = csv.DictWriter(f, fieldnames=["service", "requests", "errors", "source_page"], lineterminator="\n")
     writer.writeheader()
     writer.writerows(records)
 subprocess.run(['pdftoppm', '-png', '-singlefile', '-r', '108', str(pdf_path), str(OUT / 'service-usage-preview')], check=True)
@@ -104,7 +104,7 @@ graph = {
 write_json("architecture-input.json", graph)
 mermaid = "flowchart LR\n" + "".join(f'  {n["id"]}["{n["label"]}"]\n' for n in graph["nodes"])
 mermaid += "".join(f'  {e["from"]} -->|{e["label"]}| {e["to"]}\n' for e in graph["edges"])
-(OUT / "architecture.mmd").write_text(mermaid, encoding="utf-8")
+(OUT / "architecture.mmd").write_text(mermaid, encoding="utf-8", newline="\n")
 positions = {"browser": (70, 290), "api": (465, 290), "database": (925, 150), "queue": (925, 430)}
 paths = ["M 290 340 H 465", "M 685 340 H 790 V 200 H 925", "M 685 340 H 790 V 480 H 925"]
 labels = [(375, 317), (852, 180), (852, 460)]
@@ -125,7 +125,7 @@ for node in graph["nodes"]:
 svg += ['<text x="70" y="630" font-family="sans-serif" font-size="18" fill="#626262">Fictional input. Mermaid source and SVG preserve the same nodes and directed edges.</text>',
         '<text x="70" y="664" font-family="sans-serif" font-size="16" fill="#626262">Directly generated editorial fixture. Not an Archify render or a production-system diagram.</text>', '</svg>']
 svg_text = "\n".join(svg)
-(OUT / "architecture.svg").write_text(svg_text, encoding="utf-8")
+(OUT / "architecture.svg").write_text(svg_text, encoding="utf-8", newline="\n")
 xml = ElementTree.fromstring(svg_text)
 assert {n.attrib["data-node"] for n in xml.iter() if "data-node" in n.attrib} == {n["id"] for n in graph["nodes"]}
 assert {(n.attrib["data-from"], n.attrib["data-to"]) for n in xml.iter() if "data-from" in n.attrib} == {(e["from"], e["to"]) for e in graph["edges"]}
@@ -158,5 +158,5 @@ write_json("production-notes.json", {
     "scope": "Editorial examples. No upstream Skill, agent compatibility, production data or runtime certification is claimed. PNG previews must also be visually inspected before publication.",
     "files": {p.name: {"bytes": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(files)},
 })
-(OUT / "LICENSE.txt").write_text("Original synthetic examples by OpenAgentSkill. Released under CC0-1.0.\nhttps://creativecommons.org/publicdomain/zero/1.0/\n", encoding="utf-8")
+(OUT / "LICENSE.txt").write_text("Original synthetic examples by OpenAgentSkill. Released under CC0-1.0.\nhttps://creativecommons.org/publicdomain/zero/1.0/\n", encoding="utf-8", newline="\n")
 print("Generated PDF, extracted CSV/JSON and diagram sources; data reconciliation passed.")
