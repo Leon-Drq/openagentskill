@@ -6,6 +6,7 @@ import { ACTIVATION_EVENTS, GROWTH_ATTRIBUTION_KEY, GROWTH_SESSION_MS, analytics
 export type AnalyticsParameterValue = string | number | boolean
 
 export type AnalyticsEventName =
+  | 'task_brief_copy'
   | 'growth_activation'
   | 'partner_outbound'
   | 'outbound_link_click'

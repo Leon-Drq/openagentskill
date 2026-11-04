@@ -1,4 +1,5 @@
 import { USE_CASES, type UseCaseDefinition } from '@/lib/use-cases'
+import { getTaskPlaybook } from './task-playbooks'
 import { SCENARIO_TOPICS, SCENARIO_UPDATED_AT, getScenarioTopic } from './scenario-pages'
 import { getPresentationPage, PRESENTATION_PAGES, PRESENTATION_UPDATED_AT } from '@/lib/seo/presentation-pages'
 
@@ -460,9 +461,9 @@ export const BEST_SKILL_PAGES: BestSkillPageDefinition[] = [
   })),
 ].map(page => {
   const scenario = getScenarioTopic(page.slug)
-  if (scenario) return { ...page, title: scenario.title, description: scenario.description, updatedAt: SCENARIO_UPDATED_AT }
+  if (scenario) return { ...page, title: scenario.title, description: scenario.description, updatedAt: getTaskPlaybook(page.slug)?.updatedAt || SCENARIO_UPDATED_AT }
   const presentation = getPresentationPage(page.slug)
-  return presentation ? { ...page, title: presentation.title, description: presentation.description, updatedAt: PRESENTATION_UPDATED_AT } : page
+  return presentation ? { ...page, title: presentation.title, description: presentation.description, updatedAt: getTaskPlaybook(page.slug)?.updatedAt || presentation.updatedAt || PRESENTATION_UPDATED_AT } : page
 })
 
 export const FEATURED_BEST_PAGES = BEST_SKILL_PAGES.filter((page) =>

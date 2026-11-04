@@ -1,0 +1,8 @@
+flowchart LR
+  browser["Browser"]
+  api["API"]
+  database["Database"]
+  queue["Queue"]
+  browser -->|HTTPS request| api
+  api -->|Read / write| database
+  api -->|Enqueue job| queue

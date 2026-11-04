@@ -1,5 +1,8 @@
 // Editorial source comparison. These facts describe the linked source revision;
 // they do not change registry publication, review or runtime verification.
+// @ts-expect-error Direct Node regression tests require TypeScript extensions.
+import { getTaskPlaybook } from './task-playbooks.ts'
+
 export const PRESENTATION_UPDATED_AT = '2026-10-06'
 export const PRESENTATION_HUB_PATH = '/best/presentation-generation'
 export const WORKBUDDY_PRESENTATION_PATH = '/best/workbuddy-ppt-skills'
@@ -427,7 +430,7 @@ export function presentationStructuredData(page: PresentationPageDefinition) {
     '@context': 'https://schema.org',
     '@graph': [
       { '@type': 'CollectionPage', '@id': url, url, name: page.title, description: page.description,
-        dateModified: page.updatedAt || PRESENTATION_UPDATED_AT, inLanguage: 'en',
+        dateModified: getTaskPlaybook(page.slug)?.updatedAt || page.updatedAt || PRESENTATION_UPDATED_AT, inLanguage: 'en',
         publisher: { '@type': 'Organization', name: 'OpenAgentSkill', url: 'https://www.openagentskill.com' },
         mainEntity: { '@id': `${url}#comparison` } },
       { '@type': 'ItemList', '@id': `${url}#comparison`, numberOfItems: sources.length,

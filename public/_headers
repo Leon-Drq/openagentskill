@@ -1,2 +1,5 @@
 /_next/static/*
   Cache-Control: public,max-age=31536000,immutable
+
+/examples/topic-growth/service-usage.pdf
+  X-Robots-Tag: noindex, follow

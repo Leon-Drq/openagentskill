@@ -13,6 +13,24 @@ export interface ScenarioExample {
 const root = '/examples/scenarios'
 export const SCENARIO_EXAMPLES: ScenarioExample[] = [
   {
+    id: 'architecture-map', title: 'Four components, three directed relationships',
+    input: 'A fictional Browser, API, Database and Queue with three explicitly labeled connections.',
+    output: 'A viewable SVG, editable Mermaid text and the original JSON component list.',
+    evidence: 'The generated SVG node IDs and directed edges are reconciled with the input. The Mermaid file serializes the same list.',
+    limitations: 'Original editorial fixture generated directly from synthetic data. It is not an Archify render, a Draw.io file or a diagram of the production website.',
+    image: '/examples/topic-growth/architecture-preview.png',
+    links: [{ label: 'Open the diagram', href: '/examples/topic-growth/architecture.svg' }, { label: 'Download Mermaid source', href: '/examples/topic-growth/architecture.mmd' }, { label: 'Download component list', href: '/examples/topic-growth/architecture-input.json' }, { label: 'Production notes', href: '/examples/topic-growth/production-notes.json' }],
+  },
+  {
+    id: 'pdf-table-extraction', title: 'A PDF table with reconciled CSV and JSON',
+    input: 'An original one-page PDF with selectable text, three synthetic service records and a separate Total row.',
+    output: 'Three extracted records with page references: 1,500 requests and seven errors, in CSV and JSON.',
+    evidence: 'Created with ReportLab and extracted with pdfplumber. Extracted cells are compared with the source table and totals are recomputed; the page is rendered with Poppler for inspection.',
+    limitations: 'This digital PDF example does not test OCR on scans, complex merged tables or any upstream Skill runtime.',
+    image: '/examples/topic-growth/service-usage-preview.png',
+    links: [{ label: 'Download the PDF', href: '/examples/topic-growth/service-usage.pdf' }, { label: 'Download extracted CSV', href: '/examples/topic-growth/service-usage.csv' }, { label: 'Download extracted JSON', href: '/examples/topic-growth/service-usage.json' }, { label: 'Production notes', href: '/examples/topic-growth/production-notes.json' }],
+  },
+  {
     id: 'frontend-landing', title: 'A landing page from a product brief',
     input: 'A fictional task-management product, approved sample copy and an accessible single-page layout.',
     output: 'A responsive HTML landing page with keyboard-visible navigation and an FAQ.',

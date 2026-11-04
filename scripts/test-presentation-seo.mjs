@@ -29,9 +29,16 @@ function compile(path, dependencies) {
 const forbidden = () => { throw new Error('PPT editorial pages must not depend on a database, scores or installations') }
 const Link = { default: ({ children, ...props }) => { delete props.prefetch; return createElement('a', props, children) } }
 const Image = { default: ({ ...props }) => { delete props.fill; delete props.sizes; return createElement('img', props) } }
+const playbookData = await import('../lib/seo/task-playbooks.ts')
+const playbookComponent = compile('components/task-playbook.tsx', {
+  'react/jsx-runtime': jsx,
+  '@/components/crawl-link': {default:({children,...props})=>createElement('a',props,children)},
+  '@/components/task-brief-copy': {TaskBriefCopy:()=>createElement('button',null,'Copy task brief')},
+})
 const topic = compile('components/presentation-topic.tsx', {
   'react/jsx-runtime': jsx, '@/components/crawl-link': Link, 'next/image': Image,
   '@/components/marketing-page': { MarketingPageShell: ({ children }) => createElement('main', null, children) },
+  '@/components/task-playbook':playbookComponent, '@/lib/seo/task-playbooks':playbookData,
   '@/lib/seo/presentation-pages': data,
   '@/lib/showcase': { SHOWCASE_CASES: [], getShowcaseEvidenceLabel: forbidden, getShowcaseImageSrc: forbidden },
 })
@@ -78,9 +85,9 @@ for (const page of data.PRESENTATION_PAGES) {
   const collection = structured['@graph'].find(node => node['@type'] === 'CollectionPage')
   const list = structured['@graph'].find(node => node['@type'] === 'ItemList')
   assert.equal(collection.url, canonical)
-  assert.equal(collection.dateModified, page.updatedAt || data.PRESENTATION_UPDATED_AT)
+  assert.equal(collection.dateModified, playbookData.getTaskPlaybook(page.slug)?.updatedAt || page.updatedAt || data.PRESENTATION_UPDATED_AT)
   assert.ok(nodes.some(node => node.tagName === 'time' && attrs(node).datetime === data.PRESENTATION_UPDATED_AT), 'Source-check date stays separate from editorial updates')
-  if (page.updatedAt) assert.ok(nodes.some(node => node.tagName === 'time' && attrs(node).datetime === page.updatedAt), 'Modified date is visible to readers')
+  if (collection.dateModified) assert.ok(nodes.some(node => node.tagName === 'time' && attrs(node).datetime === collection.dateModified), 'Modified date is visible to readers')
   assert.equal(list.numberOfItems, page.sourceIds.length)
   assert.deepEqual(list.itemListElement.map(item => item.name), data.getPresentationSources(page).map(source => source.name))
   for (const source of data.getPresentationSources(page)) {
@@ -134,6 +141,7 @@ await assert.rejects(route.default({ params: Promise.resolve({ slug: 'not-a-real
 
 const example = (slug, skillSlug) => ({ slug, skillSlug, title: { en: slug }, description: { en: 'Author presentation example' }, media: [{ src: `/showcase/${slug}.webp`, alt: { en: `${slug} preview` } }] })
 const withExamples = compile('components/presentation-topic.tsx', {
+  '@/components/task-playbook':playbookComponent, '@/lib/seo/task-playbooks':playbookData,
   'react/jsx-runtime': jsx, '@/components/crawl-link': Link, 'next/image': Image,
   '@/components/marketing-page': { MarketingPageShell: ({ children }) => createElement('main', null, children) },
   '@/lib/seo/presentation-pages': data,
@@ -160,7 +168,7 @@ for (const page of data.PRESENTATION_PAGES) {
   const entry = growth.getBestSkillPage(page.slug)
   assert.equal(entry.title, page.title)
   assert.equal(entry.description, page.description)
-  assert.equal(entry.updatedAt, data.PRESENTATION_UPDATED_AT)
+  assert.equal(entry.updatedAt, data.presentationStructuredData(page)['@graph'][0].dateModified, 'Sitemap and visible editorial dates agree')
 }
 const sitemapSource = read('lib/seo/sitemap.ts')
 const bestSitemapFunction = sitemapSource.slice(sitemapSource.indexOf('export function getBestSitemapEntries'), sitemapSource.indexOf('export function getRankingSitemapEntries'))
@@ -168,7 +176,7 @@ const sitemapCode = ts.transpileModule(bestSitemapFunction, { compilerOptions: {
 const sitemap = {}
 new Function('exports', 'BEST_SKILL_PAGES', 'SITEMAP_BASE_URL', sitemapCode)(sitemap, growth.BEST_SKILL_PAGES, 'https://www.openagentskill.com')
 const entries = sitemap.getBestSitemapEntries()
-assert.equal(entries.filter(entry => entry.lastModified === data.PRESENTATION_UPDATED_AT).length, 8)
+for (const page of data.PRESENTATION_PAGES) assert.equal(entries.find(entry => entry.url.endsWith('/best/' + page.slug)).lastModified, data.presentationStructuredData(page)['@graph'][0].dateModified)
 for (const page of data.PRESENTATION_PAGES) assert.ok(entries.some(entry => entry.url.endsWith(`/best/${page.slug}`)), 'Every presentation platform needs sitemap discovery')
 assert.ok(entries.some(entry => entry.url.endsWith('/best/workbuddy-ppt-skills')), 'WorkBuddy needs sitemap discovery')
 assert.ok(entries.some(entry => entry.url.endsWith('/coding-agents') && entry.lastModified === undefined))

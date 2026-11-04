@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import Link from '@/components/crawl-link'
 import { MarketingPageShell } from '@/components/marketing-page'
+import { TaskPlaybook } from '@/components/task-playbook'
+import { getTaskPlaybook } from '@/lib/seo/task-playbooks'
 import { SHOWCASE_CASES, getShowcaseEvidenceLabel, getShowcaseImageSrc } from '@/lib/showcase'
 import {
   PRESENTATION_FORMATS,
@@ -17,6 +19,8 @@ const linkClass = 'inline-flex min-h-11 items-center rounded-lg border border-bo
 
 export function PresentationTopic({ page }: { page: PresentationPageDefinition }) {
   const sources = getPresentationSources(page)
+  const playbook = getTaskPlaybook(page.slug)
+  const updatedAt = playbook?.updatedAt || page.updatedAt
   const examples = SHOWCASE_CASES.filter(item =>
     (item.slug === 'editorial-html-slides' || item.skillSlug === 'zarazhangrui-frontend-slides') &&
     sources.some(source => source.registrySlug === item.skillSlug)
@@ -40,7 +44,7 @@ export function PresentationTopic({ page }: { page: PresentationPageDefinition }
             <a href={page.platformGuide ? `#${page.platformGuide.id}` : '#comparison'} className={`${linkClass} border-[#006b4f] bg-[#006b4f] text-white hover:bg-[#00553f]`}>{page.platformGuide ? page.platformGuide.cta : `Compare ${sources.length} ${sources.length === 1 ? 'skill' : 'skills'}`}</a>
             <a href="#choose" className={linkClass}>{page.platformGuide ? 'Explore the community option' : 'Find your workflow'}</a>
           </div>
-          <p className="mt-6 text-xs leading-5 text-secondary">By OpenAgentSkill · Source notes checked <time dateTime={PRESENTATION_UPDATED_AT}>October 6, 2026</time>{page.updatedAt && <> · Guide updated <time dateTime={page.updatedAt}>{page.updatedAt}</time></>}</p>
+          <p className="mt-6 text-xs leading-5 text-secondary">By OpenAgentSkill · Source notes checked <time dateTime={PRESENTATION_UPDATED_AT}>October 6, 2026</time>{updatedAt && <> · Guide updated <time dateTime={updatedAt}>{updatedAt}</time></>}</p>
         </div>
         <aside className="self-start rounded-xl border border-border bg-card p-5 sm:p-6">
           <h2 className="text-lg font-semibold">Choose the output first</h2>
@@ -56,7 +60,7 @@ export function PresentationTopic({ page }: { page: PresentationPageDefinition }
       </header>
 
       <nav aria-label="On this page" className="flex flex-wrap gap-x-6 gap-y-1 border-b border-border py-3 text-sm text-secondary">
-        {[['Your agent', '#agents'], ...(page.platformGuide ? [[page.platformGuide.label, `#${page.platformGuide.id}`]] : []), ['Choose a skill', '#choose'], ['Comparison', '#comparison'], ['Source notes', '#sources'], ...(showExamples ? [['Examples', '#examples']] : []), ['Questions', '#questions']].map(([label, href]) => <a key={href} href={href} className="inline-flex min-h-11 items-center underline-offset-4 hover:text-foreground hover:underline">{label}</a>)}
+        {[['Your agent', '#agents'], ...(page.platformGuide ? [[page.platformGuide.label, `#${page.platformGuide.id}`]] : []), ['Choose a skill', '#choose'], ['Comparison', '#comparison'], ['Source notes', '#sources'], ...(playbook ? [['Try a task', '#try-a-task']] : []), ...(showExamples ? [['Examples', '#examples']] : []), ['Questions', '#questions']].map(([label, href]) => <a key={href} href={href} className="inline-flex min-h-11 items-center underline-offset-4 hover:text-foreground hover:underline">{label}</a>)}
       </nav>
 
       <section id="agents" aria-labelledby="agents-heading" className="scroll-mt-8 border-b border-border py-8">
@@ -149,6 +153,7 @@ export function PresentationTopic({ page }: { page: PresentationPageDefinition }
         {page.sections.map(section => <div key={section.title}><h2 className="font-display text-2xl sm:text-3xl">{section.title}</h2>{section.paragraphs.map(paragraph => <p key={paragraph} className="mt-4 text-sm leading-7 text-secondary">{paragraph}</p>)}</div>)}
       </section>
 
+      {playbook && <TaskPlaybook playbook={playbook} topic={page.slug} />}
       <section id="questions" aria-labelledby="questions-heading" className="scroll-mt-8 border-b border-border py-10 sm:py-14">
         <h2 id="questions-heading" className="font-display text-3xl sm:text-4xl">PPT skill questions</h2>
         <div className="mt-6 divide-y divide-border">{page.faq.map(faq => <details key={faq.question} className="group py-4"><summary className="min-h-11 cursor-pointer py-2 pr-5 text-base font-medium">{faq.question}</summary><p className="max-w-3xl pb-3 pt-2 text-sm leading-7 text-secondary">{faq.answer}</p></details>)}</div>

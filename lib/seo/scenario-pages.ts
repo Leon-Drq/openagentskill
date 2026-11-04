@@ -5,6 +5,15 @@ export interface ScenarioTopic { slug: string; shortTitle: string; title: string
 
 export const SCENARIO_SOURCES: ScenarioSource[] = [
   {
+    id: 'archify', name: 'Archify', repository: 'tt-a1i/archify',
+    path: 'archify/SKILL.md', commit: '0b636d9f2f410ce7c617dbfd8818b775d42e9d4d',
+    registrySlug: 'tt-a1i-archify', role: 'Architecture, workflow, sequence and lifecycle diagrams',
+    output: 'Standalone HTML with inline SVG; documented image and SVG export',
+    setup: 'A local agent, the complete source package, Node.js CLI and the matching diagram schema',
+    limits: 'Validate the candidate and inspect the export. Repository evidence is needed for diagrams of real systems. Native Draw.io export is not established by this source.',
+    topic: 'architecture',
+  },
+  {
     "id": "frontend",
     "repository": "anthropics/skills",
     "path": "skills/frontend-design/SKILL.md",
@@ -137,6 +146,29 @@ export const SCENARIO_SOURCES: ScenarioSource[] = [
 ]
 
 export const SCENARIO_TOPICS: ScenarioTopic[] = [
+  {
+    slug: 'architecture-diagram-skills', shortTitle: 'Architecture diagram skills',
+    title: 'Architecture Diagram Skills: Archify, Mermaid and Editable Outputs',
+    description: 'Choose an architecture diagram skill by components, request sequences or states. Inspect Archify source notes, a downloadable Mermaid example and output checks.',
+    useCaseSlug: 'design-creative',
+    intro: 'Start with the question your diagram must answer. A component map, an API sequence and a state machine need different structures. This focused guide covers one documented Skill, Archify, and a neutral example you can inspect before choosing your output.',
+    sourceIds: ['archify'],
+    choices: [
+      { task: 'Explain components and system boundaries', sourceId: 'archify', reason: 'Use an architecture view with real components, responsibilities and relationships. Keep evidence for claims about an existing system.' },
+      { task: 'Trace a request across services', sourceId: 'archify', reason: 'Choose a sequence diagram when message order and responses matter more than physical layout.' },
+      { task: 'Convert Mermaid into an explorable diagram', sourceId: 'archify', reason: 'The pinned instructions cover flowchart, sequenceDiagram and stateDiagram inputs. Preserve topology and meaning when authoring the matching schema.' },
+      { task: 'Choose an editable delivery format', href: '#try-a-task', reason: 'Keep the source as well as the image. Distinguish Mermaid text, Archify JSON/HTML and a native Draw.io file before promising a handoff.' },
+    ],
+    steps: ['List components and directed relationships; identify uncertain facts.', 'Choose architecture, workflow, sequence, dataflow or lifecycle according to the question.', 'Use the source-specific schema and validate the candidate; keep source and exported file together.', 'Reconcile every relationship with the input and inspect labels, boundaries and the requested output format.'],
+    exampleIds: ['architecture-map'],
+    related: [{ href: '/skills/tt-a1i-archify', label: 'Archify source profile' }, { href: '/best/frontend-design-skills', label: 'Frontend design workflows' }, { href: '/best/presentation-generation', label: 'Use diagrams in a presentation' }],
+    faq: [
+      { question: 'What is an architecture diagram skill?', answer: 'It provides an agent with instructions, schemas or scripts for turning supplied system information into a diagram. It does not discover or prove your production architecture without supporting evidence.' },
+      { question: 'Can Archify use Mermaid input?', answer: 'The linked revision documents flowchart/graph, sequenceDiagram and stateDiagram inputs. It interprets topology and meaning into its own JSON schema rather than preserving every Mermaid styling instruction.' },
+      { question: 'Does this workflow produce an editable Draw.io file?', answer: 'The reviewed Archify source describes standalone HTML, inline SVG and export formats including SVG and images. Native .drawio export is not established. Specify that requirement before selecting a different workflow.' },
+      { question: 'Was the example generated with Archify?', answer: 'No. It is an original editorial fixture built from a fictional component list, with Mermaid text and a directly generated SVG. Its notes describe the checks; it does not certify Archify installation or runtime behavior.' },
+    ],
+  },
   {
     "slug": "frontend-design-skills",
     "shortTitle": "Frontend design skills",
@@ -439,7 +471,7 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
       "Keep page numbers and source references with the extracted content; do not silently replace missing text.",
       "Reconcile table rows and numeric totals and check reading order before writing markdown or importing into RAG."
     ],
-    "exampleIds": [],
+    "exampleIds": ["pdf-table-extraction"],
     "guideSlug": "pdf-extraction-vs-ocr-skills",
     "related": [
       {
