@@ -1,0 +1,27 @@
+{
+  "synthetic": true,
+  "records": [
+    {
+      "service": "Search",
+      "requests": 1200,
+      "errors": 2,
+      "source_page": 1
+    },
+    {
+      "service": "Export",
+      "requests": 240,
+      "errors": 4,
+      "source_page": 1
+    },
+    {
+      "service": "Preview",
+      "requests": 60,
+      "errors": 1,
+      "source_page": 1
+    }
+  ],
+  "totals": {
+    "requests": 1500,
+    "errors": 7
+  }
+}

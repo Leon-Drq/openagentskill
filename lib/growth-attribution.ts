@@ -58,6 +58,7 @@ export function analyticsPageType(path: string) {
 }
 
 export const ACTIVATION_EVENTS = new Set([
+  'task_brief_copy',
   'skill_install_copy', 'skill_install_start', 'showcase_task_copy',
   'showcase_handoff_copy', 'localized_resolve_copy_install',
 ])

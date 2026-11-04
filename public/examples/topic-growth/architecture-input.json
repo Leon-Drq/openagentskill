@@ -1,0 +1,43 @@
+{
+  "synthetic": true,
+  "description": "A fictional small web service. Not OpenAgentSkill's production architecture.",
+  "nodes": [
+    {
+      "id": "browser",
+      "label": "Browser",
+      "role": "User interface"
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "role": "Request handling"
+    },
+    {
+      "id": "database",
+      "label": "Database",
+      "role": "Saved records"
+    },
+    {
+      "id": "queue",
+      "label": "Queue",
+      "role": "Deferred jobs"
+    }
+  ],
+  "edges": [
+    {
+      "from": "browser",
+      "to": "api",
+      "label": "HTTPS request"
+    },
+    {
+      "from": "api",
+      "to": "database",
+      "label": "Read / write"
+    },
+    {
+      "from": "api",
+      "to": "queue",
+      "label": "Enqueue job"
+    }
+  ]
+}

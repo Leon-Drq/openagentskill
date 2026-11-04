@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+<title id="title">A fictional four-component service</title><desc id="desc">Browser sends HTTPS requests to API. API reads and writes Database and sends jobs to Queue.</desc>
+<rect width="1280" height="720" fill="#F8F7F3"/>
+<text x="70" y="70" font-family="sans-serif" font-size="18" fill="#006B4F">OPENAGENTSKILL / EDITORIAL EXAMPLE</text>
+<text x="70" y="120" font-family="serif" font-size="36" fill="#171717">Start with four components and three relationships.</text>
+<path data-from="browser" data-to="api" d="M 290 340 H 465" fill="none" stroke="#006B4F" stroke-width="3"/>
+<polygon points="463,340 450,333 450,347" fill="#006B4F"/>
+<text x="375" y="317" text-anchor="middle" font-family="sans-serif" font-size="17" fill="#626262">HTTPS request</text>
+<path data-from="api" data-to="database" d="M 685 340 H 790 V 200 H 925" fill="none" stroke="#006B4F" stroke-width="3"/>
+<polygon points="923,200 910,193 910,207" fill="#006B4F"/>
+<text x="852" y="180" text-anchor="middle" font-family="sans-serif" font-size="17" fill="#626262">Read / write</text>
+<path data-from="api" data-to="queue" d="M 685 340 H 790 V 480 H 925" fill="none" stroke="#006B4F" stroke-width="3"/>
+<polygon points="923,480 910,473 910,487" fill="#006B4F"/>
+<text x="852" y="460" text-anchor="middle" font-family="sans-serif" font-size="17" fill="#626262">Enqueue job</text>
+<g data-node="browser"><rect x="70" y="290" width="220" height="100" rx="12" fill="white" stroke="#DDDBD4"/><text x="92" y="330" font-family="sans-serif" font-size="24" fill="#171717">Browser</text><text x="92" y="362" font-family="sans-serif" font-size="17" fill="#626262">User interface</text></g>
+<g data-node="api"><rect x="465" y="290" width="220" height="100" rx="12" fill="white" stroke="#DDDBD4"/><text x="487" y="330" font-family="sans-serif" font-size="24" fill="#171717">API</text><text x="487" y="362" font-family="sans-serif" font-size="17" fill="#626262">Request handling</text></g>
+<g data-node="database"><rect x="925" y="150" width="220" height="100" rx="12" fill="white" stroke="#DDDBD4"/><text x="947" y="190" font-family="sans-serif" font-size="24" fill="#171717">Database</text><text x="947" y="222" font-family="sans-serif" font-size="17" fill="#626262">Saved records</text></g>
+<g data-node="queue"><rect x="925" y="430" width="220" height="100" rx="12" fill="white" stroke="#DDDBD4"/><text x="947" y="470" font-family="sans-serif" font-size="24" fill="#171717">Queue</text><text x="947" y="502" font-family="sans-serif" font-size="17" fill="#626262">Deferred jobs</text></g>
+<text x="70" y="630" font-family="sans-serif" font-size="18" fill="#626262">Fictional input. Mermaid source and SVG preserve the same nodes and directed edges.</text>
+<text x="70" y="664" font-family="sans-serif" font-size="16" fill="#626262">Directly generated editorial fixture. Not an Archify render or a production-system diagram.</text>
+</svg>

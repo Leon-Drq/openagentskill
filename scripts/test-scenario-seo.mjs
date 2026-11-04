@@ -46,11 +46,18 @@ const { getBestSitemapEntries, getGuideSitemapEntries }=compile('lib/seo/sitemap
 const sourceData=await import('../lib/seo/scenario-pages.ts')
 for (const source of SCENARIO_SOURCES.filter(source=>!source.registrySlug)) assert.equal(sourceData.scenarioProfileHref(source), sourceData.scenarioSourceUrl(source))
 const exampleData=await import('../lib/seo/scenario-examples.ts')
+const playbookData = await import('../lib/seo/task-playbooks.ts')
+const playbookComponent = compile('components/task-playbook.tsx', {
+  'react/jsx-runtime': jsx,
+  '@/components/crawl-link': {default:({children,...props})=>createElement('a',props,children)},
+  '@/components/task-brief-copy': {TaskBriefCopy:()=>createElement('button',null,'Copy task brief')},
+})
 const components=compile('components/scenario-topic.tsx',{
   'react/jsx-runtime':jsx,
   '@/components/crawl-link':{default:({children,...props})=>createElement('a',props,children)},
   'next/image':{default:props=>createElement('img',props)},
   '@/components/marketing-page':{MarketingPageShell:({children})=>createElement('main',null,children)},
+  '@/components/task-playbook':playbookComponent, '@/lib/seo/task-playbooks':playbookData,
   '@/lib/seo/scenario-pages':sourceData,'@/lib/seo/scenario-examples':exampleData,
 })
 const route=compile('app/best/[slug]/page.tsx',{

@@ -19,7 +19,7 @@ export const SKILL_GROWTH_PROFILES: readonly SkillGrowthProfile[] = [
     summary: 'Archify turns a system description or supported Mermaid input into an interactive HTML diagram. The linked source covers architecture, workflow, sequence, data-flow and lifecycle diagrams, with image and SVG export.',
     setup: 'Start with the diagram type, real components and relationships, and the format you need to share. Keep the complete source package and its Node.js CLI available; ask your agent to inspect the matching schema and validate the diagram before delivery.',
     limitation: 'A diagram is only as accurate as its input. For an existing codebase, check the diagram against repository evidence. Review labels and layout in the exported file. The source revision below is documentation, not an OpenAgentSkill runtime test; the current source status still applies.',
-    relatedHref: '/rankings/best-design-creative-skills', relatedLabel: 'Compare design and visual creation skills',
+    relatedHref: '/best/architecture-diagram-skills', relatedLabel: 'Choose a diagram workflow and inspect an example',
   },
   {
     slug: 'everettfish-holo-card-studio', repository: 'EverettFish/holo-card-studio', path: 'SKILL.md', commit: 'b470957e0dea681eadc05e467a57bdc84b702333',
@@ -48,7 +48,7 @@ export const SKILL_GROWTH_PROFILES: readonly SkillGrowthProfile[] = [
     limitation: `${source.limitation} This overview compares the linked source instructions; it is not an installation or generated-deck test.`,
     relatedHref: '/best/presentation-generation', relatedLabel: 'Compare PPTX and HTML presentation workflows',
   })),
-  ...SCENARIO_SOURCES.filter(source => source.registrySlug).map(source => ({
+  ...SCENARIO_SOURCES.filter(source => source.registrySlug && source.id !== 'archify').map(source => ({
     slug: source.registrySlug!, repository: source.repository, path: source.path, commit: source.commit,
     title: `${source.name} Skill: ${source.role}`,
     description: `${source.output}. Check task fit, setup and limitations before choosing this skill.`,

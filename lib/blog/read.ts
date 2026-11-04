@@ -13,8 +13,10 @@ async function attachPublicSkills<T extends { skill_id: string | null }>(client:
   const skills = new Map<string, StaticBlogSkill>()
   if (ids.length) {
     const { data, error } = await client.from('skills').select(skillColumns).in('id', ids)
-    if (error) throw new Error('Blog skill references temporarily unavailable')
-    for (const row of data || []) skills.set(row.id, row as StaticBlogSkill)
+    // Related cards are optional. A failed reference lookup must not discard an
+    // independently published article, or expose partially returned Skill data.
+    if (error) console.warn('[blog] Related Skill cards temporarily unavailable')
+    else for (const row of data || []) skills.set(row.id, row as StaticBlogSkill)
   }
   // The public client applies publication policy: a private/deleted reference
   // must not expose that Skill or hide the independently published article.

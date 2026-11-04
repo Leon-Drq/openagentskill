@@ -23,6 +23,7 @@ globalThis.window = { location: new URL(origin + '/skills/tt-a1i-archify?utm_sou
 globalThis.document = { referrer: 'https://chatgpt.com/c/private-conversation', title: 'Archify' }
 trackAnalyticsPageView(window.location.href)
 trackAnalyticsEvent('skill_install_copy')
+trackAnalyticsEvent('task_brief_copy', { topic_slug: 'claude-excel-skills' })
 assert.equal(calls.length, 0, 'No analytics events before consent')
 assert.equal(window.sessionStorage.getItem(GROWTH_ATTRIBUTION_KEY), null)
 updateAnalyticsConsent('granted')
@@ -51,7 +52,7 @@ assert.equal(calls.length, count)
 assert.equal(window.sessionStorage.getItem(GROWTH_ATTRIBUTION_KEY), null)
 window.sessionStorage = { getItem() { throw Error('blocked') }, setItem() { throw Error('blocked') }, removeItem() { throw Error('blocked') } }
 updateAnalyticsConsent('granted')
-trackAnalyticsEvent('skill_install_copy')
+trackAnalyticsEvent('task_brief_copy', { topic_slug: 'claude-excel-skills' })
 trackAnalyticsEvent('skill_install_copy')
 assert.equal(calls.filter(c => c[1] === 'growth_activation').length, 3, 'Storage failure retains in-memory deduplication')
 
