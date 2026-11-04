@@ -4972,6 +4972,94 @@
     ]
   },
   {
+    "skillSlug": "natolambert-colloquium",
+    "repository": "natolambert/colloquium",
+    "revision": "f22ab9bf4328482e4555bdd4ae85734e69e0f116",
+    "sourceUrl": "https://github.com/natolambert/colloquium/blob/f22ab9bf4328482e4555bdd4ae85734e69e0f116/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-bce041d216bb26f00e12544e1f82e9d753444e489e6df0e9013c7d2795aa219f.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "bce041d216bb26f00e12544e1f82e9d753444e489e6df0e9013c7d2795aa219f",
+    "documentSha256": "4be2271e47502ce9f703619827ca4be03ffbde751d5179f44a6935a192fc7de6",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-04T07:33:37.767Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/8f8772d026c195f35222b5c4e627549951ddffe833d6198e5b84bffdf37474db.preview.webp",
+        "previewSrc": "/skill-previews/auto/8f8772d026c195f35222b5c4e627549951ddffe833d6198e5b84bffdf37474db.preview.webp",
+        "cardSrc": "/skill-previews/auto/8f8772d026c195f35222b5c4e627549951ddffe833d6198e5b84bffdf37474db.card.webp",
+        "width": 1200,
+        "height": 675,
+        "sha256": "8f8772d026c195f35222b5c4e627549951ddffe833d6198e5b84bffdf37474db",
+        "originalSrc": "/skill-previews/auto/8f8772d026c195f35222b5c4e627549951ddffe833d6198e5b84bffdf37474db.png",
+        "sourceUrl": "https://github.com/natolambert/colloquium/blob/f22ab9bf4328482e4555bdd4ae85734e69e0f116/docs/figure-title.png",
+        "kind": "example",
+        "title": {
+          "en": "Colloquium · Author preview",
+          "zh": "Colloquium · 作者预览"
+        },
+        "alt": {
+          "en": "Colloquium: A plot whose exported title was replaced by the slide heading",
+          "zh": "Colloquium：A plot whose exported title was replaced by the slide heading"
+        },
+        "sourcePath": "docs/figure-title.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/2e8771b5f70e970142ef7a2d9c225aabac73c426a9c52420d158e6d29a9833a3.preview.webp",
+        "previewSrc": "/skill-previews/auto/2e8771b5f70e970142ef7a2d9c225aabac73c426a9c52420d158e6d29a9833a3.preview.webp",
+        "cardSrc": "/skill-previews/auto/2e8771b5f70e970142ef7a2d9c225aabac73c426a9c52420d158e6d29a9833a3.card.webp",
+        "width": 1280,
+        "height": 720,
+        "sha256": "2e8771b5f70e970142ef7a2d9c225aabac73c426a9c52420d158e6d29a9833a3",
+        "originalSrc": "/skill-previews/auto/2e8771b5f70e970142ef7a2d9c225aabac73c426a9c52420d158e6d29a9833a3.png",
+        "sourceUrl": "https://github.com/natolambert/colloquium/blob/f22ab9bf4328482e4555bdd4ae85734e69e0f116/docs/share-card.png",
+        "kind": "example",
+        "title": {
+          "en": "Colloquium · Author preview",
+          "zh": "Colloquium · 作者预览"
+        },
+        "alt": {
+          "en": "Colloquium: Link preview card: the first slide of the hello example",
+          "zh": "Colloquium：Link preview card: the first slide of the hello example"
+        },
+        "sourcePath": "docs/share-card.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/17be4e9f359e4a991420980d01b4932da2277e50d71dc9b5a7e9271f594d85b8.preview.webp",
+        "previewSrc": "/skill-previews/auto/17be4e9f359e4a991420980d01b4932da2277e50d71dc9b5a7e9271f594d85b8.preview.webp",
+        "cardSrc": "/skill-previews/auto/17be4e9f359e4a991420980d01b4932da2277e50d71dc9b5a7e9271f594d85b8.card.webp",
+        "width": 960,
+        "height": 540,
+        "sha256": "17be4e9f359e4a991420980d01b4932da2277e50d71dc9b5a7e9271f594d85b8",
+        "originalSrc": "/skill-previews/auto/17be4e9f359e4a991420980d01b4932da2277e50d71dc9b5a7e9271f594d85b8.png",
+        "sourceUrl": "https://github.com/natolambert/colloquium/blob/f22ab9bf4328482e4555bdd4ae85734e69e0f116/docs/custom-css.png",
+        "kind": "reference",
+        "title": {
+          "en": "Colloquium · Author preview",
+          "zh": "Colloquium · 作者预览"
+        },
+        "alt": {
+          "en": "Colloquium: A deck whose styles come from a .css file next to it",
+          "zh": "Colloquium：A deck whose styles come from a .css file next to it"
+        },
+        "sourcePath": "docs/custom-css.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "nyxtides-ppt-image-first",
     "repository": "NyxTides/ppt-image-first",
     "revision": "87a300a559a2a55097fab337241218c6557bfa23",
