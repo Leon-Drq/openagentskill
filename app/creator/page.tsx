@@ -75,7 +75,7 @@ export default async function CreatorDashboard({
   const approvedSlugs = (claims || []).filter((claim) => claim.status === 'approved').map((claim) => claim.skill_slug)
   const [{ data: skills }, { data: events }, { data: outcomes }, { data: dailyEvents }, { data: versions }] = await Promise.all([
     approvedSlugs.length
-      ? readCreatorClaimBatches(approvedSlugs, batch => supabase.from('skills').select('slug,name,category,repository,github_repo,version,license,license_source,license_status,source_commit_sha,source_sync_status,last_synced_at').in('slug', batch))
+      ? readCreatorClaimBatches(approvedSlugs, batch => supabase.from('skills').select('slug,name,category,repository,github_repo,version,license,license_source,license_status,source_commit_sha,source_sync_status,last_synced_at,author_user_id,publisher_verified').in('slug', batch))
       : Promise.resolve({ data: [] }),
     approvedSlugs.length && needsAnalytics
       ? readCreatorClaimBatches(approvedSlugs, batch => supabase.from('skill_event_stats').select('*').in('skill_slug', batch))
@@ -96,7 +96,7 @@ export default async function CreatorDashboard({
   const versionCounts = new Map<string, number>()
   for (const row of versions || []) versionCounts.set(row.skill_slug, (versionCounts.get(row.skill_slug) || 0) + 1)
   const approvedMatchingGitHubCount = verifiedGitHubUsername && (tab === 'overview' || tab === 'skills')
-    ? (skills || []).filter((skill) => String(skill.github_repo || '').toLowerCase().startsWith(`${verifiedGitHubUsername}/`)).length
+    ? (skills || []).filter((skill) => skill.author_user_id === user.id && skill.publisher_verified && String(skill.github_repo || '').toLowerCase().startsWith(`${verifiedGitHubUsername}/`)).length
     : 0
   const totals = (skills || []).reduce(
     (sum, skill) => {

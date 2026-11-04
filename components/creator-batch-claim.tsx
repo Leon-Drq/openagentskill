@@ -21,23 +21,28 @@ export function CreatorBatchClaim({
     setState('loading')
     setMessage('')
 
-    const response = await fetch('/api/claims/batch', { method: 'POST' })
-    const payload = await response.json().catch(() => ({}))
-    if (!response.ok) {
-      setMessage(payload.error || 'Could not claim GitHub-owned skills.')
-      setState('error')
-      return
-    }
+    try {
+      const response = await fetch('/api/claims/batch', { method: 'POST', signal: AbortSignal.timeout(30_000) })
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setMessage(payload.error || 'Could not claim GitHub-owned skills.')
+        setState('error')
+        return
+      }
 
-    trackAnalyticsEvent('creator_claim_all', {
-      github_username: githubUsername,
-      claimed_count: Number(payload.claimed || 0),
-    })
-    setMessage(payload.claimed
-      ? `${payload.claimed} GitHub-owned skill${payload.claimed === 1 ? '' : 's'} verified.`
-      : 'All eligible GitHub-owned skills are already claimed.')
-    setState('done')
-    router.refresh()
+      trackAnalyticsEvent('creator_claim_all', {
+        github_username: githubUsername,
+        claimed_count: Number(payload.claimed || 0),
+      })
+      setMessage(payload.claimed
+        ? `${payload.claimed} GitHub-owned skill${payload.claimed === 1 ? '' : 's'} verified.`
+        : 'All eligible GitHub-owned skills are already claimed.')
+      setState('done')
+      router.refresh()
+    } catch {
+      setMessage('Could not sync ownership. Please retry.')
+      setState('error')
+    }
   }
 
   return (
