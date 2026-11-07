@@ -2,6 +2,9 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import ts from 'typescript'
+import * as react from 'react'
+import * as jsx from 'react/jsx-runtime'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { register } from 'node:module'
 register('./test-owner-publication-loader.mjs', import.meta.url)
 const { EXTERNAL_SKILLS, ExternalSkillSchema, validateExternalCatalog, searchExternalSkills, getExternalSkill, externalSkillDiscoveryRecord, isMissingExternalSkillPath } = await import('../lib/skills/external-catalog.ts')
@@ -30,7 +33,7 @@ for (const item of skillryEntries) {
   assert.equal(data.publisher.name, 'Skillry')
   assert.equal(data.install_command, null)
   assert.equal(data.runtime_demo, null)
-  assert.equal(data.examples.length, item.previewImages.length)
+  assert.equal(data.examples.length, item.active ? item.previewImages.length : 0)
   for (const example of data.examples) {
     assert.equal(example.attribution, 'Skillry')
     assert.equal(example.runtime_verified, false)
@@ -39,8 +42,13 @@ for (const item of skillryEntries) {
   assert.equal(data.ai_reviewed, false)
   assert.equal(data.source_url, item.sourceUrl)
   assert.equal(new URL(data.source_url).search, '', 'Source evidence stays canonical')
-  assert.equal(new URL(data.acquisition_url).searchParams.get('via'), 'openagentskill')
-  assert.equal(new URL(data.acquisition_url).pathname, new URL(item.sourceUrl).pathname)
+  if (item.active) {
+    assert.equal(new URL(data.acquisition_url).searchParams.get('via'), 'openagentskill')
+    assert.equal(new URL(data.acquisition_url).pathname, new URL(item.sourceUrl).pathname)
+  } else {
+    assert.equal(data.acquisition_url, null)
+    assert.equal(data.source_video_url, null)
+  }
   assert.equal(externalSourceRel(item.sourceUrl), 'sponsored noopener noreferrer')
   for (const changes of [
     { aiReviewed: true }, { runtimeVerified: true }, { autoInstallAllowed: true },
@@ -75,7 +83,7 @@ assert.equal(searchExternalSkills('unrelated finance').length, 0)
 assert.equal(getExternalSkill('missing'), undefined)
 for (const path of ['/skills', '/skills/external', `/skills/external/${entry.slug}`, `/skills/external/${entry.slug}/`]) assert.equal(isMissingExternalSkillPath(path), false)
 for (const path of ['/skills/skillry-missing', '/skills/redskill-missing', '/skills/external/missing', '/skills/external/%GG']) assert.equal(isMissingExternalSkillPath(path), true)
-assert.equal(searchExternalSkills('').length, EXTERNAL_SKILLS.length)
+assert.equal(searchExternalSkills('').length, EXTERNAL_SKILLS.filter(item => item.provider !== 'skillry' || item.active).length)
 const scenario = getExternalSkill('scenario-auto-edit')
 assert.ok(scenario)
 assert.equal(searchExternalSkills('Scenario Auto Edit')[0], scenario)
@@ -145,6 +153,42 @@ assert.equal((await response.json()).auto_install_allowed, false)
 assert.equal(response.headers.get('x-robots-tag'), 'noindex')
 assert.equal((await routeExports.GET(new Request('https://example.com'), { params: Promise.resolve({ slug: 'missing' }) })).status, 404)
 const page = read('components/catalog-skill-content.tsx')
+// An archived record stays addressable, but must not keep publishing dead
+// media, acquisition prompts or social preview URLs from its old snapshot.
+const archived = getExternalSkill('skillry-grammarly-style-og')
+assert.equal(archived.active, false)
+assert.equal(searchExternalSkills('Grammarly Style OG Image').length, 0)
+const archivedResponse = await routeExports.GET(new Request('https://example.com'), { params: Promise.resolve({ slug: archived.slug }) })
+assert.equal(archivedResponse.status, 200)
+const archivedData = await archivedResponse.json()
+assert.equal(archivedData.active, false)
+assert.equal(archivedData.acquisition_url, null)
+assert.deepEqual(archivedData.examples, [])
+assert.equal(archivedData.source_url, archived.sourceUrl, 'Retain historical source identity')
+assert.equal(externalSkillDiscoveryRecord({ ...archived, previewVideo: 'https://skillry.dev/skills/bs-grammarly-style-og/media/preview.mp4' }).source_video_url, null)
+const pageExports = {}
+new Function('exports', 'require', ts.transpileModule(page, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } }).outputText)(pageExports, name => {
+  if (name === 'react/jsx-runtime') return jsx
+  if (name === 'next/navigation') return { notFound: () => { throw Error('Unexpected missing archive') } }
+  if (name === '@/lib/skills/external-catalog') return { getExternalSkill, EXTERNAL_SKILLS, externalSkillHref: slug => '/skills/' + slug }
+  if (name === '@/lib/skills/external-outbound') return { externalSourceHref, externalSourceRel }
+  if (name === '@/components/crawl-link') return { default: props => react.createElement('a', props, props.children) }
+  if (name === '@/components/skill-engagement') return { SkillEngagementProvider: props => props.children, SkillActions: () => null }
+  return new Proxy({}, { get: () => () => null })
+})
+for (const lang of ['en', 'zh']) {
+  const props = { params: Promise.resolve({ slug: archived.slug }), searchParams: Promise.resolve(lang === 'zh' ? { lang } : {}) }
+  const markup = renderToStaticMarkup(await pageExports.default(props))
+  assert.match(markup, /data-catalog-state="archived"/)
+  assert.match(markup, lang === 'zh' ? /已归档/ : /Archived/)
+  assert.match(markup, /href="\/(?:zh\/)?skills"/)
+  assert.doesNotMatch(markup, /<img|<video|Get skill|获取技能|Available on Skillry|\/media\/preview/)
+  const metadata = await pageExports.buildCatalogSkillMetadata(props)
+  assert.equal(metadata.robots.index, false)
+  assert.equal(metadata.alternates.canonical, 'https://www.openagentskill.com/skills/' + archived.slug)
+  assert.equal(metadata.openGraph.images, undefined)
+  assert.equal(metadata.twitter.card, 'summary')
+}
 assert.match(page, /notFound\(\)/)
 assert.match(page, /<section id="showcase"/)
 assert.match(page, /alternates: \{ canonical: url \}/)

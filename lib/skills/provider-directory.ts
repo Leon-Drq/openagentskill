@@ -18,7 +18,7 @@ export function providerCommerce(entry: ExternalSkill, now = Date.now()): SkillC
   if (entry.provider === 'scenario') return { type: 'free', billing: 'free', amount: null, currency: null, sourceUrl: entry.sourceUrl, checkedAt: entry.versionObservedAt, runtime: 'model', purchaseUrl: null, checkout: 'external', purchaseRequiresUserConsent: true }
   if (entry.provider === 'resource') return { type: 'free', billing: 'free', amount: null, currency: null, sourceUrl: entry.sourceUrl, checkedAt: entry.publishedAt, runtime: 'unknown', purchaseUrl: null, checkout: 'external', purchaseRequiresUserConsent: true }
   const evidence = entry.provider === 'skillry' ? entry.listingEvidence : null
-  const cents = evidence?.priceUsdCents ?? null
+  const cents = entry.provider === 'skillry' && !entry.active ? null : evidence?.priceUsdCents ?? null
   const candidate = cents === null ? null : cents === 0
     ? { type: 'free' as const, billing: 'free' as const, sourceUrl: entry.sourceUrl, checkedAt: evidence!.observedAt, runtime: 'unknown' as const }
     : { type: 'paid' as const, billing: 'one-time' as const, amount: cents / 100, currency: 'USD', purchaseUrl: entry.sourceUrl, sourceUrl: entry.sourceUrl, checkedAt: evidence!.observedAt, runtime: 'unknown' as const }
@@ -27,7 +27,7 @@ export function providerCommerce(entry: ExternalSkill, now = Date.now()): SkillC
     sourceUrl: entry.sourceUrl, checkedAt: entry.provider === 'skillry' ? entry.listingEvidence.observedAt : null,
     runtime: 'unknown', purchaseUrl: offer && 'purchaseUrl' in offer && offer.purchaseUrl ? externalSourceHref(offer.purchaseUrl) : null, checkout: 'external', purchaseRequiresUserConsent: true }
 }
-export function providerExampleCount(entry: ExternalSkill) { return entry.provider === 'scenario' ? 1 : entry.provider === 'resource' ? entry.sourcePreviews.length : entry.provider === 'skillry' ? entry.previewImages.length : entry.runtimeDemo ? 1 : 0 }
+export function providerExampleCount(entry: ExternalSkill) { return entry.provider === 'scenario' ? 1 : entry.provider === 'resource' ? entry.sourcePreviews.length : entry.provider === 'skillry' ? (entry.active ? entry.previewImages.length : 0) : entry.runtimeDemo ? 1 : 0 }
 export function hasProviderCommercialOffers() { return EXTERNAL_SKILLS.some(entry => (entry.provider !== 'skillry' || entry.active) && providerCommerce(entry).type === 'paid') }
 export function selectProviderSkills(filters: {
   query?: string; category: string; topic: string; output: string; pricing: PriceFilter; examplesOnly: boolean;
@@ -61,8 +61,8 @@ export function toProviderDirectorySkill(entry: ExternalSkill, locale: string): 
     exampleCount: providerExampleCount(entry),
     provider: { resource: entry.provider === 'resource', label: entry.provider === 'scenario' ? 'Scenario' : entry.provider === 'resource' ? (lang === 'zh' ? '字体资源' : 'Font resource') : entry.provider === 'skillry' ? 'Skillry' : 'RedSkill', localizedName: lang === 'zh' && entry.provider === 'skillry' && entry.title.zh !== entry.skillName ? entry.title.zh : undefined,
       sourceDownloads: entry.provider === 'skillry' ? entry.listingEvidence.downloadCount : undefined, sourceHref: externalSourceHref(entry.sourceUrl), sourceRel: externalSourceRel(entry.sourceUrl),
-      image: entry.provider === 'scenario' ? entry.sourceDemo.cover : entry.provider === 'resource' ? entry.sourcePreviews[0]?.src : entry.provider === 'skillry' ? entry.previewImages[0].replace('&variant=detail', '&variant=card') : entry.runtimeDemo?.poster,
-      video: entry.provider === 'scenario' ? entry.sourceDemo.video : entry.provider === 'skillry' ? entry.previewVideo || undefined : entry.runtimeDemo?.video,
+      image: entry.provider === 'scenario' ? entry.sourceDemo.cover : entry.provider === 'resource' ? entry.sourcePreviews[0]?.src : entry.provider === 'skillry' ? (entry.active ? entry.previewImages[0].replace('&variant=detail', '&variant=card') : undefined) : entry.runtimeDemo?.poster,
+      video: entry.provider === 'scenario' ? entry.sourceDemo.video : entry.provider === 'skillry' ? (entry.active ? entry.previewVideo || undefined : undefined) : entry.runtimeDemo?.video,
       exampleLabel: entry.provider === 'scenario' ? (lang === 'zh' ? '官方样片 · Scenario' : 'Source example · Scenario') : entry.provider === 'resource' ? (lang === 'zh' ? '原仓库示例 · GitHub' : 'Source example · GitHub') : entry.provider === 'skillry' ? (lang === 'zh' ? '原站案例 · Skillry' : 'Source example · Skillry') : (lang === 'zh' ? '本站实录' : 'Recorded here') },
   }
 }

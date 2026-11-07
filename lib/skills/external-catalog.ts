@@ -257,7 +257,7 @@ export function externalSkillDiscoveryRecord(entry: ExternalSkill) {
     type: entry.provider === 'resource' ? 'design-resource' : 'external-platform-skill', slug: entry.slug, name: entry.title.en,
     description: entry.description.en, provider: entry.provider, identifier: entry.identifier,
     url: `https://www.openagentskill.com${externalSkillHref(entry.slug)}`,
-    source_url: entry.sourceUrl, acquisition_url: externalSourceHref(entry.sourceUrl),
+    source_url: entry.sourceUrl, acquisition_url: entry.provider === 'skillry' && !entry.active ? null : externalSourceHref(entry.sourceUrl),
     author: entry.provider === 'skillry' || entry.provider === 'scenario' ? null : entry.author,
     publisher: entry.provider === 'skillry' || entry.provider === 'scenario' ? entry.author : null, version: entry.version,
     ...(entry.provider === 'resource' ? { resource_type: entry.resourceType, source_commit: entry.sourceCommit, manifest_url: entry.manifestUrl, article_url: `https://www.openagentskill.com${entry.articlePath}`,
@@ -266,8 +266,8 @@ export function externalSkillDiscoveryRecord(entry: ExternalSkill) {
       ? entry.versionObservedAt ? `Skillry public product page observed at ${entry.versionObservedAt}` : 'Version not recorded; check Skillry for the current package version'
       : 'RedSkill bundle manifest observed at publication; not automatically synchronized',
     ...(entry.provider === 'skillry' ? { output_type: entry.outputType, listing_evidence: entry.listingEvidence, active: entry.active,
-      source_video_url: entry.previewVideo,
-      examples: entry.previewImages.map(src => ({ image_url: src, source_url: entry.sourceUrl, attribution: 'Skillry', runtime_verified: false })) } : {}),
+      source_video_url: entry.active ? entry.previewVideo : null,
+      examples: entry.active ? entry.previewImages.map(src => ({ image_url: src, source_url: entry.sourceUrl, attribution: 'Skillry', runtime_verified: false })) : [] } : {}),
     ...(entry.provider === 'scenario' ? { download_url: entry.downloadUrl, output_type: 'video', requirements: entry.limitations.en,
       acquisition_price: 'free', runtime_cost: 'paid-cloud-services',
       examples: [

@@ -26,6 +26,16 @@ for (const filter of ['platform','quality','trust','safety','supplyTrack','useCa
 assert.equal(selectProviderSkills({...defaults,minStars:1}).length,0)
 for (const entry of EXTERNAL_SKILLS) {
   const card = toProviderDirectorySkill(entry,'zh')
+  if (entry.provider === 'skillry' && !entry.active) {
+    assert.equal(card.exampleCount, 0)
+    assert.equal(card.provider.image, undefined)
+    assert.equal(card.provider.video, undefined)
+    assert.equal(card.commerce.type, 'unknown')
+    assert.equal(card.commerce.purchaseUrl, null)
+    assert.equal(card.commerce.amount, null)
+    assert.equal(selectProviderSkills({ ...defaults, query: entry.skillName }).some(item => item.slug === entry.slug), false)
+    continue
+  }
   if (entry.provider === 'scenario') {
     assert.equal(card.category, 'video-creation')
     assert.equal(card.provider.video, entry.sourceDemo.video)
