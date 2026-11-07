@@ -5,7 +5,7 @@ import {sqliteD1} from './fixtures/sqlite-d1.mjs'
 import {createD1ServiceFetch} from '../lib/db/cloudflare-service.ts'
 import {createD1PublicFetch} from '../lib/db/cloudflare-public-write.ts'
 const {sqlite,database}=sqliteD1()
-for(const n of ['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0006_telemetry','0007_quality','0008_outcomes','0009_skill_writes'])sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${n}.sql`,import.meta.url),'utf8'))
+for(const n of ['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0006_telemetry','0007_quality','0008_outcomes','0009_skill_writes','0011_search_cost'])sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${n}.sql`,import.meta.url),'utf8'))
 const client=transport=>createClient('https://d1.internal','fixture',{auth:{persistSession:false,autoRefreshToken:false},db:{retry:false},global:{fetch:transport}})
 const service=client(createD1ServiceFetch(database)),pub=client(createD1PublicFetch(database))
 const ok=async p=>{const r=await p;assert.equal(r.error,null,JSON.stringify(r.error));return r.data}

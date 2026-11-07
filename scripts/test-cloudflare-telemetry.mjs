@@ -5,7 +5,7 @@ import {sqliteD1} from './fixtures/sqlite-d1.mjs'
 import {createD1PublicFetch} from '../lib/db/cloudflare-public-write.ts'
 import {createD1ServiceFetch} from '../lib/db/cloudflare-service.ts'
 const {sqlite,database}=sqliteD1()
-for(const n of ['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0006_telemetry','0007_quality'])sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${n}.sql`,import.meta.url),'utf8'))
+for(const n of ['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0006_telemetry','0007_quality','0011_search_cost'])sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${n}.sql`,import.meta.url),'utf8'))
 const user='a0000000-0000-4000-8000-000000000001'
 sqlite.prepare('INSERT INTO account_identities(id) VALUES (?)').run(user)
 sqlite.prepare('INSERT INTO profiles(id) VALUES (?)').run(user)

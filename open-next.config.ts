@@ -7,6 +7,7 @@ export default defineCloudflareConfig({
   incrementalCache: r2IncrementalCache,
   queue: doQueue,
   tagCache: d1NextTagCache,
-  // Keep tag checks on the authoritative store until invalidation is verified.
-  enableCacheInterception: false,
+  // Serve ISR hits before loading/rendering Next pages. The interceptor still
+  // checks authoritative D1 tags; no second, independently stale edge cache.
+  enableCacheInterception: true,
 })

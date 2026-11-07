@@ -63,6 +63,28 @@ function fullText(source: unknown) {
   return terms.map(term => `"${term.replaceAll('"', '""')}"`).join(' OR ')
 }
 
+// A LIKE match necessarily contains each literal run between its wildcards.
+// Trigram MATCH narrows candidates; LIKE still decides case/escaping/order.
+// Never use this for negated or nested OR predicates: that would remove valid
+// rows. Short patterns retain the original query rather than losing matches.
+function nameTrigramQuery(expression: string | null) {
+  if (!expression?.startsWith('ilike.')) return null
+  const pattern = unquote(expression.slice(6)).replaceAll('*', '%')
+  if (pattern.includes('\0')) return null
+  const literals: string[] = []
+  let literal = '', escaped = false
+  for (const char of pattern) {
+    if (escaped) { literal += char; escaped = false }
+    else if (char === '\\') escaped = true
+    else if (char === '%' || char === '_') { literals.push(literal); literal = '' }
+    else literal += char
+  }
+  if (escaped) return null
+  literals.push(literal)
+  const terms = [...new Set(literals.filter(value => [...value].length >= 3))]
+  return terms.length ? terms.map(value => `"${value.replaceAll('"', '""')}"`).join(' AND ') : null
+}
+
 export function compileRead(input: { url: URL; method: string; headers: Headers; body?: unknown }, principal: ReadPrincipal = { userId: null }) {
   const { url, method, headers } = input
   const match = /^\/rest\/v1\/(?:rpc\/)?([a-z_]+)$/.exec(url.pathname)
@@ -191,6 +213,8 @@ export function compileRead(input: { url: URL; method: string; headers: Headers;
     if (['select','order','limit','offset'].includes(key)) continue
     clauses.push(filter(key,value))
   }
+  const nameCandidates = table === 'skills' ? nameTrigramQuery(query.get('name')) : null
+  if (nameCandidates) clauses.push(`t.rowid IN (SELECT rowid FROM skills_name_fts WHERE skills_name_fts MATCH ${bind(nameCandidates)})`)
   // JSON projection paths are identifier-only literals, so SELECT adds no
   // parameters ahead of the already compiled WHERE/count parameters.
   const selected = query.get('select') || '*'
@@ -224,7 +248,9 @@ export function compileRead(input: { url: URL; method: string; headers: Headers;
   }
   const limit = Math.min(defaultLimit,integer(query.get('limit'),defaultLimit,4000))
   const offset = integer(query.get('offset'),0,1_600_000)
-  const from = `FROM ${identifier(table)} t WHERE ${clauses.map(c => `(${c})`).join(' AND ')}`
+  // Force rowid candidate lookups for substring search instead of letting an
+  // ordering index turn a small FTS result into a whole-catalog scan.
+  const from = `FROM ${identifier(table)} t${nameCandidates ? ' NOT INDEXED' : ''} WHERE ${clauses.map(c => `(${c})`).join(' AND ')}`
   return {
     where: clauses.map(c => `(${c})`).join(' AND '), table,
     sql: `SELECT ${selection} ${from}${ordering ? ` ORDER BY ${ordering}` : ''} LIMIT ${limit} OFFSET ${offset}`,

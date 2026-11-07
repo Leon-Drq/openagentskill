@@ -5,9 +5,10 @@ import { sqliteD1 } from './fixtures/sqlite-d1.mjs'
 import { createD1ReadFetch, compileRead } from '../lib/db/cloudflare-read.ts'
 import { businessValue } from './rehearse-cloudflare-business.mjs'
 import { sqliteExpression } from './build-cloudflare-business-schema.mjs'
+import { checkSearchCost } from './fixtures/search-cost-checks.mjs'
 
 const { sqlite, database } = sqliteD1()
-for (const name of ['0001_commerce','0002_auth','0003_business','0004_catalog']) sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${name}.sql`,import.meta.url),'utf8'))
+for (const name of ['0001_commerce','0002_auth','0003_business','0004_catalog','0011_search_cost']) sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${name}.sql`,import.meta.url),'utf8'))
 const owner = '00000000-0000-4000-8000-000000000001', other = '00000000-0000-4000-8000-000000000002'
 sqlite.prepare('INSERT INTO account_identities(id) VALUES (?),(?)').run(owner,other)
 const insert = sqlite.prepare(`INSERT INTO skills(id,slug,name,description,author_name,repository,github_repo,category,license,
@@ -31,6 +32,7 @@ const client = userId => createClient('https://d1.internal','fixture', { auth:{ 
 const anonymous = client(null), alice = client(owner)
 const successful = result => { assert.equal(result.error,null,JSON.stringify(result.error)); return result.data }
 try {
+  console.log('Search cost checks:', await checkSearchCost(database))
   assert.equal(businessValue('timestamptz','2026-10-01 01:02:03.123456+00'),'2026-10-01T01:02:03.123456Z')
   assert.equal(businessValue('bool','false'),0)
   assert.throws(() => businessValue('int8','9007199254740993'),/Unsafe/)

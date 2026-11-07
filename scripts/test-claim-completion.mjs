@@ -12,7 +12,7 @@ import { readCreatorClaimBatches } from '../lib/creator-profile.ts'
 // Real routes, query builder and D1 SQL against an isolated database. GitHub and
 // cache calls are stubbed; no credentials, production writes or Skill execution.
 const { sqlite, database } = sqliteD1()
-for (const name of ['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0006_telemetry','0007_quality','0008_outcomes','0009_skill_writes']) {
+for (const name of ['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0006_telemetry','0007_quality','0008_outcomes','0009_skill_writes','0011_search_cost']) {
   sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${name}.sql`, import.meta.url), 'utf8'))
 }
 const userId = '90000000-0000-4000-8000-000000000001'

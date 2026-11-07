@@ -5,7 +5,7 @@ import {sqliteD1} from './fixtures/sqlite-d1.mjs'
 import {createD1ServiceFetch} from '../lib/db/cloudflare-service.ts'
 import {createD1PublicFetch} from '../lib/db/cloudflare-public-write.ts'
 const {sqlite,database}=sqliteD1()
-for(const n of ['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0006_telemetry','0007_quality','0008_outcomes'])sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${n}.sql`,import.meta.url),'utf8'))
+for(const n of ['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0006_telemetry','0007_quality','0008_outcomes','0011_search_cost'])sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${n}.sql`,import.meta.url),'utf8'))
 for(const slug of ['first','second','private'])sqlite.prepare(`INSERT INTO skills(id,slug,name,description,author_name,repository,github_repo,category,license,ai_review_approved) VALUES (?,?,'Fixture','Fixture','Fixture','https://example.invalid',?,'development','MIT',?)`).run(slug,slug,'fixture/'+slug,slug==='private'?0:1)
 const client=transport=>createClient('https://d1.internal','fixture',{auth:{persistSession:false,autoRefreshToken:false},db:{retry:false},global:{fetch:transport}})
 const service=client(createD1ServiceFetch(database)),publicClient=client(createD1PublicFetch(database))
