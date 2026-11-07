@@ -83,7 +83,13 @@ try {
       const response=await fetch(base+path,{headers,redirect:'manual',signal:AbortSignal.timeout(30_000)})
       const body=await response.text()
       assert.equal(response.status,200,path)
-      assert.equal(response.headers.get('set-cookie'),null,path)
+      if(headers.cookie) {
+        // Next clears invalid preview cookies after the interceptor bypasses.
+        // Only those expired preview cookies are allowed, never auth cookies.
+        const cookies=response.headers.getSetCookie()
+        assert.ok(cookies.length>0)
+        assert.ok(cookies.every(cookie=>/^__(?:prerender_bypass|next_preview_data)=;/.test(cookie)&&cookie.includes('Expires=Thu, 01 Jan 1970')),path)
+      } else assert.equal(response.headers.get('set-cookie'),null,path)
       return {response,body}
     }
     for (const path of ['/agent-skill','/zh/agent-skill']) {
