@@ -26,7 +26,7 @@ import { getPublicAudit } from '@/lib/skills/public-analysis'
 import { getSkillTrustProfile, type TrustCheckStatus } from '@/lib/trust'
 
 // Deduplicate metadata/page lookups without caching a transient lookup failure.
-const getSkill = cache((slug: string) => getSkillBySlugOrFallbackStrict(slug, 900))
+const getSkill = cache((slug: string) => getSkillBySlugOrFallbackStrict(slug, 14400))
 const SKILL_AUDIT_SUPPORT_TIMEOUT_MS = 1200
 
 export async function generateMetadata({

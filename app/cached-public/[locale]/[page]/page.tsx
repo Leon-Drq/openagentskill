@@ -3,7 +3,7 @@ import { ContactContent, SponsorContent } from '@/components/partnership-pages'
 import { partnershipPageData } from '@/lib/seo/partnerships'
 import { isPublicCacheLocale } from '@/lib/public-cached-routing'
 
-export const revalidate = 86400
+export const revalidate = 14400
 export function generateStaticParams() { return [] }
 type Props = { params: Promise<{ locale: string; page: string }> }
 async function data(params: Props['params']) {

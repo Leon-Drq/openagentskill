@@ -22,7 +22,7 @@ import { getSkillTrustProfile } from '@/lib/trust'
 import { getPresentationPage } from '@/lib/seo/presentation-pages'
 import { getUseCaseBySlug, getUseCasesForSkill } from '@/lib/use-cases'
 
-export const revalidate = 300
+export const revalidate = 14400
 const BEST_PAGE_QUERY_TIMEOUT_MS = 2000
 
 export function generateStaticParams() {

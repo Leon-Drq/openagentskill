@@ -31,7 +31,7 @@ const getSearchCandidatePool = unstable_cache(
     }
   },
   ['skills-search-candidate-pool-v2'],
-  { revalidate: 300, tags: ['public-skill-directory'] }
+  { revalidate: 14400, tags: ['public-skill-directory'] }
 )
 
 function clampLimit(value: string | null) {

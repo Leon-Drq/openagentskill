@@ -8,7 +8,7 @@ import { SKILL_STACKS } from '@/lib/collections'
 import { USE_CASES, selectSkillsForUseCase } from '@/lib/use-cases'
 import { groupUseCases } from '@/lib/use-case-directory'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export const metadata: Metadata = {
   title: 'AI Agent Skill Use Cases',

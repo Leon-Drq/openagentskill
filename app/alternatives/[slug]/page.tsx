@@ -10,7 +10,7 @@ import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillBySlugOrFallbackStrict } from '@/lib/skill-fallbacks'
 import { getSkillTrustProfile } from '@/lib/trust'
 
-export const revalidate = 900
+export const revalidate = 14400
 const getTarget = cache((slug: string) => getSkillBySlugOrFallbackStrict(slug, 900))
 
 export function generateStaticParams() {

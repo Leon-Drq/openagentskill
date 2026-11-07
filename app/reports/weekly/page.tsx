@@ -6,7 +6,7 @@ import { getAllSkills, getSkillEventStatsMap, type SkillRecord } from '@/lib/db/
 import { buildWeeklySkillReport } from '@/lib/reports'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export const metadata: Metadata = getResourceMetadata('weekly')
 

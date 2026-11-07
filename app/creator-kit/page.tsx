@@ -13,7 +13,7 @@ import { formatCompactNumber } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { CreatorCitationBuilder } from '@/components/creator-citation-builder'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export const metadata: Metadata = {
   title: 'Creator Kit for AI Agent Skills',

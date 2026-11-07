@@ -9,7 +9,8 @@ import { withTimeout } from '../lib/async.ts'
 const source = readFileSync('lib/db/skills.ts', 'utf8')
 const deps = Object.fromEntries([...source.matchAll(/from '([^']+)'/g)].map(match => [match[1], {}]))
 const shared = new Map(), cacheTags = new Map(), cachePolicies = new Map(), reads = []
-let unavailable = false, revision = 1, active = 0, maxActive = 0
+let unavailable = false, revision = 1, active = 0, maxActive = 0, now = 0
+const expiresAt = new Map()
 const row = slug => ({ slug, name: slug, version: String(revision), ai_review_approved: true, category: 'development', ai_review_score: { risk: 'retain source evidence' } })
 Object.assign(deps, {
   '@/lib/cache/packed-json': packed, '@/lib/cache/coalesced': coalesced,
@@ -19,8 +20,9 @@ Object.assign(deps, {
   '@/lib/skills/registry-scope': { isMcpOnlySkillRecord: value => value.slug === 'mcp-only' },
   'next/cache': { unstable_cache: (fn, keys, options) => async (...args) => {
     const key = JSON.stringify([keys, args])
-    if (shared.has(key)) return shared.get(key)
+    if (shared.has(key) && expiresAt.get(key) > now) return shared.get(key)
     const value = await fn(...args); shared.set(key, value)
+    expiresAt.set(key, now + options.revalidate)
     cacheTags.set(key, options.tags || []); cachePolicies.set(key, options)
     return value
   } },
@@ -83,19 +85,32 @@ const beforeDetails = reads.length
 await Promise.all(Array.from({ length: 8 }, () => db.getSkillBySlugStrict('detail')))
 assert.equal(reads.length, beforeDetails + 1, 'Metadata and detail body misses share one lookup')
 await db.getSkillBySlugStrict('other')
-await db.getSkillBySlugStrict('detail', 900)
+await db.getSkillBySlugStrict('detail', 14400)
 assert.ok([...cachePolicies.values()].some(policy => policy.revalidate === 300 && policy.tags.includes('public-skill:detail')), 'API lookup retains the original freshness window')
-assert.ok([...cachePolicies.values()].some(policy => policy.revalidate === 900 && policy.tags.includes('public-skill:detail')), 'Public display uses its separate longer cache')
+assert.ok([...cachePolicies.values()].some(policy => policy.revalidate === 14400 && policy.tags.includes('public-skill:detail')), 'Public display uses its separate longer cache')
 revision = 3
 for (const [key, tags] of cacheTags) if (tags.includes('public-skill:detail')) shared.delete(key)
 assert.equal((await db.getSkillBySlugStrict('detail')).version, '3')
-assert.equal((await db.getSkillBySlugStrict('detail', 900)).version, '3', 'Targeted invalidation expires both freshness tiers')
+assert.equal((await db.getSkillBySlugStrict('detail', 14400)).version, '3', 'Targeted invalidation expires both freshness tiers')
 assert.equal((await db.getSkillBySlugStrict('other')).version, '2', 'Unrelated details stay warm')
 assert.ok([...cacheTags.values()].filter(tags => tags.includes('public-skill:detail')).every(tags => !tags.includes('public-skill-directory')), 'A directory refresh cannot invalidate every detail')
 assert.ok(reads.every(batch => batch.length <= 100), 'Per-source tags stay below the framework tag limit')
+
+// Exercise both actual lookup policies across their boundaries. Public display
+// stays warm for four hours while install/manifest callers retain five minutes.
+await db.getSkillBySlugStrict('display-window', 14400)
+await db.getSkillBySlugStrict('operational-window')
+revision = 4; now = 301
+assert.equal((await db.getSkillBySlugStrict('operational-window')).version, '4')
+assert.equal((await db.getSkillBySlugStrict('display-window', 14400)).version, '3')
+now = 14399
+assert.equal((await db.getSkillBySlugStrict('display-window', 14400)).version, '3')
+now = 14401
+assert.equal((await db.getSkillBySlugStrict('display-window', 14400)).version, '4')
 console.log('Public source batches: canonical keys, 8-way coalescing, packed cache, invalidation, failure recovery, source evidence, ordering and bounded concurrency passed.')
 
 const oldPause = process.env.SUPABASE_DATA_PAUSED
+const healthyBeforePause = await db.getSkillBySlugStrict('detail')
 try {
   process.env.SUPABASE_DATA_PAUSED = '1'
   const beforePause = { reads: reads.length, caches: shared.size }
@@ -111,4 +126,4 @@ try {
   if (oldPause === undefined) delete process.env.SUPABASE_DATA_PAUSED
   else process.env.SUPABASE_DATA_PAUSED = oldPause
 }
-assert.equal((await db.getSkillBySlugStrict('detail')).version, '3', 'Recovery reuses the unmodified healthy cache')
+assert.equal((await db.getSkillBySlugStrict('detail')).version, healthyBeforePause.version, 'Recovery reuses the unmodified healthy cache')

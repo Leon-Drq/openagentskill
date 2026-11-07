@@ -51,7 +51,7 @@ assert.equal(page.metadata.title, 'AI Agent Skill Use Cases')
 assert.equal(page.metadata.alternates.canonical, 'https://www.openagentskill.com/use-cases')
 assert.equal(page.metadata.openGraph.url, page.metadata.alternates.canonical)
 assert.equal(page.metadata.robots?.index, undefined, 'Retain the root layout index policy')
-assert.equal(page.revalidate, 300)
+assert.equal(page.revalidate, 14400)
 
 const nodes = node => [node, ...(node.childNodes || []).flatMap(nodes)]
 const attr = (node, name) => node.attrs?.find(item => item.name === name)?.value

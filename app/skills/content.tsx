@@ -1201,7 +1201,7 @@ const getDefaultDirectory = unstable_cache(async (locale: Locale) => {
   if (model.clientProps.degraded) throw new DegradedDirectory(model)
   return model
 }, ['public-directory-model-v5-product-examples'], {
-  revalidate: 3600, tags: ['public-skill-directory', 'public-skill-stats'],
+  revalidate: 14400, tags: ['public-skill-directory', 'public-skill-stats'],
 })
 
 const getBrowseDirectory = unstable_cache(async (locale: Locale, key: string) => {
@@ -1211,7 +1211,7 @@ const getBrowseDirectory = unstable_cache(async (locale: Locale, key: string) =>
   if (model.clientProps.degraded) throw new DegradedDirectory(model)
   return model
 }, ['public-browse-model-v2-product-examples'], {
-  revalidate: 3600, tags: ['public-skill-directory', 'public-skill-stats'],
+  revalidate: 14400, tags: ['public-skill-directory', 'public-skill-stats'],
 })
 
 // Separate, finite keys for the deliberate maintenance state. Never replace a

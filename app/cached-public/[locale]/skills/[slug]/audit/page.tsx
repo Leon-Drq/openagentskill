@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import Content, { generateMetadata as metadata } from '@/app/skills/[slug]/audit/content'
 import { isPublicCacheLocale } from '@/lib/public-cached-routing'
 
-export const revalidate = 900
+export const revalidate = 14400
 export function generateStaticParams() { return [] }
 type Props = { params: Promise<{ locale: string; slug: string }> }
 async function inputs(params: Props['params']) {

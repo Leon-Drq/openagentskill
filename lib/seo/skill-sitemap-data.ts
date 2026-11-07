@@ -38,7 +38,7 @@ async function captureCompleteSnapshot(): Promise<string> {
 const getCachedCompleteSnapshot = unstable_cache(
   () => readSource(policy, captureCompleteSnapshot),
   ['complete-skill-sitemap-v4-canonical-scope',policy],
-  {revalidate:3600,tags:['approved-sitemap-count','approved-sitemap-records']}
+  {revalidate: 14400,tags:['approved-sitemap-count','approved-sitemap-records']}
 )
 
 export async function getSkillSitemapSnapshot(): Promise<SkillSitemapSnapshot> {

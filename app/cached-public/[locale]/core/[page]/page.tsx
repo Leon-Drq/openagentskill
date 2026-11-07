@@ -5,7 +5,7 @@ import { isLocalizedCorePageSlug } from '@/lib/i18n/market-routing'
 import { I18nProvider } from '@/lib/i18n/context'
 import type { Locale } from '@/lib/i18n/config'
 
-export const revalidate = 900
+export const revalidate = 14400
 export function generateStaticParams() { return [] }
 type Props = { params: Promise<{ locale: string; page: string }> }
 async function inputs(params: Props['params']) {

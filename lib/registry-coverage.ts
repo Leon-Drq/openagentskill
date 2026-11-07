@@ -58,7 +58,7 @@ async function fetchRegistryCoverageStats(): Promise<RegistryCoverageStats> {
 const getCachedRegistryCoverageStats = unstable_cache(
   fetchRegistryCoverageStats,
   ['public-registry-coverage-v1'],
-  { revalidate: 300, tags: ['registry-coverage'] }
+  { revalidate: 14400, tags: ['registry-coverage'] }
 )
 
 export async function getRegistryCoverageStats(): Promise<RegistryCoverageStats | null> {

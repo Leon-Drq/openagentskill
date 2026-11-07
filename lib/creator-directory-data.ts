@@ -34,7 +34,7 @@ const getPublishedSkills = unstable_cache(
     return data as CreatorSkill[]
   },
   ['featured-creator-skills-v1'],
-  { revalidate: 3600, tags: ['creator-directory'] },
+  { revalidate: 14400, tags: ['creator-directory'] },
 )
 
 const getClaims = unstable_cache(
@@ -61,7 +61,7 @@ const getClaims = unstable_cache(
     }
   },
   ['featured-creator-claims-v1'],
-  { revalidate: 300, tags: ['creator-directory'] },
+  { revalidate: 14400, tags: ['creator-directory'] },
 )
 
 export async function getCreatorDirectory() {

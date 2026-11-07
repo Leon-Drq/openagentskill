@@ -16,7 +16,7 @@ const REPORT_URL = `${SITE_URL}/reports/state-of-agent-skills-2026`
 
 // The report reads a live registry snapshot. Cache it for an hour so a slow
 // database connection cannot fail a production deployment.
-export const revalidate = 3_600
+export const revalidate = 14400
 
 export const metadata: Metadata = getResourceMetadata('research')
 

@@ -13,7 +13,7 @@ const getCachedDownloadTotals = unstable_cache(async (slugs: string[]) => {
     .in('skill_slug', slugs).limit(DOWNLOAD_BATCH_SIZE)
   if (error) throw error
   return Object.fromEntries((data || []).map(row => [row.skill_slug, Number(row.downloads)])) as Record<string, number>
-}, ['site-download-totals-v3-scoped'], { revalidate: 3600, tags: ['site-download-totals'] })
+}, ['site-download-totals-v3-scoped'], { revalidate: 14400, tags: ['site-download-totals'] })
 
 export async function getDownloadTotals(slugs: readonly string[]) {
   // Missing counts are not zero downloads; callers already display null safely.

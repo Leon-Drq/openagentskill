@@ -15,7 +15,7 @@ import { getCanonicalSkillSlug } from '../lib/skill-slug-aliases.ts'
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
 const detailWrapper = read('app/skills/[slug]/page.tsx')
 assert.doesNotMatch(detailWrapper, /await.*searchParams|props\.searchParams|searchParams:\s*Promise</)
-assert.match(detailWrapper, /revalidate = 900/)
+assert.match(detailWrapper, /revalidate = 14400/)
 assert.match(detailWrapper, /searchParams=\{Promise.resolve\(\{\}\)\}/)
 assert.match(read('app/skills/[slug]/page.tsx'), /generateStaticParams\(\) \{ return \[\] \}/)
 assert.doesNotMatch(read('components/skills-page-client.tsx'), /const .* = useSearchParams\(/, 'cached directory must keep SSR content, not a loading bailout')

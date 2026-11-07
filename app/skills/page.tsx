@@ -1,7 +1,7 @@
 import { connection } from 'next/server'
 import SkillsContent, { generateMetadata as buildMetadata } from './content'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> }
 

@@ -40,7 +40,7 @@ assert.equal(page.metadata.description, 'Installable AI agent skill packs for fr
 assert.equal(page.metadata.alternates.canonical, 'https://www.openagentskill.com/skill-packs')
 assert.equal(page.metadata.openGraph.url, page.metadata.alternates.canonical)
 assert.equal(page.metadata.robots?.index, undefined, 'Inherit the root index policy')
-assert.equal(page.revalidate, 300)
+assert.equal(page.revalidate, 14400)
 const nodes = node => [node, ...(node.childNodes || []).flatMap(nodes)]
 const attr = (node, name) => node.attrs?.find(item => item.name === name)?.value
 const text = node => node.nodeName === '#text' ? node.value : (node.childNodes || []).map(text).join('')

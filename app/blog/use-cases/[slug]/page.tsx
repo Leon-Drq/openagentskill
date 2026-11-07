@@ -8,7 +8,7 @@ import { SKILL_STACKS } from '@/lib/collections'
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { getUseCaseBySlug, selectSkillsForUseCase } from '@/lib/use-cases'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export async function generateMetadata({
   params,

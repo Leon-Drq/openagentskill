@@ -67,9 +67,9 @@ try {
   assert.deepEqual(await downloads.getDownloadTotals(['b', 'a', 'b', 'missing']), { a: 1, b: 1 })
   await downloads.getDownloadTotals(['missing', 'a', 'b'])
   assert.equal(reads, 1, 'Canonical keys share reordered sets, with no whole-table query')
-  now = 3599; revision = 2
+  now = 14399; revision = 2
   assert.equal((await downloads.getDownloadTotals(['b', 'a', 'missing'])).a, 1)
-  now = 3601
+  now = 14401
   assert.equal((await downloads.getDownloadTotals(['b', 'a', 'missing'])).a, 2)
   const many = Array.from({ length: 1250 }, (_, i) => `long-public-skill-slug-${String(i).padStart(4, '0')}`)
   assert.equal(Object.keys(await downloads.getDownloadTotals(many)).length, many.length, 'All candidates survive API row and URL limits')
@@ -80,7 +80,7 @@ try {
   revision = 3; invalidate('site-download-totals')
   assert.equal((await downloads.getDownloadTotals(['retry'])).retry, 3)
   assert.equal((await ranking.getLatestRankingSnapshot('trending')).revision, 3)
-  now += 21599; revision = 4
+  now += 14399; revision = 4
   assert.equal((await ranking.getLatestRankingSnapshot('trending')).revision, 3)
   now += 2
   assert.equal((await ranking.getLatestRankingSnapshot('trending')).revision, 4)
@@ -94,8 +94,8 @@ try {
   assert.deepEqual({ accesses, reads, entries: entries.size }, before, 'Pause never reads or overwrites a warm cache')
   delete process.env.SUPABASE_DATA_PAUSED
   assert.equal((await ranking.getLatestRankingSnapshot('trending')).revision, 5)
-  assert.ok(policies.some(p => p.revalidate === 3600 && p.tags.includes('site-download-totals')))
-  assert.ok(policies.some(p => p.revalidate === 21600 && p.tags.includes('ranking-snapshots')))
+  assert.ok(policies.some(p => p.revalidate === 14400 && p.tags.includes('site-download-totals')))
+  assert.ok(policies.some(p => p.revalidate === 14400 && p.tags.includes('ranking-snapshots')))
 } finally {
   if (pausedBefore === undefined) delete process.env.SUPABASE_DATA_PAUSED
   else process.env.SUPABASE_DATA_PAUSED = pausedBefore

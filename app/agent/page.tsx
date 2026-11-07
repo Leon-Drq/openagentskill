@@ -18,7 +18,7 @@ import {
 } from '@/lib/indexer/high-star-import'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export const metadata: Metadata = getResourceMetadata('agent')
 

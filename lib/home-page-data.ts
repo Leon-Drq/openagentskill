@@ -24,7 +24,7 @@ export interface HomeSkillCount {
 async function fetchExactApprovedSkillCount(): Promise<HomeSkillCount> {
   const result = await getApprovedRegistrySkillCount(HOME_STATS_QUERY_TIMEOUT_MS)
   if (!result?.exact) {
-    // Do not turn a timeout or planner estimate into a five-minute cached
+    // Do not turn a timeout or planner estimate into a four-hour cached
     // regression. Rejecting lets Next keep serving the last successful value
     // during stale-while-revalidate; the caller owns the cold-cache fallback.
     throw new Error('Exact approved skill count is temporarily unavailable')
@@ -36,7 +36,7 @@ async function fetchExactApprovedSkillCount(): Promise<HomeSkillCount> {
 const getCachedExactApprovedSkillCount = unstable_cache(
   fetchExactApprovedSkillCount,
   ['home-approved-skill-count-v3'],
-  { revalidate: 300 }
+  { revalidate: 14400 }
 )
 
 async function getStableApprovedSkillCount(): Promise<HomeSkillCount> {
@@ -71,7 +71,7 @@ async function fetchEvidenceStats() {
 const getCachedEvidenceStats = unstable_cache(
   fetchEvidenceStats,
   ['home-evidence-stats-v2'],
-  { revalidate: 300 }
+  { revalidate: 14400 }
 )
 
 export function getRegistryEvidenceStats() {
