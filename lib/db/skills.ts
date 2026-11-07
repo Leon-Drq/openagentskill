@@ -1264,7 +1264,7 @@ const getCachedNearNameSearch = unstable_cache(
     const supabase = createPublicClient({ requestTimeoutMs: SKILL_EXACT_SEARCH_TIMEOUT_MS, circuitScope: 'skill-search' })
     const results = await Promise.all(patterns.map(async pattern => {
       const { data, error } = await supabase.from('skills').select(SKILL_DIRECTORY_SELECT)
-        .or(PUBLIC_SKILL_FILTER).ilike('name', pattern).order('name').limit(24)
+        .or(PUBLIC_SKILL_FILTER).ilike('name', pattern).order('name').order('slug').limit(24)
       if (error) throw error
       return filterSkillOnly((data || []) as unknown as SkillRecord[])
         .filter(skill => classifySearchMatch(skill, query) !== 'related')
