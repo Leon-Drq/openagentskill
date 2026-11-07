@@ -87,7 +87,16 @@ try {
       return {response,body}
     }
     for (const path of ['/agent-skill','/zh/agent-skill']) {
-      const html=await readPage(path)
+      // Preview may populate a different local store than the Worker uses.
+      // A cold render is valid; its background R2 write must become a hit.
+      await readPage(path)
+      let html
+      for(let attempt=0;attempt<5;attempt++) {
+        html=await readPage(path)
+        if(html.response.headers.get('x-opennext-cache')==='HIT')break
+        await new Promise(resolve=>setTimeout(resolve,200))
+      }
+      if(html.response.headers.get('x-opennext-cache')!=='HIT')console.log('Cache probe headers',path,Object.fromEntries(html.response.headers))
       assert.equal(html.response.headers.get('x-opennext-cache'),'HIT',`${path}: intercepted HTML`)
       assert.match(html.body,/<html/)
       const flight=await readPage(path+'?_rsc=cache-check',{RSC:'1'})
