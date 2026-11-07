@@ -34,7 +34,7 @@ import { classifySearchMatch, isDirectSkillLookup } from '@/lib/search-match'
 
 const SITE_URL = 'https://www.openagentskill.com'
 const RESOLVE_CANDIDATE_POOL_SIZE = 750
-const RESOLVE_CACHE_REVALIDATE = 300
+const RESOLVE_CACHE_REVALIDATE = 14400
 const RESOLVE_QUERY_TIMEOUT_MS = 1800
 const RESOLVE_EXACT_QUERY_TIMEOUT_MS = 9000
 async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {

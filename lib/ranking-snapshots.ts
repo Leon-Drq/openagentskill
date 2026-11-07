@@ -224,7 +224,7 @@ const getCachedLatestRankingSnapshot = unstable_cache(
     return data as RankingSnapshot | null
   },
   ['latest-ranking-snapshot-v2'],
-  { revalidate: 21600, tags: ['ranking-snapshots'] }
+  { revalidate: 14400, tags: ['ranking-snapshots'] }
 )
 
 export async function getLatestRankingSnapshot(rankingSlug: string) {

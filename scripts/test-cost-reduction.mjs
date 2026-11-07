@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import './test-cost-cache-policy.mjs'
+import './test-public-cache-window.mjs'
 import { readFileSync } from 'node:fs'
 import ts from 'typescript'
 import { publicCachedRoute } from '../lib/public-cached-routing.ts'
@@ -65,7 +66,7 @@ await assert.rejects(() => mod.getPublicAudit({ ...record, source_content_hash: 
 unavailable = false
 await mod.getPublicAudit({ ...record, source_content_hash: 'error' }, null)
 assert.equal(record.ai_review_approved, false, 'Display caching cannot approve a review')
-assert.ok(policies.every(policy => policy.tags.includes('public-skill:example') && policy.revalidate === 3600))
+assert.ok(policies.every(policy => policy.tags.includes('public-skill:example') && policy.revalidate === 14400))
 
 const robots = readFileSync('public/robots.txt', 'utf8').replace(/\r\n/g, '\n')
 const group = bot => robots.split('User-agent: ' + bot + '\n')[1].split('\nUser-agent: ')[0]

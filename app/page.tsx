@@ -9,7 +9,7 @@ import {
 } from '@/lib/seo/social'
 import { getLocalizedLanguageAlternates } from '@/lib/seo/localized-pages'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export const metadata: Metadata = {
   title: {

@@ -3,7 +3,7 @@ import { getMotionEntry } from '@/lib/motion/catalog'
 import { motionDetailMetadata } from '@/lib/motion/detail'
 import { MotionSkillPage } from '@/components/motion/skill-page'
 
-export const revalidate = 300
+export const revalidate = 14400
 export function generateStaticParams() { return [] }
 type Props = { params: Promise<{ locale: string; slug: string }> }
 

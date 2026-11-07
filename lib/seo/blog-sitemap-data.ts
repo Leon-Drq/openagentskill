@@ -7,5 +7,5 @@ import { readPublishedBlogSitemap } from '@/lib/blog/read'
 export const getPublishedBlogSitemap = unstable_cache(
   () => readPublishedBlogSitemap(createPublicClient()),
   ['published-blog-sitemap-v1'],
-  { revalidate: 3600, tags: ['published-blog-sitemap'] },
+  { revalidate: 14400, tags: ['published-blog-sitemap'] },
 )

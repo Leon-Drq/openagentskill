@@ -17,7 +17,7 @@ import { REA_ARTICLE_COPY } from '@/lib/blog/rea-guide'
 import { CREATOR_ARTICLE_COPY } from '@/lib/blog/creator-workflows'
 import { CreatorGuideFeature } from '@/components/blog/creator-guide-feature'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export const metadata: Metadata = getResourceMetadata('blog')
 

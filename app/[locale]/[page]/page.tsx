@@ -2,7 +2,7 @@ import { connection } from 'next/server'
 import LocalizedContent, { generateMetadata as buildMetadata } from './content'
 export { generateStaticParams } from './content'
 
-export const revalidate = 300
+export const revalidate = 14400
 export const dynamicParams = false
 
 type Props = {

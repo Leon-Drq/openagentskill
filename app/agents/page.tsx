@@ -5,7 +5,7 @@ import { getAllSkills } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
 import { AGENT_PROFILES, rankSkillsForAgent } from '@/lib/seo/growth-directories'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export const metadata: Metadata = {
   title: 'AI Agent Skills by Agent | Claude Code, Codex, Cursor, Copilot',

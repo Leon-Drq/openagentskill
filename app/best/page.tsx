@@ -13,7 +13,7 @@ import { BEST_SKILL_PAGES, FEATURED_BEST_PAGES } from '@/lib/seo/growth-pages'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
 import { getPresentationPage, getPresentationSources } from '@/lib/seo/presentation-pages'
 
-export const revalidate = 300
+export const revalidate = 14400
 const BEST_PAGE_QUERY_TIMEOUT_MS = 2000
 
 export const metadata: Metadata = {

@@ -45,7 +45,7 @@ const getCachedRankingLanding = unstable_cache(async (slug: string) => {
   // A cold miss is handled outside the cache, never stored as a zero-item list.
   if (result.source !== 'directory') throw new Error('Ranking refresh unavailable')
   return result
-}, ['ranking-landing-v2-success-only'], { revalidate: 900, tags: ['public-skill-directory', 'public-skill-outcomes'] })
+}, ['ranking-landing-v2-success-only'], { revalidate: 14400, tags: ['public-skill-directory', 'public-skill-outcomes'] })
 
 type Landing = Awaited<ReturnType<typeof loadRankingLanding>> & { savedFrom?: string; savedThrough?: string }
 
@@ -62,7 +62,7 @@ const getSavedRankingLanding = unstable_cache(async (slug: string, savedVersion:
     items: rankSkillsForDefinition(candidates, ranking, {}, 30), candidateCount: candidates.length,
     source: 'saved-directory', savedFrom: saved.savedFrom, savedThrough: saved.savedThrough,
   }
-}, ['saved-ranking-selection-v1'], { revalidate: 300 })
+}, ['saved-ranking-selection-v1'], { revalidate: 14400 })
 
 export async function getRankingLanding(slug: string): Promise<Landing> {
   const ranking = getRankingDefinition(slug)

@@ -86,9 +86,11 @@ const SKILLS_PAGE_SIZE = 1000
 const DEFAULT_SKILL_QUERY_LIMIT = 1200
 const MAX_SKILL_QUERY_LIMIT = 4000
 const ALL_SKILLS_CACHE_TTL_MS = 30 * 1000
-const SHARED_SKILL_CACHE_REVALIDATE_SECONDS = 300
-const DIRECTORY_CACHE_REVALIDATE_SECONDS = 3600
-const CATEGORY_CACHE_REVALIDATE_SECONDS = 3600
+// Public discovery data refreshes on demand after four hours. Publication and
+// owner edits still invalidate these tagged entries before the TTL expires.
+const SHARED_SKILL_CACHE_REVALIDATE_SECONDS = 14400
+const DIRECTORY_CACHE_REVALIDATE_SECONDS = 14400
+const CATEGORY_CACHE_REVALIDATE_SECONDS = 14400
 // SQL can use its full 3s statement budget, before network and body decoding.
 // Shorter transport deadlines incorrectly open the circuit on healthy reads.
 const SKILL_DIRECTORY_REQUEST_TIMEOUT_MS = 7000
@@ -105,7 +107,7 @@ const SKILL_SEARCH_RESULT_TIMEOUT_MS = 8000
 // registry shard enough time to return the complete URL set, then let the
 // shared and edge caches keep that work away from visitors.
 const SITEMAP_QUERY_TIMEOUT_MS = 6500
-const SITEMAP_CACHE_REVALIDATE_SECONDS = 3600
+const SITEMAP_CACHE_REVALIDATE_SECONDS = 14400
 
 // Public directory views do not need private submission contact data or long
 // editorial suggestions. Keeping that payload out of high-volume list reads
@@ -534,7 +536,7 @@ async function fetchApprovedSkillSitemapCount(minStars: number, minQualityScore:
   // cannot count this narrower SEO set, even when no numeric floors are used.
   const query = supabase
     .from('skills')
-    // This result is cached for one hour. An exact indexed count prevents the
+    // This result is cached for four hours. An exact indexed count prevents the
     // planner estimate from creating empty sitemap shards or hiding valid ones.
     .select('slug', { count: 'exact', head: true })
     .or(buildLegacySearchIndexFilter(minStars, minQualityScore))
@@ -980,7 +982,9 @@ const loadSkillBySlug = coalesceCacheLoader(async (slug: string): Promise<SkillR
 })
 
 function getCachedSkillBySlug(slug: string, cacheSeconds: number) {
-  const revalidate = cacheSeconds === 900 ? 900 : SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS
+  // Display pages opt into four hours; installation/manifest callers retain
+  // their short lookup window and both tiers share the same invalidation tag.
+  const revalidate = cacheSeconds === 14400 ? 14400 : SKILL_LOOKUP_CACHE_REVALIDATE_SECONDS
   return unstable_cache(loadSkillBySlug, ['public-skill-by-slug-v4', String(revalidate)], {
     revalidate, tags: [`public-skill:${slug}`],
   })(slug)

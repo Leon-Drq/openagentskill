@@ -9,7 +9,7 @@ import {
 import { AGENT_TASKS } from '@/lib/agent-tasks'
 import { getApprovedRegistrySkillCount, LAST_VERIFIED_APPROVED_SKILL_COUNT } from '@/lib/registry-stats'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export const metadata: Metadata = {
   title: 'AI Agent Tasks - OpenAgentSkill',

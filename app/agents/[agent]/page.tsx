@@ -8,7 +8,7 @@ import { getAllSkills } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
 import { AGENT_PROFILES, getAgentProfile, rankSkillsForAgent } from '@/lib/seo/growth-directories'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export function generateStaticParams() {
   return AGENT_PROFILES.map((profile) => ({ agent: profile.slug }))

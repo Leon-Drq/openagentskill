@@ -21,7 +21,7 @@ import { getSkillBySlugOrFallbackStrict } from '@/lib/skill-fallbacks'
 import { ScenarioExamples } from '@/components/scenario-topic'
 import { SCENARIO_TOPICS, getScenarioSources, scenarioProfileHref, scenarioSourceUrl } from '@/lib/seo/scenario-pages'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export function generateStaticParams() {
   return GROWTH_GUIDES.map((guide) => ({ slug: guide.slug }))

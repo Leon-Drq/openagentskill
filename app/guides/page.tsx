@@ -5,7 +5,7 @@ import Link from '@/components/crawl-link'
 import { MarketingHero, MarketingMetricStrip } from '@/components/marketing-page'
 import { GROWTH_GUIDES } from '@/lib/seo/growth-guides'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export const metadata: Metadata = getResourceMetadata('guides')
 

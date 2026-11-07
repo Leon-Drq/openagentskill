@@ -6,7 +6,7 @@ import { getAllSkills } from '@/lib/db/skills'
 
 const BASE_URL = 'https://www.openagentskill.com'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export const metadata: Metadata = {
   title: 'The Skill Layer for AI Agents',

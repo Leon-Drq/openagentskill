@@ -9,7 +9,7 @@ import { selectSkillsForPack, SKILL_PACKS } from '@/lib/skill-packs'
 const BASE_URL = 'https://www.openagentskill.com'
 const PACK_CANDIDATE_LIMIT = 1200
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export const metadata: Metadata = {
   title: 'Installable AI Agent Skill Packs',

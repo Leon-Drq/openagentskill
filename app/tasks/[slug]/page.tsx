@@ -10,7 +10,7 @@ import { getAllSkills, getSkillsBySlugs, searchSkills, type SkillRecord } from '
 import { getSkillInstallTargets } from '@/lib/install-targets'
 import { getUseCaseBySlug } from '@/lib/use-cases'
 
-export const revalidate = 3600
+export const revalidate = 14400
 
 export async function generateMetadata({
   params,

@@ -13,7 +13,7 @@ import {
 } from '@/lib/db/skills'
 import { formatCompactNumber } from '@/lib/quality'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export const metadata: Metadata = {
   title: 'AI Agent Skill Audit Reports | OpenAgentSkill',

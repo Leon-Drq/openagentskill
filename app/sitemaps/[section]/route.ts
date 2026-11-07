@@ -14,7 +14,7 @@ import {
 } from '@/lib/seo/sitemap'
 
 export const dynamic = 'force-dynamic'
-export const revalidate = 3600
+export const revalidate = 14400
 export const maxDuration = 120
 
 const SHARDED_SECTION_PREFIXES: Array<[RegExp, SitemapSection]> = [
@@ -90,7 +90,7 @@ function xmlResponse(body: string, generatedAt?: string, scope?: string) {
   return new Response(body, {
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',
-      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      'Cache-Control': 'public, s-maxage=14400, stale-while-revalidate=86400',
       ...(generatedAt ? { 'X-Sitemap-Snapshot': generatedAt } : {}),
       ...(scope ? { 'X-Sitemap-Scope': scope } : {}),
     },

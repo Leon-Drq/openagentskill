@@ -74,30 +74,30 @@ import { MotionSkillPage } from '@/components/motion/skill-page'
 const SKILL_DETAIL_SUPPORT_TIMEOUT_MS = 1200
 
 const getCachedSkillBySlug = cache(async (slug: string) =>
-  getSkillBySlugOrFallbackStrict(getCanonicalSkillSlug(slug), 900)
+  getSkillBySlugOrFallbackStrict(getCanonicalSkillSlug(slug), 14400)
 )
 
 // Independent success-only caches: one timed-out service must not erase the
-// healthy related items, telemetry or claim record for the next fifteen minutes.
+// healthy related items, telemetry or claim record for the next four hours.
 const getSharedRelatedSkills = (id: string, category: string, slug: string) => unstable_cache(
   (skillId: string, skillCategory: string) => getRelatedSkills(skillId, skillCategory, 4, true),
   ['skill-detail-related-v3'],
-  { revalidate: 900, tags: [`public-skill:${slug}`] }
+  { revalidate: 14400, tags: [`public-skill:${slug}`] }
 )(id, category)
 const getSharedEventStats = unstable_cache(
   (slug: string) => getSkillEventStats(slug, true),
   ['skill-detail-events-v2'],
-  { revalidate: 900, tags: ['public-skill-events'] }
+  { revalidate: 14400, tags: ['public-skill-events'] }
 )
 const getSharedOutcomeStats = unstable_cache(
   (slug: string) => getAgentOutcomeStats(slug, true),
   ['skill-detail-outcomes-v2'],
-  { revalidate: 900, tags: ['public-skill-outcomes'] }
+  { revalidate: 14400, tags: ['public-skill-outcomes'] }
 )
 const getSharedApprovedClaim = (slug: string) => unstable_cache(
   (key: string) => getApprovedClaimBySkillSlug(key, true),
   ['skill-detail-claim-v3'],
-  { revalidate: 900, tags: [`public-skill:${slug}`, 'public-skill-claims'] }
+  { revalidate: 14400, tags: [`public-skill:${slug}`, 'public-skill-claims'] }
 )(slug)
 
 const getCachedSkillDetailSupport = cache(async (skillId: string, category: string, slug: string) => {

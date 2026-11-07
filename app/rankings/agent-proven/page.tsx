@@ -29,7 +29,7 @@ import { getSkillTrustProfile } from '@/lib/trust'
 import { GitHubOwnerAvatar } from '@/components/github-owner-avatar'
 import { getGitHubOwner } from '@/lib/github-owner'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export const metadata: Metadata = {
   title: 'Agent-Proven AI Agent Skills',

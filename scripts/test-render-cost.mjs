@@ -117,7 +117,7 @@ for (const params of [{ category: 'design-creative', access: 'free' }, { q: 'des
 }
 await assert.rejects(() => renderProps({ page: '0' }), /404/)
 await assert.rejects(() => renderProps({ page: '999999' }), /404/)
-assert.deepEqual(policies, [...Array.from({length: 2}, () => ({ revalidate: 3600, tags: ['public-skill-directory', 'public-skill-stats'] })), { revalidate: 21600 }])
+assert.deepEqual(policies, [...Array.from({length: 2}, () => ({ revalidate: 14400, tags: ['public-skill-directory', 'public-skill-stats'] })), { revalidate: 21600 }])
 
 for (const params of [{ sort: 'stars' }, { page: '2' }, { category: 'design-creative' }]) {
   const first = await renderProps(params)

@@ -14,7 +14,7 @@ import { getSkillBySlugOrFallbackStrict, isCuratedSkillFallback } from '@/lib/sk
 import { getPublicEval } from '@/lib/skills/public-analysis'
 
 // Deduplicate metadata/page lookups without caching a transient lookup failure.
-const getSkill = cache((slug: string) => getSkillBySlugOrFallbackStrict(slug, 900))
+const getSkill = cache((slug: string) => getSkillBySlugOrFallbackStrict(slug, 14400))
 
 export async function generateMetadata({
   params,

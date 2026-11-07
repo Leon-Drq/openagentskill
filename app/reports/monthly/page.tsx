@@ -6,7 +6,7 @@ import { getAllSkills, getSkillEventStatsMap, type SkillEventStats, type SkillRe
 import { formatCompactNumber, getSkillQualityProfile } from '@/lib/quality'
 import { getSkillTrustProfile } from '@/lib/trust'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export const metadata: Metadata = getResourceMetadata('monthly')
 

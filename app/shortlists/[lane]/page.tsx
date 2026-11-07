@@ -7,7 +7,7 @@ import { getXShortlist, getXShortlistInstallCommand, getXShortlistStars, isXShor
 
 const BASE_URL = 'https://www.openagentskill.com'
 
-export const revalidate = 300
+export const revalidate = 14400
 
 export async function generateMetadata({
   params,

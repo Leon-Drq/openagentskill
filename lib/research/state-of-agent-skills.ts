@@ -367,7 +367,7 @@ const getCachedReport = unstable_cache(
     return buildReport(skills, indexedCandidates, outcomes)
   },
   ['state-of-agent-skills-2026-v1'],
-  { revalidate: 3_600 }
+  { revalidate: 14400 }
 )
 
 export function getStateOfAgentSkillsReport() {
