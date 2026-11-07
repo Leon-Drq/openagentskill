@@ -10254,60 +10254,6 @@
       "sourceDocumentSha256": "87ba4b24bd23b8757fdf56c16ae855def923faad9f36aada24cc8f6aaae1331f"
     },
     {
-      "sourceSlug": "bs-grammarly-style-og",
-      "name": "Grammarly Style OG Image",
-      "outputType": "image",
-      "priceUsdCents": 499,
-      "downloadCount": 12,
-      "featured": false,
-      "publishedAt": "2026-09-03T09:23:07.994Z",
-      "previewImages": [
-        "https://skillry.dev/skills/bs-grammarly-style-og/media/preview-1.webp?v=dd257854-fb07-40bd-882b-72acf62367c7&variant=detail",
-        "https://skillry.dev/skills/bs-grammarly-style-og/media/preview-2.webp?v=942b5aab-91d0-4b89-916c-39d051dfee7f&variant=detail",
-        "https://skillry.dev/skills/bs-grammarly-style-og/media/preview-3.webp?v=a22c62e5-a9cb-4451-983b-f54371bdd12a&variant=detail"
-      ],
-      "previewVideo": null,
-      "tags": [
-        {
-          "kind": "scenario",
-          "value": "product-launch",
-          "label": "Product Launch & App Growth"
-        },
-        {
-          "kind": "scenario",
-          "value": "web-publishing",
-          "label": "Digital Publications & Web Pages"
-        },
-        {
-          "kind": "task",
-          "value": "create-og-image",
-          "label": "Create Og Image"
-        },
-        {
-          "kind": "style",
-          "value": "deep-teal",
-          "label": "Deep Teal"
-        },
-        {
-          "kind": "style",
-          "value": "oversized-copy",
-          "label": "Oversized Copy"
-        },
-        {
-          "kind": "style",
-          "value": "rounded-ui-crop",
-          "label": "Rounded Ui Crop"
-        },
-        {
-          "kind": "style",
-          "value": "split-screen-hero",
-          "label": "Split Screen Hero"
-        }
-      ],
-      "observedAt": "2026-10-03T02:23:57.766Z",
-      "sourceDocumentSha256": "87ba4b24bd23b8757fdf56c16ae855def923faad9f36aada24cc8f6aaae1331f"
-    },
-    {
       "sourceSlug": "bs-green-pharmacy-storefront",
       "name": "Green Pharmacy Storefront",
       "outputType": "html",
@@ -20680,5 +20626,60 @@
       "sourceDocumentSha256": "87ba4b24bd23b8757fdf56c16ae855def923faad9f36aada24cc8f6aaae1331f"
     }
   ],
-  "archived": []
+  "archived": [
+    {
+      "sourceSlug": "bs-grammarly-style-og",
+      "name": "Grammarly Style OG Image",
+      "outputType": "image",
+      "priceUsdCents": 499,
+      "downloadCount": 12,
+      "featured": false,
+      "publishedAt": "2026-09-03T09:23:07.994Z",
+      "previewImages": [
+        "https://skillry.dev/skills/bs-grammarly-style-og/media/preview-1.webp?v=dd257854-fb07-40bd-882b-72acf62367c7&variant=detail",
+        "https://skillry.dev/skills/bs-grammarly-style-og/media/preview-2.webp?v=942b5aab-91d0-4b89-916c-39d051dfee7f&variant=detail",
+        "https://skillry.dev/skills/bs-grammarly-style-og/media/preview-3.webp?v=a22c62e5-a9cb-4451-983b-f54371bdd12a&variant=detail"
+      ],
+      "previewVideo": null,
+      "tags": [
+        {
+          "kind": "scenario",
+          "value": "product-launch",
+          "label": "Product Launch & App Growth"
+        },
+        {
+          "kind": "scenario",
+          "value": "web-publishing",
+          "label": "Digital Publications & Web Pages"
+        },
+        {
+          "kind": "task",
+          "value": "create-og-image",
+          "label": "Create Og Image"
+        },
+        {
+          "kind": "style",
+          "value": "deep-teal",
+          "label": "Deep Teal"
+        },
+        {
+          "kind": "style",
+          "value": "oversized-copy",
+          "label": "Oversized Copy"
+        },
+        {
+          "kind": "style",
+          "value": "rounded-ui-crop",
+          "label": "Rounded Ui Crop"
+        },
+        {
+          "kind": "style",
+          "value": "split-screen-hero",
+          "label": "Split Screen Hero"
+        }
+      ],
+      "observedAt": "2026-10-03T02:23:57.766Z",
+      "sourceDocumentSha256": "87ba4b24bd23b8757fdf56c16ae855def923faad9f36aada24cc8f6aaae1331f"
+    }
+  ]
 }

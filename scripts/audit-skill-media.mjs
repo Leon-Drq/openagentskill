@@ -147,7 +147,8 @@ export async function auditMedia({ catalog, remote = false, fetcher = fetch, out
   const report = { checkedAt: new Date().toISOString(), summary: {
     galleryCases: SHOWCASE_CASES.length, galleryVideos: SHOWCASE_CASES.filter(item => item.videoUrl).length,
     sourcePreviewSkills: SKILL_SOURCE_PREVIEWS.length, boundSkills: bindings.length,
-    externalSkills: providers.length, externalVideos: providers.filter(item => item.previewVideo || item.runtimeDemo || item.sourceDemo).length,
+    externalSkills: providers.length, archivedExternalSkills: EXTERNAL_SKILLS.length - providers.length,
+    externalVideos: providers.filter(item => item.previewVideo || item.runtimeDemo || item.sourceDemo).length,
     localAssets: results.filter(item => item.url.startsWith('/')).length, remoteAssets: results.filter(item => !item.url.startsWith('/')).length,
     checked: results.filter(item => item.state === 'ok').length, failed: errors.length,
   }, coverage, errors, assets: results.sort((a, b) => a.url.localeCompare(b.url)) }

@@ -22,7 +22,7 @@ export async function buildCatalogSkillMetadata({ params, searchParams }: Props)
   const query = await searchParams
   const lang = query.lang === 'zh' ? 'zh' : 'en'
   const url = base + externalSkillHref(entry.slug)
-  const socialImage = entry.provider === 'scenario' ? entry.sourceDemo.cover : entry.provider === 'resource' ? entry.sourcePreviews[0]?.src : entry.provider === 'skillry' ? entry.previewImages[0] : entry.runtimeDemo ? base + entry.runtimeDemo.poster : null
+  const socialImage = entry.provider === 'scenario' ? entry.sourceDemo.cover : entry.provider === 'resource' ? entry.sourcePreviews[0]?.src : entry.provider === 'skillry' ? (entry.active ? entry.previewImages[0] : null) : entry.runtimeDemo ? base + entry.runtimeDemo.poster : null
   return {
     title: entry.title[lang], description: entry.description[lang],
     alternates: { canonical: url }, robots: { index: Object.keys(query).length === 0 && (entry.provider !== 'skillry' || (entry.active && entry.seoIndexable)), follow: true },
@@ -38,6 +38,18 @@ export default async function CatalogSkillContent({ params, searchParams }: Prop
   const zh = (await searchParams).lang === 'zh'
   if (entry.provider === 'resource') return <FontResourceContent entry={entry} zh={zh} />
   if (entry.provider === 'scenario') return <ScenarioSkillContent entry={entry} zh={zh} />
+  if (entry.provider === 'skillry' && !entry.active) return <div className="min-h-screen bg-background text-foreground">
+    <SiteHeader />
+    <main className="mx-auto max-w-6xl px-6 pb-20 pt-10" lang={zh ? 'zh' : 'en'} data-catalog-skill={entry.slug} data-catalog-state="archived">
+      <Link href={zh ? '/zh/skills' : '/skills'} className="inline-flex min-h-11 items-center text-sm underline underline-offset-4">{zh ? '返回技能目录' : 'Back to skills'}</Link>
+      <p className="mt-8 text-sm text-secondary">{zh ? '历史收录 · 已归档' : 'Historical listing · Archived'}</p>
+      <h1 className="mt-4 font-display text-4xl leading-tight sm:text-5xl">{entry.skillName}</h1>
+      <p className="mt-6 max-w-3xl text-base leading-8 text-secondary">{zh ? '此条目已不在当前收录目录中。历史链接与收藏记录保留，旧预览和获取入口已停用。你可以返回目录选择其他技能。' : 'This listing is no longer in the current catalog. Its historical URL and saved records remain available, but old previews and acquisition links are disabled. Browse the directory to choose another skill.'}</p>
+      <p className="mt-4 text-sm text-secondary">{zh ? '原发布平台：Skillry' : 'Original publisher: Skillry'}</p>
+      <div className="mt-6"><SkillEngagementProvider slugs={[entry.slug]} untrackedSlugs={[entry.slug]}><SkillActions slug={entry.slug} name={entry.title[zh ? 'zh' : 'en']} /></SkillEngagementProvider></div>
+    </main>
+    <SiteFooter />
+  </div>
   const lang = zh ? 'zh' : 'en'
   const url = base + externalSkillHref(entry.slug)
   const demo = entry.runtimeDemo
