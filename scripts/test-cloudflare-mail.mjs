@@ -13,7 +13,7 @@ for(const mail of [{to:'fixture@example.invalid\nBcc:bad@example.invalid',url:or
  {to:'fixture@example.invalid',url:origin+'/api/payments/checkout'}])await assert.rejects(send({...mail,purpose:'verify-email'}),/Invalid/)
 await assert.rejects(createCloudflareAuthMailer({async send(){throw new Error('private token leak')}},origin)({to:'fixture@example.invalid',url:origin+'/api/auth/reset-password/fixture-only',purpose:'reset-password'}),/^Error: Authentication email delivery failed$/)
 const {sqlite,database}=sqliteD1()
-for(const n of ['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile'])sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${n}.sql`,import.meta.url),'utf8'))
+for(const n of ['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0011_search_cost'])sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${n}.sql`,import.meta.url),'utf8'))
 const env={HOSTING_PROVIDER:'cloudflare',MIGRATION_READ_ONLY:'0',CLOUDFLARE_AUTH_ENABLED:'1',AUTH_ORIGIN:origin,
  BETTER_AUTH_SECRET:crypto.randomUUID()+crypto.randomUUID(),APP_DB:database,AUTH_EMAIL_ENABLED:'1',AUTH_REGISTRATION_ENABLED:'1',AUTH_EMAIL:binding}
 const request=(path,body)=>new Request(origin+'/api/auth'+path,{method:'POST',headers:{origin,'content-type':'application/json','cf-connecting-ip':'192.0.2.99'},body:JSON.stringify(body)})

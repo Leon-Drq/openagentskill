@@ -43,7 +43,7 @@ try{
 }finally{globalThis.fetch=originalFetch;if(priorToken===undefined)delete process.env.X_BEARER_TOKEN;else process.env.X_BEARER_TOKEN=priorToken}
 
 const {sqlite,database}=sqliteD1()
-for(const n of ['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0006_telemetry','0007_quality','0008_outcomes','0009_skill_writes'])sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${n}.sql`,import.meta.url),'utf8'))
+for(const n of ['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0006_telemetry','0007_quality','0008_outcomes','0009_skill_writes','0011_search_cost'])sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${n}.sql`,import.meta.url),'utf8'))
 const client=db=>createClient('https://d1.internal','fixture',{auth:{persistSession:false,autoRefreshToken:false},db:{retry:false},global:{fetch:createD1ServiceFetch(db)}})
 try{
  for(let i=1;i<=3;i++)sqlite.prepare("INSERT INTO skill_candidates(id,source_key,github_full_name,github_owner,github_repo,canonical_source_url,github_stars,status,next_attempt_at) VALUES (?,?,?,'fixture',?,?,?,'discovered','2000-01-01T00:00:00.000000Z')").run('c'+i,'source'+i,'fixture/c'+i,'c'+i,'https://github.com/fixture/c'+i,i*100)

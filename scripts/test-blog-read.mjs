@@ -6,7 +6,7 @@ import { createD1ReadFetch } from '../lib/db/cloudflare-read.ts'
 import { readPublishedBlogPost, readPublishedBlogPosts, readPublishedBlogSitemap } from '../lib/blog/read.ts'
 
 const { sqlite, database } = sqliteD1()
-for (const name of ['0001_commerce','0002_auth','0003_business','0004_catalog']) sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${name}.sql`, import.meta.url), 'utf8'))
+for (const name of ['0001_commerce','0002_auth','0003_business','0004_catalog','0011_search_cost']) sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${name}.sql`, import.meta.url), 'utf8'))
 const client = transport => createClient('https://d1.internal', 'fixture', { auth:{persistSession:false,autoRefreshToken:false}, db:{retry:false}, global:{fetch:transport} })
 const pub = client(createD1ReadFetch(database))
 try {

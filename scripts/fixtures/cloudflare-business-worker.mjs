@@ -9,11 +9,16 @@ import { createD1PublicFetch } from '../../lib/db/cloudflare-public-write.ts'
 import { enqueueIndexNowUrls, drainIndexNowQueue } from '../../lib/indexnow-queue.ts'
 import { createIndexNowRequest } from '../../lib/indexnow.ts'
 import { readPublishedBlogPost, readPublishedBlogPosts, readPublishedBlogSitemap } from '../../lib/blog/read.ts'
+import { checkSearchCost } from './search-cost-checks.mjs'
 
 const worker = {
   async fetch(request, env) {
     if (env.BUSINESS_TEST_ONLY !== '1' || !['localhost','127.0.0.1'].includes(new URL(request.url).hostname) || request.method !== 'POST') return new Response('Unavailable',{status:503})
     const db = env.APP_DB
+    if (new URL(request.url).pathname==='/search-cost-check') {
+      const checks=await checkSearchCost(db)
+      return Response.json({passed:true,checks})
+    }
     if (new URL(request.url).pathname==='/blog-check') {
       const client=createClient('https://d1.internal','fixture',{auth:{persistSession:false,autoRefreshToken:false},db:{retry:false},global:{fetch:createD1ReadFetch(db)}})
       await db.batch([

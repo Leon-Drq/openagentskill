@@ -1,4 +1,5 @@
-import { spawn } from 'node:child_process'
+import { spawn, execFile } from 'node:child_process'
+import { promisify } from 'node:util'
 import { mkdirSync, openSync, closeSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { resolve } from 'node:path'
@@ -74,6 +75,41 @@ try {
       assert.match(response.headers.get('X-Robots-Tag') || '', /noindex/)
     }
     await response.body?.cancel().catch(() => {})
+  }
+  if (!remote) {
+    // Test the actual built interceptor, local R2 and authoritative D1 tags.
+    // No test routes, credentials or invalidation API are added to production.
+    const readPage = async (path,headers={}) => {
+      const response=await fetch(base+path,{headers,redirect:'manual',signal:AbortSignal.timeout(30_000)})
+      const body=await response.text()
+      assert.equal(response.status,200,path)
+      assert.equal(response.headers.get('set-cookie'),null,path)
+      return {response,body}
+    }
+    for (const path of ['/agent-skill','/zh/agent-skill']) {
+      const html=await readPage(path)
+      assert.equal(html.response.headers.get('x-opennext-cache'),'HIT',`${path}: intercepted HTML`)
+      assert.match(html.body,/<html/)
+      const flight=await readPage(path+'?_rsc=cache-check',{RSC:'1'})
+      assert.equal(flight.response.headers.get('x-opennext-cache'),'HIT',`${path}: intercepted Flight`)
+      assert.match(flight.response.headers.get('content-type')||'',/text\/x-component/)
+      assert.doesNotMatch(flight.body,/<!DOCTYPE html>/i)
+      const head=await fetch(base+path,{method:'HEAD'})
+      assert.equal(head.status,200);assert.equal(await head.text(),'')
+      const preview=await readPage(path,{cookie:'__prerender_bypass=invalid-fixture'})
+      assert.notEqual(preview.response.headers.get('x-opennext-cache'),'HIT','Preview cookies bypass interception')
+      report.push({path,interceptedHtml:true,interceptedRsc:true,previewBypass:true})
+    }
+    const buildId=readFileSync('.next/BUILD_ID','utf8').trim()
+    assert.match(buildId,/^[\w-]+$/)
+    // Same persisted representation as revalidateTag(tag,{expire:0}).
+    const now=Date.now()
+    const sql=`INSERT INTO revalidations(tag,revalidatedAt,stale,expire) VALUES ('${buildId}/_N_T_/agent-skill',${now},${now},${now})`
+    await promisify(execFile)(process.execPath,[resolve('node_modules/wrangler/bin/wrangler.js'),'d1','execute','NEXT_TAG_CACHE_D1','--local','--config',previewConfig,'--command',sql],{env:process.env})
+    const invalidated=await readPage('/agent-skill')
+    assert.notEqual(invalidated.response.headers.get('x-opennext-cache'),'HIT','Expired tag must reach Next renderer')
+    assert.match(invalidated.body,/OpenAgentSkill/)
+    report.push({path:'/agent-skill',expiredTagBypass:true})
   }
   writeFileSync(reportPath, JSON.stringify(report, null, 2))
   console.log(`Cloudflare workerd smoke checks passed: ${report.length} public/isolation cases`)

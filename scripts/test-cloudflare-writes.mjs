@@ -6,7 +6,7 @@ import {createD1UserFetch} from '../lib/db/cloudflare-user-write.ts'
 import {createD1ServiceFetch} from '../lib/db/cloudflare-service.ts'
 import {processStripeEvent} from '../lib/payments/webhook.ts'
 const {sqlite,database}=sqliteD1()
-for(const n of ['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile'])sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${n}.sql`,import.meta.url),'utf8'))
+for(const n of ['0001_commerce','0002_auth','0003_business','0004_catalog','0005_account_profile','0011_search_cost'])sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${n}.sql`,import.meta.url),'utf8'))
 const user='90000000-0000-4000-8000-000000000001',other='90000000-0000-4000-8000-000000000002',release='90000000-0000-4000-8000-000000000003'
 sqlite.prepare('INSERT INTO account_identities(id) VALUES (?),(?)').run(user,other)
 sqlite.prepare('INSERT INTO profiles(id,username) VALUES (?,NULL),(?,?)').run(user,other,'occupied')
