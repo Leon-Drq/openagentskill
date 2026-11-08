@@ -1256,13 +1256,13 @@
   {
     "skillSlug": "arcsin1-oh-my-ppt",
     "repository": "arcsin1/oh-my-ppt",
-    "revision": "35648cbd8dd1d6f85a14b6285f8ae9713df10757",
-    "sourceUrl": "https://github.com/arcsin1/oh-my-ppt/blob/35648cbd8dd1d6f85a14b6285f8ae9713df10757/README.md",
+    "revision": "1f1da525616f1508111b820800865c7783ca7145",
+    "sourceUrl": "https://github.com/arcsin1/oh-my-ppt/blob/1f1da525616f1508111b820800865c7783ca7145/README.md",
     "license": "Apache-2.0",
     "licenseUrl": "/skill-previews/auto/LICENSE-8b1bff4ba14834bd8f13b2f64d975366bed5a9fd0d009824dfe8418ac3d38c23.txt",
     "licenseSourcePath": "LICENSE",
     "licenseSha256": "b12c77850bdc87b4024029f0d1d43c39a5f9d63e559371828d95fef07f8d0a81",
-    "documentSha256": "8510584e3f03e2516a8300c55e806947ce49eb9336fb9d15d7f04e932405dfc4",
+    "documentSha256": "1b4d9b7b98a693c434087a66015304f3cc83b0484585e55a203d85d2c160016b",
     "format": {
       "en": "Author preview",
       "zh": "作者预览"
@@ -1271,7 +1271,7 @@
       "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
       "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
     },
-    "collectedAt": "2026-10-07T04:15:41.778Z",
+    "collectedAt": "2026-11-08T07:27:44.362Z",
     "media": [
       {
         "src": "/skill-previews/auto/6d1b664b559a788d718e90ceb1e2c4283e36d83ab84e4888ec98c26bc1766b36.preview.webp",
@@ -1281,7 +1281,7 @@
         "height": 1032,
         "sha256": "6d1b664b559a788d718e90ceb1e2c4283e36d83ab84e4888ec98c26bc1766b36",
         "originalSrc": "/skill-previews/auto/6d1b664b559a788d718e90ceb1e2c4283e36d83ab84e4888ec98c26bc1766b36.webp",
-        "sourceUrl": "https://github.com/arcsin1/oh-my-ppt/blob/35648cbd8dd1d6f85a14b6285f8ae9713df10757/docs/images/anime.webp",
+        "sourceUrl": "https://github.com/arcsin1/oh-my-ppt/blob/1f1da525616f1508111b820800865c7783ca7145/docs/images/anime.webp",
         "kind": "reference",
         "title": {
           "en": "Oh My Ppt · Author preview",
@@ -1296,6 +1296,28 @@
         "format": "image"
       },
       {
+        "src": "/skill-previews/auto/5f0e3c0f3fe60c33dd61a955e31974634d938cabb0701e49f0473734fb7fbb4f.preview.webp",
+        "previewSrc": "/skill-previews/auto/5f0e3c0f3fe60c33dd61a955e31974634d938cabb0701e49f0473734fb7fbb4f.preview.webp",
+        "cardSrc": "/skill-previews/auto/5f0e3c0f3fe60c33dd61a955e31974634d938cabb0701e49f0473734fb7fbb4f.card.webp",
+        "width": 1600,
+        "height": 900,
+        "sha256": "5f0e3c0f3fe60c33dd61a955e31974634d938cabb0701e49f0473734fb7fbb4f",
+        "originalSrc": "/skill-previews/auto/5f0e3c0f3fe60c33dd61a955e31974634d938cabb0701e49f0473734fb7fbb4f.webp",
+        "sourceUrl": "https://github.com/arcsin1/oh-my-ppt/blob/1f1da525616f1508111b820800865c7783ca7145/docs/images/crazyToken-cn.webp",
+        "kind": "reference",
+        "title": {
+          "en": "Oh My Ppt · Author preview",
+          "zh": "Oh My Ppt · 作者预览"
+        },
+        "alt": {
+          "en": "Oh My Ppt: CrazyToken",
+          "zh": "Oh My Ppt：CrazyToken"
+        },
+        "sourcePath": "docs/images/crazyToken-cn.webp",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
         "src": "/skill-previews/auto/aeff2c90b524b59ec49a30612e8bed2c663844b6d068ff565336ac54892c91a4.preview.webp",
         "previewSrc": "/skill-previews/auto/aeff2c90b524b59ec49a30612e8bed2c663844b6d068ff565336ac54892c91a4.preview.webp",
         "cardSrc": "/skill-previews/auto/aeff2c90b524b59ec49a30612e8bed2c663844b6d068ff565336ac54892c91a4.card.webp",
@@ -1303,7 +1325,7 @@
         "height": 1043,
         "sha256": "aeff2c90b524b59ec49a30612e8bed2c663844b6d068ff565336ac54892c91a4",
         "originalSrc": "/skill-previews/auto/aeff2c90b524b59ec49a30612e8bed2c663844b6d068ff565336ac54892c91a4.webp",
-        "sourceUrl": "https://github.com/arcsin1/oh-my-ppt/blob/35648cbd8dd1d6f85a14b6285f8ae9713df10757/docs/images/edit.webp",
+        "sourceUrl": "https://github.com/arcsin1/oh-my-ppt/blob/1f1da525616f1508111b820800865c7783ca7145/docs/images/edit.webp",
         "kind": "reference",
         "title": {
           "en": "Oh My Ppt · Author preview",
@@ -1314,28 +1336,6 @@
           "zh": "Oh My Ppt：Oh My PPT 编辑页"
         },
         "sourcePath": "docs/images/edit.webp",
-        "documentPath": "README.md",
-        "format": "image"
-      },
-      {
-        "src": "/skill-previews/auto/3f169a73c0d802442644e86a1ab35140d9720e5d020b87c365ae22e355eec48d.preview.webp",
-        "previewSrc": "/skill-previews/auto/3f169a73c0d802442644e86a1ab35140d9720e5d020b87c365ae22e355eec48d.preview.webp",
-        "cardSrc": "/skill-previews/auto/3f169a73c0d802442644e86a1ab35140d9720e5d020b87c365ae22e355eec48d.card.webp",
-        "width": 1600,
-        "height": 1035,
-        "sha256": "3f169a73c0d802442644e86a1ab35140d9720e5d020b87c365ae22e355eec48d",
-        "originalSrc": "/skill-previews/auto/3f169a73c0d802442644e86a1ab35140d9720e5d020b87c365ae22e355eec48d.webp",
-        "sourceUrl": "https://github.com/arcsin1/oh-my-ppt/blob/35648cbd8dd1d6f85a14b6285f8ae9713df10757/docs/images/edit2.webp",
-        "kind": "reference",
-        "title": {
-          "en": "Oh My Ppt · Author preview",
-          "zh": "Oh My Ppt · 作者预览"
-        },
-        "alt": {
-          "en": "Oh My Ppt: Oh My PPT 导出菜单",
-          "zh": "Oh My Ppt：Oh My PPT 导出菜单"
-        },
-        "sourcePath": "docs/images/edit2.webp",
         "documentPath": "README.md",
         "format": "image"
       }
@@ -3214,8 +3214,8 @@
   {
     "skillSlug": "dsy-xueai-image2editable",
     "repository": "DSY-Xueai/image2editable",
-    "revision": "c0a6049d66d9cecbd61605d08550cfdcb6118dfb",
-    "sourceUrl": "https://github.com/DSY-Xueai/image2editable/blob/c0a6049d66d9cecbd61605d08550cfdcb6118dfb/README.md",
+    "revision": "c2af3e4290a64c93621583ed4e245a6fb152d6a1",
+    "sourceUrl": "https://github.com/DSY-Xueai/image2editable/blob/c2af3e4290a64c93621583ed4e245a6fb152d6a1/README.md",
     "license": "MIT",
     "licenseUrl": "/skill-previews/auto/LICENSE-49ae5ac53e312ffae8cc852fd2f419d1eb3f72c9f36028b56a9a35f2a4c1d11d.txt",
     "licenseSourcePath": "LICENSE",
@@ -3229,7 +3229,7 @@
       "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
       "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
     },
-    "collectedAt": "2026-10-07T04:15:41.778Z",
+    "collectedAt": "2026-11-08T07:27:44.362Z",
     "media": [
       {
         "src": "/skill-previews/auto/fd7d64fa9be5c77de2c6537e0cacb3762b27022cae7a54ef0a489f9bc9d94b52.preview.webp",
@@ -3239,7 +3239,7 @@
         "height": 901,
         "sha256": "fd7d64fa9be5c77de2c6537e0cacb3762b27022cae7a54ef0a489f9bc9d94b52",
         "originalSrc": "/skill-previews/auto/fd7d64fa9be5c77de2c6537e0cacb3762b27022cae7a54ef0a489f9bc9d94b52.png",
-        "sourceUrl": "https://github.com/DSY-Xueai/image2editable/blob/c0a6049d66d9cecbd61605d08550cfdcb6118dfb/docs/images/demo-result-1.png",
+        "sourceUrl": "https://github.com/DSY-Xueai/image2editable/blob/c2af3e4290a64c93621583ed4e245a6fb152d6a1/docs/images/demo-result-1.png",
         "kind": "example",
         "title": {
           "en": "Image2editable · Author preview",
@@ -3261,7 +3261,7 @@
         "height": 892,
         "sha256": "c76c67e607e6487321d6771748dfd35974ef86fbaad2111d5a727dbbee316635",
         "originalSrc": "/skill-previews/auto/c76c67e607e6487321d6771748dfd35974ef86fbaad2111d5a727dbbee316635.png",
-        "sourceUrl": "https://github.com/DSY-Xueai/image2editable/blob/c0a6049d66d9cecbd61605d08550cfdcb6118dfb/docs/images/demo-result-2.png",
+        "sourceUrl": "https://github.com/DSY-Xueai/image2editable/blob/c2af3e4290a64c93621583ed4e245a6fb152d6a1/docs/images/demo-result-2.png",
         "kind": "example",
         "title": {
           "en": "Image2editable · Author preview",
@@ -3283,7 +3283,7 @@
         "height": 901,
         "sha256": "a4d14bc37d274b403e26fc2feed65207f38f3dc07488d867f33c1856e411381c",
         "originalSrc": "/skill-previews/auto/a4d14bc37d274b403e26fc2feed65207f38f3dc07488d867f33c1856e411381c.png",
-        "sourceUrl": "https://github.com/DSY-Xueai/image2editable/blob/c0a6049d66d9cecbd61605d08550cfdcb6118dfb/docs/images/demo-result-3.png",
+        "sourceUrl": "https://github.com/DSY-Xueai/image2editable/blob/c2af3e4290a64c93621583ed4e245a6fb152d6a1/docs/images/demo-result-3.png",
         "kind": "example",
         "title": {
           "en": "Image2editable · Author preview",
@@ -3830,13 +3830,13 @@
   {
     "skillSlug": "helloianneo-ian-handdrawn-ppt",
     "repository": "helloianneo/ian-handdrawn-ppt",
-    "revision": "306d8240c49d1c7c390fd55b55ec6b18650a8a1a",
-    "sourceUrl": "https://github.com/helloianneo/ian-handdrawn-ppt/blob/306d8240c49d1c7c390fd55b55ec6b18650a8a1a/README.md",
+    "revision": "7b832a406da0a775123a9be5c784327a1b1d1356",
+    "sourceUrl": "https://github.com/helloianneo/ian-handdrawn-ppt/blob/7b832a406da0a775123a9be5c784327a1b1d1356/README.md",
     "license": "MIT",
     "licenseUrl": "/skill-previews/auto/LICENSE-e6997ca185720984ca7f353699821e3fc727d9727be535ee75573115bbed70d1.txt",
     "licenseSourcePath": "LICENSE",
     "licenseSha256": "b995a6b845825b06461cbc5d7ace91d05fe0fe6d061e1c17bffc31964d2684aa",
-    "documentSha256": "9141905017e9becf15fbd78b4a5751d54c87fa56b323c5d78c7282090960ff3d",
+    "documentSha256": "77a6d5c1fa04b0c36c3a9cd0a74e283f83278890ff7be2a61d2a6b80e9399af4",
     "format": {
       "en": "Author preview",
       "zh": "作者预览"
@@ -3845,7 +3845,7 @@
       "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
       "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
     },
-    "collectedAt": "2026-10-07T04:15:41.778Z",
+    "collectedAt": "2026-11-08T07:27:44.362Z",
     "media": [
       {
         "src": "/skill-previews/auto/ce212c25086484fad78878e50fb8a8bc20330193ddbf84c9bd101f3486c50627.preview.webp",
@@ -3855,7 +3855,7 @@
         "height": 677,
         "sha256": "ce212c25086484fad78878e50fb8a8bc20330193ddbf84c9bd101f3486c50627",
         "originalSrc": "/skill-previews/auto/ce212c25086484fad78878e50fb8a8bc20330193ddbf84c9bd101f3486c50627.png",
-        "sourceUrl": "https://github.com/helloianneo/ian-handdrawn-ppt/blob/306d8240c49d1c7c390fd55b55ec6b18650a8a1a/examples/images/cover-automation-boundary.png",
+        "sourceUrl": "https://github.com/helloianneo/ian-handdrawn-ppt/blob/7b832a406da0a775123a9be5c784327a1b1d1356/examples/images/cover-automation-boundary.png",
         "kind": "example",
         "title": {
           "en": "Ian Handdrawn Ppt · Author preview",
@@ -3877,7 +3877,7 @@
         "height": 900,
         "sha256": "7c8ed0bf320f264d3d56cc1c1f34a2c3ce8e0498ed3e204429c5da67d9a12000",
         "originalSrc": "/skill-previews/auto/7c8ed0bf320f264d3d56cc1c1f34a2c3ce8e0498ed3e204429c5da67d9a12000.png",
-        "sourceUrl": "https://github.com/helloianneo/ian-handdrawn-ppt/blob/306d8240c49d1c7c390fd55b55ec6b18650a8a1a/examples/images/page-01-reading-two-things.png",
+        "sourceUrl": "https://github.com/helloianneo/ian-handdrawn-ppt/blob/7b832a406da0a775123a9be5c784327a1b1d1356/examples/images/page-01-reading-two-things.png",
         "kind": "example",
         "title": {
           "en": "Ian Handdrawn Ppt · Author preview",
@@ -3899,7 +3899,7 @@
         "height": 900,
         "sha256": "a1e1e99c7d776e83c9fedb80aab4a4134f3072219414235101fdb9838c4ccf3e",
         "originalSrc": "/skill-previews/auto/a1e1e99c7d776e83c9fedb80aab4a4134f3072219414235101fdb9838c4ccf3e.png",
-        "sourceUrl": "https://github.com/helloianneo/ian-handdrawn-ppt/blob/306d8240c49d1c7c390fd55b55ec6b18650a8a1a/examples/images/page-02-where-to-automate.png",
+        "sourceUrl": "https://github.com/helloianneo/ian-handdrawn-ppt/blob/7b832a406da0a775123a9be5c784327a1b1d1356/examples/images/page-02-where-to-automate.png",
         "kind": "example",
         "title": {
           "en": "Ian Handdrawn Ppt · Author preview",
@@ -4006,8 +4006,8 @@
   {
     "skillSlug": "iofficeai-officecli",
     "repository": "iOfficeAI/OfficeCLI",
-    "revision": "8d079c777ed6bea35b922c3d893758d3c2081137",
-    "sourceUrl": "https://github.com/iOfficeAI/OfficeCLI/blob/8d079c777ed6bea35b922c3d893758d3c2081137/SKILL.md",
+    "revision": "c56512c8c7b76fe284f09940e4cd492470099d3e",
+    "sourceUrl": "https://github.com/iOfficeAI/OfficeCLI/blob/c56512c8c7b76fe284f09940e4cd492470099d3e/SKILL.md",
     "license": "Apache-2.0",
     "licenseUrl": "/skill-previews/auto/LICENSE-11272adc980fe797c135cc5a3d24c28b6b10f0f7dedb50cc7832754c12ee69d1.txt",
     "licenseSourcePath": "LICENSE",
@@ -4021,7 +4021,7 @@
       "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
       "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
     },
-    "collectedAt": "2026-10-07T04:15:41.778Z",
+    "collectedAt": "2026-11-08T07:27:44.362Z",
     "media": [
       {
         "src": "/skill-previews/auto/904ac116c6078377f40b789982680624deca422fdbe0c4958125d76edb7a8eb8.preview.webp",
@@ -4031,7 +4031,7 @@
         "height": 462,
         "sha256": "904ac116c6078377f40b789982680624deca422fdbe0c4958125d76edb7a8eb8",
         "originalSrc": "/skill-previews/auto/904ac116c6078377f40b789982680624deca422fdbe0c4958125d76edb7a8eb8.gif",
-        "sourceUrl": "https://github.com/iOfficeAI/OfficeCLI/blob/8d079c777ed6bea35b922c3d893758d3c2081137/assets/showcase/excel1.gif",
+        "sourceUrl": "https://github.com/iOfficeAI/OfficeCLI/blob/c56512c8c7b76fe284f09940e4cd492470099d3e/assets/showcase/excel1.gif",
         "kind": "example",
         "title": {
           "en": "OfficeCLI · Animation · still preview",
@@ -4053,7 +4053,7 @@
         "height": 457,
         "sha256": "5e958a6125081f6bedd284f2ab6766c1cadcd8af2cd71d3588b1ae9a1942e099",
         "originalSrc": "/skill-previews/auto/5e958a6125081f6bedd284f2ab6766c1cadcd8af2cd71d3588b1ae9a1942e099.gif",
-        "sourceUrl": "https://github.com/iOfficeAI/OfficeCLI/blob/8d079c777ed6bea35b922c3d893758d3c2081137/assets/showcase/excel2.gif",
+        "sourceUrl": "https://github.com/iOfficeAI/OfficeCLI/blob/c56512c8c7b76fe284f09940e4cd492470099d3e/assets/showcase/excel2.gif",
         "kind": "example",
         "title": {
           "en": "OfficeCLI · Animation · still preview",
@@ -4075,7 +4075,7 @@
         "height": 460,
         "sha256": "55c74f6b4553c4cc7f85b5d093e983497129344bd066c754a23d91e0ceebd37c",
         "originalSrc": "/skill-previews/auto/55c74f6b4553c4cc7f85b5d093e983497129344bd066c754a23d91e0ceebd37c.gif",
-        "sourceUrl": "https://github.com/iOfficeAI/OfficeCLI/blob/8d079c777ed6bea35b922c3d893758d3c2081137/assets/showcase/excel3.gif",
+        "sourceUrl": "https://github.com/iOfficeAI/OfficeCLI/blob/c56512c8c7b76fe284f09940e4cd492470099d3e/assets/showcase/excel3.gif",
         "kind": "example",
         "title": {
           "en": "OfficeCLI · Animation · still preview",
@@ -4182,13 +4182,13 @@
   {
     "skillSlug": "k1low-deck",
     "repository": "k1LoW/deck",
-    "revision": "8411dde934bd08b0bd6e309afdbeb956373b939d",
-    "sourceUrl": "https://github.com/k1LoW/deck/blob/8411dde934bd08b0bd6e309afdbeb956373b939d/README.md",
+    "revision": "82e8d197553e3e30305a2a56fb3c19fc9342f377",
+    "sourceUrl": "https://github.com/k1LoW/deck/blob/82e8d197553e3e30305a2a56fb3c19fc9342f377/README.md",
     "license": "MIT",
     "licenseUrl": "/skill-previews/auto/LICENSE-c2ac1ad137a23fdc22126ae5f7d38bc97d77adff263075f868dc450ba7a997e6.txt",
     "licenseSourcePath": "LICENSE",
     "licenseSha256": "c2ac1ad137a23fdc22126ae5f7d38bc97d77adff263075f868dc450ba7a997e6",
-    "documentSha256": "adde0d327077a4e1ec5dcbd9d1983113f003ba0b410ae06b1df6a8a8a76875db",
+    "documentSha256": "36f9967cf81e5ce1cb719d5723c9a908d86f15648def89413b2b00b93fea95f8",
     "format": {
       "en": "Author preview",
       "zh": "作者预览"
@@ -4197,7 +4197,7 @@
       "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
       "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
     },
-    "collectedAt": "2026-10-07T04:15:41.778Z",
+    "collectedAt": "2026-11-08T07:27:44.362Z",
     "media": [
       {
         "src": "/skill-previews/auto/e33e7d8685095217d829c98bf5eb0042790a565af469c5463d9d9a0bf6cffade.preview.webp",
@@ -4207,7 +4207,7 @@
         "height": 898,
         "sha256": "e33e7d8685095217d829c98bf5eb0042790a565af469c5463d9d9a0bf6cffade",
         "originalSrc": "/skill-previews/auto/e33e7d8685095217d829c98bf5eb0042790a565af469c5463d9d9a0bf6cffade.png",
-        "sourceUrl": "https://github.com/k1LoW/deck/blob/8411dde934bd08b0bd6e309afdbeb956373b939d/img/result.png",
+        "sourceUrl": "https://github.com/k1LoW/deck/blob/82e8d197553e3e30305a2a56fb3c19fc9342f377/img/result.png",
         "kind": "example",
         "title": {
           "en": "Deck · Author preview",
@@ -4229,7 +4229,7 @@
         "height": 862,
         "sha256": "4a780e5184067138f48ad31869e6ecae4e720a0b5c17cbee7d8b2379f81b5599",
         "originalSrc": "/skill-previews/auto/4a780e5184067138f48ad31869e6ecae4e720a0b5c17cbee7d8b2379f81b5599.png",
-        "sourceUrl": "https://github.com/k1LoW/deck/blob/8411dde934bd08b0bd6e309afdbeb956373b939d/img/layout_name.png",
+        "sourceUrl": "https://github.com/k1LoW/deck/blob/82e8d197553e3e30305a2a56fb3c19fc9342f377/img/layout_name.png",
         "kind": "reference",
         "title": {
           "en": "Deck · Author preview",
@@ -4251,7 +4251,7 @@
         "height": 898,
         "sha256": "4ffbab6244c03232676ea33637ab1d137479345ccc22e6c7b6da60320f7da1d8",
         "originalSrc": "/skill-previews/auto/4ffbab6244c03232676ea33637ab1d137479345ccc22e6c7b6da60320f7da1d8.png",
-        "sourceUrl": "https://github.com/k1LoW/deck/blob/8411dde934bd08b0bd6e309afdbeb956373b939d/img/layout.png",
+        "sourceUrl": "https://github.com/k1LoW/deck/blob/82e8d197553e3e30305a2a56fb3c19fc9342f377/img/layout.png",
         "kind": "reference",
         "title": {
           "en": "Deck · Author preview",
@@ -4402,13 +4402,13 @@
   {
     "skillSlug": "laihenyi-nblm2pptx",
     "repository": "laihenyi/NBLM2PPTX",
-    "revision": "2abe2927af08f658045d96f08a2a6ac68c587941",
-    "sourceUrl": "https://github.com/laihenyi/NBLM2PPTX/blob/2abe2927af08f658045d96f08a2a6ac68c587941/README.md",
+    "revision": "fe2acccae0def37c71feff622134da35024f5c69",
+    "sourceUrl": "https://github.com/laihenyi/NBLM2PPTX/blob/fe2acccae0def37c71feff622134da35024f5c69/README.md",
     "license": "MIT",
     "licenseUrl": "/skill-previews/auto/LICENSE-067f61442877552f582087e4560c52f6af45a7907c3dc09e7b00532e960c7c74.txt",
     "licenseSourcePath": "LICENSE",
     "licenseSha256": "067f61442877552f582087e4560c52f6af45a7907c3dc09e7b00532e960c7c74",
-    "documentSha256": "1b051458025d0a0973607a317c2458275d715e9ec30a58d7f2bd679e30dd9d48",
+    "documentSha256": "bff2d6a51cf66b5ece2624669c952ab9d69e8e96b781d045967ac380b0dc1119",
     "format": {
       "en": "Author preview",
       "zh": "作者预览"
@@ -4417,7 +4417,7 @@
       "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
       "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
     },
-    "collectedAt": "2026-10-07T04:15:41.778Z",
+    "collectedAt": "2026-11-08T07:27:44.362Z",
     "media": [
       {
         "src": "/skill-previews/auto/f7e7f0ede307b797573429ef3b0e31f38c1879f1ccce01bbc800efbc630705aa.preview.webp",
@@ -4427,7 +4427,7 @@
         "height": 900,
         "sha256": "f7e7f0ede307b797573429ef3b0e31f38c1879f1ccce01bbc800efbc630705aa",
         "originalSrc": "/skill-previews/auto/f7e7f0ede307b797573429ef3b0e31f38c1879f1ccce01bbc800efbc630705aa.png",
-        "sourceUrl": "https://github.com/laihenyi/NBLM2PPTX/blob/2abe2927af08f658045d96f08a2a6ac68c587941/assets/demo-after.png",
+        "sourceUrl": "https://github.com/laihenyi/NBLM2PPTX/blob/fe2acccae0def37c71feff622134da35024f5c69/assets/demo-after.png",
         "kind": "example",
         "title": {
           "en": "NBLM2PPTX · Author preview",
@@ -4442,46 +4442,46 @@
         "format": "image"
       },
       {
-        "src": "/skill-previews/auto/57892009b47c6cac4cf6938803ce6a566fad58e74398662f9b215d9bb2a2e4cd.preview.webp",
-        "previewSrc": "/skill-previews/auto/57892009b47c6cac4cf6938803ce6a566fad58e74398662f9b215d9bb2a2e4cd.preview.webp",
-        "cardSrc": "/skill-previews/auto/57892009b47c6cac4cf6938803ce6a566fad58e74398662f9b215d9bb2a2e4cd.card.webp",
-        "width": 1600,
-        "height": 899,
-        "sha256": "57892009b47c6cac4cf6938803ce6a566fad58e74398662f9b215d9bb2a2e4cd",
-        "originalSrc": "/skill-previews/auto/57892009b47c6cac4cf6938803ce6a566fad58e74398662f9b215d9bb2a2e4cd.png",
-        "sourceUrl": "https://github.com/laihenyi/NBLM2PPTX/blob/2abe2927af08f658045d96f08a2a6ac68c587941/assets/demo-before.png",
+        "src": "/skill-previews/auto/5714c0242a156fcac4b247fdb4d2bfaddc7bb4017542555e08a39a8f772bf824.preview.webp",
+        "previewSrc": "/skill-previews/auto/5714c0242a156fcac4b247fdb4d2bfaddc7bb4017542555e08a39a8f772bf824.preview.webp",
+        "cardSrc": "/skill-previews/auto/5714c0242a156fcac4b247fdb4d2bfaddc7bb4017542555e08a39a8f772bf824.card.webp",
+        "width": 800,
+        "height": 450,
+        "sha256": "5714c0242a156fcac4b247fdb4d2bfaddc7bb4017542555e08a39a8f772bf824",
+        "originalSrc": "/skill-previews/auto/5714c0242a156fcac4b247fdb4d2bfaddc7bb4017542555e08a39a8f772bf824.jpg",
+        "sourceUrl": "https://github.com/laihenyi/NBLM2PPTX/blob/fe2acccae0def37c71feff622134da35024f5c69/assets/demo-native-v0.1.1-alpha6.jpg",
         "kind": "example",
         "title": {
           "en": "NBLM2PPTX · Author preview",
           "zh": "NBLM2PPTX · 作者预览"
         },
         "alt": {
-          "en": "NBLM2PPTX: demo-before.png",
-          "zh": "NBLM2PPTX：demo-before.png"
+          "en": "NBLM2PPTX: demo-native-v0.1.1-alpha6.jpg",
+          "zh": "NBLM2PPTX：demo-native-v0.1.1-alpha6.jpg"
         },
-        "sourcePath": "assets/demo-before.png",
+        "sourcePath": "assets/demo-native-v0.1.1-alpha6.jpg",
         "documentPath": "README.md",
         "format": "image"
       },
       {
-        "src": "/skill-previews/auto/4bb0ffa5db4e09676739a9165d49c2f1c1076959029dd98c7e9a270d8fd03b05.preview.webp",
-        "previewSrc": "/skill-previews/auto/4bb0ffa5db4e09676739a9165d49c2f1c1076959029dd98c7e9a270d8fd03b05.preview.webp",
-        "cardSrc": "/skill-previews/auto/4bb0ffa5db4e09676739a9165d49c2f1c1076959029dd98c7e9a270d8fd03b05.card.webp",
+        "src": "/skill-previews/auto/0ebdca6c6a254e992b81a8b412c354438a58a60fc530a025bb9843ef08f33416.preview.webp",
+        "previewSrc": "/skill-previews/auto/0ebdca6c6a254e992b81a8b412c354438a58a60fc530a025bb9843ef08f33416.preview.webp",
+        "cardSrc": "/skill-previews/auto/0ebdca6c6a254e992b81a8b412c354438a58a60fc530a025bb9843ef08f33416.card.webp",
         "width": 800,
-        "height": 447,
-        "sha256": "4bb0ffa5db4e09676739a9165d49c2f1c1076959029dd98c7e9a270d8fd03b05",
-        "originalSrc": "/skill-previews/auto/4bb0ffa5db4e09676739a9165d49c2f1c1076959029dd98c7e9a270d8fd03b05.jpg",
-        "sourceUrl": "https://github.com/laihenyi/NBLM2PPTX/blob/2abe2927af08f658045d96f08a2a6ac68c587941/assets/demo-v1.1-original.jpg",
+        "height": 450,
+        "sha256": "0ebdca6c6a254e992b81a8b412c354438a58a60fc530a025bb9843ef08f33416",
+        "originalSrc": "/skill-previews/auto/0ebdca6c6a254e992b81a8b412c354438a58a60fc530a025bb9843ef08f33416.jpg",
+        "sourceUrl": "https://github.com/laihenyi/NBLM2PPTX/blob/fe2acccae0def37c71feff622134da35024f5c69/assets/demo-native-v0.1.1-kitchen.jpg",
         "kind": "example",
         "title": {
           "en": "NBLM2PPTX · Author preview",
           "zh": "NBLM2PPTX · 作者预览"
         },
         "alt": {
-          "en": "NBLM2PPTX: demo-v1.1-original.jpg",
-          "zh": "NBLM2PPTX：demo-v1.1-original.jpg"
+          "en": "NBLM2PPTX: demo-native-v0.1.1-kitchen.jpg",
+          "zh": "NBLM2PPTX：demo-native-v0.1.1-kitchen.jpg"
         },
-        "sourcePath": "assets/demo-v1.1-original.jpg",
+        "sourcePath": "assets/demo-native-v0.1.1-kitchen.jpg",
         "documentPath": "README.md",
         "format": "image"
       }
@@ -4490,13 +4490,13 @@
   {
     "skillSlug": "lanceli93-aws-html-slides",
     "repository": "lanceli93/aws-html-slides",
-    "revision": "5ae3d68b66277e8a0d0b6ceea479a4b5117f16b2",
-    "sourceUrl": "https://github.com/lanceli93/aws-html-slides/blob/5ae3d68b66277e8a0d0b6ceea479a4b5117f16b2/README.md",
+    "revision": "3bc1554bfba57885acc15f21010fa7be70b64957",
+    "sourceUrl": "https://github.com/lanceli93/aws-html-slides/blob/3bc1554bfba57885acc15f21010fa7be70b64957/README.md",
     "license": "MIT",
     "licenseUrl": "/skill-previews/auto/LICENSE-62928eb197fe4662d1efc3af0735b3ba5df3c0308badd9a2baf2b619009f5366.txt",
     "licenseSourcePath": "LICENSE",
     "licenseSha256": "62928eb197fe4662d1efc3af0735b3ba5df3c0308badd9a2baf2b619009f5366",
-    "documentSha256": "fe6b34e0c258af468b519016f6604229e524fc1c680768f7db33c10dab7e20e1",
+    "documentSha256": "61112f67a696a72d6957cbffc248611fe97beefd3b2b4729ffa2b76cfc95585e",
     "format": {
       "en": "Author preview",
       "zh": "作者预览"
@@ -4505,71 +4505,71 @@
       "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
       "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
     },
-    "collectedAt": "2026-10-07T04:15:41.778Z",
+    "collectedAt": "2026-11-08T07:27:44.362Z",
     "media": [
       {
-        "src": "/skill-previews/auto/25353ee040e30ca2718b4d65c6196a87124efa82bb4d8b1c165ed18df7d50607.preview.webp",
-        "previewSrc": "/skill-previews/auto/25353ee040e30ca2718b4d65c6196a87124efa82bb4d8b1c165ed18df7d50607.preview.webp",
-        "cardSrc": "/skill-previews/auto/25353ee040e30ca2718b4d65c6196a87124efa82bb4d8b1c165ed18df7d50607.card.webp",
-        "width": 1600,
-        "height": 937,
-        "sha256": "25353ee040e30ca2718b4d65c6196a87124efa82bb4d8b1c165ed18df7d50607",
-        "originalSrc": "/skill-previews/auto/25353ee040e30ca2718b4d65c6196a87124efa82bb4d8b1c165ed18df7d50607.png",
-        "sourceUrl": "https://github.com/lanceli93/aws-html-slides/blob/5ae3d68b66277e8a0d0b6ceea479a4b5117f16b2/docs/overview-slides.png",
+        "src": "/skill-previews/auto/b91d300e617f21e22b583502853b133aff7d95bb8e22976e42b13ea3b5532982.preview.webp",
+        "previewSrc": "/skill-previews/auto/b91d300e617f21e22b583502853b133aff7d95bb8e22976e42b13ea3b5532982.preview.webp",
+        "cardSrc": "/skill-previews/auto/b91d300e617f21e22b583502853b133aff7d95bb8e22976e42b13ea3b5532982.card.webp",
+        "width": 1440,
+        "height": 810,
+        "sha256": "b91d300e617f21e22b583502853b133aff7d95bb8e22976e42b13ea3b5532982",
+        "originalSrc": "/skill-previews/auto/b91d300e617f21e22b583502853b133aff7d95bb8e22976e42b13ea3b5532982.jpg",
+        "sourceUrl": "https://github.com/lanceli93/aws-html-slides/blob/3bc1554bfba57885acc15f21010fa7be70b64957/docs/screens/overview.jpg",
         "kind": "example",
         "title": {
           "en": "Aws Html Slides · Author preview",
           "zh": "Aws Html Slides · 作者预览"
         },
         "alt": {
-          "en": "Aws Html Slides: Overview mode — PPT-style thumbnail grid",
-          "zh": "Aws Html Slides：Overview mode — PPT-style thumbnail grid"
+          "en": "Aws Html Slides: Overview mode: thumbnail grid of every slide",
+          "zh": "Aws Html Slides：Overview mode: thumbnail grid of every slide"
         },
-        "sourcePath": "docs/overview-slides.png",
+        "sourcePath": "docs/screens/overview.jpg",
         "documentPath": "README.md",
         "format": "image"
       },
       {
-        "src": "/skill-previews/auto/ecce37b36a983515ebe6cc524b71494609beff95bd3b9ff3944da04813d77d17.preview.webp",
-        "previewSrc": "/skill-previews/auto/ecce37b36a983515ebe6cc524b71494609beff95bd3b9ff3944da04813d77d17.preview.webp",
-        "cardSrc": "/skill-previews/auto/ecce37b36a983515ebe6cc524b71494609beff95bd3b9ff3944da04813d77d17.card.webp",
+        "src": "/skill-previews/auto/182a3252a670b706397d0a23c7f745d30ed2c64b4544522ed1f668dd3e6ece0a.preview.webp",
+        "previewSrc": "/skill-previews/auto/182a3252a670b706397d0a23c7f745d30ed2c64b4544522ed1f668dd3e6ece0a.preview.webp",
+        "cardSrc": "/skill-previews/auto/182a3252a670b706397d0a23c7f745d30ed2c64b4544522ed1f668dd3e6ece0a.card.webp",
         "width": 1600,
-        "height": 723,
-        "sha256": "ecce37b36a983515ebe6cc524b71494609beff95bd3b9ff3944da04813d77d17",
-        "originalSrc": "/skill-previews/auto/ecce37b36a983515ebe6cc524b71494609beff95bd3b9ff3944da04813d77d17.png",
-        "sourceUrl": "https://github.com/lanceli93/aws-html-slides/blob/5ae3d68b66277e8a0d0b6ceea479a4b5117f16b2/docs/layouts/diagram-iso3d.png",
+        "height": 601,
+        "sha256": "182a3252a670b706397d0a23c7f745d30ed2c64b4544522ed1f668dd3e6ece0a",
+        "originalSrc": "/skill-previews/auto/182a3252a670b706397d0a23c7f745d30ed2c64b4544522ed1f668dd3e6ece0a.jpg",
+        "sourceUrl": "https://github.com/lanceli93/aws-html-slides/blob/3bc1554bfba57885acc15f21010fa7be70b64957/docs/screens/aurora-bigdata.jpg",
         "kind": "reference",
         "title": {
           "en": "Aws Html Slides · Author preview",
           "zh": "Aws Html Slides · 作者预览"
         },
         "alt": {
-          "en": "Aws Html Slides: Isometric 3D architecture diagram",
-          "zh": "Aws Html Slides：Isometric 3D architecture diagram"
+          "en": "Aws Html Slides: Aurora: modern data platform strategy (中文)",
+          "zh": "Aws Html Slides：Aurora: modern data platform strategy (中文)"
         },
-        "sourcePath": "docs/layouts/diagram-iso3d.png",
+        "sourcePath": "docs/screens/aurora-bigdata.jpg",
         "documentPath": "README.md",
         "format": "image"
       },
       {
-        "src": "/skill-previews/auto/d41f57144781bda63c4f65b7ade320d3484f1c6518e91e3b33141f272fc7f2bc.preview.webp",
-        "previewSrc": "/skill-previews/auto/d41f57144781bda63c4f65b7ade320d3484f1c6518e91e3b33141f272fc7f2bc.preview.webp",
-        "cardSrc": "/skill-previews/auto/d41f57144781bda63c4f65b7ade320d3484f1c6518e91e3b33141f272fc7f2bc.card.webp",
+        "src": "/skill-previews/auto/0e7542b31162735fb81ba0918c9ad68420f4982b0d2c18de0a74d39895ce25eb.preview.webp",
+        "previewSrc": "/skill-previews/auto/0e7542b31162735fb81ba0918c9ad68420f4982b0d2c18de0a74d39895ce25eb.preview.webp",
+        "cardSrc": "/skill-previews/auto/0e7542b31162735fb81ba0918c9ad68420f4982b0d2c18de0a74d39895ce25eb.card.webp",
         "width": 1600,
-        "height": 723,
-        "sha256": "d41f57144781bda63c4f65b7ade320d3484f1c6518e91e3b33141f272fc7f2bc",
-        "originalSrc": "/skill-previews/auto/d41f57144781bda63c4f65b7ade320d3484f1c6518e91e3b33141f272fc7f2bc.png",
-        "sourceUrl": "https://github.com/lanceli93/aws-html-slides/blob/5ae3d68b66277e8a0d0b6ceea479a4b5117f16b2/docs/layouts/diagram-sequence.png",
+        "height": 601,
+        "sha256": "0e7542b31162735fb81ba0918c9ad68420f4982b0d2c18de0a74d39895ce25eb",
+        "originalSrc": "/skill-previews/auto/0e7542b31162735fb81ba0918c9ad68420f4982b0d2c18de0a74d39895ce25eb.jpg",
+        "sourceUrl": "https://github.com/lanceli93/aws-html-slides/blob/3bc1554bfba57885acc15f21010fa7be70b64957/docs/screens/aurora-keynote.jpg",
         "kind": "reference",
         "title": {
           "en": "Aws Html Slides · Author preview",
           "zh": "Aws Html Slides · 作者预览"
         },
         "alt": {
-          "en": "Aws Html Slides: Sequence / API flow diagram",
-          "zh": "Aws Html Slides：Sequence / API flow diagram"
+          "en": "Aws Html Slides: Aurora: product keynote",
+          "zh": "Aws Html Slides：Aurora: product keynote"
         },
-        "sourcePath": "docs/layouts/diagram-sequence.png",
+        "sourcePath": "docs/screens/aurora-keynote.jpg",
         "documentPath": "README.md",
         "format": "image"
       }
@@ -4710,8 +4710,8 @@
   {
     "skillSlug": "martenbe-mkslides",
     "repository": "MartenBE/mkslides",
-    "revision": "d0ee4895df88c110e2fa822a2581b837f62e4743",
-    "sourceUrl": "https://github.com/MartenBE/mkslides/blob/d0ee4895df88c110e2fa822a2581b837f62e4743/README.md",
+    "revision": "424a9ff01445dff3f03bc385d979d11a2dee8f38",
+    "sourceUrl": "https://github.com/MartenBE/mkslides/blob/424a9ff01445dff3f03bc385d979d11a2dee8f38/README.md",
     "license": "MIT",
     "licenseUrl": "/skill-previews/auto/LICENSE-2d0765dfab790220201392136851f7d6a5d825594c2094f503c8fc66856606ad.txt",
     "licenseSourcePath": "LICENSE",
@@ -4725,7 +4725,7 @@
       "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
       "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
     },
-    "collectedAt": "2026-10-07T04:15:41.778Z",
+    "collectedAt": "2026-11-08T07:27:44.362Z",
     "media": [
       {
         "src": "/skill-previews/auto/70d40e4b53d0b9528bbefb404c3a2c880cc072cf5fbd5e22c0f8ee4a2ac6c67d.preview.webp",
@@ -4735,7 +4735,7 @@
         "height": 644,
         "sha256": "70d40e4b53d0b9528bbefb404c3a2c880cc072cf5fbd5e22c0f8ee4a2ac6c67d",
         "originalSrc": "/skill-previews/auto/70d40e4b53d0b9528bbefb404c3a2c880cc072cf5fbd5e22c0f8ee4a2ac6c67d.png",
-        "sourceUrl": "https://github.com/MartenBE/mkslides/blob/d0ee4895df88c110e2fa822a2581b837f62e4743/docs/img/example-index.png",
+        "sourceUrl": "https://github.com/MartenBE/mkslides/blob/424a9ff01445dff3f03bc385d979d11a2dee8f38/docs/img/example-index.png",
         "kind": "example",
         "title": {
           "en": "Mkslides · Author preview",
@@ -4757,7 +4757,7 @@
         "height": 723,
         "sha256": "729c9e97c7ea2322b4a576d0dc4c223a6aafbcd35782e48013ea382718f49ad5",
         "originalSrc": "/skill-previews/auto/729c9e97c7ea2322b4a576d0dc4c223a6aafbcd35782e48013ea382718f49ad5.png",
-        "sourceUrl": "https://github.com/MartenBE/mkslides/blob/d0ee4895df88c110e2fa822a2581b837f62e4743/docs/img/example-slide.png",
+        "sourceUrl": "https://github.com/MartenBE/mkslides/blob/424a9ff01445dff3f03bc385d979d11a2dee8f38/docs/img/example-slide.png",
         "kind": "example",
         "title": {
           "en": "Mkslides · Author preview",
@@ -4779,7 +4779,7 @@
         "height": 467,
         "sha256": "468dc8da3c7b1e8005425d41838d0d83f62d79b89d8e7e265b01c5ba944419a1",
         "originalSrc": "/skill-previews/auto/468dc8da3c7b1e8005425d41838d0d83f62d79b89d8e7e265b01c5ba944419a1.png",
-        "sourceUrl": "https://github.com/MartenBE/mkslides/blob/d0ee4895df88c110e2fa822a2581b837f62e4743/docs/img/youtube-demo.png",
+        "sourceUrl": "https://github.com/MartenBE/mkslides/blob/424a9ff01445dff3f03bc385d979d11a2dee8f38/docs/img/youtube-demo.png",
         "kind": "example",
         "title": {
           "en": "Mkslides · Author preview",
@@ -4886,13 +4886,13 @@
   {
     "skillSlug": "mfontanini-presenterm",
     "repository": "mfontanini/presenterm",
-    "revision": "5f8add11a24af9d257fd18da48c8004dd9c516f8",
-    "sourceUrl": "https://github.com/mfontanini/presenterm/blob/5f8add11a24af9d257fd18da48c8004dd9c516f8/README.md",
+    "revision": "e809175281f666fe561d079d968b5dd7b3dfbdf2",
+    "sourceUrl": "https://github.com/mfontanini/presenterm/blob/e809175281f666fe561d079d968b5dd7b3dfbdf2/README.md",
     "license": "BSD-2-Clause",
     "licenseUrl": "/skill-previews/auto/LICENSE-7719fdc015406536b411a7420b10f3d355610daba2aeea3bf33ba9e4486aa851.txt",
     "licenseSourcePath": "LICENSE",
     "licenseSha256": "7719fdc015406536b411a7420b10f3d355610daba2aeea3bf33ba9e4486aa851",
-    "documentSha256": "235b84ca4bad935a23087e3bcab7117f4a8dc658e9bb671951df29c35bc35b88",
+    "documentSha256": "cbd645ca2a9fb38d3501004371e6746b7df5124771feb2f62610f25113b76e0d",
     "format": {
       "en": "Animation · still preview",
       "zh": "动图 · 静帧预览"
@@ -4901,7 +4901,7 @@
       "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
       "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
     },
-    "collectedAt": "2026-10-07T04:15:41.778Z",
+    "collectedAt": "2026-11-08T07:27:44.362Z",
     "media": [
       {
         "src": "/skill-previews/auto/581c8194abfb6c90f128553e913300eb90496aeeb27cca7028c029caf9977d95.preview.webp",
@@ -4911,7 +4911,7 @@
         "height": 1099,
         "sha256": "581c8194abfb6c90f128553e913300eb90496aeeb27cca7028c029caf9977d95",
         "originalSrc": "/skill-previews/auto/581c8194abfb6c90f128553e913300eb90496aeeb27cca7028c029caf9977d95.gif",
-        "sourceUrl": "https://github.com/mfontanini/presenterm/blob/5f8add11a24af9d257fd18da48c8004dd9c516f8/docs/src/assets/demo.gif",
+        "sourceUrl": "https://github.com/mfontanini/presenterm/blob/e809175281f666fe561d079d968b5dd7b3dfbdf2/docs/src/assets/demo.gif",
         "kind": "example",
         "title": {
           "en": "Presenterm · Animation · still preview",
@@ -5326,13 +5326,13 @@
   {
     "skillSlug": "siril9-presentation-skill",
     "repository": "siril9/presentation-skill",
-    "revision": "2776d8a7d08e64924a69cbf5bdb1271c5bedf99b",
-    "sourceUrl": "https://github.com/siril9/presentation-skill/blob/2776d8a7d08e64924a69cbf5bdb1271c5bedf99b/SKILL.md",
+    "revision": "efd899c5ddf866af2ce0001c4c9340af775d4d55",
+    "sourceUrl": "https://github.com/siril9/presentation-skill/blob/efd899c5ddf866af2ce0001c4c9340af775d4d55/SKILL.md",
     "license": "MIT",
     "licenseUrl": "/skill-previews/auto/LICENSE-35ad5e04d561f55065144021e70024bf94f50ef43903f4c54fc62802ed9f50f5.txt",
     "licenseSourcePath": "LICENSE",
     "licenseSha256": "35ad5e04d561f55065144021e70024bf94f50ef43903f4c54fc62802ed9f50f5",
-    "documentSha256": "b6555ad5bd289e2d946071d96b615a0d2b6450aa8ca18751b8a56c397564af4e",
+    "documentSha256": "61cde674a8823f3e20a6a48a1c18bf02d2bc7a716fb30e0a915b715e0499b617",
     "format": {
       "en": "Author preview",
       "zh": "作者预览"
@@ -5341,71 +5341,71 @@
       "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
       "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
     },
-    "collectedAt": "2026-10-07T04:15:41.778Z",
+    "collectedAt": "2026-11-08T07:27:44.362Z",
     "media": [
       {
-        "src": "/skill-previews/auto/37ab544fe4089b74cfde5c493a1a8a53add75cfac88874f1c8fb9a25df956f80.preview.webp",
-        "previewSrc": "/skill-previews/auto/37ab544fe4089b74cfde5c493a1a8a53add75cfac88874f1c8fb9a25df956f80.preview.webp",
-        "cardSrc": "/skill-previews/auto/37ab544fe4089b74cfde5c493a1a8a53add75cfac88874f1c8fb9a25df956f80.card.webp",
+        "src": "/skill-previews/auto/69d2288a5fa262fdc08ba938c665c0791a0551fc6b963da16fdd6520be1b25a4.preview.webp",
+        "previewSrc": "/skill-previews/auto/69d2288a5fa262fdc08ba938c665c0791a0551fc6b963da16fdd6520be1b25a4.preview.webp",
+        "cardSrc": "/skill-previews/auto/69d2288a5fa262fdc08ba938c665c0791a0551fc6b963da16fdd6520be1b25a4.card.webp",
         "width": 1600,
-        "height": 683,
-        "sha256": "37ab544fe4089b74cfde5c493a1a8a53add75cfac88874f1c8fb9a25df956f80",
-        "originalSrc": "/skill-previews/auto/37ab544fe4089b74cfde5c493a1a8a53add75cfac88874f1c8fb9a25df956f80.jpg",
-        "sourceUrl": "https://github.com/siril9/presentation-skill/blob/2776d8a7d08e64924a69cbf5bdb1271c5bedf99b/examples/v0.13_editorial_contact_sheet.jpg",
+        "height": 620,
+        "sha256": "69d2288a5fa262fdc08ba938c665c0791a0551fc6b963da16fdd6520be1b25a4",
+        "originalSrc": "/skill-previews/auto/69d2288a5fa262fdc08ba938c665c0791a0551fc6b963da16fdd6520be1b25a4.jpg",
+        "sourceUrl": "https://github.com/siril9/presentation-skill/blob/efd899c5ddf866af2ce0001c4c9340af775d4d55/examples/v0.14_lab_showcase.jpg",
         "kind": "example",
         "title": {
           "en": "presentation-skill · Author preview",
           "zh": "presentation-skill · 作者预览"
         },
         "alt": {
-          "en": "presentation-skill: editorial",
-          "zh": "presentation-skill：editorial"
+          "en": "presentation-skill: v0.14 scientific and report study preview",
+          "zh": "presentation-skill：v0.14 scientific and report study preview"
         },
-        "sourcePath": "examples/v0.13_editorial_contact_sheet.jpg",
+        "sourcePath": "examples/v0.14_lab_showcase.jpg",
         "documentPath": "README.md",
         "format": "image"
       },
       {
-        "src": "/skill-previews/auto/a0aa845895ae9303b3d78e9de3641ed2f8298c4c0d340b8daf00df38df56474b.preview.webp",
-        "previewSrc": "/skill-previews/auto/a0aa845895ae9303b3d78e9de3641ed2f8298c4c0d340b8daf00df38df56474b.preview.webp",
-        "cardSrc": "/skill-previews/auto/a0aa845895ae9303b3d78e9de3641ed2f8298c4c0d340b8daf00df38df56474b.card.webp",
-        "width": 1600,
-        "height": 1006,
-        "sha256": "a0aa845895ae9303b3d78e9de3641ed2f8298c4c0d340b8daf00df38df56474b",
-        "originalSrc": "/skill-previews/auto/a0aa845895ae9303b3d78e9de3641ed2f8298c4c0d340b8daf00df38df56474b.jpg",
-        "sourceUrl": "https://github.com/siril9/presentation-skill/blob/2776d8a7d08e64924a69cbf5bdb1271c5bedf99b/examples/v0.13_lab_contact_sheet.jpg",
+        "src": "/skill-previews/auto/fb1d65f5bd66c74f741a7109f057b5164a1bc90f8a4415d609617234083e55e5.preview.webp",
+        "previewSrc": "/skill-previews/auto/fb1d65f5bd66c74f741a7109f057b5164a1bc90f8a4415d609617234083e55e5.preview.webp",
+        "cardSrc": "/skill-previews/auto/fb1d65f5bd66c74f741a7109f057b5164a1bc90f8a4415d609617234083e55e5.card.webp",
+        "width": 1401,
+        "height": 1600,
+        "sha256": "fb1d65f5bd66c74f741a7109f057b5164a1bc90f8a4415d609617234083e55e5",
+        "originalSrc": "/skill-previews/auto/fb1d65f5bd66c74f741a7109f057b5164a1bc90f8a4415d609617234083e55e5.jpg",
+        "sourceUrl": "https://github.com/siril9/presentation-skill/blob/efd899c5ddf866af2ce0001c4c9340af775d4d55/examples/v0.14_lab_studies/dark_contrast_contact_sheet.jpg",
         "kind": "example",
         "title": {
           "en": "presentation-skill · Author preview",
           "zh": "presentation-skill · 作者预览"
         },
         "alt": {
-          "en": "presentation-skill: Clean lab report with native charts, tables and explicit limitations",
-          "zh": "presentation-skill：Clean lab report with native charts, tables and explicit limitations"
+          "en": "presentation-skill: dark contrast seminar",
+          "zh": "presentation-skill：dark contrast seminar"
         },
-        "sourcePath": "examples/v0.13_lab_contact_sheet.jpg",
+        "sourcePath": "examples/v0.14_lab_studies/dark_contrast_contact_sheet.jpg",
         "documentPath": "README.md",
         "format": "image"
       },
       {
-        "src": "/skill-previews/auto/23f598e0cf830b19908f2fb0e40dc216328c393660e41b6567de716b4463e0df.preview.webp",
-        "previewSrc": "/skill-previews/auto/23f598e0cf830b19908f2fb0e40dc216328c393660e41b6567de716b4463e0df.preview.webp",
-        "cardSrc": "/skill-previews/auto/23f598e0cf830b19908f2fb0e40dc216328c393660e41b6567de716b4463e0df.card.webp",
-        "width": 1600,
-        "height": 1006,
-        "sha256": "23f598e0cf830b19908f2fb0e40dc216328c393660e41b6567de716b4463e0df",
-        "originalSrc": "/skill-previews/auto/23f598e0cf830b19908f2fb0e40dc216328c393660e41b6567de716b4463e0df.jpg",
-        "sourceUrl": "https://github.com/siril9/presentation-skill/blob/2776d8a7d08e64924a69cbf5bdb1271c5bedf99b/examples/v0.13_operations_contact_sheet.jpg",
+        "src": "/skill-previews/auto/dd6402b248451cf411b32e908a730c544b98afe99c5656e850dd7611d474b8fc.preview.webp",
+        "previewSrc": "/skill-previews/auto/dd6402b248451cf411b32e908a730c544b98afe99c5656e850dd7611d474b8fc.preview.webp",
+        "cardSrc": "/skill-previews/auto/dd6402b248451cf411b32e908a730c544b98afe99c5656e850dd7611d474b8fc.card.webp",
+        "width": 1401,
+        "height": 1600,
+        "sha256": "dd6402b248451cf411b32e908a730c544b98afe99c5656e850dd7611d474b8fc",
+        "originalSrc": "/skill-previews/auto/dd6402b248451cf411b32e908a730c544b98afe99c5656e850dd7611d474b8fc.jpg",
+        "sourceUrl": "https://github.com/siril9/presentation-skill/blob/efd899c5ddf866af2ce0001c4c9340af775d4d55/examples/v0.14_lab_studies/light_river_report_contact_sheet.jpg",
         "kind": "example",
         "title": {
           "en": "presentation-skill · Author preview",
           "zh": "presentation-skill · 作者预览"
         },
         "alt": {
-          "en": "presentation-skill: operations",
-          "zh": "presentation-skill：operations"
+          "en": "presentation-skill: light sampling report",
+          "zh": "presentation-skill：light sampling report"
         },
-        "sourcePath": "examples/v0.13_operations_contact_sheet.jpg",
+        "sourcePath": "examples/v0.14_lab_studies/light_river_report_contact_sheet.jpg",
         "documentPath": "README.md",
         "format": "image"
       }

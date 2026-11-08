@@ -1,11 +1,11 @@
 {
-  "checkedAt": "2026-11-05T07:57:09.972Z",
+  "checkedAt": "2026-11-08T07:27:42.452Z",
   "updatedAt": "2026-09-27",
   "sources": [
     {
       "source": "baoyu",
       "repository": "JimLiu/baoyu-skills",
-      "revision": "5792c7dc8d09a28d6969e8970166c5eb090ce6ad",
+      "revision": "ca703c2d7c2c4399a1dc0cf82224f8551e05a96d",
       "candidates": 89,
       "missing": [],
       "skips": [],
