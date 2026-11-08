@@ -119,7 +119,7 @@
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.112.3",
     "@vercel/blob": "2.8.2",
-    "ai": "^6.0.94",
+    "ai": "^7.0.163",
     "autoprefixer": "^10.4.20",
     "bcryptjs": "3.0.3",
     "better-auth": "1.7.15",
