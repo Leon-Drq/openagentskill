@@ -35,6 +35,23 @@ export async function checkSearchCost(db) {
     assert.ok((await run(plan.sql,plan.params)).some(row=>row.slug==='cost-2'))
   }
   assert.ok(indexed>=10)
+  await run("UPDATE skills SET listing_status='static_checked' WHERE id='cost-15'")
+  await run("UPDATE skills SET source_content_hash='fixture-shared-hash' WHERE id IN ('cost-0','cost-14','cost-15')")
+  for (const [field, value, index] of [['repository', 'https://example.invalid', 'skills_lookup_repository'],
+    ['github_repo', 'fixture/cost-14', 'skills_lookup_github_repo'],
+    ['source_content_hash', 'fixture-shared-hash', 'skills_lookup_source_hash']]) {
+    const url = new URL('https://d1.internal/rest/v1/skills')
+    url.search = new URLSearchParams({ select: 'slug', [field]: 'eq.' + value, order: 'slug.asc', limit: '100' }).toString()
+    const plan = compileRead({ url, method: 'GET', headers: new Headers() })
+    const rows = await run(plan.sql, plan.params)
+    assert.deepEqual(rows, await run(plan.sql.replace('"skills" t WHERE', '"skills" t NOT INDEXED WHERE'), plan.params))
+    assert.ok(!rows.some(row => row.slug === 'cost-14'), 'Private matches stay private')
+    if (field === 'source_content_hash') assert.deepEqual(rows.map(row => row.slug), ['cost-0', 'cost-15'])
+    const explanation = await run('EXPLAIN QUERY PLAN ' + plan.sql, plan.params)
+    assert.ok(explanation.some(row => row.detail.includes(index)), JSON.stringify(explanation))
+  }
+  const candidatePlan = await run("EXPLAIN QUERY PLAN SELECT id FROM skill_candidates WHERE source_content_hash=? AND source_key<>? AND status IN (SELECT value FROM json_each(?)) ORDER BY created_at ASC LIMIT 1", ['missing', 'key', '["published","publishing"]'])
+  assert.ok(candidatePlan.some(row => row.detail.includes('candidates_lookup_source_hash')), JSON.stringify(candidatePlan))
   const indexSnapshot=async()=>JSON.stringify(await run('SELECT id,hex(block) AS block FROM skills_fts_data ORDER BY id'))
   const before=await indexSnapshot()
   await run("UPDATE skills SET site_downloads=site_downloads+1,quality_score=50 WHERE id='cost-2'")
@@ -49,5 +66,5 @@ export async function checkSearchCost(db) {
   // External-content integrity checks include the live content table.
   await run("INSERT INTO skills_name_fts(skills_name_fts,rank) VALUES ('integrity-check',1)")
   await run("INSERT INTO skills_fts(skills_fts,rank) VALUES ('integrity-check',1)")
-  return {patterns:patterns.length,indexed,resultsEquivalent:true,writeAmplificationRemoved:true}
+  return {patterns:patterns.length,indexed,resultsEquivalent:true,writeAmplificationRemoved:true,indexedIdentityLookups:4}
 }

@@ -1254,6 +1254,7 @@ export default async function SkillsPage({
 
   return (
     <>
+      {!paused && !clientProps.degraded && !clientProps.savedDirectory && <template data-oas-directory-cache="ready" />}
       <script
         id="skills-directory-jsonld"
         type="application/ld+json"

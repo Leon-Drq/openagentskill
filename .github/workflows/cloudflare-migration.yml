@@ -39,6 +39,8 @@ jobs:
         run: node scripts/check-cloudflare-auth-runtime.mjs
       - name: Validate business permissions and search in native D1
         run: node scripts/check-cloudflare-business-runtime.mjs
+      - name: Validate public directory caching and invalidation in native D1 and Cache API
+        run: node scripts/check-public-directory-cache-runtime.mjs
       - run: node --experimental-strip-types scripts/test-agent-connection.mjs
       - name: Build Cloudflare application without production credentials
         run: pnpm cf:build

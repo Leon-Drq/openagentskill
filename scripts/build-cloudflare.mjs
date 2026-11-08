@@ -1,5 +1,5 @@
 import { spawn, execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 // Compile public flags for the production site. Preview isolation is enforced
@@ -16,4 +16,11 @@ const child = spawn(process.execPath, [cli, 'build', ...process.argv.slice(2)], 
   stdio: 'inherit',
 })
 child.on('error', error => { console.error(error.message); process.exitCode = 1 })
-child.on('exit', code => { process.exitCode = code ?? 1 })
+child.on('exit', code => {
+  process.exitCode = code ?? 1
+  if (code === 0) {
+    const buildId = readFileSync(new URL('../.open-next/assets/BUILD_ID', import.meta.url), 'utf8').trim()
+    if (!/^[\w-]+$/.test(buildId)) throw new Error('Invalid cache build ID')
+    writeFileSync(new URL('../.open-next/directory-cache-build.mjs', import.meta.url), `export const buildId = ${JSON.stringify(buildId)};\n`)
+  }
+})
