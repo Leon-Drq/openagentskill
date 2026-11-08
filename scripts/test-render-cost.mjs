@@ -82,7 +82,11 @@ records = structuredClone(load('lib/seo/curated-skill-snapshot.ts').CURATED_SKIL
 const render = load('app/skills/content.tsx').default
 const renderProps = async (params, extra = {}) => {
   const result = await render({ searchParams: Promise.resolve(params), ...extra })
-  return result.props.children[1].props
+  const props = result.props.children.find(child => child?.type === 'SkillsPageClient').props
+  const marker = result.props.children.find(child => child?.type === 'template')
+  assert.equal(Boolean(marker), process.env.SUPABASE_DATA_PAUSED !== '1' && !props.degraded && !props.savedDirectory,
+    'Only healthy live HTML opts into the anonymous directory edge cache')
+  return props
 }
 const normalize = value => JSON.parse(JSON.stringify(value))
 searchDelay = 4200

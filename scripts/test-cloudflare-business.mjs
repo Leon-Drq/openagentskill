@@ -8,7 +8,7 @@ import { sqliteExpression } from './build-cloudflare-business-schema.mjs'
 import { checkSearchCost } from './fixtures/search-cost-checks.mjs'
 
 const { sqlite, database } = sqliteD1()
-for (const name of ['0001_commerce','0002_auth','0003_business','0004_catalog','0011_search_cost']) sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${name}.sql`,import.meta.url),'utf8'))
+for (const name of ['0001_commerce','0002_auth','0003_business','0004_catalog','0011_search_cost','0012_lookup_cost']) sqlite.exec(readFileSync(new URL(`../cloudflare/migrations/data/${name}.sql`,import.meta.url),'utf8'))
 const owner = '00000000-0000-4000-8000-000000000001', other = '00000000-0000-4000-8000-000000000002'
 sqlite.prepare('INSERT INTO account_identities(id) VALUES (?),(?)').run(owner,other)
 const insert = sqlite.prepare(`INSERT INTO skills(id,slug,name,description,author_name,repository,github_repo,category,license,

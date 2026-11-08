@@ -86,6 +86,7 @@
     }
   ],
   "vars": {
+    "PUBLIC_DIRECTORY_EDGE_CACHE": "1",
     "HOSTING_PROVIDER": "cloudflare",
     "NEXT_PUBLIC_HOSTING_PROVIDER": "cloudflare",
     "NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN": "8632bbbce8c243bda81d1a2f4649265c",
