@@ -2,6 +2,7 @@ import { unstable_cache } from 'next/cache'
 import { getApprovedRegistrySkillCount } from '@/lib/registry-stats'
 import { getAgentOutcomeStatsMapStrict } from '@/lib/db/skills'
 import { getLatestRankingSnapshot } from '@/lib/ranking-snapshots'
+import { getRankingLanding } from '@/lib/ranking-landing-data'
 import { getGitHubOwner } from '@/lib/github-owner'
 import { getRegistryCoverageStats } from '@/lib/registry-coverage'
 import { isDataPaused } from '@/lib/data-maintenance'
@@ -87,14 +88,12 @@ export function getRegistryEvidenceStats() {
 
 export async function getHomePageData() {
   const paused = isDataPaused()
-  const [totalSkills, evidence, coverage, popularitySnapshot, trendingSnapshot] = await Promise.all([
+  const [totalSkills, evidence, coverage, leaderboard] = await Promise.all([
     getStableApprovedSkillCount(),
     getRegistryEvidenceStats(),
     paused ? Promise.resolve(null) : getRegistryCoverageStats(),
-    paused ? Promise.resolve(null) : getLatestRankingSnapshot('most-starred-agent-skills'),
-    paused ? Promise.resolve(null) : getLatestRankingSnapshot('trending'),
+    getHomeLeaderboard(paused),
   ])
-  const leaderboardSnapshot = popularitySnapshot || trendingSnapshot
 
   return {
     stats: {
@@ -110,9 +109,7 @@ export async function getHomePageData() {
       coverageUpdatedAt: coverage?.updatedAt || null,
     },
     activities: [],
-    featuredSkills: [...(leaderboardSnapshot?.items || [])]
-      .sort((a, b) => Number(b.github_stars || 0) - Number(a.github_stars || 0))
-      .slice(0, 10)
+    featuredSkills: leaderboard.items.slice(0, 10)
       .map((item, index) => ({
         slug: item.slug,
         name: item.name,
@@ -127,6 +124,31 @@ export async function getHomePageData() {
         github_owner: item.github_owner || getGitHubOwner({ repository: item.repository }),
         author_name: item.author_name || null,
       })),
-    rankingGeneratedAt: leaderboardSnapshot?.generated_at || null,
+    rankingGeneratedAt: leaderboard.generatedAt,
+    rankingSource: leaderboard.source,
+  }
+}
+
+async function getHomeLeaderboard(paused: boolean) {
+  const unavailable = { items: [], generatedAt: null, source: 'unavailable' as const }
+  if (paused) return unavailable
+  const snapshot = await getLatestRankingSnapshot('most-starred-agent-skills')
+  if (snapshot?.items.length) {
+    return { items: snapshot.items, generatedAt: snapshot.generated_at, source: 'snapshot' as const }
+  }
+  // Reuse the same bounded, four-hour-cached selection as the ranking page.
+  // Trending is a different population and must never masquerade as most-starred.
+  const ranking = await getRankingLanding('most-starred-agent-skills')
+  if (!ranking.items.length) return unavailable
+  return {
+    source: ranking.source,
+    generatedAt: ranking.source === 'saved-directory' ? ranking.savedThrough || null : null,
+    items: ranking.items.map(({ skill, badge, reason }) => ({
+      slug: skill.slug, name: skill.name, description: skill.description,
+      github_stars: skill.github_stars, category: skill.category,
+      repository: skill.repository || `https://github.com/${skill.github_repo}`,
+      github_owner: getGitHubOwner(skill), author_name: skill.author_name,
+      badge, reason,
+    })),
   }
 }

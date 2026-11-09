@@ -57,6 +57,7 @@ export interface HomePageEnhancedProps {
     author_name: string | null
   }>
   rankingGeneratedAt: string | null
+  rankingSource: 'snapshot' | 'directory' | 'saved-directory' | 'unavailable'
 }
 
 const DEMO_RECOMMENDATIONS = [
@@ -713,7 +714,7 @@ function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) 
   )
 }
 
-export function HomePageEnhanced({ initialLocale, stats, featuredSkills, rankingGeneratedAt, showcase, creators }: HomePageEnhancedProps) {
+export function HomePageEnhanced({ initialLocale, stats, featuredSkills, rankingGeneratedAt, rankingSource, showcase, creators }: HomePageEnhancedProps) {
   const { t, locale } = useI18n()
   const activeLocale = initialLocale || locale
   const [taskQuery, setTaskQuery] = useState('')
@@ -854,7 +855,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
             </div>
             <div className="flex flex-wrap items-center gap-3">
               {rankingGeneratedAt && (
-                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#6d675e]">{siteCopy(locale, "Updated")}{' '}{new Date(rankingGeneratedAt).toLocaleString(locale, {
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#6d675e]">{siteCopy(locale, rankingSource === 'saved-directory' ? 'Saved directory' : 'Updated')}{' '}{new Date(rankingGeneratedAt).toLocaleString(locale, {
                     timeZone: 'UTC',
                     month: 'short',
                     day: 'numeric',
@@ -913,7 +914,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
               />
             </div>
           ) : (
-            <div className="mt-6 rounded-[10px] border border-dashed border-[#d8d2c6] bg-[#fffdf8] p-6 text-sm leading-relaxed text-[#5f5a52]">{siteCopy(locale, "The first daily leaderboard snapshot is being generated. Browse the live rankings while the scheduled snapshot is prepared.")}</div>
+            <div className="mt-6 rounded-[10px] border border-dashed border-[#d8d2c6] bg-[#fffdf8] p-6 text-sm leading-relaxed text-[#5f5a52]">{siteCopy(locale, "The leaderboard is temporarily unavailable. You can still browse the Skills directory.")} <Link href={getLocalizedNavigationHref('/skills?sort=stars', locale)} className="text-[#006b4f] underline underline-offset-4">{siteCopy(locale, 'Browse skills')} →</Link></div>
           )}
         </div>
       </section>

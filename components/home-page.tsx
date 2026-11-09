@@ -7,5 +7,6 @@ import { HomeDiscovery } from './home-discovery'
 // not the entire gallery/creator catalog and its data-building functions.
 export function HomePage(props: Omit<HomePageEnhancedProps, 'showcase' | 'creators'>) {
   const locale = props.initialLocale || 'en'
-  return <HomePageEnhanced {...props} showcase={<><HomeShowcaseStatic locale={locale} /><HomeDiscovery locale={locale} /></>} creators={<HomeCreators locale={locale} />} />
+  const ready = props.featuredSkills.length > 0 && ['snapshot', 'directory'].includes(props.rankingSource)
+  return <><template data-oas-home-cache={ready ? 'ready' : 'fallback'} /><HomePageEnhanced {...props} showcase={<><HomeShowcaseStatic locale={locale} /><HomeDiscovery locale={locale} /></>} creators={<HomeCreators locale={locale} />} /></>
 }

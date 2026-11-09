@@ -41,6 +41,7 @@ const home = compile('lib/home-page-data.ts', {
   '@/lib/db/skills': { getAgentOutcomeStatsMapStrict: forbidden },
   '@/lib/ranking-snapshots': { getLatestRankingSnapshot: forbidden },
   '@/lib/github-owner': { getGitHubOwner: forbidden },
+  '@/lib/ranking-landing-data': { getRankingLanding: forbidden },
   '@/lib/registry-coverage': { getRegistryCoverageStats: forbidden },
 })
 const post = (method, params) => route.POST(new NextRequest('https://www.openagentskill.com/api/mcp', {
@@ -84,6 +85,7 @@ try {
     '@/lib/registry-stats': { getApprovedRegistrySkillCount: async () => countResult },
     '@/lib/db/skills': { getAgentOutcomeStatsMapStrict: async () => ({}) },
     '@/lib/ranking-snapshots': { getLatestRankingSnapshot: async () => null },
+    '@/lib/ranking-landing-data': { getRankingLanding: async () => ({ items: [], source: 'unavailable' }) },
     '@/lib/github-owner': { getGitHubOwner: forbidden },
     '@/lib/registry-coverage': { getRegistryCoverageStats: async () => null },
   })

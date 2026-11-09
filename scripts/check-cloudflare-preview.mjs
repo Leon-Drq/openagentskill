@@ -24,6 +24,10 @@ if (!remote) {
   // Public CI must not authenticate or make paid calls. This preview exercises
   // the disabled AI path; the real binding is verified separately on Cloudflare.
   delete config.ai
+  // Exercise runtime D1 recovery after a credential-free build. The local
+  // database starts empty; migration isolation still blocks all public APIs.
+  config.vars.SUPABASE_DATA_PAUSED = '0'
+  config.vars.CLOUDFLARE_DATA_ENABLED = '1'
   config.main = resolve(config.main)
   config.assets.directory = resolve(config.assets.directory)
   writeFileSync(previewConfig, JSON.stringify(config, null, 2))
@@ -127,6 +131,42 @@ try {
     }
     const buildId=readFileSync('.next/BUILD_ID','utf8').trim()
     assert.match(buildId,/^[\w-]+$/)
+    // The first homepage above rendered without production data. Add a local
+    // snapshot now: it must recover immediately, without a purge or a 4h wait,
+    // then return HTML and Flight cache hits. No production DB is accessed.
+    const snapshotSchema = readFileSync('cloudflare/migrations/data/0003_business.sql', 'utf8')
+      .match(/CREATE TABLE "ranking_snapshots" \([\s\S]*?\) STRICT;/)?.[0]
+    assert.ok(snapshotSchema)
+    const generated = new Date().toISOString()
+    const fixture = [{ rank: 1, score: 42, badge: '42 stars', reason: 'Local runtime fixture',
+      slug: 'home-runtime-fixture', name: 'Homepage runtime fixture', description: 'Local test only',
+      category: 'developer-tools', github_stars: 42, github_forks: 0, quality_score: 80,
+      repository: 'https://github.com/test/home-runtime-fixture', github_owner: 'test', author_name: 'test',
+      updated_at: generated, install: '' }]
+    const quote = value => `'${String(value).replaceAll("'", "''")}'`
+    const seedPath = resolve('.codex-tmp/home-runtime-snapshot.sql')
+    writeFileSync(seedPath, `${snapshotSchema.replace('CREATE TABLE', 'CREATE TABLE IF NOT EXISTS')}
+      INSERT INTO ranking_snapshots(ranking_slug,snapshot_date,generated_at,methodology_version,item_count,items,source_counts)
+      VALUES ('most-starred-agent-skills',${quote(generated.slice(0,10))},${quote(generated)},'local-runtime-test',1,${quote(JSON.stringify(fixture))},'{}')
+      ON CONFLICT(ranking_slug,snapshot_date) DO UPDATE SET items=excluded.items,generated_at=excluded.generated_at;`)
+    await promisify(execFile)(process.execPath,[resolve('node_modules/wrangler/bin/wrangler.js'),'d1','execute','APP_DB','--local','--config',previewConfig,'--file',seedPath],{env:process.env})
+    for (const path of ['/', '/zh', '/ja', '/ko', '/es', '/de', '/fr', '/id']) {
+      const recovered = await readPage(path)
+      assert.match(recovered.body, /data-oas-home-cache="ready"/, `${path}: runtime data replaces bootstrap`)
+      assert.match(recovered.body, /Homepage runtime fixture/)
+      assert.doesNotMatch(recovered.body, /data-oas-home-cache="fallback"/)
+      let hit
+      for (let attempt = 0; attempt < 5; attempt++) {
+        hit = await readPage(path)
+        if (hit.response.headers.get('x-opennext-cache') === 'HIT') break
+        await new Promise(resolve => setTimeout(resolve, 200))
+      }
+      assert.equal(hit.response.headers.get('x-opennext-cache'), 'HIT', `${path}: healthy ISR remains enabled`)
+      const flight = await readPage(path + '?_rsc=home-check', { RSC: '1' })
+      assert.equal(flight.response.headers.get('x-opennext-cache'), 'HIT')
+      assert.match(flight.body, /home-runtime-fixture/)
+      report.push({ path, homeRecovery: true, interceptedHtml: true, interceptedRsc: true })
+    }
     // Same persisted representation as revalidateTag(tag,{expire:0}).
     const now=Date.now()
     const sql=`INSERT INTO revalidations(tag,revalidatedAt,stale,expire) VALUES ('${buildId}/_N_T_/agent-skill',${now},${now},${now})`

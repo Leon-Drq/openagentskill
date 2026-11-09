@@ -54,7 +54,7 @@ export const metadata: Metadata = {
 }
 
 export default async function Page() {
-  const { stats, activities, featuredSkills, rankingGeneratedAt } = await getHomePageData()
+  const { stats, activities, featuredSkills, rankingGeneratedAt, rankingSource } = await getHomePageData()
 
   return (
     <HomePageEnhanced
@@ -62,6 +62,7 @@ export default async function Page() {
       activities={activities}
       featuredSkills={featuredSkills}
       rankingGeneratedAt={rankingGeneratedAt}
+      rankingSource={rankingSource}
     />
   )
 }
