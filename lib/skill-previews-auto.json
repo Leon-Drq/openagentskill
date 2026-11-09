@@ -2948,6 +2948,138 @@
     ]
   },
   {
+    "skillSlug": "conardli-garden-skills",
+    "repository": "ConardLi/garden-skills",
+    "revision": "08150e750bdc8c8dc452fb43c8ef5221b71c4308",
+    "sourceUrl": "https://github.com/ConardLi/garden-skills/blob/08150e750bdc8c8dc452fb43c8ef5221b71c4308/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-1126322e2cc8d165adc4c792eeb195717de2bcc7b39be1ce77959d78e87ef685.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "1126322e2cc8d165adc4c792eeb195717de2bcc7b39be1ce77959d78e87ef685",
+    "documentSha256": "9c6cfe00c7d22658b6823a4a2db8cf90cfff43ca50ea64eaa7be7ffb37bfb409",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-09T04:19:26.260Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/60e99394065551ebac3b81f53a3834f0bf322655b587d849b0235733879c374f.preview.webp",
+        "previewSrc": "/skill-previews/auto/60e99394065551ebac3b81f53a3834f0bf322655b587d849b0235733879c374f.preview.webp",
+        "cardSrc": "/skill-previews/auto/60e99394065551ebac3b81f53a3834f0bf322655b587d849b0235733879c374f.card.webp",
+        "width": 1600,
+        "height": 900,
+        "sha256": "60e99394065551ebac3b81f53a3834f0bf322655b587d849b0235733879c374f",
+        "originalSrc": "/skill-previews/auto/60e99394065551ebac3b81f53a3834f0bf322655b587d849b0235733879c374f.webp",
+        "sourceUrl": "https://github.com/ConardLi/garden-skills/blob/08150e750bdc8c8dc452fb43c8ef5221b71c4308/dist/imgs/covers/beautiful-article.webp",
+        "kind": "reference",
+        "title": {
+          "en": "Garden Skills · Author preview",
+          "zh": "Garden Skills · 作者预览"
+        },
+        "alt": {
+          "en": "Garden Skills: Beautiful Article Skill",
+          "zh": "Garden Skills：Beautiful Article Skill"
+        },
+        "sourcePath": "dist/imgs/covers/beautiful-article.webp",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/8d4f9be4632c2066c734a6917cb54c3b353a0495e0e028e83b1cc6ced52f00a8.preview.webp",
+        "previewSrc": "/skill-previews/auto/8d4f9be4632c2066c734a6917cb54c3b353a0495e0e028e83b1cc6ced52f00a8.preview.webp",
+        "cardSrc": "/skill-previews/auto/8d4f9be4632c2066c734a6917cb54c3b353a0495e0e028e83b1cc6ced52f00a8.card.webp",
+        "width": 1600,
+        "height": 900,
+        "sha256": "8d4f9be4632c2066c734a6917cb54c3b353a0495e0e028e83b1cc6ced52f00a8",
+        "originalSrc": "/skill-previews/auto/8d4f9be4632c2066c734a6917cb54c3b353a0495e0e028e83b1cc6ced52f00a8.webp",
+        "sourceUrl": "https://github.com/ConardLi/garden-skills/blob/08150e750bdc8c8dc452fb43c8ef5221b71c4308/dist/imgs/covers/gpt-image-2.webp",
+        "kind": "reference",
+        "title": {
+          "en": "Garden Skills · Author preview",
+          "zh": "Garden Skills · 作者预览"
+        },
+        "alt": {
+          "en": "Garden Skills: GPT Image 2 Skill",
+          "zh": "Garden Skills：GPT Image 2 Skill"
+        },
+        "sourcePath": "dist/imgs/covers/gpt-image-2.webp",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/0bb9beefd2b6f32095b8eaff26d61288e1ef76a9235301f1271594f882dec670.preview.webp",
+        "previewSrc": "/skill-previews/auto/0bb9beefd2b6f32095b8eaff26d61288e1ef76a9235301f1271594f882dec670.preview.webp",
+        "cardSrc": "/skill-previews/auto/0bb9beefd2b6f32095b8eaff26d61288e1ef76a9235301f1271594f882dec670.card.webp",
+        "width": 1600,
+        "height": 900,
+        "sha256": "0bb9beefd2b6f32095b8eaff26d61288e1ef76a9235301f1271594f882dec670",
+        "originalSrc": "/skill-previews/auto/0bb9beefd2b6f32095b8eaff26d61288e1ef76a9235301f1271594f882dec670.webp",
+        "sourceUrl": "https://github.com/ConardLi/garden-skills/blob/08150e750bdc8c8dc452fb43c8ef5221b71c4308/dist/imgs/covers/kb-retriever.webp",
+        "kind": "reference",
+        "title": {
+          "en": "Garden Skills · Author preview",
+          "zh": "Garden Skills · 作者预览"
+        },
+        "alt": {
+          "en": "Garden Skills: Kb Retriever Skill",
+          "zh": "Garden Skills：Kb Retriever Skill"
+        },
+        "sourcePath": "dist/imgs/covers/kb-retriever.webp",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "crossplane-contrib-crossview",
+    "repository": "crossplane-contrib/crossview",
+    "revision": "d38c3b391071043da2fd940a8655f808dced4683",
+    "sourceUrl": "https://github.com/crossplane-contrib/crossview/blob/d38c3b391071043da2fd940a8655f808dced4683/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-eccb04b94c71454ea03f00ecb518b997952c4f2f23aca50baab98230f5c8dc00.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "eccb04b94c71454ea03f00ecb518b997952c4f2f23aca50baab98230f5c8dc00",
+    "documentSha256": "c081e0791ccce2fecddea17b32a7d2da1868263d77d147e44c1dda6098edcc16",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-09T04:19:26.260Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/2864eceb461552c2b2895fa9f0de1cbc335a35ee287cd9d81159c1b5c3aa82c7.preview.webp",
+        "previewSrc": "/skill-previews/auto/2864eceb461552c2b2895fa9f0de1cbc335a35ee287cd9d81159c1b5c3aa82c7.preview.webp",
+        "cardSrc": "/skill-previews/auto/2864eceb461552c2b2895fa9f0de1cbc335a35ee287cd9d81159c1b5c3aa82c7.card.webp",
+        "width": 1600,
+        "height": 934,
+        "sha256": "2864eceb461552c2b2895fa9f0de1cbc335a35ee287cd9d81159c1b5c3aa82c7",
+        "originalSrc": "/skill-previews/auto/2864eceb461552c2b2895fa9f0de1cbc335a35ee287cd9d81159c1b5c3aa82c7.png",
+        "sourceUrl": "https://github.com/crossplane-contrib/crossview/blob/d38c3b391071043da2fd940a8655f808dced4683/public/images/new-screeenshot.png",
+        "kind": "reference",
+        "title": {
+          "en": "Crossview · Author preview",
+          "zh": "Crossview · 作者预览"
+        },
+        "alt": {
+          "en": "Crossview: Crossview Dashboard",
+          "zh": "Crossview：Crossview Dashboard"
+        },
+        "sourcePath": "public/images/new-screeenshot.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "d0c-s4vage-lookatme",
     "repository": "d0c-s4vage/lookatme",
     "revision": "c05abe1804d93254e9139039937eed43fb6b49ab",
@@ -3124,6 +3256,94 @@
     ]
   },
   {
+    "skillSlug": "dacnay816y62-hub-fantasy-qiqiguaiguai-skill",
+    "repository": "dacnay816y62-hub/fantasy-qiqiguaiguai-skill",
+    "revision": "bff3ebd5355223bc08d2315d84480cee48de7fe2",
+    "sourceUrl": "https://github.com/dacnay816y62-hub/fantasy-qiqiguaiguai-skill/blob/bff3ebd5355223bc08d2315d84480cee48de7fe2/SKILL.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-47b257fc6419a74c3f3751c89f37848a90c831babfcdc65e0347c1a4766ba66e.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "47b257fc6419a74c3f3751c89f37848a90c831babfcdc65e0347c1a4766ba66e",
+    "documentSha256": "60a8e9028d692abbd60761e2aa45da8092a804865aa50396f04ba301cf253377",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-09T04:19:26.260Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/056bf445f1ab9dbf437fe59ef25c88cfab46c083f81f30224e98a12b76ca1e75.preview.webp",
+        "previewSrc": "/skill-previews/auto/056bf445f1ab9dbf437fe59ef25c88cfab46c083f81f30224e98a12b76ca1e75.preview.webp",
+        "cardSrc": "/skill-previews/auto/056bf445f1ab9dbf437fe59ef25c88cfab46c083f81f30224e98a12b76ca1e75.card.webp",
+        "width": 1194,
+        "height": 632,
+        "sha256": "056bf445f1ab9dbf437fe59ef25c88cfab46c083f81f30224e98a12b76ca1e75",
+        "originalSrc": "/skill-previews/auto/056bf445f1ab9dbf437fe59ef25c88cfab46c083f81f30224e98a12b76ca1e75.png",
+        "sourceUrl": "https://github.com/dacnay816y62-hub/fantasy-qiqiguaiguai-skill/blob/bff3ebd5355223bc08d2315d84480cee48de7fe2/examples/direct-3x4-contact-sheet.png",
+        "kind": "example",
+        "title": {
+          "en": "Fantasy Qiqiguaiguai Skill · Author preview",
+          "zh": "Fantasy Qiqiguaiguai Skill · 作者预览"
+        },
+        "alt": {
+          "en": "Fantasy Qiqiguaiguai Skill: FANTASY 奇奇怪怪 · 仓库视觉示例",
+          "zh": "Fantasy Qiqiguaiguai Skill：FANTASY 奇奇怪怪 · 仓库视觉示例"
+        },
+        "sourcePath": "examples/direct-3x4-contact-sheet.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/9887f703d6e7362ba699a0ca8aab53ec7c956efab28446e27e7d3029f83ae8d4.preview.webp",
+        "previewSrc": "/skill-previews/auto/9887f703d6e7362ba699a0ca8aab53ec7c956efab28446e27e7d3029f83ae8d4.preview.webp",
+        "cardSrc": "/skill-previews/auto/9887f703d6e7362ba699a0ca8aab53ec7c956efab28446e27e7d3029f83ae8d4.card.webp",
+        "width": 1086,
+        "height": 1448,
+        "sha256": "9887f703d6e7362ba699a0ca8aab53ec7c956efab28446e27e7d3029f83ae8d4",
+        "originalSrc": "/skill-previews/auto/9887f703d6e7362ba699a0ca8aab53ec7c956efab28446e27e7d3029f83ae8d4.png",
+        "sourceUrl": "https://github.com/dacnay816y62-hub/fantasy-qiqiguaiguai-skill/blob/bff3ebd5355223bc08d2315d84480cee48de7fe2/examples/direct-3x4/fantasy-qiqiguaiguai-direct-3x4-api-01-01-first-person-coffee.png",
+        "kind": "example",
+        "title": {
+          "en": "Fantasy Qiqiguaiguai Skill · Author preview",
+          "zh": "Fantasy Qiqiguaiguai Skill · 作者预览"
+        },
+        "alt": {
+          "en": "Fantasy Qiqiguaiguai Skill: fantasy-qiqiguaiguai-direct-3x4-api-01-01-first-person-coffee.png",
+          "zh": "Fantasy Qiqiguaiguai Skill：fantasy-qiqiguaiguai-direct-3x4-api-01-01-first-person-coffee.png"
+        },
+        "sourcePath": "examples/direct-3x4/fantasy-qiqiguaiguai-direct-3x4-api-01-01-first-person-coffee.png",
+        "documentPath": "SKILL.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/944475789de5c0ec015b77a9a2eeba36a1d32518f9ebe41359ffaf4f8bb45f45.preview.webp",
+        "previewSrc": "/skill-previews/auto/944475789de5c0ec015b77a9a2eeba36a1d32518f9ebe41359ffaf4f8bb45f45.preview.webp",
+        "cardSrc": "/skill-previews/auto/944475789de5c0ec015b77a9a2eeba36a1d32518f9ebe41359ffaf4f8bb45f45.card.webp",
+        "width": 1086,
+        "height": 1448,
+        "sha256": "944475789de5c0ec015b77a9a2eeba36a1d32518f9ebe41359ffaf4f8bb45f45",
+        "originalSrc": "/skill-previews/auto/944475789de5c0ec015b77a9a2eeba36a1d32518f9ebe41359ffaf4f8bb45f45.png",
+        "sourceUrl": "https://github.com/dacnay816y62-hub/fantasy-qiqiguaiguai-skill/blob/bff3ebd5355223bc08d2315d84480cee48de7fe2/examples/direct-3x4/fantasy-qiqiguaiguai-direct-3x4-api-02-02-street-crossing.png",
+        "kind": "example",
+        "title": {
+          "en": "Fantasy Qiqiguaiguai Skill · Author preview",
+          "zh": "Fantasy Qiqiguaiguai Skill · 作者预览"
+        },
+        "alt": {
+          "en": "Fantasy Qiqiguaiguai Skill: fantasy-qiqiguaiguai-direct-3x4-api-02-02-street-crossing.png",
+          "zh": "Fantasy Qiqiguaiguai Skill：fantasy-qiqiguaiguai-direct-3x4-api-02-02-street-crossing.png"
+        },
+        "sourcePath": "examples/direct-3x4/fantasy-qiqiguaiguai-direct-3x4-api-02-02-street-crossing.png",
+        "documentPath": "SKILL.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "dacnay816y62-hub-photo-revival",
     "repository": "dacnay816y62-hub/photo-revival",
     "revision": "5574fa2f6fa8fa52b232d7836b7960bf6b5753f6",
@@ -3208,6 +3428,182 @@
         "sourcePath": "examples/01_moon_gate.png",
         "documentPath": "README.md",
         "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "datavane-tis",
+    "repository": "datavane/tis",
+    "revision": "31a25e2920c70d7d235a1778448477f03bafab9e",
+    "sourceUrl": "https://github.com/datavane/tis/blob/31a25e2920c70d7d235a1778448477f03bafab9e/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-f885d4d66ef7cbb5e54c14a89d6e611efb505a567329b1156aa1842b840093eb.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "f885d4d66ef7cbb5e54c14a89d6e611efb505a567329b1156aa1842b840093eb",
+    "documentSha256": "99c219a90c7daf21eff8e80c3df6ca7123b9924fcdd2c4f21ef40ead769de045",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-09T04:19:26.260Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/e2f2e090712c885aa20e634a4cf791076f145df3d415d7e28714590d9402940e.preview.webp",
+        "previewSrc": "/skill-previews/auto/e2f2e090712c885aa20e634a4cf791076f145df3d415d7e28714590d9402940e.preview.webp",
+        "cardSrc": "/skill-previews/auto/e2f2e090712c885aa20e634a4cf791076f145df3d415d7e28714590d9402940e.card.webp",
+        "width": 1600,
+        "height": 777,
+        "sha256": "e2f2e090712c885aa20e634a4cf791076f145df3d415d7e28714590d9402940e",
+        "originalSrc": "/skill-previews/auto/e2f2e090712c885aa20e634a4cf791076f145df3d415d7e28714590d9402940e.png",
+        "sourceUrl": "https://github.com/datavane/tis/blob/31a25e2920c70d7d235a1778448477f03bafab9e/docs/add-elastic-writer.png",
+        "kind": "reference",
+        "title": {
+          "en": "Tis · Author preview",
+          "zh": "Tis · 作者预览"
+        },
+        "alt": {
+          "en": "Tis: tis",
+          "zh": "Tis：tis"
+        },
+        "sourcePath": "docs/add-elastic-writer.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/2e8202fbd73a9403613cfbf97797cd02860f37768e3f251246b650ca9514af5a.preview.webp",
+        "previewSrc": "/skill-previews/auto/2e8202fbd73a9403613cfbf97797cd02860f37768e3f251246b650ca9514af5a.preview.webp",
+        "cardSrc": "/skill-previews/auto/2e8202fbd73a9403613cfbf97797cd02860f37768e3f251246b650ca9514af5a.card.webp",
+        "width": 1600,
+        "height": 703,
+        "sha256": "2e8202fbd73a9403613cfbf97797cd02860f37768e3f251246b650ca9514af5a",
+        "originalSrc": "/skill-previews/auto/2e8202fbd73a9403613cfbf97797cd02860f37768e3f251246b650ca9514af5a.png",
+        "sourceUrl": "https://github.com/datavane/tis/blob/31a25e2920c70d7d235a1778448477f03bafab9e/docs/add-mysql-reader.png",
+        "kind": "reference",
+        "title": {
+          "en": "Tis · Author preview",
+          "zh": "Tis · 作者预览"
+        },
+        "alt": {
+          "en": "Tis: tis",
+          "zh": "Tis：tis"
+        },
+        "sourcePath": "docs/add-mysql-reader.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/9525706583658bd5a8a6bfee736566d8657ac8ef51408b7cead45cf356386c91.preview.webp",
+        "previewSrc": "/skill-previews/auto/9525706583658bd5a8a6bfee736566d8657ac8ef51408b7cead45cf356386c91.preview.webp",
+        "cardSrc": "/skill-previews/auto/9525706583658bd5a8a6bfee736566d8657ac8ef51408b7cead45cf356386c91.card.webp",
+        "width": 1135,
+        "height": 733,
+        "sha256": "9525706583658bd5a8a6bfee736566d8657ac8ef51408b7cead45cf356386c91",
+        "originalSrc": "/skill-previews/auto/9525706583658bd5a8a6bfee736566d8657ac8ef51408b7cead45cf356386c91.png",
+        "sourceUrl": "https://github.com/datavane/tis/blob/31a25e2920c70d7d235a1778448477f03bafab9e/docs/ai-agent-pipeline.png",
+        "kind": "reference",
+        "title": {
+          "en": "Tis · Author preview",
+          "zh": "Tis · 作者预览"
+        },
+        "alt": {
+          "en": "Tis: tis",
+          "zh": "Tis：tis"
+        },
+        "sourcePath": "docs/ai-agent-pipeline.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "diffusionstudio-lottie",
+    "repository": "diffusionstudio/lottie",
+    "revision": "3c72912fad543897f90045ed4d355813837927fc",
+    "sourceUrl": "https://github.com/diffusionstudio/lottie/blob/3c72912fad543897f90045ed4d355813837927fc/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-53e75f4653f37f979bef6ae2d13fee2cba97239689a2439678c79a100e2740af.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "53e75f4653f37f979bef6ae2d13fee2cba97239689a2439678c79a100e2740af",
+    "documentSha256": "0c1ff49abeee92581cb805fae751ac0a966ab51ae05c5909304517a554e19653",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-09T04:19:26.260Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/d403a6c44c9cecff48a502c2767323d4f2129308430451c26c5ecf9d6107010f.preview.webp",
+        "previewSrc": "/skill-previews/auto/d403a6c44c9cecff48a502c2767323d4f2129308430451c26c5ecf9d6107010f.preview.webp",
+        "cardSrc": "/skill-previews/auto/d403a6c44c9cecff48a502c2767323d4f2129308430451c26c5ecf9d6107010f.card.webp",
+        "width": 720,
+        "height": 405,
+        "sha256": "d403a6c44c9cecff48a502c2767323d4f2129308430451c26c5ecf9d6107010f",
+        "originalSrc": "/skill-previews/auto/d403a6c44c9cecff48a502c2767323d4f2129308430451c26c5ecf9d6107010f.gif",
+        "sourceUrl": "https://github.com/diffusionstudio/lottie/blob/3c72912fad543897f90045ed4d355813837927fc/assets/demo-1.gif",
+        "kind": "example",
+        "title": {
+          "en": "lottie · Animation · still preview",
+          "zh": "lottie · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "lottie: demo-1.gif",
+          "zh": "lottie：demo-1.gif"
+        },
+        "sourcePath": "assets/demo-1.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/dbab178d09e50346ee988ef5b06851ae026c6d210f408b8b586e4379bbc8c936.preview.webp",
+        "previewSrc": "/skill-previews/auto/dbab178d09e50346ee988ef5b06851ae026c6d210f408b8b586e4379bbc8c936.preview.webp",
+        "cardSrc": "/skill-previews/auto/dbab178d09e50346ee988ef5b06851ae026c6d210f408b8b586e4379bbc8c936.card.webp",
+        "width": 720,
+        "height": 405,
+        "sha256": "dbab178d09e50346ee988ef5b06851ae026c6d210f408b8b586e4379bbc8c936",
+        "originalSrc": "/skill-previews/auto/dbab178d09e50346ee988ef5b06851ae026c6d210f408b8b586e4379bbc8c936.gif",
+        "sourceUrl": "https://github.com/diffusionstudio/lottie/blob/3c72912fad543897f90045ed4d355813837927fc/assets/demo-2.gif",
+        "kind": "example",
+        "title": {
+          "en": "lottie · Animation · still preview",
+          "zh": "lottie · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "lottie: demo-2.gif",
+          "zh": "lottie：demo-2.gif"
+        },
+        "sourcePath": "assets/demo-2.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/915e1273794cb5114f781cc1573b66fb7ce9c108654b3ca6e4473d13e4eaf5fe.preview.webp",
+        "previewSrc": "/skill-previews/auto/915e1273794cb5114f781cc1573b66fb7ce9c108654b3ca6e4473d13e4eaf5fe.preview.webp",
+        "cardSrc": "/skill-previews/auto/915e1273794cb5114f781cc1573b66fb7ce9c108654b3ca6e4473d13e4eaf5fe.card.webp",
+        "width": 960,
+        "height": 320,
+        "sha256": "915e1273794cb5114f781cc1573b66fb7ce9c108654b3ca6e4473d13e4eaf5fe",
+        "originalSrc": "/skill-previews/auto/915e1273794cb5114f781cc1573b66fb7ce9c108654b3ca6e4473d13e4eaf5fe.gif",
+        "sourceUrl": "https://github.com/diffusionstudio/lottie/blob/3c72912fad543897f90045ed4d355813837927fc/assets/header.gif",
+        "kind": "reference",
+        "title": {
+          "en": "lottie · Animation · still preview",
+          "zh": "lottie · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "lottie: Text to Lottie",
+          "zh": "lottie：Text to Lottie"
+        },
+        "sourcePath": "assets/header.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
       }
     ]
   },

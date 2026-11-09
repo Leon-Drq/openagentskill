@@ -31,4 +31,16 @@ await assert.rejects(fetchCuratedBytes(urls.download, 'b'.repeat(64), 100, { fet
 await assert.rejects(fetchCuratedBytes(urls.download, hash, 3, { fetcher }), /too large/)
 await assert.rejects(fetchCuratedBytes(urls.download, hash, 100, { fetcher: async () => new Response(null, { status: 302, headers: { location: 'https://release-assets.githubusercontent.com/loop' } }) }), /Too many/)
 await assert.rejects(fetchCuratedBytes(urls.download, hash, 100, { fetcher: async () => new Response('not found', { status: 404 }) }), /unavailable/)
+const pinnedRaw = curatedSourceUrls(source, 'docs/image.png').download
+const pointer = Buffer.from(`version https://git-lfs.github.com/spec/v1\noid sha256:${hash}\nsize ${bytes.length}\n`)
+const lfsFetch = async (url, options) => {
+  const target = new URL(url)
+  assert.ok(!options.headers?.Authorization)
+  if (target.hostname === 'raw.githubusercontent.com') return new Response(pointer)
+  assert.equal(target.href, `https://media.githubusercontent.com/media/author/skill/${source.revision}/docs/image.png`)
+  assert.equal(options.redirect, 'error')
+  return new Response(bytes)
+}
+assert.deepEqual(await fetchCuratedBytes(pinnedRaw, hash, 1024, { fetcher: lfsFetch }), bytes)
+await assert.rejects(fetchCuratedBytes(pinnedRaw, 'b'.repeat(64), 1024, { fetcher: lfsFetch }), /hash changed/, 'LFS pointer integrity does not replace the reviewed source hash')
 console.log('Curated media: exact source paths, trusted release redirects, byte limits and SHA-256 pinning passed.')

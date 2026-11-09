@@ -5,6 +5,7 @@ import { parseArgs } from 'node:util'
 import { boundedFetch } from './gallery/core.mjs'
 import { digest, safePath, safeRepo, identity, selectBatch, documentPaths, discoverAssets } from './skill-media/discovery.mjs'
 import { renderAsset } from './skill-media/render.mjs'
+import { resolveGitHubLfs } from './skill-media/github-lfs.mjs'
 
 const rootDefault = fileURLToPath(new URL('../', import.meta.url))
 const licenses = {
@@ -54,9 +55,10 @@ export function githubReader({ fetcher = fetch, token = process.env.GITHUB_TOKEN
     return bytes
   }
   const api = async suffix => JSON.parse((await get(`https://api.github.com/repos/${suffix}`, 12 * 1024 * 1024)).toString())
-  const raw = (repo, revision, file, limit = 500000) => {
+  const raw = async (repo, revision, file, limit = 500000) => {
     if (!safeRepo(repo) || !/^[a-f0-9]{40}$/.test(revision) || !safePath(file)) throw Error('Invalid pinned source')
-    return get(`https://raw.githubusercontent.com/${repo}/${revision}/${file.split('/').map(encodeURIComponent).join('/')}`, limit)
+    const url = `https://raw.githubusercontent.com/${repo}/${revision}/${file.split('/').map(encodeURIComponent).join('/')}`
+    return resolveGitHubLfs(await get(url, limit), url, limit, { fetcher })
   }
   const repository = async row => {
     if (!safeRepo(row.github_repo)) throw Error('Invalid repository')
@@ -89,17 +91,21 @@ export function githubReader({ fetcher = fetch, token = process.env.GITHUB_TOKEN
   return { repository, raw }
 }
 
-export async function collectSkillMedia({ root = rootDefault, catalog, limit = 150, refresh = false, now = new Date().toISOString(), reader = githubReader(), renderer = renderAsset, maxBytes = 100 * 1024 * 1024 } = {}) {
+export async function collectSkillMedia({ root = rootDefault, catalog, skills, limit = 150, refresh = false, now = new Date().toISOString(), reader = githubReader(), renderer = renderAsset, maxBytes = 100 * 1024 * 1024 } = {}) {
   const read = async file => JSON.parse(await readFile(path.join(root, file), 'utf8'))
   const rows = catalog || await fetchCatalog()
   if (!Array.isArray(rows) || !rows.length || new Set(rows.map(row => row.slug)).size !== rows.length) throw Error('Invalid catalog')
+  // Scope attempts, never the eligibility feed: a partial catalog would remove
+  // valid previews belonging to other categories during pruning below.
+  if (skills && (!Array.isArray(skills) || !skills.length || skills.some(slug => !rows.some(row => row.slug === slug)))) throw Error('Unknown or empty Skill selection')
+  const selected = skills ? new Set(skills) : null
   const state = await read('lib/skill-media-sync.json')
   const exclusions = await read('scripts/skill-media/exclusions.json')
   const automatic = new Map((await read('lib/skill-previews-auto.json')).map(item => [item.skillSlug, item]))
   const manual = new Set([...(await read('lib/skill-previews.json')).map(item => item.skillSlug), ...(await read('lib/skill-preview-bindings.json')).map(item => item.skillSlug), ...Object.values(await read('lib/showcase-groups.json')).map(item => item.skillSlug)])
   // These hand-authored Gallery cases predate the group registry.
   for (const slug of ['liamgvchi-gc-minimal-zine-poster', 'liamgvchi-gc-minimal-zine-poster-v0-3', 'yanliudesign-mono-color-skill', 'design-taste-frontend', 'op7418-guizang-ppt-skill', 'nexu-io-open-design', 'vox-director']) manual.add(slug)
-  const { batch, pending } = selectBatch(rows, state.records, { limit, now, excluded: manual, refresh })
+  const { batch, pending } = selectBatch(selected ? rows.filter(row => selected.has(row.slug)) : rows, state.records, { limit, now, excluded: manual, refresh })
   const present = new Set(rows.map(row => row.slug)), results = [], files = new Map()
   // A complete feed is required above. Remove only registry associations for
   // unpublished/deleted identities; content-addressed files remain immutable.
@@ -188,10 +194,10 @@ export async function collectSkillMedia({ root = rootDefault, catalog, limit = 1
     }
   }))
   if (fatal) throw fatal
-  const report = { checkedAt: now, catalogRecords: rows.length, attempted: results.length, pending, collectedSkills: automatic.size, bytesAdded: writtenBytes, statuses: Object.fromEntries([...new Set(results.map(row => row.status))].map(status => [status, results.filter(row => row.status === status).length])), results }
+  const report = { checkedAt: now, catalogRecords: rows.length, ...(selected ? { selectedSkills: [...selected] } : {}), attempted: results.length, pending, collectedSkills: automatic.size, bytesAdded: writtenBytes, statuses: Object.fromEntries([...new Set(results.map(row => row.status))].map(status => [status, results.filter(row => row.status === status).length])), results }
   state.checkedAt = now
   state.records = Object.fromEntries(Object.entries(state.records).sort(([a], [b]) => a.localeCompare(b, 'en')))
-  state.summary = { catalogRecords: rows.length, attempted: results.length, pending, collectedSkills: automatic.size, statuses: report.statuses }
+  state.summary = { catalogRecords: rows.length, ...(selected ? { selectedSkills: [...selected] } : {}), attempted: results.length, pending, collectedSkills: automatic.size, statuses: report.statuses }
   // Publish manifests only after every staged asset is ready; a network failure
   // cannot produce dangling card URLs. CI gates the commit before production.
   for (const [url, bytes] of files) { const target = path.join(root, 'public', url); await mkdir(path.dirname(target), { recursive: true }); await writeFile(target, bytes) }
@@ -202,8 +208,8 @@ export async function collectSkillMedia({ root = rootDefault, catalog, limit = 1
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values } = parseArgs({ options: { catalog: { type: 'string' }, limit: { type: 'string' }, refresh: { type: 'boolean', default: false }, 'cache-dir': { type: 'string' } } })
+  const { values } = parseArgs({ options: { catalog: { type: 'string' }, skill: { type: 'string', multiple: true }, limit: { type: 'string' }, refresh: { type: 'boolean', default: false }, 'cache-dir': { type: 'string' } } })
   const limit = Number(values.limit || 150)
   if (!Number.isInteger(limit) || limit < 1 || limit > 1000) throw Error('Limit must be 1–1000')
-  await collectSkillMedia({ catalog: values.catalog ? JSON.parse(await readFile(values.catalog, 'utf8')) : undefined, limit, refresh: values.refresh, reader: githubReader({ cacheDir: values['cache-dir'] }) })
+  await collectSkillMedia({ catalog: values.catalog ? JSON.parse(await readFile(values.catalog, 'utf8')) : undefined, skills: values.skill, limit, refresh: values.refresh, reader: githubReader({ cacheDir: values['cache-dir'] }) })
 }

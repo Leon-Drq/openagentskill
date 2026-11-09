@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import { safePath, safeRepo } from './discovery.mjs'
+import { resolveGitHubLfs } from './github-lfs.mjs'
 
 export function curatedSourceUrls(source, file, releaseTag) {
   if (!safeRepo(source.repository) || !/^[a-f0-9]{40}$/.test(source.revision) || !safePath(file)) throw Error('Invalid pinned source')
@@ -40,7 +41,7 @@ export async function fetchCuratedBytes(url, expectedHash, limit, { fetcher = fe
       if (size > limit) throw Error('Source too large')
       chunks.push(chunk)
     }
-    const bytes = Buffer.concat(chunks)
+    const bytes = await resolveGitHubLfs(Buffer.concat(chunks), target.href, limit, { fetcher })
     if (createHash('sha256').update(bytes).digest('hex') !== expectedHash) throw Error('Source hash changed')
     return bytes
   }
