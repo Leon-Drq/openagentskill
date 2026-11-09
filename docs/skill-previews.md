@@ -1,5 +1,38 @@
 # Skill directory previews
 
+## Design & UI additions (2026-11-09)
+
+Seven reviewed previews now bind to the exact public records
+`nextlevelbuilder-ui-ux-pro-max-skill`, `mui-material-ui` and `tt-a1i-archify`.
+UI UX Pro Max uses its README website screenshot, labeled **Tool interface**;
+the third-party Juniper audit screenshots are excluded. Material UI uses three
+official free React template previews (dashboard, marketing and checkout).
+Archify uses the author's architecture/workflow/explainer documentation examples,
+with a pinned `archify/SKILL.md` binding. None attach to `archify-review`.
+
+The source registry records immutable revisions and original hashes. MIT license
+copies accompany UI UX Pro Max and Material UI; Archify retains its current
+Apache-2.0 license, `NOTICE` and `THIRD_PARTY_NOTICES.md` verbatim. The importer
+supports reviewed MIT/Apache-2.0 sources, optional hash-pinned `notices` and
+`bindingPath`/`bindingSha256`; notices are linked on the detail page. Source
+examples are not independent execution or review claims. Only Material UI and
+Archify qualify for **With examples**; a website interface alone does not.
+
+The automatic collector now interleaves presentation, images, design, video and
+the remaining catalog instead of exhausting one category before trying the next.
+The 150-entry daily budget, new/retry reservations, backoff and license checks
+are unchanged. Existing assets render locally as 720px/1600px WebP derivatives;
+visitors do not trigger GitHub downloads, image processing or database writes.
+
+During verification, anonymous category-only URLs returned 404 while cookie or
+no-cache requests succeeded. The public-directory cache had dropped `Host`,
+which OpenNext uses to identify internal proxy rewrites. The normalized request
+now derives `Host` from its already-keyed URL (never a client forwarding override).
+The four-hour TTL, private/auth/Flight bypass and tag invalidation remain intact.
+Regression checks cover both English and Chinese category request authority.
+
+## Earlier curated additions
+
 On 2026-10-19 the huashu-motion listing gained the author's hash-pinned
 `docs/media/deepseek-flash.gif` README example. Its code/documentation MIT license
 and `THIRD_PARTY.md` were inspected; the restricted bean Huashu character is not

@@ -34,6 +34,11 @@ export function directoryCacheRequest(request) {
   // Do not let unkeyed forwarding/custom headers change a cached render.
   const headers = new Headers()
   for (const key of varyHeaders) if (request.headers.has(key)) headers.set(key, request.headers.get(key))
+  // OpenNext uses Host to distinguish local middleware rewrites from external
+  // requests. A bare Request(URL) does not supply it: a category rewrite can
+  // otherwise re-enter the public-only guard and return 404. Derive it from
+  // the keyed URL, never an untrusted Host/forwarding override.
+  headers.set('host', url.host)
   return { url, headers, identity: JSON.stringify([url.href, ...varyHeaders.map(key => headers.get(key))]) }
 }
 

@@ -31,6 +31,16 @@ for (const preview of previews) {
   assert.equal(preview.revision, source.revision)
   assert.match(preview.revision, /^[a-f0-9]{40}$/)
   assert.equal(digest(readFileSync(file(preview.licenseUrl))), source.licenseSha256)
+  assert.equal(preview.license, source.license)
+  assert.equal(preview.notices?.length || 0, source.notices?.length || 0)
+  for (const [index, notice] of (preview.notices || []).entries()) {
+    assert.equal(notice.title, source.notices[index].path)
+    assert.equal(digest(readFileSync(file(notice.url))), source.notices[index].sha256, 'Retain source attribution notices verbatim')
+  }
+  if (source.bindingPath) {
+    assert.equal(preview.bindingUrl, curatedSourceUrls(source, source.bindingPath).sourceUrl)
+    assert.match(source.bindingSha256, /^[a-f0-9]{64}$/)
+  }
   assert.equal(preview.media.length, source.media.length)
   assert.deepEqual(getSkillPreviewCardData(preview.skillSlug), { media: preview.media[0], imageCount: preview.media.length, format: preview.format })
   for (const [index, media] of preview.media.entries()) {
@@ -72,6 +82,14 @@ assert.ok(SOURCE_EXAMPLE_SKILL_SLUGS.includes(sweetySlug), 'Hand-drawn author vi
 assert.equal(getSkillSourcePreview(sweetySlug).media.filter(media => media.videoSrc).length, 2)
 assert.match(getSkillPreviewCardData(sweetySlug).media.sourceUrl, /snake-story\.mp4$/, 'The short snake fable leads the card preview')
 assert.ok(!SOURCE_EXAMPLE_SKILL_SLUGS.includes('enricoros-big-agi'), 'Interface screenshots alone do not satisfy With examples')
+assert.equal(getSkillSourcePreview('nextlevelbuilder-ui-ux-pro-max-skill').media[0].kind, 'interface')
+assert.ok(!SOURCE_EXAMPLE_SKILL_SLUGS.includes('nextlevelbuilder-ui-ux-pro-max-skill'), 'A tool website is not a generated output example')
+for (const slug of ['mui-material-ui', 'tt-a1i-archify']) {
+  assert.equal(getSkillSourcePreview(slug).media.length, 3)
+  assert.ok(SOURCE_EXAMPLE_SKILL_SLUGS.includes(slug), 'Author templates and output examples appear in With examples')
+}
+assert.equal(getSkillSourcePreview('tt-a1i-archify').license, 'Apache-2.0')
+assert.equal(getSkillSourcePreview('tt-a1i-archify-review'), null, 'Do not attach diagram examples to the separate review Skill')
 assert.ok(!SOURCE_EXAMPLE_SKILL_SLUGS.includes('adobe-research-custom-diffusion'), 'A source-gallery link is not a locally collected example')
 assert.ok(SOURCE_GALLERY_LINKS['adobe-research-custom-diffusion'])
 assert.deepEqual(showcase.getShowcasesForSkill('liamgvchi-gc-minimal-zine-poster'), showcase.getShowcasesForSkill('liamgvchi-gc-minimal-zine-poster-v0-3'))
@@ -191,6 +209,7 @@ for (const binding of bindings) {
 }
 for (const preview of previews) {
   all = render(SkillSourcePreviews, { preview, locale: 'en' })
+  for (const notice of preview.notices || []) assert.ok(all.some(node => node.tagName === 'a' && attr(node, 'href') === notice.url && text(node) === notice.title))
   assert.equal(all.filter(node => node.tagName === 'img').length, preview.media.filter(media => !media.videoSrc).length)
   assert.ok(all.some(node => attr(node, 'id') === 'visual-previews'))
   assert.ok(all.some(node => node.tagName === 'p' && text(node) === preview.note.en))

@@ -405,5 +405,168 @@
         }
       }
     ]
+  },
+  {
+    "skillSlug": "nextlevelbuilder-ui-ux-pro-max-skill",
+    "repository": "nextlevelbuilder/ui-ux-pro-max-skill",
+    "revision": "4f2dbb67e64969a9a30ab00742f2d55d66ddec2b",
+    "sourcePath": "README.md",
+    "license": "MIT",
+    "format": {
+      "en": "Website interface",
+      "zh": "网站界面"
+    },
+    "note": {
+      "en": "The project website screenshot published in the UI UX Pro Max README. It shows the tool’s own interface, not a design independently generated or tested by OpenAgentSkill.",
+      "zh": "UI UX Pro Max 作者在 README 中发布的网站截图，展示工具自身界面；并非 OpenAgentSkill 独立生成或测试的设计作品。"
+    },
+    "licensePath": "LICENSE",
+    "licenseSha256": "738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014",
+    "documentSha256": "025068efb73ac9a3b6e247d138c0c83e3929759757a8672ce89f84a0e1a842e8",
+    "media": [
+      {
+        "path": "screenshots/website.png",
+        "sha256": "fc7e43cca39159d154043866a3c09360b75c1f06aa0fab34b30a136c52ac0053",
+        "kind": "interface",
+        "title": {
+          "en": "UI UX Pro Max website",
+          "zh": "UI UX Pro Max 网站界面"
+        },
+        "alt": {
+          "en": "UI UX Pro Max website with navigation and design intelligence features",
+          "zh": "UI UX Pro Max 网站的导航与设计功能展示"
+        }
+      }
+    ]
+  },
+  {
+    "skillSlug": "mui-material-ui",
+    "repository": "mui/material-ui",
+    "revision": "e76daeda7044a4824f2f7152a6334bdf62646e27",
+    "sourcePath": "docs/data/material/getting-started/templates/templates.md",
+    "license": "MIT",
+    "format": {
+      "en": "React UI templates",
+      "zh": "React 界面模板"
+    },
+    "note": {
+      "en": "Free React templates published in the official Material UI documentation. These are author template previews with sample content, not independently reproduced AI outputs. The paid template store is separate.",
+      "zh": "Material UI 官方文档发布的免费 React 模板预览，图中包含模板示例数据。这些是作者模板，并非本站独立复现的 AI 生成结果；付费模板商店另行提供。"
+    },
+    "licensePath": "LICENSE",
+    "licenseSha256": "4c57cedbef546270e5648786682f633b2e6ae62c8862a45797bcb6d0bffda98d",
+    "documentSha256": "9c2525cdbddaf2f2ec28c123422e941f1a480e22bb3c792b30a47614428f4330",
+    "media": [
+      {
+        "path": "docs/public/static/screenshots/material-ui/getting-started/templates/dashboard.jpg",
+        "sha256": "1484fe0413a658bd5df90e5210688cec95feed2e06ab5f72b03024d03b7f1d6c",
+        "kind": "template",
+        "title": {
+          "en": "Dashboard template",
+          "zh": "数据看板模板"
+        },
+        "alt": {
+          "en": "Dashboard template with navigation, summary metrics, charts and a data table",
+          "zh": "含侧边导航、统计指标、图表和数据表格的数据看板模板"
+        }
+      },
+      {
+        "path": "docs/public/static/screenshots/material-ui/getting-started/templates/marketing-page.jpg",
+        "sha256": "b1de8c67f8aff882ccb5b003bfc9147f632391a33e1336128da4fccd571cab4d",
+        "kind": "template",
+        "title": {
+          "en": "Marketing page template",
+          "zh": "产品营销页模板"
+        },
+        "alt": {
+          "en": "Light marketing template with product headline and dashboard preview",
+          "zh": "带产品标题与仪表盘预览的浅色营销页模板"
+        }
+      },
+      {
+        "path": "docs/public/static/screenshots/material-ui/getting-started/templates/checkout.jpg",
+        "sha256": "93c8029356384802f719d192127fe771ba886d0803d873ddc12592acd77f1206",
+        "kind": "template",
+        "title": {
+          "en": "Checkout template",
+          "zh": "结算页模板"
+        },
+        "alt": {
+          "en": "Checkout template with order summary and a multi-step shipping form",
+          "zh": "带订单摘要和分步收货地址表单的结算页模板"
+        }
+      }
+    ]
+  },
+  {
+    "skillSlug": "tt-a1i-archify",
+    "repository": "tt-a1i/archify",
+    "revision": "11b0d6031853bdae89eed57e7979aabbf0034097",
+    "sourcePath": "README.md",
+    "bindingPath": "archify/SKILL.md",
+    "license": "Apache-2.0",
+    "format": {
+      "en": "Diagrams & explainers",
+      "zh": "图表与讲解页面"
+    },
+    "note": {
+      "en": "Architecture, workflow and explainer examples published by the Archify author. The pinned Archify Skill describes these output types. OpenAgentSkill has not independently reproduced them; these previews do not belong to the separate archify-review Skill.",
+      "zh": "Archify 作者发布的架构图、工作流及讲解页面案例，对应版本的 Archify Skill 明确支持这些输出类型。本站未独立复现；这些案例不属于独立的 archify-review 技能。"
+    },
+    "licensePath": "LICENSE",
+    "licenseSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "documentSha256": "eb134f12b85bd171683f2bd51ef7b123066881b104b27613cdbe395119ff8c34",
+    "bindingSha256": "1382cfb7108b05e500b82af93c04fd7b694430d3908039bd92d634f01c1e7181",
+    "notices": [
+      {
+        "path": "NOTICE",
+        "sha256": "665eb53e6fcf09cee183c9f23c8052645dc95570d9ccbbf53dc0f5213a1b5edd"
+      },
+      {
+        "path": "THIRD_PARTY_NOTICES.md",
+        "sha256": "b5e129197f391568f7abf287c74b24f4835f10e5388f600407c8788feaeb9015"
+      }
+    ],
+    "media": [
+      {
+        "path": "docs/assets/archify-architecture.png",
+        "sha256": "ffc6e2d2c5a2c4726730b2a08a46b09469708e6351eee4f3bf1d6b952e379888",
+        "kind": "example",
+        "title": {
+          "en": "Web application architecture",
+          "zh": "Web 应用架构图"
+        },
+        "alt": {
+          "en": "Author architecture example connecting client, API services, storage and observability",
+          "zh": "作者架构图案例，连接客户端、API 服务、存储与可观测性模块"
+        }
+      },
+      {
+        "path": "docs/assets/archify-workflow.png",
+        "sha256": "80b6efa0c1ca677d15599fbe5cbfd460f639372962d38518c2688fd2323ee223",
+        "kind": "example",
+        "title": {
+          "en": "Agent tool call workflow",
+          "zh": "Agent 工具调用工作流"
+        },
+        "alt": {
+          "en": "Agent workflow diagram with planning, approval, execution and recovery lanes",
+          "zh": "包含规划、审批、执行和恢复路径的 Agent 工作流图"
+        }
+      },
+      {
+        "path": "docs/assets/explainer-tls-en.png",
+        "sha256": "78a048d87f5027b0d14a163ba7d110611791c1deb654c45a545740624feea48d",
+        "kind": "example",
+        "title": {
+          "en": "HTTPS explainer page",
+          "zh": "HTTPS 讲解页面"
+        },
+        "alt": {
+          "en": "Dark editorial explainer page describing a first HTTPS connection",
+          "zh": "介绍首次 HTTPS 连接过程的深色编辑式讲解页面"
+        }
+      }
+    ]
   }
 ]

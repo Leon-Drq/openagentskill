@@ -8,6 +8,21 @@ export async function checkPublicDirectoryCache({ db, cache, setTag }) {
   const ctx = { waitUntil: promise => deferred.push(promise) }
   const flush = async () => { await Promise.all(deferred.splice(0)) }
   const request = (path = '/skills?q=ppt', init) => new Request('https://www.openagentskill.com' + path, init)
+  for (const path of ['/skills?category=design-creative', '/zh/skills?category=design-creative']) {
+    const candidate = directoryCacheRequest(request(path, { headers: { host: 'untrusted.test', 'x-forwarded-host': 'untrusted.test', 'x-custom-context': 'private' } }))
+    assert.equal(candidate.headers.get('host'), candidate.url.host, 'OpenNext must recognize the category rewrite as internal')
+    assert.equal(candidate.headers.get('x-forwarded-host'), null)
+    assert.equal(candidate.headers.get('x-custom-context'), null)
+    let invoked = false
+    const result = await publicDirectoryResponse(request(path), env, ctx, buildId, async input => {
+      invoked = true
+      assert.equal(input.headers.get('host'), new URL(input.url).host, 'The normalized render request must retain the URL authority')
+      return new Response(`<html>${DIRECTORY_READY_MARKER}</html>`, { headers: { 'Content-Type': 'text/html' } })
+    }, cache)
+    await result.text(); await flush()
+    assert.ok(invoked)
+    assert.equal(result.status, 200)
+  }
   let renders = 0, mode = 'ready', duringRender
   const origin = async input => {
     renders++

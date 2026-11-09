@@ -24,6 +24,8 @@ export interface SkillSourcePreview {
   sourceUrl: string
   license: string
   licenseUrl: string
+  /** Unmodified attribution notices accompanying the licensed source media. */
+  notices?: { title: string; url: string }[]
   format: PreviewText
   note: PreviewText
   /** Pinned Skill document establishing the relationship to an upstream template. */

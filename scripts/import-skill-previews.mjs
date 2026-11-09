@@ -36,11 +36,23 @@ for (const source of sources) {
     registry.push(previous)
     continue
   }
-  if (!/^[a-z0-9-]+$/.test(source.skillSlug) || source.license !== 'MIT' || !source.media.length) throw new Error('Unsupported source definition')
+  if (!/^[a-z0-9-]+$/.test(source.skillSlug) || !['MIT', 'Apache-2.0'].includes(source.license) || !source.media.length) throw new Error('Unsupported source definition')
   const base = `/skill-previews/${source.skillSlug}`
   const license = await checkedFile(source, source.licensePath, source.licenseSha256, 100000)
   const licenseUrl = `${base}/LICENSE-${source.licenseSha256.slice(0, 12)}.txt`
   pending.push([licenseUrl, license])
+  const notices = []
+  for (const notice of source.notices || []) {
+    const bytes = await checkedFile(source, notice.path, notice.sha256, 100000)
+    const url = `${base}/NOTICE-${notice.sha256.slice(0, 12)}.txt`
+    pending.push([url, bytes])
+    notices.push({ title: notice.path, url })
+  }
+  let bindingUrl
+  if (source.bindingPath) {
+    await checkedFile(source, source.bindingPath, source.bindingSha256, 1024 * 1024)
+    bindingUrl = curatedSourceUrls(source, source.bindingPath).sourceUrl
+  }
   const document = source.media.some(item => item.releaseTag !== undefined || item.poster?.releaseTag !== undefined)
     ? (await checkedFile(source, source.sourcePath, source.documentSha256, 1024 * 1024)).toString('utf8') : null
   const media = []
@@ -103,7 +115,8 @@ for (const source of sources) {
   }
   registry.push({ skillSlug: source.skillSlug, repository: source.repository, revision: source.revision,
     sourceUrl: `https://github.com/${source.repository}/blob/${source.revision}/${source.sourcePath}`,
-    license: source.license, licenseUrl, format: source.format, note: source.note, media })
+    license: source.license, licenseUrl, ...(notices.length ? { notices } : {}),
+    ...(bindingUrl ? { bindingUrl } : {}), format: source.format, note: source.note, media })
 }
 // Validate the entire batch before writing; leave the published manifest intact
 // when any source, license, hash or image check fails. URLs are content-addressed.

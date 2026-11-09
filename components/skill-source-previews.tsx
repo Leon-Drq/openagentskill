@@ -30,6 +30,7 @@ export function SkillSourcePreviews({ preview, locale }: { preview: SkillSourceP
       <p className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-xs text-secondary">
         <a href={preview.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-4">{preview.repository}</a>
         <a href={preview.licenseUrl} target="_blank" rel="noreferrer" className="underline underline-offset-4">{previewCopy('license', locale)}: {preview.license}</a>
+        {preview.notices?.map(notice => <a key={notice.url} href={notice.url} target="_blank" rel="noreferrer" className="underline underline-offset-4">{notice.title}</a>)}
         {preview.bindingUrl && <a href={preview.bindingUrl} target="_blank" rel="noreferrer" className="underline underline-offset-4">{previewCopy('binding', locale)}</a>}
       </p>
     </section>
