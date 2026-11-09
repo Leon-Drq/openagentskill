@@ -221,9 +221,12 @@ const getCachedLatestRankingSnapshot = unstable_cache(
       .maybeSingle()
 
     if (error) throw new Error(`Failed to read ranking snapshot: ${error.message}`)
-    return data as RankingSnapshot | null
+    // A missing row (including an empty build-time database) is not a successful
+    // refresh. Do not store null for four hours or replace a last-good snapshot.
+    if (!data || !Array.isArray(data.items)) throw new Error('Ranking snapshot is not initialized')
+    return data as RankingSnapshot
   },
-  ['latest-ranking-snapshot-v2'],
+  ['latest-ranking-snapshot-v3-success-only'],
   { revalidate: 14400, tags: ['ranking-snapshots'] }
 )
 

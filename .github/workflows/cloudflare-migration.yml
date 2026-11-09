@@ -50,6 +50,8 @@ jobs:
         run: pnpm exec wrangler deploy --config wrangler.production.jsonc --dry-run
       - name: Exercise public routes in the Workers runtime
         run: node scripts/check-cloudflare-preview.mjs
+      - name: Verify homepage recovery and cache hits with local ranking data
+        run: node scripts/check-cloudflare-preview.mjs --home-only
       - name: Package portable build output
         run: |
           tar --exclude='*/node_modules' --exclude='.open-next/assets' -czf cloudflare-runtime.tar.gz .open-next
