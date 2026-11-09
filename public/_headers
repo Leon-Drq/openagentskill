@@ -1,5 +1,27 @@
 /_next/static/*
   Cache-Control: public,max-age=31536000,immutable
 
+# Source previews have content-addressed filenames; changed media gets a new URL.
+/skill-previews/*
+  Cache-Control: public,max-age=604800,immutable
+
+# Gallery artwork shares the one-week policy. Match media, not HTML pages.
+/showcase/*.webp
+  Cache-Control: public,max-age=604800
+/showcase/*.png
+  Cache-Control: public,max-age=604800
+/showcase/*.jpg
+  Cache-Control: public,max-age=604800
+/showcase/*.jpeg
+  Cache-Control: public,max-age=604800
+/showcase/*.gif
+  Cache-Control: public,max-age=604800
+/showcase/*.svg
+  Cache-Control: public,max-age=604800
+/showcase/*.mp4
+  Cache-Control: public,max-age=604800
+/showcase/*.webm
+  Cache-Control: public,max-age=604800
+
 /examples/topic-growth/service-usage.pdf
   X-Robots-Tag: noindex, follow

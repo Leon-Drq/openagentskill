@@ -77,6 +77,16 @@ try {
     await response.body?.cancel().catch(() => {})
   }
   if (!remote) {
+    // Exercise the deployed asset header parser, not only the _headers text.
+    // Gallery HTML must continue through Next; only static media gets a week.
+    const preview = JSON.parse(readFileSync('lib/skill-previews.json', 'utf8'))[0]
+    const gallery = JSON.parse(readFileSync('lib/showcase-auto.json', 'utf8'))[0]
+    for (const path of [preview.media[0].cardSrc, preview.media[0].previewSrc, gallery.media.src.replace(/\.[^.]+$/, '.card.webp')]) {
+      const response = await fetch(base + path, { method: 'HEAD', signal: AbortSignal.timeout(30_000) })
+      assert.equal(response.status, 200, path)
+      assert.match(response.headers.get('Cache-Control') || '', /(?:^|[,\s])max-age=604800(?:$|[,\s])/, path)
+      report.push({ path, method: 'HEAD', status: response.status, mediaCache: response.headers.get('Cache-Control') })
+    }
     // Test the actual built interceptor, local R2 and authoritative D1 tags.
     // No test routes, credentials or invalidation API are added to production.
     const readPage = async (path,headers={}) => {
