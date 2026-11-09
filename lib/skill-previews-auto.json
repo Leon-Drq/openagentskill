@@ -1,5 +1,181 @@
 [
   {
+    "skillSlug": "001tmf-proteinview",
+    "repository": "001TMF/ProteinView",
+    "revision": "9b9a0790bc78f1d2a7c0923905049d27c67c05e2",
+    "sourceUrl": "https://github.com/001TMF/ProteinView/blob/9b9a0790bc78f1d2a7c0923905049d27c67c05e2/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-df35c44f05d473e2c21f94eb329e7122fd5d6a2529924acfa9f2f8a8cc748ef3.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "df35c44f05d473e2c21f94eb329e7122fd5d6a2529924acfa9f2f8a8cc748ef3",
+    "documentSha256": "fd191c0f4251cdd050b0b0a8b6e3c7502a64d30f1517f74a6480b5aef7b9d2a8",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-09T08:04:13.407Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/6bfcebe3df9f4d51451a0207d10c341c056b5dfdfb9e083482305def464983b9.preview.webp",
+        "previewSrc": "/skill-previews/auto/6bfcebe3df9f4d51451a0207d10c341c056b5dfdfb9e083482305def464983b9.preview.webp",
+        "cardSrc": "/skill-previews/auto/6bfcebe3df9f4d51451a0207d10c341c056b5dfdfb9e083482305def464983b9.card.webp",
+        "width": 1600,
+        "height": 1021,
+        "sha256": "6bfcebe3df9f4d51451a0207d10c341c056b5dfdfb9e083482305def464983b9",
+        "originalSrc": "/skill-previews/auto/6bfcebe3df9f4d51451a0207d10c341c056b5dfdfb9e083482305def464983b9.png",
+        "sourceUrl": "https://github.com/001TMF/ProteinView/blob/9b9a0790bc78f1d2a7c0923905049d27c67c05e2/assets/dna-element.png",
+        "kind": "reference",
+        "title": {
+          "en": "ProteinView · Author preview",
+          "zh": "ProteinView · 作者预览"
+        },
+        "alt": {
+          "en": "ProteinView: B-DNA double helix with element (CPK) coloring",
+          "zh": "ProteinView：B-DNA double helix with element (CPK) coloring"
+        },
+        "sourcePath": "assets/dna-element.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/4498fe95dbf87bff0b0dd541912fb0683a3ee0d570e18e2c3db79b438102d626.preview.webp",
+        "previewSrc": "/skill-previews/auto/4498fe95dbf87bff0b0dd541912fb0683a3ee0d570e18e2c3db79b438102d626.preview.webp",
+        "cardSrc": "/skill-previews/auto/4498fe95dbf87bff0b0dd541912fb0683a3ee0d570e18e2c3db79b438102d626.card.webp",
+        "width": 1600,
+        "height": 1021,
+        "sha256": "4498fe95dbf87bff0b0dd541912fb0683a3ee0d570e18e2c3db79b438102d626",
+        "originalSrc": "/skill-previews/auto/4498fe95dbf87bff0b0dd541912fb0683a3ee0d570e18e2c3db79b438102d626.png",
+        "sourceUrl": "https://github.com/001TMF/ProteinView/blob/9b9a0790bc78f1d2a7c0923905049d27c67c05e2/assets/hero-histone.png",
+        "kind": "reference",
+        "title": {
+          "en": "ProteinView · Author preview",
+          "zh": "ProteinView · 作者预览"
+        },
+        "alt": {
+          "en": "ProteinView: Nucleosome core particle with histone proteins and DNA rendered in FullHD mode",
+          "zh": "ProteinView：Nucleosome core particle with histone proteins and DNA rendered in FullHD mode"
+        },
+        "sourcePath": "assets/hero-histone.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/cbac87d4d0e200c61b8028c576f84258876c1a6aace6cd3a9495ea6d0f3bf367.preview.webp",
+        "previewSrc": "/skill-previews/auto/cbac87d4d0e200c61b8028c576f84258876c1a6aace6cd3a9495ea6d0f3bf367.preview.webp",
+        "cardSrc": "/skill-previews/auto/cbac87d4d0e200c61b8028c576f84258876c1a6aace6cd3a9495ea6d0f3bf367.card.webp",
+        "width": 1600,
+        "height": 510,
+        "sha256": "cbac87d4d0e200c61b8028c576f84258876c1a6aace6cd3a9495ea6d0f3bf367",
+        "originalSrc": "/skill-previews/auto/cbac87d4d0e200c61b8028c576f84258876c1a6aace6cd3a9495ea6d0f3bf367.png",
+        "sourceUrl": "https://github.com/001TMF/ProteinView/blob/9b9a0790bc78f1d2a7c0923905049d27c67c05e2/assets/interface-grid.png",
+        "kind": "reference",
+        "title": {
+          "en": "ProteinView · Author preview",
+          "zh": "ProteinView · 作者预览"
+        },
+        "alt": {
+          "en": "ProteinView: Interface analysis with interaction visualization",
+          "zh": "ProteinView：Interface analysis with interaction visualization"
+        },
+        "sourcePath": "assets/interface-grid.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "0x0funky-agent-sprite-forge",
+    "repository": "0x0funky/agent-sprite-forge",
+    "revision": "6b3da5c444363378e20f3fce130ebecc22f343dd",
+    "sourceUrl": "https://github.com/0x0funky/agent-sprite-forge/blob/6b3da5c444363378e20f3fce130ebecc22f343dd/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-d63ddc781bf0d15753fe0ba22c7cd5828dabb7776465ea4d4939558d4909b0fa.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "d63ddc781bf0d15753fe0ba22c7cd5828dabb7776465ea4d4939558d4909b0fa",
+    "documentSha256": "0cb65976bda740e36ad09db031321868bf306dc1fa96695f465a98aa8bea2ec3",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-09T08:04:13.407Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/89d992ff111862535986b4ced40e366e633cbd7028858aff1389feb69c67ee34.preview.webp",
+        "previewSrc": "/skill-previews/auto/89d992ff111862535986b4ced40e366e633cbd7028858aff1389feb69c67ee34.preview.webp",
+        "cardSrc": "/skill-previews/auto/89d992ff111862535986b4ced40e366e633cbd7028858aff1389feb69c67ee34.card.webp",
+        "width": 1536,
+        "height": 1024,
+        "sha256": "89d992ff111862535986b4ced40e366e633cbd7028858aff1389feb69c67ee34",
+        "originalSrc": "/skill-previews/auto/89d992ff111862535986b4ced40e366e633cbd7028858aff1389feb69c67ee34.png",
+        "sourceUrl": "https://github.com/0x0funky/agent-sprite-forge/blob/6b3da5c444363378e20f3fce130ebecc22f343dd/src/cyber-canal-layered-preview.png",
+        "kind": "example",
+        "title": {
+          "en": "Agent Sprite Forge · Author preview",
+          "zh": "Agent Sprite Forge · 作者预览"
+        },
+        "alt": {
+          "en": "Agent Sprite Forge: Layered cyberpunk canal map with y-sorted props",
+          "zh": "Agent Sprite Forge：Layered cyberpunk canal map with y-sorted props"
+        },
+        "sourcePath": "src/cyber-canal-layered-preview.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/49ba19269e38a9258bea1339a4c4b279eba496d40dfb9100ee13bc9a8e1b72ea.preview.webp",
+        "previewSrc": "/skill-previews/auto/49ba19269e38a9258bea1339a4c4b279eba496d40dfb9100ee13bc9a8e1b72ea.preview.webp",
+        "cardSrc": "/skill-previews/auto/49ba19269e38a9258bea1339a4c4b279eba496d40dfb9100ee13bc9a8e1b72ea.card.webp",
+        "width": 1600,
+        "height": 1067,
+        "sha256": "49ba19269e38a9258bea1339a4c4b279eba496d40dfb9100ee13bc9a8e1b72ea",
+        "originalSrc": "/skill-previews/auto/49ba19269e38a9258bea1339a4c4b279eba496d40dfb9100ee13bc9a8e1b72ea.png",
+        "sourceUrl": "https://github.com/0x0funky/agent-sprite-forge/blob/6b3da5c444363378e20f3fce130ebecc22f343dd/src/godot-meadow-debug-preview.png",
+        "kind": "example",
+        "title": {
+          "en": "Agent Sprite Forge · Author preview",
+          "zh": "Agent Sprite Forge · 作者预览"
+        },
+        "alt": {
+          "en": "Agent Sprite Forge: Godot meadow debug preview with collision and zones",
+          "zh": "Agent Sprite Forge：Godot meadow debug preview with collision and zones"
+        },
+        "sourcePath": "src/godot-meadow-debug-preview.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/91951108f45df16f3dfeb0f26b8627db730d8cc4d312321f7d46b42e3f4628be.preview.webp",
+        "previewSrc": "/skill-previews/auto/91951108f45df16f3dfeb0f26b8627db730d8cc4d312321f7d46b42e3f4628be.preview.webp",
+        "cardSrc": "/skill-previews/auto/91951108f45df16f3dfeb0f26b8627db730d8cc4d312321f7d46b42e3f4628be.card.webp",
+        "width": 1600,
+        "height": 1067,
+        "sha256": "91951108f45df16f3dfeb0f26b8627db730d8cc4d312321f7d46b42e3f4628be",
+        "originalSrc": "/skill-previews/auto/91951108f45df16f3dfeb0f26b8627db730d8cc4d312321f7d46b42e3f4628be.png",
+        "sourceUrl": "https://github.com/0x0funky/agent-sprite-forge/blob/6b3da5c444363378e20f3fce130ebecc22f343dd/src/godot-meadow-layered-preview.png",
+        "kind": "example",
+        "title": {
+          "en": "Agent Sprite Forge · Author preview",
+          "zh": "Agent Sprite Forge · 作者预览"
+        },
+        "alt": {
+          "en": "Agent Sprite Forge: Godot meadow layered RPG map preview",
+          "zh": "Agent Sprite Forge：Godot meadow layered RPG map preview"
+        },
+        "sourcePath": "src/godot-meadow-layered-preview.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "0x7c13-notepads",
     "repository": "0x7c13/Notepads",
     "revision": "6ec270c134b115d6bff38bc3966784e8893a419c",
@@ -236,6 +412,72 @@
           "zh": "HiDT：teaser image"
         },
         "sourcePath": "docs/img/1_intro_grid.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "aetaric-checkrr",
+    "repository": "aetaric/checkrr",
+    "revision": "323bef3c4acf9f775961d1cedeef476f1a7b2577",
+    "sourceUrl": "https://github.com/aetaric/checkrr/blob/323bef3c4acf9f775961d1cedeef476f1a7b2577/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-c15e9c5cabb40dc2e94e46f92fc6d3ea04e344f8afd48a3cb1f3c15f80e91492.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "c15e9c5cabb40dc2e94e46f92fc6d3ea04e344f8afd48a3cb1f3c15f80e91492",
+    "documentSha256": "d3ff4077e84a1b6f3247695f3d0f4fb896343385fa02950725d87eff041b0c3f",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-09T08:04:13.407Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/53448be8fb53646c2fb747e2ed4a8614ec15f9f55a291b2d2fe7154338d23ebb.preview.webp",
+        "previewSrc": "/skill-previews/auto/53448be8fb53646c2fb747e2ed4a8614ec15f9f55a291b2d2fe7154338d23ebb.preview.webp",
+        "cardSrc": "/skill-previews/auto/53448be8fb53646c2fb747e2ed4a8614ec15f9f55a291b2d2fe7154338d23ebb.card.webp",
+        "width": 1600,
+        "height": 1187,
+        "sha256": "53448be8fb53646c2fb747e2ed4a8614ec15f9f55a291b2d2fe7154338d23ebb",
+        "originalSrc": "/skill-previews/auto/53448be8fb53646c2fb747e2ed4a8614ec15f9f55a291b2d2fe7154338d23ebb.png",
+        "sourceUrl": "https://github.com/aetaric/checkrr/blob/323bef3c4acf9f775961d1cedeef476f1a7b2577/screenshots/Idle.png",
+        "kind": "reference",
+        "title": {
+          "en": "Checkrr · Author preview",
+          "zh": "Checkrr · 作者预览"
+        },
+        "alt": {
+          "en": "Checkrr: Idle screenshot",
+          "zh": "Checkrr：Idle screenshot"
+        },
+        "sourcePath": "screenshots/Idle.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/72a11e46b386a10bc807898692175197254e53232b7e4a3f2999e52b8355bddf.preview.webp",
+        "previewSrc": "/skill-previews/auto/72a11e46b386a10bc807898692175197254e53232b7e4a3f2999e52b8355bddf.preview.webp",
+        "cardSrc": "/skill-previews/auto/72a11e46b386a10bc807898692175197254e53232b7e4a3f2999e52b8355bddf.card.webp",
+        "width": 1600,
+        "height": 1210,
+        "sha256": "72a11e46b386a10bc807898692175197254e53232b7e4a3f2999e52b8355bddf",
+        "originalSrc": "/skill-previews/auto/72a11e46b386a10bc807898692175197254e53232b7e4a3f2999e52b8355bddf.png",
+        "sourceUrl": "https://github.com/aetaric/checkrr/blob/323bef3c4acf9f775961d1cedeef476f1a7b2577/screenshots/Running.png",
+        "kind": "reference",
+        "title": {
+          "en": "Checkrr · Author preview",
+          "zh": "Checkrr · 作者预览"
+        },
+        "alt": {
+          "en": "Checkrr: Running screenshot",
+          "zh": "Checkrr：Running screenshot"
+        },
+        "sourcePath": "screenshots/Running.png",
         "documentPath": "README.md",
         "format": "image"
       }
