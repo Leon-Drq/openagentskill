@@ -687,5 +687,221 @@
         }
       }
     ]
+  },
+  {
+    "skillSlug": "copilotkit-copilotkit",
+    "repository": "CopilotKit/CopilotKit",
+    "revision": "c7815d9ac96f48fb3a64ad8c18e176a870c81763",
+    "sourceUrl": "https://github.com/CopilotKit/CopilotKit/blob/c7815d9ac96f48fb3a64ad8c18e176a870c81763/examples/showcases/generative-ui/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/copilotkit-copilotkit/LICENSE-15a0e5343aea.txt",
+    "format": {
+      "en": "Generative UI examples",
+      "zh": "生成式 UI 示例"
+    },
+    "note": {
+      "en": "Official CopilotKit documentation examples of rendered UI. These are author screenshots, not new outputs executed by OpenAgentSkill.",
+      "zh": "CopilotKit 官方文档中的界面渲染示例。图片由作者提供，并非 OpenAgentSkill 重新执行生成的结果。"
+    },
+    "media": [
+      {
+        "src": "/skill-previews/copilotkit-copilotkit/a1774f0a02c7a0f4e8eb40b6.png",
+        "cardSrc": "/skill-previews/copilotkit-copilotkit/a1774f0a02c7a0f4e8eb40b6.card.webp",
+        "previewSrc": "/skill-previews/copilotkit-copilotkit/a1774f0a02c7a0f4e8eb40b6.preview.webp",
+        "width": 977,
+        "height": 548,
+        "sha256": "a1774f0a02c7a0f4e8eb40b6cb9be5065d0e8b7a13d4f98fa30019bbe2b44b38",
+        "sourceUrl": "https://github.com/CopilotKit/CopilotKit/blob/c7815d9ac96f48fb3a64ad8c18e176a870c81763/examples/showcases/generative-ui/assets/static-generative-ui-example.png",
+        "kind": "example",
+        "title": {
+          "en": "Weather card in a chat",
+          "zh": "对话中的天气卡片"
+        },
+        "alt": {
+          "en": "A weather response rendered as a styled card beside the conversation.",
+          "zh": "对话旁以样式化卡片呈现的天气回复。"
+        }
+      },
+      {
+        "src": "/skill-previews/copilotkit-copilotkit/a8b6295aa9a74c79b20e24c2.png",
+        "cardSrc": "/skill-previews/copilotkit-copilotkit/a8b6295aa9a74c79b20e24c2.card.webp",
+        "previewSrc": "/skill-previews/copilotkit-copilotkit/a8b6295aa9a74c79b20e24c2.preview.webp",
+        "width": 1038,
+        "height": 337,
+        "sha256": "a8b6295aa9a74c79b20e24c2ed07ed2eb9663c98a86fb69b8c15bfd2aafcd5e6",
+        "sourceUrl": "https://github.com/CopilotKit/CopilotKit/blob/c7815d9ac96f48fb3a64ad8c18e176a870c81763/examples/showcases/generative-ui/assets/open-json-ui-card-example.png",
+        "kind": "example",
+        "title": {
+          "en": "Open-JSON-UI card example",
+          "zh": "Open-JSON-UI 卡片示例"
+        },
+        "alt": {
+          "en": "The documentation shows a UI card rendered from a structured response.",
+          "zh": "文档展示由结构化回复渲染出的界面卡片。"
+        }
+      }
+    ]
+  },
+  {
+    "skillSlug": "onlook-dev-onlook",
+    "repository": "onlook-dev/onlook",
+    "revision": "423e2e924366419e418ee049093872d535eea41a",
+    "sourceUrl": "https://github.com/onlook-dev/onlook/blob/423e2e924366419e418ee049093872d535eea41a/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/onlook-dev-onlook/LICENSE-ebac09c6f085.txt",
+    "format": {
+      "en": "Visual editor interface",
+      "zh": "可视化编辑器界面"
+    },
+    "note": {
+      "en": "Screenshots of the open-source Onlook editor from its official README. These show the tool interface; they do not establish access to the newer hosted product or an independently tested output.",
+      "zh": "来自官方 README 的 Onlook 开源编辑器截图，展示工具界面，不代表新版托管产品的可用权限，也不是本站独立测试的产出。"
+    },
+    "media": [
+      {
+        "src": "/skill-previews/onlook-dev-onlook/b00d0554347eeb9eb88da53e.png",
+        "cardSrc": "/skill-previews/onlook-dev-onlook/b00d0554347eeb9eb88da53e.card.webp",
+        "previewSrc": "/skill-previews/onlook-dev-onlook/b00d0554347eeb9eb88da53e.preview.webp",
+        "width": 1462,
+        "height": 1134,
+        "sha256": "b00d0554347eeb9eb88da53eef8e7fd1a51a63646b5b9af6718a420f09f40542",
+        "sourceUrl": "https://github.com/onlook-dev/onlook/blob/423e2e924366419e418ee049093872d535eea41a/assets/text-styling.png",
+        "kind": "interface",
+        "title": {
+          "en": "Editing text styles",
+          "zh": "编辑文字样式"
+        },
+        "alt": {
+          "en": "Onlook typography controls beside the page being edited.",
+          "zh": "页面旁的 Onlook 文字排版编辑控件。"
+        }
+      },
+      {
+        "src": "/skill-previews/onlook-dev-onlook/f16a38b7d43fa32107f9642a.png",
+        "cardSrc": "/skill-previews/onlook-dev-onlook/f16a38b7d43fa32107f9642a.card.webp",
+        "previewSrc": "/skill-previews/onlook-dev-onlook/f16a38b7d43fa32107f9642a.preview.webp",
+        "width": 2066,
+        "height": 1532,
+        "sha256": "f16a38b7d43fa32107f9642aac6238fc1f4778f2950d50322e8e18cb34fce42c",
+        "sourceUrl": "https://github.com/onlook-dev/onlook/blob/423e2e924366419e418ee049093872d535eea41a/assets/code-connect.png",
+        "kind": "interface",
+        "title": {
+          "en": "Design beside its code",
+          "zh": "设计与代码并排查看"
+        },
+        "alt": {
+          "en": "Onlook shows a page design alongside the associated code.",
+          "zh": "Onlook 并排展示页面设计及其对应代码。"
+        }
+      }
+    ]
+  },
+  {
+    "skillSlug": "bytedance-ui-tars-desktop",
+    "repository": "bytedance/UI-TARS-desktop",
+    "revision": "3ac2cb8d946d78d5ff92ad17b318eaafa18c178c",
+    "sourceUrl": "https://github.com/bytedance/UI-TARS-desktop/blob/3ac2cb8d946d78d5ff92ad17b318eaafa18c178c/docs/quick-start.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/bytedance-ui-tars-desktop/LICENSE-c71d239df917.txt",
+    "format": {
+      "en": "Desktop agent interface",
+      "zh": "桌面智能体界面"
+    },
+    "note": {
+      "en": "UI-TARS Desktop interface screenshots from the official quick-start guide. They illustrate task entry and the application UI, not a design generated by this tool or a platform execution.",
+      "zh": "UI-TARS Desktop 官方入门文档中的界面截图，展示任务输入与应用界面，不是该工具生成的设计稿，也不是本站执行记录。"
+    },
+    "media": [
+      {
+        "src": "/skill-previews/bytedance-ui-tars-desktop/08620573abd7a90dcdfdab4c.png",
+        "cardSrc": "/skill-previews/bytedance-ui-tars-desktop/08620573abd7a90dcdfdab4c.card.webp",
+        "previewSrc": "/skill-previews/bytedance-ui-tars-desktop/08620573abd7a90dcdfdab4c.preview.webp",
+        "width": 2292,
+        "height": 1536,
+        "sha256": "08620573abd7a90dcdfdab4c7992acc11f2cf1adf3af75fc3151a18a76ce2563",
+        "sourceUrl": "https://github.com/bytedance/UI-TARS-desktop/blob/3ac2cb8d946d78d5ff92ad17b318eaafa18c178c/apps/ui-tars/images/mac_app.png",
+        "kind": "interface",
+        "title": {
+          "en": "UI-TARS Desktop application",
+          "zh": "UI-TARS Desktop 应用"
+        },
+        "alt": {
+          "en": "The UI-TARS Desktop application interface shown in its installation guide.",
+          "zh": "安装指南中展示的 UI-TARS Desktop 应用界面。"
+        }
+      },
+      {
+        "src": "/skill-previews/bytedance-ui-tars-desktop/55f8fbdd936b834b7e28bc2e.png",
+        "cardSrc": "/skill-previews/bytedance-ui-tars-desktop/55f8fbdd936b834b7e28bc2e.card.webp",
+        "previewSrc": "/skill-previews/bytedance-ui-tars-desktop/55f8fbdd936b834b7e28bc2e.preview.webp",
+        "width": 2624,
+        "height": 1624,
+        "sha256": "55f8fbdd936b834b7e28bc2e0719aaede1d14acbb401bb958de242ba1b48080d",
+        "sourceUrl": "https://github.com/bytedance/UI-TARS-desktop/blob/3ac2cb8d946d78d5ff92ad17b318eaafa18c178c/apps/ui-tars/images/quick_start/start_task.png",
+        "kind": "interface",
+        "title": {
+          "en": "Starting a desktop task",
+          "zh": "发起桌面操作任务"
+        },
+        "alt": {
+          "en": "UI-TARS Desktop task prompt and agent conversation interface.",
+          "zh": "UI-TARS Desktop 的任务输入与智能体对话界面。"
+        }
+      }
+    ]
+  },
+  {
+    "skillSlug": "dagroup-pku-mhla",
+    "repository": "DAGroup-PKU/MHLA",
+    "revision": "275352cad3a38a51414afe45e91e2c9641aa485e",
+    "sourceUrl": "https://github.com/DAGroup-PKU/MHLA/blob/275352cad3a38a51414afe45e91e2c9641aa485e/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/dagroup-pku-mhla/LICENSE-bb52bb545cd1.txt",
+    "format": {
+      "en": "Research figures",
+      "zh": "研究图表"
+    },
+    "note": {
+      "en": "Research benchmark figures from the author documentation. These are technical references, not UI designs or generated design examples.",
+      "zh": "作者文档中的研究基准图表，属于技术参考，不是 UI 设计稿或设计生成效果示例。"
+    },
+    "media": [
+      {
+        "src": "/skill-previews/dagroup-pku-mhla/3fbc4bdfe6a87868ec2f8778.png",
+        "cardSrc": "/skill-previews/dagroup-pku-mhla/3fbc4bdfe6a87868ec2f8778.card.webp",
+        "previewSrc": "/skill-previews/dagroup-pku-mhla/3fbc4bdfe6a87868ec2f8778.preview.webp",
+        "width": 2410,
+        "height": 1136,
+        "sha256": "3fbc4bdfe6a87868ec2f877817d771adda6de957ce8613933115bc302955f6ec",
+        "sourceUrl": "https://github.com/DAGroup-PKU/MHLA/blob/275352cad3a38a51414afe45e91e2c9641aa485e/assets/MHLA_preview.png",
+        "kind": "reference",
+        "title": {
+          "en": "Performance benchmarks",
+          "zh": "性能基准图表"
+        },
+        "alt": {
+          "en": "Throughput and benchmark charts for MHLA and related models.",
+          "zh": "MHLA 与相关模型的吞吐量及基准对比图表。"
+        }
+      },
+      {
+        "src": "/skill-previews/dagroup-pku-mhla/bb887cc98a4acfbfc1fb9535.png",
+        "cardSrc": "/skill-previews/dagroup-pku-mhla/bb887cc98a4acfbfc1fb9535.card.webp",
+        "previewSrc": "/skill-previews/dagroup-pku-mhla/bb887cc98a4acfbfc1fb9535.preview.webp",
+        "width": 1356,
+        "height": 624,
+        "sha256": "bb887cc98a4acfbfc1fb95352d4d620eac4ed2c4cfd5a75f96bc8441df6d1c15",
+        "sourceUrl": "https://github.com/DAGroup-PKU/MHLA/blob/275352cad3a38a51414afe45e91e2c9641aa485e/assets/MHLA_video_loss.png",
+        "kind": "reference",
+        "title": {
+          "en": "Training loss comparison",
+          "zh": "训练损失对比"
+        },
+        "alt": {
+          "en": "The author compares training-loss curves.",
+          "zh": "作者对比的训练损失曲线。"
+        }
+      }
+    ]
   }
 ]

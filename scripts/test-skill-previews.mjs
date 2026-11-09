@@ -90,6 +90,12 @@ for (const slug of ['mui-material-ui', 'tt-a1i-archify']) {
 }
 assert.equal(getSkillSourcePreview('tt-a1i-archify').license, 'Apache-2.0')
 assert.equal(getSkillSourcePreview('tt-a1i-archify-review'), null, 'Do not attach diagram examples to the separate review Skill')
+assert.ok(SOURCE_EXAMPLE_SKILL_SLUGS.includes('copilotkit-copilotkit'), 'Official rendered UI examples participate in the example filter')
+for (const slug of ['onlook-dev-onlook', 'bytedance-ui-tars-desktop']) {
+  assert.ok(getSkillSourcePreview(slug).media.every(media => media.kind === 'interface'))
+  assert.ok(!SOURCE_EXAMPLE_SKILL_SLUGS.includes(slug), 'Application interface screenshots are not output examples')
+}
+assert.ok(!SOURCE_EXAMPLE_SKILL_SLUGS.includes('dagroup-pku-mhla'), 'Benchmark figures are technical references, not generated design examples')
 assert.ok(!SOURCE_EXAMPLE_SKILL_SLUGS.includes('adobe-research-custom-diffusion'), 'A source-gallery link is not a locally collected example')
 assert.ok(SOURCE_GALLERY_LINKS['adobe-research-custom-diffusion'])
 assert.deepEqual(showcase.getShowcasesForSkill('liamgvchi-gc-minimal-zine-poster'), showcase.getShowcasesForSkill('liamgvchi-gc-minimal-zine-poster-v0-3'))

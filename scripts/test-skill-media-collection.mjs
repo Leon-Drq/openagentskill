@@ -8,6 +8,7 @@ import { promisify } from 'node:util'
 import { safePath, resolveAsset, documentPaths, discoverAssets, selectBatch, identity, digest } from './skill-media/discovery.mjs'
 import { collectSkillMedia, fetchCatalog, githubReader } from './collect-skill-media.mjs'
 import { renderAsset } from './skill-media/render.mjs'
+import { resolveGitHubLfs } from './skill-media/github-lfs.mjs'
 import { MEDIA_FEED_SELECT, mediaFeedCursor } from '../lib/skills/media-feed.ts'
 
 const rev = 'a'.repeat(40), now = '2026-10-07T00:00:00.000Z'
@@ -57,6 +58,15 @@ assert.ok(!reserved.some(item => item.slug === row.slug || item.slug === 'presen
 assert.equal(new Set(reserved.map(item => item.slug)).size, 15)
 assert.equal(selectBatch(backlog, {}, { now, limit: 0 }).batch.length, 0)
 
+// Repeatedly due alphabetic entries must not crowd out the unvisited tail.
+const recycled = Array.from({ length: 150 }, (_, i) => ({ ...row, slug: `a-retry-${i}`, created_at: '2026-01-01' }))
+const unvisited = Array.from({ length: 150 }, (_, i) => ({ ...row, slug: `z-first-${i}`, created_at: '2026-01-01' }))
+const recycledState = Object.fromEntries(recycled.map(item => [item.slug, { identity: identity(item), nextAt: '2026-10-01T00:00:00Z' }]))
+const progressing = selectBatch([...recycled, ...unvisited], recycledState, { now, limit: 150 }).batch
+assert.equal(progressing.filter(item => item.slug.startsWith('a-retry-')).length, 30)
+assert.equal(progressing.filter(item => item.slug.startsWith('z-first-')).length, 120)
+assert.equal(selectBatch(recycled, recycledState, { now, limit: 150 }).batch.length, 150, 'Retries can use spare capacity when no first visits remain')
+
 let pages = 0
 assert.equal((await fetchCatalog({ fetcher: async () => Response.json(++pages === 1 ? { records: [row], next: row.slug } : { records: [{ ...row, slug: 'next-skill' }], next: null }) })).length, 2)
 await assert.rejects(fetchCatalog({ fetcher: async () => new Response(null, { status: 503 }) }), /503/)
@@ -69,6 +79,25 @@ const require = createRequire(import.meta.url)
 const sharp = require(require.resolve('sharp', { paths: [require.resolve('next/package.json')] }))
 const sampleImage = color => sharp({ create: { width: 900, height: 600, channels: 3, background: color } }).composite([{ input: Buffer.from('<svg width="900" height="600"><rect x="90" y="70" width="580" height="320" fill="white"/></svg>') }]).png().toBuffer()
 let bytes = await sampleImage('blue')
+const lfsPointer = Buffer.from(`version https://git-lfs.github.com/spec/v1\noid sha256:${digest(bytes)}\nsize ${bytes.length}\n`)
+const lfsUrl = `https://raw.githubusercontent.com/author/repo/${rev}/examples/cover.png`
+let lfsCalls = 0
+const lfsFetch = async (url, options) => {
+  lfsCalls++
+  assert.equal(url, `https://media.githubusercontent.com/media/author/repo/${rev}/examples/cover.png`)
+  assert.equal(options.redirect, 'error')
+  assert.ok(!Object.keys(options.headers).some(key => key.toLowerCase() === 'authorization'))
+  return new Response(bytes)
+}
+assert.deepEqual(await resolveGitHubLfs(lfsPointer, lfsUrl, bytes.length, { fetcher: lfsFetch }), bytes)
+await assert.rejects(resolveGitHubLfs(lfsPointer, lfsUrl, bytes.length - 1, { fetcher: lfsFetch }), /byte limit/)
+assert.equal(lfsCalls, 1, 'Oversized LFS objects must be rejected before downloading')
+await assert.rejects(resolveGitHubLfs(lfsPointer, lfsUrl.replace(rev, 'main'), bytes.length), /pinned/)
+await assert.rejects(resolveGitHubLfs(lfsPointer, lfsUrl, bytes.length, { fetcher: async () => new Response(Buffer.alloc(bytes.length)) }), /hash or size/)
+await assert.rejects(resolveGitHubLfs(lfsPointer, lfsUrl, bytes.length, { fetcher: async () => new Response(Buffer.alloc(bytes.length + 1)) }), /declared size/)
+assert.deepEqual(await resolveGitHubLfs(bytes, lfsUrl, bytes.length, { fetcher: lfsFetch }), bytes)
+const lfsReader = githubReader({ token: 'test-private-token', fetcher: async (url, options) => url === lfsUrl ? new Response(lfsPointer) : lfsFetch(url, options) })
+assert.deepEqual(await lfsReader.raw('author/repo', rev, 'examples/cover.png', bytes.length), bytes, 'Automatic collection resolves LFS before decoding')
 const rendered = await renderAsset(bytes, 'examples/cover.png')
 assert.equal(rendered.media.width, 900)
 assert.equal((await sharp(rendered.files.get(rendered.media.cardSrc)).metadata()).width, 720)
@@ -137,6 +166,15 @@ try {
   assert.equal((await run()).attempted, 0)
   assert.equal(calls, priorCalls, 'Idempotent reruns do not download known sources')
   assert.equal(await readFile(path.join(fixture, 'lib/skill-previews-auto.json'), 'utf8'), first)
+  const secondRow = { ...row, slug: 'author-other-deck' }
+  await run({ catalog: [row, secondRow], skills: [secondRow.slug] })
+  const scoped = JSON.parse(await readFile(path.join(fixture, 'lib/skill-previews-auto.json'), 'utf8'))
+  assert.deepEqual(scoped.map(item => item.skillSlug).sort(), [row.slug, secondRow.slug].sort(), 'Scoped backfills retain previews for other published identities')
+  assert.deepEqual(scoped.find(item => item.skillSlug === row.slug), JSON.parse(first)[0])
+  await assert.rejects(run({ skills: ['typo-not-in-registry'] }), /Unknown/)
+  await assert.rejects(run({ skills: [] }), /empty/)
+  // Restore the single-record fixture for the remaining refresh/pruning checks.
+  await run()
   bytes = await sampleImage('red')
   await run({ now: '2026-11-08T00:00:00.000Z', refresh: true })
   const updated = await readFile(path.join(fixture, 'lib/skill-previews-auto.json'), 'utf8')

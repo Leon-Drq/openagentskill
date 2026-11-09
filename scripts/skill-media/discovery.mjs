@@ -56,7 +56,12 @@ export function selectBatch(rows, state, { limit = 150, now = new Date().toISOSt
   const newest = ordered.filter(row => !state[row.slug] && Date.parse(row.created_at) > time - 7 * 86400000)
     .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)).slice(0, Math.floor(limit / 3))
   const retries = refresh ? [] : ordered.filter(row => state[row.slug]).sort((a, b) => Date.parse(state[a.slug].nextAt) - Date.parse(state[b.slug].nextAt)).slice(0, Math.floor(limit / 5))
-  const batch = [...new Map([...newest, ...retries, ...ordered].map(row => [row.slug, row])).values()].slice(0, limit)
+  // Retries already have a reserved share. Fill the remainder with identities
+  // we have never scanned (or whose source changed) before recycling the older
+  // alphabetic entries. Otherwise seven-day retries can consume every run and
+  // leave the long tail permanently undiscovered.
+  const firstVisits = ordered.filter(row => !state[row.slug] || state[row.slug].identity !== identity(row))
+  const batch = [...new Map([...newest, ...retries, ...firstVisits, ...ordered].map(row => [row.slug, row])).values()].slice(0, limit)
   return { batch, pending: due.length - batch.length }
 }
 

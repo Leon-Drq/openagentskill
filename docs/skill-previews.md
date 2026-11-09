@@ -45,6 +45,49 @@ now derives `Host` from its already-keyed URL (never a client forwarding overrid
 The four-hour TTL, private/auth/Flight bypass and tag invalidation remain intact.
 Regression checks cover both English and Chinese category request authority.
 
+## Design coverage follow-up (2026-11-09)
+
+A complete public feed contained 3,246 GitHub design records. Before this
+follow-up, 45 had configured previews, 2,582 had never been scanned, 547 had
+no eligible image in the scanned documents, 54 needed source/rights review,
+and 18 had collection errors. These counts exclude provider-only entries and
+are a point-in-time audit, not the total displayed by the combined directory.
+The first two quality-sorted pages still included many missing previews.
+
+CopilotKit now has two official rendered UI examples from its generative-UI
+documentation. Onlook and UI-TARS Desktop each have two official application
+screenshots, labeled as interfaces and excluded from **With examples**.
+Sources retain exact revisions, original hashes and MIT/Apache license copies.
+No screenshots are attached to sibling Skills or described as platform runs.
+
+A bounded follow-up checked 148 additional selected design identities: 121
+had no eligible preview in the scanned documents, 18 needed source review,
+3 had fetch/decoder errors, and 6 yielded media. One of those six, MHLA, was
+manually classified as research references rather than design outputs and moved
+to the curated registry. Together with the three prominent additions above,
+this release adds 21 images across nine exact records. Coverage remains partial;
+source failures and unresolved media are recorded without changing listings.
+
+The collector now fills remaining capacity with first-time/source-changed
+identities after reserving new-listing and retry slots. Previously, older
+alphabetic entries could retry every seven days and crowd out the unscanned
+tail. The daily limit remains 150; existing local static assets retain the
+seven-day cache. Text-only and unresolved external sources still need author
+examples or source review; absence of a local image is not a broken image.
+
+Git LFS pointers are resolved to the same repository/path at the pinned commit
+on `media.githubusercontent.com`. Both the pointer's SHA-256 and declared size
+are checked before decoding; curated imports also require the reviewed source
+hash. No credentials or redirects are allowed on this media fetch. File sizes,
+run budgets and license gates remain unchanged.
+
+For a bounded, targeted backfill, use `pnpm media:collect --skill exact-slug`
+(repeat `--skill` for multiple records). `--refresh` bypasses their retry dates.
+The collector still reads the complete public feed, preserves other published
+previews, and rejects unknown selections. `--catalog` must still contain the
+complete export, even for a scoped run. The report names the selected identities
+so its pending count cannot be mistaken for the full backlog.
+
 ## Earlier curated additions
 
 On 2026-10-19 the huashu-motion listing gained the author's hash-pinned
@@ -234,7 +277,8 @@ and no overriding nested license/notice. Root NOTICE files are retained with
 the license. Other sources remain in `needs-review`; this state concerns media
 attribution only and never changes Skill submission reviews or installation
 claims. GitHub credentials are sent only to `api.github.com`, never to raw media,
-author URLs or public clients. Only same-repository pinned raw files are fetched.
+author URLs or public clients. Only same-repository pinned raw files and their
+hash-verified GitHub LFS objects are fetched.
 
 Generated assets live under `public/skill-previews/auto/`, addressed by SHA-256.
 `lib/skill-previews-auto.json` joins the existing server-only preview registry,
