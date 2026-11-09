@@ -42,6 +42,20 @@ assert.equal(selectBatch([{ ...row, source_path: 'skills/new/SKILL.md' }], state
 assert.notEqual(identity({ ...row, source_path: null, repository: 'https://github.com/author/repo/tree/main/one' }), identity({ ...row, source_path: null, repository: 'https://github.com/author/repo/tree/main/two' }), 'Legacy URL-only source directories remain distinct')
 const queue = Array.from({ length: 12 }, (_, i) => ({ ...row, slug: `older-${i}`, created_at: '2026-01-01' }))
 assert.ok(selectBatch([...queue, { ...row, slug: 'new-other', category: 'development' }], {}, { now, limit: 6 }).batch.some(item => item.slug === 'new-other'), 'New Skills get slots outside visual categories')
+const categories = ['presentation', 'image-generation', 'design-creative', 'video-creation', 'development']
+const backlog = categories.flatMap(category => Array.from({ length: 200 }, (_, i) => ({ ...row, slug: `${category}-${String(i).padStart(3, '0')}`, category, created_at: '2026-01-01' })))
+const fair = selectBatch(backlog, {}, { now, limit: 150 })
+assert.equal(fair.batch.length, 150)
+assert.equal(fair.pending, 850)
+for (const category of categories) assert.equal(fair.batch.filter(item => item.category === category).length, 30, 'A large earlier category must not starve another visual category')
+assert.deepEqual(selectBatch([...backlog].reverse(), {}, { now, limit: 150 }), fair, 'Catalog/feed order must not change allocation')
+const retried = { ...row, slug: 'retried', created_at: '2026-01-01' }
+const retryState = { [retried.slug]: { identity: identity(retried), nextAt: '2026-10-06T00:00:00Z' }, ...state }
+const reserved = selectBatch([...backlog, row, retried, { ...row, slug: 'new-design', category: 'design-creative' }], retryState, { now, limit: 15, excluded: new Set(['presentation-000']) }).batch
+assert.ok(reserved.some(item => item.slug === 'retried') && reserved.some(item => item.slug === 'new-design'), 'Fair category ordering preserves new-entry and retry slots')
+assert.ok(!reserved.some(item => item.slug === row.slug || item.slug === 'presentation-000'), 'Not-due and excluded records stay out')
+assert.equal(new Set(reserved.map(item => item.slug)).size, 15)
+assert.equal(selectBatch(backlog, {}, { now, limit: 0 }).batch.length, 0)
 
 let pages = 0
 assert.equal((await fetchCatalog({ fetcher: async () => Response.json(++pages === 1 ? { records: [row], next: row.slug } : { records: [{ ...row, slug: 'next-skill' }], next: null }) })).length, 2)

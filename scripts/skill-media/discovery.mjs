@@ -41,8 +41,16 @@ export function selectBatch(rows, state, { limit = 150, now = new Date().toISOSt
     const prior = state[row.slug]
     return refresh || !prior || prior.identity !== identity(row) || Date.parse(prior.nextAt) <= time
   })
-  const priority = row => visual.includes(row.category) ? visual.indexOf(row.category) : 4
-  const ordered = due.sort((a, b) => priority(a) - priority(b) || a.slug.localeCompare(b.slug, 'en'))
+  // Interleave visual categories and the rest of the catalog. A large slides
+  // backlog must not keep design/video entries waiting indefinitely. Keep the
+  // same bounded daily budget and stable slug order inside each bucket.
+  const buckets = Array.from({ length: visual.length + 1 }, () => [])
+  for (const row of due) buckets[visual.includes(row.category) ? visual.indexOf(row.category) : visual.length].push(row)
+  for (const bucket of buckets) bucket.sort((a, b) => a.slug.localeCompare(b.slug, 'en'))
+  const ordered = []
+  for (let i = 0; ordered.length < due.length; i++) {
+    for (const bucket of buckets) if (bucket[i]) ordered.push(bucket[i])
+  }
   // Reserve slots for both first-time/new listings and retries/backlog. Neither
   // a popular source nor a failing endpoint can monopolize future collection.
   const newest = ordered.filter(row => !state[row.slug] && Date.parse(row.created_at) > time - 7 * 86400000)
