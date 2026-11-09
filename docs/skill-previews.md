@@ -1,5 +1,19 @@
 # Skill directory previews
 
+## Media cache policy
+
+The owner requested a seven-day media cache on 2026-11-09. Cloudflare static
+asset headers set `public,max-age=604800,immutable` for `/skill-previews/*`,
+whose filenames include source-content hashes, and `public,max-age=604800` for
+image/video extensions under `/showcase/`. The latter also contains older named
+assets, so it does not claim immutability. When replacing an artwork, publish
+it at a new content-hash/versioned URL and update the manifest; never overwrite
+a long-cached URL with different artwork. External provider media keeps its
+provider's cache policy. The directory HTML/data refresh interval remains four
+hours so ranking, pricing and availability can refresh independently of images.
+Cloudflare's `_headers` handles asset responses directly, without adding a
+Worker image-processing or database path. Existing page/API headers are unchanged.
+
 ## Design & UI additions (2026-11-09)
 
 Seven reviewed previews now bind to the exact public records
