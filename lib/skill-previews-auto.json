@@ -176,6 +176,50 @@
     ]
   },
   {
+    "skillSlug": "0x676e67-wreq",
+    "repository": "0x676e67/wreq",
+    "revision": "7812c30857dd734bfa45a73ab83baff8b56880e8",
+    "sourceUrl": "https://github.com/0x676e67/wreq/blob/7812c30857dd734bfa45a73ab83baff8b56880e8/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-92caec58166a8afc9d5054ba03c96c1c351f4e788bbf647ba058ba0318e9078f.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "92caec58166a8afc9d5054ba03c96c1c351f4e788bbf647ba058ba0318e9078f",
+    "documentSha256": "9dcfbe96aa2c0698d849478b9ebaa8e82a675e3f010736cc08637c3f0bccc6f3",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-10T08:29:00.993Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/8d4deeb6a6853e17d5746fbf11c37c8267f3862278dfb2b426b239570e4ac9fb.preview.webp",
+        "previewSrc": "/skill-previews/auto/8d4deeb6a6853e17d5746fbf11c37c8267f3862278dfb2b426b239570e4ac9fb.preview.webp",
+        "cardSrc": "/skill-previews/auto/8d4deeb6a6853e17d5746fbf11c37c8267f3862278dfb2b426b239570e4ac9fb.card.webp",
+        "width": 1070,
+        "height": 296,
+        "sha256": "8d4deeb6a6853e17d5746fbf11c37c8267f3862278dfb2b426b239570e4ac9fb",
+        "originalSrc": "/skill-previews/auto/8d4deeb6a6853e17d5746fbf11c37c8267f3862278dfb2b426b239570e4ac9fb.jpg",
+        "sourceUrl": "https://github.com/0x676e67/wreq/blob/7812c30857dd734bfa45a73ab83baff8b56880e8/.github/assets/hypersolutions.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "Wreq · Author preview",
+          "zh": "Wreq · 作者预览"
+        },
+        "alt": {
+          "en": "Wreq: hypersolutions.jpg",
+          "zh": "Wreq：hypersolutions.jpg"
+        },
+        "sourcePath": ".github/assets/hypersolutions.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "0x7c13-notepads",
     "repository": "0x7c13/Notepads",
     "revision": "6ec270c134b115d6bff38bc3966784e8893a419c",
@@ -258,6 +302,314 @@
           "zh": "Notepads：Screenshot DiffViewer"
         },
         "sourcePath": "ScreenShots/3.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "0xcert-framework",
+    "repository": "0xcert/framework",
+    "revision": "88c8ec7107a86b5aecd2ac943a4df100ba602bac",
+    "sourceUrl": "https://github.com/0xcert/framework/blob/88c8ec7107a86b5aecd2ac943a4df100ba602bac/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-bb2029fe8c482619bb155ba65b8d7caa5d4b41942b0cc403bfd7824da05cb321.txt",
+    "licenseSourcePath": "LICENCE",
+    "licenseSha256": "bb2029fe8c482619bb155ba65b8d7caa5d4b41942b0cc403bfd7824da05cb321",
+    "documentSha256": "40e4f53e09804d158f1866f3fa6a12f5d6c44e7159c348551bab41241fb6be7c",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-10T08:29:00.993Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/a8bab915897a2175c7cdbaa9e60aeea047d952a69c3f2d2ca9d111c36a0ff92b.preview.webp",
+        "previewSrc": "/skill-previews/auto/a8bab915897a2175c7cdbaa9e60aeea047d952a69c3f2d2ca9d111c36a0ff92b.preview.webp",
+        "cardSrc": "/skill-previews/auto/a8bab915897a2175c7cdbaa9e60aeea047d952a69c3f2d2ca9d111c36a0ff92b.card.webp",
+        "width": 1584,
+        "height": 396,
+        "sha256": "a8bab915897a2175c7cdbaa9e60aeea047d952a69c3f2d2ca9d111c36a0ff92b",
+        "originalSrc": "/skill-previews/auto/a8bab915897a2175c7cdbaa9e60aeea047d952a69c3f2d2ca9d111c36a0ff92b.png",
+        "sourceUrl": "https://github.com/0xcert/framework/blob/88c8ec7107a86b5aecd2ac943a4df100ba602bac/assets/cover.png",
+        "kind": "reference",
+        "title": {
+          "en": "Framework · Author preview",
+          "zh": "Framework · 作者预览"
+        },
+        "alt": {
+          "en": "Framework: cover.png",
+          "zh": "Framework：cover.png"
+        },
+        "sourcePath": "assets/cover.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "0xdea-weggli-patterns",
+    "repository": "0xdea/weggli-patterns",
+    "revision": "5193516edc695cb8dfa4933806f13d6c461fcb50",
+    "sourceUrl": "https://github.com/0xdea/weggli-patterns/blob/5193516edc695cb8dfa4933806f13d6c461fcb50/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-186c33381b75495d50c5b3fd259c77a1381d32012064c50932864bdd6a36fb87.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "186c33381b75495d50c5b3fd259c77a1381d32012064c50932864bdd6a36fb87",
+    "documentSha256": "76439ca138a0c420dc7089aab59ef41d43cac736324da0c2f0c68a25bbe52181",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-10T08:29:00.993Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/6c6e597d45312efca398457824c942581dbbfe10a320dbaaf0f519887485b80a.preview.webp",
+        "previewSrc": "/skill-previews/auto/6c6e597d45312efca398457824c942581dbbfe10a320dbaaf0f519887485b80a.preview.webp",
+        "cardSrc": "/skill-previews/auto/6c6e597d45312efca398457824c942581dbbfe10a320dbaaf0f519887485b80a.card.webp",
+        "width": 1600,
+        "height": 898,
+        "sha256": "6c6e597d45312efca398457824c942581dbbfe10a320dbaaf0f519887485b80a",
+        "originalSrc": "/skill-previews/auto/6c6e597d45312efca398457824c942581dbbfe10a320dbaaf0f519887485b80a.jpg",
+        "sourceUrl": "https://github.com/0xdea/weggli-patterns/blob/5193516edc695cb8dfa4933806f13d6c461fcb50/.img/shrooms.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "Weggli Patterns · Author preview",
+          "zh": "Weggli Patterns · 作者预览"
+        },
+        "alt": {
+          "en": "Weggli Patterns: shrooms.jpg",
+          "zh": "Weggli Patterns：shrooms.jpg"
+        },
+        "sourcePath": ".img/shrooms.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "0xjuanma-golazo",
+    "repository": "0xjuanma/golazo",
+    "revision": "ed484fb155509548df54776a77de67b15c8dde54",
+    "sourceUrl": "https://github.com/0xjuanma/golazo/blob/ed484fb155509548df54776a77de67b15c8dde54/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-4dc0a5daa325b37f64f50f726db4dd94342dcfec49bd0fe80266a0ef59953bfa.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "4dc0a5daa325b37f64f50f726db4dd94342dcfec49bd0fe80266a0ef59953bfa",
+    "documentSha256": "8bcf8e6b79f798019407da1f35d46bd04b452271558c3ac2a2080ee9b21c9d70",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-10T08:29:00.993Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/9a36f283a42b56fdaabd8407ba5a1c493a5b1fa256f961e9514c6e631b348304.preview.webp",
+        "previewSrc": "/skill-previews/auto/9a36f283a42b56fdaabd8407ba5a1c493a5b1fa256f961e9514c6e631b348304.preview.webp",
+        "cardSrc": "/skill-previews/auto/9a36f283a42b56fdaabd8407ba5a1c493a5b1fa256f961e9514c6e631b348304.card.webp",
+        "width": 1000,
+        "height": 700,
+        "sha256": "9a36f283a42b56fdaabd8407ba5a1c493a5b1fa256f961e9514c6e631b348304",
+        "originalSrc": "/skill-previews/auto/9a36f283a42b56fdaabd8407ba5a1c493a5b1fa256f961e9514c6e631b348304.gif",
+        "sourceUrl": "https://github.com/0xjuanma/golazo/blob/ed484fb155509548df54776a77de67b15c8dde54/assets/golazo-demo.gif",
+        "kind": "example",
+        "title": {
+          "en": "Golazo · Animation · still preview",
+          "zh": "Golazo · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Golazo: Golazo demo",
+          "zh": "Golazo：Golazo demo"
+        },
+        "sourcePath": "assets/golazo-demo.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
+    "skillSlug": "0xmassi-stik-app",
+    "repository": "0xMassi/stik_app",
+    "revision": "2f7370f4b50dddb253569c97d92927a3acf210f8",
+    "sourceUrl": "https://github.com/0xMassi/stik_app/blob/2f7370f4b50dddb253569c97d92927a3acf210f8/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-57bc7e5de8b52c37e836b3350e9065ef31eabdc67747ed486fa489823a1af74b.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "57bc7e5de8b52c37e836b3350e9065ef31eabdc67747ed486fa489823a1af74b",
+    "documentSha256": "1885ba2d60373a5c0fddd873d432ae74c81031547f930c0d00df0fb17678d5c0",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-10T08:29:00.993Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/2d7d8bdccc6b08b7056ee194d2d873c5c9b80c4b572b78e249b2aecdf0d82e9d.preview.webp",
+        "previewSrc": "/skill-previews/auto/2d7d8bdccc6b08b7056ee194d2d873c5c9b80c4b572b78e249b2aecdf0d82e9d.preview.webp",
+        "cardSrc": "/skill-previews/auto/2d7d8bdccc6b08b7056ee194d2d873c5c9b80c4b572b78e249b2aecdf0d82e9d.card.webp",
+        "width": 800,
+        "height": 520,
+        "sha256": "2d7d8bdccc6b08b7056ee194d2d873c5c9b80c4b572b78e249b2aecdf0d82e9d",
+        "originalSrc": "/skill-previews/auto/2d7d8bdccc6b08b7056ee194d2d873c5c9b80c4b572b78e249b2aecdf0d82e9d.gif",
+        "sourceUrl": "https://github.com/0xMassi/stik_app/blob/2f7370f4b50dddb253569c97d92927a3acf210f8/.github/assets/hero.gif",
+        "kind": "example",
+        "title": {
+          "en": "Stik App · Animation · still preview",
+          "zh": "Stik App · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Stik App: Stik demo",
+          "zh": "Stik App：Stik demo"
+        },
+        "sourcePath": ".github/assets/hero.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
+    "skillSlug": "0xnyk-council-of-high-intelligence",
+    "repository": "0xNyk/council-of-high-intelligence",
+    "revision": "79a36a8561c34df4f2df172bd5b0fd5f3e174834",
+    "sourceUrl": "https://github.com/0xNyk/council-of-high-intelligence/blob/79a36a8561c34df4f2df172bd5b0fd5f3e174834/SKILL.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-678df73993b4b6709cd80aed556263ef5cdcffd5e7d6a7d796c828bf36baa4c7.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "678df73993b4b6709cd80aed556263ef5cdcffd5e7d6a7d796c828bf36baa4c7",
+    "documentSha256": "c6b7fc23b75474fde90bd6b327626427ddff1d3227ddc6a9c420b974e0cb23a8",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-10T08:29:00.993Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/aae2fe2f14629cdab92ae8208af6ab454269b11f3fe3fa662173cdfd2fe25b66.preview.webp",
+        "previewSrc": "/skill-previews/auto/aae2fe2f14629cdab92ae8208af6ab454269b11f3fe3fa662173cdfd2fe25b66.preview.webp",
+        "cardSrc": "/skill-previews/auto/aae2fe2f14629cdab92ae8208af6ab454269b11f3fe3fa662173cdfd2fe25b66.card.webp",
+        "width": 1536,
+        "height": 1024,
+        "sha256": "aae2fe2f14629cdab92ae8208af6ab454269b11f3fe3fa662173cdfd2fe25b66",
+        "originalSrc": "/skill-previews/auto/aae2fe2f14629cdab92ae8208af6ab454269b11f3fe3fa662173cdfd2fe25b66.jpg",
+        "sourceUrl": "https://github.com/0xNyk/council-of-high-intelligence/blob/79a36a8561c34df4f2df172bd5b0fd5f3e174834/assets/decision-field-notes.jpeg",
+        "kind": "reference",
+        "title": {
+          "en": "Council Of High Intelligence · Author preview",
+          "zh": "Council Of High Intelligence · 作者预览"
+        },
+        "alt": {
+          "en": "Council Of High Intelligence: Decision field notes",
+          "zh": "Council Of High Intelligence：Decision field notes"
+        },
+        "sourcePath": "assets/decision-field-notes.jpeg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/9cfe420dc6ca92f62ea3074170a8f31e049cd36f359786be975661d14eb3f546.preview.webp",
+        "previewSrc": "/skill-previews/auto/9cfe420dc6ca92f62ea3074170a8f31e049cd36f359786be975661d14eb3f546.preview.webp",
+        "cardSrc": "/skill-previews/auto/9cfe420dc6ca92f62ea3074170a8f31e049cd36f359786be975661d14eb3f546.card.webp",
+        "width": 1200,
+        "height": 480,
+        "sha256": "9cfe420dc6ca92f62ea3074170a8f31e049cd36f359786be975661d14eb3f546",
+        "originalSrc": "/skill-previews/auto/9cfe420dc6ca92f62ea3074170a8f31e049cd36f359786be975661d14eb3f546.jpg",
+        "sourceUrl": "https://github.com/0xNyk/council-of-high-intelligence/blob/79a36a8561c34df4f2df172bd5b0fd5f3e174834/assets/header.jpeg",
+        "kind": "reference",
+        "title": {
+          "en": "Council Of High Intelligence · Author preview",
+          "zh": "Council Of High Intelligence · 作者预览"
+        },
+        "alt": {
+          "en": "Council Of High Intelligence: Council of High Intelligence",
+          "zh": "Council Of High Intelligence：Council of High Intelligence"
+        },
+        "sourcePath": "assets/header.jpeg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/4108260b270c7c6f1caee21448d3e30c174bc644bdb8b97ac9e6fdbcb28d2201.preview.webp",
+        "previewSrc": "/skill-previews/auto/4108260b270c7c6f1caee21448d3e30c174bc644bdb8b97ac9e6fdbcb28d2201.preview.webp",
+        "cardSrc": "/skill-previews/auto/4108260b270c7c6f1caee21448d3e30c174bc644bdb8b97ac9e6fdbcb28d2201.card.webp",
+        "width": 1536,
+        "height": 1024,
+        "sha256": "4108260b270c7c6f1caee21448d3e30c174bc644bdb8b97ac9e6fdbcb28d2201",
+        "originalSrc": "/skill-previews/auto/4108260b270c7c6f1caee21448d3e30c174bc644bdb8b97ac9e6fdbcb28d2201.jpg",
+        "sourceUrl": "https://github.com/0xNyk/council-of-high-intelligence/blob/79a36a8561c34df4f2df172bd5b0fd5f3e174834/assets/mode-selector.jpeg",
+        "kind": "reference",
+        "title": {
+          "en": "Council Of High Intelligence · Author preview",
+          "zh": "Council Of High Intelligence · 作者预览"
+        },
+        "alt": {
+          "en": "Council Of High Intelligence: Council mode selector",
+          "zh": "Council Of High Intelligence：Council mode selector"
+        },
+        "sourcePath": "assets/mode-selector.jpeg",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "0xplaygrounds-rig",
+    "repository": "0xPlaygrounds/rig",
+    "revision": "f5bd5de5edd4d9785c1f7f81c19f2c199ad41026",
+    "sourceUrl": "https://github.com/0xPlaygrounds/rig/blob/f5bd5de5edd4d9785c1f7f81c19f2c199ad41026/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-42cf0f78132fe1de338cbff947bf5b9f7d2d8a377cb827c9df9e90b4b9499ef7.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "42cf0f78132fe1de338cbff947bf5b9f7d2d8a377cb827c9df9e90b4b9499ef7",
+    "documentSha256": "befaab22cb407e1ba5d611bcd137b4232e4302a580c03c60442d3d980a43a586",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-10T08:29:00.993Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/c4599db040bb02ef8f3672df597f85db847d4a55eefa5b29287b08244208d0d2.preview.webp",
+        "previewSrc": "/skill-previews/auto/c4599db040bb02ef8f3672df597f85db847d4a55eefa5b29287b08244208d0d2.preview.webp",
+        "cardSrc": "/skill-previews/auto/c4599db040bb02ef8f3672df597f85db847d4a55eefa5b29287b08244208d0d2.card.webp",
+        "width": 1250,
+        "height": 507,
+        "sha256": "c4599db040bb02ef8f3672df597f85db847d4a55eefa5b29287b08244208d0d2",
+        "originalSrc": "/skill-previews/auto/c4599db040bb02ef8f3672df597f85db847d4a55eefa5b29287b08244208d0d2.png",
+        "sourceUrl": "https://github.com/0xPlaygrounds/rig/blob/f5bd5de5edd4d9785c1f7f81c19f2c199ad41026/img/ryzome-bg.png",
+        "kind": "reference",
+        "title": {
+          "en": "Rig · Author preview",
+          "zh": "Rig · 作者预览"
+        },
+        "alt": {
+          "en": "Rig: Ryzome",
+          "zh": "Rig：Ryzome"
+        },
+        "sourcePath": "img/ryzome-bg.png",
         "documentPath": "README.md",
         "format": "image"
       }
@@ -478,6 +830,50 @@
           "zh": "Checkrr：Running screenshot"
         },
         "sourcePath": "screenshots/Running.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "agents365-ai-video-podcast-maker",
+    "repository": "Agents365-ai/video-podcast-maker",
+    "revision": "33b8078e3e87c9626d39d144b4c901b4ebf16f74",
+    "sourceUrl": "https://github.com/Agents365-ai/video-podcast-maker/blob/33b8078e3e87c9626d39d144b4c901b4ebf16f74/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-0d43b46456eda48a9054fbfa915ac80e150f5db5cf90714eda710c02e1df461a.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "0d43b46456eda48a9054fbfa915ac80e150f5db5cf90714eda710c02e1df461a",
+    "documentSha256": "e44d067281c76831b096a60af60c9b293557fd4887e10dc7e1bedac4c00d5fe2",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-10T08:29:00.993Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/06439808702229adefb0eda6faabd653eed737bfa79fbbe7ffca893be81364aa.preview.webp",
+        "previewSrc": "/skill-previews/auto/06439808702229adefb0eda6faabd653eed737bfa79fbbe7ffca893be81364aa.preview.webp",
+        "cardSrc": "/skill-previews/auto/06439808702229adefb0eda6faabd653eed737bfa79fbbe7ffca893be81364aa.card.webp",
+        "width": 1600,
+        "height": 544,
+        "sha256": "06439808702229adefb0eda6faabd653eed737bfa79fbbe7ffca893be81364aa",
+        "originalSrc": "/skill-previews/auto/06439808702229adefb0eda6faabd653eed737bfa79fbbe7ffca893be81364aa.png",
+        "sourceUrl": "https://github.com/Agents365-ai/video-podcast-maker/blob/33b8078e3e87c9626d39d144b4c901b4ebf16f74/images/pipeline.png",
+        "kind": "reference",
+        "title": {
+          "en": "Video Podcast Maker · Author preview",
+          "zh": "Video Podcast Maker · 作者预览"
+        },
+        "alt": {
+          "en": "Video Podcast Maker: Pipeline",
+          "zh": "Video Podcast Maker：Pipeline"
+        },
+        "sourcePath": "images/pipeline.png",
         "documentPath": "README.md",
         "format": "image"
       }
@@ -764,6 +1160,72 @@
           "zh": "Ru Dalle：anime-girl-super-resolution.png"
         },
         "sourcePath": "pics/malevich/anime-girl-super-resolution.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "ailab-cvc-videogen-eval",
+    "repository": "AILab-CVC/VideoGen-Eval",
+    "revision": "4fefbc4073b6353a387a955dff27961cdece9c6f",
+    "sourceUrl": "https://github.com/AILab-CVC/VideoGen-Eval/blob/4fefbc4073b6353a387a955dff27961cdece9c6f/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-93cf3582762ed722a7743ca09134ad1776a562ece1b58795cae2f33fa2b5d5e7.txt",
+    "licenseSourcePath": "LICENSE.txt",
+    "licenseSha256": "93cf3582762ed722a7743ca09134ad1776a562ece1b58795cae2f33fa2b5d5e7",
+    "documentSha256": "706b52866e25f97511d8f5ba7bea0f8cb1473802c9cfddfdd312f331b1f1c0d5",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-10T08:29:00.993Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/d2435b5b8a42d7ef8f06bf87865e7f58aa38fab2b8bea8132189368ffaf22319.preview.webp",
+        "previewSrc": "/skill-previews/auto/d2435b5b8a42d7ef8f06bf87865e7f58aa38fab2b8bea8132189368ffaf22319.preview.webp",
+        "cardSrc": "/skill-previews/auto/d2435b5b8a42d7ef8f06bf87865e7f58aa38fab2b8bea8132189368ffaf22319.card.webp",
+        "width": 1600,
+        "height": 850,
+        "sha256": "d2435b5b8a42d7ef8f06bf87865e7f58aa38fab2b8bea8132189368ffaf22319",
+        "originalSrc": "/skill-previews/auto/d2435b5b8a42d7ef8f06bf87865e7f58aa38fab2b8bea8132189368ffaf22319.png",
+        "sourceUrl": "https://github.com/AILab-CVC/VideoGen-Eval/blob/4fefbc4073b6353a387a955dff27961cdece9c6f/docs/teaser/teaser.png",
+        "kind": "reference",
+        "title": {
+          "en": "VideoGen Eval · Author preview",
+          "zh": "VideoGen Eval · 作者预览"
+        },
+        "alt": {
+          "en": "VideoGen Eval: Teaser Image",
+          "zh": "VideoGen Eval：Teaser Image"
+        },
+        "sourcePath": "docs/teaser/teaser.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/9365db3693dcb20afb42d1610f8fc863cbdb825ec254c29f4ebc7413a845b3f6.preview.webp",
+        "previewSrc": "/skill-previews/auto/9365db3693dcb20afb42d1610f8fc863cbdb825ec254c29f4ebc7413a845b3f6.preview.webp",
+        "cardSrc": "/skill-previews/auto/9365db3693dcb20afb42d1610f8fc863cbdb825ec254c29f4ebc7413a845b3f6.card.webp",
+        "width": 1600,
+        "height": 993,
+        "sha256": "9365db3693dcb20afb42d1610f8fc863cbdb825ec254c29f4ebc7413a845b3f6",
+        "originalSrc": "/skill-previews/auto/9365db3693dcb20afb42d1610f8fc863cbdb825ec254c29f4ebc7413a845b3f6.png",
+        "sourceUrl": "https://github.com/AILab-CVC/VideoGen-Eval/blob/4fefbc4073b6353a387a955dff27961cdece9c6f/docs/teaser/teaser2.png",
+        "kind": "reference",
+        "title": {
+          "en": "VideoGen Eval · Author preview",
+          "zh": "VideoGen Eval · 作者预览"
+        },
+        "alt": {
+          "en": "VideoGen Eval: Teaser Image",
+          "zh": "VideoGen Eval：Teaser Image"
+        },
+        "sourcePath": "docs/teaser/teaser2.png",
         "documentPath": "README.md",
         "format": "image"
       }
