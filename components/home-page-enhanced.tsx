@@ -19,6 +19,7 @@ import { GitHubPopularityList } from './github-popularity-list'
 export interface HomePageEnhancedProps {
   showcase: ReactNode
   creators: ReactNode
+  listings: ReactNode
   initialLocale?: Locale
   stats: {
     totalSkills: number
@@ -714,7 +715,7 @@ function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) 
   )
 }
 
-export function HomePageEnhanced({ initialLocale, stats, featuredSkills, rankingGeneratedAt, rankingSource, showcase, creators }: HomePageEnhancedProps) {
+export function HomePageEnhanced({ initialLocale, stats, featuredSkills, rankingGeneratedAt, rankingSource, showcase, creators, listings }: HomePageEnhancedProps) {
   const { t, locale } = useI18n()
   const activeLocale = initialLocale || locale
   const [taskQuery, setTaskQuery] = useState('')
@@ -1259,6 +1260,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
       </main>
 
       {creators}
+      {listings}
       <SiteFooter />
 
     </div>

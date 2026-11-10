@@ -2,11 +2,12 @@ import { HomePageEnhanced, type HomePageEnhancedProps } from './home-page-enhanc
 import { HomeCreators } from './home-creators'
 import { HomeShowcaseStatic } from './home-showcase-static'
 import { HomeDiscovery } from './home-discovery'
+import { HomeDirectoryBadges } from './home-directory-badges'
 
 // Render editorial content on the server: client navigation receives HTML,
 // not the entire gallery/creator catalog and its data-building functions.
-export function HomePage(props: Omit<HomePageEnhancedProps, 'showcase' | 'creators'>) {
+export function HomePage(props: Omit<HomePageEnhancedProps, 'showcase' | 'creators' | 'listings'>) {
   const locale = props.initialLocale || 'en'
   const ready = props.featuredSkills.length > 0 && ['snapshot', 'directory'].includes(props.rankingSource)
-  return <><template data-oas-home-cache={ready ? 'ready' : 'fallback'} /><HomePageEnhanced {...props} showcase={<><HomeShowcaseStatic locale={locale} /><HomeDiscovery locale={locale} /></>} creators={<HomeCreators locale={locale} />} /></>
+  return <><template data-oas-home-cache={ready ? 'ready' : 'fallback'} /><HomePageEnhanced {...props} showcase={<><HomeShowcaseStatic locale={locale} /><HomeDiscovery locale={locale} /></>} creators={<HomeCreators locale={locale} />} listings={<HomeDirectoryBadges locale={locale} />} /></>
 }
