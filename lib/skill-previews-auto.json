@@ -616,6 +616,226 @@
     ]
   },
   {
+    "skillSlug": "0xranx-golembot",
+    "repository": "0xranx/golembot",
+    "revision": "aa310a0b28f46a7869acac4df1face2e4285c8fb",
+    "sourceUrl": "https://github.com/0xranx/golembot/blob/aa310a0b28f46a7869acac4df1face2e4285c8fb/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-7dd5eb1755da5e1a7239b726f1536442c288dbc566038a5168fb0dc18cc88949.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "7dd5eb1755da5e1a7239b726f1536442c288dbc566038a5168fb0dc18cc88949",
+    "documentSha256": "ecb3f85e1565b9637f9058c32ca9c32133151e944b06539824d8c2826d0ad2b6",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-11T07:47:27.936Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/2f6de8deae89d426ae3da1c57615b9303b7a4076eab50ca9aaefc376705ac835.preview.webp",
+        "previewSrc": "/skill-previews/auto/2f6de8deae89d426ae3da1c57615b9303b7a4076eab50ca9aaefc376705ac835.preview.webp",
+        "cardSrc": "/skill-previews/auto/2f6de8deae89d426ae3da1c57615b9303b7a4076eab50ca9aaefc376705ac835.card.webp",
+        "width": 1280,
+        "height": 1048,
+        "sha256": "2f6de8deae89d426ae3da1c57615b9303b7a4076eab50ca9aaefc376705ac835",
+        "originalSrc": "/skill-previews/auto/2f6de8deae89d426ae3da1c57615b9303b7a4076eab50ca9aaefc376705ac835.png",
+        "sourceUrl": "https://github.com/0xranx/golembot/blob/aa310a0b28f46a7869acac4df1face2e4285c8fb/docs/assets/dashboard.png",
+        "kind": "reference",
+        "title": {
+          "en": "Golembot · Author preview",
+          "zh": "Golembot · 作者预览"
+        },
+        "alt": {
+          "en": "Golembot: GolemBot Dashboard",
+          "zh": "Golembot：GolemBot Dashboard"
+        },
+        "sourcePath": "docs/assets/dashboard.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/82dda39693eb339d8be69ee5b9824e7c6b081734b0d53cc32b46c1b0750fec39.preview.webp",
+        "previewSrc": "/skill-previews/auto/82dda39693eb339d8be69ee5b9824e7c6b081734b0d53cc32b46c1b0750fec39.preview.webp",
+        "cardSrc": "/skill-previews/auto/82dda39693eb339d8be69ee5b9824e7c6b081734b0d53cc32b46c1b0750fec39.card.webp",
+        "width": 1280,
+        "height": 900,
+        "sha256": "82dda39693eb339d8be69ee5b9824e7c6b081734b0d53cc32b46c1b0750fec39",
+        "originalSrc": "/skill-previews/auto/82dda39693eb339d8be69ee5b9824e7c6b081734b0d53cc32b46c1b0750fec39.png",
+        "sourceUrl": "https://github.com/0xranx/golembot/blob/aa310a0b28f46a7869acac4df1face2e4285c8fb/docs/assets/fleet-dashboard.png",
+        "kind": "reference",
+        "title": {
+          "en": "Golembot · Author preview",
+          "zh": "Golembot · 作者预览"
+        },
+        "alt": {
+          "en": "Golembot: GolemBot Fleet Dashboard",
+          "zh": "Golembot：GolemBot Fleet Dashboard"
+        },
+        "sourcePath": "docs/assets/fleet-dashboard.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/fac9bbe25167ce788c8e2264e12779dc6757a85c9f8f6f73ff42b50b9c332a04.preview.webp",
+        "previewSrc": "/skill-previews/auto/fac9bbe25167ce788c8e2264e12779dc6757a85c9f8f6f73ff42b50b9c332a04.preview.webp",
+        "cardSrc": "/skill-previews/auto/fac9bbe25167ce788c8e2264e12779dc6757a85c9f8f6f73ff42b50b9c332a04.card.webp",
+        "width": 256,
+        "height": 256,
+        "sha256": "fac9bbe25167ce788c8e2264e12779dc6757a85c9f8f6f73ff42b50b9c332a04",
+        "originalSrc": "/skill-previews/auto/fac9bbe25167ce788c8e2264e12779dc6757a85c9f8f6f73ff42b50b9c332a04.png",
+        "sourceUrl": "https://github.com/0xranx/golembot/blob/aa310a0b28f46a7869acac4df1face2e4285c8fb/docs/public/icons/clawhub.png",
+        "kind": "reference",
+        "title": {
+          "en": "Golembot · Author preview",
+          "zh": "Golembot · 作者预览"
+        },
+        "alt": {
+          "en": "Golembot: ClawHub",
+          "zh": "Golembot：ClawHub"
+        },
+        "sourcePath": "docs/public/icons/clawhub.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "0xsanei-darwinia",
+    "repository": "0xSanei/darwinia",
+    "revision": "b62f1a2c18d6c6a21ca22c46259a0eada0569c82",
+    "sourceUrl": "https://github.com/0xSanei/darwinia/blob/b62f1a2c18d6c6a21ca22c46259a0eada0569c82/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-5be6f680fc5cbb38dc80963e406474c3b7aa8113c5c2c26ab162f35c1482172e.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "5be6f680fc5cbb38dc80963e406474c3b7aa8113c5c2c26ab162f35c1482172e",
+    "documentSha256": "b5c1feffd2a7bdc89b712c892feb9df65222cda14483ef8d98f22964b9c28811",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-11T07:47:27.936Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/5747b5e34192abbff7f188bb9a3712c51f9f111cba02c5ea2b71e5974fe36830.preview.webp",
+        "previewSrc": "/skill-previews/auto/5747b5e34192abbff7f188bb9a3712c51f9f111cba02c5ea2b71e5974fe36830.preview.webp",
+        "cardSrc": "/skill-previews/auto/5747b5e34192abbff7f188bb9a3712c51f9f111cba02c5ea2b71e5974fe36830.card.webp",
+        "width": 900,
+        "height": 600,
+        "sha256": "5747b5e34192abbff7f188bb9a3712c51f9f111cba02c5ea2b71e5974fe36830",
+        "originalSrc": "/skill-previews/auto/5747b5e34192abbff7f188bb9a3712c51f9f111cba02c5ea2b71e5974fe36830.gif",
+        "sourceUrl": "https://github.com/0xSanei/darwinia/blob/b62f1a2c18d6c6a21ca22c46259a0eada0569c82/docs/screenshots/demo.gif",
+        "kind": "example",
+        "title": {
+          "en": "Darwinia · Animation · still preview",
+          "zh": "Darwinia · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Darwinia: Darwinia Demo",
+          "zh": "Darwinia：Darwinia Demo"
+        },
+        "sourcePath": "docs/screenshots/demo.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/e23cb51cdf99005d1809be667187a3d34dc1bfacc346ec4cc0965bcb661c9d6a.preview.webp",
+        "previewSrc": "/skill-previews/auto/e23cb51cdf99005d1809be667187a3d34dc1bfacc346ec4cc0965bcb661c9d6a.preview.webp",
+        "cardSrc": "/skill-previews/auto/e23cb51cdf99005d1809be667187a3d34dc1bfacc346ec4cc0965bcb661c9d6a.card.webp",
+        "width": 1374,
+        "height": 748,
+        "sha256": "e23cb51cdf99005d1809be667187a3d34dc1bfacc346ec4cc0965bcb661c9d6a",
+        "originalSrc": "/skill-previews/auto/e23cb51cdf99005d1809be667187a3d34dc1bfacc346ec4cc0965bcb661c9d6a.png",
+        "sourceUrl": "https://github.com/0xSanei/darwinia/blob/b62f1a2c18d6c6a21ca22c46259a0eada0569c82/docs/screenshots/arms_race.png",
+        "kind": "reference",
+        "title": {
+          "en": "Darwinia · Author preview",
+          "zh": "Darwinia · 作者预览"
+        },
+        "alt": {
+          "en": "Darwinia: Arms Race",
+          "zh": "Darwinia：Arms Race"
+        },
+        "sourcePath": "docs/screenshots/arms_race.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/bdc02fd769e82ddd889478e80d287ae91a1350f411fadbb027f205d7f263371e.preview.webp",
+        "previewSrc": "/skill-previews/auto/bdc02fd769e82ddd889478e80d287ae91a1350f411fadbb027f205d7f263371e.preview.webp",
+        "cardSrc": "/skill-previews/auto/bdc02fd769e82ddd889478e80d287ae91a1350f411fadbb027f205d7f263371e.card.webp",
+        "width": 1374,
+        "height": 748,
+        "sha256": "bdc02fd769e82ddd889478e80d287ae91a1350f411fadbb027f205d7f263371e",
+        "originalSrc": "/skill-previews/auto/bdc02fd769e82ddd889478e80d287ae91a1350f411fadbb027f205d7f263371e.png",
+        "sourceUrl": "https://github.com/0xSanei/darwinia/blob/b62f1a2c18d6c6a21ca22c46259a0eada0569c82/docs/screenshots/discoveries.png",
+        "kind": "reference",
+        "title": {
+          "en": "Darwinia · Author preview",
+          "zh": "Darwinia · 作者预览"
+        },
+        "alt": {
+          "en": "Darwinia: Discoveries",
+          "zh": "Darwinia：Discoveries"
+        },
+        "sourcePath": "docs/screenshots/discoveries.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "0xtaodev-jupiter-python-cli",
+    "repository": "0xTaoDev/jupiter-python-cli",
+    "revision": "66cf88d938d4fc804e9102e71d04a46100f658f1",
+    "sourceUrl": "https://github.com/0xTaoDev/jupiter-python-cli/blob/66cf88d938d4fc804e9102e71d04a46100f658f1/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-e17381178732d62a1dd87c3d91a6d46a5cd422df2f145594e95ebf961f326797.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "e17381178732d62a1dd87c3d91a6d46a5cd422df2f145594e95ebf961f326797",
+    "documentSha256": "cf5b39e6bd64b57a3a2566b5ef140707e808f93708057ac9ba396f84d170c265",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-11T07:47:27.936Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/ef86d163f77b71e9433a58f3cfe0e43d5b7ae172bae5c12fadf2fb222c71f54a.preview.webp",
+        "previewSrc": "/skill-previews/auto/ef86d163f77b71e9433a58f3cfe0e43d5b7ae172bae5c12fadf2fb222c71f54a.preview.webp",
+        "cardSrc": "/skill-previews/auto/ef86d163f77b71e9433a58f3cfe0e43d5b7ae172bae5c12fadf2fb222c71f54a.card.webp",
+        "width": 611,
+        "height": 282,
+        "sha256": "ef86d163f77b71e9433a58f3cfe0e43d5b7ae172bae5c12fadf2fb222c71f54a",
+        "originalSrc": "/skill-previews/auto/ef86d163f77b71e9433a58f3cfe0e43d5b7ae172bae5c12fadf2fb222c71f54a.png",
+        "sourceUrl": "https://github.com/0xTaoDev/jupiter-python-cli/blob/66cf88d938d4fc804e9102e71d04a46100f658f1/images/sniper_bot_watch.png",
+        "kind": "reference",
+        "title": {
+          "en": "Jupiter Python Cli · Author preview",
+          "zh": "Jupiter Python Cli · 作者预览"
+        },
+        "alt": {
+          "en": "Jupiter Python Cli: sniper_bot_watch.png",
+          "zh": "Jupiter Python Cli：sniper_bot_watch.png"
+        },
+        "sourcePath": "images/sniper_bot_watch.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "acot-a11y-acot",
     "repository": "acot-a11y/acot",
     "revision": "34ff82b04faf65d22f323fd9ea47e03ede0fc13c",
@@ -1320,6 +1540,72 @@
     ]
   },
   {
+    "skillSlug": "alesaccoia-voicestreamai",
+    "repository": "alesaccoia/VoiceStreamAI",
+    "revision": "9248cd1fcf267b105f7d88b8d93e5b840009445e",
+    "sourceUrl": "https://github.com/alesaccoia/VoiceStreamAI/blob/9248cd1fcf267b105f7d88b8d93e5b840009445e/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-eb1a12a1ed486a49502f3ab49978257ae4a70621f0068e84b9437344a501c3eb.txt",
+    "licenseSourcePath": "LICENSE.txt",
+    "licenseSha256": "eb1a12a1ed486a49502f3ab49978257ae4a70621f0068e84b9437344a501c3eb",
+    "documentSha256": "9aa79b0f7e696f208e29a67ba72d86013ac244d698b06483947a9e14b45190a0",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-11T07:47:27.936Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/a38ade6af2b9ef5eaa434a2fbc9280f8d1e6c0e94ecad2d61b0b13080489c6c0.preview.webp",
+        "previewSrc": "/skill-previews/auto/a38ade6af2b9ef5eaa434a2fbc9280f8d1e6c0e94ecad2d61b0b13080489c6c0.preview.webp",
+        "cardSrc": "/skill-previews/auto/a38ade6af2b9ef5eaa434a2fbc9280f8d1e6c0e94ecad2d61b0b13080489c6c0.card.webp",
+        "width": 1600,
+        "height": 1203,
+        "sha256": "a38ade6af2b9ef5eaa434a2fbc9280f8d1e6c0e94ecad2d61b0b13080489c6c0",
+        "originalSrc": "/skill-previews/auto/a38ade6af2b9ef5eaa434a2fbc9280f8d1e6c0e94ecad2d61b0b13080489c6c0.png",
+        "sourceUrl": "https://github.com/alesaccoia/VoiceStreamAI/blob/9248cd1fcf267b105f7d88b8d93e5b840009445e/img/client.png",
+        "kind": "example",
+        "title": {
+          "en": "VoiceStreamAI · Author preview",
+          "zh": "VoiceStreamAI · 作者预览"
+        },
+        "alt": {
+          "en": "VoiceStreamAI: Client Demo",
+          "zh": "VoiceStreamAI：Client Demo"
+        },
+        "sourcePath": "img/client.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/93b50f2d58e143fab626387ec414e1bd9229363baf12d4f45d08771e8bf21d9e.preview.webp",
+        "previewSrc": "/skill-previews/auto/93b50f2d58e143fab626387ec414e1bd9229363baf12d4f45d08771e8bf21d9e.preview.webp",
+        "cardSrc": "/skill-previews/auto/93b50f2d58e143fab626387ec414e1bd9229363baf12d4f45d08771e8bf21d9e.card.webp",
+        "width": 1600,
+        "height": 459,
+        "sha256": "93b50f2d58e143fab626387ec414e1bd9229363baf12d4f45d08771e8bf21d9e",
+        "originalSrc": "/skill-previews/auto/93b50f2d58e143fab626387ec414e1bd9229363baf12d4f45d08771e8bf21d9e.png",
+        "sourceUrl": "https://github.com/alesaccoia/VoiceStreamAI/blob/9248cd1fcf267b105f7d88b8d93e5b840009445e/img/vad.png",
+        "kind": "reference",
+        "title": {
+          "en": "VoiceStreamAI · Author preview",
+          "zh": "VoiceStreamAI · 作者预览"
+        },
+        "alt": {
+          "en": "VoiceStreamAI: Buffering Mechanism",
+          "zh": "VoiceStreamAI：Buffering Mechanism"
+        },
+        "sourcePath": "img/vad.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "algolia-voice-overlay-ios",
     "repository": "algolia/voice-overlay-ios",
     "revision": "55a1047be9e0d9e4d4295ef127cc31b3ef7b8b54",
@@ -1402,6 +1688,336 @@
           "zh": "Voice Overlay Ios：listeninginitial.png"
         },
         "sourcePath": "Resources/listeninginitial.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "ali-vilab-dreamtalk",
+    "repository": "ali-vilab/dreamtalk",
+    "revision": "ba798b0e586d96a63f61050f7e8e17287ff3c859",
+    "sourceUrl": "https://github.com/ali-vilab/dreamtalk/blob/ba798b0e586d96a63f61050f7e8e17287ff3c859/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-d39636c9fa68062bab387344d19cf080d3fca808b313e7ca5a991c8049991525.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "d39636c9fa68062bab387344d19cf080d3fca808b313e7ca5a991c8049991525",
+    "documentSha256": "c540a3a5946fc209470f4afb78ba955761951502850f39c7e6a30d448ffb3866",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-11T07:47:27.936Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/73f1dc7c8baae253b789e9bf7be33214e6b3e68107433802d2d0e62117e6cd29.preview.webp",
+        "previewSrc": "/skill-previews/auto/73f1dc7c8baae253b789e9bf7be33214e6b3e68107433802d2d0e62117e6cd29.preview.webp",
+        "cardSrc": "/skill-previews/auto/73f1dc7c8baae253b789e9bf7be33214e6b3e68107433802d2d0e62117e6cd29.card.webp",
+        "width": 1120,
+        "height": 480,
+        "sha256": "73f1dc7c8baae253b789e9bf7be33214e6b3e68107433802d2d0e62117e6cd29",
+        "originalSrc": "/skill-previews/auto/73f1dc7c8baae253b789e9bf7be33214e6b3e68107433802d2d0e62117e6cd29.gif",
+        "sourceUrl": "https://github.com/ali-vilab/dreamtalk/blob/ba798b0e586d96a63f61050f7e8e17287ff3c859/media/teaser.gif",
+        "kind": "reference",
+        "title": {
+          "en": "Dreamtalk · Animation · still preview",
+          "zh": "Dreamtalk · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Dreamtalk: teaser",
+          "zh": "Dreamtalk：teaser"
+        },
+        "sourcePath": "media/teaser.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
+    "skillSlug": "ali-vilab-vace",
+    "repository": "ali-vilab/VACE",
+    "revision": "48eb44f1c4be87cc65a98bff985a26976841e9f3",
+    "sourceUrl": "https://github.com/ali-vilab/VACE/blob/48eb44f1c4be87cc65a98bff985a26976841e9f3/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4.txt",
+    "licenseSourcePath": "LICENSE.txt",
+    "licenseSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "documentSha256": "15844abba9a2c16f35378667e36b6f306154638f131d71519d570b9305da65e7",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-11T07:47:27.936Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/87ce75e8dcbf1536674d3a951326727e0aff80192f52cf7388b34c03f13f711f.preview.webp",
+        "previewSrc": "/skill-previews/auto/87ce75e8dcbf1536674d3a951326727e0aff80192f52cf7388b34c03f13f711f.preview.webp",
+        "cardSrc": "/skill-previews/auto/87ce75e8dcbf1536674d3a951326727e0aff80192f52cf7388b34c03f13f711f.card.webp",
+        "width": 1600,
+        "height": 949,
+        "sha256": "87ce75e8dcbf1536674d3a951326727e0aff80192f52cf7388b34c03f13f711f",
+        "originalSrc": "/skill-previews/auto/87ce75e8dcbf1536674d3a951326727e0aff80192f52cf7388b34c03f13f711f.jpg",
+        "sourceUrl": "https://github.com/ali-vilab/VACE/blob/48eb44f1c4be87cc65a98bff985a26976841e9f3/assets/materials/teaser.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "VACE · Author preview",
+          "zh": "VACE · 作者预览"
+        },
+        "alt": {
+          "en": "VACE: teaser.jpg",
+          "zh": "VACE：teaser.jpg"
+        },
+        "sourcePath": "assets/materials/teaser.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "ali-vilab-videocomposer",
+    "repository": "ali-vilab/videocomposer",
+    "revision": "490ed21b5c41ecbb12fd024de4308ce68b1e0f64",
+    "sourceUrl": "https://github.com/ali-vilab/videocomposer/blob/490ed21b5c41ecbb12fd024de4308ce68b1e0f64/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-13b4546c64817c71631710c6eb6f1131ef46c5512f2a9005eabbcb925a4a5cca.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "13b4546c64817c71631710c6eb6f1131ef46c5512f2a9005eabbcb925a4a5cca",
+    "documentSha256": "8ad017e23d046d53d9de5f3413ed4f834e1d926802aa56a37a2b17c2e652f2c5",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-11T07:47:27.936Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/e6924fce470351742a51293b48bda28f73ec7eb1190c4fe69e377c3a692e2959.preview.webp",
+        "previewSrc": "/skill-previews/auto/e6924fce470351742a51293b48bda28f73ec7eb1190c4fe69e377c3a692e2959.preview.webp",
+        "cardSrc": "/skill-previews/auto/e6924fce470351742a51293b48bda28f73ec7eb1190c4fe69e377c3a692e2959.card.webp",
+        "width": 1024,
+        "height": 256,
+        "sha256": "e6924fce470351742a51293b48bda28f73ec7eb1190c4fe69e377c3a692e2959",
+        "originalSrc": "/skill-previews/auto/e6924fce470351742a51293b48bda28f73ec7eb1190c4fe69e377c3a692e2959.gif",
+        "sourceUrl": "https://github.com/ali-vilab/videocomposer/blob/490ed21b5c41ecbb12fd024de4308ce68b1e0f64/source/results/exp02_motion_transfer-S00009.gif",
+        "kind": "example",
+        "title": {
+          "en": "Videocomposer · Animation · still preview",
+          "zh": "Videocomposer · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Videocomposer: case1",
+          "zh": "Videocomposer：case1"
+        },
+        "sourcePath": "source/results/exp02_motion_transfer-S00009.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/24824098f199d6a1cff2a244a6bcf8e3eb3c96b886a272a6a6cb83ecbf9a2cec.preview.webp",
+        "previewSrc": "/skill-previews/auto/24824098f199d6a1cff2a244a6bcf8e3eb3c96b886a272a6a6cb83ecbf9a2cec.preview.webp",
+        "cardSrc": "/skill-previews/auto/24824098f199d6a1cff2a244a6bcf8e3eb3c96b886a272a6a6cb83ecbf9a2cec.card.webp",
+        "width": 1024,
+        "height": 256,
+        "sha256": "24824098f199d6a1cff2a244a6bcf8e3eb3c96b886a272a6a6cb83ecbf9a2cec",
+        "originalSrc": "/skill-previews/auto/24824098f199d6a1cff2a244a6bcf8e3eb3c96b886a272a6a6cb83ecbf9a2cec.gif",
+        "sourceUrl": "https://github.com/ali-vilab/videocomposer/blob/490ed21b5c41ecbb12fd024de4308ce68b1e0f64/source/results/exp02_motion_transfer-S09999.gif",
+        "kind": "example",
+        "title": {
+          "en": "Videocomposer · Animation · still preview",
+          "zh": "Videocomposer · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Videocomposer: case2",
+          "zh": "Videocomposer：case2"
+        },
+        "sourcePath": "source/results/exp02_motion_transfer-S09999.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/456ad75d28d14941d2831b3ff9e30a432881c47fef67103e674fca69c9df9f8e.preview.webp",
+        "previewSrc": "/skill-previews/auto/456ad75d28d14941d2831b3ff9e30a432881c47fef67103e674fca69c9df9f8e.preview.webp",
+        "cardSrc": "/skill-previews/auto/456ad75d28d14941d2831b3ff9e30a432881c47fef67103e674fca69c9df9f8e.card.webp",
+        "width": 512,
+        "height": 256,
+        "sha256": "456ad75d28d14941d2831b3ff9e30a432881c47fef67103e674fca69c9df9f8e",
+        "originalSrc": "/skill-previews/auto/456ad75d28d14941d2831b3ff9e30a432881c47fef67103e674fca69c9df9f8e.gif",
+        "sourceUrl": "https://github.com/ali-vilab/videocomposer/blob/490ed21b5c41ecbb12fd024de4308ce68b1e0f64/source/results/exp03_sketch2video_style-S09999.gif",
+        "kind": "example",
+        "title": {
+          "en": "Videocomposer · Animation · still preview",
+          "zh": "Videocomposer · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Videocomposer: case2",
+          "zh": "Videocomposer：case2"
+        },
+        "sourcePath": "source/results/exp03_sketch2video_style-S09999.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
+    "skillSlug": "alibaba-animate-anything",
+    "repository": "alibaba/animate-anything",
+    "revision": "dca241202348fa2ac68e22e81fca042fe05e3550",
+    "sourceUrl": "https://github.com/alibaba/animate-anything/blob/dca241202348fa2ac68e22e81fca042fe05e3550/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-20c1066ace6131723d842b0370f56a0ff9bd83372f4399a877cfdf0da065f25b.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "20c1066ace6131723d842b0370f56a0ff9bd83372f4399a877cfdf0da065f25b",
+    "documentSha256": "66133edbbb2a0495626d1fef9d73a3cb9f1389eb4b1420b73cb7b96b1de8d2b7",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-11T07:47:27.936Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/49cbc40aba5d97b43cabc36c45702f56e8b1b550e38bd5cf986ee16267571b07.preview.webp",
+        "previewSrc": "/skill-previews/auto/49cbc40aba5d97b43cabc36c45702f56e8b1b550e38bd5cf986ee16267571b07.preview.webp",
+        "cardSrc": "/skill-previews/auto/49cbc40aba5d97b43cabc36c45702f56e8b1b550e38bd5cf986ee16267571b07.card.webp",
+        "width": 592,
+        "height": 440,
+        "sha256": "49cbc40aba5d97b43cabc36c45702f56e8b1b550e38bd5cf986ee16267571b07",
+        "originalSrc": "/skill-previews/auto/49cbc40aba5d97b43cabc36c45702f56e8b1b550e38bd5cf986ee16267571b07.gif",
+        "sourceUrl": "https://github.com/alibaba/animate-anything/blob/dca241202348fa2ac68e22e81fca042fe05e3550/docs/sample_1.gif",
+        "kind": "example",
+        "title": {
+          "en": "Animate Anything · Animation · still preview",
+          "zh": "Animate Anything · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Animate Anything: Result",
+          "zh": "Animate Anything：Result"
+        },
+        "sourcePath": "docs/sample_1.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/5bf8507795aa8b851e594e2a0e5b3a513da3c982da79eb504ba2754d6dc1d7a1.preview.webp",
+        "previewSrc": "/skill-previews/auto/5bf8507795aa8b851e594e2a0e5b3a513da3c982da79eb504ba2754d6dc1d7a1.preview.webp",
+        "cardSrc": "/skill-previews/auto/5bf8507795aa8b851e594e2a0e5b3a513da3c982da79eb504ba2754d6dc1d7a1.card.webp",
+        "width": 384,
+        "height": 384,
+        "sha256": "5bf8507795aa8b851e594e2a0e5b3a513da3c982da79eb504ba2754d6dc1d7a1",
+        "originalSrc": "/skill-previews/auto/5bf8507795aa8b851e594e2a0e5b3a513da3c982da79eb504ba2754d6dc1d7a1.gif",
+        "sourceUrl": "https://github.com/alibaba/animate-anything/blob/dca241202348fa2ac68e22e81fca042fe05e3550/docs/sample_2.gif",
+        "kind": "example",
+        "title": {
+          "en": "Animate Anything · Animation · still preview",
+          "zh": "Animate Anything · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Animate Anything: Result",
+          "zh": "Animate Anything：Result"
+        },
+        "sourcePath": "docs/sample_2.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/ef6ecbd3c091c7a999971b36522e25da748eb6bcb3e0cdafdc36f8def29f2886.preview.webp",
+        "previewSrc": "/skill-previews/auto/ef6ecbd3c091c7a999971b36522e25da748eb6bcb3e0cdafdc36f8def29f2886.preview.webp",
+        "cardSrc": "/skill-previews/auto/ef6ecbd3c091c7a999971b36522e25da748eb6bcb3e0cdafdc36f8def29f2886.card.webp",
+        "width": 512,
+        "height": 512,
+        "sha256": "ef6ecbd3c091c7a999971b36522e25da748eb6bcb3e0cdafdc36f8def29f2886",
+        "originalSrc": "/skill-previews/auto/ef6ecbd3c091c7a999971b36522e25da748eb6bcb3e0cdafdc36f8def29f2886.gif",
+        "sourceUrl": "https://github.com/alibaba/animate-anything/blob/dca241202348fa2ac68e22e81fca042fe05e3550/docs/sample_3.gif",
+        "kind": "example",
+        "title": {
+          "en": "Animate Anything · Animation · still preview",
+          "zh": "Animate Anything · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Animate Anything: Result",
+          "zh": "Animate Anything：Result"
+        },
+        "sourcePath": "docs/sample_3.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
+    "skillSlug": "alonzoleeeooo-stablev2v",
+    "repository": "AlonzoLeeeooo/StableV2V",
+    "revision": "68aff43cd01aed58159f57fee626e5f1bb72aef3",
+    "sourceUrl": "https://github.com/AlonzoLeeeooo/StableV2V/blob/68aff43cd01aed58159f57fee626e5f1bb72aef3/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-b24a69681926422fdf0d9b5fa7b5980f6ed343e321a7385830d0765cf92d09cb.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "b24a69681926422fdf0d9b5fa7b5980f6ed343e321a7385830d0765cf92d09cb",
+    "documentSha256": "32c7654e8f370479517aa8f2f8fd5eed5041b49e828bd8805279388a038a346e",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-11T07:47:27.936Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/e9eabde45976f1af46d9f8d40b79e6b3a03b3e5e8b64c13b19d0c2dd5cbea7c8.preview.webp",
+        "previewSrc": "/skill-previews/auto/e9eabde45976f1af46d9f8d40b79e6b3a03b3e5e8b64c13b19d0c2dd5cbea7c8.preview.webp",
+        "cardSrc": "/skill-previews/auto/e9eabde45976f1af46d9f8d40b79e6b3a03b3e5e8b64c13b19d0c2dd5cbea7c8.card.webp",
+        "width": 854,
+        "height": 480,
+        "sha256": "e9eabde45976f1af46d9f8d40b79e6b3a03b3e5e8b64c13b19d0c2dd5cbea7c8",
+        "originalSrc": "/skill-previews/auto/e9eabde45976f1af46d9f8d40b79e6b3a03b3e5e8b64c13b19d0c2dd5cbea7c8.png",
+        "sourceUrl": "https://github.com/AlonzoLeeeooo/StableV2V/blob/68aff43cd01aed58159f57fee626e5f1bb72aef3/inputs/dilated-masks/car-turn.png",
+        "kind": "reference",
+        "title": {
+          "en": "StableV2V · Author preview",
+          "zh": "StableV2V · 作者预览"
+        },
+        "alt": {
+          "en": "StableV2V: car-turn.png",
+          "zh": "StableV2V：car-turn.png"
+        },
+        "sourcePath": "inputs/dilated-masks/car-turn.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/eaa32e98dd03880ca6d83a4aef4b2282191af6fbe5573d1028cad41b576b7358.preview.webp",
+        "previewSrc": "/skill-previews/auto/eaa32e98dd03880ca6d83a4aef4b2282191af6fbe5573d1028cad41b576b7358.preview.webp",
+        "cardSrc": "/skill-previews/auto/eaa32e98dd03880ca6d83a4aef4b2282191af6fbe5573d1028cad41b576b7358.card.webp",
+        "width": 854,
+        "height": 480,
+        "sha256": "eaa32e98dd03880ca6d83a4aef4b2282191af6fbe5573d1028cad41b576b7358",
+        "originalSrc": "/skill-previews/auto/eaa32e98dd03880ca6d83a4aef4b2282191af6fbe5573d1028cad41b576b7358.png",
+        "sourceUrl": "https://github.com/AlonzoLeeeooo/StableV2V/blob/68aff43cd01aed58159f57fee626e5f1bb72aef3/inputs/masks/car-turn.png",
+        "kind": "reference",
+        "title": {
+          "en": "StableV2V · Author preview",
+          "zh": "StableV2V · 作者预览"
+        },
+        "alt": {
+          "en": "StableV2V: car-turn.png",
+          "zh": "StableV2V：car-turn.png"
+        },
+        "sourcePath": "inputs/masks/car-turn.png",
         "documentPath": "README.md",
         "format": "image"
       }
@@ -1650,6 +2266,116 @@
     ]
   },
   {
+    "skillSlug": "amanvirparhar-chaplin",
+    "repository": "amanvirparhar/chaplin",
+    "revision": "7aee1f8fca776ce4f63690063310b53573b7d804",
+    "sourceUrl": "https://github.com/amanvirparhar/chaplin/blob/7aee1f8fca776ce4f63690063310b53573b7d804/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-7a50abe218d6f25ce45081f9e7b3ac00c31c0e89b079f43e2dc824f27f497289.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "7a50abe218d6f25ce45081f9e7b3ac00c31c0e89b079f43e2dc824f27f497289",
+    "documentSha256": "acaf595098ab6c3365c02bfd968678754c89b75c02d59d0dd98c397612d67761",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-11T07:47:27.936Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/f35d5ffbdb9f3c4ade088c04d11612942995c6b361001360fd5b3287d188e270.preview.webp",
+        "previewSrc": "/skill-previews/auto/f35d5ffbdb9f3c4ade088c04d11612942995c6b361001360fd5b3287d188e270.preview.webp",
+        "cardSrc": "/skill-previews/auto/f35d5ffbdb9f3c4ade088c04d11612942995c6b361001360fd5b3287d188e270.card.webp",
+        "width": 1600,
+        "height": 900,
+        "sha256": "f35d5ffbdb9f3c4ade088c04d11612942995c6b361001360fd5b3287d188e270",
+        "originalSrc": "/skill-previews/auto/f35d5ffbdb9f3c4ade088c04d11612942995c6b361001360fd5b3287d188e270.png",
+        "sourceUrl": "https://github.com/amanvirparhar/chaplin/blob/7aee1f8fca776ce4f63690063310b53573b7d804/thumbnail.png",
+        "kind": "reference",
+        "title": {
+          "en": "Chaplin · Author preview",
+          "zh": "Chaplin · 作者预览"
+        },
+        "alt": {
+          "en": "Chaplin: Chaplin Thumbnail",
+          "zh": "Chaplin：Chaplin Thumbnail"
+        },
+        "sourcePath": "thumbnail.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "anchen1011-toflow",
+    "repository": "anchen1011/toflow",
+    "revision": "941eae530199e646118cc5ec36b4a8896ebeb24b",
+    "sourceUrl": "https://github.com/anchen1011/toflow/blob/941eae530199e646118cc5ec36b4a8896ebeb24b/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-0c5acc39135d76f82422f18ecac89dc919352c109006ae71784a54d214298960.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "0c5acc39135d76f82422f18ecac89dc919352c109006ae71784a54d214298960",
+    "documentSha256": "7b04f8dc280e6de983058dd4896e1eefc5d07d624e7fc94270624cc077243fd5",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-11T07:47:27.936Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/15f8731feb650343fdc9c7d8f5aa21dac8d95d186e1043646b4e5d7830bdd016.preview.webp",
+        "previewSrc": "/skill-previews/auto/15f8731feb650343fdc9c7d8f5aa21dac8d95d186e1043646b4e5d7830bdd016.preview.webp",
+        "cardSrc": "/skill-previews/auto/15f8731feb650343fdc9c7d8f5aa21dac8d95d186e1043646b4e5d7830bdd016.card.webp",
+        "width": 960,
+        "height": 487,
+        "sha256": "15f8731feb650343fdc9c7d8f5aa21dac8d95d186e1043646b4e5d7830bdd016",
+        "originalSrc": "/skill-previews/auto/15f8731feb650343fdc9c7d8f5aa21dac8d95d186e1043646b4e5d7830bdd016.png",
+        "sourceUrl": "https://github.com/anchen1011/toflow/blob/941eae530199e646118cc5ec36b4a8896ebeb24b/data/doc/dataset.png",
+        "kind": "reference",
+        "title": {
+          "en": "Toflow · Author preview",
+          "zh": "Toflow · 作者预览"
+        },
+        "alt": {
+          "en": "Toflow: This image cannot be displayed. Please open this link in another browser: https://github.com/anchen1011/toflow/raw/master/data/doc/dataset.png",
+          "zh": "Toflow：This image cannot be displayed. Please open this link in another browser: https://github.com/anchen1011/toflow/raw/master/data/doc/dataset.png"
+        },
+        "sourcePath": "data/doc/dataset.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/480563fc4d054afe6c3b6e81919c64df68c43546ea616cb861ef3fff0051f664.preview.webp",
+        "previewSrc": "/skill-previews/auto/480563fc4d054afe6c3b6e81919c64df68c43546ea616cb861ef3fff0051f664.preview.webp",
+        "cardSrc": "/skill-previews/auto/480563fc4d054afe6c3b6e81919c64df68c43546ea616cb861ef3fff0051f664.card.webp",
+        "width": 960,
+        "height": 600,
+        "sha256": "480563fc4d054afe6c3b6e81919c64df68c43546ea616cb861ef3fff0051f664",
+        "originalSrc": "/skill-previews/auto/480563fc4d054afe6c3b6e81919c64df68c43546ea616cb861ef3fff0051f664.png",
+        "sourceUrl": "https://github.com/anchen1011/toflow/blob/941eae530199e646118cc5ec36b4a8896ebeb24b/data/doc/video.png",
+        "kind": "reference",
+        "title": {
+          "en": "Toflow · Author preview",
+          "zh": "Toflow · 作者预览"
+        },
+        "alt": {
+          "en": "Toflow: ![IMAGE ALT TEXT",
+          "zh": "Toflow：![IMAGE ALT TEXT"
+        },
+        "sourcePath": "data/doc/video.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "andy1314chen-architecture-drawer",
     "repository": "Andy1314Chen/architecture-drawer",
     "revision": "3f5fb5a8bcd3e024c9358dd1ce9fc73503f646b0",
@@ -1732,6 +2458,72 @@
           "zh": "Architecture Drawer：mlir_pipeline.png"
         },
         "sourcePath": "docs/showcase/mlir_pipeline.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "ankanbhunia-pidm",
+    "repository": "ankanbhunia/PIDM",
+    "revision": "e4f1d880772072ee464a83240d0374bf466b6772",
+    "sourceUrl": "https://github.com/ankanbhunia/PIDM/blob/e4f1d880772072ee464a83240d0374bf466b6772/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-5eba1cf3ad7c48f62feebc3e7b354574a31bdde448092593661c70faf8d38861.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "5eba1cf3ad7c48f62feebc3e7b354574a31bdde448092593661c70faf8d38861",
+    "documentSha256": "69aec2e36242ae9e164aa98b27e3b6e246278dfb734c58d61f1ecfea87ac9c55",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-11T07:47:27.936Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/c3cc6ed82b98a0b20537f4eaa275c798c501e78910033fd61a2481a3930aa0cb.preview.webp",
+        "previewSrc": "/skill-previews/auto/c3cc6ed82b98a0b20537f4eaa275c798c501e78910033fd61a2481a3930aa0cb.preview.webp",
+        "cardSrc": "/skill-previews/auto/c3cc6ed82b98a0b20537f4eaa275c798c501e78910033fd61a2481a3930aa0cb.card.webp",
+        "width": 1385,
+        "height": 460,
+        "sha256": "c3cc6ed82b98a0b20537f4eaa275c798c501e78910033fd61a2481a3930aa0cb",
+        "originalSrc": "/skill-previews/auto/c3cc6ed82b98a0b20537f4eaa275c798c501e78910033fd61a2481a3930aa0cb.gif",
+        "sourceUrl": "https://github.com/ankanbhunia/PIDM/blob/e4f1d880772072ee464a83240d0374bf466b6772/Figures/images.gif",
+        "kind": "reference",
+        "title": {
+          "en": "PIDM · Animation · still preview",
+          "zh": "PIDM · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "PIDM: images.gif",
+          "zh": "PIDM：images.gif"
+        },
+        "sourcePath": "Figures/images.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/07cf67dcfa705c735cf5535cc780858b94d2af4b2326262a11451c5f9c63f351.preview.webp",
+        "previewSrc": "/skill-previews/auto/07cf67dcfa705c735cf5535cc780858b94d2af4b2326262a11451c5f9c63f351.preview.webp",
+        "cardSrc": "/skill-previews/auto/07cf67dcfa705c735cf5535cc780858b94d2af4b2326262a11451c5f9c63f351.card.webp",
+        "width": 1600,
+        "height": 548,
+        "sha256": "07cf67dcfa705c735cf5535cc780858b94d2af4b2326262a11451c5f9c63f351",
+        "originalSrc": "/skill-previews/auto/07cf67dcfa705c735cf5535cc780858b94d2af4b2326262a11451c5f9c63f351.jpg",
+        "sourceUrl": "https://github.com/ankanbhunia/PIDM/blob/e4f1d880772072ee464a83240d0374bf466b6772/Figures/intro_fig.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "PIDM · Author preview",
+          "zh": "PIDM · 作者预览"
+        },
+        "alt": {
+          "en": "PIDM: intro_fig.jpg",
+          "zh": "PIDM：intro_fig.jpg"
+        },
+        "sourcePath": "Figures/intro_fig.jpg",
         "documentPath": "README.md",
         "format": "image"
       }

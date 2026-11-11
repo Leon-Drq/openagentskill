@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "checkedAt": "2026-11-10T08:29:00.993Z",
+  "checkedAt": "2026-11-11T07:47:27.936Z",
   "records": {
     "001tmf-proteinview": {
       "identity": "5992a3c7067909901e64a4faf034453d5fc9bcfa2a253cb689fc207e1ace6826",
@@ -1594,6 +1594,30 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "0xranx-general": {
+      "identity": "91493eeff5fd4c4c4f3677ef2a69cfad304f21a8cae106fc33bbe8675b1d51fd",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "aa310a0b28f46a7869acac4df1face2e4285c8fb",
+      "documentPath": "skills/general/SKILL.md",
+      "documentSha256": "35e4d8510256a8ea7bc489c950c45f474ffd3793c35a8a35ffb4f3e1850da1ae",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xranx-golembot": {
+      "identity": "c9a7a2d4b7491c6cb780896ce7f8562be02aca6886000274125f4ee77ce2db59",
+      "status": "collected",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-12-11T07:47:27.936Z",
+      "revision": "aa310a0b28f46a7869acac4df1face2e4285c8fb",
+      "documentPath": "README.md",
+      "documentSha256": "ecb3f85e1565b9637f9058c32ca9c32133151e944b06539824d8c2826d0ad2b6",
+      "candidates": 3,
+      "previews": 3,
+      "skipped": []
+    },
     "0xranx-im-adapter": {
       "identity": "96f1298a8b5c9618a443f11e7610d481e07d2216777e8cee0afcce526f1a5141",
       "status": "not-found",
@@ -1605,6 +1629,2061 @@
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
+    },
+    "0xranx-kb-guide": {
+      "identity": "cc94ae16b8ffcf0e56945d70ef31db26f5913dfe3ea1571ed0979c964f947925",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "aa310a0b28f46a7869acac4df1face2e4285c8fb",
+      "documentPath": "skills/kb-guide/SKILL.md",
+      "documentSha256": "8d55557312e3e3da6a3f3364c106d1c39c9e0a5c6ef50d102dfb7a27bd24a88a",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xranx-meeting": {
+      "identity": "711ae3a7421327a465749b2fad2bf7c5b290eab606195bdf1b3f89e6ebb10b5f",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "aa310a0b28f46a7869acac4df1face2e4285c8fb",
+      "documentPath": "templates/meeting-notes/skills/meeting/SKILL.md",
+      "documentSha256": "b8fc8280f088ae7f1d9648db53eeb41ea1986e00a2cacaa1a6eb1cc4488c921e",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xranx-message-push": {
+      "identity": "16e75edb8485af7575090f980e5cdf6425be38bd88066405c7d4e2dbb55cf1cd",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "aa310a0b28f46a7869acac4df1face2e4285c8fb",
+      "documentPath": "skills/message-push/SKILL.md",
+      "documentSha256": "783ca977a9c774a87d935ded7f6346e240d5b4225db3acc2e4accb0b0f134518",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xranx-multi-bot": {
+      "identity": "9cc51dded910d109070c7fa30b6776fabb1f46cff549d5a8968c5b79efddcc83",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "aa310a0b28f46a7869acac4df1face2e4285c8fb",
+      "documentPath": "skills/multi-bot/SKILL.md",
+      "documentSha256": "b51dc45539026873cf1ee37bfe0587f7ae7d4cb5c422e3f162cc95b518ea54b5",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xranx-ops": {
+      "identity": "e99824fec02cd73b34d40cbb08553bc4bac20575f9a8c8d8843721ffe99f087e",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "aa310a0b28f46a7869acac4df1face2e4285c8fb",
+      "documentPath": "templates/ops-assistant/skills/ops/SKILL.md",
+      "documentSha256": "7a8d24a5d1aa3c5c37e9ee17f0d5665523909cbca20fd9b4ea3d5099dddaf953",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xranx-research": {
+      "identity": "4d70b7cc31ace76f44c96323fb56b4d3a1e590de4cd1c81652b4b517fdc053b5",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "aa310a0b28f46a7869acac4df1face2e4285c8fb",
+      "documentPath": "templates/research/skills/research/SKILL.md",
+      "documentSha256": "0c5041c550440afd24900e018019a2fe6cd1645d32af9e2b087f4972d53131c0",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xranx-researcher": {
+      "identity": "ef5cd6e9c8e60ec8fc5cdf07eee1ec0e66c10cf95df9dc069aae9895c76f08c1",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "aa310a0b28f46a7869acac4df1face2e4285c8fb",
+      "documentPath": "examples/multi-bot-group/bot-a/skills/researcher/SKILL.md",
+      "documentSha256": "b6d27262c2c03daf5ee157446605090898e3fc622b26919074de10c66cc0816a",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xranx-task-manager": {
+      "identity": "420224c6003df2c77250d776d0114576c55661e5eda9079e037be0bbd6ae257a",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "aa310a0b28f46a7869acac4df1face2e4285c8fb",
+      "documentPath": "skills/task-manager/SKILL.md",
+      "documentSha256": "e0270d8111470020bd3ddd55023dc64c820129c294d1f32365d7962e3b077719",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xricksanchez-paper-collection": {
+      "identity": "af4b5c93404512123388406617aae46e994c9a7cc240c948dbb0e54b02a7ce44",
+      "status": "needs-review",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "30d42ddcd1f6008addef6176f9dd7ada1e106db6",
+      "documentPath": "README.md",
+      "documentSha256": "8ddf7bb81fcd320a2f41da4efd95179cd51430da9768b46e2318429de4e803cf",
+      "candidates": 0,
+      "reason": "source-association-or-license",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "missing-asset",
+          "asset": "www.wingtecher.com/themes/WingTecherResearch/assets/papers/healer-sosp21.pdf"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "0xs34n-blockchain": {
+      "identity": "a4e7b60e200bb55dadfe094344ad95bb59f9be78c67607d941056d7a04649a59",
+      "status": "needs-review",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e03e2bbea668d8b845dcd6043404bf163b4475f3",
+      "documentPath": "README.md",
+      "documentSha256": "501a7ad7679458464a500501b40ce8a032f093b784ec097c2f8b6bb9e5d2c9a0",
+      "candidates": 0,
+      "reason": "source-association-or-license",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "0xs34n-blockchain-cli": {
+      "identity": "42ed588701962cfe0e54bdd7ae6c22682c7bbbd9672ffd75ed33b9dc39d34429",
+      "status": "needs-review",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "f9aab821d3de5063cb78a219c915b075e5d5f2d2",
+      "documentPath": "README.md",
+      "documentSha256": "0a71c07027db0ee154a8f6bf05a5cd3753afe8db7112ec1bd81716465d82afe1",
+      "candidates": 0,
+      "reason": "source-association-or-license",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
     },
     "0xs4n4tg-papercut-build": {
       "identity": "499f0166b3a0a2b4d8974cb830dd7fd2090eae6e893c1402400d9486f96225e0",
@@ -1629,6 +3708,229 @@
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
+    },
+    "0xs4n4tg-papercut-hook": {
+      "identity": "cecfed4b3d4851afc3541e92e5259a20900abb72452f0443414cf6ae6de15ddb",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "5a342bf855160379b4684e1c49f2e3faaecd5d0b",
+      "documentPath": "skills/papercut-hook/SKILL.md",
+      "documentSha256": "3881124cf73a9cb07801238ab573e55ce88433f5f15bace73b8d085417e57909",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xs4n4tg-papercut-qa": {
+      "identity": "90b7cde1758b6a0f3c3df655fde2e7ed4c4dbf5b9e6e9c9a1cd177f2edebce09",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "5a342bf855160379b4684e1c49f2e3faaecd5d0b",
+      "documentPath": "skills/papercut-qa/SKILL.md",
+      "documentSha256": "f43ce2e67f37e5ef541d8c730039745ba466c4da43112a4c79004e3cb90b5dd9",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xs4n4tg-papercut-setup": {
+      "identity": "bdb3d7ec85fb293914f03bb0d133c02b66a97ce6d5e1a2ab67d9e2f8fab326b7",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "5a342bf855160379b4684e1c49f2e3faaecd5d0b",
+      "documentPath": "skills/papercut-setup/SKILL.md",
+      "documentSha256": "cc244803884cbd41b7afea796264c59aa1b543d534c4dd7d6ab8f73e63886f0b",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xs4n4tg-papercut-storyboard": {
+      "identity": "b8c91e816f22fa48e6d5cc02c2f5098c1da3b840a6e1b1e7ce1bf6e361b63250",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "5a342bf855160379b4684e1c49f2e3faaecd5d0b",
+      "documentPath": "skills/papercut-storyboard/SKILL.md",
+      "documentSha256": "6b69d53f7ae5cbee47008c6e9f2fafe946de5912bf3ac2d72daab709cb8329e5",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xs4n4tg-papercut-strategy": {
+      "identity": "14beebb9d3214404d24fe884dd53af138e5d09c213074bdded2e730551e6617a",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "5a342bf855160379b4684e1c49f2e3faaecd5d0b",
+      "documentPath": "skills/papercut-strategy/SKILL.md",
+      "documentSha256": "fadfd7feea906f50864f8bd734f11d4d893a15d387d486e7f302cd75970e157b",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xs4n4tg-papercut-voice": {
+      "identity": "050b004e59a9055278bb760fc4ca5f50d9ec82c458f9554cf28f7848a789b6c0",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "5a342bf855160379b4684e1c49f2e3faaecd5d0b",
+      "documentPath": "skills/papercut-voice/SKILL.md",
+      "documentSha256": "9a5333d955bf4a49056488cb02d7ea24e86dfce33dc6909585da6496ba04c9a3",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xsanei-darwinia": {
+      "identity": "12ac88ab27ae0f81290793517933bbcfc06cb1ea1ffb700bfe08005845ebb8d9",
+      "status": "collected",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-12-11T07:47:27.936Z",
+      "revision": "b62f1a2c18d6c6a21ca22c46259a0eada0569c82",
+      "documentPath": "README.md",
+      "documentSha256": "b5c1feffd2a7bdc89b712c892feb9df65222cda14483ef8d98f22964b9c28811",
+      "candidates": 5,
+      "previews": 3,
+      "skipped": []
+    },
+    "0xsauby-yasuo": {
+      "identity": "5d96e6dada0a07ab1f8253c1963198fb0abd560bbb50a9c94327ea8edf2c4842",
+      "status": "needs-review",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "994dcb17f3730319125b0036cea77fa745ee94dd",
+      "documentPath": "README.md",
+      "documentSha256": "2a55ce4161c8d0d73b37a14cba0b4da9e5ec784fd5d94e8f42a18451e8baf722",
+      "candidates": 1,
+      "reason": "image-license-not-established",
+      "skipped": []
+    },
+    "0xsero-parchi": {
+      "identity": "753a17663d54d88aa3d8928376f5f6413ddbcb24f98304a76ae84fc5d90e3c24",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "f550d789c993129cbe33badbb39f89660a5caa62",
+      "documentPath": "SKILL.MD",
+      "documentSha256": "77c92cf32828ff62fb07d5da32dbcd60abfdf87eb781756131ddb389411a3439",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xsha-chainwalker": {
+      "identity": "3a60fa560571ad2652c0301dbf5458076f004456866add942184aa01060ed910",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "4f901358623969cc2d501c979e775aa21ad4605b",
+      "documentPath": "README.md",
+      "documentSha256": "acbec7b15d6f0925258377e16cf9ac23767f0a39a2f4acd31b9fb2c99174288f",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xsteph-pentest-ai-agents": {
+      "identity": "52b549f65e185da465125e2d31e3be983bad393bac3e073a17b0afc3d9e04890",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e5d7aa02c4c0c29a90e4789034b45e0cb7488e89",
+      "documentPath": "README.md",
+      "documentSha256": "1357801f743ebaa7ffcf07b367c1979160e23b3d2bc64208835fb35d94426cae",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xtaodev-jupiter-python-cli": {
+      "identity": "3081d53d054c085ed2a183a80afedcf230a2470b985b6c52318882afecdcd805",
+      "status": "collected",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-12-11T07:47:27.936Z",
+      "revision": "66cf88d938d4fc804e9102e71d04a46100f658f1",
+      "documentPath": "README.md",
+      "documentSha256": "cf5b39e6bd64b57a3a2566b5ef140707e808f93708057ac9ba396f84d170c265",
+      "candidates": 1,
+      "previews": 1,
+      "skipped": []
+    },
+    "0xtaodev-jupiter-python-sdk": {
+      "identity": "5e9df22ec4c36d20a8da25e3798858a574cf63aac4cee1f1f0dada3316f67a30",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "343f0037bc74fc3bd1a21c06bfb4c95eca0301cb",
+      "documentPath": "README.md",
+      "documentSha256": "84db6e40388393e7041c9240d6f1a2d8fb7bbfa7131a16cd6d61f7bb81359764",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "0xwilliamortiz-ponytail-improved": {
+      "identity": "9cf23ae61d000c50cf79a5dae13f686e54a93c2fb20aee1de987a812d506e7b5",
+      "status": "error",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-12T07:47:27.936Z",
+      "reason": "HTTP 404"
+    },
+    "0xzkzhao-movie-compare": {
+      "identity": "0884bf8f23b6f13fb98972abffaee560eb6a7763200fca6cec87661db991886a",
+      "status": "needs-review",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "7fa3f66837040935fa01a00ac9bb4d6602cc9ddb",
+      "documentPath": "readme.md",
+      "documentSha256": "dd61f55e355af7c62d64e00bacc7724a6bd06885226b410b762fd9cac88a7b27",
+      "candidates": 3,
+      "reason": "image-license-not-established",
+      "skipped": []
+    },
+    "1095071913-maozi-cloud-parent": {
+      "identity": "e45d7e11a583feb063fad111c4a4f9b7eaddb0f3c1bf768a12f55918dcdb20bf",
+      "status": "error",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-12T07:47:27.936Z",
+      "reason": "source-unavailable"
+    },
+    "10up-action-wordpress-plugin-deploy": {
+      "identity": "ca33d572b0a4d212c6bfa268392c72ce263c2155dc30c29ad00470f7351ddb0c",
+      "status": "needs-review",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "008657da18d18e065aaaccd287fa3af53ff768a1",
+      "documentPath": "README.md",
+      "documentSha256": "f7c250629cd5ed99c4a45e4ae16fa8bdd81b5e0be5c554efd064d52aefae7e94",
+      "candidates": 0,
+      "reason": "source-association-or-license",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "10up-classifai": {
+      "identity": "dd807d3521f57b8c6f8303dcc213618017a1331c803cdec4b2accb48eb03ceb4",
+      "status": "needs-review",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "0cd087f4e1975cd4960f7ab74d511f4bbc87819e",
+      "documentPath": "README.md",
+      "documentSha256": "e568beb7cc75b599591d8b1b2f47245d1d7facad606801b2730bb7bd86ec2ef3",
+      "candidates": 14,
+      "reason": "image-license-not-established",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "1102tools-dev-federal-contracting-skills": {
+      "identity": "d5b9d5440bca1f1cd067d01a3e400ee907c6b641bb4e2d96cd23bb4f9c052d26",
+      "status": "error",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-12T07:47:27.936Z",
+      "reason": "HTTP 404"
     },
     "124zhe-youtube-curiosity-stories": {
       "identity": "0734cf6a40665e1ddad5e1ce5865f41e7c2e03eb629625b281dbf5d27f70fec5",
@@ -5964,6 +8266,18 @@
       "reason": "no-exact-source-document",
       "revision": "ed368b5793e73652399f14a263af1280f09d29ac"
     },
+    "alekpet-comfyui-custom-nodes-alekpet": {
+      "identity": "3f4020a00548dcc67440fa1b1175fffa2fb2eb9bd687ae7882ab5837793dae7e",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "8111722784733b4d5d85096ae1fb3cdef32742ca",
+      "documentPath": "README.md",
+      "documentSha256": "5932f9d0d25f08178bc43dccf86caab8a4125d6159077c7c3c36f112828b820f",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "alekseiul-presentation": {
       "identity": "59b109dc79ecc63ead4f82ecc5bdf76328b297ae22e1bf16d22e37ba9adfdeaf",
       "status": "not-found",
@@ -6012,6 +8326,18 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "alemtuzlak-hyperframes-video": {
+      "identity": "4bca2cd38408e60db235e1c03b08e4397aa36e1d9bd50f98784e2518aaa22153",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "76d78a54b5ded8031a4affbd08f21c834f056c76",
+      "documentPath": "skills/hyperframes-video/SKILL.md",
+      "documentSha256": "61a25abbff3d12393aa2e46454132bfbfeb03d9da710e227bc8fdc7cf3c4085d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "alemtuzlak-presentation": {
       "identity": "9c7d9928f9c37635097f2839d9992c2414594afac3eb222256cdf50fd03ea8d3",
       "status": "not-found",
@@ -6024,6 +8350,18 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "alemtuzlak-produce-video": {
+      "identity": "af1a80a598506821c5de27cdc13f41fafbcdff9eaa7f46426ca5ad64ee8ccbb8",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "76d78a54b5ded8031a4affbd08f21c834f056c76",
+      "documentPath": "skills/produce-video/SKILL.md",
+      "documentSha256": "d37582cdf62f837205895ceaee8b81e6b5c3dfc0f554749e95ab0b8003a91c5d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "alemtuzlak-prove-it": {
       "identity": "612e505a04072858cc2b5167ca4e2d2362c78dfd16a03e88c73a3fb74428fe04",
       "status": "not-found",
@@ -6032,6 +8370,18 @@
       "revision": "76d78a54b5ded8031a4affbd08f21c834f056c76",
       "documentPath": "skills/prove-it/SKILL.md",
       "documentSha256": "5d89a0ef85899475728f2cd9315258cb2b2ab9dc170a94d148f1de285b2bbb70",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "alemtuzlak-remotion-video": {
+      "identity": "7a5a6fcf5f743fdfdfa12120be3154663f10c485fecfb21b822a483d48214e18",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "76d78a54b5ded8031a4affbd08f21c834f056c76",
+      "documentPath": "skills/remotion-video/SKILL.md",
+      "documentSha256": "e1d020f798800ec567fc12fc3b779bba5888ffebdf47457703fc525f4c584252",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -6070,6 +8420,66 @@
       "documentSha256": "5aa03e5ab025cb8c3d3098c3501be349c4b258552e9b21195200d0af1cea072b",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "alemtuzlak-transcribe-video": {
+      "identity": "85c2bf095916fe392b3903eb7eac4e9f5a46a552f00384661b798542fb4286fd",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "76d78a54b5ded8031a4affbd08f21c834f056c76",
+      "documentPath": "skills/transcribe-video/SKILL.md",
+      "documentSha256": "f6caa55dbca6499cf5b953ffc93f854d528a1aca45941446529b3069e8b7d2e2",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "alemtuzlak-video-script": {
+      "identity": "3c9da1f0265e831f42cfe334d760ffce36cdc69cf64190a3efa61ec0873d9399",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "76d78a54b5ded8031a4affbd08f21c834f056c76",
+      "documentPath": "skills/video-script/SKILL.md",
+      "documentSha256": "529085ac1f9bf592bf652d44a86b176f011cfec8038c1481989647a2563de921",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "alemtuzlak-youtube-copy": {
+      "identity": "af7eb912fdebfbf67244498c2f1c48c133053b242ce650695cf1035fd899c739",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "76d78a54b5ded8031a4affbd08f21c834f056c76",
+      "documentPath": "skills/youtube-copy/SKILL.md",
+      "documentSha256": "f4e733487dcc0f509d3ba39be6d5e80f48e2e846f387ac825bec91ee900125e8",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "alen-smajic-stable-diffusion-latent-space-explorer": {
+      "identity": "3cb66286bbc230201821d7d80b910fae6ec66055f7da7786ad8961bbcecce8db",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "8d76b28898b74d2efa37807b2f09bbb30572b5fc",
+      "documentPath": "README.md",
+      "documentSha256": "c876df1cab6b5f7d601d0488fa7cf311c42bd349fb45878c0480315b70facccc",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "alesaccoia-voicestreamai": {
+      "identity": "90f57e23b3a483f43971a7dab7e74b7ab936847f28bcbc86cc1e6409ce40085e",
+      "status": "collected",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-12-11T07:47:27.936Z",
+      "revision": "9248cd1fcf267b105f7d88b8d93e5b840009445e",
+      "documentPath": "README.md",
+      "documentSha256": "9aa79b0f7e696f208e29a67ba72d86013ac244d698b06483947a9e14b45190a0",
+      "candidates": 2,
+      "previews": 2,
       "skipped": []
     },
     "alexchantastic-figma-export": {
@@ -6274,6 +8684,92 @@
         }
       ]
     },
+    "ali-vilab-dreamtalk": {
+      "identity": "152d017022eb065a3f13c9ca8a11de731829b0643b3bdab6924217e843d9a14b",
+      "status": "collected",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-12-11T07:47:27.936Z",
+      "revision": "ba798b0e586d96a63f61050f7e8e17287ff3c859",
+      "documentPath": "README.md",
+      "documentSha256": "c540a3a5946fc209470f4afb78ba955761951502850f39c7e6a30d448ffb3866",
+      "candidates": 1,
+      "previews": 1,
+      "skipped": []
+    },
+    "ali-vilab-teacache": {
+      "identity": "45161cc085c14c784bb196185fadfc9a04f195eff0aab9e7371f7e19e3325ac5",
+      "status": "error",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-12T07:47:27.936Z",
+      "reason": "source-unavailable"
+    },
+    "ali-vilab-unianimate": {
+      "identity": "86d7176a204216418ab1d7a51bb8fa62c4975c9a5c013d1a703d8d60201cfb26",
+      "status": "needs-review",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "643c9637715888cea38818892bf1ef313a3dcfa9",
+      "documentPath": "README.md",
+      "documentSha256": "bed46c06327feb1772e9528c6137aa4ac4ddf6ee32ec78e7738ed7f0a79e7169",
+      "candidates": 0,
+      "reason": "source-association-or-license",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "ali-vilab-unianimate-dit": {
+      "identity": "f2205f4357edae6be78dba208b7bf01e4cfe5c32b81189a2bc88d5dd5f2d500c",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "61d882c25385042f0cf5bcdaf6853238d9756d68",
+      "documentPath": "README.md",
+      "documentSha256": "2c0a641544aaa90da0765b3c03c2b46c2858f092fc5f93036d3ee175ad14479d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ali-vilab-vace": {
+      "identity": "4f1eee6ffca562beda41a98513a8473887f17e98306df3453d39a40c0a4b7f25",
+      "status": "collected",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-12-11T07:47:27.936Z",
+      "revision": "48eb44f1c4be87cc65a98bff985a26976841e9f3",
+      "documentPath": "README.md",
+      "documentSha256": "15844abba9a2c16f35378667e36b6f306154638f131d71519d570b9305da65e7",
+      "candidates": 1,
+      "previews": 1,
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "ali-vilab-videocomposer": {
+      "identity": "ae87d5fdc3421e20c60ca9eb7d05378d6e187c0b355599f955258513e155489f",
+      "status": "collected",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-12-11T07:47:27.936Z",
+      "revision": "490ed21b5c41ecbb12fd024de4308ce68b1e0f64",
+      "documentPath": "README.md",
+      "documentSha256": "8ad017e23d046d53d9de5f3413ed4f834e1d926802aa56a37a2b17c2e652f2c5",
+      "candidates": 11,
+      "previews": 3,
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
     "alianilkocak-flutter-shopping-ui-kit": {
       "identity": "bdc3f4fdad8e4e1d83969b43425d412c4d66333721b95a3dbc014bc6f51dc195",
       "status": "not-found",
@@ -6281,6 +8777,18 @@
       "nextAt": "2026-11-11T07:33:37.767Z",
       "reason": "no-exact-source-document",
       "revision": "f1aa2a10b0d2757f6db17fdd86383343667d2ac4"
+    },
+    "alibaba-animate-anything": {
+      "identity": "7cc0ed9b3d3e5ad6bfad56c3f12e87e013f824468ac5bc5e5dd5e6995cf27e39",
+      "status": "collected",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-12-11T07:47:27.936Z",
+      "revision": "dca241202348fa2ac68e22e81fca042fe05e3550",
+      "documentPath": "README.md",
+      "documentSha256": "66133edbbb2a0495626d1fef9d73a3cb9f1389eb4b1420b73cb7b96b1de8d2b7",
+      "candidates": 10,
+      "previews": 3,
+      "skipped": []
     },
     "alibaba-chatui": {
       "identity": "fa7f4a799bf365b19565c494a734824b899454ef49486cd20c13e690f8c9256c",
@@ -6476,6 +8984,18 @@
       "reason": "no-exact-source-document",
       "revision": "c85b17e1fb621ba760478baaacc4fcb9be225e74"
     },
+    "allengkc-seedance-25": {
+      "identity": "ed77214bbdc9c26d22ec469f0fcdea28c30815d906d0a3651b0bc5215b95194e",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "ebc68d3c19a62fba0f9ba9d2805af1f711a82aa7",
+      "documentPath": "skill/seedance-25/SKILL.md",
+      "documentSha256": "9b0a55fefb4228af61a0f5d01ae5f83437cabe18db892f98f007be1e1293c5e0",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "aloisdeniel-figma-to-flutter": {
       "identity": "861b2e5d0db32c73f06e589606caf0dc6ad793faa4bff745eae7f775e3e3940a",
       "status": "not-found",
@@ -6495,6 +9015,67 @@
       "candidates": 4,
       "reason": "image-license-not-established",
       "skipped": []
+    },
+    "alonzoleeeooo-stablev2v": {
+      "identity": "6673cafb371c78573587539cf8d6bae04fc3c066e4aa740ea4d40f7a4d7a145b",
+      "status": "collected",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-12-11T07:47:27.936Z",
+      "revision": "68aff43cd01aed58159f57fee626e5f1bb72aef3",
+      "documentPath": "README.md",
+      "documentSha256": "32c7654e8f370479517aa8f2f8fd5eed5041b49e828bd8805279388a038a346e",
+      "candidates": 2,
+      "previews": 2,
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
     },
     "alpacahq-alpaca-broker-funding-transfers": {
       "identity": "3c3f76324bdc6828d900093c4cd35c3f8971e96d820a5960eb794f66a4031ef1",
@@ -6576,6 +9157,71 @@
       "revision": "78a17571623708acb31984655a5df873c88bb734",
       "documentPath": "skills/nyc-landmarks/SKILL.md",
       "documentSha256": "cc5cae866869ff7996fd49ac77ed248f969d88752cf33c6151d593476e6048e7",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "alphacep-vosk": {
+      "identity": "d4fe5c66c9ed22bdb219909659c76e598f79a857c6c488383db0841d166148fd",
+      "status": "needs-review",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "059ddf2d5c80b3ec354ba1436e1f1461bac2e60f",
+      "documentPath": "README.md",
+      "documentSha256": "870291dd1ecc24acbe795add1c49d553e31fcfa8dd984026badbc28e1efa0a01",
+      "candidates": 0,
+      "reason": "source-association-or-license",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "alphacep-vosk-android-demo": {
+      "identity": "ba5019526acbc04ba122383b306e8d41c140b8a4d689f024ea58dbafb2b77807",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a5e58ec399135f78325bd3e289849fc3fb57ce96",
+      "documentPath": "README.md",
+      "documentSha256": "67da0c2bc123de7691fced3ba752ccf347812c73a19a99be9c7a7ce9782683c0",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "alphacep-vosk-api": {
+      "identity": "7b4c0e525925e0febaf95fdf710556a3336019a37db3cadb9124ec41dd7dfd7f",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "4ab9821510b488efb7740094714a130bd3545e90",
+      "documentPath": "README.md",
+      "documentSha256": "5f56ab2addced6c3655d22dbeeaf05dd5fc75ab9aa8e5e6a9f18b622fe68e5bb",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "alphacep-vosk-server": {
+      "identity": "8ce105dfab68e2968c7ba1b2fe4b9cbb96b616cf3b05c2208f6840ba86aa3baf",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "47998a26f232252f7baaed53dd8ce89d38bbfbce",
+      "documentPath": "README.md",
+      "documentSha256": "bfe896f42ce1c9214b17f1032df3bc6f19206d49f69120cf8a9ac50c1d38318d",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -6684,6 +9330,18 @@
       "revision": "4a5b75358026b33d3e53101bf551331e12113bee",
       "documentPath": "skills/bioinformatics/alterlab-anndata/SKILL.md",
       "documentSha256": "04f076625984ebae1ef97047d6250b62dd06a261cf3d2bed9c05f2ea0cc2fc69",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "alterlab-ieu-alterlab-arboreto": {
+      "identity": "2e0917d17285490ffcd25dc62fbf6473849e44d1558671082f9c2a57e0367ff4",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "3ab6d034385ec4fedc3f6f4099292d4e91f60300",
+      "documentPath": "skills/bioinformatics/alterlab-arboreto/SKILL.md",
+      "documentSha256": "061c2ec3e5dbef4742a7fa3b8044354914d28082cab1a9c77327c076622d4028",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -6808,6 +9466,18 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "alumae-kaldi-gstreamer-server": {
+      "identity": "24a7d1bf0b357256dfee27fd59397399d68b2ae47aa87c63072d8d0a6d325a8b",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "daafb0bb6490c6775ac263871d52bab9d8ef4ea6",
+      "documentPath": "README.md",
+      "documentSha256": "ce65cc3334f591cc0976c5ce76856dcb671a3621c5ba5c36ba6e54f3074dcc13",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "alvin-reyes-bmad-agent-architect": {
       "identity": "2baad866b1f47b277a714fc4876b788b1cc5afb33cdca8d0c85471499097596a",
       "status": "not-found",
@@ -6873,6 +9543,26 @@
         }
       ]
     },
+    "amanchadha-iseebetter": {
+      "identity": "81faedaf6c72dee42bdc5e77b5e2e2d38a82d7dc61c712124cb3171122183230",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "reason": "no-exact-source-document",
+      "revision": "c8c6836d3f3689128e5c53be8dc10a3b3bbdf5df"
+    },
+    "amanvirparhar-chaplin": {
+      "identity": "75696752ee1cf711174c4e471f669112c072dd2030a632431cb2c5a62ef6bde9",
+      "status": "collected",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-12-11T07:47:27.936Z",
+      "revision": "7aee1f8fca776ce4f63690063310b53573b7d804",
+      "documentPath": "README.md",
+      "documentSha256": "acaf595098ab6c3365c02bfd968678754c89b75c02d59d0dd98c397612d67761",
+      "candidates": 1,
+      "previews": 1,
+      "skipped": []
+    },
     "amazingang-old-coder-api": {
       "identity": "b2fc236355e6f434023cb3caea47384081e9bbb43d2aac1c23b792799ee8dc0e",
       "status": "not-found",
@@ -6885,6 +9575,18 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "amazon-science-video-contrastive-learning": {
+      "identity": "4a1e192c45dde63f769f43399fadca1c9e26a9fb1c0e0ca36256a28df25dd079",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "4fb66c3df03a4109a462b1169c71c963538d8632",
+      "documentPath": "README.md",
+      "documentSha256": "a469e194e2d7f8c4570651dedd563d4359a150db94e7f92f986e6b35a0f48f43",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "amd-lemonade-router-builder": {
       "identity": "7e8358c8ec92663372e8c0ed5f3172722785dd9cd8a0ee9036f037d81383a8a4",
       "status": "not-found",
@@ -6893,6 +9595,30 @@
       "revision": "9eba3192f6793237eaeacfabd61fb0bd557e53cf",
       "documentPath": "skills/lemonade-router-builder/SKILL.md",
       "documentSha256": "0d2a5b22c233a1757d34a135a633931eea05d22fe0107ebd3452d80b072c657d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "amd-local-ai-app-integration": {
+      "identity": "3a8d819a60899ad174b7bd69d36cf1ca8bfb1f064367d06c8032c1dc75a2737f",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "3e504aadc58818142ec50aee265c446295f784a2",
+      "documentPath": "skills/local-ai-app-integration/SKILL.md",
+      "documentSha256": "e66d30bcb8969ed98679fa2332b65002d5b94c299b843916d026a1aa6e2718e3",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "amd-local-ai-use": {
+      "identity": "3e86b7af8ca3f5c0116d94696a469a86631a3fcf1062781a7aff75084ba3231e",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "3e504aadc58818142ec50aee265c446295f784a2",
+      "documentPath": "skills/local-ai-use/SKILL.md",
+      "documentSha256": "b93029a8918934626a9ce5ec8286b244022ab92560389ec188d4a612ec6dd3f9",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -7233,6 +9959,42 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "ammaarreshi-openjourney": {
+      "identity": "4eca4fa879d7f283452e88555cad77eba269e9d16299520a8aad52f39fb5d5f3",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "32f8b95be1701d74166fb46e410ab60582cfab47",
+      "documentPath": "README.md",
+      "documentSha256": "444a94bca69db4e0af0807357b482c032b091357fdfdf552325e18e5c8403c3f",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "analyticalmonk-explaining-codebases": {
+      "identity": "1891bcc0fc386a6dea55cf35c37c7eefd12406af4cb7fa3f2f0a69f4d3b3d64a",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "f64dab456ca23a351fe4d932c4e73bc91d3f2c52",
+      "documentPath": "skills/explaining-codebases/SKILL.md",
+      "documentSha256": "6d52de745455c80c2fda2c95bc8fc78c93c115b38a408faff3971dbacf143dfd",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "analyticalmonk-fact-checking-explainers": {
+      "identity": "12c189adc8ff4e3111653a440d2df7d1183c2dda8421d477fc31ebd8f4885b22",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "f64dab456ca23a351fe4d932c4e73bc91d3f2c52",
+      "documentPath": "skills/fact-checking-explainers/SKILL.md",
+      "documentSha256": "a660efc471ba5336c0ec955bb050429a0351e7f112e62f98dc4f132c37a7b5cc",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "anaulin-generative-art": {
       "identity": "d0e80519241b370a38e63306dc7df2e8b51d5057f55650a5ca86518950b3c2c4",
       "status": "needs-review",
@@ -7269,6 +10031,27 @@
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
+    },
+    "anchen1011-toflow": {
+      "identity": "f242d057d07c6bd2a50f40641f82d0cb4fb84d6e3aaa9a634de9f1ffb337fc8d",
+      "status": "collected",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-12-11T07:47:27.936Z",
+      "revision": "941eae530199e646118cc5ec36b4a8896ebeb24b",
+      "documentPath": "README.md",
+      "documentSha256": "7b04f8dc280e6de983058dd4896e1eefc5d07d624e7fc94270624cc077243fd5",
+      "candidates": 2,
+      "previews": 2,
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
     },
     "ancoleman-ai-design-components": {
       "identity": "1a6653b47977da84b9b1c930162bda0203844397aa37697201a287d2752a3158",
@@ -7455,6 +10238,59 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "anil-matcha-open-ai-micro-drama-generator": {
+      "identity": "76ed9fa3d0d3af19646b445ca0f1be7b0802be3e10776eff96e4b0bd62b7d490",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "94ef2a6611696f353a8fc319fbef81b248725e20",
+      "documentPath": "README.md",
+      "documentSha256": "180dfe8c8d2d5e93e96c3c4dd7dca34d0226051cd41fe7d9a3ea01752e39d8a2",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "anil-matcha-seedance2-comfyui": {
+      "identity": "cf2126a867e2ee46a6819a27ffd141b9c2a39675d34cf7acb8ca862c74176afb",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "584b08328dfda9650077e3420dfd9fe5c87ac838",
+      "documentPath": "README.md",
+      "documentSha256": "38b50e4cd17b4ac4ea037de89456eb9af419f0b4ba1c914e1b40c0091df803cd",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "anil-matcha-vox-ai-motion-graphics-generator": {
+      "identity": "d158cabe527e90ae2bc0971b9424a06c17986d19e68a28b03d6932eecd1ee283",
+      "status": "needs-review",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "c6856442a45761f86ae67cb05efbf25f65228e7c",
+      "documentPath": "SKILL.md",
+      "documentSha256": "dd6f6779d67ae59cca30a2be47ed34041adf8a8bddae024d36ef357fc832f4a8",
+      "candidates": 1,
+      "reason": "image-license-not-established",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "ankanbhunia-pidm": {
+      "identity": "f8cba15ad5d849250701e5331e17a9fa793882de63edb27d0983f6a19a4ccdf3",
+      "status": "collected",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-12-11T07:47:27.936Z",
+      "revision": "e4f1d880772072ee464a83240d0374bf466b6772",
+      "documentPath": "README.md",
+      "documentSha256": "69aec2e36242ae9e164aa98b27e3b6e246278dfb734c58d61f1ecfea87ac9c55",
+      "candidates": 2,
+      "previews": 2,
+      "skipped": []
+    },
     "ankraft-acme-cse": {
       "identity": "f5dfe6c6d4c774c23d52922c1ba796013f0cfa4c44424d883031383ca5188d13",
       "status": "not-found",
@@ -7629,6 +10465,30 @@
       "revision": "e98e476e315f068f72d53bd3afb34fdd4d5851c3",
       "documentPath": "skills/vue/SKILL.md",
       "documentSha256": "eba0d129cc4c2cf9c08116d4b136cc6800322985e831a9e04da4e97f3dca137a",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "antgroup-ditto-talkinghead": {
+      "identity": "ddaf648f4dd0243d71d98651678d4b8a8a9af1e2909be5e50eedc2be46d2b24c",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "c3e47eee2e626500017a0556b470d6d4182f85e8",
+      "documentPath": "README.md",
+      "documentSha256": "f39329835c98a021a6d1b2d1ac6b09751333de5ebd45995d29efbd43adfd63c0",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "antgroup-echomimic-v2": {
+      "identity": "0035a2b6825eeadc1243c799fc9d795c0cb9a004c1246ec5221906977ded82ea",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "38c86809efa041884c774ee31d984a9577c0e0aa",
+      "documentPath": "README.md",
+      "documentSha256": "ea5112f662972ce6564cc91c3d0dcdfc92318fed50052eaaad60e15ea1b049c6",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -8076,8 +10936,8 @@
     "arbazkhan971-agent": {
       "identity": "eadd8e3e1dc93ce087468ef7526e4a8dcd708053cfa5f715424af085814e836b",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "18bfc31d669804856ba232f04cdbd172afbdc379",
       "documentPath": "skills/agent/SKILL.md",
       "documentSha256": "919f67344c2c2ddaa50feb401f10fa0a74d063118715170f5939889469256cf9",
@@ -8088,8 +10948,8 @@
     "arbazkhan971-architect": {
       "identity": "5ec57a9411a5eef35ad79f3f12ca7961e4cdebee100d0ee3f897823bac22a416",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "18bfc31d669804856ba232f04cdbd172afbdc379",
       "documentPath": "skills/architect/SKILL.md",
       "documentSha256": "1300628aefa7359e9c9d976b5fce209e954b59a20a27f475163dd45c57c9a063",
@@ -8100,8 +10960,8 @@
     "arbazkhan971-build": {
       "identity": "f4276650b6b06c9ed2a650897de04dc92f8a9abcaf75805a3c90934418cdb5b0",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "18bfc31d669804856ba232f04cdbd172afbdc379",
       "documentPath": "skills/build/SKILL.md",
       "documentSha256": "3fc5e3acd74f446b66c3b3162a5fc701f94e6816ec4f270bc4447386f628eed2",
@@ -8112,8 +10972,8 @@
     "arbazkhan971-cicd": {
       "identity": "5d85fdb23286304246bbc0681f25aa5c9812493cccf4d3f0c39ed9a3daf23978",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "18bfc31d669804856ba232f04cdbd172afbdc379",
       "documentPath": "skills/cicd/SKILL.md",
       "documentSha256": "082e4347330c5c6b06c32a36b59345b4f6d45f0b5ce124fc94cc42ce345dffec",
@@ -8136,8 +10996,8 @@
     "arcasilesgroup-feature-batch": {
       "identity": "0536a8695c6f5064590bb02e536c2f1dd5290f4636bbee7995a20f5b9e8f30d0",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "954a7b827fc6171a5b37580367e7627268c721b2",
       "documentPath": "skills/ai-goal/feature-batch/SKILL.md",
       "documentSha256": "b96a523f38facc45e1173f8013ea96a363d6d9359ca3bd2b0336cee3a1adcdb2",
@@ -8172,9 +11032,9 @@
     "arco-design-arco-design": {
       "identity": "0ff6e34f7de57b5173a16b15390b020a0a587fa16a49d08fb1c56d7e18f99a89",
       "status": "needs-review",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
-      "revision": "c2b050d9c7ce94bebba94f616a0721344231caac",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "4e087a0fe7d5ae2f222fbce4a9518ba047b01772",
       "documentPath": "README.md",
       "documentSha256": "4261ef0e2ebd8ab931d2b1deafe3b105c64015afde5893bba4aea120e5c9a0ac",
       "candidates": 0,
@@ -8209,9 +11069,9 @@
     "arco-design-arco-design-vue": {
       "identity": "8c2ffb83d2d31522aa715748b00c86993be4865c9c5ba4512492cd5cee4532ec",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
-      "revision": "ee158dd75e81f636f34d1929fd3b19b5a6f0e32a",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a3826943f0e3ed8bd5f3f5a2ff3f4542eaa26ebd",
       "documentPath": "README.md",
       "documentSha256": "26345cc745b0286bb18e0a51d183902e9257b87543fa79b8d86ac0cfa50a0bd8",
       "candidates": 0,
@@ -8221,9 +11081,9 @@
     "arcreel-frontend-design": {
       "identity": "d9136d1bb7ec9b1e328a9ac6e6601685d774af632e9cc72db1e6010ff0c0da59",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
-      "revision": "dec992c3866dd1bfbdd207d3c115f895f0e07b49",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e73db30f732db7787469aca08e096968b0b09146",
       "documentPath": ".agents/skills/frontend-design/SKILL.md",
       "documentSha256": "d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3",
       "candidates": 0,
@@ -8233,9 +11093,9 @@
     "arcreel-grill-with-docs": {
       "identity": "9df1ec97173e8ebff40df66c312f9e450c4a44c7c6da37e3d0dbc68e24c3b158",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
-      "revision": "dec992c3866dd1bfbdd207d3c115f895f0e07b49",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e73db30f732db7787469aca08e096968b0b09146",
       "documentPath": ".agents/skills/grill-with-docs/SKILL.md",
       "documentSha256": "7de372c13488f1ee96cc11cd8907b56b6809cc93eef776eeddd37de6b6cbe3fe",
       "candidates": 0,
@@ -8245,9 +11105,9 @@
     "arcreel-prototype": {
       "identity": "4f5d43ed44555fbc21ea00d8d2f7932feabd5064a763e46ca7a00be505191eb4",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
-      "revision": "dec992c3866dd1bfbdd207d3c115f895f0e07b49",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e73db30f732db7787469aca08e096968b0b09146",
       "documentPath": ".agents/skills/prototype/SKILL.md",
       "documentSha256": "714de632d116bb73f65cdb5a882db15b9369a6713b9a47c0fad827848f0bfbe3",
       "candidates": 0,
@@ -8282,8 +11142,8 @@
     "ardov-huetone": {
       "identity": "9884b6a8f804878959c86d78b60c7890d9ed62938db130a06a08600425cbedb1",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "edb99b2e5c3b65510884ee354888188ec225fbca",
       "documentPath": "README.md",
       "documentSha256": "0e0b915720c59180a01c6f2532ffff4abf79c46cda28ab3e4fa236155448f134",
@@ -8294,8 +11154,8 @@
     "arham43-ops-neobrutalist": {
       "identity": "a9c5df968970483cc2b4a2942651eefe7a3400cdc7da8833e922bbeaf6c43e69",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "0edf3a157d64249cf4f1d31c2653538ab7e4f28a",
       "documentPath": "README.md",
       "documentSha256": "d840604600a988747c74f17f3067c6ead2e73ee1b2fdad1cb79ca080f5709849",
@@ -8318,8 +11178,8 @@
     "arize-ai-arize-link": {
       "identity": "4ccd38aec2dde9cd1b56a092d776a73fde869190158c988631b3da6895d1ef63",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "20ea1034e2ff400aceb90e77d410aa878923954e",
       "documentPath": "skills/arize-link/SKILL.md",
       "documentSha256": "a1456da6a70cd790876be4b16d1231b09dc9d77c47c57ecc157b351d208aaf30",
@@ -8378,8 +11238,8 @@
     "arohitu-salesforce-revenue-cloud-pricing": {
       "identity": "02f92cdcdd72f0a4d4c39821b4446075278fbd1d4bf7c01d000705a5182945cf",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "6c9ce0673225559adbedf8555ba8404d2d01265a",
       "documentPath": "skills/salesforce-revenue-cloud-pricing/SKILL.md",
       "documentSha256": "931336403cca5938bef7b51ab7155b0a993d9242ee54faf298c11f8c24fd2c83",
@@ -8390,8 +11250,8 @@
     "arozumenko-accessibility-audit": {
       "identity": "156bfd2b993b46db375d111ebcacd52f802c3840b2bb2359de54962fe386231c",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "f94a44a898c8075a89f227fc5370b99c7582e8f1",
       "documentPath": "bundles/manual-qa/skills/accessibility-audit/SKILL.md",
       "documentSha256": "b3cb8504eebd89869d757f10f6c98c4c30951e30d3800418c53dee00b5e6ff21",
@@ -8402,8 +11262,8 @@
     "arpitg1304-robotics-design-patterns": {
       "identity": "c83c8eef548d72e9fbcc373e5cc64bef6f61f14eeb1b635acc2d0681e75b0259",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "f9bc5467ff9ee3d23f1a1b0b29a649843bb6ad11",
       "documentPath": "skills/robotics-design-patterns/SKILL.md",
       "documentSha256": "9d911e5462eac45ba165ef248504d4c0f17a67b30de538e48c634f83d7a09f86",
@@ -8414,8 +11274,8 @@
     "arpitg1304-ros1": {
       "identity": "fa7eb5e137fd55ba2bc77565bf46a9cf12affdac93bf18cd098f6fef32f37837",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "f9bc5467ff9ee3d23f1a1b0b29a649843bb6ad11",
       "documentPath": "skills/ros1/SKILL.md",
       "documentSha256": "f415dea885641c673be1637464335a4556878c541432c6ed6ed282edd5f09e24",
@@ -8426,8 +11286,8 @@
     "arriemeijer-creator-aerojax": {
       "identity": "2402889b34be5e52f3edbf95ebe72b079b541a21506ae72a41abc785b1683a0e",
       "status": "needs-review",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "9e4fa16d5faa7b711ed546be19afad5806562430",
       "documentPath": "README.md",
       "documentSha256": "7399c46ae268aa15cb693694d567735a003c4dec41488c8b3058804828706db9",
@@ -8450,8 +11310,8 @@
     "aryaniyaps-lamina-67b73dff": {
       "identity": "1b148dc7ed45ccf0a05a74b99400176d51a961b468a7ca5ead0bcbf59aca15c0",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "af269ef3347fb7edeb956f3af9c943641717891c",
       "documentPath": "skills/lamina/SKILL.md",
       "documentSha256": "4a18ec9295be7653d5069b6247f7fe49590499fa98444db0caa12cb000705822",
@@ -8462,8 +11322,8 @@
     "aryaniyaps-lamina-design": {
       "identity": "63eaebc2974d33da589e9b60ae2ae8e76b8d5159f49b7689b76110aa109e0b88",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "af269ef3347fb7edeb956f3af9c943641717891c",
       "documentPath": "skills/lamina-design/SKILL.md",
       "documentSha256": "c90bcc5d84e310f1b39f3f7ea42f4dc69a184c2cbb12cd1a2e63898fb0e52ca2",
@@ -8474,8 +11334,8 @@
     "aryaniyaps-lamina-product-behavior": {
       "identity": "bb97d1f7a78f5b7755b2397ea8cda682cebd0c26fa89563a654e30b31e384873",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "af269ef3347fb7edeb956f3af9c943641717891c",
       "documentPath": "skills/lamina-product-behavior/SKILL.md",
       "documentSha256": "5c718d753aa99673030d9622a13cfb8e3f7e7c2255e689c28fc57b9bd460d6d7",
@@ -8486,8 +11346,8 @@
     "aryaniyaps-lamina-product-discovery": {
       "identity": "13927e436e2ffd9e9f028538c523938d342b9429c690de7a701d2934675e9f22",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "af269ef3347fb7edeb956f3af9c943641717891c",
       "documentPath": "skills/lamina-product-discovery/SKILL.md",
       "documentSha256": "1672e9b701186b7e18f4c2ed4672471a3713d832cc4496fe30dbfcf05b833294",
@@ -8498,8 +11358,8 @@
     "aryaniyaps-lamina-ux": {
       "identity": "010b31c7f84e5b71b85e9e94744faee6726db3414271aa63010fcc2fd436ed60",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "af269ef3347fb7edeb956f3af9c943641717891c",
       "documentPath": "skills/lamina-ux/SKILL.md",
       "documentSha256": "0862439ad73631088ed66a1dca40d07818716c335c8aabcf54ff582599f12e78",
@@ -8510,8 +11370,8 @@
     "aryaniyaps-lamina-verify": {
       "identity": "c17f24de00713ed2a2a8122db9b9bafda882b31010d798893c1be95801cf92d8",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "af269ef3347fb7edeb956f3af9c943641717891c",
       "documentPath": "skills/lamina-verify/SKILL.md",
       "documentSha256": "e79672dc3da914d14f68a861befeb9caf4fec69f9a7749e023d1516a519e23ea",
@@ -8522,8 +11382,8 @@
     "ash1794-vibe-devil-advocate-review": {
       "identity": "9953ce25803d13bc0cecfee272f96dd32a53aa92a0bb13a896955352cb3ecf52",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "98188aba78809b2f2edd424d4c3fbcb9376d42b0",
       "documentPath": "plugins/vibe-engineering/skills/vibe-devil-advocate-review/SKILL.md",
       "documentSha256": "edf1048a3934be37599c6e44dec45247756f01e487beeb80e9bf53556ef97038",
@@ -8534,8 +11394,8 @@
     "ash1794-vibe-doc-quality-gate": {
       "identity": "17372b1c734a94d5050b585042b40cdaa967e556d70a0c6fcd40a08da4925428",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "98188aba78809b2f2edd424d4c3fbcb9376d42b0",
       "documentPath": "plugins/vibe-engineering/skills/vibe-doc-quality-gate/SKILL.md",
       "documentSha256": "414717732abc5fc2b04e47eb4b498d9d188853d8cc24fd899edc8e87d4e8e0d7",
@@ -8546,8 +11406,8 @@
     "ash1794-vibe-research-before-design": {
       "identity": "456a241c467cc862fd0dba5cacc193143a5a16f9f609d45f09e97efacd981154",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "c9fd7bebb397d395028650c3e28b7408b374ade3",
       "documentPath": "plugins/vibe-engineering/skills/vibe-research-before-design/SKILL.md",
       "documentSha256": "019aea1725cc79646086f2c5af69090a1ef8beed1851e0d6a0608558c0df6461",
@@ -8558,8 +11418,8 @@
     "ashishsahu1-ml-projectyard": {
       "identity": "57f82adc85593b51fe79d62c25278feeb830ad4d8c629229c5ca37279c519ef1",
       "status": "needs-review",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "0d49beef30354e167b1eaef89c70bc51267ca65d",
       "documentPath": "README.md",
       "documentSha256": "212dc5478e996b873b44875b55fa1db8d29888ebff42910fb547f7413600b4c4",
@@ -8592,8 +11452,8 @@
     "asmcss-assembler": {
       "identity": "c77367590492aa2f77b0dee702580259c85a8b2e64efe4eaef28c5670f37898b",
       "status": "needs-review",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "3d3a4af516185ec0d8f6c9021f61167925c49023",
       "documentPath": "README.md",
       "documentSha256": "602dec86b8e813486e5a937f46b4900743216893728eedfd63db660ff59a245c",
@@ -11912,8 +14772,8 @@
     "chenshuo2004-cs-chatcut-video-blueprint": {
       "identity": "fd40d516da985797a3160f5ba2e98ff7a7545214aa16da84bb037d145ca4e955",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
       "revision": "6f5009d710ed73eeda6bd13e5be4f902ce56d7c5",
       "documentPath": "cs-chatcut-video-blueprint/SKILL.md",
       "documentSha256": "dad48e9fefc810a43c236c45a3256a6af9f54b0dc61da44be855f10771b270c9",
@@ -12121,6 +14981,162 @@
       "revision": "b439e97ec1a50c1a23eb728e43a3b145956e5ab4",
       "documentPath": "plugins/fh-commons/skills/persona-cast/SKILL.md",
       "documentSha256": "58ee31f8ba187d04bfbc13cd7be6e97211c7739a296b6cc2f469d118c9508af8",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chuhaiqu-app-store-growth": {
+      "identity": "4042c3e71b124ce11347e25dcc545a60613ca785a588d3018ef4e8c71e67086c",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e8ea8b118c00183e02059f80569380c00b6b7b78",
+      "documentPath": "skills/app-store-growth/SKILL.md",
+      "documentSha256": "8bcfafb2b3727b870663947b7ab257693a95bee0d654c3d9edee8231f5652b66",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chuhaiqu-business-english": {
+      "identity": "115dc9a9738137d1fffac4d6adbe9495c0c4aae39928e18f60f7c0d8575a3d43",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e8ea8b118c00183e02059f80569380c00b6b7b78",
+      "documentPath": "skills/business-english/SKILL.md",
+      "documentSha256": "5c070a0329a5f9614ec9dad2d5669701d8f290954bdaf4e5d4fdd5a2e2026a51",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chuhaiqu-channel-fit": {
+      "identity": "097799e58faf4adcd42749a1d8c73b00710fe88b0fd3fd5406f2f4960553a666",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e8ea8b118c00183e02059f80569380c00b6b7b78",
+      "documentPath": "skills/channel-fit/SKILL.md",
+      "documentSha256": "d39766b59ba9481192633bc3461805a5e927a303b01dad5722e13db58c5f34d2",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chuhaiqu-company-setup": {
+      "identity": "361a5ba8e623491d0893ce4641ac462007bec99c113728b1da2b5c253d34bd45",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e8ea8b118c00183e02059f80569380c00b6b7b78",
+      "documentPath": "skills/company-setup/SKILL.md",
+      "documentSha256": "f5477114236e5ae10317e6d9399b303c189b1215b3cafa9226f5c8b4af648331",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chuhaiqu-content-system": {
+      "identity": "5b2bfa0152cf364d65cebba00d9700742537ebcef3ee1b480a8d296b6af15021",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e8ea8b118c00183e02059f80569380c00b6b7b78",
+      "documentPath": "skills/content-system/SKILL.md",
+      "documentSha256": "c3de24b09362d76e3ca4bc5ff04c5a22f6a23cebbeb9a316a98148cf18040cec",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chuhaiqu-creator-marketing": {
+      "identity": "4e1fc2157836daf77b538e124cf6abb74adfd2dade1dda13cf9e38b78a080a5e",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e8ea8b118c00183e02059f80569380c00b6b7b78",
+      "documentPath": "skills/creator-marketing/SKILL.md",
+      "documentSha256": "1619162a7cde82ad042593db5b00efff127e705525901e5b43526d087df6aa79",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chuhaiqu-evidence-decisions": {
+      "identity": "38aa8f869fc446e46227f2d98c584bdb27fc6eb5f013f04f794091d4fea6f5c1",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e8ea8b118c00183e02059f80569380c00b6b7b78",
+      "documentPath": "skills/evidence-decisions/SKILL.md",
+      "documentSha256": "427399c90afdc7720a594eeaab4e0a6faf31db7caf4b8ed51e94581ab38c38c7",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chuhaiqu-market-research": {
+      "identity": "452b78a35f37508312202a4282f474b51b02c2380aa6edcea50015d772be43c2",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e8ea8b118c00183e02059f80569380c00b6b7b78",
+      "documentPath": "skills/market-research/SKILL.md",
+      "documentSha256": "5cad97c01c1bc557c835432ae7973b99f7a18b91b8d60ac2256d09e34a19b652",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chuhaiqu-outbound-sales": {
+      "identity": "f45e7ab25e2e4f2127e5b3eb2d557666626363bbfba08218bfce1923bf20f7cc",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e8ea8b118c00183e02059f80569380c00b6b7b78",
+      "documentPath": "skills/outbound-sales/SKILL.md",
+      "documentSha256": "f425c44391495f7574cc6109bf8cd19651f102be3fe9e8b9f460c9589278aa5a",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chuhaiqu-paid-acquisition": {
+      "identity": "745948d37ecd327c8ef89f6c214790d3f0efa9739ba13849d1231f307272e6f0",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e8ea8b118c00183e02059f80569380c00b6b7b78",
+      "documentPath": "skills/paid-acquisition/SKILL.md",
+      "documentSha256": "846d36b54349f70d0448e57a401eadaed60e8b12d1a3d161676b12e277ce196e",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chuhaiqu-partner-programs": {
+      "identity": "b3206b34cb90404134ec6ca04fce8334ff451983d7d2477052d6e8a5c9e16b58",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e8ea8b118c00183e02059f80569380c00b6b7b78",
+      "documentPath": "skills/partner-programs/SKILL.md",
+      "documentSha256": "91bd5818ab9490dd822f88f5be1d8dcc7c1a270944026ccc6d57e8588a4e39fc",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chuhaiqu-pricing-strategy": {
+      "identity": "6fe5de0bdb55479786204c01e90486839566f2167a80d97e6b8923d20857108e",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e8ea8b118c00183e02059f80569380c00b6b7b78",
+      "documentPath": "skills/pricing-strategy/SKILL.md",
+      "documentSha256": "baee758ff68d961fb837835bed0c1d0d03dc2f1f12ba446c8409f8344f6e2ada",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chuhaiqu-product-launch": {
+      "identity": "71fcc55796731a7e2060766e654e3ef43254b5556c603aa015a098cffda68a52",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "e8ea8b118c00183e02059f80569380c00b6b7b78",
+      "documentPath": "skills/product-launch/SKILL.md",
+      "documentSha256": "c3cb54f564c35804165fd4daf8af94f49e200429e4ed7eabb15d99900052d57e",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -16512,6 +19528,18 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "e-comet-e-comet-doctor": {
+      "identity": "abf92ff274b2f1c3d07e0e3652673136e4ca5352bff7fff5954850a27dbced15",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "4d904c55caf92b9dc03f0af8244f91d110591344",
+      "documentPath": "plugins/e-comet-skills/skills/e-comet-doctor/SKILL.md",
+      "documentSha256": "c62876c3ba96534cf39fe04302391ac31bab4475536d6ceba3c78f61c6eaaabf",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "edothedev-film-taste": {
       "identity": "34e6129eb23679e1fda0f9240f86bccddf557eb1fc9ca590151c3ac545ccb7b7",
       "status": "not-found",
@@ -17328,6 +20356,90 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "genspark-ai-executive-deck": {
+      "identity": "9900ae1bc57445e27b382925c12c9b3980c90fc272b73d0fef6b84b9921fd260",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "97dac8bd28c03aabe93a81cade47dbc99324a441",
+      "documentPath": "skills/recommended/executive-deck/SKILL.md",
+      "documentSha256": "49dc0dfe9b1eedf4fea388d04525f9feb84a6b7cba4b4fbf478a6fb6c8c75312",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "genspark-ai-expense-report": {
+      "identity": "e22b4715df8eb609f56872b8f7a42c9a32244434ef9be2d6191efca695795a68",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "97dac8bd28c03aabe93a81cade47dbc99324a441",
+      "documentPath": "skills/recommended/expense-report/SKILL.md",
+      "documentSha256": "91d0db24e7c02d59b77d925bc33e8d84af31bf7d57816c03d7b80856b37d9850",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "genspark-ai-financial-statement-analysis": {
+      "identity": "b0fba6934b2a80003ee8d372f5ffc6b05f046ebb31e357a10cd03e3c83930d64",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "97dac8bd28c03aabe93a81cade47dbc99324a441",
+      "documentPath": "skills/recommended/financial-statement-analysis/SKILL.md",
+      "documentSha256": "c04b75896cf7c11369985b242ba308031834bda2da45dbf3bff219047a3d8e49",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "genspark-ai-interview-coach": {
+      "identity": "23c6e487c292c6e634d8135b6024d4e98afbc07e9e148b0aee6a37560304228d",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "97dac8bd28c03aabe93a81cade47dbc99324a441",
+      "documentPath": "skills/recommended/interview-coach/SKILL.md",
+      "documentSha256": "63830f3fb660a00e3c5eee57e9d1331aa02c54566c93c347ad8d376aab725fbb",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "genspark-ai-invoice-tax-checklist": {
+      "identity": "1167bdadf7fad852a41d166e9f5d1c39ef0fdac03311237426467def7dd57fb8",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "97dac8bd28c03aabe93a81cade47dbc99324a441",
+      "documentPath": "skills/recommended/invoice-tax-checklist/SKILL.md",
+      "documentSha256": "a3062bebb7271d7b4a490befb7dc5326192dbad5fc82a06fbee60b994ad56b0b",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "genspark-ai-job-description": {
+      "identity": "ffd24dff2f979d598caf1e2fe3814836b3aba1e304dd0ff3d6a20a76454c330a",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "97dac8bd28c03aabe93a81cade47dbc99324a441",
+      "documentPath": "skills/recommended/job-description/SKILL.md",
+      "documentSha256": "29f7c655b05555e4f872a54353e2695fc43805ffd08a5e8b3fe88aad483ef581",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "genspark-ai-kpi-dashboard": {
+      "identity": "c27ad6db552e3e9027ef522d9938a23ce698d034d5355a90482538429fbab28c",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "97dac8bd28c03aabe93a81cade47dbc99324a441",
+      "documentPath": "skills/recommended/kpi-dashboard/SKILL.md",
+      "documentSha256": "e463d2401191e2e8d5f81665457b53e7ea611940996d2906817a6233a3721d9e",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "getsentry-presentation-creator": {
       "identity": "6194e716ef15868446a21b90b48f641432a585fbcb9cf0412d9eb04c1b869bf2",
       "status": "not-found",
@@ -17720,6 +20832,18 @@
       "checkedAt": "2026-11-08T07:27:44.362Z",
       "nextAt": "2026-11-09T07:27:44.362Z",
       "reason": "HTTP 404"
+    },
+    "hainrixz-ads-generate": {
+      "identity": "e1954a4d142498902c34259fb99976f55d3cb220951415703e13640c978ac95f",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a62525be49b44a558b3d5c02751f9227a7490515",
+      "documentPath": "skills/ads-generate/SKILL.md",
+      "documentSha256": "3fe3f426d03db089dc57cd660d3b1fe76c5f55d70d37ee097826dc69a9f25818",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
     },
     "hanlulong-econ-write": {
       "identity": "64ccfef09fc06ab54114555d8b523ff79193518e551d81516aea7e872a554a57",
@@ -21341,6 +24465,18 @@
       "revision": "3001cc436656c435e54425443e708e3e2d8c7d68",
       "documentPath": "packages/daemon/assets/skills/rigs/SKILL.md",
       "documentSha256": "48727266096d9ebe7934a723b720b2b3a60016c3977f62a3154a2c115050c8ce",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "mvschwarz-working-with-an-openrig-team": {
+      "identity": "bc9d9176818ff0bb649a38b537ccf8a1d75135e5bba5aa42cc6641f0e21ff21e",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "8990e1cb6e771d743b381aa8b9abcfe405695b87",
+      "documentPath": "packages/daemon/assets/plugins/openrig/skills/working-with-an-openrig-team/SKILL.md",
+      "documentSha256": "01b0aaeb3454bbb4b881dba058022d5a80e62da15516be7db8390b281dd3a228",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -25406,6 +28542,54 @@
         }
       ]
     },
+    "skein-js-audit-plan": {
+      "identity": "b1641151e188914e8d96fba4a3a88354c6dae43cf42aadd6cd09bcaedf85f5cf",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a241ff0edec2159c49f27c68f975b4a1b2b385f7",
+      "documentPath": ".agents/skills/audit-plan/SKILL.md",
+      "documentSha256": "fa22e1c9a0b7fea04fbb0bdf9b37384fd8e8f4906c50ba98af88fd74d1e86d27",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "skein-js-skein-js": {
+      "identity": "c725308fa5bff54426d3432a99dda870d528ef4f1150dae7c938cc7e3cfbcad5",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a241ff0edec2159c49f27c68f975b4a1b2b385f7",
+      "documentPath": "skills/skein-js/SKILL.md",
+      "documentSha256": "ce084092eaaca85c7df66677db739eea3575cc518aa6097752f9076a88aaa8c1",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "skein-js-skein-js-nx": {
+      "identity": "b9605dda73c160c71d6003fb8c399d77e8a2e3bff12f209c18b0a96680504a3d",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a241ff0edec2159c49f27c68f975b4a1b2b385f7",
+      "documentPath": "skills/skein-js-nx/SKILL.md",
+      "documentSha256": "5196d29e274c8256108edcdeb6658f4b5d86efa5662867dbadc4a34e03a7477e",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "skein-js-skein-js-turborepo": {
+      "identity": "548cbd5b77f21b0042d58feb88877045df294a4ef4a3979c7091190a09958cd4",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a241ff0edec2159c49f27c68f975b4a1b2b385f7",
+      "documentPath": "skills/skein-js-turborepo/SKILL.md",
+      "documentSha256": "47d9a446b3778b36d4672748e9f13eada34b3d2f7c07739e76efea1b7b9a9047",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "skyf0xx-brand-story": {
       "identity": "049ed8cdbb0716533d0b1e2b3e703e6b2c108d2dea11f2238fbc5b59e79046b2",
       "status": "not-found",
@@ -25819,6 +29003,222 @@
       "revision": "cbf7ef1324a026b29e2b77b71e2034554ddd3e22",
       "documentPath": "skill/SKILL.md",
       "documentSha256": "8f758a262fc5ea67075cb1291491b99a62223cb6c29acb17fe94294387221d63",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-action-contract-execution-feedback-loop": {
+      "identity": "f544e65bb56ce38355872f8f721a0123f4cf3ad48ea42cf21c348e200f35f214",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/action-contract-execution-feedback-loop/SKILL.md",
+      "documentSha256": "eb24e1362bbf760eb845b442ae8e42571c1735e700afe675849b55357890271b",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-ai-training-inference-data-asset-governance": {
+      "identity": "dd4c2e960bb7af78677d2c6055c719542005c007e5707fc8a0faa5a3d91b27c9",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/ai-training-inference-data-asset-governance/SKILL.md",
+      "documentSha256": "2e1387e47135db1b5037257c45ff35553a16f7a9cee625c5a50947cfdb232ea4",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-business-scenario-deep-analysis": {
+      "identity": "efa2f82a9784bce528fb9631a749604db9db2e8d1003143433cfa8e0c787f6bd",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/business-scenario-deep-analysis/SKILL.md",
+      "documentSha256": "9a3c96c5e5b362c59efb880705e8f6516260182bfe1f8e2654be4af2895861c6",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-data-to-ontology-mapping-and-instantiation": {
+      "identity": "c623a165a2975f2c4ba880a76e4df1cb7cc00628fc8f10e5a2725dbf4ef55d9b",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/data-to-ontology-mapping-and-instantiation/SKILL.md",
+      "documentSha256": "68fd9d9d48506a67ec0bc09527ddc69b2621ec21d96ca64357b92f82d545b006",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-fact-reason-action-business-loop": {
+      "identity": "0e11314378701ecfbb43ca3174d9a320fc6d3b3a26b7d4f7d6bee67fd44beba7",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/fact-reason-action-business-loop/SKILL.md",
+      "documentSha256": "567ea00ea1c2c7338f92cccb77904438726dd1d43b1366d1be694d10df2cd19c",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-five-ring-ontology-engineering-lifecycle": {
+      "identity": "4402263ebe823e9900481f23aa8ec03bf939b3e64e644737f0a7bf320dc6ff01",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/five-ring-ontology-engineering-lifecycle/SKILL.md",
+      "documentSha256": "ce877d676e996879c8bc0e7b72f0d19b8107fe37e2e42bbf325f1a21db2368ee",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-ontology-ai-application-pattern-selection": {
+      "identity": "c19bdeeb81df0e86344a05ab069a179af8a87d6bdde5a01331f17028084866b1",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/ontology-ai-application-pattern-selection/SKILL.md",
+      "documentSha256": "8136437f7440c1eed930e450ba421acd5827c309e965e802cede087e9e2c2a6a",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-ontology-ai-scenario-fit-and-spike": {
+      "identity": "ab43b9c612efa2bdc85832db137c2d9e1752f5bc7428fcc349b0c9ab178b27af",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/ontology-ai-scenario-fit-and-spike/SKILL.md",
+      "documentSha256": "9c50f692577dc96f990001a1894b4d34652a14f7fb873bab515e10caab652f4c",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-ontology-conceptual-model-design": {
+      "identity": "6a9babb3c5af186096157f003fb5343aad73384d5e902e76325b21a3972f6cff",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/ontology-conceptual-model-design/SKILL.md",
+      "documentSha256": "038719484ab624b922117c6f00fb8a8baffad670a8ab2212291509a19e4581e4",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-ontology-constraint-and-knowledge-injection": {
+      "identity": "26bf9a899e33868b1818d8a1feb9c6db1624b6d7572e9a4fa81c9d2890d3f81b",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/ontology-constraint-and-knowledge-injection/SKILL.md",
+      "documentSha256": "139c79f7a194062c81da8d6c229a1a0bb4ec97bc0acdef24ed201116db9dd0c0",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-ontology-golden-case-testing": {
+      "identity": "18980eb6fdf8142adc9d42a919ce6274c4d01282dca542d0a417bb19fd0cb5a3",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/ontology-golden-case-testing/SKILL.md",
+      "documentSha256": "340c3fe5e5aca788a0d2ea33f85636e72d9da8dc8ee4cb15d8da4e504ea22b7d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-ontology-logical-model-generation": {
+      "identity": "22c72e2e8bf193a09c7f758d7a582b637dfbef0247ca44cbde6dd417d02b4a89",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/ontology-logical-model-generation/SKILL.md",
+      "documentSha256": "3710f93c4933007d6ac8c16a3207515007eb19941280d2d620aeaf1ebcca3d9a",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-ontology-model-multilayer-quality-gate": {
+      "identity": "ee4000ebe7b73b23787059e7c861326555e0e170df4d0e724badd07a458abd62",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/ontology-model-multilayer-quality-gate/SKILL.md",
+      "documentSha256": "35bf22eaa880d52b2d6988a72da39ecbbd183d5b3957ca1312304bbe3166cfd0",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-ontology-runtime-service-and-version-operations": {
+      "identity": "d6f06ccb3eceebf5a85f4fc45004c6b915bdccd787a3a15840c9536338f4109d",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/ontology-runtime-service-and-version-operations/SKILL.md",
+      "documentSha256": "dcb14cd75d2d372645e247df9e13602ed4ef68a4d4e54aa040644e3f614f7eff",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-ontology-scenario-delivery": {
+      "identity": "a32acaa427071f5f8907ec018d97c76e268a99408d2083986cfd42e50cacd258",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/ontology-scenario-delivery/SKILL.md",
+      "documentSha256": "c674eb08ef012bd134b90e8471c2552c169132d81f98c9cdd8dbffd7f9467696",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-point-line-plane-ontology-scaling": {
+      "identity": "7df7bf4ddf464cd1a939a49f03a41d6fe07bab3b06b087dcb17a0817ea44653d",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/point-line-plane-ontology-scaling/SKILL.md",
+      "documentSha256": "ac05a937e812d5c736d8455f697da9e6ca68a1e9039be5b7f4cbd386ffde4976",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-risk-based-agent-action-modes": {
+      "identity": "5430c5f89e273d7fcd11798478ce1ef0668d88ce2ef66af1f99eb1048b0495ea",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/risk-based-agent-action-modes/SKILL.md",
+      "documentSha256": "0f616930ab990832c66fe7d9f6f27bf90c5b05b07c2f7085a8f31145320d0627",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "superchason-scenario-agent-role-design": {
+      "identity": "8a8edc0d8b7aa79bc9dea324a132c0109760d407445ea01840368559e7c7e491",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "a2f5b8f4762572de1674ed3fa3ef83e0ca43cf4b",
+      "documentPath": "skills/scenario-agent-role-design/SKILL.md",
+      "documentSha256": "ec56ca3a1e5b7ac79f93a0d8f24e20ab1c67a7addd0e4126028d383d39ffdbd0",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -28512,6 +31912,54 @@
       "previews": 1,
       "skipped": []
     },
+    "zstvns-brand-strategy": {
+      "identity": "de51ce96ae4ed8a14832a996ef50a47f22be343ca8123284c239a3ad7bd57561",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "8dab61b527bf5fb5dd8a0050a2111020e08df8ea",
+      "documentPath": "skills/brand-strategy/SKILL.md",
+      "documentSha256": "bb43ccb1181135dafe8e1ea2da78f3e8f144d0232254ad2e0f7403094166695d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "zstvns-design-principles": {
+      "identity": "6b76a757e6c0e666b7716cf9831eb5c64114db88a6e4b0a34e91927f839015e6",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "8dab61b527bf5fb5dd8a0050a2111020e08df8ea",
+      "documentPath": "skills/design-principles/SKILL.md",
+      "documentSha256": "85fde3778ff1d496f03ee4460e7443e19b13512e7fd0e339044566c95ec290bd",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "zstvns-motion-design": {
+      "identity": "3df5bce833d92079df2bd37ee763c4d0e88ec47761509c2bf801eb1d73a24e08",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "8dab61b527bf5fb5dd8a0050a2111020e08df8ea",
+      "documentPath": "skills/motion-design/SKILL.md",
+      "documentSha256": "358d818c4c232bfbc701285513f9837ebecf17caa2ede1bac9503e4c02046b3d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "zstvns-web-design": {
+      "identity": "c620af828409bef4982a530dd511402f709383ebb9ffcecf21162bf2f42a7e36",
+      "status": "not-found",
+      "checkedAt": "2026-11-11T07:47:27.936Z",
+      "nextAt": "2026-11-18T07:47:27.936Z",
+      "revision": "8dab61b527bf5fb5dd8a0050a2111020e08df8ea",
+      "documentPath": "skills/web-design/SKILL.md",
+      "documentSha256": "68fbfdfd0c64b283f72489e4a37ed96c781878e731a4604f28e093ae7ff8890d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "zxzin-final-delivery-clean": {
       "identity": "d1bf5b51aa22ba4bcc73bc6a3e9d085a7a28e933ab9b05a9bbbd22502ac9b4b7",
       "status": "not-found",
@@ -28526,15 +31974,15 @@
     }
   },
   "summary": {
-    "catalogRecords": 37382,
+    "catalogRecords": 37581,
     "attempted": 150,
-    "pending": 36343,
-    "collectedSkills": 103,
+    "pending": 36680,
+    "collectedSkills": 115,
     "statuses": {
-      "not-found": 112,
-      "error": 16,
-      "needs-review": 13,
-      "collected": 9
+      "not-found": 120,
+      "needs-review": 14,
+      "collected": 12,
+      "error": 4
     }
   }
 }
