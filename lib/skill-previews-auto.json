@@ -836,6 +836,138 @@
     ]
   },
   {
+    "skillSlug": "1kbgz-tributary",
+    "repository": "1kbgz/tributary",
+    "revision": "d334017e22e068841038e65ff8e9c28819c18e35",
+    "sourceUrl": "https://github.com/1kbgz/tributary/blob/d334017e22e068841038e65ff8e9c28819c18e35/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-194b7e5d40a458e0f46472d63e19e08dcaaf53f25d9914a3257642b4b2553aa6.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "194b7e5d40a458e0f46472d63e19e08dcaaf53f25d9914a3257642b4b2553aa6",
+    "documentSha256": "636d7e5dc5ad857fb6eb900b67bab8f3be5a32e97922c777045e009dd0ebe240",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-12T08:25:53.389Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/7f73bbfab97db059d18ba39a7775efcd06cf58e14c149e1614691064bcb5dbfd.preview.webp",
+        "previewSrc": "/skill-previews/auto/7f73bbfab97db059d18ba39a7775efcd06cf58e14c149e1614691064bcb5dbfd.preview.webp",
+        "cardSrc": "/skill-previews/auto/7f73bbfab97db059d18ba39a7775efcd06cf58e14c149e1614691064bcb5dbfd.card.webp",
+        "width": 1081,
+        "height": 847,
+        "sha256": "7f73bbfab97db059d18ba39a7775efcd06cf58e14c149e1614691064bcb5dbfd",
+        "originalSrc": "/skill-previews/auto/7f73bbfab97db059d18ba39a7775efcd06cf58e14c149e1614691064bcb5dbfd.gif",
+        "sourceUrl": "https://github.com/1kbgz/tributary/blob/d334017e22e068841038e65ff8e9c28819c18e35/docs/img/example.gif",
+        "kind": "example",
+        "title": {
+          "en": "Tributary · Animation · still preview",
+          "zh": "Tributary · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Tributary: example.gif",
+          "zh": "Tributary：example.gif"
+        },
+        "sourcePath": "docs/img/example.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/e6bd257b885ba13e2cacf47d48563870025c484c48967961d3ffe16e6b710913.preview.webp",
+        "previewSrc": "/skill-previews/auto/e6bd257b885ba13e2cacf47d48563870025c484c48967961d3ffe16e6b710913.preview.webp",
+        "cardSrc": "/skill-previews/auto/e6bd257b885ba13e2cacf47d48563870025c484c48967961d3ffe16e6b710913.card.webp",
+        "width": 730,
+        "height": 619,
+        "sha256": "e6bd257b885ba13e2cacf47d48563870025c484c48967961d3ffe16e6b710913",
+        "originalSrc": "/skill-previews/auto/e6bd257b885ba13e2cacf47d48563870025c484c48967961d3ffe16e6b710913.gif",
+        "sourceUrl": "https://github.com/1kbgz/tributary/blob/d334017e22e068841038e65ff8e9c28819c18e35/docs/img/lazy/dagred3.gif",
+        "kind": "reference",
+        "title": {
+          "en": "Tributary · Animation · still preview",
+          "zh": "Tributary · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Tributary: dagred3.gif",
+          "zh": "Tributary：dagred3.gif"
+        },
+        "sourcePath": "docs/img/lazy/dagred3.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/1e3f503627680a79374d29a42f1b8b8b058afda9804c1f3a58a370681705d663.preview.webp",
+        "previewSrc": "/skill-previews/auto/1e3f503627680a79374d29a42f1b8b8b058afda9804c1f3a58a370681705d663.preview.webp",
+        "cardSrc": "/skill-previews/auto/1e3f503627680a79374d29a42f1b8b8b058afda9804c1f3a58a370681705d663.card.webp",
+        "width": 316,
+        "height": 316,
+        "sha256": "1e3f503627680a79374d29a42f1b8b8b058afda9804c1f3a58a370681705d663",
+        "originalSrc": "/skill-previews/auto/1e3f503627680a79374d29a42f1b8b8b058afda9804c1f3a58a370681705d663.png",
+        "sourceUrl": "https://github.com/1kbgz/tributary/blob/d334017e22e068841038e65ff8e9c28819c18e35/docs/img/nem.png",
+        "kind": "reference",
+        "title": {
+          "en": "Tributary · Author preview",
+          "zh": "Tributary · 作者预览"
+        },
+        "alt": {
+          "en": "Tributary: nem.png",
+          "zh": "Tributary：nem.png"
+        },
+        "sourcePath": "docs/img/nem.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "1xiaoyueryuer-boss-hr-agent-toolkit",
+    "repository": "1xiaoyueryuer/boss-hr-agent-toolkit",
+    "revision": "22626327006c667dfcdd6d7707298068721cff02",
+    "sourceUrl": "https://github.com/1xiaoyueryuer/boss-hr-agent-toolkit/blob/22626327006c667dfcdd6d7707298068721cff02/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-479698235ab700524876500b88fe0856fd023d8fb6beec9336cce98c840eddd1.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "479698235ab700524876500b88fe0856fd023d8fb6beec9336cce98c840eddd1",
+    "documentSha256": "520e1e46efd0e9e96227f83f607b1770ebfd260ddffbac941462daa16ad50a42",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-12T08:25:53.389Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/f90f57b9fecc9b86c02e23dbe5d09f3a8de79d4977646df63eeda22bcb9bbc39.preview.webp",
+        "previewSrc": "/skill-previews/auto/f90f57b9fecc9b86c02e23dbe5d09f3a8de79d4977646df63eeda22bcb9bbc39.preview.webp",
+        "cardSrc": "/skill-previews/auto/f90f57b9fecc9b86c02e23dbe5d09f3a8de79d4977646df63eeda22bcb9bbc39.card.webp",
+        "width": 1600,
+        "height": 900,
+        "sha256": "f90f57b9fecc9b86c02e23dbe5d09f3a8de79d4977646df63eeda22bcb9bbc39",
+        "originalSrc": "/skill-previews/auto/f90f57b9fecc9b86c02e23dbe5d09f3a8de79d4977646df63eeda22bcb9bbc39.png",
+        "sourceUrl": "https://github.com/1xiaoyueryuer/boss-hr-agent-toolkit/blob/22626327006c667dfcdd6d7707298068721cff02/docs/assets/boss-hr-poster.png",
+        "kind": "reference",
+        "title": {
+          "en": "Boss Hr Agent Toolkit · Author preview",
+          "zh": "Boss Hr Agent Toolkit · 作者预览"
+        },
+        "alt": {
+          "en": "Boss Hr Agent Toolkit: BOSS HR Agent Toolkit：让招聘筛选，更有章法。岗位解析、简历获取、逐份评分与可视化报告。",
+          "zh": "Boss Hr Agent Toolkit：BOSS HR Agent Toolkit：让招聘筛选，更有章法。岗位解析、简历获取、逐份评分与可视化报告。"
+        },
+        "sourcePath": "docs/assets/boss-hr-poster.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "acot-a11y-acot",
     "repository": "acot-a11y/acot",
     "revision": "34ff82b04faf65d22f323fd9ea47e03ede0fc13c",
@@ -2530,6 +2662,72 @@
     ]
   },
   {
+    "skillSlug": "antgroup-echomimic-v3",
+    "repository": "antgroup/echomimic_v3",
+    "revision": "7e89489ca51c0d008fc1963ec6c03fc5bd0b9397",
+    "sourceUrl": "https://github.com/antgroup/echomimic_v3/blob/7e89489ca51c0d008fc1963ec6c03fc5bd0b9397/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4.txt",
+    "licenseSourcePath": "LICENSE.txt",
+    "licenseSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "documentSha256": "1ed14ae55feea5f19045edeb0090e6f56bdf8ff663ac1c23a2c690213b47adc9",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-12T08:25:53.389Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/5d5bfde80d7b5b954af7cbc8beee957c68fd66f7c303676eece55b49c0bb1b86.preview.webp",
+        "previewSrc": "/skill-previews/auto/5d5bfde80d7b5b954af7cbc8beee957c68fd66f7c303676eece55b49c0bb1b86.preview.webp",
+        "cardSrc": "/skill-previews/auto/5d5bfde80d7b5b954af7cbc8beee957c68fd66f7c303676eece55b49c0bb1b86.card.webp",
+        "width": 1287,
+        "height": 724,
+        "sha256": "5d5bfde80d7b5b954af7cbc8beee957c68fd66f7c303676eece55b49c0bb1b86",
+        "originalSrc": "/skill-previews/auto/5d5bfde80d7b5b954af7cbc8beee957c68fd66f7c303676eece55b49c0bb1b86.png",
+        "sourceUrl": "https://github.com/antgroup/echomimic_v3/blob/7e89489ca51c0d008fc1963ec6c03fc5bd0b9397/asset/algo_framework.png",
+        "kind": "reference",
+        "title": {
+          "en": "Echomimic V3 · Author preview",
+          "zh": "Echomimic V3 · 作者预览"
+        },
+        "alt": {
+          "en": "Echomimic V3: algo_framework.png",
+          "zh": "Echomimic V3：algo_framework.png"
+        },
+        "sourcePath": "asset/algo_framework.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/ce4e1f599fba7f5c9ba3603fb133a8715d78959738ef5391414465b2dd47c2fa.preview.webp",
+        "previewSrc": "/skill-previews/auto/ce4e1f599fba7f5c9ba3603fb133a8715d78959738ef5391414465b2dd47c2fa.preview.webp",
+        "cardSrc": "/skill-previews/auto/ce4e1f599fba7f5c9ba3603fb133a8715d78959738ef5391414465b2dd47c2fa.card.webp",
+        "width": 1600,
+        "height": 1396,
+        "sha256": "ce4e1f599fba7f5c9ba3603fb133a8715d78959738ef5391414465b2dd47c2fa",
+        "originalSrc": "/skill-previews/auto/ce4e1f599fba7f5c9ba3603fb133a8715d78959738ef5391414465b2dd47c2fa.jpg",
+        "sourceUrl": "https://github.com/antgroup/echomimic_v3/blob/7e89489ca51c0d008fc1963ec6c03fc5bd0b9397/asset/echomimicv3.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "Echomimic V3 · Author preview",
+          "zh": "Echomimic V3 · 作者预览"
+        },
+        "alt": {
+          "en": "Echomimic V3: echomimicv3.jpg",
+          "zh": "Echomimic V3：echomimicv3.jpg"
+        },
+        "sourcePath": "asset/echomimicv3.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "appandflow-react-native-design-utility",
     "repository": "AppAndFlow/react-native-design-utility",
     "revision": "f827dad88caae053d6ff1799203fcc53ac253479",
@@ -2882,6 +3080,94 @@
     ]
   },
   {
+    "skillSlug": "arthur-qiu-freetraj",
+    "repository": "arthur-qiu/FreeTraj",
+    "revision": "1e0f64bb7b65a44db6ab53799f58b7349f7e7c16",
+    "sourceUrl": "https://github.com/arthur-qiu/FreeTraj/blob/1e0f64bb7b65a44db6ab53799f58b7349f7e7c16/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "documentSha256": "26b9c03edf04287d53c2b5f750b2c43506d0224b890d25dbdb7db0537b44cd16",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-12T08:25:53.389Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/cdd79355b739a0fe3ebda644509e09a2f1c8cc4d7e94dddd8e6d65258725e99b.preview.webp",
+        "previewSrc": "/skill-previews/auto/cdd79355b739a0fe3ebda644509e09a2f1c8cc4d7e94dddd8e6d65258725e99b.preview.webp",
+        "cardSrc": "/skill-previews/auto/cdd79355b739a0fe3ebda644509e09a2f1c8cc4d7e94dddd8e6d65258725e99b.card.webp",
+        "width": 256,
+        "height": 160,
+        "sha256": "cdd79355b739a0fe3ebda644509e09a2f1c8cc4d7e94dddd8e6d65258725e99b",
+        "originalSrc": "/skill-previews/auto/cdd79355b739a0fe3ebda644509e09a2f1c8cc4d7e94dddd8e6d65258725e99b.gif",
+        "sourceUrl": "https://github.com/arthur-qiu/FreeTraj/blob/1e0f64bb7b65a44db6ab53799f58b7349f7e7c16/assets/demo/0019_0_0.3_0.3.gif",
+        "kind": "example",
+        "title": {
+          "en": "FreeTraj · Animation · still preview",
+          "zh": "FreeTraj · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "FreeTraj: 0019_0_0.3_0.3.gif",
+          "zh": "FreeTraj：0019_0_0.3_0.3.gif"
+        },
+        "sourcePath": "assets/demo/0019_0_0.3_0.3.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/d9d0196cb1fb3b45153d9580211924082083a693e5deac22d25038fa9ebaec85.preview.webp",
+        "previewSrc": "/skill-previews/auto/d9d0196cb1fb3b45153d9580211924082083a693e5deac22d25038fa9ebaec85.preview.webp",
+        "cardSrc": "/skill-previews/auto/d9d0196cb1fb3b45153d9580211924082083a693e5deac22d25038fa9ebaec85.card.webp",
+        "width": 256,
+        "height": 160,
+        "sha256": "d9d0196cb1fb3b45153d9580211924082083a693e5deac22d25038fa9ebaec85",
+        "originalSrc": "/skill-previews/auto/d9d0196cb1fb3b45153d9580211924082083a693e5deac22d25038fa9ebaec85.gif",
+        "sourceUrl": "https://github.com/arthur-qiu/FreeTraj/blob/1e0f64bb7b65a44db6ab53799f58b7349f7e7c16/assets/demo/0026_0_0.4_0.4.gif",
+        "kind": "example",
+        "title": {
+          "en": "FreeTraj · Animation · still preview",
+          "zh": "FreeTraj · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "FreeTraj: 0026_0_0.4_0.4.gif",
+          "zh": "FreeTraj：0026_0_0.4_0.4.gif"
+        },
+        "sourcePath": "assets/demo/0026_0_0.4_0.4.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/84c8da4f980b2127f1e8c81ee4eaf96916b52a2ffa2347e854403888a5cbdeb2.preview.webp",
+        "previewSrc": "/skill-previews/auto/84c8da4f980b2127f1e8c81ee4eaf96916b52a2ffa2347e854403888a5cbdeb2.preview.webp",
+        "cardSrc": "/skill-previews/auto/84c8da4f980b2127f1e8c81ee4eaf96916b52a2ffa2347e854403888a5cbdeb2.card.webp",
+        "width": 256,
+        "height": 160,
+        "sha256": "84c8da4f980b2127f1e8c81ee4eaf96916b52a2ffa2347e854403888a5cbdeb2",
+        "originalSrc": "/skill-previews/auto/84c8da4f980b2127f1e8c81ee4eaf96916b52a2ffa2347e854403888a5cbdeb2.gif",
+        "sourceUrl": "https://github.com/arthur-qiu/FreeTraj/blob/1e0f64bb7b65a44db6ab53799f58b7349f7e7c16/assets/demo/0035_1_0.35_0.35.gif",
+        "kind": "example",
+        "title": {
+          "en": "FreeTraj · Animation · still preview",
+          "zh": "FreeTraj · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "FreeTraj: 0035_1_0.35_0.35.gif",
+          "zh": "FreeTraj：0035_1_0.35_0.35.gif"
+        },
+        "sourcePath": "assets/demo/0035_1_0.35_0.35.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
     "skillSlug": "ashual-scene-generation",
     "repository": "ashual/scene_generation",
     "revision": "6f6fe6afffae58da94c0c061e4dcaf273cdb9f44",
@@ -3014,6 +3300,50 @@
     ]
   },
   {
+    "skillSlug": "athena-team-athena",
+    "repository": "athena-team/athena",
+    "revision": "0be22c155c782207349ad6b2135f974d8673611f",
+    "sourceUrl": "https://github.com/athena-team/athena/blob/0be22c155c782207349ad6b2135f974d8673611f/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-4eddd9df4cd9a1d0761df9a3b3469745eaec0c3af72baf9b981c4e16346a0367.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "4eddd9df4cd9a1d0761df9a3b3469745eaec0c3af72baf9b981c4e16346a0367",
+    "documentSha256": "7be34b9266e57c68455b67ab99430c37b2adb4f10b83e486efd67991a65c571e",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-12T08:25:53.389Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/dabfdd4843e7cb241aced8b4ee6af117a6ac9c6121a73787da2416ba1f12c808.preview.webp",
+        "previewSrc": "/skill-previews/auto/dabfdd4843e7cb241aced8b4ee6af117a6ac9c6121a73787da2416ba1f12c808.preview.webp",
+        "cardSrc": "/skill-previews/auto/dabfdd4843e7cb241aced8b4ee6af117a6ac9c6121a73787da2416ba1f12c808.card.webp",
+        "width": 905,
+        "height": 603,
+        "sha256": "dabfdd4843e7cb241aced8b4ee6af117a6ac9c6121a73787da2416ba1f12c808",
+        "originalSrc": "/skill-previews/auto/dabfdd4843e7cb241aced8b4ee6af117a6ac9c6121a73787da2416ba1f12c808.png",
+        "sourceUrl": "https://github.com/athena-team/athena/blob/0be22c155c782207349ad6b2135f974d8673611f/examples/align/ctc_alignment_demo.png",
+        "kind": "example",
+        "title": {
+          "en": "Athena · Author preview",
+          "zh": "Athena · 作者预览"
+        },
+        "alt": {
+          "en": "Athena: ctc_alignment_demo.png",
+          "zh": "Athena：ctc_alignment_demo.png"
+        },
+        "sourcePath": "examples/align/ctc_alignment_demo.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "atomicarchitects-equiformer-v2",
     "repository": "atomicarchitects/equiformer_v2",
     "revision": "d5ad4be729b56f74012ebb7f097f77c5b00a1004",
@@ -3102,6 +3432,50 @@
     ]
   },
   {
+    "skillSlug": "autoark-gpa",
+    "repository": "AutoArk/GPA",
+    "revision": "3ec1efb402d8598cbaa26e6156cc148a04c60d50",
+    "sourceUrl": "https://github.com/AutoArk/GPA/blob/3ec1efb402d8598cbaa26e6156cc148a04c60d50/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-7581ba2e287de18fb2f42186a121d72692d5bf5811cb9c77fbac1b2c12cea943.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "7581ba2e287de18fb2f42186a121d72692d5bf5811cb9c77fbac1b2c12cea943",
+    "documentSha256": "5a94db889baf0fc431227d94ca3b18ecce011150480b471cf249d756582312bf",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-12T08:25:53.389Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/db913a44d1e835f0879f4a9f3a388846eccc56a362489e0167b12949e1cdcf75.preview.webp",
+        "previewSrc": "/skill-previews/auto/db913a44d1e835f0879f4a9f3a388846eccc56a362489e0167b12949e1cdcf75.preview.webp",
+        "cardSrc": "/skill-previews/auto/db913a44d1e835f0879f4a9f3a388846eccc56a362489e0167b12949e1cdcf75.card.webp",
+        "width": 1536,
+        "height": 1024,
+        "sha256": "db913a44d1e835f0879f4a9f3a388846eccc56a362489e0167b12949e1cdcf75",
+        "originalSrc": "/skill-previews/auto/db913a44d1e835f0879f4a9f3a388846eccc56a362489e0167b12949e1cdcf75.jpg",
+        "sourceUrl": "https://github.com/AutoArk/GPA/blob/3ec1efb402d8598cbaa26e6156cc148a04c60d50/docs/GPA_v1.5.jpeg",
+        "kind": "reference",
+        "title": {
+          "en": "GPA · Author preview",
+          "zh": "GPA · 作者预览"
+        },
+        "alt": {
+          "en": "GPA: GPA Unified Speech Model Overview",
+          "zh": "GPA：GPA Unified Speech Model Overview"
+        },
+        "sourcePath": "docs/GPA_v1.5.jpeg",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "autodesk-molecular-design-toolkit",
     "repository": "Autodesk/molecular-design-toolkit",
     "revision": "5f45a47fea21d3603899a6366cb163024f0e2ec4",
@@ -3141,6 +3515,94 @@
         },
         "sourcePath": "moldesign/_notebooks/img/Header.png",
         "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "axodox-axodox-machinelearning",
+    "repository": "axodox/axodox-machinelearning",
+    "revision": "41cfb3ebcf368f7249aaae528cc0a2e06fdad1ef",
+    "sourceUrl": "https://github.com/axodox/axodox-machinelearning/blob/41cfb3ebcf368f7249aaae528cc0a2e06fdad1ef/readme.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-a1f45039c867e5730523cc4a846254f6af35a9394f944a921dd2225edef419d9.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "a1f45039c867e5730523cc4a846254f6af35a9394f944a921dd2225edef419d9",
+    "documentSha256": "5a6947f32ca8264d279e3883b714f9d817de980d4ace3db5367f1b0bd54fe054",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-12T08:25:53.389Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/c843b92805f1b7f517a070d3b942c38c4c8e57289a4f35d921e4db2f8dc835f1.preview.webp",
+        "previewSrc": "/skill-previews/auto/c843b92805f1b7f517a070d3b942c38c4c8e57289a4f35d921e4db2f8dc835f1.preview.webp",
+        "cardSrc": "/skill-previews/auto/c843b92805f1b7f517a070d3b942c38c4c8e57289a4f35d921e4db2f8dc835f1.card.webp",
+        "width": 1600,
+        "height": 801,
+        "sha256": "c843b92805f1b7f517a070d3b942c38c4c8e57289a4f35d921e4db2f8dc835f1",
+        "originalSrc": "/skill-previews/auto/c843b92805f1b7f517a070d3b942c38c4c8e57289a4f35d921e4db2f8dc835f1.png",
+        "sourceUrl": "https://github.com/axodox/axodox-machinelearning/blob/41cfb3ebcf368f7249aaae528cc0a2e06fdad1ef/Examples/controlnet.png",
+        "kind": "example",
+        "title": {
+          "en": "Axodox Machinelearning · Author preview",
+          "zh": "Axodox Machinelearning · 作者预览"
+        },
+        "alt": {
+          "en": "Axodox Machinelearning: OpenPose based ControlNet",
+          "zh": "Axodox Machinelearning：OpenPose based ControlNet"
+        },
+        "sourcePath": "Examples/controlnet.png",
+        "documentPath": "readme.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/069d1abfd554a45c91df6f494a4d2b654063f07b0c66472bc2f156a4d3894886.preview.webp",
+        "previewSrc": "/skill-previews/auto/069d1abfd554a45c91df6f494a4d2b654063f07b0c66472bc2f156a4d3894886.preview.webp",
+        "cardSrc": "/skill-previews/auto/069d1abfd554a45c91df6f494a4d2b654063f07b0c66472bc2f156a4d3894886.card.webp",
+        "width": 1600,
+        "height": 801,
+        "sha256": "069d1abfd554a45c91df6f494a4d2b654063f07b0c66472bc2f156a4d3894886",
+        "originalSrc": "/skill-previews/auto/069d1abfd554a45c91df6f494a4d2b654063f07b0c66472bc2f156a4d3894886.png",
+        "sourceUrl": "https://github.com/axodox/axodox-machinelearning/blob/41cfb3ebcf368f7249aaae528cc0a2e06fdad1ef/Examples/controlnet2.png",
+        "kind": "example",
+        "title": {
+          "en": "Axodox Machinelearning · Author preview",
+          "zh": "Axodox Machinelearning · 作者预览"
+        },
+        "alt": {
+          "en": "Axodox Machinelearning: HED based ControlNet",
+          "zh": "Axodox Machinelearning：HED based ControlNet"
+        },
+        "sourcePath": "Examples/controlnet2.png",
+        "documentPath": "readme.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/53c1a8e125b57ef68f014b2da56a1b8c2854298bae0461ef38d7e18490ff6afc.preview.webp",
+        "previewSrc": "/skill-previews/auto/53c1a8e125b57ef68f014b2da56a1b8c2854298bae0461ef38d7e18490ff6afc.preview.webp",
+        "cardSrc": "/skill-previews/auto/53c1a8e125b57ef68f014b2da56a1b8c2854298bae0461ef38d7e18490ff6afc.card.webp",
+        "width": 1600,
+        "height": 801,
+        "sha256": "53c1a8e125b57ef68f014b2da56a1b8c2854298bae0461ef38d7e18490ff6afc",
+        "originalSrc": "/skill-previews/auto/53c1a8e125b57ef68f014b2da56a1b8c2854298bae0461ef38d7e18490ff6afc.png",
+        "sourceUrl": "https://github.com/axodox/axodox-machinelearning/blob/41cfb3ebcf368f7249aaae528cc0a2e06fdad1ef/Examples/controlnet3.png",
+        "kind": "example",
+        "title": {
+          "en": "Axodox Machinelearning · Author preview",
+          "zh": "Axodox Machinelearning · 作者预览"
+        },
+        "alt": {
+          "en": "Axodox Machinelearning: Depth based ControlNet",
+          "zh": "Axodox Machinelearning：Depth based ControlNet"
+        },
+        "sourcePath": "Examples/controlnet3.png",
+        "documentPath": "readme.md",
         "format": "image"
       }
     ]
