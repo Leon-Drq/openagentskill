@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "checkedAt": "2026-11-12T08:25:53.389Z",
+  "checkedAt": "2026-11-13T08:06:15.819Z",
   "records": {
     "001tmf-proteinview": {
       "identity": "5992a3c7067909901e64a4faf034453d5fc9bcfa2a253cb689fc207e1ace6826",
@@ -4365,6 +4365,67 @@
       "previews": 1,
       "skipped": []
     },
+    "1xyz-pryrite": {
+      "identity": "0585791f83d18c10d65fe4070f48c16bde2d14a290baa7b21319abc41060cd15",
+      "status": "error",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-14T08:06:15.819Z",
+      "revision": "05fba6c37f60d0903965dd91b1ec4f054889b743",
+      "documentPath": "README.md",
+      "documentSha256": "5b88cd6e5aa9e3935bb6454321911d12e6af899c950440980c3d49e384a4aa5d",
+      "candidates": 1,
+      "reason": "no-renderable-preview",
+      "skipped": [
+        {
+          "asset": ".images/noun-pryrite.png",
+          "reason": "decode-or-fetch-failed"
+        }
+      ]
+    },
+    "200ok-ch-organice": {
+      "identity": "15de637b3d2541f9dc7f897a962773242716fe879b520eba9c561c8c87b1a27b",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "reason": "no-exact-source-document",
+      "revision": "9e01d4fc5f406f198c6747ad54499d7b5e51399c"
+    },
+    "2023anita-scientific-cover-visual": {
+      "identity": "0d5c76a3585fd9c9e67adb7d0063ebe3e4283fcd969ca2f581ce6d764c2a2162",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "830325856a06d75e20306bf3302fd9668c785c0f",
+      "documentPath": "skills/scientific-cover-visual/SKILL.md",
+      "documentSha256": "31141be3ee1038839490542fb4122de637ff25ab8b8f22ec7426707ab793f76e",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "2023anita-scientific-infographic": {
+      "identity": "e8d75b65d7c41cfa2096f220ee20700df4d9e29451ef3a0737c2cd4f5fbaaf18",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "830325856a06d75e20306bf3302fd9668c785c0f",
+      "documentPath": "skills/scientific-infographic/SKILL.md",
+      "documentSha256": "6c7f964a67da2b5e119341bb5cd462fda759adfc2b49d5341edc116998f50a00",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "2023anita-scientific-paper-figure": {
+      "identity": "dd94d04d2536244d50f814acbb451268758f236963ee5dc3d490195c4802c7d7",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "830325856a06d75e20306bf3302fd9668c785c0f",
+      "documentPath": "skills/scientific-paper-figure/SKILL.md",
+      "documentSha256": "0c39bcc9e0adf95b7f99fd39179afe6e80c7c774c94dd2ca9cdf7de1168c4a41",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "20240610ldx-hub-charlie-munger-wisdom": {
       "identity": "ddbc771c374d5247703587f29f48f67a5a14672bb7355e1cc0b4c65c30e50273",
       "status": "not-found",
@@ -4533,6 +4594,51 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "21cncstudio-project-aura": {
+      "identity": "01740de119a371f55b1b24887fa5879ff9d5064391e53efb9f062d3e11cf03ba",
+      "status": "needs-review",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "937c49f2bd194fcf86eef53f80a7b8534df540c3",
+      "documentPath": "README.md",
+      "documentSha256": "dbe9d3bf4404b2974498ba3e29905518d49c3f4a8d530c7be66c53eb18ab54ab",
+      "candidates": 12,
+      "reason": "image-license-not-established",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "2362094903-ops-study-assistant-skills": {
+      "identity": "5782490d39a85c1acc6023ef550716f1fb4b2f6af2f7c102000a26638a584d26",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "3f555b845ac1cd4ede03d9b78b0138de1011116a",
+      "documentPath": "README.md",
+      "documentSha256": "21fb2046740294879d74a07bfbc20138b365c64c42172ba33a8672b81cd2a741",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "2362094903-ops-study-feynman": {
+      "identity": "b6a177d5544dc5b101976092fa4de05cb57071a166bcde60c00e70299202adf9",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "3f555b845ac1cd4ede03d9b78b0138de1011116a",
+      "documentPath": "study-feynman/SKILL.md",
+      "documentSha256": "143fa635caa81c40a98fb6aec93cbc16752b769a911e14993f67e98f25f72837",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "2362094903-ops-study-img": {
       "identity": "8073c09a6c8a97be6f76173cfe4fb643ecc70386636a13e6f396a02719d985d0",
       "status": "not-found",
@@ -4541,6 +4647,42 @@
       "revision": "3f555b845ac1cd4ede03d9b78b0138de1011116a",
       "documentPath": "study-img/SKILL.md",
       "documentSha256": "d9c2648a6c4e7b823f210de6ecadda74ef3b8dc08895e5148360500f031b08c1",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "23blocks-os-agent-browser": {
+      "identity": "2dd6eea08bfff59838dbf1c96a563ce7b281c270b9ae75f9335a2bae3f98a81f",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "1f820ab771d02294892e78176365c65888d1c257",
+      "documentPath": ".agents/skills/agent-browser/SKILL.md",
+      "documentSha256": "e830da36176bbba2aa5423a91b4e76c1e74bc25bbfbe4a336c958450f0281677",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "23blocks-os-ai-maestro": {
+      "identity": "5fbce62f56a161eee7739534e2598dff16c13c7633d9ed4fe0426a57f14c597e",
+      "status": "collected",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-12-13T08:06:15.819Z",
+      "revision": "e7ebd0c9516f8e9cbe14b40473cea688c5248747",
+      "documentPath": "README.md",
+      "documentSha256": "d6c7e951b6488dc651f52d51477d055df31c1cf839b67ea5ffaadccc07ba8fa9",
+      "candidates": 26,
+      "previews": 3,
+      "skipped": []
+    },
+    "23jmo-agentation": {
+      "identity": "7d53f36f3db7a2b7c8908a095a09ea4f573d645b8b41c2ac60e995909ab598e7",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "6082bf2c472857d6cfda48995ab985b69345aac6",
+      "documentPath": "skills/agentation/SKILL.md",
+      "documentSha256": "09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -4581,12 +4723,136 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "23jmo-interview": {
+      "identity": "65ea61e6a07a19025c5f3b050a10bd1750c1986161a22bc376c9d51611b41142",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "6082bf2c472857d6cfda48995ab985b69345aac6",
+      "documentPath": "skills/interview/SKILL.md",
+      "documentSha256": "b589180c395874fec62fdc5670d79362477e5cc10bec37720b84b6908e0722b5",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "23jmo-ste": {
+      "identity": "1f66c3f93a5b083e0df815aa85a9243fa575236a8237529c57c5c6350bd67283",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "6082bf2c472857d6cfda48995ab985b69345aac6",
+      "documentPath": "skills/ste/SKILL.md",
+      "documentSha256": "19c326cb3b96a7054cbcb7f67800f8dd28f5678450c35aaf7d4ab4ce3706b0bd",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "2417467487-hub-trend2video-pro": {
       "identity": "17b70cb2af9c6dcb79b28beab07629e0c3ce87acb09437fb5ba9a4ca5492dee6",
       "status": "error",
       "checkedAt": "2026-11-09T08:04:13.407Z",
       "nextAt": "2026-11-10T08:04:13.407Z",
       "reason": "source-unavailable"
+    },
+    "2417467487-hub-worldcuproi": {
+      "identity": "ec0e422c234a8b0abe64582d0a208e39782e644c110654a62bc298ebaa3017f9",
+      "status": "error",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-14T08:06:15.819Z",
+      "reason": "source-unavailable"
+    },
+    "24eme-signaturepdf": {
+      "identity": "b4de3d909883591bb93fe15790608f97c936d0160217d8de4dfcfff99a5e26ff",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f4b29411d3450ec3401f75b6144a75fde00432f9",
+      "documentPath": "README.md",
+      "documentSha256": "b3df2ea3fba113123b4adf2d14339536bfd1f6047c12698c0eb14e25090cf27e",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "256dpi-arduino-mqtt": {
+      "identity": "42dd2d04c28e6753a163ad76b906a50f634206652ad6c82851046251fafa4ad7",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "ec224e62c3d104cb4f59f59dfca7007d9a9e768f",
+      "documentPath": "README.md",
+      "documentSha256": "b8c0b33d49f4cc7e94ef8038979b38f95094db7a4417c1bbffb76734b9ddfd98",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "25h-maya": {
+      "identity": "9a8df3a9e896c27080e477241fe06bd6613a6f1c410792b14462e64ceec40e21",
+      "status": "needs-review",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "5274cbdea1a6b9e7bae3868ced91e54834878484",
+      "documentPath": "README.md",
+      "documentSha256": "29b89f9233bf6e2fad213a90db4729736bcb86d61fec3952a87cda2881850665",
+      "candidates": 0,
+      "reason": "source-association-or-license",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "26hzhang-dl-nlp-readings": {
+      "identity": "5975795c2490353b2db394b11fc9f3cc97e1d0d872afbdaf7b3f24072b8e8d38",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "82ca76e9184a3b00ac87129d99391477c85cfcd2",
+      "documentPath": "README.md",
+      "documentSha256": "b02ccd5a04a330d52df0235d7ab744082e94e86529d3a3660d1ebe053b0a2619",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
     },
     "26hzhang-optimizedimageenhance": {
       "identity": "aa81a6131d9bd9d7fd10d5635f3b56a331c1b94cf49c7e2c872a46a76696b58f",
@@ -4595,6 +4861,54 @@
       "nextAt": "2026-11-16T08:04:13.407Z",
       "reason": "no-exact-source-document",
       "revision": "540f91fc563b4a5ce0ce17a6bd1277b3be14ed92"
+    },
+    "28mm-blast-radius": {
+      "identity": "e8b5a353d9f9e13e1439ae8f935e7c549b723e2119faad7b95dd15d463fd9b5e",
+      "status": "collected",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-12-13T08:06:15.819Z",
+      "revision": "a7ec4ef78141ab0d2a688c65112f799adb9622ba",
+      "documentPath": "README.md",
+      "documentSha256": "bef9cc00069415d659807d141ddea704f8407c96b352a62177abeb9ad5f8bfb5",
+      "candidates": 1,
+      "previews": 1,
+      "skipped": []
+    },
+    "2998980-hue-surreal-pop-collage": {
+      "identity": "4031148032ba412bb2c889a1af8cb8fd1be127201c20c2f073db55036aa247ee",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "5bcf6f52592b3c83a384e5314556d2eac804dcc0",
+      "documentPath": "SKILL.md",
+      "documentSha256": "eb6b90578f9ef904bbd92f4ca02994a0420a72f86e33c506d22b55b85729c8ca",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "2arons-duel-agents": {
+      "identity": "36406dbb89ca8331a08cf7a3be8a7e1bbd15b9bc9e32f06e1dd8cabd317e167f",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "c9559e42fc383bb332cc20b3268a6b380c790c4d",
+      "documentPath": "README.md",
+      "documentSha256": "f4e33fda3ed74ed3623b54d122d3b3884ef712908851af5684875066f4cebede",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "2b-t-docker-for-robotics": {
+      "identity": "0db235003008a4825be72c7b295cb22762438bf2eb2cc3d79ab4e6163f1e7019",
+      "status": "collected",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-12-13T08:06:15.819Z",
+      "revision": "dd752ad67b1cf5a42106021f52435183cafbec96",
+      "documentPath": "ReadMe.md",
+      "documentSha256": "fae6028b1977249ce910d9a2448c190a7467f39da6ec3d3d8c98aa38cd7e2375",
+      "candidates": 2,
+      "previews": 2,
+      "skipped": []
     },
     "360cvgroup-fancyvideo": {
       "identity": "31be7bab0faee075e82bb0dd28ac6c99de00cce3f2e6124774c54965b50f7016",
@@ -7640,11 +7954,11 @@
       "skipped": []
     },
     "ahmadrosid-record-demo": {
-      "identity": "6cbb6e5356da70f3f887ba03f040b8abe0974fbfc1383415e60c8100f99009ad",
+      "identity": "38a2e5c8b3c9913edd4139a62de83cdd6101cb467431ae777582a4bdfe0d58be",
       "status": "not-found",
-      "checkedAt": "2026-11-10T08:29:00.993Z",
-      "nextAt": "2026-11-17T08:29:00.993Z",
-      "revision": "8ab2b4fa50d76c63f030d6f36bbb249992c5726b",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "c87634664f7f54b18b0a4c6108007f4985c4dfeb",
       "documentPath": ".agents/skills/record-demo/SKILL.md",
       "documentSha256": "2274590dbb3e5f0e3773cda2d31fc7cdb7583f85e178e1bfb281193507b6ee39",
       "candidates": 0,
@@ -8087,6 +8401,66 @@
       "checkedAt": "2026-11-10T08:29:00.993Z",
       "nextAt": "2026-11-11T08:29:00.993Z",
       "reason": "source-unavailable"
+    },
+    "aidenxu-1-lulu-analysis": {
+      "identity": "6570b3184f14a62448f170df031bff93be1c46de6c8c7aba0c09cd16f48a5949",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "bc3fcf36e711e6aa705696b3e59b1738daf9ceeb",
+      "documentPath": "app/internal-skills/packages/lulu-analysis/SKILL.md",
+      "documentSha256": "4aebde46ad8e6032ea6785e57a76693d84179c00f75149143f1d8722e303e916",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "aidenxu-1-lulu-proofread": {
+      "identity": "a930f81f2d09053206d037b0cdbe4e34e857b606dac9a3af8fe615793d4d9169",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "bc3fcf36e711e6aa705696b3e59b1738daf9ceeb",
+      "documentPath": "app/internal-skills/packages/lulu-proofread/SKILL.md",
+      "documentSha256": "ae410ea4c9ac444abf72f7659e19c3256d382024dda546de8c11a2d41cfc673e",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "aidenxu-1-lulu-summary": {
+      "identity": "7ad1e325338089a29e3d843ab8e63e5b84e8b6aefa62ee8bc1a91c358037b45b",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "bc3fcf36e711e6aa705696b3e59b1738daf9ceeb",
+      "documentPath": "app/internal-skills/packages/lulu-summary/SKILL.md",
+      "documentSha256": "e794347862eed075a34a5e77c489a6a1e0899a5c193e9e68e603a8d1a0b22c23",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "aidenxu-1-lulu-translate": {
+      "identity": "d814f87c408492257a07a3c0275b74bdf29934b281cc86c3ab66ce8f7310d228",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "bc3fcf36e711e6aa705696b3e59b1738daf9ceeb",
+      "documentPath": "app/internal-skills/packages/lulu-translate/SKILL.md",
+      "documentSha256": "596239c200ca2d144b64a558c645f6c199f3b3b5d0a8d0b79315588f139394f4",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "aidenxu-1-lulu-voice": {
+      "identity": "5aeb0b048f76d46cab21071fe28e6e183c56abf613610ad018db1ea738c0b956",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "bc3fcf36e711e6aa705696b3e59b1738daf9ceeb",
+      "documentPath": "app/internal-skills/packages/lulu-voice/SKILL.md",
+      "documentSha256": "1a6da0e88d057efd488f4ef871cdc3725202b5b174f29d9c32a7ca8c8f60e3e8",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
     },
     "aidevgtm-growth-loops": {
       "identity": "c42e2dd910eb327b77a3b786630a9fd22063be2ff11579f863f173a29d84e70d",
@@ -8952,6 +9326,30 @@
       "revision": "bc374f4bafcf738e48d18ec1b57ada17ad374ddd",
       "documentPath": "ru/SKILL.md",
       "documentSha256": "511f40ebfaed66ccde1d608033e94bd06e047971f4cde5cf2bbd74e0f970ad01",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "alexshpunt-computer-use": {
+      "identity": "53fbcdbebfe8628541f3d886079cde0d7ee27057614d237f80a098e6fa1f3e3b",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "d37c14edbe10f9ce1342425acc85d8eee0a46ae9",
+      "documentPath": "skills/computer-use/SKILL.md",
+      "documentSha256": "2abfcb3a7cc7f5588936794b47bc2ee9896e37862ee76c0f8856166d64aea6f6",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "alexshpunt-develop-computer-use": {
+      "identity": "52d958e907f83272e8d4b9e671c5da2a8f2ca96ed774f18e3afc8ec0b6f01c52",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "d37c14edbe10f9ce1342425acc85d8eee0a46ae9",
+      "documentPath": ".pi/skills/develop-computer-use/SKILL.md",
+      "documentSha256": "9487c5a834d0df8d7ac7a400e91e2cf6a3692d6eab0ca40000c674a9213c2819",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -10484,6 +10882,18 @@
         }
       ]
     },
+    "andisab-mcp-tool-dev": {
+      "identity": "46f4ad16e9ed68922d9a8f01003a08ddc033b0bc59e31cd0446c023c281a0bc4",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "90e34006457ec184cfce7ae0ebb893ac9b661b50",
+      "documentPath": "plugins/context-engineering/skills/mcp-tool-dev/SKILL.md",
+      "documentSha256": "1e12c50eb44fd4fcb62017383ee9b80da6f20c09345c721fe03e5c790644f45e",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "andreworia-hypothesis-design": {
       "identity": "4073b21c8fde0300bb3c1c27c3856f5325a041a9f6d3ca99c942b3c107f49fb3",
       "status": "not-found",
@@ -11151,6 +11561,42 @@
       "revision": "4e7b3d08e0d17935644a0e281c944764da4b2601",
       "documentPath": "skills/find-journal/SKILL.md",
       "documentSha256": "f4b4e02ee78b4d9b92cf80da53ee67e7901ce36e868fd3fd47e97e51d4931e83",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "apexcheng-code-quality": {
+      "identity": "3b39d23c868bec4c48e8de4a04a2cec99f9915eadae706b2ec5407324e254a17",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "e6178d5f05fdb323c33a1db5abd4d6a09cff395a",
+      "documentPath": "project-template/.agents/skills/code-quality/SKILL.md",
+      "documentSha256": "7da36e44c742d3ae44df43994c2cee5a40b84b1761bd9da43a66df66a45c98b5",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "apexcheng-spreadsheet-operations": {
+      "identity": "f5ee6694a8109ebfed4c349b8e7b94e9c0a1ece934de891bf1e879da031965a7",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "e6178d5f05fdb323c33a1db5abd4d6a09cff395a",
+      "documentPath": "project-template/.agents/skills/spreadsheet-operations/SKILL.md",
+      "documentSha256": "7d1de97feb30bae76df12a6ea3e011d20fa8ecc4440b583784801356fabc4c27",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "apexcheng-web-workflow-extraction": {
+      "identity": "0cbfeab0ace0a8be7aa2e176fa9fd7ff2ffe7fa25aa34e5318144f0a84ee7e24",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "e6178d5f05fdb323c33a1db5abd4d6a09cff395a",
+      "documentPath": "project-template/.agents/skills/web-workflow-extraction/SKILL.md",
+      "documentSha256": "e7a38cc36edf5b1ddf2c4d218cf69a1daa2e8028fb0dc85e779d71bd7a441e03",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -12934,6 +13380,18 @@
         }
       ]
     },
+    "axodox-unpaint": {
+      "identity": "32a4b78c7e5f71194cde674031582a3e930fcfa34e5e2b92f9bd0dc82a404b04",
+      "status": "needs-review",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "80e5a0c9e07d424f1c6691b12761c3e85970d771",
+      "documentPath": "readme.md",
+      "documentSha256": "8f05f300221f5835d72f23d670a7315cbee4f955801ffd860185ea048c242510",
+      "candidates": 2,
+      "reason": "image-license-not-established",
+      "skipped": []
+    },
     "axorax-tkforge": {
       "identity": "98e1f4fac4ee638826be1a0a71b546bccb75f7cce4d7c3245813269b34583a79",
       "status": "collected",
@@ -12944,6 +13402,18 @@
       "documentSha256": "95f3a8d6fa01c9febf73f812e47526ff2b7e73036756d27ea1f74d75c2cd781d",
       "candidates": 1,
       "previews": 1,
+      "skipped": []
+    },
+    "axoviq-ai-youtube": {
+      "identity": "7516ab4a4e4b0fe7d09f8deb81ff8088f337366e1b3c74eee6907b9136d3434d",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "816b34fba44a2cfaa1428bc74d53504852070954",
+      "documentPath": "synthadoc/skills/youtube/SKILL.md",
+      "documentSha256": "de132f4e8eabc44b2d91c81621fa93b2a00a73d50c26209f47a7bae81a6d914c",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
     "ayroui-bootstrap-ui-components": {
@@ -12975,6 +13445,18 @@
       "reason": "no-exact-source-document",
       "revision": "88c989d544653d6c909a58a2b4b49465092a5ed9"
     },
+    "azure-samples-cognitive-speech-tts": {
+      "identity": "33ddc4b5bed6f9d88d0d526322bc777ddc22397a82032e24da6c326275c47523",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "6f96d6ebdf123b3f2cb4cf905599cb411c47f6d0",
+      "documentPath": "README.md",
+      "documentSha256": "077a640a6db970871998946167f8d0931cb5635e46aecb7f1c15b45907baa9e1",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "b3nnyl-figgo": {
       "identity": "c90fb29b1e28853993bf7bcdd7ef806c21eabebcaa71cb0e88d21caf3fb9d2ba",
       "status": "collected",
@@ -12991,6 +13473,67 @@
           "documentPath": "readme.md"
         }
       ]
+    },
+    "baaivision-nova": {
+      "identity": "bfc7079196352e1f5927bc5e8ecc3197399b8010b5e1e21db1de103ace514286",
+      "status": "collected",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-12-13T08:06:15.819Z",
+      "revision": "63c5a724fc4e264e229a95c893184434f00c9413",
+      "documentPath": "README.md",
+      "documentSha256": "71f14343a2c148868588f06bee3715c08ee78878e40febb865ad262248cbec06",
+      "candidates": 1,
+      "previews": 1,
+      "skipped": []
+    },
+    "baaivision-ursa": {
+      "identity": "0d5b94ac1ef84ca6a114d641228272271dab399f7f999d3b32b8ca4557fffdf0",
+      "status": "collected",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-12-13T08:06:15.819Z",
+      "revision": "68ed282b0ed788cf02d0cc615ef2a8b96c855dba",
+      "documentPath": "README.md",
+      "documentSha256": "ed38aaee819088b7cebfc856eb64549beba86f1e88106b83e87d7a531ff2f20b",
+      "candidates": 2,
+      "previews": 2,
+      "skipped": []
+    },
+    "babysor-mockingbird": {
+      "identity": "7e647822a6afed30f16fc689357c610f4066b6d8b7e071f26d9c26d068a2868c",
+      "status": "needs-review",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "28dc5e14f12d7c754612af2fde8e78a4b03f8616",
+      "documentPath": "README.md",
+      "documentSha256": "a5e81c93e67365ffc538956c9185a3e7e4339a1e3294d03d525e759418f5c8fe",
+      "candidates": 0,
+      "reason": "source-association-or-license",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "backblaze-labs-genblaze": {
+      "identity": "26dd1ad997cd7402bc870cbcb0dcd0ae0618be1452415eb86714e709c710cc6a",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "9e462e12ff607e42155ea39e21d04ef3c82822af",
+      "documentPath": "README.md",
+      "documentSha256": "8a979b1e7d85c9bba1faa84c34d80384868bc30fb45a2269b8d221776ac36ac0",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
     },
     "backnotprop-architect": {
       "identity": "a8e490f382f3c17b107d4ef6d9b5ae754ff76ffdadb32eb6e63ab4fccaa4ca54",
@@ -13048,6 +13591,18 @@
       "revision": "0642a58496d4dfa1de9688a82c29dfa34d24370a",
       "documentPath": "skills/product-engineering/SKILL.md",
       "documentSha256": "36fbd1eb1f0f2ec532faa4c85dd8f8ae94da254328613d15a80a9205f0f583e8",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "baidu-aip-speech-demo": {
+      "identity": "a2743b3b0f750e1f3b9fea1163afd471ef76ec470782664388d194b3a6ed8d0e",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "602bae9f40d2ecd2b1273acc3ba86caf3129d55d",
+      "documentPath": "README.md",
+      "documentSha256": "769c5d273e9d2f68e235db365b0b9c354dd4bc8377dbac62267d1ee6863ff3b7",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -13244,6 +13799,23 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "bawangxx-xzvoice": {
+      "identity": "025ba4ce484bf9a0242eed1a15415639464f48700ff82e4a2723d615e1cc2f55",
+      "status": "needs-review",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "afc99d5e2908c95984590131b4b067c41e5d5255",
+      "documentPath": "README.md",
+      "documentSha256": "7fda2ffa98ae14136e22acf5fa25324ee00a2154014fec530d4d1af6fe8a0bf7",
+      "candidates": 0,
+      "reason": "source-association-or-license",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
     "bayramannakov-ai-systems-coach": {
       "identity": "748cf6f8f1ae6512489fecd6319e3b729231168561dc169468d16c1b94527f80",
       "status": "not-found",
@@ -13290,6 +13862,18 @@
       "documentSha256": "540aca86d41191ff62092142e4ec212745ab56dc91a7d40e63aff1ca20b5f786",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "bcmi-light-a-video": {
+      "identity": "6f6be972ea48079d9ad19920b906cb03792439e48e69012359446a6fd447566f",
+      "status": "collected",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-12-13T08:06:15.819Z",
+      "revision": "13c0eefd105135178c24c801bdbc093d688eac69",
+      "documentPath": "README.md",
+      "documentSha256": "ac9fd012a59f29db301ca73a66882d41c307fefe992102006c15708712e26ea8",
+      "candidates": 6,
+      "previews": 3,
       "skipped": []
     },
     "beakpoint-insights-cross-repo-handoff": {
@@ -13362,6 +13946,42 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "benjiyaya-h3-video-prompt-enhancer": {
+      "identity": "b78a6a4761a1d4ae105e240791d6ad34ccbd9e7cef7cc390b1d43fcfe0ce4dda",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "9ebf679a588dc425ec528ec33eda0045980ffc45",
+      "documentPath": "SKILL.md",
+      "documentSha256": "f329053a5b72f1bbcfa91521e08ccbbaeb7ddd08c9c948420cfe86ada03fd0bd",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "benjiyaya-muse-studio": {
+      "identity": "0a35ea7f361b0376d940ce191a989386b27ab814e320591a572d01ccd46ed0a8",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "d44b7c7ffb6d6f426feadd02367707390311cfec",
+      "documentPath": "README.md",
+      "documentSha256": "db3708c6709747594d8cfcf4a585224ade9aaf16c3f0a898285d189a2aa0375b",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "berabuddies-gemini-video-analyzer": {
+      "identity": "80eb38bdb6b0ba740a7a1ce4d735744702e40f19873901eeda2a4d2300b59a11",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "379bc25fe99833eb185efe56a38fe15f0235799c",
+      "documentPath": "tests/fixtures/skills/aiwithabidi/a6-gemini-video-analyzer/SKILL.md",
+      "documentSha256": "815aad97be91a45e18751d11592268162275f46a31db32d8e1acb2eadacf808a",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "berabuddies-goals": {
       "identity": "d522e51c9e837f965ba0f029cae5281561cca9dd02b3029782c075588c0947ba",
       "status": "not-found",
@@ -13370,6 +13990,18 @@
       "revision": "379bc25fe99833eb185efe56a38fe15f0235799c",
       "documentPath": "tests/fixtures/skills/ivangdavila/goals/SKILL.md",
       "documentSha256": "bbf727754a8ef07c91bcf565f7725d6001f4fe38bb807bcaa700ee85ac348a30",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "berabuddies-youtube-summarize": {
+      "identity": "c3b25eb16b09432cdb8948b43b21fd5fd8dfab9a639a2d9979c43f32e7924d41",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "379bc25fe99833eb185efe56a38fe15f0235799c",
+      "documentPath": "tests/fixtures/skills/jordanprater/youtube-summarize/SKILL.md",
+      "documentSha256": "207eeaaed4028aa084d41b9f73b73325c7926c22397db7b94b16d345dad9d1d3",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -13442,6 +14074,30 @@
       "revision": "9ef015308ae02178a6d3cd5c09ca402f1cee0e3b",
       "documentPath": "pitch-deck-coach/SKILL.md",
       "documentSha256": "4a4024711495bc9e2c345a90d8131f663ae3c811fc0b2ad90354b8fd7e3d3205",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "betahope-priya": {
+      "identity": "859b3bedd53085461809a71d794880d69e0418f468dbf1d1266ca38903640e93",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "9ef015308ae02178a6d3cd5c09ca402f1cee0e3b",
+      "documentPath": "priya/SKILL.md",
+      "documentSha256": "7cc11b9680927ceca4f88f8e0d9f059bd7d816fb28dd7e0dbbbd078e778cb957",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "betahope-startup-application-coach": {
+      "identity": "3e6e0c8dcc8636358ed3024875716c883e04f85151f5f920f4d2e0c03c4cc846",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "9ef015308ae02178a6d3cd5c09ca402f1cee0e3b",
+      "documentPath": "startup-application-coach/SKILL.md",
+      "documentSha256": "2634e7500a249c129260fdb0c89af7344197c6bb1085f33be5ea67f227c2b897",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -13519,6 +14175,18 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "bgrenat-gamedev-audio-design": {
+      "identity": "d1e19831f092f3e3a448ee3b1a50885902aed32653038c33d259bab1772eddf6",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "cb2e2cb6bedeada7140d73a0f45a93db1964e634",
+      "documentPath": "skills/gamedev-audio-design/SKILL.md",
+      "documentSha256": "80f12c3d41917b55e647bb94ed3c328ee658a3b7e169bd680ce7d633e28ea3c2",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "bgrenat-gamedev-game-ui-ux": {
       "identity": "586f56b610af5f0b2c89f491a7e128b254247ecd6856a73f5ab8f62f96377ab5",
       "status": "not-found",
@@ -13554,6 +14222,23 @@
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
+    },
+    "bhanuprakashnani-image-processing": {
+      "identity": "b2d8f0e13cad68a0d74b932b035708eafc105ff4857135e58b1b6ef5ccaace1e",
+      "status": "collected",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-12-13T08:06:15.819Z",
+      "revision": "8d4cf9af49de9113ebf8c5e6e3587afd3d772b6a",
+      "documentPath": "README.md",
+      "documentSha256": "aab9630417ea1416d915f43aa2b6c33931a43cb8f48a621cb8aff83274d71dc6",
+      "candidates": 39,
+      "previews": 3,
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
     },
     "bholmesdev-taste-review": {
       "identity": "bf10e14b94b6fd520f0203056a97c559a41275345bd7e4421b74fb859b21d043",
@@ -13603,6 +14288,42 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "binggandata-bggg-tiktok-capcut": {
+      "identity": "713f1066b1b39d72844b73c358457693e512a888145cc87ecf6e552db5284ea3",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "1034ee5805f3fd5b010a4f57affa4aa796ab75d5",
+      "documentPath": "bggg-tiktok-capcut/SKILL.md",
+      "documentSha256": "8f77f42045605601391ef31600bbe27adcd56ed590213cf9e156445fe7d8cfdd",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "binggandata-bggg-tiktok-readvideo": {
+      "identity": "25236466c782a479dc67966ef7b05fc2e38fc73b7f97cf587f06b8e7d2d5ba61",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "1034ee5805f3fd5b010a4f57affa4aa796ab75d5",
+      "documentPath": "bggg-tiktok-readvideo/SKILL.md",
+      "documentSha256": "d226fddd0c5d233cbd3d4f55a7b4ca993bbb6fc1cd9c00f5d6118d7772788778",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "binggandata-tiktok-gemini-video-workflow": {
+      "identity": "e0e362d8a21de4621337e9a9efab275937a55f7e60234eb6da209a1853559c38",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "1034ee5805f3fd5b010a4f57affa4aa796ab75d5",
+      "documentPath": "tiktok-gemini-video-workflow/SKILL.md",
+      "documentSha256": "edcc158aadfa7451e7d07dd33ef69b7bd4d6703a5bebb9a8bbec07db75bbcd9b",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "bino5150-run-lumina": {
       "identity": "3328cbc2ea95af8dcb9b6b6087ec537499e892d2781fb554d53a287032c89498",
       "status": "not-found",
@@ -13611,6 +14332,18 @@
       "revision": "248e491d9152dde884057573a46a37a499d75504",
       "documentPath": ".agents/skills/run-lumina/SKILL.md",
       "documentSha256": "43a6608bc050016fab92123d0f4c0d1c5ff33da6247b7ad8525beb016f136072",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "binwang28-audio-ai-hub": {
+      "identity": "ea830c35e60f45b19a4c1cc4c01564d9996ab0c205b9fca7343cf04efa08556b",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "02e4cfe624db882176f49e51e31e162d4436ce30",
+      "documentPath": "README.md",
+      "documentSha256": "48ea9dfa68c228bb165adbbf097a91e5dc9b31a0a63e2117595733b68e89906c",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -13817,6 +14550,66 @@
         }
       ]
     },
+    "black-forest-labs-flux-3-archival-formats": {
+      "identity": "644d89b7ce9228b0a9720941aba6097c028375bb52600aa1d7f617ee7d39d609",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "8907d515b0ac270a988ec7a239add81ee13d6cba",
+      "documentPath": "skills/flux-3-archival-formats/SKILL.md",
+      "documentSha256": "4afcbd6e64ead64f671d48e83dcd8dec495db349dcb13dcff693db97ba659376",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "black-forest-labs-flux-3-audio-dialogue": {
+      "identity": "8d8458eb89d5df6b913270440b175e50b6b4c4a3b0bf1fd17593915f0c3be3ad",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "8907d515b0ac270a988ec7a239add81ee13d6cba",
+      "documentPath": "skills/flux-3-audio-dialogue/SKILL.md",
+      "documentSha256": "6ede36f116bcb59f1346463ef504d63b73397bcdd3cf8b153ab29633e86e825f",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "black-forest-labs-flux-3-cinematic-inserts": {
+      "identity": "ecbc0b11575512226506487f9967b65bd6ccc9876c2b4ad97db26480f3584bb1",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "8907d515b0ac270a988ec7a239add81ee13d6cba",
+      "documentPath": "skills/flux-3-cinematic-inserts/SKILL.md",
+      "documentSha256": "7e2d16fdd33162f431193e2e01b786a3aad63cfc2503c6c7d053141002cffff2",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "black-forest-labs-flux-3-generate": {
+      "identity": "d23712df2493b9035c60744659349d3476c4557d635be2304a24842d955507bc",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "8907d515b0ac270a988ec7a239add81ee13d6cba",
+      "documentPath": "skills/flux-3-generate/SKILL.md",
+      "documentSha256": "f0bffa758a8e1c178f857bf09fea59956a647fb45e1b425084b705080617c188",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "black-forest-labs-flux-3-keyframes-continuation": {
+      "identity": "5e45cb7b77541f592236c5ccacbad0fac1f1c5ac1d7c66ff8a7804b672c3c548",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "8907d515b0ac270a988ec7a239add81ee13d6cba",
+      "documentPath": "skills/flux-3-keyframes-continuation/SKILL.md",
+      "documentSha256": "d77da52487d54d72426465800ec6effd605a94b3dfc8fc7999aa62cc6740024d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "black-forest-labs-flux-3-product-ads": {
       "identity": "17009e2727a273373a51ec58351f27968def3f0168180e460292fb3a4942c5a9",
       "status": "not-found",
@@ -13825,6 +14618,18 @@
       "revision": "8907d515b0ac270a988ec7a239add81ee13d6cba",
       "documentPath": "skills/flux-3-product-ads/SKILL.md",
       "documentSha256": "db2a791245f0293001d7ec91ef5a6cb0658d52950d2c609df86f8a37a17aee6b",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "black-forest-labs-flux-3-video": {
+      "identity": "513bf0cb6833826fdb86a725b4e2c8fe05f9f1cc7a566295a5ed2b7578038563",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "8907d515b0ac270a988ec7a239add81ee13d6cba",
+      "documentPath": "skills/flux-3-video/SKILL.md",
+      "documentSha256": "aba52d597d683148af8f0d0ffff7ce309a24326ae6d3de5c8e6afd2b412a87b8",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -13925,6 +14730,41 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "blade6570-icface": {
+      "identity": "a7490f7b60eda82bbfe98dcd01657a848a0037c65ac0af08c6141da05dd956c1",
+      "status": "needs-review",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "3b9fad8560dddb86dbae40c69a65a1459095b2e3",
+      "documentPath": "README.md",
+      "documentSha256": "368878e4652029d7298389ef4e121772b968bf46536015d8bd89f6471dc970a5",
+      "candidates": 3,
+      "reason": "image-license-not-established",
+      "skipped": [
+        {
+          "reason": "missing-asset",
+          "asset": "test_code_released_new/new_crop/7.jpg"
+        },
+        {
+          "reason": "missing-asset",
+          "asset": "test_code_released_new/new_crop/8.png"
+        }
+      ]
+    },
+    "blaizzy-mlx-audio": {
+      "identity": "04bc720fbe0906a024f00affcec31f3793d758741f8e74e06ae10a930456cfb0",
+      "status": "error",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-14T08:06:15.819Z",
+      "reason": "source-unavailable"
+    },
+    "blaizzy-mlx-audio-swift": {
+      "identity": "c9dd13f4e31e5f641029ea7bc899ca18970c9b74b0e34fcafb5243ad66e8d6a9",
+      "status": "error",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-14T08:06:15.819Z",
+      "reason": "source-unavailable"
+    },
     "blazorblueprintui-ui": {
       "identity": "152705e5e492bdad27d4feb37596d1b2b7371e4368de8defd99c23ef731f9027",
       "status": "collected",
@@ -13967,6 +14807,51 @@
       "checkedAt": "2026-11-09T04:19:26.260Z",
       "nextAt": "2026-11-10T04:19:26.260Z",
       "reason": "HTTP 404"
+    },
+    "bloc97-anime4k": {
+      "identity": "59daf54bc9502a6f00bcbfc38a2c3719d990a358c49c231c8255891b03ab8832",
+      "status": "collected",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-12-13T08:06:15.819Z",
+      "revision": "7684e9586f8dcc738af08a1cdceb024cc184f426",
+      "documentPath": "README.md",
+      "documentSha256": "0922a6645ea63fed3f7c96b3c0e0e5d788e06d9e2cf28274c6a9460890e91d9a",
+      "candidates": 4,
+      "previews": 2,
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        },
+        {
+          "asset": "results/Comparisons/Cropped_Screenshots/Higurashi_360p_4K.png",
+          "reason": "decode-or-fetch-failed"
+        },
+        {
+          "asset": "results/Comparisons/Cropped_Screenshots/Magia_360p_4K.png",
+          "reason": "decode-or-fetch-failed"
+        }
+      ]
     },
     "blueprintui-blueprintui": {
       "identity": "0202b9cf4d16f655bd3b4040ba5e0f4f71238e9189474e71db89d4ec3bda5a7e",
@@ -14059,6 +14944,30 @@
       "nextAt": "2026-10-16T07:28:30.393Z",
       "reason": "no-exact-source-document",
       "revision": "82ecf45985a3dd991e1c94e23743e7ef02ef142a"
+    },
+    "boese0601-magicdance": {
+      "identity": "7243a17e51ca3662c9486af10c052d3ff856b54a15277180f11bc60a5d096d5e",
+      "status": "needs-review",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "a515a1f4a5fceb9abb3d2cabbc48958ba249e560",
+      "documentPath": "README.md",
+      "documentSha256": "47ea3ba7a72b57f519bbc0270848bca4e1fb93541aeb8e101c5b7b2e96b0ef24",
+      "candidates": 8,
+      "reason": "image-license-not-established",
+      "skipped": [
+        {
+          "reason": "external-or-unresolved-source",
+          "documentPath": "README.md"
+        }
+      ]
+    },
+    "bomx-super-video-maker-skill": {
+      "identity": "800218f6226797da852c03b905f987de1622dc8806b08f16346d6678d023a5e9",
+      "status": "error",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-14T08:06:15.819Z",
+      "reason": "source-unavailable"
     },
     "boom-vitt-thai-customer-service": {
       "identity": "23f3e89a1565c5517d27a144733502fa9128e81c6d8120abcfaebb8c30c408c7",
@@ -14264,6 +15173,18 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "boring-stuff-club-the-scribble-thing-skill-the-scribble-thing": {
+      "identity": "8ae71c77089c574ff4f3d74d1119fd27b55746a95eaecde39eac84ff42af62f0",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "d001a39892ad53ec9d5daf67ebea758da7b9245c",
+      "documentPath": "skills/the-scribble-thing/SKILL.md",
+      "documentSha256": "96ff55aa51a85537e605a67de5d34e3b4ec5b9ec03de6697f9e602093ca61d5a",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "bot66-mnistdiffusion": {
       "identity": "a44e25c6b90d3d647052248dce80690bcd02246b70eb3732c021b677a397296f",
       "status": "error",
@@ -14327,6 +15248,18 @@
       "checkedAt": "2026-11-10T08:29:00.993Z",
       "nextAt": "2026-11-11T08:29:00.993Z",
       "reason": "HTTP 404"
+    },
+    "boyang-hu-website-rebuild": {
+      "identity": "517c4f955fbb5322f0aac3694d4b70a56eda3b878bd505ac382ad440ffb71391",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "ac60c9d8a2ab40045a89b5403c3457f1404e92b3",
+      "documentPath": "skills/website-rebuild/SKILL.md",
+      "documentSha256": "8dffe42c98126eab259d83f6d1df12234806f7702269c245cecd5764fb2c4388",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
     },
     "bradfeld-ceos-dashboard": {
       "identity": "ece46990787f65809d66cfb3b947cbcc180c9bed6627a083a96336244abd2008",
@@ -14393,6 +15326,18 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "breakthrough-pyscenedetect": {
+      "identity": "9e00aea728e2f191dc9cfb14a1603cf05d03ad94ac519d25889ab177724727f1",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "78992833b28266e35eb56343d701ad24d9b505de",
+      "documentPath": "README.md",
+      "documentSha256": "f22deed79a4c4c7a0286986d22fa4c4c3cde0ed820cc929e395bec0e043ed35b",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "bria-ai-automotive": {
       "identity": "02fa42a206085d545d7247ddcd30d7a78afa4b06f90fdc25d17fe7f58d89d46f",
       "status": "not-found",
@@ -14438,6 +15383,13 @@
       "nextAt": "2026-10-22T06:06:14.969Z",
       "reason": "HTTP 422"
     },
+    "bria-ai-video-remove-background": {
+      "identity": "fb9c333062f5a8979cc6b72ba91a93a3b006b5bea8a1a622ebb792d1b393d5fb",
+      "status": "error",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-14T08:06:15.819Z",
+      "reason": "HTTP 422"
+    },
     "brijr-craft": {
       "identity": "d506d5d792969e320022bfb16e394cd31308cc36e1daff91efcfec72149677ad",
       "status": "not-found",
@@ -14446,6 +15398,30 @@
       "revision": "d27cbea3fe1f41cc35bf6d696cd83d0563d2d645",
       "documentPath": "README.md",
       "documentSha256": "ae05fa174cea9d2aea90efab930089b4d4633ca92ae567bb7199d651444b2888",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "brokensource-depthflow": {
+      "identity": "d105e04dda8bd5dac2809620505cdd44a8676629151fb5e6bc137c98bf97432f",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "4d002b49f0ee2172d38fac93dcbc50c487e12301",
+      "documentPath": "readme.md",
+      "documentSha256": "49520ec92c5515100a4b48b3cbfa667a54078123df1e38e0c788307c2e9a8eb9",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "browser-use-video-use": {
+      "identity": "e277bb7dd60475c5e651b50e22837e4c4398b074bc0f5aa15b3f8399eb948986",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "43cfc566833548093455c9d4a46bd69913b7e552",
+      "documentPath": "SKILL.md",
+      "documentSha256": "d3bbeb19bc0e81e197d74806fba15e0a5f5694a0cdf33f0a2348bffe8472a27b",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -14689,6 +15665,42 @@
       "nextAt": "2026-11-11T08:29:00.993Z",
       "reason": "source-unavailable"
     },
+    "byjlw-video-analyzer": {
+      "identity": "3be4993ff713137b36532179be3ce2cab63310aec4a18e754b7aa63a62888b8f",
+      "status": "collected",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-12-13T08:06:15.819Z",
+      "revision": "2b095faf8a965eda5ba055ef29eb0cd71698ae6f",
+      "documentPath": "readme.md",
+      "documentSha256": "816ddbd8501b31944520a4df7c6966496830a45473bed9ae6c856c16006cc476",
+      "candidates": 1,
+      "previews": 1,
+      "skipped": []
+    },
+    "bytedance-bernini": {
+      "identity": "636a80ed3841f681d71bd8954667ac2f19beaaa4f6a6905c91f3a95bcf69b364",
+      "status": "collected",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-12-13T08:06:15.819Z",
+      "revision": "e6c2cf11843470b08491745947abcba9c3c6b079",
+      "documentPath": "README.md",
+      "documentSha256": "2ce851066c1fe8e86e1271ea2f2e98ae872020166fc318efd6f2d292163a739e",
+      "candidates": 1,
+      "previews": 1,
+      "skipped": []
+    },
+    "bytedance-comfyui-infiniteyou": {
+      "identity": "454aaeacbee474132a2b20957adfebe00e01a61f0d79923697daf5260683d80f",
+      "status": "collected",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-12-13T08:06:15.819Z",
+      "revision": "1c979397c5c80f5ac83a2473a2f7d4503104110f",
+      "documentPath": "README.md",
+      "documentSha256": "d330aa147a1201287a0755b8076e7e227946cbd028365aad9901f08de5a037b7",
+      "candidates": 3,
+      "previews": 3,
+      "skipped": []
+    },
     "bytedance-fanqie-ai-mosaic": {
       "identity": "b827a9a63b06cad52a4a0a5d77d4b0892a623ab33fb68d03aaa5bf0df687fa3e",
       "status": "needs-review",
@@ -14699,6 +15711,42 @@
       "documentSha256": "3909a04f7297604e6f53a5d043ed18aaf998b6e4cef957eaed6bc71238732cda",
       "candidates": 2,
       "reason": "image-license-not-established",
+      "skipped": []
+    },
+    "bytedance-infiniteyou": {
+      "identity": "eb716fdaff54cad968978c984888703496688b019d0458bfd428cc58a232e3e8",
+      "status": "collected",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-12-13T08:06:15.819Z",
+      "revision": "aaa6ea5f75ba2ff58b9025fa7df45e4a139ed717",
+      "documentPath": "README.md",
+      "documentSha256": "5d41426ef5e40b3b8af222e8115bdd2bf295aa9bc99bd6ee26428ac07b470d86",
+      "candidates": 3,
+      "previews": 3,
+      "skipped": []
+    },
+    "bytedance-lance": {
+      "identity": "ec4a00060cc5a477b372a8248818fa4a1353daf23eddadde1569aebb801e548f",
+      "status": "collected",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-12-13T08:06:15.819Z",
+      "revision": "4baeee086648996f6ab12e673cbe461b0b149997",
+      "documentPath": "README.md",
+      "documentSha256": "df0fe31b06c0943bf909a42daab150367f6e95d6360c18c64ce146718c15fc04",
+      "candidates": 22,
+      "previews": 3,
+      "skipped": []
+    },
+    "bytedance-salmonn": {
+      "identity": "86c273ee53376d3e778dab029331068ef13b03bc15959ee6e098c0380500df71",
+      "status": "collected",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-12-13T08:06:15.819Z",
+      "revision": "0d9ac440928002d153c1aa35ee2029aea53626b9",
+      "documentPath": "README.md",
+      "documentSha256": "fe64db51ce9fcef05a929f4febfe694c2e5198435d8751aee3732fe57797ca96",
+      "candidates": 1,
+      "previews": 1,
       "skipped": []
     },
     "bytedance-ui-tars-desktop": {
@@ -15861,6 +16909,30 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "chinhkrb113-open-code-review": {
+      "identity": "ad235e371fcb4a296dc847e6d08d7cd9ff524c4cfb586f32bc0cc20244acf5f7",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f1c55a03b0e2d679f533303023793224722c7e99",
+      "documentPath": "plugin/skills/open-code-review/SKILL.md",
+      "documentSha256": "d86e1a8ab33cd1cd5292ce2937fffbe737b0f07e8f3572fef197224f7f098367",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "chinhkrb113-ponytail": {
+      "identity": "762671da9e8c799bd0bbb0b5ba160c5dcc326ff845d2bf7521894979c985a178",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f1c55a03b0e2d679f533303023793224722c7e99",
+      "documentPath": "plugin/skills/ponytail/SKILL.md",
+      "documentSha256": "6eec2542904c06fea3b6e9e2d6621cfaad9f24bd7494e6049a26537196e0d03d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "chiruu12-oss-second-contribution": {
       "identity": "c46e48bb18f3e2a132d8b1dd5c5a633c69863161dcc3a033870e0030569d7a7d",
       "status": "not-found",
@@ -16632,8 +17704,8 @@
     "claude-office-skills-clickup-automation": {
       "identity": "4b7a384154dbd8b97f6433a0ea040aa5f3de28291ab332abab5c15b8c3701e4a",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
       "documentPath": "clickup-automation/SKILL.md",
       "documentSha256": "a6d3126529d996e1557a3f852488cce8a9a8e0d1f0aa2064f95878aa74bdc44b",
@@ -16644,8 +17716,8 @@
     "claude-office-skills-company-research": {
       "identity": "5c193f823f401d8bcaa2772f1a22bbe76193101de95c02cc8b9e9308dd1ebca0",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
       "documentPath": "company-research/SKILL.md",
       "documentSha256": "0f4b98909876887079eacc3297322cfb7b0fa995c02c50e56516d2d9b6e52beb",
@@ -16656,8 +17728,8 @@
     "claude-office-skills-competitive-analysis": {
       "identity": "d3b209c35578994a286cef1626a88e54d186d43c6322cb99134600a68a90de43",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
       "documentPath": "competitive-analysis/SKILL.md",
       "documentSha256": "0147807fc659db91d30f0857b8d79676bf8c24f9b7a17f0a7ace12b86191772a",
@@ -16668,8 +17740,8 @@
     "claude-office-skills-content-research-writer": {
       "identity": "f28ce97574681df1b6c6914ff7b504741cb6b63b1f1a83a4c85de6cc97d76ae4",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
       "documentPath": "content-writer/SKILL.md",
       "documentSha256": "315eb73c65b667b96dfbb7bdab2a94a7fc443d2ee76fe6802bbbef1e6aa5989f",
@@ -16692,8 +17764,8 @@
     "claude-office-skills-contract-template": {
       "identity": "468160bd7ce72838df09d6d432ea09b15be883568104ed66e96805b0dcd0ab1d",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "9c4c7d5cd2813a8936bf2c9fdb174ea883b85a11",
       "documentPath": "contract-template/SKILL.md",
       "documentSha256": "2135099b5a7be8383a860fcf40563a46c5e15c22745683447cd613ff2c7bc069",
@@ -18325,8 +19397,8 @@
     "creatoonforge-korean-writing-reviewer": {
       "identity": "89e1bb2882b324ccb10917c88545544db26c5f523054c71dd17b2b0852b12d3f",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "8f37444fa5ce7237602606c3e325e272fff3622e",
       "documentPath": "skills/general-agent/SKILL.md",
       "documentSha256": "f2a7e1328f1edd49bcf5335d08269b22e625c86bbf296716478aca7f31902a26",
@@ -18337,8 +19409,8 @@
     "creatoonforge-korean-writing-reviewer-fad60c7d": {
       "identity": "59181f375acdea8de4baca4b7e13074c5442e02097ea124db92dfca257347dee",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "8f37444fa5ce7237602606c3e325e272fff3622e",
       "documentPath": "skills/obsidian-yolo/SKILL.md",
       "documentSha256": "dbcbaf42cb6105e6a2e3484de87f6eb1abb5d5af993a9117e2f4e735510413a3",
@@ -20428,6 +21500,54 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "duncan-buildroom-dissect": {
+      "identity": "449e53041fd5a1d1d838c315030322964aad8bac6f3a9aa2d22ac3d12beb28ff",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "02dbb12dafe48016a087887ccedc5eb701958b6d",
+      "documentPath": "skills/dissect/SKILL.md",
+      "documentSha256": "3da78453bebfb962f5e977799701c8258d06ac5f2a62bf058e9615c623060f87",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "duncan-buildroom-first-customer-closer": {
+      "identity": "ab3928dc7e47cd8228c8a4edc8f10417985f2839075d6b42ed94c21685ef73db",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "02dbb12dafe48016a087887ccedc5eb701958b6d",
+      "documentPath": "skills/first-customer-closer/SKILL.md",
+      "documentSha256": "bedf08160bd37ec5cc7cf6ffb35efbf2406c261a82d6235f0d6ad4e112f4c9f8",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "duncan-buildroom-hooks": {
+      "identity": "b9408828b92fc3cdf0ed4ef89dc8a02fd67b517cee4075c0997ce1d06fefcd35",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "02dbb12dafe48016a087887ccedc5eb701958b6d",
+      "documentPath": "skills/hooks/SKILL.md",
+      "documentSha256": "f9f29c6df2ced97caf3c4fb016844c2df43d8ad43a399e9734f0ee74e1208834",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "duncan-buildroom-launch-plan": {
+      "identity": "024e097ddc0c017f1baf7e96042d7e406aee206d60798d7e5d6a4a2f4b6d04a4",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "02dbb12dafe48016a087887ccedc5eb701958b6d",
+      "documentPath": "skills/launch-plan/SKILL.md",
+      "documentSha256": "b00b23927b8d8f952da4f746679ac577e8d34833236ff5a002fa1fa2f9efe6b9",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "dvdsosa-sciwrite-manuscript": {
       "identity": "de93e70d81566fd2926f45be6d00e70518ebb3969e0f99a51a1ce737ca4b88b6",
       "status": "not-found",
@@ -20832,11 +21952,11 @@
       "skipped": []
     },
     "firecrawl-brand-identity": {
-      "identity": "74a9986b87996f5cb1a47b7bd65a42d5b48ffb6c0bf55e658f164388d86d6e9a",
+      "identity": "db7c68cc02a7b1134623a19d544ec6117385658bfc3cc4501f3d337c5bf46714",
       "status": "not-found",
-      "checkedAt": "2026-11-09T08:04:13.407Z",
-      "nextAt": "2026-11-16T08:04:13.407Z",
-      "revision": "9711154f5b16ef62dbde46edcc9a7f0988f21db6",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "6065705d4a8c6e41a01f6b6411e09684aa2f10b8",
       "documentPath": "skills/brand-identity/SKILL.md",
       "documentSha256": "901bef5a1a1f758e2b0619d8cfa8db0c41a69d6981cb8bef0377fc079defbb10",
       "candidates": 0,
@@ -22693,6 +23813,18 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "inhotel-io-govisit-toolkit-govisit-get-collection-section": {
+      "identity": "f7fe79fb7c15f4d19258e8cfe93eb0a067dab2e0b6427e70929d3d20b219fb8e",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "2d2700db921e861063fbabba8d598f4402e909c8",
+      "documentPath": "skills/govisit-get-collection-section/SKILL.md",
+      "documentSha256": "35914b76d09290ccb76870262d03a163979abe272b78f2f6647dfd1dd315a090",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "inhotel-io-govisit-toolkit-govisit-get-place-section": {
       "identity": "2d666ad2e9aea9c6ea8439eaaf5b0565247265e5f22015b0105f394694c0ae31",
       "status": "not-found",
@@ -22701,6 +23833,42 @@
       "revision": "acc586b12484e3e88a6399811c0d0698746eb0ba",
       "documentPath": "skills/govisit-get-place-section/SKILL.md",
       "documentSha256": "dc8f810793840db7f5a519a0767aeeab5e2f645c7351f75464e6fd3d0e823c13",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "inhotel-io-govisit-toolkit-govisit-get-place-visit-facts": {
+      "identity": "432fc622585f4b827421b5bf5ef6d0a1e93ab4889e71ac3cf6bdf9b6a5c96316",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "2d2700db921e861063fbabba8d598f4402e909c8",
+      "documentPath": "skills/govisit-get-place-visit-facts/SKILL.md",
+      "documentSha256": "4af664781cf0fdcc05234e8f76dd53663e3299c8f72c586062d7e7bcff8bc1ff",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "inhotel-io-govisit-toolkit-govisit-list-category-places": {
+      "identity": "d7a342fd3fe3fc9fc154b17fbe5531d87987ea4663c26faddb4e2d29712a4452",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "2d2700db921e861063fbabba8d598f4402e909c8",
+      "documentPath": "skills/govisit-list-category-places/SKILL.md",
+      "documentSha256": "e32370ae70b4120d7f7ce59754c2e4605ba0d91e31a86204422a7946434eced8",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "inhotel-io-govisit-toolkit-govisit-list-collection-places": {
+      "identity": "37301c0af20323e41398769a8755967fa8c1ced6f13e7a665b3eb075f1df3eee",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "2d2700db921e861063fbabba8d598f4402e909c8",
+      "documentPath": "skills/govisit-list-collection-places/SKILL.md",
+      "documentSha256": "b548808ddb13c09b68f715a60ab0ea7422f65ce0212a213b87a64e9dc2134386",
       "candidates": 0,
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
@@ -23776,8 +24944,8 @@
     "leanmcp-translate-explanation": {
       "identity": "b6ef73eb1d104a2b5e12303eeb84a53de10b90657ddcb5de6bc5ddfc782c0749",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "7a708ce17d05bd390da88b2350f4b794d9427f18",
       "documentPath": "skills/translate-explanation/SKILL.md",
       "documentSha256": "62e6e1fde9a7d0e7e5b9cbd11c3cf330c34105c40a00c0ade20f9f8eb0cd5f94",
@@ -25181,6 +26349,30 @@
       "reason": "no-exact-source-document",
       "revision": "391508702523088f564fecfdd95ce76304efb117"
     },
+    "mcarvin8-sf-decomposer-edit-metadata": {
+      "identity": "d370948d7575738ceb12e965fec2ac5bd31c6e45cd689f15bad393e2c44098ad",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "5479ac1733c8cc9179c8f820449e68b3c770d351",
+      "documentPath": "plugins/sf-decomposer/skills/sf-decomposer-edit-metadata/SKILL.md",
+      "documentSha256": "d91b310a406a10dc97198ce9e1c6b1860c466d08a1802b9878e9926f2c35bc27",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "mcarvin8-sf-decomposer-setup": {
+      "identity": "7bd0fdc8d8f47cc32e486e8299b730e0ef0164892018cb2bf7d6db3bff94786b",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "5479ac1733c8cc9179c8f820449e68b3c770d351",
+      "documentPath": "plugins/sf-decomposer/skills/sf-decomposer-setup/SKILL.md",
+      "documentSha256": "83dcbc569a0a4caf5a5cba0c7677b39ab7d2d2bf0cdd040a93f6250f72da21f4",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "mclub4-build-html-ppt": {
       "identity": "eb597a8ce5b03270e095232d577f53592509d8919cef3e169bbaf812c477aa44",
       "status": "collected",
@@ -25460,8 +26652,8 @@
     "microsoft-pg-graph": {
       "identity": "5b5071bf38dfc82dc599a82086d6065155e5a80dc18e4288c561e5b89bf0589f",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "9ba96abc800a574a0872f3d6b912ea8be1a6735e",
       "documentPath": "plugin/skills/pg-graph/SKILL.md",
       "documentSha256": "54be354edc88b4a46d5af1f8bd19b601d2c74b3f4655ecb4dca6c10dc83998dd",
@@ -25745,6 +26937,30 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "mrveiss-github-search": {
+      "identity": "e770a3e7f088c846c6af9eaafc3e25febe227c2d18bdba85ec52fe94a341e430",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "8fd6fe568115557c64bb17b0674cf94128dc5549",
+      "documentPath": "autobot-backend/skills/builtin/github_search/SKILL.md",
+      "documentSha256": "761ebb19fd77cbca9c56567eb3f196e09065b50979228b33b5b5cfee41f6aed1",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "mrveiss-rss-reader": {
+      "identity": "1a89db724e643ac9365ddea991e5823f3711437c19bac115dbd45f8c222f7c00",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "8fd6fe568115557c64bb17b0674cf94128dc5549",
+      "documentPath": "autobot-backend/skills/builtin/rss_reader/SKILL.md",
+      "documentSha256": "188efe2639e823cab913d4600330a8fdd26ff1dc248a7db510136fa9de5f7a11",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "mszturc-obsidian-advanced-slides": {
       "identity": "2b8dc8801b3937ef422d75d7bc1b4b33bc80f2b23a7b4c6fa1e4e2901862ed6d",
       "status": "collected",
@@ -25960,8 +27176,8 @@
     "nathanonn-ask-first": {
       "identity": "b65007628458490d860366d2c84bfda44309b277f9daf00a03171348ec6f02cf",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "9be9fcbe25ab549a6f46da372d9a2c9a1bc7cd59",
       "documentPath": "plugins/ask-first/skills/ask-first/SKILL.md",
       "documentSha256": "065c290bdff0d4b5ad168ea799bbe0124d48e66746d2ac84c47f515c5d0f8309",
@@ -25972,8 +27188,8 @@
     "nathanonn-handoff-doc": {
       "identity": "ee61ce6135f35ad084346b2462eaabca6f0ea9576b99f34da78de700e9da1ca9",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "9be9fcbe25ab549a6f46da372d9a2c9a1bc7cd59",
       "documentPath": "skills/handoff-doc/SKILL.md",
       "documentSha256": "aac719251eec9a43e08cc714e21945739796cf232c4146a70dcb87f1dbaeced6",
@@ -25984,8 +27200,8 @@
     "nathanonn-webg-spec-to-goal": {
       "identity": "a1faf384dce4b9967f2547058b8242301fce3cb4e997e6629f28667e3df8f3cb",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "9be9fcbe25ab549a6f46da372d9a2c9a1bc7cd59",
       "documentPath": "plugins/webg-spec-to-goal/skills/webg-spec-to-goal/SKILL.md",
       "documentSha256": "1afa8a1fa6248920abdcbbf4ae5a6be2397546991eb41bdbf7f002329e656510",
@@ -25996,8 +27212,8 @@
     "nathanonn-wp-spec-to-goal": {
       "identity": "921f3d43ca0cc1fab3b10316a990dc43c4fe775c18d3c636e8dea23f08f26798",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "9be9fcbe25ab549a6f46da372d9a2c9a1bc7cd59",
       "documentPath": "plugins/wp-spec-to-goal/skills/wp-spec-to-goal/SKILL.md",
       "documentSha256": "df340ffaf10b99563bba1f0eaf3fec36df304cfeeefcab5dc1efbe5e8145da13",
@@ -26397,8 +27613,8 @@
     "nonlooped-roblox": {
       "identity": "7af98c4c72f2182750028c4f73f86918d6e8c9491991bafb90819a5086c0baf5",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "c914ce65470a6eb1b28000b8c58d5543b48760ca",
       "documentPath": "roblox/SKILL.md",
       "documentSha256": "39f0ed6402e5738f6c9135fcda8006575eb54dee57aa8ca4fe8da5bfb43bbf6b",
@@ -26728,6 +27944,174 @@
       "documentSha256": "1b54a5a4225f210743cc45d9baa3b32cd9c436b699f118ef2a311afb262e151f",
       "candidates": 1,
       "reason": "image-license-not-established",
+      "skipped": []
+    },
+    "omicverse-biocontext-knowledge-queries": {
+      "identity": "1161ba40d0fac9f4142b479d44f2465bd0d89b1f74a0a9b02a51806fcc69ef70",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f94af9b6e8060c94891def4913d40cf7eb26652f",
+      "documentPath": "src/omicverse_skills/skills/biocontext-knowledge/SKILL.md",
+      "documentSha256": "784b0105e8e666cfc9d17f1663c08642cde126003110de6815dea7b7caf690d7",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "omicverse-bulk-rna-seq-batch-correction-with-combat": {
+      "identity": "285613bb3a0ee1abb61dc26ccd266832b5fb3f66ac16a8a92753e1b7b4385c46",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f94af9b6e8060c94891def4913d40cf7eb26652f",
+      "documentPath": "src/omicverse_skills/skills/bulk-combat-correction/SKILL.md",
+      "documentSha256": "583605b2520363e5e4168bb3f0db116c09bf9b321966273809f746c1e60df3a6",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "omicverse-bulk-rna-seq-differential-expression-with-omicverse": {
+      "identity": "0eec91e00a5984fb9888fb17210c9fd07f69440e5467d783a4367ff87a6746cc",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f94af9b6e8060c94891def4913d40cf7eb26652f",
+      "documentPath": "src/omicverse_skills/skills/bulk-deg-analysis/SKILL.md",
+      "documentSha256": "fc0d05949a433fc0be1cbc8659ad35f72ade91649c4d1b7488c7599158457645",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "omicverse-bulk-wgcna-analysis-with-omicverse": {
+      "identity": "f1417491e1316b5d8aa99fdeb03b9168375d4b5189ca39298f4a175ab3f4471b",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f94af9b6e8060c94891def4913d40cf7eb26652f",
+      "documentPath": "src/omicverse_skills/skills/bulk-wgcna-analysis/SKILL.md",
+      "documentSha256": "d29021aec25a33b50fb1682b7201301a81ce9f789b040b657b935d00fdf48c91",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "omicverse-bulktrajblend-trajectory-interpolation": {
+      "identity": "35a76b9105a9487cdd59d03082e08bb3310f4c60217d54a52ea5546ded6e8466",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f94af9b6e8060c94891def4913d40cf7eb26652f",
+      "documentPath": "src/omicverse_skills/skills/bulk-trajblend-interpolation/SKILL.md",
+      "documentSha256": "0cbfbb9a5cbc967207883014c71bad28595b309f69d84a09e4b5aff8f6f1ac6f",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "omicverse-data-io-loading": {
+      "identity": "9784a0b7aa6b1523bbc7e481cb15040e1fbc78c8150b4dd1b48382bc349d7068",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f94af9b6e8060c94891def4913d40cf7eb26652f",
+      "documentPath": "src/omicverse_skills/skills/data-io-loading/SKILL.md",
+      "documentSha256": "5f578471c4d4e9e9b1016f9d9790909d64bd3fc234b794c615dc6f2209746d70",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "omicverse-data-stats-analysis": {
+      "identity": "ff76b26cd4d0a043e59051c20bb0037b75af831254f4161a5a638c7771df9751",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f94af9b6e8060c94891def4913d40cf7eb26652f",
+      "documentPath": "src/omicverse_skills/skills/data-stats-analysis/SKILL.md",
+      "documentSha256": "c66803cf420440801607f26d13d887e9e20aa7b92c7d6b50b630771c4b343422",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "omicverse-data-transform": {
+      "identity": "b9d31e0e4f0d1ebe477c8f0e77caac3ae9d026406cb8dda3a4e702e4cd5e9eec",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f94af9b6e8060c94891def4913d40cf7eb26652f",
+      "documentPath": "src/omicverse_skills/skills/data-transform/SKILL.md",
+      "documentSha256": "cecba35bc6ad2c96c47645ef7973d5053fda799170e86ea4f8e6975c4a36f39c",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "omicverse-data-viz-plots": {
+      "identity": "7e8b5fbe445e84b2f7fe8afd1d256ae7395bf4b8bfc36eb550fa345a2341f1ff",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f94af9b6e8060c94891def4913d40cf7eb26652f",
+      "documentPath": "src/omicverse_skills/skills/data-viz-plots/SKILL.md",
+      "documentSha256": "a6f3c6a2f6dd6909c02c62b52cc961ad1c00010ed72751f173b6bad11432f0ec",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "omicverse-datasets-loading": {
+      "identity": "9a725f9476b1f8b1f91e8ffc1d5386cb0ced1a3a285f0b4aa9b20c7a9a357a8e",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f94af9b6e8060c94891def4913d40cf7eb26652f",
+      "documentPath": "src/omicverse_skills/skills/datasets-loading/SKILL.md",
+      "documentSha256": "04b09ef43fec46d63b5dcc64b44b8d2f605663d742c3c7037b235d60a37bbc65",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "omicverse-fastq-analysis-pipeline": {
+      "identity": "05260f69e67c60f045ca40aabd33731a460f7e07381049de4a928492eccc1e28",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f94af9b6e8060c94891def4913d40cf7eb26652f",
+      "documentPath": "src/omicverse_skills/skills/fastq-analysis/SKILL.md",
+      "documentSha256": "7c4148c126eb7b45c85de0d3861fc5bbd0e13e58c55af5988c4d571ae203fe23",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "omicverse-gsea-enrichment-analysis": {
+      "identity": "d614866556cf3a0ed3bb43ea3570f16a56e0ab85b66a3173f42087d3216ee697",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f94af9b6e8060c94891def4913d40cf7eb26652f",
+      "documentPath": "src/omicverse_skills/skills/gsea-enrichment/SKILL.md",
+      "documentSha256": "2a00093ccc4f61d6be2dcfcd552b146680fa5b5f22e527d5408f1a1a5a5d0b50",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "omicverse-omicverse-visualization-for-bulk-color-systems-and-single-cell-d": {
+      "identity": "cf3066eb37f6ddcb7e81457c3d33274627752336c0bf493e6a960fee36b0f4c8",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f94af9b6e8060c94891def4913d40cf7eb26652f",
+      "documentPath": "src/omicverse_skills/skills/plotting-visualization/SKILL.md",
+      "documentSha256": "67a32182fef2f4d454219461aed59e203d364d2e43d379f66cfb675191ab1c7d",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "omicverse-string-protein-interaction-analysis-with-omicverse": {
+      "identity": "262b581aef82f5ddaeabdf3d83b76f6a5273c1246b9412fb1412b10b431cdc58",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f94af9b6e8060c94891def4913d40cf7eb26652f",
+      "documentPath": "src/omicverse_skills/skills/bulk-stringdb-ppi/SKILL.md",
+      "documentSha256": "3efb48ca8bbc0ce88e87aedbdae58e0e37c24b09501270610b78b89225a639f9",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
     "onewave-ai-animate": {
@@ -28533,8 +29917,8 @@
     "qa-aman-acceptance-criteria-writer": {
       "identity": "94ffefaaf67174f8d7dc3c5593ef880963f0208322773756bb980069a1b60465",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
       "documentPath": "skills/by-role/business-analyst/acceptance-criteria-writer/SKILL.md",
       "documentSha256": "0af3002e15e2ac3024704de4681bd5b024d5a4212b72e532b635fc59d1051aff",
@@ -28545,8 +29929,8 @@
     "qa-aman-brd-writer": {
       "identity": "46bbbd5b9c7a9b287f4b804b8b3239d351c9fe8ac151879ef9b67a90fd96166e",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
       "documentPath": "skills/by-role/business-analyst/brd-writer/SKILL.md",
       "documentSha256": "54a2ec238d3de89beaf9b1c28ebadb0111ff6abb9681b2bb0745fe860870aa47",
@@ -28557,8 +29941,8 @@
     "qa-aman-budget-variance-analysis": {
       "identity": "23b00d9cc2f42d4ea1835adc90d1ecb0d0e4ebd6fbfec3a72164b6fb8dc66aa5",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
       "documentPath": "skills/by-role/accountant/budget-variance-analysis/SKILL.md",
       "documentSha256": "46df80f501fa31f56b8e70a43026aa446fcd4affee5521c364d104d4b079083a",
@@ -28569,8 +29953,8 @@
     "qa-aman-data-dictionary": {
       "identity": "e669775c71e855062030631c280dfc857fdf808f7466f992d5855ef06fcb79a2",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
       "documentPath": "skills/by-role/business-analyst/data-dictionary/SKILL.md",
       "documentSha256": "1cdb8df9bc55e31776bb9bfd08fa33f0b3570300faf06e3781a3d9bb134b0d27",
@@ -28581,8 +29965,8 @@
     "qa-aman-financial-statement-review": {
       "identity": "2403ee57ba40a05f60656520839c366e4c66cd81d056a2ff2d41f7454612255d",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
       "documentPath": "skills/by-role/accountant/financial-statement-review/SKILL.md",
       "documentSha256": "f8e51a94a72679569c108451d044108c2977843c346ffc2da5cd47a68f302608",
@@ -28593,8 +29977,8 @@
     "qa-aman-frd-writer": {
       "identity": "067d314783c0df12d8a040684873ffcf7eb74700d942f741b9f4289d5d8f55bd",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
       "documentPath": "skills/by-role/business-analyst/frd-writer/SKILL.md",
       "documentSha256": "56227c0fa71fc5ad0b73d95b4c652dbaf188b3fe2a4ecf08cc84e15c99c31d36",
@@ -28605,8 +29989,8 @@
     "qa-aman-impact-assessment": {
       "identity": "6ff4087491889150f7271132ed5cf9f6dbaf8eb7a2fb017eadf5d66ca9bfddd3",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
       "documentPath": "skills/by-role/business-analyst/impact-assessment/SKILL.md",
       "documentSha256": "0d726f35731fa6a0c3f859fdc53cea88b4c6d50d81cf4be8206419704f809783",
@@ -28617,8 +30001,8 @@
     "qa-aman-root-cause-analysis": {
       "identity": "f237157c2305d23f3838f20dadca4018243bdf062c4a75696de9491e1207cd78",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
       "documentPath": "skills/by-role/business-analyst/root-cause-analysis/SKILL.md",
       "documentSha256": "5fa758d7913f547b424536b394668b354f1b7760fa5f0f86ebd2ec0cbce40eb8",
@@ -28629,8 +30013,8 @@
     "qa-aman-stakeholder-map": {
       "identity": "47663910d94cb99a93614116d2335e5385295d1914eba2e06b9abee176d9d4b1",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "72ef27fe4fe791363be7c811a16c25ffaa6ea9c0",
       "documentPath": "skills/by-role/business-analyst/stakeholder-map/SKILL.md",
       "documentSha256": "e0b183d229df1784a0fc8be8dc6d8d6b5e43673b9f8d93f273b1c63393d3c181",
@@ -29226,6 +30610,42 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "rome-os-ddd": {
+      "identity": "bc6b6b3e10548f2a9549a647e922aaad4c088ce50fc0cbf85b143a82c048aacc",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f06e9d402b75e8851fa838e80673e99224e15022",
+      "documentPath": ".claude/skills/ddd/SKILL.md",
+      "documentSha256": "0deef241d68d30b5ff06510a08d8a87b7d66ed1a4e61f28059537e7b5f43f691",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "rome-os-imports-of": {
+      "identity": "581b5959017e39a1281578e69f55ae85573e3ffb462e48c51c1f8618a16c6bf2",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f06e9d402b75e8851fa838e80673e99224e15022",
+      "documentPath": ".claude/skills/imports-of/SKILL.md",
+      "documentSha256": "7d2939e346ecf2d5b6c231e99081a7476439e10a9959fe057eeefa2f4f6c23b0",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "rome-os-move-code": {
+      "identity": "f4dc8b9211e5cb68f4e3db161a5ba6c00560edaf6c40a3c07293dde6e5a489f4",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "f06e9d402b75e8851fa838e80673e99224e15022",
+      "documentPath": ".claude/skills/move-code/SKILL.md",
+      "documentSha256": "52fcf21a8b6d205f7fdb9ed600ebb6ac70e30d6db1d7db84a06c49c41cce2fcd",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "ronaldships-seo-ai-geo": {
       "identity": "d65c2745ca2cc34d14f2e2c13b058f9dff21a3c5190dcfa680aff370ac0412ed",
       "status": "not-found",
@@ -29253,8 +30673,8 @@
     "ronaldships-seo-content-strategy": {
       "identity": "3667dbaa461bb00dbf1305037f40d543c37a76b13a035433111d10c07e24d0c9",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "80ab9599da8f5da7d220e65b9ef489a38e5e0fed",
       "documentPath": "skills/seo-content-strategy/SKILL.md",
       "documentSha256": "4c88633557bd66f2943d6ef315430527082e530f8863f71ae6c1fca222891a61",
@@ -29265,8 +30685,8 @@
     "ronaldships-seo-local": {
       "identity": "bb2a6c27da7c52a29739b95d989fbb99762fa6c5e04e37021e9e261b53f4c18c",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "80ab9599da8f5da7d220e65b9ef489a38e5e0fed",
       "documentPath": "skills/seo-local/SKILL.md",
       "documentSha256": "7616cd155a126311d2f2e3f6453016d0dc709403e7a40322e6bccaab28c36485",
@@ -30842,8 +32262,8 @@
     "thomast1906-api-security-review": {
       "identity": "c780761c02ba803d3d91937deb86d5d6ec569a0e03b7ecd8ab01d25c6779fb73",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "554ac0b5ccbaef54730566cbb5a8b889963e3457",
       "documentPath": ".github/skills/api-security-review/SKILL.md",
       "documentSha256": "b505f5f28cf024b3ad3ac0deed07eba7618d5d522047548d432d3c19e9d65c5a",
@@ -30854,8 +32274,8 @@
     "thomast1906-azure-apim-architecture": {
       "identity": "990d40a5e84191286a93479a875f141e3853a913b0978a90316e324b7955659b",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "554ac0b5ccbaef54730566cbb5a8b889963e3457",
       "documentPath": ".github/skills/azure-apim-architecture/SKILL.md",
       "documentSha256": "b8c6affc145e002582f32566f2274a26ae431ab3b965303ea70708edf818ef34",
@@ -31286,8 +32706,8 @@
     "timharris707-orchestrate": {
       "identity": "069e278ef0b1fbc3ec42c29da57d09dfe9e9baf5ad233d58a0bee5f682e32e20",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "a93abb11d5e6c8ebff43cf46ae32d26ac5fb6c6f",
       "documentPath": "plugins/clickai-codex/skills/run/orchestrate/SKILL.md",
       "documentSha256": "af6790f193db84569ad8c195971c8950e5c4f3152f5711427a263e2cea4271c7",
@@ -31298,8 +32718,8 @@
     "timharris707-to-tickets": {
       "identity": "c39ee15ea405f5d306e8a42b5572159a7fd59a16c1d875f3f47abf7b08ed47f5",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "a93abb11d5e6c8ebff43cf46ae32d26ac5fb6c6f",
       "documentPath": "plugins/clickai-codex/skills/run/to-tickets/SKILL.md",
       "documentSha256": "ebeedc8b16458efba29d693488ae5d6cf7d46d77c9fce1a1b97c38943306bcb0",
@@ -32092,8 +33512,8 @@
     "vojtaholik-good-css": {
       "identity": "5a7a250a3af3170a286d3d37139aed5493d72c86cc8a066e7b61f67af22ee98d",
       "status": "not-found",
-      "checkedAt": "2026-10-08T07:38:31.045Z",
-      "nextAt": "2026-10-15T07:38:31.045Z",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
       "revision": "6d16d2fd27f4892e2aea4b5c5c2b016f45be7eef",
       "documentPath": "skills/good-css/SKILL.md",
       "documentSha256": "5958eb7629b3029b98e2890fb662ab805b909c76426e4c5c7ae952bdac574ecc",
@@ -33199,6 +34619,102 @@
       "reason": "no-preview-in-scanned-documents",
       "skipped": []
     },
+    "ysskrishna-lateral-thinking": {
+      "identity": "63d5f1c1ead3a301a414c1430b6a0f8810389a4bcae8a187cd5620f82bf8a75d",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "de7b1bcdc5be02ef49ad9609779a1fcf6d61ecf8",
+      "documentPath": "skills/lateral-thinking/SKILL.md",
+      "documentSha256": "9d97d0fec265446b36d19a7775cc41ab2923b86f7661f35b220a63559889c27b",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ysskrishna-pre-mortem": {
+      "identity": "71e58e5278cb88891df25590dd0cde8b4bc6a7bd6d0ba24bf59596df996747f7",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "de7b1bcdc5be02ef49ad9609779a1fcf6d61ecf8",
+      "documentPath": "skills/pre-mortem/SKILL.md",
+      "documentSha256": "ff3a9c8f33cac9aadfd51d325093b78c305bd173104fa3b6b8f1765079f0b7cc",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ysskrishna-prioritization": {
+      "identity": "7ef29e9cb89029623ba545dd0e4dbf97a658cecf6c94eb373edb4e338ae7155e",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "de7b1bcdc5be02ef49ad9609779a1fcf6d61ecf8",
+      "documentPath": "skills/prioritization/SKILL.md",
+      "documentSha256": "06823967159cf4ea4e434f30a604fdb1041ff0c0ddd28fa2f94ca5e67cadff68",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ysskrishna-six-thinking-hats": {
+      "identity": "46199be04d8d8e20bc64134650630253cb86a1acb2a459b30722f011bac3f856",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "de7b1bcdc5be02ef49ad9609779a1fcf6d61ecf8",
+      "documentPath": "skills/six-thinking-hats/SKILL.md",
+      "documentSha256": "467c90151f077829ad5b111e525c32e4781b210e8c45d911fd9f143ba35dca1e",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ysskrishna-strategic-thinking": {
+      "identity": "813fb7648db829b1b16738df1ce3dc05dc45fa2bc79227de6dce50b516728e99",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "de7b1bcdc5be02ef49ad9609779a1fcf6d61ecf8",
+      "documentPath": "skills/strategic-thinking/SKILL.md",
+      "documentSha256": "f5480f1728a772f5f4f01a9b5945ce71a59c84c69b721b8701c85eaec2b72466",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ysskrishna-swot-analysis": {
+      "identity": "503e15a18bd57618b522b73da6b5ab1e76ed4fd432df35416cdcdb49735b133f",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "de7b1bcdc5be02ef49ad9609779a1fcf6d61ecf8",
+      "documentPath": "skills/swot-analysis/SKILL.md",
+      "documentSha256": "368c72a307c75713fd7035c48f6bea5bb370057a07dafffb5db5866b4502bb96",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ysskrishna-systems-thinking": {
+      "identity": "ae8b1ec6aad3231299c96c7444cc3080ad07e97bfa5db711f297d7c75aac5e7e",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "de7b1bcdc5be02ef49ad9609779a1fcf6d61ecf8",
+      "documentPath": "skills/systems-thinking/SKILL.md",
+      "documentSha256": "fe3e3393156a67264ba3399fb05d8aca9aada53cb9a218fb6bdf8d38e7c8f9bb",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
+    "ysskrishna-thinking-method-selector": {
+      "identity": "22096ebdc4baeb5d15ff647a1109dc56754f127e06171fe7132eb7fdb18b4d6d",
+      "status": "not-found",
+      "checkedAt": "2026-11-13T08:06:15.819Z",
+      "nextAt": "2026-11-20T08:06:15.819Z",
+      "revision": "de7b1bcdc5be02ef49ad9609779a1fcf6d61ecf8",
+      "documentPath": "skills/thinking-method-selector/SKILL.md",
+      "documentSha256": "3da2211147445e44c8c06ad5f70462d9389ac8c0ad518fbd3df15260d1615b51",
+      "candidates": 0,
+      "reason": "no-preview-in-scanned-documents",
+      "skipped": []
+    },
     "yuan1z0825-nature-paper2ppt": {
       "identity": "bd6f9fbfe4b4a51c2dd3e822d05e2b92a0b634020930c4d09310c71e95c82625",
       "status": "not-found",
@@ -33522,15 +35038,15 @@
     }
   },
   "summary": {
-    "catalogRecords": 37693,
+    "catalogRecords": 37831,
     "attempted": 150,
-    "pending": 36800,
-    "collectedSkills": 122,
+    "pending": 36790,
+    "collectedSkills": 136,
     "statuses": {
-      "not-found": 122,
-      "needs-review": 19,
-      "collected": 7,
-      "error": 2
+      "not-found": 123,
+      "needs-review": 7,
+      "collected": 14,
+      "error": 6
     }
   }
 }

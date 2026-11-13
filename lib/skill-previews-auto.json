@@ -968,6 +968,204 @@
     ]
   },
   {
+    "skillSlug": "23blocks-os-ai-maestro",
+    "repository": "23blocks-OS/ai-maestro",
+    "revision": "e7ebd0c9516f8e9cbe14b40473cea688c5248747",
+    "sourceUrl": "https://github.com/23blocks-OS/ai-maestro/blob/e7ebd0c9516f8e9cbe14b40473cea688c5248747/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-bac517c0e2e7286936e2b774e3bbf11b5bed539a709b6e0660c6141f124bc77d.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "bac517c0e2e7286936e2b774e3bbf11b5bed539a709b6e0660c6141f124bc77d",
+    "documentSha256": "d6c7e951b6488dc651f52d51477d055df31c1cf839b67ea5ffaadccc07ba8fa9",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-13T08:06:15.819Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/72e793180fc4c4ffde518824d325dcb6d0069dc0300ac5d8845d356cb3690a41.preview.webp",
+        "previewSrc": "/skill-previews/auto/72e793180fc4c4ffde518824d325dcb6d0069dc0300ac5d8845d356cb3690a41.preview.webp",
+        "cardSrc": "/skill-previews/auto/72e793180fc4c4ffde518824d325dcb6d0069dc0300ac5d8845d356cb3690a41.card.webp",
+        "width": 1600,
+        "height": 637,
+        "sha256": "72e793180fc4c4ffde518824d325dcb6d0069dc0300ac5d8845d356cb3690a41",
+        "originalSrc": "/skill-previews/auto/72e793180fc4c4ffde518824d325dcb6d0069dc0300ac5d8845d356cb3690a41.png",
+        "sourceUrl": "https://github.com/23blocks-OS/ai-maestro/blob/e7ebd0c9516f8e9cbe14b40473cea688c5248747/docs/images/agent-inbox.png",
+        "kind": "reference",
+        "title": {
+          "en": "AI Maestro · Author preview",
+          "zh": "AI Maestro · 作者预览"
+        },
+        "alt": {
+          "en": "AI Maestro: Agent Messaging",
+          "zh": "AI Maestro：Agent Messaging"
+        },
+        "sourcePath": "docs/images/agent-inbox.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/f699fa1cb1a3d388a3c8f9e59c1dd4b2e6d65c0e2689d049cef8e94f16932427.preview.webp",
+        "previewSrc": "/skill-previews/auto/f699fa1cb1a3d388a3c8f9e59c1dd4b2e6d65c0e2689d049cef8e94f16932427.preview.webp",
+        "cardSrc": "/skill-previews/auto/f699fa1cb1a3d388a3c8f9e59c1dd4b2e6d65c0e2689d049cef8e94f16932427.card.webp",
+        "width": 1440,
+        "height": 900,
+        "sha256": "f699fa1cb1a3d388a3c8f9e59c1dd4b2e6d65c0e2689d049cef8e94f16932427",
+        "originalSrc": "/skill-previews/auto/f699fa1cb1a3d388a3c8f9e59c1dd4b2e6d65c0e2689d049cef8e94f16932427.jpg",
+        "sourceUrl": "https://github.com/23blocks-OS/ai-maestro/blob/e7ebd0c9516f8e9cbe14b40473cea688c5248747/docs/images/agent-profile.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "AI Maestro · Author preview",
+          "zh": "AI Maestro · 作者预览"
+        },
+        "alt": {
+          "en": "AI Maestro: Agent profile with identity, program, model, tags and commits",
+          "zh": "AI Maestro：Agent profile with identity, program, model, tags and commits"
+        },
+        "sourcePath": "docs/images/agent-profile.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/276018773cdb54defd11acacfcbf11e8db6308a6cb5baaea817e6709796b8a0a.preview.webp",
+        "previewSrc": "/skill-previews/auto/276018773cdb54defd11acacfcbf11e8db6308a6cb5baaea817e6709796b8a0a.preview.webp",
+        "cardSrc": "/skill-previews/auto/276018773cdb54defd11acacfcbf11e8db6308a6cb5baaea817e6709796b8a0a.card.webp",
+        "width": 736,
+        "height": 1600,
+        "sha256": "276018773cdb54defd11acacfcbf11e8db6308a6cb5baaea817e6709796b8a0a",
+        "originalSrc": "/skill-previews/auto/276018773cdb54defd11acacfcbf11e8db6308a6cb5baaea817e6709796b8a0a.png",
+        "sourceUrl": "https://github.com/23blocks-OS/ai-maestro/blob/e7ebd0c9516f8e9cbe14b40473cea688c5248747/docs/images/aimaestro-mobile.png",
+        "kind": "reference",
+        "title": {
+          "en": "AI Maestro · Author preview",
+          "zh": "AI Maestro · 作者预览"
+        },
+        "alt": {
+          "en": "AI Maestro: Mobile View",
+          "zh": "AI Maestro：Mobile View"
+        },
+        "sourcePath": "docs/images/aimaestro-mobile.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "28mm-blast-radius",
+    "repository": "28mm/blast-radius",
+    "revision": "a7ec4ef78141ab0d2a688c65112f799adb9622ba",
+    "sourceUrl": "https://github.com/28mm/blast-radius/blob/a7ec4ef78141ab0d2a688c65112f799adb9622ba/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-3de20c7a10b213d90a0808ec5188539efc097732761b21e8cd5dcc7ef559da37.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "3de20c7a10b213d90a0808ec5188539efc097732761b21e8cd5dcc7ef559da37",
+    "documentSha256": "bef9cc00069415d659807d141ddea704f8407c96b352a62177abeb9ad5f8bfb5",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-13T08:06:15.819Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/d0b3ff68a6b350b2813bd7383d65d21af05d2c68df806ba2cf63a73b527bf6ba.preview.webp",
+        "previewSrc": "/skill-previews/auto/d0b3ff68a6b350b2813bd7383d65d21af05d2c68df806ba2cf63a73b527bf6ba.preview.webp",
+        "cardSrc": "/skill-previews/auto/d0b3ff68a6b350b2813bd7383d65d21af05d2c68df806ba2cf63a73b527bf6ba.card.webp",
+        "width": 1015,
+        "height": 642,
+        "sha256": "d0b3ff68a6b350b2813bd7383d65d21af05d2c68df806ba2cf63a73b527bf6ba",
+        "originalSrc": "/skill-previews/auto/d0b3ff68a6b350b2813bd7383d65d21af05d2c68df806ba2cf63a73b527bf6ba.png",
+        "sourceUrl": "https://github.com/28mm/blast-radius/blob/a7ec4ef78141ab0d2a688c65112f799adb9622ba/doc/blastradius-interactive.png",
+        "kind": "reference",
+        "title": {
+          "en": "Blast Radius · Author preview",
+          "zh": "Blast Radius · 作者预览"
+        },
+        "alt": {
+          "en": "Blast Radius: screenshot",
+          "zh": "Blast Radius：screenshot"
+        },
+        "sourcePath": "doc/blastradius-interactive.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "2b-t-docker-for-robotics",
+    "repository": "2b-t/docker-for-robotics",
+    "revision": "dd752ad67b1cf5a42106021f52435183cafbec96",
+    "sourceUrl": "https://github.com/2b-t/docker-for-robotics/blob/dd752ad67b1cf5a42106021f52435183cafbec96/ReadMe.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-149ddcfc5390c8b2df214908c2dec76d3f0c9eeab062cbc5c60a79124cfda5a6.txt",
+    "licenseSourcePath": "License.md",
+    "licenseSha256": "149ddcfc5390c8b2df214908c2dec76d3f0c9eeab062cbc5c60a79124cfda5a6",
+    "documentSha256": "fae6028b1977249ce910d9a2448c190a7467f39da6ec3d3d8c98aa38cd7e2375",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-13T08:06:15.819Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/2bf23e045e43ffc05dc41830cc368c8012a15c84bb0a83f2ba77cc89f9de92fa.preview.webp",
+        "previewSrc": "/skill-previews/auto/2bf23e045e43ffc05dc41830cc368c8012a15c84bb0a83f2ba77cc89f9de92fa.preview.webp",
+        "cardSrc": "/skill-previews/auto/2bf23e045e43ffc05dc41830cc368c8012a15c84bb0a83f2ba77cc89f9de92fa.card.webp",
+        "width": 1600,
+        "height": 675,
+        "sha256": "2bf23e045e43ffc05dc41830cc368c8012a15c84bb0a83f2ba77cc89f9de92fa",
+        "originalSrc": "/skill-previews/auto/2bf23e045e43ffc05dc41830cc368c8012a15c84bb0a83f2ba77cc89f9de92fa.png",
+        "sourceUrl": "https://github.com/2b-t/docker-for-robotics/blob/dd752ad67b1cf5a42106021f52435183cafbec96/media/ubuntu_jammy_affordance_templates.png",
+        "kind": "example",
+        "title": {
+          "en": "Docker For Robotics · Author preview",
+          "zh": "Docker For Robotics · 作者预览"
+        },
+        "alt": {
+          "en": "Docker For Robotics: Docker on Ubuntu",
+          "zh": "Docker For Robotics：Docker on Ubuntu"
+        },
+        "sourcePath": "media/ubuntu_jammy_affordance_templates.png",
+        "documentPath": "ReadMe.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/d9b089086180d3de0da2dfee63c171fbd82870141eaafd0e12c59d7b511bf403.preview.webp",
+        "previewSrc": "/skill-previews/auto/d9b089086180d3de0da2dfee63c171fbd82870141eaafd0e12c59d7b511bf403.preview.webp",
+        "cardSrc": "/skill-previews/auto/d9b089086180d3de0da2dfee63c171fbd82870141eaafd0e12c59d7b511bf403.card.webp",
+        "width": 1600,
+        "height": 675,
+        "sha256": "d9b089086180d3de0da2dfee63c171fbd82870141eaafd0e12c59d7b511bf403",
+        "originalSrc": "/skill-previews/auto/d9b089086180d3de0da2dfee63c171fbd82870141eaafd0e12c59d7b511bf403.png",
+        "sourceUrl": "https://github.com/2b-t/docker-for-robotics/blob/dd752ad67b1cf5a42106021f52435183cafbec96/media/windows10_affordance_templates.png",
+        "kind": "example",
+        "title": {
+          "en": "Docker For Robotics · Author preview",
+          "zh": "Docker For Robotics · 作者预览"
+        },
+        "alt": {
+          "en": "Docker For Robotics: Docker on Windows",
+          "zh": "Docker For Robotics：Docker on Windows"
+        },
+        "sourcePath": "media/windows10_affordance_templates.png",
+        "documentPath": "ReadMe.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "acot-a11y-acot",
     "repository": "acot-a11y/acot",
     "revision": "34ff82b04faf65d22f323fd9ea47e03ede0fc13c",
@@ -3696,6 +3894,116 @@
     ]
   },
   {
+    "skillSlug": "baaivision-nova",
+    "repository": "baaivision/NOVA",
+    "revision": "63c5a724fc4e264e229a95c893184434f00c9413",
+    "sourceUrl": "https://github.com/baaivision/NOVA/blob/63c5a724fc4e264e229a95c893184434f00c9413/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+    "documentSha256": "71f14343a2c148868588f06bee3715c08ee78878e40febb865ad262248cbec06",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-13T08:06:15.819Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/70610ea6711a434bdc3e0b552a526934e98bf7bbb2964b3aae99d0732963469b.preview.webp",
+        "previewSrc": "/skill-previews/auto/70610ea6711a434bdc3e0b552a526934e98bf7bbb2964b3aae99d0732963469b.preview.webp",
+        "cardSrc": "/skill-previews/auto/70610ea6711a434bdc3e0b552a526934e98bf7bbb2964b3aae99d0732963469b.card.webp",
+        "width": 1600,
+        "height": 492,
+        "sha256": "70610ea6711a434bdc3e0b552a526934e98bf7bbb2964b3aae99d0732963469b",
+        "originalSrc": "/skill-previews/auto/70610ea6711a434bdc3e0b552a526934e98bf7bbb2964b3aae99d0732963469b.png",
+        "sourceUrl": "https://github.com/baaivision/NOVA/blob/63c5a724fc4e264e229a95c893184434f00c9413/assets/model_overview.png",
+        "kind": "reference",
+        "title": {
+          "en": "NOVA · Author preview",
+          "zh": "NOVA · 作者预览"
+        },
+        "alt": {
+          "en": "NOVA: model_overview.png",
+          "zh": "NOVA：model_overview.png"
+        },
+        "sourcePath": "assets/model_overview.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "baaivision-ursa",
+    "repository": "baaivision/URSA",
+    "revision": "68ed282b0ed788cf02d0cc615ef2a8b96c855dba",
+    "sourceUrl": "https://github.com/baaivision/URSA/blob/68ed282b0ed788cf02d0cc615ef2a8b96c855dba/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+    "documentSha256": "ed38aaee819088b7cebfc856eb64549beba86f1e88106b83e87d7a531ff2f20b",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-13T08:06:15.819Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/45621fb4577622fc6557c2a566291a381e8a2968935820520e70ef2ba710fef4.preview.webp",
+        "previewSrc": "/skill-previews/auto/45621fb4577622fc6557c2a566291a381e8a2968935820520e70ef2ba710fef4.preview.webp",
+        "cardSrc": "/skill-previews/auto/45621fb4577622fc6557c2a566291a381e8a2968935820520e70ef2ba710fef4.card.webp",
+        "width": 1024,
+        "height": 320,
+        "sha256": "45621fb4577622fc6557c2a566291a381e8a2968935820520e70ef2ba710fef4",
+        "originalSrc": "/skill-previews/auto/45621fb4577622fc6557c2a566291a381e8a2968935820520e70ef2ba710fef4.gif",
+        "sourceUrl": "https://github.com/baaivision/URSA/blob/68ed282b0ed788cf02d0cc615ef2a8b96c855dba/assets/model_preview.gif",
+        "kind": "example",
+        "title": {
+          "en": "URSA · Animation · still preview",
+          "zh": "URSA · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "URSA: model_preview.gif",
+          "zh": "URSA：model_preview.gif"
+        },
+        "sourcePath": "assets/model_preview.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/37bac4ecf5c30a3e58b0ad89fce1350b2de7b76dbf8615778a0f0cdb1e673195.preview.webp",
+        "previewSrc": "/skill-previews/auto/37bac4ecf5c30a3e58b0ad89fce1350b2de7b76dbf8615778a0f0cdb1e673195.preview.webp",
+        "cardSrc": "/skill-previews/auto/37bac4ecf5c30a3e58b0ad89fce1350b2de7b76dbf8615778a0f0cdb1e673195.card.webp",
+        "width": 1600,
+        "height": 1227,
+        "sha256": "37bac4ecf5c30a3e58b0ad89fce1350b2de7b76dbf8615778a0f0cdb1e673195",
+        "originalSrc": "/skill-previews/auto/37bac4ecf5c30a3e58b0ad89fce1350b2de7b76dbf8615778a0f0cdb1e673195.png",
+        "sourceUrl": "https://github.com/baaivision/URSA/blob/68ed282b0ed788cf02d0cc615ef2a8b96c855dba/assets/model_overview.png",
+        "kind": "reference",
+        "title": {
+          "en": "URSA · Author preview",
+          "zh": "URSA · 作者预览"
+        },
+        "alt": {
+          "en": "URSA: model_overview.png",
+          "zh": "URSA：model_overview.png"
+        },
+        "sourcePath": "assets/model_overview.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "baku89-glisp",
     "repository": "baku89/glisp",
     "revision": "c9e4693a77d0837d4134ffe6b4a83c345180c188",
@@ -3784,6 +4092,94 @@
     ]
   },
   {
+    "skillSlug": "bcmi-light-a-video",
+    "repository": "bcmi/Light-A-Video",
+    "revision": "13c0eefd105135178c24c801bdbc093d688eac69",
+    "sourceUrl": "https://github.com/bcmi/Light-A-Video/blob/13c0eefd105135178c24c801bdbc093d688eac69/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+    "documentSha256": "ac9fd012a59f29db301ca73a66882d41c307fefe992102006c15708712e26ea8",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-13T08:06:15.819Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/9171d365d5a9643f7509364a71b566736dbe1e9fd758f11adc89617f042899d3.preview.webp",
+        "previewSrc": "/skill-previews/auto/9171d365d5a9643f7509364a71b566736dbe1e9fd758f11adc89617f042899d3.preview.webp",
+        "cardSrc": "/skill-previews/auto/9171d365d5a9643f7509364a71b566736dbe1e9fd758f11adc89617f042899d3.card.webp",
+        "width": 1024,
+        "height": 512,
+        "sha256": "9171d365d5a9643f7509364a71b566736dbe1e9fd758f11adc89617f042899d3",
+        "originalSrc": "/skill-previews/auto/9171d365d5a9643f7509364a71b566736dbe1e9fd758f11adc89617f042899d3.gif",
+        "sourceUrl": "https://github.com/bcmi/Light-A-Video/blob/13c0eefd105135178c24c801bdbc093d688eac69/__assets__/boat_light.gif",
+        "kind": "reference",
+        "title": {
+          "en": "Light A Video · Animation · still preview",
+          "zh": "Light A Video · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Light A Video: boat_light.gif",
+          "zh": "Light A Video：boat_light.gif"
+        },
+        "sourcePath": "__assets__/boat_light.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/b33dd1a609e0b37dd41e63a8889d57342b60fee4fe733221f112fb8fd17632a3.preview.webp",
+        "previewSrc": "/skill-previews/auto/b33dd1a609e0b37dd41e63a8889d57342b60fee4fe733221f112fb8fd17632a3.preview.webp",
+        "cardSrc": "/skill-previews/auto/b33dd1a609e0b37dd41e63a8889d57342b60fee4fe733221f112fb8fd17632a3.card.webp",
+        "width": 1024,
+        "height": 512,
+        "sha256": "b33dd1a609e0b37dd41e63a8889d57342b60fee4fe733221f112fb8fd17632a3",
+        "originalSrc": "/skill-previews/auto/b33dd1a609e0b37dd41e63a8889d57342b60fee4fe733221f112fb8fd17632a3.gif",
+        "sourceUrl": "https://github.com/bcmi/Light-A-Video/blob/13c0eefd105135178c24c801bdbc093d688eac69/__assets__/cat_light.gif",
+        "kind": "reference",
+        "title": {
+          "en": "Light A Video · Animation · still preview",
+          "zh": "Light A Video · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Light A Video: cat_light.gif",
+          "zh": "Light A Video：cat_light.gif"
+        },
+        "sourcePath": "__assets__/cat_light.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/c207d125e8a82817d56ff86e28533ed22fdeb972bfee3160b0c19323e6a832a3.preview.webp",
+        "previewSrc": "/skill-previews/auto/c207d125e8a82817d56ff86e28533ed22fdeb972bfee3160b0c19323e6a832a3.preview.webp",
+        "cardSrc": "/skill-previews/auto/c207d125e8a82817d56ff86e28533ed22fdeb972bfee3160b0c19323e6a832a3.card.webp",
+        "width": 1024,
+        "height": 512,
+        "sha256": "c207d125e8a82817d56ff86e28533ed22fdeb972bfee3160b0c19323e6a832a3",
+        "originalSrc": "/skill-previews/auto/c207d125e8a82817d56ff86e28533ed22fdeb972bfee3160b0c19323e6a832a3.gif",
+        "sourceUrl": "https://github.com/bcmi/Light-A-Video/blob/13c0eefd105135178c24c801bdbc093d688eac69/__assets__/man_light.gif",
+        "kind": "reference",
+        "title": {
+          "en": "Light A Video · Animation · still preview",
+          "zh": "Light A Video · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Light A Video: man_light.gif",
+          "zh": "Light A Video：man_light.gif"
+        },
+        "sourcePath": "__assets__/man_light.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
     "skillSlug": "bergside-awesome-design-skills",
     "repository": "bergside/awesome-design-skills",
     "revision": "f631a09b4fcc0166f2e2c1a8c81906ef680c57e8",
@@ -3866,6 +4262,94 @@
           "zh": "Awesome Design Skills：Artistic"
         },
         "sourcePath": "registry-examples/artistic-marketing.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "bhanuprakashnani-image-processing",
+    "repository": "BhanuPrakashNani/Image_Processing",
+    "revision": "8d4cf9af49de9113ebf8c5e6e3587afd3d772b6a",
+    "sourceUrl": "https://github.com/BhanuPrakashNani/Image_Processing/blob/8d4cf9af49de9113ebf8c5e6e3587afd3d772b6a/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-bb8fb4511f4701397bce036b473269cbdb66eb2f2723e0306db2bf0468fe6818.txt",
+    "licenseSourcePath": "LICENSE.txt",
+    "licenseSha256": "bb8fb4511f4701397bce036b473269cbdb66eb2f2723e0306db2bf0468fe6818",
+    "documentSha256": "aab9630417ea1416d915f43aa2b6c33931a43cb8f48a621cb8aff83274d71dc6",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-13T08:06:15.819Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/0ff133b02092f491c0472dc6de46f323a394ffd1d307728ff56a4e78cbecb4e1.preview.webp",
+        "previewSrc": "/skill-previews/auto/0ff133b02092f491c0472dc6de46f323a394ffd1d307728ff56a4e78cbecb4e1.preview.webp",
+        "cardSrc": "/skill-previews/auto/0ff133b02092f491c0472dc6de46f323a394ffd1d307728ff56a4e78cbecb4e1.card.webp",
+        "width": 458,
+        "height": 611,
+        "sha256": "0ff133b02092f491c0472dc6de46f323a394ffd1d307728ff56a4e78cbecb4e1",
+        "originalSrc": "/skill-previews/auto/0ff133b02092f491c0472dc6de46f323a394ffd1d307728ff56a4e78cbecb4e1.jpg",
+        "sourceUrl": "https://github.com/BhanuPrakashNani/Image_Processing/blob/8d4cf9af49de9113ebf8c5e6e3587afd3d772b6a/Adaptive+Gaussian Thresholding/AG.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "Image Processing · Author preview",
+          "zh": "Image Processing · 作者预览"
+        },
+        "alt": {
+          "en": "Image Processing: AG.jpg",
+          "zh": "Image Processing：AG.jpg"
+        },
+        "sourcePath": "Adaptive+Gaussian Thresholding/AG.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/1750e7d0019e9000a22f0a4e44669b86e0a3145e873d7f6a76b84aeead87244a.preview.webp",
+        "previewSrc": "/skill-previews/auto/1750e7d0019e9000a22f0a4e44669b86e0a3145e873d7f6a76b84aeead87244a.preview.webp",
+        "cardSrc": "/skill-previews/auto/1750e7d0019e9000a22f0a4e44669b86e0a3145e873d7f6a76b84aeead87244a.card.webp",
+        "width": 458,
+        "height": 611,
+        "sha256": "1750e7d0019e9000a22f0a4e44669b86e0a3145e873d7f6a76b84aeead87244a",
+        "originalSrc": "/skill-previews/auto/1750e7d0019e9000a22f0a4e44669b86e0a3145e873d7f6a76b84aeead87244a.jpg",
+        "sourceUrl": "https://github.com/BhanuPrakashNani/Image_Processing/blob/8d4cf9af49de9113ebf8c5e6e3587afd3d772b6a/Adaptive+Gaussian Thresholding/AM.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "Image Processing · Author preview",
+          "zh": "Image Processing · 作者预览"
+        },
+        "alt": {
+          "en": "Image Processing: AM.jpg",
+          "zh": "Image Processing：AM.jpg"
+        },
+        "sourcePath": "Adaptive+Gaussian Thresholding/AM.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/9e54b52b4fa4544336378605185ae5347476b49dfa1ff99bf967494f2497c8dc.preview.webp",
+        "previewSrc": "/skill-previews/auto/9e54b52b4fa4544336378605185ae5347476b49dfa1ff99bf967494f2497c8dc.preview.webp",
+        "cardSrc": "/skill-previews/auto/9e54b52b4fa4544336378605185ae5347476b49dfa1ff99bf967494f2497c8dc.card.webp",
+        "width": 458,
+        "height": 611,
+        "sha256": "9e54b52b4fa4544336378605185ae5347476b49dfa1ff99bf967494f2497c8dc",
+        "originalSrc": "/skill-previews/auto/9e54b52b4fa4544336378605185ae5347476b49dfa1ff99bf967494f2497c8dc.jpg",
+        "sourceUrl": "https://github.com/BhanuPrakashNani/Image_Processing/blob/8d4cf9af49de9113ebf8c5e6e3587afd3d772b6a/Adaptive+Gaussian Thresholding/page.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "Image Processing · Author preview",
+          "zh": "Image Processing · 作者预览"
+        },
+        "alt": {
+          "en": "Image Processing: page.jpg",
+          "zh": "Image Processing：page.jpg"
+        },
+        "sourcePath": "Adaptive+Gaussian Thresholding/page.jpg",
         "documentPath": "README.md",
         "format": "image"
       }
@@ -4020,6 +4504,72 @@
           "zh": "Comfyui Jankhidiffusion：Image with embedded SDXL workflow"
         },
         "sourcePath": "assets/sdxl_workflow.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "bloc97-anime4k",
+    "repository": "bloc97/Anime4K",
+    "revision": "7684e9586f8dcc738af08a1cdceb024cc184f426",
+    "sourceUrl": "https://github.com/bloc97/Anime4K/blob/7684e9586f8dcc738af08a1cdceb024cc184f426/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-5bad448b737378e3d0c977ad0d0521fa37ad279a7e76ea9a31d9257eeb6953f5.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "5bad448b737378e3d0c977ad0d0521fa37ad279a7e76ea9a31d9257eeb6953f5",
+    "documentSha256": "0922a6645ea63fed3f7c96b3c0e0e5d788e06d9e2cf28274c6a9460890e91d9a",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-13T08:06:15.819Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/0bb8ae1fea7055b8819c70adc2406aa871eea0af7a555dc9186b5891694d6d48.preview.webp",
+        "previewSrc": "/skill-previews/auto/0bb8ae1fea7055b8819c70adc2406aa871eea0af7a555dc9186b5891694d6d48.preview.webp",
+        "cardSrc": "/skill-previews/auto/0bb8ae1fea7055b8819c70adc2406aa871eea0af7a555dc9186b5891694d6d48.card.webp",
+        "width": 1536,
+        "height": 1536,
+        "sha256": "0bb8ae1fea7055b8819c70adc2406aa871eea0af7a555dc9186b5891694d6d48",
+        "originalSrc": "/skill-previews/auto/0bb8ae1fea7055b8819c70adc2406aa871eea0af7a555dc9186b5891694d6d48.png",
+        "sourceUrl": "https://github.com/bloc97/Anime4K/blob/7684e9586f8dcc738af08a1cdceb024cc184f426/results/Comparisons/Cropped_Screenshots/Maxed.png",
+        "kind": "example",
+        "title": {
+          "en": "Anime4K · Author preview",
+          "zh": "Anime4K · 作者预览"
+        },
+        "alt": {
+          "en": "Anime4K: Comparison",
+          "zh": "Anime4K：Comparison"
+        },
+        "sourcePath": "results/Comparisons/Cropped_Screenshots/Maxed.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/7049db4b18330973a6dcabd3da395bd44fc73de4951e342a3244cc4124a79967.preview.webp",
+        "previewSrc": "/skill-previews/auto/7049db4b18330973a6dcabd3da395bd44fc73de4951e342a3244cc4124a79967.preview.webp",
+        "cardSrc": "/skill-previews/auto/7049db4b18330973a6dcabd3da395bd44fc73de4951e342a3244cc4124a79967.card.webp",
+        "width": 1536,
+        "height": 1536,
+        "sha256": "7049db4b18330973a6dcabd3da395bd44fc73de4951e342a3244cc4124a79967",
+        "originalSrc": "/skill-previews/auto/7049db4b18330973a6dcabd3da395bd44fc73de4951e342a3244cc4124a79967.png",
+        "sourceUrl": "https://github.com/bloc97/Anime4K/blob/7684e9586f8dcc738af08a1cdceb024cc184f426/results/Comparisons/Cropped_Screenshots/Slime.png",
+        "kind": "example",
+        "title": {
+          "en": "Anime4K · Author preview",
+          "zh": "Anime4K · 作者预览"
+        },
+        "alt": {
+          "en": "Anime4K: Comparison",
+          "zh": "Anime4K：Comparison"
+        },
+        "sourcePath": "results/Comparisons/Cropped_Screenshots/Slime.png",
         "documentPath": "README.md",
         "format": "image"
       }
@@ -4196,6 +4746,402 @@
           "zh": "Markdown Exporter：HTML Example"
         },
         "sourcePath": "_assets/screenshots/md_to_html_1.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "byjlw-video-analyzer",
+    "repository": "byjlw/video-analyzer",
+    "revision": "2b095faf8a965eda5ba055ef29eb0cd71698ae6f",
+    "sourceUrl": "https://github.com/byjlw/video-analyzer/blob/2b095faf8a965eda5ba055ef29eb0cd71698ae6f/readme.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "documentSha256": "816ddbd8501b31944520a4df7c6966496830a45473bed9ae6c856c16006cc476",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-13T08:06:15.819Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/c686b980e1f1ae7a4aa8d730075ce92dd891c5438922b81fa884bb6774d71787.preview.webp",
+        "previewSrc": "/skill-previews/auto/c686b980e1f1ae7a4aa8d730075ce92dd891c5438922b81fa884bb6774d71787.preview.webp",
+        "cardSrc": "/skill-previews/auto/c686b980e1f1ae7a4aa8d730075ce92dd891c5438922b81fa884bb6774d71787.card.webp",
+        "width": 1252,
+        "height": 623,
+        "sha256": "c686b980e1f1ae7a4aa8d730075ce92dd891c5438922b81fa884bb6774d71787",
+        "originalSrc": "/skill-previews/auto/c686b980e1f1ae7a4aa8d730075ce92dd891c5438922b81fa884bb6774d71787.png",
+        "sourceUrl": "https://github.com/byjlw/video-analyzer/blob/2b095faf8a965eda5ba055ef29eb0cd71698ae6f/docs/design.png",
+        "kind": "reference",
+        "title": {
+          "en": "Video Analyzer · Author preview",
+          "zh": "Video Analyzer · 作者预览"
+        },
+        "alt": {
+          "en": "Video Analyzer: Design",
+          "zh": "Video Analyzer：Design"
+        },
+        "sourcePath": "docs/design.png",
+        "documentPath": "readme.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "bytedance-bernini",
+    "repository": "bytedance/Bernini",
+    "revision": "e6c2cf11843470b08491745947abcba9c3c6b079",
+    "sourceUrl": "https://github.com/bytedance/Bernini/blob/e6c2cf11843470b08491745947abcba9c3c6b079/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "documentSha256": "2ce851066c1fe8e86e1271ea2f2e98ae872020166fc318efd6f2d292163a739e",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-13T08:06:15.819Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/28ae3f129eef0395db0699fe631805fd1828277ee0ad403edcf2ffb53be0fdde.preview.webp",
+        "previewSrc": "/skill-previews/auto/28ae3f129eef0395db0699fe631805fd1828277ee0ad403edcf2ffb53be0fdde.preview.webp",
+        "cardSrc": "/skill-previews/auto/28ae3f129eef0395db0699fe631805fd1828277ee0ad403edcf2ffb53be0fdde.card.webp",
+        "width": 1600,
+        "height": 501,
+        "sha256": "28ae3f129eef0395db0699fe631805fd1828277ee0ad403edcf2ffb53be0fdde",
+        "originalSrc": "/skill-previews/auto/28ae3f129eef0395db0699fe631805fd1828277ee0ad403edcf2ffb53be0fdde.png",
+        "sourceUrl": "https://github.com/bytedance/Bernini/blob/e6c2cf11843470b08491745947abcba9c3c6b079/assets/arena.png",
+        "kind": "reference",
+        "title": {
+          "en": "Bernini · Author preview",
+          "zh": "Bernini · 作者预览"
+        },
+        "alt": {
+          "en": "Bernini: Video editing arena: Bradley-Terry leaderboard and pairwise win-rate matrix",
+          "zh": "Bernini：Video editing arena: Bradley-Terry leaderboard and pairwise win-rate matrix"
+        },
+        "sourcePath": "assets/arena.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "bytedance-comfyui-infiniteyou",
+    "repository": "bytedance/ComfyUI_InfiniteYou",
+    "revision": "1c979397c5c80f5ac83a2473a2f7d4503104110f",
+    "sourceUrl": "https://github.com/bytedance/ComfyUI_InfiniteYou/blob/1c979397c5c80f5ac83a2473a2f7d4503104110f/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+    "documentSha256": "d330aa147a1201287a0755b8076e7e227946cbd028365aad9901f08de5a037b7",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-13T08:06:15.819Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/832a3029e2a9087a91a8127ec9e9eb3b14e6af11c2ff242e3863595a0a65a9f5.preview.webp",
+        "previewSrc": "/skill-previews/auto/832a3029e2a9087a91a8127ec9e9eb3b14e6af11c2ff242e3863595a0a65a9f5.preview.webp",
+        "cardSrc": "/skill-previews/auto/832a3029e2a9087a91a8127ec9e9eb3b14e6af11c2ff242e3863595a0a65a9f5.card.webp",
+        "width": 1600,
+        "height": 1003,
+        "sha256": "832a3029e2a9087a91a8127ec9e9eb3b14e6af11c2ff242e3863595a0a65a9f5",
+        "originalSrc": "/skill-previews/auto/832a3029e2a9087a91a8127ec9e9eb3b14e6af11c2ff242e3863595a0a65a9f5.jpg",
+        "sourceUrl": "https://github.com/bytedance/ComfyUI_InfiniteYou/blob/1c979397c5c80f5ac83a2473a2f7d4503104110f/examples/multi_id_workflow.jpg",
+        "kind": "example",
+        "title": {
+          "en": "ComfyUI InfiniteYou · Author preview",
+          "zh": "ComfyUI InfiniteYou · 作者预览"
+        },
+        "alt": {
+          "en": "ComfyUI InfiniteYou: basic workflow",
+          "zh": "ComfyUI InfiniteYou：basic workflow"
+        },
+        "sourcePath": "examples/multi_id_workflow.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/08543db3b4797a616c8b1ba778916ce440e1475e2653cc5b89ae5d72654cd91e.preview.webp",
+        "previewSrc": "/skill-previews/auto/08543db3b4797a616c8b1ba778916ce440e1475e2653cc5b89ae5d72654cd91e.preview.webp",
+        "cardSrc": "/skill-previews/auto/08543db3b4797a616c8b1ba778916ce440e1475e2653cc5b89ae5d72654cd91e.card.webp",
+        "width": 1600,
+        "height": 1378,
+        "sha256": "08543db3b4797a616c8b1ba778916ce440e1475e2653cc5b89ae5d72654cd91e",
+        "originalSrc": "/skill-previews/auto/08543db3b4797a616c8b1ba778916ce440e1475e2653cc5b89ae5d72654cd91e.jpg",
+        "sourceUrl": "https://github.com/bytedance/ComfyUI_InfiniteYou/blob/1c979397c5c80f5ac83a2473a2f7d4503104110f/examples/teaser.jpg",
+        "kind": "example",
+        "title": {
+          "en": "ComfyUI InfiniteYou · Author preview",
+          "zh": "ComfyUI InfiniteYou · 作者预览"
+        },
+        "alt": {
+          "en": "ComfyUI InfiniteYou: teaser",
+          "zh": "ComfyUI InfiniteYou：teaser"
+        },
+        "sourcePath": "examples/teaser.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/b2769ac0989f12a92beada58faa6a96084b01585a38bc5f5da6a9d592360d062.preview.webp",
+        "previewSrc": "/skill-previews/auto/b2769ac0989f12a92beada58faa6a96084b01585a38bc5f5da6a9d592360d062.preview.webp",
+        "cardSrc": "/skill-previews/auto/b2769ac0989f12a92beada58faa6a96084b01585a38bc5f5da6a9d592360d062.card.webp",
+        "width": 1600,
+        "height": 814,
+        "sha256": "b2769ac0989f12a92beada58faa6a96084b01585a38bc5f5da6a9d592360d062",
+        "originalSrc": "/skill-previews/auto/b2769ac0989f12a92beada58faa6a96084b01585a38bc5f5da6a9d592360d062.jpg",
+        "sourceUrl": "https://github.com/bytedance/ComfyUI_InfiniteYou/blob/1c979397c5c80f5ac83a2473a2f7d4503104110f/examples/workflow.jpg",
+        "kind": "example",
+        "title": {
+          "en": "ComfyUI InfiniteYou · Author preview",
+          "zh": "ComfyUI InfiniteYou · 作者预览"
+        },
+        "alt": {
+          "en": "ComfyUI InfiniteYou: basic workflow",
+          "zh": "ComfyUI InfiniteYou：basic workflow"
+        },
+        "sourcePath": "examples/workflow.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "bytedance-infiniteyou",
+    "repository": "bytedance/InfiniteYou",
+    "revision": "aaa6ea5f75ba2ff58b9025fa7df45e4a139ed717",
+    "sourceUrl": "https://github.com/bytedance/InfiniteYou/blob/aaa6ea5f75ba2ff58b9025fa7df45e4a139ed717/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+    "documentSha256": "5d41426ef5e40b3b8af222e8115bdd2bf295aa9bc99bd6ee26428ac07b470d86",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-13T08:06:15.819Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/c612ecafa42cc46459d1bd910582e88b7d633ce5fc12db31cc9db00b2900672d.preview.webp",
+        "previewSrc": "/skill-previews/auto/c612ecafa42cc46459d1bd910582e88b7d633ce5fc12db31cc9db00b2900672d.preview.webp",
+        "cardSrc": "/skill-previews/auto/c612ecafa42cc46459d1bd910582e88b7d633ce5fc12db31cc9db00b2900672d.card.webp",
+        "width": 1576,
+        "height": 1600,
+        "sha256": "c612ecafa42cc46459d1bd910582e88b7d633ce5fc12db31cc9db00b2900672d",
+        "originalSrc": "/skill-previews/auto/c612ecafa42cc46459d1bd910582e88b7d633ce5fc12db31cc9db00b2900672d.jpg",
+        "sourceUrl": "https://github.com/bytedance/InfiniteYou/blob/aaa6ea5f75ba2ff58b9025fa7df45e4a139ed717/assets/comparative_results.jpg",
+        "kind": "example",
+        "title": {
+          "en": "InfiniteYou · Author preview",
+          "zh": "InfiniteYou · 作者预览"
+        },
+        "alt": {
+          "en": "InfiniteYou: comparative_results",
+          "zh": "InfiniteYou：comparative_results"
+        },
+        "sourcePath": "assets/comparative_results.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/7905845747f74229969a55fe15be2a4db1cb88692b898f7c7ac1cffba3fc8148.preview.webp",
+        "previewSrc": "/skill-previews/auto/7905845747f74229969a55fe15be2a4db1cb88692b898f7c7ac1cffba3fc8148.preview.webp",
+        "cardSrc": "/skill-previews/auto/7905845747f74229969a55fe15be2a4db1cb88692b898f7c7ac1cffba3fc8148.card.webp",
+        "width": 1600,
+        "height": 824,
+        "sha256": "7905845747f74229969a55fe15be2a4db1cb88692b898f7c7ac1cffba3fc8148",
+        "originalSrc": "/skill-previews/auto/7905845747f74229969a55fe15be2a4db1cb88692b898f7c7ac1cffba3fc8148.jpg",
+        "sourceUrl": "https://github.com/bytedance/InfiniteYou/blob/aaa6ea5f75ba2ff58b9025fa7df45e4a139ed717/assets/plug_and_play.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "InfiniteYou · Author preview",
+          "zh": "InfiniteYou · 作者预览"
+        },
+        "alt": {
+          "en": "InfiniteYou: plug_and_play",
+          "zh": "InfiniteYou：plug_and_play"
+        },
+        "sourcePath": "assets/plug_and_play.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/08543db3b4797a616c8b1ba778916ce440e1475e2653cc5b89ae5d72654cd91e.preview.webp",
+        "previewSrc": "/skill-previews/auto/08543db3b4797a616c8b1ba778916ce440e1475e2653cc5b89ae5d72654cd91e.preview.webp",
+        "cardSrc": "/skill-previews/auto/08543db3b4797a616c8b1ba778916ce440e1475e2653cc5b89ae5d72654cd91e.card.webp",
+        "width": 1600,
+        "height": 1378,
+        "sha256": "08543db3b4797a616c8b1ba778916ce440e1475e2653cc5b89ae5d72654cd91e",
+        "originalSrc": "/skill-previews/auto/08543db3b4797a616c8b1ba778916ce440e1475e2653cc5b89ae5d72654cd91e.jpg",
+        "sourceUrl": "https://github.com/bytedance/InfiniteYou/blob/aaa6ea5f75ba2ff58b9025fa7df45e4a139ed717/assets/teaser.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "InfiniteYou · Author preview",
+          "zh": "InfiniteYou · 作者预览"
+        },
+        "alt": {
+          "en": "InfiniteYou: teaser",
+          "zh": "InfiniteYou：teaser"
+        },
+        "sourcePath": "assets/teaser.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "bytedance-lance",
+    "repository": "bytedance/Lance",
+    "revision": "4baeee086648996f6ab12e673cbe461b0b149997",
+    "sourceUrl": "https://github.com/bytedance/Lance/blob/4baeee086648996f6ab12e673cbe461b0b149997/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "documentSha256": "df0fe31b06c0943bf909a42daab150367f6e95d6360c18c64ce146718c15fc04",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-13T08:06:15.819Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/29058eb4c4ccee642995da0a48fe046415afc9b6698ca0366804deeef70fc0d1.preview.webp",
+        "previewSrc": "/skill-previews/auto/29058eb4c4ccee642995da0a48fe046415afc9b6698ca0366804deeef70fc0d1.preview.webp",
+        "cardSrc": "/skill-previews/auto/29058eb4c4ccee642995da0a48fe046415afc9b6698ca0366804deeef70fc0d1.card.webp",
+        "width": 288,
+        "height": 163,
+        "sha256": "29058eb4c4ccee642995da0a48fe046415afc9b6698ca0366804deeef70fc0d1",
+        "originalSrc": "/skill-previews/auto/29058eb4c4ccee642995da0a48fe046415afc9b6698ca0366804deeef70fc0d1.gif",
+        "sourceUrl": "https://github.com/bytedance/Lance/blob/4baeee086648996f6ab12e673cbe461b0b149997/assets/intelligent-video/previews/intelligent-video-demo-01.gif",
+        "kind": "example",
+        "title": {
+          "en": "Lance · Animation · still preview",
+          "zh": "Lance · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Lance: intelligent-video-demo-01.gif",
+          "zh": "Lance：intelligent-video-demo-01.gif"
+        },
+        "sourcePath": "assets/intelligent-video/previews/intelligent-video-demo-01.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/90cceaaa1b500d4cb9b8fbbba8fe72d4bcf5ecf97576a5d7d22005955e2b1557.preview.webp",
+        "previewSrc": "/skill-previews/auto/90cceaaa1b500d4cb9b8fbbba8fe72d4bcf5ecf97576a5d7d22005955e2b1557.preview.webp",
+        "cardSrc": "/skill-previews/auto/90cceaaa1b500d4cb9b8fbbba8fe72d4bcf5ecf97576a5d7d22005955e2b1557.card.webp",
+        "width": 288,
+        "height": 163,
+        "sha256": "90cceaaa1b500d4cb9b8fbbba8fe72d4bcf5ecf97576a5d7d22005955e2b1557",
+        "originalSrc": "/skill-previews/auto/90cceaaa1b500d4cb9b8fbbba8fe72d4bcf5ecf97576a5d7d22005955e2b1557.gif",
+        "sourceUrl": "https://github.com/bytedance/Lance/blob/4baeee086648996f6ab12e673cbe461b0b149997/assets/intelligent-video/previews/intelligent-video-demo-02.gif",
+        "kind": "example",
+        "title": {
+          "en": "Lance · Animation · still preview",
+          "zh": "Lance · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Lance: intelligent-video-demo-02.gif",
+          "zh": "Lance：intelligent-video-demo-02.gif"
+        },
+        "sourcePath": "assets/intelligent-video/previews/intelligent-video-demo-02.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/6f265bd4c78bb7791ea1e6d706cc241d9b05d37ab4f193c4d1f0797553ceb678.preview.webp",
+        "previewSrc": "/skill-previews/auto/6f265bd4c78bb7791ea1e6d706cc241d9b05d37ab4f193c4d1f0797553ceb678.preview.webp",
+        "cardSrc": "/skill-previews/auto/6f265bd4c78bb7791ea1e6d706cc241d9b05d37ab4f193c4d1f0797553ceb678.card.webp",
+        "width": 288,
+        "height": 163,
+        "sha256": "6f265bd4c78bb7791ea1e6d706cc241d9b05d37ab4f193c4d1f0797553ceb678",
+        "originalSrc": "/skill-previews/auto/6f265bd4c78bb7791ea1e6d706cc241d9b05d37ab4f193c4d1f0797553ceb678.gif",
+        "sourceUrl": "https://github.com/bytedance/Lance/blob/4baeee086648996f6ab12e673cbe461b0b149997/assets/intelligent-video/previews/intelligent-video-demo-03.gif",
+        "kind": "example",
+        "title": {
+          "en": "Lance · Animation · still preview",
+          "zh": "Lance · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Lance: intelligent-video-demo-03.gif",
+          "zh": "Lance：intelligent-video-demo-03.gif"
+        },
+        "sourcePath": "assets/intelligent-video/previews/intelligent-video-demo-03.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
+    "skillSlug": "bytedance-salmonn",
+    "repository": "bytedance/SALMONN",
+    "revision": "0d9ac440928002d153c1aa35ee2029aea53626b9",
+    "sourceUrl": "https://github.com/bytedance/SALMONN/blob/0d9ac440928002d153c1aa35ee2029aea53626b9/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-f56f1741fbe627912dac8a4108ede3474c5340d2f39b10b263c00a48c8b4af28.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "f56f1741fbe627912dac8a4108ede3474c5340d2f39b10b263c00a48c8b4af28",
+    "documentSha256": "fe64db51ce9fcef05a929f4febfe694c2e5198435d8751aee3732fe57797ca96",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-13T08:06:15.819Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/327be7b9bca82e29c93688d5b470bdcf720da1b42f36bb926583be385c081165.preview.webp",
+        "previewSrc": "/skill-previews/auto/327be7b9bca82e29c93688d5b470bdcf720da1b42f36bb926583be385c081165.preview.webp",
+        "cardSrc": "/skill-previews/auto/327be7b9bca82e29c93688d5b470bdcf720da1b42f36bb926583be385c081165.card.webp",
+        "width": 1024,
+        "height": 1024,
+        "sha256": "327be7b9bca82e29c93688d5b470bdcf720da1b42f36bb926583be385c081165",
+        "originalSrc": "/skill-previews/auto/327be7b9bca82e29c93688d5b470bdcf720da1b42f36bb926583be385c081165.png",
+        "sourceUrl": "https://github.com/bytedance/SALMONN/blob/0d9ac440928002d153c1aa35ee2029aea53626b9/resource/salmon.png",
+        "kind": "reference",
+        "title": {
+          "en": "SALMONN · Author preview",
+          "zh": "SALMONN · 作者预览"
+        },
+        "alt": {
+          "en": "SALMONN: salmon.png",
+          "zh": "SALMONN：salmon.png"
+        },
+        "sourcePath": "resource/salmon.png",
         "documentPath": "README.md",
         "format": "image"
       }
