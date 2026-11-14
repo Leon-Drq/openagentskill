@@ -35,6 +35,11 @@ Skill details, editorial pages, APIs, accounts, checkout and webhooks are outsid
 this limiter. Binding failures fail open. Setting `SEARCH_COST_GUARD=0` disables
 the guard on the next deployment; it does not alter data.
 
+Complex directory responses expose `X-OAS-Search-Limit`: `allowed`, `exceeded`,
+`unavailable`, `disabled` or `no-source`. These states contain no address or
+search text and let deployment checks distinguish a working limiter from a
+fail-open binding. Unavailable bindings also emit a fixed diagnostic log.
+
 Robots rules ask automated search crawlers to use canonical pages and sitemaps,
 and avoid the directory query graph. User-directed ChatGPT/Claude browsing keeps
 its existing robots rules. Robots rules are advisory and are not access control.

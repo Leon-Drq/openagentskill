@@ -182,6 +182,10 @@ for (const kind of ['audit', 'evals']) {
 }
 console.log('Render cost: eight bounded model keys, request isolation, query bypass, invalidation, outage recovery and lazy card projection passed.')
 
+const noMatchingFilters = await renderProps({ category: 'design-creative', platform: 'no-such-platform' })
+assert.equal(noMatchingFilters.resultCount, 0)
+assert.deepEqual(noMatchingFilters.directorySections, [], 'Related collections respect active filters and do not analyze an unrelated candidate pool')
+
 const previousRecords = records
 records = Array.from({length:32},(_,i)=>({...previousRecords[0], id:`new-${i}`, slug:i===12?'morluto-rea-reverse-engineer-anything':`new-${i}`, created_at:new Date(Date.UTC(2027,0,1,0,0,100-i)).toISOString(), github_last_pushed_at:new Date(Date.UTC(2027,0,1,0,0,100-i)).toISOString()}))
 for (const sort of ['new','fresh']) for (const lang of ['en','zh']) {

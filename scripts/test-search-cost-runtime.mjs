@@ -58,7 +58,9 @@ assert.equal(denied.status, 429); assert.equal(denied.headers.get('retry-after')
 assert.equal(denied.headers.get('cache-control'), 'private, no-store')
 assert.equal(await (await searchCostGuard(request('/skills?q=design', { method: 'HEAD' }), env)).text(), '')
 failure = true
-assert.equal(await searchCostGuard(request('/skills?q=design'), env), null, 'Limiter outage preserves availability')
+const states = []
+assert.equal(await searchCostGuard(request('/skills?q=design'), env, state => states.push(state)), null, 'Limiter outage preserves availability')
+assert.deepEqual(states, ['unavailable'], 'A failed production binding must be observable')
 assert.equal(await searchCostGuard(request('/skills?q=design'), { ...env, SEARCH_COST_GUARD: '0' }), null)
 assert.equal(await searchCostGuard(new Request('https://www.openagentskill.com/skills?q=design'), env), null)
 console.log('Search cost: OR top-N equivalence, lazy source analysis, scoped rate limits, retry and failure recovery passed.')

@@ -9,9 +9,14 @@ export { DOQueueHandler } from '../.open-next/worker.js'
 
 export default {
   async fetch(request, env, ctx) {
+    let searchLimitState
     const intercepted = await stagingResponse(request, env) || migrationResponse(request, env)
-    const response = intercepted || await searchCostGuard(request, env) || await publicDirectoryResponse(request, env, ctx, buildId,
+    let response = intercepted || await searchCostGuard(request, env, state => { searchLimitState = state }) || await publicDirectoryResponse(request, env, ctx, buildId,
       input => handler.fetch(input, env, ctx))
+    if (searchLimitState) {
+      response = new Response(response.body, response)
+      response.headers.set('X-OAS-Search-Limit', searchLimitState)
+    }
     return previewHeaders(response, env)
   },
   async scheduled(event, env) {

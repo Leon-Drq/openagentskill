@@ -1154,7 +1154,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     hasMoreResults = pageOffset + VISIBLE_SKILL_LIMIT < resultCount
   }
   const directorySections = catalogMode || paused || query ? [] : buildDirectorySections(
-    enrichedRecords.slice(0, DIRECTORY_SECTION_SOURCE_LIMIT)
+    filteredRecords.slice(0, DIRECTORY_SECTION_SOURCE_LIMIT)
   )
   const directoryLinks: DirectoryLink[] = POPULAR_DIRECTORY_LINKS.map((link) => ({ ...link }))
   if (!paused && sort !== 'downloads') {
