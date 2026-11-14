@@ -15,7 +15,7 @@ import { isMcpOnlyCategory, isMcpOnlySkillRecord } from '@/lib/skills/registry-s
 import { unstable_cache } from 'next/cache'
 import type { Skill } from '@/lib/types'
 import { CURATED_SKILL_SNAPSHOT } from '@/lib/seo/curated-skill-snapshot'
-import { getSearchTerms, normalizeExactSearchQuery, repositorySearchQuery } from '@/lib/search-query'
+import { getSearchTerms, normalizeExactSearchQuery, repositorySearchQuery, mergeSearchTermResults } from '@/lib/search-query'
 import { classifySearchMatch, nameLookupPatterns } from '@/lib/search-match'
 import { packCacheJson, unpackCacheJson } from '@/lib/cache/packed-json'
 import { buildLegacySearchIndexFilter, buildEditorialSearchIndexFilter, matchesLegacySearchIndex } from '@/lib/seo/search-indexability'
@@ -1130,16 +1130,17 @@ async function searchSkillsWithLegacyFilter(
     .limit(limit)
 
   if (error) throw error
-  return filterSkillOnly((data || []) as unknown as SkillRecord[])
+  return (data || []) as unknown as SkillRecord[]
 }
 
-async function fetchSearchSkills(normalizedQuery: string, limit: number): Promise<SkillRecord[]> {
-  const searchTerms = getSearchTerms(normalizedQuery)
+async function fetchSearchTerm(term: string): Promise<SkillRecord[]> {
+  const limit = 200
+  const searchTerms = [term]
   const supabase = createPublicClient({ requestTimeoutMs: SKILL_BROAD_SEARCH_TIMEOUT_MS, circuitScope: 'skill-search-broad' })
-  const fullTextQuery = searchTerms.map((term) => term.replace(/[^a-z0-9-]/g, '')).filter(Boolean).join(' OR ')
+  const fullTextQuery = term
 
   let { data, error } = await supabase
-    .rpc('search_public_skills', { p_query: fullTextQuery || normalizedQuery, p_limit: limit })
+    .rpc('search_public_skills', { p_query: fullTextQuery, p_limit: limit })
     .select(SKILL_DIRECTORY_SELECT)
 
   // Older preview/local databases may not have the additive migration yet.
@@ -1147,7 +1148,7 @@ async function fetchSearchSkills(normalizedQuery: string, limit: number): Promis
   if (error && ['PGRST202', '42883'].includes(error.code || '')) {
     const fallback = await supabase.from('skills').select(SKILL_DIRECTORY_SELECT)
       .or(PUBLIC_SKILL_FILTER)
-      .textSearch('search_document', fullTextQuery || normalizedQuery, { config: 'simple', type: 'websearch' })
+      .textSearch('search_document', fullTextQuery, { config: 'simple', type: 'websearch' })
       .order('quality_score', { ascending: false }).limit(limit)
     data = fallback.data
     error = fallback.error
@@ -1163,16 +1164,37 @@ async function fetchSearchSkills(normalizedQuery: string, limit: number): Promis
     throw error
   }
 
-  return filterSkillOnly((data || []) as unknown as SkillRecord[])
+  // Scope filtering must follow the global top-N, exactly as the OR query did.
+  return (data || []) as unknown as SkillRecord[]
 }
 
-const getCachedSearchSkills = unstable_cache(
-  coalesceCacheLoader(async (normalizedQuery: string, limit: number) => fetchSearchSkills(normalizedQuery, limit)),
-  ['public-skill-search-v6-indexed-matches'],
+class EmptySearchResult extends Error {
+  constructor(readonly packed: string) { super('No search matches; skip persistent cache write') }
+}
+
+const readSearchTerm = unstable_cache(
+  coalesceCacheLoader(async (term: string) => {
+    const rows = await fetchSearchTerm(term)
+    if (!rows.length) throw new EmptySearchResult('')
+    return packCacheJson(rows)
+  }),
+  ['public-skill-search-term-v1'],
   { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
 
-const getCachedExactSearchPart = unstable_cache(
+async function getCachedSearchSkills(normalizedQuery: string, limit: number): Promise<SkillRecord[]> {
+  const sanitized = getSearchTerms(normalizedQuery).map(term => term.replace(/[^a-z0-9-]/g, '')).filter(Boolean)
+  const terms = [...new Set(sanitized.length ? sanitized : normalizedQuery.split(/\s+OR\s+/i).map(term => term.trim()).filter(Boolean))].sort()
+  const pools: SkillRecord[][] = []
+  // Bound cold fan-out, while common words share one four-hour cache across
+  // query permutations, languages, limits and filter combinations.
+  for (let i = 0; i < terms.length; i += 3) pools.push(...await Promise.all(terms.slice(i, i + 3).map(term =>
+    readSearchTerm(term).then(packed => unpackCacheJson<SkillRecord[]>(packed))
+      .catch(error => { if (error instanceof EmptySearchResult) return []; throw error }))))
+  return filterSkillOnly(mergeSearchTermResults(pools, limit))
+}
+
+const readExactSearchPart = unstable_cache(
   coalesceCacheLoader(async (field: 'slug' | 'name', exactQuery: string): Promise<string> => {
     const supabase = createPublicClient({ requestTimeoutMs: SKILL_EXACT_SEARCH_TIMEOUT_MS, circuitScope: 'skill-search' })
     let { data, error } = await (field === 'slug'
@@ -1184,11 +1206,16 @@ const getCachedExactSearchPart = unstable_cache(
       error = fallback.error
     }
     if (error) throw error
-    return packCacheJson(data || [])
+    const packed = await packCacheJson(data || [])
+    if (!data?.length) throw new EmptySearchResult(packed)
+    return packed
   }),
   ['public-exact-search-parts-v2-public-name'],
   { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
+
+const getCachedExactSearchPart = (field: 'slug' | 'name', query: string) => readExactSearchPart(field, query)
+  .catch(error => { if (error instanceof EmptySearchResult) return error.packed; throw error })
 
 async function fetchExactSearchSkills(query: string): Promise<{ records: SkillRecord[]; degraded: boolean }> {
   const exactQuery = normalizeExactSearchQuery(query).toLowerCase()
@@ -1257,10 +1284,10 @@ async function fetchSearchSkillsWithStatus(query: string, limit = 120) {
   return { ...collected, degraded: collected.degraded || (exact.status === 'fulfilled' && exact.value.degraded) }
 }
 
-const getCachedNearNameSearch = unstable_cache(
+const readNearNameSearch = unstable_cache(
   coalesceCacheLoader(async (query: string): Promise<SkillRecord[]> => {
     const patterns = nameLookupPatterns(query)
-    if (!patterns.length) return []
+    if (!patterns.length) throw new EmptySearchResult('')
     const supabase = createPublicClient({ requestTimeoutMs: SKILL_EXACT_SEARCH_TIMEOUT_MS, circuitScope: 'skill-search' })
     const results = await Promise.all(patterns.map(async pattern => {
       const { data, error } = await supabase.from('skills').select(SKILL_DIRECTORY_SELECT)
@@ -1269,11 +1296,16 @@ const getCachedNearNameSearch = unstable_cache(
       return filterSkillOnly((data || []) as unknown as SkillRecord[])
         .filter(skill => classifySearchMatch(skill, query) !== 'related')
     }))
-    return [...new Map(results.flat().map(skill => [skill.slug, skill])).values()]
+    const rows = [...new Map(results.flat().map(skill => [skill.slug, skill])).values()]
+    if (!rows.length) throw new EmptySearchResult('')
+    return rows
   }),
   ['public-near-name-search-v1'],
   { revalidate: SHARED_SKILL_CACHE_REVALIDATE_SECONDS, tags: ['public-skill-directory'] }
 )
+
+const getCachedNearNameSearch = (query: string) => readNearNameSearch(query)
+  .catch(error => { if (error instanceof EmptySearchResult) return []; throw error })
 
 function applyTaxonomyFilters<T extends { eq: (column: string, value: string) => T; contains: (column: string, value: string[]) => T; or: (filters: string) => T }>(query: T, category: string, topic: string, output: string): T {
   const primary = normalizeSkillCategory(category)

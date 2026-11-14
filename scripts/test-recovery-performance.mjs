@@ -5,6 +5,7 @@ import * as packed from '../lib/cache/packed-json.ts'
 import * as coalesced from '../lib/cache/coalesced.ts'
 import * as searchQuery from '../lib/search-query.ts'
 import * as searchResults from '../lib/search-results.ts'
+import * as searchMatch from '../lib/search-match.ts'
 import { withTimeout } from '../lib/async.ts'
 import { scheduleSourceSync } from '../lib/indexer/source-sync-scheduler.ts'
 
@@ -26,9 +27,10 @@ assert.equal(scheduleSourceSync({ ...queues, requested: [manual] }).filter(x => 
 assert.equal(scheduleSourceSync({ ...queues, claimed: [], stale: [], now: 6 * 3600000, limit: 1 })[0].discoverySource, 'd2', 'Seeds rotate rather than repeatedly consuming the same slot')
 assert.deepEqual(scheduleSourceSync({ ...queues, claimed: [], stale: [], seeds: [], limit: 2 }), [])
 
-function searchFixture({ delay = 0, cacheValues = true } = {}) {
+function searchFixture({ delay = 0, cacheValues = true, empty = false } = {}) {
   const calls = { slug: 0, name: 0, rpc: 0, fallback: 0 }
   const options = []
+  let writes = 0
   let nameFailed = true, rpcError = null
   const row = slug => ({ slug, name: slug, ai_review_approved: true, category: 'development' })
   function query(kind = 'fallback', timeoutMs) {
@@ -38,7 +40,7 @@ function searchFixture({ delay = 0, cacheValues = true } = {}) {
       then(resolve, reject) {
         calls[kind]++
         const error = kind === 'name' && nameFailed ? { code: '57014', message: 'timeout' } : kind === 'rpc' ? rpcError : null
-        const result = { error, data: error ? null : kind === 'name' ? [] : [row(kind === 'slug' ? 'alpha' : 'broad')] }
+        const result = { error, data: error ? null : empty || kind === 'name' ? [] : [row(kind === 'slug' ? 'alpha' : 'broad')] }
         return (delay ? withTimeout(new Promise(done => setTimeout(() => done(result), delay)), timeoutMs, 'transport') : Promise.resolve(result)).then(resolve, reject)
       },
     }
@@ -53,17 +55,17 @@ function searchFixture({ delay = 0, cacheValues = true } = {}) {
   Object.assign(deps, {
     '@/lib/supabase/public': { createPublicClient: client }, '@/lib/skills/publication': { PUBLIC_SKILL_FILTER: 'ai_review_approved.eq.true' },
     '@/lib/skills/registry-scope': { isMcpOnlySkillRecord: () => false }, '@/lib/async': { withTimeout },
-    '@/lib/search-query': searchQuery, '@/lib/search-results': searchResults, '@/lib/cache/packed-json': packed, '@/lib/cache/coalesced': coalesced,
+    '@/lib/search-query': searchQuery, '@/lib/search-match': searchMatch, '@/lib/search-results': searchResults, '@/lib/cache/packed-json': packed, '@/lib/cache/coalesced': coalesced,
     'next/cache': { unstable_cache: (fn, keys) => {
       const cache = new Map()
       return async (...args) => {
         const key = JSON.stringify([keys, args])
         if (cache.has(key)) return cache.get(key)
-        const result = await fn(...args); if (cacheValues) cache.set(key, result); return result
+        const result = await fn(...args); if (cacheValues) { cache.set(key, result); writes++ } return result
       }
     } },
   })
-  return { db: compile('lib/db/skills.ts', deps), calls, options, recoverName: () => { nameFailed = false }, errorRpc: error => { rpcError = error } }
+  return { db: compile('lib/db/skills.ts', deps), calls, options, writes: () => writes, recoverName: () => { nameFailed = false }, errorRpc: error => { rpcError = error } }
 }
 const f = searchFixture()
 const partial = await f.db.searchSkillsWithStatus('alpha')
@@ -96,10 +98,19 @@ assert.ok(cold.options.every(option => option.circuitScope !== 'public-read'))
 const concurrent = searchFixture({ delay: 15, cacheValues: false }); concurrent.recoverName()
 const results = await Promise.all(Array.from({ length: 8 }, (_, i) => concurrent.db.searchSkillsWithStatus('shared', 120 + i)))
 assert.ok(results.every(result => !result.degraded))
-assert.deepEqual(concurrent.calls, { slug: 1, name: 1, rpc: 8, fallback: 0 })
+assert.deepEqual(concurrent.calls, { slug: 1, name: 1, rpc: 1, fallback: 0 }, 'Different result limits reuse the same term shortlist')
 await concurrent.db.searchSkillsWithStatus('shared', 140)
 assert.equal(concurrent.calls.slug, 2, 'Completed in-flight reads cannot shadow shared-cache invalidation')
 assert.equal(concurrent.calls.name, 2)
+
+const missing = searchFixture({ empty: true }); missing.recoverName()
+assert.deepEqual(await missing.db.searchSkillsWithStatus('unknown-cost-probe'), { records: [], degraded: false })
+assert.equal(missing.writes(), 0, 'Arbitrary missing searches cannot amplify persistent writes')
+const words = searchFixture(); words.recoverName()
+await words.db.searchSkillsWithStatus('design video')
+const termReads = words.calls.rpc
+await words.db.searchSkillsWithStatus('video design', 180)
+assert.equal(words.calls.rpc, termReads, 'Reordered sentences and different limits reuse term retrieval')
 
 // Aggregate cache excludes cookies, user IDs and personal votes. Mutation
 // invalidation immediately refreshes aggregates; failures cannot cache a zero.

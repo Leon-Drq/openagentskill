@@ -112,7 +112,7 @@ export default async function GrowthGuidePage({
   // in the first page of a popularity/quality-ranked global catalog.
   const allSkills = scenario ? [] : guide.curatedOnly
     ? (await Promise.all((guide.primarySkillSlugs || []).slice(0, 8).map(skillSlug =>
-        withTimeout(getSkillBySlugOrFallbackStrict(skillSlug), 2500, 'guide source lookup').catch(() => null)
+        withTimeout(getSkillBySlugOrFallbackStrict(skillSlug, 14400), 2500, 'guide source lookup').catch(() => null)
       ))).filter((skill): skill is SkillRecord => Boolean(skill))
     : await getAllSkills('quality', undefined, 1200).catch(() => [])
   const guideSkills = getGuideSkillModels(allSkills, guide)

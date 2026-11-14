@@ -9,7 +9,7 @@ import { commerceFilterSlugs, getSkillCommerce, matchesCommerce } from '@/lib/sk
 import { getBrowseSkillCandidates, getSkillCatalogPage, getSkillsBySlugs } from '@/lib/db/skills'
 import { clampResultPage, requestedDirectoryPage } from '@/lib/skills/pagination'
 import { catalogPageNumber, catalogStars, directoryDiscoveryFilters, canShowCatalogSnapshot, selectCatalogSnapshot } from '@/lib/skills/catalog-query'
-import { getDirectoryProfiles } from '@/lib/skills/directory-profiles'
+import { withLazyDirectoryProfiles } from '@/lib/skills/directory-profiles'
 import { projectDirectoryWindow } from '@/lib/skills/directory-window'
 import { isChronologicalSort, chronologicalDirectoryPage, compareDirectoryDownloads } from '@/lib/skills/chronological-directory'
 import { getAgentSafetyProfile } from '@/lib/agent-safety'
@@ -19,7 +19,7 @@ import { getSkillPreviewCardData, SOURCE_EXAMPLE_SKILL_SLUGS, SOURCE_GALLERY_LIN
 import { SkillsPageClient, type DirectorySkillCard } from '@/components/skills-page-client'
 import { selectProviderSkills, toProviderDirectorySkill, providerCatalogWindow, mergeProviderCatalogPage, providerRowsFirst } from '@/lib/skills/provider-directory'
 import { getSkillQualityProfile, getPlatformHints } from '@/lib/quality'
-import { getSkillSupplyProfile, getSupplyTrackSummaries } from '@/lib/supply'
+import { getSkillSupplyProfile } from '@/lib/supply'
 import { getSkillTrustProfile } from '@/lib/trust'
 import { getUseCaseBySlug, scoreSkillForUseCase, USE_CASES } from '@/lib/use-cases'
 import { dedupeRankedSkills, rankSkillsForQuery } from '@/lib/registry'
@@ -1041,15 +1041,15 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
 
   const enrichedRecords = records.map((record) => {
     const agentStats = statsMap[record.slug] || null
-    return {
+    return withLazyDirectoryProfiles({
       sourceCategory: record.category,
       record: { ...record, ...skillTaxonomy(record), category: skillPresentationCategory(record), site_downloads: siteDownloads ? siteDownloads[record.slug] ?? 0 : null },
       agentStats,
-      ...getDirectoryProfiles(record, agentStats),
-    }
+    }, record, agentStats)
   })
 
-  const supplyTracks = getSupplyTrackSummaries(enrichedRecords.map((item) => item.supplyProfile))
+  // The filter controls use the fixed taxonomy, not per-result track counts.
+  const supplyTracks: ComponentProps<typeof SkillsPageClient>['supplyTracks'] = []
 
   let filteredRecords = enrichedRecords.filter((item) => {
     const { record } = item
@@ -1153,7 +1153,7 @@ async function prepareDirectory(params: SkillsSearchParams, requireHealthy = fal
     skills = projectDirectoryWindow(filteredRecords, providerSkills, pageOffset, prefix, projectCard, VISIBLE_SKILL_LIMIT)
     hasMoreResults = pageOffset + VISIBLE_SKILL_LIMIT < resultCount
   }
-  const directorySections = catalogMode || paused ? [] : buildDirectorySections(
+  const directorySections = catalogMode || paused || query ? [] : buildDirectorySections(
     enrichedRecords.slice(0, DIRECTORY_SECTION_SOURCE_LIMIT)
   )
   const directoryLinks: DirectoryLink[] = POPULAR_DIRECTORY_LINKS.map((link) => ({ ...link }))
