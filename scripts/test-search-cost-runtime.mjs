@@ -47,6 +47,18 @@ for (const path of ['/skills', '/zh/skills?category=design-creative&page=2', '/b
   assert.equal(await searchCostGuard(request(path), env), null)
 }
 assert.equal(limiterCalls, 0)
+for (const agent of ['ShapBot/0.1', 'Sogou web spider/4.0', 'Claude-SearchBot/1.0', 'Googlebot/2.1', 'OAI-SearchBot/1.0', 'MJ12bot/v1.4.8']) {
+  const headers = { 'user-agent': agent }
+  assert.equal((await searchCostGuard(request('/skills?q=design', { headers }), env)).status, 429)
+  assert.equal((await searchCostGuard(request('/zh/skills?category=design-creative&access=free', { headers }), env)).headers.get('retry-after'), '3600')
+  for (const path of ['/skills', '/skills?category=design-creative', '/skills/example', '/best/presentation-generation', '/api/agent/skills?q=design']) {
+    assert.equal(await searchCostGuard(request(path, { headers }), env), null, `${agent} ${path}`)
+  }
+}
+assert.equal(limiterCalls, 0, 'Crawler backoff needs no storage or limiter calls')
+for (const agent of ['Mozilla/5.0 Chrome/130.0', 'ChatGPT-User/1.0', 'Claude-User/1.0']) {
+  assert.equal(await searchCostGuard(request('/skills?q=design', { headers: { 'user-agent': agent } }), env), null)
+}
 for (const locale of ['', '/zh', '/ja', '/ko', '/es', '/de', '/fr', '/id']) {
   assert.equal(await searchCostGuard(request(`${locale}/skills?q=design`), env), null)
 }
