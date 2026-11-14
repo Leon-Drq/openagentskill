@@ -1166,6 +1166,314 @@
     ]
   },
   {
+    "skillSlug": "2b-t-linux-realtime",
+    "repository": "2b-t/linux-realtime",
+    "revision": "9928d2e407598677042d05b4dd02086e2b322bc0",
+    "sourceUrl": "https://github.com/2b-t/linux-realtime/blob/9928d2e407598677042d05b4dd02086e2b322bc0/ReadMe.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-a343c81234d5fee90ab221a52f9536dfe888b3cec9de1fb848a002fd39c3b741.txt",
+    "licenseSourcePath": "License.md",
+    "licenseSha256": "a343c81234d5fee90ab221a52f9536dfe888b3cec9de1fb848a002fd39c3b741",
+    "documentSha256": "15144b1b72248b42c68eb588a763eab949bb8b07b68dcfe3b4bee662b7b14a11",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-14T07:39:35.463Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/310c8f513338681df9216a1963ccb8549a3e3be321eea1cf47043f59a92b95a6.preview.webp",
+        "previewSrc": "/skill-previews/auto/310c8f513338681df9216a1963ccb8549a3e3be321eea1cf47043f59a92b95a6.preview.webp",
+        "cardSrc": "/skill-previews/auto/310c8f513338681df9216a1963ccb8549a3e3be321eea1cf47043f59a92b95a6.card.webp",
+        "width": 786,
+        "height": 533,
+        "sha256": "310c8f513338681df9216a1963ccb8549a3e3be321eea1cf47043f59a92b95a6",
+        "originalSrc": "/skill-previews/auto/310c8f513338681df9216a1963ccb8549a3e3be321eea1cf47043f59a92b95a6.png",
+        "sourceUrl": "https://github.com/2b-t/linux-realtime/blob/9928d2e407598677042d05b4dd02086e2b322bc0/media/compile_kernel_preempt_rt_1.png",
+        "kind": "reference",
+        "title": {
+          "en": "Linux Realtime · Author preview",
+          "zh": "Linux Realtime · 作者预览"
+        },
+        "alt": {
+          "en": "Linux Realtime: Compilation from source",
+          "zh": "Linux Realtime：Compilation from source"
+        },
+        "sourcePath": "media/compile_kernel_preempt_rt_1.png",
+        "documentPath": "ReadMe.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/1d707eef496faf106f486208d34a251b83d40f278c7f98f7365275ab07fd97e0.preview.webp",
+        "previewSrc": "/skill-previews/auto/1d707eef496faf106f486208d34a251b83d40f278c7f98f7365275ab07fd97e0.preview.webp",
+        "cardSrc": "/skill-previews/auto/1d707eef496faf106f486208d34a251b83d40f278c7f98f7365275ab07fd97e0.card.webp",
+        "width": 786,
+        "height": 533,
+        "sha256": "1d707eef496faf106f486208d34a251b83d40f278c7f98f7365275ab07fd97e0",
+        "originalSrc": "/skill-previews/auto/1d707eef496faf106f486208d34a251b83d40f278c7f98f7365275ab07fd97e0.png",
+        "sourceUrl": "https://github.com/2b-t/linux-realtime/blob/9928d2e407598677042d05b4dd02086e2b322bc0/media/install_debian_preemptrt_2.png",
+        "kind": "reference",
+        "title": {
+          "en": "Linux Realtime · Author preview",
+          "zh": "Linux Realtime · 作者预览"
+        },
+        "alt": {
+          "en": "Linux Realtime: Installation script from existing Debian",
+          "zh": "Linux Realtime：Installation script from existing Debian"
+        },
+        "sourcePath": "media/install_debian_preemptrt_2.png",
+        "documentPath": "ReadMe.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/d03010ea5fab1c368a60ef4c17b836de220bbfc95fbcbeed466a5a7b8dfc521c.preview.webp",
+        "previewSrc": "/skill-previews/auto/d03010ea5fab1c368a60ef4c17b836de220bbfc95fbcbeed466a5a7b8dfc521c.preview.webp",
+        "cardSrc": "/skill-previews/auto/d03010ea5fab1c368a60ef4c17b836de220bbfc95fbcbeed466a5a7b8dfc521c.card.webp",
+        "width": 640,
+        "height": 480,
+        "sha256": "d03010ea5fab1c368a60ef4c17b836de220bbfc95fbcbeed466a5a7b8dfc521c",
+        "originalSrc": "/skill-previews/auto/d03010ea5fab1c368a60ef4c17b836de220bbfc95fbcbeed466a5a7b8dfc521c.png",
+        "sourceUrl": "https://github.com/2b-t/linux-realtime/blob/9928d2e407598677042d05b4dd02086e2b322bc0/media/p500_rt_cstates_off.png",
+        "kind": "reference",
+        "title": {
+          "en": "Linux Realtime · Author preview",
+          "zh": "Linux Realtime · 作者预览"
+        },
+        "alt": {
+          "en": "Linux Realtime: On host operating system",
+          "zh": "Linux Realtime：On host operating system"
+        },
+        "sourcePath": "media/p500_rt_cstates_off.png",
+        "documentPath": "ReadMe.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "2fastlabs-agent-squad",
+    "repository": "2FastLabs/agent-squad",
+    "revision": "729d5f52869c8280f599a9fa5cf27fc1df445602",
+    "sourceUrl": "https://github.com/2FastLabs/agent-squad/blob/729d5f52869c8280f599a9fa5cf27fc1df445602/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "documentSha256": "455e69872510e32d19537627bdb4e9c689c76f586510fbed20355835092c0f4a",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-14T07:39:35.463Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/d84ade9e4bc1d0ffca001fcae41afc0219c5cf9239016281ffe4f45b7941a229.preview.webp",
+        "previewSrc": "/skill-previews/auto/d84ade9e4bc1d0ffca001fcae41afc0219c5cf9239016281ffe4f45b7941a229.preview.webp",
+        "cardSrc": "/skill-previews/auto/d84ade9e4bc1d0ffca001fcae41afc0219c5cf9239016281ffe4f45b7941a229.card.webp",
+        "width": 1000,
+        "height": 563,
+        "sha256": "d84ade9e4bc1d0ffca001fcae41afc0219c5cf9239016281ffe4f45b7941a229",
+        "originalSrc": "/skill-previews/auto/d84ade9e4bc1d0ffca001fcae41afc0219c5cf9239016281ffe4f45b7941a229.gif",
+        "sourceUrl": "https://github.com/2FastLabs/agent-squad/blob/729d5f52869c8280f599a9fa5cf27fc1df445602/img/demo-app.gif",
+        "kind": "example",
+        "title": {
+          "en": "Agent Squad · Animation · still preview",
+          "zh": "Agent Squad · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Agent Squad: Demo app",
+          "zh": "Agent Squad：Demo app"
+        },
+        "sourcePath": "img/demo-app.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      },
+      {
+        "src": "/skill-previews/auto/ec4642d8b2a6970a3c9dea0897d0b91661e8bc7633e273a1dd6d6795a443fee5.preview.webp",
+        "previewSrc": "/skill-previews/auto/ec4642d8b2a6970a3c9dea0897d0b91661e8bc7633e273a1dd6d6795a443fee5.preview.webp",
+        "cardSrc": "/skill-previews/auto/ec4642d8b2a6970a3c9dea0897d0b91661e8bc7633e273a1dd6d6795a443fee5.card.webp",
+        "width": 1600,
+        "height": 632,
+        "sha256": "ec4642d8b2a6970a3c9dea0897d0b91661e8bc7633e273a1dd6d6795a443fee5",
+        "originalSrc": "/skill-previews/auto/ec4642d8b2a6970a3c9dea0897d0b91661e8bc7633e273a1dd6d6795a443fee5.png",
+        "sourceUrl": "https://github.com/2FastLabs/agent-squad/blob/729d5f52869c8280f599a9fa5cf27fc1df445602/docs/public/grounded-agent.png",
+        "kind": "reference",
+        "title": {
+          "en": "Agent Squad · Author preview",
+          "zh": "Agent Squad · 作者预览"
+        },
+        "alt": {
+          "en": "Agent Squad: GroundedAgent flow diagram",
+          "zh": "Agent Squad：GroundedAgent flow diagram"
+        },
+        "sourcePath": "docs/public/grounded-agent.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/5d878440f7dadecc009b7f20355bb3731e90dffe2f57505426954017ff752f72.preview.webp",
+        "previewSrc": "/skill-previews/auto/5d878440f7dadecc009b7f20355bb3731e90dffe2f57505426954017ff752f72.preview.webp",
+        "cardSrc": "/skill-previews/auto/5d878440f7dadecc009b7f20355bb3731e90dffe2f57505426954017ff752f72.card.webp",
+        "width": 564,
+        "height": 651,
+        "sha256": "5d878440f7dadecc009b7f20355bb3731e90dffe2f57505426954017ff752f72",
+        "originalSrc": "/skill-previews/auto/5d878440f7dadecc009b7f20355bb3731e90dffe2f57505426954017ff752f72.jpg",
+        "sourceUrl": "https://github.com/2FastLabs/agent-squad/blob/729d5f52869c8280f599a9fa5cf27fc1df445602/img/flow-supervisor.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "Agent Squad · Author preview",
+          "zh": "Agent Squad · 作者预览"
+        },
+        "alt": {
+          "en": "Agent Squad: SupervisorAgent flow diagram",
+          "zh": "Agent Squad：SupervisorAgent flow diagram"
+        },
+        "sourcePath": "img/flow-supervisor.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "360cvgroup-seechat",
+    "repository": "360CVGroup/SEEChat",
+    "revision": "24e13b12240fab2c5767758e03cc0db4fa2641b2",
+    "sourceUrl": "https://github.com/360CVGroup/SEEChat/blob/24e13b12240fab2c5767758e03cc0db4fa2641b2/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "documentSha256": "38c059a4d2fd596ee2ff1253becd175def16ca9ff07a3cfb40414df26953eba0",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-14T07:39:35.463Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/b1466ebce1e2f5fdcc4d88aab659407b0867d903a8d9f5da4578028b61c195af.preview.webp",
+        "previewSrc": "/skill-previews/auto/b1466ebce1e2f5fdcc4d88aab659407b0867d903a8d9f5da4578028b61c195af.preview.webp",
+        "cardSrc": "/skill-previews/auto/b1466ebce1e2f5fdcc4d88aab659407b0867d903a8d9f5da4578028b61c195af.card.webp",
+        "width": 1114,
+        "height": 841,
+        "sha256": "b1466ebce1e2f5fdcc4d88aab659407b0867d903a8d9f5da4578028b61c195af",
+        "originalSrc": "/skill-previews/auto/b1466ebce1e2f5fdcc4d88aab659407b0867d903a8d9f5da4578028b61c195af.png",
+        "sourceUrl": "https://github.com/360CVGroup/SEEChat/blob/24e13b12240fab2c5767758e03cc0db4fa2641b2/doc/img/captionwinrate.png",
+        "kind": "reference",
+        "title": {
+          "en": "SEEChat · Author preview",
+          "zh": "SEEChat · 作者预览"
+        },
+        "alt": {
+          "en": "SEEChat: “caption-win-rate”",
+          "zh": "SEEChat：“caption-win-rate”"
+        },
+        "sourcePath": "doc/img/captionwinrate.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/72bdb968db2d3c751d94b1f8c5d47a7b093500a07d40937bb3304289ac43c7f1.preview.webp",
+        "previewSrc": "/skill-previews/auto/72bdb968db2d3c751d94b1f8c5d47a7b093500a07d40937bb3304289ac43c7f1.preview.webp",
+        "cardSrc": "/skill-previews/auto/72bdb968db2d3c751d94b1f8c5d47a7b093500a07d40937bb3304289ac43c7f1.card.webp",
+        "width": 1600,
+        "height": 562,
+        "sha256": "72bdb968db2d3c751d94b1f8c5d47a7b093500a07d40937bb3304289ac43c7f1",
+        "originalSrc": "/skill-previews/auto/72bdb968db2d3c751d94b1f8c5d47a7b093500a07d40937bb3304289ac43c7f1.png",
+        "sourceUrl": "https://github.com/360CVGroup/SEEChat/blob/24e13b12240fab2c5767758e03cc0db4fa2641b2/doc/img/MLLM model structure.png",
+        "kind": "reference",
+        "title": {
+          "en": "SEEChat · Author preview",
+          "zh": "SEEChat · 作者预览"
+        },
+        "alt": {
+          "en": "SEEChat: “MLLMmodel”",
+          "zh": "SEEChat：“MLLMmodel”"
+        },
+        "sourcePath": "doc/img/MLLM model structure.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/e4b6d11f89ed3f21338056b1acb94080b4a275e070d5116ea53c526ed00681a7.preview.webp",
+        "previewSrc": "/skill-previews/auto/e4b6d11f89ed3f21338056b1acb94080b4a275e070d5116ea53c526ed00681a7.preview.webp",
+        "cardSrc": "/skill-previews/auto/e4b6d11f89ed3f21338056b1acb94080b4a275e070d5116ea53c526ed00681a7.card.webp",
+        "width": 1442,
+        "height": 1600,
+        "sha256": "e4b6d11f89ed3f21338056b1acb94080b4a275e070d5116ea53c526ed00681a7",
+        "originalSrc": "/skill-previews/auto/e4b6d11f89ed3f21338056b1acb94080b4a275e070d5116ea53c526ed00681a7.png",
+        "sourceUrl": "https://github.com/360CVGroup/SEEChat/blob/24e13b12240fab2c5767758e03cc0db4fa2641b2/doc/img/SEEChat-demo1.png",
+        "kind": "reference",
+        "title": {
+          "en": "SEEChat · Author preview",
+          "zh": "SEEChat · 作者预览"
+        },
+        "alt": {
+          "en": "SEEChat: “SEEChat-demo1”",
+          "zh": "SEEChat：“SEEChat-demo1”"
+        },
+        "sourcePath": "doc/img/SEEChat-demo1.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "3choff-docs-miner",
+    "repository": "3choff/docs-miner",
+    "revision": "48755dc25b927db9eedb5f275edc9f42665cd9d0",
+    "sourceUrl": "https://github.com/3choff/docs-miner/blob/48755dc25b927db9eedb5f275edc9f42665cd9d0/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-a00163e518e9c1eb8f9842b2428b822b42b173960594f6dce5e7ee31a9c0fea8.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "a00163e518e9c1eb8f9842b2428b822b42b173960594f6dce5e7ee31a9c0fea8",
+    "documentSha256": "290f62ac154b05dd77dbab79335dfeb4f468e8a0cc46cd091715ca762bbd5949",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-14T07:39:35.463Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/f2dd779de0667156584a4c15e34dd5738a85f49c5b99563bcfde1dde6a3ac65e.preview.webp",
+        "previewSrc": "/skill-previews/auto/f2dd779de0667156584a4c15e34dd5738a85f49c5b99563bcfde1dde6a3ac65e.preview.webp",
+        "cardSrc": "/skill-previews/auto/f2dd779de0667156584a4c15e34dd5738a85f49c5b99563bcfde1dde6a3ac65e.card.webp",
+        "width": 800,
+        "height": 600,
+        "sha256": "f2dd779de0667156584a4c15e34dd5738a85f49c5b99563bcfde1dde6a3ac65e",
+        "originalSrc": "/skill-previews/auto/f2dd779de0667156584a4c15e34dd5738a85f49c5b99563bcfde1dde6a3ac65e.gif",
+        "sourceUrl": "https://github.com/3choff/docs-miner/blob/48755dc25b927db9eedb5f275edc9f42665cd9d0/media/demo.gif",
+        "kind": "example",
+        "title": {
+          "en": "Docs Miner · Animation · still preview",
+          "zh": "Docs Miner · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Docs Miner: Demo",
+          "zh": "Docs Miner：Demo"
+        },
+        "sourcePath": "media/demo.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
     "skillSlug": "acot-a11y-acot",
     "repository": "acot-a11y/acot",
     "revision": "34ff82b04faf65d22f323fd9ea47e03ede0fc13c",
@@ -5456,6 +5764,50 @@
     ]
   },
   {
+    "skillSlug": "cay-zhang-swiftspeech",
+    "repository": "Cay-Zhang/SwiftSpeech",
+    "revision": "6e41f289f5ccc1751ef5674972d46b48b326c4c6",
+    "sourceUrl": "https://github.com/Cay-Zhang/SwiftSpeech/blob/6e41f289f5ccc1751ef5674972d46b48b326c4c6/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-ba44e63c9e842130c5baebeabd2e5da03c5ea5ff3cf57a313bc6e4c8e09afc17.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "ba44e63c9e842130c5baebeabd2e5da03c5ea5ff3cf57a313bc6e4c8e09afc17",
+    "documentSha256": "1c5969541e17b78fde6425613b5eb034f034b4bbdac2185c3b16437844f634bf",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-14T07:39:35.463Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/12ff4fae8373f4d7b136c10abf8fd9593e521573432c354814c01decd6d1dbde.preview.webp",
+        "previewSrc": "/skill-previews/auto/12ff4fae8373f4d7b136c10abf8fd9593e521573432c354814c01decd6d1dbde.preview.webp",
+        "cardSrc": "/skill-previews/auto/12ff4fae8373f4d7b136c10abf8fd9593e521573432c354814c01decd6d1dbde.card.webp",
+        "width": 1600,
+        "height": 1043,
+        "sha256": "12ff4fae8373f4d7b136c10abf8fd9593e521573432c354814c01decd6d1dbde",
+        "originalSrc": "/skill-previews/auto/12ff4fae8373f4d7b136c10abf8fd9593e521573432c354814c01decd6d1dbde.gif",
+        "sourceUrl": "https://github.com/Cay-Zhang/SwiftSpeech/blob/6e41f289f5ccc1751ef5674972d46b48b326c4c6/Readme Assets/Demos.gif",
+        "kind": "example",
+        "title": {
+          "en": "SwiftSpeech · Animation · still preview",
+          "zh": "SwiftSpeech · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "SwiftSpeech: Demos",
+          "zh": "SwiftSpeech：Demos"
+        },
+        "sourcePath": "Readme Assets/Demos.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
     "skillSlug": "cclank-lanshu-animated-architecture-diagram",
     "repository": "cclank/lanshu-animated-architecture-diagram",
     "revision": "c17f5b4e5de99d3603b364530ad04d930d038d24",
@@ -5516,6 +5868,94 @@
           "zh": "lanshu-animated-architecture-diagram：Memory Pack animated architecture diagram"
         },
         "sourcePath": "assets/previews/memory-pack.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
+    "skillSlug": "cclank-lanshu-awesome-ai-video-kit",
+    "repository": "cclank/lanshu-awesome-ai-video-kit",
+    "revision": "f4c1bbd09800a0002a169465d14060e3b6a88f1e",
+    "sourceUrl": "https://github.com/cclank/lanshu-awesome-ai-video-kit/blob/f4c1bbd09800a0002a169465d14060e3b6a88f1e/README.en.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-5ee4e300085ba144aae1ec5b72774ef5408bd933c1f02f429359313a4251bfad.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "5ee4e300085ba144aae1ec5b72774ef5408bd933c1f02f429359313a4251bfad",
+    "documentSha256": "6061a1102ef3b12bec9e4f630614df46e467fcb4d497a0ff2a757918d55601b4",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-14T07:39:35.463Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/384fab2cbc2ca09564fbf246d3670583aa982764b880d248d6c505b05883d514.preview.webp",
+        "previewSrc": "/skill-previews/auto/384fab2cbc2ca09564fbf246d3670583aa982764b880d248d6c505b05883d514.preview.webp",
+        "cardSrc": "/skill-previews/auto/384fab2cbc2ca09564fbf246d3670583aa982764b880d248d6c505b05883d514.card.webp",
+        "width": 1600,
+        "height": 787,
+        "sha256": "384fab2cbc2ca09564fbf246d3670583aa982764b880d248d6c505b05883d514",
+        "originalSrc": "/skill-previews/auto/384fab2cbc2ca09564fbf246d3670583aa982764b880d248d6c505b05883d514.webp",
+        "sourceUrl": "https://github.com/cclank/lanshu-awesome-ai-video-kit/blob/f4c1bbd09800a0002a169465d14060e3b6a88f1e/docs/screenshots/home.webp",
+        "kind": "reference",
+        "title": {
+          "en": "Lanshu Awesome AI Video Kit · Author preview",
+          "zh": "Lanshu Awesome AI Video Kit · 作者预览"
+        },
+        "alt": {
+          "en": "Lanshu Awesome AI Video Kit: lanshu-video-kit Homepage",
+          "zh": "Lanshu Awesome AI Video Kit：lanshu-video-kit Homepage"
+        },
+        "sourcePath": "docs/screenshots/home.webp",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "cdaein-ssam",
+    "repository": "cdaein/ssam",
+    "revision": "ba2b686f1a03070f4f3b80eaf8cc19cae13acb82",
+    "sourceUrl": "https://github.com/cdaein/ssam/blob/ba2b686f1a03070f4f3b80eaf8cc19cae13acb82/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-2fdb67d854e9cc373fe3f57d4f7579e54a4441eef30d8a3a1bdc7674e3323a75.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "2fdb67d854e9cc373fe3f57d4f7579e54a4441eef30d8a3a1bdc7674e3323a75",
+    "documentSha256": "bc3c7645a14a7703aabcf29ffe382b42046d108c41d2334df8771f3eb0caede5",
+    "format": {
+      "en": "Animation · still preview",
+      "zh": "动图 · 静帧预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-14T07:39:35.463Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/74a085cfe587aa3ba6831d4a34e0ab06363e0fbc7b6f6e9c5a8a038a7f19df23.preview.webp",
+        "previewSrc": "/skill-previews/auto/74a085cfe587aa3ba6831d4a34e0ab06363e0fbc7b6f6e9c5a8a038a7f19df23.preview.webp",
+        "cardSrc": "/skill-previews/auto/74a085cfe587aa3ba6831d4a34e0ab06363e0fbc7b6f6e9c5a8a038a7f19df23.card.webp",
+        "width": 600,
+        "height": 200,
+        "sha256": "74a085cfe587aa3ba6831d4a34e0ab06363e0fbc7b6f6e9c5a8a038a7f19df23",
+        "originalSrc": "/skill-previews/auto/74a085cfe587aa3ba6831d4a34e0ab06363e0fbc7b6f6e9c5a8a038a7f19df23.gif",
+        "sourceUrl": "https://github.com/cdaein/ssam/blob/ba2b686f1a03070f4f3b80eaf8cc19cae13acb82/docs/example.gif",
+        "kind": "example",
+        "title": {
+          "en": "Ssam · Animation · still preview",
+          "zh": "Ssam · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Ssam: ![example gif animation",
+          "zh": "Ssam：![example gif animation"
+        },
+        "sourcePath": "docs/example.gif",
         "documentPath": "README.md",
         "format": "animation-poster"
       }
