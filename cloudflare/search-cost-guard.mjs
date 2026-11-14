@@ -13,15 +13,21 @@ export function isExpensiveDirectoryRequest(request) {
 
 // A platform-local counter bounds rapid traversal of the interactive URL graph.
 // No database writes, stored addresses, UA assumptions, or account/payment limits.
-export async function searchCostGuard(request, env) {
-  if (env.SEARCH_COST_GUARD !== '1' || !env.DIRECTORY_SEARCH_LIMITER || !isExpensiveDirectoryRequest(request)) return null
+export async function searchCostGuard(request, env, report = () => {}) {
+  if (!isExpensiveDirectoryRequest(request)) return null
+  if (env.SEARCH_COST_GUARD !== '1' || !env.DIRECTORY_SEARCH_LIMITER) { report('disabled'); return null }
   const ip = request.headers.get('cf-connecting-ip')
-  if (!ip) return null
+  if (!ip) { report('no-source'); return null }
   const key = createHash('sha256').update('oas-directory-search-v1:').update(ip).digest('hex')
   try {
     const { success } = await env.DIRECTORY_SEARCH_LIMITER.limit({ key })
-    if (success) return null
-  } catch { return null }
+    if (success) { report('allowed'); return null }
+  } catch {
+    report('unavailable')
+    console.warn('directory_search_limiter_unavailable')
+    return null
+  }
+  report('exceeded')
   return new Response(request.method === 'HEAD' ? null : 'Too many searches. Please wait a minute and try again.', {
     status: 429,
     headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'private, no-store', 'Retry-After': '60',
