@@ -3,6 +3,19 @@ const SEARCH_STOP_WORDS = new Set([
   'that', 'the', 'this', 'use', 'using', 'want', 'what', 'when', 'with',
 ])
 
+/** Each OR term's top N contains every row that can enter the union's top N.
+ * Match SQL quality DESC NULLS FIRST, slug ASC before registry scope filtering.
+ */
+export function mergeSearchTermResults<T extends { slug: string; quality_score: number | null }>(pools: T[][], limit: number): T[] {
+  const rows = [...new Map(pools.flat().map(row => [row.slug, row])).values()]
+  return rows.sort((a, b) => {
+    if (a.quality_score == null && b.quality_score != null) return -1
+    if (b.quality_score == null && a.quality_score != null) return 1
+    return Number(b.quality_score || 0) - Number(a.quality_score || 0)
+      || (a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0)
+  }).slice(0, limit)
+}
+
 // Retrieval must understand the same common tasks as the ranker. This bridge
 // is deterministic: no model call, translation service or per-query charge.
 const TASK_TERMS: Array<[RegExp, string[]]> = [

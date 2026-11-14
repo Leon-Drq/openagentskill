@@ -3,13 +3,14 @@ import schedules from '../vercel.json' with { type: 'json' }
 import { dispatchScheduled, migrationResponse, previewHeaders, stagingResponse } from './runtime.mjs'
 import { publicDirectoryResponse } from './public-directory-cache.mjs'
 import { buildId } from '../.open-next/directory-cache-build.mjs'
+import { searchCostGuard } from './search-cost-guard.mjs'
 
 export { DOQueueHandler } from '../.open-next/worker.js'
 
 export default {
   async fetch(request, env, ctx) {
     const intercepted = await stagingResponse(request, env) || migrationResponse(request, env)
-    const response = intercepted || await publicDirectoryResponse(request, env, ctx, buildId,
+    const response = intercepted || await searchCostGuard(request, env) || await publicDirectoryResponse(request, env, ctx, buildId,
       input => handler.fetch(input, env, ctx))
     return previewHeaders(response, env)
   },

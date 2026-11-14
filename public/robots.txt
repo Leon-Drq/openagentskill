@@ -4,6 +4,14 @@
 
 User-agent: *
 Allow: /
+Disallow: /skills?
+Disallow: /zh/skills?
+Disallow: /ja/skills?
+Disallow: /ko/skills?
+Disallow: /es/skills?
+Disallow: /de/skills?
+Disallow: /fr/skills?
+Disallow: /id/skills?
 
 # API endpoints specifically designed for agents
 Allow: /api/agent/
@@ -36,6 +44,14 @@ Disallow: /render-query/
 # unchanged. These directives permit crawling; they do not guarantee ranking.
 User-agent: OAI-SearchBot
 Allow: /
+Disallow: /skills?
+Disallow: /zh/skills?
+Disallow: /ja/skills?
+Disallow: /ko/skills?
+Disallow: /es/skills?
+Disallow: /de/skills?
+Disallow: /fr/skills?
+Disallow: /id/skills?
 
 User-agent: GPTBot
 Allow: /
@@ -57,21 +73,53 @@ Disallow: /cached-public/
 
 User-agent: Claude-SearchBot
 Allow: /
+Disallow: /skills?
+Disallow: /zh/skills?
+Disallow: /ja/skills?
+Disallow: /ko/skills?
+Disallow: /es/skills?
+Disallow: /de/skills?
+Disallow: /fr/skills?
+Disallow: /id/skills?
 
 User-agent: Claude-User
 Allow: /
 
 User-agent: Anthropic-AI
 Allow: /
+Disallow: /skills?
+Disallow: /zh/skills?
+Disallow: /ja/skills?
+Disallow: /ko/skills?
+Disallow: /es/skills?
+Disallow: /de/skills?
+Disallow: /fr/skills?
+Disallow: /id/skills?
 
 User-agent: Google-Extended
 Allow: /
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /skills?
+Disallow: /zh/skills?
+Disallow: /ja/skills?
+Disallow: /ko/skills?
+Disallow: /es/skills?
+Disallow: /de/skills?
+Disallow: /fr/skills?
+Disallow: /id/skills?
 
 User-agent: YouBot
 Allow: /
+Disallow: /skills?
+Disallow: /zh/skills?
+Disallow: /ja/skills?
+Disallow: /ko/skills?
+Disallow: /es/skills?
+Disallow: /de/skills?
+Disallow: /fr/skills?
+Disallow: /id/skills?
 
 # Agent-readable data formats available
 # JSON API: /api/agent/skills

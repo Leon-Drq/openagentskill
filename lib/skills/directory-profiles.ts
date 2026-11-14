@@ -30,3 +30,19 @@ export function getDirectoryProfiles(record: SkillRecord, agentStats: SkillAgent
   // record cannot inherit stale safety results from another version.
   return memo([record, agentStats], () => computeProfiles(record, agentStats))
 }
+
+/** Filtering/ranking needs raw records; only evaluated filters and visible
+ * cards need full audit/safety/supply profiles. Never fabricate placeholder scores.
+ */
+export function withLazyDirectoryProfiles<T extends object>(item: T, record: SkillRecord, agentStats: SkillAgentStats | null) {
+  let profiles: ReturnType<typeof getDirectoryProfiles> | undefined
+  const read = () => profiles ??= getDirectoryProfiles(record, agentStats)
+  const fields = {
+    get qualityProfile() { return read().qualityProfile },
+    get trustProfile() { return read().trustProfile },
+    get safetyProfile() { return read().safetyProfile },
+    get platformHints() { return read().platformHints },
+    get supplyProfile() { return read().supplyProfile },
+  }
+  return Object.defineProperties(item, Object.getOwnPropertyDescriptors(fields)) as T & typeof fields
+}

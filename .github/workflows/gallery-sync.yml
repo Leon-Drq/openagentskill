@@ -1,8 +1,8 @@
-name: Daily Gallery sync
+name: Gallery sync
 
 on:
   schedule:
-    - cron: '23 1 * * *'
+    - cron: '23 1 * * 2,5'
   workflow_dispatch:
 
 concurrency:

@@ -11,7 +11,7 @@ import { getSkillBySlugOrFallbackStrict } from '@/lib/skill-fallbacks'
 import { getSkillTrustProfile } from '@/lib/trust'
 
 export const revalidate = 14400
-const getTarget = cache((slug: string) => getSkillBySlugOrFallbackStrict(slug, 900))
+const getTarget = cache((slug: string) => getSkillBySlugOrFallbackStrict(slug, 14400))
 
 export function generateStaticParams() {
   return []

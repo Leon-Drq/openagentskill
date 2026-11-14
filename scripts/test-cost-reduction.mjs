@@ -72,7 +72,11 @@ const robots = readFileSync('public/robots.txt', 'utf8').replace(/\r\n/g, '\n')
 const group = bot => robots.split('User-agent: ' + bot + '\n')[1].split('\nUser-agent: ')[0]
 assert.match(group('ClaudeBot'), /Crawl-delay: 10/)
 for (const bot of ['ClaudeBot', 'GPTBot']) assert.match(group(bot), /Disallow: \/\*\?/)
-for (const bot of ['Claude-User', 'Claude-SearchBot', 'ChatGPT-User', 'OAI-SearchBot']) assert.doesNotMatch(group(bot), /Disallow|Crawl-delay/)
+for (const bot of ['Claude-User', 'ChatGPT-User']) assert.doesNotMatch(group(bot), /Disallow|Crawl-delay/)
+for (const bot of ['Claude-SearchBot', 'OAI-SearchBot', '*']) {
+  assert.match(group(bot), /Allow: \//)
+  for (const locale of ['', '/zh', '/ja', '/ko', '/es', '/de', '/fr', '/id']) assert.ok(group(bot).includes(`Disallow: ${locale}/skills?`))
+}
 const cron = JSON.parse(readFileSync('vercel.json', 'utf8')).crons
 assert.equal(cron.find(job => job.path === '/api/cron/skill-submissions').schedule, '*/5 * * * *', 'User submissions retain their existing queue cadence')
 const publication = cron.find(job => job.path === '/api/cron/skill-candidates-publish').schedule.split(' ')

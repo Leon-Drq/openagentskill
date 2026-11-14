@@ -27,7 +27,7 @@ export async function skillOgImage(requestedSlug: string) {
 
 async function renderSkill(slug: string) {
   // A backend failure is a retryable 503, never a cacheable missing skill.
-  const record = await getSkillBySlugOrFallbackStrict(slug)
+  const record = await getSkillBySlugOrFallbackStrict(slug, 14400)
 
   // A missing skill must not produce a plausible-looking social card. Those
   // 200 image responses make obsolete URLs look valid to crawlers and social
