@@ -40,6 +40,16 @@ Complex directory responses expose `X-OAS-Search-Limit`: `allowed`, `exceeded`,
 search text and let deployment checks distinguish a working limiter from a
 fail-open binding. Unavailable bindings also emit a fixed diagnostic log.
 
+Identifiable crawler UAs requesting free-text or compound-filter directory URLs
+receive 429 with a one-hour retry interval before rendering or storage access.
+These URLs are already excluded by robots policy and are not canonical SEO
+landing pages. This is a backoff response, not an alternate result set. Canonical
+directories, single-facet browse states, Skill/editorial pages, agent APIs and
+user-directed ChatGPT/Claude agents retain their existing access. This UA rule
+controls resource use; it is not an identity or security guarantee.
+Cache hits and backoff responses also skip loading the Next entry point; the
+queue Durable Object keeps its generated implementation as a separate export.
+
 Robots rules ask automated search crawlers to use canonical pages and sitemaps,
 and avoid the directory query graph. User-directed ChatGPT/Claude browsing keeps
 its existing robots rules. Robots rules are advisory and are not access control.
