@@ -1474,6 +1474,204 @@
     ]
   },
   {
+    "skillSlug": "3dcitydb-3dcitydb",
+    "repository": "3dcitydb/3dcitydb",
+    "revision": "b139fd98d4f1edd3378d840e4ae22c90efc44f61",
+    "sourceUrl": "https://github.com/3dcitydb/3dcitydb/blob/b139fd98d4f1edd3378d840e4ae22c90efc44f61/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "documentSha256": "fde95321b55c25c305380b2c259038a0910dc68367fdc702a87c9102c06cacb9",
+    "format": {
+      "en": "PDF · first page",
+      "zh": "PDF · 首页预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-17T09:20:15.900Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/a5ecbd7b23ec7223169cf406cde79ecf2cdcaa3f91cdf87d9420345f920f6aa5.preview.webp",
+        "previewSrc": "/skill-previews/auto/a5ecbd7b23ec7223169cf406cde79ecf2cdcaa3f91cdf87d9420345f920f6aa5.preview.webp",
+        "cardSrc": "/skill-previews/auto/a5ecbd7b23ec7223169cf406cde79ecf2cdcaa3f91cdf87d9420345f920f6aa5.card.webp",
+        "width": 1600,
+        "height": 1500,
+        "sha256": "a5ecbd7b23ec7223169cf406cde79ecf2cdcaa3f91cdf87d9420345f920f6aa5",
+        "originalSrc": "/skill-previews/auto/a5ecbd7b23ec7223169cf406cde79ecf2cdcaa3f91cdf87d9420345f920f6aa5.pdf",
+        "sourceUrl": "https://github.com/3dcitydb/3dcitydb/blob/b139fd98d4f1edd3378d840e4ae22c90efc44f61/postgresql/db-schema/3dcitydb-schema.pdf",
+        "kind": "reference",
+        "title": {
+          "en": "3dcitydb · PDF · first page",
+          "zh": "3dcitydb · PDF · 首页预览"
+        },
+        "alt": {
+          "en": "3dcitydb: relational schema of 3DCityDB V5",
+          "zh": "3dcitydb：relational schema of 3DCityDB V5"
+        },
+        "sourcePath": "postgresql/db-schema/3dcitydb-schema.pdf",
+        "documentPath": "README.md",
+        "format": "pdf-cover"
+      }
+    ]
+  },
+  {
+    "skillSlug": "403errors-repomind",
+    "repository": "403errors/repomind",
+    "revision": "e5a9869eb729f4310699a233864d6d9e15115b38",
+    "sourceUrl": "https://github.com/403errors/repomind/blob/e5a9869eb729f4310699a233864d6d9e15115b38/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-593d041448383ade25588c08c34f15e3230cda6f5196e966821e6a4dc0bf8c30.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "593d041448383ade25588c08c34f15e3230cda6f5196e966821e6a4dc0bf8c30",
+    "documentSha256": "52e372c808262d1ca67b1950078f41a89dc68d8d952600435b9757d5d8910926",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-17T09:20:15.900Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/7c79b4a5233263126bc6324f40999dc58a3ef84d792766827704437031ecb749.preview.webp",
+        "previewSrc": "/skill-previews/auto/7c79b4a5233263126bc6324f40999dc58a3ef84d792766827704437031ecb749.preview.webp",
+        "cardSrc": "/skill-previews/auto/7c79b4a5233263126bc6324f40999dc58a3ef84d792766827704437031ecb749.card.webp",
+        "width": 1600,
+        "height": 990,
+        "sha256": "7c79b4a5233263126bc6324f40999dc58a3ef84d792766827704437031ecb749",
+        "originalSrc": "/skill-previews/auto/7c79b4a5233263126bc6324f40999dc58a3ef84d792766827704437031ecb749.png",
+        "sourceUrl": "https://github.com/403errors/repomind/blob/e5a9869eb729f4310699a233864d6d9e15115b38/public/assets/architecture_example.png",
+        "kind": "example",
+        "title": {
+          "en": "Repomind · Author preview",
+          "zh": "Repomind · 作者预览"
+        },
+        "alt": {
+          "en": "Repomind: Architecture Example",
+          "zh": "Repomind：Architecture Example"
+        },
+        "sourcePath": "public/assets/architecture_example.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/6294acb56e7285f468f2effb9f8c28fe0503249bc5d5c12ad6718c4300cd0fab.preview.webp",
+        "previewSrc": "/skill-previews/auto/6294acb56e7285f468f2effb9f8c28fe0503249bc5d5c12ad6718c4300cd0fab.preview.webp",
+        "cardSrc": "/skill-previews/auto/6294acb56e7285f468f2effb9f8c28fe0503249bc5d5c12ad6718c4300cd0fab.card.webp",
+        "width": 1600,
+        "height": 1039,
+        "sha256": "6294acb56e7285f468f2effb9f8c28fe0503249bc5d5c12ad6718c4300cd0fab",
+        "originalSrc": "/skill-previews/auto/6294acb56e7285f468f2effb9f8c28fe0503249bc5d5c12ad6718c4300cd0fab.png",
+        "sourceUrl": "https://github.com/403errors/repomind/blob/e5a9869eb729f4310699a233864d6d9e15115b38/public/assets/repo_profile.png",
+        "kind": "example",
+        "title": {
+          "en": "Repomind · Author preview",
+          "zh": "Repomind · 作者预览"
+        },
+        "alt": {
+          "en": "Repomind: Repo Profile Example",
+          "zh": "Repomind：Repo Profile Example"
+        },
+        "sourcePath": "public/assets/repo_profile.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/fe9a7c0f59f3846f5aee3c0098f95a9e0abe838e77fe37b21a8c49b4c121f0a4.preview.webp",
+        "previewSrc": "/skill-previews/auto/fe9a7c0f59f3846f5aee3c0098f95a9e0abe838e77fe37b21a8c49b4c121f0a4.preview.webp",
+        "cardSrc": "/skill-previews/auto/fe9a7c0f59f3846f5aee3c0098f95a9e0abe838e77fe37b21a8c49b4c121f0a4.card.webp",
+        "width": 1600,
+        "height": 900,
+        "sha256": "fe9a7c0f59f3846f5aee3c0098f95a9e0abe838e77fe37b21a8c49b4c121f0a4",
+        "originalSrc": "/skill-previews/auto/fe9a7c0f59f3846f5aee3c0098f95a9e0abe838e77fe37b21a8c49b4c121f0a4.gif",
+        "sourceUrl": "https://github.com/403errors/repomind/blob/e5a9869eb729f4310699a233864d6d9e15115b38/public/assets/cag_vs_rag.gif",
+        "kind": "reference",
+        "title": {
+          "en": "Repomind · Animation · still preview",
+          "zh": "Repomind · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Repomind: CAG vs RAG",
+          "zh": "Repomind：CAG vs RAG"
+        },
+        "sourcePath": "public/assets/cag_vs_rag.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
+      }
+    ]
+  },
+  {
+    "skillSlug": "40rbidd3n-hydro0x01",
+    "repository": "40rbidd3n/Hydro0x01",
+    "revision": "306d593420d5c3f61b01064affc9f5890690cd71",
+    "sourceUrl": "https://github.com/40rbidd3n/Hydro0x01/blob/306d593420d5c3f61b01064affc9f5890690cd71/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-75045782532bde0b9cb2b77a84e57ad502c53800be60f16e1784755b4caf08a9.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "75045782532bde0b9cb2b77a84e57ad502c53800be60f16e1784755b4caf08a9",
+    "documentSha256": "aeba34935a9baa91a0ca935fb6808d966f4fd6689d9b65b0dc73338be969220a",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-17T09:20:15.900Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/a37da2f2f0167f14330f7b7928a991438d41296e07d82da3e5683294da58b711.preview.webp",
+        "previewSrc": "/skill-previews/auto/a37da2f2f0167f14330f7b7928a991438d41296e07d82da3e5683294da58b711.preview.webp",
+        "cardSrc": "/skill-previews/auto/a37da2f2f0167f14330f7b7928a991438d41296e07d82da3e5683294da58b711.card.webp",
+        "width": 1376,
+        "height": 768,
+        "sha256": "a37da2f2f0167f14330f7b7928a991438d41296e07d82da3e5683294da58b711",
+        "originalSrc": "/skill-previews/auto/a37da2f2f0167f14330f7b7928a991438d41296e07d82da3e5683294da58b711.png",
+        "sourceUrl": "https://github.com/40rbidd3n/Hydro0x01/blob/306d593420d5c3f61b01064affc9f5890690cd71/assets/diagrams/HydroponicOne-architecture-master.png",
+        "kind": "reference",
+        "title": {
+          "en": "Hydro0x01 · Author preview",
+          "zh": "Hydro0x01 · 作者预览"
+        },
+        "alt": {
+          "en": "Hydro0x01: HydroponicOne System Architecture",
+          "zh": "Hydro0x01：HydroponicOne System Architecture"
+        },
+        "sourcePath": "assets/diagrams/HydroponicOne-architecture-master.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/6cc5d79c00948c55c774e7de1ced881f1c279a7e18cdc7c5a95f4f3370d97194.preview.webp",
+        "previewSrc": "/skill-previews/auto/6cc5d79c00948c55c774e7de1ced881f1c279a7e18cdc7c5a95f4f3370d97194.preview.webp",
+        "cardSrc": "/skill-previews/auto/6cc5d79c00948c55c774e7de1ced881f1c279a7e18cdc7c5a95f4f3370d97194.card.webp",
+        "width": 1376,
+        "height": 768,
+        "sha256": "6cc5d79c00948c55c774e7de1ced881f1c279a7e18cdc7c5a95f4f3370d97194",
+        "originalSrc": "/skill-previews/auto/6cc5d79c00948c55c774e7de1ced881f1c279a7e18cdc7c5a95f4f3370d97194.png",
+        "sourceUrl": "https://github.com/40rbidd3n/Hydro0x01/blob/306d593420d5c3f61b01064affc9f5890690cd71/assets/images/HydroponicOne-system-overview.png",
+        "kind": "reference",
+        "title": {
+          "en": "Hydro0x01 · Author preview",
+          "zh": "Hydro0x01 · 作者预览"
+        },
+        "alt": {
+          "en": "Hydro0x01: system overview",
+          "zh": "Hydro0x01：system overview"
+        },
+        "sourcePath": "assets/images/HydroponicOne-system-overview.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "acot-a11y-acot",
     "repository": "acot-a11y/acot",
     "revision": "34ff82b04faf65d22f323fd9ea47e03ede0fc13c",
@@ -6154,6 +6352,94 @@
           "zh": "Text2Earth：zero_result.png"
         },
         "sourcePath": "images/zero_result.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "chenyme-chenyme-aavt",
+    "repository": "chenyme/Chenyme-AAVT",
+    "revision": "b36765bb965f0dca7df8d5960d8f25d8a1968614",
+    "sourceUrl": "https://github.com/chenyme/Chenyme-AAVT/blob/b36765bb965f0dca7df8d5960d8f25d8a1968614/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-d660669ba5200c93e2284b4323d99e5ba4881ac3995bbd4a764b4470560878b7.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "d660669ba5200c93e2284b4323d99e5ba4881ac3995bbd4a764b4470560878b7",
+    "documentSha256": "6e24b645119e429ff8b8d65731d3a7b14374f71a6a8f8715713876596f865d53",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-17T09:20:15.900Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/653825ff2433d8bde5a2b3961b5ed4ed98848a6a84fc12bade1a31089b4ee085.preview.webp",
+        "previewSrc": "/skill-previews/auto/653825ff2433d8bde5a2b3961b5ed4ed98848a6a84fc12bade1a31089b4ee085.preview.webp",
+        "cardSrc": "/skill-previews/auto/653825ff2433d8bde5a2b3961b5ed4ed98848a6a84fc12bade1a31089b4ee085.card.webp",
+        "width": 1429,
+        "height": 930,
+        "sha256": "653825ff2433d8bde5a2b3961b5ed4ed98848a6a84fc12bade1a31089b4ee085",
+        "originalSrc": "/skill-previews/auto/653825ff2433d8bde5a2b3961b5ed4ed98848a6a84fc12bade1a31089b4ee085.png",
+        "sourceUrl": "https://github.com/chenyme/Chenyme-AAVT/blob/b36765bb965f0dca7df8d5960d8f25d8a1968614/cache/public/picture/audio.png",
+        "kind": "reference",
+        "title": {
+          "en": "Chenyme AAVT · Author preview",
+          "zh": "Chenyme AAVT · 作者预览"
+        },
+        "alt": {
+          "en": "Chenyme AAVT: 13",
+          "zh": "Chenyme AAVT：13"
+        },
+        "sourcePath": "cache/public/picture/audio.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/4888710a2c559bf0c4a939a4703ab849d72ddea100f85c6f6e65af8d73f07fd4.preview.webp",
+        "previewSrc": "/skill-previews/auto/4888710a2c559bf0c4a939a4703ab849d72ddea100f85c6f6e65af8d73f07fd4.preview.webp",
+        "cardSrc": "/skill-previews/auto/4888710a2c559bf0c4a939a4703ab849d72ddea100f85c6f6e65af8d73f07fd4.card.webp",
+        "width": 1429,
+        "height": 930,
+        "sha256": "4888710a2c559bf0c4a939a4703ab849d72ddea100f85c6f6e65af8d73f07fd4",
+        "originalSrc": "/skill-previews/auto/4888710a2c559bf0c4a939a4703ab849d72ddea100f85c6f6e65af8d73f07fd4.png",
+        "sourceUrl": "https://github.com/chenyme/Chenyme-AAVT/blob/b36765bb965f0dca7df8d5960d8f25d8a1968614/cache/public/picture/blog.png",
+        "kind": "reference",
+        "title": {
+          "en": "Chenyme AAVT · Author preview",
+          "zh": "Chenyme AAVT · 作者预览"
+        },
+        "alt": {
+          "en": "Chenyme AAVT: 15",
+          "zh": "Chenyme AAVT：15"
+        },
+        "sourcePath": "cache/public/picture/blog.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/e3d44991105d5dcd493817520215adb745f4eb08f2a77c3f6390900a62836540.preview.webp",
+        "previewSrc": "/skill-previews/auto/e3d44991105d5dcd493817520215adb745f4eb08f2a77c3f6390900a62836540.preview.webp",
+        "cardSrc": "/skill-previews/auto/e3d44991105d5dcd493817520215adb745f4eb08f2a77c3f6390900a62836540.card.webp",
+        "width": 1429,
+        "height": 930,
+        "sha256": "e3d44991105d5dcd493817520215adb745f4eb08f2a77c3f6390900a62836540",
+        "originalSrc": "/skill-previews/auto/e3d44991105d5dcd493817520215adb745f4eb08f2a77c3f6390900a62836540.png",
+        "sourceUrl": "https://github.com/chenyme/Chenyme-AAVT/blob/b36765bb965f0dca7df8d5960d8f25d8a1968614/cache/public/picture/bot.png",
+        "kind": "reference",
+        "title": {
+          "en": "Chenyme AAVT · Author preview",
+          "zh": "Chenyme AAVT · 作者预览"
+        },
+        "alt": {
+          "en": "Chenyme AAVT: 11",
+          "zh": "Chenyme AAVT：11"
+        },
+        "sourcePath": "cache/public/picture/bot.png",
         "documentPath": "README.md",
         "format": "image"
       }
