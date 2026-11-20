@@ -1672,6 +1672,622 @@
     ]
   },
   {
+    "skillSlug": "416rehman-deepzero",
+    "repository": "416rehman/DeepZero",
+    "revision": "b26865ba5eed25a6eceabb930f04f86bf8243ae3",
+    "sourceUrl": "https://github.com/416rehman/DeepZero/blob/b26865ba5eed25a6eceabb930f04f86bf8243ae3/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-5ae8742ee2d7043631e8f608db30d58c7addedb4f23d3138cf6f4d7eb4edd4df.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "5ae8742ee2d7043631e8f608db30d58c7addedb4f23d3138cf6f4d7eb4edd4df",
+    "documentSha256": "5a2213892f056b9384d4a01f490210f94c0b6fc61b3c6caf6bee4cc060d08f99",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-20T08:41:15.253Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/42b7a7389badad3624c17405ae5da7868f49d1f8cdaa2f1e0ea768eb98e3850d.preview.webp",
+        "previewSrc": "/skill-previews/auto/42b7a7389badad3624c17405ae5da7868f49d1f8cdaa2f1e0ea768eb98e3850d.preview.webp",
+        "cardSrc": "/skill-previews/auto/42b7a7389badad3624c17405ae5da7868f49d1f8cdaa2f1e0ea768eb98e3850d.card.webp",
+        "width": 1400,
+        "height": 860,
+        "sha256": "42b7a7389badad3624c17405ae5da7868f49d1f8cdaa2f1e0ea768eb98e3850d",
+        "originalSrc": "/skill-previews/auto/42b7a7389badad3624c17405ae5da7868f49d1f8cdaa2f1e0ea768eb98e3850d.png",
+        "sourceUrl": "https://github.com/416rehman/DeepZero/blob/b26865ba5eed25a6eceabb930f04f86bf8243ae3/.github/assets/report-loldrivers.png",
+        "kind": "reference",
+        "title": {
+          "en": "DeepZero · Author preview",
+          "zh": "DeepZero · 作者预览"
+        },
+        "alt": {
+          "en": "DeepZero: DeepZero HTML report for a kernel driver review",
+          "zh": "DeepZero：DeepZero HTML report for a kernel driver review"
+        },
+        "sourcePath": ".github/assets/report-loldrivers.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/99f65e9a7ce7576e080dbb48a9c7f45e963248f58daad54b28fb5c18f17cd871.preview.webp",
+        "previewSrc": "/skill-previews/auto/99f65e9a7ce7576e080dbb48a9c7f45e963248f58daad54b28fb5c18f17cd871.preview.webp",
+        "cardSrc": "/skill-previews/auto/99f65e9a7ce7576e080dbb48a9c7f45e963248f58daad54b28fb5c18f17cd871.card.webp",
+        "width": 1400,
+        "height": 860,
+        "sha256": "99f65e9a7ce7576e080dbb48a9c7f45e963248f58daad54b28fb5c18f17cd871",
+        "originalSrc": "/skill-previews/auto/99f65e9a7ce7576e080dbb48a9c7f45e963248f58daad54b28fb5c18f17cd871.png",
+        "sourceUrl": "https://github.com/416rehman/DeepZero/blob/b26865ba5eed25a6eceabb930f04f86bf8243ae3/.github/assets/report-source-audit.png",
+        "kind": "reference",
+        "title": {
+          "en": "DeepZero · Author preview",
+          "zh": "DeepZero · 作者预览"
+        },
+        "alt": {
+          "en": "DeepZero: DeepZero HTML report for a source code audit",
+          "zh": "DeepZero：DeepZero HTML report for a source code audit"
+        },
+        "sourcePath": ".github/assets/report-source-audit.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "4paradigm-openmldb",
+    "repository": "4paradigm/OpenMLDB",
+    "revision": "2d11e791c4300c72c8e35f0f762db40a278dfb87",
+    "sourceUrl": "https://github.com/4paradigm/OpenMLDB/blob/2d11e791c4300c72c8e35f0f762db40a278dfb87/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "documentSha256": "5f773b084bf32feb14863ad1787ef2c540e3bf8bc924fa0bb87004236f5ec413",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-20T08:41:15.253Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/81ca1b051b66b66c44e201391a86c3e8ba0a534ef09be597a0837511f91dc1cc.preview.webp",
+        "previewSrc": "/skill-previews/auto/81ca1b051b66b66c44e201391a86c3e8ba0a534ef09be597a0837511f91dc1cc.preview.webp",
+        "cardSrc": "/skill-previews/auto/81ca1b051b66b66c44e201391a86c3e8ba0a534ef09be597a0837511f91dc1cc.card.webp",
+        "width": 1464,
+        "height": 674,
+        "sha256": "81ca1b051b66b66c44e201391a86c3e8ba0a534ef09be597a0837511f91dc1cc",
+        "originalSrc": "/skill-previews/auto/81ca1b051b66b66c44e201391a86c3e8ba0a534ef09be597a0837511f91dc1cc.jpg",
+        "sourceUrl": "https://github.com/4paradigm/OpenMLDB/blob/2d11e791c4300c72c8e35f0f762db40a278dfb87/docs/en/about/images/workflow.png",
+        "kind": "reference",
+        "title": {
+          "en": "OpenMLDB · Author preview",
+          "zh": "OpenMLDB · 作者预览"
+        },
+        "alt": {
+          "en": "OpenMLDB: workflow",
+          "zh": "OpenMLDB：workflow"
+        },
+        "sourcePath": "docs/en/about/images/workflow.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/38cabb6815c532ff70599be3de4832090ed97172ad57c18bc7984e56739ba434.preview.webp",
+        "previewSrc": "/skill-previews/auto/38cabb6815c532ff70599be3de4832090ed97172ad57c18bc7984e56739ba434.preview.webp",
+        "cardSrc": "/skill-previews/auto/38cabb6815c532ff70599be3de4832090ed97172ad57c18bc7984e56739ba434.card.webp",
+        "width": 1237,
+        "height": 1600,
+        "sha256": "38cabb6815c532ff70599be3de4832090ed97172ad57c18bc7984e56739ba434",
+        "originalSrc": "/skill-previews/auto/38cabb6815c532ff70599be3de4832090ed97172ad57c18bc7984e56739ba434.pdf",
+        "sourceUrl": "https://github.com/4paradigm/OpenMLDB/blob/2d11e791c4300c72c8e35f0f762db40a278dfb87/docs/paper/scale_oij_icde2023.pdf",
+        "kind": "reference",
+        "title": {
+          "en": "OpenMLDB · PDF · first page",
+          "zh": "OpenMLDB · PDF · 首页预览"
+        },
+        "alt": {
+          "en": "OpenMLDB: Scalable Online Interval Join on Modern Multicore Processors in OpenMLDB",
+          "zh": "OpenMLDB：Scalable Online Interval Join on Modern Multicore Processors in OpenMLDB"
+        },
+        "sourcePath": "docs/paper/scale_oij_icde2023.pdf",
+        "documentPath": "README.md",
+        "format": "pdf-cover"
+      }
+    ]
+  },
+  {
+    "skillSlug": "512team-dhorse",
+    "repository": "512team/dhorse",
+    "revision": "38c69a1acdccc5480cb616b8c137151e0a6cabda",
+    "sourceUrl": "https://github.com/512team/dhorse/blob/38c69a1acdccc5480cb616b8c137151e0a6cabda/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-e6e1ad825c24cee35ed7c0c565b2636a24e13b3cca27e5675e0f3b6c31e6956c.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "documentSha256": "2fe2bd4a87c4f3ec968dd03c9d920190efbec96a323742393adb04fb558aa92d",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-20T08:41:15.253Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/8084cdeb4d2c0d086d4de718d7484948ef0296a21dc0d238d9a9520879481459.preview.webp",
+        "previewSrc": "/skill-previews/auto/8084cdeb4d2c0d086d4de718d7484948ef0296a21dc0d238d9a9520879481459.preview.webp",
+        "cardSrc": "/skill-previews/auto/8084cdeb4d2c0d086d4de718d7484948ef0296a21dc0d238d9a9520879481459.card.webp",
+        "width": 696,
+        "height": 355,
+        "sha256": "8084cdeb4d2c0d086d4de718d7484948ef0296a21dc0d238d9a9520879481459",
+        "originalSrc": "/skill-previews/auto/8084cdeb4d2c0d086d4de718d7484948ef0296a21dc0d238d9a9520879481459.png",
+        "sourceUrl": "https://github.com/512team/dhorse/blob/38c69a1acdccc5480cb616b8c137151e0a6cabda/static/images/architecture.jpg",
+        "kind": "reference",
+        "title": {
+          "en": "Dhorse · Author preview",
+          "zh": "Dhorse · 作者预览"
+        },
+        "alt": {
+          "en": "Dhorse: Image text",
+          "zh": "Dhorse：Image text"
+        },
+        "sourcePath": "static/images/architecture.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/d8b51151f766e0b0173432a178b65a3d262bc255178267d9f2ad286a305e6055.preview.webp",
+        "previewSrc": "/skill-previews/auto/d8b51151f766e0b0173432a178b65a3d262bc255178267d9f2ad286a305e6055.preview.webp",
+        "cardSrc": "/skill-previews/auto/d8b51151f766e0b0173432a178b65a3d262bc255178267d9f2ad286a305e6055.card.webp",
+        "width": 1600,
+        "height": 687,
+        "sha256": "d8b51151f766e0b0173432a178b65a3d262bc255178267d9f2ad286a305e6055",
+        "originalSrc": "/skill-previews/auto/d8b51151f766e0b0173432a178b65a3d262bc255178267d9f2ad286a305e6055.png",
+        "sourceUrl": "https://github.com/512team/dhorse/blob/38c69a1acdccc5480cb616b8c137151e0a6cabda/static/images/home.png",
+        "kind": "reference",
+        "title": {
+          "en": "Dhorse · Author preview",
+          "zh": "Dhorse · 作者预览"
+        },
+        "alt": {
+          "en": "Dhorse: Image text",
+          "zh": "Dhorse：Image text"
+        },
+        "sourcePath": "static/images/home.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "51bitquant-ai-hedge-fund-crypto",
+    "repository": "51bitquant/ai-hedge-fund-crypto",
+    "revision": "c6750e0041cb2e528856864783585427c45cc34d",
+    "sourceUrl": "https://github.com/51bitquant/ai-hedge-fund-crypto/blob/c6750e0041cb2e528856864783585427c45cc34d/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-785a1802434661abe38ead3c6944988de7ae5b9aa269ad984374ebec12824f88.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "785a1802434661abe38ead3c6944988de7ae5b9aa269ad984374ebec12824f88",
+    "documentSha256": "0960e3399d54f6666f395a11c8866972e1d2f12e8014b4974f47692420013671",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-20T08:41:15.253Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/f8392b05295ae0dd94b8790fbeddf553facabf7a1f3964e8dd94bc83d93e6874.preview.webp",
+        "previewSrc": "/skill-previews/auto/f8392b05295ae0dd94b8790fbeddf553facabf7a1f3964e8dd94bc83d93e6874.preview.webp",
+        "cardSrc": "/skill-previews/auto/f8392b05295ae0dd94b8790fbeddf553facabf7a1f3964e8dd94bc83d93e6874.card.webp",
+        "width": 1198,
+        "height": 633,
+        "sha256": "f8392b05295ae0dd94b8790fbeddf553facabf7a1f3964e8dd94bc83d93e6874",
+        "originalSrc": "/skill-previews/auto/f8392b05295ae0dd94b8790fbeddf553facabf7a1f3964e8dd94bc83d93e6874.png",
+        "sourceUrl": "https://github.com/51bitquant/ai-hedge-fund-crypto/blob/c6750e0041cb2e528856864783585427c45cc34d/imgs/backtest1.png",
+        "kind": "example",
+        "title": {
+          "en": "AI Hedge Fund Crypto · Author preview",
+          "zh": "AI Hedge Fund Crypto · 作者预览"
+        },
+        "alt": {
+          "en": "AI Hedge Fund Crypto: Backtest Results",
+          "zh": "AI Hedge Fund Crypto：Backtest Results"
+        },
+        "sourcePath": "imgs/backtest1.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/77f35f017e3aa86025f9abb807f899c5cf7a051f114dce3889c6786b160a608b.preview.webp",
+        "previewSrc": "/skill-previews/auto/77f35f017e3aa86025f9abb807f899c5cf7a051f114dce3889c6786b160a608b.preview.webp",
+        "cardSrc": "/skill-previews/auto/77f35f017e3aa86025f9abb807f899c5cf7a051f114dce3889c6786b160a608b.card.webp",
+        "width": 1200,
+        "height": 600,
+        "sha256": "77f35f017e3aa86025f9abb807f899c5cf7a051f114dce3889c6786b160a608b",
+        "originalSrc": "/skill-previews/auto/77f35f017e3aa86025f9abb807f899c5cf7a051f114dce3889c6786b160a608b.png",
+        "sourceUrl": "https://github.com/51bitquant/ai-hedge-fund-crypto/blob/c6750e0041cb2e528856864783585427c45cc34d/imgs/backtest3.png",
+        "kind": "reference",
+        "title": {
+          "en": "AI Hedge Fund Crypto · Author preview",
+          "zh": "AI Hedge Fund Crypto · 作者预览"
+        },
+        "alt": {
+          "en": "AI Hedge Fund Crypto: Portfolio Performance",
+          "zh": "AI Hedge Fund Crypto：Portfolio Performance"
+        },
+        "sourcePath": "imgs/backtest3.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/4abd56c26cad28e3a07fed9cf93c5fec98c7c7f5ce3c2925bc76c7e0208babb4.preview.webp",
+        "previewSrc": "/skill-previews/auto/4abd56c26cad28e3a07fed9cf93c5fec98c7c7f5ce3c2925bc76c7e0208babb4.preview.webp",
+        "cardSrc": "/skill-previews/auto/4abd56c26cad28e3a07fed9cf93c5fec98c7c7f5ce3c2925bc76c7e0208babb4.card.webp",
+        "width": 250,
+        "height": 730,
+        "sha256": "4abd56c26cad28e3a07fed9cf93c5fec98c7c7f5ce3c2925bc76c7e0208babb4",
+        "originalSrc": "/skill-previews/auto/4abd56c26cad28e3a07fed9cf93c5fec98c7c7f5ce3c2925bc76c7e0208babb4.png",
+        "sourceUrl": "https://github.com/51bitquant/ai-hedge-fund-crypto/blob/c6750e0041cb2e528856864783585427c45cc34d/imgs/graph1.png",
+        "kind": "reference",
+        "title": {
+          "en": "AI Hedge Fund Crypto · Author preview",
+          "zh": "AI Hedge Fund Crypto · 作者预览"
+        },
+        "alt": {
+          "en": "AI Hedge Fund Crypto: Graph Demo1",
+          "zh": "AI Hedge Fund Crypto：Graph Demo1"
+        },
+        "sourcePath": "imgs/graph1.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "51bitquant-binance-grid-trader",
+    "repository": "51bitquant/binance_grid_trader",
+    "revision": "97a65982541b93d412b4e6e8a9bc6582509f826a",
+    "sourceUrl": "https://github.com/51bitquant/binance_grid_trader/blob/97a65982541b93d412b4e6e8a9bc6582509f826a/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-81294e5bcba945564df8586f1d789b016001b7b43eb4de97736679dd882cf191.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "81294e5bcba945564df8586f1d789b016001b7b43eb4de97736679dd882cf191",
+    "documentSha256": "00b72910da034272865f6dafe0e3fdbedbb23bf275211280994bb8636585addb",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-20T08:41:15.253Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/80b9f3bc325716aa83fe543a613ebf200550e75fc81b0db2e0979c40d24abf1e.preview.webp",
+        "previewSrc": "/skill-previews/auto/80b9f3bc325716aa83fe543a613ebf200550e75fc81b0db2e0979c40d24abf1e.preview.webp",
+        "cardSrc": "/skill-previews/auto/80b9f3bc325716aa83fe543a613ebf200550e75fc81b0db2e0979c40d24abf1e.card.webp",
+        "width": 824,
+        "height": 714,
+        "sha256": "80b9f3bc325716aa83fe543a613ebf200550e75fc81b0db2e0979c40d24abf1e",
+        "originalSrc": "/skill-previews/auto/80b9f3bc325716aa83fe543a613ebf200550e75fc81b0db2e0979c40d24abf1e.png",
+        "sourceUrl": "https://github.com/51bitquant/binance_grid_trader/blob/97a65982541b93d412b4e6e8a9bc6582509f826a/resources/add_future_grid_strategy.png",
+        "kind": "reference",
+        "title": {
+          "en": "Binance Grid Trader · Author preview",
+          "zh": "Binance Grid Trader · 作者预览"
+        },
+        "alt": {
+          "en": "Binance Grid Trader: window picture",
+          "zh": "Binance Grid Trader：window picture"
+        },
+        "sourcePath": "resources/add_future_grid_strategy.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/f5ac371338d7f9270547aa7046212033c6db2fd5f1438d36fe0d1904923be6ba.preview.webp",
+        "previewSrc": "/skill-previews/auto/f5ac371338d7f9270547aa7046212033c6db2fd5f1438d36fe0d1904923be6ba.preview.webp",
+        "cardSrc": "/skill-previews/auto/f5ac371338d7f9270547aa7046212033c6db2fd5f1438d36fe0d1904923be6ba.card.webp",
+        "width": 766,
+        "height": 776,
+        "sha256": "f5ac371338d7f9270547aa7046212033c6db2fd5f1438d36fe0d1904923be6ba",
+        "originalSrc": "/skill-previews/auto/f5ac371338d7f9270547aa7046212033c6db2fd5f1438d36fe0d1904923be6ba.png",
+        "sourceUrl": "https://github.com/51bitquant/binance_grid_trader/blob/97a65982541b93d412b4e6e8a9bc6582509f826a/resources/add_spot_grid_strategy.png",
+        "kind": "reference",
+        "title": {
+          "en": "Binance Grid Trader · Author preview",
+          "zh": "Binance Grid Trader · 作者预览"
+        },
+        "alt": {
+          "en": "Binance Grid Trader: window picture",
+          "zh": "Binance Grid Trader：window picture"
+        },
+        "sourcePath": "resources/add_spot_grid_strategy.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/9a7e61e7e55449338deb23431600262c802b569d5ed8d2dccc7d5708abc7011c.preview.webp",
+        "previewSrc": "/skill-previews/auto/9a7e61e7e55449338deb23431600262c802b569d5ed8d2dccc7d5708abc7011c.preview.webp",
+        "cardSrc": "/skill-previews/auto/9a7e61e7e55449338deb23431600262c802b569d5ed8d2dccc7d5708abc7011c.card.webp",
+        "width": 562,
+        "height": 506,
+        "sha256": "9a7e61e7e55449338deb23431600262c802b569d5ed8d2dccc7d5708abc7011c",
+        "originalSrc": "/skill-previews/auto/9a7e61e7e55449338deb23431600262c802b569d5ed8d2dccc7d5708abc7011c.png",
+        "sourceUrl": "https://github.com/51bitquant/binance_grid_trader/blob/97a65982541b93d412b4e6e8a9bc6582509f826a/resources/connect_future_usdt.png",
+        "kind": "reference",
+        "title": {
+          "en": "Binance Grid Trader · Author preview",
+          "zh": "Binance Grid Trader · 作者预览"
+        },
+        "alt": {
+          "en": "Binance Grid Trader: connect_future_usdt",
+          "zh": "Binance Grid Trader：connect_future_usdt"
+        },
+        "sourcePath": "resources/connect_future_usdt.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "51bitquant-howtrader",
+    "repository": "51bitquant/howtrader",
+    "revision": "fcad8e2d86825506b9d33441ab78be853c2c3bdd",
+    "sourceUrl": "https://github.com/51bitquant/howtrader/blob/fcad8e2d86825506b9d33441ab78be853c2c3bdd/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-701cc39fb58202c5399821933f16235e61671730c3b752550c83908908048c0f.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "701cc39fb58202c5399821933f16235e61671730c3b752550c83908908048c0f",
+    "documentSha256": "2c167776549a173da176be213070742868d963eb4b9b80c3537913552c3015a2",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-20T08:41:15.253Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/55cbfbf19ad187a38c80e21a004f374fbd8b3eebc9a479bb033331b58303ab98.preview.webp",
+        "previewSrc": "/skill-previews/auto/55cbfbf19ad187a38c80e21a004f374fbd8b3eebc9a479bb033331b58303ab98.preview.webp",
+        "cardSrc": "/skill-previews/auto/55cbfbf19ad187a38c80e21a004f374fbd8b3eebc9a479bb033331b58303ab98.card.webp",
+        "width": 478,
+        "height": 501,
+        "sha256": "55cbfbf19ad187a38c80e21a004f374fbd8b3eebc9a479bb033331b58303ab98",
+        "originalSrc": "/skill-previews/auto/55cbfbf19ad187a38c80e21a004f374fbd8b3eebc9a479bb033331b58303ab98.png",
+        "sourceUrl": "https://github.com/51bitquant/howtrader/blob/fcad8e2d86825506b9d33441ab78be853c2c3bdd/docs/imgs/api_type.png",
+        "kind": "reference",
+        "title": {
+          "en": "Howtrader · Author preview",
+          "zh": "Howtrader · 作者预览"
+        },
+        "alt": {
+          "en": "Howtrader: figure below",
+          "zh": "Howtrader：figure below"
+        },
+        "sourcePath": "docs/imgs/api_type.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/f3c419c094b6c78014dd6e2f1cf8d658f551bbae667703b4893bfa96b06ae00e.preview.webp",
+        "previewSrc": "/skill-previews/auto/f3c419c094b6c78014dd6e2f1cf8d658f551bbae667703b4893bfa96b06ae00e.preview.webp",
+        "cardSrc": "/skill-previews/auto/f3c419c094b6c78014dd6e2f1cf8d658f551bbae667703b4893bfa96b06ae00e.card.webp",
+        "width": 946,
+        "height": 546,
+        "sha256": "f3c419c094b6c78014dd6e2f1cf8d658f551bbae667703b4893bfa96b06ae00e",
+        "originalSrc": "/skill-previews/auto/f3c419c094b6c78014dd6e2f1cf8d658f551bbae667703b4893bfa96b06ae00e.png",
+        "sourceUrl": "https://github.com/51bitquant/howtrader/blob/fcad8e2d86825506b9d33441ab78be853c2c3bdd/docs/imgs/generate_public_private_key.png",
+        "kind": "reference",
+        "title": {
+          "en": "Howtrader · Author preview",
+          "zh": "Howtrader · 作者预览"
+        },
+        "alt": {
+          "en": "Howtrader: figure below",
+          "zh": "Howtrader：figure below"
+        },
+        "sourcePath": "docs/imgs/generate_public_private_key.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "68publishers-cookie-consent",
+    "repository": "68publishers/cookie-consent",
+    "revision": "3b3f4696cc6fa53274078bd183cb93956a3d08f2",
+    "sourceUrl": "https://github.com/68publishers/cookie-consent/blob/3b3f4696cc6fa53274078bd183cb93956a3d08f2/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-42784e5f6ccb4d736bf7a287e842073f3fb30ef36c38b245ac8976a51b0d704b.txt",
+    "licenseSourcePath": "LICENSE.md",
+    "licenseSha256": "42784e5f6ccb4d736bf7a287e842073f3fb30ef36c38b245ac8976a51b0d704b",
+    "documentSha256": "fec854b83d4f4d79c57dd8177ae76495d2bb5ed75f49e6ef9686050f33d76808",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-20T08:41:15.253Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/6b976ddd70d59a08849ae6636f84181ee1b8d79610bd9e6a1f931bfb170adb45.preview.webp",
+        "previewSrc": "/skill-previews/auto/6b976ddd70d59a08849ae6636f84181ee1b8d79610bd9e6a1f931bfb170adb45.preview.webp",
+        "cardSrc": "/skill-previews/auto/6b976ddd70d59a08849ae6636f84181ee1b8d79610bd9e6a1f931bfb170adb45.card.webp",
+        "width": 492,
+        "height": 710,
+        "sha256": "6b976ddd70d59a08849ae6636f84181ee1b8d79610bd9e6a1f931bfb170adb45",
+        "originalSrc": "/skill-previews/auto/6b976ddd70d59a08849ae6636f84181ee1b8d79610bd9e6a1f931bfb170adb45.png",
+        "sourceUrl": "https://github.com/68publishers/cookie-consent/blob/3b3f4696cc6fa53274078bd183cb93956a3d08f2/docs/images/import-template.png",
+        "kind": "example",
+        "title": {
+          "en": "Cookie Consent · Author preview",
+          "zh": "Cookie Consent · 作者预览"
+        },
+        "alt": {
+          "en": "Cookie Consent: Right dropdown",
+          "zh": "Cookie Consent：Right dropdown"
+        },
+        "sourcePath": "docs/images/import-template.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/a66991abaef401a21cc59a658ed461ad590731519d12c45ba98d02309ed7f468.preview.webp",
+        "previewSrc": "/skill-previews/auto/a66991abaef401a21cc59a658ed461ad590731519d12c45ba98d02309ed7f468.preview.webp",
+        "cardSrc": "/skill-previews/auto/a66991abaef401a21cc59a658ed461ad590731519d12c45ba98d02309ed7f468.card.webp",
+        "width": 1600,
+        "height": 426,
+        "sha256": "a66991abaef401a21cc59a658ed461ad590731519d12c45ba98d02309ed7f468",
+        "originalSrc": "/skill-previews/auto/a66991abaef401a21cc59a658ed461ad590731519d12c45ba98d02309ed7f468.png",
+        "sourceUrl": "https://github.com/68publishers/cookie-consent/blob/3b3f4696cc6fa53274078bd183cb93956a3d08f2/docs/images/composite-consent-event-trigger.png",
+        "kind": "reference",
+        "title": {
+          "en": "Cookie Consent · Author preview",
+          "zh": "Cookie Consent · 作者预览"
+        },
+        "alt": {
+          "en": "Cookie Consent: Revision message translation",
+          "zh": "Cookie Consent：Revision message translation"
+        },
+        "sourcePath": "docs/images/composite-consent-event-trigger.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/f4fc8ed64db7a6314ac94d8c4266d1eea87fba970a98e5f164ddf12d9d1c2040.preview.webp",
+        "previewSrc": "/skill-previews/auto/f4fc8ed64db7a6314ac94d8c4266d1eea87fba970a98e5f164ddf12d9d1c2040.preview.webp",
+        "cardSrc": "/skill-previews/auto/f4fc8ed64db7a6314ac94d8c4266d1eea87fba970a98e5f164ddf12d9d1c2040.card.webp",
+        "width": 1600,
+        "height": 897,
+        "sha256": "f4fc8ed64db7a6314ac94d8c4266d1eea87fba970a98e5f164ddf12d9d1c2040",
+        "originalSrc": "/skill-previews/auto/f4fc8ed64db7a6314ac94d8c4266d1eea87fba970a98e5f164ddf12d9d1c2040.png",
+        "sourceUrl": "https://github.com/68publishers/cookie-consent/blob/3b3f4696cc6fa53274078bd183cb93956a3d08f2/docs/images/cookie-consent-tag.png",
+        "kind": "reference",
+        "title": {
+          "en": "Cookie Consent · Author preview",
+          "zh": "Cookie Consent · 作者预览"
+        },
+        "alt": {
+          "en": "Cookie Consent: Cookie consent tag",
+          "zh": "Cookie Consent：Cookie consent tag"
+        },
+        "sourcePath": "docs/images/cookie-consent-tag.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "710leo-urlooker",
+    "repository": "710leo/urlooker",
+    "revision": "fe42ad6cf68a33330463563286f98f716ba4dfb5",
+    "sourceUrl": "https://github.com/710leo/urlooker/blob/fe42ad6cf68a33330463563286f98f716ba4dfb5/README.md",
+    "license": "Apache-2.0",
+    "licenseUrl": "/skill-previews/auto/LICENSE-b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "documentSha256": "a32cedba16446b832fd26ed0ff82eabd819cf41b2e7f4e1089db94a5d78e24a1",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-20T08:41:15.253Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/74910fd81a147b3a3916258cbc55a832d5fb50f3e933e5b7e7dd48188306febb.preview.webp",
+        "previewSrc": "/skill-previews/auto/74910fd81a147b3a3916258cbc55a832d5fb50f3e933e5b7e7dd48188306febb.preview.webp",
+        "cardSrc": "/skill-previews/auto/74910fd81a147b3a3916258cbc55a832d5fb50f3e933e5b7e7dd48188306febb.card.webp",
+        "width": 956,
+        "height": 538,
+        "sha256": "74910fd81a147b3a3916258cbc55a832d5fb50f3e933e5b7e7dd48188306febb",
+        "originalSrc": "/skill-previews/auto/74910fd81a147b3a3916258cbc55a832d5fb50f3e933e5b7e7dd48188306febb.png",
+        "sourceUrl": "https://github.com/710leo/urlooker/blob/fe42ad6cf68a33330463563286f98f716ba4dfb5/img/urlooker_arch.png",
+        "kind": "reference",
+        "title": {
+          "en": "Urlooker · Author preview",
+          "zh": "Urlooker · 作者预览"
+        },
+        "alt": {
+          "en": "Urlooker: Architecture",
+          "zh": "Urlooker：Architecture"
+        },
+        "sourcePath": "img/urlooker_arch.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/2d4be602f73f58f5ba022ecbe6cdcbee31baabdd6820683a299262513baf0813.preview.webp",
+        "previewSrc": "/skill-previews/auto/2d4be602f73f58f5ba022ecbe6cdcbee31baabdd6820683a299262513baf0813.preview.webp",
+        "cardSrc": "/skill-previews/auto/2d4be602f73f58f5ba022ecbe6cdcbee31baabdd6820683a299262513baf0813.card.webp",
+        "width": 1600,
+        "height": 816,
+        "sha256": "2d4be602f73f58f5ba022ecbe6cdcbee31baabdd6820683a299262513baf0813",
+        "originalSrc": "/skill-previews/auto/2d4be602f73f58f5ba022ecbe6cdcbee31baabdd6820683a299262513baf0813.png",
+        "sourceUrl": "https://github.com/710leo/urlooker/blob/fe42ad6cf68a33330463563286f98f716ba4dfb5/img/urlooker_en1.png",
+        "kind": "reference",
+        "title": {
+          "en": "Urlooker · Author preview",
+          "zh": "Urlooker · 作者预览"
+        },
+        "alt": {
+          "en": "Urlooker: urlooker_en1.png",
+          "zh": "Urlooker：urlooker_en1.png"
+        },
+        "sourcePath": "img/urlooker_en1.png",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/61cc5c4cc2b3236a4e565c860cb59e6849099c38af2795251f43f291883b6d8f.preview.webp",
+        "previewSrc": "/skill-previews/auto/61cc5c4cc2b3236a4e565c860cb59e6849099c38af2795251f43f291883b6d8f.preview.webp",
+        "cardSrc": "/skill-previews/auto/61cc5c4cc2b3236a4e565c860cb59e6849099c38af2795251f43f291883b6d8f.card.webp",
+        "width": 1600,
+        "height": 819,
+        "sha256": "61cc5c4cc2b3236a4e565c860cb59e6849099c38af2795251f43f291883b6d8f",
+        "originalSrc": "/skill-previews/auto/61cc5c4cc2b3236a4e565c860cb59e6849099c38af2795251f43f291883b6d8f.png",
+        "sourceUrl": "https://github.com/710leo/urlooker/blob/fe42ad6cf68a33330463563286f98f716ba4dfb5/img/urlooker_stra.png",
+        "kind": "reference",
+        "title": {
+          "en": "Urlooker · Author preview",
+          "zh": "Urlooker · 作者预览"
+        },
+        "alt": {
+          "en": "Urlooker: stra",
+          "zh": "Urlooker：stra"
+        },
+        "sourcePath": "img/urlooker_stra.png",
+        "documentPath": "README.md",
+        "format": "image"
+      }
+    ]
+  },
+  {
     "skillSlug": "acot-a11y-acot",
     "repository": "acot-a11y/acot",
     "revision": "34ff82b04faf65d22f323fd9ea47e03ede0fc13c",
@@ -6442,6 +7058,94 @@
         "sourcePath": "cache/public/picture/bot.png",
         "documentPath": "README.md",
         "format": "image"
+      }
+    ]
+  },
+  {
+    "skillSlug": "chrischen667788-wind-comic",
+    "repository": "ChrisChen667788/wind-comic",
+    "revision": "d0601c98ac52cc568bf97775346d4847864bd640",
+    "sourceUrl": "https://github.com/ChrisChen667788/wind-comic/blob/d0601c98ac52cc568bf97775346d4847864bd640/README.md",
+    "license": "MIT",
+    "licenseUrl": "/skill-previews/auto/LICENSE-a2fefe23a217db3bac7b2ebcd7554f4ef6611e1f6dd803bfb438c0735a7783cd.txt",
+    "licenseSourcePath": "LICENSE",
+    "licenseSha256": "a2fefe23a217db3bac7b2ebcd7554f4ef6611e1f6dd803bfb438c0735a7783cd",
+    "documentSha256": "e06cfe3ec04dd40a55222e7dd14e3186f363f582979cfed818d54aa67492e9c4",
+    "format": {
+      "en": "Author preview",
+      "zh": "作者预览"
+    },
+    "note": {
+      "en": "Explore images and examples shared by the author. Open the original files for full-size artwork and animations.",
+      "zh": "浏览作者提供的图片与示例。打开原始文件，可查看完整尺寸的作品和动图。"
+    },
+    "collectedAt": "2026-11-20T08:41:15.253Z",
+    "media": [
+      {
+        "src": "/skill-previews/auto/ea9661efa7613e94ef983ae6a37d6843c0227c8e238878a397e2283b68545208.preview.webp",
+        "previewSrc": "/skill-previews/auto/ea9661efa7613e94ef983ae6a37d6843c0227c8e238878a397e2283b68545208.preview.webp",
+        "cardSrc": "/skill-previews/auto/ea9661efa7613e94ef983ae6a37d6843c0227c8e238878a397e2283b68545208.card.webp",
+        "width": 1600,
+        "height": 1022,
+        "sha256": "ea9661efa7613e94ef983ae6a37d6843c0227c8e238878a397e2283b68545208",
+        "originalSrc": "/skill-previews/auto/ea9661efa7613e94ef983ae6a37d6843c0227c8e238878a397e2283b68545208.jpg",
+        "sourceUrl": "https://github.com/ChrisChen667788/wind-comic/blob/d0601c98ac52cc568bf97775346d4847864bd640/assets/v10/templates.jpg",
+        "kind": "example",
+        "title": {
+          "en": "Wind Comic · Author preview",
+          "zh": "Wind Comic · 作者预览"
+        },
+        "alt": {
+          "en": "Wind Comic: templates.jpg",
+          "zh": "Wind Comic：templates.jpg"
+        },
+        "sourcePath": "assets/v10/templates.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/eb96c51cae297f9a812dda0f162627a334521c6dc6e2c1da042caf08c6faf72e.preview.webp",
+        "previewSrc": "/skill-previews/auto/eb96c51cae297f9a812dda0f162627a334521c6dc6e2c1da042caf08c6faf72e.preview.webp",
+        "cardSrc": "/skill-previews/auto/eb96c51cae297f9a812dda0f162627a334521c6dc6e2c1da042caf08c6faf72e.card.webp",
+        "width": 1600,
+        "height": 1000,
+        "sha256": "eb96c51cae297f9a812dda0f162627a334521c6dc6e2c1da042caf08c6faf72e",
+        "originalSrc": "/skill-previews/auto/eb96c51cae297f9a812dda0f162627a334521c6dc6e2c1da042caf08c6faf72e.jpg",
+        "sourceUrl": "https://github.com/ChrisChen667788/wind-comic/blob/d0601c98ac52cc568bf97775346d4847864bd640/docs/screenshots/v12/07-clip-audio-preview.jpg",
+        "kind": "example",
+        "title": {
+          "en": "Wind Comic · Author preview",
+          "zh": "Wind Comic · 作者预览"
+        },
+        "alt": {
+          "en": "Wind Comic: 片段音频预览",
+          "zh": "Wind Comic：片段音频预览"
+        },
+        "sourcePath": "docs/screenshots/v12/07-clip-audio-preview.jpg",
+        "documentPath": "README.md",
+        "format": "image"
+      },
+      {
+        "src": "/skill-previews/auto/d7bacc6bfd66a70a1947c9b02f7c19c433b582fb1d7968d5460c994dd7370b05.preview.webp",
+        "previewSrc": "/skill-previews/auto/d7bacc6bfd66a70a1947c9b02f7c19c433b582fb1d7968d5460c994dd7370b05.preview.webp",
+        "cardSrc": "/skill-previews/auto/d7bacc6bfd66a70a1947c9b02f7c19c433b582fb1d7968d5460c994dd7370b05.card.webp",
+        "width": 760,
+        "height": 428,
+        "sha256": "d7bacc6bfd66a70a1947c9b02f7c19c433b582fb1d7968d5460c994dd7370b05",
+        "originalSrc": "/skill-previews/auto/d7bacc6bfd66a70a1947c9b02f7c19c433b582fb1d7968d5460c994dd7370b05.gif",
+        "sourceUrl": "https://github.com/ChrisChen667788/wind-comic/blob/d0601c98ac52cc568bf97775346d4847864bd640/assets/promo/wind-comic-promo.gif",
+        "kind": "reference",
+        "title": {
+          "en": "Wind Comic · Animation · still preview",
+          "zh": "Wind Comic · 动图 · 静帧预览"
+        },
+        "alt": {
+          "en": "Wind Comic: Wind Comic — the full 39-second promo, condensed into a silent 15-second loop (click to watch with voiceover & sound)",
+          "zh": "Wind Comic：Wind Comic — the full 39-second promo, condensed into a silent 15-second loop (click to watch with voiceover & sound)"
+        },
+        "sourcePath": "assets/promo/wind-comic-promo.gif",
+        "documentPath": "README.md",
+        "format": "animation-poster"
       }
     ]
   },
