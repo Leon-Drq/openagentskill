@@ -17,7 +17,6 @@ mkdirSync('.codex-tmp', { recursive: true })
 const log = remote ? null : openSync('.codex-tmp/cloudflare-preview.log', 'w')
 const cli = fileURLToPath(new URL('../node_modules/@opennextjs/cloudflare/dist/cli/index.js', import.meta.url))
 const previewConfig = resolve('.codex-tmp/cloudflare-preview.jsonc')
-const realDateNow = Date.now
 if (!remote) {
   const config = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'))
   assert.equal(config.vars.MIGRATION_READ_ONLY, '1')
@@ -40,11 +39,10 @@ if (!remote) {
     const saved = JSON.parse(readFileSync('data/public-directory-saved.json', 'utf8'))
     const fixtureTime = Date.parse(saved.savedThrough) + 1000
     assert.ok(Number.isFinite(fixtureTime))
-    const offset = fixtureTime - realDateNow()
+    const offset = fixtureTime - Date.now()
     const entry = JSON.stringify(config.main)
     config.main = resolve('.codex-tmp/cloudflare-preview-clock.mjs')
-    writeFileSync(config.main, `import worker from ${entry};\nexport { DOQueueHandler } from ${entry};\n(${installFixtureClock.toString()})(${offset});\nexport default worker;\n`)
-    installFixtureClock(offset)
+    writeFileSync(config.main, `import worker from ${entry};\nexport { DOQueueHandler } from ${entry};\nexport default (${withSavedDirectoryClock.toString()})(worker, ${offset});\n`)
   }
   config.assets.directory = resolve(config.assets.directory)
   writeFileSync(previewConfig, JSON.stringify(config, null, 2))
@@ -61,10 +59,19 @@ child?.on('error', () => { exited = true })
 const base = remote || 'http://localhost:8788'
 const reportPath = remote ? '.codex-tmp/cloudflare-remote-smoke.json' : '.codex-tmp/cloudflare-smoke.json'
 const report = []
-function installFixtureClock(offset) {
-  // Keep the native Date constructor/call signature used by Workers internals.
+function withSavedDirectoryClock(worker, offset) {
+  // Only sequential saved-directory probes need the historical fixture clock.
+  // R2 supplies real last-modified timestamps: cache/invalidation probes must
+  // keep their real clock, as must the host that writes the invalidation tag.
   const nativeNow = Date.now
-  Date.now = () => nativeNow() + offset
+  return {
+    ...worker,
+    fetch(request, ...args) {
+      const savedDirectory = /^\/(?:zh\/)?skills$/.test(new URL(request.url).pathname)
+      Date.now = savedDirectory ? () => nativeNow() + offset : nativeNow
+      return worker.fetch(request, ...args)
+    },
+  }
 }
 try {
   const deadline = Date.now() + 180_000
@@ -207,7 +214,6 @@ try {
   writeFileSync(reportPath, JSON.stringify(report, null, 2))
   console.log(`Cloudflare workerd smoke checks passed: ${report.length} public/isolation cases`)
 } finally {
-  Date.now = realDateNow
   if (child) try { process.kill(-child.pid, 'SIGTERM') } catch { /* process already exited */ }
   if (log !== null) closeSync(log)
 }
