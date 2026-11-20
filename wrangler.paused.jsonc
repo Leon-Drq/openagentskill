@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "openagentskill-migration",
+  "account_id": "113e589daada01e37bfd43cfb4763aab",
+  "main": "cloudflare/paused-worker.mjs",
+  "minify": true,
+  "compatibility_date": "2026-10-01",
+  "workers_dev": false,
+  "preview_urls": false,
+  "rules": [{ "type": "Text", "globs": ["**/*.html"], "fallthrough": true }],
+  "assets": {
+    "directory": "cloudflare/paused-assets",
+    "binding": "ASSETS",
+    "run_worker_first": false,
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "none"
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "NEXT_CACHE_DO_QUEUE", "class_name": "DOQueueHandler" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DOQueueHandler"] }],
+  "vars": { "SITE_PAUSED": "1", "CRON_ENABLED": "0" },
+  "triggers": { "crons": [] },
+  "limits": { "cpu_ms": 10 },
+  "observability": { "enabled": false },
+  "routes": [
+    { "pattern": "www.openagentskill.com", "custom_domain": true },
+    { "pattern": "openagentskill.com", "custom_domain": true }
+  ]
+}

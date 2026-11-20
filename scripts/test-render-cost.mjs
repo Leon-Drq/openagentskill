@@ -219,8 +219,13 @@ console.log('Download renderer: visible-only counts, full-candidate sorting and 
 // Execute the actual paused renderer with every live dependency booby-trapped.
 // A stale live cache must not be touched or revalidated while data is paused.
 const pauseBefore = process.env.SUPABASE_DATA_PAUSED
+const originalDateNow = Date.now
 const originalReaders = { ...db }
 try {
+  // Exercise this saved fixture while it is valid, independently of today's
+  // date. Snapshot expiry itself is covered by the saved-directory tests.
+  const savedFixture = JSON.parse(readFileSync('data/public-directory-saved.json', 'utf8'))
+  Date.now = () => Date.parse(savedFixture.savedThrough) + 1000
   downloadReads = 0
   process.env.SUPABASE_DATA_PAUSED = '1'
   for (const name of Object.keys(db)) db[name] = async () => { pausedLiveReads++; throw new Error('Unexpected paused data read: ' + name) }
@@ -236,6 +241,7 @@ try {
   assert.equal(downloadReads, 0)
   assert.equal(pausedLiveReads, 0)
 } finally {
+  Date.now = originalDateNow
   Object.assign(db, originalReaders)
   if (pauseBefore === undefined) delete process.env.SUPABASE_DATA_PAUSED; else process.env.SUPABASE_DATA_PAUSED = pauseBefore
 }

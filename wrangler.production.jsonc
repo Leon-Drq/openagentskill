@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "openagentskill-migration",
   "account_id": "113e589daada01e37bfd43cfb4763aab",
-  "main": "cloudflare/worker.mjs",
+  "main": "cloudflare/paused-worker.mjs",
   "minify": true,
   "compatibility_date": "2026-10-01",
   "compatibility_flags": [
@@ -95,7 +95,7 @@
     "CLOUDFLARE_AUTH_ENABLED": "1",
     "AUTH_EMAIL_ENABLED": "1",
     "AUTH_REGISTRATION_ENABLED": "1",
-    "CRON_ENABLED": "1",
+    "CRON_ENABLED": "0",
     "SKILL_RADAR_X_MAX_QUERIES": "1",
     "SKILL_RADAR_X_SCAN_INTERVAL_HOURS": "24",
     "SKILL_RADAR_X_RESULTS_PER_QUERY": "10",
@@ -114,29 +114,9 @@
     "COMMERCE_SITE_URL": "https://www.openagentskill.com"
   },
   "triggers": {
-    "crons": [
-      "*/5 * * * *",
-      "30 2 * * *",
-      "55 2 * * *",
-      "20 * * * *",
-      "5 0 * * *",
-      "0 */3 * * *",
-      "10 * * * *",
-      "45 */3 * * *",
-      "0,15,30,45 * * * *",
-      "5 */6 * * *",
-      "15 4 * * *",
-      "30 4 * * *",
-      "45 4 * * *",
-      "0 5 * * *",
-      "20 13 * * *",
-      "30 15,19,23 * * *",
-      "30 14 * * *",
-      "15 */12 * * *",
-      "35 15,19,23 * * *",
-      "45 18 * * *"
-    ]
+    "crons": []
   },
+  "rules": [{ "type": "Text", "globs": ["**/*.html"], "fallthrough": true }],
   "ratelimits": [{ "name": "DIRECTORY_SEARCH_LIMITER", "namespace_id": "2026111401", "simple": { "limit": 30, "period": 60 } }],
   "observability": {
     "enabled": true,
