@@ -17,7 +17,7 @@ mkdirSync('.codex-tmp', { recursive: true })
 const log = remote ? null : openSync('.codex-tmp/cloudflare-preview.log', 'w')
 const cli = fileURLToPath(new URL('../node_modules/@opennextjs/cloudflare/dist/cli/index.js', import.meta.url))
 const previewConfig = resolve('.codex-tmp/cloudflare-preview.jsonc')
-const realDate = globalThis.Date
+const realDateNow = Date.now
 if (!remote) {
   const config = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'))
   assert.equal(config.vars.MIGRATION_READ_ONLY, '1')
@@ -40,7 +40,7 @@ if (!remote) {
     const saved = JSON.parse(readFileSync('data/public-directory-saved.json', 'utf8'))
     const fixtureTime = Date.parse(saved.savedThrough) + 1000
     assert.ok(Number.isFinite(fixtureTime))
-    const offset = fixtureTime - realDate.now()
+    const offset = fixtureTime - realDateNow()
     const entry = JSON.stringify(config.main)
     config.main = resolve('.codex-tmp/cloudflare-preview-clock.mjs')
     writeFileSync(config.main, `import worker from ${entry};\nexport { DOQueueHandler } from ${entry};\n(${installFixtureClock.toString()})(${offset});\nexport default worker;\n`)
@@ -62,14 +62,9 @@ const base = remote || 'http://localhost:8788'
 const reportPath = remote ? '.codex-tmp/cloudflare-remote-smoke.json' : '.codex-tmp/cloudflare-smoke.json'
 const report = []
 function installFixtureClock(offset) {
-  const NativeDate = globalThis.Date
-  globalThis.Date = class extends NativeDate {
-    constructor(...args) {
-      if (args.length) super(...args)
-      else super(NativeDate.now() + offset)
-    }
-    static now() { return NativeDate.now() + offset }
-  }
+  // Keep the native Date constructor/call signature used by Workers internals.
+  const nativeNow = Date.now
+  Date.now = () => nativeNow() + offset
 }
 try {
   const deadline = Date.now() + 180_000
@@ -95,6 +90,9 @@ try {
     const response = await fetch(base + path, { method, redirect: 'manual', signal: AbortSignal.timeout(30_000) })
     report.push({ path, method, status: response.status, cache: response.headers.get('x-nextjs-cache') })
     writeFileSync(reportPath, JSON.stringify(report, null, 2))
+    if (response.status !== status) {
+      console.error('Unexpected preview response', path, (await response.clone().text()).slice(0, 4000))
+    }
     assert.equal(response.status, status, `${method} ${path}`)
     assert.equal(response.headers.get('Set-Cookie'), null, `No session mutation: ${path}`)
     const text = path.endsWith('.png') ? '' : await response.text()
@@ -209,7 +207,7 @@ try {
   writeFileSync(reportPath, JSON.stringify(report, null, 2))
   console.log(`Cloudflare workerd smoke checks passed: ${report.length} public/isolation cases`)
 } finally {
-  globalThis.Date = realDate
+  Date.now = realDateNow
   if (child) try { process.kill(-child.pid, 'SIGTERM') } catch { /* process already exited */ }
   if (log !== null) closeSync(log)
 }
