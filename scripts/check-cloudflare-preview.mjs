@@ -17,6 +17,7 @@ mkdirSync('.codex-tmp', { recursive: true })
 const log = remote ? null : openSync('.codex-tmp/cloudflare-preview.log', 'w')
 const cli = fileURLToPath(new URL('../node_modules/@opennextjs/cloudflare/dist/cli/index.js', import.meta.url))
 const previewConfig = resolve('.codex-tmp/cloudflare-preview.jsonc')
+const realDate = globalThis.Date
 if (!remote) {
   const config = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'))
   assert.equal(config.vars.MIGRATION_READ_ONLY, '1')
@@ -32,6 +33,19 @@ if (!remote) {
     config.vars.CLOUDFLARE_DATA_ENABLED = '1'
   }
   config.main = resolve(config.main)
+  if (!homeOnly) {
+    // The migration preview deliberately uses a dated, expiring saved fixture.
+    // Test it within its validity window without refreshing its public dates.
+    // This generated wrapper is local-only and never packaged for production.
+    const saved = JSON.parse(readFileSync('data/public-directory-saved.json', 'utf8'))
+    const fixtureTime = Date.parse(saved.savedThrough) + 1000
+    assert.ok(Number.isFinite(fixtureTime))
+    const offset = fixtureTime - realDate.now()
+    const entry = JSON.stringify(config.main)
+    config.main = resolve('.codex-tmp/cloudflare-preview-clock.mjs')
+    writeFileSync(config.main, `import worker from ${entry};\nexport { DOQueueHandler } from ${entry};\n(${installFixtureClock.toString()})(${offset});\nexport default worker;\n`)
+    installFixtureClock(offset)
+  }
   config.assets.directory = resolve(config.assets.directory)
   writeFileSync(previewConfig, JSON.stringify(config, null, 2))
 }
@@ -47,6 +61,16 @@ child?.on('error', () => { exited = true })
 const base = remote || 'http://localhost:8788'
 const reportPath = remote ? '.codex-tmp/cloudflare-remote-smoke.json' : '.codex-tmp/cloudflare-smoke.json'
 const report = []
+function installFixtureClock(offset) {
+  const NativeDate = globalThis.Date
+  globalThis.Date = class extends NativeDate {
+    constructor(...args) {
+      if (args.length) super(...args)
+      else super(NativeDate.now() + offset)
+    }
+    static now() { return NativeDate.now() + offset }
+  }
+}
 try {
   const deadline = Date.now() + 180_000
   while (true) {
@@ -185,6 +209,7 @@ try {
   writeFileSync(reportPath, JSON.stringify(report, null, 2))
   console.log(`Cloudflare workerd smoke checks passed: ${report.length} public/isolation cases`)
 } finally {
+  globalThis.Date = realDate
   if (child) try { process.kill(-child.pid, 'SIGTERM') } catch { /* process already exited */ }
   if (log !== null) closeSync(log)
 }
