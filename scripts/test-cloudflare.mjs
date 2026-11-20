@@ -5,9 +5,9 @@ import { dispatchScheduled, migrationResponse, previewHeaders, stagingResponse }
 
 const schedules = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url))).crons
 
-test('production deployment restores account and data services while retiring the preview hostname', () => {
+test('explicit resume configuration restores account and data services while retiring the preview hostname', () => {
   const preview = JSON.parse(readFileSync(new URL('../wrangler.jsonc', import.meta.url)))
-  const production = JSON.parse(readFileSync(new URL('../wrangler.production.jsonc', import.meta.url)))
+  const production = JSON.parse(readFileSync(new URL('../wrangler.active.jsonc', import.meta.url)))
   assert.equal(production.name, preview.name)
   for (const binding of ['d1_databases', 'r2_buckets', 'durable_objects', 'send_email']) {
     assert.deepEqual(production[binding], preview[binding])

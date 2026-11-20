@@ -32,6 +32,18 @@ if (!remote) {
     config.vars.CLOUDFLARE_DATA_ENABLED = '1'
   }
   config.main = resolve(config.main)
+  if (!homeOnly) {
+    // The migration preview deliberately uses a dated, expiring saved fixture.
+    // Test it within its validity window without refreshing its public dates.
+    // This generated wrapper is local-only and never packaged for production.
+    const saved = JSON.parse(readFileSync('data/public-directory-saved.json', 'utf8'))
+    const fixtureTime = Date.parse(saved.savedThrough) + 1000
+    assert.ok(Number.isFinite(fixtureTime))
+    const offset = fixtureTime - Date.now()
+    const entry = JSON.stringify(config.main)
+    config.main = resolve('.codex-tmp/cloudflare-preview-clock.mjs')
+    writeFileSync(config.main, `import worker from ${entry};\nexport { DOQueueHandler } from ${entry};\nexport default (${withSavedDirectoryClock.toString()})(worker, ${offset});\n`)
+  }
   config.assets.directory = resolve(config.assets.directory)
   writeFileSync(previewConfig, JSON.stringify(config, null, 2))
 }
@@ -47,6 +59,20 @@ child?.on('error', () => { exited = true })
 const base = remote || 'http://localhost:8788'
 const reportPath = remote ? '.codex-tmp/cloudflare-remote-smoke.json' : '.codex-tmp/cloudflare-smoke.json'
 const report = []
+function withSavedDirectoryClock(worker, offset) {
+  // Only sequential saved-directory probes need the historical fixture clock.
+  // R2 supplies real last-modified timestamps: cache/invalidation probes must
+  // keep their real clock, as must the host that writes the invalidation tag.
+  const nativeNow = Date.now
+  return {
+    ...worker,
+    fetch(request, ...args) {
+      const savedDirectory = /^\/(?:zh\/)?skills$/.test(new URL(request.url).pathname)
+      Date.now = savedDirectory ? () => nativeNow() + offset : nativeNow
+      return worker.fetch(request, ...args)
+    },
+  }
+}
 try {
   const deadline = Date.now() + 180_000
   while (true) {
@@ -71,6 +97,9 @@ try {
     const response = await fetch(base + path, { method, redirect: 'manual', signal: AbortSignal.timeout(30_000) })
     report.push({ path, method, status: response.status, cache: response.headers.get('x-nextjs-cache') })
     writeFileSync(reportPath, JSON.stringify(report, null, 2))
+    if (response.status !== status) {
+      console.error('Unexpected preview response', path, (await response.clone().text()).slice(0, 4000))
+    }
     assert.equal(response.status, status, `${method} ${path}`)
     assert.equal(response.headers.get('Set-Cookie'), null, `No session mutation: ${path}`)
     const text = path.endsWith('.png') ? '' : await response.text()

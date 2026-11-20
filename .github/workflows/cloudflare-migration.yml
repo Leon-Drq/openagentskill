@@ -32,6 +32,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
+      - name: Validate the reversible low-cost pause
+        run: |
+          node scripts/test-pause.mjs
+          node scripts/check-paused-runtime.mjs
+          pnpm exec wrangler deploy --config wrangler.paused.jsonc --dry-run
       - run: pnpm test:links
       - run: pnpm test
       - run: pnpm test:cloudflare
