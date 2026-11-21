@@ -1,0 +1,13 @@
+/* Interaction adapters only; the page itself uses its original components and CSS. */
+.readonly-home { --font-inter:Inter; --font-geist-mono:"Geist Mono"; }
+.readonly-home-language { display:inline-flex; align-items:center; gap:6px; font-size:12px; }
+.readonly-home-language select { min-height:44px; max-width:80px; background:transparent; cursor:pointer; }
+.readonly-home-mobile summary { list-style:none; }
+.readonly-home-mobile summary::-webkit-details-marker { display:none; }
+.readonly-home-mobile:not([open]) > div { display:none; }
+/* A backdrop filter otherwise confines fixed descendants to the 64px header. */
+.readonly-home header:has([data-home-mobile][open]) { backdrop-filter:none; }
+body.readonly-home:has([data-home-mobile][open]) { overflow:hidden; }
+.readonly-home [data-home-menu-open] { visibility:visible; pointer-events:auto; }
+.readonly-home :focus-visible { outline:2px solid #006b4f; outline-offset:4px; }
+@media (min-width:1280px) { .readonly-home-mobile { display:none; } }

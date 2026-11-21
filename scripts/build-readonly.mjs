@@ -5,6 +5,7 @@ import {createHash,randomUUID} from 'node:crypto'
 import {execFileSync} from 'node:child_process'
 import {loadSnapshot} from '../lib/readonly/snapshot.mjs'
 import {searchable} from '../lib/readonly/search.mjs'
+import {buildReadonlyHome} from '../lib/readonly/home-build.mjs'
 
 const require=createRequire(import.meta.url),wranglerRequire=createRequire(require.resolve('wrangler'))
 const {build}=wranglerRequire('esbuild')
@@ -31,7 +32,13 @@ await fs.writeFile(path.join(root,cssPath),css)
 const client=await build({entryPoints:['components/readonly/reader-client.mjs'],bundle:true,platform:'browser',target:'es2020',minify:true,write:false,logLevel:'warning'})
 const js=client.outputFiles[0].contents,jsPath=`/reader/reader.${sha(js).slice(0,12)}.js`
 await fs.writeFile(path.join(root,jsPath),js)
-const assets={css:cssPath,js:jsPath}
+const home=await buildReadonlyHome(buildRoot)
+const homeCssPath=`/reader/home.${sha(home.css).slice(0,12)}.css`
+await fs.writeFile(path.join(root,homeCssPath),home.css)
+const homeClient=await build({entryPoints:['components/readonly/home-client.mjs'],bundle:true,platform:'browser',target:'es2020',minify:true,write:false,logLevel:'warning'})
+const homeJs=homeClient.outputFiles[0].contents,homeJsPath=`/reader/home.${sha(homeJs).slice(0,12)}.js`
+await fs.writeFile(path.join(root,homeJsPath),homeJs)
+const assets={css:cssPath,js:jsPath,homeCss:homeCssPath,homeJs:homeJsPath}
 const ordered=catalog.skills.map(render.browseRow).sort((a,b)=>(b.quality||0)-(a.quality||0)||a.slug.localeCompare(b.slug))
 const browseBySlug=new Map(ordered.map(row=>[row.slug,row]))
 const indexBuckets=Array.from({length:32},()=>[])
@@ -62,7 +69,7 @@ async function writePage(locale,route,title,description,body,{lastModified=catal
 const posts=render.publicPosts(catalog),ranked=render.rankProjects(ordered,'stars')
 for(const locale of render.languages) {
   const zh=locale==='zh'
-  await writePage(locale,'/',zh?'发现适合你的 Agent Skill':'Discover reusable agent skills',zh?'浏览公开技能、分类、案例与安装说明。':'Browse public agent skills, categories, examples and installation instructions.',render.homeBody(locale,ordered,ranked))
+  await writePage(locale,'/',zh?'AI Agent 的技能层':'Agent Skill Registry & Discovery API',zh?'浏览公开技能、分类、案例与安装说明。':'The skill layer for AI agents. Browse reusable skills, their sources and examples.',home.render.homeBody(locale,ordered,ranked,catalog.capturedAt))
   const totalPages=Math.ceil(ordered.length/render.pageSize)
   for(let page=1;page<=totalPages;page++)await writePage(locale,page===1?'/skills':`/skills/page/${page}`,`${zh?'全部 Agent Skill':'All agent skills'}${page>1?' · '+page:''}`,zh?'搜索和筛选完整公开目录，查看技能来源与安装说明。':'Search and filter the published catalog, inspect sources and installation instructions.',render.directoryBody(locale,ordered,page,searchManifestPath,catalog.capturedAt))
   console.log(`${locale}: directory pages generated (${totalPages})`)
@@ -122,7 +129,7 @@ await fs.writeFile(path.join(root,'_headers'),`/*
   X-OAS-Mode: readonly
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://github.com https://avatars.githubusercontent.com https://launchbuff.com; media-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'
   Cache-Control: public, max-age=300
 /reader/*
   Cache-Control: public, max-age=604800, immutable

@@ -18,6 +18,10 @@ closed. A fixed snapshot does not claim real-time stars, rankings or outcomes.
 The normal application and the reader share the header frame, brand mark and
 design palette. The reader also uses the existing taxonomy, preview licensing,
 example attribution, pricing records, editorial guides and PPT source content.
+The homepage is built directly from the original HomePage composition and its
+Tailwind stylesheet, including the hero, gallery, discovery, ranking, creator
+and directory-listing sections. Build-only adapters replace Next links/images
+and account controls; they do not ship the framework or resume paid services.
 Existing publication states stay distinct; owner/static publication is never
 upgraded to AI approval or runtime verification during export.
 
