@@ -17,6 +17,8 @@ import { SiteHeader } from './site-header'
 import { GitHubPopularityList } from './github-popularity-list'
 
 export interface HomePageEnhancedProps {
+  /** Reuse the same homepage design for a frozen, browser-only catalog. */
+  readOnly?: boolean
   showcase: ReactNode
   creators: ReactNode
   listings: ReactNode
@@ -715,7 +717,7 @@ function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) 
   )
 }
 
-export function HomePageEnhanced({ initialLocale, stats, featuredSkills, rankingGeneratedAt, rankingSource, showcase, creators, listings }: HomePageEnhancedProps) {
+export function HomePageEnhanced({ initialLocale, stats, featuredSkills, rankingGeneratedAt, rankingSource, showcase, creators, listings, readOnly = false }: HomePageEnhancedProps) {
   const { t, locale } = useI18n()
   const activeLocale = initialLocale || locale
   const [taskQuery, setTaskQuery] = useState('')
@@ -740,7 +742,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
     [totalSkillsLabel, stats.totalSkillsExact ? searchCopy.indexed : statsCopy.recordedSkills],
     [stats.evidenceExact ? stats.totalVerifiedInstalls.toLocaleString() : stats.dataPaused ? statsCopy.paused : 'OpenAPI', stats.evidenceExact ? copy.stats[1] : statsCopy.agentApi],
     [stats.evidenceExact ? stats.totalOutcomes.toLocaleString() : stats.dataPaused ? statsCopy.paused : '6h', stats.evidenceExact ? copy.stats[2] : discoveryCopy.sourceRefresh],
-    [stats.evidenceExact ? stats.provenSkills.toLocaleString() : 'OpenAPI', stats.evidenceExact ? copy.stats[3] : discoveryCopy.machineContract],
+    [stats.evidenceExact ? stats.provenSkills.toLocaleString() : readOnly ? statsCopy.paused : 'OpenAPI', stats.evidenceExact ? copy.stats[3] : discoveryCopy.machineContract],
   ]
 
   const handleFindSkills = () => {
@@ -753,6 +755,8 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
   return (
     <div className="min-h-screen bg-[#fbfaf6] text-[#1d1b18]">
       <SiteHeader />
+
+      {readOnly && <p className="border-b border-border bg-[#edf5f0] px-4 py-2 text-center text-xs leading-relaxed text-[#245344]" role="status">{activeLocale === 'zh' ? '浏览与搜索已开放，目录按记录日期展示；自动更新、AI、账户和支付服务暂时关闭。' : 'Browsing and search are open from a dated catalog. Automatic updates, AI, accounts and payments are paused.'}</p>}
 
       <main>
       <section className="relative overflow-hidden border-b border-[#e4e0d8]">
@@ -787,8 +791,10 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
           <div className="mt-9 max-w-3xl">
             <form
               role="search"
+              action={readOnly ? getLocalizedNavigationHref('/skills', activeLocale) : undefined}
+              method={readOnly ? 'get' : undefined}
               aria-label={copy.taskLabel}
-              onSubmit={(event) => { event.preventDefault(); void handleFindSkills() }}
+              onSubmit={readOnly ? undefined : (event) => { event.preventDefault(); void handleFindSkills() }}
               className="flex items-center gap-2 rounded-[10px] border border-[#d8d2c6] bg-[#fffdf8] p-2 shadow-[0_6px_24px_rgba(29,27,24,0.035)] transition-colors focus-within:border-[#006b4f] focus-within:ring-2 focus-within:ring-[#006b4f]/10"
             >
               <label htmlFor="hero-task-query" className="sr-only">{copy.taskLabel}</label>
@@ -796,6 +802,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
               <div className="relative min-w-0 flex-1">
               <input
                 id="hero-task-query"
+                name={readOnly ? 'q' : undefined}
                 type="search"
                 value={taskQuery}
                 onFocus={() => setSearchFocused(true)}
@@ -803,13 +810,13 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
                 onChange={(event) => setTaskQuery(event.target.value)}
                 onKeyDown={(event) => { if (event.key === 'Enter' && event.nativeEvent.isComposing) event.preventDefault() }}
                 placeholder={searchCopy.placeholder}
-                className={`w-full min-w-0 bg-transparent px-2 py-3 text-base text-[#1d1b18] outline-none placeholder:text-[#8b857b] ${!searchFocused && !taskQuery ? 'motion-safe:placeholder:text-transparent' : ''}`}
+                className={`w-full min-w-0 bg-transparent px-2 py-3 text-base text-[#1d1b18] outline-none placeholder:text-[#8b857b] ${!readOnly && !searchFocused && !taskQuery ? 'motion-safe:placeholder:text-transparent' : ''}`}
               />
-              <AnimatedSearchHint key={activeLocale} active={!searchFocused && !taskQuery && !isSearching} placeholder={searchCopy.placeholder} examples={HOME_SEARCH_EXAMPLES[activeLocale]} />
+              {!readOnly && <AnimatedSearchHint key={activeLocale} active={!searchFocused && !taskQuery && !isSearching} placeholder={searchCopy.placeholder} examples={HOME_SEARCH_EXAMPLES[activeLocale]} />}
               </div>
               <button
                 type="submit"
-                disabled={isSearching || !taskQuery.trim()}
+                disabled={!readOnly && (isSearching || !taskQuery.trim())}
                 className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-[6px] bg-[#006b4f] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#005640] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006b4f] disabled:cursor-not-allowed disabled:opacity-50 sm:px-6"
               >
                 {t.hero.findSkills}
@@ -820,7 +827,7 @@ export function HomePageEnhanced({ initialLocale, stats, featuredSkills, ranking
               <Link href={getLocalizedNavigationHref('/skills', activeLocale)} className="inline-flex min-h-10 items-center gap-2 text-[#5f5a52] hover:text-[#006b4f]">
                 {searchCopy.browse}<ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
               </Link>
-              <ConnectAiInline locale={activeLocale} label={searchCopy.connect} />
+              {readOnly ? <span className="inline-flex min-h-10 items-center gap-2 text-[#5f5a52]" aria-disabled="true" title={statsCopy.statisticsPaused}>{searchCopy.connect} · {statsCopy.paused}</span> : <ConnectAiInline locale={activeLocale} label={searchCopy.connect} />}
             </div>
           </div>
 

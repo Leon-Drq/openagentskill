@@ -88,7 +88,7 @@
     "readonly:build": "node scripts/build-readonly.mjs",
     "readonly:refresh": "node --experimental-strip-types scripts/export-readonly-catalog.mjs",
     "readonly:preview": "node scripts/serve-readonly.mjs",
-    "test:readonly": "node --experimental-strip-types scripts/test-readonly.mjs"
+    "test:readonly": "node --experimental-strip-types scripts/test-readonly.mjs && node scripts/test-readonly-home.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
