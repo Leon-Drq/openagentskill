@@ -27,12 +27,12 @@ jobs:
             echo '::error::Configure GALLERY_PUBLISH_TOKEN with Contents read/write for only this repository. The built-in token cannot publish this protected branch.'
             exit 1
           fi
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: main
           token: ${{ secrets.GALLERY_PUBLISH_TOKEN }}
       - run: corepack enable && corepack prepare pnpm@10.28.2 --activate
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
           node-version: 22
           cache: pnpm
@@ -89,7 +89,7 @@ jobs:
         run: git push origin --delete "$CANDIDATE_BRANCH"
       - name: Preserve collection report
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: gallery-sync-report
           path: artifacts/gallery-sync-report.json
@@ -97,7 +97,7 @@ jobs:
           retention-days: 30
       - name: Preserve Skill media collection report
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: skill-media-collection
           path: artifacts/skill-media-collection.json
