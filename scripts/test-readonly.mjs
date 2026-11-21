@@ -62,6 +62,10 @@ assert.match(page,new RegExp(`rel="canonical" href="https://www.openagentskill.c
 assert.ok(!page.includes('</script><script>alert'))
 assert.ok(!page.includes('noindex'))
 assert.ok(!page.includes('next/image'))
+assert.equal(render.categoryMetadata('presentation-generation','zh').localized,false)
+const original=render.postBody('zh',[{slug:'original-text',title:'Original text',summary:'Source text',content:'An original paragraph.',published_at:catalog.capturedAt}],'original-text')
+assert.match(original,/未自动翻译/)
+assert.ok(!original.includes('lang="zh-CN"'),'Untranslated editorial text must not claim a Chinese translation')
 for(const language of render.translatedPostLanguages) {
   const post=render.publicPosts(catalog).find(item=>item.slug===render.translatedPostSlugs[0])
   const meta=render.postMetadata(post,language)

@@ -78,13 +78,13 @@ for(const locale of render.languages) {
   await writePage(locale,'/rankings',zh?'Agent Skill 固定榜单':'Agent skill rankings',zh?'固定目录记录中的项目榜单。':'Project rankings from a fixed published catalog snapshot.',render.rankingBody(locale,ordered))
   for(const [slug,,en,titleZh] of render.rankings)await writePage(locale,`/rankings/${slug}`,zh?titleZh:en,'Fixed catalog snapshot; one entry per repository.',render.rankingBody(locale,ordered,slug))
   await writePage(locale,'/best',zh?'按任务寻找技能':'Skills by task','Task-specific skill shortlists.',render.categoryBody(locale,ordered))
-  for(const slug of render.categoryPages){const meta=render.categoryMetadata(slug,locale);await writePage(locale,`/best/${slug}`,meta.title,meta.description,render.categoryBody(locale,ordered,slug),{lastModified:meta.updatedAt||catalog.capturedAt})}
+  for(const slug of render.categoryPages){const meta=render.categoryMetadata(slug,locale);await writePage(locale,`/best/${slug}`,meta.title,meta.description,render.categoryBody(locale,ordered,slug),{lastModified:meta.updatedAt||catalog.capturedAt,alternates:meta.localized})}
   await writePage(locale,'/showcase',zh?'Skill 效果案例':'Skill examples','Source examples, templates and their original attribution.',render.examplesBody(locale))
   for(const example of render.examplePages())await writePage(locale,`/showcase/${example.slug}`,zh?example.title.zh:example.title.en,zh?example.description.zh:example.description.en,render.examplesBody(locale,example.slug),{lastModified:example.updatedAt,noindex:example.discoveryKind==='source-preview'})
   await writePage(locale,'/blog',zh?'文章与实践笔记':'Articles and practical notes','Published articles and practical skill notes.',render.postBody(locale,posts))
-  for(const post of posts){const meta=render.postMetadata(post,locale);await writePage(locale,`/blog/${post.slug}`,meta.title,meta.description,render.postBody(locale,posts,post.slug),{lastModified:post.updated_at||post.published_at,languageAlternates:meta.languageAlternates})}
+  for(const post of posts){const meta=render.postMetadata(post,locale);await writePage(locale,`/blog/${post.slug}`,meta.title,meta.description,render.postBody(locale,posts,post.slug),{lastModified:post.updated_at||post.published_at,languageAlternates:meta.languageAlternates,alternates:Boolean(meta.languageAlternates)})}
   await writePage(locale,'/guides',zh?'实用技能指南':'Practical skill guides','Source-based guidance for using agent skills.',render.guideBody(locale,ordered))
-  for(const guide of render.guidePages)await writePage(locale,`/guides/${guide.slug}`,guide.title,guide.description,render.guideBody(locale,ordered,guide.slug),{lastModified:guide.updatedAt||catalog.capturedAt})
+  for(const guide of render.guidePages)await writePage(locale,`/guides/${guide.slug}`,guide.title,guide.description,render.guideBody(locale,ordered,guide.slug),{lastModified:guide.updatedAt||catalog.capturedAt,alternates:false})
 }
 for(const slug of render.translatedPostSlugs) {
   const post=posts.find(item=>item.slug===slug)

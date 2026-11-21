@@ -9,6 +9,8 @@ It supports the existing deterministic Chinese task expansions.
 English and Chinese keep their established public detail URLs. Original,
 genuinely translated editorial articles retain their eight language versions.
 Other legacy language routes temporarily redirect to available English pages.
+Untranslated editorial text stays labeled as original text and does not
+advertise translation alternates; existing authored translations retain theirs.
 Missing archive pages return temporary 503 responses, rather than fabricated
 content or permanent 404s. New checkout, login, submissions and write APIs stay
 closed. A fixed snapshot does not claim real-time stars, rankings or outcomes.
