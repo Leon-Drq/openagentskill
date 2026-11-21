@@ -62,4 +62,11 @@ assert.match(page,new RegExp(`rel="canonical" href="https://www.openagentskill.c
 assert.ok(!page.includes('</script><script>alert'))
 assert.ok(!page.includes('noindex'))
 assert.ok(!page.includes('next/image'))
+for(const language of render.translatedPostLanguages) {
+  const post=render.publicPosts(catalog).find(item=>item.slug===render.translatedPostSlugs[0])
+  const meta=render.postMetadata(post,language)
+  const translated=render.documentPage({locale:language==='zh'?'zh':'en',path:`/${language}/blog/${post.slug}`,title:meta.title,description:meta.description,body:'',capturedAt:catalog.capturedAt,assets:{css:'/reader/site.css',js:'/reader/reader.js'},contentLanguage:language,languageAlternates:meta.languageAlternates})
+  assert.ok(translated.includes(`value="${language}" selected=""`),'Header selection must match actual article language')
+  assert.ok(translated.includes(`hreflang="${language==='zh'?'zh-CN':language}"`))
+}
 console.log(`Read-only checks passed: ${catalog.skills.length} public records, exclusion of private/rejected data, search/filters, XSS handling, inactive APIs and deployment cost guards.`)

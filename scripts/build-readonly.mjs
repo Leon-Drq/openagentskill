@@ -25,7 +25,7 @@ render.setPublicSkills(catalog.skills)
 const commit=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()
 const palette=(await fs.readFile('app/globals.css','utf8')).match(/:root\s*\{[\s\S]*?\}/)?.[0]
 if(!palette)throw new Error('Shared site palette is missing')
-const css=palette+'\n'+await fs.readFile(path.join(buildRoot,'render.css'),'utf8')+'\n'+await fs.readFile('components/readonly/reader.css','utf8')
+const css=(palette+'\n'+await fs.readFile(path.join(buildRoot,'render.css'),'utf8')+'\n'+await fs.readFile('components/readonly/reader.css','utf8')).replaceAll('\r\n','\n')
 const cssPath=`/reader/site.${sha(css).slice(0,12)}.css`
 await fs.writeFile(path.join(root,cssPath),css)
 const client=await build({entryPoints:['components/readonly/reader-client.mjs'],bundle:true,platform:'browser',target:'es2020',minify:true,write:false,logLevel:'warning'})

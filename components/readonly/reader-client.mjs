@@ -6,7 +6,8 @@ const path=value=>(locale==='zh'?'/zh':'')+value
 const format=n=>n===null?'—':Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(n)
 document.querySelectorAll('[data-language]').forEach(select=>select.addEventListener('change',()=>{
   const next=new URL(location.href),route=next.pathname.replace(/^\/(en|zh|ja|ko|es|de|fr|id)(?=\/|$)/,'')||'/'
-  next.pathname=(select.value==='zh'?'/zh':'')+(route==='/'?'':route)||'/'
+  const selected=['en','zh','ja','ko','es','de','fr','id'].includes(select.value)?select.value:'en'
+  next.pathname=(selected==='en'?'':'/'+selected)+(route==='/'?'':route)||'/'
   location.assign(next.href)
 }))
 document.querySelectorAll('[data-copy]').forEach(button=>button.addEventListener('click',async()=>{

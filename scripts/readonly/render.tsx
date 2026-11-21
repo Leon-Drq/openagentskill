@@ -60,18 +60,20 @@ function Button({to,children,primary=false}:{to:string;children:React.ReactNode;
   return <a href={to} className={`ro-button${primary?' ro-button-primary':''}`}>{children}</a>
 }
 const shellCache=new Map<string,string>()
-function header(locale:Language) {
-  if(shellCache.has(locale))return shellCache.get(locale)!
+function header(locale:Language,contentLanguage=String(locale),translatedArticle=false) {
+  const cacheKey=locale+':'+contentLanguage+':'+translatedArticle
+  if(shellCache.has(cacheKey))return shellCache.get(cacheKey)!
+  const names:Record<string,string>={en:'English',zh:'中文',ja:'日本語',ko:'한국어',es:'Español',de:'Deutsch',fr:'Français',id:'Indonesia'}
   const items=[['/skills',tx(locale,'Skills','技能目录')],['/rankings',tx(locale,'Rankings','固定榜单')],
     ['/showcase',tx(locale,'Examples','案例')],['/best',tx(locale,'Categories','分类')],['/guides',tx(locale,'Resources','资源')]]
   const links=items.map(([path,label])=><a key={path} href={href(locale,path)}>{label}</a>)
   const result=renderToStaticMarkup(<SiteHeaderFrame brand={<a className="ro-brand" href={href(locale,'/')}><BrandMark className="ro-brandmark"/><span>OpenAgentSkill</span></a>}
     navigation={<nav className="ro-nav" aria-label={tx(locale,'Primary navigation','主导航')}>{links}</nav>}
     actions={<><A to="https://github.com/Leon-Drq/openagentskill" className="ro-github">GitHub</A>
-      <label><span className="ro-sr-only" hidden>{tx(locale,'Language','语言')}</span><select className="ro-language" data-language aria-label={tx(locale,'Language','语言')} defaultValue={locale}><option value="en">English</option><option value="zh">中文</option></select></label>
+      <label><span className="ro-sr-only" hidden>{tx(locale,'Language','语言')}</span><select className="ro-language" data-language aria-label={tx(locale,'Language','语言')} defaultValue={contentLanguage}>{(translatedArticle?BLOG_LOCALES:languages).map(language=><option value={language} key={language}>{names[language]}</option>)}</select></label>
       <noscript><a href={locale==='zh'?'/':'/zh'}>{locale==='zh'?'English':'中文'}</a></noscript>
       <details className="ro-mobile"><summary aria-label={tx(locale,'Open navigation','打开导航')}>☰</summary><nav>{links}</nav></details></>}/> )
-  shellCache.set(locale,result);return result
+  shellCache.set(cacheKey,result);return result
 }
 function footer(locale:Language,capturedAt:string) {
   return renderToStaticMarkup(<footer className="ro-footer"><div className="ro-wrap"><a className="ro-brand" href={href(locale,'/')}><BrandMark className="ro-brandmark"/>OpenAgentSkill</a>
@@ -82,7 +84,7 @@ function footer(locale:Language,capturedAt:string) {
 export function documentPage({locale,path,title,description,body,capturedAt,assets,jsonld,noindex=false,alternates=true,contentLanguage=locale,languageAlternates}:{locale:Language;path:string;title:string;description:string;body:string;capturedAt:string;assets:{css:string;js:string};jsonld?:unknown;noindex?:boolean;alternates?:boolean;contentLanguage?:string;languageAlternates?:Record<string,string>}) {
   const canonical=origin+href(locale,path)
   const alternateLinks=languageAlternates?Object.entries(languageAlternates).map(([lang,url])=>`<link rel="alternate" hreflang="${text(lang)}" href="${text(url)}">`).join(''):alternates?languages.map(lang=>`<link rel="alternate" hreflang="${lang==='zh'?'zh-CN':'en'}" href="${text(origin+href(lang,path))}">`).join('')+`<link rel="alternate" hreflang="x-default" href="${text(origin+href('en',path))}">`:''
-  return `<!doctype html><html lang="${contentLanguage==='zh'?'zh-CN':contentLanguage}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${text(title)} | OpenAgentSkill</title><meta name="description" content="${text(short(description,170))}"><link rel="canonical" href="${text(canonical)}">${noindex?'<meta name="robots" content="noindex,follow">':''}${alternateLinks}<meta property="og:type" content="website"><meta property="og:title" content="${text(title)}"><meta property="og:description" content="${text(short(description,170))}"><meta property="og:url" content="${text(canonical)}"><meta name="twitter:card" content="summary"><link rel="icon" href="/icon.svg"><link rel="stylesheet" href="${assets.css}"><script defer src="${assets.js}"></script>${jsonld?`<script type="application/ld+json">${JSON.stringify(jsonld).replaceAll('<','\\u003c')}</script>`:''}</head><body class="ro-site" data-locale="${locale}"><a class="ro-skip" href="#content">${tx(locale,'Skip to content','跳至正文')}</a>${header(locale)}<div class="ro-notice">${tx(locale,'Browsing is open · Catalog captured','浏览已开放 · 目录记录日期')} ${capturedAt.slice(0,10)} · ${tx(locale,'Automatic updates and account services are paused.','自动更新和账户服务暂时关闭。')}</div><main id="content">${body}</main>${footer(locale,capturedAt)}</body></html>`
+  return `<!doctype html><html lang="${contentLanguage==='zh'?'zh-CN':contentLanguage}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${text(title)} | OpenAgentSkill</title><meta name="description" content="${text(short(description,170))}"><link rel="canonical" href="${text(canonical)}">${noindex?'<meta name="robots" content="noindex,follow">':''}${alternateLinks}<meta property="og:type" content="website"><meta property="og:title" content="${text(title)}"><meta property="og:description" content="${text(short(description,170))}"><meta property="og:url" content="${text(canonical)}"><meta name="twitter:card" content="summary"><link rel="icon" href="/icon.svg"><link rel="stylesheet" href="${assets.css}"><script defer src="${assets.js}"></script>${jsonld?`<script type="application/ld+json">${JSON.stringify(jsonld).replaceAll('<','\\u003c')}</script>`:''}</head><body class="ro-site" data-locale="${locale}"><a class="ro-skip" href="#content">${tx(locale,'Skip to content','跳至正文')}</a>${header(locale,contentLanguage,Boolean(languageAlternates))}<div class="ro-notice">${tx(locale,'Browsing is open · Catalog captured','浏览已开放 · 目录记录日期')} ${capturedAt.slice(0,10)} · ${tx(locale,'Automatic updates and account services are paused.','自动更新和账户服务暂时关闭。')}</div><main id="content">${body}</main>${footer(locale,capturedAt)}</body></html>`
 }
 export function Card({skill,locale}:{skill:BrowseSkill;locale:Language}) {
   return <article className="ro-card">
