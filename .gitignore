@@ -15,6 +15,9 @@ artifacts/
 .vercel
 supabase/.temp/
 .open-next/
+.readonly/
+.readonly-build/
+data/readonly/catalog.json.gz
 .wrangler/
 .dev.vars*
 !.dev.vars.example

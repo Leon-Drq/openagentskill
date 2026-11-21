@@ -48,7 +48,9 @@ jobs:
         run: node scripts/check-public-directory-cache-runtime.mjs
       - run: node --experimental-strip-types scripts/test-agent-connection.mjs
       - name: Build Cloudflare application without production credentials
-        run: pnpm cf:build
+        run: pnpm cf:build --full-app
+      - name: Exercise static reader and disabled services in Workers runtime
+        run: node scripts/check-readonly-runtime.mjs
       - name: Validate Worker packaging without deploying
         run: pnpm exec wrangler deploy --dry-run --outdir .codex-tmp/worker-dry-run
       - name: Validate production bindings and packaging without deploying
@@ -81,4 +83,6 @@ jobs:
           path: |
             .codex-tmp/cloudflare-preview.log
             .codex-tmp/cloudflare-smoke.json
+            .readonly-build/report.json
+            .readonly-build/runtime-acceptance.json
           retention-days: 3

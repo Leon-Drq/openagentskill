@@ -32,10 +32,10 @@ assert.equal((await queue.fetch(new Request('https://www.openagentskill.com/reva
 await sandbox.worker.scheduled()
 const config = JSON.parse(await fs.readFile(new URL('../wrangler.paused.jsonc',import.meta.url)))
 const automatic = JSON.parse(await fs.readFile(new URL('../wrangler.production.jsonc',import.meta.url)))
-assert.equal(automatic.main,config.main,'Automatic deployments must not restart the active application')
+assert.ok(['cloudflare/paused-worker.mjs','cloudflare/readonly-worker.mjs'].includes(automatic.main),'Automatic deployments must not restart the active application')
 assert.equal(automatic.vars.CRON_ENABLED,'0')
 assert.deepEqual(automatic.triggers.crons,[])
-for(const binding of ['d1_databases','r2_buckets','ai','services','send_email','queues'])assert.equal(config[binding],undefined)
+for(const binding of ['d1_databases','r2_buckets','ai','services','send_email','queues']){assert.equal(config[binding],undefined);assert.equal(automatic[binding],undefined)}
 assert.deepEqual(config.triggers.crons,[])
 assert.equal(config.assets.run_worker_first,false)
 assert.equal(config.assets.not_found_handling,'none','Unknown pages must reach 503, never a SPA soft 404')

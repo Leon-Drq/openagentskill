@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
     'artifacts/**',
     '.next/**',
     '.open-next/**',
+    '.readonly/**',
+    '.readonly-build/**',
     '.wrangler/**',
     'out/**',
     'build/**',
