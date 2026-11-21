@@ -5,6 +5,7 @@ import Link from '@/components/crawl-link'
 import { usePathname, useRouter } from 'next/navigation'
 import { ChevronDown } from 'lucide-react'
 import { BrandMark } from '@/components/brand-mark'
+import { SiteHeaderFrame } from '@/components/site-header-frame'
 import { GitHubStarButton } from '@/components/github-star-button'
 import { HeaderNavigationContent } from '@/components/header-navigation-content'
 import { LanguageSwitcher } from '@/components/language-switcher'
@@ -77,13 +78,12 @@ export function SiteHeader() {
   const router = useRouter()
   const [openSection, setOpenSection] = useState<string | null>(null)
 
-  return <header className={styles.header}>
-    <div className={styles.inner}>
+  return <SiteHeaderFrame brand={
       <Link href={getLocalizedNavigationHref('/', locale)} className={styles.brand} aria-label="OpenAgentSkill">
         <BrandMark className="h-7 w-7 text-foreground" />
         <span>OpenAgentSkill</span>
       </Link>
-
+    } navigation={
       <nav className={styles.primaryNav} aria-label={getNavigationCopy(locale).navigation} data-primary-navigation>
         {HEADER_NAVIGATION.map(section => section.items ? (
           <NavDropdown key={section.id} pathname={pathname} section={section} open={openSection === section.id} onOpen={setOpenSection} />
@@ -98,13 +98,10 @@ export function SiteHeader() {
           </Link>
         ))}
       </nav>
-
-      <div className={styles.actions}>
+    } actions={<>
         <div className={styles.desktopUtility}><GitHubStarButton variant="navigation" /></div>
         <LanguageSwitcher showName={false} className={styles.language} />
         <div className={styles.desktopUtility}><NavUserMenu /></div>
         <MobileNav />
-      </div>
-    </div>
-  </header>
+      </>} />
 }

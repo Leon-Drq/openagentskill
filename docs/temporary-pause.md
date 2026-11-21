@@ -39,7 +39,11 @@ the account continue to run and are outside this pause.
 To resume, restore any temporary cache lifecycle changes, build the normal
 application with `pnpm cf:build` and deploy `wrangler.active.jsonc`. To resume
 normal automatic deployments, also explicitly restore the saved active config
-as `wrangler.production.jsonc` and commit that change. Verify
+as `wrangler.production.jsonc` and commit that change. If the static reader is
+installed, use `pnpm cf:build --full-app` for that full application build and
+restore the normal OpenNext production deploy command in `package.json` as
+well; its dedicated read-only deploy command intentionally rejects active
+configurations. See `docs/readonly-site.md`. Verify
 the restored production application before re-enabling its automatic builds
 and the three paused workflows. This deploy restores the normal bindings and
 twenty cron expressions; make sure starting ingestion is intended. If rolling
