@@ -7,9 +7,12 @@ are gated by `NEXT_PUBLIC_STOREFRONT_PREVIEW=true` and all inherit `noindex,nofo
 Do not enable this flag for a production deployment. Public skill URLs, canonical
 metadata, structured data, sitemap, localization and ISR remain unchanged.
 
-The design keeps the existing paper, ink and green palette (#f8f7f3, #20231f,
-#006b4f, #dddbd4, #e8eee3), Inter body and Georgia display type. Original interface
-illustrations show the concept without claiming third-party outputs as products.
+The interface reuses the site's background, foreground, secondary, card, muted
+and border tokens, Inter body and Georgia display type, with the existing
+#006b4f action color. The catalog follows the registry's 1152px container,
+single-column directory heading and search, and the gallery's flat cards.
+Original product illustrations remain separate from the host interface theme;
+they show concepts without claiming third-party outputs as products.
 
 ## Routes and flows
 
