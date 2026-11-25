@@ -9,6 +9,7 @@ import { GitHubStarButton } from '@/components/github-star-button'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { MobileNav } from '@/components/mobile-nav'
 import { CreatorMenuProfile } from '@/components/creator-menu-profile'
+import { StorefrontEntry } from '@/components/storefront/entry'
 import { useI18n } from '@/lib/i18n/context'
 import { getShowcaseNavLabel } from '@/lib/i18n/showcase-label'
 import { getLocalizedNavigationHref } from '@/lib/i18n/market-routing'
@@ -103,6 +104,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex h-full shrink-0 items-center gap-1.5 sm:gap-2">
+          <StorefrontEntry compact />
           <div className="hidden items-center gap-2 xl:flex">
             <GitHubStarButton />
             <Link

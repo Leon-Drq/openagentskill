@@ -8,6 +8,7 @@ import { useEffect, useRef, useSyncExternalStore, useTransition, type ReactNode 
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
+import { StorefrontEntry } from './storefront/entry'
 import type { SupplyTrackSummary } from '@/lib/supply'
 
 interface AgentStats {
@@ -261,6 +262,7 @@ export function SkillsPageClient(props: Props) {
             <button type="submit" disabled={pending} className="shrink-0 bg-[#006b4f] px-4 py-3 text-sm font-semibold text-white hover:bg-[#00533d] disabled:opacity-50 sm:px-6">{c.search}</button>
           </form>
           <nav aria-label={label('browseMode')} className="mt-6 flex flex-wrap gap-3" data-directory-modes>
+            <StorefrontEntry />
             {(['skills', 'all'] as const).map(mode => <Link key={mode} prefetch={false}
               href={href({ view: mode, q: undefined, useCase: undefined, platform: undefined, quality: undefined, trust: undefined, safety: undefined, track: undefined })}
               aria-current={props.view === mode && !query ? 'page' : undefined}
