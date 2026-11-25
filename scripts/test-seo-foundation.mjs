@@ -1,3 +1,4 @@
+await import('./test-blog-availability.mjs')
 await import('./test-sitemap-recovery.mjs')
 await import('./test-presentation-seo.mjs')
 import assert from 'node:assert/strict'

@@ -5,6 +5,7 @@
  * using Vercel AI Gateway.
  */
 
+import { cache } from 'react'
 import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { STATIC_BLOG_POSTS, getStaticBlogPostBySlug } from '@/lib/blog/static-posts'
@@ -44,7 +45,7 @@ interface BlogSkillRow extends BlogSkillPreview {
   frameworks: string[]
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ������ Helpers ������������������������������������������������������������������������������������������������������������������������������������
 
 function buildBlogSlug(skillSlug: string): string {
   return `introducing-${skillSlug}`
@@ -113,7 +114,7 @@ async function fetchApprovedSkillCount() {
   return count
 }
 
-// ─── AI Content Generator ─────────────────────────────────────────────────────
+// ������ AI Content Generator ����������������������������������������������������������������������������������������������������������
 
 async function generateBlogContent(skill: {
   slug: string
@@ -130,7 +131,7 @@ async function generateBlogContent(skill: {
   throw new Error('Per-skill AI blog generation is retired. Use the reviewed weekly editorial queue (20 slots/week).')
 }
 
-// ─── Main Entry Point ─────────────────────────────────────────────────────────
+// ������ Main Entry Point ������������������������������������������������������������������������������������������������������������������
 
 export async function generateBlogPostForSkill(skillId: string): Promise<BlogGenerateResult> {
   const supabase = createAdminClient()
@@ -180,7 +181,7 @@ export async function generateBlogPostForSkill(skillId: string): Promise<BlogGen
   }
 }
 
-// ─── Fetch helpers for pages ──────────────────────────────────────────────────
+// ������ Fetch helpers for pages ����������������������������������������������������������������������������������������������������
 
 export async function getBlogPosts(limit = 20) {
   const supabase = createPublicClient()
@@ -203,7 +204,9 @@ export async function getBlogPosts(limit = 20) {
   return mergedPosts.slice(0, limit)
 }
 
-export async function getBlogPostBySlug(slug: string) {
+// Metadata and page content share one read within a render. In particular they
+// must not disagree about existence when the upstream service is unavailable.
+export const getBlogPostBySlug = cache(async (slug: string) => {
   const supabase = createPublicClient()
   const { data, error } = await supabase
     .from('blog_posts')
@@ -212,11 +215,18 @@ export async function getBlogPostBySlug(slug: string) {
       skills ( slug, name, category, github_stars, author_name, github_repo, install_command, tags )
     `)
     .eq('slug', slug)
-    .single()
+    .maybeSingle()
 
-  if (error) return getStaticBlogPostBySlug(slug)
-  return data
-}
+  const staticPost = getStaticBlogPostBySlug(slug)
+  if (error) {
+    // Only a successful zero-row lookup proves absence. Quota restrictions,
+    // timeouts and permission failures must not become 404 + robots noindex.
+    // Known static articles remain available without inventing missing content.
+    if (staticPost) return staticPost
+    throw new Error('Blog content is temporarily unavailable')
+  }
+  return data ?? staticPost
+})
 
 export async function getBlogHubData(): Promise<BlogHubData> {
   let rows: BlogSkillRow[] = []
