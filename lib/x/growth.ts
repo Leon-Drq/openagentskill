@@ -26,7 +26,8 @@ import {
   isGoodXCandidate,
 } from '@/lib/x/candidates'
 import { buildXShortlist, getXShortlistEdition, getXShortlistLaneForDate } from '@/lib/x/shortlist'
-import { createXTrackingCode, X_GROWTH_EXPERIMENT_ID } from '@/lib/x/attribution'
+import { buildXTrackingUrl, createXTrackingCode, X_GROWTH_EXPERIMENT_ID } from '@/lib/x/attribution'
+import { buildXEditorialDraft, queuedEditorialSkipReason } from '@/lib/x/editorial'
 
 type SupabasePublicClient = ReturnType<typeof createPublicClient>
 
@@ -365,7 +366,16 @@ export async function enqueueXDigestPostQueue(
       experimentId,
     },
   })
-  if (shortlist.picks.length < 3) {
+  const editorial = buildXEditorialDraft(shortlist.picks.map(({ skill }) => ({
+    slug: skill.slug,
+    name: skill.name,
+    description: skill.description || skill.long_description || '',
+    githubRepo: skill.github_repo || undefined,
+    url: buildXTrackingUrl(`/skills/${encodeURIComponent(skill.slug)}`, {
+      campaign, content: trackingCode, experimentId,
+    }),
+  })))
+  if (!editorial) {
     return { status: 'skipped', queued: 0, skipped: 1, considered: candidates.length, results: [] }
   }
 
@@ -381,28 +391,31 @@ export async function enqueueXDigestPostQueue(
       // of any explicit, manually queued creator announcement.
       priority: 300,
       scheduled_for: new Date().toISOString(),
-      post_text: shortlist.mainText,
-      reply_text: shortlist.replyText,
+      post_text: editorial.mainText,
+      reply_text: editorial.replyText,
       source: 'editorial_shortlist_generator',
       metadata: {
         generated_by: 'x_growth_os',
         digest_type: 'task_shortlist',
-        content_format: 'scenario_shortlist',
+        content_format: 'skill_spotlight',
+        editorial_snapshot: editorial,
         experiment_id: experimentId,
         experiment_topic: `${lane}-${edition}`,
         tracking_code: trackingCode,
-        tracking_url: shortlist.url,
-        expected_action: 'shortlist_visit_then_skill_install',
+        tracking_url: editorial.picks[0].url,
+        expected_action: 'skill_visit_then_install',
         auto_thread_reply: true,
         lane: shortlist.lane,
         edition: shortlist.edition,
         shortlist_url: shortlist.url,
-        share_assets: shortlist.shareAssets,
-        skills: shortlist.picks.map((pick) => ({
+        // Live shortlist OG images can show a different set of skills later.
+        // Do not advertise those images as media for this frozen draft.
+        share_assets: [],
+        skills: shortlist.picks.filter((pick) => editorial.picks.some((featured) => featured.slug === pick.skill.slug)).map((pick) => ({
           slug: pick.skill.slug,
           name: pick.skill.name,
           role: pick.role,
-          reason: pick.reason,
+          reason: editorial.picks[0].description,
           stars: pick.skill.github_stars,
           quality_score: pick.qualityScore,
         })),
@@ -700,6 +713,8 @@ export async function postNextCreatorReplyToX(): Promise<XCreatorReplyPostResult
 }
 
 function getQueuedSkillSkipReason(item: XContentQueueItem) {
+  const editorialReason = queuedEditorialSkipReason(item)
+  if (editorialReason) return editorialReason
   if (item.content_type !== 'skill_pick') return null
 
   const metadata = item.metadata || {}
